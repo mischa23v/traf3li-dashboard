@@ -1,14 +1,14 @@
-import { useState } from 'react'
-import { z } from 'zod'
+/**
+ * User Authentication Form (Sign In)
+ * Connects to Traf3li backend for authentication
+ */
+
+import { HTMLAttributes, useState } from 'react'
+import { useNavigate } from '@tanstack/react-router'
 import { useForm } from 'react-hook-form'
+import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Link, useNavigate } from '@tanstack/react-router'
-import { Loader2, LogIn } from 'lucide-react'
-import { toast } from 'sonner'
-import { IconFacebook, IconGithub } from '@/assets/brand-icons'
-import { useAuthStore } from '@/stores/auth-store'
-import { sleep, cn } from '@/lib/utils'
-import { Button } from '@/components/ui/button'
+import { IconBrandGithub, IconBrandGoogle } from '@tabler/icons-react'
 import {
   Form,
   FormControl,
@@ -18,133 +18,182 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
 import { PasswordInput } from '@/components/password-input'
+import { cn } from '@/lib/utils'
+import { useAuthStore } from '@/stores/auth-store'
 
+interface UserAuthFormProps extends HTMLAttributes<HTMLDivElement> {}
+
+/**
+ * Form validation schema
+ */
 const formSchema = z.object({
-  email: z.email({
-    error: (iss) => (iss.input === '' ? 'Please enter your email' : undefined),
-  }),
+  username: z
+    .string()
+    .min(1, { message: 'الرجاء إدخال اسم المستخدم أو البريد الإلكتروني' }),
   password: z
     .string()
-    .min(1, 'Please enter your password')
-    .min(7, 'Password must be at least 7 characters long'),
+    .min(1, { message: 'الرجاء إدخال كلمة المرور' })
+    .min(6, { message: 'كلمة المرور يجب أن تكون 6 أحرف على الأقل' }),
 })
 
-interface UserAuthFormProps extends React.HTMLAttributes<HTMLFormElement> {
-  redirectTo?: string
-}
-
-export function UserAuthForm({
-  className,
-  redirectTo,
-  ...props
-}: UserAuthFormProps) {
-  const [isLoading, setIsLoading] = useState(false)
+export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
   const navigate = useNavigate()
-  const { auth } = useAuthStore()
+  const { login, error: authError, clearError } = useAuthStore()
+  const [isLoading, setIsLoading] = useState(false)
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      email: '',
+      username: '',
       password: '',
     },
   })
 
-  function onSubmit(data: z.infer<typeof formSchema>) {
+  /**
+   * Handle form submission
+   */
+  async function onSubmit(data: z.infer<typeof formSchema>) {
     setIsLoading(true)
+    clearError()
 
-    toast.promise(sleep(2000), {
-      loading: 'Signing in...',
-      success: () => {
-        setIsLoading(false)
+    try {
+      await login(data)
 
-        // Mock successful authentication with expiry computed at success time
-        const mockUser = {
-          accountNo: 'ACC001',
-          email: data.email,
-          role: ['user'],
-          exp: Date.now() + 24 * 60 * 60 * 1000, // 24 hours from now
-        }
+      // Get user from store to determine redirect
+      const user = useAuthStore.getState().user
 
-        // Set user and access token
-        auth.setUser(mockUser)
-        auth.setAccessToken('mock-access-token')
+      if (!user) {
+        throw new Error('فشل تسجيل الدخول')
+      }
 
-        // Redirect to the stored location or default to dashboard
-        const targetPath = redirectTo || '/'
-        navigate({ to: targetPath, replace: true })
-
-        return `Welcome back, ${data.email}!`
-      },
-      error: 'Error',
-    })
+      // Redirect based on role
+      if (user.role === 'admin') {
+        navigate({ to: '/users' })
+      } else if (user.role === 'lawyer') {
+        navigate({ to: '/' }) // Dashboard home
+      } else {
+        navigate({ to: '/' }) // Client dashboard
+      }
+    } catch (error: any) {
+      console.error('Login error:', error)
+      // Error is handled by the store
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   return (
-    <Form {...form}>
-      <form
-        onSubmit={form.handleSubmit(onSubmit)}
-        className={cn('grid gap-3', className)}
-        {...props}
-      >
-        <FormField
-          control={form.control}
-          name='email'
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Email</FormLabel>
-              <FormControl>
-                <Input placeholder='name@example.com' {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name='password'
-          render={({ field }) => (
-            <FormItem className='relative'>
-              <FormLabel>Password</FormLabel>
-              <FormControl>
-                <PasswordInput placeholder='********' {...field} />
-              </FormControl>
-              <FormMessage />
-              <Link
-                to='/forgot-password'
-                className='text-muted-foreground absolute end-0 -top-0.5 text-sm font-medium hover:opacity-75'
+    <div className={cn('grid gap-6', className)} {...props}>
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)}>
+          <div className='grid gap-4'>
+            {/* Username/Email Field */}
+            <FormField
+              control={form.control}
+              name='username'
+              render={({ field }) => (
+                <FormItem className='space-y-1'>
+                  <FormLabel>اسم المستخدم أو البريد الإلكتروني</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder='ahmad_salem أو ahmad@example.com'
+                      dir='auto'
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {/* Password Field */}
+            <FormField
+              control={form.control}
+              name='password'
+              render={({ field }) => (
+                <FormItem className='space-y-1'>
+                  <div className='flex items-center justify-between'>
+                    <FormLabel>كلمة المرور</FormLabel>
+                    <Button
+                      variant='link'
+                      className='h-auto p-0 text-sm font-normal'
+                      onClick={() => navigate({ to: '/forgot-password' })}
+                      type='button'
+                    >
+                      نسيت كلمة المرور؟
+                    </Button>
+                  </div>
+                  <FormControl>
+                    <PasswordInput placeholder='••••••••' {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {/* Display API Error */}
+            {authError && (
+              <div className='rounded-md bg-destructive/15 p-3 text-sm text-destructive'>
+                {authError}
+              </div>
+            )}
+
+            {/* Submit Button */}
+            <Button type='submit' className='mt-2' disabled={isLoading}>
+              {isLoading ? 'جارٍ تسجيل الدخول...' : 'تسجيل الدخول'}
+            </Button>
+
+            {/* Divider */}
+            <div className='relative my-2'>
+              <div className='absolute inset-0 flex items-center'>
+                <span className='w-full border-t' />
+              </div>
+              <div className='relative flex justify-center text-xs uppercase'>
+                <span className='bg-background px-2 text-muted-foreground'>
+                  أو تابع بـ
+                </span>
+              </div>
+            </div>
+
+            {/* Social Login Buttons */}
+            <div className='flex gap-2'>
+              <Button
+                variant='outline'
+                className='w-full'
+                type='button'
+                disabled={isLoading}
               >
-                Forgot password?
-              </Link>
-            </FormItem>
-          )}
-        />
-        <Button className='mt-2' disabled={isLoading}>
-          {isLoading ? <Loader2 className='animate-spin' /> : <LogIn />}
-          Sign in
+                <IconBrandGithub className='mr-2 h-4 w-4' />
+                GitHub
+              </Button>
+              <Button
+                variant='outline'
+                className='w-full'
+                type='button'
+                disabled={isLoading}
+              >
+                <IconBrandGoogle className='mr-2 h-4 w-4' />
+                Google
+              </Button>
+            </div>
+          </div>
+        </form>
+      </Form>
+
+      {/* Sign Up Link */}
+      <p className='text-center text-sm text-muted-foreground'>
+        ليس لديك حساب؟{' '}
+        <Button
+          variant='link'
+          className='h-auto p-0 font-semibold underline-offset-4 hover:underline'
+          onClick={() => navigate({ to: '/sign-up' })}
+          type='button'
+        >
+          سجل الآن
         </Button>
-
-        <div className='relative my-2'>
-          <div className='absolute inset-0 flex items-center'>
-            <span className='w-full border-t' />
-          </div>
-          <div className='relative flex justify-center text-xs uppercase'>
-            <span className='bg-background text-muted-foreground px-2'>
-              Or continue with
-            </span>
-          </div>
-        </div>
-
-        <div className='grid grid-cols-2 gap-2'>
-          <Button variant='outline' type='button' disabled={isLoading}>
-            <IconGithub className='h-4 w-4' /> GitHub
-          </Button>
-          <Button variant='outline' type='button' disabled={isLoading}>
-            <IconFacebook className='h-4 w-4' /> Facebook
-          </Button>
-        </div>
-      </form>
-    </Form>
+      </p>
+    </div>
   )
 }
