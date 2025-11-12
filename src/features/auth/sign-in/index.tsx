@@ -24,7 +24,7 @@ export function SignIn() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <UserAuthForm redirectTo={redirect} />
+          <UserAuthForm />
         </CardContent>
         <CardFooter>
           <p className='text-muted-foreground px-8 text-center text-sm'>
