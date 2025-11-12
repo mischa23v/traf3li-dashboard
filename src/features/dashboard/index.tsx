@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
 import {
   Card,
@@ -20,6 +21,35 @@ import { Overview } from './components/overview'
 import { RecentSales } from './components/recent-sales'
 
 export function Dashboard() {
+  const { t } = useTranslation()
+
+  const topNav = [
+    {
+      title: t('dashboard.topNav.overview'),
+      href: 'dashboard/overview',
+      isActive: true,
+      disabled: false,
+    },
+    {
+      title: t('dashboard.topNav.customers'),
+      href: 'dashboard/customers',
+      isActive: false,
+      disabled: true,
+    },
+    {
+      title: t('dashboard.topNav.products'),
+      href: 'dashboard/products',
+      isActive: false,
+      disabled: true,
+    },
+    {
+      title: t('dashboard.topNav.settings'),
+      href: 'dashboard/settings',
+      isActive: false,
+      disabled: true,
+    },
+  ]
+
   return (
     <>
       {/* ===== Top Heading ===== */}
@@ -37,9 +67,9 @@ export function Dashboard() {
       {/* ===== Main ===== */}
       <Main>
         <div className='mb-2 flex items-center justify-between space-y-2'>
-          <h1 className='text-2xl font-bold tracking-tight'>Dashboard</h1>
+          <h1 className='text-2xl font-bold tracking-tight'>{t('dashboard.title')}</h1>
           <div className='flex items-center space-x-2'>
-            <Button>Download</Button>
+            <Button>{t('dashboard.download')}</Button>
           </div>
         </div>
         <Tabs
@@ -49,13 +79,13 @@ export function Dashboard() {
         >
           <div className='w-full overflow-x-auto pb-2'>
             <TabsList>
-              <TabsTrigger value='overview'>Overview</TabsTrigger>
-              <TabsTrigger value='analytics'>Analytics</TabsTrigger>
+              <TabsTrigger value='overview'>{t('dashboard.tabs.overview')}</TabsTrigger>
+              <TabsTrigger value='analytics'>{t('dashboard.tabs.analytics')}</TabsTrigger>
               <TabsTrigger value='reports' disabled>
-                Reports
+                {t('dashboard.tabs.reports')}
               </TabsTrigger>
               <TabsTrigger value='notifications' disabled>
-                Notifications
+                {t('dashboard.tabs.notifications')}
               </TabsTrigger>
             </TabsList>
           </div>
@@ -64,7 +94,7 @@ export function Dashboard() {
               <Card>
                 <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
                   <CardTitle className='text-sm font-medium'>
-                    Total Revenue
+                    {t('dashboard.stats.totalRevenue.title')}
                   </CardTitle>
                   <svg
                     xmlns='http://www.w3.org/2000/svg'
@@ -80,16 +110,16 @@ export function Dashboard() {
                   </svg>
                 </CardHeader>
                 <CardContent>
-                  <div className='text-2xl font-bold'>$45,231.89</div>
+                  <div className='text-2xl font-bold'>{t('dashboard.stats.totalRevenue.value')}</div>
                   <p className='text-muted-foreground text-xs'>
-                    +20.1% from last month
+                    {t('dashboard.stats.totalRevenue.change')}
                   </p>
                 </CardContent>
               </Card>
               <Card>
                 <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
                   <CardTitle className='text-sm font-medium'>
-                    Subscriptions
+                    {t('dashboard.stats.subscriptions.title')}
                   </CardTitle>
                   <svg
                     xmlns='http://www.w3.org/2000/svg'
@@ -107,15 +137,15 @@ export function Dashboard() {
                   </svg>
                 </CardHeader>
                 <CardContent>
-                  <div className='text-2xl font-bold'>+2350</div>
+                  <div className='text-2xl font-bold'>{t('dashboard.stats.subscriptions.value')}</div>
                   <p className='text-muted-foreground text-xs'>
-                    +180.1% from last month
+                    {t('dashboard.stats.subscriptions.change')}
                   </p>
                 </CardContent>
               </Card>
               <Card>
                 <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-                  <CardTitle className='text-sm font-medium'>Sales</CardTitle>
+                  <CardTitle className='text-sm font-medium'>{t('dashboard.stats.sales.title')}</CardTitle>
                   <svg
                     xmlns='http://www.w3.org/2000/svg'
                     viewBox='0 0 24 24'
@@ -131,16 +161,16 @@ export function Dashboard() {
                   </svg>
                 </CardHeader>
                 <CardContent>
-                  <div className='text-2xl font-bold'>+12,234</div>
+                  <div className='text-2xl font-bold'>{t('dashboard.stats.sales.value')}</div>
                   <p className='text-muted-foreground text-xs'>
-                    +19% from last month
+                    {t('dashboard.stats.sales.change')}
                   </p>
                 </CardContent>
               </Card>
               <Card>
                 <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
                   <CardTitle className='text-sm font-medium'>
-                    Active Now
+                    {t('dashboard.stats.activeNow.title')}
                   </CardTitle>
                   <svg
                     xmlns='http://www.w3.org/2000/svg'
@@ -156,9 +186,9 @@ export function Dashboard() {
                   </svg>
                 </CardHeader>
                 <CardContent>
-                  <div className='text-2xl font-bold'>+573</div>
+                  <div className='text-2xl font-bold'>{t('dashboard.stats.activeNow.value')}</div>
                   <p className='text-muted-foreground text-xs'>
-                    +201 since last hour
+                    {t('dashboard.stats.activeNow.change')}
                   </p>
                 </CardContent>
               </Card>
@@ -166,7 +196,7 @@ export function Dashboard() {
             <div className='grid grid-cols-1 gap-4 lg:grid-cols-7'>
               <Card className='col-span-1 lg:col-span-4'>
                 <CardHeader>
-                  <CardTitle>Overview</CardTitle>
+                  <CardTitle>{t('dashboard.overview.title')}</CardTitle>
                 </CardHeader>
                 <CardContent className='ps-2'>
                   <Overview />
@@ -174,9 +204,9 @@ export function Dashboard() {
               </Card>
               <Card className='col-span-1 lg:col-span-3'>
                 <CardHeader>
-                  <CardTitle>Recent Sales</CardTitle>
+                  <CardTitle>{t('dashboard.overview.recentSales')}</CardTitle>
                   <CardDescription>
-                    You made 265 sales this month.
+                    {t('dashboard.overview.salesThisMonth')}
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -193,30 +223,3 @@ export function Dashboard() {
     </>
   )
 }
-
-const topNav = [
-  {
-    title: 'Overview',
-    href: 'dashboard/overview',
-    isActive: true,
-    disabled: false,
-  },
-  {
-    title: 'Customers',
-    href: 'dashboard/customers',
-    isActive: false,
-    disabled: true,
-  },
-  {
-    title: 'Products',
-    href: 'dashboard/products',
-    isActive: false,
-    disabled: true,
-  },
-  {
-    title: 'Settings',
-    href: 'dashboard/settings',
-    isActive: false,
-    disabled: true,
-  },
-]
