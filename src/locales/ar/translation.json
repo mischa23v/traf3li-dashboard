@@ -6,7 +6,9 @@
       "acmeInc": "شركة أكمي",
       "enterprise": "مؤسسة",
       "acmeCorp": "شركة أكمي",
-      "startup": "شركة ناشئة"
+      "startup": "شركة ناشئة",
+      "teams": "الفرق",
+      "addTeam": "إضافة فريق"
     },
     "general": "عام",
     "dashboard": "لوحة التحكم",
@@ -229,9 +231,12 @@
     "dropdown": {
       "username": "satnaing",
       "email": "satnaingdev@gmail.com",
+      "upgradeToPro": "الترقية إلى Pro",
+      "account": "الحساب",
+      "billing": "الفواتير",
+      "notifications": "الإشعارات",
       "profile": "الملف الشخصي",
       "profileShortcut": "⇧⌘P",
-      "billing": "الفواتير",
       "billingShortcut": "⌘B",
       "settings": "الإعدادات",
       "settingsShortcut": "⌘S",

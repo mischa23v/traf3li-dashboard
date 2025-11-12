@@ -6,7 +6,9 @@
       "acmeInc": "Acme Inc",
       "enterprise": "Enterprise",
       "acmeCorp": "Acme Corp.",
-      "startup": "Startup"
+      "startup": "Startup",
+      "teams": "Teams",
+      "addTeam": "Add team"
     },
     "general": "General",
     "dashboard": "Dashboard",
@@ -229,9 +231,12 @@
     "dropdown": {
       "username": "satnaing",
       "email": "satnaingdev@gmail.com",
+      "upgradeToPro": "Upgrade to Pro",
+      "account": "Account",
+      "billing": "Billing",
+      "notifications": "Notifications",
       "profile": "Profile",
       "profileShortcut": "⇧⌘P",
-      "billing": "Billing",
       "billingShortcut": "⌘B",
       "settings": "Settings",
       "settingsShortcut": "⌘S",
