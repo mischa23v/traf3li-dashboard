@@ -1,53 +1,44 @@
 import { createContext, useContext, useEffect, useState } from 'react'
 import { DirectionProvider as RdxDirProvider } from '@radix-ui/react-direction'
-import { getCookie, setCookie, removeCookie } from '@/lib/cookies'
+import { useTranslation } from 'react-i18next'
 
 export type Direction = 'ltr' | 'rtl'
 
-const DEFAULT_DIRECTION = 'ltr'
-const DIRECTION_COOKIE_NAME = 'dir'
-const DIRECTION_COOKIE_MAX_AGE = 60 * 60 * 24 * 365 // 1 year
-
 type DirectionContextType = {
-  defaultDir: Direction
   dir: Direction
-  setDir: (dir: Direction) => void
-  resetDir: () => void
 }
 
 const DirectionContext = createContext<DirectionContextType | null>(null)
 
 export function DirectionProvider({ children }: { children: React.ReactNode }) {
-  const [dir, _setDir] = useState<Direction>(
-    () => (getCookie(DIRECTION_COOKIE_NAME) as Direction) || DEFAULT_DIRECTION
+  const { i18n } = useTranslation()
+  const [dir, setDir] = useState<Direction>(() => 
+    i18n.language === 'ar' ? 'rtl' : 'ltr'
   )
 
   useEffect(() => {
-    const htmlElement = document.documentElement
-    htmlElement.setAttribute('dir', dir)
-  }, [dir])
+    // Sync direction with i18n language changes
+    const updateDirection = (lng: string) => {
+      const newDir = lng === 'ar' ? 'rtl' : 'ltr'
+      setDir(newDir)
+      document.documentElement.setAttribute('dir', newDir)
+    }
 
-  const setDir = (dir: Direction) => {
-    _setDir(dir)
-    setCookie(DIRECTION_COOKIE_NAME, dir, DIRECTION_COOKIE_MAX_AGE)
-  }
+    // Set initial direction
+    updateDirection(i18n.language)
 
-  const resetDir = () => {
-    _setDir(DEFAULT_DIRECTION)
-    removeCookie(DIRECTION_COOKIE_NAME)
-  }
+    // Listen to language changes
+    i18n.on('languageChanged', updateDirection)
+
+    return () => {
+      i18n.off('languageChanged', updateDirection)
+    }
+  }, [i18n])
 
   return (
-    <DirectionContext
-      value={{
-        defaultDir: DEFAULT_DIRECTION,
-        dir,
-        setDir,
-        resetDir,
-      }}
-    >
+    <DirectionContext.Provider value={{ dir }}>
       <RdxDirProvider dir={dir}>{children}</RdxDirProvider>
-    </DirectionContext>
+    </DirectionContext.Provider>
   )
 }
 
