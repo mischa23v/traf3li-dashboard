@@ -1,0 +1,292 @@
+{
+  "sidebar": {
+    "teamSwitcher": {
+      "shadcnAdmin": "إدارة شادسن",
+      "viteShadcnUI": "فايت + شادسن UI",
+      "acmeInc": "شركة أكمي",
+      "enterprise": "مؤسسة",
+      "acmeCorp": "شركة أكمي",
+      "startup": "شركة ناشئة"
+    },
+    "general": "عام",
+    "dashboard": "لوحة التحكم",
+    "tasks": "المهام",
+    "apps": "التطبيقات",
+    "chats": "المحادثات",
+    "users": "المستخدمون",
+    "securedByClerk": "محمي بواسطة Clerk",
+    "pages": "الصفحات",
+    "auth": "المصادقة",
+    "signIn": "تسجيل الدخول",
+    "signIn2Col": "تسجيل الدخول (عمودين)",
+    "signUp": "إنشاء حساب",
+    "forgotPassword": "نسيت كلمة المرور",
+    "otp": "رمز التحقق",
+    "errors": "الأخطاء",
+    "unauthorized": "غير مصرح",
+    "forbidden": "محظور",
+    "notFound": "غير موجود",
+    "internalServerError": "خطأ في الخادم",
+    "maintenanceError": "خطأ الصيانة",
+    "other": "أخرى",
+    "settings": "الإعدادات",
+    "profile": "الملف الشخصي",
+    "account": "الحساب",
+    "appearance": "المظهر",
+    "notifications": "الإشعارات",
+    "display": "العرض",
+    "helpCenter": "مركز المساعدة"
+  },
+  "auth": {
+    "signIn": {
+      "title": "تسجيل الدخول",
+      "subtitle": "أدخل بريدك الإلكتروني وكلمة المرور أدناه",
+      "toLogIn": "لتسجيل الدخول إلى حسابك",
+      "termsPrefix": "بالنقر على تسجيل الدخول، فإنك توافق على",
+      "termsOfService": "شروط الخدمة",
+      "and": "و",
+      "privacyPolicy": "سياسة الخصوصية",
+      "email": "البريد الإلكتروني",
+      "emailPlaceholder": "name@example.com",
+      "password": "كلمة المرور",
+      "passwordPlaceholder": "********",
+      "forgotPassword": "نسيت كلمة المرور؟",
+      "signInButton": "تسجيل الدخول",
+      "signingIn": "جاري تسجيل الدخول...",
+      "orContinueWith": "أو المتابعة باستخدام",
+      "github": "GitHub",
+      "facebook": "Facebook",
+      "validation": {
+        "emailRequired": "الرجاء إدخال بريدك الإلكتروني",
+        "passwordRequired": "الرجاء إدخال كلمة المرور",
+        "passwordMinLength": "يجب أن تتكون كلمة المرور من 7 أحرف على الأقل"
+      },
+      "welcomeBack": "مرحباً بعودتك، {{email}}!",
+      "error": "خطأ"
+    }
+  },
+  "settings": {
+    "title": "الإعدادات",
+    "description": "إدارة إعدادات حسابك وتفضيلات البريد الإلكتروني.",
+    "tabs": {
+      "profile": "الملف الشخصي",
+      "account": "الحساب",
+      "appearance": "المظهر",
+      "notifications": "الإشعارات",
+      "display": "العرض"
+    },
+    "profile": {
+      "username": "اسم المستخدم",
+      "usernamePlaceholder": "shadcn",
+      "usernameDescription": "هذا هو اسم العرض العام الخاص بك. يمكن أن يكون اسمك الحقيقي أو اسماً مستعاراً. يمكنك تغيير هذا مرة واحدة فقط كل 30 يوماً.",
+      "email": "البريد الإلكتروني",
+      "emailDescription": "اختر بريداً إلكترونياً تم التحقق منه لعرضه",
+      "emailExample1": "m@example.com",
+      "emailExample2": "m@google.com",
+      "emailExample3": "m@support.com",
+      "emailSettingsLink": "يمكنك إدارة عناوين البريد الإلكتروني التي تم التحقق منها في",
+      "emailSettings": "إعدادات البريد الإلكتروني",
+      "bio": "السيرة الذاتية",
+      "bioPlaceholder": "أخبرنا قليلاً عن نفسك",
+      "bioDescription": "يمكنك @الإشارة إلى مستخدمين ومؤسسات أخرى للربط بهم.",
+      "bioDefault": "أنا أمتلك جهاز كمبيوتر.",
+      "urls": "الروابط",
+      "urlsDescription": "أضف روابط إلى موقعك الإلكتروني أو مدونتك أو ملفات التواصل الاجتماعي الخاصة بك.",
+      "addUrl": "إضافة رابط",
+      "updateProfile": "تحديث الملف الشخصي",
+      "validation": {
+        "usernameRequired": "الرجاء إدخال اسم المستخدم الخاص بك.",
+        "usernameMinLength": "يجب أن يتكون اسم المستخدم من حرفين على الأقل.",
+        "usernameMaxLength": "يجب ألا يزيد اسم المستخدم عن 30 حرفاً.",
+        "emailRequired": "الرجاء اختيار بريد إلكتروني للعرض.",
+        "invalidUrl": "الرجاء إدخال عنوان URL صالح."
+      }
+    }
+  },
+  "tasks": {
+    "title": "المهام",
+    "description": "هذه قائمة بمهامك لهذا الشهر!",
+    "columns": {
+      "task": "المهمة",
+      "title": "العنوان",
+      "status": "الحالة",
+      "priority": "الأولوية"
+    },
+    "labels": {
+      "bug": "خلل",
+      "feature": "ميزة",
+      "documentation": "توثيق"
+    },
+    "statuses": {
+      "backlog": "متراكمة",
+      "todo": "قائمة المهام",
+      "inProgress": "قيد التنفيذ",
+      "done": "مكتملة",
+      "canceled": "ملغاة"
+    },
+    "priorities": {
+      "low": "منخفضة",
+      "medium": "متوسطة",
+      "high": "عالية",
+      "critical": "حرجة"
+    }
+  },
+  "users": {
+    "title": "قائمة المستخدمين",
+    "description": "إدارة المستخدمين وأدوارهم هنا.",
+    "columns": {
+      "username": "اسم المستخدم",
+      "name": "الاسم",
+      "email": "البريد الإلكتروني",
+      "phoneNumber": "رقم الهاتف",
+      "status": "الحالة",
+      "role": "الدور"
+    },
+    "statuses": {
+      "active": "نشط",
+      "inactive": "غير نشط",
+      "invited": "مدعو",
+      "suspended": "معلق"
+    },
+    "roles": {
+      "superadmin": "مدير عام",
+      "admin": "مدير",
+      "manager": "مشرف",
+      "cashier": "أمين صندوق"
+    }
+  },
+  "dashboard": {
+    "title": "لوحة التحكم",
+    "download": "تحميل",
+    "tabs": {
+      "overview": "نظرة عامة",
+      "analytics": "التحليلات",
+      "reports": "التقارير",
+      "notifications": "الإشعارات"
+    },
+    "topNav": {
+      "overview": "نظرة عامة",
+      "customers": "العملاء",
+      "products": "المنتجات",
+      "settings": "الإعدادات"
+    },
+    "stats": {
+      "totalRevenue": {
+        "title": "إجمالي الإيرادات",
+        "value": "45,231.89 ريال",
+        "change": "+20.1% من الشهر الماضي"
+      },
+      "subscriptions": {
+        "title": "الاشتراكات",
+        "value": "+2350",
+        "change": "+180.1% من الشهر الماضي"
+      },
+      "sales": {
+        "title": "المبيعات",
+        "value": "+12,234",
+        "change": "+19% من الشهر الماضي"
+      },
+      "activeNow": {
+        "title": "نشط الآن",
+        "value": "+573",
+        "change": "+201 منذ الساعة الأخيرة"
+      }
+    },
+    "overview": {
+      "title": "نظرة عامة",
+      "recentSales": "المبيعات الأخيرة",
+      "salesThisMonth": "لقد قمت بـ 265 عملية بيع هذا الشهر."
+    }
+  },
+  "dataTable": {
+    "toolbar": {
+      "filterPlaceholder": "تصفية...",
+      "reset": "إعادة تعيين"
+    },
+    "pagination": {
+      "page": "الصفحة {{current}} من {{total}}",
+      "rowsPerPage": "صفوف لكل صفحة",
+      "goToFirstPage": "الانتقال إلى الصفحة الأولى",
+      "goToPreviousPage": "الانتقال إلى الصفحة السابقة",
+      "goToNextPage": "الانتقال إلى الصفحة التالية",
+      "goToLastPage": "الانتقال إلى الصفحة الأخيرة",
+      "goToPage": "الانتقال إلى الصفحة {{page}}"
+    },
+    "selectAll": "تحديد الكل",
+    "selectRow": "تحديد الصف"
+  },
+  "errors": {
+    "404": {
+      "code": "404",
+      "title": "عذراً! الصفحة غير موجودة!",
+      "description": "يبدو أن الصفحة التي تبحث عنها",
+      "descriptionContinued": "غير موجودة أو ربما تمت إزالتها.",
+      "goBack": "العودة",
+      "backToHome": "العودة إلى الصفحة الرئيسية"
+    }
+  },
+  "profile": {
+    "dropdown": {
+      "username": "satnaing",
+      "email": "satnaingdev@gmail.com",
+      "profile": "الملف الشخصي",
+      "profileShortcut": "⇧⌘P",
+      "billing": "الفواتير",
+      "billingShortcut": "⌘B",
+      "settings": "الإعدادات",
+      "settingsShortcut": "⌘S",
+      "newTeam": "فريق جديد",
+      "signOut": "تسجيل الخروج",
+      "signOutShortcut": "⇧⌘Q"
+    }
+  },
+  "command": {
+    "searchPlaceholder": "اكتب أمراً أو ابحث...",
+    "noResults": "لم يتم العثور على نتائج.",
+    "theme": "السمة",
+    "light": "فاتح",
+    "dark": "داكن",
+    "system": "النظام"
+  },
+  "common": {
+    "search": "بحث",
+    "loading": "جاري التحميل...",
+    "submit": "إرسال",
+    "cancel": "إلغاء",
+    "delete": "حذف",
+    "edit": "تعديل",
+    "save": "حفظ",
+    "close": "إغلاق",
+    "add": "إضافة",
+    "create": "إنشاء",
+    "update": "تحديث",
+    "remove": "إزالة",
+    "confirm": "تأكيد",
+    "yes": "نعم",
+    "no": "لا",
+    "view": "عرض",
+    "export": "تصدير",
+    "import": "استيراد",
+    "filter": "تصفية",
+    "sort": "ترتيب",
+    "actions": "الإجراءات"
+  },
+  "validation": {
+    "required": "هذا الحقل مطلوب",
+    "invalidEmail": "البريد الإلكتروني غير صالح",
+    "passwordTooShort": "كلمة المرور قصيرة جداً",
+    "passwordsDoNotMatch": "كلمات المرور غير متطابقة",
+    "pleaseSelect": "الرجاء الاختيار",
+    "pleaseEnter": "الرجاء الإدخال"
+  },
+  "status": {
+    "success": "نجاح",
+    "error": "خطأ",
+    "warning": "تحذير",
+    "info": "معلومات",
+    "savedSuccessfully": "تم الحفظ بنجاح",
+    "updatedSuccessfully": "تم التحديث بنجاح",
+    "deletedSuccessfully": "تم الحذف بنجاح",
+    "createdSuccessfully": "تم الإنشاء بنجاح"
+  }
+}

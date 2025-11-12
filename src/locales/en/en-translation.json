@@ -1,0 +1,292 @@
+{
+  "sidebar": {
+    "teamSwitcher": {
+      "shadcnAdmin": "Shadcn Admin",
+      "viteShadcnUI": "Vite + ShadcnUI",
+      "acmeInc": "Acme Inc",
+      "enterprise": "Enterprise",
+      "acmeCorp": "Acme Corp.",
+      "startup": "Startup"
+    },
+    "general": "General",
+    "dashboard": "Dashboard",
+    "tasks": "Tasks",
+    "apps": "Apps",
+    "chats": "Chats",
+    "users": "Users",
+    "securedByClerk": "Secured by Clerk",
+    "pages": "Pages",
+    "auth": "Auth",
+    "signIn": "Sign In",
+    "signIn2Col": "Sign In (2 Col)",
+    "signUp": "Sign Up",
+    "forgotPassword": "Forgot Password",
+    "otp": "OTP",
+    "errors": "Errors",
+    "unauthorized": "Unauthorized",
+    "forbidden": "Forbidden",
+    "notFound": "Not Found",
+    "internalServerError": "Internal Server Error",
+    "maintenanceError": "Maintenance Error",
+    "other": "Other",
+    "settings": "Settings",
+    "profile": "Profile",
+    "account": "Account",
+    "appearance": "Appearance",
+    "notifications": "Notifications",
+    "display": "Display",
+    "helpCenter": "Help Center"
+  },
+  "auth": {
+    "signIn": {
+      "title": "Sign in",
+      "subtitle": "Enter your email and password below",
+      "toLogIn": "to log into your account",
+      "termsPrefix": "By clicking sign in, you agree to our",
+      "termsOfService": "Terms of Service",
+      "and": "and",
+      "privacyPolicy": "Privacy Policy",
+      "email": "Email",
+      "emailPlaceholder": "name@example.com",
+      "password": "Password",
+      "passwordPlaceholder": "********",
+      "forgotPassword": "Forgot password?",
+      "signInButton": "Sign in",
+      "signingIn": "Signing in...",
+      "orContinueWith": "Or continue with",
+      "github": "GitHub",
+      "facebook": "Facebook",
+      "validation": {
+        "emailRequired": "Please enter your email",
+        "passwordRequired": "Please enter your password",
+        "passwordMinLength": "Password must be at least 7 characters long"
+      },
+      "welcomeBack": "Welcome back, {{email}}!",
+      "error": "Error"
+    }
+  },
+  "settings": {
+    "title": "Settings",
+    "description": "Manage your account settings and set e-mail preferences.",
+    "tabs": {
+      "profile": "Profile",
+      "account": "Account",
+      "appearance": "Appearance",
+      "notifications": "Notifications",
+      "display": "Display"
+    },
+    "profile": {
+      "username": "Username",
+      "usernamePlaceholder": "shadcn",
+      "usernameDescription": "This is your public display name. It can be your real name or a pseudonym. You can only change this once every 30 days.",
+      "email": "Email",
+      "emailDescription": "Select a verified email to display",
+      "emailExample1": "m@example.com",
+      "emailExample2": "m@google.com",
+      "emailExample3": "m@support.com",
+      "emailSettingsLink": "You can manage verified email addresses in your",
+      "emailSettings": "email settings",
+      "bio": "Bio",
+      "bioPlaceholder": "Tell us a little bit about yourself",
+      "bioDescription": "You can @mention other users and organizations to link to them.",
+      "bioDefault": "I own a computer.",
+      "urls": "URLs",
+      "urlsDescription": "Add links to your website, blog, or social media profiles.",
+      "addUrl": "Add URL",
+      "updateProfile": "Update profile",
+      "validation": {
+        "usernameRequired": "Please enter your username.",
+        "usernameMinLength": "Username must be at least 2 characters.",
+        "usernameMaxLength": "Username must not be longer than 30 characters.",
+        "emailRequired": "Please select an email to display.",
+        "invalidUrl": "Please enter a valid URL."
+      }
+    }
+  },
+  "tasks": {
+    "title": "Tasks",
+    "description": "Here's a list of your tasks for this month!",
+    "columns": {
+      "task": "Task",
+      "title": "Title",
+      "status": "Status",
+      "priority": "Priority"
+    },
+    "labels": {
+      "bug": "Bug",
+      "feature": "Feature",
+      "documentation": "Documentation"
+    },
+    "statuses": {
+      "backlog": "Backlog",
+      "todo": "Todo",
+      "inProgress": "In Progress",
+      "done": "Done",
+      "canceled": "Canceled"
+    },
+    "priorities": {
+      "low": "Low",
+      "medium": "Medium",
+      "high": "High",
+      "critical": "Critical"
+    }
+  },
+  "users": {
+    "title": "User List",
+    "description": "Manage your users and their roles here.",
+    "columns": {
+      "username": "Username",
+      "name": "Name",
+      "email": "Email",
+      "phoneNumber": "Phone Number",
+      "status": "Status",
+      "role": "Role"
+    },
+    "statuses": {
+      "active": "active",
+      "inactive": "inactive",
+      "invited": "invited",
+      "suspended": "suspended"
+    },
+    "roles": {
+      "superadmin": "Superadmin",
+      "admin": "Admin",
+      "manager": "Manager",
+      "cashier": "Cashier"
+    }
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "download": "Download",
+    "tabs": {
+      "overview": "Overview",
+      "analytics": "Analytics",
+      "reports": "Reports",
+      "notifications": "Notifications"
+    },
+    "topNav": {
+      "overview": "Overview",
+      "customers": "Customers",
+      "products": "Products",
+      "settings": "Settings"
+    },
+    "stats": {
+      "totalRevenue": {
+        "title": "Total Revenue",
+        "value": "$45,231.89",
+        "change": "+20.1% from last month"
+      },
+      "subscriptions": {
+        "title": "Subscriptions",
+        "value": "+2350",
+        "change": "+180.1% from last month"
+      },
+      "sales": {
+        "title": "Sales",
+        "value": "+12,234",
+        "change": "+19% from last month"
+      },
+      "activeNow": {
+        "title": "Active Now",
+        "value": "+573",
+        "change": "+201 since last hour"
+      }
+    },
+    "overview": {
+      "title": "Overview",
+      "recentSales": "Recent Sales",
+      "salesThisMonth": "You made 265 sales this month."
+    }
+  },
+  "dataTable": {
+    "toolbar": {
+      "filterPlaceholder": "Filter...",
+      "reset": "Reset"
+    },
+    "pagination": {
+      "page": "Page {{current}} of {{total}}",
+      "rowsPerPage": "Rows per page",
+      "goToFirstPage": "Go to first page",
+      "goToPreviousPage": "Go to previous page",
+      "goToNextPage": "Go to next page",
+      "goToLastPage": "Go to last page",
+      "goToPage": "Go to page {{page}}"
+    },
+    "selectAll": "Select all",
+    "selectRow": "Select row"
+  },
+  "errors": {
+    "404": {
+      "code": "404",
+      "title": "Oops! Page Not Found!",
+      "description": "It seems like the page you're looking for",
+      "descriptionContinued": "does not exist or might have been removed.",
+      "goBack": "Go Back",
+      "backToHome": "Back to Home"
+    }
+  },
+  "profile": {
+    "dropdown": {
+      "username": "satnaing",
+      "email": "satnaingdev@gmail.com",
+      "profile": "Profile",
+      "profileShortcut": "⇧⌘P",
+      "billing": "Billing",
+      "billingShortcut": "⌘B",
+      "settings": "Settings",
+      "settingsShortcut": "⌘S",
+      "newTeam": "New Team",
+      "signOut": "Sign out",
+      "signOutShortcut": "⇧⌘Q"
+    }
+  },
+  "command": {
+    "searchPlaceholder": "Type a command or search...",
+    "noResults": "No results found.",
+    "theme": "Theme",
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System"
+  },
+  "common": {
+    "search": "Search",
+    "loading": "Loading...",
+    "submit": "Submit",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "save": "Save",
+    "close": "Close",
+    "add": "Add",
+    "create": "Create",
+    "update": "Update",
+    "remove": "Remove",
+    "confirm": "Confirm",
+    "yes": "Yes",
+    "no": "No",
+    "view": "View",
+    "export": "Export",
+    "import": "Import",
+    "filter": "Filter",
+    "sort": "Sort",
+    "actions": "Actions"
+  },
+  "validation": {
+    "required": "This field is required",
+    "invalidEmail": "Invalid email",
+    "passwordTooShort": "Password is too short",
+    "passwordsDoNotMatch": "Passwords do not match",
+    "pleaseSelect": "Please select",
+    "pleaseEnter": "Please enter"
+  },
+  "status": {
+    "success": "Success",
+    "error": "Error",
+    "warning": "Warning",
+    "info": "Info",
+    "savedSuccessfully": "Saved successfully",
+    "updatedSuccessfully": "Updated successfully",
+    "deletedSuccessfully": "Deleted successfully",
+    "createdSuccessfully": "Created successfully"
+  }
+}
