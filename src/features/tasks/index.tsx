@@ -1,35 +1,10 @@
 import { useState } from 'react'
 import { CheckSquare, Clock, AlertCircle, User, Calendar, Search, Plus, Download, MoreVertical, Edit, Trash2, Eye, Flag, Briefcase, FileText } from 'lucide-react'
-import { Card, CardContent } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import { Input } from '@/components/ui/input'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
 import { Header } from '@/components/layout/header'
 import { Main } from '@/components/layout/main'
 import { ThemeSwitch } from '@/components/theme-switch'
 import { LanguageSwitcher } from '@/components/language-switcher'
 import { ProfileDropdown } from '@/components/profile-dropdown'
-
-interface Task {
-  id: string
-  title: string
-  client: string
-  status: 'pending' | 'in_progress' | 'completed'
-  priority: 'high' | 'medium' | 'low'
-  dueDate: string
-  assignee: string
-  caseNumber: string
-  progress: number
-  type: string
-  overdue?: boolean
-}
 
 export function Tasks() {
   const [selectedFilter, setSelectedFilter] = useState('all')
@@ -46,8 +21,8 @@ export function Tasks() {
     overdue: 2
   }
 
-  // Tasks data
-  const tasks: Task[] = [
+  // Tasks data from the image
+  const tasks: any = [
     {
       id: 'CASE-1001',
       title: 'تحضير استراتيجية الدفاع في قضية نزاع الأراضي التجاري',
@@ -268,7 +243,33 @@ export function Tasks() {
     }
   ]
 
-  const getTypeIcon = (type: string) => {
+  const getStatusBadge = (status: any) => {
+    switch(status) {
+      case 'pending':
+        return { label: 'قيد الانتظار', color: 'bg-yellow-100 text-yellow-700 border-yellow-200' }
+      case 'in_progress':
+        return { label: 'قيد التنفيذ', color: 'bg-blue-100 text-blue-700 border-blue-200' }
+      case 'completed':
+        return { label: 'مكتملة', color: 'bg-green-100 text-green-700 border-green-200' }
+      default:
+        return { label: 'غير محدد', color: 'bg-slate-100 text-slate-700 border-slate-200' }
+    }
+  }
+
+  const getPriorityBadge = (priority: any) => {
+    switch(priority) {
+      case 'high':
+        return { label: 'عاجل', color: 'bg-red-100 text-red-700 border-red-200', icon: <Flag className="h-3 w-3" /> }
+      case 'medium':
+        return { label: 'متوسط', color: 'bg-yellow-100 text-yellow-700 border-yellow-200', icon: <Flag className="h-3 w-3" /> }
+      case 'low':
+        return { label: 'منخفض', color: 'bg-green-100 text-green-700 border-green-200', icon: <Flag className="h-3 w-3" /> }
+      default:
+        return { label: 'عادي', color: 'bg-slate-100 text-slate-700 border-slate-200', icon: <Flag className="h-3 w-3" /> }
+    }
+  }
+
+  const getTypeIcon = (type: any) => {
     switch(type) {
       case 'legal_prep':
         return <Briefcase className="h-4 w-4" />
@@ -285,7 +286,7 @@ export function Tasks() {
     }
   }
 
-  const getDaysUntilDue = (dueDate: string) => {
+  const getDaysUntilDue = (dueDate: any) => {
     const today = new Date()
     const due = new Date(dueDate)
     const diffTime = due.getTime() - today.getTime()
@@ -293,7 +294,7 @@ export function Tasks() {
     return diffDays
   }
 
-  const filteredTasks = tasks.filter(task => {
+  const filteredTasks = tasks.filter((task: any) => {
     const matchesStatus = selectedFilter === 'all' || task.status === selectedFilter
     const matchesPriority = selectedPriority === 'all' || task.priority === selectedPriority
     const matchesAssignee = selectedAssignee === 'all' || task.assignee === selectedAssignee
@@ -306,295 +307,286 @@ export function Tasks() {
   return (
     <>
       <Header>
-        <div className='flex items-center gap-6 flex-1'>
-          <h1 className="text-xl font-bold">المهام القانونية</h1>
-          <div className="relative">
-            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="بحث في المهام..."
-              className="w-80 pr-10"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
+        <div className="flex items-center justify-between max-w-7xl mx-auto flex-1">
+          <div>
+            <h1 className="text-2xl font-bold text-slate-900">المهام القانونية</h1>
+            <p className="text-sm text-slate-600">إدارة ومتابعة المهام القانونية للقضايا</p>
           </div>
-        </div>
-        <div className="flex items-center gap-3">
-          <Button variant="outline">
-            <Download className="h-4 w-4 mr-2" />
-            تصدير
-          </Button>
-          <Button>
-            <Plus className="h-4 w-4 mr-2" />
-            إنشاء مهمة
-          </Button>
-          <LanguageSwitcher />
-          <ThemeSwitch />
-          <ProfileDropdown />
+          <div className="flex items-center gap-3">
+            <button className="px-4 py-2 border border-slate-300 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-50 flex items-center gap-2">
+              <Download className="h-4 w-4" />
+              تصدير
+            </button>
+            <button className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 flex items-center gap-2">
+              <Plus className="h-4 w-4" />
+              إنشاء مهمة
+            </button>
+            <LanguageSwitcher />
+            <ThemeSwitch />
+            <ProfileDropdown />
+          </div>
         </div>
       </Header>
 
-      <Main dir="rtl">
+      <Main className="bg-slate-50" dir="rtl">
         {/* Summary Stats */}
         <div className="grid grid-cols-5 gap-4 mb-6">
-          <Card className="bg-gradient-to-br from-muted to-card">
-            <CardContent className="p-5">
-              <div className="flex items-center justify-between mb-3">
-                <div className="h-10 w-10 rounded-lg bg-muted flex items-center justify-center">
-                  <CheckSquare className="h-5 w-5" />
-                </div>
+          <div className="bg-gradient-to-br from-slate-50 to-white border border-slate-200 rounded-lg p-5">
+            <div className="flex items-center justify-between mb-3">
+              <div className="h-10 w-10 rounded-lg bg-slate-100 flex items-center justify-center">
+                <CheckSquare className="h-5 w-5 text-slate-700" />
               </div>
-              <div className="text-3xl font-bold mb-1">{summary.totalTasks}</div>
-              <div className="text-xs text-muted-foreground">إجمالي المهام</div>
-            </CardContent>
-          </Card>
+            </div>
+            <div className="text-3xl font-bold text-slate-900 mb-1">{summary.totalTasks}</div>
+            <div className="text-xs text-slate-600">إجمالي المهام</div>
+          </div>
 
-          <Card className="bg-gradient-to-br from-yellow-50 to-card border-yellow-200 dark:from-yellow-950">
-            <CardContent className="p-5">
-              <div className="flex items-center justify-between mb-3">
-                <div className="h-10 w-10 rounded-lg bg-yellow-100 dark:bg-yellow-900 flex items-center justify-center">
-                  <Clock className="h-5 w-5 text-yellow-600" />
-                </div>
+          <div className="bg-gradient-to-br from-yellow-50 to-white border border-yellow-200 rounded-lg p-5">
+            <div className="flex items-center justify-between mb-3">
+              <div className="h-10 w-10 rounded-lg bg-yellow-100 flex items-center justify-center">
+                <Clock className="h-5 w-5 text-yellow-600" />
               </div>
-              <div className="text-3xl font-bold mb-1">{summary.pending}</div>
-              <div className="text-xs text-muted-foreground">قيد الانتظار</div>
-            </CardContent>
-          </Card>
+            </div>
+            <div className="text-3xl font-bold text-slate-900 mb-1">{summary.pending}</div>
+            <div className="text-xs text-slate-600">قيد الانتظار</div>
+          </div>
 
-          <Card className="bg-gradient-to-br from-blue-50 to-card border-blue-200 dark:from-blue-950">
-            <CardContent className="p-5">
-              <div className="flex items-center justify-between mb-3">
-                <div className="h-10 w-10 rounded-lg bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
-                  <CheckSquare className="h-5 w-5 text-blue-600" />
-                </div>
+          <div className="bg-gradient-to-br from-blue-50 to-white border border-blue-200 rounded-lg p-5">
+            <div className="flex items-center justify-between mb-3">
+              <div className="h-10 w-10 rounded-lg bg-blue-100 flex items-center justify-center">
+                <CheckSquare className="h-5 w-5 text-blue-600" />
               </div>
-              <div className="text-3xl font-bold mb-1">{summary.inProgress}</div>
-              <div className="text-xs text-muted-foreground">قيد التنفيذ</div>
-            </CardContent>
-          </Card>
+            </div>
+            <div className="text-3xl font-bold text-slate-900 mb-1">{summary.inProgress}</div>
+            <div className="text-xs text-slate-600">قيد التنفيذ</div>
+          </div>
 
-          <Card className="bg-gradient-to-br from-green-50 to-card border-green-200 dark:from-green-950">
-            <CardContent className="p-5">
-              <div className="flex items-center justify-between mb-3">
-                <div className="h-10 w-10 rounded-lg bg-green-100 dark:bg-green-900 flex items-center justify-center">
-                  <CheckSquare className="h-5 w-5 text-green-600" />
-                </div>
+          <div className="bg-gradient-to-br from-green-50 to-white border border-green-200 rounded-lg p-5">
+            <div className="flex items-center justify-between mb-3">
+              <div className="h-10 w-10 rounded-lg bg-green-100 flex items-center justify-center">
+                <CheckSquare className="h-5 w-5 text-green-600" />
               </div>
-              <div className="text-3xl font-bold mb-1">{summary.completed}</div>
-              <div className="text-xs text-muted-foreground">مكتملة</div>
-            </CardContent>
-          </Card>
+            </div>
+            <div className="text-3xl font-bold text-slate-900 mb-1">{summary.completed}</div>
+            <div className="text-xs text-slate-600">مكتملة</div>
+          </div>
 
-          <Card className="bg-gradient-to-br from-red-50 to-card border-red-200 dark:from-red-950">
-            <CardContent className="p-5">
-              <div className="flex items-center justify-between mb-3">
-                <div className="h-10 w-10 rounded-lg bg-red-100 dark:bg-red-900 flex items-center justify-center">
-                  <AlertCircle className="h-5 w-5 text-red-600" />
-                </div>
+          <div className="bg-gradient-to-br from-red-50 to-white border border-red-200 rounded-lg p-5">
+            <div className="flex items-center justify-between mb-3">
+              <div className="h-10 w-10 rounded-lg bg-red-100 flex items-center justify-center">
+                <AlertCircle className="h-5 w-5 text-red-600" />
               </div>
-              <div className="text-3xl font-bold mb-1">{summary.overdue}</div>
-              <div className="text-xs text-muted-foreground">متأخرة</div>
-            </CardContent>
-          </Card>
+            </div>
+            <div className="text-3xl font-bold text-slate-900 mb-1">{summary.overdue}</div>
+            <div className="text-xs text-slate-600">متأخرة</div>
+          </div>
         </div>
 
         {/* Filters */}
-        <Card className="mb-6">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between gap-4">
-              <div className="flex items-center gap-3 flex-1">
-                <div className="flex gap-2">
-                  <Button
-                    variant={selectedFilter === 'all' ? 'default' : 'outline'}
-                    size="sm"
-                    onClick={() => setSelectedFilter('all')}
-                  >
-                    الكل ({tasks.length})
-                  </Button>
-                  <Button
-                    variant={selectedFilter === 'pending' ? 'default' : 'outline'}
-                    size="sm"
-                    onClick={() => setSelectedFilter('pending')}
-                  >
-                    انتظار ({tasks.filter(t => t.status === 'pending').length})
-                  </Button>
-                  <Button
-                    variant={selectedFilter === 'in_progress' ? 'default' : 'outline'}
-                    size="sm"
-                    onClick={() => setSelectedFilter('in_progress')}
-                  >
-                    تنفيذ ({tasks.filter(t => t.status === 'in_progress').length})
-                  </Button>
-                  <Button
-                    variant={selectedFilter === 'completed' ? 'default' : 'outline'}
-                    size="sm"
-                    onClick={() => setSelectedFilter('completed')}
-                  >
-                    مكتملة ({tasks.filter(t => t.status === 'completed').length})
-                  </Button>
-                </div>
+        <div className="bg-white border border-slate-200 rounded-lg p-6 mb-6">
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex items-center gap-3 flex-1">
+              <div className="relative flex-1 max-w-md">
+                <Search className="h-4 w-4 absolute right-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                <input
+                  type="text"
+                  placeholder="بحث في المهام..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pr-10 pl-4 py-2 border border-slate-200 rounded-lg text-sm w-full"
+                />
               </div>
 
-              <div className="flex items-center gap-2">
-                <Select value={selectedPriority} onValueChange={setSelectedPriority}>
-                  <SelectTrigger className="w-40 text-right" dir="rtl">
-                    <SelectValue placeholder="كل الأولويات" />
-                  </SelectTrigger>
-                  <SelectContent dir="rtl">
-                    <SelectItem value="all">كل الأولويات</SelectItem>
-                    <SelectItem value="high">عاجل</SelectItem>
-                    <SelectItem value="medium">متوسط</SelectItem>
-                    <SelectItem value="low">منخفض</SelectItem>
-                  </SelectContent>
-                </Select>
-
-                <Select value={selectedAssignee} onValueChange={setSelectedAssignee}>
-                  <SelectTrigger className="w-40 text-right" dir="rtl">
-                    <SelectValue placeholder="كل المكلفين" />
-                  </SelectTrigger>
-                  <SelectContent dir="rtl">
-                    <SelectItem value="all">كل المكلفين</SelectItem>
-                    <SelectItem value="أحمد السالم">أحمد السالم</SelectItem>
-                    <SelectItem value="فاطمة الغامدي">فاطمة الغامدي</SelectItem>
-                    <SelectItem value="خالد المري">خالد المري</SelectItem>
-                    <SelectItem value="محمد العتيبي">محمد العتيبي</SelectItem>
-                    <SelectItem value="سارة الدوسري">سارة الدوسري</SelectItem>
-                  </SelectContent>
-                </Select>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setSelectedFilter('all')}
+                  className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                    selectedFilter === 'all'
+                      ? 'bg-blue-600 text-white'
+                      : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                  }`}
+                >
+                  الكل ({tasks.length})
+                </button>
+                <button
+                  onClick={() => setSelectedFilter('pending')}
+                  className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                    selectedFilter === 'pending'
+                      ? 'bg-yellow-600 text-white'
+                      : 'bg-yellow-50 text-yellow-700 hover:bg-yellow-100'
+                  }`}
+                >
+                  انتظار ({tasks.filter((t: any) => t.status === 'pending').length})
+                </button>
+                <button
+                  onClick={() => setSelectedFilter('in_progress')}
+                  className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                    selectedFilter === 'in_progress'
+                      ? 'bg-blue-600 text-white'
+                      : 'bg-blue-50 text-blue-700 hover:bg-blue-100'
+                  }`}
+                >
+                  تنفيذ ({tasks.filter((t: any) => t.status === 'in_progress').length})
+                </button>
+                <button
+                  onClick={() => setSelectedFilter('completed')}
+                  className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                    selectedFilter === 'completed'
+                      ? 'bg-green-600 text-white'
+                      : 'bg-green-50 text-green-700 hover:bg-green-100'
+                  }`}
+                >
+                  مكتملة ({tasks.filter((t: any) => t.status === 'completed').length})
+                </button>
               </div>
             </div>
-          </CardContent>
-        </Card>
+
+            <div className="flex items-center gap-2">
+              <select
+                value={selectedPriority}
+                onChange={(e) => setSelectedPriority(e.target.value)}
+                className="px-3 py-2 border border-slate-200 rounded-lg text-sm"
+              >
+                <option value="all">كل الأولويات</option>
+                <option value="high">عاجل</option>
+                <option value="medium">متوسط</option>
+                <option value="low">منخفض</option>
+              </select>
+
+              <select
+                value={selectedAssignee}
+                onChange={(e) => setSelectedAssignee(e.target.value)}
+                className="px-3 py-2 border border-slate-200 rounded-lg text-sm"
+              >
+                <option value="all">كل المكلفين</option>
+                <option value="أحمد السالم">أحمد السالم</option>
+                <option value="فاطمة الغامدي">فاطمة الغامدي</option>
+                <option value="خالد المري">خالد المري</option>
+                <option value="محمد العتيبي">محمد العتيبي</option>
+                <option value="سارة الدوسري">سارة الدوسري</option>
+              </select>
+            </div>
+          </div>
+        </div>
 
         {/* Tasks Grid */}
         <div className="grid grid-cols-1 gap-4">
-          {filteredTasks.map((task) => {
+          {filteredTasks.map((task: any) => {
+            const status = getStatusBadge(task.status)
+            const priority = getPriorityBadge(task.priority)
             const daysUntil = getDaysUntilDue(task.dueDate)
 
             return (
-              <Card
+              <div
                 key={task.id}
-                className={`border-r-4 hover:shadow-md transition-all cursor-pointer ${
+                className={`bg-white border-r-4 border-slate-200 rounded-lg p-5 hover:shadow-md transition-all cursor-pointer ${
                   task.priority === 'high' ? 'border-r-red-500' :
                   task.priority === 'medium' ? 'border-r-yellow-500' :
                   'border-r-green-500'
-                } ${task.overdue ? 'bg-red-50 dark:bg-red-950' : ''}`}
+                } ${task.overdue ? 'bg-red-50' : ''}`}
               >
-                <CardContent className="p-5">
-                  <div className="flex items-start gap-4">
-                    {/* Icon */}
-                    <div className={`h-12 w-12 rounded-lg flex items-center justify-center flex-shrink-0 ${
-                      task.status === 'completed' ? 'bg-green-100 dark:bg-green-900' :
-                      task.status === 'in_progress' ? 'bg-blue-100 dark:bg-blue-900' :
-                      'bg-yellow-100 dark:bg-yellow-900'
-                    }`}>
-                      <div className={
-                        task.status === 'completed' ? 'text-green-600' :
-                        task.status === 'in_progress' ? 'text-blue-600' :
-                        'text-yellow-600'
-                      }>
-                        {getTypeIcon(task.type)}
-                      </div>
-                    </div>
-
-                    {/* Content */}
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-start justify-between mb-2">
-                        <div className="flex-1 min-w-0">
-                          <h3 className="text-base font-bold mb-1">{task.title}</h3>
-                          <div className="flex items-center gap-2 flex-wrap">
-                            <Badge variant={
-                              task.status === 'completed' ? 'default' :
-                              task.status === 'in_progress' ? 'secondary' :
-                              'outline'
-                            }>
-                              {task.status === 'pending' ? 'قيد الانتظار' :
-                               task.status === 'in_progress' ? 'قيد التنفيذ' :
-                               'مكتملة'}
-                            </Badge>
-                            <Badge variant={
-                              task.priority === 'high' ? 'destructive' :
-                              task.priority === 'medium' ? 'secondary' :
-                              'outline'
-                            } className="gap-1">
-                              <Flag className="h-3 w-3" />
-                              {task.priority === 'high' ? 'عاجل' :
-                               task.priority === 'medium' ? 'متوسط' :
-                               'منخفض'}
-                            </Badge>
-                            {task.overdue && (
-                              <Badge variant="destructive" className="gap-1">
-                                <AlertCircle className="h-3 w-3" />
-                                متأخر
-                              </Badge>
-                            )}
-                          </div>
-                        </div>
-                        <Button variant="ghost" size="sm">
-                          <MoreVertical className="h-5 w-5" />
-                        </Button>
-                      </div>
-
-                      {/* Progress Bar */}
-                      {task.status === 'in_progress' && (
-                        <div className="mb-3">
-                          <div className="flex items-center justify-between text-xs text-muted-foreground mb-1">
-                            <span>التقدم</span>
-                            <span className="font-semibold">{task.progress}%</span>
-                          </div>
-                          <div className="w-full bg-muted rounded-full h-2">
-                            <div
-                              className="bg-blue-500 h-2 rounded-full transition-all"
-                              style={{ width: `${task.progress}%` }}
-                            ></div>
-                          </div>
-                        </div>
-                      )}
-
-                      {/* Details */}
-                      <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                        <div className="flex items-center gap-1">
-                          <User className="h-4 w-4" />
-                          <span>{task.assignee}</span>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <Calendar className="h-4 w-4" />
-                          <span>
-                            {new Date(task.dueDate).toLocaleDateString('ar-SA')}
-                            {daysUntil >= 0 && !task.overdue && (
-                              <span className="mr-1 text-xs">
-                                (بعد {daysUntil} {daysUntil === 1 ? 'يوم' : 'أيام'})
-                              </span>
-                            )}
-                          </span>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <Briefcase className="h-4 w-4" />
-                          <span className="font-mono text-xs">{task.caseNumber}</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Actions */}
-                    <div className="flex gap-1 flex-shrink-0">
-                      <Button variant="ghost" size="sm">
-                        <Eye className="h-4 w-4" />
-                      </Button>
-                      <Button variant="ghost" size="sm">
-                        <Edit className="h-4 w-4" />
-                      </Button>
-                      <Button variant="ghost" size="sm">
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
+                <div className="flex items-start gap-4">
+                  {/* Icon */}
+                  <div className={`h-12 w-12 rounded-lg flex items-center justify-center flex-shrink-0 ${
+                    task.status === 'completed' ? 'bg-green-100' :
+                    task.status === 'in_progress' ? 'bg-blue-100' :
+                    'bg-yellow-100'
+                  }`}>
+                    <div className={
+                      task.status === 'completed' ? 'text-green-600' :
+                      task.status === 'in_progress' ? 'text-blue-600' :
+                      'text-yellow-600'
+                    }>
+                      {getTypeIcon(task.type)}
                     </div>
                   </div>
-                </CardContent>
-              </Card>
+
+                  {/* Content */}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-start justify-between mb-2">
+                      <div className="flex-1 min-w-0">
+                        <h3 className="text-base font-bold text-slate-900 mb-1">{task.title}</h3>
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium border ${status.color}`}>
+                            {status.label}
+                          </span>
+                          <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium border ${priority.color}`}>
+                            {priority.icon}
+                            {priority.label}
+                          </span>
+                          {task.overdue && (
+                            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-700 border border-red-200">
+                              <AlertCircle className="h-3 w-3 ml-1" />
+                              متأخر
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                      <button className="p-2 hover:bg-slate-100 rounded-lg">
+                        <MoreVertical className="h-5 w-5 text-slate-600" />
+                      </button>
+                    </div>
+
+                    {/* Progress Bar */}
+                    {task.status === 'in_progress' && (
+                      <div className="mb-3">
+                        <div className="flex items-center justify-between text-xs text-slate-600 mb-1">
+                          <span>التقدم</span>
+                          <span className="font-semibold">{task.progress}%</span>
+                        </div>
+                        <div className="w-full bg-slate-100 rounded-full h-2">
+                          <div
+                            className="bg-blue-500 h-2 rounded-full transition-all"
+                            style={{ width: `${task.progress}%` }}
+                          ></div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Details */}
+                    <div className="flex items-center gap-4 text-sm text-slate-600">
+                      <div className="flex items-center gap-1">
+                        <User className="h-4 w-4" />
+                        <span>{task.assignee}</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <Calendar className="h-4 w-4" />
+                        <span>
+                          {new Date(task.dueDate).toLocaleDateString('ar-SA')}
+                          {daysUntil >= 0 && !task.overdue && (
+                            <span className="mr-1 text-xs">
+                              (بعد {daysUntil} {daysUntil === 1 ? 'يوم' : 'أيام'})
+                            </span>
+                          )}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <Briefcase className="h-4 w-4" />
+                        <span className="font-mono text-xs">{task.caseNumber}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Actions */}
+                  <div className="flex gap-1 flex-shrink-0">
+                    <button className="p-2 hover:bg-blue-50 rounded-lg text-blue-600">
+                      <Eye className="h-4 w-4" />
+                    </button>
+                    <button className="p-2 hover:bg-slate-100 rounded-lg text-slate-600">
+                      <Edit className="h-4 w-4" />
+                    </button>
+                    <button className="p-2 hover:bg-red-50 rounded-lg text-red-600">
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  </div>
+                </div>
+              </div>
             )
           })}
         </div>
 
         {/* Results Info */}
-        <div className="mt-6 flex items-center justify-between text-sm text-muted-foreground">
+        <div className="mt-6 flex items-center justify-between text-sm text-slate-600">
           <div>
             عرض {filteredTasks.length} من {tasks.length} مهمة
           </div>
