@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Search, Filter, Download, Plus, ArrowUpRight, ArrowDownRight, DollarSign, TrendingUp, TrendingDown, Calendar, Building2, User } from 'lucide-react'
+import { Search, Filter, Download, Plus, ArrowUpRight, ArrowDownRight, DollarSign, Calendar, Building2, User } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
