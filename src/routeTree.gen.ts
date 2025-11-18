@@ -15,7 +15,6 @@ import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedEventsRouteImport } from './routes/_authenticated/events'
 import { Route as AuthenticatedCasesRouteImport } from './routes/_authenticated/cases'
 import { Route as AuthenticatedCalendarRouteImport } from './routes/_authenticated/calendar'
-import { Route as AuthenticatedBillingRouteImport } from './routes/_authenticated/billing'
 import { Route as errors503RouteImport } from './routes/(errors)/503'
 import { Route as errors500RouteImport } from './routes/(errors)/500'
 import { Route as errors404RouteImport } from './routes/(errors)/404'
@@ -29,11 +28,13 @@ import { Route as authForgotPasswordRouteImport } from './routes/(auth)/forgot-p
 import { Route as ClerkAuthenticatedRouteRouteImport } from './routes/clerk/_authenticated/route'
 import { Route as ClerkauthRouteRouteImport } from './routes/clerk/(auth)/route'
 import { Route as AuthenticatedSettingsRouteRouteImport } from './routes/_authenticated/settings/route'
+import { Route as AuthenticatedBillingRouteRouteImport } from './routes/_authenticated/billing/route'
 import { Route as AuthenticatedUsersIndexRouteImport } from './routes/_authenticated/users/index'
 import { Route as AuthenticatedTasksIndexRouteImport } from './routes/_authenticated/tasks/index'
 import { Route as AuthenticatedSettingsIndexRouteImport } from './routes/_authenticated/settings/index'
 import { Route as AuthenticatedHelpCenterIndexRouteImport } from './routes/_authenticated/help-center/index'
 import { Route as AuthenticatedChatsIndexRouteImport } from './routes/_authenticated/chats/index'
+import { Route as AuthenticatedBillingIndexRouteImport } from './routes/_authenticated/billing/index'
 import { Route as AuthenticatedAppsIndexRouteImport } from './routes/_authenticated/apps/index'
 import { Route as ClerkAuthenticatedUserManagementRouteImport } from './routes/clerk/_authenticated/user-management'
 import { Route as ClerkauthSignUpRouteImport } from './routes/clerk/(auth)/sign-up'
@@ -78,11 +79,6 @@ const AuthenticatedCasesRoute = AuthenticatedCasesRouteImport.update({
 const AuthenticatedCalendarRoute = AuthenticatedCalendarRouteImport.update({
   id: '/calendar',
   path: '/calendar',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
-const AuthenticatedBillingRoute = AuthenticatedBillingRouteImport.update({
-  id: '/billing',
-  path: '/billing',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const errors503Route = errors503RouteImport.update({
@@ -149,6 +145,12 @@ const AuthenticatedSettingsRouteRoute =
     path: '/settings',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedBillingRouteRoute =
+  AuthenticatedBillingRouteRouteImport.update({
+    id: '/billing',
+    path: '/billing',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedUsersIndexRoute = AuthenticatedUsersIndexRouteImport.update({
   id: '/users/',
   path: '/users/',
@@ -176,6 +178,12 @@ const AuthenticatedChatsIndexRoute = AuthenticatedChatsIndexRouteImport.update({
   path: '/chats/',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedBillingIndexRoute =
+  AuthenticatedBillingIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedBillingRouteRoute,
+  } as any)
 const AuthenticatedAppsIndexRoute = AuthenticatedAppsIndexRouteImport.update({
   id: '/apps/',
   path: '/apps/',
@@ -249,29 +257,30 @@ const AuthenticatedBillingTransactionsRoute =
   AuthenticatedBillingTransactionsRouteImport.update({
     id: '/transactions',
     path: '/transactions',
-    getParentRoute: () => AuthenticatedBillingRoute,
+    getParentRoute: () => AuthenticatedBillingRouteRoute,
   } as any)
 const AuthenticatedBillingStatementsRoute =
   AuthenticatedBillingStatementsRouteImport.update({
     id: '/statements',
     path: '/statements',
-    getParentRoute: () => AuthenticatedBillingRoute,
+    getParentRoute: () => AuthenticatedBillingRouteRoute,
   } as any)
 const AuthenticatedBillingInvoicesRoute =
   AuthenticatedBillingInvoicesRouteImport.update({
     id: '/invoices',
     path: '/invoices',
-    getParentRoute: () => AuthenticatedBillingRoute,
+    getParentRoute: () => AuthenticatedBillingRouteRoute,
   } as any)
 const AuthenticatedBillingExpensesRoute =
   AuthenticatedBillingExpensesRouteImport.update({
     id: '/expenses',
     path: '/expenses',
-    getParentRoute: () => AuthenticatedBillingRoute,
+    getParentRoute: () => AuthenticatedBillingRouteRoute,
   } as any)
 
 export interface FileRoutesByFullPath {
   '/clerk': typeof ClerkAuthenticatedRouteRouteWithChildren
+  '/billing': typeof AuthenticatedBillingRouteRouteWithChildren
   '/settings': typeof AuthenticatedSettingsRouteRouteWithChildren
   '/forgot-password': typeof authForgotPasswordRoute
   '/otp': typeof authOtpRoute
@@ -283,7 +292,6 @@ export interface FileRoutesByFullPath {
   '/404': typeof errors404Route
   '/500': typeof errors500Route
   '/503': typeof errors503Route
-  '/billing': typeof AuthenticatedBillingRouteWithChildren
   '/calendar': typeof AuthenticatedCalendarRoute
   '/cases': typeof AuthenticatedCasesRoute
   '/events': typeof AuthenticatedEventsRoute
@@ -304,6 +312,7 @@ export interface FileRoutesByFullPath {
   '/clerk/sign-up': typeof ClerkauthSignUpRoute
   '/clerk/user-management': typeof ClerkAuthenticatedUserManagementRoute
   '/apps': typeof AuthenticatedAppsIndexRoute
+  '/billing/': typeof AuthenticatedBillingIndexRoute
   '/chats': typeof AuthenticatedChatsIndexRoute
   '/help-center': typeof AuthenticatedHelpCenterIndexRoute
   '/settings/': typeof AuthenticatedSettingsIndexRoute
@@ -322,7 +331,6 @@ export interface FileRoutesByTo {
   '/404': typeof errors404Route
   '/500': typeof errors500Route
   '/503': typeof errors503Route
-  '/billing': typeof AuthenticatedBillingRouteWithChildren
   '/calendar': typeof AuthenticatedCalendarRoute
   '/cases': typeof AuthenticatedCasesRoute
   '/events': typeof AuthenticatedEventsRoute
@@ -343,6 +351,7 @@ export interface FileRoutesByTo {
   '/clerk/sign-up': typeof ClerkauthSignUpRoute
   '/clerk/user-management': typeof ClerkAuthenticatedUserManagementRoute
   '/apps': typeof AuthenticatedAppsIndexRoute
+  '/billing': typeof AuthenticatedBillingIndexRoute
   '/chats': typeof AuthenticatedChatsIndexRoute
   '/help-center': typeof AuthenticatedHelpCenterIndexRoute
   '/settings': typeof AuthenticatedSettingsIndexRoute
@@ -353,6 +362,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/clerk': typeof ClerkRouteRouteWithChildren
+  '/_authenticated/billing': typeof AuthenticatedBillingRouteRouteWithChildren
   '/_authenticated/settings': typeof AuthenticatedSettingsRouteRouteWithChildren
   '/clerk/(auth)': typeof ClerkauthRouteRouteWithChildren
   '/clerk/_authenticated': typeof ClerkAuthenticatedRouteRouteWithChildren
@@ -366,7 +376,6 @@ export interface FileRoutesById {
   '/(errors)/404': typeof errors404Route
   '/(errors)/500': typeof errors500Route
   '/(errors)/503': typeof errors503Route
-  '/_authenticated/billing': typeof AuthenticatedBillingRouteWithChildren
   '/_authenticated/calendar': typeof AuthenticatedCalendarRoute
   '/_authenticated/cases': typeof AuthenticatedCasesRoute
   '/_authenticated/events': typeof AuthenticatedEventsRoute
@@ -387,6 +396,7 @@ export interface FileRoutesById {
   '/clerk/(auth)/sign-up': typeof ClerkauthSignUpRoute
   '/clerk/_authenticated/user-management': typeof ClerkAuthenticatedUserManagementRoute
   '/_authenticated/apps/': typeof AuthenticatedAppsIndexRoute
+  '/_authenticated/billing/': typeof AuthenticatedBillingIndexRoute
   '/_authenticated/chats/': typeof AuthenticatedChatsIndexRoute
   '/_authenticated/help-center/': typeof AuthenticatedHelpCenterIndexRoute
   '/_authenticated/settings/': typeof AuthenticatedSettingsIndexRoute
@@ -397,6 +407,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/clerk'
+    | '/billing'
     | '/settings'
     | '/forgot-password'
     | '/otp'
@@ -408,7 +419,6 @@ export interface FileRouteTypes {
     | '/404'
     | '/500'
     | '/503'
-    | '/billing'
     | '/calendar'
     | '/cases'
     | '/events'
@@ -429,6 +439,7 @@ export interface FileRouteTypes {
     | '/clerk/sign-up'
     | '/clerk/user-management'
     | '/apps'
+    | '/billing/'
     | '/chats'
     | '/help-center'
     | '/settings/'
@@ -447,7 +458,6 @@ export interface FileRouteTypes {
     | '/404'
     | '/500'
     | '/503'
-    | '/billing'
     | '/calendar'
     | '/cases'
     | '/events'
@@ -468,6 +478,7 @@ export interface FileRouteTypes {
     | '/clerk/sign-up'
     | '/clerk/user-management'
     | '/apps'
+    | '/billing'
     | '/chats'
     | '/help-center'
     | '/settings'
@@ -477,6 +488,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/_authenticated'
     | '/clerk'
+    | '/_authenticated/billing'
     | '/_authenticated/settings'
     | '/clerk/(auth)'
     | '/clerk/_authenticated'
@@ -490,7 +502,6 @@ export interface FileRouteTypes {
     | '/(errors)/404'
     | '/(errors)/500'
     | '/(errors)/503'
-    | '/_authenticated/billing'
     | '/_authenticated/calendar'
     | '/_authenticated/cases'
     | '/_authenticated/events'
@@ -511,6 +522,7 @@ export interface FileRouteTypes {
     | '/clerk/(auth)/sign-up'
     | '/clerk/_authenticated/user-management'
     | '/_authenticated/apps/'
+    | '/_authenticated/billing/'
     | '/_authenticated/chats/'
     | '/_authenticated/help-center/'
     | '/_authenticated/settings/'
@@ -575,13 +587,6 @@ declare module '@tanstack/react-router' {
       path: '/calendar'
       fullPath: '/calendar'
       preLoaderRoute: typeof AuthenticatedCalendarRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/billing': {
-      id: '/_authenticated/billing'
-      path: '/billing'
-      fullPath: '/billing'
-      preLoaderRoute: typeof AuthenticatedBillingRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/(errors)/503': {
@@ -675,6 +680,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSettingsRouteRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/billing': {
+      id: '/_authenticated/billing'
+      path: '/billing'
+      fullPath: '/billing'
+      preLoaderRoute: typeof AuthenticatedBillingRouteRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/users/': {
       id: '/_authenticated/users/'
       path: '/users'
@@ -709,6 +721,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/chats'
       preLoaderRoute: typeof AuthenticatedChatsIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/billing/': {
+      id: '/_authenticated/billing/'
+      path: '/'
+      fullPath: '/billing/'
+      preLoaderRoute: typeof AuthenticatedBillingIndexRouteImport
+      parentRoute: typeof AuthenticatedBillingRouteRoute
     }
     '/_authenticated/apps/': {
       id: '/_authenticated/apps/'
@@ -799,31 +818,54 @@ declare module '@tanstack/react-router' {
       path: '/transactions'
       fullPath: '/billing/transactions'
       preLoaderRoute: typeof AuthenticatedBillingTransactionsRouteImport
-      parentRoute: typeof AuthenticatedBillingRoute
+      parentRoute: typeof AuthenticatedBillingRouteRoute
     }
     '/_authenticated/billing/statements': {
       id: '/_authenticated/billing/statements'
       path: '/statements'
       fullPath: '/billing/statements'
       preLoaderRoute: typeof AuthenticatedBillingStatementsRouteImport
-      parentRoute: typeof AuthenticatedBillingRoute
+      parentRoute: typeof AuthenticatedBillingRouteRoute
     }
     '/_authenticated/billing/invoices': {
       id: '/_authenticated/billing/invoices'
       path: '/invoices'
       fullPath: '/billing/invoices'
       preLoaderRoute: typeof AuthenticatedBillingInvoicesRouteImport
-      parentRoute: typeof AuthenticatedBillingRoute
+      parentRoute: typeof AuthenticatedBillingRouteRoute
     }
     '/_authenticated/billing/expenses': {
       id: '/_authenticated/billing/expenses'
       path: '/expenses'
       fullPath: '/billing/expenses'
       preLoaderRoute: typeof AuthenticatedBillingExpensesRouteImport
-      parentRoute: typeof AuthenticatedBillingRoute
+      parentRoute: typeof AuthenticatedBillingRouteRoute
     }
   }
 }
+
+interface AuthenticatedBillingRouteRouteChildren {
+  AuthenticatedBillingExpensesRoute: typeof AuthenticatedBillingExpensesRoute
+  AuthenticatedBillingInvoicesRoute: typeof AuthenticatedBillingInvoicesRoute
+  AuthenticatedBillingStatementsRoute: typeof AuthenticatedBillingStatementsRoute
+  AuthenticatedBillingTransactionsRoute: typeof AuthenticatedBillingTransactionsRoute
+  AuthenticatedBillingIndexRoute: typeof AuthenticatedBillingIndexRoute
+}
+
+const AuthenticatedBillingRouteRouteChildren: AuthenticatedBillingRouteRouteChildren =
+  {
+    AuthenticatedBillingExpensesRoute: AuthenticatedBillingExpensesRoute,
+    AuthenticatedBillingInvoicesRoute: AuthenticatedBillingInvoicesRoute,
+    AuthenticatedBillingStatementsRoute: AuthenticatedBillingStatementsRoute,
+    AuthenticatedBillingTransactionsRoute:
+      AuthenticatedBillingTransactionsRoute,
+    AuthenticatedBillingIndexRoute: AuthenticatedBillingIndexRoute,
+  }
+
+const AuthenticatedBillingRouteRouteWithChildren =
+  AuthenticatedBillingRouteRoute._addFileChildren(
+    AuthenticatedBillingRouteRouteChildren,
+  )
 
 interface AuthenticatedSettingsRouteRouteChildren {
   AuthenticatedSettingsAccountRoute: typeof AuthenticatedSettingsAccountRoute
@@ -848,26 +890,9 @@ const AuthenticatedSettingsRouteRouteWithChildren =
     AuthenticatedSettingsRouteRouteChildren,
   )
 
-interface AuthenticatedBillingRouteChildren {
-  AuthenticatedBillingExpensesRoute: typeof AuthenticatedBillingExpensesRoute
-  AuthenticatedBillingInvoicesRoute: typeof AuthenticatedBillingInvoicesRoute
-  AuthenticatedBillingStatementsRoute: typeof AuthenticatedBillingStatementsRoute
-  AuthenticatedBillingTransactionsRoute: typeof AuthenticatedBillingTransactionsRoute
-}
-
-const AuthenticatedBillingRouteChildren: AuthenticatedBillingRouteChildren = {
-  AuthenticatedBillingExpensesRoute: AuthenticatedBillingExpensesRoute,
-  AuthenticatedBillingInvoicesRoute: AuthenticatedBillingInvoicesRoute,
-  AuthenticatedBillingStatementsRoute: AuthenticatedBillingStatementsRoute,
-  AuthenticatedBillingTransactionsRoute: AuthenticatedBillingTransactionsRoute,
-}
-
-const AuthenticatedBillingRouteWithChildren =
-  AuthenticatedBillingRoute._addFileChildren(AuthenticatedBillingRouteChildren)
-
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedBillingRouteRoute: typeof AuthenticatedBillingRouteRouteWithChildren
   AuthenticatedSettingsRouteRoute: typeof AuthenticatedSettingsRouteRouteWithChildren
-  AuthenticatedBillingRoute: typeof AuthenticatedBillingRouteWithChildren
   AuthenticatedCalendarRoute: typeof AuthenticatedCalendarRoute
   AuthenticatedCasesRoute: typeof AuthenticatedCasesRoute
   AuthenticatedEventsRoute: typeof AuthenticatedEventsRoute
@@ -884,8 +909,8 @@ interface AuthenticatedRouteRouteChildren {
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedBillingRouteRoute: AuthenticatedBillingRouteRouteWithChildren,
   AuthenticatedSettingsRouteRoute: AuthenticatedSettingsRouteRouteWithChildren,
-  AuthenticatedBillingRoute: AuthenticatedBillingRouteWithChildren,
   AuthenticatedCalendarRoute: AuthenticatedCalendarRoute,
   AuthenticatedCasesRoute: AuthenticatedCasesRoute,
   AuthenticatedEventsRoute: AuthenticatedEventsRoute,
