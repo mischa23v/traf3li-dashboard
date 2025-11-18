@@ -1,6 +1,7 @@
 import {
   LayoutDashboard,
   Calendar,
+  CalendarDays,
   ListTodo,
   MessagesSquare,
   Briefcase,
@@ -131,6 +132,11 @@ export function useSidebarData(): SidebarData {
               },
             ],
           },
+          {
+            title: t('sidebar.events'),
+            url: '/events',
+            icon: CalendarDays,
+          },
         ],
       },
       {
@@ -159,6 +165,20 @@ export function useSidebarData(): SidebarData {
               {
                 title: t('sidebar.transactions'),
                 url: '/billing/transactions',
+              },
+            ],
+          },
+          {
+            title: t('sidebar.finance'),
+            icon: DollarSign,
+            items: [
+              {
+                title: t('sidebar.accountActivity'),
+                url: '/finance/account-activity',
+              },
+              {
+                title: t('sidebar.timeTracking'),
+                url: '/finance/time-tracking',
               },
             ],
           },

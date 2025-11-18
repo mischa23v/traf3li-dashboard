@@ -30,6 +30,7 @@ import { Route as AuthenticatedTasksIndexRouteImport } from './routes/_authentic
 import { Route as AuthenticatedSettingsIndexRouteImport } from './routes/_authenticated/settings/index'
 import { Route as AuthenticatedReviewsIndexRouteImport } from './routes/_authenticated/reviews/index'
 import { Route as AuthenticatedHelpCenterIndexRouteImport } from './routes/_authenticated/help-center/index'
+import { Route as AuthenticatedEventsIndexRouteImport } from './routes/_authenticated/events/index'
 import { Route as AuthenticatedClientsIndexRouteImport } from './routes/_authenticated/clients/index'
 import { Route as AuthenticatedChatsIndexRouteImport } from './routes/_authenticated/chats/index'
 import { Route as AuthenticatedCasesIndexRouteImport } from './routes/_authenticated/cases/index'
@@ -56,6 +57,8 @@ import { Route as AuthenticatedKnowledgeLawsRouteImport } from './routes/_authen
 import { Route as AuthenticatedKnowledgeJudgmentsRouteImport } from './routes/_authenticated/knowledge/judgments'
 import { Route as AuthenticatedJobsMyGigsRouteImport } from './routes/_authenticated/jobs/my-gigs'
 import { Route as AuthenticatedJobsBrowseRouteImport } from './routes/_authenticated/jobs/browse'
+import { Route as AuthenticatedFinanceTimeTrackingRouteImport } from './routes/_authenticated/finance/time-tracking'
+import { Route as AuthenticatedFinanceAccountActivityRouteImport } from './routes/_authenticated/finance/account-activity'
 import { Route as AuthenticatedErrorsErrorRouteImport } from './routes/_authenticated/errors/$error'
 import { Route as AuthenticatedClientsCurrentRouteImport } from './routes/_authenticated/clients/current'
 import { Route as AuthenticatedCasesActiveRouteImport } from './routes/_authenticated/cases/active'
@@ -168,6 +171,12 @@ const AuthenticatedHelpCenterIndexRoute =
   AuthenticatedHelpCenterIndexRouteImport.update({
     id: '/help-center/',
     path: '/help-center/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedEventsIndexRoute =
+  AuthenticatedEventsIndexRouteImport.update({
+    id: '/events/',
+    path: '/events/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedClientsIndexRoute =
@@ -318,6 +327,18 @@ const AuthenticatedJobsBrowseRoute = AuthenticatedJobsBrowseRouteImport.update({
   path: '/jobs/browse',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedFinanceTimeTrackingRoute =
+  AuthenticatedFinanceTimeTrackingRouteImport.update({
+    id: '/finance/time-tracking',
+    path: '/finance/time-tracking',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedFinanceAccountActivityRoute =
+  AuthenticatedFinanceAccountActivityRouteImport.update({
+    id: '/finance/account-activity',
+    path: '/finance/account-activity',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedErrorsErrorRoute =
   AuthenticatedErrorsErrorRouteImport.update({
     id: '/errors/$error',
@@ -382,6 +403,8 @@ export interface FileRoutesByFullPath {
   '/cases/active': typeof AuthenticatedCasesActiveRoute
   '/clients/current': typeof AuthenticatedClientsCurrentRoute
   '/errors/$error': typeof AuthenticatedErrorsErrorRoute
+  '/finance/account-activity': typeof AuthenticatedFinanceAccountActivityRoute
+  '/finance/time-tracking': typeof AuthenticatedFinanceTimeTrackingRoute
   '/jobs/browse': typeof AuthenticatedJobsBrowseRoute
   '/jobs/my-gigs': typeof AuthenticatedJobsMyGigsRoute
   '/knowledge/judgments': typeof AuthenticatedKnowledgeJudgmentsRoute
@@ -408,6 +431,7 @@ export interface FileRoutesByFullPath {
   '/cases': typeof AuthenticatedCasesIndexRoute
   '/chats': typeof AuthenticatedChatsIndexRoute
   '/clients': typeof AuthenticatedClientsIndexRoute
+  '/events': typeof AuthenticatedEventsIndexRoute
   '/help-center': typeof AuthenticatedHelpCenterIndexRoute
   '/reviews': typeof AuthenticatedReviewsIndexRoute
   '/settings/': typeof AuthenticatedSettingsIndexRoute
@@ -434,6 +458,8 @@ export interface FileRoutesByTo {
   '/cases/active': typeof AuthenticatedCasesActiveRoute
   '/clients/current': typeof AuthenticatedClientsCurrentRoute
   '/errors/$error': typeof AuthenticatedErrorsErrorRoute
+  '/finance/account-activity': typeof AuthenticatedFinanceAccountActivityRoute
+  '/finance/time-tracking': typeof AuthenticatedFinanceTimeTrackingRoute
   '/jobs/browse': typeof AuthenticatedJobsBrowseRoute
   '/jobs/my-gigs': typeof AuthenticatedJobsMyGigsRoute
   '/knowledge/judgments': typeof AuthenticatedKnowledgeJudgmentsRoute
@@ -460,6 +486,7 @@ export interface FileRoutesByTo {
   '/cases': typeof AuthenticatedCasesIndexRoute
   '/chats': typeof AuthenticatedChatsIndexRoute
   '/clients': typeof AuthenticatedClientsIndexRoute
+  '/events': typeof AuthenticatedEventsIndexRoute
   '/help-center': typeof AuthenticatedHelpCenterIndexRoute
   '/reviews': typeof AuthenticatedReviewsIndexRoute
   '/settings': typeof AuthenticatedSettingsIndexRoute
@@ -491,6 +518,8 @@ export interface FileRoutesById {
   '/_authenticated/cases/active': typeof AuthenticatedCasesActiveRoute
   '/_authenticated/clients/current': typeof AuthenticatedClientsCurrentRoute
   '/_authenticated/errors/$error': typeof AuthenticatedErrorsErrorRoute
+  '/_authenticated/finance/account-activity': typeof AuthenticatedFinanceAccountActivityRoute
+  '/_authenticated/finance/time-tracking': typeof AuthenticatedFinanceTimeTrackingRoute
   '/_authenticated/jobs/browse': typeof AuthenticatedJobsBrowseRoute
   '/_authenticated/jobs/my-gigs': typeof AuthenticatedJobsMyGigsRoute
   '/_authenticated/knowledge/judgments': typeof AuthenticatedKnowledgeJudgmentsRoute
@@ -517,6 +546,7 @@ export interface FileRoutesById {
   '/_authenticated/cases/': typeof AuthenticatedCasesIndexRoute
   '/_authenticated/chats/': typeof AuthenticatedChatsIndexRoute
   '/_authenticated/clients/': typeof AuthenticatedClientsIndexRoute
+  '/_authenticated/events/': typeof AuthenticatedEventsIndexRoute
   '/_authenticated/help-center/': typeof AuthenticatedHelpCenterIndexRoute
   '/_authenticated/reviews/': typeof AuthenticatedReviewsIndexRoute
   '/_authenticated/settings/': typeof AuthenticatedSettingsIndexRoute
@@ -546,6 +576,8 @@ export interface FileRouteTypes {
     | '/cases/active'
     | '/clients/current'
     | '/errors/$error'
+    | '/finance/account-activity'
+    | '/finance/time-tracking'
     | '/jobs/browse'
     | '/jobs/my-gigs'
     | '/knowledge/judgments'
@@ -572,6 +604,7 @@ export interface FileRouteTypes {
     | '/cases'
     | '/chats'
     | '/clients'
+    | '/events'
     | '/help-center'
     | '/reviews'
     | '/settings/'
@@ -598,6 +631,8 @@ export interface FileRouteTypes {
     | '/cases/active'
     | '/clients/current'
     | '/errors/$error'
+    | '/finance/account-activity'
+    | '/finance/time-tracking'
     | '/jobs/browse'
     | '/jobs/my-gigs'
     | '/knowledge/judgments'
@@ -624,6 +659,7 @@ export interface FileRouteTypes {
     | '/cases'
     | '/chats'
     | '/clients'
+    | '/events'
     | '/help-center'
     | '/reviews'
     | '/settings'
@@ -654,6 +690,8 @@ export interface FileRouteTypes {
     | '/_authenticated/cases/active'
     | '/_authenticated/clients/current'
     | '/_authenticated/errors/$error'
+    | '/_authenticated/finance/account-activity'
+    | '/_authenticated/finance/time-tracking'
     | '/_authenticated/jobs/browse'
     | '/_authenticated/jobs/my-gigs'
     | '/_authenticated/knowledge/judgments'
@@ -680,6 +718,7 @@ export interface FileRouteTypes {
     | '/_authenticated/cases/'
     | '/_authenticated/chats/'
     | '/_authenticated/clients/'
+    | '/_authenticated/events/'
     | '/_authenticated/help-center/'
     | '/_authenticated/reviews/'
     | '/_authenticated/settings/'
@@ -849,6 +888,13 @@ declare module '@tanstack/react-router' {
       path: '/help-center'
       fullPath: '/help-center'
       preLoaderRoute: typeof AuthenticatedHelpCenterIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/events/': {
+      id: '/_authenticated/events/'
+      path: '/events'
+      fullPath: '/events'
+      preLoaderRoute: typeof AuthenticatedEventsIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/clients/': {
@@ -1033,6 +1079,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedJobsBrowseRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/finance/time-tracking': {
+      id: '/_authenticated/finance/time-tracking'
+      path: '/finance/time-tracking'
+      fullPath: '/finance/time-tracking'
+      preLoaderRoute: typeof AuthenticatedFinanceTimeTrackingRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/finance/account-activity': {
+      id: '/_authenticated/finance/account-activity'
+      path: '/finance/account-activity'
+      fullPath: '/finance/account-activity'
+      preLoaderRoute: typeof AuthenticatedFinanceAccountActivityRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/errors/$error': {
       id: '/_authenticated/errors/$error'
       path: '/errors/$error'
@@ -1120,6 +1180,8 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedCasesActiveRoute: typeof AuthenticatedCasesActiveRoute
   AuthenticatedClientsCurrentRoute: typeof AuthenticatedClientsCurrentRoute
   AuthenticatedErrorsErrorRoute: typeof AuthenticatedErrorsErrorRoute
+  AuthenticatedFinanceAccountActivityRoute: typeof AuthenticatedFinanceAccountActivityRoute
+  AuthenticatedFinanceTimeTrackingRoute: typeof AuthenticatedFinanceTimeTrackingRoute
   AuthenticatedJobsBrowseRoute: typeof AuthenticatedJobsBrowseRoute
   AuthenticatedJobsMyGigsRoute: typeof AuthenticatedJobsMyGigsRoute
   AuthenticatedKnowledgeJudgmentsRoute: typeof AuthenticatedKnowledgeJudgmentsRoute
@@ -1138,6 +1200,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedCasesIndexRoute: typeof AuthenticatedCasesIndexRoute
   AuthenticatedChatsIndexRoute: typeof AuthenticatedChatsIndexRoute
   AuthenticatedClientsIndexRoute: typeof AuthenticatedClientsIndexRoute
+  AuthenticatedEventsIndexRoute: typeof AuthenticatedEventsIndexRoute
   AuthenticatedHelpCenterIndexRoute: typeof AuthenticatedHelpCenterIndexRoute
   AuthenticatedReviewsIndexRoute: typeof AuthenticatedReviewsIndexRoute
   AuthenticatedTasksIndexRoute: typeof AuthenticatedTasksIndexRoute
@@ -1154,6 +1217,9 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedCasesActiveRoute: AuthenticatedCasesActiveRoute,
   AuthenticatedClientsCurrentRoute: AuthenticatedClientsCurrentRoute,
   AuthenticatedErrorsErrorRoute: AuthenticatedErrorsErrorRoute,
+  AuthenticatedFinanceAccountActivityRoute:
+    AuthenticatedFinanceAccountActivityRoute,
+  AuthenticatedFinanceTimeTrackingRoute: AuthenticatedFinanceTimeTrackingRoute,
   AuthenticatedJobsBrowseRoute: AuthenticatedJobsBrowseRoute,
   AuthenticatedJobsMyGigsRoute: AuthenticatedJobsMyGigsRoute,
   AuthenticatedKnowledgeJudgmentsRoute: AuthenticatedKnowledgeJudgmentsRoute,
@@ -1172,6 +1238,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedCasesIndexRoute: AuthenticatedCasesIndexRoute,
   AuthenticatedChatsIndexRoute: AuthenticatedChatsIndexRoute,
   AuthenticatedClientsIndexRoute: AuthenticatedClientsIndexRoute,
+  AuthenticatedEventsIndexRoute: AuthenticatedEventsIndexRoute,
   AuthenticatedHelpCenterIndexRoute: AuthenticatedHelpCenterIndexRoute,
   AuthenticatedReviewsIndexRoute: AuthenticatedReviewsIndexRoute,
   AuthenticatedTasksIndexRoute: AuthenticatedTasksIndexRoute,
