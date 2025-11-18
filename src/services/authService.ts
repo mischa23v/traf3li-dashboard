@@ -68,12 +68,42 @@ interface AuthResponse {
 }
 
 /**
+ * Mock user for development
+ * Use credentials: username="admin" OR "lawyer", password="123456"
+ */
+const MOCK_USER: User = {
+  _id: 'mock-user-id',
+  username: 'admin',
+  email: 'admin@traf3li.com',
+  role: 'lawyer',
+  country: 'SA',
+  phone: '+966500000000',
+  description: 'Mock user for development',
+  isSeller: true,
+  lawyerProfile: {
+    specialization: ['Commercial Law', 'Corporate Law'],
+    licenseNumber: 'LAW-12345',
+    barAssociation: 'Saudi Bar Association',
+    yearsExperience: 10,
+    verified: true,
+    rating: 4.8,
+    totalReviews: 150,
+    casesWon: 85,
+    casesTotal: 100,
+    languages: ['Arabic', 'English'],
+  },
+  createdAt: new Date().toISOString(),
+  updatedAt: new Date().toISOString(),
+}
+
+/**
  * Auth Service Object
  */
 const authService = {
   /**
    * Login user
    * Backend sets HttpOnly cookie automatically
+   * Falls back to mock auth if backend is unavailable in development
    */
   login: async (credentials: LoginCredentials): Promise<User> => {
     try {
@@ -92,6 +122,23 @@ const authService = {
       return response.data.user
     } catch (error: any) {
       console.error('Login error:', error)
+
+      // In development, allow mock authentication if backend is down
+      if (import.meta.env.DEV) {
+        console.warn('⚠️ Backend unavailable, using mock authentication')
+        console.log('📝 Mock credentials: username="admin" or "lawyer", password="123456"')
+
+        // Check if credentials match mock user
+        if (
+          (credentials.username === 'admin' || credentials.username === 'lawyer') &&
+          credentials.password === '123456'
+        ) {
+          localStorage.setItem('user', JSON.stringify(MOCK_USER))
+          console.log('✅ Mock login successful!')
+          return MOCK_USER
+        }
+      }
+
       throw new Error(handleApiError(error))
     }
   },
@@ -133,6 +180,7 @@ const authService = {
   /**
    * Get current authenticated user
    * Verifies token validity with backend
+   * Falls back to cached user in development if backend is down
    */
   getCurrentUser: async (): Promise<User | null> => {
     try {
@@ -148,6 +196,16 @@ const authService = {
       return response.data.user
     } catch (error: any) {
       console.error('Get current user error:', error)
+
+      // In development, return cached user if backend is down
+      if (import.meta.env.DEV) {
+        const cachedUser = authService.getCachedUser()
+        if (cachedUser) {
+          console.warn('⚠️ Backend unavailable, using cached user')
+          return cachedUser
+        }
+      }
+
       // If unauthorized, clear localStorage
       if (error?.status === 401) {
         localStorage.removeItem('user')
