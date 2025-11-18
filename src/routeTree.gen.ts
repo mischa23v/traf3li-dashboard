@@ -31,6 +31,7 @@ import { Route as AuthenticatedTasksIndexRouteImport } from './routes/_authentic
 import { Route as AuthenticatedSettingsIndexRouteImport } from './routes/_authenticated/settings/index'
 import { Route as AuthenticatedHelpCenterIndexRouteImport } from './routes/_authenticated/help-center/index'
 import { Route as AuthenticatedFinancialIndexRouteImport } from './routes/_authenticated/financial/index'
+import { Route as AuthenticatedExpensesIndexRouteImport } from './routes/_authenticated/expenses/index'
 import { Route as AuthenticatedChatsIndexRouteImport } from './routes/_authenticated/chats/index'
 import { Route as AuthenticatedBillingIndexRouteImport } from './routes/_authenticated/billing/index'
 import { Route as AuthenticatedAppsIndexRouteImport } from './routes/_authenticated/apps/index'
@@ -155,6 +156,12 @@ const AuthenticatedFinancialIndexRoute =
     path: '/financial/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedExpensesIndexRoute =
+  AuthenticatedExpensesIndexRouteImport.update({
+    id: '/expenses/',
+    path: '/expenses/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedChatsIndexRoute = AuthenticatedChatsIndexRouteImport.update({
   id: '/chats/',
   path: '/chats/',
@@ -243,6 +250,7 @@ export interface FileRoutesByFullPath {
   '/apps': typeof AuthenticatedAppsIndexRoute
   '/billing': typeof AuthenticatedBillingIndexRoute
   '/chats': typeof AuthenticatedChatsIndexRoute
+  '/expenses': typeof AuthenticatedExpensesIndexRoute
   '/financial': typeof AuthenticatedFinancialIndexRoute
   '/help-center': typeof AuthenticatedHelpCenterIndexRoute
   '/settings/': typeof AuthenticatedSettingsIndexRoute
@@ -274,6 +282,7 @@ export interface FileRoutesByTo {
   '/apps': typeof AuthenticatedAppsIndexRoute
   '/billing': typeof AuthenticatedBillingIndexRoute
   '/chats': typeof AuthenticatedChatsIndexRoute
+  '/expenses': typeof AuthenticatedExpensesIndexRoute
   '/financial': typeof AuthenticatedFinancialIndexRoute
   '/help-center': typeof AuthenticatedHelpCenterIndexRoute
   '/settings': typeof AuthenticatedSettingsIndexRoute
@@ -310,6 +319,7 @@ export interface FileRoutesById {
   '/_authenticated/apps/': typeof AuthenticatedAppsIndexRoute
   '/_authenticated/billing/': typeof AuthenticatedBillingIndexRoute
   '/_authenticated/chats/': typeof AuthenticatedChatsIndexRoute
+  '/_authenticated/expenses/': typeof AuthenticatedExpensesIndexRoute
   '/_authenticated/financial/': typeof AuthenticatedFinancialIndexRoute
   '/_authenticated/help-center/': typeof AuthenticatedHelpCenterIndexRoute
   '/_authenticated/settings/': typeof AuthenticatedSettingsIndexRoute
@@ -344,6 +354,7 @@ export interface FileRouteTypes {
     | '/apps'
     | '/billing'
     | '/chats'
+    | '/expenses'
     | '/financial'
     | '/help-center'
     | '/settings/'
@@ -375,6 +386,7 @@ export interface FileRouteTypes {
     | '/apps'
     | '/billing'
     | '/chats'
+    | '/expenses'
     | '/financial'
     | '/help-center'
     | '/settings'
@@ -410,6 +422,7 @@ export interface FileRouteTypes {
     | '/_authenticated/apps/'
     | '/_authenticated/billing/'
     | '/_authenticated/chats/'
+    | '/_authenticated/expenses/'
     | '/_authenticated/financial/'
     | '/_authenticated/help-center/'
     | '/_authenticated/settings/'
@@ -589,6 +602,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedFinancialIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/expenses/': {
+      id: '/_authenticated/expenses/'
+      path: '/expenses'
+      fullPath: '/expenses'
+      preLoaderRoute: typeof AuthenticatedExpensesIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/chats/': {
       id: '/_authenticated/chats/'
       path: '/chats'
@@ -699,6 +719,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAppsIndexRoute: typeof AuthenticatedAppsIndexRoute
   AuthenticatedBillingIndexRoute: typeof AuthenticatedBillingIndexRoute
   AuthenticatedChatsIndexRoute: typeof AuthenticatedChatsIndexRoute
+  AuthenticatedExpensesIndexRoute: typeof AuthenticatedExpensesIndexRoute
   AuthenticatedFinancialIndexRoute: typeof AuthenticatedFinancialIndexRoute
   AuthenticatedHelpCenterIndexRoute: typeof AuthenticatedHelpCenterIndexRoute
   AuthenticatedTasksIndexRoute: typeof AuthenticatedTasksIndexRoute
@@ -713,6 +734,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAppsIndexRoute: AuthenticatedAppsIndexRoute,
   AuthenticatedBillingIndexRoute: AuthenticatedBillingIndexRoute,
   AuthenticatedChatsIndexRoute: AuthenticatedChatsIndexRoute,
+  AuthenticatedExpensesIndexRoute: AuthenticatedExpensesIndexRoute,
   AuthenticatedFinancialIndexRoute: AuthenticatedFinancialIndexRoute,
   AuthenticatedHelpCenterIndexRoute: AuthenticatedHelpCenterIndexRoute,
   AuthenticatedTasksIndexRoute: AuthenticatedTasksIndexRoute,
