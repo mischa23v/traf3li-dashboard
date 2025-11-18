@@ -223,11 +223,11 @@ export function useSidebarData(): SidebarData {
               },
               {
                 title: t('sidebar.security'),
-                url: '/settings',
+                url: '/settings/account',
               },
               {
                 title: t('sidebar.preferences'),
-                url: '/settings',
+                url: '/settings/appearance',
               },
             ],
           },
