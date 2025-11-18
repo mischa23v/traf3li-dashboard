@@ -28,17 +28,41 @@ import { Route as AuthenticatedSettingsRouteRouteImport } from './routes/_authen
 import { Route as AuthenticatedUsersIndexRouteImport } from './routes/_authenticated/users/index'
 import { Route as AuthenticatedTasksIndexRouteImport } from './routes/_authenticated/tasks/index'
 import { Route as AuthenticatedSettingsIndexRouteImport } from './routes/_authenticated/settings/index'
+import { Route as AuthenticatedReviewsIndexRouteImport } from './routes/_authenticated/reviews/index'
 import { Route as AuthenticatedHelpCenterIndexRouteImport } from './routes/_authenticated/help-center/index'
+import { Route as AuthenticatedClientsIndexRouteImport } from './routes/_authenticated/clients/index'
 import { Route as AuthenticatedChatsIndexRouteImport } from './routes/_authenticated/chats/index'
+import { Route as AuthenticatedCasesIndexRouteImport } from './routes/_authenticated/cases/index'
+import { Route as AuthenticatedCalendarIndexRouteImport } from './routes/_authenticated/calendar/index'
+import { Route as AuthenticatedBillingIndexRouteImport } from './routes/_authenticated/billing/index'
 import { Route as AuthenticatedAppsIndexRouteImport } from './routes/_authenticated/apps/index'
 import { Route as ClerkAuthenticatedUserManagementRouteImport } from './routes/clerk/_authenticated/user-management'
 import { Route as ClerkauthSignUpRouteImport } from './routes/clerk/(auth)/sign-up'
 import { Route as ClerkauthSignInRouteImport } from './routes/clerk/(auth)/sign-in'
+import { Route as AuthenticatedTasksRemindersRouteImport } from './routes/_authenticated/tasks/reminders'
+import { Route as AuthenticatedSettingsSecurityRouteImport } from './routes/_authenticated/settings/security'
 import { Route as AuthenticatedSettingsNotificationsRouteImport } from './routes/_authenticated/settings/notifications'
 import { Route as AuthenticatedSettingsDisplayRouteImport } from './routes/_authenticated/settings/display'
 import { Route as AuthenticatedSettingsAppearanceRouteImport } from './routes/_authenticated/settings/appearance'
 import { Route as AuthenticatedSettingsAccountRouteImport } from './routes/_authenticated/settings/account'
+import { Route as AuthenticatedReviewsBadgesRouteImport } from './routes/_authenticated/reviews/badges'
+import { Route as AuthenticatedReviewsAllRouteImport } from './routes/_authenticated/reviews/all'
+import { Route as AuthenticatedReportsTimeTrackingRouteImport } from './routes/_authenticated/reports/time-tracking'
+import { Route as AuthenticatedReportsRevenueRouteImport } from './routes/_authenticated/reports/revenue'
+import { Route as AuthenticatedReportsCasesRouteImport } from './routes/_authenticated/reports/cases'
+import { Route as AuthenticatedMessagesEmailRouteImport } from './routes/_authenticated/messages/email'
+import { Route as AuthenticatedKnowledgeTemplatesRouteImport } from './routes/_authenticated/knowledge/templates'
+import { Route as AuthenticatedKnowledgeLawsRouteImport } from './routes/_authenticated/knowledge/laws'
+import { Route as AuthenticatedKnowledgeJudgmentsRouteImport } from './routes/_authenticated/knowledge/judgments'
+import { Route as AuthenticatedJobsMyGigsRouteImport } from './routes/_authenticated/jobs/my-gigs'
+import { Route as AuthenticatedJobsBrowseRouteImport } from './routes/_authenticated/jobs/browse'
 import { Route as AuthenticatedErrorsErrorRouteImport } from './routes/_authenticated/errors/$error'
+import { Route as AuthenticatedClientsCurrentRouteImport } from './routes/_authenticated/clients/current'
+import { Route as AuthenticatedCasesActiveRouteImport } from './routes/_authenticated/cases/active'
+import { Route as AuthenticatedBillingTransactionsRouteImport } from './routes/_authenticated/billing/transactions'
+import { Route as AuthenticatedBillingStatementsRouteImport } from './routes/_authenticated/billing/statements'
+import { Route as AuthenticatedBillingInvoicesRouteImport } from './routes/_authenticated/billing/invoices'
+import { Route as AuthenticatedBillingExpensesRouteImport } from './routes/_authenticated/billing/expenses'
 
 const ClerkRouteRoute = ClerkRouteRouteImport.update({
   id: '/clerk',
@@ -134,10 +158,22 @@ const AuthenticatedSettingsIndexRoute =
     path: '/',
     getParentRoute: () => AuthenticatedSettingsRouteRoute,
   } as any)
+const AuthenticatedReviewsIndexRoute =
+  AuthenticatedReviewsIndexRouteImport.update({
+    id: '/reviews/',
+    path: '/reviews/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedHelpCenterIndexRoute =
   AuthenticatedHelpCenterIndexRouteImport.update({
     id: '/help-center/',
     path: '/help-center/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedClientsIndexRoute =
+  AuthenticatedClientsIndexRouteImport.update({
+    id: '/clients/',
+    path: '/clients/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedChatsIndexRoute = AuthenticatedChatsIndexRouteImport.update({
@@ -145,6 +181,23 @@ const AuthenticatedChatsIndexRoute = AuthenticatedChatsIndexRouteImport.update({
   path: '/chats/',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedCasesIndexRoute = AuthenticatedCasesIndexRouteImport.update({
+  id: '/cases/',
+  path: '/cases/',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedCalendarIndexRoute =
+  AuthenticatedCalendarIndexRouteImport.update({
+    id: '/calendar/',
+    path: '/calendar/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedBillingIndexRoute =
+  AuthenticatedBillingIndexRouteImport.update({
+    id: '/billing/',
+    path: '/billing/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAppsIndexRoute = AuthenticatedAppsIndexRouteImport.update({
   id: '/apps/',
   path: '/apps/',
@@ -166,6 +219,18 @@ const ClerkauthSignInRoute = ClerkauthSignInRouteImport.update({
   path: '/sign-in',
   getParentRoute: () => ClerkauthRouteRoute,
 } as any)
+const AuthenticatedTasksRemindersRoute =
+  AuthenticatedTasksRemindersRouteImport.update({
+    id: '/tasks/reminders',
+    path: '/tasks/reminders',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedSettingsSecurityRoute =
+  AuthenticatedSettingsSecurityRouteImport.update({
+    id: '/security',
+    path: '/security',
+    getParentRoute: () => AuthenticatedSettingsRouteRoute,
+  } as any)
 const AuthenticatedSettingsNotificationsRoute =
   AuthenticatedSettingsNotificationsRouteImport.update({
     id: '/notifications',
@@ -190,10 +255,109 @@ const AuthenticatedSettingsAccountRoute =
     path: '/account',
     getParentRoute: () => AuthenticatedSettingsRouteRoute,
   } as any)
+const AuthenticatedReviewsBadgesRoute =
+  AuthenticatedReviewsBadgesRouteImport.update({
+    id: '/reviews/badges',
+    path: '/reviews/badges',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedReviewsAllRoute = AuthenticatedReviewsAllRouteImport.update({
+  id: '/reviews/all',
+  path: '/reviews/all',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedReportsTimeTrackingRoute =
+  AuthenticatedReportsTimeTrackingRouteImport.update({
+    id: '/reports/time-tracking',
+    path: '/reports/time-tracking',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedReportsRevenueRoute =
+  AuthenticatedReportsRevenueRouteImport.update({
+    id: '/reports/revenue',
+    path: '/reports/revenue',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedReportsCasesRoute =
+  AuthenticatedReportsCasesRouteImport.update({
+    id: '/reports/cases',
+    path: '/reports/cases',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedMessagesEmailRoute =
+  AuthenticatedMessagesEmailRouteImport.update({
+    id: '/messages/email',
+    path: '/messages/email',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedKnowledgeTemplatesRoute =
+  AuthenticatedKnowledgeTemplatesRouteImport.update({
+    id: '/knowledge/templates',
+    path: '/knowledge/templates',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedKnowledgeLawsRoute =
+  AuthenticatedKnowledgeLawsRouteImport.update({
+    id: '/knowledge/laws',
+    path: '/knowledge/laws',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedKnowledgeJudgmentsRoute =
+  AuthenticatedKnowledgeJudgmentsRouteImport.update({
+    id: '/knowledge/judgments',
+    path: '/knowledge/judgments',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedJobsMyGigsRoute = AuthenticatedJobsMyGigsRouteImport.update({
+  id: '/jobs/my-gigs',
+  path: '/jobs/my-gigs',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedJobsBrowseRoute = AuthenticatedJobsBrowseRouteImport.update({
+  id: '/jobs/browse',
+  path: '/jobs/browse',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedErrorsErrorRoute =
   AuthenticatedErrorsErrorRouteImport.update({
     id: '/errors/$error',
     path: '/errors/$error',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedClientsCurrentRoute =
+  AuthenticatedClientsCurrentRouteImport.update({
+    id: '/clients/current',
+    path: '/clients/current',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedCasesActiveRoute =
+  AuthenticatedCasesActiveRouteImport.update({
+    id: '/cases/active',
+    path: '/cases/active',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedBillingTransactionsRoute =
+  AuthenticatedBillingTransactionsRouteImport.update({
+    id: '/billing/transactions',
+    path: '/billing/transactions',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedBillingStatementsRoute =
+  AuthenticatedBillingStatementsRouteImport.update({
+    id: '/billing/statements',
+    path: '/billing/statements',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedBillingInvoicesRoute =
+  AuthenticatedBillingInvoicesRouteImport.update({
+    id: '/billing/invoices',
+    path: '/billing/invoices',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedBillingExpensesRoute =
+  AuthenticatedBillingExpensesRouteImport.update({
+    id: '/billing/expenses',
+    path: '/billing/expenses',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 
@@ -211,17 +375,41 @@ export interface FileRoutesByFullPath {
   '/500': typeof errors500Route
   '/503': typeof errors503Route
   '/': typeof AuthenticatedIndexRoute
+  '/billing/expenses': typeof AuthenticatedBillingExpensesRoute
+  '/billing/invoices': typeof AuthenticatedBillingInvoicesRoute
+  '/billing/statements': typeof AuthenticatedBillingStatementsRoute
+  '/billing/transactions': typeof AuthenticatedBillingTransactionsRoute
+  '/cases/active': typeof AuthenticatedCasesActiveRoute
+  '/clients/current': typeof AuthenticatedClientsCurrentRoute
   '/errors/$error': typeof AuthenticatedErrorsErrorRoute
+  '/jobs/browse': typeof AuthenticatedJobsBrowseRoute
+  '/jobs/my-gigs': typeof AuthenticatedJobsMyGigsRoute
+  '/knowledge/judgments': typeof AuthenticatedKnowledgeJudgmentsRoute
+  '/knowledge/laws': typeof AuthenticatedKnowledgeLawsRoute
+  '/knowledge/templates': typeof AuthenticatedKnowledgeTemplatesRoute
+  '/messages/email': typeof AuthenticatedMessagesEmailRoute
+  '/reports/cases': typeof AuthenticatedReportsCasesRoute
+  '/reports/revenue': typeof AuthenticatedReportsRevenueRoute
+  '/reports/time-tracking': typeof AuthenticatedReportsTimeTrackingRoute
+  '/reviews/all': typeof AuthenticatedReviewsAllRoute
+  '/reviews/badges': typeof AuthenticatedReviewsBadgesRoute
   '/settings/account': typeof AuthenticatedSettingsAccountRoute
   '/settings/appearance': typeof AuthenticatedSettingsAppearanceRoute
   '/settings/display': typeof AuthenticatedSettingsDisplayRoute
   '/settings/notifications': typeof AuthenticatedSettingsNotificationsRoute
+  '/settings/security': typeof AuthenticatedSettingsSecurityRoute
+  '/tasks/reminders': typeof AuthenticatedTasksRemindersRoute
   '/clerk/sign-in': typeof ClerkauthSignInRoute
   '/clerk/sign-up': typeof ClerkauthSignUpRoute
   '/clerk/user-management': typeof ClerkAuthenticatedUserManagementRoute
   '/apps': typeof AuthenticatedAppsIndexRoute
+  '/billing': typeof AuthenticatedBillingIndexRoute
+  '/calendar': typeof AuthenticatedCalendarIndexRoute
+  '/cases': typeof AuthenticatedCasesIndexRoute
   '/chats': typeof AuthenticatedChatsIndexRoute
+  '/clients': typeof AuthenticatedClientsIndexRoute
   '/help-center': typeof AuthenticatedHelpCenterIndexRoute
+  '/reviews': typeof AuthenticatedReviewsIndexRoute
   '/settings/': typeof AuthenticatedSettingsIndexRoute
   '/tasks': typeof AuthenticatedTasksIndexRoute
   '/users': typeof AuthenticatedUsersIndexRoute
@@ -239,17 +427,41 @@ export interface FileRoutesByTo {
   '/500': typeof errors500Route
   '/503': typeof errors503Route
   '/': typeof AuthenticatedIndexRoute
+  '/billing/expenses': typeof AuthenticatedBillingExpensesRoute
+  '/billing/invoices': typeof AuthenticatedBillingInvoicesRoute
+  '/billing/statements': typeof AuthenticatedBillingStatementsRoute
+  '/billing/transactions': typeof AuthenticatedBillingTransactionsRoute
+  '/cases/active': typeof AuthenticatedCasesActiveRoute
+  '/clients/current': typeof AuthenticatedClientsCurrentRoute
   '/errors/$error': typeof AuthenticatedErrorsErrorRoute
+  '/jobs/browse': typeof AuthenticatedJobsBrowseRoute
+  '/jobs/my-gigs': typeof AuthenticatedJobsMyGigsRoute
+  '/knowledge/judgments': typeof AuthenticatedKnowledgeJudgmentsRoute
+  '/knowledge/laws': typeof AuthenticatedKnowledgeLawsRoute
+  '/knowledge/templates': typeof AuthenticatedKnowledgeTemplatesRoute
+  '/messages/email': typeof AuthenticatedMessagesEmailRoute
+  '/reports/cases': typeof AuthenticatedReportsCasesRoute
+  '/reports/revenue': typeof AuthenticatedReportsRevenueRoute
+  '/reports/time-tracking': typeof AuthenticatedReportsTimeTrackingRoute
+  '/reviews/all': typeof AuthenticatedReviewsAllRoute
+  '/reviews/badges': typeof AuthenticatedReviewsBadgesRoute
   '/settings/account': typeof AuthenticatedSettingsAccountRoute
   '/settings/appearance': typeof AuthenticatedSettingsAppearanceRoute
   '/settings/display': typeof AuthenticatedSettingsDisplayRoute
   '/settings/notifications': typeof AuthenticatedSettingsNotificationsRoute
+  '/settings/security': typeof AuthenticatedSettingsSecurityRoute
+  '/tasks/reminders': typeof AuthenticatedTasksRemindersRoute
   '/clerk/sign-in': typeof ClerkauthSignInRoute
   '/clerk/sign-up': typeof ClerkauthSignUpRoute
   '/clerk/user-management': typeof ClerkAuthenticatedUserManagementRoute
   '/apps': typeof AuthenticatedAppsIndexRoute
+  '/billing': typeof AuthenticatedBillingIndexRoute
+  '/calendar': typeof AuthenticatedCalendarIndexRoute
+  '/cases': typeof AuthenticatedCasesIndexRoute
   '/chats': typeof AuthenticatedChatsIndexRoute
+  '/clients': typeof AuthenticatedClientsIndexRoute
   '/help-center': typeof AuthenticatedHelpCenterIndexRoute
+  '/reviews': typeof AuthenticatedReviewsIndexRoute
   '/settings': typeof AuthenticatedSettingsIndexRoute
   '/tasks': typeof AuthenticatedTasksIndexRoute
   '/users': typeof AuthenticatedUsersIndexRoute
@@ -272,17 +484,41 @@ export interface FileRoutesById {
   '/(errors)/500': typeof errors500Route
   '/(errors)/503': typeof errors503Route
   '/_authenticated/': typeof AuthenticatedIndexRoute
+  '/_authenticated/billing/expenses': typeof AuthenticatedBillingExpensesRoute
+  '/_authenticated/billing/invoices': typeof AuthenticatedBillingInvoicesRoute
+  '/_authenticated/billing/statements': typeof AuthenticatedBillingStatementsRoute
+  '/_authenticated/billing/transactions': typeof AuthenticatedBillingTransactionsRoute
+  '/_authenticated/cases/active': typeof AuthenticatedCasesActiveRoute
+  '/_authenticated/clients/current': typeof AuthenticatedClientsCurrentRoute
   '/_authenticated/errors/$error': typeof AuthenticatedErrorsErrorRoute
+  '/_authenticated/jobs/browse': typeof AuthenticatedJobsBrowseRoute
+  '/_authenticated/jobs/my-gigs': typeof AuthenticatedJobsMyGigsRoute
+  '/_authenticated/knowledge/judgments': typeof AuthenticatedKnowledgeJudgmentsRoute
+  '/_authenticated/knowledge/laws': typeof AuthenticatedKnowledgeLawsRoute
+  '/_authenticated/knowledge/templates': typeof AuthenticatedKnowledgeTemplatesRoute
+  '/_authenticated/messages/email': typeof AuthenticatedMessagesEmailRoute
+  '/_authenticated/reports/cases': typeof AuthenticatedReportsCasesRoute
+  '/_authenticated/reports/revenue': typeof AuthenticatedReportsRevenueRoute
+  '/_authenticated/reports/time-tracking': typeof AuthenticatedReportsTimeTrackingRoute
+  '/_authenticated/reviews/all': typeof AuthenticatedReviewsAllRoute
+  '/_authenticated/reviews/badges': typeof AuthenticatedReviewsBadgesRoute
   '/_authenticated/settings/account': typeof AuthenticatedSettingsAccountRoute
   '/_authenticated/settings/appearance': typeof AuthenticatedSettingsAppearanceRoute
   '/_authenticated/settings/display': typeof AuthenticatedSettingsDisplayRoute
   '/_authenticated/settings/notifications': typeof AuthenticatedSettingsNotificationsRoute
+  '/_authenticated/settings/security': typeof AuthenticatedSettingsSecurityRoute
+  '/_authenticated/tasks/reminders': typeof AuthenticatedTasksRemindersRoute
   '/clerk/(auth)/sign-in': typeof ClerkauthSignInRoute
   '/clerk/(auth)/sign-up': typeof ClerkauthSignUpRoute
   '/clerk/_authenticated/user-management': typeof ClerkAuthenticatedUserManagementRoute
   '/_authenticated/apps/': typeof AuthenticatedAppsIndexRoute
+  '/_authenticated/billing/': typeof AuthenticatedBillingIndexRoute
+  '/_authenticated/calendar/': typeof AuthenticatedCalendarIndexRoute
+  '/_authenticated/cases/': typeof AuthenticatedCasesIndexRoute
   '/_authenticated/chats/': typeof AuthenticatedChatsIndexRoute
+  '/_authenticated/clients/': typeof AuthenticatedClientsIndexRoute
   '/_authenticated/help-center/': typeof AuthenticatedHelpCenterIndexRoute
+  '/_authenticated/reviews/': typeof AuthenticatedReviewsIndexRoute
   '/_authenticated/settings/': typeof AuthenticatedSettingsIndexRoute
   '/_authenticated/tasks/': typeof AuthenticatedTasksIndexRoute
   '/_authenticated/users/': typeof AuthenticatedUsersIndexRoute
@@ -303,17 +539,41 @@ export interface FileRouteTypes {
     | '/500'
     | '/503'
     | '/'
+    | '/billing/expenses'
+    | '/billing/invoices'
+    | '/billing/statements'
+    | '/billing/transactions'
+    | '/cases/active'
+    | '/clients/current'
     | '/errors/$error'
+    | '/jobs/browse'
+    | '/jobs/my-gigs'
+    | '/knowledge/judgments'
+    | '/knowledge/laws'
+    | '/knowledge/templates'
+    | '/messages/email'
+    | '/reports/cases'
+    | '/reports/revenue'
+    | '/reports/time-tracking'
+    | '/reviews/all'
+    | '/reviews/badges'
     | '/settings/account'
     | '/settings/appearance'
     | '/settings/display'
     | '/settings/notifications'
+    | '/settings/security'
+    | '/tasks/reminders'
     | '/clerk/sign-in'
     | '/clerk/sign-up'
     | '/clerk/user-management'
     | '/apps'
+    | '/billing'
+    | '/calendar'
+    | '/cases'
     | '/chats'
+    | '/clients'
     | '/help-center'
+    | '/reviews'
     | '/settings/'
     | '/tasks'
     | '/users'
@@ -331,17 +591,41 @@ export interface FileRouteTypes {
     | '/500'
     | '/503'
     | '/'
+    | '/billing/expenses'
+    | '/billing/invoices'
+    | '/billing/statements'
+    | '/billing/transactions'
+    | '/cases/active'
+    | '/clients/current'
     | '/errors/$error'
+    | '/jobs/browse'
+    | '/jobs/my-gigs'
+    | '/knowledge/judgments'
+    | '/knowledge/laws'
+    | '/knowledge/templates'
+    | '/messages/email'
+    | '/reports/cases'
+    | '/reports/revenue'
+    | '/reports/time-tracking'
+    | '/reviews/all'
+    | '/reviews/badges'
     | '/settings/account'
     | '/settings/appearance'
     | '/settings/display'
     | '/settings/notifications'
+    | '/settings/security'
+    | '/tasks/reminders'
     | '/clerk/sign-in'
     | '/clerk/sign-up'
     | '/clerk/user-management'
     | '/apps'
+    | '/billing'
+    | '/calendar'
+    | '/cases'
     | '/chats'
+    | '/clients'
     | '/help-center'
+    | '/reviews'
     | '/settings'
     | '/tasks'
     | '/users'
@@ -363,17 +647,41 @@ export interface FileRouteTypes {
     | '/(errors)/500'
     | '/(errors)/503'
     | '/_authenticated/'
+    | '/_authenticated/billing/expenses'
+    | '/_authenticated/billing/invoices'
+    | '/_authenticated/billing/statements'
+    | '/_authenticated/billing/transactions'
+    | '/_authenticated/cases/active'
+    | '/_authenticated/clients/current'
     | '/_authenticated/errors/$error'
+    | '/_authenticated/jobs/browse'
+    | '/_authenticated/jobs/my-gigs'
+    | '/_authenticated/knowledge/judgments'
+    | '/_authenticated/knowledge/laws'
+    | '/_authenticated/knowledge/templates'
+    | '/_authenticated/messages/email'
+    | '/_authenticated/reports/cases'
+    | '/_authenticated/reports/revenue'
+    | '/_authenticated/reports/time-tracking'
+    | '/_authenticated/reviews/all'
+    | '/_authenticated/reviews/badges'
     | '/_authenticated/settings/account'
     | '/_authenticated/settings/appearance'
     | '/_authenticated/settings/display'
     | '/_authenticated/settings/notifications'
+    | '/_authenticated/settings/security'
+    | '/_authenticated/tasks/reminders'
     | '/clerk/(auth)/sign-in'
     | '/clerk/(auth)/sign-up'
     | '/clerk/_authenticated/user-management'
     | '/_authenticated/apps/'
+    | '/_authenticated/billing/'
+    | '/_authenticated/calendar/'
+    | '/_authenticated/cases/'
     | '/_authenticated/chats/'
+    | '/_authenticated/clients/'
     | '/_authenticated/help-center/'
+    | '/_authenticated/reviews/'
     | '/_authenticated/settings/'
     | '/_authenticated/tasks/'
     | '/_authenticated/users/'
@@ -529,6 +837,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSettingsIndexRouteImport
       parentRoute: typeof AuthenticatedSettingsRouteRoute
     }
+    '/_authenticated/reviews/': {
+      id: '/_authenticated/reviews/'
+      path: '/reviews'
+      fullPath: '/reviews'
+      preLoaderRoute: typeof AuthenticatedReviewsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/help-center/': {
       id: '/_authenticated/help-center/'
       path: '/help-center'
@@ -536,11 +851,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedHelpCenterIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/clients/': {
+      id: '/_authenticated/clients/'
+      path: '/clients'
+      fullPath: '/clients'
+      preLoaderRoute: typeof AuthenticatedClientsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/chats/': {
       id: '/_authenticated/chats/'
       path: '/chats'
       fullPath: '/chats'
       preLoaderRoute: typeof AuthenticatedChatsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/cases/': {
+      id: '/_authenticated/cases/'
+      path: '/cases'
+      fullPath: '/cases'
+      preLoaderRoute: typeof AuthenticatedCasesIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/calendar/': {
+      id: '/_authenticated/calendar/'
+      path: '/calendar'
+      fullPath: '/calendar'
+      preLoaderRoute: typeof AuthenticatedCalendarIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/billing/': {
+      id: '/_authenticated/billing/'
+      path: '/billing'
+      fullPath: '/billing'
+      preLoaderRoute: typeof AuthenticatedBillingIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/apps/': {
@@ -571,6 +914,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ClerkauthSignInRouteImport
       parentRoute: typeof ClerkauthRouteRoute
     }
+    '/_authenticated/tasks/reminders': {
+      id: '/_authenticated/tasks/reminders'
+      path: '/tasks/reminders'
+      fullPath: '/tasks/reminders'
+      preLoaderRoute: typeof AuthenticatedTasksRemindersRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/settings/security': {
+      id: '/_authenticated/settings/security'
+      path: '/security'
+      fullPath: '/settings/security'
+      preLoaderRoute: typeof AuthenticatedSettingsSecurityRouteImport
+      parentRoute: typeof AuthenticatedSettingsRouteRoute
+    }
     '/_authenticated/settings/notifications': {
       id: '/_authenticated/settings/notifications'
       path: '/notifications'
@@ -599,11 +956,130 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSettingsAccountRouteImport
       parentRoute: typeof AuthenticatedSettingsRouteRoute
     }
+    '/_authenticated/reviews/badges': {
+      id: '/_authenticated/reviews/badges'
+      path: '/reviews/badges'
+      fullPath: '/reviews/badges'
+      preLoaderRoute: typeof AuthenticatedReviewsBadgesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/reviews/all': {
+      id: '/_authenticated/reviews/all'
+      path: '/reviews/all'
+      fullPath: '/reviews/all'
+      preLoaderRoute: typeof AuthenticatedReviewsAllRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/reports/time-tracking': {
+      id: '/_authenticated/reports/time-tracking'
+      path: '/reports/time-tracking'
+      fullPath: '/reports/time-tracking'
+      preLoaderRoute: typeof AuthenticatedReportsTimeTrackingRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/reports/revenue': {
+      id: '/_authenticated/reports/revenue'
+      path: '/reports/revenue'
+      fullPath: '/reports/revenue'
+      preLoaderRoute: typeof AuthenticatedReportsRevenueRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/reports/cases': {
+      id: '/_authenticated/reports/cases'
+      path: '/reports/cases'
+      fullPath: '/reports/cases'
+      preLoaderRoute: typeof AuthenticatedReportsCasesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/messages/email': {
+      id: '/_authenticated/messages/email'
+      path: '/messages/email'
+      fullPath: '/messages/email'
+      preLoaderRoute: typeof AuthenticatedMessagesEmailRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/knowledge/templates': {
+      id: '/_authenticated/knowledge/templates'
+      path: '/knowledge/templates'
+      fullPath: '/knowledge/templates'
+      preLoaderRoute: typeof AuthenticatedKnowledgeTemplatesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/knowledge/laws': {
+      id: '/_authenticated/knowledge/laws'
+      path: '/knowledge/laws'
+      fullPath: '/knowledge/laws'
+      preLoaderRoute: typeof AuthenticatedKnowledgeLawsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/knowledge/judgments': {
+      id: '/_authenticated/knowledge/judgments'
+      path: '/knowledge/judgments'
+      fullPath: '/knowledge/judgments'
+      preLoaderRoute: typeof AuthenticatedKnowledgeJudgmentsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/jobs/my-gigs': {
+      id: '/_authenticated/jobs/my-gigs'
+      path: '/jobs/my-gigs'
+      fullPath: '/jobs/my-gigs'
+      preLoaderRoute: typeof AuthenticatedJobsMyGigsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/jobs/browse': {
+      id: '/_authenticated/jobs/browse'
+      path: '/jobs/browse'
+      fullPath: '/jobs/browse'
+      preLoaderRoute: typeof AuthenticatedJobsBrowseRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/errors/$error': {
       id: '/_authenticated/errors/$error'
       path: '/errors/$error'
       fullPath: '/errors/$error'
       preLoaderRoute: typeof AuthenticatedErrorsErrorRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/clients/current': {
+      id: '/_authenticated/clients/current'
+      path: '/clients/current'
+      fullPath: '/clients/current'
+      preLoaderRoute: typeof AuthenticatedClientsCurrentRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/cases/active': {
+      id: '/_authenticated/cases/active'
+      path: '/cases/active'
+      fullPath: '/cases/active'
+      preLoaderRoute: typeof AuthenticatedCasesActiveRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/billing/transactions': {
+      id: '/_authenticated/billing/transactions'
+      path: '/billing/transactions'
+      fullPath: '/billing/transactions'
+      preLoaderRoute: typeof AuthenticatedBillingTransactionsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/billing/statements': {
+      id: '/_authenticated/billing/statements'
+      path: '/billing/statements'
+      fullPath: '/billing/statements'
+      preLoaderRoute: typeof AuthenticatedBillingStatementsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/billing/invoices': {
+      id: '/_authenticated/billing/invoices'
+      path: '/billing/invoices'
+      fullPath: '/billing/invoices'
+      preLoaderRoute: typeof AuthenticatedBillingInvoicesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/billing/expenses': {
+      id: '/_authenticated/billing/expenses'
+      path: '/billing/expenses'
+      fullPath: '/billing/expenses'
+      preLoaderRoute: typeof AuthenticatedBillingExpensesRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
   }
@@ -614,6 +1090,7 @@ interface AuthenticatedSettingsRouteRouteChildren {
   AuthenticatedSettingsAppearanceRoute: typeof AuthenticatedSettingsAppearanceRoute
   AuthenticatedSettingsDisplayRoute: typeof AuthenticatedSettingsDisplayRoute
   AuthenticatedSettingsNotificationsRoute: typeof AuthenticatedSettingsNotificationsRoute
+  AuthenticatedSettingsSecurityRoute: typeof AuthenticatedSettingsSecurityRoute
   AuthenticatedSettingsIndexRoute: typeof AuthenticatedSettingsIndexRoute
 }
 
@@ -624,6 +1101,7 @@ const AuthenticatedSettingsRouteRouteChildren: AuthenticatedSettingsRouteRouteCh
     AuthenticatedSettingsDisplayRoute: AuthenticatedSettingsDisplayRoute,
     AuthenticatedSettingsNotificationsRoute:
       AuthenticatedSettingsNotificationsRoute,
+    AuthenticatedSettingsSecurityRoute: AuthenticatedSettingsSecurityRoute,
     AuthenticatedSettingsIndexRoute: AuthenticatedSettingsIndexRoute,
   }
 
@@ -635,10 +1113,33 @@ const AuthenticatedSettingsRouteRouteWithChildren =
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedSettingsRouteRoute: typeof AuthenticatedSettingsRouteRouteWithChildren
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
+  AuthenticatedBillingExpensesRoute: typeof AuthenticatedBillingExpensesRoute
+  AuthenticatedBillingInvoicesRoute: typeof AuthenticatedBillingInvoicesRoute
+  AuthenticatedBillingStatementsRoute: typeof AuthenticatedBillingStatementsRoute
+  AuthenticatedBillingTransactionsRoute: typeof AuthenticatedBillingTransactionsRoute
+  AuthenticatedCasesActiveRoute: typeof AuthenticatedCasesActiveRoute
+  AuthenticatedClientsCurrentRoute: typeof AuthenticatedClientsCurrentRoute
   AuthenticatedErrorsErrorRoute: typeof AuthenticatedErrorsErrorRoute
+  AuthenticatedJobsBrowseRoute: typeof AuthenticatedJobsBrowseRoute
+  AuthenticatedJobsMyGigsRoute: typeof AuthenticatedJobsMyGigsRoute
+  AuthenticatedKnowledgeJudgmentsRoute: typeof AuthenticatedKnowledgeJudgmentsRoute
+  AuthenticatedKnowledgeLawsRoute: typeof AuthenticatedKnowledgeLawsRoute
+  AuthenticatedKnowledgeTemplatesRoute: typeof AuthenticatedKnowledgeTemplatesRoute
+  AuthenticatedMessagesEmailRoute: typeof AuthenticatedMessagesEmailRoute
+  AuthenticatedReportsCasesRoute: typeof AuthenticatedReportsCasesRoute
+  AuthenticatedReportsRevenueRoute: typeof AuthenticatedReportsRevenueRoute
+  AuthenticatedReportsTimeTrackingRoute: typeof AuthenticatedReportsTimeTrackingRoute
+  AuthenticatedReviewsAllRoute: typeof AuthenticatedReviewsAllRoute
+  AuthenticatedReviewsBadgesRoute: typeof AuthenticatedReviewsBadgesRoute
+  AuthenticatedTasksRemindersRoute: typeof AuthenticatedTasksRemindersRoute
   AuthenticatedAppsIndexRoute: typeof AuthenticatedAppsIndexRoute
+  AuthenticatedBillingIndexRoute: typeof AuthenticatedBillingIndexRoute
+  AuthenticatedCalendarIndexRoute: typeof AuthenticatedCalendarIndexRoute
+  AuthenticatedCasesIndexRoute: typeof AuthenticatedCasesIndexRoute
   AuthenticatedChatsIndexRoute: typeof AuthenticatedChatsIndexRoute
+  AuthenticatedClientsIndexRoute: typeof AuthenticatedClientsIndexRoute
   AuthenticatedHelpCenterIndexRoute: typeof AuthenticatedHelpCenterIndexRoute
+  AuthenticatedReviewsIndexRoute: typeof AuthenticatedReviewsIndexRoute
   AuthenticatedTasksIndexRoute: typeof AuthenticatedTasksIndexRoute
   AuthenticatedUsersIndexRoute: typeof AuthenticatedUsersIndexRoute
 }
@@ -646,10 +1147,33 @@ interface AuthenticatedRouteRouteChildren {
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedSettingsRouteRoute: AuthenticatedSettingsRouteRouteWithChildren,
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
+  AuthenticatedBillingExpensesRoute: AuthenticatedBillingExpensesRoute,
+  AuthenticatedBillingInvoicesRoute: AuthenticatedBillingInvoicesRoute,
+  AuthenticatedBillingStatementsRoute: AuthenticatedBillingStatementsRoute,
+  AuthenticatedBillingTransactionsRoute: AuthenticatedBillingTransactionsRoute,
+  AuthenticatedCasesActiveRoute: AuthenticatedCasesActiveRoute,
+  AuthenticatedClientsCurrentRoute: AuthenticatedClientsCurrentRoute,
   AuthenticatedErrorsErrorRoute: AuthenticatedErrorsErrorRoute,
+  AuthenticatedJobsBrowseRoute: AuthenticatedJobsBrowseRoute,
+  AuthenticatedJobsMyGigsRoute: AuthenticatedJobsMyGigsRoute,
+  AuthenticatedKnowledgeJudgmentsRoute: AuthenticatedKnowledgeJudgmentsRoute,
+  AuthenticatedKnowledgeLawsRoute: AuthenticatedKnowledgeLawsRoute,
+  AuthenticatedKnowledgeTemplatesRoute: AuthenticatedKnowledgeTemplatesRoute,
+  AuthenticatedMessagesEmailRoute: AuthenticatedMessagesEmailRoute,
+  AuthenticatedReportsCasesRoute: AuthenticatedReportsCasesRoute,
+  AuthenticatedReportsRevenueRoute: AuthenticatedReportsRevenueRoute,
+  AuthenticatedReportsTimeTrackingRoute: AuthenticatedReportsTimeTrackingRoute,
+  AuthenticatedReviewsAllRoute: AuthenticatedReviewsAllRoute,
+  AuthenticatedReviewsBadgesRoute: AuthenticatedReviewsBadgesRoute,
+  AuthenticatedTasksRemindersRoute: AuthenticatedTasksRemindersRoute,
   AuthenticatedAppsIndexRoute: AuthenticatedAppsIndexRoute,
+  AuthenticatedBillingIndexRoute: AuthenticatedBillingIndexRoute,
+  AuthenticatedCalendarIndexRoute: AuthenticatedCalendarIndexRoute,
+  AuthenticatedCasesIndexRoute: AuthenticatedCasesIndexRoute,
   AuthenticatedChatsIndexRoute: AuthenticatedChatsIndexRoute,
+  AuthenticatedClientsIndexRoute: AuthenticatedClientsIndexRoute,
   AuthenticatedHelpCenterIndexRoute: AuthenticatedHelpCenterIndexRoute,
+  AuthenticatedReviewsIndexRoute: AuthenticatedReviewsIndexRoute,
   AuthenticatedTasksIndexRoute: AuthenticatedTasksIndexRoute,
   AuthenticatedUsersIndexRoute: AuthenticatedUsersIndexRoute,
 }

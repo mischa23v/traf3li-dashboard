@@ -1,0 +1,14 @@
+[
+{"name":"process_name","args":{"name":"tsc"},"cat":"__metadata","ph":"M","ts":108631.75,"pid":1,"tid":1},
+{"name":"thread_name","args":{"name":"Main"},"cat":"__metadata","ph":"M","ts":108631.75,"pid":1,"tid":1},
+{"name":"TracingStartedInBrowser","cat":"disabled-by-default-devtools.timeline","ph":"M","ts":108631.75,"pid":1,"tid":1},
+{"pid":1,"tid":1,"ph":"B","cat":"program","ts":109660.754,"name":"createProgram","args":{"configFilePath":"/home/user/traf3li-dashboard/tsconfig.json"}},
+{"pid":1,"tid":1,"ph":"B","cat":"parse","ts":111108.967,"name":"createSourceFile","args":{"path":"/home/user/traf3li-dashboard/tsconfig.app.json"}},
+{"pid":1,"tid":1,"ph":"E","cat":"parse","ts":112572.09,"name":"createSourceFile","args":{"path":"/home/user/traf3li-dashboard/tsconfig.app.json"}},
+{"pid":1,"tid":1,"ph":"X","cat":"parse","ts":112685.906,"name":"parseJsonSourceFileConfigFileContent","dur":46173.00200000002,"args":{"path":"/home/user/traf3li-dashboard/tsconfig.app.json"}},
+{"pid":1,"tid":1,"ph":"B","cat":"parse","ts":162910.535,"name":"createSourceFile","args":{"path":"/home/user/traf3li-dashboard/tsconfig.node.json"}},
+{"pid":1,"tid":1,"ph":"E","cat":"parse","ts":163479.698,"name":"createSourceFile","args":{"path":"/home/user/traf3li-dashboard/tsconfig.node.json"}},
+{"pid":1,"tid":1,"ph":"E","cat":"program","ts":166520.691,"name":"createProgram","args":{"configFilePath":"/home/user/traf3li-dashboard/tsconfig.json"}},
+{"pid":1,"tid":1,"ph":"B","cat":"emit","ts":167111.471,"name":"emit","args":{}},
+{"pid":1,"tid":1,"ph":"E","cat":"emit","ts":176466.43800000002,"name":"emit","args":{}}
+]

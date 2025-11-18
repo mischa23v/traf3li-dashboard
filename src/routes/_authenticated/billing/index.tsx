@@ -1,7 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { DollarSign, FileText, Receipt, CreditCard, TrendingUp } from 'lucide-react'
+import { DollarSign, FileText, Receipt, TrendingUp } from 'lucide-react'
 import { Link } from '@tanstack/react-router'
 
 function BillingDashboard() {

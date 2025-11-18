@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { ColumnDef } from '@tanstack/react-table';
+import { useQueryClient } from '@tanstack/react-query';
 import {
   Card,
   CardContent,
@@ -28,7 +27,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { DataTable } from '@/components/data-table';
 import {
   Play,
   Pause,
@@ -81,7 +79,6 @@ interface ActiveTimer {
 }
 
 export default function TimeTrackingPage() {
-  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [activeTimer, setActiveTimer] = useState<ActiveTimer | null>(null);
   const [filterPeriod, setFilterPeriod] = useState<'today' | 'week' | 'month'>('week');
   const queryClient = useQueryClient();

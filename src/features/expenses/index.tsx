@@ -1,6 +1,5 @@
 import { useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { ColumnDef } from '@tanstack/react-table';
+import { useQueryClient } from '@tanstack/react-query';
 import {
   Card,
   CardContent,
@@ -28,8 +27,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { DataTable } from '@/components/data-table';
-import { Loader2, Plus, Receipt, Trash2, Eye, Download } from 'lucide-react';
+import { Loader2, Plus, Receipt, Trash2, Eye } from 'lucide-react';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
 import { ar } from 'date-fns/locale';
@@ -73,7 +71,6 @@ interface CreateExpenseInput {
 
 export default function ExpensesPage() {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
-  const [selectedExpense, setSelectedExpense] = useState<Expense | null>(null);
   const [filterCategory, setFilterCategory] = useState<string>('all');
   const queryClient = useQueryClient();
 

@@ -1,7 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { Scale, CheckCircle, Clock, XCircle, BarChart } from 'lucide-react'
+import { Scale, CheckCircle, Clock, BarChart } from 'lucide-react'
 
 function CasesReportPage() {
   const caseStats = [

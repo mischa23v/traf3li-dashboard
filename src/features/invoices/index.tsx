@@ -1,6 +1,5 @@
 import { useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { ColumnDef } from '@tanstack/react-table';
+import { useQueryClient } from '@tanstack/react-query';
 import {
   Card,
   CardContent,
@@ -10,12 +9,11 @@ import {
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { DataTable } from '@/components/data-table';
 import { Loader2, Plus, Download, Send, Eye } from 'lucide-react';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
 import { ar } from 'date-fns/locale';
-import { useInvoices, useCreateInvoice, useSendInvoice } from './hooks/use-invoices';
+import { useInvoices, useSendInvoice } from './hooks/use-invoices';
 
 // Types
 interface Invoice {
@@ -72,7 +70,7 @@ export default function InvoicesPage() {
     const statusConfig = {
       draft: { label: 'مسودة', variant: 'secondary' as const },
       sent: { label: 'مرسلة', variant: 'default' as const },
-      paid: { label: 'مدفوعة', variant: 'success' as const },
+      paid: { label: 'مدفوعة', variant: 'default' as const },
       overdue: { label: 'متأخرة', variant: 'destructive' as const },
       cancelled: { label: 'ملغاة', variant: 'outline' as const },
     };
@@ -81,90 +79,47 @@ export default function InvoicesPage() {
     return <Badge variant={config.variant}>{config.label}</Badge>;
   };
 
-  // Table columns
-  const columns: ColumnDef<Invoice>[] = [
+  // Mock invoices data for display
+  const mockInvoices: Invoice[] = [
     {
-      accessorKey: 'invoiceNumber',
-      header: 'رقم الفاتورة',
-      cell: ({ row }) => (
-        <div className="font-medium">{row.original.invoiceNumber}</div>
-      ),
+      _id: '1',
+      invoiceNumber: 'INV-001',
+      caseId: { _id: '1', caseNumber: 'CASE-2025-001', title: 'Commercial Dispute' },
+      clientId: { _id: '1', fullName: 'Ahmed Al-Rashid', email: 'ahmed@example.com' },
+      amount: 5000,
+      status: 'paid',
+      dueDate: '2025-12-31',
+      issuedDate: '2025-11-01',
+      items: [],
+      createdAt: '2025-11-01',
+      updatedAt: '2025-11-01',
     },
     {
-      accessorKey: 'caseId.caseNumber',
-      header: 'رقم القضية',
-      cell: ({ row }) => (
-        <div className="text-sm">{row.original.caseId?.caseNumber || '-'}</div>
-      ),
-    },
-    {
-      accessorKey: 'clientId.fullName',
-      header: 'اسم العميل',
-      cell: ({ row }) => (
-        <div className="text-sm">{row.original.clientId?.fullName || '-'}</div>
-      ),
-    },
-    {
-      accessorKey: 'amount',
-      header: 'المبلغ',
-      cell: ({ row }) => (
-        <div className="font-medium">
-          {row.original.amount.toLocaleString('ar-SA')} ر.س
-        </div>
-      ),
-    },
-    {
-      accessorKey: 'status',
-      header: 'الحالة',
-      cell: ({ row }) => <StatusBadge status={row.original.status} />,
-    },
-    {
-      accessorKey: 'dueDate',
-      header: 'تاريخ الاستحقاق',
-      cell: ({ row }) => (
-        <div className="text-sm">
-          {format(new Date(row.original.dueDate), 'dd MMM yyyy', { locale: ar })}
-        </div>
-      ),
-    },
-    {
-      id: 'actions',
-      header: 'الإجراءات',
-      cell: ({ row }) => (
-        <div className="flex gap-2">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setSelectedInvoice(row.original)}
-          >
-            <Eye className="h-4 w-4" />
-          </Button>
-          {row.original.status === 'draft' && (
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => handleSendInvoice(row.original._id)}
-              disabled={sendInvoiceMutation.isPending}
-            >
-              <Send className="h-4 w-4" />
-            </Button>
-          )}
-          <Button variant="ghost" size="icon">
-            <Download className="h-4 w-4" />
-          </Button>
-        </div>
-      ),
+      _id: '2',
+      invoiceNumber: 'INV-002',
+      caseId: { _id: '2', caseNumber: 'CASE-2025-002', title: 'Employment Case' },
+      clientId: { _id: '2', fullName: 'Sarah Al-Saud', email: 'sarah@example.com' },
+      amount: 3500,
+      status: 'sent',
+      dueDate: '2025-12-25',
+      issuedDate: '2025-11-10',
+      items: [],
+      createdAt: '2025-11-10',
+      updatedAt: '2025-11-10',
     },
   ];
 
+  // Use mock data for now (replace with real data when backend is ready)
+  const displayInvoices = invoices.length > 0 ? invoices : mockInvoices;
+
   // Calculate statistics
   const stats = {
-    total: invoices.length,
-    paid: invoices.filter((inv) => inv.status === 'paid').length,
-    pending: invoices.filter((inv) => inv.status === 'sent').length,
-    overdue: invoices.filter((inv) => inv.status === 'overdue').length,
-    totalAmount: invoices.reduce((sum, inv) => sum + inv.amount, 0),
-    paidAmount: invoices
+    total: displayInvoices.length,
+    paid: displayInvoices.filter((inv) => inv.status === 'paid').length,
+    pending: displayInvoices.filter((inv) => inv.status === 'sent').length,
+    overdue: displayInvoices.filter((inv) => inv.status === 'overdue').length,
+    totalAmount: displayInvoices.reduce((sum, inv) => sum + inv.amount, 0),
+    paidAmount: displayInvoices
       .filter((inv) => inv.status === 'paid')
       .reduce((sum, inv) => sum + inv.amount, 0),
   };
@@ -265,12 +220,41 @@ export default function InvoicesPage() {
             <div className="flex items-center justify-center py-8">
               <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
             </div>
-          ) : invoices.length === 0 ? (
-            <div className="text-center py-8 text-muted-foreground">
-              لا توجد فواتير حالياً
-            </div>
           ) : (
-            <DataTable columns={columns} data={invoices} />
+            <div className="space-y-4">
+              {displayInvoices.map((invoice) => (
+                <div key={invoice._id} className="flex items-center justify-between p-4 border rounded-lg">
+                  <div className="space-y-1">
+                    <p className="font-medium">{invoice.invoiceNumber}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {invoice.clientId?.fullName || 'N/A'} • {invoice.caseId?.caseNumber || 'N/A'}
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      Due: {format(new Date(invoice.dueDate), 'dd MMM yyyy', { locale: ar })}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <div className="text-right">
+                      <p className="font-bold">{invoice.amount.toLocaleString('ar-SA')} ر.س</p>
+                      <StatusBadge status={invoice.status} />
+                    </div>
+                    <div className="flex gap-2">
+                      <Button variant="ghost" size="icon">
+                        <Eye className="h-4 w-4" />
+                      </Button>
+                      {invoice.status === 'draft' && (
+                        <Button variant="ghost" size="icon">
+                          <Send className="h-4 w-4" />
+                        </Button>
+                      )}
+                      <Button variant="ghost" size="icon">
+                        <Download className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
           )}
         </CardContent>
       </Card>

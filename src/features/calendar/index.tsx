@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
 import {
   Card,
   CardContent,
@@ -18,9 +17,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import {
   Select,
   SelectContent,
@@ -28,7 +24,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   Calendar as CalendarIcon,
   Clock,
@@ -41,7 +37,6 @@ import {
 } from 'lucide-react';
 import { format, startOfMonth, endOfMonth, isToday, isSameDay } from 'date-fns';
 import { ar } from 'date-fns/locale';
-import { toast } from 'sonner';
 import {
   useEvents,
   useCreateEvent,
@@ -123,7 +118,7 @@ export default function CalendarPage() {
   const StatusBadge = ({ status }: { status: CalendarEvent['status'] }) => {
     const statusConfig = {
       scheduled: { label: 'مجدولة', variant: 'default' as const },
-      completed: { label: 'مكتملة', variant: 'success' as const },
+      completed: { label: 'مكتملة', variant: 'default' as const },
       cancelled: { label: 'ملغاة', variant: 'destructive' as const },
       postponed: { label: 'مؤجلة', variant: 'secondary' as const },
     };
