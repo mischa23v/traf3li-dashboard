@@ -1,484 +1,663 @@
-import { useState } from 'react';
-import { useQueryClient } from '@tanstack/react-query';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
+import { useState } from 'react'
+import { Search, Filter, Download, Plus, Eye, Edit, Trash2, Upload, Receipt, TrendingDown, FileText, Building, Coffee, Car, Briefcase, Home } from 'lucide-react'
+import { Card, CardContent } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { Input } from '@/components/ui/input'
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { Loader2, Plus, Receipt, Trash2 } from 'lucide-react';
-import { toast } from 'sonner';
-import { format } from 'date-fns';
-import { ar } from 'date-fns/locale';
-import {
-  useExpenses,
-  useCreateExpense,
-  useDeleteExpense,
-  useExpenseStats,
-} from './hooks/use-expenses';
+} from '@/components/ui/select'
+import { Header } from '@/components/layout/header'
+import { Main } from '@/components/layout/main'
+import { ThemeSwitch } from '@/components/theme-switch'
+import { LanguageSwitcher } from '@/components/language-switcher'
+import { ProfileDropdown } from '@/components/profile-dropdown'
+import { LucideIcon } from 'lucide-react'
 
-// Types
 interface Expense {
-  _id: string;
-  description: string;
-  amount: number;
-  category: 'court_fees' | 'travel' | 'consultation' | 'documents' | 'research' | 'other';
-  caseId?: string | {
-    _id: string;
-    caseNumber: string;
-    title: string;
-  };
-  date: string;
-  receiptUrl?: string;
-  notes?: string;
-  isBillable: boolean;
-  isReimbursed: boolean;
-  createdAt: string;
-  updatedAt: string;
+  id: string
+  description: string
+  category: string
+  categoryIcon: LucideIcon
+  amount: number
+  date: string
+  caseNumber: string | null
+  caseName: string
+  paymentMethod: string
+  status: string
+  statusColor: string
+  hasReceipt: boolean
+  vendor: string
 }
 
-interface CreateExpenseInput {
-  description: string;
-  amount: number;
-  category: Expense['category'];
-  caseId?: string;
-  date: string;
-  receiptUrl?: string;
-  notes?: string;
-  isBillable: boolean;
+interface CategoryData {
+  total: number
+  count: number
 }
 
-export default function ExpensesPage() {
-  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
-  const [filterCategory, setFilterCategory] = useState<string>('all');
-  const queryClient = useQueryClient();
+interface CaseData {
+  name: string
+  total: number
+  count: number
+}
 
-  // Fetch expenses
-  const { data: expenses = [], isLoading, error } = useExpenses({
-    category: filterCategory !== 'all' ? filterCategory : undefined,
-  });
+export default function ExpensesDashboard() {
+  const [activeTab, setActiveTab] = useState('all')
+  const [searchQuery, setSearchQuery] = useState('')
+  const [selectedPeriod, setSelectedPeriod] = useState('month')
 
-  // Stats
-  const { data: stats } = useExpenseStats();
-
-  // Create expense mutation
-  const createExpenseMutation = useCreateExpense();
-
-  // Delete expense mutation
-  const deleteExpenseMutation = useDeleteExpense();
-
-  // Categories config
-  const categories = [
-    { value: 'court_fees', label: 'رسوم المحكمة', color: 'bg-blue-500' },
-    { value: 'travel', label: 'السفر والتنقل', color: 'bg-green-500' },
-    { value: 'consultation', label: 'استشارات', color: 'bg-purple-500' },
-    { value: 'documents', label: 'مستندات', color: 'bg-yellow-500' },
-    { value: 'research', label: 'بحث قانوني', color: 'bg-orange-500' },
-    { value: 'other', label: 'أخرى', color: 'bg-gray-500' },
-  ];
-
-  // Category badge component
-  const CategoryBadge = ({ category }: { category: Expense['category'] }) => {
-    const config = categories.find((c) => c.value === category);
-    return (
-      <Badge variant="outline" className={`${config?.color} text-white`}>
-        {config?.label}
-      </Badge>
-    );
-  };
-
-  // Handle create expense
-  const handleCreateExpense = async (data: CreateExpenseInput) => {
-    try {
-      await createExpenseMutation.mutateAsync(data);
-      toast.success('تم إضافة المصروف بنجاح');
-      setIsCreateDialogOpen(false);
-      queryClient.invalidateQueries({ queryKey: ['expenses'] });
-      queryClient.invalidateQueries({ queryKey: ['expense-stats'] });
-    } catch (error: any) {
-      toast.error(error.response?.data?.message || 'فشل إضافة المصروف');
+  // Sample expenses data
+  const expenses: Expense[] = [
+    {
+      id: 'EXP-2025-001',
+      description: 'استئجار قاعة المحكمة',
+      category: 'رسوم قانونية',
+      categoryIcon: Building,
+      amount: 5000,
+      date: '15 نوفمبر 2025',
+      caseNumber: '4772077905',
+      caseName: 'قضية مشاري الرابح',
+      paymentMethod: 'بطاقة ائتمان',
+      status: 'مدفوع',
+      statusColor: 'bg-green-500',
+      hasReceipt: true,
+      vendor: 'وزارة العدل'
+    },
+    {
+      id: 'EXP-2025-002',
+      description: 'اشتراك المكتبة القانونية الرقمية',
+      category: 'اشتراكات',
+      categoryIcon: FileText,
+      amount: 2500,
+      date: '14 نوفمبر 2025',
+      caseNumber: null,
+      caseName: 'مصروف عام',
+      paymentMethod: 'تحويل بنكي',
+      status: 'مدفوع',
+      statusColor: 'bg-green-500',
+      hasReceipt: true,
+      vendor: 'شركة المعلومات القانونية'
+    },
+    {
+      id: 'EXP-2025-003',
+      description: 'استشارة خبير مالي',
+      category: 'استشارات',
+      categoryIcon: Briefcase,
+      amount: 8000,
+      date: '12 نوفمبر 2025',
+      caseNumber: '4772088016',
+      caseName: 'قضية عبدالله الغامدي',
+      paymentMethod: 'نقدي',
+      status: 'مدفوع',
+      statusColor: 'bg-green-500',
+      hasReceipt: true,
+      vendor: 'مكتب الخبراء الماليين'
+    },
+    {
+      id: 'EXP-2025-004',
+      description: 'وقود السيارة - زيارات العملاء',
+      category: 'مواصلات',
+      categoryIcon: Car,
+      amount: 450,
+      date: '10 نوفمبر 2025',
+      caseNumber: '4772099127',
+      caseName: 'قضية فاطمة العتيبي',
+      paymentMethod: 'نقدي',
+      status: 'مدفوع',
+      statusColor: 'bg-green-500',
+      hasReceipt: true,
+      vendor: 'محطة الوقود'
+    },
+    {
+      id: 'EXP-2025-005',
+      description: 'اجتماع عمل مع العميل',
+      category: 'ضيافة',
+      categoryIcon: Coffee,
+      amount: 320,
+      date: '9 نوفمبر 2025',
+      caseNumber: '4772100238',
+      caseName: 'قضية خالد القحطاني',
+      paymentMethod: 'بطاقة ائتمان',
+      status: 'مدفوع',
+      statusColor: 'bg-green-500',
+      hasReceipt: true,
+      vendor: 'مقهى النخيل'
+    },
+    {
+      id: 'EXP-2025-006',
+      description: 'رسوم ترجمة مستندات قانونية',
+      category: 'خدمات',
+      categoryIcon: FileText,
+      amount: 1500,
+      date: '8 نوفمبر 2025',
+      caseNumber: '4772111349',
+      caseName: 'قضية سارة المطيري',
+      paymentMethod: 'تحويل بنكي',
+      status: 'معلق',
+      statusColor: 'bg-amber-500',
+      hasReceipt: false,
+      vendor: 'مكتب الترجمة المعتمد'
+    },
+    {
+      id: 'EXP-2025-007',
+      description: 'إيجار المكتب - نوفمبر',
+      category: 'إيجار',
+      categoryIcon: Home,
+      amount: 15000,
+      date: '1 نوفمبر 2025',
+      caseNumber: null,
+      caseName: 'مصروف عام',
+      paymentMethod: 'تحويل بنكي',
+      status: 'مدفوع',
+      statusColor: 'bg-green-500',
+      hasReceipt: true,
+      vendor: 'شركة العقارات'
+    },
+    {
+      id: 'EXP-2025-008',
+      description: 'طباعة المستندات القانونية',
+      category: 'مكتبية',
+      categoryIcon: FileText,
+      amount: 280,
+      date: '7 نوفمبر 2025',
+      caseNumber: '4772122450',
+      caseName: 'قضية محمد الدوسري',
+      paymentMethod: 'نقدي',
+      status: 'مدفوع',
+      statusColor: 'bg-green-500',
+      hasReceipt: true,
+      vendor: 'مركز الطباعة'
+    },
+    {
+      id: 'EXP-2025-009',
+      description: 'رسوم تسجيل علامة تجارية',
+      category: 'رسوم قانونية',
+      categoryIcon: Building,
+      amount: 3500,
+      date: '5 نوفمبر 2025',
+      caseNumber: '4772133561',
+      caseName: 'قضية نورة الشمري',
+      paymentMethod: 'بطاقة ائتمان',
+      status: 'مدفوع',
+      statusColor: 'bg-green-500',
+      hasReceipt: true,
+      vendor: 'الهيئة السعودية للملكية الفكرية'
+    },
+    {
+      id: 'EXP-2025-010',
+      description: 'تكاليف السفر - حضور جلسة في جدة',
+      category: 'مواصلات',
+      categoryIcon: Car,
+      amount: 1200,
+      date: '3 نوفمبر 2025',
+      caseNumber: '4772144672',
+      caseName: 'قضية عمر العنزي',
+      paymentMethod: 'بطاقة ائتمان',
+      status: 'مدفوع',
+      statusColor: 'bg-green-500',
+      hasReceipt: true,
+      vendor: 'الخطوط الجوية السعودية'
     }
-  };
+  ]
 
-  // Handle delete expense
-  const handleDeleteExpense = async (expenseId: string) => {
-    if (!confirm('هل أنت متأكد من حذف هذا المصروف؟')) return;
+  // Filter expenses based on active tab
+  const filteredExpenses = expenses.filter((exp) => {
+    if (activeTab === 'all') return true
+    if (activeTab === 'case') return exp.caseNumber !== null
+    if (activeTab === 'general') return exp.caseNumber === null
+    if (activeTab === 'pending') return exp.status === 'معلق'
+    return true
+  })
 
-    try {
-      await deleteExpenseMutation.mutateAsync(expenseId);
-      toast.success('تم حذف المصروف بنجاح');
-      queryClient.invalidateQueries({ queryKey: ['expenses'] });
-      queryClient.invalidateQueries({ queryKey: ['expense-stats'] });
-    } catch (error: any) {
-      toast.error(error.response?.data?.message || 'فشل حذف المصروف');
+  // Calculate statistics
+  const totalExpenses = expenses.reduce((sum: number, exp) => sum + exp.amount, 0)
+  const caseExpenses = expenses.filter((exp) => exp.caseNumber !== null).reduce((sum: number, exp) => sum + exp.amount, 0)
+  const generalExpenses = expenses.filter((exp) => exp.caseNumber === null).reduce((sum: number, exp) => sum + exp.amount, 0)
+  const pendingExpenses = expenses.filter((exp) => exp.status === 'معلق').reduce((sum: number, exp) => sum + exp.amount, 0)
+
+  const expensesByCategory = expenses.reduce((acc: Record<string, CategoryData>, exp) => {
+    if (!acc[exp.category]) {
+      acc[exp.category] = { total: 0, count: 0 };
     }
-  };
+    acc[exp.category].total += exp.amount;
+    acc[exp.category].count += 1;
+    return acc;
+  }, {});
 
-  if (error) {
-    return (
-      <div className="flex items-center justify-center h-full">
-        <Card className="w-full max-w-md">
-          <CardHeader>
-            <CardTitle>خطأ في تحميل المصروفات</CardTitle>
-            <CardDescription>
-              {error instanceof Error ? error.message : 'حدث خطأ غير متوقع'}
-            </CardDescription>
-          </CardHeader>
-        </Card>
-      </div>
-    );
+  // Format currency
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat('ar-SA', {
+      style: 'currency',
+      currency: 'SAR',
+      minimumFractionDigits: 0
+    }).format(amount)
   }
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold">المصروفات</h1>
-          <p className="text-muted-foreground">تتبع وإدارة المصروفات المهنية</p>
+    <>
+      <Header>
+        <div className='flex items-center gap-6 flex-1'>
+          <h1 className="text-xl font-bold">المصروفات</h1>
+          <div className="relative">
+            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="بحث في المصروفات..."
+              className="w-80 pr-10"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
         </div>
-        <div className="flex gap-2">
-          <Select value={filterCategory} onValueChange={setFilterCategory}>
-            <SelectTrigger className="w-[200px]">
-              <SelectValue placeholder="كل الفئات" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">كل الفئات</SelectItem>
-              {categories.map((cat) => (
-                <SelectItem key={cat.value} value={cat.value}>
-                  {cat.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <Button onClick={() => setIsCreateDialogOpen(true)}>
-            <Plus className="h-4 w-4 ml-2" />
+        <div className="flex items-center gap-3">
+          <Button variant="outline">
+            <Download className="h-4 w-4 mr-2" />
+            تصدير
+          </Button>
+          <Button variant="outline">
+            <Filter className="h-4 w-4 mr-2" />
+            تصفية
+          </Button>
+          <Button>
+            <Plus className="h-4 w-4 mr-2" />
             مصروف جديد
           </Button>
+          <LanguageSwitcher />
+          <ThemeSwitch />
+          <ProfileDropdown />
         </div>
-      </div>
+      </Header>
 
-      {/* Statistics Cards */}
-      {stats && (
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-          <Card>
-            <CardHeader className="pb-2">
-              <CardDescription>إجمالي المصروفات</CardDescription>
-              <CardTitle className="text-4xl">
-                {stats.totalExpenses.toLocaleString('ar-SA')} ر.س
-              </CardTitle>
-            </CardHeader>
-          </Card>
-          <Card>
-            <CardHeader className="pb-2">
-              <CardDescription>قابل للفوترة</CardDescription>
-              <CardTitle className="text-4xl text-green-600">
-                {stats.billableExpenses.toLocaleString('ar-SA')} ر.س
-              </CardTitle>
-            </CardHeader>
-          </Card>
-          <Card>
-            <CardHeader className="pb-2">
-              <CardDescription>غير قابل للفوترة</CardDescription>
-              <CardTitle className="text-4xl text-orange-600">
-                {stats.nonBillableExpenses.toLocaleString('ar-SA')} ر.س
-              </CardTitle>
-            </CardHeader>
-          </Card>
-          <Card>
-            <CardHeader className="pb-2">
-              <CardDescription>تم الاسترداد</CardDescription>
-              <CardTitle className="text-4xl text-blue-600">
-                {stats.reimbursedExpenses.toLocaleString('ar-SA')} ر.س
-              </CardTitle>
-            </CardHeader>
-          </Card>
-        </div>
-      )}
-
-      {/* Category Breakdown */}
-      {stats && (
-        <Card>
-          <CardHeader>
-            <CardTitle>المصروفات حسب الفئة</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid gap-4 md:grid-cols-3">
-              {stats.byCategory.map((cat) => {
-                const config = categories.find((c) => c.value === cat.category);
-                return (
-                  <div
-                    key={cat.category}
-                    className="flex items-center justify-between p-4 border rounded-lg"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className={`w-3 h-3 rounded-full ${config?.color}`} />
-                      <span className="font-medium">{config?.label}</span>
-                    </div>
-                    <span className="text-lg font-bold">
-                      {cat.total.toLocaleString('ar-SA')} ر.س
-                    </span>
+      <Main dir="rtl">
+        {/* Modern Dashboard Overview */}
+        <div className="mb-6">
+          {/* Top Row - Key Metrics */}
+          <div className="grid grid-cols-4 gap-4 mb-4">
+            {/* Total Expenses */}
+            <Card className="bg-gradient-to-br from-muted to-card">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="h-10 w-10 rounded-lg bg-muted flex items-center justify-center">
+                    <Receipt className="h-5 w-5" />
                   </div>
-                );
-              })}
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Expenses List */}
-      <Card>
-        <CardHeader>
-          <CardTitle>قائمة المصروفات</CardTitle>
-          <CardDescription>جميع المصروفات المسجلة</CardDescription>
-        </CardHeader>
-        <CardContent>
-          {isLoading ? (
-            <div className="flex items-center justify-center py-8">
-              <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-            </div>
-          ) : expenses.length === 0 ? (
-            <div className="text-center py-8 text-muted-foreground">
-              لا توجد مصروفات مسجلة
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {expenses.map((expense) => (
-                <div
-                  key={expense._id}
-                  className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50"
-                >
-                  <div className="flex-1 space-y-1">
-                    <div className="flex items-center gap-2">
-                      <span className="font-medium">{expense.description}</span>
-                      <CategoryBadge category={expense.category} />
-                    </div>
-                    <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                      <span>{format(new Date(expense.date), 'dd MMM yyyy', { locale: ar })}</span>
-                      {expense.caseId && typeof expense.caseId === 'object' && (
-                        <span>القضية: {expense.caseId.caseNumber}</span>
-                      )}
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-4">
-                    <div className="text-left">
-                      <div className="font-bold text-lg">
-                        {expense.amount.toLocaleString('ar-SA')} ر.س
-                      </div>
-                      <div className="flex gap-2">
-                        <Badge variant={expense.isBillable ? 'default' : 'secondary'} className="text-xs">
-                          {expense.isBillable ? 'قابل للفوترة' : 'غير قابل'}
-                        </Badge>
-                        <Badge variant={expense.isReimbursed ? 'default' : 'outline'} className="text-xs">
-                          {expense.isReimbursed ? 'تم الاسترداد' : 'معلق'}
-                        </Badge>
-                      </div>
-                    </div>
-                    <div className="flex gap-2">
-                      {expense.receiptUrl && (
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => window.open(expense.receiptUrl, '_blank')}
-                        >
-                          <Receipt className="h-4 w-4" />
-                        </Button>
-                      )}
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => handleDeleteExpense(expense._id)}
-                        disabled={deleteExpenseMutation.isPending}
-                      >
-                        <Trash2 className="h-4 w-4 text-red-500" />
-                      </Button>
-                    </div>
-                  </div>
+                  <Badge variant="outline" className="text-xs">إجمالي</Badge>
                 </div>
-              ))}
-            </div>
-          )}
-        </CardContent>
-      </Card>
+                <div className="text-3xl font-bold mb-1">{formatCurrency(totalExpenses)}</div>
+                <div className="text-xs text-muted-foreground">إجمالي المصروفات</div>
+              </CardContent>
+            </Card>
 
-      {/* Create Expense Dialog */}
-      <CreateExpenseDialog
-        open={isCreateDialogOpen}
-        onOpenChange={setIsCreateDialogOpen}
-        onSubmit={handleCreateExpense}
-        isLoading={createExpenseMutation.isPending}
-        categories={categories}
-      />
-    </div>
-  );
-}
+            {/* Case Expenses */}
+            <Card className="border-blue-200 bg-gradient-to-br from-blue-50 to-card dark:from-blue-950">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="h-10 w-10 rounded-lg bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
+                    <Briefcase className="h-5 w-5 text-blue-700 dark:text-blue-300" />
+                  </div>
+                  <Badge className="bg-blue-600 text-xs">قضايا</Badge>
+                </div>
+                <div className="text-3xl font-bold text-blue-900 dark:text-blue-100 mb-1">{formatCurrency(caseExpenses)}</div>
+                <div className="text-xs text-blue-700 dark:text-blue-300">مصروفات القضايا</div>
+              </CardContent>
+            </Card>
 
-// Create Expense Dialog Component
-interface CreateExpenseDialogProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  onSubmit: (data: CreateExpenseInput) => void;
-  isLoading: boolean;
-  categories: { value: string; label: string; color: string }[];
-}
+            {/* General Expenses */}
+            <Card className="border-purple-200 bg-gradient-to-br from-purple-50 to-card dark:from-purple-950">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="h-10 w-10 rounded-lg bg-purple-100 dark:bg-purple-900 flex items-center justify-center">
+                    <Building className="h-5 w-5 text-purple-700 dark:text-purple-300" />
+                  </div>
+                  <Badge className="bg-purple-600 text-xs">عام</Badge>
+                </div>
+                <div className="text-3xl font-bold text-purple-900 dark:text-purple-100 mb-1">{formatCurrency(generalExpenses)}</div>
+                <div className="text-xs text-purple-700 dark:text-purple-300">مصروفات عامة</div>
+              </CardContent>
+            </Card>
 
-function CreateExpenseDialog({
-  open,
-  onOpenChange,
-  onSubmit,
-  isLoading,
-  categories,
-}: CreateExpenseDialogProps) {
-  const [formData, setFormData] = useState<CreateExpenseInput>({
-    description: '',
-    amount: 0,
-    category: 'other',
-    date: new Date().toISOString().split('T')[0],
-    isBillable: false,
-  });
+            {/* Pending Expenses */}
+            <Card className="border-amber-200 bg-gradient-to-br from-amber-50 to-card dark:from-amber-950">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="h-10 w-10 rounded-lg bg-amber-100 dark:bg-amber-900 flex items-center justify-center">
+                    <TrendingDown className="h-5 w-5 text-amber-700 dark:text-amber-300" />
+                  </div>
+                  <Badge className="bg-amber-600 text-xs">معلق</Badge>
+                </div>
+                <div className="text-3xl font-bold text-amber-900 dark:text-amber-100 mb-1">{formatCurrency(pendingExpenses)}</div>
+                <div className="text-xs text-amber-700 dark:text-amber-300">مصروفات معلقة</div>
+              </CardContent>
+            </Card>
+          </div>
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    onSubmit(formData);
-  };
+          {/* Bottom Row - Analytics */}
+          <div className="grid grid-cols-3 gap-4">
+            {/* Category Distribution */}
+            <Card>
+              <CardContent className="p-6">
+                <h3 className="text-sm font-semibold mb-4">توزيع الفئات</h3>
+                <div className="space-y-3">
+                  {Object.entries(expensesByCategory)
+                    .sort((a, b) => b[1].total - a[1].total)
+                    .slice(0, 3)
+                    .map(([category, data], idx) => (
+                      <div key={idx}>
+                        <div className="flex justify-between items-center mb-1">
+                          <span className="text-xs text-muted-foreground">{category}</span>
+                          <span className="text-xs font-bold">{formatCurrency(data.total)}</span>
+                        </div>
+                        <div className="w-full bg-muted rounded-full h-2">
+                          <div
+                            className="bg-blue-500 h-2 rounded-full"
+                            style={{width: `${(data.total / totalExpenses) * 100}%`}}
+                          ></div>
+                        </div>
+                      </div>
+                    ))}
+                </div>
+              </CardContent>
+            </Card>
 
-  return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl">
-        <DialogHeader>
-          <DialogTitle>إضافة مصروف جديد</DialogTitle>
-          <DialogDescription>أدخل تفاصيل المصروف المهني</DialogDescription>
-        </DialogHeader>
-        <form onSubmit={handleSubmit}>
-          <div className="grid gap-4 py-4">
-            <div className="grid gap-2">
-              <Label htmlFor="description">الوصف</Label>
-              <Input
-                id="description"
-                value={formData.description}
-                onChange={(e) =>
-                  setFormData({ ...formData, description: e.target.value })
-                }
-                placeholder="مثال: رسوم محكمة، تذاكر طيران..."
-                required
-              />
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div className="grid gap-2">
-                <Label htmlFor="amount">المبلغ (ر.س)</Label>
-                <Input
-                  id="amount"
-                  type="number"
-                  value={formData.amount}
-                  onChange={(e) =>
-                    setFormData({ ...formData, amount: Number(e.target.value) })
-                  }
-                  placeholder="0.00"
-                  required
-                />
-              </div>
-
-              <div className="grid gap-2">
-                <Label htmlFor="date">التاريخ</Label>
-                <Input
-                  id="date"
-                  type="date"
-                  value={formData.date}
-                  onChange={(e) =>
-                    setFormData({ ...formData, date: e.target.value })
-                  }
-                  required
-                />
-              </div>
-            </div>
-
-            <div className="grid gap-2">
-              <Label htmlFor="category">الفئة</Label>
-              <Select
-                value={formData.category}
-                onValueChange={(value) =>
-                  setFormData({ ...formData, category: value as Expense['category'] })
-                }
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {categories.map((cat) => (
-                    <SelectItem key={cat.value} value={cat.value}>
-                      {cat.label}
-                    </SelectItem>
+            {/* Top Cases by Expenses */}
+            <Card>
+              <CardContent className="p-6">
+                <h3 className="text-sm font-semibold mb-4">أعلى القضايا تكلفة</h3>
+                <div className="space-y-3">
+                  {Object.entries(
+                    expenses
+                      .filter((exp) => exp.caseNumber !== null)
+                      .reduce((acc: Record<string, CaseData>, exp) => {
+                        const key = exp.caseNumber!;
+                        if (!acc[key]) {
+                          acc[key] = { name: exp.caseName, total: 0, count: 0 };
+                        }
+                        acc[key].total += exp.amount;
+                        acc[key].count += 1;
+                        return acc;
+                      }, {})
+                  )
+                  .sort((a, b) => b[1].total - a[1].total)
+                  .slice(0, 3)
+                  .map(([, data], idx) => (
+                    <div key={idx} className="flex items-center gap-3">
+                      <div className="h-10 w-10 rounded-full bg-gradient-to-br from-muted to-muted/50 flex items-center justify-center">
+                        <span className="text-xs font-bold">{data.count}</span>
+                      </div>
+                      <div className="flex-1">
+                        <div className="text-xs font-medium">{data.name}</div>
+                        <div className="text-[10px] text-muted-foreground">{formatCurrency(data.total)}</div>
+                      </div>
+                      <div className="w-16 bg-muted rounded-full h-1.5">
+                        <div
+                          className="bg-foreground/60 h-1.5 rounded-full"
+                          style={{width: `${(data.total / caseExpenses) * 100}%`}}
+                        ></div>
+                      </div>
+                    </div>
                   ))}
-                </SelectContent>
-              </Select>
-            </div>
+                </div>
+              </CardContent>
+            </Card>
 
-            <div className="grid gap-2">
-              <Label htmlFor="notes">ملاحظات (اختياري)</Label>
-              <Textarea
-                id="notes"
-                value={formData.notes || ''}
-                onChange={(e) =>
-                  setFormData({ ...formData, notes: e.target.value })
-                }
-                placeholder="أي تفاصيل إضافية..."
-                rows={3}
-              />
-            </div>
+            {/* Recent Activity */}
+            <Card>
+              <CardContent className="p-6">
+                <h3 className="text-sm font-semibold mb-4">آخر المصروفات</h3>
+                <div className="space-y-3">
+                  {expenses.slice(0, 3).map((exp, idx) => {
+                    const Icon = exp.categoryIcon
+                    return (
+                      <div key={idx} className="flex items-center gap-3">
+                        <div className="h-10 w-10 rounded-lg bg-gradient-to-br from-muted to-muted/50 flex items-center justify-center">
+                          <Icon className="h-5 w-5" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="text-xs font-medium truncate">{exp.description}</div>
+                          <div className="text-[10px] text-muted-foreground">{exp.date}</div>
+                        </div>
+                        <div className="text-xs font-bold">
+                          {formatCurrency(exp.amount)}
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
 
+        {/* Tabs and Filters */}
+        <div className="bg-card rounded-lg border mb-6">
+          <div className="border-b px-6 py-3">
             <div className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                id="isBillable"
-                checked={formData.isBillable}
-                onChange={(e) =>
-                  setFormData({ ...formData, isBillable: e.target.checked })
-                }
-                className="rounded"
-              />
-              <Label htmlFor="isBillable" className="cursor-pointer">
-                هذا المصروف قابل للفوترة على العميل
-              </Label>
+              <Button
+                variant={activeTab === 'all' ? 'default' : 'ghost'}
+                size="sm"
+                onClick={() => setActiveTab('all')}
+                className="rounded-full"
+              >
+                جميع المصروفات ({expenses.length})
+              </Button>
+              <Button
+                variant={activeTab === 'case' ? 'default' : 'ghost'}
+                size="sm"
+                onClick={() => setActiveTab('case')}
+                className="rounded-full"
+              >
+                مصروفات القضايا ({expenses.filter((e) => e.caseNumber !== null).length})
+              </Button>
+              <Button
+                variant={activeTab === 'general' ? 'default' : 'ghost'}
+                size="sm"
+                onClick={() => setActiveTab('general')}
+                className="rounded-full"
+              >
+                مصروفات عامة ({expenses.filter((e) => e.caseNumber === null).length})
+              </Button>
+              <Button
+                variant={activeTab === 'pending' ? 'default' : 'ghost'}
+                size="sm"
+                onClick={() => setActiveTab('pending')}
+                className="rounded-full"
+              >
+                معلقة ({expenses.filter((e) => e.status === 'معلق').length})
+              </Button>
             </div>
           </div>
 
-          <DialogFooter>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => onOpenChange(false)}
-            >
-              إلغاء
-            </Button>
-            <Button type="submit" disabled={isLoading}>
-              {isLoading && <Loader2 className="h-4 w-4 ml-2 animate-spin" />}
-              إضافة المصروف
-            </Button>
-          </DialogFooter>
-        </form>
-      </DialogContent>
-    </Dialog>
-  );
+          {/* Filters */}
+          <div className="px-6 py-4 bg-muted border-b">
+            <div className="grid grid-cols-4 gap-4">
+              <div>
+                <label className="text-xs font-medium text-muted-foreground mb-2 block text-right">الفترة الزمنية</label>
+                <Select value={selectedPeriod} onValueChange={setSelectedPeriod}>
+                  <SelectTrigger className="w-full text-right" dir="rtl">
+                    <SelectValue placeholder="اختر..." />
+                  </SelectTrigger>
+                  <SelectContent dir="rtl">
+                    <SelectItem value="week">هذا الأسبوع</SelectItem>
+                    <SelectItem value="month">هذا الشهر</SelectItem>
+                    <SelectItem value="quarter">هذا الربع</SelectItem>
+                    <SelectItem value="year">هذا العام</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <label className="text-xs font-medium text-muted-foreground mb-2 block text-right">الفئة</label>
+                <Select>
+                  <SelectTrigger className="w-full text-right" dir="rtl">
+                    <SelectValue placeholder="جميع الفئات" />
+                  </SelectTrigger>
+                  <SelectContent dir="rtl">
+                    <SelectItem value="all">جميع الفئات</SelectItem>
+                    {Array.from(new Set(expenses.map((exp) => exp.category))).map((cat) => (
+                      <SelectItem key={cat} value={cat}>{cat}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <label className="text-xs font-medium text-muted-foreground mb-2 block text-right">القضية</label>
+                <Select>
+                  <SelectTrigger className="w-full text-right" dir="rtl">
+                    <SelectValue placeholder="اختر..." />
+                  </SelectTrigger>
+                  <SelectContent dir="rtl">
+                    <SelectItem value="all">جميع القضايا</SelectItem>
+                    {Array.from(new Set(expenses.filter((e) => e.caseNumber).map((exp) => exp.caseName))).map((name) => (
+                      <SelectItem key={name} value={name}>{name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <label className="text-xs font-medium text-muted-foreground mb-2 block text-right">طريقة الدفع</label>
+                <Select>
+                  <SelectTrigger className="w-full text-right" dir="rtl">
+                    <SelectValue placeholder="اختر..." />
+                  </SelectTrigger>
+                  <SelectContent dir="rtl">
+                    <SelectItem value="all">الكل</SelectItem>
+                    <SelectItem value="card">بطاقة ائتمان</SelectItem>
+                    <SelectItem value="bank">تحويل بنكي</SelectItem>
+                    <SelectItem value="cash">نقدي</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2 mt-4">
+              <Button size="sm">تطبيق</Button>
+              <Button size="sm" variant="outline">مسح</Button>
+            </div>
+          </div>
+        </div>
+
+        {/* Expenses Table */}
+        <Card>
+          <CardContent className="p-0">
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-muted border-b">
+                  <tr>
+                    <th className="px-6 py-4 text-right text-xs font-semibold text-muted-foreground">رقم المصروف</th>
+                    <th className="px-6 py-4 text-right text-xs font-semibold text-muted-foreground">الوصف</th>
+                    <th className="px-6 py-4 text-right text-xs font-semibold text-muted-foreground">الفئة</th>
+                    <th className="px-6 py-4 text-right text-xs font-semibold text-muted-foreground">القضية</th>
+                    <th className="px-6 py-4 text-right text-xs font-semibold text-muted-foreground">المبلغ</th>
+                    <th className="px-6 py-4 text-right text-xs font-semibold text-muted-foreground">التاريخ</th>
+                    <th className="px-6 py-4 text-right text-xs font-semibold text-muted-foreground">طريقة الدفع</th>
+                    <th className="px-6 py-4 text-right text-xs font-semibold text-muted-foreground">الحالة</th>
+                    <th className="px-6 py-4 text-right text-xs font-semibold text-muted-foreground">الإجراءات</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredExpenses.map((expense) => {
+                    const Icon = expense.categoryIcon
+                    return (
+                      <tr
+                        key={expense.id}
+                        className="border-b hover:bg-muted/50 transition-colors"
+                      >
+                        {/* Expense ID */}
+                        <td className="px-6 py-4">
+                          <div className="text-sm font-bold text-right">{expense.id}</div>
+                        </td>
+
+                        {/* Description */}
+                        <td className="px-6 py-4">
+                          <div className="text-right">
+                            <div className="text-sm font-medium mb-1">{expense.description}</div>
+                            <div className="text-xs text-muted-foreground">{expense.vendor}</div>
+                          </div>
+                        </td>
+
+                        {/* Category */}
+                        <td className="px-6 py-4">
+                          <div className="flex items-center gap-2 justify-end">
+                            <span className="text-sm">{expense.category}</span>
+                            <div className="h-8 w-8 rounded-lg bg-muted flex items-center justify-center">
+                              <Icon className="h-4 w-4" />
+                            </div>
+                          </div>
+                        </td>
+
+                        {/* Case */}
+                        <td className="px-6 py-4">
+                          <div className="text-right">
+                            {expense.caseNumber ? (
+                              <>
+                                <div className="text-sm">{expense.caseNumber}</div>
+                                <div className="text-xs text-muted-foreground">{expense.caseName}</div>
+                              </>
+                            ) : (
+                              <Badge variant="outline" className="text-xs">مصروف عام</Badge>
+                            )}
+                          </div>
+                        </td>
+
+                        {/* Amount */}
+                        <td className="px-6 py-4">
+                          <div className="text-sm font-bold text-right">
+                            {formatCurrency(expense.amount)}
+                          </div>
+                        </td>
+
+                        {/* Date */}
+                        <td className="px-6 py-4">
+                          <div className="text-sm text-right">{expense.date}</div>
+                        </td>
+
+                        {/* Payment Method */}
+                        <td className="px-6 py-4">
+                          <div className="text-sm text-right">{expense.paymentMethod}</div>
+                        </td>
+
+                        {/* Status */}
+                        <td className="px-6 py-4">
+                          <div className="flex items-center gap-2 justify-end">
+                            <Badge className={expense.statusColor}>{expense.status}</Badge>
+                            {expense.hasReceipt && (
+                              <Receipt className="h-4 w-4 text-green-600" />
+                            )}
+                          </div>
+                        </td>
+
+                        {/* Actions */}
+                        <td className="px-6 py-4">
+                          <div className="flex items-center gap-2 justify-end">
+                            <Button variant="ghost" size="sm" title="عرض">
+                              <Eye className="h-4 w-4" />
+                            </Button>
+                            <Button variant="ghost" size="sm" title="تعديل">
+                              <Edit className="h-4 w-4" />
+                            </Button>
+                            {!expense.hasReceipt && (
+                              <Button variant="ghost" size="sm" title="رفع إيصال">
+                                <Upload className="h-4 w-4" />
+                              </Button>
+                            )}
+                            <Button variant="ghost" size="sm" title="حذف">
+                              <Trash2 className="h-4 w-4 text-red-600" />
+                            </Button>
+                          </div>
+                        </td>
+                      </tr>
+                    )
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </CardContent>
+        </Card>
+      </Main>
+    </>
+  )
 }
