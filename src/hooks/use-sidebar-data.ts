@@ -32,99 +32,99 @@ export function useSidebarData(): SidebarData {
       {
         name: 'TRAF3LI',
         logo: Command,
-        plan: 'Legal Platform',
+        plan: 'منصة قانونية',
       },
       {
-        name: 'Law Firm',
+        name: 'مكتب محاماة',
         logo: GalleryVerticalEnd,
-        plan: 'Enterprise',
+        plan: 'مؤسسي',
       },
       {
-        name: 'Solo Practice',
+        name: 'ممارسة فردية',
         logo: AudioWaveform,
-        plan: 'Professional',
+        plan: 'احترافي',
       },
     ],
     navGroups: [
       {
-        title: 'Main',
+        title: 'الرئيسية',
         items: [
           {
-            title: 'Overview',
+            title: 'نظرة عامة',
             url: '/',
             icon: LayoutDashboard,
           },
           {
-            title: 'Calendar',
+            title: 'التقويم',
             url: '/calendar',
             icon: Calendar,
           },
           {
-            title: 'Tasks',
+            title: 'المهام',
             icon: ListTodo,
             items: [
               {
-                title: 'Tasks',
+                title: 'المهام',
                 url: '/tasks',
               },
               {
-                title: 'Reminders',
+                title: 'التذكيرات',
                 url: '/tasks/reminders',
               },
             ],
           },
           {
-            title: 'Messages',
+            title: 'الرسائل',
             icon: MessagesSquare,
             items: [
               {
-                title: 'Chat',
+                title: 'الدردشة',
                 url: '/chats',
               },
               {
-                title: 'Email',
+                title: 'البريد الإلكتروني',
                 url: '/messages/email',
               },
             ],
           },
           {
-            title: 'Jobs',
+            title: 'فرص وظيفية',
             icon: Briefcase,
             items: [
               {
-                title: 'My Gigs',
+                title: 'خدماتي',
                 url: '/jobs/my-gigs',
               },
               {
-                title: 'Browse Jobs',
+                title: 'تصفح الوظائف',
                 url: '/jobs/browse',
               },
             ],
           },
           {
-            title: 'Clients',
+            title: 'العملاء',
             icon: Users,
             items: [
               {
-                title: 'Current Clients',
+                title: 'العملاء الحاليون',
                 url: '/clients/current',
               },
               {
-                title: 'All Clients',
+                title: 'جميع العملاء',
                 url: '/clients',
               },
             ],
           },
           {
-            title: 'Cases',
+            title: 'القضايا',
             icon: Scale,
             items: [
               {
-                title: 'Active Cases',
+                title: 'القضايا الحالية',
                 url: '/cases/active',
               },
               {
-                title: 'All Cases',
+                title: 'جميع القضايا',
                 url: '/cases',
               },
             ],
@@ -132,30 +132,30 @@ export function useSidebarData(): SidebarData {
         ],
       },
       {
-        title: 'Financial',
+        title: 'المالية',
         items: [
           {
-            title: 'Billing',
+            title: 'الحسابات',
             icon: DollarSign,
             items: [
               {
-                title: 'Dashboard',
+                title: 'لوحة الحسابات',
                 url: '/billing',
               },
               {
-                title: 'Invoices',
+                title: 'الفواتير',
                 url: '/billing/invoices',
               },
               {
-                title: 'Expenses',
+                title: 'المصروفات',
                 url: '/billing/expenses',
               },
               {
-                title: 'Statements',
+                title: 'كشوف الحساب',
                 url: '/billing/statements',
               },
               {
-                title: 'Transactions',
+                title: 'المعاملات',
                 url: '/billing/transactions',
               },
             ],
@@ -163,58 +163,58 @@ export function useSidebarData(): SidebarData {
         ],
       },
       {
-        title: 'Professional',
+        title: 'احترافي',
         items: [
           {
-            title: 'Reviews & Reputation',
+            title: 'التقييمات والسمعة',
             icon: Star,
             items: [
               {
-                title: 'Overview',
+                title: 'نظرة عامة',
                 url: '/reviews',
               },
               {
-                title: 'All Reviews',
+                title: 'جميع التقييمات',
                 url: '/reviews/all',
               },
               {
-                title: 'My Badges',
+                title: 'شاراتي',
                 url: '/reviews/badges',
               },
             ],
           },
           {
-            title: 'Reports',
+            title: 'التقارير',
             icon: BarChart3,
             items: [
               {
-                title: 'Revenue Report',
+                title: 'تقرير الإيرادات',
                 url: '/reports/revenue',
               },
               {
-                title: 'Cases Report',
+                title: 'تقرير القضايا',
                 url: '/reports/cases',
               },
               {
-                title: 'Time Tracking',
+                title: 'تتبع الوقت',
                 url: '/reports/time-tracking',
               },
             ],
           },
           {
-            title: 'Knowledge Center',
+            title: 'مركز المعرفة',
             icon: BookOpen,
             items: [
               {
-                title: 'Laws',
+                title: 'القوانين',
                 url: '/knowledge/laws',
               },
               {
-                title: 'Judgments',
+                title: 'الأحكام',
                 url: '/knowledge/judgments',
               },
               {
-                title: 'Templates',
+                title: 'النماذج',
                 url: '/knowledge/templates',
               },
             ],
@@ -222,29 +222,29 @@ export function useSidebarData(): SidebarData {
         ],
       },
       {
-        title: 'System',
+        title: 'النظام',
         items: [
           {
-            title: 'Settings',
+            title: 'الإعدادات',
             icon: Settings,
             items: [
               {
-                title: 'Profile',
+                title: 'الملف الشخصي',
                 url: '/settings',
                 icon: UserCog,
               },
               {
-                title: 'Security',
+                title: 'الأمان',
                 url: '/settings/security',
                 icon: Shield,
               },
               {
-                title: 'Preferences',
+                title: 'التفضيلات',
                 url: '/settings/appearance',
                 icon: Palette,
               },
               {
-                title: 'Help Center',
+                title: 'مركز المساعدة',
                 url: '/help-center',
                 icon: HelpCircle,
               },
