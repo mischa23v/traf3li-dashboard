@@ -3,7 +3,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Users, Plus, Mail, Phone } from 'lucide-react'
-import { Link } from '@tanstack/react-router'
 
 function AllClientsPage() {
   const clients = [
@@ -28,14 +27,6 @@ function AllClientsPage() {
         </Button>
       </div>
 
-      <div className="flex gap-2">
-        <Button variant="outline" asChild>
-          <Link to="/clients/current">Current Clients</Link>
-        </Button>
-        <Button variant="default" asChild>
-          <Link to="/clients">All Clients</Link>
-        </Button>
-      </div>
 
       <div className="grid gap-4 md:grid-cols-4">
         <Card>

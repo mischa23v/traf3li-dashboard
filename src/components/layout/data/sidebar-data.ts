@@ -105,10 +105,6 @@ export const sidebarData: SidebarData = {
           icon: Users,
           items: [
             {
-              title: 'Current Clients',
-              url: '/clients/current',
-            },
-            {
               title: 'All Clients',
               url: '/clients',
             },
@@ -118,10 +114,6 @@ export const sidebarData: SidebarData = {
           title: 'Cases',
           icon: Scale,
           items: [
-            {
-              title: 'Active Cases',
-              url: '/cases/active',
-            },
             {
               title: 'All Cases',
               url: '/cases',
@@ -171,10 +163,6 @@ export const sidebarData: SidebarData = {
             {
               title: 'Overview',
               url: '/reviews',
-            },
-            {
-              title: 'All Reviews',
-              url: '/reviews/all',
             },
             {
               title: 'My Badges',

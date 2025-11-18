@@ -89,20 +89,6 @@ function ReviewsOverviewPage() {
 
         <Card>
           <CardHeader>
-            <CardTitle>جميع التقييمات - All Reviews</CardTitle>
-            <CardDescription>View all client feedback</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Link to="/reviews/all">
-              <Button className="w-full">
-                View All Reviews
-              </Button>
-            </Link>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
             <CardTitle>شاراتي - My Badges</CardTitle>
             <CardDescription>View earned achievements</CardDescription>
           </CardHeader>

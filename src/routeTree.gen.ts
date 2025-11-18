@@ -47,7 +47,6 @@ import { Route as AuthenticatedSettingsDisplayRouteImport } from './routes/_auth
 import { Route as AuthenticatedSettingsAppearanceRouteImport } from './routes/_authenticated/settings/appearance'
 import { Route as AuthenticatedSettingsAccountRouteImport } from './routes/_authenticated/settings/account'
 import { Route as AuthenticatedReviewsBadgesRouteImport } from './routes/_authenticated/reviews/badges'
-import { Route as AuthenticatedReviewsAllRouteImport } from './routes/_authenticated/reviews/all'
 import { Route as AuthenticatedReportsTimeTrackingRouteImport } from './routes/_authenticated/reports/time-tracking'
 import { Route as AuthenticatedReportsRevenueRouteImport } from './routes/_authenticated/reports/revenue'
 import { Route as AuthenticatedReportsCasesRouteImport } from './routes/_authenticated/reports/cases'
@@ -60,8 +59,6 @@ import { Route as AuthenticatedJobsBrowseRouteImport } from './routes/_authentic
 import { Route as AuthenticatedFinanceTimeTrackingRouteImport } from './routes/_authenticated/finance/time-tracking'
 import { Route as AuthenticatedFinanceAccountActivityRouteImport } from './routes/_authenticated/finance/account-activity'
 import { Route as AuthenticatedErrorsErrorRouteImport } from './routes/_authenticated/errors/$error'
-import { Route as AuthenticatedClientsCurrentRouteImport } from './routes/_authenticated/clients/current'
-import { Route as AuthenticatedCasesActiveRouteImport } from './routes/_authenticated/cases/active'
 import { Route as AuthenticatedBillingTransactionsRouteImport } from './routes/_authenticated/billing/transactions'
 import { Route as AuthenticatedBillingStatementsRouteImport } from './routes/_authenticated/billing/statements'
 import { Route as AuthenticatedBillingInvoicesRouteImport } from './routes/_authenticated/billing/invoices'
@@ -270,11 +267,6 @@ const AuthenticatedReviewsBadgesRoute =
     path: '/reviews/badges',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
-const AuthenticatedReviewsAllRoute = AuthenticatedReviewsAllRouteImport.update({
-  id: '/reviews/all',
-  path: '/reviews/all',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
 const AuthenticatedReportsTimeTrackingRoute =
   AuthenticatedReportsTimeTrackingRouteImport.update({
     id: '/reports/time-tracking',
@@ -345,18 +337,6 @@ const AuthenticatedErrorsErrorRoute =
     path: '/errors/$error',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
-const AuthenticatedClientsCurrentRoute =
-  AuthenticatedClientsCurrentRouteImport.update({
-    id: '/clients/current',
-    path: '/clients/current',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedCasesActiveRoute =
-  AuthenticatedCasesActiveRouteImport.update({
-    id: '/cases/active',
-    path: '/cases/active',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
 const AuthenticatedBillingTransactionsRoute =
   AuthenticatedBillingTransactionsRouteImport.update({
     id: '/billing/transactions',
@@ -400,8 +380,6 @@ export interface FileRoutesByFullPath {
   '/billing/invoices': typeof AuthenticatedBillingInvoicesRoute
   '/billing/statements': typeof AuthenticatedBillingStatementsRoute
   '/billing/transactions': typeof AuthenticatedBillingTransactionsRoute
-  '/cases/active': typeof AuthenticatedCasesActiveRoute
-  '/clients/current': typeof AuthenticatedClientsCurrentRoute
   '/errors/$error': typeof AuthenticatedErrorsErrorRoute
   '/finance/account-activity': typeof AuthenticatedFinanceAccountActivityRoute
   '/finance/time-tracking': typeof AuthenticatedFinanceTimeTrackingRoute
@@ -414,7 +392,6 @@ export interface FileRoutesByFullPath {
   '/reports/cases': typeof AuthenticatedReportsCasesRoute
   '/reports/revenue': typeof AuthenticatedReportsRevenueRoute
   '/reports/time-tracking': typeof AuthenticatedReportsTimeTrackingRoute
-  '/reviews/all': typeof AuthenticatedReviewsAllRoute
   '/reviews/badges': typeof AuthenticatedReviewsBadgesRoute
   '/settings/account': typeof AuthenticatedSettingsAccountRoute
   '/settings/appearance': typeof AuthenticatedSettingsAppearanceRoute
@@ -455,8 +432,6 @@ export interface FileRoutesByTo {
   '/billing/invoices': typeof AuthenticatedBillingInvoicesRoute
   '/billing/statements': typeof AuthenticatedBillingStatementsRoute
   '/billing/transactions': typeof AuthenticatedBillingTransactionsRoute
-  '/cases/active': typeof AuthenticatedCasesActiveRoute
-  '/clients/current': typeof AuthenticatedClientsCurrentRoute
   '/errors/$error': typeof AuthenticatedErrorsErrorRoute
   '/finance/account-activity': typeof AuthenticatedFinanceAccountActivityRoute
   '/finance/time-tracking': typeof AuthenticatedFinanceTimeTrackingRoute
@@ -469,7 +444,6 @@ export interface FileRoutesByTo {
   '/reports/cases': typeof AuthenticatedReportsCasesRoute
   '/reports/revenue': typeof AuthenticatedReportsRevenueRoute
   '/reports/time-tracking': typeof AuthenticatedReportsTimeTrackingRoute
-  '/reviews/all': typeof AuthenticatedReviewsAllRoute
   '/reviews/badges': typeof AuthenticatedReviewsBadgesRoute
   '/settings/account': typeof AuthenticatedSettingsAccountRoute
   '/settings/appearance': typeof AuthenticatedSettingsAppearanceRoute
@@ -515,8 +489,6 @@ export interface FileRoutesById {
   '/_authenticated/billing/invoices': typeof AuthenticatedBillingInvoicesRoute
   '/_authenticated/billing/statements': typeof AuthenticatedBillingStatementsRoute
   '/_authenticated/billing/transactions': typeof AuthenticatedBillingTransactionsRoute
-  '/_authenticated/cases/active': typeof AuthenticatedCasesActiveRoute
-  '/_authenticated/clients/current': typeof AuthenticatedClientsCurrentRoute
   '/_authenticated/errors/$error': typeof AuthenticatedErrorsErrorRoute
   '/_authenticated/finance/account-activity': typeof AuthenticatedFinanceAccountActivityRoute
   '/_authenticated/finance/time-tracking': typeof AuthenticatedFinanceTimeTrackingRoute
@@ -529,7 +501,6 @@ export interface FileRoutesById {
   '/_authenticated/reports/cases': typeof AuthenticatedReportsCasesRoute
   '/_authenticated/reports/revenue': typeof AuthenticatedReportsRevenueRoute
   '/_authenticated/reports/time-tracking': typeof AuthenticatedReportsTimeTrackingRoute
-  '/_authenticated/reviews/all': typeof AuthenticatedReviewsAllRoute
   '/_authenticated/reviews/badges': typeof AuthenticatedReviewsBadgesRoute
   '/_authenticated/settings/account': typeof AuthenticatedSettingsAccountRoute
   '/_authenticated/settings/appearance': typeof AuthenticatedSettingsAppearanceRoute
@@ -573,8 +544,6 @@ export interface FileRouteTypes {
     | '/billing/invoices'
     | '/billing/statements'
     | '/billing/transactions'
-    | '/cases/active'
-    | '/clients/current'
     | '/errors/$error'
     | '/finance/account-activity'
     | '/finance/time-tracking'
@@ -587,7 +556,6 @@ export interface FileRouteTypes {
     | '/reports/cases'
     | '/reports/revenue'
     | '/reports/time-tracking'
-    | '/reviews/all'
     | '/reviews/badges'
     | '/settings/account'
     | '/settings/appearance'
@@ -628,8 +596,6 @@ export interface FileRouteTypes {
     | '/billing/invoices'
     | '/billing/statements'
     | '/billing/transactions'
-    | '/cases/active'
-    | '/clients/current'
     | '/errors/$error'
     | '/finance/account-activity'
     | '/finance/time-tracking'
@@ -642,7 +608,6 @@ export interface FileRouteTypes {
     | '/reports/cases'
     | '/reports/revenue'
     | '/reports/time-tracking'
-    | '/reviews/all'
     | '/reviews/badges'
     | '/settings/account'
     | '/settings/appearance'
@@ -687,8 +652,6 @@ export interface FileRouteTypes {
     | '/_authenticated/billing/invoices'
     | '/_authenticated/billing/statements'
     | '/_authenticated/billing/transactions'
-    | '/_authenticated/cases/active'
-    | '/_authenticated/clients/current'
     | '/_authenticated/errors/$error'
     | '/_authenticated/finance/account-activity'
     | '/_authenticated/finance/time-tracking'
@@ -701,7 +664,6 @@ export interface FileRouteTypes {
     | '/_authenticated/reports/cases'
     | '/_authenticated/reports/revenue'
     | '/_authenticated/reports/time-tracking'
-    | '/_authenticated/reviews/all'
     | '/_authenticated/reviews/badges'
     | '/_authenticated/settings/account'
     | '/_authenticated/settings/appearance'
@@ -1009,13 +971,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedReviewsBadgesRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/reviews/all': {
-      id: '/_authenticated/reviews/all'
-      path: '/reviews/all'
-      fullPath: '/reviews/all'
-      preLoaderRoute: typeof AuthenticatedReviewsAllRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
     '/_authenticated/reports/time-tracking': {
       id: '/_authenticated/reports/time-tracking'
       path: '/reports/time-tracking'
@@ -1100,20 +1055,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedErrorsErrorRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/clients/current': {
-      id: '/_authenticated/clients/current'
-      path: '/clients/current'
-      fullPath: '/clients/current'
-      preLoaderRoute: typeof AuthenticatedClientsCurrentRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/cases/active': {
-      id: '/_authenticated/cases/active'
-      path: '/cases/active'
-      fullPath: '/cases/active'
-      preLoaderRoute: typeof AuthenticatedCasesActiveRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
     '/_authenticated/billing/transactions': {
       id: '/_authenticated/billing/transactions'
       path: '/billing/transactions'
@@ -1177,8 +1118,6 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedBillingInvoicesRoute: typeof AuthenticatedBillingInvoicesRoute
   AuthenticatedBillingStatementsRoute: typeof AuthenticatedBillingStatementsRoute
   AuthenticatedBillingTransactionsRoute: typeof AuthenticatedBillingTransactionsRoute
-  AuthenticatedCasesActiveRoute: typeof AuthenticatedCasesActiveRoute
-  AuthenticatedClientsCurrentRoute: typeof AuthenticatedClientsCurrentRoute
   AuthenticatedErrorsErrorRoute: typeof AuthenticatedErrorsErrorRoute
   AuthenticatedFinanceAccountActivityRoute: typeof AuthenticatedFinanceAccountActivityRoute
   AuthenticatedFinanceTimeTrackingRoute: typeof AuthenticatedFinanceTimeTrackingRoute
@@ -1191,7 +1130,6 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedReportsCasesRoute: typeof AuthenticatedReportsCasesRoute
   AuthenticatedReportsRevenueRoute: typeof AuthenticatedReportsRevenueRoute
   AuthenticatedReportsTimeTrackingRoute: typeof AuthenticatedReportsTimeTrackingRoute
-  AuthenticatedReviewsAllRoute: typeof AuthenticatedReviewsAllRoute
   AuthenticatedReviewsBadgesRoute: typeof AuthenticatedReviewsBadgesRoute
   AuthenticatedTasksRemindersRoute: typeof AuthenticatedTasksRemindersRoute
   AuthenticatedAppsIndexRoute: typeof AuthenticatedAppsIndexRoute
@@ -1214,8 +1152,6 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedBillingInvoicesRoute: AuthenticatedBillingInvoicesRoute,
   AuthenticatedBillingStatementsRoute: AuthenticatedBillingStatementsRoute,
   AuthenticatedBillingTransactionsRoute: AuthenticatedBillingTransactionsRoute,
-  AuthenticatedCasesActiveRoute: AuthenticatedCasesActiveRoute,
-  AuthenticatedClientsCurrentRoute: AuthenticatedClientsCurrentRoute,
   AuthenticatedErrorsErrorRoute: AuthenticatedErrorsErrorRoute,
   AuthenticatedFinanceAccountActivityRoute:
     AuthenticatedFinanceAccountActivityRoute,
@@ -1229,7 +1165,6 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedReportsCasesRoute: AuthenticatedReportsCasesRoute,
   AuthenticatedReportsRevenueRoute: AuthenticatedReportsRevenueRoute,
   AuthenticatedReportsTimeTrackingRoute: AuthenticatedReportsTimeTrackingRoute,
-  AuthenticatedReviewsAllRoute: AuthenticatedReviewsAllRoute,
   AuthenticatedReviewsBadgesRoute: AuthenticatedReviewsBadgesRoute,
   AuthenticatedTasksRemindersRoute: AuthenticatedTasksRemindersRoute,
   AuthenticatedAppsIndexRoute: AuthenticatedAppsIndexRoute,

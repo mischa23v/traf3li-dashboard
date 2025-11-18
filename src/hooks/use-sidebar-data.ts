@@ -109,10 +109,6 @@ export function useSidebarData(): SidebarData {
             icon: Users,
             items: [
               {
-                title: t('sidebar.currentClients'),
-                url: '/clients/current',
-              },
-              {
                 title: t('sidebar.allClients'),
                 url: '/clients',
               },
@@ -122,10 +118,6 @@ export function useSidebarData(): SidebarData {
             title: t('sidebar.cases'),
             icon: Scale,
             items: [
-              {
-                title: t('sidebar.activeCases'),
-                url: '/cases/active',
-              },
               {
                 title: t('sidebar.allCases'),
                 url: '/cases',
@@ -194,10 +186,6 @@ export function useSidebarData(): SidebarData {
               {
                 title: t('sidebar.reviewsOverview'),
                 url: '/reviews',
-              },
-              {
-                title: t('sidebar.allReviews'),
-                url: '/reviews/all',
               },
               {
                 title: t('sidebar.myBadges'),

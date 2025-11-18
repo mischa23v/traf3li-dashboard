@@ -3,7 +3,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Scale, Plus, Calendar, Users } from 'lucide-react'
-import { Link } from '@tanstack/react-router'
 
 function AllCasesPage() {
   const cases = [
@@ -28,14 +27,6 @@ function AllCasesPage() {
         </Button>
       </div>
 
-      <div className="flex gap-2">
-        <Button variant="outline" asChild>
-          <Link to="/cases/active">Active Cases</Link>
-        </Button>
-        <Button variant="default" asChild>
-          <Link to="/cases">All Cases</Link>
-        </Button>
-      </div>
 
       <div className="grid gap-4 md:grid-cols-4">
         <Card>
