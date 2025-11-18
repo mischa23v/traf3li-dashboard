@@ -9,7 +9,6 @@ import {
   Download,
   DollarSign,
   Calendar,
-  User,
   FileText,
   Search,
   Edit,
@@ -27,7 +26,7 @@ export const Route = createFileRoute('/_authenticated/time-entries/')({
 })
 
 function TimeEntriesPage() {
-  const { t, i18n } = useTranslation()
+  const { i18n } = useTranslation()
   const isRTL = i18n.language === 'ar'
   const [isTimerRunning, setIsTimerRunning] = useState(false)
   const [currentTime, setCurrentTime] = useState(0)

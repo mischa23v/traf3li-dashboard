@@ -26,7 +26,7 @@ export const Route = createFileRoute('/_authenticated/financial/')({
 })
 
 function FinancialInsights() {
-  const { t, i18n } = useTranslation()
+  const { i18n } = useTranslation()
   const isRTL = i18n.language === 'ar'
   const [selectedPeriod, setSelectedPeriod] = useState('12months')
 

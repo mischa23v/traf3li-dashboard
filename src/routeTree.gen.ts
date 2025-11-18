@@ -26,10 +26,13 @@ import { Route as ClerkAuthenticatedRouteRouteImport } from './routes/clerk/_aut
 import { Route as ClerkauthRouteRouteImport } from './routes/clerk/(auth)/route'
 import { Route as AuthenticatedSettingsRouteRouteImport } from './routes/_authenticated/settings/route'
 import { Route as AuthenticatedUsersIndexRouteImport } from './routes/_authenticated/users/index'
+import { Route as AuthenticatedTimeEntriesIndexRouteImport } from './routes/_authenticated/time-entries/index'
 import { Route as AuthenticatedTasksIndexRouteImport } from './routes/_authenticated/tasks/index'
 import { Route as AuthenticatedSettingsIndexRouteImport } from './routes/_authenticated/settings/index'
 import { Route as AuthenticatedHelpCenterIndexRouteImport } from './routes/_authenticated/help-center/index'
+import { Route as AuthenticatedFinancialIndexRouteImport } from './routes/_authenticated/financial/index'
 import { Route as AuthenticatedChatsIndexRouteImport } from './routes/_authenticated/chats/index'
+import { Route as AuthenticatedBillingIndexRouteImport } from './routes/_authenticated/billing/index'
 import { Route as AuthenticatedAppsIndexRouteImport } from './routes/_authenticated/apps/index'
 import { Route as ClerkAuthenticatedUserManagementRouteImport } from './routes/clerk/_authenticated/user-management'
 import { Route as ClerkauthSignUpRouteImport } from './routes/clerk/(auth)/sign-up'
@@ -123,6 +126,12 @@ const AuthenticatedUsersIndexRoute = AuthenticatedUsersIndexRouteImport.update({
   path: '/users/',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedTimeEntriesIndexRoute =
+  AuthenticatedTimeEntriesIndexRouteImport.update({
+    id: '/time-entries/',
+    path: '/time-entries/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedTasksIndexRoute = AuthenticatedTasksIndexRouteImport.update({
   id: '/tasks/',
   path: '/tasks/',
@@ -140,11 +149,23 @@ const AuthenticatedHelpCenterIndexRoute =
     path: '/help-center/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedFinancialIndexRoute =
+  AuthenticatedFinancialIndexRouteImport.update({
+    id: '/financial/',
+    path: '/financial/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedChatsIndexRoute = AuthenticatedChatsIndexRouteImport.update({
   id: '/chats/',
   path: '/chats/',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedBillingIndexRoute =
+  AuthenticatedBillingIndexRouteImport.update({
+    id: '/billing/',
+    path: '/billing/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAppsIndexRoute = AuthenticatedAppsIndexRouteImport.update({
   id: '/apps/',
   path: '/apps/',
@@ -220,10 +241,13 @@ export interface FileRoutesByFullPath {
   '/clerk/sign-up': typeof ClerkauthSignUpRoute
   '/clerk/user-management': typeof ClerkAuthenticatedUserManagementRoute
   '/apps': typeof AuthenticatedAppsIndexRoute
+  '/billing': typeof AuthenticatedBillingIndexRoute
   '/chats': typeof AuthenticatedChatsIndexRoute
+  '/financial': typeof AuthenticatedFinancialIndexRoute
   '/help-center': typeof AuthenticatedHelpCenterIndexRoute
   '/settings/': typeof AuthenticatedSettingsIndexRoute
   '/tasks': typeof AuthenticatedTasksIndexRoute
+  '/time-entries': typeof AuthenticatedTimeEntriesIndexRoute
   '/users': typeof AuthenticatedUsersIndexRoute
 }
 export interface FileRoutesByTo {
@@ -248,10 +272,13 @@ export interface FileRoutesByTo {
   '/clerk/sign-up': typeof ClerkauthSignUpRoute
   '/clerk/user-management': typeof ClerkAuthenticatedUserManagementRoute
   '/apps': typeof AuthenticatedAppsIndexRoute
+  '/billing': typeof AuthenticatedBillingIndexRoute
   '/chats': typeof AuthenticatedChatsIndexRoute
+  '/financial': typeof AuthenticatedFinancialIndexRoute
   '/help-center': typeof AuthenticatedHelpCenterIndexRoute
   '/settings': typeof AuthenticatedSettingsIndexRoute
   '/tasks': typeof AuthenticatedTasksIndexRoute
+  '/time-entries': typeof AuthenticatedTimeEntriesIndexRoute
   '/users': typeof AuthenticatedUsersIndexRoute
 }
 export interface FileRoutesById {
@@ -281,10 +308,13 @@ export interface FileRoutesById {
   '/clerk/(auth)/sign-up': typeof ClerkauthSignUpRoute
   '/clerk/_authenticated/user-management': typeof ClerkAuthenticatedUserManagementRoute
   '/_authenticated/apps/': typeof AuthenticatedAppsIndexRoute
+  '/_authenticated/billing/': typeof AuthenticatedBillingIndexRoute
   '/_authenticated/chats/': typeof AuthenticatedChatsIndexRoute
+  '/_authenticated/financial/': typeof AuthenticatedFinancialIndexRoute
   '/_authenticated/help-center/': typeof AuthenticatedHelpCenterIndexRoute
   '/_authenticated/settings/': typeof AuthenticatedSettingsIndexRoute
   '/_authenticated/tasks/': typeof AuthenticatedTasksIndexRoute
+  '/_authenticated/time-entries/': typeof AuthenticatedTimeEntriesIndexRoute
   '/_authenticated/users/': typeof AuthenticatedUsersIndexRoute
 }
 export interface FileRouteTypes {
@@ -312,10 +342,13 @@ export interface FileRouteTypes {
     | '/clerk/sign-up'
     | '/clerk/user-management'
     | '/apps'
+    | '/billing'
     | '/chats'
+    | '/financial'
     | '/help-center'
     | '/settings/'
     | '/tasks'
+    | '/time-entries'
     | '/users'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -340,10 +373,13 @@ export interface FileRouteTypes {
     | '/clerk/sign-up'
     | '/clerk/user-management'
     | '/apps'
+    | '/billing'
     | '/chats'
+    | '/financial'
     | '/help-center'
     | '/settings'
     | '/tasks'
+    | '/time-entries'
     | '/users'
   id:
     | '__root__'
@@ -372,10 +408,13 @@ export interface FileRouteTypes {
     | '/clerk/(auth)/sign-up'
     | '/clerk/_authenticated/user-management'
     | '/_authenticated/apps/'
+    | '/_authenticated/billing/'
     | '/_authenticated/chats/'
+    | '/_authenticated/financial/'
     | '/_authenticated/help-center/'
     | '/_authenticated/settings/'
     | '/_authenticated/tasks/'
+    | '/_authenticated/time-entries/'
     | '/_authenticated/users/'
   fileRoutesById: FileRoutesById
 }
@@ -515,6 +554,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedUsersIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/time-entries/': {
+      id: '/_authenticated/time-entries/'
+      path: '/time-entries'
+      fullPath: '/time-entries'
+      preLoaderRoute: typeof AuthenticatedTimeEntriesIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/tasks/': {
       id: '/_authenticated/tasks/'
       path: '/tasks'
@@ -536,11 +582,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedHelpCenterIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/financial/': {
+      id: '/_authenticated/financial/'
+      path: '/financial'
+      fullPath: '/financial'
+      preLoaderRoute: typeof AuthenticatedFinancialIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/chats/': {
       id: '/_authenticated/chats/'
       path: '/chats'
       fullPath: '/chats'
       preLoaderRoute: typeof AuthenticatedChatsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/billing/': {
+      id: '/_authenticated/billing/'
+      path: '/billing'
+      fullPath: '/billing'
+      preLoaderRoute: typeof AuthenticatedBillingIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/apps/': {
@@ -637,9 +697,12 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
   AuthenticatedErrorsErrorRoute: typeof AuthenticatedErrorsErrorRoute
   AuthenticatedAppsIndexRoute: typeof AuthenticatedAppsIndexRoute
+  AuthenticatedBillingIndexRoute: typeof AuthenticatedBillingIndexRoute
   AuthenticatedChatsIndexRoute: typeof AuthenticatedChatsIndexRoute
+  AuthenticatedFinancialIndexRoute: typeof AuthenticatedFinancialIndexRoute
   AuthenticatedHelpCenterIndexRoute: typeof AuthenticatedHelpCenterIndexRoute
   AuthenticatedTasksIndexRoute: typeof AuthenticatedTasksIndexRoute
+  AuthenticatedTimeEntriesIndexRoute: typeof AuthenticatedTimeEntriesIndexRoute
   AuthenticatedUsersIndexRoute: typeof AuthenticatedUsersIndexRoute
 }
 
@@ -648,9 +711,12 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
   AuthenticatedErrorsErrorRoute: AuthenticatedErrorsErrorRoute,
   AuthenticatedAppsIndexRoute: AuthenticatedAppsIndexRoute,
+  AuthenticatedBillingIndexRoute: AuthenticatedBillingIndexRoute,
   AuthenticatedChatsIndexRoute: AuthenticatedChatsIndexRoute,
+  AuthenticatedFinancialIndexRoute: AuthenticatedFinancialIndexRoute,
   AuthenticatedHelpCenterIndexRoute: AuthenticatedHelpCenterIndexRoute,
   AuthenticatedTasksIndexRoute: AuthenticatedTasksIndexRoute,
+  AuthenticatedTimeEntriesIndexRoute: AuthenticatedTimeEntriesIndexRoute,
   AuthenticatedUsersIndexRoute: AuthenticatedUsersIndexRoute,
 }
 

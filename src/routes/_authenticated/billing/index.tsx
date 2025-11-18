@@ -2,7 +2,6 @@ import { createFileRoute } from '@tanstack/react-router'
 import { useQuery } from '@tanstack/react-query'
 import {
   TrendingUp,
-  TrendingDown,
   DollarSign,
   Clock,
   AlertCircle,
@@ -19,7 +18,7 @@ export const Route = createFileRoute('/_authenticated/billing/')({
 })
 
 function BillingDashboard() {
-  const { t, i18n } = useTranslation()
+  const { i18n } = useTranslation()
   const isRTL = i18n.language === 'ar'
 
   // Fetch dashboard overview data
