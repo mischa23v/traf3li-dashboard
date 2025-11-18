@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';;
-import { ColumnDef } from '@tanstack/react-table';
+import { useQueryClient } from '@tanstack/react-query';
 import {
   Card,
   CardContent,
@@ -9,18 +8,8 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import {
   Select,
   SelectContent,
@@ -30,47 +19,17 @@ import {
 } from '@/components/ui/select';
 import {
   Play,
-  Pause,
   Square,
   Clock,
-  Plus,
-  Trash2,
-  DollarSign,
-  Calendar as CalendarIcon,
   Loader2,
 } from 'lucide-react';
 import { format } from 'date-fns';
-import { ar } from 'date-fns/locale';
 import { toast } from 'sonner';
 import {
   useTimeEntries,
   useCreateTimeEntry,
-  useUpdateTimeEntry,
-  useDeleteTimeEntry,
   useTimeStats,
 } from './hooks/use-time-tracking';
-
-// Types
-interface TimeEntry {
-  _id: string;
-  description: string;
-  caseId: {
-    _id: string;
-    caseNumber: string;
-    title: string;
-  };
-  date: string;
-  startTime: string;
-  endTime?: string;
-  duration: number; // minutes
-  hourlyRate: number;
-  totalAmount: number;
-  isBillable: boolean;
-  isBilled: boolean;
-  notes?: string;
-  createdAt: string;
-  updatedAt: string;
-}
 
 interface ActiveTimer {
   description: string;
@@ -80,7 +39,6 @@ interface ActiveTimer {
 }
 
 export default function TimeTrackingPage() {
-  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [activeTimer, setActiveTimer] = useState<ActiveTimer | null>(null);
   const [filterPeriod, setFilterPeriod] = useState<'today' | 'week' | 'month'>('week');
   const queryClient = useQueryClient();
@@ -112,9 +70,6 @@ export default function TimeTrackingPage() {
 
   // Create time entry mutation
   const createTimeEntryMutation = useCreateTimeEntry();
-
-  // Delete time entry mutation
-  const deleteTimeEntryMutation = useDeleteTimeEntry();
 
   // Start timer
   const startTimer = (caseId: string, description: string) => {
@@ -171,103 +126,6 @@ export default function TimeTrackingPage() {
     return `${hours}س ${mins}د`;
   };
 
-  // Handle delete time entry
-  const handleDeleteTimeEntry = async (entryId: string) => {
-    if (!confirm('هل أنت متأكد من حذف هذا السجل؟')) return;
-
-    try {
-      await deleteTimeEntryMutation.mutateAsync(entryId);
-      toast.success('تم حذف السجل');
-      queryClient.invalidateQueries({ queryKey: ['time-entries'] });
-      queryClient.invalidateQueries({ queryKey: ['time-stats'] });
-    } catch (error: any) {
-      toast.error('فشل حذف السجل');
-    }
-  };
-
-  // Table columns
-  const columns: ColumnDef<TimeEntry>[] = [
-    {
-      accessorKey: 'date',
-      header: 'التاريخ',
-      cell: ({ row }) => (
-        <div className="text-sm">
-          {format(new Date(row.original.date), 'dd MMM yyyy', { locale: ar })}
-        </div>
-      ),
-    },
-    {
-      accessorKey: 'description',
-      header: 'الوصف',
-      cell: ({ row }) => (
-        <div>
-          <div className="font-medium">{row.original.description}</div>
-          <div className="text-xs text-muted-foreground">
-            {row.original.caseId?.caseNumber} - {row.original.caseId?.title}
-          </div>
-        </div>
-      ),
-    },
-    {
-      accessorKey: 'duration',
-      header: 'المدة',
-      cell: ({ row }) => (
-        <div className="font-medium">{formatDuration(row.original.duration)}</div>
-      ),
-    },
-    {
-      accessorKey: 'startTime',
-      header: 'الوقت',
-      cell: ({ row }) => (
-        <div className="text-sm">
-          {row.original.startTime}
-          {row.original.endTime && ` - ${row.original.endTime}`}
-        </div>
-      ),
-    },
-    {
-      accessorKey: 'totalAmount',
-      header: 'المبلغ',
-      cell: ({ row }) => (
-        <div className="font-medium">
-          {row.original.totalAmount.toLocaleString('ar-SA')} ر.س
-        </div>
-      ),
-    },
-    {
-      accessorKey: 'isBillable',
-      header: 'قابل للفوترة',
-      cell: ({ row }) => (
-        <Badge variant={row.original.isBillable ? 'default' : 'secondary'}>
-          {row.original.isBillable ? 'نعم' : 'لا'}
-        </Badge>
-      ),
-    },
-    {
-      accessorKey: 'isBilled',
-      header: 'تم الفوترة',
-      cell: ({ row }) => (
-        <Badge variant={row.original.isBilled ? 'success' : 'outline'}>
-          {row.original.isBilled ? 'نعم' : 'لا'}
-        </Badge>
-      ),
-    },
-    {
-      id: 'actions',
-      header: 'الإجراءات',
-      cell: ({ row }) => (
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => handleDeleteTimeEntry(row.original._id)}
-          disabled={deleteTimeEntryMutation.isPending}
-        >
-          <Trash2 className="h-4 w-4 text-red-500" />
-        </Button>
-      ),
-    },
-  ];
-
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -276,22 +134,16 @@ export default function TimeTrackingPage() {
           <h1 className="text-3xl font-bold">تسجيل الوقت</h1>
           <p className="text-muted-foreground">تتبع الساعات القابلة للفوترة</p>
         </div>
-        <div className="flex gap-2">
-          <Select value={filterPeriod} onValueChange={(v: any) => setFilterPeriod(v)}>
-            <SelectTrigger className="w-[150px]">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="today">اليوم</SelectItem>
-              <SelectItem value="week">هذا الأسبوع</SelectItem>
-              <SelectItem value="month">هذا الشهر</SelectItem>
-            </SelectContent>
-          </Select>
-          <Button onClick={() => setIsCreateDialogOpen(true)}>
-            <Plus className="h-4 w-4 ml-2" />
-            إضافة يدوياً
-          </Button>
-        </div>
+        <Select value={filterPeriod} onValueChange={(v: any) => setFilterPeriod(v)}>
+          <SelectTrigger className="w-[150px]">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="today">اليوم</SelectItem>
+            <SelectItem value="week">هذا الأسبوع</SelectItem>
+            <SelectItem value="month">هذا الشهر</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
 
       {/* Active Timer */}

@@ -13,17 +13,9 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   Calendar as CalendarIcon,
@@ -37,15 +29,10 @@ import {
 } from 'lucide-react';
 import { format, startOfMonth, endOfMonth, isToday, isSameDay } from 'date-fns';
 import { ar } from 'date-fns/locale';
-import {
-  useEvents,
-  useCreateEvent,
-  useUpdateEvent,
-  useDeleteEvent,
-} from './hooks/use-calendar';
+import { useEvents } from './hooks/use-calendar';
 
-// Types
-interface CalendarEvent {
+// Import CalendarEvent type from hooks
+type CalendarEvent = {
   _id: string;
   title: string;
   type: 'hearing' | 'meeting' | 'deadline' | 'consultation';
@@ -54,19 +41,19 @@ interface CalendarEvent {
   startTime: string;
   endTime?: string;
   location?: string;
-  caseId?: {
+  caseId?: string | {
     _id: string;
     caseNumber: string;
     title: string;
   };
   attendees?: string[];
   notes?: string;
-  reminderBefore?: number; // minutes
+  reminderBefore?: number;
   isAllDay: boolean;
   status: 'scheduled' | 'completed' | 'cancelled' | 'postponed';
   createdAt: string;
   updatedAt: string;
-}
+};
 
 export default function CalendarPage() {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
@@ -112,18 +99,6 @@ export default function CalendarPage() {
         {config?.label}
       </Badge>
     );
-  };
-
-  // Status badge
-  const StatusBadge = ({ status }: { status: CalendarEvent['status'] }) => {
-    const statusConfig = {
-      scheduled: { label: 'مجدولة', variant: 'default' as const },
-      completed: { label: 'مكتملة', variant: 'default' as const },
-      cancelled: { label: 'ملغاة', variant: 'destructive' as const },
-      postponed: { label: 'مؤجلة', variant: 'secondary' as const },
-    };
-    const config = statusConfig[status];
-    return <Badge variant={config.variant}>{config.label}</Badge>;
   };
 
   // Check if date has events
@@ -321,7 +296,6 @@ export default function CalendarPage() {
       <CreateEventDialog
         open={isCreateDialogOpen}
         onOpenChange={setIsCreateDialogOpen}
-        eventTypes={eventTypes}
       />
 
       {/* Event Detail Dialog */}
@@ -364,7 +338,7 @@ function EventCard({ event, onSelect }: EventCardProps) {
           </div>
           <div>
             <div className="font-medium">{event.title}</div>
-            {event.caseId && (
+            {event.caseId && typeof event.caseId === 'object' && (
               <div className="text-xs text-muted-foreground">
                 {event.caseId.caseNumber} - {event.caseId.title}
               </div>
@@ -395,10 +369,9 @@ function EventCard({ event, onSelect }: EventCardProps) {
 interface CreateEventDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  eventTypes: any[];
 }
 
-function CreateEventDialog({ open, onOpenChange, eventTypes }: CreateEventDialogProps) {
+function CreateEventDialog({ open, onOpenChange }: CreateEventDialogProps) {
   // Implementation similar to expenses dialog
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>

@@ -27,7 +27,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Loader2, Plus, Receipt, Trash2, Eye } from 'lucide-react';
+import { Loader2, Plus, Receipt, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
 import { ar } from 'date-fns/locale';
@@ -44,7 +44,7 @@ interface Expense {
   description: string;
   amount: number;
   category: 'court_fees' | 'travel' | 'consultation' | 'documents' | 'research' | 'other';
-  caseId?: {
+  caseId?: string | {
     _id: string;
     caseNumber: string;
     title: string;
@@ -134,97 +134,6 @@ export default function ExpensesPage() {
       toast.error(error.response?.data?.message || 'فشل حذف المصروف');
     }
   };
-
-  // Table columns
-  const columns: ColumnDef<Expense>[] = [
-    {
-      accessorKey: 'date',
-      header: 'التاريخ',
-      cell: ({ row }) => (
-        <div className="text-sm">
-          {format(new Date(row.original.date), 'dd MMM yyyy', { locale: ar })}
-        </div>
-      ),
-    },
-    {
-      accessorKey: 'description',
-      header: 'الوصف',
-      cell: ({ row }) => (
-        <div>
-          <div className="font-medium">{row.original.description}</div>
-          {row.original.caseId && (
-            <div className="text-xs text-muted-foreground">
-              القضية: {row.original.caseId.caseNumber}
-            </div>
-          )}
-        </div>
-      ),
-    },
-    {
-      accessorKey: 'category',
-      header: 'الفئة',
-      cell: ({ row }) => <CategoryBadge category={row.original.category} />,
-    },
-    {
-      accessorKey: 'amount',
-      header: 'المبلغ',
-      cell: ({ row }) => (
-        <div className="font-medium">
-          {row.original.amount.toLocaleString('ar-SA')} ر.س
-        </div>
-      ),
-    },
-    {
-      accessorKey: 'isBillable',
-      header: 'قابل للفوترة',
-      cell: ({ row }) => (
-        <Badge variant={row.original.isBillable ? 'default' : 'secondary'}>
-          {row.original.isBillable ? 'نعم' : 'لا'}
-        </Badge>
-      ),
-    },
-    {
-      accessorKey: 'isReimbursed',
-      header: 'تم الاسترداد',
-      cell: ({ row }) => (
-        <Badge variant={row.original.isReimbursed ? 'success' : 'outline'}>
-          {row.original.isReimbursed ? 'نعم' : 'لا'}
-        </Badge>
-      ),
-    },
-    {
-      id: 'actions',
-      header: 'الإجراءات',
-      cell: ({ row }) => (
-        <div className="flex gap-2">
-          {row.original.receiptUrl && (
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => window.open(row.original.receiptUrl, '_blank')}
-            >
-              <Receipt className="h-4 w-4" />
-            </Button>
-          )}
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setSelectedExpense(row.original)}
-          >
-            <Eye className="h-4 w-4" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => handleDeleteExpense(row.original._id)}
-            disabled={deleteExpenseMutation.isPending}
-          >
-            <Trash2 className="h-4 w-4 text-red-500" />
-          </Button>
-        </div>
-      ),
-    },
-  ];
 
   if (error) {
     return (
@@ -338,7 +247,7 @@ export default function ExpensesPage() {
         </Card>
       )}
 
-      {/* Expenses Table */}
+      {/* Expenses List */}
       <Card>
         <CardHeader>
           <CardTitle>قائمة المصروفات</CardTitle>
@@ -354,7 +263,61 @@ export default function ExpensesPage() {
               لا توجد مصروفات مسجلة
             </div>
           ) : (
-            <DataTable columns={columns} data={expenses} />
+            <div className="space-y-4">
+              {expenses.map((expense) => (
+                <div
+                  key={expense._id}
+                  className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50"
+                >
+                  <div className="flex-1 space-y-1">
+                    <div className="flex items-center gap-2">
+                      <span className="font-medium">{expense.description}</span>
+                      <CategoryBadge category={expense.category} />
+                    </div>
+                    <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                      <span>{format(new Date(expense.date), 'dd MMM yyyy', { locale: ar })}</span>
+                      {expense.caseId && typeof expense.caseId === 'object' && (
+                        <span>القضية: {expense.caseId.caseNumber}</span>
+                      )}
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <div className="text-left">
+                      <div className="font-bold text-lg">
+                        {expense.amount.toLocaleString('ar-SA')} ر.س
+                      </div>
+                      <div className="flex gap-2">
+                        <Badge variant={expense.isBillable ? 'default' : 'secondary'} className="text-xs">
+                          {expense.isBillable ? 'قابل للفوترة' : 'غير قابل'}
+                        </Badge>
+                        <Badge variant={expense.isReimbursed ? 'default' : 'outline'} className="text-xs">
+                          {expense.isReimbursed ? 'تم الاسترداد' : 'معلق'}
+                        </Badge>
+                      </div>
+                    </div>
+                    <div className="flex gap-2">
+                      {expense.receiptUrl && (
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => window.open(expense.receiptUrl, '_blank')}
+                        >
+                          <Receipt className="h-4 w-4" />
+                        </Button>
+                      )}
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => handleDeleteExpense(expense._id)}
+                        disabled={deleteExpenseMutation.isPending}
+                      >
+                        <Trash2 className="h-4 w-4 text-red-500" />
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
           )}
         </CardContent>
       </Card>

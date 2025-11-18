@@ -1,5 +1,3 @@
-import { useState } from 'react';
-import { useQueryClient } from '@tanstack/react-query';
 import {
   Card,
   CardContent,
@@ -10,21 +8,20 @@ import {
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Loader2, Plus, Download, Send, Eye } from 'lucide-react';
-import { toast } from 'sonner';
 import { format } from 'date-fns';
 import { ar } from 'date-fns/locale';
-import { useInvoices, useSendInvoice } from './hooks/use-invoices';
+import { useInvoices } from './hooks/use-invoices';
 
 // Types
 interface Invoice {
   _id: string;
   invoiceNumber: string;
-  caseId: {
+  caseId: string | {
     _id: string;
     caseNumber: string;
     title: string;
   };
-  clientId: {
+  clientId: string | {
     _id: string;
     fullName: string;
     email: string;
@@ -45,25 +42,8 @@ interface Invoice {
 }
 
 export default function InvoicesPage() {
-  const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
-  const queryClient = useQueryClient();
-
   // Fetch invoices
   const { data: invoices = [], isLoading, error } = useInvoices();
-
-  // Send invoice mutation
-  const sendInvoiceMutation = useSendInvoice();
-
-  // Handle send invoice
-  const handleSendInvoice = async (invoiceId: string) => {
-    try {
-      await sendInvoiceMutation.mutateAsync(invoiceId);
-      toast.success('تم إرسال الفاتورة بنجاح');
-      queryClient.invalidateQueries({ queryKey: ['invoices'] });
-    } catch (error: any) {
-      toast.error(error.response?.data?.message || 'فشل إرسال الفاتورة');
-    }
-  };
 
   // Status badge component
   const StatusBadge = ({ status }: { status: Invoice['status'] }) => {
@@ -227,7 +207,7 @@ export default function InvoicesPage() {
                   <div className="space-y-1">
                     <p className="font-medium">{invoice.invoiceNumber}</p>
                     <p className="text-sm text-muted-foreground">
-                      {invoice.clientId?.fullName || 'N/A'} • {invoice.caseId?.caseNumber || 'N/A'}
+                      {typeof invoice.clientId === 'object' ? invoice.clientId.fullName : 'N/A'} • {typeof invoice.caseId === 'object' ? invoice.caseId.caseNumber : 'N/A'}
                     </p>
                     <p className="text-sm text-muted-foreground">
                       Due: {format(new Date(invoice.dueDate), 'dd MMM yyyy', { locale: ar })}
