@@ -1,21 +1,13 @@
-import { useTranslation } from 'react-i18next'
 import {
   LayoutDashboard,
   Calendar,
   ListTodo,
-  Bell,
   MessageSquare,
-  Mail,
   Briefcase,
   Users,
   Scale,
   DollarSign,
-  Receipt,
-  FileText,
-  CreditCard,
   BarChart3,
-  Clock,
-  Activity,
   Award,
   BookOpen,
   Settings,
@@ -23,14 +15,10 @@ import {
   Lock,
   Palette,
   HelpCircle,
-  Gavel,
-  Building2,
-  FileCheck,
 } from 'lucide-react'
 import { type SidebarData } from '@/components/layout/types'
 
 export function useSidebarData(): SidebarData {
-  const { t } = useTranslation()
 
   return {
     user: {

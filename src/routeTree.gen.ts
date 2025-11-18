@@ -12,6 +12,10 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as ClerkRouteRouteImport } from './routes/clerk/route'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
+import { Route as AuthenticatedEventsRouteImport } from './routes/_authenticated/events'
+import { Route as AuthenticatedCasesRouteImport } from './routes/_authenticated/cases'
+import { Route as AuthenticatedCalendarRouteImport } from './routes/_authenticated/calendar'
+import { Route as AuthenticatedBillingRouteImport } from './routes/_authenticated/billing'
 import { Route as errors503RouteImport } from './routes/(errors)/503'
 import { Route as errors500RouteImport } from './routes/(errors)/500'
 import { Route as errors404RouteImport } from './routes/(errors)/404'
@@ -34,11 +38,18 @@ import { Route as AuthenticatedAppsIndexRouteImport } from './routes/_authentica
 import { Route as ClerkAuthenticatedUserManagementRouteImport } from './routes/clerk/_authenticated/user-management'
 import { Route as ClerkauthSignUpRouteImport } from './routes/clerk/(auth)/sign-up'
 import { Route as ClerkauthSignInRouteImport } from './routes/clerk/(auth)/sign-in'
+import { Route as AuthenticatedTasksRemindersRouteImport } from './routes/_authenticated/tasks/reminders'
 import { Route as AuthenticatedSettingsNotificationsRouteImport } from './routes/_authenticated/settings/notifications'
 import { Route as AuthenticatedSettingsDisplayRouteImport } from './routes/_authenticated/settings/display'
 import { Route as AuthenticatedSettingsAppearanceRouteImport } from './routes/_authenticated/settings/appearance'
 import { Route as AuthenticatedSettingsAccountRouteImport } from './routes/_authenticated/settings/account'
+import { Route as AuthenticatedFinanceTimeTrackingRouteImport } from './routes/_authenticated/finance/time-tracking'
+import { Route as AuthenticatedFinanceAccountActivityRouteImport } from './routes/_authenticated/finance/account-activity'
 import { Route as AuthenticatedErrorsErrorRouteImport } from './routes/_authenticated/errors/$error'
+import { Route as AuthenticatedBillingTransactionsRouteImport } from './routes/_authenticated/billing/transactions'
+import { Route as AuthenticatedBillingStatementsRouteImport } from './routes/_authenticated/billing/statements'
+import { Route as AuthenticatedBillingInvoicesRouteImport } from './routes/_authenticated/billing/invoices'
+import { Route as AuthenticatedBillingExpensesRouteImport } from './routes/_authenticated/billing/expenses'
 
 const ClerkRouteRoute = ClerkRouteRouteImport.update({
   id: '/clerk',
@@ -52,6 +63,26 @@ const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
 const AuthenticatedIndexRoute = AuthenticatedIndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedEventsRoute = AuthenticatedEventsRouteImport.update({
+  id: '/events',
+  path: '/events',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedCasesRoute = AuthenticatedCasesRouteImport.update({
+  id: '/cases',
+  path: '/cases',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedCalendarRoute = AuthenticatedCalendarRouteImport.update({
+  id: '/calendar',
+  path: '/calendar',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedBillingRoute = AuthenticatedBillingRouteImport.update({
+  id: '/billing',
+  path: '/billing',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const errors503Route = errors503RouteImport.update({
@@ -166,6 +197,12 @@ const ClerkauthSignInRoute = ClerkauthSignInRouteImport.update({
   path: '/sign-in',
   getParentRoute: () => ClerkauthRouteRoute,
 } as any)
+const AuthenticatedTasksRemindersRoute =
+  AuthenticatedTasksRemindersRouteImport.update({
+    id: '/tasks/reminders',
+    path: '/tasks/reminders',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedSettingsNotificationsRoute =
   AuthenticatedSettingsNotificationsRouteImport.update({
     id: '/notifications',
@@ -190,11 +227,47 @@ const AuthenticatedSettingsAccountRoute =
     path: '/account',
     getParentRoute: () => AuthenticatedSettingsRouteRoute,
   } as any)
+const AuthenticatedFinanceTimeTrackingRoute =
+  AuthenticatedFinanceTimeTrackingRouteImport.update({
+    id: '/finance/time-tracking',
+    path: '/finance/time-tracking',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedFinanceAccountActivityRoute =
+  AuthenticatedFinanceAccountActivityRouteImport.update({
+    id: '/finance/account-activity',
+    path: '/finance/account-activity',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedErrorsErrorRoute =
   AuthenticatedErrorsErrorRouteImport.update({
     id: '/errors/$error',
     path: '/errors/$error',
     getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedBillingTransactionsRoute =
+  AuthenticatedBillingTransactionsRouteImport.update({
+    id: '/transactions',
+    path: '/transactions',
+    getParentRoute: () => AuthenticatedBillingRoute,
+  } as any)
+const AuthenticatedBillingStatementsRoute =
+  AuthenticatedBillingStatementsRouteImport.update({
+    id: '/statements',
+    path: '/statements',
+    getParentRoute: () => AuthenticatedBillingRoute,
+  } as any)
+const AuthenticatedBillingInvoicesRoute =
+  AuthenticatedBillingInvoicesRouteImport.update({
+    id: '/invoices',
+    path: '/invoices',
+    getParentRoute: () => AuthenticatedBillingRoute,
+  } as any)
+const AuthenticatedBillingExpensesRoute =
+  AuthenticatedBillingExpensesRouteImport.update({
+    id: '/expenses',
+    path: '/expenses',
+    getParentRoute: () => AuthenticatedBillingRoute,
   } as any)
 
 export interface FileRoutesByFullPath {
@@ -210,12 +283,23 @@ export interface FileRoutesByFullPath {
   '/404': typeof errors404Route
   '/500': typeof errors500Route
   '/503': typeof errors503Route
+  '/billing': typeof AuthenticatedBillingRouteWithChildren
+  '/calendar': typeof AuthenticatedCalendarRoute
+  '/cases': typeof AuthenticatedCasesRoute
+  '/events': typeof AuthenticatedEventsRoute
   '/': typeof AuthenticatedIndexRoute
+  '/billing/expenses': typeof AuthenticatedBillingExpensesRoute
+  '/billing/invoices': typeof AuthenticatedBillingInvoicesRoute
+  '/billing/statements': typeof AuthenticatedBillingStatementsRoute
+  '/billing/transactions': typeof AuthenticatedBillingTransactionsRoute
   '/errors/$error': typeof AuthenticatedErrorsErrorRoute
+  '/finance/account-activity': typeof AuthenticatedFinanceAccountActivityRoute
+  '/finance/time-tracking': typeof AuthenticatedFinanceTimeTrackingRoute
   '/settings/account': typeof AuthenticatedSettingsAccountRoute
   '/settings/appearance': typeof AuthenticatedSettingsAppearanceRoute
   '/settings/display': typeof AuthenticatedSettingsDisplayRoute
   '/settings/notifications': typeof AuthenticatedSettingsNotificationsRoute
+  '/tasks/reminders': typeof AuthenticatedTasksRemindersRoute
   '/clerk/sign-in': typeof ClerkauthSignInRoute
   '/clerk/sign-up': typeof ClerkauthSignUpRoute
   '/clerk/user-management': typeof ClerkAuthenticatedUserManagementRoute
@@ -238,12 +322,23 @@ export interface FileRoutesByTo {
   '/404': typeof errors404Route
   '/500': typeof errors500Route
   '/503': typeof errors503Route
+  '/billing': typeof AuthenticatedBillingRouteWithChildren
+  '/calendar': typeof AuthenticatedCalendarRoute
+  '/cases': typeof AuthenticatedCasesRoute
+  '/events': typeof AuthenticatedEventsRoute
   '/': typeof AuthenticatedIndexRoute
+  '/billing/expenses': typeof AuthenticatedBillingExpensesRoute
+  '/billing/invoices': typeof AuthenticatedBillingInvoicesRoute
+  '/billing/statements': typeof AuthenticatedBillingStatementsRoute
+  '/billing/transactions': typeof AuthenticatedBillingTransactionsRoute
   '/errors/$error': typeof AuthenticatedErrorsErrorRoute
+  '/finance/account-activity': typeof AuthenticatedFinanceAccountActivityRoute
+  '/finance/time-tracking': typeof AuthenticatedFinanceTimeTrackingRoute
   '/settings/account': typeof AuthenticatedSettingsAccountRoute
   '/settings/appearance': typeof AuthenticatedSettingsAppearanceRoute
   '/settings/display': typeof AuthenticatedSettingsDisplayRoute
   '/settings/notifications': typeof AuthenticatedSettingsNotificationsRoute
+  '/tasks/reminders': typeof AuthenticatedTasksRemindersRoute
   '/clerk/sign-in': typeof ClerkauthSignInRoute
   '/clerk/sign-up': typeof ClerkauthSignUpRoute
   '/clerk/user-management': typeof ClerkAuthenticatedUserManagementRoute
@@ -271,12 +366,23 @@ export interface FileRoutesById {
   '/(errors)/404': typeof errors404Route
   '/(errors)/500': typeof errors500Route
   '/(errors)/503': typeof errors503Route
+  '/_authenticated/billing': typeof AuthenticatedBillingRouteWithChildren
+  '/_authenticated/calendar': typeof AuthenticatedCalendarRoute
+  '/_authenticated/cases': typeof AuthenticatedCasesRoute
+  '/_authenticated/events': typeof AuthenticatedEventsRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
+  '/_authenticated/billing/expenses': typeof AuthenticatedBillingExpensesRoute
+  '/_authenticated/billing/invoices': typeof AuthenticatedBillingInvoicesRoute
+  '/_authenticated/billing/statements': typeof AuthenticatedBillingStatementsRoute
+  '/_authenticated/billing/transactions': typeof AuthenticatedBillingTransactionsRoute
   '/_authenticated/errors/$error': typeof AuthenticatedErrorsErrorRoute
+  '/_authenticated/finance/account-activity': typeof AuthenticatedFinanceAccountActivityRoute
+  '/_authenticated/finance/time-tracking': typeof AuthenticatedFinanceTimeTrackingRoute
   '/_authenticated/settings/account': typeof AuthenticatedSettingsAccountRoute
   '/_authenticated/settings/appearance': typeof AuthenticatedSettingsAppearanceRoute
   '/_authenticated/settings/display': typeof AuthenticatedSettingsDisplayRoute
   '/_authenticated/settings/notifications': typeof AuthenticatedSettingsNotificationsRoute
+  '/_authenticated/tasks/reminders': typeof AuthenticatedTasksRemindersRoute
   '/clerk/(auth)/sign-in': typeof ClerkauthSignInRoute
   '/clerk/(auth)/sign-up': typeof ClerkauthSignUpRoute
   '/clerk/_authenticated/user-management': typeof ClerkAuthenticatedUserManagementRoute
@@ -302,12 +408,23 @@ export interface FileRouteTypes {
     | '/404'
     | '/500'
     | '/503'
+    | '/billing'
+    | '/calendar'
+    | '/cases'
+    | '/events'
     | '/'
+    | '/billing/expenses'
+    | '/billing/invoices'
+    | '/billing/statements'
+    | '/billing/transactions'
     | '/errors/$error'
+    | '/finance/account-activity'
+    | '/finance/time-tracking'
     | '/settings/account'
     | '/settings/appearance'
     | '/settings/display'
     | '/settings/notifications'
+    | '/tasks/reminders'
     | '/clerk/sign-in'
     | '/clerk/sign-up'
     | '/clerk/user-management'
@@ -330,12 +447,23 @@ export interface FileRouteTypes {
     | '/404'
     | '/500'
     | '/503'
+    | '/billing'
+    | '/calendar'
+    | '/cases'
+    | '/events'
     | '/'
+    | '/billing/expenses'
+    | '/billing/invoices'
+    | '/billing/statements'
+    | '/billing/transactions'
     | '/errors/$error'
+    | '/finance/account-activity'
+    | '/finance/time-tracking'
     | '/settings/account'
     | '/settings/appearance'
     | '/settings/display'
     | '/settings/notifications'
+    | '/tasks/reminders'
     | '/clerk/sign-in'
     | '/clerk/sign-up'
     | '/clerk/user-management'
@@ -362,12 +490,23 @@ export interface FileRouteTypes {
     | '/(errors)/404'
     | '/(errors)/500'
     | '/(errors)/503'
+    | '/_authenticated/billing'
+    | '/_authenticated/calendar'
+    | '/_authenticated/cases'
+    | '/_authenticated/events'
     | '/_authenticated/'
+    | '/_authenticated/billing/expenses'
+    | '/_authenticated/billing/invoices'
+    | '/_authenticated/billing/statements'
+    | '/_authenticated/billing/transactions'
     | '/_authenticated/errors/$error'
+    | '/_authenticated/finance/account-activity'
+    | '/_authenticated/finance/time-tracking'
     | '/_authenticated/settings/account'
     | '/_authenticated/settings/appearance'
     | '/_authenticated/settings/display'
     | '/_authenticated/settings/notifications'
+    | '/_authenticated/tasks/reminders'
     | '/clerk/(auth)/sign-in'
     | '/clerk/(auth)/sign-up'
     | '/clerk/_authenticated/user-management'
@@ -415,6 +554,34 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof AuthenticatedIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/events': {
+      id: '/_authenticated/events'
+      path: '/events'
+      fullPath: '/events'
+      preLoaderRoute: typeof AuthenticatedEventsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/cases': {
+      id: '/_authenticated/cases'
+      path: '/cases'
+      fullPath: '/cases'
+      preLoaderRoute: typeof AuthenticatedCasesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/calendar': {
+      id: '/_authenticated/calendar'
+      path: '/calendar'
+      fullPath: '/calendar'
+      preLoaderRoute: typeof AuthenticatedCalendarRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/billing': {
+      id: '/_authenticated/billing'
+      path: '/billing'
+      fullPath: '/billing'
+      preLoaderRoute: typeof AuthenticatedBillingRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/(errors)/503': {
@@ -571,6 +738,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ClerkauthSignInRouteImport
       parentRoute: typeof ClerkauthRouteRoute
     }
+    '/_authenticated/tasks/reminders': {
+      id: '/_authenticated/tasks/reminders'
+      path: '/tasks/reminders'
+      fullPath: '/tasks/reminders'
+      preLoaderRoute: typeof AuthenticatedTasksRemindersRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/settings/notifications': {
       id: '/_authenticated/settings/notifications'
       path: '/notifications'
@@ -599,12 +773,54 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSettingsAccountRouteImport
       parentRoute: typeof AuthenticatedSettingsRouteRoute
     }
+    '/_authenticated/finance/time-tracking': {
+      id: '/_authenticated/finance/time-tracking'
+      path: '/finance/time-tracking'
+      fullPath: '/finance/time-tracking'
+      preLoaderRoute: typeof AuthenticatedFinanceTimeTrackingRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/finance/account-activity': {
+      id: '/_authenticated/finance/account-activity'
+      path: '/finance/account-activity'
+      fullPath: '/finance/account-activity'
+      preLoaderRoute: typeof AuthenticatedFinanceAccountActivityRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/errors/$error': {
       id: '/_authenticated/errors/$error'
       path: '/errors/$error'
       fullPath: '/errors/$error'
       preLoaderRoute: typeof AuthenticatedErrorsErrorRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/billing/transactions': {
+      id: '/_authenticated/billing/transactions'
+      path: '/transactions'
+      fullPath: '/billing/transactions'
+      preLoaderRoute: typeof AuthenticatedBillingTransactionsRouteImport
+      parentRoute: typeof AuthenticatedBillingRoute
+    }
+    '/_authenticated/billing/statements': {
+      id: '/_authenticated/billing/statements'
+      path: '/statements'
+      fullPath: '/billing/statements'
+      preLoaderRoute: typeof AuthenticatedBillingStatementsRouteImport
+      parentRoute: typeof AuthenticatedBillingRoute
+    }
+    '/_authenticated/billing/invoices': {
+      id: '/_authenticated/billing/invoices'
+      path: '/invoices'
+      fullPath: '/billing/invoices'
+      preLoaderRoute: typeof AuthenticatedBillingInvoicesRouteImport
+      parentRoute: typeof AuthenticatedBillingRoute
+    }
+    '/_authenticated/billing/expenses': {
+      id: '/_authenticated/billing/expenses'
+      path: '/expenses'
+      fullPath: '/billing/expenses'
+      preLoaderRoute: typeof AuthenticatedBillingExpensesRouteImport
+      parentRoute: typeof AuthenticatedBillingRoute
     }
   }
 }
@@ -632,10 +848,34 @@ const AuthenticatedSettingsRouteRouteWithChildren =
     AuthenticatedSettingsRouteRouteChildren,
   )
 
+interface AuthenticatedBillingRouteChildren {
+  AuthenticatedBillingExpensesRoute: typeof AuthenticatedBillingExpensesRoute
+  AuthenticatedBillingInvoicesRoute: typeof AuthenticatedBillingInvoicesRoute
+  AuthenticatedBillingStatementsRoute: typeof AuthenticatedBillingStatementsRoute
+  AuthenticatedBillingTransactionsRoute: typeof AuthenticatedBillingTransactionsRoute
+}
+
+const AuthenticatedBillingRouteChildren: AuthenticatedBillingRouteChildren = {
+  AuthenticatedBillingExpensesRoute: AuthenticatedBillingExpensesRoute,
+  AuthenticatedBillingInvoicesRoute: AuthenticatedBillingInvoicesRoute,
+  AuthenticatedBillingStatementsRoute: AuthenticatedBillingStatementsRoute,
+  AuthenticatedBillingTransactionsRoute: AuthenticatedBillingTransactionsRoute,
+}
+
+const AuthenticatedBillingRouteWithChildren =
+  AuthenticatedBillingRoute._addFileChildren(AuthenticatedBillingRouteChildren)
+
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedSettingsRouteRoute: typeof AuthenticatedSettingsRouteRouteWithChildren
+  AuthenticatedBillingRoute: typeof AuthenticatedBillingRouteWithChildren
+  AuthenticatedCalendarRoute: typeof AuthenticatedCalendarRoute
+  AuthenticatedCasesRoute: typeof AuthenticatedCasesRoute
+  AuthenticatedEventsRoute: typeof AuthenticatedEventsRoute
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
   AuthenticatedErrorsErrorRoute: typeof AuthenticatedErrorsErrorRoute
+  AuthenticatedFinanceAccountActivityRoute: typeof AuthenticatedFinanceAccountActivityRoute
+  AuthenticatedFinanceTimeTrackingRoute: typeof AuthenticatedFinanceTimeTrackingRoute
+  AuthenticatedTasksRemindersRoute: typeof AuthenticatedTasksRemindersRoute
   AuthenticatedAppsIndexRoute: typeof AuthenticatedAppsIndexRoute
   AuthenticatedChatsIndexRoute: typeof AuthenticatedChatsIndexRoute
   AuthenticatedHelpCenterIndexRoute: typeof AuthenticatedHelpCenterIndexRoute
@@ -645,8 +885,16 @@ interface AuthenticatedRouteRouteChildren {
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedSettingsRouteRoute: AuthenticatedSettingsRouteRouteWithChildren,
+  AuthenticatedBillingRoute: AuthenticatedBillingRouteWithChildren,
+  AuthenticatedCalendarRoute: AuthenticatedCalendarRoute,
+  AuthenticatedCasesRoute: AuthenticatedCasesRoute,
+  AuthenticatedEventsRoute: AuthenticatedEventsRoute,
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
   AuthenticatedErrorsErrorRoute: AuthenticatedErrorsErrorRoute,
+  AuthenticatedFinanceAccountActivityRoute:
+    AuthenticatedFinanceAccountActivityRoute,
+  AuthenticatedFinanceTimeTrackingRoute: AuthenticatedFinanceTimeTrackingRoute,
+  AuthenticatedTasksRemindersRoute: AuthenticatedTasksRemindersRoute,
   AuthenticatedAppsIndexRoute: AuthenticatedAppsIndexRoute,
   AuthenticatedChatsIndexRoute: AuthenticatedChatsIndexRoute,
   AuthenticatedHelpCenterIndexRoute: AuthenticatedHelpCenterIndexRoute,
