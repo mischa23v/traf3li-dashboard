@@ -1,27 +1,38 @@
 import { useTranslation } from 'react-i18next'
 import {
-  Construction,
+  Home,
   LayoutDashboard,
-  Monitor,
-  Bug,
-  ListTodo,
-  FileX,
-  HelpCircle,
-  Lock,
-  Bell,
-  Package,
-  Palette,
-  ServerOff,
-  Settings,
-  Wrench,
-  UserCog,
-  UserX,
+  Calendar,
+  CheckSquare,
+  MessageSquare,
+  Briefcase,
   Users,
-  MessagesSquare,
-  ShieldCheck,
-  AudioWaveform,
+  Scale,
+  DollarSign,
+  Star,
+  BarChart3,
+  BookOpen,
+  Settings,
+  HelpCircle,
+  Mail,
+  BellRing,
+  CalendarCheck,
+  MessageCircle,
+  UserCircle,
+  Shield,
+  SlidersHorizontal,
+  Folder,
+  FileText,
+  Gavel,
+  TrendingUp,
+  Clock,
+  CreditCard,
+  Receipt,
+  Activity,
+  Award,
   Command,
   GalleryVerticalEnd,
+  AudioWaveform,
 } from 'lucide-react'
 import { ClerkLogo } from '@/assets/clerk-logo'
 import { type SidebarData } from '@/components/layout/types'
@@ -54,147 +65,201 @@ export function useSidebarData(): SidebarData {
     ],
     navGroups: [
       {
-        title: t('sidebar.general'),
+        title: t('sidebar.main'),
         items: [
           {
-            title: t('sidebar.dashboard'),
+            title: t('sidebar.overview'),
             url: '/',
-            icon: LayoutDashboard,
+            icon: Home,
+          },
+          {
+            title: t('sidebar.calendar'),
+            url: '/calendar',
+            icon: Calendar,
           },
           {
             title: t('sidebar.tasks'),
             url: '/tasks',
-            icon: ListTodo,
+            icon: CheckSquare,
+            items: [
+              {
+                title: t('sidebar.tasks'),
+                url: '/tasks',
+              },
+              {
+                title: t('sidebar.reminders'),
+                url: '/tasks/reminders',
+              },
+              {
+                title: t('sidebar.events'),
+                url: '/tasks/events',
+              },
+            ],
           },
           {
-            title: t('sidebar.apps'),
-            url: '/apps',
-            icon: Package,
+            title: t('sidebar.messages'),
+            url: '/messages',
+            icon: MessageSquare,
+            items: [
+              {
+                title: t('sidebar.chat'),
+                url: '/messages/chat',
+              },
+              {
+                title: t('sidebar.email'),
+                url: '/messages/email',
+              },
+            ],
+          },
+        ],
+      },
+      {
+        title: t('sidebar.business'),
+        items: [
+          {
+            title: t('sidebar.jobOpportunities'),
+            url: '/jobs',
+            icon: Briefcase,
+            items: [
+              {
+                title: t('sidebar.myServices'),
+                url: '/jobs/my-services',
+              },
+              {
+                title: t('sidebar.browseJobs'),
+                url: '/jobs/browse',
+              },
+            ],
           },
           {
-            title: t('sidebar.chats'),
-            url: '/chats',
-            badge: '3',
-            icon: MessagesSquare,
-          },
-          {
-            title: t('sidebar.users'),
-            url: '/users',
+            title: t('sidebar.clients'),
+            url: '/clients',
             icon: Users,
           },
           {
-            title: t('sidebar.securedByClerk'),
-            icon: ClerkLogo,
-            items: [
-              {
-                title: t('sidebar.signIn'),
-                url: '/clerk/sign-in',
-              },
-              {
-                title: t('sidebar.signUp'),
-                url: '/clerk/sign-up',
-              },
-              {
-                title: 'User Management',
-                url: '/clerk/user-management',
-              },
-            ],
+            title: t('sidebar.cases'),
+            url: '/cases',
+            icon: Scale,
           },
         ],
       },
       {
-        title: t('sidebar.pages'),
+        title: t('sidebar.finance'),
         items: [
           {
-            title: t('sidebar.auth'),
-            icon: ShieldCheck,
+            title: t('sidebar.accounts'),
+            url: '/accounts',
+            icon: DollarSign,
             items: [
               {
-                title: t('sidebar.signIn'),
-                url: '/sign-in',
+                title: t('sidebar.accountsDashboard'),
+                url: '/accounts/dashboard',
               },
               {
-                title: t('sidebar.signIn2Col'),
-                url: '/sign-in-2',
+                title: t('sidebar.invoices'),
+                url: '/accounts/invoices',
               },
               {
-                title: t('sidebar.signUp'),
-                url: '/sign-up',
+                title: t('sidebar.expenses'),
+                url: '/accounts/expenses',
               },
               {
-                title: t('sidebar.forgotPassword'),
-                url: '/forgot-password',
+                title: t('sidebar.statements'),
+                url: '/accounts/statements',
               },
               {
-                title: t('sidebar.otp'),
-                url: '/otp',
-              },
-            ],
-          },
-          {
-            title: t('sidebar.errors'),
-            icon: Bug,
-            items: [
-              {
-                title: t('sidebar.unauthorized'),
-                url: '/errors/unauthorized',
-                icon: Lock,
+                title: t('sidebar.transactions'),
+                url: '/accounts/transactions',
               },
               {
-                title: t('sidebar.forbidden'),
-                url: '/errors/forbidden',
-                icon: UserX,
+                title: t('sidebar.timeTracking'),
+                url: '/accounts/time-tracking',
               },
               {
-                title: t('sidebar.notFound'),
-                url: '/errors/not-found',
-                icon: FileX,
-              },
-              {
-                title: t('sidebar.internalServerError'),
-                url: '/errors/internal-server-error',
-                icon: ServerOff,
-              },
-              {
-                title: t('sidebar.maintenanceError'),
-                url: '/errors/maintenance-error',
-                icon: Construction,
+                title: t('sidebar.accountActivity'),
+                url: '/accounts/activity',
               },
             ],
           },
         ],
       },
       {
-        title: t('sidebar.other'),
+        title: t('sidebar.professionalExcellence'),
+        items: [
+          {
+            title: t('sidebar.ratingsReputation'),
+            url: '/ratings',
+            icon: Star,
+            items: [
+              {
+                title: t('sidebar.overview'),
+                url: '/ratings/overview',
+              },
+              {
+                title: t('sidebar.myBadges'),
+                url: '/ratings/badges',
+              },
+            ],
+          },
+          {
+            title: t('sidebar.reports'),
+            url: '/reports',
+            icon: BarChart3,
+            items: [
+              {
+                title: t('sidebar.revenueReport'),
+                url: '/reports/revenue',
+              },
+              {
+                title: t('sidebar.casesReport'),
+                url: '/reports/cases',
+              },
+              {
+                title: t('sidebar.timeReport'),
+                url: '/reports/time',
+              },
+            ],
+          },
+          {
+            title: t('sidebar.knowledgeCenter'),
+            url: '/knowledge',
+            icon: BookOpen,
+            items: [
+              {
+                title: t('sidebar.laws'),
+                url: '/knowledge/laws',
+              },
+              {
+                title: t('sidebar.judgments'),
+                url: '/knowledge/judgments',
+              },
+              {
+                title: t('sidebar.forms'),
+                url: '/knowledge/forms',
+              },
+            ],
+          },
+        ],
+      },
+      {
+        title: t('sidebar.system'),
         items: [
           {
             title: t('sidebar.settings'),
+            url: '/settings',
             icon: Settings,
             items: [
               {
                 title: t('sidebar.profile'),
-                url: '/settings',
-                icon: UserCog,
+                url: '/settings/profile',
               },
               {
-                title: t('sidebar.account'),
-                url: '/settings/account',
-                icon: Wrench,
+                title: t('sidebar.security'),
+                url: '/settings/security',
               },
               {
-                title: t('sidebar.appearance'),
-                url: '/settings/appearance',
-                icon: Palette,
-              },
-              {
-                title: t('sidebar.notifications'),
-                url: '/settings/notifications',
-                icon: Bell,
-              },
-              {
-                title: t('sidebar.display'),
-                url: '/settings/display',
-                icon: Monitor,
+                title: t('sidebar.preferences'),
+                url: '/settings/preferences',
               },
             ],
           },
