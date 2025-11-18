@@ -15,6 +15,7 @@ import {
   Lock,
   Palette,
   HelpCircle,
+  Building2,
 } from 'lucide-react'
 import { type SidebarData } from '@/components/layout/types'
 
@@ -26,7 +27,13 @@ export function useSidebarData(): SidebarData {
       email: 'satnaingdev@gmail.com',
       avatar: '/avatars/shadcn.jpg',
     },
-    teams: [],
+    teams: [
+      {
+        name: 'TRAF3LI',
+        logo: Building2,
+        plan: 'Enterprise',
+      },
+    ],
     navGroups: [
       {
         title: 'الرئيسية',
