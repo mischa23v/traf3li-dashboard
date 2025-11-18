@@ -136,7 +136,7 @@ const authService = {
    */
   getCurrentUser: async (): Promise<User | null> => {
     try {
-      const response = await apiClient.get<AuthResponse>('/api/auth/status')
+      const response = await apiClient.get<AuthResponse>('/api/auth/me')
 
       if (response.data.error || !response.data.user) {
         return null
