@@ -1,406 +1,512 @@
-import { useState } from 'react';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Calendar } from '@/components/ui/calendar';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import {
-  Calendar as CalendarIcon,
-  Clock,
-  MapPin,
-  Plus,
-  Users,
-  FileText,
-  AlertCircle,
-  Loader2,
-} from 'lucide-react';
-import { format, startOfMonth, endOfMonth, isToday, isSameDay } from 'date-fns';
-import { ar } from 'date-fns/locale';
-import { useEvents } from './hooks/use-calendar';
+import { useState } from 'react'
+import { Calendar as CalendarIcon, ChevronLeft, ChevronRight, Plus, Filter, Clock, MapPin, Users, FileText, CheckSquare, Briefcase, Bell, X } from 'lucide-react'
+import { Card, CardContent } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { Header } from '@/components/layout/header'
+import { Main } from '@/components/layout/main'
+import { ThemeSwitch } from '@/components/theme-switch'
+import { LanguageSwitcher } from '@/components/language-switcher'
+import { ProfileDropdown } from '@/components/profile-dropdown'
 
-// Import CalendarEvent type from hooks
-type CalendarEvent = {
-  _id: string;
-  title: string;
-  type: 'hearing' | 'meeting' | 'deadline' | 'consultation';
-  startDate: string;
-  endDate?: string;
-  startTime: string;
-  endTime?: string;
-  location?: string;
-  caseId?: string | {
-    _id: string;
-    caseNumber: string;
-    title: string;
-  };
-  attendees?: string[];
-  notes?: string;
-  reminderBefore?: number;
-  isAllDay: boolean;
-  status: 'scheduled' | 'completed' | 'cancelled' | 'postponed';
-  createdAt: string;
-  updatedAt: string;
-};
+interface CalendarItem {
+  id: number
+  type: 'event' | 'task' | 'case'
+  title: string
+  date: Date
+  time: string
+  duration?: string
+  location?: string
+  court?: string
+  caseNumber?: string
+  client?: string
+  lawyer?: string
+  attendees?: string[]
+  priority?: string
+  assignee?: string
+  estimatedHours?: number
+  sessionType?: string
+  status?: string
+  color: string
+}
 
 export default function CalendarPage() {
-  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
-  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
-  const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(null);
-  const [viewMode, setViewMode] = useState<'month' | 'week' | 'day'>('month');
+  const [currentDate, setCurrentDate] = useState(new Date(2025, 10, 17))
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null)
+  const [selectedItem, setSelectedItem] = useState<CalendarItem | null>(null)
 
-  // Fetch events for selected month
-  const startDate = startOfMonth(selectedDate);
-  const endDate = endOfMonth(selectedDate);
+  const monthNames = [
+    'يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو',
+    'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'
+  ]
 
-  const { data: events = [], isLoading } = useEvents({
-    startDate: startDate.toISOString(),
-    endDate: endDate.toISOString(),
-  });
+  const dayNames = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت']
 
-  // Event type config
-  const eventTypes = [
-    { value: 'hearing', label: 'جلسة محكمة', icon: FileText, color: 'bg-red-500' },
-    { value: 'meeting', label: 'اجتماع', icon: Users, color: 'bg-blue-500' },
-    { value: 'deadline', label: 'موعد نهائي', icon: AlertCircle, color: 'bg-orange-500' },
-    { value: 'consultation', label: 'استشارة', icon: Clock, color: 'bg-green-500' },
-  ];
+  const calendarItems: CalendarItem[] = [
+    {
+      id: 1,
+      type: 'event',
+      title: 'اجتماع مع العميل - مشاري الرابح',
+      date: new Date(2025, 10, 17),
+      time: '10:00 ص',
+      duration: '1 ساعة',
+      location: 'مكتب المحاماة - الرياض',
+      attendees: ['أحمد السالم', 'فاطمة الغامدي'],
+      caseNumber: 'CASE-2025-001',
+      color: 'blue',
+      status: 'upcoming'
+    },
+    {
+      id: 4,
+      type: 'task',
+      title: 'إعداد مذكرة دفاع في القضية التجارية',
+      date: new Date(2025, 10, 17),
+      time: '2:00 م',
+      priority: 'high',
+      assignee: 'أحمد السالم',
+      caseNumber: 'CASE-2025-001',
+      client: 'مشاري الرابح',
+      estimatedHours: 3.5,
+      color: 'red',
+      status: 'pending'
+    },
+    {
+      id: 9,
+      type: 'case',
+      title: 'جلسة المحكمة التجارية - شركة البناء الحديثة',
+      date: new Date(2025, 10, 18),
+      time: '9:00 ص',
+      duration: '2 ساعة',
+      court: 'المحكمة التجارية - الرياض',
+      caseNumber: 'CASE-2025-012',
+      client: 'شركة البناء الحديثة',
+      lawyer: 'فاطمة الغامدي',
+      sessionType: 'جلسة مرافعة',
+      color: 'purple',
+      status: 'scheduled'
+    }
+  ]
 
-  // Get events for selected date
-  const selectedDateEvents = events.filter((event) =>
-    isSameDay(new Date(event.startDate), selectedDate)
-  );
+  const getDaysInMonth = (date: Date) => {
+    const year = date.getFullYear()
+    const month = date.getMonth()
+    const firstDay = new Date(year, month, 1)
+    const lastDay = new Date(year, month + 1, 0)
+    const daysInMonth = lastDay.getDate()
+    const startingDayOfWeek = firstDay.getDay()
+    
+    const days: Array<{ day: number | string; isCurrentMonth: boolean; date?: Date }> = []
+    
+    for (let i = 0; i < startingDayOfWeek; i++) {
+      days.push({ day: '', isCurrentMonth: false })
+    }
+    
+    for (let i = 1; i <= daysInMonth; i++) {
+      days.push({ day: i, isCurrentMonth: true, date: new Date(year, month, i) })
+    }
+    
+    const remainingDays = 42 - days.length
+    for (let i = 1; i <= remainingDays; i++) {
+      days.push({ day: '', isCurrentMonth: false })
+    }
+    
+    return days
+  }
 
-  // Get upcoming events (next 7 days)
-  const upcomingEvents = events
-    .filter((event) => new Date(event.startDate) >= new Date())
-    .sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime())
-    .slice(0, 5);
+  const getItemsForDate = (date: Date | undefined) => {
+    if (!date) return []
+    return calendarItems.filter(item => 
+      item.date.toDateString() === date.toDateString()
+    )
+  }
 
-  // Event type badge
-  const EventTypeBadge = ({ type }: { type: CalendarEvent['type'] }) => {
-    const config = eventTypes.find((t) => t.value === type);
-    const Icon = config?.icon || CalendarIcon;
-    return (
-      <Badge className={`${config?.color} text-white`}>
-        <Icon className="h-3 w-3 ml-1" />
-        {config?.label}
-      </Badge>
-    );
-  };
+  const changeMonth = (direction: number) => {
+    const newDate = new Date(currentDate)
+    newDate.setMonth(currentDate.getMonth() + direction)
+    setCurrentDate(newDate)
+  }
 
-  // Check if date has events
-  const dateHasEvents = (date: Date) => {
-    return events.some((event) => isSameDay(new Date(event.startDate), date));
-  };
+  const isToday = (date: Date | undefined) => {
+    if (!date) return false
+    const today = new Date()
+    return date.toDateString() === today.toDateString()
+  }
+
+  const getTypeLabel = (type: string) => {
+    const types: Record<string, string> = {
+      event: 'حدث',
+      task: 'مهمة',
+      case: 'قضية'
+    }
+    return types[type] || ''
+  }
+
+  const getTypeBadgeColor = (type: string) => {
+    const colors: Record<string, string> = {
+      event: 'bg-blue-100 text-blue-700 border-blue-200 dark:bg-blue-950',
+      task: 'bg-yellow-100 text-yellow-700 border-yellow-200 dark:bg-yellow-950',
+      case: 'bg-purple-100 text-purple-700 border-purple-200 dark:bg-purple-950'
+    }
+    return colors[type] || 'bg-muted text-muted-foreground'
+  }
+
+  const days = getDaysInMonth(currentDate)
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold">التقويم</h1>
-          <p className="text-muted-foreground">إدارة الجلسات والمواعيد</p>
+    <>
+      <Header>
+        <div className='flex items-center gap-6 flex-1'>
+          <div>
+            <h1 className="text-2xl font-bold">التقويم</h1>
+            <p className="text-sm text-muted-foreground">إدارة الأحداث والمهام والقضايا</p>
+          </div>
         </div>
-        <Button onClick={() => setIsCreateDialogOpen(true)}>
-          <Plus className="h-4 w-4 ml-2" />
-          حدث جديد
-        </Button>
-      </div>
+        <div className="flex items-center gap-3">
+          <Button variant="outline">
+            <Filter className="h-4 w-4 mr-2" />
+            تصفية
+          </Button>
+          <Button>
+            <Plus className="h-4 w-4 mr-2" />
+            إضافة جديد
+          </Button>
+          <LanguageSwitcher />
+          <ThemeSwitch />
+          <ProfileDropdown />
+        </div>
+      </Header>
 
-      <div className="grid gap-6 lg:grid-cols-3">
-        {/* Calendar Section */}
-        <div className="lg:col-span-2 space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center justify-between">
-                <span>
-                  {format(selectedDate, 'MMMM yyyy', { locale: ar })}
-                </span>
-                <Tabs value={viewMode} onValueChange={(v) => setViewMode(v as any)}>
-                  <TabsList>
-                    <TabsTrigger value="month">شهر</TabsTrigger>
-                    <TabsTrigger value="week">أسبوع</TabsTrigger>
-                    <TabsTrigger value="day">يوم</TabsTrigger>
-                  </TabsList>
-                </Tabs>
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <Calendar
-                mode="single"
-                selected={selectedDate}
-                onSelect={(date) => date && setSelectedDate(date)}
-                locale={ar}
-                className="rounded-md border"
-                modifiers={{
-                  hasEvents: (date) => dateHasEvents(date),
-                }}
-                modifiersStyles={{
-                  hasEvents: {
-                    fontWeight: 'bold',
-                    textDecoration: 'underline',
-                  },
-                }}
-              />
-            </CardContent>
-          </Card>
-
-          {/* Selected Date Events */}
-          <Card>
-            <CardHeader>
-              <CardTitle>
-                أحداث يوم {format(selectedDate, 'dd MMMM yyyy', { locale: ar })}
-              </CardTitle>
-              <CardDescription>
-                {selectedDateEvents.length === 0
-                  ? 'لا توجد أحداث في هذا اليوم'
-                  : `${selectedDateEvents.length} حدث مجدول`}
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              {isLoading ? (
-                <div className="flex items-center justify-center py-8">
-                  <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+      <Main dir="rtl">
+        {/* Calendar Header */}
+        <Card className="mb-6">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-4">
+                <h2 className="text-2xl font-bold">
+                  {monthNames[currentDate.getMonth()]} {currentDate.getFullYear()}
+                </h2>
+                <div className="flex gap-2">
+                  <Button
+                    onClick={() => changeMonth(-1)}
+                    variant="outline"
+                    size="sm"
+                  >
+                    <ChevronRight className="h-5 w-5" />
+                  </Button>
+                  <Button
+                    onClick={() => changeMonth(1)}
+                    variant="outline"
+                    size="sm"
+                  >
+                    <ChevronLeft className="h-5 w-5" />
+                  </Button>
                 </div>
-              ) : selectedDateEvents.length === 0 ? (
-                <div className="text-center py-8 text-muted-foreground">
-                  لا توجد أحداث مجدولة
+                <Button
+                  onClick={() => setCurrentDate(new Date())}
+                  variant="outline"
+                  size="sm"
+                >
+                  اليوم
+                </Button>
+              </div>
+            </div>
+
+            {/* Calendar Grid */}
+            <div className="grid grid-cols-7 gap-1">
+              {/* Day Headers */}
+              {dayNames.map(day => (
+                <div key={day} className="text-center py-3 text-sm font-semibold text-muted-foreground bg-muted rounded-lg">
+                  {day}
+                </div>
+              ))}
+
+              {/* Calendar Days */}
+              {days.map((dayObj, idx) => {
+                const itemsOnThisDay = dayObj.date ? getItemsForDate(dayObj.date) : []
+                const isCurrentDay = dayObj.date && isToday(dayObj.date)
+                
+                return (
+                  <button
+                    key={idx}
+                    onClick={() => dayObj.date && setSelectedDate(dayObj.date)}
+                    className={`min-h-32 p-2 border rounded-lg text-right hover:bg-muted/50 transition-colors ${
+                      !dayObj.isCurrentMonth ? 'bg-muted/50 opacity-40' : 'bg-card'
+                    } ${
+                      selectedDate && dayObj.date && selectedDate.toDateString() === dayObj.date.toDateString()
+                        ? 'border-blue-500 border-2 bg-blue-50 dark:bg-blue-950'
+                        : 'border-border'
+                    } ${
+                      isCurrentDay ? 'ring-2 ring-blue-400' : ''
+                    }`}
+                    disabled={!dayObj.isCurrentMonth}
+                  >
+                    {dayObj.day && (
+                      <>
+                        <div className={`inline-flex items-center justify-center w-7 h-7 rounded-full text-sm font-semibold mb-1 ${
+                          isCurrentDay 
+                            ? 'bg-blue-600 text-white' 
+                            : ''
+                        }`}>
+                          {dayObj.day}
+                        </div>
+                        
+                        <div className="space-y-1">
+                          {itemsOnThisDay.slice(0, 3).map(item => (
+                            <div
+                              key={item.id}
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                setSelectedItem(item)
+                              }}
+                              className={`text-xs px-2 py-1 rounded truncate cursor-pointer ${
+                                item.type === 'event' ? 'bg-blue-100 text-blue-800 hover:bg-blue-200 dark:bg-blue-950' :
+                                item.type === 'task' ? 'bg-yellow-100 text-yellow-800 hover:bg-yellow-200 dark:bg-yellow-950' :
+                                'bg-purple-100 text-purple-800 hover:bg-purple-200 dark:bg-purple-950'
+                              }`}
+                            >
+                              {item.time} {item.title}
+                            </div>
+                          ))}
+                          {itemsOnThisDay.length > 3 && (
+                            <div className="text-xs text-muted-foreground text-center">
+                              +{itemsOnThisDay.length - 3} المزيد
+                            </div>
+                          )}
+                        </div>
+                      </>
+                    )}
+                  </button>
+                )
+              })}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Upcoming Events Summary */}
+        <Card className="mb-6">
+          <CardContent className="p-6">
+            <h4 className="text-sm font-bold mb-4 flex items-center gap-2">
+              <Bell className="h-4 w-4 text-blue-600" />
+              الأحداث القادمة
+            </h4>
+            
+            <div className="space-y-2">
+              {calendarItems
+                .filter(i => {
+                  const today = new Date()
+                  today.setHours(0, 0, 0, 0)
+                  return i.date >= today
+                })
+                .sort((a, b) => a.date.getTime() - b.date.getTime())
+                .slice(0, 5)
+                .map((event) => (
+                  <div
+                    key={event.id}
+                    onClick={() => setSelectedItem(event)}
+                    className={`flex items-center justify-between text-sm p-3 rounded-lg cursor-pointer transition-colors ${
+                      event.type === 'event' ? 'bg-blue-50 hover:bg-blue-100 dark:bg-blue-950' :
+                      event.type === 'task' ? 'bg-yellow-50 hover:bg-yellow-100 dark:bg-yellow-950' :
+                      'bg-purple-50 hover:bg-purple-100 dark:bg-purple-950'
+                    }`}
+                  >
+                    <div className="flex items-center gap-2 flex-1 min-w-0">
+                      <div className={`h-2 w-2 rounded-full flex-shrink-0 ${
+                        event.type === 'event' ? 'bg-blue-500' :
+                        event.type === 'task' ? 'bg-yellow-500' :
+                        'bg-purple-500'
+                      }`}></div>
+                      <div className="flex-1 min-w-0">
+                        <div className="truncate">{event.title}</div>
+                        <div className="text-xs text-muted-foreground">
+                          {event.date.getDate()} {monthNames[event.date.getMonth()]}
+                        </div>
+                      </div>
+                    </div>
+                    <span className="font-semibold text-xs ml-2">{event.time}</span>
+                  </div>
+                ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Items List for Selected Date */}
+        {selectedDate && (
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-bold">
+                  {dayNames[selectedDate.getDay()]} - {selectedDate.getDate()} {monthNames[selectedDate.getMonth()]} {selectedDate.getFullYear()}
+                </h3>
+                <Button
+                  onClick={() => setSelectedDate(null)}
+                  variant="outline"
+                  size="sm"
+                >
+                  <X className="h-5 w-5" />
+                </Button>
+              </div>
+              
+              {getItemsForDate(selectedDate).length === 0 ? (
+                <div className="text-center py-12 text-muted-foreground">
+                  <CalendarIcon className="h-12 w-12 mx-auto mb-3 opacity-20" />
+                  <p className="text-sm">لا توجد أحداث أو مهام في هذا اليوم</p>
                 </div>
               ) : (
-                <div className="space-y-4">
-                  {selectedDateEvents.map((event) => (
-                    <EventCard
-                      key={event._id}
-                      event={event}
-                      onSelect={() => setSelectedEvent(event)}
-                    />
+                <div className="space-y-3">
+                  {getItemsForDate(selectedDate).map(item => (
+                    <div
+                      key={item.id}
+                      onClick={() => setSelectedItem(item)}
+                      className={`p-4 rounded-lg border-2 hover:shadow-md cursor-pointer transition-all ${
+                        item.type === 'event' ? 'bg-blue-50 border-blue-200 hover:border-blue-300 dark:bg-blue-950' :
+                        item.type === 'task' ? 'bg-yellow-50 border-yellow-200 hover:border-yellow-300 dark:bg-yellow-950' :
+                        'bg-purple-50 border-purple-200 hover:border-purple-300 dark:bg-purple-950'
+                      }`}
+                    >
+                      <div className="flex items-start gap-3">
+                        <div className={`p-2.5 rounded-lg ${
+                          item.type === 'event' ? 'bg-blue-100 dark:bg-blue-900' :
+                          item.type === 'task' ? 'bg-yellow-100 dark:bg-yellow-900' :
+                          'bg-purple-100 dark:bg-purple-900'
+                        }`}>
+                          {item.type === 'event' && <CalendarIcon className="h-4 w-4" />}
+                          {item.type === 'task' && <CheckSquare className="h-4 w-4" />}
+                          {item.type === 'case' && <Briefcase className="h-4 w-4" />}
+                        </div>
+                        <div className="flex-1">
+                          <div className="flex items-center justify-between mb-2">
+                            <h4 className="font-bold">{item.title}</h4>
+                            <Badge variant="outline" className={getTypeBadgeColor(item.type)}>
+                              {getTypeLabel(item.type)}
+                            </Badge>
+                          </div>
+                          <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground mb-2">
+                            <span className="flex items-center gap-1 font-semibold">
+                              <Clock className="h-4 w-4" />
+                              {item.time}
+                            </span>
+                            {item.duration && (
+                              <span className="text-xs bg-muted px-2 py-0.5 rounded">
+                                {item.duration}
+                              </span>
+                            )}
+                            {item.location && (
+                              <span className="flex items-center gap-1 text-xs">
+                                <MapPin className="h-3 w-3" />
+                                {item.location}
+                              </span>
+                            )}
+                            {item.court && (
+                              <span className="flex items-center gap-1 text-xs">
+                                <MapPin className="h-3 w-3" />
+                                {item.court}
+                              </span>
+                            )}
+                          </div>
+                          {item.client && (
+                            <div className="text-xs text-muted-foreground">
+                              العميل: <span className="font-semibold">{item.client}</span>
+                            </div>
+                          )}
+                          {item.caseNumber && (
+                            <div className="text-xs text-muted-foreground mt-1">
+                              <span className="font-mono text-blue-600 font-semibold">{item.caseNumber}</span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
                   ))}
                 </div>
               )}
             </CardContent>
           </Card>
-        </div>
+        )}
 
-        {/* Sidebar */}
-        <div className="space-y-6">
-          {/* Today's Events */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">أحداث اليوم</CardTitle>
-            </CardHeader>
-            <CardContent>
-              {events
-                .filter((event) => isToday(new Date(event.startDate)))
-                .map((event) => (
-                  <div
-                    key={event._id}
-                    className="flex items-start gap-3 p-3 rounded-lg hover:bg-muted cursor-pointer mb-2"
-                    onClick={() => setSelectedEvent(event)}
+        {/* Item Detail Modal */}
+        {selectedItem && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" onClick={() => setSelectedItem(null)}>
+            <Card className="max-w-2xl w-full mx-4" onClick={(e) => e.stopPropagation()}>
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <Badge variant="outline" className={getTypeBadgeColor(selectedItem.type)}>
+                    {getTypeLabel(selectedItem.type)}
+                  </Badge>
+                  <Button
+                    onClick={() => setSelectedItem(null)}
+                    variant="outline"
+                    size="sm"
                   >
-                    <Clock className="h-4 w-4 text-muted-foreground mt-1" />
-                    <div className="flex-1">
-                      <div className="font-medium">{event.title}</div>
-                      <div className="text-sm text-muted-foreground">
-                        {event.startTime}
-                        {event.location && (
-                          <span className="flex items-center gap-1 mt-1">
-                            <MapPin className="h-3 w-3" />
-                            {event.location}
-                          </span>
-                        )}
+                    <X className="h-5 w-5" />
+                  </Button>
+                </div>
+
+                <h2 className="text-2xl font-bold mb-4">{selectedItem.title}</h2>
+
+                <div className="space-y-4">
+                  <div className="flex items-center gap-3">
+                    <Clock className="h-5 w-5 text-muted-foreground" />
+                    <span>{selectedItem.time} {selectedItem.duration && `- ${selectedItem.duration}`}</span>
+                  </div>
+
+                  {selectedItem.location && (
+                    <div className="flex items-center gap-3">
+                      <MapPin className="h-5 w-5 text-muted-foreground" />
+                      <span>{selectedItem.location}</span>
+                    </div>
+                  )}
+
+                  {selectedItem.court && (
+                    <div className="flex items-center gap-3">
+                      <MapPin className="h-5 w-5 text-muted-foreground" />
+                      <span>{selectedItem.court}</span>
+                    </div>
+                  )}
+
+                  {selectedItem.attendees && (
+                    <div className="flex items-start gap-3">
+                      <Users className="h-5 w-5 text-muted-foreground mt-0.5" />
+                      <div>
+                        <div className="text-sm text-muted-foreground mb-1">الحضور:</div>
+                        <div className="flex flex-wrap gap-2">
+                          {selectedItem.attendees.map((attendee, idx) => (
+                            <span key={idx} className="px-3 py-1 bg-muted rounded-full text-sm">
+                              {attendee}
+                            </span>
+                          ))}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
-            </CardContent>
-          </Card>
+                  )}
 
-          {/* Upcoming Events */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">الأحداث القادمة</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                {upcomingEvents.map((event) => (
-                  <div
-                    key={event._id}
-                    className="p-3 border rounded-lg hover:bg-muted cursor-pointer"
-                    onClick={() => setSelectedEvent(event)}
-                  >
-                    <div className="flex items-start justify-between gap-2 mb-2">
-                      <div className="font-medium text-sm">{event.title}</div>
-                      <EventTypeBadge type={event.type} />
+                  {selectedItem.caseNumber && (
+                    <div className="flex items-center gap-3">
+                      <FileText className="h-5 w-5 text-muted-foreground" />
+                      <span>رقم القضية: <span className="font-mono font-semibold">{selectedItem.caseNumber}</span></span>
                     </div>
-                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                      <CalendarIcon className="h-3 w-3" />
-                      {format(new Date(event.startDate), 'dd MMM', { locale: ar })}
-                      <Clock className="h-3 w-3 mr-2" />
-                      {event.startTime}
+                  )}
+
+                  {selectedItem.client && (
+                    <div className="flex items-center gap-3">
+                      <Users className="h-5 w-5 text-muted-foreground" />
+                      <span>العميل: <span className="font-semibold">{selectedItem.client}</span></span>
                     </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Quick Stats */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">إحصائيات</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-muted-foreground">هذا الشهر</span>
-                  <span className="font-bold">{events.length} حدث</span>
+                  )}
                 </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-muted-foreground">جلسات محكمة</span>
-                  <span className="font-bold">
-                    {events.filter((e) => e.type === 'hearing').length}
-                  </span>
+
+                <div className="flex gap-3 mt-6">
+                  <Button className="flex-1">
+                    تعديل
+                  </Button>
+                  <Button variant="outline" className="flex-1">
+                    حذف
+                  </Button>
                 </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-muted-foreground">اجتماعات</span>
-                  <span className="font-bold">
-                    {events.filter((e) => e.type === 'meeting').length}
-                  </span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-muted-foreground">مواعيد نهائية</span>
-                  <span className="font-bold text-orange-600">
-                    {events.filter((e) => e.type === 'deadline').length}
-                  </span>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
-
-      {/* Create Event Dialog */}
-      <CreateEventDialog
-        open={isCreateDialogOpen}
-        onOpenChange={setIsCreateDialogOpen}
-      />
-
-      {/* Event Detail Dialog */}
-      {selectedEvent && (
-        <EventDetailDialog
-          event={selectedEvent}
-          onClose={() => setSelectedEvent(null)}
-        />
-      )}
-    </div>
-  );
-}
-
-// Event Card Component
-interface EventCardProps {
-  event: CalendarEvent;
-  onSelect: () => void;
-}
-
-function EventCard({ event, onSelect }: EventCardProps) {
-  const eventTypes = [
-    { value: 'hearing', label: 'جلسة محكمة', icon: FileText, color: 'bg-red-500' },
-    { value: 'meeting', label: 'اجتماع', icon: Users, color: 'bg-blue-500' },
-    { value: 'deadline', label: 'موعد نهائي', icon: AlertCircle, color: 'bg-orange-500' },
-    { value: 'consultation', label: 'استشارة', icon: Clock, color: 'bg-green-500' },
-  ];
-
-  const config = eventTypes.find((t) => t.value === event.type);
-  const Icon = config?.icon || CalendarIcon;
-
-  return (
-    <div
-      className="p-4 border rounded-lg hover:bg-muted cursor-pointer transition-colors"
-      onClick={onSelect}
-    >
-      <div className="flex items-start justify-between mb-2">
-        <div className="flex items-center gap-2">
-          <div className={`p-2 rounded-lg ${config?.color}`}>
-            <Icon className="h-4 w-4 text-white" />
-          </div>
-          <div>
-            <div className="font-medium">{event.title}</div>
-            {event.caseId && typeof event.caseId === 'object' && (
-              <div className="text-xs text-muted-foreground">
-                {event.caseId.caseNumber} - {event.caseId.title}
-              </div>
-            )}
-          </div>
-        </div>
-        <Badge variant="outline">{event.status === 'scheduled' ? 'مجدولة' : event.status}</Badge>
-      </div>
-
-      <div className="flex items-center gap-4 text-sm text-muted-foreground">
-        <div className="flex items-center gap-1">
-          <Clock className="h-3 w-3" />
-          {event.startTime}
-          {event.endTime && ` - ${event.endTime}`}
-        </div>
-        {event.location && (
-          <div className="flex items-center gap-1">
-            <MapPin className="h-3 w-3" />
-            {event.location}
+              </CardContent>
+            </Card>
           </div>
         )}
-      </div>
-    </div>
-  );
-}
-
-// Create Event Dialog Component
-interface CreateEventDialogProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-}
-
-function CreateEventDialog({ open, onOpenChange }: CreateEventDialogProps) {
-  // Implementation similar to expenses dialog
-  return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl">
-        <DialogHeader>
-          <DialogTitle>إضافة حدث جديد</DialogTitle>
-          <DialogDescription>أدخل تفاصيل الحدث أو الموعد</DialogDescription>
-        </DialogHeader>
-        {/* Form fields here */}
-      </DialogContent>
-    </Dialog>
-  );
-}
-
-// Event Detail Dialog Component
-interface EventDetailDialogProps {
-  event: CalendarEvent;
-  onClose: () => void;
-}
-
-function EventDetailDialog({ event, onClose }: EventDetailDialogProps) {
-  return (
-    <Dialog open={true} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl">
-        <DialogHeader>
-          <DialogTitle>{event.title}</DialogTitle>
-        </DialogHeader>
-        {/* Event details here */}
-      </DialogContent>
-    </Dialog>
-  );
+      </Main>
+    </>
+  )
 }
