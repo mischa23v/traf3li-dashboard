@@ -242,12 +242,12 @@ export const sidebarData: SidebarData = {
               url: '/settings/appearance',
               icon: Palette,
             },
+            {
+              title: 'Help Center',
+              url: '/help-center',
+              icon: HelpCircle,
+            },
           ],
-        },
-        {
-          title: 'Help Center',
-          url: '/help-center',
-          icon: HelpCircle,
         },
       ],
     },
