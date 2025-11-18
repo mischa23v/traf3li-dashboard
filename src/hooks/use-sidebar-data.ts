@@ -1,7 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import {
   Home,
-  LayoutDashboard,
   Calendar,
   CheckSquare,
   MessageSquare,
@@ -14,27 +13,10 @@ import {
   BookOpen,
   Settings,
   HelpCircle,
-  Mail,
-  BellRing,
-  CalendarCheck,
-  MessageCircle,
-  UserCircle,
-  Shield,
-  SlidersHorizontal,
-  Folder,
-  FileText,
-  Gavel,
-  TrendingUp,
-  Clock,
-  CreditCard,
-  Receipt,
-  Activity,
-  Award,
   Command,
   GalleryVerticalEnd,
   AudioWaveform,
 } from 'lucide-react'
-import { ClerkLogo } from '@/assets/clerk-logo'
 import { type SidebarData } from '@/components/layout/types'
 
 export function useSidebarData(): SidebarData {
@@ -79,7 +61,6 @@ export function useSidebarData(): SidebarData {
           },
           {
             title: t('sidebar.tasks'),
-            url: '/tasks',
             icon: CheckSquare,
             items: [
               {
@@ -98,7 +79,6 @@ export function useSidebarData(): SidebarData {
           },
           {
             title: t('sidebar.messages'),
-            url: '/messages',
             icon: MessageSquare,
             items: [
               {
@@ -118,7 +98,6 @@ export function useSidebarData(): SidebarData {
         items: [
           {
             title: t('sidebar.jobOpportunities'),
-            url: '/jobs',
             icon: Briefcase,
             items: [
               {
@@ -148,7 +127,6 @@ export function useSidebarData(): SidebarData {
         items: [
           {
             title: t('sidebar.accounts'),
-            url: '/accounts',
             icon: DollarSign,
             items: [
               {
@@ -188,7 +166,6 @@ export function useSidebarData(): SidebarData {
         items: [
           {
             title: t('sidebar.ratingsReputation'),
-            url: '/ratings',
             icon: Star,
             items: [
               {
@@ -203,7 +180,6 @@ export function useSidebarData(): SidebarData {
           },
           {
             title: t('sidebar.reports'),
-            url: '/reports',
             icon: BarChart3,
             items: [
               {
@@ -222,7 +198,6 @@ export function useSidebarData(): SidebarData {
           },
           {
             title: t('sidebar.knowledgeCenter'),
-            url: '/knowledge',
             icon: BookOpen,
             items: [
               {
@@ -246,7 +221,6 @@ export function useSidebarData(): SidebarData {
         items: [
           {
             title: t('sidebar.settings'),
-            url: '/settings',
             icon: Settings,
             items: [
               {
