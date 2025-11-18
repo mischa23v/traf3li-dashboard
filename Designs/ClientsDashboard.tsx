@@ -205,7 +205,7 @@ export default function ClientsDashboard() {
 
   const totalRevenue = clients.reduce((sum, c) => sum + c.totalRevenue, 0)
   const totalActiveCases = clients.reduce((sum, c) => sum + c.activeCases, 0)
-  const averageRevenuePerClient = (totalRevenue / totalClients).toFixed(0)
+  const averageRevenuePerClient = totalRevenue / totalClients
 
   // Format currency
   const formatCurrency = (amount: number) => {
