@@ -1,21 +1,13 @@
 import { useState } from 'react'
-import { Search, Filter, Download, Plus, Eye, Edit, Phone, Mail, Building2, User, Users, TrendingUp, Clock, CheckCircle, UserCheck, UserX, Calendar, MapPin, Briefcase } from 'lucide-react'
+import { Search, Filter, Download, Plus, Eye, Edit, Phone, Mail, Building2, User, Users, TrendingUp, Clock, UserCheck, MapPin, Briefcase } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
 
 export default function ClientsDashboard() {
   const [activeTab, setActiveTab] = useState('all')
   const [searchQuery, setSearchQuery] = useState('')
-  const [selectedPeriod, setSelectedPeriod] = useState('month')
 
   // Sample clients data
   const clients = [
@@ -216,7 +208,7 @@ export default function ClientsDashboard() {
   const averageRevenuePerClient = (totalRevenue / totalClients).toFixed(0)
 
   // Format currency
-  const formatCurrency = (amount) => {
+  const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('ar-SA', {
       style: 'currency',
       currency: 'SAR',
