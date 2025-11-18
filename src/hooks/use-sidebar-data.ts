@@ -88,6 +88,10 @@ export function useSidebarData(): SidebarData {
                 title: t('sidebar.email'),
                 url: '/messages/email',
               },
+              {
+                title: t('sidebar.events'),
+                url: '/events',
+              },
             ],
           },
           {
@@ -123,11 +127,6 @@ export function useSidebarData(): SidebarData {
                 url: '/cases',
               },
             ],
-          },
-          {
-            title: t('sidebar.events'),
-            url: '/events',
-            icon: CalendarDays,
           },
         ],
       },
