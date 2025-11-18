@@ -19,9 +19,11 @@ import {
   GalleryVerticalEnd,
   AudioWaveform,
 } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { type SidebarData } from '@/components/layout/types'
 
 export function useSidebarData(): SidebarData {
+  const { t } = useTranslation()
   return {
     user: {
       name: 'satnaing',
@@ -30,101 +32,101 @@ export function useSidebarData(): SidebarData {
     },
     teams: [
       {
-        name: 'TRAF3LI',
+        name: t('sidebar.teamSwitcher.traf3li'),
         logo: Command,
-        plan: 'منصة قانونية',
+        plan: t('sidebar.teamSwitcher.legalPlatform'),
       },
       {
-        name: 'مكتب محاماة',
+        name: t('sidebar.teamSwitcher.lawFirm'),
         logo: GalleryVerticalEnd,
-        plan: 'مؤسسي',
+        plan: t('sidebar.teamSwitcher.enterprise'),
       },
       {
-        name: 'ممارسة فردية',
+        name: t('sidebar.teamSwitcher.soloPractice'),
         logo: AudioWaveform,
-        plan: 'احترافي',
+        plan: t('sidebar.teamSwitcher.professional'),
       },
     ],
     navGroups: [
       {
-        title: 'الرئيسية',
+        title: t('sidebar.main'),
         items: [
           {
-            title: 'نظرة عامة',
+            title: t('sidebar.overview'),
             url: '/',
             icon: LayoutDashboard,
           },
           {
-            title: 'التقويم',
+            title: t('sidebar.calendar'),
             url: '/calendar',
             icon: Calendar,
           },
           {
-            title: 'المهام',
+            title: t('sidebar.tasks'),
             icon: ListTodo,
             items: [
               {
-                title: 'المهام',
+                title: t('sidebar.tasks'),
                 url: '/tasks',
               },
               {
-                title: 'التذكيرات',
+                title: t('sidebar.reminders'),
                 url: '/tasks/reminders',
               },
             ],
           },
           {
-            title: 'الرسائل',
+            title: t('sidebar.messages'),
             icon: MessagesSquare,
             items: [
               {
-                title: 'الدردشة',
+                title: t('sidebar.chat'),
                 url: '/chats',
               },
               {
-                title: 'البريد الإلكتروني',
+                title: t('sidebar.email'),
                 url: '/messages/email',
               },
             ],
           },
           {
-            title: 'فرص وظيفية',
+            title: t('sidebar.jobs'),
             icon: Briefcase,
             items: [
               {
-                title: 'خدماتي',
+                title: t('sidebar.myGigs'),
                 url: '/jobs/my-gigs',
               },
               {
-                title: 'تصفح الوظائف',
+                title: t('sidebar.browseJobs'),
                 url: '/jobs/browse',
               },
             ],
           },
           {
-            title: 'العملاء',
+            title: t('sidebar.clients'),
             icon: Users,
             items: [
               {
-                title: 'العملاء الحاليون',
+                title: t('sidebar.currentClients'),
                 url: '/clients/current',
               },
               {
-                title: 'جميع العملاء',
+                title: t('sidebar.allClients'),
                 url: '/clients',
               },
             ],
           },
           {
-            title: 'القضايا',
+            title: t('sidebar.cases'),
             icon: Scale,
             items: [
               {
-                title: 'القضايا الحالية',
+                title: t('sidebar.activeCases'),
                 url: '/cases/active',
               },
               {
-                title: 'جميع القضايا',
+                title: t('sidebar.allCases'),
                 url: '/cases',
               },
             ],
@@ -132,30 +134,30 @@ export function useSidebarData(): SidebarData {
         ],
       },
       {
-        title: 'المالية',
+        title: t('sidebar.financial'),
         items: [
           {
-            title: 'الحسابات',
+            title: t('sidebar.billing'),
             icon: DollarSign,
             items: [
               {
-                title: 'لوحة الحسابات',
+                title: t('sidebar.billingDashboard'),
                 url: '/billing',
               },
               {
-                title: 'الفواتير',
+                title: t('sidebar.invoices'),
                 url: '/billing/invoices',
               },
               {
-                title: 'المصروفات',
+                title: t('sidebar.expenses'),
                 url: '/billing/expenses',
               },
               {
-                title: 'كشوف الحساب',
+                title: t('sidebar.statements'),
                 url: '/billing/statements',
               },
               {
-                title: 'المعاملات',
+                title: t('sidebar.transactions'),
                 url: '/billing/transactions',
               },
             ],
@@ -163,58 +165,58 @@ export function useSidebarData(): SidebarData {
         ],
       },
       {
-        title: 'احترافي',
+        title: t('sidebar.professional'),
         items: [
           {
-            title: 'التقييمات والسمعة',
+            title: t('sidebar.reviewsAndReputation'),
             icon: Star,
             items: [
               {
-                title: 'نظرة عامة',
+                title: t('sidebar.reviewsOverview'),
                 url: '/reviews',
               },
               {
-                title: 'جميع التقييمات',
+                title: t('sidebar.allReviews'),
                 url: '/reviews/all',
               },
               {
-                title: 'شاراتي',
+                title: t('sidebar.myBadges'),
                 url: '/reviews/badges',
               },
             ],
           },
           {
-            title: 'التقارير',
+            title: t('sidebar.reports'),
             icon: BarChart3,
             items: [
               {
-                title: 'تقرير الإيرادات',
+                title: t('sidebar.revenueReport'),
                 url: '/reports/revenue',
               },
               {
-                title: 'تقرير القضايا',
+                title: t('sidebar.casesReport'),
                 url: '/reports/cases',
               },
               {
-                title: 'تتبع الوقت',
+                title: t('sidebar.timeTracking'),
                 url: '/reports/time-tracking',
               },
             ],
           },
           {
-            title: 'مركز المعرفة',
+            title: t('sidebar.knowledgeCenter'),
             icon: BookOpen,
             items: [
               {
-                title: 'القوانين',
+                title: t('sidebar.laws'),
                 url: '/knowledge/laws',
               },
               {
-                title: 'الأحكام',
+                title: t('sidebar.judgments'),
                 url: '/knowledge/judgments',
               },
               {
-                title: 'النماذج',
+                title: t('sidebar.templates'),
                 url: '/knowledge/templates',
               },
             ],
@@ -222,29 +224,29 @@ export function useSidebarData(): SidebarData {
         ],
       },
       {
-        title: 'النظام',
+        title: t('sidebar.system'),
         items: [
           {
-            title: 'الإعدادات',
+            title: t('sidebar.settings'),
             icon: Settings,
             items: [
               {
-                title: 'الملف الشخصي',
+                title: t('sidebar.profile'),
                 url: '/settings',
                 icon: UserCog,
               },
               {
-                title: 'الأمان',
+                title: t('sidebar.security'),
                 url: '/settings/security',
                 icon: Shield,
               },
               {
-                title: 'التفضيلات',
+                title: t('sidebar.preferences'),
                 url: '/settings/appearance',
                 icon: Palette,
               },
               {
-                title: 'مركز المساعدة',
+                title: t('sidebar.helpCenter'),
                 url: '/help-center',
                 icon: HelpCircle,
               },
