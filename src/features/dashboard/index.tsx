@@ -55,7 +55,7 @@ export function Dashboard() {
       {/* ===== Top Heading ===== */}
       <Header>
         <TopNav links={topNav} />
-        <div className='ms-auto flex items-center space-x-4'>
+        <div className='ms-auto flex items-center gap-4'>
           <Search />
           <LanguageSwitcher />
           <ThemeSwitch />
@@ -68,7 +68,7 @@ export function Dashboard() {
       <Main>
         <div className='mb-2 flex items-center justify-between space-y-2'>
           <h1 className='text-2xl font-bold tracking-tight'>{t('dashboard.title')}</h1>
-          <div className='flex items-center space-x-2'>
+          <div className='flex items-center gap-2'>
             <Button>{t('dashboard.download')}</Button>
           </div>
         </div>

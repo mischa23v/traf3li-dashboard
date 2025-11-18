@@ -15,12 +15,14 @@ export function LanguageSwitcher() {
     i18n.changeLanguage(lng)
   }
 
+  const currentLanguageLabel = i18n.language === 'ar' ? 'اللغة: العربية' : 'Language: English'
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant='ghost' size='icon'>
+        <Button variant='ghost' size='icon' aria-label={currentLanguageLabel}>
           <Languages className='h-5 w-5' />
-          <span className='sr-only'>Toggle language</span>
+          <span className='sr-only'>{currentLanguageLabel}</span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align='end'>

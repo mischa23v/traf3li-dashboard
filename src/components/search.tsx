@@ -1,4 +1,5 @@
 import { SearchIcon } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { cn } from '@/lib/utils'
 import { useSearch } from '@/context/search-provider'
 import { Button } from './ui/button'
@@ -9,11 +10,19 @@ type SearchProps = {
   placeholder?: string
 }
 
+// Detect if user is on Mac
+const isMac = typeof window !== 'undefined' && navigator.platform.toUpperCase().indexOf('MAC') >= 0
+
 export function Search({
   className = '',
-  placeholder = 'Search',
+  placeholder,
 }: SearchProps) {
+  const { t } = useTranslation()
   const { setOpen } = useSearch()
+
+  const displayPlaceholder = placeholder || t('common.search')
+  const modifierKey = isMac ? '⌘' : 'Ctrl'
+
   return (
     <Button
       variant='outline'
@@ -28,9 +37,9 @@ export function Search({
         className='absolute start-1.5 top-1/2 -translate-y-1/2'
         size={16}
       />
-      <span className='ms-4'>{placeholder}</span>
+      <span className='ms-4'>{displayPlaceholder}</span>
       <kbd className='bg-muted group-hover:bg-accent pointer-events-none absolute end-[0.3rem] top-[0.3rem] hidden h-5 items-center gap-1 rounded border px-1.5 font-mono text-[10px] font-medium opacity-100 select-none sm:flex'>
-        <span className='text-xs'>⌘</span>K
+        <span className='text-xs'>{modifierKey}</span>K
       </kbd>
     </Button>
   )

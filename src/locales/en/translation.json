@@ -293,5 +293,40 @@
     "updatedSuccessfully": "Updated successfully",
     "deletedSuccessfully": "Deleted successfully",
     "createdSuccessfully": "Created successfully"
+  },
+  "config": {
+    "openSettings": "Open theme settings",
+    "title": "Theme Settings",
+    "description": "Adjust the appearance and layout to suit your preferences.",
+    "reset": "Reset",
+    "resetAriaLabel": "Reset all settings to default values",
+    "theme": {
+      "title": "Theme",
+      "ariaLabel": "Select theme preference",
+      "description": "Choose between system preference, light mode, or dark mode"
+    },
+    "sidebar": {
+      "title": "Sidebar",
+      "ariaLabel": "Select sidebar style",
+      "inset": "Inset",
+      "floating": "Floating",
+      "sidebar": "Sidebar",
+      "description": "Choose between inset, floating, or standard sidebar layout"
+    },
+    "layout": {
+      "title": "Layout",
+      "ariaLabel": "Select layout style",
+      "default": "Default",
+      "compact": "Compact",
+      "full": "Full layout",
+      "description": "Choose between default expanded, compact icon-only, or full layout mode"
+    },
+    "direction": {
+      "title": "Direction",
+      "ariaLabel": "Select site direction",
+      "ltr": "Left to Right",
+      "rtl": "Right to Left",
+      "description": "Choose between left-to-right or right-to-left site direction"
+    }
   }
 }
