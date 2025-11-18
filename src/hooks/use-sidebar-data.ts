@@ -1,29 +1,32 @@
 import { useTranslation } from 'react-i18next'
 import {
-  Construction,
   LayoutDashboard,
-  Monitor,
-  Bug,
+  Calendar,
   ListTodo,
-  FileX,
-  HelpCircle,
-  Lock,
   Bell,
-  Package,
-  Palette,
-  ServerOff,
-  Settings,
-  Wrench,
-  UserCog,
-  UserX,
+  MessageSquare,
+  Mail,
+  Briefcase,
   Users,
-  MessagesSquare,
-  ShieldCheck,
-  AudioWaveform,
-  Command,
-  GalleryVerticalEnd,
+  Scale,
+  DollarSign,
+  Receipt,
+  FileText,
+  CreditCard,
+  BarChart3,
+  Clock,
+  Activity,
+  Award,
+  BookOpen,
+  Settings,
+  UserCog,
+  Lock,
+  Palette,
+  HelpCircle,
+  Gavel,
+  Building2,
+  FileCheck,
 } from 'lucide-react'
-import { ClerkLogo } from '@/assets/clerk-logo'
 import { type SidebarData } from '@/components/layout/types'
 
 export function useSidebarData(): SidebarData {
@@ -35,171 +38,204 @@ export function useSidebarData(): SidebarData {
       email: 'satnaingdev@gmail.com',
       avatar: '/avatars/shadcn.jpg',
     },
-    teams: [
-      {
-        name: t('sidebar.teamSwitcher.shadcnAdmin'),
-        logo: Command,
-        plan: t('sidebar.teamSwitcher.viteShadcnUI'),
-      },
-      {
-        name: t('sidebar.teamSwitcher.acmeInc'),
-        logo: GalleryVerticalEnd,
-        plan: t('sidebar.teamSwitcher.enterprise'),
-      },
-      {
-        name: t('sidebar.teamSwitcher.acmeCorp'),
-        logo: AudioWaveform,
-        plan: t('sidebar.teamSwitcher.startup'),
-      },
-    ],
+    teams: [],
     navGroups: [
       {
-        title: t('sidebar.general'),
+        title: 'الرئيسية',
         items: [
           {
-            title: t('sidebar.dashboard'),
+            title: 'نظرة عامة',
             url: '/',
             icon: LayoutDashboard,
           },
           {
-            title: t('sidebar.tasks'),
-            url: '/tasks',
+            title: 'التقويم',
+            url: '/calendar',
+            icon: Calendar,
+          },
+          {
+            title: 'المهام',
             icon: ListTodo,
+            items: [
+              {
+                title: 'المهام',
+                url: '/tasks',
+              },
+              {
+                title: 'التذكيرات',
+                url: '/tasks/reminders',
+              },
+              {
+                title: 'الأحداث',
+                url: '/events',
+              },
+            ],
           },
           {
-            title: t('sidebar.apps'),
-            url: '/apps',
-            icon: Package,
+            title: 'الرسائل',
+            icon: MessageSquare,
+            items: [
+              {
+                title: 'الدردشة',
+                url: '/chats',
+              },
+              {
+                title: 'البريد الإلكتروني',
+                url: '/messages/email',
+              },
+            ],
+          },
+        ],
+      },
+      {
+        title: 'الأعمال',
+        items: [
+          {
+            title: 'فرص وظيفية',
+            icon: Briefcase,
+            items: [
+              {
+                title: 'خدماتي',
+                url: '/jobs/my-gigs',
+              },
+              {
+                title: 'تصفح الوظائف',
+                url: '/jobs/browse',
+              },
+            ],
           },
           {
-            title: t('sidebar.chats'),
-            url: '/chats',
-            badge: '3',
-            icon: MessagesSquare,
-          },
-          {
-            title: t('sidebar.users'),
-            url: '/users',
+            title: 'العملاء',
+            url: '/clients',
             icon: Users,
           },
           {
-            title: t('sidebar.securedByClerk'),
-            icon: ClerkLogo,
+            title: 'القضايا',
+            url: '/cases',
+            icon: Scale,
+          },
+        ],
+      },
+      {
+        title: 'المالية',
+        items: [
+          {
+            title: 'الحسابات',
+            icon: DollarSign,
             items: [
               {
-                title: t('sidebar.signIn'),
-                url: '/clerk/sign-in',
+                title: 'لوحة الحسابات',
+                url: '/billing',
               },
               {
-                title: t('sidebar.signUp'),
-                url: '/clerk/sign-up',
+                title: 'الفواتير',
+                url: '/billing/invoices',
               },
               {
-                title: 'User Management',
-                url: '/clerk/user-management',
+                title: 'المصروفات',
+                url: '/billing/expenses',
+              },
+              {
+                title: 'كشوف الحساب',
+                url: '/billing/statements',
+              },
+              {
+                title: 'المعاملات',
+                url: '/billing/transactions',
+              },
+              {
+                title: 'تتبع الوقت',
+                url: '/finance/time-tracking',
+              },
+              {
+                title: 'نشاط الحساب',
+                url: '/finance/account-activity',
               },
             ],
           },
         ],
       },
       {
-        title: t('sidebar.pages'),
+        title: 'التميز المهني',
         items: [
           {
-            title: t('sidebar.auth'),
-            icon: ShieldCheck,
+            title: 'التقييمات والسمعة',
+            icon: Award,
             items: [
               {
-                title: t('sidebar.signIn'),
-                url: '/sign-in',
+                title: 'نظرة عامة',
+                url: '/reviews',
               },
               {
-                title: t('sidebar.signIn2Col'),
-                url: '/sign-in-2',
-              },
-              {
-                title: t('sidebar.signUp'),
-                url: '/sign-up',
-              },
-              {
-                title: t('sidebar.forgotPassword'),
-                url: '/forgot-password',
-              },
-              {
-                title: t('sidebar.otp'),
-                url: '/otp',
+                title: 'شاراتي',
+                url: '/achievements',
               },
             ],
           },
           {
-            title: t('sidebar.errors'),
-            icon: Bug,
+            title: 'التقارير',
+            icon: BarChart3,
             items: [
               {
-                title: t('sidebar.unauthorized'),
-                url: '/errors/unauthorized',
-                icon: Lock,
+                title: 'تقرير الإيرادات',
+                url: '/reports/revenue',
               },
               {
-                title: t('sidebar.forbidden'),
-                url: '/errors/forbidden',
-                icon: UserX,
+                title: 'تقرير القضايا',
+                url: '/reports/cases',
               },
               {
-                title: t('sidebar.notFound'),
-                url: '/errors/not-found',
-                icon: FileX,
+                title: 'تقرير الوقت',
+                url: '/reports/time-tracking',
+              },
+            ],
+          },
+          {
+            title: 'مركز المعرفة',
+            icon: BookOpen,
+            items: [
+              {
+                title: 'القوانين',
+                url: '/knowledge/laws',
               },
               {
-                title: t('sidebar.internalServerError'),
-                url: '/errors/internal-server-error',
-                icon: ServerOff,
+                title: 'الأحكام',
+                url: '/knowledge/rulings',
               },
               {
-                title: t('sidebar.maintenanceError'),
-                url: '/errors/maintenance-error',
-                icon: Construction,
+                title: 'النماذج',
+                url: '/knowledge/forms',
               },
             ],
           },
         ],
       },
       {
-        title: t('sidebar.other'),
+        title: 'النظام',
         items: [
           {
-            title: t('sidebar.settings'),
+            title: 'الإعدادات',
             icon: Settings,
             items: [
               {
-                title: t('sidebar.profile'),
+                title: 'الملف الشخصي',
                 url: '/settings',
                 icon: UserCog,
               },
               {
-                title: t('sidebar.account'),
+                title: 'الأمان',
                 url: '/settings/account',
-                icon: Wrench,
+                icon: Lock,
               },
               {
-                title: t('sidebar.appearance'),
+                title: 'التفضيلات',
                 url: '/settings/appearance',
                 icon: Palette,
-              },
-              {
-                title: t('sidebar.notifications'),
-                url: '/settings/notifications',
-                icon: Bell,
-              },
-              {
-                title: t('sidebar.display'),
-                url: '/settings/display',
-                icon: Monitor,
               },
             ],
           },
           {
-            title: t('sidebar.helpCenter'),
+            title: 'مركز المساعدة',
             url: '/help-center',
             icon: HelpCircle,
           },
