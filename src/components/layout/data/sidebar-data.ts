@@ -42,22 +42,14 @@ export const sidebarData: SidebarData = {
           icon: Calendar,
         },
         {
-          title: 'المهام',
+          title: 'التذكيرات',
+          url: '/tasks/reminders',
           icon: ListTodo,
-          items: [
-            {
-              title: 'المهام',
-              url: '/tasks',
-            },
-            {
-              title: 'التذكيرات',
-              url: '/tasks/reminders',
-            },
-            {
-              title: 'الأحداث',
-              url: '/events',
-            },
-          ],
+        },
+        {
+          title: 'الأحداث',
+          url: '/events',
+          icon: Calendar,
         },
         {
           title: 'الرسائل',
@@ -103,10 +95,6 @@ export const sidebarData: SidebarData = {
             {
               title: 'كشوف الحساب',
               url: '/billing/statements',
-            },
-            {
-              title: 'المعاملات',
-              url: '/billing/transactions',
             },
             {
               title: 'تتبع الوقت',

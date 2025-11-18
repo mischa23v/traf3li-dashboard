@@ -46,7 +46,6 @@ import { Route as AuthenticatedSettingsAccountRouteImport } from './routes/_auth
 import { Route as AuthenticatedFinanceTimeTrackingRouteImport } from './routes/_authenticated/finance/time-tracking'
 import { Route as AuthenticatedFinanceAccountActivityRouteImport } from './routes/_authenticated/finance/account-activity'
 import { Route as AuthenticatedErrorsErrorRouteImport } from './routes/_authenticated/errors/$error'
-import { Route as AuthenticatedBillingTransactionsRouteImport } from './routes/_authenticated/billing/transactions'
 import { Route as AuthenticatedBillingStatementsRouteImport } from './routes/_authenticated/billing/statements'
 import { Route as AuthenticatedBillingInvoicesRouteImport } from './routes/_authenticated/billing/invoices'
 import { Route as AuthenticatedBillingExpensesRouteImport } from './routes/_authenticated/billing/expenses'
@@ -245,12 +244,6 @@ const AuthenticatedErrorsErrorRoute =
     path: '/errors/$error',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
-const AuthenticatedBillingTransactionsRoute =
-  AuthenticatedBillingTransactionsRouteImport.update({
-    id: '/transactions',
-    path: '/transactions',
-    getParentRoute: () => AuthenticatedBillingRoute,
-  } as any)
 const AuthenticatedBillingStatementsRoute =
   AuthenticatedBillingStatementsRouteImport.update({
     id: '/statements',
@@ -291,7 +284,6 @@ export interface FileRoutesByFullPath {
   '/billing/expenses': typeof AuthenticatedBillingExpensesRoute
   '/billing/invoices': typeof AuthenticatedBillingInvoicesRoute
   '/billing/statements': typeof AuthenticatedBillingStatementsRoute
-  '/billing/transactions': typeof AuthenticatedBillingTransactionsRoute
   '/errors/$error': typeof AuthenticatedErrorsErrorRoute
   '/finance/account-activity': typeof AuthenticatedFinanceAccountActivityRoute
   '/finance/time-tracking': typeof AuthenticatedFinanceTimeTrackingRoute
@@ -330,7 +322,6 @@ export interface FileRoutesByTo {
   '/billing/expenses': typeof AuthenticatedBillingExpensesRoute
   '/billing/invoices': typeof AuthenticatedBillingInvoicesRoute
   '/billing/statements': typeof AuthenticatedBillingStatementsRoute
-  '/billing/transactions': typeof AuthenticatedBillingTransactionsRoute
   '/errors/$error': typeof AuthenticatedErrorsErrorRoute
   '/finance/account-activity': typeof AuthenticatedFinanceAccountActivityRoute
   '/finance/time-tracking': typeof AuthenticatedFinanceTimeTrackingRoute
@@ -374,7 +365,6 @@ export interface FileRoutesById {
   '/_authenticated/billing/expenses': typeof AuthenticatedBillingExpensesRoute
   '/_authenticated/billing/invoices': typeof AuthenticatedBillingInvoicesRoute
   '/_authenticated/billing/statements': typeof AuthenticatedBillingStatementsRoute
-  '/_authenticated/billing/transactions': typeof AuthenticatedBillingTransactionsRoute
   '/_authenticated/errors/$error': typeof AuthenticatedErrorsErrorRoute
   '/_authenticated/finance/account-activity': typeof AuthenticatedFinanceAccountActivityRoute
   '/_authenticated/finance/time-tracking': typeof AuthenticatedFinanceTimeTrackingRoute
@@ -416,7 +406,6 @@ export interface FileRouteTypes {
     | '/billing/expenses'
     | '/billing/invoices'
     | '/billing/statements'
-    | '/billing/transactions'
     | '/errors/$error'
     | '/finance/account-activity'
     | '/finance/time-tracking'
@@ -455,7 +444,6 @@ export interface FileRouteTypes {
     | '/billing/expenses'
     | '/billing/invoices'
     | '/billing/statements'
-    | '/billing/transactions'
     | '/errors/$error'
     | '/finance/account-activity'
     | '/finance/time-tracking'
@@ -498,7 +486,6 @@ export interface FileRouteTypes {
     | '/_authenticated/billing/expenses'
     | '/_authenticated/billing/invoices'
     | '/_authenticated/billing/statements'
-    | '/_authenticated/billing/transactions'
     | '/_authenticated/errors/$error'
     | '/_authenticated/finance/account-activity'
     | '/_authenticated/finance/time-tracking'
@@ -794,13 +781,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedErrorsErrorRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/billing/transactions': {
-      id: '/_authenticated/billing/transactions'
-      path: '/transactions'
-      fullPath: '/billing/transactions'
-      preLoaderRoute: typeof AuthenticatedBillingTransactionsRouteImport
-      parentRoute: typeof AuthenticatedBillingRoute
-    }
     '/_authenticated/billing/statements': {
       id: '/_authenticated/billing/statements'
       path: '/statements'
@@ -852,14 +832,12 @@ interface AuthenticatedBillingRouteChildren {
   AuthenticatedBillingExpensesRoute: typeof AuthenticatedBillingExpensesRoute
   AuthenticatedBillingInvoicesRoute: typeof AuthenticatedBillingInvoicesRoute
   AuthenticatedBillingStatementsRoute: typeof AuthenticatedBillingStatementsRoute
-  AuthenticatedBillingTransactionsRoute: typeof AuthenticatedBillingTransactionsRoute
 }
 
 const AuthenticatedBillingRouteChildren: AuthenticatedBillingRouteChildren = {
   AuthenticatedBillingExpensesRoute: AuthenticatedBillingExpensesRoute,
   AuthenticatedBillingInvoicesRoute: AuthenticatedBillingInvoicesRoute,
   AuthenticatedBillingStatementsRoute: AuthenticatedBillingStatementsRoute,
-  AuthenticatedBillingTransactionsRoute: AuthenticatedBillingTransactionsRoute,
 }
 
 const AuthenticatedBillingRouteWithChildren =
