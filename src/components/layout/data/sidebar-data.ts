@@ -1,28 +1,34 @@
 import {
-  Construction,
   LayoutDashboard,
-  Monitor,
-  Bug,
+  Calendar,
   ListTodo,
-  FileX,
-  HelpCircle,
-  Lock,
   Bell,
-  Package,
-  Palette,
-  ServerOff,
-  Settings,
-  Wrench,
-  UserCog,
-  UserX,
-  Users,
   MessagesSquare,
-  ShieldCheck,
-  AudioWaveform,
+  Mail,
+  Briefcase,
+  Users,
+  Scale,
+  DollarSign,
+  FileText,
+  Receipt,
+  CreditCard,
+  Star,
+  Award,
+  BarChart3,
+  TrendingUp,
+  Clock,
+  BookOpen,
+  Gavel,
+  FileCheck,
+  Settings,
+  UserCog,
+  Shield,
+  Palette,
+  HelpCircle,
   Command,
   GalleryVerticalEnd,
+  AudioWaveform,
 } from 'lucide-react'
-import { ClerkLogo } from '@/assets/clerk-logo'
 import { type SidebarData } from '../types'
 
 export const sidebarData: SidebarData = {
@@ -33,135 +39,199 @@ export const sidebarData: SidebarData = {
   },
   teams: [
     {
-      name: 'Shadcn Admin',
+      name: 'TRAF3LI',
       logo: Command,
-      plan: 'Vite + ShadcnUI',
+      plan: 'Legal Platform',
     },
     {
-      name: 'Acme Inc',
+      name: 'Law Firm',
       logo: GalleryVerticalEnd,
       plan: 'Enterprise',
     },
     {
-      name: 'Acme Corp.',
+      name: 'Solo Practice',
       logo: AudioWaveform,
-      plan: 'Startup',
+      plan: 'Professional',
     },
   ],
   navGroups: [
     {
-      title: 'General',
+      title: 'Main',
       items: [
         {
-          title: 'Dashboard',
+          title: 'Overview',
           url: '/',
           icon: LayoutDashboard,
         },
         {
+          title: 'Calendar',
+          url: '/calendar',
+          icon: Calendar,
+        },
+        {
           title: 'Tasks',
-          url: '/tasks',
           icon: ListTodo,
-        },
-        {
-          title: 'Apps',
-          url: '/apps',
-          icon: Package,
-        },
-        {
-          title: 'Chats',
-          url: '/chats',
-          badge: '3',
-          icon: MessagesSquare,
-        },
-        {
-          title: 'Users',
-          url: '/users',
-          icon: Users,
-        },
-        {
-          title: 'Secured by Clerk',
-          icon: ClerkLogo,
           items: [
             {
-              title: 'Sign In',
-              url: '/clerk/sign-in',
+              title: 'Tasks',
+              url: '/tasks',
             },
             {
-              title: 'Sign Up',
-              url: '/clerk/sign-up',
+              title: 'Reminders',
+              url: '/tasks/reminders',
+            },
+          ],
+        },
+        {
+          title: 'Messages',
+          icon: MessagesSquare,
+          items: [
+            {
+              title: 'Chat',
+              url: '/chats',
             },
             {
-              title: 'User Management',
-              url: '/clerk/user-management',
+              title: 'Email',
+              url: '/messages/email',
+            },
+          ],
+        },
+        {
+          title: 'Jobs',
+          icon: Briefcase,
+          items: [
+            {
+              title: 'My Gigs',
+              url: '/jobs/my-gigs',
+            },
+            {
+              title: 'Browse Jobs',
+              url: '/jobs/browse',
+            },
+          ],
+        },
+        {
+          title: 'Clients',
+          icon: Users,
+          items: [
+            {
+              title: 'Current Clients',
+              url: '/clients/current',
+            },
+            {
+              title: 'All Clients',
+              url: '/clients',
+            },
+          ],
+        },
+        {
+          title: 'Cases',
+          icon: Scale,
+          items: [
+            {
+              title: 'Active Cases',
+              url: '/cases/active',
+            },
+            {
+              title: 'All Cases',
+              url: '/cases',
             },
           ],
         },
       ],
     },
     {
-      title: 'Pages',
+      title: 'Financial',
       items: [
         {
-          title: 'Auth',
-          icon: ShieldCheck,
+          title: 'Billing',
+          icon: DollarSign,
           items: [
             {
-              title: 'Sign In',
-              url: '/sign-in',
+              title: 'Dashboard',
+              url: '/billing',
             },
             {
-              title: 'Sign In (2 Col)',
-              url: '/sign-in-2',
+              title: 'Invoices',
+              url: '/billing/invoices',
             },
             {
-              title: 'Sign Up',
-              url: '/sign-up',
+              title: 'Expenses',
+              url: '/billing/expenses',
             },
             {
-              title: 'Forgot Password',
-              url: '/forgot-password',
+              title: 'Statements',
+              url: '/billing/statements',
             },
             {
-              title: 'OTP',
-              url: '/otp',
-            },
-          ],
-        },
-        {
-          title: 'Errors',
-          icon: Bug,
-          items: [
-            {
-              title: 'Unauthorized',
-              url: '/errors/unauthorized',
-              icon: Lock,
-            },
-            {
-              title: 'Forbidden',
-              url: '/errors/forbidden',
-              icon: UserX,
-            },
-            {
-              title: 'Not Found',
-              url: '/errors/not-found',
-              icon: FileX,
-            },
-            {
-              title: 'Internal Server Error',
-              url: '/errors/internal-server-error',
-              icon: ServerOff,
-            },
-            {
-              title: 'Maintenance Error',
-              url: '/errors/maintenance-error',
-              icon: Construction,
+              title: 'Transactions',
+              url: '/billing/transactions',
             },
           ],
         },
       ],
     },
     {
-      title: 'Other',
+      title: 'Professional',
+      items: [
+        {
+          title: 'Reviews & Reputation',
+          icon: Star,
+          items: [
+            {
+              title: 'Overview',
+              url: '/reviews',
+            },
+            {
+              title: 'All Reviews',
+              url: '/reviews/all',
+            },
+            {
+              title: 'My Badges',
+              url: '/reviews/badges',
+            },
+          ],
+        },
+        {
+          title: 'Reports',
+          icon: BarChart3,
+          items: [
+            {
+              title: 'Revenue Report',
+              url: '/reports/revenue',
+            },
+            {
+              title: 'Cases Report',
+              url: '/reports/cases',
+            },
+            {
+              title: 'Time Tracking',
+              url: '/reports/time-tracking',
+            },
+          ],
+        },
+        {
+          title: 'Knowledge Center',
+          icon: BookOpen,
+          items: [
+            {
+              title: 'Laws',
+              url: '/knowledge/laws',
+            },
+            {
+              title: 'Judgments',
+              url: '/knowledge/judgments',
+            },
+            {
+              title: 'Templates',
+              url: '/knowledge/templates',
+            },
+          ],
+        },
+      ],
+    },
+    {
+      title: 'System',
       items: [
         {
           title: 'Settings',
@@ -173,24 +243,14 @@ export const sidebarData: SidebarData = {
               icon: UserCog,
             },
             {
-              title: 'Account',
-              url: '/settings/account',
-              icon: Wrench,
+              title: 'Security',
+              url: '/settings/security',
+              icon: Shield,
             },
             {
-              title: 'Appearance',
+              title: 'Preferences',
               url: '/settings/appearance',
               icon: Palette,
-            },
-            {
-              title: 'Notifications',
-              url: '/settings/notifications',
-              icon: Bell,
-            },
-            {
-              title: 'Display',
-              url: '/settings/display',
-              icon: Monitor,
             },
           ],
         },
