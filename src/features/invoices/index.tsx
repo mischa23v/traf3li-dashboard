@@ -4,6 +4,7 @@ import { Main } from '@/components/layout/main'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { Search } from '@/components/search'
 import { ThemeSwitch } from '@/components/theme-switch'
+import InvoicesDashboard from '../../../Designs/InvoicesDashboard'
 
 export function Invoices() {
   return (
@@ -18,17 +19,7 @@ export function Invoices() {
       </Header>
 
       <Main className='flex flex-1 flex-col gap-4 sm:gap-6'>
-        <div>
-          <h2 className='text-2xl font-bold tracking-tight'>الفواتير</h2>
-          <p className='text-muted-foreground'>
-            عرض وإدارة جميع الفواتير
-          </p>
-        </div>
-        <div className='rounded-lg border bg-card p-8 text-center'>
-          <p className='text-muted-foreground'>
-            صفحة الفواتير قيد التطوير
-          </p>
-        </div>
+        <InvoicesDashboard />
       </Main>
     </>
   )
