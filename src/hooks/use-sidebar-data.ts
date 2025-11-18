@@ -50,7 +50,7 @@ export function useSidebarData(): SidebarData {
           },
           {
             title: t('sidebar.calendar'),
-            url: '/',
+            url: '/calendar',
             icon: CheckSquare,
           },
           {
@@ -129,11 +129,11 @@ export function useSidebarData(): SidebarData {
               },
               {
                 title: t('sidebar.invoices'),
-                url: '/',
+                url: '/invoices',
               },
               {
                 title: t('sidebar.expenses'),
-                url: '/',
+                url: '/expenses',
               },
               {
                 title: t('sidebar.statements'),
@@ -145,7 +145,7 @@ export function useSidebarData(): SidebarData {
               },
               {
                 title: t('sidebar.timeTracking'),
-                url: '/',
+                url: '/time-tracking',
               },
               {
                 title: t('sidebar.accountActivity'),
