@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge'
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
 import { Switch } from '@/components/ui/switch'
-import { Shield, Key, Smartphone, Lock, AlertCircle } from 'lucide-react'
+import { Key, Smartphone, Lock, AlertCircle } from 'lucide-react'
 
 function SecurityPage() {
   return (
@@ -97,14 +97,6 @@ function SecurityPage() {
                 <p className="text-xs text-muted-foreground mt-1">Last active: Just now</p>
               </div>
               <Badge>Active</Badge>
-            </div>
-            <div className="flex items-center justify-between p-4 border rounded-lg">
-              <div>
-                <p className="font-medium">iPhone 13</p>
-                <p className="text-sm text-muted-foreground">Safari on iOS • Jeddah, Saudi Arabia</p>
-                <p className="text-xs text-muted-foreground mt-1">Last active: 2 hours ago</p>
-              </div>
-              <Button variant="outline" size="sm">Revoke</Button>
             </div>
           </CardContent>
         </Card>
