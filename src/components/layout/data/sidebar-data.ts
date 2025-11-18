@@ -1,28 +1,17 @@
 import {
-  Construction,
   LayoutDashboard,
-  Monitor,
-  Bug,
+  Calendar,
   ListTodo,
-  FileX,
-  HelpCircle,
-  Lock,
-  Bell,
-  Package,
-  Palette,
-  ServerOff,
+  MessageSquare,
+  Scale,
+  DollarSign,
   Settings,
-  Wrench,
   UserCog,
-  UserX,
-  Users,
-  MessagesSquare,
-  ShieldCheck,
-  AudioWaveform,
+  Shield,
+  Sliders,
+  HelpCircle,
   Command,
-  GalleryVerticalEnd,
 } from 'lucide-react'
-import { ClerkLogo } from '@/assets/clerk-logo'
 import { type SidebarData } from '../types'
 
 export const sidebarData: SidebarData = {
@@ -33,169 +22,130 @@ export const sidebarData: SidebarData = {
   },
   teams: [
     {
-      name: 'Shadcn Admin',
+      name: 'TRAF3LI',
       logo: Command,
-      plan: 'Vite + ShadcnUI',
-    },
-    {
-      name: 'Acme Inc',
-      logo: GalleryVerticalEnd,
-      plan: 'Enterprise',
-    },
-    {
-      name: 'Acme Corp.',
-      logo: AudioWaveform,
-      plan: 'Startup',
+      plan: 'Dashboard',
     },
   ],
   navGroups: [
     {
-      title: 'General',
+      title: 'الرئيسية',
       items: [
         {
-          title: 'Dashboard',
+          title: 'نظرة عامة',
           url: '/',
           icon: LayoutDashboard,
         },
         {
-          title: 'Tasks',
-          url: '/tasks',
+          title: 'التقويم',
+          url: '/calendar',
+          icon: Calendar,
+        },
+        {
+          title: 'المهام',
           icon: ListTodo,
-        },
-        {
-          title: 'Apps',
-          url: '/apps',
-          icon: Package,
-        },
-        {
-          title: 'Chats',
-          url: '/chats',
-          badge: '3',
-          icon: MessagesSquare,
-        },
-        {
-          title: 'Users',
-          url: '/users',
-          icon: Users,
-        },
-        {
-          title: 'Secured by Clerk',
-          icon: ClerkLogo,
           items: [
             {
-              title: 'Sign In',
-              url: '/clerk/sign-in',
+              title: 'المهام',
+              url: '/tasks',
             },
             {
-              title: 'Sign Up',
-              url: '/clerk/sign-up',
+              title: 'التذكيرات',
+              url: '/tasks/reminders',
             },
             {
-              title: 'User Management',
-              url: '/clerk/user-management',
+              title: 'الأحداث',
+              url: '/events',
+            },
+          ],
+        },
+        {
+          title: 'الرسائل',
+          icon: MessageSquare,
+          items: [
+            {
+              title: 'الدردشة',
+              url: '/chats',
             },
           ],
         },
       ],
     },
     {
-      title: 'Pages',
+      title: 'الأعمال',
       items: [
         {
-          title: 'Auth',
-          icon: ShieldCheck,
-          items: [
-            {
-              title: 'Sign In',
-              url: '/sign-in',
-            },
-            {
-              title: 'Sign In (2 Col)',
-              url: '/sign-in-2',
-            },
-            {
-              title: 'Sign Up',
-              url: '/sign-up',
-            },
-            {
-              title: 'Forgot Password',
-              url: '/forgot-password',
-            },
-            {
-              title: 'OTP',
-              url: '/otp',
-            },
-          ],
+          title: 'القضايا',
+          url: '/cases',
+          icon: Scale,
         },
+      ],
+    },
+    {
+      title: 'المالية',
+      items: [
         {
-          title: 'Errors',
-          icon: Bug,
+          title: 'الحسابات',
+          icon: DollarSign,
           items: [
             {
-              title: 'Unauthorized',
-              url: '/errors/unauthorized',
-              icon: Lock,
+              title: 'لوحة الحسابات',
+              url: '/billing',
             },
             {
-              title: 'Forbidden',
-              url: '/errors/forbidden',
-              icon: UserX,
+              title: 'الفواتير',
+              url: '/billing/invoices',
             },
             {
-              title: 'Not Found',
-              url: '/errors/not-found',
-              icon: FileX,
+              title: 'المصروفات',
+              url: '/billing/expenses',
             },
             {
-              title: 'Internal Server Error',
-              url: '/errors/internal-server-error',
-              icon: ServerOff,
+              title: 'كشوف الحساب',
+              url: '/billing/statements',
             },
             {
-              title: 'Maintenance Error',
-              url: '/errors/maintenance-error',
-              icon: Construction,
+              title: 'المعاملات',
+              url: '/billing/transactions',
+            },
+            {
+              title: 'تتبع الوقت',
+              url: '/finance/time-tracking',
+            },
+            {
+              title: 'نشاط الحساب',
+              url: '/finance/account-activity',
             },
           ],
         },
       ],
     },
     {
-      title: 'Other',
+      title: 'النظام',
       items: [
         {
-          title: 'Settings',
+          title: 'الإعدادات',
           icon: Settings,
           items: [
             {
-              title: 'Profile',
+              title: 'الملف الشخصي',
               url: '/settings',
               icon: UserCog,
             },
             {
-              title: 'Account',
+              title: 'الأمان',
               url: '/settings/account',
-              icon: Wrench,
+              icon: Shield,
             },
             {
-              title: 'Appearance',
+              title: 'التفضيلات',
               url: '/settings/appearance',
-              icon: Palette,
-            },
-            {
-              title: 'Notifications',
-              url: '/settings/notifications',
-              icon: Bell,
-            },
-            {
-              title: 'Display',
-              url: '/settings/display',
-              icon: Monitor,
+              icon: Sliders,
             },
           ],
         },
         {
-          title: 'Help Center',
+          title: 'مركز المساعدة',
           url: '/help-center',
           icon: HelpCircle,
         },
