@@ -8,16 +8,11 @@ import {
   Eye,
   Edit,
   Trash2,
-  Calendar,
   DollarSign,
   TrendingDown,
   Receipt,
   FileText,
-  Tag,
   Building,
-  Coffee,
-  Car,
-  Briefcase,
   Home,
 } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
