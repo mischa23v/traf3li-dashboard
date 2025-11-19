@@ -66,15 +66,18 @@ apiClient.interceptors.response.use(
     }
 
     // Handle 401 Unauthorized - User needs to login
+    // DISABLED FOR TESTING - No redirect on 401 errors
+    /*
     if (error.response?.status === 401) {
       // Clear any stored auth state
       localStorage.removeItem('user')
-      
+
       // Redirect to sign-in page if not already there
       if (!window.location.pathname.includes('/sign-in')) {
         window.location.href = '/sign-in'
       }
     }
+    */
 
     // Return formatted error
     return Promise.reject({
