@@ -1,15 +1,9 @@
 import { useState } from 'react'
 import {
-    ArrowRight,
     Calendar,
-    CheckSquare,
     Clock,
     FileText,
-    Filter,
-    MoreHorizontal,
     Plus,
-    Search,
-    Settings,
     Upload,
     User,
     Briefcase,
@@ -17,18 +11,10 @@ import {
     Building2,
     DollarSign,
     FileCheck,
-    Mail,
-    Phone,
     MapPin,
-    ChevronRight,
-    ArrowLeft,
-    Gavel,
     Scale,
-    Shield,
     AlertCircle,
-    Download,
-    Eye,
-    UserCheck
+    Download
 } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -37,14 +23,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Progress } from "@/components/ui/progress"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Separator } from "@/components/ui/separator"
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { Input } from "@/components/ui/input"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 
 export default function CaseDetailsDashboard() {
     const [activeTab, setActiveTab] = useState("overview")

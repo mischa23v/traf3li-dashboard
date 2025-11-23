@@ -1,9 +1,9 @@
 import { useState } from 'react'
 import {
-    FileText, Calendar, CheckSquare, Clock, MoreHorizontal, Plus, Upload,
-    User, AlertCircle, CheckCircle2, Scale, Building, Mail, Phone,
-    ChevronRight, Search, ArrowLeft, Gavel, Shield, Briefcase,
-    FileCheck, AlertTriangle, Download, Eye, History, Share2
+    FileText, Calendar, Clock, Plus, Upload,
+    User, Scale,
+    ArrowLeft, Gavel, Shield,
+    AlertTriangle, Download, Eye, History, Share2
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -11,7 +11,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Progress } from '@/components/ui/progress'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { Separator } from '@/components/ui/separator'
 import {
     DropdownMenu,
     DropdownMenuContent,

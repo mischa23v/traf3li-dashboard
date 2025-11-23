@@ -13,31 +13,7 @@ import {
   Settings,
   HelpCircle,
 } from 'lucide-react'
-
-type SidebarData = {
-  user: {
-    name: string
-    email: string
-    avatar: string
-  }
-  teams: {
-    name: string
-    logo: React.ElementType
-    plan: string
-  }[]
-  navGroups: {
-    title: string
-    items: {
-      title: string
-      url?: string
-      icon: React.ElementType
-      items?: {
-        title: string
-        url: string
-      }[]
-    }[]
-  }[]
-}
+import type { SidebarData } from '@/components/layout/types'
 
 export function useSidebarData(): SidebarData {
   return {

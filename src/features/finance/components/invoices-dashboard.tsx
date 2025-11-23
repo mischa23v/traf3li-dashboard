@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import {
-    Search, Filter, Plus, MoreHorizontal,
+    Search, Plus, MoreHorizontal,
     FileText, AlertCircle, CheckCircle, Bell
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'

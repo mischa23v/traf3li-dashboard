@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import {
-    Search, Filter, Download, Plus, MoreHorizontal,
+    Search, Download, Plus, MoreHorizontal,
     Clock, Play, Pause, Square, DollarSign,
     User, FileText, Check, Timer
 } from 'lucide-react'

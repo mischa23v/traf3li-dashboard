@@ -1,5 +1,5 @@
 import {
-    Clock, Bell, CheckCircle2, MapPin, Calendar as CalendarIcon
+    Clock, Bell, CheckCircle2, MapPin
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'

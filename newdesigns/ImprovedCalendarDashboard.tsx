@@ -11,8 +11,7 @@ import {
     Briefcase,
     AlertTriangle,
     Gavel,
-    Calendar as CalendarIcon,
-    MoreHorizontal
+    Calendar as CalendarIcon
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {

@@ -11,8 +11,6 @@ import {
     Briefcase,
     AlertTriangle,
     Gavel,
-    Calendar as CalendarIcon,
-    MoreHorizontal,
     Search,
     Bell
 } from 'lucide-react'
