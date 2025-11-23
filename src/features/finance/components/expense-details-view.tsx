@@ -1,9 +1,9 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import {
     FileText, Calendar, CheckSquare, Clock, MoreHorizontal, Plus, Upload,
     User, ArrowLeft, Briefcase,
     History, Link as LinkIcon, Flag, Send, Eye, Download, Search, Bell,
-    CreditCard, DollarSign, CheckCircle2, AlertCircle, Receipt
+    CreditCard, DollarSign, CheckCircle2, AlertCircle, Receipt, Loader2
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -21,24 +21,39 @@ import { LanguageSwitcher } from '@/components/language-switcher'
 import { ThemeSwitch } from '@/components/theme-switch'
 import { ConfigDrawer } from '@/components/config-drawer'
 import { ProfileDropdown } from '@/components/profile-dropdown'
+import { Skeleton } from '@/components/ui/skeleton'
+import { useExpense } from '@/hooks/useFinance'
+import { useParams } from '@tanstack/react-router'
 
 export function ExpenseDetailsView() {
-    // Mock Data for a single expense
-    const expense = {
-        id: 'EXP-2024-056',
-        category: 'رسوم قضائية',
-        description: 'رسوم رفع دعوى - قضية 402',
-        amount: '500.00',
-        currency: 'SAR',
-        status: 'approved',
-        date: '2024-11-21',
-        paidBy: 'أحمد المحامي',
-        receiptUrl: '/placeholder-receipt.jpg',
-        history: [
-            { date: '2024-11-21', action: 'تم تسجيل المصروف', user: 'أحمد المحامي' },
-            { date: '2024-11-21', action: 'تمت الموافقة', user: 'المدير المالي' }
-        ]
-    }
+    const { expenseId } = useParams({ strict: false }) as { expenseId: string }
+
+    // Fetch expense data
+    const { data: expenseData, isLoading, isError, error, refetch } = useExpense(expenseId)
+
+    // Transform API data to component format
+    const expense = useMemo(() => {
+        if (!expenseData?.data) return null
+        const exp = expenseData.data
+        return {
+            id: exp.expenseId || exp._id,
+            category: exp.category,
+            description: exp.description,
+            amount: new Intl.NumberFormat('ar-SA', { minimumFractionDigits: 2 }).format(exp.amount || 0),
+            currency: 'ر.س',
+            status: exp.status,
+            date: new Date(exp.date).toLocaleDateString('ar-SA'),
+            paidBy: exp.userId?.name || `${exp.userId?.firstName || ''} ${exp.userId?.lastName || ''}`.trim() || 'غير محدد',
+            receiptUrl: exp.receipts?.[0]?.fileUrl || null,
+            receipts: exp.receipts || [],
+            vendor: exp.vendor,
+            paymentMethod: exp.paymentMethod,
+            isBillable: exp.isBillable,
+            billableAmount: exp.billableAmount,
+            notes: exp.notes,
+            caseId: exp.caseId,
+        }
+    }, [expenseData])
 
     const topNav = [
         { title: 'نظرة عامة', href: '/dashboard/finance/overview', isActive: false },
@@ -47,6 +62,115 @@ export function ExpenseDetailsView() {
         { title: 'المعاملات', href: '/dashboard/finance/transactions', isActive: false },
     ]
 
+    // LOADING STATE
+    if (isLoading) {
+        return (
+            <>
+                <Header className="bg-navy shadow-none relative">
+                    <TopNav links={topNav} className="[&>a]:text-slate-300 [&>a:hover]:text-white [&>a[aria-current='page']]:text-white" />
+                    <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
+                        <DynamicIsland />
+                    </div>
+                    <div className='ms-auto flex items-center space-x-4'>
+                        <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white" />
+                        <ThemeSwitch className="text-slate-300 hover:bg-white/10 hover:text-white" />
+                        <ConfigDrawer className="text-slate-300 hover:bg-white/10 hover:text-white" />
+                        <ProfileDropdown className="text-slate-300 hover:bg-white/10 hover:text-white" />
+                    </div>
+                    <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-emerald-500/50 to-transparent"></div>
+                </Header>
+                <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8">
+                    <Skeleton className="h-12 w-48" />
+                    <Skeleton className="h-48 w-full rounded-3xl" />
+                    <Skeleton className="h-96 w-full rounded-2xl" />
+                </Main>
+            </>
+        )
+    }
+
+    // ERROR STATE
+    if (isError) {
+        return (
+            <>
+                <Header className="bg-navy shadow-none relative">
+                    <TopNav links={topNav} className="[&>a]:text-slate-300 [&>a:hover]:text-white [&>a[aria-current='page']]:text-white" />
+                    <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
+                        <DynamicIsland />
+                    </div>
+                    <div className='ms-auto flex items-center space-x-4'>
+                        <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white" />
+                        <ThemeSwitch className="text-slate-300 hover:bg-white/10 hover:text-white" />
+                        <ConfigDrawer className="text-slate-300 hover:bg-white/10 hover:text-white" />
+                        <ProfileDropdown className="text-slate-300 hover:bg-white/10 hover:text-white" />
+                    </div>
+                    <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-emerald-500/50 to-transparent"></div>
+                </Header>
+                <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8">
+                    <div className="max-w-[1600px] mx-auto mb-6">
+                        <Link to="/dashboard/finance/expenses" className="inline-flex items-center text-slate-500 hover:text-navy transition-colors">
+                            <ArrowLeft className="h-4 w-4 ml-2" />
+                            العودة إلى المصروفات
+                        </Link>
+                    </div>
+                    <div className="bg-white rounded-3xl p-12 text-center border border-slate-100 shadow-sm">
+                        <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <AlertCircle className="h-8 w-8 text-red-500" />
+                        </div>
+                        <h3 className="text-xl font-bold text-slate-900 mb-2">فشل تحميل تفاصيل المصروف</h3>
+                        <p className="text-slate-500 mb-6">{error?.message || 'حدث خطأ أثناء تحميل البيانات'}</p>
+                        <Button onClick={() => refetch()} className="bg-emerald-500 hover:bg-emerald-600 text-white px-8">
+                            <Loader2 className="ml-2 h-4 w-4" />
+                            إعادة المحاولة
+                        </Button>
+                    </div>
+                </Main>
+            </>
+        )
+    }
+
+    // EMPTY STATE (not found)
+    if (!expense) {
+        return (
+            <>
+                <Header className="bg-navy shadow-none relative">
+                    <TopNav links={topNav} className="[&>a]:text-slate-300 [&>a:hover]:text-white [&>a[aria-current='page']]:text-white" />
+                    <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
+                        <DynamicIsland />
+                    </div>
+                    <div className='ms-auto flex items-center space-x-4'>
+                        <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white" />
+                        <ThemeSwitch className="text-slate-300 hover:bg-white/10 hover:text-white" />
+                        <ConfigDrawer className="text-slate-300 hover:bg-white/10 hover:text-white" />
+                        <ProfileDropdown className="text-slate-300 hover:bg-white/10 hover:text-white" />
+                    </div>
+                    <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-emerald-500/50 to-transparent"></div>
+                </Header>
+                <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8">
+                    <div className="max-w-[1600px] mx-auto mb-6">
+                        <Link to="/dashboard/finance/expenses" className="inline-flex items-center text-slate-500 hover:text-navy transition-colors">
+                            <ArrowLeft className="h-4 w-4 ml-2" />
+                            العودة إلى المصروفات
+                        </Link>
+                    </div>
+                    <div className="bg-white rounded-3xl p-12 text-center border border-slate-100 shadow-sm">
+                        <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <Receipt className="h-8 w-8 text-slate-400" />
+                        </div>
+                        <h3 className="text-xl font-bold text-slate-900 mb-2">المصروف غير موجود</h3>
+                        <p className="text-slate-500 mb-6">لم نتمكن من العثور على المصروف المطلوب</p>
+                        <Button asChild className="bg-brand-blue hover:bg-blue-600 text-white px-8">
+                            <Link to="/dashboard/finance/expenses">
+                                <ArrowLeft className="ml-2 h-4 w-4" />
+                                العودة إلى قائمة المصروفات
+                            </Link>
+                        </Button>
+                    </div>
+                </Main>
+            </>
+        )
+    }
+
+    // SUCCESS STATE
     return (
         <>
             <Header className="bg-navy shadow-none relative">
