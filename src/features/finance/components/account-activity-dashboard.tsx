@@ -435,7 +435,7 @@ export default function AccountActivityDashboard() {
                                             </div>
                                             <span className="text-sm font-medium text-red-900">مصروفات</span>
                                         </div>
-                                        <span className="font-bold text-red-700">{activities.filter(a => a.type === 'expense_new').length}</span>
+                                        <span className="font-bold text-red-700">{activities.filter(a => a.type === 'expense_created').length}</span>
                                     </div>
                                 </CardContent>
                             </Card>

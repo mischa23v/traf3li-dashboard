@@ -43,8 +43,8 @@ export function CreateReminderView() {
 
         const reminderData = {
             title: formData.title,
-            type: formData.type,
-            priority: formData.priority,
+            type: formData.type as 'task' | 'hearing' | 'deadline' | 'meeting' | 'payment' | 'general',
+            priority: formData.priority as 'low' | 'medium' | 'high' | 'urgent',
             reminderDate: formData.dueDate,
             reminderTime: formData.time,
             dueDate: formData.dueDate,
@@ -141,9 +141,11 @@ export function CreateReminderView() {
                                                 </SelectTrigger>
                                                 <SelectContent>
                                                     <SelectItem value="deadline">موعد نهائي</SelectItem>
-                                                    <SelectItem value="admin">إداري</SelectItem>
-                                                    <SelectItem value="payment">مالي</SelectItem>
-                                                    <SelectItem value="followup">متابعة</SelectItem>
+                                                    <SelectItem value="task">مهمة</SelectItem>
+                                                    <SelectItem value="hearing">جلسة</SelectItem>
+                                                    <SelectItem value="meeting">اجتماع</SelectItem>
+                                                    <SelectItem value="payment">دفع</SelectItem>
+                                                    <SelectItem value="general">عام</SelectItem>
                                                 </SelectContent>
                                             </Select>
                                         </div>
@@ -188,7 +190,7 @@ export function CreateReminderView() {
                                                 <SelectValue placeholder="اختر الأهمية" />
                                             </SelectTrigger>
                                             <SelectContent>
-                                                <SelectItem value="critical">عاجل جداً</SelectItem>
+                                                <SelectItem value="urgent">عاجل جداً</SelectItem>
                                                 <SelectItem value="high">عالية</SelectItem>
                                                 <SelectItem value="medium">متوسطة</SelectItem>
                                                 <SelectItem value="low">منخفضة</SelectItem>

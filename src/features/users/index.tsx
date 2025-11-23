@@ -55,7 +55,7 @@ export function Users() {
           </div>
         ) : (
           <UsersTable
-            data={data?.users || []}
+            data={(data?.users || []) as any}
             search={search}
             navigate={navigate}
           />

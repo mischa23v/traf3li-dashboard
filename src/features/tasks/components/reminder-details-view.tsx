@@ -223,7 +223,7 @@ export function ReminderDetailsView() {
                                 </div>
                                 <div className="flex items-center gap-2">
                                     <Flag className="h-4 w-4 text-rose-400" />
-                                    <span className="text-rose-200 font-bold">الأولوية: {reminder.priority === 'critical' ? 'عاجل جداً' : 'عادية'}</span>
+                                    <span className="text-rose-200 font-bold">الأولوية: {reminder.priority === 'urgent' ? 'عاجل جداً' : 'عادية'}</span>
                                 </div>
                             </div>
                         </div>

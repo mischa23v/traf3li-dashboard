@@ -45,7 +45,7 @@ export function CreateTaskView() {
             title: formData.title,
             description: formData.description,
             dueDate: formData.dueDate,
-            priority: formData.priority,
+            priority: formData.priority as 'low' | 'medium' | 'high' | 'critical',
             assignedTo: '', // Will be populated later
             ...(formData.clientId && { clientId: formData.clientId }),
             ...(formData.caseId && { caseId: formData.caseId }),

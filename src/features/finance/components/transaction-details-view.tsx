@@ -240,8 +240,8 @@ export function TransactionDetailsView() {
                         <div className="flex flex-col gap-4 min-w-[250px]">
                             <div className="text-left lg:text-left">
                                 <div className="text-slate-300 text-sm mb-1">المبلغ</div>
-                                <div className={`text-3xl font-bold ${transaction.type === 'credit' ? 'text-emerald-400' : 'text-red-400'}`}>
-                                    {transaction.type === 'credit' ? '+' : '-'}{transaction.amount} <span className="text-lg text-white">{transaction.currency}</span>
+                                <div className={`text-3xl font-bold ${transaction.type === 'income' ? 'text-emerald-400' : 'text-red-400'}`}>
+                                    {transaction.type === 'income' ? '+' : '-'}{transaction.amount} <span className="text-lg text-white">{transaction.currency}</span>
                                 </div>
                             </div>
                         </div>
@@ -267,7 +267,7 @@ export function TransactionDetailsView() {
                                         </div>
                                         <div>
                                             <label className="text-sm text-slate-500 block mb-2">نوع المعاملة</label>
-                                            <div className="font-medium text-navy">{transaction.type === 'credit' ? 'إيداع' : 'سحب'}</div>
+                                            <div className="font-medium text-navy">{transaction.type === 'income' ? 'إيداع' : 'سحب'}</div>
                                         </div>
                                     </div>
                                 </CardContent>

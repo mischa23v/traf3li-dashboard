@@ -48,7 +48,7 @@ export function CreateEventView() {
 
         const eventData = {
             title: formData.title,
-            type: formData.type,
+            type: formData.type as 'hearing' | 'meeting' | 'deadline' | 'task' | 'other',
             startDate: formData.date,
             time: formData.time,
             location: formData.location,
@@ -143,10 +143,11 @@ export function CreateEventView() {
                                                     <SelectValue placeholder="اختر النوع" />
                                                 </SelectTrigger>
                                                 <SelectContent>
-                                                    <SelectItem value="court">جلسة محكمة</SelectItem>
+                                                    <SelectItem value="hearing">جلسة محكمة</SelectItem>
                                                     <SelectItem value="meeting">اجتماع</SelectItem>
-                                                    <SelectItem value="workshop">ورشة عمل</SelectItem>
-                                                    <SelectItem value="online">اجتماع عن بعد</SelectItem>
+                                                    <SelectItem value="deadline">موعد نهائي</SelectItem>
+                                                    <SelectItem value="task">مهمة</SelectItem>
+                                                    <SelectItem value="other">أخرى</SelectItem>
                                                 </SelectContent>
                                             </Select>
                                         </div>

@@ -286,7 +286,7 @@ export function CasesListView() {
                                     <h4 className="text-lg font-bold text-navy mb-2">لا توجد قضايا</h4>
                                     <p className="text-slate-500 mb-4">لم يتم العثور على قضايا</p>
                                     <Button asChild className="bg-blue-500 hover:bg-blue-600 text-white rounded-xl">
-                                        <Link to="/dashboard/cases/new">
+                                        <Link to="/dashboard/cases" search={{ create: true } as any}>
                                             <Plus className="ml-2 h-4 w-4" />
                                             إنشاء قضية جديدة
                                         </Link>

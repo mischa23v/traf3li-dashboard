@@ -40,7 +40,7 @@ export function CreateTransactionView() {
 
         const transactionData = {
             description: formData.description,
-            type: formData.type,
+            type: formData.type as 'expense' | 'income' | 'transfer',
             amount: Number(formData.amount),
             category: 'general',
             date: formData.date,

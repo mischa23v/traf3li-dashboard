@@ -191,7 +191,7 @@ export function EventDetailsView() {
                                 <div className="bg-white/10 p-2 rounded-xl backdrop-blur-md border border-white/10 text-emerald-400">
                                     <CalendarIcon className="h-6 w-6" />
                                 </div>
-                                <span className="text-emerald-100 font-medium">فعالية {event.type === 'court' ? 'قضائية' : 'عامة'}</span>
+                                <span className="text-emerald-100 font-medium">فعالية {event.type === 'hearing' ? 'قضائية' : 'عامة'}</span>
                                 <span className="text-white/20">•</span>
                                 <Badge variant="outline" className="mr-2 border-emerald-500/30 text-emerald-300 bg-emerald-500/10">
                                     {event.id}
