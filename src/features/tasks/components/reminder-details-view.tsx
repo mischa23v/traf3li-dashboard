@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
+import { useParams } from '@tanstack/react-router'
 import {
     Clock, AlertCircle, MoreHorizontal, CheckCircle2,
     User, ArrowLeft, Briefcase,
@@ -20,35 +21,51 @@ import { LanguageSwitcher } from '@/components/language-switcher'
 import { ThemeSwitch } from '@/components/theme-switch'
 import { ConfigDrawer } from '@/components/config-drawer'
 import { ProfileDropdown } from '@/components/profile-dropdown'
+import { useReminder } from '@/hooks/useRemindersAndEvents'
+import { Skeleton } from '@/components/ui/skeleton'
+import { Alert, AlertDescription } from '@/components/ui/alert'
 
 export function ReminderDetailsView() {
     const [activeTab, setActiveTab] = useState('overview')
+    const { reminderId } = useParams({ strict: false }) as { reminderId: string }
 
-    // Mock Data for a single reminder
-    const reminder = {
-        id: 'REM-1001',
-        title: 'انتهاء مهلة الاستئناف - قضية 402',
-        description: 'تذكير بضرورة تقديم لائحة الاستئناف في القضية رقم 402 قبل انتهاء الدوام الرسمي. يرجى التأكد من إرفاق جميع المستندات المؤيدة.',
-        type: 'deadline',
-        priority: 'critical',
-        date: '2025-11-22',
-        time: '14:00',
-        status: 'pending',
-        assignee: {
-            name: 'أحمد السالم',
-            role: 'محامي أول',
-            avatar: '/avatars/01.png'
-        },
-        relatedTo: {
-            type: 'case',
-            id: 'CASE-402',
-            title: 'شركة الإنشاءات ضد مؤسسة النور'
-        },
-        timeline: [
-            { date: '2025-11-20', title: 'تم إنشاء التذكير', type: 'created', status: 'completed' },
-            { date: '2025-11-22', title: 'موعد التذكير', type: 'deadline', status: 'upcoming' },
-        ]
-    }
+    const { data: reminderData, isLoading, isError, error, refetch } = useReminder(reminderId)
+
+    const reminder = useMemo(() => {
+        if (!reminderData?.data) return null
+        const r = reminderData.data
+
+        const reminderDate = r.dueDate ? new Date(r.dueDate) : null
+        const dateDisplay = reminderDate ? reminderDate.toLocaleDateString('ar-SA', { year: 'numeric', month: 'long', day: 'numeric' }) : 'غير محدد'
+        const timeDisplay = r.time || (reminderDate ? reminderDate.toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' }) : 'غير محدد')
+
+        return {
+            id: r._id,
+            title: r.title || r.message || 'تذكير غير محدد',
+            description: r.description || r.message || 'لا يوجد وصف',
+            type: r.type || 'general',
+            priority: r.priority || 'medium',
+            date: dateDisplay,
+            time: timeDisplay,
+            status: r.status || 'pending',
+            assignee: r.assignedTo ? {
+                name: r.assignedTo.firstName + ' ' + r.assignedTo.lastName || 'غير محدد',
+                role: r.assignedTo.role || 'موظف',
+                avatar: r.assignedTo.avatar || '/avatars/default.png'
+            } : null,
+            relatedTo: r.caseId ? {
+                type: 'case',
+                id: r.caseId.caseNumber || 'N/A',
+                title: r.caseId.title || 'قضية غير محددة'
+            } : null,
+            timeline: (r.history || []).map((h: any) => ({
+                date: h.timestamp ? new Date(h.timestamp).toLocaleDateString('ar-SA') : 'غير محدد',
+                title: h.description || h.action || 'تحديث',
+                type: h.type || 'update',
+                status: 'completed'
+            }))
+        }
+    }, [reminderData])
 
     const topNav = [
         { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
@@ -95,7 +112,66 @@ export function ReminderDetailsView() {
                     </Link>
                 </div>
 
-                {/* Hero Content */}
+                {/* Loading State */}
+                {isLoading && (
+                    <div className="max-w-[1600px] mx-auto space-y-6">
+                        <div className="bg-emerald-950 rounded-3xl p-8 shadow-xl">
+                            <Skeleton className="h-8 w-3/4 mb-4 bg-white/20" />
+                            <Skeleton className="h-6 w-1/2 mb-6 bg-white/20" />
+                            <div className="flex gap-4">
+                                <Skeleton className="h-10 w-32 bg-white/20" />
+                                <Skeleton className="h-10 w-32 bg-white/20" />
+                            </div>
+                        </div>
+                        <div className="grid grid-cols-12 gap-6">
+                            <div className="col-span-12 lg:col-span-3">
+                                <Skeleton className="h-64 w-full rounded-2xl" />
+                            </div>
+                            <div className="col-span-12 lg:col-span-9">
+                                <Skeleton className="h-96 w-full rounded-2xl" />
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {/* Error State */}
+                {isError && !isLoading && (
+                    <div className="max-w-[1600px] mx-auto">
+                        <Alert className="border-red-200 bg-red-50">
+                            <AlertCircle className="h-4 w-4 text-red-600" />
+                            <AlertDescription className="text-red-800">
+                                <div className="flex items-center justify-between">
+                                    <span>حدث خطأ أثناء تحميل تفاصيل التذكير: {error?.message || 'خطأ غير معروف'}</span>
+                                    <Button onClick={() => refetch()} variant="outline" size="sm" className="border-red-300 text-red-700 hover:bg-red-100">
+                                        إعادة المحاولة
+                                    </Button>
+                                </div>
+                            </AlertDescription>
+                        </Alert>
+                    </div>
+                )}
+
+                {/* Empty State */}
+                {!isLoading && !isError && !reminder && (
+                    <div className="max-w-[1600px] mx-auto">
+                        <div className="text-center py-12 bg-white rounded-3xl">
+                            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-slate-100 mb-4">
+                                <Bell className="h-8 w-8 text-slate-400" />
+                            </div>
+                            <h4 className="text-lg font-bold text-navy mb-2">لم يتم العثور على التذكير</h4>
+                            <p className="text-slate-500 mb-4">التذكير المطلوب غير موجود أو تم حذفه</p>
+                            <Button asChild className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl">
+                                <Link to="/dashboard/tasks/reminders">
+                                    <ArrowLeft className="ml-2 h-4 w-4" />
+                                    العودة إلى التذكيرات
+                                </Link>
+                            </Button>
+                        </div>
+                    </div>
+                )}
+
+                {/* Success State - Hero Content */}
+                {!isLoading && !isError && reminder && (
                 <div className="max-w-[1600px] mx-auto bg-emerald-950 rounded-3xl p-8 shadow-xl shadow-emerald-900/20 mb-8 relative overflow-hidden">
                     {/* Background Decoration */}
                     <div className="absolute top-0 left-0 w-full h-full overflow-hidden z-0 pointer-events-none">
@@ -262,6 +338,7 @@ export function ReminderDetailsView() {
                         </div>
                     </div>
                 </div>
+                )}
             </Main>
         </>
     )
