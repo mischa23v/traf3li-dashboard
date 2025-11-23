@@ -1,9 +1,9 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import {
     FileText, Calendar, CheckSquare, Clock, MoreHorizontal, Plus, Upload,
     User, ArrowLeft, Briefcase,
     History, Link as LinkIcon, Flag, Send, Eye, Download, Search, Bell,
-    CreditCard, DollarSign, CheckCircle2, AlertCircle, ArrowRightLeft
+    CreditCard, DollarSign, CheckCircle2, AlertCircle, ArrowRightLeft, Loader2
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -21,26 +21,37 @@ import { LanguageSwitcher } from '@/components/language-switcher'
 import { ThemeSwitch } from '@/components/theme-switch'
 import { ConfigDrawer } from '@/components/config-drawer'
 import { ProfileDropdown } from '@/components/profile-dropdown'
+import { Skeleton } from '@/components/ui/skeleton'
+import { useTransaction } from '@/hooks/useFinance'
+import { useParams } from '@tanstack/react-router'
 
 export function TransactionDetailsView() {
-    // Mock Data for a single transaction
-    const transaction = {
-        id: 'TRX-987654',
-        description: 'تحويل بنكي - دفعة مقدمة',
-        amount: '15,000.00',
-        currency: 'SAR',
-        type: 'credit', // credit or debit
-        status: 'completed',
-        date: '2024-11-22',
-        time: '10:30 AM',
-        reference: 'REF-123456',
-        account: 'SA0000000000000000000000',
-        bank: 'البنك الأهلي',
-        history: [
-            { date: '2024-11-22 10:30 AM', action: 'تم استلام التحويل', user: 'النظام' },
-            { date: '2024-11-22 10:35 AM', action: 'تم تأكيد المعاملة', user: 'النظام البنكي' }
-        ]
-    }
+    const { transactionId } = useParams({ strict: false }) as { transactionId: string }
+
+    // Fetch transaction data
+    const { data: transactionData, isLoading, isError, error, refetch } = useTransaction(transactionId)
+
+    // Transform API data to component format
+    const transaction = useMemo(() => {
+        if (!transactionData?.data) return null
+        const txn = transactionData.data
+        return {
+            id: txn._id,
+            description: txn.description,
+            amount: new Intl.NumberFormat('ar-SA', { minimumFractionDigits: 2 }).format(txn.amount || 0),
+            currency: 'ر.س',
+            type: txn.type, // credit or debit
+            status: txn.status,
+            date: new Date(txn.date).toLocaleDateString('ar-SA'),
+            time: new Date(txn.date).toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' }),
+            reference: txn.reference || '-',
+            paymentMethod: txn.paymentMethod,
+            category: txn.category,
+            invoiceId: txn.invoiceId,
+            expenseId: txn.expenseId,
+            notes: txn.notes,
+        }
+    }, [transactionData])
 
     const topNav = [
         { title: 'نظرة عامة', href: '/dashboard/finance/overview', isActive: false },
@@ -49,6 +60,115 @@ export function TransactionDetailsView() {
         { title: 'المعاملات', href: '/dashboard/finance/transactions', isActive: true },
     ]
 
+    // LOADING STATE
+    if (isLoading) {
+        return (
+            <>
+                <Header className="bg-navy shadow-none relative">
+                    <TopNav links={topNav} className="[&>a]:text-slate-300 [&>a:hover]:text-white [&>a[aria-current='page']]:text-white" />
+                    <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
+                        <DynamicIsland />
+                    </div>
+                    <div className='ms-auto flex items-center space-x-4'>
+                        <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white" />
+                        <ThemeSwitch className="text-slate-300 hover:bg-white/10 hover:text-white" />
+                        <ConfigDrawer className="text-slate-300 hover:bg-white/10 hover:text-white" />
+                        <ProfileDropdown className="text-slate-300 hover:bg-white/10 hover:text-white" />
+                    </div>
+                    <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-emerald-500/50 to-transparent"></div>
+                </Header>
+                <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8">
+                    <Skeleton className="h-12 w-48" />
+                    <Skeleton className="h-48 w-full rounded-3xl" />
+                    <Skeleton className="h-96 w-full rounded-2xl" />
+                </Main>
+            </>
+        )
+    }
+
+    // ERROR STATE
+    if (isError) {
+        return (
+            <>
+                <Header className="bg-navy shadow-none relative">
+                    <TopNav links={topNav} className="[&>a]:text-slate-300 [&>a:hover]:text-white [&>a[aria-current='page']]:text-white" />
+                    <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
+                        <DynamicIsland />
+                    </div>
+                    <div className='ms-auto flex items-center space-x-4'>
+                        <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white" />
+                        <ThemeSwitch className="text-slate-300 hover:bg-white/10 hover:text-white" />
+                        <ConfigDrawer className="text-slate-300 hover:bg-white/10 hover:text-white" />
+                        <ProfileDropdown className="text-slate-300 hover:bg-white/10 hover:text-white" />
+                    </div>
+                    <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-emerald-500/50 to-transparent"></div>
+                </Header>
+                <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8">
+                    <div className="max-w-[1600px] mx-auto mb-6">
+                        <Link to="/dashboard/finance/transactions" className="inline-flex items-center text-slate-500 hover:text-navy transition-colors">
+                            <ArrowLeft className="h-4 w-4 ml-2" />
+                            العودة إلى المعاملات
+                        </Link>
+                    </div>
+                    <div className="bg-white rounded-3xl p-12 text-center border border-slate-100 shadow-sm">
+                        <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <AlertCircle className="h-8 w-8 text-red-500" />
+                        </div>
+                        <h3 className="text-xl font-bold text-slate-900 mb-2">فشل تحميل تفاصيل المعاملة</h3>
+                        <p className="text-slate-500 mb-6">{error?.message || 'حدث خطأ أثناء تحميل البيانات'}</p>
+                        <Button onClick={() => refetch()} className="bg-emerald-500 hover:bg-emerald-600 text-white px-8">
+                            <Loader2 className="ml-2 h-4 w-4" />
+                            إعادة المحاولة
+                        </Button>
+                    </div>
+                </Main>
+            </>
+        )
+    }
+
+    // EMPTY STATE (not found)
+    if (!transaction) {
+        return (
+            <>
+                <Header className="bg-navy shadow-none relative">
+                    <TopNav links={topNav} className="[&>a]:text-slate-300 [&>a:hover]:text-white [&>a[aria-current='page']]:text-white" />
+                    <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
+                        <DynamicIsland />
+                    </div>
+                    <div className='ms-auto flex items-center space-x-4'>
+                        <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white" />
+                        <ThemeSwitch className="text-slate-300 hover:bg-white/10 hover:text-white" />
+                        <ConfigDrawer className="text-slate-300 hover:bg-white/10 hover:text-white" />
+                        <ProfileDropdown className="text-slate-300 hover:bg-white/10 hover:text-white" />
+                    </div>
+                    <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-emerald-500/50 to-transparent"></div>
+                </Header>
+                <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8">
+                    <div className="max-w-[1600px] mx-auto mb-6">
+                        <Link to="/dashboard/finance/transactions" className="inline-flex items-center text-slate-500 hover:text-navy transition-colors">
+                            <ArrowLeft className="h-4 w-4 ml-2" />
+                            العودة إلى المعاملات
+                        </Link>
+                    </div>
+                    <div className="bg-white rounded-3xl p-12 text-center border border-slate-100 shadow-sm">
+                        <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <ArrowRightLeft className="h-8 w-8 text-slate-400" />
+                        </div>
+                        <h3 className="text-xl font-bold text-slate-900 mb-2">المعاملة غير موجودة</h3>
+                        <p className="text-slate-500 mb-6">لم نتمكن من العثور على المعاملة المطلوبة</p>
+                        <Button asChild className="bg-brand-blue hover:bg-blue-600 text-white px-8">
+                            <Link to="/dashboard/finance/transactions">
+                                <ArrowLeft className="ml-2 h-4 w-4" />
+                                العودة إلى قائمة المعاملات
+                            </Link>
+                        </Button>
+                    </div>
+                </Main>
+            </>
+        )
+    }
+
+    // SUCCESS STATE
     return (
         <>
             <Header className="bg-navy shadow-none relative">

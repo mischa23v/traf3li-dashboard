@@ -337,6 +337,14 @@ export const useTransactions = (filters?: any) => {
   })
 }
 
+export const useTransaction = (id: string) => {
+  return useQuery({
+    queryKey: ['transactions', id],
+    queryFn: () => financeService.getTransaction(id),
+    enabled: !!id,
+  })
+}
+
 export const useCreateTransaction = () => {
   const queryClient = useQueryClient()
 

@@ -607,6 +607,19 @@ const financeService = {
   },
 
   /**
+   * Get single transaction
+   */
+  getTransaction: async (id: string): Promise<{ data: Transaction }> => {
+    try {
+      const response = await apiClient.get(`/transactions/${id}`)
+      return response.data
+    } catch (error: any) {
+      console.error('Get transaction error:', error)
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
    * Create transaction
    */
   createTransaction: async (data: CreateTransactionData): Promise<Transaction> => {
