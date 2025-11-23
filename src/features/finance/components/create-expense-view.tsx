@@ -19,18 +19,38 @@ import { DynamicIsland } from '@/components/dynamic-island'
 import { Main } from '@/components/layout/main'
 import { Link, useNavigate } from '@tanstack/react-router'
 import { FinanceSidebar } from './finance-sidebar'
+import { useCreateExpense } from '@/hooks/useFinance'
 
 export function CreateExpenseView() {
     const navigate = useNavigate()
-    const [isLoading, setIsLoading] = useState(false)
+    const createExpenseMutation = useCreateExpense()
+
+    const [formData, setFormData] = useState({
+        description: '',
+        amount: '',
+        category: '',
+        date: '',
+        paymentMethod: '',
+        notes: '',
+    })
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
-        setIsLoading(true)
-        // Simulate API call
-        await new Promise(resolve => setTimeout(resolve, 1000))
-        setIsLoading(false)
-        navigate({ to: '/dashboard/finance/expenses' })
+
+        const expenseData = {
+            description: formData.description,
+            amount: Number(formData.amount),
+            category: formData.category,
+            date: formData.date,
+            paymentMethod: formData.paymentMethod,
+            notes: formData.notes,
+        }
+
+        createExpenseMutation.mutate(expenseData, {
+            onSuccess: () => {
+                navigate({ to: '/dashboard/finance/expenses' })
+            },
+        })
     }
 
     const topNav = [
@@ -98,14 +118,27 @@ export function CreateExpenseView() {
                                                 <FileText className="w-4 h-4 text-emerald-500" />
                                                 وصف المصروف
                                             </label>
-                                            <Input placeholder="مثال: شراء قرطاسية للمكتب" className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500" required />
+                                            <Input
+                                                placeholder="مثال: شراء قرطاسية للمكتب"
+                                                value={formData.description}
+                                                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                                                className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500"
+                                                required
+                                            />
                                         </div>
                                         <div className="space-y-2">
                                             <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
                                                 <DollarSign className="w-4 h-4 text-emerald-500" />
                                                 المبلغ
                                             </label>
-                                            <Input type="number" placeholder="0.00" className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500" required />
+                                            <Input
+                                                type="number"
+                                                placeholder="0.00"
+                                                value={formData.amount}
+                                                onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
+                                                className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500"
+                                                required
+                                            />
                                         </div>
                                     </div>
 
@@ -115,7 +148,7 @@ export function CreateExpenseView() {
                                                 <Tag className="w-4 h-4 text-emerald-500" />
                                                 التصنيف
                                             </label>
-                                            <Select>
+                                            <Select value={formData.category} onValueChange={(value) => setFormData({ ...formData, category: value })}>
                                                 <SelectTrigger className="rounded-xl border-slate-200 focus:ring-emerald-500">
                                                     <SelectValue placeholder="اختر التصنيف" />
                                                 </SelectTrigger>
@@ -133,7 +166,13 @@ export function CreateExpenseView() {
                                                 <Calendar className="w-4 h-4 text-emerald-500" />
                                                 التاريخ
                                             </label>
-                                            <Input type="date" className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500" required />
+                                            <Input
+                                                type="date"
+                                                value={formData.date}
+                                                onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+                                                className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500"
+                                                required
+                                            />
                                         </div>
                                     </div>
 
@@ -143,7 +182,7 @@ export function CreateExpenseView() {
                                                 <CreditCard className="w-4 h-4 text-emerald-500" />
                                                 طريقة الدفع
                                             </label>
-                                            <Select>
+                                            <Select value={formData.paymentMethod} onValueChange={(value) => setFormData({ ...formData, paymentMethod: value })}>
                                                 <SelectTrigger className="rounded-xl border-slate-200 focus:ring-emerald-500">
                                                     <SelectValue placeholder="اختر طريقة الدفع" />
                                                 </SelectTrigger>
@@ -170,6 +209,8 @@ export function CreateExpenseView() {
                                         </label>
                                         <Textarea
                                             placeholder="أدخل أي تفاصيل إضافية..."
+                                            value={formData.notes}
+                                            onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                                             className="min-h-[100px] rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500"
                                         />
                                     </div>
@@ -184,9 +225,9 @@ export function CreateExpenseView() {
                                     <Button
                                         type="submit"
                                         className="bg-emerald-500 hover:bg-emerald-600 text-white min-w-[140px] rounded-xl shadow-lg shadow-emerald-500/20"
-                                        disabled={isLoading}
+                                        disabled={createExpenseMutation.isPending}
                                     >
-                                        {isLoading ? (
+                                        {createExpenseMutation.isPending ? (
                                             <span className="flex items-center gap-2">
                                                 جاري الحفظ...
                                             </span>
