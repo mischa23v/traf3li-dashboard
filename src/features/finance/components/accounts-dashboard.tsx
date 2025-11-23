@@ -1,4 +1,4 @@
-
+import { useMemo } from 'react'
 import {
     TrendingUp, TrendingDown, FileText, Receipt, AlertCircle,
     ArrowUpRight, ArrowDownRight,
@@ -6,6 +6,8 @@ import {
     Wallet,
     CreditCard, ArrowLeftRight, Landmark, Bell
 } from 'lucide-react'
+import { Skeleton } from '@/components/ui/skeleton'
+import { useAccountBalance, useTransactionSummary, useTransactions, useInvoices } from '@/hooks/useFinance'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -24,34 +26,75 @@ interface AccountsDashboardProps {
 }
 
 export default function AccountsDashboard({ }: AccountsDashboardProps) {
-    // Financial Summary Data
-    const financialSummary = {
-        totalBalance: 1245000,
-        monthlyRevenue: 125400,
-        monthlyExpenses: 48320,
-        netProfit: 77080,
-        growth: 15.3,
-        outstanding: 105807.50
-    }
+    // Fetch financial data
+    const { data: balanceData, isLoading: isLoadingBalance } = useAccountBalance()
+    const { data: summaryData, isLoading: isLoadingSummary } = useTransactionSummary()
+    const { data: transactionsData, isLoading: isLoadingTransactions } = useTransactions({ limit: 10 })
+    const { data: invoicesData } = useInvoices({ status: 'pending' })
 
-    // Cash Flow Data
-    const cashFlow = [
-        { month: 'يونيو', income: 75000, expenses: 42000 },
-        { month: 'يوليو', income: 82000, expenses: 45000 },
-        { month: 'أغسطس', income: 68000, expenses: 38000 },
-        { month: 'سبتمبر', income: 95000, expenses: 52000 },
-        { month: 'أكتوبر', income: 118000, expenses: 48000 },
-        { month: 'نوفمبر', income: 125400, expenses: 48320 }
-    ]
+    const isLoading = isLoadingBalance || isLoadingSummary || isLoadingTransactions
+
+    // Calculate financial summary
+    const financialSummary = useMemo(() => {
+        const balance = balanceData?.data?.balance || 0
+        const revenue = summaryData?.data?.totalIncome || summaryData?.data?.income || 0
+        const expenses = summaryData?.data?.totalExpenses || summaryData?.data?.expenses || 0
+        const netProfit = revenue - expenses
+        const growth = summaryData?.data?.growth || 0
+
+        // Calculate outstanding from pending invoices
+        const outstanding = invoicesData?.data
+            ? invoicesData.data.reduce((sum: number, inv: any) => sum + (inv.balanceDue || inv.totalAmount || 0), 0)
+            : 0
+
+        return {
+            totalBalance: balance,
+            monthlyRevenue: revenue,
+            monthlyExpenses: expenses,
+            netProfit,
+            growth,
+            outstanding
+        }
+    }, [balanceData, summaryData, invoicesData])
+
+    // Cash Flow Data (last 6 months from API or mock)
+    const cashFlow = useMemo(() => {
+        // If API provides monthly breakdown, use it
+        if (summaryData?.data?.monthlyBreakdown) {
+            return summaryData.data.monthlyBreakdown
+        }
+
+        // Otherwise use mock data for now
+        return [
+            { month: 'يونيو', income: 75000, expenses: 42000 },
+            { month: 'يوليو', income: 82000, expenses: 45000 },
+            { month: 'أغسطس', income: 68000, expenses: 38000 },
+            { month: 'سبتمبر', income: 95000, expenses: 52000 },
+            { month: 'أكتوبر', income: 118000, expenses: 48000 },
+            { month: 'نوفمبر', income: financialSummary.monthlyRevenue, expenses: financialSummary.monthlyExpenses }
+        ]
+    }, [summaryData, financialSummary])
+
     const maxCashFlow = Math.max(...cashFlow.map(m => Math.max(m.income, m.expenses)))
 
-    // Recent Transactions (Mixed)
-    const transactions = [
-        { id: 'TRX-001', type: 'income', title: 'دفعة - قضية المصنع السعودي', date: 'اليوم, 10:30 ص', amount: 15000, status: 'completed' },
-        { id: 'TRX-002', type: 'expense', title: 'إيجار المكتب - نوفمبر', date: 'أمس, 09:15 ص', amount: 15000, status: 'completed' },
-        { id: 'TRX-003', type: 'income', title: 'استشارة قانونية - محمد', date: '15 نوفمبر', amount: 2500, status: 'completed' },
-        { id: 'TRX-004', type: 'expense', title: 'رسوم محكمة', date: '14 نوفمبر', amount: 500, status: 'pending' },
-    ]
+    // Transform recent transactions
+    const transactions = useMemo(() => {
+        if (!transactionsData?.data) return []
+
+        return transactionsData.data.slice(0, 4).map((txn: any) => ({
+            id: txn._id,
+            type: txn.type === 'credit' ? 'income' : 'expense',
+            title: txn.description || 'معاملة',
+            date: new Date(txn.date).toLocaleDateString('ar-SA', {
+                month: 'long',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            }),
+            amount: txn.amount || 0,
+            status: txn.status || 'completed'
+        }))
+    }, [transactionsData])
 
     const formatCurrency = (amount: number) => {
         return new Intl.NumberFormat('ar-SA', {
@@ -100,10 +143,26 @@ export default function AccountsDashboard({ }: AccountsDashboardProps) {
             </Header>
 
             <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-r border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
-                <div className="max-w-[1600px] mx-auto space-y-8">
+                {/* Loading State */}
+                {isLoading ? (
+                    <div className="max-w-[1600px] mx-auto space-y-8">
+                        <Skeleton className="h-[400px] w-full rounded-[32px]" />
+                        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                            <div className="lg:col-span-8 space-y-8">
+                                <Skeleton className="h-[400px] w-full rounded-[32px]" />
+                                <Skeleton className="h-[300px] w-full rounded-[32px]" />
+                            </div>
+                            <div className="lg:col-span-4 space-y-6">
+                                <Skeleton className="h-[300px] w-full rounded-[32px]" />
+                                <Skeleton className="h-[400px] w-full rounded-[32px]" />
+                            </div>
+                        </div>
+                    </div>
+                ) : (
+                    <div className="max-w-[1600px] mx-auto space-y-8">
 
-                    {/* HERO SECTION */}
-                    <div className="bg-navy rounded-[32px] p-8 relative overflow-hidden text-white shadow-2xl shadow-navy/20">
+                        {/* HERO SECTION */}
+                        <div className="bg-navy rounded-[32px] p-8 relative overflow-hidden text-white shadow-2xl shadow-navy/20">
                         {/* Abstract Background Shapes */}
                         <div className="absolute top-0 left-0 w-full h-full overflow-hidden z-0 pointer-events-none">
                             <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] bg-brand-blue/20 rounded-full blur-[120px]"></div>
@@ -392,6 +451,7 @@ export default function AccountsDashboard({ }: AccountsDashboardProps) {
                         </div>
                     </div>
                 </div>
+                )}
             </Main>
         </>
     )
