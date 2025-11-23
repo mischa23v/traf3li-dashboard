@@ -19,18 +19,43 @@ import { DynamicIsland } from '@/components/dynamic-island'
 import { Main } from '@/components/layout/main'
 import { Link, useNavigate } from '@tanstack/react-router'
 import { TasksSidebar } from './tasks-sidebar'
+import { useCreateReminder } from '@/hooks/useRemindersAndEvents'
 
 export function CreateReminderView() {
     const navigate = useNavigate()
-    const [isLoading, setIsLoading] = useState(false)
+    const createReminderMutation = useCreateReminder()
+
+    const [formData, setFormData] = useState({
+        title: '',
+        type: '',
+        priority: '',
+        dueDate: '',
+        time: '',
+        description: ''
+    })
+
+    const handleChange = (field: string, value: string) => {
+        setFormData(prev => ({ ...prev, [field]: value }))
+    }
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
-        setIsLoading(true)
-        // Simulate API call
-        await new Promise(resolve => setTimeout(resolve, 1000))
-        setIsLoading(false)
-        navigate({ to: '/dashboard/tasks/reminders' })
+
+        const reminderData = {
+            title: formData.title,
+            type: formData.type,
+            priority: formData.priority,
+            dueDate: formData.dueDate,
+            time: formData.time,
+            message: formData.description,
+            description: formData.description,
+        }
+
+        createReminderMutation.mutate(reminderData, {
+            onSuccess: () => {
+                navigate({ to: '/dashboard/tasks/reminders' })
+            }
+        })
     }
 
     const topNav = [
@@ -95,14 +120,20 @@ export function CreateReminderView() {
                                                 <Bell className="w-4 h-4 text-emerald-500" />
                                                 عنوان التذكير
                                             </label>
-                                            <Input placeholder="مثال: انتهاء مهلة الاستئناف" className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500" required />
+                                            <Input
+                                                placeholder="مثال: انتهاء مهلة الاستئناف"
+                                                className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500"
+                                                required
+                                                value={formData.title}
+                                                onChange={(e) => handleChange('title', e.target.value)}
+                                            />
                                         </div>
                                         <div className="space-y-2">
                                             <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
                                                 <AlertCircle className="w-4 h-4 text-emerald-500" />
                                                 نوع التذكير
                                             </label>
-                                            <Select>
+                                            <Select value={formData.type} onValueChange={(value) => handleChange('type', value)}>
                                                 <SelectTrigger className="rounded-xl border-slate-200 focus:ring-emerald-500">
                                                     <SelectValue placeholder="اختر النوع" />
                                                 </SelectTrigger>
@@ -122,14 +153,26 @@ export function CreateReminderView() {
                                                 <Calendar className="w-4 h-4 text-emerald-500" />
                                                 التاريخ
                                             </label>
-                                            <Input type="date" className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500" required />
+                                            <Input
+                                                type="date"
+                                                className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500"
+                                                required
+                                                value={formData.dueDate}
+                                                onChange={(e) => handleChange('dueDate', e.target.value)}
+                                            />
                                         </div>
                                         <div className="space-y-2">
                                             <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
                                                 <Clock className="w-4 h-4 text-emerald-500" />
                                                 الوقت
                                             </label>
-                                            <Input type="time" className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500" required />
+                                            <Input
+                                                type="time"
+                                                className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500"
+                                                required
+                                                value={formData.time}
+                                                onChange={(e) => handleChange('time', e.target.value)}
+                                            />
                                         </div>
                                     </div>
 
@@ -138,7 +181,7 @@ export function CreateReminderView() {
                                             <AlertCircle className="w-4 h-4 text-emerald-500" />
                                             الأهمية
                                         </label>
-                                        <Select defaultValue="high">
+                                        <Select value={formData.priority} onValueChange={(value) => handleChange('priority', value)} defaultValue="high">
                                             <SelectTrigger className="rounded-xl border-slate-200 focus:ring-emerald-500">
                                                 <SelectValue placeholder="اختر الأهمية" />
                                             </SelectTrigger>
@@ -159,6 +202,8 @@ export function CreateReminderView() {
                                         <Textarea
                                             placeholder="أدخل أي ملاحظات إضافية..."
                                             className="min-h-[120px] rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500"
+                                            value={formData.description}
+                                            onChange={(e) => handleChange('description', e.target.value)}
                                         />
                                     </div>
                                 </div>
@@ -172,9 +217,9 @@ export function CreateReminderView() {
                                     <Button
                                         type="submit"
                                         className="bg-emerald-500 hover:bg-emerald-600 text-white min-w-[140px] rounded-xl shadow-lg shadow-emerald-500/20"
-                                        disabled={isLoading}
+                                        disabled={createReminderMutation.isPending}
                                     >
-                                        {isLoading ? (
+                                        {createReminderMutation.isPending ? (
                                             <span className="flex items-center gap-2">
                                                 جاري الحفظ...
                                             </span>
