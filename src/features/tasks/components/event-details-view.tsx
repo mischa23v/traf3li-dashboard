@@ -1,8 +1,9 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
+import { useParams } from '@tanstack/react-router'
 import {
     Calendar as CalendarIcon, MapPin, Users, Video, MoreHorizontal, CheckCircle2,
     User, ArrowLeft, Briefcase,
-    History, Link as LinkIcon, Flag, Send, Bell, Search, Clock
+    History, Link as LinkIcon, Flag, Send, Bell, Search, Clock, AlertCircle, Shield
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -20,34 +21,53 @@ import { LanguageSwitcher } from '@/components/language-switcher'
 import { ThemeSwitch } from '@/components/theme-switch'
 import { ConfigDrawer } from '@/components/config-drawer'
 import { ProfileDropdown } from '@/components/profile-dropdown'
+import { useEvent } from '@/hooks/useRemindersAndEvents'
+import { Skeleton } from '@/components/ui/skeleton'
+import { Alert, AlertDescription } from '@/components/ui/alert'
 
 export function EventDetailsView() {
     const [activeTab, setActiveTab] = useState('overview')
+    const { eventId } = useParams({ strict: false }) as { eventId: string }
 
-    // Mock Data for a single event
-    const event = {
-        id: 'EVT-2001',
-        title: 'جلسة مرافعة - قضية 402',
-        description: 'جلسة مرافعة للنظر في الدفوع المقدمة من الخصم. يجب إحضار أصل المستندات.',
-        type: 'court',
-        location: 'المحكمة العامة - القاعة 4',
-        date: '2025-11-22',
-        time: '09:00 ص',
-        status: 'upcoming',
-        attendees: [
-            { name: 'أحمد المحامي', role: 'محامي', status: 'confirmed' },
-            { name: 'العميل', role: 'صاحب القضية', status: 'pending' }
-        ],
-        relatedTo: {
-            type: 'case',
-            id: 'CASE-402',
-            title: 'شركة الإنشاءات ضد مؤسسة النور'
-        },
-        timeline: [
-            { date: '2025-11-15', title: 'تم جدولة الجلسة', type: 'created', status: 'completed' },
-            { date: '2025-11-22', title: 'موعد الجلسة', type: 'event', status: 'upcoming' },
-        ]
-    }
+    // Fetch event data
+    const { data: eventData, isLoading, isError, error, refetch } = useEvent(eventId)
+
+    // Transform API data
+    const event = useMemo(() => {
+        if (!eventData?.data) return null
+        const e = eventData.data
+
+        const eventDate = e.date ? new Date(e.date) : null
+        const dateDisplay = eventDate ? eventDate.toLocaleDateString('ar-SA', { year: 'numeric', month: 'long', day: 'numeric' }) : 'غير محدد'
+        const timeDisplay = e.time || (eventDate ? eventDate.toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' }) : 'غير محدد')
+
+        return {
+            id: e._id,
+            title: e.title || e.description || 'فعالية غير محددة',
+            description: e.description || e.notes || 'لا يوجد وصف',
+            type: e.type || 'meeting',
+            location: e.location || 'غير محدد',
+            date: dateDisplay,
+            time: timeDisplay,
+            status: e.status || 'pending',
+            attendees: (e.attendees || []).map((att: any) => ({
+                name: typeof att === 'string' ? att : (att.name || att.userId?.firstName + ' ' + att.userId?.lastName || 'حاضر'),
+                role: typeof att === 'string' ? 'حاضر' : (att.role || att.userId?.role || 'حاضر'),
+                status: typeof att === 'string' ? 'pending' : (att.status || 'pending')
+            })),
+            relatedTo: e.caseId ? {
+                type: 'case',
+                id: e.caseId.caseNumber || 'N/A',
+                title: e.caseId.title || 'قضية غير محددة'
+            } : null,
+            timeline: (e.history || []).map((h: any) => ({
+                date: h.timestamp ? new Date(h.timestamp).toLocaleDateString('ar-SA') : 'غير محدد',
+                title: h.description || h.action || 'تحديث',
+                type: h.type || 'update',
+                status: 'completed'
+            }))
+        }
+    }, [eventData])
 
     const topNav = [
         { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
@@ -94,7 +114,66 @@ export function EventDetailsView() {
                     </Link>
                 </div>
 
-                {/* Hero Content */}
+                {/* Loading State */}
+                {isLoading && (
+                    <div className="max-w-[1600px] mx-auto space-y-6">
+                        <div className="bg-emerald-950 rounded-3xl p-8 shadow-xl">
+                            <Skeleton className="h-8 w-3/4 mb-4 bg-white/20" />
+                            <Skeleton className="h-6 w-1/2 mb-6 bg-white/20" />
+                            <div className="flex gap-4">
+                                <Skeleton className="h-10 w-32 bg-white/20" />
+                                <Skeleton className="h-10 w-32 bg-white/20" />
+                            </div>
+                        </div>
+                        <div className="grid grid-cols-12 gap-6">
+                            <div className="col-span-12 lg:col-span-3">
+                                <Skeleton className="h-64 w-full rounded-2xl" />
+                            </div>
+                            <div className="col-span-12 lg:col-span-9">
+                                <Skeleton className="h-96 w-full rounded-2xl" />
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {/* Error State */}
+                {isError && !isLoading && (
+                    <div className="max-w-[1600px] mx-auto">
+                        <Alert className="border-red-200 bg-red-50">
+                            <AlertCircle className="h-4 w-4 text-red-600" />
+                            <AlertDescription className="text-red-800">
+                                <div className="flex items-center justify-between">
+                                    <span>حدث خطأ أثناء تحميل تفاصيل الفعالية: {error?.message || 'خطأ غير معروف'}</span>
+                                    <Button onClick={() => refetch()} variant="outline" size="sm" className="border-red-300 text-red-700 hover:bg-red-100">
+                                        إعادة المحاولة
+                                    </Button>
+                                </div>
+                            </AlertDescription>
+                        </Alert>
+                    </div>
+                )}
+
+                {/* Empty State */}
+                {!isLoading && !isError && !event && (
+                    <div className="max-w-[1600px] mx-auto">
+                        <div className="text-center py-12 bg-white rounded-3xl">
+                            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-slate-100 mb-4">
+                                <CalendarIcon className="h-8 w-8 text-slate-400" />
+                            </div>
+                            <h4 className="text-lg font-bold text-navy mb-2">لم يتم العثور على الفعالية</h4>
+                            <p className="text-slate-500 mb-4">الفعالية المطلوبة غير موجودة أو تم حذفها</p>
+                            <Button asChild className="bg-blue-500 hover:bg-blue-600 text-white rounded-xl">
+                                <Link to="/dashboard/tasks/events">
+                                    <ArrowLeft className="ml-2 h-4 w-4" />
+                                    العودة إلى الفعاليات
+                                </Link>
+                            </Button>
+                        </div>
+                    </div>
+                )}
+
+                {/* Success State - Hero Content */}
+                {!isLoading && !isError && event && (
                 <div className="max-w-[1600px] mx-auto bg-emerald-950 rounded-3xl p-8 shadow-xl shadow-emerald-900/20 mb-8 relative overflow-hidden">
                     {/* Background Decoration */}
                     <div className="absolute top-0 left-0 w-full h-full overflow-hidden z-0 pointer-events-none">
@@ -191,22 +270,24 @@ export function EventDetailsView() {
                             </Card>
 
                             {/* Related To Card */}
-                            <Card className="border border-slate-100 shadow-sm rounded-2xl">
-                                <CardHeader className="pb-3">
-                                    <CardTitle className="text-base font-bold text-navy">مرتبط بـ</CardTitle>
-                                </CardHeader>
-                                <CardContent className="space-y-4">
-                                    <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-xl border border-slate-100">
-                                        <div className="w-10 h-10 rounded-lg bg-white flex items-center justify-center border border-slate-200 text-blue-600">
-                                            <Briefcase className="h-5 w-5" />
+                            {event.relatedTo && (
+                                <Card className="border border-slate-100 shadow-sm rounded-2xl">
+                                    <CardHeader className="pb-3">
+                                        <CardTitle className="text-base font-bold text-navy">مرتبط بـ</CardTitle>
+                                    </CardHeader>
+                                    <CardContent className="space-y-4">
+                                        <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-xl border border-slate-100">
+                                            <div className="w-10 h-10 rounded-lg bg-white flex items-center justify-center border border-slate-200 text-blue-600">
+                                                <Briefcase className="h-5 w-5" />
+                                            </div>
+                                            <div>
+                                                <div className="text-sm font-bold text-navy line-clamp-1" title={event.relatedTo.title}>{event.relatedTo.title}</div>
+                                                <div className="text-xs text-slate-500 font-medium">{event.relatedTo.id}</div>
+                                            </div>
                                         </div>
-                                        <div>
-                                            <div className="text-sm font-bold text-navy line-clamp-1" title={event.relatedTo.title}>{event.relatedTo.title}</div>
-                                            <div className="text-xs text-slate-500 font-medium">{event.relatedTo.id}</div>
-                                        </div>
-                                    </div>
-                                </CardContent>
-                            </Card>
+                                    </CardContent>
+                                </Card>
+                            )}
                         </div>
 
                         {/* CENTER CONTENT */}
@@ -285,6 +366,7 @@ export function EventDetailsView() {
                         </div>
                     </div>
                 </div>
+                )}
             </Main>
         </>
     )
