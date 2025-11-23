@@ -8,7 +8,8 @@ import { useNavigate } from '@tanstack/react-router'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { IconBrandGithub, IconBrandGoogle } from '@tabler/icons-react'
+import { IconBrandGoogle } from '@tabler/icons-react'
+import { useTranslation } from 'react-i18next'
 import {
   Form,
   FormControl,
@@ -26,22 +27,27 @@ import { useAuthStore } from '@/stores/auth-store'
 interface UserAuthFormProps extends HTMLAttributes<HTMLDivElement> {}
 
 /**
- * Form validation schema
+ * Form validation schema factory
+ * We'll create this dynamically to support i18n messages
  */
-const formSchema = z.object({
-  username: z
-    .string()
-    .min(1, { message: 'الرجاء إدخال اسم المستخدم أو البريد الإلكتروني' }),
-  password: z
-    .string()
-    .min(1, { message: 'الرجاء إدخال كلمة المرور' })
-    .min(6, { message: 'كلمة المرور يجب أن تكون 6 أحرف على الأقل' }),
-})
+const createFormSchema = (t: any) =>
+  z.object({
+    username: z
+      .string()
+      .min(1, { message: t('auth.signIn.validation.usernameOrEmailRequired') }),
+    password: z
+      .string()
+      .min(1, { message: t('auth.signIn.validation.passwordRequired') })
+      .min(6, { message: t('auth.signIn.validation.passwordMinLength') }),
+  })
 
 export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
   const navigate = useNavigate()
+  const { t } = useTranslation()
   const { login, error: authError, clearError } = useAuthStore()
   const [isLoading, setIsLoading] = useState(false)
+
+  const formSchema = createFormSchema(t)
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -65,7 +71,7 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
       const user = useAuthStore.getState().user
 
       if (!user) {
-        throw new Error('فشل تسجيل الدخول')
+        throw new Error(t('auth.signIn.error'))
       }
 
       // Redirect based on role
@@ -95,10 +101,10 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
               name='username'
               render={({ field }) => (
                 <FormItem className='space-y-1'>
-                  <FormLabel>اسم المستخدم أو البريد الإلكتروني</FormLabel>
+                  <FormLabel>{t('auth.signIn.usernameOrEmail')}</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder='ahmad_salem أو ahmad@example.com'
+                      placeholder={t('auth.signIn.usernameOrEmailPlaceholder')}
                       dir='auto'
                       {...field}
                     />
@@ -115,18 +121,21 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
               render={({ field }) => (
                 <FormItem className='space-y-1'>
                   <div className='flex items-center justify-between'>
-                    <FormLabel>كلمة المرور</FormLabel>
+                    <FormLabel>{t('auth.signIn.password')}</FormLabel>
                     <Button
                       variant='link'
                       className='h-auto p-0 text-sm font-normal'
                       onClick={() => navigate({ to: '/forgot-password' })}
                       type='button'
                     >
-                      نسيت كلمة المرور؟
+                      {t('auth.signIn.forgotPassword')}
                     </Button>
                   </div>
                   <FormControl>
-                    <PasswordInput placeholder='••••••••' {...field} />
+                    <PasswordInput
+                      placeholder={t('auth.signIn.passwordPlaceholder')}
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -142,7 +151,9 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
 
             {/* Submit Button */}
             <Button type='submit' className='mt-2' disabled={isLoading}>
-              {isLoading ? 'جارٍ تسجيل الدخول...' : 'تسجيل الدخول'}
+              {isLoading
+                ? t('auth.signIn.signingIn')
+                : t('auth.signIn.signInButton')}
             </Button>
 
             {/* Divider */}
@@ -152,46 +163,35 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
               </div>
               <div className='relative flex justify-center text-xs uppercase'>
                 <span className='bg-background px-2 text-muted-foreground'>
-                  أو تابع بـ
+                  {t('auth.signIn.orContinueWith')}
                 </span>
               </div>
             </div>
 
             {/* Social Login Buttons */}
-            <div className='flex gap-2'>
-              <Button
-                variant='outline'
-                className='w-full'
-                type='button'
-                disabled={isLoading}
-              >
-                <IconBrandGithub className='mr-2 h-4 w-4' />
-                GitHub
-              </Button>
-              <Button
-                variant='outline'
-                className='w-full'
-                type='button'
-                disabled={isLoading}
-              >
-                <IconBrandGoogle className='mr-2 h-4 w-4' />
-                Google
-              </Button>
-            </div>
+            <Button
+              variant='outline'
+              className='w-full'
+              type='button'
+              disabled={isLoading}
+            >
+              <IconBrandGoogle className='mr-2 h-4 w-4' />
+              {t('auth.signIn.google')}
+            </Button>
           </div>
         </form>
       </Form>
 
       {/* Sign Up Link */}
       <p className='text-center text-sm text-muted-foreground'>
-        ليس لديك حساب؟{' '}
+        {t('auth.signIn.noAccount')}{' '}
         <Button
           variant='link'
           className='h-auto p-0 font-semibold underline-offset-4 hover:underline'
           onClick={() => navigate({ to: '/sign-up' })}
           type='button'
         >
-          سجل الآن
+          {t('auth.signIn.registerNow')}
         </Button>
       </p>
     </div>

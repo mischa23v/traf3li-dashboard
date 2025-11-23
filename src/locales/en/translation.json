@@ -50,18 +50,25 @@
       "privacyPolicy": "Privacy Policy",
       "email": "Email",
       "emailPlaceholder": "name@example.com",
+      "username": "Username",
+      "usernameOrEmail": "Username or Email",
+      "usernameOrEmailPlaceholder": "ahmad_salem or ahmad@example.com",
       "password": "Password",
-      "passwordPlaceholder": "********",
+      "passwordPlaceholder": "••••••••",
       "forgotPassword": "Forgot password?",
       "signInButton": "Sign in",
       "signingIn": "Signing in...",
       "orContinueWith": "Or continue with",
+      "google": "Google",
       "github": "GitHub",
       "facebook": "Facebook",
+      "noAccount": "Don't have an account?",
+      "registerNow": "Register now",
       "validation": {
         "emailRequired": "Please enter your email",
+        "usernameOrEmailRequired": "Please enter your username or email",
         "passwordRequired": "Please enter your password",
-        "passwordMinLength": "Password must be at least 7 characters long"
+        "passwordMinLength": "Password must be at least 6 characters long"
       },
       "welcomeBack": "Welcome back, {{email}}!",
       "error": "Error"
