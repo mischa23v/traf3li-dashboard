@@ -42,6 +42,7 @@ export function CreateTransactionView() {
             description: formData.description,
             type: formData.type,
             amount: Number(formData.amount),
+            category: 'general',
             date: formData.date,
             fromAccount: formData.fromAccount,
             ...(formData.toAccount && { toAccount: formData.toAccount }),

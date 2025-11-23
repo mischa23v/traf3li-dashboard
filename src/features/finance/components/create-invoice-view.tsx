@@ -52,6 +52,12 @@ export function CreateInvoiceView() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
 
+        // Calculate totals
+        const subtotal = items.reduce((sum, item) => sum + (item.quantity * item.price), 0)
+        const vatRate = 0.15
+        const vatAmount = subtotal * vatRate
+        const totalAmount = subtotal + vatAmount
+
         const invoiceData = {
             invoiceNumber: formData.invoiceNumber,
             clientId: formData.clientId,
@@ -60,8 +66,13 @@ export function CreateInvoiceView() {
             items: items.map(item => ({
                 description: item.description,
                 quantity: item.quantity,
-                price: item.price,
+                unitPrice: item.price,
+                total: item.quantity * item.price,
             })),
+            subtotal,
+            vatRate,
+            vatAmount,
+            totalAmount,
             notes: formData.notes,
         }
 

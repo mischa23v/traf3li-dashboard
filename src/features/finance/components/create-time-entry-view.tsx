@@ -39,12 +39,20 @@ export function CreateTimeEntryView() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
 
+        // Calculate duration in hours
+        const start = new Date(`2000-01-01T${formData.startTime}`)
+        const end = new Date(`2000-01-01T${formData.endTime}`)
+        const durationHours = (end.getTime() - start.getTime()) / (1000 * 60 * 60)
+
         const timeEntryData = {
             description: formData.description,
             caseId: formData.caseId,
+            clientId: '', // Will be populated from case
             date: formData.date,
             startTime: formData.startTime,
             endTime: formData.endTime,
+            duration: durationHours,
+            hourlyRate: 0,
             isBillable: formData.isBillable,
             notes: formData.notes,
         }

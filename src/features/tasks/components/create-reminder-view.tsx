@@ -45,6 +45,8 @@ export function CreateReminderView() {
             title: formData.title,
             type: formData.type,
             priority: formData.priority,
+            reminderDate: formData.dueDate,
+            reminderTime: formData.time,
             dueDate: formData.dueDate,
             time: formData.time,
             message: formData.description,

@@ -159,9 +159,9 @@ export function Dashboard() {
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold text-navy">{stats?.revenue.current.toLocaleString('ar-SA')} ر.س</div>
-                  <p className={`text-xs flex items-center mt-1 font-bold ${stats?.revenue.percentageChange >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                    {stats?.revenue.percentageChange >= 0 ? <ArrowUpRight className="h-3 w-3 ml-1" /> : <ArrowDownRight className="h-3 w-3 ml-1" />}
-                    {Math.abs(stats?.revenue.percentageChange || 0)}% من الشهر الماضي
+                  <p className={`text-xs flex items-center mt-1 font-bold ${(stats?.revenue.percentageChange ?? 0) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                    {(stats?.revenue.percentageChange ?? 0) >= 0 ? <ArrowUpRight className="h-3 w-3 ml-1" /> : <ArrowDownRight className="h-3 w-3 ml-1" />}
+                    {Math.abs(stats?.revenue.percentageChange ?? 0)}% من الشهر الماضي
                   </p>
                 </CardContent>
               </Card>

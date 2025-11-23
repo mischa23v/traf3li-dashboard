@@ -49,7 +49,7 @@ export function CreateEventView() {
         const eventData = {
             title: formData.title,
             type: formData.type,
-            date: formData.date,
+            startDate: formData.date,
             time: formData.time,
             location: formData.location,
             attendees: attendeesList,

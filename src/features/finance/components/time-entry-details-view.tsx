@@ -41,11 +41,23 @@ export function TimeEntryDetailsView() {
         const minutes = Math.round(((e.hours || 0) - hours) * 60)
         const duration = `${hours}h ${minutes}m`
 
+        // Type narrow clientId and userId
+        const clientName = typeof e.clientId === 'string' ? e.clientId : 'عميل غير محدد'
+        const lawyerName = typeof e.lawyerId === 'string'
+            ? e.lawyerId
+            : `${e.lawyerId?.firstName || ''} ${e.lawyerId?.lastName || ''}`.trim() || 'غير محدد'
+        const userIdName = !e.userId
+            ? 'غير محدد'
+            : typeof e.userId === 'string'
+            ? e.userId
+            : `${e.userId.firstName || ''} ${e.userId.lastName || ''}`.trim() || 'غير محدد'
+
         return {
             id: e._id,
             task: e.description || 'مهمة غير محددة',
-            client: e.clientId?.name || e.clientId?.firstName + ' ' + e.clientId?.lastName || 'عميل غير محدد',
-            lawyer: e.userId?.firstName + ' ' + e.userId?.lastName || 'غير محدد',
+            client: clientName,
+            lawyer: lawyerName,
+            userId: userIdName,
             date: new Date(e.date).toLocaleDateString('ar-SA'),
             startTime: e.startTime ? new Date(e.startTime).toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' }) : 'N/A',
             endTime: e.endTime ? new Date(e.endTime).toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' }) : 'N/A',

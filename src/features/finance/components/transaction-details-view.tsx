@@ -49,7 +49,10 @@ export function TransactionDetailsView() {
             category: txn.category,
             invoiceId: txn.invoiceId,
             expenseId: txn.expenseId,
+            bank: txn.bank,
+            account: txn.account,
             notes: txn.notes,
+            history: txn.history || []
         }
     }, [transactionData])
 

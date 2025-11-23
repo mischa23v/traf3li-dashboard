@@ -20,7 +20,7 @@ import { Main } from '@/components/layout/main'
 import { Link, useNavigate } from '@tanstack/react-router'
 import { FinanceSidebar } from './finance-sidebar'
 import { useCreateStatement } from '@/hooks/useFinance'
-import { useClients } from '@/hooks/useClients'
+import { useClients } from '@/hooks/useCasesAndClients'
 
 export function CreateStatementView() {
     const navigate = useNavigate()
