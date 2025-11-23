@@ -157,51 +157,6 @@ const corsOptions = {
 
 ---
 
-## Nginx Configuration (if using reverse proxy)
-
-If you're using Nginx as a reverse proxy:
-
-```nginx
-server {
-    listen 443 ssl;
-    server_name api.traf3li.com;
-
-    # ... SSL configuration ...
-
-    location / {
-        # CORS headers
-        add_header 'Access-Control-Allow-Origin' 'https://traf3li-dashboard-9e4y2s2su-mischa-alrabehs-projects.vercel.app' always;
-        add_header 'Access-Control-Allow-Credentials' 'true' always;
-        add_header 'Access-Control-Allow-Methods' 'GET, POST, PUT, PATCH, DELETE, OPTIONS' always;
-        add_header 'Access-Control-Allow-Headers' 'Content-Type, Authorization, X-Requested-With, Accept, Origin' always;
-
-        # Handle preflight requests
-        if ($request_method = 'OPTIONS') {
-            add_header 'Access-Control-Allow-Origin' 'https://traf3li-dashboard-9e4y2s2su-mischa-alrabehs-projects.vercel.app' always;
-            add_header 'Access-Control-Allow-Credentials' 'true' always;
-            add_header 'Access-Control-Allow-Methods' 'GET, POST, PUT, PATCH, DELETE, OPTIONS' always;
-            add_header 'Access-Control-Allow-Headers' 'Content-Type, Authorization, X-Requested-With, Accept, Origin' always;
-            add_header 'Access-Control-Max-Age' 86400;
-            add_header 'Content-Length' 0;
-            add_header 'Content-Type' 'text/plain charset=UTF-8';
-            return 204;
-        }
-
-        proxy_pass http://localhost:8080;
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection 'upgrade';
-        proxy_set_header Host $host;
-        proxy_cache_bypass $http_upgrade;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-    }
-}
-```
-
----
-
 ## Testing CORS Configuration
 
 After applying the configuration:
