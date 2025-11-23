@@ -266,7 +266,7 @@ export default function ExpensesDashboard() {
                 <div className="max-w-7xl mx-auto space-y-6">
 
                     {/* Hero Section - Contained Navy Card */}
-                    <div className="bg-navy rounded-3xl p-8 relative overflow-hidden text-white shadow-xl shadow-navy/20 mb-8">
+                    <div className="bg-[#022c22] rounded-3xl p-8 relative overflow-hidden text-white shadow-xl shadow-[#022c22]/20 mb-8">
                         {/* Background Effects */}
                         <div className="absolute top-0 left-0 w-full h-full overflow-hidden z-0 pointer-events-none">
                             <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-brand-blue/20 rounded-full blur-[100px]"></div>
@@ -348,7 +348,7 @@ export default function ExpensesDashboard() {
                                 </div>
                                 <div className="space-y-1">
                                     <h3 className="text-slate-500 text-sm">مصروفات معلقة</h3>
-                                    <div className="text-2xl font-bold text-navy">{formatCurrency(pendingExpenses)}</div>
+                                    <div className="text-2xl font-bold text-[#022c22]">{formatCurrency(pendingExpenses)}</div>
                                 </div>
                                 <Progress value={(pendingExpenses / totalExpenses) * 100} className="h-1.5 mt-4 bg-slate-100" indicatorClassName="bg-amber-500" />
                             </CardContent>
@@ -367,7 +367,7 @@ export default function ExpensesDashboard() {
                                 </div>
                                 <div className="space-y-1">
                                     <h3 className="text-slate-500 text-sm">المتبقي من الميزانية</h3>
-                                    <div className="text-2xl font-bold text-navy">45%</div>
+                                    <div className="text-2xl font-bold text-[#022c22]">45%</div>
                                 </div>
                                 <Progress value={55} className="h-1.5 mt-4 bg-slate-100" indicatorClassName="bg-blue-500" />
                             </CardContent>
@@ -386,7 +386,7 @@ export default function ExpensesDashboard() {
                                 </div>
                                 <div className="space-y-1">
                                     <h3 className="text-slate-500 text-sm">متوسط الصرف اليومي</h3>
-                                    <div className="text-2xl font-bold text-navy">{formatCurrency(totalExpenses / 30)}</div>
+                                    <div className="text-2xl font-bold text-[#022c22]">{formatCurrency(totalExpenses / 30)}</div>
                                 </div>
                                 <Progress value={30} className="h-1.5 mt-4 bg-slate-100" indicatorClassName="bg-purple-500" />
                             </CardContent>
@@ -403,7 +403,7 @@ export default function ExpensesDashboard() {
                                     <TabsList className="justify-start bg-slate-50 p-1 rounded-xl border border-slate-200 h-auto">
                                         <TabsTrigger
                                             value="all"
-                                            className="rounded-lg px-4 py-2 data-[state=active]:bg-navy data-[state=active]:text-white transition-all duration-300"
+                                            className="rounded-lg px-4 py-2 data-[state=active]:bg-[#022c22] data-[state=active]:text-white transition-all duration-300"
                                         >
                                             الكل
                                         </TabsTrigger>
@@ -433,7 +433,7 @@ export default function ExpensesDashboard() {
                                         <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                                         <Input
                                             placeholder="بحث في المصروفات..."
-                                            className="pr-10 rounded-xl border-slate-200 focus:ring-navy focus:border-navy"
+                                            className="pr-10 rounded-xl border-slate-200 focus:ring-[#022c22] focus:border-[#022c22]"
                                             value={searchQuery}
                                             onChange={(e) => setSearchQuery(e.target.value)}
                                         />
@@ -457,7 +457,7 @@ export default function ExpensesDashboard() {
                                                     </div>
                                                     <div>
                                                         <div className="flex items-center gap-2 mb-1">
-                                                            <h4 className="font-bold text-navy text-lg">{expense.description}</h4>
+                                                            <h4 className="font-bold text-[#022c22] text-lg">{expense.description}</h4>
                                                             <Badge className={`${expense.statusColor} border-0 px-2 rounded-md`}>
                                                                 {expense.status}
                                                             </Badge>
@@ -467,7 +467,7 @@ export default function ExpensesDashboard() {
                                                 </div>
                                                 <DropdownMenu>
                                                     <DropdownMenuTrigger asChild>
-                                                        <Button variant="ghost" size="icon" className="text-slate-400 hover:text-navy">
+                                                        <Button variant="ghost" size="icon" className="text-slate-400 hover:text-[#022c22]">
                                                             <MoreHorizontal className="h-5 w-5" />
                                                         </Button>
                                                     </DropdownMenuTrigger>
@@ -483,16 +483,16 @@ export default function ExpensesDashboard() {
                                                 <div className="flex items-center gap-6">
                                                     <div className="text-center">
                                                         <div className="text-xs text-slate-400 mb-1">المبلغ</div>
-                                                        <div className="font-bold text-navy text-lg">{formatCurrency(expense.amount)}</div>
+                                                        <div className="font-bold text-[#022c22] text-lg">{formatCurrency(expense.amount)}</div>
                                                     </div>
                                                     <div className="text-center">
                                                         <div className="text-xs text-slate-400 mb-1">التاريخ</div>
-                                                        <div className="font-bold text-navy">{expense.date}</div>
+                                                        <div className="font-bold text-[#022c22]">{expense.date}</div>
                                                     </div>
                                                     {expense.caseName && (
                                                         <div className="text-center hidden sm:block">
                                                             <div className="text-xs text-slate-400 mb-1">القضية</div>
-                                                            <div className="font-bold text-navy text-sm">{expense.caseName}</div>
+                                                            <div className="font-bold text-[#022c22] text-sm">{expense.caseName}</div>
                                                         </div>
                                                     )}
                                                 </div>
@@ -513,7 +513,7 @@ export default function ExpensesDashboard() {
                             {/* Category Distribution */}
                             <Card className="border-none shadow-sm bg-white rounded-3xl overflow-hidden hover:shadow-md transition-all duration-300">
                                 <CardHeader className="border-b border-slate-100 pb-4">
-                                    <CardTitle className="text-lg font-bold text-navy flex items-center gap-2">
+                                    <CardTitle className="text-lg font-bold text-[#022c22] flex items-center gap-2">
                                         <PieChart className="w-5 h-5 text-brand-blue" />
                                         توزيع المصروفات
                                     </CardTitle>
@@ -525,7 +525,7 @@ export default function ExpensesDashboard() {
                                         .map(([category, data]: any, idx) => (
                                             <div key={idx} className="space-y-2">
                                                 <div className="flex justify-between text-sm">
-                                                    <span className="font-bold text-navy">{category}</span>
+                                                    <span className="font-bold text-[#022c22]">{category}</span>
                                                     <span className="text-slate-500">{formatCurrency(data.total)}</span>
                                                 </div>
                                                 <Progress
@@ -541,7 +541,7 @@ export default function ExpensesDashboard() {
                             {/* Recent Activity (Simplified) */}
                             <Card className="border-none shadow-sm bg-white rounded-3xl overflow-hidden hover:shadow-md transition-all duration-300">
                                 <CardHeader className="border-b border-slate-100 pb-4">
-                                    <CardTitle className="text-lg font-bold text-navy flex items-center gap-2">
+                                    <CardTitle className="text-lg font-bold text-[#022c22] flex items-center gap-2">
                                         <Clock className="w-5 h-5 text-amber-500" />
                                         آخر النشاطات
                                     </CardTitle>
@@ -551,7 +551,7 @@ export default function ExpensesDashboard() {
                                         <div key={idx} className="flex items-start gap-3 p-3 rounded-xl bg-slate-50 border border-slate-100 hover:bg-slate-100 transition-colors">
                                             <div className="w-2 h-2 rounded-full mt-2 shrink-0 bg-emerald-500"></div>
                                             <div>
-                                                <div className="font-bold text-navy text-sm">تم دفع {exp.description}</div>
+                                                <div className="font-bold text-[#022c22] text-sm">تم دفع {exp.description}</div>
                                                 <div className="text-xs text-slate-500 mt-0.5">{exp.date}</div>
                                             </div>
                                         </div>
