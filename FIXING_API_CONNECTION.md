@@ -124,26 +124,21 @@ One of these is true:
 
 **📖 Detailed Test Results:** See [`CORS_TEST_RESULTS.md`](./CORS_TEST_RESULTS.md)
 
-**What I need from you:**
+**📖 Render.com Deployment Guide:** See [`RENDER_DEPLOYMENT_GUIDE.md`](./RENDER_DEPLOYMENT_GUIDE.md) ⭐ **START HERE**
 
-1. **Where is `api.traf3li.com` hosted?**
-   - Render.com?
-   - Railway.app?
-   - AWS?
-   - Google Cloud?
-   - Other?
+### ✅ Hosting Platform: Render.com
 
-2. **Is the backend deployed?**
-   - When did you last deploy?
-   - Is it currently running?
-   - How do you deploy? (git push, manual, Docker, etc.)
+**Backend is hosted on Render.com!**
 
-3. **Can you access the hosting platform?**
-   - Do you have dashboard access?
-   - Can you see logs?
-   - Can you restart the server?
+**Quick Deploy Steps:**
 
-**Once you provide this info, I can give you exact deployment steps!**
+1. Go to https://dashboard.render.com
+2. Find your backend service
+3. Click **"Manual Deploy"** → **"Deploy latest commit"**
+4. Wait 2-3 minutes
+5. Run `./test-cors.sh` to verify
+
+**See [`RENDER_DEPLOYMENT_GUIDE.md`](./RENDER_DEPLOYMENT_GUIDE.md) for complete step-by-step instructions!**
 
 ---
 
