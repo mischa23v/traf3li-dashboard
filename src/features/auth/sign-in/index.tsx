@@ -8,16 +8,21 @@ import {
 } from '@/components/ui/card'
 import { AuthLayout } from '../auth-layout'
 import { UserAuthForm } from './components/user-auth-form'
+import { useTranslation } from 'react-i18next'
 
 export function SignIn() {
+  const { t } = useTranslation()
+
   return (
     <AuthLayout>
       <Card className='gap-4'>
         <CardHeader>
-          <CardTitle className='text-lg tracking-tight'>Sign in</CardTitle>
+          <CardTitle className='text-lg tracking-tight'>
+            {t('auth.signIn.title')}
+          </CardTitle>
           <CardDescription>
-            Enter your email and password below to <br />
-            log into your account
+            {t('auth.signIn.subtitle')} <br />
+            {t('auth.signIn.toLogIn')}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -25,19 +30,19 @@ export function SignIn() {
         </CardContent>
         <CardFooter>
           <p className='text-muted-foreground px-8 text-center text-sm'>
-            By clicking sign in, you agree to our{' '}
+            {t('auth.signIn.termsPrefix')}{' '}
             <a
               href='/terms'
               className='hover:text-primary underline underline-offset-4'
             >
-              Terms of Service
+              {t('auth.signIn.termsOfService')}
             </a>{' '}
-            and{' '}
+            {t('auth.signIn.and')}{' '}
             <a
               href='/privacy'
               className='hover:text-primary underline underline-offset-4'
             >
-              Privacy Policy
+              {t('auth.signIn.privacyPolicy')}
             </a>
             .
           </p>

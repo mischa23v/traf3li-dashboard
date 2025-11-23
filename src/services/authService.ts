@@ -68,15 +68,53 @@ interface AuthResponse {
 }
 
 /**
+ * DEVELOPMENT ONLY: Test credentials
+ * Remove this in production!
+ */
+const TEST_CREDENTIALS = {
+  username: 'test',
+  email: 'test@example.com',
+  password: 'test123',
+}
+
+const TEST_USER: User = {
+  _id: 'test-user-id',
+  username: 'test',
+  email: 'test@example.com',
+  role: 'admin',
+  country: 'SA',
+  phone: '+966500000000',
+  description: 'Test user account',
+  isSeller: false,
+  createdAt: new Date().toISOString(),
+  updatedAt: new Date().toISOString(),
+}
+
+/**
  * Auth Service Object
  */
 const authService = {
   /**
    * Login user
    * Backend sets HttpOnly cookie automatically
+   *
+   * DEVELOPMENT: Supports test credentials (test/test123)
    */
   login: async (credentials: LoginCredentials): Promise<User> => {
     try {
+      // DEVELOPMENT ONLY: Check for test credentials
+      const isTestCredentials =
+        (credentials.username === TEST_CREDENTIALS.username ||
+          credentials.username === TEST_CREDENTIALS.email) &&
+        credentials.password === TEST_CREDENTIALS.password
+
+      if (isTestCredentials) {
+        console.log('🧪 Using test credentials - Development mode')
+        localStorage.setItem('user', JSON.stringify(TEST_USER))
+        return TEST_USER
+      }
+
+      // Production login flow
       const response = await apiClient.post<AuthResponse>(
         '/api/auth/login',
         credentials
