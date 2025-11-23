@@ -285,6 +285,66 @@ export default function AccountActivityDashboard() {
                         </div>
                     </div>
 
+                    {/* Stats Grid - Remaining Metrics */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        {/* Total Activities Card */}
+                        <Card className="border-none shadow-sm bg-white rounded-3xl overflow-hidden group hover:shadow-md transition-all duration-300">
+                            <CardContent className="p-6">
+                                <div className="flex justify-between items-start mb-4">
+                                    <div className="w-12 h-12 rounded-2xl bg-purple-50 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                                        <Activity className="w-6 h-6 text-purple-600" />
+                                    </div>
+                                    <Badge variant="outline" className="bg-purple-50 text-purple-700 border-purple-100">
+                                        نشاط
+                                    </Badge>
+                                </div>
+                                <div className="space-y-1">
+                                    <h3 className="text-slate-500 text-sm">إجمالي النشاطات</h3>
+                                    <div className="text-2xl font-bold text-[#022c22]">{activities.length} حركة</div>
+                                </div>
+                                <Progress value={65} className="h-1.5 mt-4 bg-slate-100" indicatorClassName="bg-purple-500" />
+                            </CardContent>
+                        </Card>
+
+                        {/* Payments Count Card */}
+                        <Card className="border-none shadow-sm bg-white rounded-3xl overflow-hidden group hover:shadow-md transition-all duration-300">
+                            <CardContent className="p-6">
+                                <div className="flex justify-between items-start mb-4">
+                                    <div className="w-12 h-12 rounded-2xl bg-emerald-50 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                                        <Check className="w-6 h-6 text-emerald-600" />
+                                    </div>
+                                    <Badge variant="outline" className="bg-emerald-50 text-emerald-700 border-emerald-100">
+                                        دفعات
+                                    </Badge>
+                                </div>
+                                <div className="space-y-1">
+                                    <h3 className="text-slate-500 text-sm">الدفعات المكتملة</h3>
+                                    <div className="text-2xl font-bold text-[#022c22]">{activities.filter(a => a.type === 'payment_received').length}</div>
+                                </div>
+                                <Progress value={(activities.filter(a => a.type === 'payment_received').length / activities.length) * 100} className="h-1.5 mt-4 bg-slate-100" indicatorClassName="bg-emerald-500" />
+                            </CardContent>
+                        </Card>
+
+                        {/* Active Users Card */}
+                        <Card className="border-none shadow-sm bg-white rounded-3xl overflow-hidden group hover:shadow-md transition-all duration-300">
+                            <CardContent className="p-6">
+                                <div className="flex justify-between items-start mb-4">
+                                    <div className="w-12 h-12 rounded-2xl bg-blue-50 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                                        <User className="w-6 h-6 text-blue-600" />
+                                    </div>
+                                    <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-100">
+                                        مستخدمون
+                                    </Badge>
+                                </div>
+                                <div className="space-y-1">
+                                    <h3 className="text-slate-500 text-sm">المستخدمون النشطون</h3>
+                                    <div className="text-2xl font-bold text-[#022c22]">{activeUsers.length} مستخدم</div>
+                                </div>
+                                <Progress value={75} className="h-1.5 mt-4 bg-slate-100" indicatorClassName="bg-blue-500" />
+                            </CardContent>
+                        </Card>
+                    </div>
+
                     {/* Main Content Area */}
                     <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
                         {/* Activity Feed */}

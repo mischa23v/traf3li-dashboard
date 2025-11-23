@@ -306,6 +306,66 @@ export default function TransactionsDashboard() {
                         </div>
                     </div>
 
+                    {/* Stats Grid - Remaining Metrics */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        {/* Net Profit Card */}
+                        <Card className="border-none shadow-sm bg-white rounded-3xl overflow-hidden group hover:shadow-md transition-all duration-300">
+                            <CardContent className="p-6">
+                                <div className="flex justify-between items-start mb-4">
+                                    <div className="w-12 h-12 rounded-2xl bg-emerald-50 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                                        <TrendingUp className="w-6 h-6 text-emerald-600" />
+                                    </div>
+                                    <Badge variant="outline" className="bg-emerald-50 text-emerald-700 border-emerald-100">
+                                        صافي
+                                    </Badge>
+                                </div>
+                                <div className="space-y-1">
+                                    <h3 className="text-slate-500 text-sm">صافي الربح</h3>
+                                    <div className="text-2xl font-bold text-[#022c22]">{formatCurrency(netProfit)}</div>
+                                </div>
+                                <Progress value={(netProfit / totalIncome) * 100} className="h-1.5 mt-4 bg-slate-100" indicatorClassName="bg-emerald-500" />
+                            </CardContent>
+                        </Card>
+
+                        {/* Total Income Card */}
+                        <Card className="border-none shadow-sm bg-white rounded-3xl overflow-hidden group hover:shadow-md transition-all duration-300">
+                            <CardContent className="p-6">
+                                <div className="flex justify-between items-start mb-4">
+                                    <div className="w-12 h-12 rounded-2xl bg-blue-50 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                                        <ArrowUpRight className="w-6 h-6 text-blue-600" />
+                                    </div>
+                                    <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-100">
+                                        دخل
+                                    </Badge>
+                                </div>
+                                <div className="space-y-1">
+                                    <h3 className="text-slate-500 text-sm">إجمالي الدخل</h3>
+                                    <div className="text-2xl font-bold text-[#022c22]">{formatCurrency(totalIncome)}</div>
+                                </div>
+                                <Progress value={(totalIncome / (totalIncome + totalExpenses)) * 100} className="h-1.5 mt-4 bg-slate-100" indicatorClassName="bg-blue-500" />
+                            </CardContent>
+                        </Card>
+
+                        {/* Total Expenses Card */}
+                        <Card className="border-none shadow-sm bg-white rounded-3xl overflow-hidden group hover:shadow-md transition-all duration-300">
+                            <CardContent className="p-6">
+                                <div className="flex justify-between items-start mb-4">
+                                    <div className="w-12 h-12 rounded-2xl bg-red-50 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                                        <ArrowDownRight className="w-6 h-6 text-red-600" />
+                                    </div>
+                                    <Badge variant="outline" className="bg-red-50 text-red-700 border-red-100">
+                                        مصروف
+                                    </Badge>
+                                </div>
+                                <div className="space-y-1">
+                                    <h3 className="text-slate-500 text-sm">إجمالي المصروفات</h3>
+                                    <div className="text-2xl font-bold text-[#022c22]">{formatCurrency(totalExpenses)}</div>
+                                </div>
+                                <Progress value={(totalExpenses / (totalIncome + totalExpenses)) * 100} className="h-1.5 mt-4 bg-slate-100" indicatorClassName="bg-red-500" />
+                            </CardContent>
+                        </Card>
+                    </div>
+
                     {/* Main Content Area */}
                     <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
                         {/* Transactions List */}
@@ -365,7 +425,7 @@ export default function TransactionsDashboard() {
                                                     </div>
                                                     <div>
                                                         <div className="flex items-center gap-2 mb-1">
-                                                            <h4 className="font-bold text-navy text-lg">{txn.description}</h4>
+                                                            <h4 className="font-bold text-[#022c22] text-lg">{txn.description}</h4>
                                                             <Badge variant="outline" className={`${isIncome ? 'text-emerald-600 border-emerald-200 bg-emerald-50' : 'text-red-600 border-red-200 bg-red-50'} border px-2 rounded-md`}>
                                                                 {isIncome ? 'دخل' : 'مصروف'}
                                                             </Badge>
@@ -375,7 +435,7 @@ export default function TransactionsDashboard() {
                                                 </div>
                                                 <DropdownMenu>
                                                     <DropdownMenuTrigger asChild>
-                                                        <Button variant="ghost" size="icon" className="text-slate-400 hover:text-navy">
+                                                        <Button variant="ghost" size="icon" className="text-slate-400 hover:text-[#022c22]">
                                                             <MoreHorizontal className="h-5 w-5" />
                                                         </Button>
                                                     </DropdownMenuTrigger>
@@ -400,14 +460,14 @@ export default function TransactionsDashboard() {
                                                     </div>
                                                     <div className="text-center">
                                                         <div className="text-xs text-slate-400 mb-1">التاريخ</div>
-                                                        <div className="font-bold text-navy">{txn.date}</div>
+                                                        <div className="font-bold text-[#022c22]">{txn.date}</div>
                                                     </div>
                                                     <div className="text-center hidden sm:block">
                                                         <div className="text-xs text-slate-400 mb-1">طريقة الدفع</div>
-                                                        <div className="font-bold text-navy text-sm">{txn.paymentMethod}</div>
+                                                        <div className="font-bold text-[#022c22] text-sm">{txn.paymentMethod}</div>
                                                     </div>
                                                 </div>
-                                                <Button asChild variant="ghost" className="text-slate-500 hover:text-navy hover:bg-slate-100 rounded-lg">
+                                                <Button asChild variant="ghost" className="text-slate-500 hover:text-[#022c22] hover:bg-slate-100 rounded-lg">
                                                     <Link to="/dashboard/finance/transactions/$transactionId" params={{ transactionId: txn.id }}>
                                                         عرض
                                                     </Link>
@@ -424,7 +484,7 @@ export default function TransactionsDashboard() {
                             {/* Net Profit Card */}
                             <Card className="border-none shadow-sm bg-white rounded-3xl overflow-hidden hover:shadow-md transition-all duration-300">
                                 <CardHeader className="border-b border-slate-100 pb-4">
-                                    <CardTitle className="text-lg font-bold text-navy flex items-center gap-2">
+                                    <CardTitle className="text-lg font-bold text-[#022c22] flex items-center gap-2">
                                         <PieChart className="w-5 h-5 text-brand-blue" />
                                         صافي الربح
                                     </CardTitle>
@@ -434,7 +494,7 @@ export default function TransactionsDashboard() {
                                         <div className="absolute inset-0 rounded-full border-8 border-emerald-500 border-t-transparent transform -rotate-45"></div>
                                         <div className="text-center">
                                             <div className="text-xs text-slate-400">الصافي</div>
-                                            <div className="font-bold text-navy text-lg">{formatCurrency(netProfit)}</div>
+                                            <div className="font-bold text-[#022c22] text-lg">{formatCurrency(netProfit)}</div>
                                         </div>
                                     </div>
                                     <div className="grid grid-cols-2 gap-4 mt-6">
@@ -453,7 +513,7 @@ export default function TransactionsDashboard() {
                             {/* Recent Activity */}
                             <Card className="border-none shadow-sm bg-white rounded-3xl overflow-hidden hover:shadow-md transition-all duration-300">
                                 <CardHeader className="border-b border-slate-100 pb-4">
-                                    <CardTitle className="text-lg font-bold text-navy flex items-center gap-2">
+                                    <CardTitle className="text-lg font-bold text-[#022c22] flex items-center gap-2">
                                         <Calendar className="w-5 h-5 text-amber-500" />
                                         ملخص النشاط
                                     </CardTitle>
@@ -461,7 +521,7 @@ export default function TransactionsDashboard() {
                                 <CardContent className="p-6 space-y-4">
                                     <div className="flex items-center justify-between text-sm">
                                         <span className="text-slate-500">عدد المعاملات</span>
-                                        <span className="font-bold text-navy">{transactions.length}</span>
+                                        <span className="font-bold text-[#022c22]">{transactions.length}</span>
                                     </div>
                                     <div className="flex items-center justify-between text-sm">
                                         <span className="text-slate-500">أعلى دخل</span>
