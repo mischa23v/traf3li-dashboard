@@ -40,8 +40,8 @@ export function TaskDetailsView() {
 
     // Transform API data
     const task = useMemo(() => {
-        if (!taskData?.data) return null
-        const t = taskData.data
+        if (!taskData) return null
+        const t = taskData
 
         // Calculate completion percentage
         const subtasks = t.subtasks || []

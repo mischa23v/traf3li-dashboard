@@ -13,12 +13,22 @@ export interface Case {
   caseNumber: string
   title: string
   status: string
-  clientId: string
+  clientId: { _id: string; name: string } | string
   lawyerId: string
   caseType?: string
   court?: string
   priority?: string
   description?: string
+  opposingParty?: string
+  judge?: string
+  assignedTo?: { firstName: string; lastName: string }
+  filingDate?: string
+  nextHearingDate?: string
+  claimAmount?: number
+  progress?: number
+  documents?: any[]
+  tasks?: any[]
+  history?: any[]
   createdAt: string
   updatedAt: string
 }

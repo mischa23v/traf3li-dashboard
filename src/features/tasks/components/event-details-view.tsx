@@ -174,6 +174,7 @@ export function EventDetailsView() {
 
                 {/* Success State - Hero Content */}
                 {!isLoading && !isError && event && (
+                <>
                 <div className="max-w-[1600px] mx-auto bg-emerald-950 rounded-3xl p-8 shadow-xl shadow-emerald-900/20 mb-8 relative overflow-hidden">
                     {/* Background Decoration */}
                     <div className="absolute top-0 left-0 w-full h-full overflow-hidden z-0 pointer-events-none">
@@ -281,8 +282,8 @@ export function EventDetailsView() {
                                                 <Briefcase className="h-5 w-5" />
                                             </div>
                                             <div>
-                                                <div className="text-sm font-bold text-navy line-clamp-1" title={event.relatedTo.title}>{event.relatedTo.title}</div>
-                                                <div className="text-xs text-slate-500 font-medium">{event.relatedTo.id}</div>
+                                                <div className="text-sm font-bold text-navy line-clamp-1" title={event.relatedTo?.title}>{event.relatedTo?.title}</div>
+                                                <div className="text-xs text-slate-500 font-medium">{event.relatedTo?.id}</div>
                                             </div>
                                         </div>
                                     </CardContent>
@@ -366,6 +367,7 @@ export function EventDetailsView() {
                         </div>
                     </div>
                 </div>
+                </>
                 )}
             </Main>
         </>

@@ -29,6 +29,7 @@ export interface Task {
   subtasks?: Subtask[]
   attachments?: Attachment[]
   comments?: Comment[]
+  history?: any[]
   completedAt?: string
   createdAt: string
   updatedAt: string
@@ -48,8 +49,12 @@ export interface Attachment {
 }
 
 export interface Comment {
+  id?: string
   userId: string
+  user?: string
+  avatar?: string
   text: string
+  time?: string
   createdAt: string
 }
 

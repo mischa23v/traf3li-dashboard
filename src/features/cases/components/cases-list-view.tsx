@@ -48,9 +48,9 @@ export function CasesListView() {
     const { data: casesData, isLoading, isError, error, refetch } = useCases(filters)
 
     const cases = useMemo(() => {
-        if (!casesData?.data) return []
+        if (!casesData?.cases) return []
 
-        return casesData.data.map((caseItem: any) => ({
+        return casesData.cases.map((caseItem: any) => ({
             id: caseItem.caseNumber || caseItem._id,
             title: caseItem.title || 'قضية غير محددة',
             plaintiff: caseItem.clientId?.name || 'غير محدد',

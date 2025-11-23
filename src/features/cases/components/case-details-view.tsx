@@ -40,8 +40,8 @@ export function CaseDetailsView() {
     const { data: caseData, isLoading, isError, error, refetch } = useCase(caseId)
 
     const caseInfo = useMemo(() => {
-        if (!caseData?.data) return null
-        const c = caseData.data
+        if (!caseData) return null
+        const c = caseData
 
         return {
             id: c.caseNumber || c._id,
@@ -162,6 +162,7 @@ export function CaseDetailsView() {
 
                 {/* Success State - HERO BANNER */}
                 {!isLoading && !isError && caseInfo && (
+                <>
                 <div className="bg-navy rounded-3xl p-8 relative overflow-hidden text-white shadow-xl shadow-navy/20 group">
                     <div className="absolute -bottom-32 -left-32 w-96 h-96 bg-brand-blue rounded-full blur-[120px] opacity-40 group-hover:opacity-50 transition-opacity duration-700"></div>
                     <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
@@ -187,11 +188,11 @@ export function CaseDetailsView() {
                                 </div>
                                 <div className="flex items-center gap-2">
                                     <Calendar className="h-4 w-4 text-slate-400" />
-                                    <span>تاريخ الفتح: {caseInfo.startDate}</span>
+                                    <span>تاريخ الفتح: {caseInfo.filingDate}</span>
                                 </div>
                                 <div className="flex items-center gap-2">
                                     <Clock className="h-4 w-4 text-amber-400" />
-                                    <span className="text-amber-100 font-bold">الجلسة القادمة: {caseInfo.nextHearing}</span>
+                                    <span className="text-amber-100 font-bold">الجلسة القادمة: {caseInfo.nextHearingDate}</span>
                                 </div>
                             </div>
                         </div>
@@ -200,17 +201,13 @@ export function CaseDetailsView() {
                         <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-6 min-w-[300px]">
                             <div className="flex justify-between items-center mb-4">
                                 <span className="text-slate-300">نسبة الإنجاز</span>
-                                <span className="text-2xl font-bold text-brand-blue">{caseInfo.completion}%</span>
+                                <span className="text-2xl font-bold text-brand-blue">{caseInfo.progress}%</span>
                             </div>
-                            <Progress value={caseInfo.completion} className="h-2 bg-white/10 mb-6" indicatorClassName="bg-brand-blue" />
+                            <Progress value={caseInfo.progress} className="h-2 bg-white/10 mb-6" indicatorClassName="bg-brand-blue" />
                             <div className="flex justify-between items-center pt-4 border-t border-white/10">
-                                <div>
+                                <div className="w-full text-center">
                                     <div className="text-xs text-slate-400 mb-1">قيمة المطالبة</div>
-                                    <div className="font-bold text-lg">{caseInfo.claimAmount.toLocaleString()} ر.س</div>
-                                </div>
-                                <div className="text-left">
-                                    <div className="text-xs text-slate-400 mb-1">الربح المتوقع</div>
-                                    <div className="font-bold text-lg text-emerald-400">{caseInfo.expectedWin.toLocaleString()} ر.س</div>
+                                    <div className="font-bold text-xl">{caseInfo.claimAmount.toLocaleString()} ر.س</div>
                                 </div>
                             </div>
                         </div>
@@ -238,7 +235,7 @@ export function CaseDetailsView() {
                                         <div className="absolute top-2 bottom-2 right-[5px] w-0.5 bg-slate-200"></div>
 
                                         <div className="space-y-6 relative">
-                                            {timeline.map((event, i) => (
+                                            {caseInfo.timeline.map((event: any, i: number) => (
                                                 <div key={i} className="flex gap-4 relative">
                                                     <div className={`
                                                         w-3 h-3 rounded-full mt-1.5 z-10 ring-4 ring-white shrink-0
@@ -653,7 +650,7 @@ export function CaseDetailsView() {
                                     </div>
 
                                     <div className="space-y-4">
-                                        {invoices.map((invoice) => (
+                                        {([] as any[]).map((invoice: any) => (
                                             <div key={invoice.id} className="bg-white rounded-2xl p-5 border border-slate-100 hover:shadow-md transition-all group">
                                                 <div className="flex justify-between items-start mb-4">
                                                     <div className="flex items-center gap-4">
@@ -694,6 +691,7 @@ export function CaseDetailsView() {
                         </div>
                     </div>
                 </div>
+                </>
                 )}
             </Main>
         </>

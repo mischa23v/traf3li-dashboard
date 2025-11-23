@@ -38,9 +38,9 @@ export function TasksListView() {
 
     // Transform API data
     const tasks = useMemo(() => {
-        if (!tasksData?.data) return []
+        if (!tasksData?.tasks) return []
 
-        return tasksData.data.map((task: any) => ({
+        return tasksData.tasks.map((task: any) => ({
             id: task._id,
             title: task.title || task.description || 'مهمة غير محددة',
             client: task.caseId?.clientId?.name || task.clientId?.name || 'غير محدد',
