@@ -43,7 +43,7 @@ export function ExpenseDetailsView() {
             currency: 'ر.س',
             status: exp.status,
             date: new Date(exp.date).toLocaleDateString('ar-SA'),
-            paidBy: exp.userId?.name || `${exp.userId?.firstName || ''} ${exp.userId?.lastName || ''}`.trim() || 'غير محدد',
+            paidBy: typeof exp.userId === 'string' ? exp.userId : (exp.userId?.name || `${exp.userId?.firstName || ''} ${exp.userId?.lastName || ''}`.trim() || 'غير محدد'),
             receiptUrl: exp.receipts?.[0]?.fileUrl || null,
             receipts: exp.receipts || [],
             vendor: exp.vendor,
@@ -52,6 +52,7 @@ export function ExpenseDetailsView() {
             billableAmount: exp.billableAmount,
             notes: exp.notes,
             caseId: exp.caseId,
+            history: exp.history || []
         }
     }, [expenseData])
 

@@ -38,7 +38,7 @@ export function InvoiceDetailsView() {
         const inv = invoiceData
         return {
             id: inv.invoiceNumber || inv._id,
-            client: inv.clientId?.name || `${inv.clientId?.firstName || ''} ${inv.clientId?.lastName || ''}`.trim() || 'عميل غير محدد',
+            client: typeof inv.clientId === 'string' ? inv.clientId : (inv.clientId?.name || `${inv.clientId?.firstName || ''} ${inv.clientId?.lastName || ''}`.trim() || 'عميل غير محدد'),
             amount: new Intl.NumberFormat('ar-SA', { minimumFractionDigits: 2 }).format(inv.totalAmount || 0),
             currency: 'ر.س',
             status: inv.status,

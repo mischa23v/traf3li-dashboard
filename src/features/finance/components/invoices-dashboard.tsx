@@ -76,8 +76,8 @@ export default function InvoicesDashboard() {
             .filter((inv: any) => inv.status === 'pending' || inv.status === 'sent')
             .reduce((sum: number, inv: any) => sum + (inv.balanceDue || inv.totalAmount || 0), 0)
 
-        const totalOverdue = overdueData?.invoices
-            ? overdueData.invoices.reduce((sum: number, inv: any) => sum + (inv.balanceDue || inv.totalAmount || 0), 0)
+        const totalOverdue = overdueData
+            ? overdueData.reduce((sum: number, inv: any) => sum + (inv.balanceDue || inv.totalAmount || 0), 0)
             : 0
 
         const thisMonth = new Date()
