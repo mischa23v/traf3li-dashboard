@@ -1,9 +1,12 @@
 import { TasksSidebar } from './tasks-sidebar'
+import { useState, useMemo } from 'react'
 import {
     MoreHorizontal, Plus,
     Briefcase, Smartphone, Shield,
-    ChevronLeft, Search, Bell
+    ChevronLeft, Search, Bell, AlertCircle
 } from 'lucide-react'
+import { Skeleton } from '@/components/ui/skeleton'
+import { useTasks } from '@/hooks/useTasks'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Header } from '@/components/layout/header'
@@ -17,11 +20,36 @@ import { ProfileDropdown } from '@/components/profile-dropdown'
 import { Link } from '@tanstack/react-router'
 
 export function TasksListView() {
-    const tasks = [
-        { id: '1', title: 'مراجعة مسودة العقد النهائي', client: 'شركة الإنشاءات', deadline: 'اليوم', priority: 'high', status: 'active' },
-        { id: '2', title: 'اجتماع تحضيري للقضية 452', client: 'مجموعة العقارية', deadline: 'غداً', priority: 'medium', status: 'active' },
-        { id: '3', title: 'إرسال المطالبة المالية', client: 'مؤسسة النور', deadline: '23 نوفمبر', priority: 'low', status: 'pending' },
-    ]
+    const [activeStatusTab, setActiveStatusTab] = useState('active')
+
+    // API Filters
+    const filters = useMemo(() => {
+        const f: any = {}
+        if (activeStatusTab === 'active') {
+            f.status = 'active'
+        } else if (activeStatusTab === 'completed') {
+            f.status = 'completed'
+        }
+        return f
+    }, [activeStatusTab])
+
+    // Fetch tasks
+    const { data: tasksData, isLoading, isError, error, refetch } = useTasks(filters)
+
+    // Transform API data
+    const tasks = useMemo(() => {
+        if (!tasksData?.tasks) return []
+
+        return tasksData.tasks.map((task: any) => ({
+            id: task._id,
+            title: task.title || task.description || 'مهمة غير محددة',
+            client: task.caseId?.clientId?.name || task.clientId?.name || 'غير محدد',
+            deadline: task.dueDate ? new Date(task.dueDate).toLocaleDateString('ar-SA', { month: 'long', day: 'numeric' }) : 'غير محدد',
+            priority: task.priority || 'medium',
+            status: task.status || 'pending',
+            _id: task._id,
+        }))
+    }, [tasksData])
 
     const topNav = [
         { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
@@ -107,13 +135,79 @@ export function TasksListView() {
                             <div className="p-6 pb-2 flex justify-between items-center">
                                 <h3 className="font-bold text-navy text-xl">المهام الحالية</h3>
                                 <div className="flex gap-2">
-                                    <Button size="sm" className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-full px-4">النشطة</Button>
-                                    <Button size="sm" variant="ghost" className="text-slate-500 hover:text-navy rounded-full px-4">المكتملة</Button>
+                                    <Button
+                                        size="sm"
+                                        onClick={() => setActiveStatusTab('active')}
+                                        className={activeStatusTab === 'active' ? "bg-emerald-500 hover:bg-emerald-600 text-white rounded-full px-4" : "bg-slate-100 text-slate-600 hover:bg-slate-200 rounded-full px-4"}
+                                    >
+                                        النشطة
+                                    </Button>
+                                    <Button
+                                        size="sm"
+                                        onClick={() => setActiveStatusTab('completed')}
+                                        className={activeStatusTab === 'completed' ? "bg-emerald-500 hover:bg-emerald-600 text-white rounded-full px-4" : "bg-slate-100 text-slate-600 hover:bg-slate-200 rounded-full px-4"}
+                                    >
+                                        المكتملة
+                                    </Button>
                                 </div>
                             </div>
 
                             <div className="p-4 space-y-4">
-                                {tasks.map((task) => (
+                                {/* Loading State */}
+                                {isLoading && (
+                                    <>
+                                        {[1, 2, 3].map((i) => (
+                                            <div key={i} className="bg-[#F8F9FA] rounded-2xl p-6 border border-slate-100">
+                                                <div className="flex gap-4 mb-4">
+                                                    <Skeleton className="w-12 h-12 rounded-xl" />
+                                                    <div className="flex-1 space-y-2">
+                                                        <Skeleton className="h-6 w-3/4" />
+                                                        <Skeleton className="h-4 w-1/2" />
+                                                    </div>
+                                                </div>
+                                                <Skeleton className="h-20 w-full" />
+                                            </div>
+                                        ))}
+                                    </>
+                                )}
+
+                                {/* Error State */}
+                                {isError && (
+                                    <div className="bg-white rounded-2xl p-12 border border-slate-100 text-center">
+                                        <div className="flex justify-center mb-4">
+                                            <div className="w-16 h-16 rounded-full bg-red-50 flex items-center justify-center">
+                                                <AlertCircle className="w-8 h-8 text-red-500" />
+                                            </div>
+                                        </div>
+                                        <h3 className="text-lg font-bold text-slate-900 mb-2">حدث خطأ أثناء تحميل المهام</h3>
+                                        <p className="text-slate-500 mb-4">{error?.message || 'تعذر الاتصال بالخادم'}</p>
+                                        <Button onClick={() => refetch()} className="bg-emerald-500 hover:bg-emerald-600">
+                                            إعادة المحاولة
+                                        </Button>
+                                    </div>
+                                )}
+
+                                {/* Empty State */}
+                                {!isLoading && !isError && tasks.length === 0 && (
+                                    <div className="bg-white rounded-2xl p-12 border border-slate-100 text-center">
+                                        <div className="flex justify-center mb-4">
+                                            <div className="w-16 h-16 rounded-full bg-emerald-50 flex items-center justify-center">
+                                                <Briefcase className="w-8 h-8 text-emerald-500" />
+                                            </div>
+                                        </div>
+                                        <h3 className="text-lg font-bold text-slate-900 mb-2">لا توجد مهام</h3>
+                                        <p className="text-slate-500 mb-4">ابدأ بإضافة مهمة جديدة</p>
+                                        <Button asChild className="bg-emerald-500 hover:bg-emerald-600">
+                                            <Link to="/dashboard/tasks/new">
+                                                <Plus className="w-4 h-4 ml-2" />
+                                                مهمة جديدة
+                                            </Link>
+                                        </Button>
+                                    </div>
+                                )}
+
+                                {/* Success State - Tasks List */}
+                                {!isLoading && !isError && tasks.map((task) => (
                                     <div key={task.id} className="bg-[#F8F9FA] rounded-2xl p-6 border border-slate-100 hover:border-emerald-200 transition-all group">
                                         <div className="flex justify-between items-start mb-4">
                                             <div className="flex gap-4 items-center">

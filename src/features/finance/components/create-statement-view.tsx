@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import {
     ArrowRight, Save, Calendar, FileText,
-    Download, CreditCard, Filter
+    Download, CreditCard, Filter, Loader2, User
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -19,18 +19,31 @@ import { DynamicIsland } from '@/components/dynamic-island'
 import { Main } from '@/components/layout/main'
 import { Link, useNavigate } from '@tanstack/react-router'
 import { FinanceSidebar } from './finance-sidebar'
+import { useCreateStatement } from '@/hooks/useFinance'
+import { useClients } from '@/hooks/useCasesAndClients'
 
 export function CreateStatementView() {
     const navigate = useNavigate()
-    const [isLoading, setIsLoading] = useState(false)
+    const { mutate: createStatement, isPending } = useCreateStatement()
+    const { data: clientsData, isLoading: loadingClients } = useClients()
+
+    const [formData, setFormData] = useState({
+        clientId: '',
+        period: '',
+        startDate: '',
+        endDate: '',
+        notes: '',
+        status: 'draft' as 'draft' | 'sent'
+    })
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
-        setIsLoading(true)
-        // Simulate API call
-        await new Promise(resolve => setTimeout(resolve, 1000))
-        setIsLoading(false)
-        navigate({ to: '/dashboard/finance/statements' })
+
+        createStatement(formData, {
+            onSuccess: () => {
+                navigate({ to: '/dashboard/finance/statements' })
+            }
+        })
     }
 
     const topNav = [
@@ -95,35 +108,39 @@ export function CreateStatementView() {
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                         <div className="space-y-2">
                                             <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                                <CreditCard className="w-4 h-4 text-emerald-500" />
-                                                الحساب
+                                                <User className="w-4 h-4 text-emerald-500" />
+                                                العميل
                                             </label>
-                                            <Select>
+                                            <Select
+                                                value={formData.clientId}
+                                                onValueChange={(value) => setFormData(prev => ({ ...prev, clientId: value }))}
+                                                disabled={loadingClients}
+                                            >
                                                 <SelectTrigger className="rounded-xl border-slate-200 focus:ring-emerald-500">
-                                                    <SelectValue placeholder="اختر الحساب" />
+                                                    <SelectValue placeholder={loadingClients ? "جاري التحميل..." : "اختر العميل"} />
                                                 </SelectTrigger>
                                                 <SelectContent>
-                                                    <SelectItem value="main">الحساب الرئيسي (SAR)</SelectItem>
-                                                    <SelectItem value="savings">حساب الادخار</SelectItem>
-                                                    <SelectItem value="petty">صندوق المصروفات النثرية</SelectItem>
+                                                    {clientsData?.data?.map((client: any) => (
+                                                        <SelectItem key={client._id} value={client._id}>
+                                                            {client.fullName || client.name}
+                                                        </SelectItem>
+                                                    ))}
                                                 </SelectContent>
                                             </Select>
                                         </div>
                                         <div className="space-y-2">
                                             <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                                <Download className="w-4 h-4 text-emerald-500" />
-                                                صيغة الملف
+                                                <FileText className="w-4 h-4 text-emerald-500" />
+                                                الفترة
                                             </label>
-                                            <Select defaultValue="pdf">
-                                                <SelectTrigger className="rounded-xl border-slate-200 focus:ring-emerald-500">
-                                                    <SelectValue placeholder="اختر الصيغة" />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    <SelectItem value="pdf">PDF (للطباعة)</SelectItem>
-                                                    <SelectItem value="excel">Excel (للمراجعة)</SelectItem>
-                                                    <SelectItem value="csv">CSV (للأنظمة)</SelectItem>
-                                                </SelectContent>
-                                            </Select>
+                                            <Input
+                                                type="text"
+                                                placeholder="مثال: يناير 2025"
+                                                className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500"
+                                                value={formData.period}
+                                                onChange={(e) => setFormData(prev => ({ ...prev, period: e.target.value }))}
+                                                required
+                                            />
                                         </div>
                                     </div>
 
@@ -133,14 +150,26 @@ export function CreateStatementView() {
                                                 <Calendar className="w-4 h-4 text-emerald-500" />
                                                 من تاريخ
                                             </label>
-                                            <Input type="date" className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500" required />
+                                            <Input
+                                                type="date"
+                                                className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500"
+                                                value={formData.startDate}
+                                                onChange={(e) => setFormData(prev => ({ ...prev, startDate: e.target.value }))}
+                                                required
+                                            />
                                         </div>
                                         <div className="space-y-2">
                                             <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
                                                 <Calendar className="w-4 h-4 text-emerald-500" />
                                                 إلى تاريخ
                                             </label>
-                                            <Input type="date" className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500" required />
+                                            <Input
+                                                type="date"
+                                                className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500"
+                                                value={formData.endDate}
+                                                onChange={(e) => setFormData(prev => ({ ...prev, endDate: e.target.value }))}
+                                                required
+                                            />
                                         </div>
                                     </div>
 
@@ -152,7 +181,28 @@ export function CreateStatementView() {
                                         <Textarea
                                             placeholder="أدخل أي ملاحظات تريد إضافتها للتقرير..."
                                             className="min-h-[100px] rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500"
+                                            value={formData.notes}
+                                            onChange={(e) => setFormData(prev => ({ ...prev, notes: e.target.value }))}
                                         />
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                                            <Save className="w-4 h-4 text-emerald-500" />
+                                            الحالة
+                                        </label>
+                                        <Select
+                                            value={formData.status}
+                                            onValueChange={(value: 'draft' | 'sent') => setFormData(prev => ({ ...prev, status: value }))}
+                                        >
+                                            <SelectTrigger className="rounded-xl border-slate-200 focus:ring-emerald-500">
+                                                <SelectValue placeholder="اختر الحالة" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="draft">مسودة</SelectItem>
+                                                <SelectItem value="sent">إرسال للعميل</SelectItem>
+                                            </SelectContent>
+                                        </Select>
                                     </div>
                                 </div>
 
@@ -165,16 +215,17 @@ export function CreateStatementView() {
                                     <Button
                                         type="submit"
                                         className="bg-emerald-500 hover:bg-emerald-600 text-white min-w-[140px] rounded-xl shadow-lg shadow-emerald-500/20"
-                                        disabled={isLoading}
+                                        disabled={isPending}
                                     >
-                                        {isLoading ? (
+                                        {isPending ? (
                                             <span className="flex items-center gap-2">
-                                                جاري المعالجة...
+                                                <Loader2 className="w-4 h-4 animate-spin" />
+                                                جاري الحفظ...
                                             </span>
                                         ) : (
                                             <span className="flex items-center gap-2">
-                                                <Download className="w-4 h-4" />
-                                                إصدار الكشف
+                                                <Save className="w-4 h-4" />
+                                                إنشاء الكشف
                                             </span>
                                         )}
                                     </Button>

@@ -1,9 +1,9 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import {
     Search, Filter, Download, Plus, MoreHorizontal,
     ArrowUpRight, ArrowDownRight,
     FileText, Calendar, TrendingUp, Car,
-    Wallet, Building, PieChart, Bell
+    Wallet, Building, PieChart, Bell, Loader2, AlertCircle
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -26,125 +26,71 @@ import { LanguageSwitcher } from '@/components/language-switcher'
 import { ThemeSwitch } from '@/components/theme-switch'
 import { ConfigDrawer } from '@/components/config-drawer'
 import { ProfileDropdown } from '@/components/profile-dropdown'
+import { Skeleton } from '@/components/ui/skeleton'
+import { useTransactions, useAccountBalance, useTransactionSummary } from '@/hooks/useFinance'
+
+// Helper function to get icon based on category
+const getCategoryIcon = (category: string, type: string) => {
+    if (type === 'credit' || type === 'income') return ArrowUpRight
+    if (type === 'debit' || type === 'expense') return ArrowDownRight
+    const lowerCategory = category?.toLowerCase() || ''
+    if (lowerCategory.includes('قانون') || lowerCategory.includes('legal')) return Building
+    if (lowerCategory.includes('استشار') || lowerCategory.includes('consult')) return TrendingUp
+    if (lowerCategory.includes('مواصلات') || lowerCategory.includes('transport')) return Car
+    return FileText
+}
 
 export default function TransactionsDashboard() {
     const [activeTab, setActiveTab] = useState('all')
     const [searchQuery, setSearchQuery] = useState('')
 
-    // Mock Data
-    const transactions = [
-        {
-            id: 'TXN-2025-001',
-            date: '15 نوفمبر 2025',
-            type: 'income',
-            category: 'فاتورة',
-            description: 'دفعة من مشاري الرابح',
-            reference: 'INV-2025-001',
-            amount: 52900,
-            paymentMethod: 'تحويل بنكي',
-            status: 'مكتمل',
-            icon: ArrowUpRight
-        },
-        {
-            id: 'TXN-2025-002',
-            date: '15 نوفمبر 2025',
-            type: 'expense',
-            category: 'رسوم قانونية',
-            description: 'استئجار قاعة المحكمة',
-            reference: 'EXP-2025-001',
-            amount: 5652.17,
-            paymentMethod: 'بطاقة ائتمان',
-            status: 'مكتمل',
-            icon: Building
-        },
-        {
-            id: 'TXN-2025-003',
-            date: '14 نوفمبر 2025',
-            type: 'income',
-            category: 'فاتورة',
-            description: 'دفعة من عبدالله الغامدي',
-            reference: 'INV-2025-002',
-            amount: 38000,
-            paymentMethod: 'تحويل بنكي',
-            status: 'مكتمل',
-            icon: ArrowUpRight
-        },
-        {
-            id: 'TXN-2025-004',
-            date: '14 نوفمبر 2025',
-            type: 'expense',
-            category: 'اشتراكات',
-            description: 'اشتراك المكتبة القانونية',
-            reference: 'EXP-2025-002',
-            amount: 2500,
-            paymentMethod: 'تحويل بنكي',
-            status: 'مكتمل',
-            icon: FileText
-        },
-        {
-            id: 'TXN-2025-005',
-            date: '12 نوفمبر 2025',
-            type: 'income',
-            category: 'فاتورة',
-            description: 'دفعة من فاطمة العتيبي',
-            reference: 'INV-2025-003',
-            amount: 52000,
-            paymentMethod: 'شيك',
-            status: 'مكتمل',
-            icon: ArrowUpRight
-        },
-        {
-            id: 'TXN-2025-006',
-            date: '12 نوفمبر 2025',
-            type: 'expense',
-            category: 'استشارات',
-            description: 'استشارة خبير مالي',
-            reference: 'EXP-2025-003',
-            amount: 8000,
-            paymentMethod: 'نقدي',
-            status: 'مكتمل',
-            icon: TrendingUp
-        },
-        {
-            id: 'TXN-2025-007',
-            date: '10 نوفمبر 2025',
-            type: 'expense',
-            category: 'مواصلات',
-            description: 'وقود السيارة',
-            reference: 'EXP-2025-004',
-            amount: 450,
-            paymentMethod: 'نقدي',
-            status: 'مكتمل',
-            icon: Car
-        },
-        {
-            id: 'TXN-2025-009',
-            date: '8 نوفمبر 2025',
-            type: 'expense',
-            category: 'خدمات',
-            description: 'ترجمة مستندات قانونية',
-            reference: 'EXP-2025-006',
-            amount: 1500,
-            paymentMethod: 'تحويل بنكي',
-            status: 'معلق',
-            icon: FileText
-        }
-    ]
+    // Fetch transactions data
+    const { data: transactionsData, isLoading, isError, error, refetch } = useTransactions()
+    const { data: balanceData } = useAccountBalance()
+    const { data: summaryData } = useTransactionSummary()
+
+    // Transform API data to component format
+    const transactions = useMemo(() => {
+        if (!transactionsData?.data) return []
+        return transactionsData.data.map((txn: any) => ({
+            id: txn._id,
+            date: new Date(txn.date).toLocaleDateString('ar-SA'),
+            type: txn.type === 'credit' ? 'income' : 'expense',
+            category: txn.category || 'عام',
+            description: txn.description,
+            reference: txn.invoiceId?._id || txn.expenseId?._id || txn.reference || '-',
+            amount: txn.amount,
+            paymentMethod: txn.paymentMethod || 'غير محدد',
+            status: txn.status === 'completed' ? 'مكتمل' : txn.status === 'pending' ? 'معلق' : txn.status,
+            icon: getCategoryIcon(txn.category, txn.type),
+        }))
+    }, [transactionsData])
 
     // Filter Logic
-    const filteredTransactions = transactions.filter(txn => {
-        if (activeTab === 'all') return true
-        if (activeTab === 'income') return txn.type === 'income'
-        if (activeTab === 'expense') return txn.type === 'expense'
-        if (searchQuery && !txn.description.includes(searchQuery) && !txn.reference.includes(searchQuery)) return false
-        return true
-    })
+    const filteredTransactions = useMemo(() => {
+        return transactions.filter(txn => {
+            if (activeTab === 'all') return true
+            if (activeTab === 'income') return txn.type === 'income'
+            if (activeTab === 'expense') return txn.type === 'expense'
+            if (searchQuery && !txn.description.includes(searchQuery) && !txn.reference.includes(searchQuery)) {
+                return false
+            }
+            return true
+        })
+    }, [transactions, activeTab, searchQuery])
 
     // Calculate statistics
-    const totalIncome = transactions.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0)
-    const totalExpenses = transactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0)
-    const netProfit = totalIncome - totalExpenses
-    const currentBalance = 125400 // Mock balance
+    const { totalIncome, totalExpenses, netProfit, currentBalance } = useMemo(() => {
+        const income = transactions.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0)
+        const expenses = transactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0)
+        const balance = balanceData?.balance || 0
+        return {
+            totalIncome: income,
+            totalExpenses: expenses,
+            netProfit: income - expenses,
+            currentBalance: balance,
+        }
+    }, [transactions, balanceData])
 
     // Format currency
     const formatCurrency = (amount: number) => {
@@ -163,6 +109,104 @@ export default function TransactionsDashboard() {
         { title: 'المعاملات', href: '/dashboard/finance/transactions', isActive: true },
     ]
 
+    // LOADING STATE
+    if (isLoading) {
+        return (
+            <>
+                <Header className="bg-navy shadow-none relative">
+                    <TopNav links={topNav} className="[&>a]:text-slate-300 [&>a:hover]:text-white [&>a[aria-current='page']]:text-white" />
+                    <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
+                        <DynamicIsland />
+                    </div>
+                    <div className='ms-auto flex items-center space-x-4'>
+                        <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white" />
+                        <ThemeSwitch className="text-slate-300 hover:bg-white/10 hover:text-white" />
+                        <ConfigDrawer className="text-slate-300 hover:bg-white/10 hover:text-white" />
+                        <ProfileDropdown className="text-slate-300 hover:bg-white/10 hover:text-white" />
+                    </div>
+                    <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-emerald-500/50 to-transparent"></div>
+                </Header>
+                <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8">
+                    <Skeleton className="h-32 w-full rounded-3xl" />
+                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                        <div className="lg:col-span-8 space-y-6">
+                            <Skeleton className="h-16 w-full rounded-2xl" />
+                            <Skeleton className="h-96 w-full rounded-3xl" />
+                        </div>
+                        <div className="lg:col-span-4 space-y-6">
+                            <Skeleton className="h-64 w-full rounded-2xl" />
+                        </div>
+                    </div>
+                </Main>
+            </>
+        )
+    }
+
+    // ERROR STATE
+    if (isError) {
+        return (
+            <>
+                <Header className="bg-navy shadow-none relative">
+                    <TopNav links={topNav} className="[&>a]:text-slate-300 [&>a:hover]:text-white [&>a[aria-current='page']]:text-white" />
+                    <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
+                        <DynamicIsland />
+                    </div>
+                    <div className='ms-auto flex items-center space-x-4'>
+                        <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white" />
+                        <ThemeSwitch className="text-slate-300 hover:bg-white/10 hover:text-white" />
+                        <ConfigDrawer className="text-slate-300 hover:bg-white/10 hover:text-white" />
+                        <ProfileDropdown className="text-slate-300 hover:bg-white/10 hover:text-white" />
+                    </div>
+                    <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-emerald-500/50 to-transparent"></div>
+                </Header>
+                <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8">
+                    <div className="bg-white rounded-3xl p-12 text-center border border-slate-100 shadow-sm">
+                        <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <AlertCircle className="h-8 w-8 text-red-500" />
+                        </div>
+                        <h3 className="text-xl font-bold text-slate-900 mb-2">فشل تحميل المعاملات</h3>
+                        <p className="text-slate-500 mb-6">{error?.message || 'حدث خطأ أثناء تحميل البيانات'}</p>
+                        <Button onClick={() => refetch()} className="bg-emerald-500 hover:bg-emerald-600 text-white px-8">
+                            <Loader2 className="ml-2 h-4 w-4" />
+                            إعادة المحاولة
+                        </Button>
+                    </div>
+                </Main>
+            </>
+        )
+    }
+
+    // EMPTY STATE
+    if (filteredTransactions.length === 0 && !searchQuery && activeTab === 'all') {
+        return (
+            <>
+                <Header className="bg-navy shadow-none relative">
+                    <TopNav links={topNav} className="[&>a]:text-slate-300 [&>a:hover]:text-white [&>a[aria-current='page']]:text-white" />
+                    <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
+                        <DynamicIsland />
+                    </div>
+                    <div className='ms-auto flex items-center space-x-4'>
+                        <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white" />
+                        <ThemeSwitch className="text-slate-300 hover:bg-white/10 hover:text-white" />
+                        <ConfigDrawer className="text-slate-300 hover:bg-white/10 hover:text-white" />
+                        <ProfileDropdown className="text-slate-300 hover:bg-white/10 hover:text-white" />
+                    </div>
+                    <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-emerald-500/50 to-transparent"></div>
+                </Header>
+                <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8">
+                    <div className="bg-white rounded-3xl p-12 text-center border border-slate-100 shadow-sm">
+                        <div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <Wallet className="h-8 w-8 text-brand-blue" />
+                        </div>
+                        <h3 className="text-xl font-bold text-slate-900 mb-2">لا توجد معاملات بعد</h3>
+                        <p className="text-slate-500 mb-6">ستظهر جميع المعاملات المالية هنا</p>
+                    </div>
+                </Main>
+            </>
+        )
+    }
+
+    // SUCCESS STATE
     return (
         <>
             <Header className="bg-navy shadow-none relative">

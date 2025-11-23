@@ -20,18 +20,48 @@ import { DynamicIsland } from '@/components/dynamic-island'
 import { Main } from '@/components/layout/main'
 import { Link, useNavigate } from '@tanstack/react-router'
 import { FinanceSidebar } from './finance-sidebar'
+import { useCreateTimeEntry } from '@/hooks/useFinance'
 
 export function CreateTimeEntryView() {
     const navigate = useNavigate()
-    const [isLoading, setIsLoading] = useState(false)
+    const createTimeEntryMutation = useCreateTimeEntry()
+
+    const [formData, setFormData] = useState({
+        description: '',
+        caseId: '',
+        date: '',
+        startTime: '',
+        endTime: '',
+        isBillable: true,
+        notes: '',
+    })
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
-        setIsLoading(true)
-        // Simulate API call
-        await new Promise(resolve => setTimeout(resolve, 1000))
-        setIsLoading(false)
-        navigate({ to: '/dashboard/finance/time-tracking' })
+
+        // Calculate duration in hours
+        const start = new Date(`2000-01-01T${formData.startTime}`)
+        const end = new Date(`2000-01-01T${formData.endTime}`)
+        const durationHours = (end.getTime() - start.getTime()) / (1000 * 60 * 60)
+
+        const timeEntryData = {
+            description: formData.description,
+            caseId: formData.caseId,
+            clientId: '', // Will be populated from case
+            date: formData.date,
+            startTime: formData.startTime,
+            endTime: formData.endTime,
+            duration: durationHours,
+            hourlyRate: 0,
+            isBillable: formData.isBillable,
+            notes: formData.notes,
+        }
+
+        createTimeEntryMutation.mutate(timeEntryData, {
+            onSuccess: () => {
+                navigate({ to: '/dashboard/finance/time-tracking' })
+            },
+        })
     }
 
     const topNav = [
@@ -99,14 +129,20 @@ export function CreateTimeEntryView() {
                                                 <FileText className="w-4 h-4 text-emerald-500" />
                                                 وصف العمل
                                             </label>
-                                            <Input placeholder="مثال: مراجعة مستندات القضية" className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500" required />
+                                            <Input
+                                                placeholder="مثال: مراجعة مستندات القضية"
+                                                value={formData.description}
+                                                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                                                className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500"
+                                                required
+                                            />
                                         </div>
                                         <div className="space-y-2">
                                             <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
                                                 <Briefcase className="w-4 h-4 text-emerald-500" />
                                                 القضية / المشروع
                                             </label>
-                                            <Select>
+                                            <Select value={formData.caseId} onValueChange={(value) => setFormData({ ...formData, caseId: value })}>
                                                 <SelectTrigger className="rounded-xl border-slate-200 focus:ring-emerald-500">
                                                     <SelectValue placeholder="اختر القضية" />
                                                 </SelectTrigger>
@@ -125,26 +161,49 @@ export function CreateTimeEntryView() {
                                                 <Calendar className="w-4 h-4 text-emerald-500" />
                                                 التاريخ
                                             </label>
-                                            <Input type="date" className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500" required />
+                                            <Input
+                                                type="date"
+                                                value={formData.date}
+                                                onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+                                                className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500"
+                                                required
+                                            />
                                         </div>
                                         <div className="space-y-2">
                                             <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
                                                 <Clock className="w-4 h-4 text-emerald-500" />
                                                 وقت البدء
                                             </label>
-                                            <Input type="time" className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500" required />
+                                            <Input
+                                                type="time"
+                                                value={formData.startTime}
+                                                onChange={(e) => setFormData({ ...formData, startTime: e.target.value })}
+                                                className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500"
+                                                required
+                                            />
                                         </div>
                                         <div className="space-y-2">
                                             <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
                                                 <Clock className="w-4 h-4 text-emerald-500" />
                                                 وقت الانتهاء
                                             </label>
-                                            <Input type="time" className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500" required />
+                                            <Input
+                                                type="time"
+                                                value={formData.endTime}
+                                                onChange={(e) => setFormData({ ...formData, endTime: e.target.value })}
+                                                className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500"
+                                                required
+                                            />
                                         </div>
                                     </div>
 
                                     <div className="flex items-center space-x-2 space-x-reverse">
-                                        <Checkbox id="billable" defaultChecked className="data-[state=checked]:bg-emerald-500 border-slate-300" />
+                                        <Checkbox
+                                            id="billable"
+                                            checked={formData.isBillable}
+                                            onCheckedChange={(checked) => setFormData({ ...formData, isBillable: checked as boolean })}
+                                            className="data-[state=checked]:bg-emerald-500 border-slate-300"
+                                        />
                                         <label
                                             htmlFor="billable"
                                             className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
@@ -160,6 +219,8 @@ export function CreateTimeEntryView() {
                                         </label>
                                         <Textarea
                                             placeholder="أدخل أي تفاصيل إضافية..."
+                                            value={formData.notes}
+                                            onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                                             className="min-h-[100px] rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500"
                                         />
                                     </div>
@@ -174,9 +235,9 @@ export function CreateTimeEntryView() {
                                     <Button
                                         type="submit"
                                         className="bg-emerald-500 hover:bg-emerald-600 text-white min-w-[140px] rounded-xl shadow-lg shadow-emerald-500/20"
-                                        disabled={isLoading}
+                                        disabled={createTimeEntryMutation.isPending}
                                     >
-                                        {isLoading ? (
+                                        {createTimeEntryMutation.isPending ? (
                                             <span className="flex items-center gap-2">
                                                 جاري الحفظ...
                                             </span>

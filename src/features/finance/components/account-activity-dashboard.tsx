@@ -1,8 +1,8 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import {
     Search, Filter, Download,
     Check, FileText, Receipt, AlertCircle,
-    User, Calendar, ArrowUpRight, ArrowDownRight, Activity, Bell, Plus
+    User, Calendar, ArrowUpRight, ArrowDownRight, Activity, Bell, Plus, Loader2, CreditCard, Send
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -19,137 +19,104 @@ import { LanguageSwitcher } from '@/components/language-switcher'
 import { ThemeSwitch } from '@/components/theme-switch'
 import { ConfigDrawer } from '@/components/config-drawer'
 import { ProfileDropdown } from '@/components/profile-dropdown'
+import { Skeleton } from '@/components/ui/skeleton'
+import { useActivities } from '@/hooks/useFinance'
 
 export default function AccountActivityDashboard() {
     const [activeTab, setActiveTab] = useState('all')
     const [searchQuery, setSearchQuery] = useState('')
 
-    // Mock Data
-    const activities = [
-        {
-            id: 'ACT-2025-001',
-            date: '17 نوفمبر 2025',
-            time: '2:30 مساءً',
-            type: 'payment_received',
-            title: 'دفعة مستلمة',
-            description: 'تم استلام دفعة من مشاري الرابح',
-            reference: 'INV-2025-001',
-            amount: 52900,
-            user: 'أحمد المحامي',
-            status: 'مكتمل',
-            icon: Check,
-            color: 'emerald'
-        },
-        {
-            id: 'ACT-2025-002',
-            date: '17 نوفمبر 2025',
-            time: '10:30 صباحاً',
-            type: 'expense_new',
-            title: 'مصروف جديد',
-            description: 'تم إضافة مصروف: استئجار قاعة المحكمة',
-            reference: 'EXP-2025-001',
-            amount: -5652.17,
-            user: 'أحمد المحامي',
-            status: 'مكتمل',
-            icon: Receipt,
-            color: 'red'
-        },
-        {
-            id: 'ACT-2025-003',
-            date: '16 نوفمبر 2025',
-            time: '4:15 مساءً',
-            type: 'invoice_sent',
-            title: 'فاتورة مرسلة',
-            description: 'تم إرسال فاتورة إلى مشاري الرابح',
-            reference: 'INV-2025-001',
-            amount: 52900,
-            user: 'سارة المحامية',
-            status: 'معلق',
-            icon: FileText,
-            color: 'blue'
-        },
-        {
-            id: 'ACT-2025-004',
-            date: '15 نوفمبر 2025',
-            time: '9:20 صباحاً',
-            type: 'payment_received',
-            title: 'دفعة مستلمة',
-            description: 'تم استلام دفعة من عبدالله الغامدي',
-            reference: 'INV-2025-002',
-            amount: 38000,
-            user: 'أحمد المحامي',
-            status: 'مكتمل',
-            icon: Check,
-            color: 'emerald'
-        },
-        {
-            id: 'ACT-2025-005',
-            date: '15 نوفمبر 2025',
-            time: '11:00 صباحاً',
-            type: 'invoice_created',
-            title: 'فاتورة منشأة',
-            description: 'تم إنشاء فاتورة جديدة لعبدالله الغامدي',
-            reference: 'INV-2025-002',
-            amount: 38000,
-            user: 'سارة المحامية',
-            status: 'مسودة',
-            icon: FileText,
-            color: 'slate'
-        },
-        {
-            id: 'ACT-2025-006',
-            date: '14 نوفمبر 2025',
-            time: '3:45 مساءً',
-            type: 'expense_new',
-            title: 'مصروف جديد',
-            description: 'تم إضافة مصروف: اشتراك المكتبة القانونية',
-            reference: 'EXP-2025-002',
-            amount: -2500,
-            user: 'محمد المحامي',
-            status: 'مكتمل',
-            icon: Receipt,
-            color: 'red'
-        },
-        {
-            id: 'ACT-2025-010',
-            date: '12 نوفمبر 2025',
-            time: '9:00 صباحاً',
-            type: 'payment_reminder',
-            title: 'تذكير دفع',
-            description: 'تم إرسال تذكير دفع لعبدالله الغامدي',
-            reference: 'INV-2025-002',
-            amount: 0,
-            user: 'النظام',
-            status: 'مرسل',
-            icon: AlertCircle,
-            color: 'amber'
-        }
-    ]
+    const { data, isLoading, isError, error } = useActivities()
+    const activities = data?.data || []
 
-    // Filter Logic
-    const filteredActivities = activities.filter(act => {
-        if (activeTab === 'all') return true
-        if (activeTab === 'payments') return act.type === 'payment_received'
-        if (activeTab === 'invoices') return act.type.includes('invoice')
-        if (activeTab === 'expenses') return act.type === 'expense_new'
-        if (searchQuery && !act.description.includes(searchQuery) && !act.reference.includes(searchQuery)) return false
-        return true
-    })
+    // Helper function to get icon and color based on activity type
+    const getActivityStyle = (type: string) => {
+        const styles: Record<string, { icon: any; color: string; iconBg: string }> = {
+            payment_received: { icon: Check, color: 'emerald', iconBg: 'bg-emerald-50 text-emerald-600' },
+            payment_sent: { icon: ArrowDownRight, color: 'red', iconBg: 'bg-red-50 text-red-600' },
+            invoice_created: { icon: FileText, color: 'slate', iconBg: 'bg-slate-50 text-slate-600' },
+            invoice_sent: { icon: Send, color: 'blue', iconBg: 'bg-blue-50 text-blue-600' },
+            invoice_paid: { icon: Check, color: 'emerald', iconBg: 'bg-emerald-50 text-emerald-600' },
+            expense_created: { icon: Receipt, color: 'red', iconBg: 'bg-red-50 text-red-600' },
+            expense_approved: { icon: Check, color: 'emerald', iconBg: 'bg-emerald-50 text-emerald-600' },
+            transaction_created: { icon: CreditCard, color: 'blue', iconBg: 'bg-blue-50 text-blue-600' },
+        }
+        return styles[type] || { icon: AlertCircle, color: 'amber', iconBg: 'bg-amber-50 text-amber-600' }
+    }
+
+    // Filter Logic using useMemo for performance
+    const filteredActivities = useMemo(() => {
+        return activities.filter(act => {
+            // Tab filter
+            if (activeTab === 'payments') {
+                if (act.type !== 'payment_received' && act.type !== 'payment_sent') return false
+            }
+            if (activeTab === 'invoices') {
+                if (!act.type.includes('invoice')) return false
+            }
+            if (activeTab === 'expenses') {
+                if (!act.type.includes('expense')) return false
+            }
+
+            // Search filter
+            if (searchQuery) {
+                const query = searchQuery.toLowerCase()
+                if (!act.description.toLowerCase().includes(query) &&
+                    !act.reference.toLowerCase().includes(query) &&
+                    !act.title.toLowerCase().includes(query)) {
+                    return false
+                }
+            }
+
+            return true
+        })
+    }, [activities, activeTab, searchQuery])
 
     // Group by Date
-    const groupedActivities = filteredActivities.reduce((groups, activity) => {
-        const date = activity.date
-        if (!groups[date]) {
-            groups[date] = []
-        }
-        groups[date].push(activity)
-        return groups
-    }, {} as Record<string, typeof activities>)
+    const groupedActivities = useMemo(() => {
+        return filteredActivities.reduce((groups, activity) => {
+            const date = new Date(activity.date).toLocaleDateString('ar-SA', {
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric'
+            })
+            if (!groups[date]) {
+                groups[date] = []
+            }
+            groups[date].push(activity)
+            return groups
+        }, {} as Record<string, typeof filteredActivities>)
+    }, [filteredActivities])
 
     // Stats
-    const todayActivities = activities.filter(a => a.date === '17 نوفمبر 2025').length
-    const totalIncome = activities.filter(a => a.amount > 0 && a.type === 'payment_received').reduce((sum, a) => sum + a.amount, 0)
-    const totalExpenses = Math.abs(activities.filter(a => a.amount < 0).reduce((sum, a) => sum + a.amount, 0))
+    const todayActivities = useMemo(() => {
+        const today = new Date().toDateString()
+        return activities.filter(a => new Date(a.date).toDateString() === today).length
+    }, [activities])
+
+    const totalIncome = useMemo(() => {
+        return activities
+            .filter(a => a.type === 'payment_received')
+            .reduce((sum, a) => sum + a.amount, 0)
+    }, [activities])
+
+    const totalExpenses = useMemo(() => {
+        return Math.abs(activities
+            .filter(a => a.type === 'payment_sent' || a.type.includes('expense'))
+            .reduce((sum, a) => sum + Math.abs(a.amount), 0))
+    }, [activities])
+
+    // Get unique active users
+    const activeUsers = useMemo(() => {
+        const userMap = new Map<string, number>()
+        activities.forEach(act => {
+            userMap.set(act.userName, (userMap.get(act.userName) || 0) + 1)
+        })
+        return Array.from(userMap.entries())
+            .map(([name, count]) => ({ name, count }))
+            .sort((a, b) => b.count - a.count)
+            .slice(0, 3)
+    }, [activities])
 
     // Format currency
     const formatCurrency = (amount: number) => {
@@ -200,7 +167,51 @@ export default function AccountActivityDashboard() {
             </Header>
 
             <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-r border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
-                <div className="max-w-7xl mx-auto space-y-6">
+                {isLoading ? (
+                    <div className="max-w-7xl mx-auto space-y-6">
+                        <div className="bg-white rounded-3xl p-8">
+                            <Skeleton className="h-8 w-64 mb-4" />
+                            <Skeleton className="h-6 w-96 mb-8" />
+                            <div className="grid grid-cols-3 gap-6">
+                                <Skeleton className="h-24 w-full" />
+                                <Skeleton className="h-24 w-full" />
+                                <Skeleton className="h-24 w-full" />
+                            </div>
+                        </div>
+                        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                            <div className="lg:col-span-8 space-y-4">
+                                {Array.from({ length: 5 }).map((_, i) => (
+                                    <Skeleton key={i} className="h-32 w-full rounded-2xl" />
+                                ))}
+                            </div>
+                            <div className="lg:col-span-4 space-y-4">
+                                <Skeleton className="h-64 w-full rounded-3xl" />
+                                <Skeleton className="h-64 w-full rounded-3xl" />
+                            </div>
+                        </div>
+                    </div>
+                ) : isError ? (
+                    <div className="max-w-7xl mx-auto">
+                        <div className="bg-white rounded-3xl p-12 text-center border border-red-100">
+                            <AlertCircle className="h-16 w-16 text-red-500 mx-auto mb-4" />
+                            <h3 className="text-xl font-bold mb-2 text-slate-900">فشل تحميل سجل النشاط</h3>
+                            <p className="text-slate-500 mb-4">{error?.message || 'حدث خطأ أثناء تحميل البيانات'}</p>
+                            <Button onClick={() => window.location.reload()}>إعادة المحاولة</Button>
+                        </div>
+                    </div>
+                ) : activities.length === 0 ? (
+                    <div className="max-w-7xl mx-auto">
+                        <div className="bg-white rounded-3xl p-12 text-center border border-slate-100">
+                            <Activity className="h-16 w-16 text-slate-300 mx-auto mb-4" />
+                            <h3 className="text-xl font-bold mb-2 text-slate-900">لا يوجد نشاط مالي</h3>
+                            <p className="text-slate-500 mb-4">لم يتم تسجيل أي نشاط مالي بعد</p>
+                            <Button asChild>
+                                <Link to="/dashboard/finance/activity/new">تسجيل نشاط جديد</Link>
+                            </Button>
+                        </div>
+                    </div>
+                ) : (
+                    <div className="max-w-7xl mx-auto space-y-6">
 
                     {/* Hero Section - Contained Navy Card */}
                     <div className="bg-[#022c22] rounded-3xl p-8 relative overflow-hidden text-white shadow-xl shadow-[#022c22]/20 mb-8">
@@ -336,27 +347,22 @@ export default function AccountActivityDashboard() {
 
                                         <div className="space-y-3">
                                             {dateActivities.map((activity) => {
-                                                const Icon = activity.icon
+                                                const style = getActivityStyle(activity.type)
+                                                const Icon = style.icon
                                                 const isPositive = activity.amount > 0
                                                 const isNegative = activity.amount < 0
 
-                                                let iconBg = 'bg-slate-100 text-slate-600'
-                                                if (activity.color === 'emerald') iconBg = 'bg-emerald-50 text-emerald-600'
-                                                if (activity.color === 'red') iconBg = 'bg-red-50 text-red-600'
-                                                if (activity.color === 'blue') iconBg = 'bg-blue-50 text-blue-600'
-                                                if (activity.color === 'amber') iconBg = 'bg-amber-50 text-amber-600'
-
                                                 return (
-                                                    <div key={activity.id} className="bg-white rounded-2xl p-5 border border-slate-100 hover:border-blue-200 hover:shadow-md transition-all group relative overflow-hidden">
+                                                    <div key={activity._id} className="bg-white rounded-2xl p-5 border border-slate-100 hover:border-blue-200 hover:shadow-md transition-all group relative overflow-hidden">
                                                         <div className="flex items-start gap-4">
-                                                            <div className={`w-12 h-12 rounded-xl flex items-center justify-center shadow-sm ${iconBg}`}>
+                                                            <div className={`w-12 h-12 rounded-xl flex items-center justify-center shadow-sm ${style.iconBg}`}>
                                                                 <Icon className="h-6 w-6" />
                                                             </div>
 
                                                             <div className="flex-1 min-w-0">
                                                                 <div className="flex justify-between items-start mb-1">
                                                                     <div>
-                                                                        <Link to="/dashboard/finance/activity/$activityId" params={{ activityId: activity.id }}>
+                                                                        <Link to="/dashboard/finance/activity/$activityId" params={{ activityId: activity._id }}>
                                                                             <h4 className="font-bold text-[#022c22] text-lg mb-1 hover:text-emerald-600 transition-colors">{activity.title}</h4>
                                                                         </Link>
                                                                         <p className="text-slate-600 text-sm">{activity.description}</p>
@@ -370,7 +376,7 @@ export default function AccountActivityDashboard() {
                                                                     <div className="flex items-center gap-4 text-xs text-slate-500">
                                                                         <span className="flex items-center gap-1">
                                                                             <User className="h-3 w-3" />
-                                                                            {activity.user}
+                                                                            {activity.userName}
                                                                         </span>
                                                                         <span className="font-mono bg-slate-50 px-1.5 py-0.5 rounded text-slate-400">{activity.reference}</span>
                                                                         <Badge variant="secondary" className="text-[10px] h-5">{activity.status}</Badge>
@@ -429,7 +435,7 @@ export default function AccountActivityDashboard() {
                                             </div>
                                             <span className="text-sm font-medium text-red-900">مصروفات</span>
                                         </div>
-                                        <span className="font-bold text-red-700">{activities.filter(a => a.type === 'expense_new').length}</span>
+                                        <span className="font-bold text-red-700">{activities.filter(a => a.type === 'expense_created').length}</span>
                                     </div>
                                 </CardContent>
                             </Card>
@@ -443,24 +449,31 @@ export default function AccountActivityDashboard() {
                                     </CardTitle>
                                 </CardHeader>
                                 <CardContent className="p-6 space-y-4">
-                                    {['أحمد المحامي', 'سارة المحامية', 'محمد المحامي'].map((user, idx) => (
-                                        <div key={idx} className="flex items-center justify-between">
-                                            <div className="flex items-center gap-3">
-                                                <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 font-bold text-xs">
-                                                    {user.charAt(0)}
+                                    {activeUsers.length > 0 ? (
+                                        activeUsers.map((user, idx) => (
+                                            <div key={idx} className="flex items-center justify-between">
+                                                <div className="flex items-center gap-3">
+                                                    <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 font-bold text-xs">
+                                                        {user.name.charAt(0)}
+                                                    </div>
+                                                    <span className="text-sm font-medium text-slate-700">{user.name}</span>
                                                 </div>
-                                                <span className="text-sm font-medium text-slate-700">{user}</span>
+                                                <Badge variant="outline" className="text-xs text-slate-500">
+                                                    {user.count} نشاط
+                                                </Badge>
                                             </div>
-                                            <Badge variant="outline" className="text-xs text-slate-500">
-                                                {activities.filter(a => a.user === user).length} نشاط
-                                            </Badge>
+                                        ))
+                                    ) : (
+                                        <div className="text-center text-slate-400 py-4">
+                                            <p className="text-sm">لا يوجد مستخدمون نشطون</p>
                                         </div>
-                                    ))}
+                                    )}
                                 </CardContent>
                             </Card>
                         </div>
                     </div>
-                </div>
+                    </div>
+                )}
             </Main>
         </>
     )

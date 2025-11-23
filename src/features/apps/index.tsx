@@ -1,4 +1,4 @@
-import { type ChangeEvent, useState } from 'react'
+import { type ChangeEvent, useState, useMemo } from 'react'
 import { getRouteApi } from '@tanstack/react-router'
 import { SlidersHorizontal, ArrowUpAZ, ArrowDownAZ } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -17,7 +17,9 @@ import { Main } from '@/components/layout/main'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { Search } from '@/components/search'
 import { ThemeSwitch } from '@/components/theme-switch'
-import { apps } from './data/apps'
+import { useApps } from '@/hooks/useApps'
+import { Skeleton } from '@/components/ui/skeleton'
+import { getAppIcon } from './utils/icon-mapper'
 
 const route = getRouteApi('/_authenticated/apps/')
 
@@ -41,20 +43,27 @@ export function Apps() {
   const [appType, setAppType] = useState(type)
   const [searchTerm, setSearchTerm] = useState(filter)
 
-  const filteredApps = apps
-    .sort((a, b) =>
-      sort === 'asc'
-        ? a.name.localeCompare(b.name)
-        : b.name.localeCompare(a.name)
-    )
-    .filter((app) =>
-      appType === 'connected'
-        ? app.connected
-        : appType === 'notConnected'
-          ? !app.connected
-          : true
-    )
-    .filter((app) => app.name.toLowerCase().includes(searchTerm.toLowerCase()))
+  // Fetch apps from API
+  const { data: apps, isLoading } = useApps()
+
+  const filteredApps = useMemo(() => {
+    if (!apps) return []
+
+    return apps
+      .sort((a, b) =>
+        sort === 'asc'
+          ? a.name.localeCompare(b.name)
+          : b.name.localeCompare(a.name)
+      )
+      .filter((app) =>
+        appType === 'connected'
+          ? app.connected
+          : appType === 'notConnected'
+            ? !app.connected
+            : true
+      )
+      .filter((app) => app.name.toLowerCase().includes(searchTerm.toLowerCase()))
+  }, [apps, sort, appType, searchTerm])
 
   const handleSearch = (e: ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value)
@@ -146,33 +155,41 @@ export function Apps() {
           </Select>
         </div>
         <Separator className='shadow-sm' />
-        <ul className='faded-bottom no-scrollbar grid gap-4 overflow-auto pt-4 pb-16 md:grid-cols-2 lg:grid-cols-3'>
-          {filteredApps.map((app) => (
-            <li
-              key={app.name}
-              className='rounded-lg border p-4 hover:shadow-md'
-            >
-              <div className='mb-8 flex items-center justify-between'>
-                <div
-                  className={`bg-muted flex size-10 items-center justify-center rounded-lg p-2`}
-                >
-                  {app.logo}
+        {isLoading ? (
+          <div className='grid gap-4 pt-4 md:grid-cols-2 lg:grid-cols-3'>
+            {Array.from({ length: 6 }).map((_, i) => (
+              <Skeleton key={i} className='h-32 w-full' />
+            ))}
+          </div>
+        ) : (
+          <ul className='faded-bottom no-scrollbar grid gap-4 overflow-auto pt-4 pb-16 md:grid-cols-2 lg:grid-cols-3'>
+            {filteredApps.map((app) => (
+              <li
+                key={app.id}
+                className='rounded-lg border p-4 hover:shadow-md'
+              >
+                <div className='mb-8 flex items-center justify-between'>
+                  <div
+                    className={`bg-muted flex size-10 items-center justify-center rounded-lg p-2`}
+                  >
+                    {getAppIcon(app.iconName)}
+                  </div>
+                  <Button
+                    variant='outline'
+                    size='sm'
+                    className={`${app.connected ? 'border border-blue-300 bg-blue-50 hover:bg-blue-100 dark:border-blue-700 dark:bg-blue-950 dark:hover:bg-blue-900' : ''}`}
+                  >
+                    {app.connected ? 'Connected' : 'Connect'}
+                  </Button>
                 </div>
-                <Button
-                  variant='outline'
-                  size='sm'
-                  className={`${app.connected ? 'border border-blue-300 bg-blue-50 hover:bg-blue-100 dark:border-blue-700 dark:bg-blue-950 dark:hover:bg-blue-900' : ''}`}
-                >
-                  {app.connected ? 'Connected' : 'Connect'}
-                </Button>
-              </div>
-              <div>
-                <h2 className='mb-1 font-semibold'>{app.name}</h2>
-                <p className='line-clamp-2 text-gray-500'>{app.desc}</p>
-              </div>
-            </li>
-          ))}
-        </ul>
+                <div>
+                  <h2 className='mb-1 font-semibold'>{app.name}</h2>
+                  <p className='line-clamp-2 text-gray-500'>{app.desc}</p>
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
       </Main>
     </>
   )

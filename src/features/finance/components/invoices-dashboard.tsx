@@ -1,7 +1,7 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import {
     Search, Filter, Plus, MoreHorizontal,
-    FileText, AlertCircle, CheckCircle, Bell
+    FileText, AlertCircle, CheckCircle, Bell, Loader2
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -23,29 +23,74 @@ import { LanguageSwitcher } from '@/components/language-switcher'
 import { ThemeSwitch } from '@/components/theme-switch'
 import { ConfigDrawer } from '@/components/config-drawer'
 import { ProfileDropdown } from '@/components/profile-dropdown'
+import { Skeleton } from '@/components/ui/skeleton'
+import { useInvoices, useOverdueInvoices } from '@/hooks/useFinance'
 
 export default function InvoicesDashboard() {
     const [activeTab, setActiveTab] = useState('all')
     const [searchQuery, setSearchQuery] = useState('')
 
-    // Mock Data
-    const invoices = [
-        { id: 'INV-2025-001', client: 'مشاري الرابح', amount: 52900, date: '15/11/2025', status: 'pending', dueDate: '15/12/2025' },
-        { id: 'INV-2025-002', client: 'شركة البناء الحديثة', amount: 28000, date: '10/11/2025', status: 'paid', dueDate: '10/12/2025' },
-        { id: 'INV-2025-003', client: 'محمد الدوسري', amount: 42000, date: '05/11/2025', status: 'overdue', dueDate: '05/11/2025' },
-        { id: 'INV-2025-004', client: 'سارة المطيري', amount: 15000, date: '01/11/2025', status: 'paid', dueDate: '01/12/2025' },
-        { id: 'INV-2025-005', client: 'عمر العنزي', amount: 8500, date: '28/10/2025', status: 'pending', dueDate: '28/11/2025' },
-    ]
+    // API Filters
+    const filters = useMemo(() => {
+        const f: any = {}
+        if (activeTab !== 'all') {
+            f.status = activeTab
+        }
+        return f
+    }, [activeTab])
 
-    // Filter Logic
-    const filteredInvoices = invoices.filter(inv => {
-        if (activeTab === 'all') return true
-        if (activeTab === 'paid') return inv.status === 'paid'
-        if (activeTab === 'pending') return inv.status === 'pending'
-        if (activeTab === 'overdue') return inv.status === 'overdue'
-        if (searchQuery && !inv.client.includes(searchQuery) && !inv.id.includes(searchQuery)) return false
-        return true
-    })
+    // Fetch data
+    const { data: invoicesData, isLoading, isError, error, refetch } = useInvoices(filters)
+    const { data: overdueData } = useOverdueInvoices()
+
+    // Transform API data to component format
+    const invoices = useMemo(() => {
+        if (!invoicesData?.invoices) return []
+        return invoicesData.invoices.map((inv: any) => ({
+            id: inv.invoiceNumber || inv._id,
+            client: inv.clientId?.name || inv.clientId?.firstName + ' ' + inv.clientId?.lastName || 'عميل غير محدد',
+            amount: inv.totalAmount || 0,
+            date: new Date(inv.issueDate).toLocaleDateString('ar-SA'),
+            status: inv.status,
+            dueDate: new Date(inv.dueDate).toLocaleDateString('ar-SA'),
+            _id: inv._id,
+        }))
+    }, [invoicesData])
+
+    // Filter Logic (client-side search)
+    const filteredInvoices = useMemo(() => {
+        return invoices.filter(inv => {
+            if (searchQuery && !inv.client.includes(searchQuery) && !inv.id.includes(searchQuery)) {
+                return false
+            }
+            return true
+        })
+    }, [invoices, searchQuery])
+
+    // Calculate statistics
+    const stats = useMemo(() => {
+        if (!invoicesData?.invoices) return { totalPending: 0, totalOverdue: 0, totalPaidThisMonth: 0 }
+
+        const allInvoices = invoicesData.invoices
+        const totalPending = allInvoices
+            .filter((inv: any) => inv.status === 'pending' || inv.status === 'sent')
+            .reduce((sum: number, inv: any) => sum + (inv.balanceDue || inv.totalAmount || 0), 0)
+
+        const totalOverdue = overdueData
+            ? overdueData.reduce((sum: number, inv: any) => sum + (inv.balanceDue || inv.totalAmount || 0), 0)
+            : 0
+
+        const thisMonth = new Date()
+        const totalPaidThisMonth = allInvoices
+            .filter((inv: any) => {
+                if (inv.status !== 'paid' || !inv.paidDate) return false
+                const paidDate = new Date(inv.paidDate)
+                return paidDate.getMonth() === thisMonth.getMonth() && paidDate.getFullYear() === thisMonth.getFullYear()
+            })
+            .reduce((sum: number, inv: any) => sum + (inv.totalAmount || 0), 0)
+
+        return { totalPending, totalOverdue, totalPaidThisMonth }
+    }, [invoicesData, overdueData])
 
     const formatCurrency = (amount: number) => {
         return new Intl.NumberFormat('ar-SA', {
@@ -65,6 +110,138 @@ export default function InvoicesDashboard() {
         { title: 'نشاط الحساب', href: '/dashboard/finance/activity', isActive: false },
     ]
 
+    // LOADING STATE
+    if (isLoading) {
+        return (
+            <>
+                <Header className="bg-navy shadow-none relative">
+                    <TopNav links={topNav} className="[&>a]:text-slate-300 [&>a:hover]:text-white [&>a[aria-current='page']]:text-white" />
+                    <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
+                        <DynamicIsland />
+                    </div>
+                    <div className='ms-auto flex items-center space-x-4'>
+                        <div className="relative hidden md:block">
+                            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                            <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pr-9 pl-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
+                        </div>
+                        <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white">
+                            <Bell className="h-5 w-5" />
+                            <span className="absolute top-2 right-2 h-2 w-2 bg-red-500 rounded-full border border-navy"></span>
+                        </Button>
+                        <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white" />
+                        <ThemeSwitch className="text-slate-300 hover:bg-white/10 hover:text-white" />
+                        <ConfigDrawer className="text-slate-300 hover:bg-white/10 hover:text-white" />
+                        <ProfileDropdown className="text-slate-300 hover:bg-white/10 hover:text-white" />
+                    </div>
+                    <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-emerald-500/50 to-transparent"></div>
+                </Header>
+                <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8">
+                    <Skeleton className="h-32 w-full rounded-3xl" />
+                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                        <div className="lg:col-span-8 space-y-6">
+                            <Skeleton className="h-16 w-full rounded-2xl" />
+                            <Skeleton className="h-32 w-full rounded-3xl" />
+                            <Skeleton className="h-32 w-full rounded-3xl" />
+                            <Skeleton className="h-32 w-full rounded-3xl" />
+                        </div>
+                        <div className="lg:col-span-4 space-y-6">
+                            <Skeleton className="h-32 w-full rounded-2xl" />
+                            <Skeleton className="h-32 w-full rounded-2xl" />
+                            <Skeleton className="h-32 w-full rounded-2xl" />
+                        </div>
+                    </div>
+                </Main>
+            </>
+        )
+    }
+
+    // ERROR STATE
+    if (isError) {
+        return (
+            <>
+                <Header className="bg-navy shadow-none relative">
+                    <TopNav links={topNav} className="[&>a]:text-slate-300 [&>a:hover]:text-white [&>a[aria-current='page']]:text-white" />
+                    <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
+                        <DynamicIsland />
+                    </div>
+                    <div className='ms-auto flex items-center space-x-4'>
+                        <div className="relative hidden md:block">
+                            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                            <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pr-9 pl-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
+                        </div>
+                        <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white">
+                            <Bell className="h-5 w-5" />
+                            <span className="absolute top-2 right-2 h-2 w-2 bg-red-500 rounded-full border border-navy"></span>
+                        </Button>
+                        <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white" />
+                        <ThemeSwitch className="text-slate-300 hover:bg-white/10 hover:text-white" />
+                        <ConfigDrawer className="text-slate-300 hover:bg-white/10 hover:text-white" />
+                        <ProfileDropdown className="text-slate-300 hover:bg-white/10 hover:text-white" />
+                    </div>
+                    <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-emerald-500/50 to-transparent"></div>
+                </Header>
+                <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8">
+                    <div className="bg-white rounded-3xl p-12 text-center border border-slate-100 shadow-sm">
+                        <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <AlertCircle className="h-8 w-8 text-red-500" />
+                        </div>
+                        <h3 className="text-xl font-bold text-slate-900 mb-2">فشل تحميل الفواتير</h3>
+                        <p className="text-slate-500 mb-6">{error?.message || 'حدث خطأ أثناء تحميل البيانات'}</p>
+                        <Button onClick={() => refetch()} className="bg-emerald-500 hover:bg-emerald-600 text-white px-8">
+                            <Loader2 className="ml-2 h-4 w-4" />
+                            إعادة المحاولة
+                        </Button>
+                    </div>
+                </Main>
+            </>
+        )
+    }
+
+    // EMPTY STATE
+    if (filteredInvoices.length === 0 && !searchQuery && activeTab === 'all') {
+        return (
+            <>
+                <Header className="bg-navy shadow-none relative">
+                    <TopNav links={topNav} className="[&>a]:text-slate-300 [&>a:hover]:text-white [&>a[aria-current='page']]:text-white" />
+                    <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
+                        <DynamicIsland />
+                    </div>
+                    <div className='ms-auto flex items-center space-x-4'>
+                        <div className="relative hidden md:block">
+                            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                            <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pr-9 pl-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
+                        </div>
+                        <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white">
+                            <Bell className="h-5 w-5" />
+                            <span className="absolute top-2 right-2 h-2 w-2 bg-red-500 rounded-full border border-navy"></span>
+                        </Button>
+                        <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white" />
+                        <ThemeSwitch className="text-slate-300 hover:bg-white/10 hover:text-white" />
+                        <ConfigDrawer className="text-slate-300 hover:bg-white/10 hover:text-white" />
+                        <ProfileDropdown className="text-slate-300 hover:bg-white/10 hover:text-white" />
+                    </div>
+                    <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-emerald-500/50 to-transparent"></div>
+                </Header>
+                <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8">
+                    <div className="bg-white rounded-3xl p-12 text-center border border-slate-100 shadow-sm">
+                        <div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <FileText className="h-8 w-8 text-brand-blue" />
+                        </div>
+                        <h3 className="text-xl font-bold text-slate-900 mb-2">لا توجد فواتير بعد</h3>
+                        <p className="text-slate-500 mb-6">ابدأ بإنشاء أول فاتورة لعملائك</p>
+                        <Button asChild className="bg-brand-blue hover:bg-blue-600 text-white px-8">
+                            <Link to="/dashboard/finance/invoices/new">
+                                <Plus className="ml-2 h-4 w-4" />
+                                إنشاء فاتورة جديدة
+                            </Link>
+                        </Button>
+                    </div>
+                </Main>
+            </>
+        )
+    }
+
+    // SUCCESS STATE
     return (
         <>
             <Header className="bg-navy shadow-none relative">
@@ -180,7 +357,25 @@ export default function InvoicesDashboard() {
 
                             {/* List Items */}
                             <div className="space-y-4">
-                                {filteredInvoices.map((inv) => (
+                                {filteredInvoices.length === 0 ? (
+                                    <div className="bg-white p-12 rounded-3xl text-center border border-slate-100">
+                                        <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                                            <Search className="h-8 w-8 text-slate-400" />
+                                        </div>
+                                        <h3 className="text-lg font-bold text-slate-900 mb-2">لا توجد نتائج</h3>
+                                        <p className="text-slate-500 mb-4">لم نجد فواتير تطابق البحث أو الفلاتر المحددة</p>
+                                        <Button
+                                            variant="outline"
+                                            onClick={() => {
+                                                setSearchQuery('')
+                                                setActiveTab('all')
+                                            }}
+                                            className="border-slate-200 hover:bg-slate-50"
+                                        >
+                                            مسح الفلاتر
+                                        </Button>
+                                    </div>
+                                ) : filteredInvoices.map((inv) => (
                                     <div key={inv.id} className="bg-white p-6 rounded-[24px] border border-slate-100 shadow-sm hover:shadow-md transition-all flex flex-col md:flex-row md:items-center justify-between gap-4">
                                         <div className="flex items-center gap-4">
                                             <div className="w-14 h-14 rounded-2xl bg-blue-50 flex items-center justify-center text-brand-blue">
@@ -191,10 +386,19 @@ export default function InvoicesDashboard() {
                                                     <h4 className="font-bold text-navy text-lg">{inv.id}</h4>
                                                     <Badge className={`
                                                         ${inv.status === 'paid' ? 'bg-emerald-100 text-emerald-700' :
-                                                            inv.status === 'overdue' ? 'bg-rose-100 text-rose-700' : 'bg-amber-100 text-amber-700'} 
+                                                            inv.status === 'overdue' ? 'bg-rose-100 text-rose-700' :
+                                                            inv.status === 'cancelled' ? 'bg-slate-100 text-slate-700' :
+                                                            inv.status === 'draft' ? 'bg-slate-100 text-slate-600' :
+                                                            inv.status === 'partial' ? 'bg-blue-100 text-blue-700' :
+                                                            'bg-amber-100 text-amber-700'}
                                                         border-0 px-2 py-0.5
                                                     `}>
-                                                        {inv.status === 'paid' ? 'مدفوعة' : inv.status === 'overdue' ? 'متأخرة' : 'معلقة'}
+                                                        {inv.status === 'paid' ? 'مدفوعة' :
+                                                         inv.status === 'overdue' ? 'متأخرة' :
+                                                         inv.status === 'cancelled' ? 'ملغاة' :
+                                                         inv.status === 'draft' ? 'مسودة' :
+                                                         inv.status === 'partial' ? 'مدفوعة جزئياً' :
+                                                         inv.status === 'sent' ? 'مرسلة' : 'معلقة'}
                                                     </Badge>
                                                 </div>
                                                 <p className="text-slate-500 font-medium">{inv.client}</p>
@@ -217,7 +421,7 @@ export default function InvoicesDashboard() {
                                                 </DropdownMenuTrigger>
                                                 <DropdownMenuContent align="end">
                                                     <DropdownMenuItem asChild>
-                                                        <Link to="/dashboard/finance/invoices/$invoiceId" params={{ invoiceId: inv.id }}>
+                                                        <Link to="/dashboard/finance/invoices/$invoiceId" params={{ invoiceId: inv._id }}>
                                                             عرض الفاتورة
                                                         </Link>
                                                     </DropdownMenuItem>
@@ -242,7 +446,7 @@ export default function InvoicesDashboard() {
                                             </div>
                                             <Badge className="bg-blue-100 text-brand-blue hover:bg-blue-200 border-0">نشطة</Badge>
                                         </div>
-                                        <div className="text-2xl font-bold text-navy">{formatCurrency(105807.50)}</div>
+                                        <div className="text-2xl font-bold text-navy">{formatCurrency(stats.totalPending)}</div>
                                         <div className="text-sm text-slate-500">إجمالي الفواتير المستحقة</div>
                                     </CardContent>
                                 </Card>
@@ -254,7 +458,7 @@ export default function InvoicesDashboard() {
                                             </div>
                                             <Badge className="bg-rose-100 text-rose-600 hover:bg-rose-200 border-0">متأخرة</Badge>
                                         </div>
-                                        <div className="text-2xl font-bold text-navy">{formatCurrency(42000)}</div>
+                                        <div className="text-2xl font-bold text-navy">{formatCurrency(stats.totalOverdue)}</div>
                                         <div className="text-sm text-slate-500">فواتير متأخرة السداد</div>
                                     </CardContent>
                                 </Card>
@@ -266,7 +470,7 @@ export default function InvoicesDashboard() {
                                             </div>
                                             <Badge className="bg-emerald-100 text-emerald-600 hover:bg-emerald-200 border-0">هذا الشهر</Badge>
                                         </div>
-                                        <div className="text-2xl font-bold text-navy">{formatCurrency(85000)}</div>
+                                        <div className="text-2xl font-bold text-navy">{formatCurrency(stats.totalPaidThisMonth)}</div>
                                         <div className="text-sm text-slate-500">تم تحصيلها مؤخراً</div>
                                     </CardContent>
                                 </Card>

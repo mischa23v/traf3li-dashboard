@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import {
     ArrowRight, Save, Calendar, Activity,
-    FileText, User, Shield
+    FileText, User, Shield, Loader2, DollarSign, Hash
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -19,18 +19,39 @@ import { DynamicIsland } from '@/components/dynamic-island'
 import { Main } from '@/components/layout/main'
 import { Link, useNavigate } from '@tanstack/react-router'
 import { FinanceSidebar } from './finance-sidebar'
+import { useCreateActivity } from '@/hooks/useFinance'
+
+type ActivityType = 'payment_received' | 'payment_sent' | 'invoice_created' | 'invoice_sent' | 'invoice_paid' | 'expense_created' | 'expense_approved' | 'transaction_created'
 
 export function CreateAccountActivityView() {
     const navigate = useNavigate()
-    const [isLoading, setIsLoading] = useState(false)
+    const { mutate: createActivity, isPending } = useCreateActivity()
+
+    const [formData, setFormData] = useState({
+        type: '' as ActivityType | '',
+        title: '',
+        description: '',
+        reference: '',
+        amount: 0,
+        status: 'completed',
+        metadata: {}
+    })
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
-        setIsLoading(true)
-        // Simulate API call
-        await new Promise(resolve => setTimeout(resolve, 1000))
-        setIsLoading(false)
-        navigate({ to: '/dashboard/finance/activity' })
+
+        if (!formData.type) {
+            return
+        }
+
+        createActivity({
+            ...formData,
+            type: formData.type as ActivityType
+        }, {
+            onSuccess: () => {
+                navigate({ to: '/dashboard/finance/activity' })
+            }
+        })
     }
 
     const topNav = [
@@ -98,22 +119,35 @@ export function CreateAccountActivityView() {
                                                 <FileText className="w-4 h-4 text-emerald-500" />
                                                 عنوان النشاط
                                             </label>
-                                            <Input placeholder="مثال: مراجعة صلاحيات المستخدمين" className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500" required />
+                                            <Input
+                                                placeholder="مثال: استلام دفعة من العميل"
+                                                className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500"
+                                                value={formData.title}
+                                                onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
+                                                required
+                                            />
                                         </div>
                                         <div className="space-y-2">
                                             <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
                                                 <Activity className="w-4 h-4 text-emerald-500" />
                                                 نوع النشاط
                                             </label>
-                                            <Select>
+                                            <Select
+                                                value={formData.type}
+                                                onValueChange={(value: ActivityType) => setFormData(prev => ({ ...prev, type: value }))}
+                                            >
                                                 <SelectTrigger className="rounded-xl border-slate-200 focus:ring-emerald-500">
                                                     <SelectValue placeholder="اختر النوع" />
                                                 </SelectTrigger>
                                                 <SelectContent>
-                                                    <SelectItem value="audit">تدقيق</SelectItem>
-                                                    <SelectItem value="security">أمان</SelectItem>
-                                                    <SelectItem value="system">نظام</SelectItem>
-                                                    <SelectItem value="user">مستخدم</SelectItem>
+                                                    <SelectItem value="payment_received">دفعة مستلمة</SelectItem>
+                                                    <SelectItem value="payment_sent">دفعة مرسلة</SelectItem>
+                                                    <SelectItem value="invoice_created">فاتورة منشأة</SelectItem>
+                                                    <SelectItem value="invoice_sent">فاتورة مرسلة</SelectItem>
+                                                    <SelectItem value="invoice_paid">فاتورة مدفوعة</SelectItem>
+                                                    <SelectItem value="expense_created">مصروف منشأ</SelectItem>
+                                                    <SelectItem value="expense_approved">مصروف موافق عليه</SelectItem>
+                                                    <SelectItem value="transaction_created">معاملة منشأة</SelectItem>
                                                 </SelectContent>
                                             </Select>
                                         </div>
@@ -122,17 +156,30 @@ export function CreateAccountActivityView() {
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                         <div className="space-y-2">
                                             <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                                <User className="w-4 h-4 text-emerald-500" />
-                                                المستخدم المسؤول
+                                                <Hash className="w-4 h-4 text-emerald-500" />
+                                                المرجع
                                             </label>
-                                            <Input placeholder="اسم المستخدم" className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500" />
+                                            <Input
+                                                placeholder="مثال: INV-2025-001"
+                                                className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500"
+                                                value={formData.reference}
+                                                onChange={(e) => setFormData(prev => ({ ...prev, reference: e.target.value }))}
+                                                required
+                                            />
                                         </div>
                                         <div className="space-y-2">
                                             <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                                <Calendar className="w-4 h-4 text-emerald-500" />
-                                                التاريخ والوقت
+                                                <DollarSign className="w-4 h-4 text-emerald-500" />
+                                                المبلغ (ر.س)
                                             </label>
-                                            <Input type="datetime-local" className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500" required />
+                                            <Input
+                                                type="number"
+                                                placeholder="0.00"
+                                                className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500"
+                                                value={formData.amount}
+                                                onChange={(e) => setFormData(prev => ({ ...prev, amount: parseFloat(e.target.value) || 0 }))}
+                                                required
+                                            />
                                         </div>
                                     </div>
 
@@ -144,7 +191,30 @@ export function CreateAccountActivityView() {
                                         <Textarea
                                             placeholder="أدخل تفاصيل النشاط..."
                                             className="min-h-[100px] rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500"
+                                            value={formData.description}
+                                            onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+                                            required
                                         />
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                                            <Shield className="w-4 h-4 text-emerald-500" />
+                                            الحالة
+                                        </label>
+                                        <Select
+                                            value={formData.status}
+                                            onValueChange={(value: string) => setFormData(prev => ({ ...prev, status: value }))}
+                                        >
+                                            <SelectTrigger className="rounded-xl border-slate-200 focus:ring-emerald-500">
+                                                <SelectValue placeholder="اختر الحالة" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="completed">مكتمل</SelectItem>
+                                                <SelectItem value="pending">معلق</SelectItem>
+                                                <SelectItem value="failed">فشل</SelectItem>
+                                            </SelectContent>
+                                        </Select>
                                     </div>
                                 </div>
 
@@ -157,16 +227,17 @@ export function CreateAccountActivityView() {
                                     <Button
                                         type="submit"
                                         className="bg-emerald-500 hover:bg-emerald-600 text-white min-w-[140px] rounded-xl shadow-lg shadow-emerald-500/20"
-                                        disabled={isLoading}
+                                        disabled={isPending}
                                     >
-                                        {isLoading ? (
+                                        {isPending ? (
                                             <span className="flex items-center gap-2">
+                                                <Loader2 className="w-4 h-4 animate-spin" />
                                                 جاري الحفظ...
                                             </span>
                                         ) : (
                                             <span className="flex items-center gap-2">
                                                 <Save className="w-4 h-4" />
-                                                حفظ السجل
+                                                تسجيل النشاط
                                             </span>
                                         )}
                                     </Button>

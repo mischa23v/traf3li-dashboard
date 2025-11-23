@@ -1,9 +1,12 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import {
     FileText, Calendar, CheckSquare, Clock, MoreHorizontal, Plus, Upload,
     User, ArrowLeft, Briefcase,
-    History, Link as LinkIcon, Flag, Send, Eye, Download, Search, Bell
+    History, Link as LinkIcon, Flag, Send, Eye, Download, Search, Bell, AlertCircle
 } from 'lucide-react'
+import { Skeleton } from '@/components/ui/skeleton'
+import { useTask } from '@/hooks/useTasks'
+import { useParams } from '@tanstack/react-router'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -29,48 +32,69 @@ import { ConfigDrawer } from '@/components/config-drawer'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 
 export function TaskDetailsView() {
+    const { taskId } = useParams({ strict: false }) as { taskId: string }
     const [activeTab, setActiveTab] = useState('overview')
 
-    // Mock Data for a single task
-    const task = {
-        id: 'TASK-1001',
-        title: 'تحضير استراتيجية الدفاع في قضية نزاع الأراضي',
-        description: 'يجب إعداد استراتيجية دفاع شاملة تتضمن مراجعة جميع المستندات المقدمة من الخصم، وتحليل الثغرات القانونية في عقود الملكية. يرجى التركيز على المادة 45 من نظام المرافعات.',
-        status: 'in_progress',
-        priority: 'high',
-        dueDate: '2025-11-25',
-        completion: 65,
-        assignee: {
-            name: 'أحمد السالم',
-            role: 'محامي أول',
-            avatar: '/avatars/01.png'
-        },
-        client: {
-            name: 'مشاري الرابح',
-            type: 'فرد',
-            phone: '0501234567'
-        },
-        case: {
-            id: 'CASE-2025-001',
-            title: 'نزاع أراضي - حي العليا',
-            court: 'المحكمة العامة بالرياض'
-        },
-        subtasks: [
-            { id: 1, title: 'مراجعة لائحة الدعوى', completed: true },
-            { id: 2, title: 'تحليل عقود الملكية', completed: true },
-            { id: 3, title: 'إعداد مسودة الرد الأولية', completed: false },
-            { id: 4, title: 'مراجعة المسودة مع العميل', completed: false },
-        ],
-        comments: [
-            { id: 1, user: 'فاطمة الغامدي', text: 'تم رفع المستندات المطلوبة على النظام.', time: 'منذ ساعتين', avatar: 'FG' },
-            { id: 2, user: 'أحمد السالم', text: 'شكراً فاطمة، سأبدأ بالمراجعة فوراً.', time: 'منذ ساعة', avatar: 'AS' },
-        ],
-        timeline: [
-            { date: '2025-11-20', title: 'تم إنشاء المهمة', type: 'created', status: 'completed' },
-            { date: '2025-11-21', title: 'بدء العمل', type: 'started', status: 'completed' },
-            { date: '2025-11-25', title: 'موعد التسليم', type: 'deadline', status: 'upcoming' },
-        ]
-    }
+    // Fetch task data
+    const { data: taskData, isLoading, isError, error, refetch } = useTask(taskId)
+
+    // Transform API data
+    const task = useMemo(() => {
+        if (!taskData) return null
+        const t = taskData
+
+        // Calculate completion percentage
+        const subtasks = t.subtasks || []
+        const completedSubtasks = subtasks.filter((st: any) => st.completed).length
+        const completion = subtasks.length > 0 ? Math.round((completedSubtasks / subtasks.length) * 100) : 0
+
+        // Type narrow assignedTo
+        const assignee = typeof t.assignedTo === 'string'
+            ? { name: t.assignedTo, role: 'محامي', avatar: '/avatars/default.png' }
+            : {
+                name: (t.assignedTo.firstName || '') + ' ' + (t.assignedTo.lastName || '') || 'غير محدد',
+                role: t.assignedTo.role || 'محامي',
+                avatar: t.assignedTo.avatar || '/avatars/default.png'
+            }
+
+        // Type narrow caseId
+        const caseInfo = typeof t.caseId === 'string' || !t.caseId
+            ? { id: 'N/A', title: 'غير محدد', court: 'غير محدد' }
+            : {
+                id: t.caseId.caseNumber || 'N/A',
+                title: t.caseId.title || 'غير محدد',
+                court: t.caseId.court || 'غير محدد'
+            }
+
+        // Type narrow clientId
+        const clientInfo = typeof t.clientId === 'string' || !t.clientId
+            ? { name: 'غير محدد', type: 'فرد', phone: '' }
+            : {
+                name: t.clientId.name || 'غير محدد',
+                type: 'فرد',
+                phone: t.clientId.phone || ''
+            }
+
+        return {
+            id: t._id,
+            title: t.title || t.description || 'مهمة غير محددة',
+            description: t.description || 'لا يوجد وصف',
+            status: t.status || 'pending',
+            priority: t.priority || 'medium',
+            dueDate: t.dueDate ? new Date(t.dueDate).toLocaleDateString('ar-SA') : 'غير محدد',
+            completion,
+            assignee,
+            client: clientInfo,
+            case: caseInfo,
+            subtasks: subtasks.map((st: any, idx: number) => ({
+                id: idx + 1,
+                title: st.title || st.description,
+                completed: st.completed || st.status === 'completed'
+            })),
+            comments: t.comments || [],
+            timeline: t.history || []
+        }
+    }, [taskData])
 
     const topNav = [
         { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
@@ -117,8 +141,64 @@ export function TaskDetailsView() {
                     </Link>
                 </div>
 
-                {/* Task Hero Content */}
-                <div className="max-w-[1600px] mx-auto bg-emerald-950 rounded-3xl p-8 shadow-xl shadow-emerald-900/20 mb-8 relative overflow-hidden">
+                {/* Loading State */}
+                {isLoading && (
+                    <div className="max-w-[1600px] mx-auto space-y-6">
+                        <Skeleton className="h-48 w-full rounded-3xl" />
+                        <div className="grid grid-cols-12 gap-6">
+                            <div className="col-span-12 lg:col-span-8">
+                                <Skeleton className="h-96 w-full rounded-2xl" />
+                            </div>
+                            <div className="col-span-12 lg:col-span-4">
+                                <Skeleton className="h-96 w-full rounded-2xl" />
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {/* Error State */}
+                {isError && (
+                    <div className="max-w-[1600px] mx-auto">
+                        <div className="bg-white rounded-2xl p-12 border border-slate-100 text-center">
+                            <div className="flex justify-center mb-4">
+                                <div className="w-16 h-16 rounded-full bg-red-50 flex items-center justify-center">
+                                    <AlertCircle className="w-8 h-8 text-red-500" />
+                                </div>
+                            </div>
+                            <h3 className="text-lg font-bold text-slate-900 mb-2">حدث خطأ أثناء تحميل المهمة</h3>
+                            <p className="text-slate-500 mb-4">{error?.message || 'تعذر الاتصال بالخادم'}</p>
+                            <Button onClick={() => refetch()} className="bg-emerald-500 hover:bg-emerald-600">
+                                إعادة المحاولة
+                            </Button>
+                        </div>
+                    </div>
+                )}
+
+                {/* Empty State */}
+                {!isLoading && !isError && !task && (
+                    <div className="max-w-[1600px] mx-auto">
+                        <div className="bg-white rounded-2xl p-12 border border-slate-100 text-center">
+                            <div className="flex justify-center mb-4">
+                                <div className="w-16 h-16 rounded-full bg-emerald-50 flex items-center justify-center">
+                                    <Briefcase className="w-8 h-8 text-emerald-500" />
+                                </div>
+                            </div>
+                            <h3 className="text-lg font-bold text-slate-900 mb-2">المهمة غير موجودة</h3>
+                            <p className="text-slate-500 mb-4">لم يتم العثور على المهمة المطلوبة</p>
+                            <Button asChild className="bg-emerald-500 hover:bg-emerald-600">
+                                <Link to="/dashboard/tasks/list">
+                                    العودة إلى القائمة
+                                </Link>
+                            </Button>
+                        </div>
+                    </div>
+                )}
+
+                {/* Success State */}
+                {!isLoading && !isError && task && (
+                    <>
+                        {/* Task Hero Content */}
+                        <div className="max-w-[1600px] mx-auto bg-emerald-950 rounded-3xl p-8 shadow-xl shadow-emerald-900/20 mb-8 relative overflow-hidden">
                     {/* Background Decoration */}
                     <div className="absolute top-0 left-0 w-full h-full overflow-hidden z-0 pointer-events-none">
                         <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-emerald-500/10 rounded-full blur-[100px]"></div>
@@ -440,6 +520,8 @@ export function TaskDetailsView() {
                         </div>
                     </div>
                 </div>
+                    </>
+                )}
             </Main>
         </>
     )

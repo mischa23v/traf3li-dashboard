@@ -13,7 +13,9 @@ import {
   FileText,
   ChevronLeft,
   GraduationCap,
-  TrendingUp
+  TrendingUp,
+  Loader2,
+  AlertCircle,
 } from 'lucide-react'
 import { Link } from '@tanstack/react-router'
 import { Button } from '@/components/ui/button'
@@ -32,11 +34,24 @@ import { ProfileDropdown } from '@/components/profile-dropdown'
 import { ThemeSwitch } from '@/components/theme-switch'
 import { LanguageSwitcher } from '@/components/language-switcher'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-
 import { DynamicIsland } from '@/components/dynamic-island'
+import {
+  useDashboardStats,
+  useDashboardHeroStats,
+  useTodayEvents,
+  useFinancialSummary,
+  useRecentMessages,
+} from '@/hooks/useDashboard'
 
 export function Dashboard() {
   // const { t } = useTranslation()
+
+  // Fetch dashboard data
+  const { data: stats, isLoading: statsLoading, error: statsError } = useDashboardStats()
+  const { data: heroStats, isLoading: heroLoading } = useDashboardHeroStats()
+  const { data: todayEvents, isLoading: eventsLoading } = useTodayEvents()
+  const { data: financialSummary, isLoading: financialLoading } = useFinancialSummary()
+  const { data: recentMessages, isLoading: messagesLoading } = useRecentMessages(3)
 
   const topNav = [
     {
@@ -97,7 +112,16 @@ export function Dashboard() {
           <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="space-y-2 text-center md:text-start">
               <h1 className="text-3xl font-bold leading-tight">مساء الخير، مشاري 👋</h1>
-              <p className="text-slate-300 text-lg">لديك <span className="text-white font-bold">3 جلسات</span>، <span className="text-white font-bold">5 مهام عاجلة</span>، و <span className="text-white font-bold">2 رسائل جديدة</span>.</p>
+              {heroLoading ? (
+                <div className="flex items-center justify-center md:justify-start gap-2 text-slate-300">
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  <span>جاري التحميل...</span>
+                </div>
+              ) : (
+                <p className="text-slate-300 text-lg">
+                  لديك <span className="text-white font-bold">{heroStats?.upcomingSessions || 0} جلسات</span>، <span className="text-white font-bold">{heroStats?.urgentTasks || 0} مهام عاجلة</span>، و <span className="text-white font-bold">{heroStats?.newMessages || 0} رسائل جديدة</span>.
+                </p>
+              )}
             </div>
             <div className="flex flex-wrap gap-3">
               <Button className="bg-brand-blue hover:bg-blue-600 text-white rounded-xl h-11 px-6 font-bold shadow-lg shadow-blue-600/30 hover:scale-105 transition-all duration-300 border-0">
@@ -114,71 +138,84 @@ export function Dashboard() {
 
         {/* STATS ROW */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {/* Revenue */}
-          <Card className="rounded-3xl border-slate-100 shadow-sm hover:shadow-md transition-all duration-300 group">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-bold text-slate-500">الإيرادات (هذا الشهر)</CardTitle>
-              <div className="h-10 w-10 rounded-xl bg-green-50 flex items-center justify-center group-hover:bg-green-100 transition-colors">
-                <DollarSign className="h-5 w-5 text-green-600" />
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-navy">45,231.89 ر.س</div>
-              <p className="text-xs text-green-600 flex items-center mt-1 font-bold">
-                <ArrowUpRight className="h-3 w-3 ml-1" />
-                +20.1% من الشهر الماضي
-              </p>
-            </CardContent>
-          </Card>
+          {statsLoading ? (
+            <div className="col-span-full flex items-center justify-center py-12">
+              <Loader2 className="h-8 w-8 animate-spin text-navy" />
+            </div>
+          ) : statsError ? (
+            <div className="col-span-full flex items-center justify-center py-12 text-red-600">
+              <AlertCircle className="h-5 w-5 ml-2" />
+              <span>فشل تحميل الإحصائيات</span>
+            </div>
+          ) : (
+            <>
+              {/* Revenue */}
+              <Card className="rounded-3xl border-slate-100 shadow-sm hover:shadow-md transition-all duration-300 group">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-bold text-slate-500">الإيرادات (هذا الشهر)</CardTitle>
+                  <div className="h-10 w-10 rounded-xl bg-green-50 flex items-center justify-center group-hover:bg-green-100 transition-colors">
+                    <DollarSign className="h-5 w-5 text-green-600" />
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-navy">{stats?.revenue.current.toLocaleString('ar-SA')} ر.س</div>
+                  <p className={`text-xs flex items-center mt-1 font-bold ${(stats?.revenue.percentageChange ?? 0) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                    {(stats?.revenue.percentageChange ?? 0) >= 0 ? <ArrowUpRight className="h-3 w-3 ml-1" /> : <ArrowDownRight className="h-3 w-3 ml-1" />}
+                    {Math.abs(stats?.revenue.percentageChange ?? 0)}% من الشهر الماضي
+                  </p>
+                </CardContent>
+              </Card>
 
-          {/* Active Cases */}
-          <Card className="rounded-3xl border-slate-100 shadow-sm hover:shadow-md transition-all duration-300 group">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-bold text-slate-500">القضايا النشطة</CardTitle>
-              <div className="h-10 w-10 rounded-xl bg-blue-50 flex items-center justify-center group-hover:bg-blue-100 transition-colors">
-                <Scale className="h-5 w-5 text-brand-blue" />
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-navy">12 قضية</div>
-              <p className="text-xs text-slate-400 mt-1 font-medium">
-                3 قضايا تتطلب إجراء
-              </p>
-            </CardContent>
-          </Card>
+              {/* Active Cases */}
+              <Card className="rounded-3xl border-slate-100 shadow-sm hover:shadow-md transition-all duration-300 group">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-bold text-slate-500">القضايا النشطة</CardTitle>
+                  <div className="h-10 w-10 rounded-xl bg-blue-50 flex items-center justify-center group-hover:bg-blue-100 transition-colors">
+                    <Scale className="h-5 w-5 text-brand-blue" />
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-navy">{stats?.activeCases.total || 0} قضية</div>
+                  <p className="text-xs text-slate-400 mt-1 font-medium">
+                    {stats?.activeCases.requiresAction || 0} قضايا تتطلب إجراء
+                  </p>
+                </CardContent>
+              </Card>
 
-          {/* New Clients */}
-          <Card className="rounded-3xl border-slate-100 shadow-sm hover:shadow-md transition-all duration-300 group">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-bold text-slate-500">العملاء الجدد</CardTitle>
-              <div className="h-10 w-10 rounded-xl bg-purple-50 flex items-center justify-center group-hover:bg-purple-100 transition-colors">
-                <Users className="h-5 w-5 text-purple-600" />
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-navy">+4 عملاء</div>
-              <p className="text-xs text-purple-600 flex items-center mt-1 font-bold">
-                <ArrowUpRight className="h-3 w-3 ml-1" />
-                +2 هذا الأسبوع
-              </p>
-            </CardContent>
-          </Card>
+              {/* New Clients */}
+              <Card className="rounded-3xl border-slate-100 shadow-sm hover:shadow-md transition-all duration-300 group">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-bold text-slate-500">العملاء الجدد</CardTitle>
+                  <div className="h-10 w-10 rounded-xl bg-purple-50 flex items-center justify-center group-hover:bg-purple-100 transition-colors">
+                    <Users className="h-5 w-5 text-purple-600" />
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-navy">+{stats?.newClients.total || 0} عملاء</div>
+                  <p className="text-xs text-purple-600 flex items-center mt-1 font-bold">
+                    <ArrowUpRight className="h-3 w-3 ml-1" />
+                    +{stats?.newClients.thisWeek || 0} هذا الأسبوع
+                  </p>
+                </CardContent>
+              </Card>
 
-          {/* Unread Messages */}
-          <Card className="rounded-3xl border-slate-100 shadow-sm hover:shadow-md transition-all duration-300 group">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-bold text-slate-500">الرسائل غير المقروءة</CardTitle>
-              <div className="h-10 w-10 rounded-xl bg-amber-50 flex items-center justify-center group-hover:bg-amber-100 transition-colors">
-                <MessageSquare className="h-5 w-5 text-amber-600" />
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-navy">7 رسائل</div>
-              <p className="text-xs text-slate-400 mt-1 font-medium">
-                من 3 عملاء مختلفين
-              </p>
-            </CardContent>
-          </Card>
+              {/* Unread Messages */}
+              <Card className="rounded-3xl border-slate-100 shadow-sm hover:shadow-md transition-all duration-300 group">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-bold text-slate-500">الرسائل غير المقروءة</CardTitle>
+                  <div className="h-10 w-10 rounded-xl bg-amber-50 flex items-center justify-center group-hover:bg-amber-100 transition-colors">
+                    <MessageSquare className="h-5 w-5 text-amber-600" />
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-navy">{stats?.unreadMessages.total || 0} رسائل</div>
+                  <p className="text-xs text-slate-400 mt-1 font-medium">
+                    من {stats?.unreadMessages.uniqueClients || 0} عملاء مختلفين
+                  </p>
+                </CardContent>
+              </Card>
+            </>
+          )}
         </div>
 
         {/* MAIN GRID */}
@@ -199,35 +236,42 @@ export function Dashboard() {
                 </Button>
               </CardHeader>
               <CardContent className="p-0">
-                <div className="divide-y divide-slate-100">
-                  {[
-                    { id: '1', time: '09:00 ص', title: 'جلسة مرافعة - شركة الإنشاءات', type: 'session', location: 'المحكمة العمالية', color: 'blue' },
-                    { id: '2', time: '11:30 ص', title: 'اجتماع مع العميل الجديد', type: 'meeting', location: 'المكتب', color: 'purple' },
-                    { id: '3', time: '02:00 م', title: 'موعد تسليم المذكرة', type: 'deadline', location: 'عن بعد', color: 'red' },
-                  ].map((event, i) => (
-                    <Link
-                      key={i}
-                      to="/tasks/$taskId"
-                      params={{ taskId: event.id }}
-                      className="flex items-center p-6 hover:bg-slate-50/80 transition-colors group cursor-pointer block"
-                    >
-                      <div className="w-20 font-bold text-slate-600 text-sm">{event.time}</div>
-                      <div className={`w-1.5 h-12 rounded-full bg-${event.color}-500 mr-4 ml-2`}></div>
-                      <div className="flex-1">
-                        <h4 className="font-bold text-navy text-lg group-hover:text-brand-blue transition-colors">{event.title}</h4>
-                        <div className="flex items-center gap-4 mt-1 text-xs font-medium text-slate-500">
-                          <span className="flex items-center gap-1"><MapPinIcon className="h-3 w-3" /> {event.location}</span>
-                          <span className={`bg-${event.color}-50 text-${event.color}-700 px-2 py-0.5 rounded-md font-bold`}>
-                            {event.type === 'session' ? 'جلسة' : event.type === 'meeting' ? 'اجتماع' : 'موعد نهائي'}
-                          </span>
+                {eventsLoading ? (
+                  <div className="flex items-center justify-center py-12">
+                    <Loader2 className="h-6 w-6 animate-spin text-navy" />
+                  </div>
+                ) : !todayEvents || todayEvents.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center py-12 text-slate-400">
+                    <Scale className="h-12 w-12 mb-3 opacity-30" />
+                    <p className="text-sm font-medium">لا توجد مواعيد اليوم</p>
+                  </div>
+                ) : (
+                  <div className="divide-y divide-slate-100">
+                    {todayEvents.map((event) => (
+                      <Link
+                        key={event._id}
+                        to="/tasks/$taskId"
+                        params={{ taskId: event._id }}
+                        className="flex items-center p-6 hover:bg-slate-50/80 transition-colors group cursor-pointer block"
+                      >
+                        <div className="w-20 font-bold text-slate-600 text-sm">{event.time}</div>
+                        <div className={`w-1.5 h-12 rounded-full bg-${event.color}-500 mr-4 ml-2`}></div>
+                        <div className="flex-1">
+                          <h4 className="font-bold text-navy text-lg group-hover:text-brand-blue transition-colors">{event.title}</h4>
+                          <div className="flex items-center gap-4 mt-1 text-xs font-medium text-slate-500">
+                            <span className="flex items-center gap-1"><MapPinIcon className="h-3 w-3" /> {event.location}</span>
+                            <span className={`bg-${event.color}-50 text-${event.color}-700 px-2 py-0.5 rounded-md font-bold`}>
+                              {event.type === 'session' ? 'جلسة' : event.type === 'meeting' ? 'اجتماع' : 'موعد نهائي'}
+                            </span>
+                          </div>
                         </div>
-                      </div>
-                      <Button variant="ghost" size="icon" className="text-slate-300 group-hover:text-brand-blue">
-                        <ChevronLeft className="h-5 w-5" />
-                      </Button>
-                    </Link>
-                  ))}
-                </div>
+                        <Button variant="ghost" size="icon" className="text-slate-300 group-hover:text-brand-blue">
+                          <ChevronLeft className="h-5 w-5" />
+                        </Button>
+                      </Link>
+                    ))}
+                  </div>
+                )}
               </CardContent>
             </Card>
 
@@ -297,36 +341,45 @@ export function Dashboard() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-6">
-                  <div className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl">
-                    <div className="flex items-center gap-3">
-                      <div className="h-10 w-10 rounded-full bg-white flex items-center justify-center shadow-sm text-green-600">
-                        <ArrowDownRight className="h-5 w-5" />
-                      </div>
-                      <div>
-                        <p className="text-xs text-slate-600 font-bold">الدخل المتوقع</p>
-                        <p className="font-bold text-navy">12,500 ر.س</p>
+                {financialLoading ? (
+                  <div className="flex items-center justify-center py-8">
+                    <Loader2 className="h-6 w-6 animate-spin text-navy" />
+                  </div>
+                ) : (
+                  <div className="space-y-6">
+                    <div className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl">
+                      <div className="flex items-center gap-3">
+                        <div className="h-10 w-10 rounded-full bg-white flex items-center justify-center shadow-sm text-green-600">
+                          <ArrowDownRight className="h-5 w-5" />
+                        </div>
+                        <div>
+                          <p className="text-xs text-slate-600 font-bold">الدخل المتوقع</p>
+                          <p className="font-bold text-navy">{financialSummary?.expectedIncome.toLocaleString('ar-SA') || 0} ر.س</p>
+                        </div>
                       </div>
                     </div>
-                  </div>
 
-                  <div className="space-y-3">
-                    <h4 className="text-sm font-bold text-slate-600">الفواتير المستحقة</h4>
-                    {[
-                      { client: 'مؤسسة البناء الحديث', amount: '5,000', date: 'يستحق غداً' },
-                      { client: 'خالد العتيبي', amount: '2,500', date: 'متأخر يومين' },
-                    ].map((inv, i) => (
-                      <div key={i} className="flex items-center justify-between border-b border-slate-100 pb-3 last:border-0 last:pb-0">
-                        <div>
-                          <p className="text-sm font-bold text-navy">{inv.client}</p>
-                          <p className={`text-xs font-bold ${inv.date.includes('متأخر') ? 'text-rose-600' : 'text-amber-600'}`}>{inv.date}</p>
-                        </div>
-                        <span className="font-bold text-slate-700">{inv.amount}</span>
-                      </div>
-                    ))}
+                    <div className="space-y-3">
+                      <h4 className="text-sm font-bold text-slate-600">الفواتير المستحقة</h4>
+                      {!financialSummary?.pendingInvoices || financialSummary.pendingInvoices.length === 0 ? (
+                        <p className="text-xs text-slate-400 py-4 text-center">لا توجد فواتير مستحقة</p>
+                      ) : (
+                        financialSummary.pendingInvoices.map((inv) => (
+                          <div key={inv._id} className="flex items-center justify-between border-b border-slate-100 pb-3 last:border-0 last:pb-0">
+                            <div>
+                              <p className="text-sm font-bold text-navy">{inv.clientName}</p>
+                              <p className={`text-xs font-bold ${inv.isOverdue ? 'text-rose-600' : 'text-amber-600'}`}>
+                                {inv.isOverdue ? 'متأخر' : 'يستحق'} {new Date(inv.dueDate).toLocaleDateString('ar-SA')}
+                              </p>
+                            </div>
+                            <span className="font-bold text-slate-700">{inv.amount.toLocaleString('ar-SA')}</span>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                    <Button className="w-full bg-navy text-white hover:bg-navy/90 rounded-xl">الذهاب للمالية</Button>
                   </div>
-                  <Button className="w-full bg-navy text-white hover:bg-navy/90 rounded-xl">الذهاب للمالية</Button>
-                </div>
+                )}
               </CardContent>
             </Card>
 
@@ -340,30 +393,37 @@ export function Dashboard() {
                 <Button variant="ghost" size="sm" className="text-xs text-blue-600">عرض الكل</Button>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
-                  {[
-                    { name: 'سارة الأحمد', msg: 'هل تم رفع المذكرة؟', time: 'منذ 10 د', online: true },
-                    { name: 'شركة التوريد', msg: 'مرفق العقد للمراجعة', time: 'منذ 1 س', online: false },
-                    { name: 'محمد فهد', msg: 'شكراً لك يا أستاذ', time: 'منذ 3 س', online: true },
-                  ].map((chat, i) => (
-                    <div key={i} className="flex items-center gap-3 p-2 hover:bg-slate-50 rounded-xl transition-colors cursor-pointer">
-                      <div className="relative">
-                        <Avatar className="h-10 w-10 border border-slate-100">
-                          <AvatarImage src={`/avatars/0${i + 1}.png`} />
-                          <AvatarFallback>{chat.name[0]}</AvatarFallback>
-                        </Avatar>
-                        {chat.online && <span className="absolute bottom-0 right-0 h-3 w-3 bg-green-500 border-2 border-white rounded-full"></span>}
-                      </div>
-                      <div className="flex-1 overflow-hidden">
-                        <div className="flex justify-between items-center">
-                          <h5 className="font-bold text-sm text-navy truncate">{chat.name}</h5>
-                          <span className="text-[10px] text-slate-400">{chat.time}</span>
+                {messagesLoading ? (
+                  <div className="flex items-center justify-center py-8">
+                    <Loader2 className="h-6 w-6 animate-spin text-navy" />
+                  </div>
+                ) : !recentMessages || recentMessages.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center py-8 text-slate-400">
+                    <MessageSquare className="h-12 w-12 mb-3 opacity-30" />
+                    <p className="text-sm font-medium">لا توجد رسائل حديثة</p>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {recentMessages.map((chat) => (
+                      <div key={chat._id} className="flex items-center gap-3 p-2 hover:bg-slate-50 rounded-xl transition-colors cursor-pointer">
+                        <div className="relative">
+                          <Avatar className="h-10 w-10 border border-slate-100">
+                            <AvatarImage src={chat.avatar} />
+                            <AvatarFallback>{chat.name[0]}</AvatarFallback>
+                          </Avatar>
+                          {chat.isOnline && <span className="absolute bottom-0 right-0 h-3 w-3 bg-green-500 border-2 border-white rounded-full"></span>}
                         </div>
-                        <p className="text-xs text-slate-500 truncate">{chat.msg}</p>
+                        <div className="flex-1 overflow-hidden">
+                          <div className="flex justify-between items-center">
+                            <h5 className="font-bold text-sm text-navy truncate">{chat.name}</h5>
+                            <span className="text-[10px] text-slate-400">{chat.timestamp}</span>
+                          </div>
+                          <p className="text-xs text-slate-500 truncate">{chat.message}</p>
+                        </div>
                       </div>
-                    </div>
-                  ))}
-                </div>
+                    ))}
+                  </div>
+                )}
               </CardContent>
             </Card>
 

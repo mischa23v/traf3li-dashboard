@@ -19,18 +19,41 @@ import { DynamicIsland } from '@/components/dynamic-island'
 import { Main } from '@/components/layout/main'
 import { Link, useNavigate } from '@tanstack/react-router'
 import { FinanceSidebar } from './finance-sidebar'
+import { useCreateTransaction } from '@/hooks/useFinance'
 
 export function CreateTransactionView() {
     const navigate = useNavigate()
-    const [isLoading, setIsLoading] = useState(false)
+    const createTransactionMutation = useCreateTransaction()
+
+    const [formData, setFormData] = useState({
+        description: '',
+        type: '',
+        amount: '',
+        date: '',
+        fromAccount: '',
+        toAccount: '',
+        notes: '',
+    })
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
-        setIsLoading(true)
-        // Simulate API call
-        await new Promise(resolve => setTimeout(resolve, 1000))
-        setIsLoading(false)
-        navigate({ to: '/dashboard/finance/transactions' })
+
+        const transactionData = {
+            description: formData.description,
+            type: formData.type as 'expense' | 'income' | 'transfer',
+            amount: Number(formData.amount),
+            category: 'general',
+            date: formData.date,
+            fromAccount: formData.fromAccount,
+            ...(formData.toAccount && { toAccount: formData.toAccount }),
+            notes: formData.notes,
+        }
+
+        createTransactionMutation.mutate(transactionData, {
+            onSuccess: () => {
+                navigate({ to: '/dashboard/finance/transactions' })
+            },
+        })
     }
 
     const topNav = [
@@ -98,14 +121,20 @@ export function CreateTransactionView() {
                                                 <FileText className="w-4 h-4 text-emerald-500" />
                                                 وصف المعاملة
                                             </label>
-                                            <Input placeholder="مثال: تحويل رصيد للفرع الرئيسي" className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500" required />
+                                            <Input
+                                                placeholder="مثال: تحويل رصيد للفرع الرئيسي"
+                                                value={formData.description}
+                                                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                                                className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500"
+                                                required
+                                            />
                                         </div>
                                         <div className="space-y-2">
                                             <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
                                                 <ArrowRightLeft className="w-4 h-4 text-emerald-500" />
                                                 نوع المعاملة
                                             </label>
-                                            <Select>
+                                            <Select value={formData.type} onValueChange={(value) => setFormData({ ...formData, type: value })}>
                                                 <SelectTrigger className="rounded-xl border-slate-200 focus:ring-emerald-500">
                                                     <SelectValue placeholder="اختر النوع" />
                                                 </SelectTrigger>
@@ -124,14 +153,27 @@ export function CreateTransactionView() {
                                                 <DollarSign className="w-4 h-4 text-emerald-500" />
                                                 المبلغ
                                             </label>
-                                            <Input type="number" placeholder="0.00" className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500" required />
+                                            <Input
+                                                type="number"
+                                                placeholder="0.00"
+                                                value={formData.amount}
+                                                onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
+                                                className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500"
+                                                required
+                                            />
                                         </div>
                                         <div className="space-y-2">
                                             <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
                                                 <Calendar className="w-4 h-4 text-emerald-500" />
                                                 التاريخ
                                             </label>
-                                            <Input type="date" className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500" required />
+                                            <Input
+                                                type="date"
+                                                value={formData.date}
+                                                onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+                                                className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500"
+                                                required
+                                            />
                                         </div>
                                     </div>
 
@@ -141,7 +183,7 @@ export function CreateTransactionView() {
                                                 <CreditCard className="w-4 h-4 text-emerald-500" />
                                                 من حساب
                                             </label>
-                                            <Select>
+                                            <Select value={formData.fromAccount} onValueChange={(value) => setFormData({ ...formData, fromAccount: value })}>
                                                 <SelectTrigger className="rounded-xl border-slate-200 focus:ring-emerald-500">
                                                     <SelectValue placeholder="اختر الحساب" />
                                                 </SelectTrigger>
@@ -157,7 +199,7 @@ export function CreateTransactionView() {
                                                 <CreditCard className="w-4 h-4 text-emerald-500" />
                                                 إلى حساب (اختياري)
                                             </label>
-                                            <Select>
+                                            <Select value={formData.toAccount} onValueChange={(value) => setFormData({ ...formData, toAccount: value })}>
                                                 <SelectTrigger className="rounded-xl border-slate-200 focus:ring-emerald-500">
                                                     <SelectValue placeholder="اختر الحساب" />
                                                 </SelectTrigger>
@@ -177,6 +219,8 @@ export function CreateTransactionView() {
                                         </label>
                                         <Textarea
                                             placeholder="أدخل أي تفاصيل إضافية..."
+                                            value={formData.notes}
+                                            onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                                             className="min-h-[100px] rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500"
                                         />
                                     </div>
@@ -191,9 +235,9 @@ export function CreateTransactionView() {
                                     <Button
                                         type="submit"
                                         className="bg-emerald-500 hover:bg-emerald-600 text-white min-w-[140px] rounded-xl shadow-lg shadow-emerald-500/20"
-                                        disabled={isLoading}
+                                        disabled={createTransactionMutation.isPending}
                                     >
-                                        {isLoading ? (
+                                        {createTransactionMutation.isPending ? (
                                             <span className="flex items-center gap-2">
                                                 جاري الحفظ...
                                             </span>

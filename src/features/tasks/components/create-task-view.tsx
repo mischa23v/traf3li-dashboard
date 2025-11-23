@@ -19,18 +19,43 @@ import { DynamicIsland } from '@/components/dynamic-island'
 import { Main } from '@/components/layout/main'
 import { Link, useNavigate } from '@tanstack/react-router'
 import { TasksSidebar } from './tasks-sidebar'
+import { useCreateTask } from '@/hooks/useTasks'
 
 export function CreateTaskView() {
     const navigate = useNavigate()
-    const [isLoading, setIsLoading] = useState(false)
+    const createTaskMutation = useCreateTask()
+
+    const [formData, setFormData] = useState({
+        title: '',
+        clientId: '',
+        dueDate: '',
+        priority: 'medium',
+        caseId: '',
+        description: ''
+    })
+
+    const handleChange = (field: string, value: string) => {
+        setFormData(prev => ({ ...prev, [field]: value }))
+    }
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
-        setIsLoading(true)
-        // Simulate API call
-        await new Promise(resolve => setTimeout(resolve, 1000))
-        setIsLoading(false)
-        navigate({ to: '/dashboard/tasks/list' })
+
+        const taskData = {
+            title: formData.title,
+            description: formData.description,
+            dueDate: formData.dueDate,
+            priority: formData.priority as 'low' | 'medium' | 'high' | 'critical',
+            assignedTo: '', // Will be populated later
+            ...(formData.clientId && { clientId: formData.clientId }),
+            ...(formData.caseId && { caseId: formData.caseId }),
+        }
+
+        createTaskMutation.mutate(taskData, {
+            onSuccess: () => {
+                navigate({ to: '/dashboard/tasks/list' })
+            }
+        })
     }
 
     const topNav = [
@@ -95,14 +120,20 @@ export function CreateTaskView() {
                                                 <FileText className="w-4 h-4 text-emerald-500" />
                                                 عنوان المهمة
                                             </label>
-                                            <Input placeholder="مثال: مراجعة العقد النهائي" className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500" required />
+                                            <Input
+                                                placeholder="مثال: مراجعة العقد النهائي"
+                                                className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500"
+                                                required
+                                                value={formData.title}
+                                                onChange={(e) => handleChange('title', e.target.value)}
+                                            />
                                         </div>
                                         <div className="space-y-2">
                                             <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
                                                 <User className="w-4 h-4 text-emerald-500" />
                                                 العميل
                                             </label>
-                                            <Select>
+                                            <Select value={formData.clientId} onValueChange={(value) => handleChange('clientId', value)}>
                                                 <SelectTrigger className="rounded-xl border-slate-200 focus:ring-emerald-500">
                                                     <SelectValue placeholder="اختر العميل" />
                                                 </SelectTrigger>
@@ -121,14 +152,20 @@ export function CreateTaskView() {
                                                 <Calendar className="w-4 h-4 text-emerald-500" />
                                                 تاريخ الاستحقاق
                                             </label>
-                                            <Input type="date" className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500" required />
+                                            <Input
+                                                type="date"
+                                                className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500"
+                                                required
+                                                value={formData.dueDate}
+                                                onChange={(e) => handleChange('dueDate', e.target.value)}
+                                            />
                                         </div>
                                         <div className="space-y-2">
                                             <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
                                                 <Flag className="w-4 h-4 text-emerald-500" />
                                                 الأولوية
                                             </label>
-                                            <Select defaultValue="medium">
+                                            <Select value={formData.priority} onValueChange={(value) => handleChange('priority', value)} defaultValue="medium">
                                                 <SelectTrigger className="rounded-xl border-slate-200 focus:ring-emerald-500">
                                                     <SelectValue placeholder="اختر الأولوية" />
                                                 </SelectTrigger>
@@ -146,7 +183,7 @@ export function CreateTaskView() {
                                             <Briefcase className="w-4 h-4 text-emerald-500" />
                                             القضية المرتبطة (اختياري)
                                         </label>
-                                        <Select>
+                                        <Select value={formData.caseId} onValueChange={(value) => handleChange('caseId', value)}>
                                             <SelectTrigger className="rounded-xl border-slate-200 focus:ring-emerald-500">
                                                 <SelectValue placeholder="اختر القضية" />
                                             </SelectTrigger>
@@ -165,6 +202,8 @@ export function CreateTaskView() {
                                         <Textarea
                                             placeholder="أدخل تفاصيل إضافية عن المهمة..."
                                             className="min-h-[120px] rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500"
+                                            value={formData.description}
+                                            onChange={(e) => handleChange('description', e.target.value)}
                                         />
                                     </div>
                                 </div>
@@ -178,9 +217,9 @@ export function CreateTaskView() {
                                     <Button
                                         type="submit"
                                         className="bg-emerald-500 hover:bg-emerald-600 text-white min-w-[140px] rounded-xl shadow-lg shadow-emerald-500/20"
-                                        disabled={isLoading}
+                                        disabled={createTaskMutation.isPending}
                                     >
-                                        {isLoading ? (
+                                        {createTaskMutation.isPending ? (
                                             <span className="flex items-center gap-2">
                                                 جاري الحفظ...
                                             </span>

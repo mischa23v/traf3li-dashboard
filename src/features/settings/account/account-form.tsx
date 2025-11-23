@@ -1,8 +1,9 @@
+import { useEffect } from 'react'
 import { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { CaretSortIcon, CheckIcon } from '@radix-ui/react-icons'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { showSubmittedData } from '@/lib/show-submitted-data'
+import { Loader2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import {
@@ -29,9 +30,12 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover'
 import { DatePicker } from '@/components/date-picker'
+import { useSettings, useUpdateAccountSettings } from '@/hooks/useSettings'
+import { Skeleton } from '@/components/ui/skeleton'
 
 const languages = [
   { label: 'English', value: 'en' },
+  { label: 'Arabic', value: 'ar' },
   { label: 'French', value: 'fr' },
   { label: 'German', value: 'de' },
   { label: 'Spanish', value: 'es' },
@@ -48,25 +52,52 @@ const accountFormSchema = z.object({
     .min(1, 'Please enter your name.')
     .min(2, 'Name must be at least 2 characters.')
     .max(30, 'Name must not be longer than 30 characters.'),
-  dob: z.date('Please select your date of birth.'),
+  dob: z.date().optional(),
   language: z.string('Please select a language.'),
 })
 
 type AccountFormValues = z.infer<typeof accountFormSchema>
 
-// This can come from your database or API.
-const defaultValues: Partial<AccountFormValues> = {
-  name: '',
-}
-
 export function AccountForm() {
+  const { data: settings, isLoading: loadingSettings } = useSettings()
+  const { mutate: updateSettings, isPending } = useUpdateAccountSettings()
+
   const form = useForm<AccountFormValues>({
     resolver: zodResolver(accountFormSchema),
-    defaultValues,
+    defaultValues: {
+      name: '',
+      language: 'en',
+    },
   })
 
+  // Update form when settings load
+  useEffect(() => {
+    if (settings) {
+      form.reset({
+        name: settings.account.name || '',
+        dob: settings.account.dob ? new Date(settings.account.dob) : undefined,
+        language: settings.account.language || 'en',
+      })
+    }
+  }, [settings, form])
+
   function onSubmit(data: AccountFormValues) {
-    showSubmittedData(data)
+    updateSettings({
+      name: data.name,
+      dob: data.dob?.toISOString(),
+      language: data.language,
+    })
+  }
+
+  if (loadingSettings) {
+    return (
+      <div className='space-y-8'>
+        <Skeleton className='h-20 w-full' />
+        <Skeleton className='h-20 w-full' />
+        <Skeleton className='h-20 w-full' />
+        <Skeleton className='h-10 w-32' />
+      </div>
+    )
   }
 
   return (
@@ -166,7 +197,16 @@ export function AccountForm() {
             </FormItem>
           )}
         />
-        <Button type='submit'>Update account</Button>
+        <Button type='submit' disabled={isPending}>
+          {isPending ? (
+            <>
+              <Loader2 className='mr-2 h-4 w-4 animate-spin' />
+              Updating...
+            </>
+          ) : (
+            'Update account'
+          )}
+        </Button>
       </form>
     </Form>
   )

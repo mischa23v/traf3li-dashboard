@@ -1,4 +1,5 @@
 import { Link } from '@tanstack/react-router'
+import { useState, useMemo } from 'react'
 import {
     Briefcase,
     Filter,
@@ -29,75 +30,44 @@ import { LanguageSwitcher } from '@/components/language-switcher'
 import { ThemeSwitch } from '@/components/theme-switch'
 import { ConfigDrawer } from '@/components/config-drawer'
 import { ProfileDropdown } from '@/components/profile-dropdown'
+import { useCases } from '@/hooks/useCasesAndClients'
+import { Skeleton } from '@/components/ui/skeleton'
+import { Alert, AlertDescription } from '@/components/ui/alert'
 
 export function CasesListView() {
+    const [statusFilter, setStatusFilter] = useState<string>('all')
 
-    const cases = [
-        {
-            id: '4772077905',
-            title: 'مشاري بن ناهد الرابح ضد المصنع السعودي',
-            plaintiff: 'مشاري بن ناهد الرابح',
-            defendant: 'المصنع السعودي للمنتجات المعدنية',
-            type: 'عمالية',
-            status: 'active',
-            statusLabel: 'قيد النظر',
-            nextHearing: 'اليوم',
-            court: 'المحكمة العمالية - الرياض',
-            lawyer: 'أحمد المحامي',
-            claimAmount: 52900,
-            priority: 'critical',
-            progress: 65,
-            lastUpdate: 'منذ ساعتين'
-        },
-        {
-            id: '4772088016',
-            title: 'عبدالله الغامدي ضد شركة البناء الحديثة',
-            plaintiff: 'عبدالله بن سعد الغامدي',
-            defendant: 'شركة البناء الحديثة',
-            type: 'تجارية',
-            status: 'active',
-            statusLabel: 'قيد النظر',
-            nextHearing: 'غداً',
-            court: 'المحكمة التجارية - جدة',
-            lawyer: 'سارة المحامية',
-            claimAmount: 180000,
-            priority: 'high',
-            progress: 45,
-            lastUpdate: 'منذ 4 ساعات'
-        },
-        {
-            id: '4772099127',
-            title: 'فاطمة العتيبي ضد مستشفى النور الطبي',
-            plaintiff: 'فاطمة بنت محمد العتيبي',
-            defendant: 'مستشفى النور الطبي',
-            type: 'مدنية',
-            status: 'settlement',
-            statusLabel: 'تسوية ودية',
-            nextHearing: 'بعد 3 أيام',
-            court: 'مكتب العمل - الرياض',
-            lawyer: 'محمد المحامي',
-            claimAmount: 75000,
-            priority: 'medium',
-            progress: 80,
-            lastUpdate: 'منذ يوم'
-        },
-        {
-            id: '4772100238',
-            title: 'خالد القحطاني ضد شركة التقنية المتقدمة',
-            plaintiff: 'خالد بن عبدالرحمن القحطاني',
-            defendant: 'شركة التقنية المتقدمة',
-            type: 'عمالية',
-            status: 'active',
-            statusLabel: 'قيد النظر',
-            nextHearing: 'بعد أسبوع',
-            court: 'المحكمة العمالية - الدمام',
-            lawyer: 'أحمد المحامي',
-            claimAmount: 95000,
-            priority: 'medium',
-            progress: 30,
-            lastUpdate: 'منذ 3 أيام'
+    const filters = useMemo(() => {
+        const f: any = {}
+        if (statusFilter !== 'all') {
+            f.status = statusFilter
         }
-    ]
+        return f
+    }, [statusFilter])
+
+    const { data: casesData, isLoading, isError, error, refetch } = useCases(filters)
+
+    const cases = useMemo(() => {
+        if (!casesData?.cases) return []
+
+        return casesData.cases.map((caseItem: any) => ({
+            id: caseItem.caseNumber || caseItem._id,
+            title: caseItem.title || 'قضية غير محددة',
+            plaintiff: caseItem.clientId?.name || 'غير محدد',
+            defendant: caseItem.opposingParty || 'غير محدد',
+            type: caseItem.caseType || 'عامة',
+            status: caseItem.status || 'active',
+            statusLabel: caseItem.status === 'active' ? 'قيد النظر' : caseItem.status === 'closed' ? 'مغلقة' : 'قيد النظر',
+            nextHearing: caseItem.nextHearingDate ? new Date(caseItem.nextHearingDate).toLocaleDateString('ar-SA', { day: 'numeric', month: 'long' }) : 'غير محدد',
+            court: caseItem.court || 'غير محدد',
+            lawyer: caseItem.assignedTo?.firstName + ' ' + caseItem.assignedTo?.lastName || 'غير محدد',
+            claimAmount: caseItem.claimAmount || 0,
+            priority: caseItem.priority || 'medium',
+            progress: caseItem.progress || 0,
+            lastUpdate: caseItem.updatedAt ? new Date(caseItem.updatedAt).toLocaleDateString('ar-SA') : 'غير محدد',
+            _id: caseItem._id,
+        }))
+    }, [casesData])
 
     const recentActivities = [
         { title: 'تم إيداع مذكرة الرد', case: 'مشاري بن ناهد', time: 'منذ ساعتين', type: 'success' },
@@ -274,7 +244,58 @@ export function CasesListView() {
 
                         {/* Custom Cases List Design */}
                         <div className="space-y-4">
-                            {cases.map((case_) => (
+                            {/* Loading State */}
+                            {isLoading && (
+                                <>
+                                    {[1, 2, 3].map((i) => (
+                                        <div key={i} className="bg-white rounded-2xl p-6 border border-slate-100">
+                                            <div className="flex gap-4 mb-4">
+                                                <Skeleton className="w-12 h-12 rounded-xl" />
+                                                <div className="flex-1 space-y-2">
+                                                    <Skeleton className="h-6 w-3/4" />
+                                                    <Skeleton className="h-4 w-1/2" />
+                                                    <Skeleton className="h-4 w-2/3" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </>
+                            )}
+
+                            {/* Error State */}
+                            {isError && !isLoading && (
+                                <Alert className="border-red-200 bg-red-50">
+                                    <AlertCircle className="h-4 w-4 text-red-600" />
+                                    <AlertDescription className="text-red-800">
+                                        <div className="flex items-center justify-between">
+                                            <span>حدث خطأ أثناء تحميل القضايا: {error?.message || 'خطأ غير معروف'}</span>
+                                            <Button onClick={() => refetch()} variant="outline" size="sm" className="border-red-300 text-red-700 hover:bg-red-100">
+                                                إعادة المحاولة
+                                            </Button>
+                                        </div>
+                                    </AlertDescription>
+                                </Alert>
+                            )}
+
+                            {/* Empty State */}
+                            {!isLoading && !isError && cases.length === 0 && (
+                                <div className="text-center py-12 bg-white rounded-2xl">
+                                    <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-blue-50 mb-4">
+                                        <Briefcase className="h-8 w-8 text-blue-500" />
+                                    </div>
+                                    <h4 className="text-lg font-bold text-navy mb-2">لا توجد قضايا</h4>
+                                    <p className="text-slate-500 mb-4">لم يتم العثور على قضايا</p>
+                                    <Button asChild className="bg-blue-500 hover:bg-blue-600 text-white rounded-xl">
+                                        <Link to="/dashboard/cases" search={{ create: true } as any}>
+                                            <Plus className="ml-2 h-4 w-4" />
+                                            إنشاء قضية جديدة
+                                        </Link>
+                                    </Button>
+                                </div>
+                            )}
+
+                            {/* Success State */}
+                            {!isLoading && !isError && cases.length > 0 && cases.map((case_) => (
                                 <div key={case_.id} className="bg-white rounded-2xl p-6 border border-slate-100 hover:border-blue-200 transition-all group shadow-sm">
                                     <div className="flex justify-between items-start mb-4">
                                         <div className="flex gap-4 items-start flex-1">

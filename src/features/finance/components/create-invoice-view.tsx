@@ -19,10 +19,20 @@ import { DynamicIsland } from '@/components/dynamic-island'
 import { Main } from '@/components/layout/main'
 import { Link, useNavigate } from '@tanstack/react-router'
 import { FinanceSidebar } from './finance-sidebar'
+import { useCreateInvoice } from '@/hooks/useFinance'
 
 export function CreateInvoiceView() {
     const navigate = useNavigate()
-    const [isLoading, setIsLoading] = useState(false)
+    const createInvoiceMutation = useCreateInvoice()
+
+    const [formData, setFormData] = useState({
+        invoiceNumber: '',
+        clientId: '',
+        issueDate: '',
+        dueDate: '',
+        notes: '',
+    })
+
     const [items, setItems] = useState([{ id: 1, description: '', quantity: 1, price: 0 }])
 
     const handleAddItem = () => {
@@ -35,13 +45,42 @@ export function CreateInvoiceView() {
         }
     }
 
+    const handleItemChange = (id: number, field: string, value: any) => {
+        setItems(items.map(item => item.id === id ? { ...item, [field]: value } : item))
+    }
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
-        setIsLoading(true)
-        // Simulate API call
-        await new Promise(resolve => setTimeout(resolve, 1000))
-        setIsLoading(false)
-        navigate({ to: '/dashboard/finance/invoices' })
+
+        // Calculate totals
+        const subtotal = items.reduce((sum, item) => sum + (item.quantity * item.price), 0)
+        const vatRate = 0.15
+        const vatAmount = subtotal * vatRate
+        const totalAmount = subtotal + vatAmount
+
+        const invoiceData = {
+            invoiceNumber: formData.invoiceNumber,
+            clientId: formData.clientId,
+            issueDate: formData.issueDate,
+            dueDate: formData.dueDate,
+            items: items.map(item => ({
+                description: item.description,
+                quantity: item.quantity,
+                unitPrice: item.price,
+                total: item.quantity * item.price,
+            })),
+            subtotal,
+            vatRate,
+            vatAmount,
+            totalAmount,
+            notes: formData.notes,
+        }
+
+        createInvoiceMutation.mutate(invoiceData, {
+            onSuccess: () => {
+                navigate({ to: '/dashboard/finance/invoices' })
+            },
+        })
     }
 
     const topNav = [
@@ -109,14 +148,20 @@ export function CreateInvoiceView() {
                                                 <Hash className="w-4 h-4 text-emerald-500" />
                                                 رقم الفاتورة
                                             </label>
-                                            <Input placeholder="INV-2025-001" className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500" required />
+                                            <Input
+                                                placeholder="INV-2025-001"
+                                                value={formData.invoiceNumber}
+                                                onChange={(e) => setFormData({ ...formData, invoiceNumber: e.target.value })}
+                                                className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500"
+                                                required
+                                            />
                                         </div>
                                         <div className="space-y-2">
                                             <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
                                                 <User className="w-4 h-4 text-emerald-500" />
                                                 العميل
                                             </label>
-                                            <Select>
+                                            <Select value={formData.clientId} onValueChange={(value) => setFormData({ ...formData, clientId: value })}>
                                                 <SelectTrigger className="rounded-xl border-slate-200 focus:ring-emerald-500">
                                                     <SelectValue placeholder="اختر العميل" />
                                                 </SelectTrigger>
@@ -135,14 +180,26 @@ export function CreateInvoiceView() {
                                                 <Calendar className="w-4 h-4 text-emerald-500" />
                                                 تاريخ الإصدار
                                             </label>
-                                            <Input type="date" className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500" required />
+                                            <Input
+                                                type="date"
+                                                value={formData.issueDate}
+                                                onChange={(e) => setFormData({ ...formData, issueDate: e.target.value })}
+                                                className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500"
+                                                required
+                                            />
                                         </div>
                                         <div className="space-y-2">
                                             <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
                                                 <Calendar className="w-4 h-4 text-emerald-500" />
                                                 تاريخ الاستحقاق
                                             </label>
-                                            <Input type="date" className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500" required />
+                                            <Input
+                                                type="date"
+                                                value={formData.dueDate}
+                                                onChange={(e) => setFormData({ ...formData, dueDate: e.target.value })}
+                                                className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500"
+                                                required
+                                            />
                                         </div>
                                     </div>
 
@@ -163,13 +220,30 @@ export function CreateInvoiceView() {
                                             {items.map((item, index) => (
                                                 <div key={item.id} className="flex gap-4 items-start">
                                                     <div className="flex-1">
-                                                        <Input placeholder="وصف الخدمة / المنتج" className="rounded-xl border-slate-200" />
+                                                        <Input
+                                                            placeholder="وصف الخدمة / المنتج"
+                                                            value={item.description}
+                                                            onChange={(e) => handleItemChange(item.id, 'description', e.target.value)}
+                                                            className="rounded-xl border-slate-200"
+                                                        />
                                                     </div>
                                                     <div className="w-24">
-                                                        <Input type="number" placeholder="الكمية" className="rounded-xl border-slate-200" />
+                                                        <Input
+                                                            type="number"
+                                                            placeholder="الكمية"
+                                                            value={item.quantity}
+                                                            onChange={(e) => handleItemChange(item.id, 'quantity', Number(e.target.value))}
+                                                            className="rounded-xl border-slate-200"
+                                                        />
                                                     </div>
                                                     <div className="w-32">
-                                                        <Input type="number" placeholder="السعر" className="rounded-xl border-slate-200" />
+                                                        <Input
+                                                            type="number"
+                                                            placeholder="السعر"
+                                                            value={item.price}
+                                                            onChange={(e) => handleItemChange(item.id, 'price', Number(e.target.value))}
+                                                            className="rounded-xl border-slate-200"
+                                                        />
                                                     </div>
                                                     <Button type="button" onClick={() => handleRemoveItem(item.id)} variant="ghost" size="icon" className="text-red-500 hover:bg-red-50 rounded-xl">
                                                         <Trash2 className="w-4 h-4" />
@@ -186,6 +260,8 @@ export function CreateInvoiceView() {
                                         </label>
                                         <Textarea
                                             placeholder="أدخل أي ملاحظات إضافية أو شروط للدفع..."
+                                            value={formData.notes}
+                                            onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                                             className="min-h-[100px] rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500"
                                         />
                                     </div>
@@ -200,9 +276,9 @@ export function CreateInvoiceView() {
                                     <Button
                                         type="submit"
                                         className="bg-emerald-500 hover:bg-emerald-600 text-white min-w-[140px] rounded-xl shadow-lg shadow-emerald-500/20"
-                                        disabled={isLoading}
+                                        disabled={createInvoiceMutation.isPending}
                                     >
-                                        {isLoading ? (
+                                        {createInvoiceMutation.isPending ? (
                                             <span className="flex items-center gap-2">
                                                 جاري الحفظ...
                                             </span>

@@ -1,7 +1,8 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import {
     Search, Download, Plus, MoreHorizontal,
-    FileText, Calendar, Building, FileClock, Send, Bell
+    FileText, Calendar, Building, FileClock, Send, Bell,
+    Loader2, AlertCircle
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -14,6 +15,7 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Skeleton } from '@/components/ui/skeleton'
 import { Link } from '@tanstack/react-router'
 import { Header } from '@/components/layout/header'
 import { TopNav } from '@/components/layout/top-nav'
@@ -23,69 +25,26 @@ import { LanguageSwitcher } from '@/components/language-switcher'
 import { ThemeSwitch } from '@/components/theme-switch'
 import { ConfigDrawer } from '@/components/config-drawer'
 import { ProfileDropdown } from '@/components/profile-dropdown'
+import { useStatements } from '@/hooks/useFinance'
 
 export default function StatementsHistoryDashboard() {
     const [activeTab, setActiveTab] = useState('all')
     const [searchQuery, setSearchQuery] = useState('')
 
-    // Mock Data
-    const statements = [
-        {
-            id: 'ST-2025-001',
-            date: '15 نوفمبر 2025',
-            client: 'مشاري الرابح',
-            period: '1 أكتوبر - 31 أكتوبر 2025',
-            amount: 12500,
-            status: 'sent',
-            itemsCount: 5
-        },
-        {
-            id: 'ST-2025-002',
-            date: '14 نوفمبر 2025',
-            client: 'سارة المطيري',
-            period: '1 نوفمبر - 14 نوفمبر 2025',
-            amount: 4200,
-            status: 'draft',
-            itemsCount: 3
-        },
-        {
-            id: 'ST-2025-003',
-            date: '10 نوفمبر 2025',
-            client: 'محمد الدوسري',
-            period: 'سبتمبر 2025',
-            amount: 8900,
-            status: 'paid',
-            itemsCount: 7
-        },
-        {
-            id: 'ST-2025-004',
-            date: '05 نوفمبر 2025',
-            client: 'شركة البناء الحديثة',
-            period: 'الربع الثالث 2025',
-            amount: 45000,
-            status: 'sent',
-            itemsCount: 12
-        },
-        {
-            id: 'ST-2025-005',
-            date: '01 نوفمبر 2025',
-            client: 'عمر العنزي',
-            period: 'أكتوبر 2025',
-            amount: 3500,
-            status: 'paid',
-            itemsCount: 2
-        }
-    ]
+    // Fetch statements from API
+    const { data, isLoading, isError, error } = useStatements({ status: activeTab === 'all' ? undefined : activeTab })
 
     // Filter Logic
-    const filteredStatements = statements.filter(st => {
-        if (activeTab === 'all') return true
-        if (activeTab === 'sent') return st.status === 'sent'
-        if (activeTab === 'paid') return st.status === 'paid'
-        if (activeTab === 'draft') return st.status === 'draft'
-        if (searchQuery && !st.client.includes(searchQuery) && !st.id.includes(searchQuery)) return false
-        return true
-    })
+    const filteredStatements = useMemo(() => {
+        if (!data?.data) return []
+
+        return data.data.filter((st: any) => {
+            if (searchQuery && !st.clientName.includes(searchQuery) && !st.statementNumber.includes(searchQuery)) {
+                return false
+            }
+            return true
+        })
+    }, [data, searchQuery])
 
     const formatCurrency = (amount: number) => {
         return new Intl.NumberFormat('ar-SA', {
@@ -221,69 +180,105 @@ export default function StatementsHistoryDashboard() {
 
                             {/* List Items */}
                             <div className="space-y-4">
-                                {filteredStatements.map((st) => (
-                                    <div key={st.id} className="bg-white rounded-2xl p-6 border border-slate-100 hover:border-blue-200 transition-all group shadow-sm">
-                                        <div className="flex justify-between items-start mb-4">
-                                            <div className="flex gap-4 items-start">
-                                                <div className="w-12 h-12 rounded-xl bg-blue-50 text-brand-blue flex items-center justify-center shadow-sm mt-1">
-                                                    <FileText className="h-6 w-6" />
-                                                </div>
-                                                <div>
-                                                    <div className="flex items-center gap-2 mb-1">
-                                                        <h4 className="font-bold text-[#022c22] text-lg">{st.client}</h4>
-                                                        <Badge variant="outline" className={`${st.status === 'sent' ? 'text-blue-600 border-blue-200 bg-blue-50' :
-                                                            st.status === 'paid' ? 'text-emerald-600 border-emerald-200 bg-emerald-50' :
-                                                                'text-slate-600 border-slate-200 bg-slate-50'
-                                                            } border px-2 rounded-md`}>
-                                                            {st.status === 'sent' ? 'تم الإرسال' :
-                                                                st.status === 'paid' ? 'مدفوع بالكامل' : 'مسودة'}
-                                                        </Badge>
-                                                    </div>
-                                                    <div className="flex items-center gap-2 text-slate-500 text-sm">
-                                                        <span className="font-mono text-slate-400">{st.id}</span>
-                                                        <span className="text-slate-300">•</span>
-                                                        <Calendar className="w-3 h-3" />
-                                                        {st.period}
-                                                    </div>
+                                {isLoading ? (
+                                    Array.from({ length: 3 }).map((_, i) => (
+                                        <div key={i} className="bg-white rounded-2xl p-6 border border-slate-100">
+                                            <div className="flex gap-4 mb-4">
+                                                <Skeleton className="w-12 h-12 rounded-xl" />
+                                                <div className="flex-1 space-y-2">
+                                                    <Skeleton className="h-5 w-1/3" />
+                                                    <Skeleton className="h-4 w-1/2" />
                                                 </div>
                                             </div>
-                                            <DropdownMenu>
-                                                <DropdownMenuTrigger asChild>
-                                                    <Button variant="ghost" size="icon" className="text-slate-400 hover:text-[#022c22]">
-                                                        <MoreHorizontal className="h-5 w-5" />
-                                                    </Button>
-                                                </DropdownMenuTrigger>
-                                                <DropdownMenuContent align="end">
-                                                    <DropdownMenuItem asChild>
-                                                        <Link to="/dashboard/finance/statements/$statementId" params={{ statementId: st.id }}>
-                                                            عرض الكشف
-                                                        </Link>
-                                                    </DropdownMenuItem>
-                                                    <DropdownMenuItem>تحميل PDF</DropdownMenuItem>
-                                                    <DropdownMenuItem>إعادة إرسال</DropdownMenuItem>
-                                                </DropdownMenuContent>
-                                            </DropdownMenu>
+                                            <Skeleton className="h-16 w-full" />
                                         </div>
-
-                                        <div className="flex items-center justify-between pt-4 border-t border-slate-100">
-                                            <div className="flex items-center gap-6">
-                                                <div className="text-center">
-                                                    <div className="text-xs text-slate-400 mb-1">تاريخ الإصدار</div>
-                                                    <div className="font-bold text-[#022c22]">{st.date}</div>
-                                                </div>
-                                                <div className="text-center pl-4 border-l border-slate-100">
-                                                    <div className="text-xs text-slate-400 mb-1">عدد البنود</div>
-                                                    <div className="font-bold text-slate-700">{st.itemsCount}</div>
-                                                </div>
-                                            </div>
-
-                                            <div className="text-left">
-                                                <div className="text-xs text-slate-400 mb-1">إجمالي الكشف</div>
-                                                <div className="font-bold text-[#022c22] text-xl">{formatCurrency(st.amount)}</div>
-                                            </div>
-                                        </div>
+                                    ))
+                                ) : isError ? (
+                                    <div className="bg-white rounded-2xl p-12 text-center border border-red-100">
+                                        <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
+                                        <h3 className="text-xl font-bold mb-2 text-slate-900">فشل تحميل الكشوف</h3>
+                                        <p className="text-slate-500 mb-4">{error?.message || 'حدث خطأ أثناء تحميل البيانات'}</p>
+                                        <Button onClick={() => window.location.reload()} className="bg-[#022c22] hover:bg-[#033d2f]">
+                                            إعادة المحاولة
+                                        </Button>
                                     </div>
-                                ))}
+                                ) : filteredStatements.length === 0 ? (
+                                    <div className="bg-white rounded-2xl p-12 text-center border border-slate-100">
+                                        <FileText className="h-16 w-16 text-slate-300 mx-auto mb-4" />
+                                        <h3 className="text-xl font-bold mb-2 text-slate-900">لا توجد كشوف حساب</h3>
+                                        <p className="text-slate-500 mb-4">ابدأ بإنشاء كشف حساب جديد للعملاء</p>
+                                        <Button asChild className="bg-brand-blue hover:bg-blue-600">
+                                            <Link to="/dashboard/finance/statements/new">
+                                                <Plus className="w-4 h-4 ml-2" />
+                                                إنشاء كشف جديد
+                                            </Link>
+                                        </Button>
+                                    </div>
+                                ) : (
+                                    filteredStatements.map((st: any) => (
+                                        <div key={st._id} className="bg-white rounded-2xl p-6 border border-slate-100 hover:border-blue-200 transition-all group shadow-sm">
+                                            <div className="flex justify-between items-start mb-4">
+                                                <div className="flex gap-4 items-start">
+                                                    <div className="w-12 h-12 rounded-xl bg-blue-50 text-brand-blue flex items-center justify-center shadow-sm mt-1">
+                                                        <FileText className="h-6 w-6" />
+                                                    </div>
+                                                    <div>
+                                                        <div className="flex items-center gap-2 mb-1">
+                                                            <h4 className="font-bold text-[#022c22] text-lg">{st.clientName}</h4>
+                                                            <Badge variant="outline" className={`${st.status === 'sent' ? 'text-blue-600 border-blue-200 bg-blue-50' :
+                                                                st.status === 'paid' ? 'text-emerald-600 border-emerald-200 bg-emerald-50' :
+                                                                    'text-slate-600 border-slate-200 bg-slate-50'
+                                                                } border px-2 rounded-md`}>
+                                                                {st.status === 'sent' ? 'تم الإرسال' :
+                                                                    st.status === 'paid' ? 'مدفوع بالكامل' : 'مسودة'}
+                                                            </Badge>
+                                                        </div>
+                                                        <div className="flex items-center gap-2 text-slate-500 text-sm">
+                                                            <span className="font-mono text-slate-400">{st.statementNumber}</span>
+                                                            <span className="text-slate-300">•</span>
+                                                            <Calendar className="w-3 h-3" />
+                                                            {st.period}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <DropdownMenu>
+                                                    <DropdownMenuTrigger asChild>
+                                                        <Button variant="ghost" size="icon" className="text-slate-400 hover:text-[#022c22]">
+                                                            <MoreHorizontal className="h-5 w-5" />
+                                                        </Button>
+                                                    </DropdownMenuTrigger>
+                                                    <DropdownMenuContent align="end">
+                                                        <DropdownMenuItem asChild>
+                                                            <Link to="/dashboard/finance/statements/$statementId" params={{ statementId: st._id }}>
+                                                                عرض الكشف
+                                                            </Link>
+                                                        </DropdownMenuItem>
+                                                        <DropdownMenuItem>تحميل PDF</DropdownMenuItem>
+                                                        <DropdownMenuItem>إعادة إرسال</DropdownMenuItem>
+                                                    </DropdownMenuContent>
+                                                </DropdownMenu>
+                                            </div>
+
+                                            <div className="flex items-center justify-between pt-4 border-t border-slate-100">
+                                                <div className="flex items-center gap-6">
+                                                    <div className="text-center">
+                                                        <div className="text-xs text-slate-400 mb-1">تاريخ الإصدار</div>
+                                                        <div className="font-bold text-[#022c22]">{new Date(st.generatedDate).toLocaleDateString('ar-SA')}</div>
+                                                    </div>
+                                                    <div className="text-center pl-4 border-l border-slate-100">
+                                                        <div className="text-xs text-slate-400 mb-1">عدد البنود</div>
+                                                        <div className="font-bold text-slate-700">{st.items?.length || 0}</div>
+                                                    </div>
+                                                </div>
+
+                                                <div className="text-left">
+                                                    <div className="text-xs text-slate-400 mb-1">إجمالي الكشف</div>
+                                                    <div className="font-bold text-[#022c22] text-xl">{formatCurrency(st.totalAmount)}</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))
+                                )}
                             </div>
                         </div>
 
@@ -299,15 +294,15 @@ export default function StatementsHistoryDashboard() {
                                 <CardContent className="p-6 space-y-4">
                                     <div className="flex items-center justify-between text-sm">
                                         <span className="text-slate-500">الكشوفات المصدرة</span>
-                                        <span className="font-bold text-[#022c22]">{statements.length}</span>
+                                        <span className="font-bold text-[#022c22]">{data?.data?.length || 0}</span>
                                     </div>
                                     <div className="flex items-center justify-between text-sm">
                                         <span className="text-slate-500">إجمالي المبالغ</span>
-                                        <span className="font-bold text-emerald-600">{formatCurrency(statements.reduce((sum, st) => sum + st.amount, 0))}</span>
+                                        <span className="font-bold text-emerald-600">{formatCurrency(data?.data?.reduce((sum: number, st: any) => sum + st.totalAmount, 0) || 0)}</span>
                                     </div>
                                     <div className="flex items-center justify-between text-sm">
                                         <span className="text-slate-500">بانتظار الدفع</span>
-                                        <span className="font-bold text-amber-600">{formatCurrency(statements.filter(st => st.status === 'sent').reduce((sum, st) => sum + st.amount, 0))}</span>
+                                        <span className="font-bold text-amber-600">{formatCurrency(data?.data?.filter((st: any) => st.status === 'sent').reduce((sum: number, st: any) => sum + st.totalAmount, 0) || 0)}</span>
                                     </div>
                                 </CardContent>
                             </Card>

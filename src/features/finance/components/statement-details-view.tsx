@@ -3,7 +3,7 @@ import {
     FileText, Calendar, CheckSquare, Clock, MoreHorizontal, Plus, Upload,
     User, ArrowLeft, Briefcase,
     History, Link as LinkIcon, Flag, Send, Eye, Download, Search, Bell,
-    CreditCard, DollarSign, CheckCircle2, AlertCircle, FileBarChart
+    CreditCard, DollarSign, CheckCircle2, AlertCircle, FileBarChart, Loader2
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -12,7 +12,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Textarea } from '@/components/ui/textarea'
-import { Link } from '@tanstack/react-router'
+import { Skeleton } from '@/components/ui/skeleton'
+import { Link, useParams } from '@tanstack/react-router'
 import { Header } from '@/components/layout/header'
 import { TopNav } from '@/components/layout/top-nav'
 import { DynamicIsland } from '@/components/dynamic-island'
@@ -21,26 +22,13 @@ import { LanguageSwitcher } from '@/components/language-switcher'
 import { ThemeSwitch } from '@/components/theme-switch'
 import { ConfigDrawer } from '@/components/config-drawer'
 import { ProfileDropdown } from '@/components/profile-dropdown'
+import { useStatement } from '@/hooks/useFinance'
 
 export function StatementDetailsView() {
-    // Mock Data for a single statement
-    const statement = {
-        id: 'ST-2024-10',
-        period: 'أكتوبر 2024',
-        generatedDate: '2024-11-01',
-        openingBalance: '150,000.00',
-        closingBalance: '165,000.00',
-        totalIn: '30,000.00',
-        totalOut: '15,000.00',
-        currency: 'SAR',
-        status: 'verified',
-        transactions: [
-            { date: '2024-10-05', description: 'دفعة مقدمة - عميل جديد', amount: '+15,000.00', type: 'credit' },
-            { date: '2024-10-12', description: 'رواتب الموظفين', amount: '-12,000.00', type: 'debit' },
-            { date: '2024-10-25', description: 'استشارات قانونية', amount: '+15,000.00', type: 'credit' },
-            { date: '2024-10-28', description: 'فواتير كهرباء', amount: '-3,000.00', type: 'debit' }
-        ]
-    }
+    const { statementId } = useParams({ from: '/_authenticated/dashboard/finance/statements/$statementId' })
+    const { data, isLoading, isError, error } = useStatement(statementId)
+
+    const statement = data?.data
 
     const topNav = [
         { title: 'نظرة عامة', href: '/dashboard/finance/overview', isActive: false },
@@ -73,6 +61,44 @@ export function StatementDetailsView() {
             </Header>
 
             <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-r border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
+                {isLoading ? (
+                    <div className="max-w-[1600px] mx-auto space-y-6">
+                        <Skeleton className="h-8 w-48" />
+                        <div className="bg-white rounded-3xl p-8">
+                            <div className="flex gap-8 mb-8">
+                                <Skeleton className="h-16 w-16 rounded-xl" />
+                                <div className="flex-1 space-y-3">
+                                    <Skeleton className="h-6 w-64" />
+                                    <Skeleton className="h-5 w-96" />
+                                </div>
+                            </div>
+                            <Skeleton className="h-64 w-full" />
+                        </div>
+                    </div>
+                ) : isError ? (
+                    <div className="max-w-[1600px] mx-auto">
+                        <div className="bg-white rounded-3xl p-12 text-center border border-red-100">
+                            <AlertCircle className="h-16 w-16 text-red-500 mx-auto mb-4" />
+                            <h3 className="text-xl font-bold mb-2 text-slate-900">فشل تحميل الكشف</h3>
+                            <p className="text-slate-500 mb-4">{error?.message || 'حدث خطأ أثناء تحميل الكشف'}</p>
+                            <Button onClick={() => window.location.reload()}>
+                                إعادة المحاولة
+                            </Button>
+                        </div>
+                    </div>
+                ) : !statement ? (
+                    <div className="max-w-[1600px] mx-auto">
+                        <div className="bg-white rounded-3xl p-12 text-center border border-slate-100">
+                            <FileBarChart className="h-16 w-16 text-slate-300 mx-auto mb-4" />
+                            <h3 className="text-xl font-bold mb-2 text-slate-900">الكشف غير موجود</h3>
+                            <p className="text-slate-500 mb-4">لم يتم العثور على الكشف المطلوب</p>
+                            <Button asChild>
+                                <Link to="/dashboard/finance/statements">العودة إلى كشوف الحساب</Link>
+                            </Button>
+                        </div>
+                    </div>
+                ) : (
+                    <>
                 <div className="max-w-[1600px] mx-auto mb-6">
                     <Link to="/dashboard/finance/statements" className="inline-flex items-center text-slate-500 hover:text-navy transition-colors">
                         <ArrowLeft className="h-4 w-4 ml-2" />
@@ -95,7 +121,7 @@ export function StatementDetailsView() {
                                 <span className="text-emerald-100 font-medium">كشف حساب شهري</span>
                                 <span className="text-white/20">•</span>
                                 <Badge variant="outline" className="mr-2 border-emerald-500/30 text-emerald-300 bg-emerald-500/10">
-                                    {statement.status === 'verified' ? 'تم التحقق' : 'مسودة'}
+                                    {statement.status === 'sent' ? 'تم الإرسال' : statement.status === 'paid' ? 'مدفوع' : statement.status === 'archived' ? 'مؤرشف' : 'مسودة'}
                                 </Badge>
                             </div>
                             <h1 className="text-3xl font-bold mb-4 leading-tight text-white">
@@ -104,19 +130,19 @@ export function StatementDetailsView() {
                             <div className="flex flex-wrap gap-6 text-sm text-slate-300">
                                 <div className="flex items-center gap-2">
                                     <Calendar className="h-4 w-4 text-emerald-400" />
-                                    <span>تاريخ الإصدار: <span className="text-white font-medium">{statement.generatedDate}</span></span>
+                                    <span>تاريخ الإصدار: <span className="text-white font-medium">{new Date(statement.generatedDate).toLocaleDateString('ar-SA')}</span></span>
                                 </div>
                                 <div className="flex items-center gap-2">
-                                    <DollarSign className="h-4 w-4 text-emerald-400" />
-                                    <span>الرصيد الافتتاحي: <span className="text-white font-medium">{statement.openingBalance}</span></span>
+                                    <User className="h-4 w-4 text-emerald-400" />
+                                    <span>العميل: <span className="text-white font-medium">{statement.clientName}</span></span>
                                 </div>
                             </div>
                         </div>
 
                         <div className="flex flex-col gap-4 min-w-[250px]">
                             <div className="text-left lg:text-left">
-                                <div className="text-slate-300 text-sm mb-1">الرصيد الختامي</div>
-                                <div className="text-3xl font-bold text-white">{statement.closingBalance} <span className="text-lg text-emerald-400">{statement.currency}</span></div>
+                                <div className="text-slate-300 text-sm mb-1">المبلغ الإجمالي</div>
+                                <div className="text-3xl font-bold text-white">{statement.totalAmount.toLocaleString('ar-SA')} <span className="text-lg text-emerald-400">ر.س</span></div>
                             </div>
                             <div className="flex gap-3">
                                 <Button variant="outline" className="flex-1 border-white/10 text-white hover:bg-white/10 hover:text-white backdrop-blur-sm">
@@ -141,20 +167,37 @@ export function StatementDetailsView() {
                                             <thead className="bg-slate-50 text-slate-500 text-sm font-medium">
                                                 <tr>
                                                     <th className="px-6 py-4">التاريخ</th>
+                                                    <th className="px-6 py-4">النوع</th>
                                                     <th className="px-6 py-4">الوصف</th>
+                                                    <th className="px-6 py-4">المرجع</th>
                                                     <th className="px-6 py-4 text-left">المبلغ</th>
                                                 </tr>
                                             </thead>
                                             <tbody className="divide-y divide-slate-100">
-                                                {statement.transactions.map((item, index) => (
-                                                    <tr key={index} className="hover:bg-slate-50/50">
-                                                        <td className="px-6 py-4 text-slate-600">{item.date}</td>
-                                                        <td className="px-6 py-4 font-medium text-navy">{item.description}</td>
-                                                        <td className={`px-6 py-4 text-left font-bold ${item.type === 'credit' ? 'text-emerald-600' : 'text-red-600'}`}>
-                                                            {item.amount}
+                                                {statement.items && statement.items.length > 0 ? (
+                                                    statement.items.map((item, index) => (
+                                                        <tr key={item._id || index} className="hover:bg-slate-50/50">
+                                                            <td className="px-6 py-4 text-slate-600">{new Date(item.date).toLocaleDateString('ar-SA')}</td>
+                                                            <td className="px-6 py-4 text-slate-600">
+                                                                <Badge variant="outline" className="text-xs">
+                                                                    {item.type === 'invoice' ? 'فاتورة' : item.type === 'payment' ? 'دفعة' : item.type === 'expense' ? 'مصروف' : 'تعديل'}
+                                                                </Badge>
+                                                            </td>
+                                                            <td className="px-6 py-4 font-medium text-navy">{item.description}</td>
+                                                            <td className="px-6 py-4 text-slate-500 text-sm">{item.reference}</td>
+                                                            <td className="px-6 py-4 text-left font-bold text-navy">
+                                                                {item.amount.toLocaleString('ar-SA')} ر.س
+                                                            </td>
+                                                        </tr>
+                                                    ))
+                                                ) : (
+                                                    <tr>
+                                                        <td colSpan={5} className="px-6 py-12 text-center text-slate-400">
+                                                            <FileText className="h-12 w-12 mx-auto mb-2 text-slate-300" />
+                                                            <p>لا توجد حركات مالية في هذا الكشف</p>
                                                         </td>
                                                     </tr>
-                                                ))}
+                                                )}
                                             </tbody>
                                         </table>
                                     </div>
@@ -169,22 +212,37 @@ export function StatementDetailsView() {
                                 </CardHeader>
                                 <CardContent className="p-6 space-y-4">
                                     <div className="flex justify-between items-center">
-                                        <span className="text-slate-500">إجمالي الوارد</span>
-                                        <span className="font-bold text-emerald-600">+{statement.totalIn}</span>
+                                        <span className="text-slate-500">عدد العناصر</span>
+                                        <span className="font-bold text-navy">{statement.items?.length || 0}</span>
                                     </div>
                                     <div className="flex justify-between items-center">
-                                        <span className="text-slate-500">إجمالي الصادر</span>
-                                        <span className="font-bold text-red-600">-{statement.totalOut}</span>
+                                        <span className="text-slate-500">المبلغ الإجمالي</span>
+                                        <span className="font-bold text-emerald-600">{statement.totalAmount.toLocaleString('ar-SA')} ر.س</span>
                                     </div>
                                     <div className="border-t border-slate-100 pt-4 flex justify-between items-center">
-                                        <span className="font-bold text-navy">صافي الحركة</span>
-                                        <span className="font-bold text-blue-600">+{parseInt(statement.totalIn.replace(/,/g, '')) - parseInt(statement.totalOut.replace(/,/g, ''))}.00</span>
+                                        <span className="font-bold text-navy">الحالة</span>
+                                        <Badge variant="outline" className={`
+                                            ${statement.status === 'paid' ? 'border-emerald-500 text-emerald-600' : ''}
+                                            ${statement.status === 'sent' ? 'border-blue-500 text-blue-600' : ''}
+                                            ${statement.status === 'draft' ? 'border-slate-500 text-slate-600' : ''}
+                                            ${statement.status === 'archived' ? 'border-slate-400 text-slate-500' : ''}
+                                        `}>
+                                            {statement.status === 'sent' ? 'تم الإرسال' : statement.status === 'paid' ? 'مدفوع' : statement.status === 'archived' ? 'مؤرشف' : 'مسودة'}
+                                        </Badge>
                                     </div>
+                                    {statement.notes && (
+                                        <div className="border-t border-slate-100 pt-4">
+                                            <span className="text-slate-500 text-sm block mb-2">ملاحظات</span>
+                                            <p className="text-sm text-slate-700">{statement.notes}</p>
+                                        </div>
+                                    )}
                                 </CardContent>
                             </Card>
                         </div>
                     </div>
                 </div>
+                    </>
+                )}
             </Main>
         </>
     )

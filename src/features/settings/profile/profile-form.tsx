@@ -1,9 +1,8 @@
+import { useEffect } from 'react'
 import { z } from 'zod'
-import { useFieldArray, useForm } from 'react-hook-form'
+import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Link } from '@tanstack/react-router'
-import { showSubmittedData } from '@/lib/show-submitted-data'
-import { cn } from '@/lib/utils'
+import { Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
   Form,
@@ -15,108 +14,109 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
+import { useSettings, useUpdateAccountSettings } from '@/hooks/useSettings'
+import { Skeleton } from '@/components/ui/skeleton'
 
 const profileFormSchema = z.object({
-  username: z
-    .string('Please enter your username.')
-    .min(2, 'Username must be at least 2 characters.')
-    .max(30, 'Username must not be longer than 30 characters.'),
-  email: z.email({
-    error: (iss) =>
-      iss.input === undefined
-        ? 'Please select an email to display.'
-        : undefined,
-  }),
-  bio: z.string().max(160).min(4),
-  urls: z
-    .array(
-      z.object({
-        value: z.url('Please enter a valid URL.'),
-      })
-    )
-    .optional(),
+  name: z
+    .string()
+    .min(1, 'Please enter your name.')
+    .min(2, 'Name must be at least 2 characters.')
+    .max(30, 'Name must not be longer than 30 characters.'),
+  email: z.string().email('Please enter a valid email address.'),
+  bio: z.string().max(500, 'Bio must not be longer than 500 characters.').optional(),
 })
 
 type ProfileFormValues = z.infer<typeof profileFormSchema>
 
-// This can come from your database or API.
-const defaultValues: Partial<ProfileFormValues> = {
-  bio: 'I own a computer.',
-  urls: [
-    { value: 'https://shadcn.com' },
-    { value: 'http://twitter.com/shadcn' },
-  ],
-}
-
 export function ProfileForm() {
+  const { data: settings, isLoading: loadingSettings } = useSettings()
+  const { mutate: updateSettings, isPending } = useUpdateAccountSettings()
+
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileFormSchema),
-    defaultValues,
-    mode: 'onChange',
+    defaultValues: {
+      name: '',
+      email: '',
+      bio: '',
+    },
   })
 
-  const { fields, append } = useFieldArray({
-    name: 'urls',
-    control: form.control,
-  })
+  // Update form when settings load
+  useEffect(() => {
+    if (settings) {
+      form.reset({
+        name: settings.account.name || '',
+        email: settings.account.email || '',
+        bio: '', // Bio not available in current API
+      })
+    }
+  }, [settings, form])
+
+  function onSubmit(data: ProfileFormValues) {
+    updateSettings({
+      name: data.name,
+      // Email is typically not editable from profile for security reasons
+      // Bio would need to be added to the backend API
+    })
+  }
+
+  if (loadingSettings) {
+    return (
+      <div className='space-y-8'>
+        <Skeleton className='h-20 w-full' />
+        <Skeleton className='h-20 w-full' />
+        <Skeleton className='h-32 w-full' />
+        <Skeleton className='h-10 w-32' />
+      </div>
+    )
+  }
 
   return (
     <Form {...form}>
-      <form
-        onSubmit={form.handleSubmit((data) => showSubmittedData(data))}
-        className='space-y-8'
-      >
+      <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-8'>
         <FormField
           control={form.control}
-          name='username'
+          name='name'
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Username</FormLabel>
+              <FormLabel>Name</FormLabel>
               <FormControl>
-                <Input placeholder='shadcn' {...field} />
+                <Input placeholder='Your name' {...field} />
               </FormControl>
               <FormDescription>
-                This is your public display name. It can be your real name or a
-                pseudonym. You can only change this once every 30 days.
+                This is your public display name. It will be shown on your profile
+                and in communications.
               </FormDescription>
               <FormMessage />
             </FormItem>
           )}
         />
+
         <FormField
           control={form.control}
           name='email'
           render={({ field }) => (
             <FormItem>
               <FormLabel>Email</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder='Select a verified email to display' />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  <SelectItem value='m@example.com'>m@example.com</SelectItem>
-                  <SelectItem value='m@google.com'>m@google.com</SelectItem>
-                  <SelectItem value='m@support.com'>m@support.com</SelectItem>
-                </SelectContent>
-              </Select>
+              <FormControl>
+                <Input
+                  placeholder='your.email@example.com'
+                  {...field}
+                  disabled
+                  className='bg-muted'
+                />
+              </FormControl>
               <FormDescription>
-                You can manage verified email addresses in your{' '}
-                <Link to='/'>email settings</Link>.
+                Your email address is used for account recovery and important
+                notifications. Contact support to change your email.
               </FormDescription>
               <FormMessage />
             </FormItem>
           )}
         />
+
         <FormField
           control={form.control}
           name='bio'
@@ -127,50 +127,42 @@ export function ProfileForm() {
                 <Textarea
                   placeholder='Tell us a little bit about yourself'
                   className='resize-none'
+                  rows={4}
                   {...field}
+                  disabled
                 />
               </FormControl>
               <FormDescription>
-                You can <span>@mention</span> other users and organizations to
-                link to them.
+                A short bio about yourself. This feature is coming soon.
               </FormDescription>
               <FormMessage />
             </FormItem>
           )}
         />
-        <div>
-          {fields.map((field, index) => (
-            <FormField
-              control={form.control}
-              key={field.id}
-              name={`urls.${index}.value`}
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className={cn(index !== 0 && 'sr-only')}>
-                    URLs
-                  </FormLabel>
-                  <FormDescription className={cn(index !== 0 && 'sr-only')}>
-                    Add links to your website, blog, or social media profiles.
-                  </FormDescription>
-                  <FormControl className={cn(index !== 0 && 'mt-1.5')}>
-                    <Input {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          ))}
-          <Button
-            type='button'
-            variant='outline'
-            size='sm'
-            className='mt-2'
-            onClick={() => append({ value: '' })}
-          >
-            Add URL
-          </Button>
+
+        <div className='bg-muted rounded-lg p-4'>
+          <h3 className='text-sm font-medium mb-2'>Additional Settings</h3>
+          <p className='text-muted-foreground text-sm mb-3'>
+            Manage more detailed settings in the dedicated sections:
+          </p>
+          <ul className='text-muted-foreground text-sm space-y-1 list-disc list-inside'>
+            <li>Update your language, timezone, and date of birth in <strong>Account</strong></li>
+            <li>Customize theme and appearance in <strong>Appearance</strong></li>
+            <li>Configure date format and currency in <strong>Display</strong></li>
+            <li>Manage email and push notifications in <strong>Notifications</strong></li>
+          </ul>
         </div>
-        <Button type='submit'>Update profile</Button>
+
+        <Button type='submit' disabled={isPending}>
+          {isPending ? (
+            <>
+              <Loader2 className='mr-2 h-4 w-4 animate-spin' />
+              Updating...
+            </>
+          ) : (
+            'Update profile'
+          )}
+        </Button>
       </form>
     </Form>
   )

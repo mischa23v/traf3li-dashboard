@@ -86,7 +86,9 @@ const authService = {
         throw new Error(response.data.message || 'فشل تسجيل الدخول')
       }
 
-      // Store user data in localStorage for persistence
+      // Store minimal user data in localStorage for persistence
+      // SECURITY NOTE: Role stored here is for UI display only
+      // All authorization must be enforced on the backend
       localStorage.setItem('user', JSON.stringify(response.data.user))
 
       return response.data.user

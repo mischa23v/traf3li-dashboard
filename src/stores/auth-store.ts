@@ -25,21 +25,11 @@ interface AuthState {
 export const useAuthStore = create<AuthState>()(
   persist(
     (set) => ({
-      // Initial State
-      // Initial State
-      user: {
-        _id: 'dummy-id',
-        username: 'Admin',
-        email: 'admin@example.com',
-        role: 'admin',
-        country: 'SA',
-        phone: '123456789',
-        isSeller: false,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      },
+      // Initial State - Start with unauthenticated state
+      // Auth will be checked via checkAuth() on app load
+      user: null,
       isLoading: false,
-      isAuthenticated: true,
+      isAuthenticated: false,
       error: null,
 
       /**
