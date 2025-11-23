@@ -19,18 +19,48 @@ import { DynamicIsland } from '@/components/dynamic-island'
 import { Main } from '@/components/layout/main'
 import { Link, useNavigate } from '@tanstack/react-router'
 import { TasksSidebar } from './tasks-sidebar'
+import { useCreateEvent } from '@/hooks/useRemindersAndEvents'
 
 export function CreateEventView() {
     const navigate = useNavigate()
-    const [isLoading, setIsLoading] = useState(false)
+    const createEventMutation = useCreateEvent()
+
+    const [formData, setFormData] = useState({
+        title: '',
+        type: '',
+        date: '',
+        time: '',
+        location: '',
+        attendees: '',
+        description: ''
+    })
+
+    const handleChange = (field: string, value: string) => {
+        setFormData(prev => ({ ...prev, [field]: value }))
+    }
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
-        setIsLoading(true)
-        // Simulate API call
-        await new Promise(resolve => setTimeout(resolve, 1000))
-        setIsLoading(false)
-        navigate({ to: '/dashboard/tasks/events' })
+
+        const attendeesList = formData.attendees
+            ? formData.attendees.split(',').map(a => a.trim()).filter(Boolean)
+            : []
+
+        const eventData = {
+            title: formData.title,
+            type: formData.type,
+            date: formData.date,
+            time: formData.time,
+            location: formData.location,
+            attendees: attendeesList,
+            description: formData.description,
+        }
+
+        createEventMutation.mutate(eventData, {
+            onSuccess: () => {
+                navigate({ to: '/dashboard/tasks/events' })
+            }
+        })
     }
 
     const topNav = [
@@ -95,14 +125,20 @@ export function CreateEventView() {
                                                 <Calendar className="w-4 h-4 text-blue-500" />
                                                 عنوان الفعالية
                                             </label>
-                                            <Input placeholder="مثال: جلسة مرافعة" className="rounded-xl border-slate-200 focus:border-blue-500 focus:ring-blue-500" required />
+                                            <Input
+                                                placeholder="مثال: جلسة مرافعة"
+                                                className="rounded-xl border-slate-200 focus:border-blue-500 focus:ring-blue-500"
+                                                required
+                                                value={formData.title}
+                                                onChange={(e) => handleChange('title', e.target.value)}
+                                            />
                                         </div>
                                         <div className="space-y-2">
                                             <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
                                                 <Briefcase className="w-4 h-4 text-blue-500" />
                                                 نوع الفعالية
                                             </label>
-                                            <Select>
+                                            <Select value={formData.type} onValueChange={(value) => handleChange('type', value)}>
                                                 <SelectTrigger className="rounded-xl border-slate-200 focus:ring-blue-500">
                                                     <SelectValue placeholder="اختر النوع" />
                                                 </SelectTrigger>
@@ -122,14 +158,26 @@ export function CreateEventView() {
                                                 <Calendar className="w-4 h-4 text-blue-500" />
                                                 التاريخ
                                             </label>
-                                            <Input type="date" className="rounded-xl border-slate-200 focus:border-blue-500 focus:ring-blue-500" required />
+                                            <Input
+                                                type="date"
+                                                className="rounded-xl border-slate-200 focus:border-blue-500 focus:ring-blue-500"
+                                                required
+                                                value={formData.date}
+                                                onChange={(e) => handleChange('date', e.target.value)}
+                                            />
                                         </div>
                                         <div className="space-y-2">
                                             <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
                                                 <Clock className="w-4 h-4 text-blue-500" />
                                                 الوقت
                                             </label>
-                                            <Input type="time" className="rounded-xl border-slate-200 focus:border-blue-500 focus:ring-blue-500" required />
+                                            <Input
+                                                type="time"
+                                                className="rounded-xl border-slate-200 focus:border-blue-500 focus:ring-blue-500"
+                                                required
+                                                value={formData.time}
+                                                onChange={(e) => handleChange('time', e.target.value)}
+                                            />
                                         </div>
                                     </div>
 
@@ -139,14 +187,24 @@ export function CreateEventView() {
                                                 <MapPin className="w-4 h-4 text-blue-500" />
                                                 الموقع
                                             </label>
-                                            <Input placeholder="مثال: المحكمة العامة - القاعة 4" className="rounded-xl border-slate-200 focus:border-blue-500 focus:ring-blue-500" />
+                                            <Input
+                                                placeholder="مثال: المحكمة العامة - القاعة 4"
+                                                className="rounded-xl border-slate-200 focus:border-blue-500 focus:ring-blue-500"
+                                                value={formData.location}
+                                                onChange={(e) => handleChange('location', e.target.value)}
+                                            />
                                         </div>
                                         <div className="space-y-2">
                                             <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
                                                 <Users className="w-4 h-4 text-blue-500" />
                                                 الحضور
                                             </label>
-                                            <Input placeholder="أدخل أسماء الحضور مفصولة بفاصلة" className="rounded-xl border-slate-200 focus:border-blue-500 focus:ring-blue-500" />
+                                            <Input
+                                                placeholder="أدخل أسماء الحضور مفصولة بفاصلة"
+                                                className="rounded-xl border-slate-200 focus:border-blue-500 focus:ring-blue-500"
+                                                value={formData.attendees}
+                                                onChange={(e) => handleChange('attendees', e.target.value)}
+                                            />
                                         </div>
                                     </div>
 
@@ -158,6 +216,8 @@ export function CreateEventView() {
                                         <Textarea
                                             placeholder="أدخل جدول الأعمال أو ملاحظات..."
                                             className="min-h-[120px] rounded-xl border-slate-200 focus:border-blue-500 focus:ring-blue-500"
+                                            value={formData.description}
+                                            onChange={(e) => handleChange('description', e.target.value)}
                                         />
                                     </div>
                                 </div>
@@ -171,9 +231,9 @@ export function CreateEventView() {
                                     <Button
                                         type="submit"
                                         className="bg-blue-500 hover:bg-blue-600 text-white min-w-[140px] rounded-xl shadow-lg shadow-blue-500/20"
-                                        disabled={isLoading}
+                                        disabled={createEventMutation.isPending}
                                     >
-                                        {isLoading ? (
+                                        {createEventMutation.isPending ? (
                                             <span className="flex items-center gap-2">
                                                 جاري الحفظ...
                                             </span>
