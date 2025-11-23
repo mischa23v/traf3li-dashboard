@@ -26,9 +26,20 @@ export const useAuthStore = create<AuthState>()(
   persist(
     (set) => ({
       // Initial State
-      user: null,
+      // Initial State
+      user: {
+        _id: 'dummy-id',
+        username: 'Admin',
+        email: 'admin@example.com',
+        role: 'admin',
+        country: 'SA',
+        phone: '123456789',
+        isSeller: false,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      },
       isLoading: false,
-      isAuthenticated: false,
+      isAuthenticated: true,
       error: null,
 
       /**

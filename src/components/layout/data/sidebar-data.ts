@@ -3,7 +3,6 @@ import {
   LayoutDashboard,
   Monitor,
   Bug,
-  ListTodo,
   FileX,
   HelpCircle,
   Lock,
@@ -16,11 +15,17 @@ import {
   UserCog,
   UserX,
   Users,
+  Activity,
   MessagesSquare,
   ShieldCheck,
   AudioWaveform,
   Command,
   GalleryVerticalEnd,
+  FileText,
+  Clock,
+  FilePlus,
+  History,
+  CheckSquare,
 } from 'lucide-react'
 import { ClerkLogo } from '@/assets/clerk-logo'
 import { type SidebarData } from '../types'
@@ -60,13 +65,44 @@ export const sidebarData: SidebarData = {
         {
           title: 'Tasks',
           url: '/tasks',
-          icon: ListTodo,
+          icon: CheckSquare,
+        },
+        {
+          title: 'Task Details',
+          url: '/task-details',
+          icon: FileText,
         },
         {
           title: 'Apps',
           url: '/apps',
           icon: Package,
         },
+        {
+          title: 'Account Statements',
+          url: '/account-statements',
+          icon: FileText,
+        },
+        {
+          title: 'Account Activity',
+          url: '/account-activity',
+          icon: Activity,
+        },
+        {
+          title: 'Time Entries',
+          url: '/time-entries',
+          icon: Clock,
+        },
+        {
+          title: 'Generate Statement',
+          url: '/generate-statement',
+          icon: FilePlus,
+        },
+        {
+          title: 'Statements History',
+          url: '/statements-history',
+          icon: History,
+        },
+
         {
           title: 'Chats',
           url: '/chats',

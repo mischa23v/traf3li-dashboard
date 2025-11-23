@@ -28,7 +28,7 @@ import {
 } from '@/components/ui/sheet'
 import { useSidebar } from './ui/sidebar'
 
-export function ConfigDrawer() {
+export function ConfigDrawer({ className }: { className?: string }) {
   const { setOpen } = useSidebar()
   const { resetTheme } = useTheme()
   const { resetLayout } = useLayout()
@@ -47,7 +47,7 @@ export function ConfigDrawer() {
           variant='ghost'
           aria-label='Open theme settings'
           aria-describedby='config-drawer-description'
-          className='rounded-full'
+          className={cn('rounded-full', className)}
         >
           <Settings aria-hidden='true' />
         </Button>
@@ -151,7 +151,7 @@ function RadioGroupItem({
         <item.icon
           className={cn(
             !isTheme &&
-              'stroke-primary fill-primary group-data-[state=unchecked]:stroke-muted-foreground group-data-[state=unchecked]:fill-muted-foreground'
+            'stroke-primary fill-primary group-data-[state=unchecked]:stroke-muted-foreground group-data-[state=unchecked]:fill-muted-foreground'
           )}
           aria-hidden='true'
         />
@@ -324,7 +324,7 @@ function DirConfig() {
       <SectionTitle
         title='Direction'
         showReset={false}
-        onReset={() => {}}
+        onReset={() => { }}
       />
       <Radio
         value={dir}

@@ -293,5 +293,11 @@
     "updatedSuccessfully": "Updated successfully",
     "deletedSuccessfully": "Deleted successfully",
     "createdSuccessfully": "Created successfully"
+  },
+  "dynamicIsland": {
+    "newMessage": "New Message",
+    "taskCompleted": "Task Completed",
+    "systemUpdate": "System Update",
+    "view": "View"
   }
 }

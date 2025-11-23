@@ -8,7 +8,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { Languages } from 'lucide-react'
 
-export function LanguageSwitcher() {
+export function LanguageSwitcher({ className }: { className?: string }) {
   const { i18n } = useTranslation()
 
   const changeLanguage = (lng: string) => {
@@ -16,9 +16,9 @@ export function LanguageSwitcher() {
   }
 
   return (
-    <DropdownMenu>
+    <DropdownMenu modal={false}>
       <DropdownMenuTrigger asChild>
-        <Button variant='ghost' size='icon'>
+        <Button variant='ghost' size='icon' className={className}>
           <Languages className='h-5 w-5' />
           <span className='sr-only'>Toggle language</span>
         </Button>

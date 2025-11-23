@@ -293,5 +293,11 @@
     "updatedSuccessfully": "تم التحديث بنجاح",
     "deletedSuccessfully": "تم الحذف بنجاح",
     "createdSuccessfully": "تم الإنشاء بنجاح"
+  },
+  "dynamicIsland": {
+    "newMessage": "رسالة جديدة",
+    "taskCompleted": "تم إنجاز المهمة",
+    "systemUpdate": "تحديث النظام",
+    "view": "عرض"
   }
 }

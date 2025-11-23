@@ -9,6 +9,24 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TimeEntriesRouteImport } from './routes/time-entries'
+import { Route as TasksRouteImport } from './routes/tasks'
+import { Route as TaskDetailsRouteImport } from './routes/task-details'
+import { Route as StatementsHistoryRouteImport } from './routes/statements-history'
+import { Route as RemindersRouteImport } from './routes/reminders'
+import { Route as LegalTasksRouteImport } from './routes/legal-tasks'
+import { Route as InvoicesRouteImport } from './routes/invoices'
+import { Route as ImprovedTasksRouteImport } from './routes/improved-tasks'
+import { Route as ImprovedCaseRouteImport } from './routes/improved-case'
+import { Route as ImprovedCalendarRouteImport } from './routes/improved-calendar'
+import { Route as GosiChatRouteImport } from './routes/gosi-chat'
+import { Route as GenerateStatementRouteImport } from './routes/generate-statement'
+import { Route as ExpensesRouteImport } from './routes/expenses'
+import { Route as EventsRouteImport } from './routes/events'
+import { Route as CasesDashboardRouteImport } from './routes/cases-dashboard'
+import { Route as CaseDetailsRouteImport } from './routes/case-details'
+import { Route as AccountStatementsRouteImport } from './routes/account-statements'
+import { Route as AccountActivityRouteImport } from './routes/account-activity'
 import { Route as ClerkRouteRouteImport } from './routes/clerk/route'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
@@ -26,7 +44,6 @@ import { Route as ClerkAuthenticatedRouteRouteImport } from './routes/clerk/_aut
 import { Route as ClerkauthRouteRouteImport } from './routes/clerk/(auth)/route'
 import { Route as AuthenticatedSettingsRouteRouteImport } from './routes/_authenticated/settings/route'
 import { Route as AuthenticatedUsersIndexRouteImport } from './routes/_authenticated/users/index'
-import { Route as AuthenticatedTasksIndexRouteImport } from './routes/_authenticated/tasks/index'
 import { Route as AuthenticatedSettingsIndexRouteImport } from './routes/_authenticated/settings/index'
 import { Route as AuthenticatedHelpCenterIndexRouteImport } from './routes/_authenticated/help-center/index'
 import { Route as AuthenticatedChatsIndexRouteImport } from './routes/_authenticated/chats/index'
@@ -34,12 +51,134 @@ import { Route as AuthenticatedAppsIndexRouteImport } from './routes/_authentica
 import { Route as ClerkAuthenticatedUserManagementRouteImport } from './routes/clerk/_authenticated/user-management'
 import { Route as ClerkauthSignUpRouteImport } from './routes/clerk/(auth)/sign-up'
 import { Route as ClerkauthSignInRouteImport } from './routes/clerk/(auth)/sign-in'
+import { Route as AuthenticatedTasksTaskIdRouteImport } from './routes/_authenticated/tasks.$taskId'
 import { Route as AuthenticatedSettingsNotificationsRouteImport } from './routes/_authenticated/settings/notifications'
 import { Route as AuthenticatedSettingsDisplayRouteImport } from './routes/_authenticated/settings/display'
 import { Route as AuthenticatedSettingsAppearanceRouteImport } from './routes/_authenticated/settings/appearance'
 import { Route as AuthenticatedSettingsAccountRouteImport } from './routes/_authenticated/settings/account'
 import { Route as AuthenticatedErrorsErrorRouteImport } from './routes/_authenticated/errors/$error'
+import { Route as AuthenticatedDashboardCalendarRouteImport } from './routes/_authenticated/dashboard.calendar'
+import { Route as AuthenticatedDashboardCasesIndexRouteImport } from './routes/_authenticated/dashboard.cases.index'
+import { Route as AuthenticatedDashboardTasksNewRouteImport } from './routes/_authenticated/dashboard.tasks.new'
+import { Route as AuthenticatedDashboardTasksListRouteImport } from './routes/_authenticated/dashboard.tasks.list'
+import { Route as AuthenticatedDashboardMessagesChatRouteImport } from './routes/_authenticated/dashboard.messages.chat'
+import { Route as AuthenticatedDashboardFinanceOverviewRouteImport } from './routes/_authenticated/dashboard.finance.overview'
+import { Route as AuthenticatedDashboardCasesCaseIdRouteImport } from './routes/_authenticated/dashboard.cases.$caseId'
+import { Route as AuthenticatedDashboardTasksRemindersIndexRouteImport } from './routes/_authenticated/dashboard.tasks.reminders.index'
+import { Route as AuthenticatedDashboardTasksEventsIndexRouteImport } from './routes/_authenticated/dashboard.tasks.events.index'
+import { Route as AuthenticatedDashboardFinanceTransactionsIndexRouteImport } from './routes/_authenticated/dashboard.finance.transactions.index'
+import { Route as AuthenticatedDashboardFinanceTimeTrackingIndexRouteImport } from './routes/_authenticated/dashboard.finance.time-tracking.index'
+import { Route as AuthenticatedDashboardFinanceStatementsIndexRouteImport } from './routes/_authenticated/dashboard.finance.statements.index'
+import { Route as AuthenticatedDashboardFinanceInvoicesIndexRouteImport } from './routes/_authenticated/dashboard.finance.invoices.index'
+import { Route as AuthenticatedDashboardFinanceExpensesIndexRouteImport } from './routes/_authenticated/dashboard.finance.expenses.index'
+import { Route as AuthenticatedDashboardFinanceActivityIndexRouteImport } from './routes/_authenticated/dashboard.finance.activity.index'
+import { Route as AuthenticatedDashboardTasksRemindersNewRouteImport } from './routes/_authenticated/dashboard.tasks.reminders.new'
+import { Route as AuthenticatedDashboardTasksRemindersReminderIdRouteImport } from './routes/_authenticated/dashboard.tasks.reminders.$reminderId'
+import { Route as AuthenticatedDashboardTasksEventsNewRouteImport } from './routes/_authenticated/dashboard.tasks.events.new'
+import { Route as AuthenticatedDashboardTasksEventsEventIdRouteImport } from './routes/_authenticated/dashboard.tasks.events.$eventId'
+import { Route as AuthenticatedDashboardFinanceTransactionsNewRouteImport } from './routes/_authenticated/dashboard.finance.transactions.new'
+import { Route as AuthenticatedDashboardFinanceTransactionsTransactionIdRouteImport } from './routes/_authenticated/dashboard.finance.transactions.$transactionId'
+import { Route as AuthenticatedDashboardFinanceTimeTrackingNewRouteImport } from './routes/_authenticated/dashboard.finance.time-tracking.new'
+import { Route as AuthenticatedDashboardFinanceTimeTrackingEntryIdRouteImport } from './routes/_authenticated/dashboard.finance.time-tracking.$entryId'
+import { Route as AuthenticatedDashboardFinanceStatementsNewRouteImport } from './routes/_authenticated/dashboard.finance.statements.new'
+import { Route as AuthenticatedDashboardFinanceStatementsStatementIdRouteImport } from './routes/_authenticated/dashboard.finance.statements.$statementId'
+import { Route as AuthenticatedDashboardFinanceInvoicesNewRouteImport } from './routes/_authenticated/dashboard.finance.invoices.new'
+import { Route as AuthenticatedDashboardFinanceInvoicesInvoiceIdRouteImport } from './routes/_authenticated/dashboard.finance.invoices.$invoiceId'
+import { Route as AuthenticatedDashboardFinanceExpensesNewRouteImport } from './routes/_authenticated/dashboard.finance.expenses.new'
+import { Route as AuthenticatedDashboardFinanceExpensesExpenseIdRouteImport } from './routes/_authenticated/dashboard.finance.expenses.$expenseId'
+import { Route as AuthenticatedDashboardFinanceActivityNewRouteImport } from './routes/_authenticated/dashboard.finance.activity.new'
+import { Route as AuthenticatedDashboardFinanceActivityActivityIdRouteImport } from './routes/_authenticated/dashboard.finance.activity.$activityId'
 
+const TimeEntriesRoute = TimeEntriesRouteImport.update({
+  id: '/time-entries',
+  path: '/time-entries',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TasksRoute = TasksRouteImport.update({
+  id: '/tasks',
+  path: '/tasks',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TaskDetailsRoute = TaskDetailsRouteImport.update({
+  id: '/task-details',
+  path: '/task-details',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const StatementsHistoryRoute = StatementsHistoryRouteImport.update({
+  id: '/statements-history',
+  path: '/statements-history',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RemindersRoute = RemindersRouteImport.update({
+  id: '/reminders',
+  path: '/reminders',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LegalTasksRoute = LegalTasksRouteImport.update({
+  id: '/legal-tasks',
+  path: '/legal-tasks',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InvoicesRoute = InvoicesRouteImport.update({
+  id: '/invoices',
+  path: '/invoices',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ImprovedTasksRoute = ImprovedTasksRouteImport.update({
+  id: '/improved-tasks',
+  path: '/improved-tasks',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ImprovedCaseRoute = ImprovedCaseRouteImport.update({
+  id: '/improved-case',
+  path: '/improved-case',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ImprovedCalendarRoute = ImprovedCalendarRouteImport.update({
+  id: '/improved-calendar',
+  path: '/improved-calendar',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GosiChatRoute = GosiChatRouteImport.update({
+  id: '/gosi-chat',
+  path: '/gosi-chat',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GenerateStatementRoute = GenerateStatementRouteImport.update({
+  id: '/generate-statement',
+  path: '/generate-statement',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ExpensesRoute = ExpensesRouteImport.update({
+  id: '/expenses',
+  path: '/expenses',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EventsRoute = EventsRouteImport.update({
+  id: '/events',
+  path: '/events',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CasesDashboardRoute = CasesDashboardRouteImport.update({
+  id: '/cases-dashboard',
+  path: '/cases-dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CaseDetailsRoute = CaseDetailsRouteImport.update({
+  id: '/case-details',
+  path: '/case-details',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AccountStatementsRoute = AccountStatementsRouteImport.update({
+  id: '/account-statements',
+  path: '/account-statements',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AccountActivityRoute = AccountActivityRouteImport.update({
+  id: '/account-activity',
+  path: '/account-activity',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ClerkRouteRoute = ClerkRouteRouteImport.update({
   id: '/clerk',
   path: '/clerk',
@@ -123,11 +262,6 @@ const AuthenticatedUsersIndexRoute = AuthenticatedUsersIndexRouteImport.update({
   path: '/users/',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const AuthenticatedTasksIndexRoute = AuthenticatedTasksIndexRouteImport.update({
-  id: '/tasks/',
-  path: '/tasks/',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
 const AuthenticatedSettingsIndexRoute =
   AuthenticatedSettingsIndexRouteImport.update({
     id: '/',
@@ -166,6 +300,12 @@ const ClerkauthSignInRoute = ClerkauthSignInRouteImport.update({
   path: '/sign-in',
   getParentRoute: () => ClerkauthRouteRoute,
 } as any)
+const AuthenticatedTasksTaskIdRoute =
+  AuthenticatedTasksTaskIdRouteImport.update({
+    id: '/tasks/$taskId',
+    path: '/tasks/$taskId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedSettingsNotificationsRoute =
   AuthenticatedSettingsNotificationsRouteImport.update({
     id: '/notifications',
@@ -196,9 +336,213 @@ const AuthenticatedErrorsErrorRoute =
     path: '/errors/$error',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedDashboardCalendarRoute =
+  AuthenticatedDashboardCalendarRouteImport.update({
+    id: '/dashboard/calendar',
+    path: '/dashboard/calendar',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedDashboardCasesIndexRoute =
+  AuthenticatedDashboardCasesIndexRouteImport.update({
+    id: '/dashboard/cases/',
+    path: '/dashboard/cases/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedDashboardTasksNewRoute =
+  AuthenticatedDashboardTasksNewRouteImport.update({
+    id: '/dashboard/tasks/new',
+    path: '/dashboard/tasks/new',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedDashboardTasksListRoute =
+  AuthenticatedDashboardTasksListRouteImport.update({
+    id: '/dashboard/tasks/list',
+    path: '/dashboard/tasks/list',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedDashboardMessagesChatRoute =
+  AuthenticatedDashboardMessagesChatRouteImport.update({
+    id: '/dashboard/messages/chat',
+    path: '/dashboard/messages/chat',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedDashboardFinanceOverviewRoute =
+  AuthenticatedDashboardFinanceOverviewRouteImport.update({
+    id: '/dashboard/finance/overview',
+    path: '/dashboard/finance/overview',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedDashboardCasesCaseIdRoute =
+  AuthenticatedDashboardCasesCaseIdRouteImport.update({
+    id: '/dashboard/cases/$caseId',
+    path: '/dashboard/cases/$caseId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedDashboardTasksRemindersIndexRoute =
+  AuthenticatedDashboardTasksRemindersIndexRouteImport.update({
+    id: '/dashboard/tasks/reminders/',
+    path: '/dashboard/tasks/reminders/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedDashboardTasksEventsIndexRoute =
+  AuthenticatedDashboardTasksEventsIndexRouteImport.update({
+    id: '/dashboard/tasks/events/',
+    path: '/dashboard/tasks/events/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedDashboardFinanceTransactionsIndexRoute =
+  AuthenticatedDashboardFinanceTransactionsIndexRouteImport.update({
+    id: '/dashboard/finance/transactions/',
+    path: '/dashboard/finance/transactions/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedDashboardFinanceTimeTrackingIndexRoute =
+  AuthenticatedDashboardFinanceTimeTrackingIndexRouteImport.update({
+    id: '/dashboard/finance/time-tracking/',
+    path: '/dashboard/finance/time-tracking/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedDashboardFinanceStatementsIndexRoute =
+  AuthenticatedDashboardFinanceStatementsIndexRouteImport.update({
+    id: '/dashboard/finance/statements/',
+    path: '/dashboard/finance/statements/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedDashboardFinanceInvoicesIndexRoute =
+  AuthenticatedDashboardFinanceInvoicesIndexRouteImport.update({
+    id: '/dashboard/finance/invoices/',
+    path: '/dashboard/finance/invoices/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedDashboardFinanceExpensesIndexRoute =
+  AuthenticatedDashboardFinanceExpensesIndexRouteImport.update({
+    id: '/dashboard/finance/expenses/',
+    path: '/dashboard/finance/expenses/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedDashboardFinanceActivityIndexRoute =
+  AuthenticatedDashboardFinanceActivityIndexRouteImport.update({
+    id: '/dashboard/finance/activity/',
+    path: '/dashboard/finance/activity/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedDashboardTasksRemindersNewRoute =
+  AuthenticatedDashboardTasksRemindersNewRouteImport.update({
+    id: '/dashboard/tasks/reminders/new',
+    path: '/dashboard/tasks/reminders/new',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedDashboardTasksRemindersReminderIdRoute =
+  AuthenticatedDashboardTasksRemindersReminderIdRouteImport.update({
+    id: '/dashboard/tasks/reminders/$reminderId',
+    path: '/dashboard/tasks/reminders/$reminderId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedDashboardTasksEventsNewRoute =
+  AuthenticatedDashboardTasksEventsNewRouteImport.update({
+    id: '/dashboard/tasks/events/new',
+    path: '/dashboard/tasks/events/new',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedDashboardTasksEventsEventIdRoute =
+  AuthenticatedDashboardTasksEventsEventIdRouteImport.update({
+    id: '/dashboard/tasks/events/$eventId',
+    path: '/dashboard/tasks/events/$eventId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedDashboardFinanceTransactionsNewRoute =
+  AuthenticatedDashboardFinanceTransactionsNewRouteImport.update({
+    id: '/dashboard/finance/transactions/new',
+    path: '/dashboard/finance/transactions/new',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedDashboardFinanceTransactionsTransactionIdRoute =
+  AuthenticatedDashboardFinanceTransactionsTransactionIdRouteImport.update({
+    id: '/dashboard/finance/transactions/$transactionId',
+    path: '/dashboard/finance/transactions/$transactionId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedDashboardFinanceTimeTrackingNewRoute =
+  AuthenticatedDashboardFinanceTimeTrackingNewRouteImport.update({
+    id: '/dashboard/finance/time-tracking/new',
+    path: '/dashboard/finance/time-tracking/new',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedDashboardFinanceTimeTrackingEntryIdRoute =
+  AuthenticatedDashboardFinanceTimeTrackingEntryIdRouteImport.update({
+    id: '/dashboard/finance/time-tracking/$entryId',
+    path: '/dashboard/finance/time-tracking/$entryId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedDashboardFinanceStatementsNewRoute =
+  AuthenticatedDashboardFinanceStatementsNewRouteImport.update({
+    id: '/dashboard/finance/statements/new',
+    path: '/dashboard/finance/statements/new',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedDashboardFinanceStatementsStatementIdRoute =
+  AuthenticatedDashboardFinanceStatementsStatementIdRouteImport.update({
+    id: '/dashboard/finance/statements/$statementId',
+    path: '/dashboard/finance/statements/$statementId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedDashboardFinanceInvoicesNewRoute =
+  AuthenticatedDashboardFinanceInvoicesNewRouteImport.update({
+    id: '/dashboard/finance/invoices/new',
+    path: '/dashboard/finance/invoices/new',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedDashboardFinanceInvoicesInvoiceIdRoute =
+  AuthenticatedDashboardFinanceInvoicesInvoiceIdRouteImport.update({
+    id: '/dashboard/finance/invoices/$invoiceId',
+    path: '/dashboard/finance/invoices/$invoiceId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedDashboardFinanceExpensesNewRoute =
+  AuthenticatedDashboardFinanceExpensesNewRouteImport.update({
+    id: '/dashboard/finance/expenses/new',
+    path: '/dashboard/finance/expenses/new',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedDashboardFinanceExpensesExpenseIdRoute =
+  AuthenticatedDashboardFinanceExpensesExpenseIdRouteImport.update({
+    id: '/dashboard/finance/expenses/$expenseId',
+    path: '/dashboard/finance/expenses/$expenseId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedDashboardFinanceActivityNewRoute =
+  AuthenticatedDashboardFinanceActivityNewRouteImport.update({
+    id: '/dashboard/finance/activity/new',
+    path: '/dashboard/finance/activity/new',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedDashboardFinanceActivityActivityIdRoute =
+  AuthenticatedDashboardFinanceActivityActivityIdRouteImport.update({
+    id: '/dashboard/finance/activity/$activityId',
+    path: '/dashboard/finance/activity/$activityId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/clerk': typeof ClerkAuthenticatedRouteRouteWithChildren
+  '/account-activity': typeof AccountActivityRoute
+  '/account-statements': typeof AccountStatementsRoute
+  '/case-details': typeof CaseDetailsRoute
+  '/cases-dashboard': typeof CasesDashboardRoute
+  '/events': typeof EventsRoute
+  '/expenses': typeof ExpensesRoute
+  '/generate-statement': typeof GenerateStatementRoute
+  '/gosi-chat': typeof GosiChatRoute
+  '/improved-calendar': typeof ImprovedCalendarRoute
+  '/improved-case': typeof ImprovedCaseRoute
+  '/improved-tasks': typeof ImprovedTasksRoute
+  '/invoices': typeof InvoicesRoute
+  '/legal-tasks': typeof LegalTasksRoute
+  '/reminders': typeof RemindersRoute
+  '/statements-history': typeof StatementsHistoryRoute
+  '/task-details': typeof TaskDetailsRoute
+  '/tasks': typeof TasksRoute
+  '/time-entries': typeof TimeEntriesRoute
   '/settings': typeof AuthenticatedSettingsRouteRouteWithChildren
   '/forgot-password': typeof authForgotPasswordRoute
   '/otp': typeof authOtpRoute
@@ -211,11 +555,13 @@ export interface FileRoutesByFullPath {
   '/500': typeof errors500Route
   '/503': typeof errors503Route
   '/': typeof AuthenticatedIndexRoute
+  '/dashboard/calendar': typeof AuthenticatedDashboardCalendarRoute
   '/errors/$error': typeof AuthenticatedErrorsErrorRoute
   '/settings/account': typeof AuthenticatedSettingsAccountRoute
   '/settings/appearance': typeof AuthenticatedSettingsAppearanceRoute
   '/settings/display': typeof AuthenticatedSettingsDisplayRoute
   '/settings/notifications': typeof AuthenticatedSettingsNotificationsRoute
+  '/tasks/$taskId': typeof AuthenticatedTasksTaskIdRoute
   '/clerk/sign-in': typeof ClerkauthSignInRoute
   '/clerk/sign-up': typeof ClerkauthSignUpRoute
   '/clerk/user-management': typeof ClerkAuthenticatedUserManagementRoute
@@ -223,11 +569,58 @@ export interface FileRoutesByFullPath {
   '/chats': typeof AuthenticatedChatsIndexRoute
   '/help-center': typeof AuthenticatedHelpCenterIndexRoute
   '/settings/': typeof AuthenticatedSettingsIndexRoute
-  '/tasks': typeof AuthenticatedTasksIndexRoute
   '/users': typeof AuthenticatedUsersIndexRoute
+  '/dashboard/cases/$caseId': typeof AuthenticatedDashboardCasesCaseIdRoute
+  '/dashboard/finance/overview': typeof AuthenticatedDashboardFinanceOverviewRoute
+  '/dashboard/messages/chat': typeof AuthenticatedDashboardMessagesChatRoute
+  '/dashboard/tasks/list': typeof AuthenticatedDashboardTasksListRoute
+  '/dashboard/tasks/new': typeof AuthenticatedDashboardTasksNewRoute
+  '/dashboard/cases': typeof AuthenticatedDashboardCasesIndexRoute
+  '/dashboard/finance/activity/$activityId': typeof AuthenticatedDashboardFinanceActivityActivityIdRoute
+  '/dashboard/finance/activity/new': typeof AuthenticatedDashboardFinanceActivityNewRoute
+  '/dashboard/finance/expenses/$expenseId': typeof AuthenticatedDashboardFinanceExpensesExpenseIdRoute
+  '/dashboard/finance/expenses/new': typeof AuthenticatedDashboardFinanceExpensesNewRoute
+  '/dashboard/finance/invoices/$invoiceId': typeof AuthenticatedDashboardFinanceInvoicesInvoiceIdRoute
+  '/dashboard/finance/invoices/new': typeof AuthenticatedDashboardFinanceInvoicesNewRoute
+  '/dashboard/finance/statements/$statementId': typeof AuthenticatedDashboardFinanceStatementsStatementIdRoute
+  '/dashboard/finance/statements/new': typeof AuthenticatedDashboardFinanceStatementsNewRoute
+  '/dashboard/finance/time-tracking/$entryId': typeof AuthenticatedDashboardFinanceTimeTrackingEntryIdRoute
+  '/dashboard/finance/time-tracking/new': typeof AuthenticatedDashboardFinanceTimeTrackingNewRoute
+  '/dashboard/finance/transactions/$transactionId': typeof AuthenticatedDashboardFinanceTransactionsTransactionIdRoute
+  '/dashboard/finance/transactions/new': typeof AuthenticatedDashboardFinanceTransactionsNewRoute
+  '/dashboard/tasks/events/$eventId': typeof AuthenticatedDashboardTasksEventsEventIdRoute
+  '/dashboard/tasks/events/new': typeof AuthenticatedDashboardTasksEventsNewRoute
+  '/dashboard/tasks/reminders/$reminderId': typeof AuthenticatedDashboardTasksRemindersReminderIdRoute
+  '/dashboard/tasks/reminders/new': typeof AuthenticatedDashboardTasksRemindersNewRoute
+  '/dashboard/finance/activity': typeof AuthenticatedDashboardFinanceActivityIndexRoute
+  '/dashboard/finance/expenses': typeof AuthenticatedDashboardFinanceExpensesIndexRoute
+  '/dashboard/finance/invoices': typeof AuthenticatedDashboardFinanceInvoicesIndexRoute
+  '/dashboard/finance/statements': typeof AuthenticatedDashboardFinanceStatementsIndexRoute
+  '/dashboard/finance/time-tracking': typeof AuthenticatedDashboardFinanceTimeTrackingIndexRoute
+  '/dashboard/finance/transactions': typeof AuthenticatedDashboardFinanceTransactionsIndexRoute
+  '/dashboard/tasks/events': typeof AuthenticatedDashboardTasksEventsIndexRoute
+  '/dashboard/tasks/reminders': typeof AuthenticatedDashboardTasksRemindersIndexRoute
 }
 export interface FileRoutesByTo {
   '/clerk': typeof ClerkAuthenticatedRouteRouteWithChildren
+  '/account-activity': typeof AccountActivityRoute
+  '/account-statements': typeof AccountStatementsRoute
+  '/case-details': typeof CaseDetailsRoute
+  '/cases-dashboard': typeof CasesDashboardRoute
+  '/events': typeof EventsRoute
+  '/expenses': typeof ExpensesRoute
+  '/generate-statement': typeof GenerateStatementRoute
+  '/gosi-chat': typeof GosiChatRoute
+  '/improved-calendar': typeof ImprovedCalendarRoute
+  '/improved-case': typeof ImprovedCaseRoute
+  '/improved-tasks': typeof ImprovedTasksRoute
+  '/invoices': typeof InvoicesRoute
+  '/legal-tasks': typeof LegalTasksRoute
+  '/reminders': typeof RemindersRoute
+  '/statements-history': typeof StatementsHistoryRoute
+  '/task-details': typeof TaskDetailsRoute
+  '/tasks': typeof TasksRoute
+  '/time-entries': typeof TimeEntriesRoute
   '/forgot-password': typeof authForgotPasswordRoute
   '/otp': typeof authOtpRoute
   '/sign-in': typeof authSignInRoute
@@ -239,11 +632,13 @@ export interface FileRoutesByTo {
   '/500': typeof errors500Route
   '/503': typeof errors503Route
   '/': typeof AuthenticatedIndexRoute
+  '/dashboard/calendar': typeof AuthenticatedDashboardCalendarRoute
   '/errors/$error': typeof AuthenticatedErrorsErrorRoute
   '/settings/account': typeof AuthenticatedSettingsAccountRoute
   '/settings/appearance': typeof AuthenticatedSettingsAppearanceRoute
   '/settings/display': typeof AuthenticatedSettingsDisplayRoute
   '/settings/notifications': typeof AuthenticatedSettingsNotificationsRoute
+  '/tasks/$taskId': typeof AuthenticatedTasksTaskIdRoute
   '/clerk/sign-in': typeof ClerkauthSignInRoute
   '/clerk/sign-up': typeof ClerkauthSignUpRoute
   '/clerk/user-management': typeof ClerkAuthenticatedUserManagementRoute
@@ -251,13 +646,60 @@ export interface FileRoutesByTo {
   '/chats': typeof AuthenticatedChatsIndexRoute
   '/help-center': typeof AuthenticatedHelpCenterIndexRoute
   '/settings': typeof AuthenticatedSettingsIndexRoute
-  '/tasks': typeof AuthenticatedTasksIndexRoute
   '/users': typeof AuthenticatedUsersIndexRoute
+  '/dashboard/cases/$caseId': typeof AuthenticatedDashboardCasesCaseIdRoute
+  '/dashboard/finance/overview': typeof AuthenticatedDashboardFinanceOverviewRoute
+  '/dashboard/messages/chat': typeof AuthenticatedDashboardMessagesChatRoute
+  '/dashboard/tasks/list': typeof AuthenticatedDashboardTasksListRoute
+  '/dashboard/tasks/new': typeof AuthenticatedDashboardTasksNewRoute
+  '/dashboard/cases': typeof AuthenticatedDashboardCasesIndexRoute
+  '/dashboard/finance/activity/$activityId': typeof AuthenticatedDashboardFinanceActivityActivityIdRoute
+  '/dashboard/finance/activity/new': typeof AuthenticatedDashboardFinanceActivityNewRoute
+  '/dashboard/finance/expenses/$expenseId': typeof AuthenticatedDashboardFinanceExpensesExpenseIdRoute
+  '/dashboard/finance/expenses/new': typeof AuthenticatedDashboardFinanceExpensesNewRoute
+  '/dashboard/finance/invoices/$invoiceId': typeof AuthenticatedDashboardFinanceInvoicesInvoiceIdRoute
+  '/dashboard/finance/invoices/new': typeof AuthenticatedDashboardFinanceInvoicesNewRoute
+  '/dashboard/finance/statements/$statementId': typeof AuthenticatedDashboardFinanceStatementsStatementIdRoute
+  '/dashboard/finance/statements/new': typeof AuthenticatedDashboardFinanceStatementsNewRoute
+  '/dashboard/finance/time-tracking/$entryId': typeof AuthenticatedDashboardFinanceTimeTrackingEntryIdRoute
+  '/dashboard/finance/time-tracking/new': typeof AuthenticatedDashboardFinanceTimeTrackingNewRoute
+  '/dashboard/finance/transactions/$transactionId': typeof AuthenticatedDashboardFinanceTransactionsTransactionIdRoute
+  '/dashboard/finance/transactions/new': typeof AuthenticatedDashboardFinanceTransactionsNewRoute
+  '/dashboard/tasks/events/$eventId': typeof AuthenticatedDashboardTasksEventsEventIdRoute
+  '/dashboard/tasks/events/new': typeof AuthenticatedDashboardTasksEventsNewRoute
+  '/dashboard/tasks/reminders/$reminderId': typeof AuthenticatedDashboardTasksRemindersReminderIdRoute
+  '/dashboard/tasks/reminders/new': typeof AuthenticatedDashboardTasksRemindersNewRoute
+  '/dashboard/finance/activity': typeof AuthenticatedDashboardFinanceActivityIndexRoute
+  '/dashboard/finance/expenses': typeof AuthenticatedDashboardFinanceExpensesIndexRoute
+  '/dashboard/finance/invoices': typeof AuthenticatedDashboardFinanceInvoicesIndexRoute
+  '/dashboard/finance/statements': typeof AuthenticatedDashboardFinanceStatementsIndexRoute
+  '/dashboard/finance/time-tracking': typeof AuthenticatedDashboardFinanceTimeTrackingIndexRoute
+  '/dashboard/finance/transactions': typeof AuthenticatedDashboardFinanceTransactionsIndexRoute
+  '/dashboard/tasks/events': typeof AuthenticatedDashboardTasksEventsIndexRoute
+  '/dashboard/tasks/reminders': typeof AuthenticatedDashboardTasksRemindersIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/clerk': typeof ClerkRouteRouteWithChildren
+  '/account-activity': typeof AccountActivityRoute
+  '/account-statements': typeof AccountStatementsRoute
+  '/case-details': typeof CaseDetailsRoute
+  '/cases-dashboard': typeof CasesDashboardRoute
+  '/events': typeof EventsRoute
+  '/expenses': typeof ExpensesRoute
+  '/generate-statement': typeof GenerateStatementRoute
+  '/gosi-chat': typeof GosiChatRoute
+  '/improved-calendar': typeof ImprovedCalendarRoute
+  '/improved-case': typeof ImprovedCaseRoute
+  '/improved-tasks': typeof ImprovedTasksRoute
+  '/invoices': typeof InvoicesRoute
+  '/legal-tasks': typeof LegalTasksRoute
+  '/reminders': typeof RemindersRoute
+  '/statements-history': typeof StatementsHistoryRoute
+  '/task-details': typeof TaskDetailsRoute
+  '/tasks': typeof TasksRoute
+  '/time-entries': typeof TimeEntriesRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRouteRouteWithChildren
   '/clerk/(auth)': typeof ClerkauthRouteRouteWithChildren
   '/clerk/_authenticated': typeof ClerkAuthenticatedRouteRouteWithChildren
@@ -272,11 +714,13 @@ export interface FileRoutesById {
   '/(errors)/500': typeof errors500Route
   '/(errors)/503': typeof errors503Route
   '/_authenticated/': typeof AuthenticatedIndexRoute
+  '/_authenticated/dashboard/calendar': typeof AuthenticatedDashboardCalendarRoute
   '/_authenticated/errors/$error': typeof AuthenticatedErrorsErrorRoute
   '/_authenticated/settings/account': typeof AuthenticatedSettingsAccountRoute
   '/_authenticated/settings/appearance': typeof AuthenticatedSettingsAppearanceRoute
   '/_authenticated/settings/display': typeof AuthenticatedSettingsDisplayRoute
   '/_authenticated/settings/notifications': typeof AuthenticatedSettingsNotificationsRoute
+  '/_authenticated/tasks/$taskId': typeof AuthenticatedTasksTaskIdRoute
   '/clerk/(auth)/sign-in': typeof ClerkauthSignInRoute
   '/clerk/(auth)/sign-up': typeof ClerkauthSignUpRoute
   '/clerk/_authenticated/user-management': typeof ClerkAuthenticatedUserManagementRoute
@@ -284,13 +728,60 @@ export interface FileRoutesById {
   '/_authenticated/chats/': typeof AuthenticatedChatsIndexRoute
   '/_authenticated/help-center/': typeof AuthenticatedHelpCenterIndexRoute
   '/_authenticated/settings/': typeof AuthenticatedSettingsIndexRoute
-  '/_authenticated/tasks/': typeof AuthenticatedTasksIndexRoute
   '/_authenticated/users/': typeof AuthenticatedUsersIndexRoute
+  '/_authenticated/dashboard/cases/$caseId': typeof AuthenticatedDashboardCasesCaseIdRoute
+  '/_authenticated/dashboard/finance/overview': typeof AuthenticatedDashboardFinanceOverviewRoute
+  '/_authenticated/dashboard/messages/chat': typeof AuthenticatedDashboardMessagesChatRoute
+  '/_authenticated/dashboard/tasks/list': typeof AuthenticatedDashboardTasksListRoute
+  '/_authenticated/dashboard/tasks/new': typeof AuthenticatedDashboardTasksNewRoute
+  '/_authenticated/dashboard/cases/': typeof AuthenticatedDashboardCasesIndexRoute
+  '/_authenticated/dashboard/finance/activity/$activityId': typeof AuthenticatedDashboardFinanceActivityActivityIdRoute
+  '/_authenticated/dashboard/finance/activity/new': typeof AuthenticatedDashboardFinanceActivityNewRoute
+  '/_authenticated/dashboard/finance/expenses/$expenseId': typeof AuthenticatedDashboardFinanceExpensesExpenseIdRoute
+  '/_authenticated/dashboard/finance/expenses/new': typeof AuthenticatedDashboardFinanceExpensesNewRoute
+  '/_authenticated/dashboard/finance/invoices/$invoiceId': typeof AuthenticatedDashboardFinanceInvoicesInvoiceIdRoute
+  '/_authenticated/dashboard/finance/invoices/new': typeof AuthenticatedDashboardFinanceInvoicesNewRoute
+  '/_authenticated/dashboard/finance/statements/$statementId': typeof AuthenticatedDashboardFinanceStatementsStatementIdRoute
+  '/_authenticated/dashboard/finance/statements/new': typeof AuthenticatedDashboardFinanceStatementsNewRoute
+  '/_authenticated/dashboard/finance/time-tracking/$entryId': typeof AuthenticatedDashboardFinanceTimeTrackingEntryIdRoute
+  '/_authenticated/dashboard/finance/time-tracking/new': typeof AuthenticatedDashboardFinanceTimeTrackingNewRoute
+  '/_authenticated/dashboard/finance/transactions/$transactionId': typeof AuthenticatedDashboardFinanceTransactionsTransactionIdRoute
+  '/_authenticated/dashboard/finance/transactions/new': typeof AuthenticatedDashboardFinanceTransactionsNewRoute
+  '/_authenticated/dashboard/tasks/events/$eventId': typeof AuthenticatedDashboardTasksEventsEventIdRoute
+  '/_authenticated/dashboard/tasks/events/new': typeof AuthenticatedDashboardTasksEventsNewRoute
+  '/_authenticated/dashboard/tasks/reminders/$reminderId': typeof AuthenticatedDashboardTasksRemindersReminderIdRoute
+  '/_authenticated/dashboard/tasks/reminders/new': typeof AuthenticatedDashboardTasksRemindersNewRoute
+  '/_authenticated/dashboard/finance/activity/': typeof AuthenticatedDashboardFinanceActivityIndexRoute
+  '/_authenticated/dashboard/finance/expenses/': typeof AuthenticatedDashboardFinanceExpensesIndexRoute
+  '/_authenticated/dashboard/finance/invoices/': typeof AuthenticatedDashboardFinanceInvoicesIndexRoute
+  '/_authenticated/dashboard/finance/statements/': typeof AuthenticatedDashboardFinanceStatementsIndexRoute
+  '/_authenticated/dashboard/finance/time-tracking/': typeof AuthenticatedDashboardFinanceTimeTrackingIndexRoute
+  '/_authenticated/dashboard/finance/transactions/': typeof AuthenticatedDashboardFinanceTransactionsIndexRoute
+  '/_authenticated/dashboard/tasks/events/': typeof AuthenticatedDashboardTasksEventsIndexRoute
+  '/_authenticated/dashboard/tasks/reminders/': typeof AuthenticatedDashboardTasksRemindersIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/clerk'
+    | '/account-activity'
+    | '/account-statements'
+    | '/case-details'
+    | '/cases-dashboard'
+    | '/events'
+    | '/expenses'
+    | '/generate-statement'
+    | '/gosi-chat'
+    | '/improved-calendar'
+    | '/improved-case'
+    | '/improved-tasks'
+    | '/invoices'
+    | '/legal-tasks'
+    | '/reminders'
+    | '/statements-history'
+    | '/task-details'
+    | '/tasks'
+    | '/time-entries'
     | '/settings'
     | '/forgot-password'
     | '/otp'
@@ -303,11 +794,13 @@ export interface FileRouteTypes {
     | '/500'
     | '/503'
     | '/'
+    | '/dashboard/calendar'
     | '/errors/$error'
     | '/settings/account'
     | '/settings/appearance'
     | '/settings/display'
     | '/settings/notifications'
+    | '/tasks/$taskId'
     | '/clerk/sign-in'
     | '/clerk/sign-up'
     | '/clerk/user-management'
@@ -315,11 +808,58 @@ export interface FileRouteTypes {
     | '/chats'
     | '/help-center'
     | '/settings/'
-    | '/tasks'
     | '/users'
+    | '/dashboard/cases/$caseId'
+    | '/dashboard/finance/overview'
+    | '/dashboard/messages/chat'
+    | '/dashboard/tasks/list'
+    | '/dashboard/tasks/new'
+    | '/dashboard/cases'
+    | '/dashboard/finance/activity/$activityId'
+    | '/dashboard/finance/activity/new'
+    | '/dashboard/finance/expenses/$expenseId'
+    | '/dashboard/finance/expenses/new'
+    | '/dashboard/finance/invoices/$invoiceId'
+    | '/dashboard/finance/invoices/new'
+    | '/dashboard/finance/statements/$statementId'
+    | '/dashboard/finance/statements/new'
+    | '/dashboard/finance/time-tracking/$entryId'
+    | '/dashboard/finance/time-tracking/new'
+    | '/dashboard/finance/transactions/$transactionId'
+    | '/dashboard/finance/transactions/new'
+    | '/dashboard/tasks/events/$eventId'
+    | '/dashboard/tasks/events/new'
+    | '/dashboard/tasks/reminders/$reminderId'
+    | '/dashboard/tasks/reminders/new'
+    | '/dashboard/finance/activity'
+    | '/dashboard/finance/expenses'
+    | '/dashboard/finance/invoices'
+    | '/dashboard/finance/statements'
+    | '/dashboard/finance/time-tracking'
+    | '/dashboard/finance/transactions'
+    | '/dashboard/tasks/events'
+    | '/dashboard/tasks/reminders'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/clerk'
+    | '/account-activity'
+    | '/account-statements'
+    | '/case-details'
+    | '/cases-dashboard'
+    | '/events'
+    | '/expenses'
+    | '/generate-statement'
+    | '/gosi-chat'
+    | '/improved-calendar'
+    | '/improved-case'
+    | '/improved-tasks'
+    | '/invoices'
+    | '/legal-tasks'
+    | '/reminders'
+    | '/statements-history'
+    | '/task-details'
+    | '/tasks'
+    | '/time-entries'
     | '/forgot-password'
     | '/otp'
     | '/sign-in'
@@ -331,11 +871,13 @@ export interface FileRouteTypes {
     | '/500'
     | '/503'
     | '/'
+    | '/dashboard/calendar'
     | '/errors/$error'
     | '/settings/account'
     | '/settings/appearance'
     | '/settings/display'
     | '/settings/notifications'
+    | '/tasks/$taskId'
     | '/clerk/sign-in'
     | '/clerk/sign-up'
     | '/clerk/user-management'
@@ -343,12 +885,59 @@ export interface FileRouteTypes {
     | '/chats'
     | '/help-center'
     | '/settings'
-    | '/tasks'
     | '/users'
+    | '/dashboard/cases/$caseId'
+    | '/dashboard/finance/overview'
+    | '/dashboard/messages/chat'
+    | '/dashboard/tasks/list'
+    | '/dashboard/tasks/new'
+    | '/dashboard/cases'
+    | '/dashboard/finance/activity/$activityId'
+    | '/dashboard/finance/activity/new'
+    | '/dashboard/finance/expenses/$expenseId'
+    | '/dashboard/finance/expenses/new'
+    | '/dashboard/finance/invoices/$invoiceId'
+    | '/dashboard/finance/invoices/new'
+    | '/dashboard/finance/statements/$statementId'
+    | '/dashboard/finance/statements/new'
+    | '/dashboard/finance/time-tracking/$entryId'
+    | '/dashboard/finance/time-tracking/new'
+    | '/dashboard/finance/transactions/$transactionId'
+    | '/dashboard/finance/transactions/new'
+    | '/dashboard/tasks/events/$eventId'
+    | '/dashboard/tasks/events/new'
+    | '/dashboard/tasks/reminders/$reminderId'
+    | '/dashboard/tasks/reminders/new'
+    | '/dashboard/finance/activity'
+    | '/dashboard/finance/expenses'
+    | '/dashboard/finance/invoices'
+    | '/dashboard/finance/statements'
+    | '/dashboard/finance/time-tracking'
+    | '/dashboard/finance/transactions'
+    | '/dashboard/tasks/events'
+    | '/dashboard/tasks/reminders'
   id:
     | '__root__'
     | '/_authenticated'
     | '/clerk'
+    | '/account-activity'
+    | '/account-statements'
+    | '/case-details'
+    | '/cases-dashboard'
+    | '/events'
+    | '/expenses'
+    | '/generate-statement'
+    | '/gosi-chat'
+    | '/improved-calendar'
+    | '/improved-case'
+    | '/improved-tasks'
+    | '/invoices'
+    | '/legal-tasks'
+    | '/reminders'
+    | '/statements-history'
+    | '/task-details'
+    | '/tasks'
+    | '/time-entries'
     | '/_authenticated/settings'
     | '/clerk/(auth)'
     | '/clerk/_authenticated'
@@ -363,11 +952,13 @@ export interface FileRouteTypes {
     | '/(errors)/500'
     | '/(errors)/503'
     | '/_authenticated/'
+    | '/_authenticated/dashboard/calendar'
     | '/_authenticated/errors/$error'
     | '/_authenticated/settings/account'
     | '/_authenticated/settings/appearance'
     | '/_authenticated/settings/display'
     | '/_authenticated/settings/notifications'
+    | '/_authenticated/tasks/$taskId'
     | '/clerk/(auth)/sign-in'
     | '/clerk/(auth)/sign-up'
     | '/clerk/_authenticated/user-management'
@@ -375,13 +966,60 @@ export interface FileRouteTypes {
     | '/_authenticated/chats/'
     | '/_authenticated/help-center/'
     | '/_authenticated/settings/'
-    | '/_authenticated/tasks/'
     | '/_authenticated/users/'
+    | '/_authenticated/dashboard/cases/$caseId'
+    | '/_authenticated/dashboard/finance/overview'
+    | '/_authenticated/dashboard/messages/chat'
+    | '/_authenticated/dashboard/tasks/list'
+    | '/_authenticated/dashboard/tasks/new'
+    | '/_authenticated/dashboard/cases/'
+    | '/_authenticated/dashboard/finance/activity/$activityId'
+    | '/_authenticated/dashboard/finance/activity/new'
+    | '/_authenticated/dashboard/finance/expenses/$expenseId'
+    | '/_authenticated/dashboard/finance/expenses/new'
+    | '/_authenticated/dashboard/finance/invoices/$invoiceId'
+    | '/_authenticated/dashboard/finance/invoices/new'
+    | '/_authenticated/dashboard/finance/statements/$statementId'
+    | '/_authenticated/dashboard/finance/statements/new'
+    | '/_authenticated/dashboard/finance/time-tracking/$entryId'
+    | '/_authenticated/dashboard/finance/time-tracking/new'
+    | '/_authenticated/dashboard/finance/transactions/$transactionId'
+    | '/_authenticated/dashboard/finance/transactions/new'
+    | '/_authenticated/dashboard/tasks/events/$eventId'
+    | '/_authenticated/dashboard/tasks/events/new'
+    | '/_authenticated/dashboard/tasks/reminders/$reminderId'
+    | '/_authenticated/dashboard/tasks/reminders/new'
+    | '/_authenticated/dashboard/finance/activity/'
+    | '/_authenticated/dashboard/finance/expenses/'
+    | '/_authenticated/dashboard/finance/invoices/'
+    | '/_authenticated/dashboard/finance/statements/'
+    | '/_authenticated/dashboard/finance/time-tracking/'
+    | '/_authenticated/dashboard/finance/transactions/'
+    | '/_authenticated/dashboard/tasks/events/'
+    | '/_authenticated/dashboard/tasks/reminders/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   ClerkRouteRoute: typeof ClerkRouteRouteWithChildren
+  AccountActivityRoute: typeof AccountActivityRoute
+  AccountStatementsRoute: typeof AccountStatementsRoute
+  CaseDetailsRoute: typeof CaseDetailsRoute
+  CasesDashboardRoute: typeof CasesDashboardRoute
+  EventsRoute: typeof EventsRoute
+  ExpensesRoute: typeof ExpensesRoute
+  GenerateStatementRoute: typeof GenerateStatementRoute
+  GosiChatRoute: typeof GosiChatRoute
+  ImprovedCalendarRoute: typeof ImprovedCalendarRoute
+  ImprovedCaseRoute: typeof ImprovedCaseRoute
+  ImprovedTasksRoute: typeof ImprovedTasksRoute
+  InvoicesRoute: typeof InvoicesRoute
+  LegalTasksRoute: typeof LegalTasksRoute
+  RemindersRoute: typeof RemindersRoute
+  StatementsHistoryRoute: typeof StatementsHistoryRoute
+  TaskDetailsRoute: typeof TaskDetailsRoute
+  TasksRoute: typeof TasksRoute
+  TimeEntriesRoute: typeof TimeEntriesRoute
   authForgotPasswordRoute: typeof authForgotPasswordRoute
   authOtpRoute: typeof authOtpRoute
   authSignInRoute: typeof authSignInRoute
@@ -396,6 +1034,132 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/time-entries': {
+      id: '/time-entries'
+      path: '/time-entries'
+      fullPath: '/time-entries'
+      preLoaderRoute: typeof TimeEntriesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tasks': {
+      id: '/tasks'
+      path: '/tasks'
+      fullPath: '/tasks'
+      preLoaderRoute: typeof TasksRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/task-details': {
+      id: '/task-details'
+      path: '/task-details'
+      fullPath: '/task-details'
+      preLoaderRoute: typeof TaskDetailsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/statements-history': {
+      id: '/statements-history'
+      path: '/statements-history'
+      fullPath: '/statements-history'
+      preLoaderRoute: typeof StatementsHistoryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reminders': {
+      id: '/reminders'
+      path: '/reminders'
+      fullPath: '/reminders'
+      preLoaderRoute: typeof RemindersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/legal-tasks': {
+      id: '/legal-tasks'
+      path: '/legal-tasks'
+      fullPath: '/legal-tasks'
+      preLoaderRoute: typeof LegalTasksRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/invoices': {
+      id: '/invoices'
+      path: '/invoices'
+      fullPath: '/invoices'
+      preLoaderRoute: typeof InvoicesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/improved-tasks': {
+      id: '/improved-tasks'
+      path: '/improved-tasks'
+      fullPath: '/improved-tasks'
+      preLoaderRoute: typeof ImprovedTasksRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/improved-case': {
+      id: '/improved-case'
+      path: '/improved-case'
+      fullPath: '/improved-case'
+      preLoaderRoute: typeof ImprovedCaseRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/improved-calendar': {
+      id: '/improved-calendar'
+      path: '/improved-calendar'
+      fullPath: '/improved-calendar'
+      preLoaderRoute: typeof ImprovedCalendarRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/gosi-chat': {
+      id: '/gosi-chat'
+      path: '/gosi-chat'
+      fullPath: '/gosi-chat'
+      preLoaderRoute: typeof GosiChatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/generate-statement': {
+      id: '/generate-statement'
+      path: '/generate-statement'
+      fullPath: '/generate-statement'
+      preLoaderRoute: typeof GenerateStatementRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/expenses': {
+      id: '/expenses'
+      path: '/expenses'
+      fullPath: '/expenses'
+      preLoaderRoute: typeof ExpensesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/events': {
+      id: '/events'
+      path: '/events'
+      fullPath: '/events'
+      preLoaderRoute: typeof EventsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/cases-dashboard': {
+      id: '/cases-dashboard'
+      path: '/cases-dashboard'
+      fullPath: '/cases-dashboard'
+      preLoaderRoute: typeof CasesDashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/case-details': {
+      id: '/case-details'
+      path: '/case-details'
+      fullPath: '/case-details'
+      preLoaderRoute: typeof CaseDetailsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/account-statements': {
+      id: '/account-statements'
+      path: '/account-statements'
+      fullPath: '/account-statements'
+      preLoaderRoute: typeof AccountStatementsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/account-activity': {
+      id: '/account-activity'
+      path: '/account-activity'
+      fullPath: '/account-activity'
+      preLoaderRoute: typeof AccountActivityRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/clerk': {
       id: '/clerk'
       path: '/clerk'
@@ -515,13 +1279,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedUsersIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/tasks/': {
-      id: '/_authenticated/tasks/'
-      path: '/tasks'
-      fullPath: '/tasks'
-      preLoaderRoute: typeof AuthenticatedTasksIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
     '/_authenticated/settings/': {
       id: '/_authenticated/settings/'
       path: '/'
@@ -571,6 +1328,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ClerkauthSignInRouteImport
       parentRoute: typeof ClerkauthRouteRoute
     }
+    '/_authenticated/tasks/$taskId': {
+      id: '/_authenticated/tasks/$taskId'
+      path: '/tasks/$taskId'
+      fullPath: '/tasks/$taskId'
+      preLoaderRoute: typeof AuthenticatedTasksTaskIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/settings/notifications': {
       id: '/_authenticated/settings/notifications'
       path: '/notifications'
@@ -606,6 +1370,223 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedErrorsErrorRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/dashboard/calendar': {
+      id: '/_authenticated/dashboard/calendar'
+      path: '/dashboard/calendar'
+      fullPath: '/dashboard/calendar'
+      preLoaderRoute: typeof AuthenticatedDashboardCalendarRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dashboard/cases/': {
+      id: '/_authenticated/dashboard/cases/'
+      path: '/dashboard/cases'
+      fullPath: '/dashboard/cases'
+      preLoaderRoute: typeof AuthenticatedDashboardCasesIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dashboard/tasks/new': {
+      id: '/_authenticated/dashboard/tasks/new'
+      path: '/dashboard/tasks/new'
+      fullPath: '/dashboard/tasks/new'
+      preLoaderRoute: typeof AuthenticatedDashboardTasksNewRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dashboard/tasks/list': {
+      id: '/_authenticated/dashboard/tasks/list'
+      path: '/dashboard/tasks/list'
+      fullPath: '/dashboard/tasks/list'
+      preLoaderRoute: typeof AuthenticatedDashboardTasksListRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dashboard/messages/chat': {
+      id: '/_authenticated/dashboard/messages/chat'
+      path: '/dashboard/messages/chat'
+      fullPath: '/dashboard/messages/chat'
+      preLoaderRoute: typeof AuthenticatedDashboardMessagesChatRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dashboard/finance/overview': {
+      id: '/_authenticated/dashboard/finance/overview'
+      path: '/dashboard/finance/overview'
+      fullPath: '/dashboard/finance/overview'
+      preLoaderRoute: typeof AuthenticatedDashboardFinanceOverviewRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dashboard/cases/$caseId': {
+      id: '/_authenticated/dashboard/cases/$caseId'
+      path: '/dashboard/cases/$caseId'
+      fullPath: '/dashboard/cases/$caseId'
+      preLoaderRoute: typeof AuthenticatedDashboardCasesCaseIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dashboard/tasks/reminders/': {
+      id: '/_authenticated/dashboard/tasks/reminders/'
+      path: '/dashboard/tasks/reminders'
+      fullPath: '/dashboard/tasks/reminders'
+      preLoaderRoute: typeof AuthenticatedDashboardTasksRemindersIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dashboard/tasks/events/': {
+      id: '/_authenticated/dashboard/tasks/events/'
+      path: '/dashboard/tasks/events'
+      fullPath: '/dashboard/tasks/events'
+      preLoaderRoute: typeof AuthenticatedDashboardTasksEventsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dashboard/finance/transactions/': {
+      id: '/_authenticated/dashboard/finance/transactions/'
+      path: '/dashboard/finance/transactions'
+      fullPath: '/dashboard/finance/transactions'
+      preLoaderRoute: typeof AuthenticatedDashboardFinanceTransactionsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dashboard/finance/time-tracking/': {
+      id: '/_authenticated/dashboard/finance/time-tracking/'
+      path: '/dashboard/finance/time-tracking'
+      fullPath: '/dashboard/finance/time-tracking'
+      preLoaderRoute: typeof AuthenticatedDashboardFinanceTimeTrackingIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dashboard/finance/statements/': {
+      id: '/_authenticated/dashboard/finance/statements/'
+      path: '/dashboard/finance/statements'
+      fullPath: '/dashboard/finance/statements'
+      preLoaderRoute: typeof AuthenticatedDashboardFinanceStatementsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dashboard/finance/invoices/': {
+      id: '/_authenticated/dashboard/finance/invoices/'
+      path: '/dashboard/finance/invoices'
+      fullPath: '/dashboard/finance/invoices'
+      preLoaderRoute: typeof AuthenticatedDashboardFinanceInvoicesIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dashboard/finance/expenses/': {
+      id: '/_authenticated/dashboard/finance/expenses/'
+      path: '/dashboard/finance/expenses'
+      fullPath: '/dashboard/finance/expenses'
+      preLoaderRoute: typeof AuthenticatedDashboardFinanceExpensesIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dashboard/finance/activity/': {
+      id: '/_authenticated/dashboard/finance/activity/'
+      path: '/dashboard/finance/activity'
+      fullPath: '/dashboard/finance/activity'
+      preLoaderRoute: typeof AuthenticatedDashboardFinanceActivityIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dashboard/tasks/reminders/new': {
+      id: '/_authenticated/dashboard/tasks/reminders/new'
+      path: '/dashboard/tasks/reminders/new'
+      fullPath: '/dashboard/tasks/reminders/new'
+      preLoaderRoute: typeof AuthenticatedDashboardTasksRemindersNewRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dashboard/tasks/reminders/$reminderId': {
+      id: '/_authenticated/dashboard/tasks/reminders/$reminderId'
+      path: '/dashboard/tasks/reminders/$reminderId'
+      fullPath: '/dashboard/tasks/reminders/$reminderId'
+      preLoaderRoute: typeof AuthenticatedDashboardTasksRemindersReminderIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dashboard/tasks/events/new': {
+      id: '/_authenticated/dashboard/tasks/events/new'
+      path: '/dashboard/tasks/events/new'
+      fullPath: '/dashboard/tasks/events/new'
+      preLoaderRoute: typeof AuthenticatedDashboardTasksEventsNewRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dashboard/tasks/events/$eventId': {
+      id: '/_authenticated/dashboard/tasks/events/$eventId'
+      path: '/dashboard/tasks/events/$eventId'
+      fullPath: '/dashboard/tasks/events/$eventId'
+      preLoaderRoute: typeof AuthenticatedDashboardTasksEventsEventIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dashboard/finance/transactions/new': {
+      id: '/_authenticated/dashboard/finance/transactions/new'
+      path: '/dashboard/finance/transactions/new'
+      fullPath: '/dashboard/finance/transactions/new'
+      preLoaderRoute: typeof AuthenticatedDashboardFinanceTransactionsNewRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dashboard/finance/transactions/$transactionId': {
+      id: '/_authenticated/dashboard/finance/transactions/$transactionId'
+      path: '/dashboard/finance/transactions/$transactionId'
+      fullPath: '/dashboard/finance/transactions/$transactionId'
+      preLoaderRoute: typeof AuthenticatedDashboardFinanceTransactionsTransactionIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dashboard/finance/time-tracking/new': {
+      id: '/_authenticated/dashboard/finance/time-tracking/new'
+      path: '/dashboard/finance/time-tracking/new'
+      fullPath: '/dashboard/finance/time-tracking/new'
+      preLoaderRoute: typeof AuthenticatedDashboardFinanceTimeTrackingNewRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dashboard/finance/time-tracking/$entryId': {
+      id: '/_authenticated/dashboard/finance/time-tracking/$entryId'
+      path: '/dashboard/finance/time-tracking/$entryId'
+      fullPath: '/dashboard/finance/time-tracking/$entryId'
+      preLoaderRoute: typeof AuthenticatedDashboardFinanceTimeTrackingEntryIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dashboard/finance/statements/new': {
+      id: '/_authenticated/dashboard/finance/statements/new'
+      path: '/dashboard/finance/statements/new'
+      fullPath: '/dashboard/finance/statements/new'
+      preLoaderRoute: typeof AuthenticatedDashboardFinanceStatementsNewRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dashboard/finance/statements/$statementId': {
+      id: '/_authenticated/dashboard/finance/statements/$statementId'
+      path: '/dashboard/finance/statements/$statementId'
+      fullPath: '/dashboard/finance/statements/$statementId'
+      preLoaderRoute: typeof AuthenticatedDashboardFinanceStatementsStatementIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dashboard/finance/invoices/new': {
+      id: '/_authenticated/dashboard/finance/invoices/new'
+      path: '/dashboard/finance/invoices/new'
+      fullPath: '/dashboard/finance/invoices/new'
+      preLoaderRoute: typeof AuthenticatedDashboardFinanceInvoicesNewRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dashboard/finance/invoices/$invoiceId': {
+      id: '/_authenticated/dashboard/finance/invoices/$invoiceId'
+      path: '/dashboard/finance/invoices/$invoiceId'
+      fullPath: '/dashboard/finance/invoices/$invoiceId'
+      preLoaderRoute: typeof AuthenticatedDashboardFinanceInvoicesInvoiceIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dashboard/finance/expenses/new': {
+      id: '/_authenticated/dashboard/finance/expenses/new'
+      path: '/dashboard/finance/expenses/new'
+      fullPath: '/dashboard/finance/expenses/new'
+      preLoaderRoute: typeof AuthenticatedDashboardFinanceExpensesNewRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dashboard/finance/expenses/$expenseId': {
+      id: '/_authenticated/dashboard/finance/expenses/$expenseId'
+      path: '/dashboard/finance/expenses/$expenseId'
+      fullPath: '/dashboard/finance/expenses/$expenseId'
+      preLoaderRoute: typeof AuthenticatedDashboardFinanceExpensesExpenseIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dashboard/finance/activity/new': {
+      id: '/_authenticated/dashboard/finance/activity/new'
+      path: '/dashboard/finance/activity/new'
+      fullPath: '/dashboard/finance/activity/new'
+      preLoaderRoute: typeof AuthenticatedDashboardFinanceActivityNewRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dashboard/finance/activity/$activityId': {
+      id: '/_authenticated/dashboard/finance/activity/$activityId'
+      path: '/dashboard/finance/activity/$activityId'
+      fullPath: '/dashboard/finance/activity/$activityId'
+      preLoaderRoute: typeof AuthenticatedDashboardFinanceActivityActivityIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
@@ -635,23 +1616,112 @@ const AuthenticatedSettingsRouteRouteWithChildren =
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedSettingsRouteRoute: typeof AuthenticatedSettingsRouteRouteWithChildren
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
+  AuthenticatedDashboardCalendarRoute: typeof AuthenticatedDashboardCalendarRoute
   AuthenticatedErrorsErrorRoute: typeof AuthenticatedErrorsErrorRoute
+  AuthenticatedTasksTaskIdRoute: typeof AuthenticatedTasksTaskIdRoute
   AuthenticatedAppsIndexRoute: typeof AuthenticatedAppsIndexRoute
   AuthenticatedChatsIndexRoute: typeof AuthenticatedChatsIndexRoute
   AuthenticatedHelpCenterIndexRoute: typeof AuthenticatedHelpCenterIndexRoute
-  AuthenticatedTasksIndexRoute: typeof AuthenticatedTasksIndexRoute
   AuthenticatedUsersIndexRoute: typeof AuthenticatedUsersIndexRoute
+  AuthenticatedDashboardCasesCaseIdRoute: typeof AuthenticatedDashboardCasesCaseIdRoute
+  AuthenticatedDashboardFinanceOverviewRoute: typeof AuthenticatedDashboardFinanceOverviewRoute
+  AuthenticatedDashboardMessagesChatRoute: typeof AuthenticatedDashboardMessagesChatRoute
+  AuthenticatedDashboardTasksListRoute: typeof AuthenticatedDashboardTasksListRoute
+  AuthenticatedDashboardTasksNewRoute: typeof AuthenticatedDashboardTasksNewRoute
+  AuthenticatedDashboardCasesIndexRoute: typeof AuthenticatedDashboardCasesIndexRoute
+  AuthenticatedDashboardFinanceActivityActivityIdRoute: typeof AuthenticatedDashboardFinanceActivityActivityIdRoute
+  AuthenticatedDashboardFinanceActivityNewRoute: typeof AuthenticatedDashboardFinanceActivityNewRoute
+  AuthenticatedDashboardFinanceExpensesExpenseIdRoute: typeof AuthenticatedDashboardFinanceExpensesExpenseIdRoute
+  AuthenticatedDashboardFinanceExpensesNewRoute: typeof AuthenticatedDashboardFinanceExpensesNewRoute
+  AuthenticatedDashboardFinanceInvoicesInvoiceIdRoute: typeof AuthenticatedDashboardFinanceInvoicesInvoiceIdRoute
+  AuthenticatedDashboardFinanceInvoicesNewRoute: typeof AuthenticatedDashboardFinanceInvoicesNewRoute
+  AuthenticatedDashboardFinanceStatementsStatementIdRoute: typeof AuthenticatedDashboardFinanceStatementsStatementIdRoute
+  AuthenticatedDashboardFinanceStatementsNewRoute: typeof AuthenticatedDashboardFinanceStatementsNewRoute
+  AuthenticatedDashboardFinanceTimeTrackingEntryIdRoute: typeof AuthenticatedDashboardFinanceTimeTrackingEntryIdRoute
+  AuthenticatedDashboardFinanceTimeTrackingNewRoute: typeof AuthenticatedDashboardFinanceTimeTrackingNewRoute
+  AuthenticatedDashboardFinanceTransactionsTransactionIdRoute: typeof AuthenticatedDashboardFinanceTransactionsTransactionIdRoute
+  AuthenticatedDashboardFinanceTransactionsNewRoute: typeof AuthenticatedDashboardFinanceTransactionsNewRoute
+  AuthenticatedDashboardTasksEventsEventIdRoute: typeof AuthenticatedDashboardTasksEventsEventIdRoute
+  AuthenticatedDashboardTasksEventsNewRoute: typeof AuthenticatedDashboardTasksEventsNewRoute
+  AuthenticatedDashboardTasksRemindersReminderIdRoute: typeof AuthenticatedDashboardTasksRemindersReminderIdRoute
+  AuthenticatedDashboardTasksRemindersNewRoute: typeof AuthenticatedDashboardTasksRemindersNewRoute
+  AuthenticatedDashboardFinanceActivityIndexRoute: typeof AuthenticatedDashboardFinanceActivityIndexRoute
+  AuthenticatedDashboardFinanceExpensesIndexRoute: typeof AuthenticatedDashboardFinanceExpensesIndexRoute
+  AuthenticatedDashboardFinanceInvoicesIndexRoute: typeof AuthenticatedDashboardFinanceInvoicesIndexRoute
+  AuthenticatedDashboardFinanceStatementsIndexRoute: typeof AuthenticatedDashboardFinanceStatementsIndexRoute
+  AuthenticatedDashboardFinanceTimeTrackingIndexRoute: typeof AuthenticatedDashboardFinanceTimeTrackingIndexRoute
+  AuthenticatedDashboardFinanceTransactionsIndexRoute: typeof AuthenticatedDashboardFinanceTransactionsIndexRoute
+  AuthenticatedDashboardTasksEventsIndexRoute: typeof AuthenticatedDashboardTasksEventsIndexRoute
+  AuthenticatedDashboardTasksRemindersIndexRoute: typeof AuthenticatedDashboardTasksRemindersIndexRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedSettingsRouteRoute: AuthenticatedSettingsRouteRouteWithChildren,
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
+  AuthenticatedDashboardCalendarRoute: AuthenticatedDashboardCalendarRoute,
   AuthenticatedErrorsErrorRoute: AuthenticatedErrorsErrorRoute,
+  AuthenticatedTasksTaskIdRoute: AuthenticatedTasksTaskIdRoute,
   AuthenticatedAppsIndexRoute: AuthenticatedAppsIndexRoute,
   AuthenticatedChatsIndexRoute: AuthenticatedChatsIndexRoute,
   AuthenticatedHelpCenterIndexRoute: AuthenticatedHelpCenterIndexRoute,
-  AuthenticatedTasksIndexRoute: AuthenticatedTasksIndexRoute,
   AuthenticatedUsersIndexRoute: AuthenticatedUsersIndexRoute,
+  AuthenticatedDashboardCasesCaseIdRoute:
+    AuthenticatedDashboardCasesCaseIdRoute,
+  AuthenticatedDashboardFinanceOverviewRoute:
+    AuthenticatedDashboardFinanceOverviewRoute,
+  AuthenticatedDashboardMessagesChatRoute:
+    AuthenticatedDashboardMessagesChatRoute,
+  AuthenticatedDashboardTasksListRoute: AuthenticatedDashboardTasksListRoute,
+  AuthenticatedDashboardTasksNewRoute: AuthenticatedDashboardTasksNewRoute,
+  AuthenticatedDashboardCasesIndexRoute: AuthenticatedDashboardCasesIndexRoute,
+  AuthenticatedDashboardFinanceActivityActivityIdRoute:
+    AuthenticatedDashboardFinanceActivityActivityIdRoute,
+  AuthenticatedDashboardFinanceActivityNewRoute:
+    AuthenticatedDashboardFinanceActivityNewRoute,
+  AuthenticatedDashboardFinanceExpensesExpenseIdRoute:
+    AuthenticatedDashboardFinanceExpensesExpenseIdRoute,
+  AuthenticatedDashboardFinanceExpensesNewRoute:
+    AuthenticatedDashboardFinanceExpensesNewRoute,
+  AuthenticatedDashboardFinanceInvoicesInvoiceIdRoute:
+    AuthenticatedDashboardFinanceInvoicesInvoiceIdRoute,
+  AuthenticatedDashboardFinanceInvoicesNewRoute:
+    AuthenticatedDashboardFinanceInvoicesNewRoute,
+  AuthenticatedDashboardFinanceStatementsStatementIdRoute:
+    AuthenticatedDashboardFinanceStatementsStatementIdRoute,
+  AuthenticatedDashboardFinanceStatementsNewRoute:
+    AuthenticatedDashboardFinanceStatementsNewRoute,
+  AuthenticatedDashboardFinanceTimeTrackingEntryIdRoute:
+    AuthenticatedDashboardFinanceTimeTrackingEntryIdRoute,
+  AuthenticatedDashboardFinanceTimeTrackingNewRoute:
+    AuthenticatedDashboardFinanceTimeTrackingNewRoute,
+  AuthenticatedDashboardFinanceTransactionsTransactionIdRoute:
+    AuthenticatedDashboardFinanceTransactionsTransactionIdRoute,
+  AuthenticatedDashboardFinanceTransactionsNewRoute:
+    AuthenticatedDashboardFinanceTransactionsNewRoute,
+  AuthenticatedDashboardTasksEventsEventIdRoute:
+    AuthenticatedDashboardTasksEventsEventIdRoute,
+  AuthenticatedDashboardTasksEventsNewRoute:
+    AuthenticatedDashboardTasksEventsNewRoute,
+  AuthenticatedDashboardTasksRemindersReminderIdRoute:
+    AuthenticatedDashboardTasksRemindersReminderIdRoute,
+  AuthenticatedDashboardTasksRemindersNewRoute:
+    AuthenticatedDashboardTasksRemindersNewRoute,
+  AuthenticatedDashboardFinanceActivityIndexRoute:
+    AuthenticatedDashboardFinanceActivityIndexRoute,
+  AuthenticatedDashboardFinanceExpensesIndexRoute:
+    AuthenticatedDashboardFinanceExpensesIndexRoute,
+  AuthenticatedDashboardFinanceInvoicesIndexRoute:
+    AuthenticatedDashboardFinanceInvoicesIndexRoute,
+  AuthenticatedDashboardFinanceStatementsIndexRoute:
+    AuthenticatedDashboardFinanceStatementsIndexRoute,
+  AuthenticatedDashboardFinanceTimeTrackingIndexRoute:
+    AuthenticatedDashboardFinanceTimeTrackingIndexRoute,
+  AuthenticatedDashboardFinanceTransactionsIndexRoute:
+    AuthenticatedDashboardFinanceTransactionsIndexRoute,
+  AuthenticatedDashboardTasksEventsIndexRoute:
+    AuthenticatedDashboardTasksEventsIndexRoute,
+  AuthenticatedDashboardTasksRemindersIndexRoute:
+    AuthenticatedDashboardTasksRemindersIndexRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
@@ -703,6 +1773,24 @@ const ClerkRouteRouteWithChildren = ClerkRouteRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   ClerkRouteRoute: ClerkRouteRouteWithChildren,
+  AccountActivityRoute: AccountActivityRoute,
+  AccountStatementsRoute: AccountStatementsRoute,
+  CaseDetailsRoute: CaseDetailsRoute,
+  CasesDashboardRoute: CasesDashboardRoute,
+  EventsRoute: EventsRoute,
+  ExpensesRoute: ExpensesRoute,
+  GenerateStatementRoute: GenerateStatementRoute,
+  GosiChatRoute: GosiChatRoute,
+  ImprovedCalendarRoute: ImprovedCalendarRoute,
+  ImprovedCaseRoute: ImprovedCaseRoute,
+  ImprovedTasksRoute: ImprovedTasksRoute,
+  InvoicesRoute: InvoicesRoute,
+  LegalTasksRoute: LegalTasksRoute,
+  RemindersRoute: RemindersRoute,
+  StatementsHistoryRoute: StatementsHistoryRoute,
+  TaskDetailsRoute: TaskDetailsRoute,
+  TasksRoute: TasksRoute,
+  TimeEntriesRoute: TimeEntriesRoute,
   authForgotPasswordRoute: authForgotPasswordRoute,
   authOtpRoute: authOtpRoute,
   authSignInRoute: authSignInRoute,
