@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { Link } from '@tanstack/react-router'
+import { useState, useMemo } from 'react'
+import { Link, useParams } from '@tanstack/react-router'
 import {
     FileText, Calendar, CheckSquare, Clock, MoreHorizontal, Plus, Upload,
     User, AlertCircle, CheckCircle2, Scale, Building, Mail, Phone,
@@ -29,12 +29,45 @@ import { LanguageSwitcher } from '@/components/language-switcher'
 import { ThemeSwitch } from '@/components/theme-switch'
 import { ConfigDrawer } from '@/components/config-drawer'
 import { ProfileDropdown } from '@/components/profile-dropdown'
+import { useCase } from '@/hooks/useCasesAndClients'
+import { Skeleton } from '@/components/ui/skeleton'
+import { Alert, AlertDescription } from '@/components/ui/alert'
 
 export function CaseDetailsView() {
     const [activeTab, setActiveTab] = useState('overview')
+    const { caseId } = useParams({ strict: false }) as { caseId: string }
 
-    // Mock Data - Matching ImprovedCaseManagement.tsx exactly
-    const caseInfo = {
+    const { data: caseData, isLoading, isError, error, refetch } = useCase(caseId)
+
+    const caseInfo = useMemo(() => {
+        if (!caseData?.data) return null
+        const c = caseData.data
+
+        return {
+            id: c.caseNumber || c._id,
+            title: c.title || 'قضية غير محددة',
+            status: c.status || 'active',
+            statusLabel: c.status === 'active' ? 'قيد النظر' : 'مغلقة',
+            plaintiff: c.clientId?.name || 'غير محدد',
+            defendant: c.opposingParty || 'غير محدد',
+            type: c.caseType || 'عامة',
+            court: c.court || 'غير محدد',
+            judge: c.judge || 'غير محدد',
+            assignedLawyer: c.assignedTo?.firstName + ' ' + c.assignedTo?.lastName || 'غير محدد',
+            filingDate: c.filingDate ? new Date(c.filingDate).toLocaleDateString('ar-SA') : 'غير محدد',
+            nextHearingDate: c.nextHearingDate ? new Date(c.nextHearingDate).toLocaleDateString('ar-SA') : 'غير محدد',
+            claimAmount: c.claimAmount || 0,
+            caseDescription: c.description || 'لا يوجد وصف',
+            priority: c.priority || 'medium',
+            progress: c.progress || 0,
+            documents: c.documents || [],
+            tasks: c.tasks || [],
+            timeline: c.history || [],
+            _id: c._id,
+        }
+    }, [caseData])
+
+    const mockCaseInfo = {
         id: '4772077905',
         title: 'مشاري بن ناهد ضد المصنع السعودي العربي',
         status: 'active',
@@ -121,7 +154,58 @@ export function CaseDetailsView() {
 
             <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-r border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
 
-                {/* HERO BANNER - Matching ImprovedCalendarDashboard */}
+                {/* Loading State */}
+                {isLoading && (
+                    <div className="space-y-6">
+                        <div className="bg-navy rounded-3xl p-8">
+                            <Skeleton className="h-8 w-3/4 mb-4 bg-white/20" />
+                            <Skeleton className="h-6 w-1/2 bg-white/20" />
+                        </div>
+                        <div className="grid grid-cols-12 gap-6">
+                            <div className="col-span-12 lg:col-span-8">
+                                <Skeleton className="h-96 w-full rounded-2xl" />
+                            </div>
+                            <div className="col-span-12 lg:col-span-4">
+                                <Skeleton className="h-96 w-full rounded-2xl" />
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {/* Error State */}
+                {isError && !isLoading && (
+                    <Alert className="border-red-200 bg-red-50">
+                        <AlertCircle className="h-4 w-4 text-red-600" />
+                        <AlertDescription className="text-red-800">
+                            <div className="flex items-center justify-between">
+                                <span>حدث خطأ أثناء تحميل تفاصيل القضية: {error?.message || 'خطأ غير معروف'}</span>
+                                <Button onClick={() => refetch()} variant="outline" size="sm" className="border-red-300 text-red-700 hover:bg-red-100">
+                                    إعادة المحاولة
+                                </Button>
+                            </div>
+                        </AlertDescription>
+                    </Alert>
+                )}
+
+                {/* Empty State */}
+                {!isLoading && !isError && !caseInfo && (
+                    <div className="text-center py-12 bg-white rounded-3xl">
+                        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-slate-100 mb-4">
+                            <Briefcase className="h-8 w-8 text-slate-400" />
+                        </div>
+                        <h4 className="text-lg font-bold text-navy mb-2">لم يتم العثور على القضية</h4>
+                        <p className="text-slate-500 mb-4">القضية المطلوبة غير موجودة أو تم حذفها</p>
+                        <Button asChild className="bg-blue-500 hover:bg-blue-600 text-white rounded-xl">
+                            <Link to="/dashboard/cases">
+                                <ArrowLeft className="ml-2 h-4 w-4" />
+                                العودة إلى القضايا
+                            </Link>
+                        </Button>
+                    </div>
+                )}
+
+                {/* Success State - HERO BANNER */}
+                {!isLoading && !isError && caseInfo && (
                 <div className="bg-navy rounded-3xl p-8 relative overflow-hidden text-white shadow-xl shadow-navy/20 group">
                     <div className="absolute -bottom-32 -left-32 w-96 h-96 bg-brand-blue rounded-full blur-[120px] opacity-40 group-hover:opacity-50 transition-opacity duration-700"></div>
                     <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
@@ -654,6 +738,7 @@ export function CaseDetailsView() {
                         </div>
                     </div>
                 </div>
+                )}
             </Main>
         </>
     )
