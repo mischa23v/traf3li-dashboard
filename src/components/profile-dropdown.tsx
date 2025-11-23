@@ -26,7 +26,6 @@ export function ProfileDropdown({ className }: { className?: string }) {
         <DropdownMenuTrigger asChild>
           <Button variant='ghost' className={cn('relative h-8 w-8 rounded-full', className)}>
             <Avatar className='h-8 w-8'>
-              <AvatarImage src='/avatars/01.png' alt='@shadcn' />
               <AvatarFallback>SN</AvatarFallback>
             </Avatar>
           </Button>
