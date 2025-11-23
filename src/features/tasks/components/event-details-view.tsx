@@ -34,8 +34,8 @@ export function EventDetailsView() {
 
     // Transform API data
     const event = useMemo(() => {
-        if (!eventData?.data) return null
-        const e = eventData.data
+        if (!eventData) return null
+        const e = eventData
 
         const eventDate = e.date ? new Date(e.date) : null
         const dateDisplay = eventDate ? eventDate.toLocaleDateString('ar-SA', { year: 'numeric', month: 'long', day: 'numeric' }) : 'غير محدد'

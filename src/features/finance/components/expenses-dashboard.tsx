@@ -50,8 +50,8 @@ export default function ExpensesDashboard() {
 
     // Transform API data to component format
     const expenses = useMemo(() => {
-        if (!expensesData?.data) return []
-        return expensesData.data.map((exp: any) => ({
+        if (!expensesData?.expenses) return []
+        return expensesData.expenses.map((exp: any) => ({
             id: exp.expenseId || exp._id,
             _id: exp._id,
             description: exp.description,

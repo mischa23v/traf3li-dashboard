@@ -32,8 +32,8 @@ export function ReminderDetailsView() {
     const { data: reminderData, isLoading, isError, error, refetch } = useReminder(reminderId)
 
     const reminder = useMemo(() => {
-        if (!reminderData?.data) return null
-        const r = reminderData.data
+        if (!reminderData) return null
+        const r = reminderData
 
         const reminderDate = r.dueDate ? new Date(r.dueDate) : null
         const dateDisplay = reminderDate ? reminderDate.toLocaleDateString('ar-SA', { year: 'numeric', month: 'long', day: 'numeric' }) : 'غير محدد'

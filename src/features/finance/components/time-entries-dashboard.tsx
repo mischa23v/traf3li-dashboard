@@ -58,9 +58,9 @@ export default function TimeEntriesDashboard() {
 
     // Sync timer with backend data
     useEffect(() => {
-        if (timerData?.data?.isRunning && timerData.data.elapsedSeconds !== undefined) {
-            setCurrentTime(timerData.data.elapsedSeconds)
-        } else if (!timerData?.data?.isRunning) {
+        if (timerData?.isRunning && timerData.elapsedSeconds !== undefined) {
+            setCurrentTime(timerData.elapsedSeconds)
+        } else if (!timerData?.isRunning) {
             setCurrentTime(0)
         }
     }, [timerData])
@@ -68,13 +68,13 @@ export default function TimeEntriesDashboard() {
     // Local timer tick
     useEffect(() => {
         let interval: NodeJS.Timeout
-        if (timerData?.data?.isRunning) {
+        if (timerData?.isRunning) {
             interval = setInterval(() => {
                 setCurrentTime(prev => prev + 1)
             }, 1000)
         }
         return () => clearInterval(interval)
-    }, [timerData?.data?.isRunning])
+    }, [timerData?.isRunning])
 
     const formatTime = (seconds: number) => {
         const hours = Math.floor(seconds / 3600)
@@ -85,8 +85,8 @@ export default function TimeEntriesDashboard() {
 
     // Transform API data
     const timeEntries = useMemo(() => {
-        if (!entriesData?.data) return []
-        return entriesData.data.map((entry: any) => ({
+        if (!entriesData?.entries) return []
+        return entriesData.entries.map((entry: any) => ({
             id: entry._id,
             date: new Date(entry.date).toLocaleDateString('ar-SA'),
             client: entry.clientId?.name || entry.clientId?.firstName + ' ' + entry.clientId?.lastName || 'عميل غير محدد',
@@ -467,7 +467,7 @@ export default function TimeEntriesDashboard() {
                                     </div>
 
                                     <div className="flex gap-3 mb-6">
-                                        {!timerData?.data?.isRunning ? (
+                                        {!timerData?.isRunning ? (
                                             <Button
                                                 onClick={handleStartTimer}
                                                 disabled={startTimerMutation.isPending}
@@ -476,7 +476,7 @@ export default function TimeEntriesDashboard() {
                                                 <Play className="w-5 h-5 ml-2" />
                                                 بدء
                                             </Button>
-                                        ) : timerData?.data?.isPaused ? (
+                                        ) : timerData?.isPaused ? (
                                             <Button
                                                 onClick={handleResumeTimer}
                                                 disabled={resumeTimerMutation.isPending}
@@ -497,7 +497,7 @@ export default function TimeEntriesDashboard() {
                                         )}
                                         <Button
                                             onClick={handleStopTimer}
-                                            disabled={stopTimerMutation.isPending || !timerData?.data?.isRunning}
+                                            disabled={stopTimerMutation.isPending || !timerData?.isRunning}
                                             variant="outline"
                                             className="bg-white/10 border-white/20 text-white hover:bg-white/20 h-12 w-12 rounded-xl p-0"
                                         >

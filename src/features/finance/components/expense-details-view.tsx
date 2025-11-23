@@ -33,8 +33,8 @@ export function ExpenseDetailsView() {
 
     // Transform API data to component format
     const expense = useMemo(() => {
-        if (!expenseData?.data) return null
-        const exp = expenseData.data
+        if (!expenseData) return null
+        const exp = expenseData
         return {
             id: exp.expenseId || exp._id,
             category: exp.category,

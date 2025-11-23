@@ -36,7 +36,7 @@ export default function AccountsDashboard({ }: AccountsDashboardProps) {
 
     // Calculate financial summary
     const financialSummary = useMemo(() => {
-        const balance = balanceData?.data?.balance || 0
+        const balance = balanceData?.balance || 0
         const revenue = summaryData?.data?.totalIncome || summaryData?.data?.income || 0
         const expenses = summaryData?.data?.totalExpenses || summaryData?.data?.expenses || 0
         const netProfit = revenue - expenses

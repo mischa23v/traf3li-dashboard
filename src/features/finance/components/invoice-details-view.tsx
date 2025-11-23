@@ -34,8 +34,8 @@ export function InvoiceDetailsView() {
 
     // Transform API data to component format
     const invoice = useMemo(() => {
-        if (!invoiceData?.data) return null
-        const inv = invoiceData.data
+        if (!invoiceData) return null
+        const inv = invoiceData
         return {
             id: inv.invoiceNumber || inv._id,
             client: inv.clientId?.name || `${inv.clientId?.firstName || ''} ${inv.clientId?.lastName || ''}`.trim() || 'عميل غير محدد',

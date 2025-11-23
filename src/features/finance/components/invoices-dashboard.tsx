@@ -45,8 +45,8 @@ export default function InvoicesDashboard() {
 
     // Transform API data to component format
     const invoices = useMemo(() => {
-        if (!invoicesData?.data) return []
-        return invoicesData.data.map((inv: any) => ({
+        if (!invoicesData?.invoices) return []
+        return invoicesData.invoices.map((inv: any) => ({
             id: inv.invoiceNumber || inv._id,
             client: inv.clientId?.name || inv.clientId?.firstName + ' ' + inv.clientId?.lastName || 'عميل غير محدد',
             amount: inv.totalAmount || 0,
@@ -69,14 +69,14 @@ export default function InvoicesDashboard() {
 
     // Calculate statistics
     const stats = useMemo(() => {
-        if (!invoicesData?.data) return { totalPending: 0, totalOverdue: 0, totalPaidThisMonth: 0 }
+        if (!invoicesData?.invoices) return { totalPending: 0, totalOverdue: 0, totalPaidThisMonth: 0 }
 
-        const allInvoices = invoicesData.data
+        const allInvoices = invoicesData.invoices
         const totalPending = allInvoices
             .filter((inv: any) => inv.status === 'pending' || inv.status === 'sent')
             .reduce((sum: number, inv: any) => sum + (inv.balanceDue || inv.totalAmount || 0), 0)
 
-        const totalOverdue = overdueData?.data
+        const totalOverdue = overdueData?.invoices
             ? overdueData.data.reduce((sum: number, inv: any) => sum + (inv.balanceDue || inv.totalAmount || 0), 0)
             : 0
 

@@ -16,10 +16,10 @@ export interface Task {
   status: 'backlog' | 'todo' | 'in progress' | 'done' | 'canceled'
   label?: 'bug' | 'feature' | 'documentation' | 'enhancement' | 'question'
   dueDate?: string
-  assignedTo: string
+  assignedTo: string | { firstName: string; lastName: string; role?: string; avatar?: string }
   createdBy: string
-  caseId?: string
-  clientId?: string
+  caseId?: string | { caseNumber?: string; title?: string; court?: string }
+  clientId?: string | { _id?: string; name?: string; phone?: string }
   recurring?: {
     enabled: boolean
     frequency: 'daily' | 'weekly' | 'monthly'

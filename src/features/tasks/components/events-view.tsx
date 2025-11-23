@@ -37,9 +37,9 @@ export function EventsView() {
 
     // Transform API data
     const events = useMemo(() => {
-        if (!eventsData?.data) return []
+        if (!eventsData?.events) return []
 
-        return eventsData.data.map((event: any) => {
+        return eventsData.events.map((event: any) => {
             const eventDate = event.date ? new Date(event.date) : null
             const today = new Date()
             const tomorrow = new Date(today)
