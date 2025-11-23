@@ -266,7 +266,7 @@ export default function ExpensesDashboard() {
                 <div className="max-w-7xl mx-auto space-y-6">
 
                     {/* Hero Section - Contained Navy Card */}
-                    <div className="bg-navy rounded-3xl p-8 relative overflow-hidden text-white shadow-xl shadow-navy/20 mb-8">
+                    <div className="bg-[#022c22] rounded-3xl p-8 relative overflow-hidden text-white shadow-xl shadow-[#022c22]/20 mb-8">
                         {/* Background Effects */}
                         <div className="absolute top-0 left-0 w-full h-full overflow-hidden z-0 pointer-events-none">
                             <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-brand-blue/20 rounded-full blur-[100px]"></div>
@@ -403,7 +403,7 @@ export default function ExpensesDashboard() {
                                     <TabsList className="justify-start bg-slate-50 p-1 rounded-xl border border-slate-200 h-auto">
                                         <TabsTrigger
                                             value="all"
-                                            className="rounded-lg px-4 py-2 data-[state=active]:bg-navy data-[state=active]:text-white transition-all duration-300"
+                                            className="rounded-lg px-4 py-2 data-[state=active]:bg-[#022c22] data-[state=active]:text-white transition-all duration-300"
                                         >
                                             الكل
                                         </TabsTrigger>
@@ -433,7 +433,7 @@ export default function ExpensesDashboard() {
                                         <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                                         <Input
                                             placeholder="بحث في المصروفات..."
-                                            className="pr-10 rounded-xl border-slate-200 focus:ring-navy focus:border-navy"
+                                            className="pr-10 rounded-xl border-slate-200 focus:ring-[#022c22] focus:border-[#022c22]"
                                             value={searchQuery}
                                             onChange={(e) => setSearchQuery(e.target.value)}
                                         />
