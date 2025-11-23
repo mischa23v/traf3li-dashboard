@@ -9,13 +9,23 @@ import { UsersDialogs } from './components/users-dialogs'
 import { UsersPrimaryButtons } from './components/users-primary-buttons'
 import { UsersProvider } from './components/users-provider'
 import { UsersTable } from './components/users-table'
-import { users } from './data/users'
+import { useUsers } from '@/hooks/useUsers'
+import { Skeleton } from '@/components/ui/skeleton'
 
 const route = getRouteApi('/_authenticated/users/')
 
 export function Users() {
   const search = route.useSearch()
   const navigate = route.useNavigate()
+
+  // Fetch users data from API
+  const { data, isLoading } = useUsers({
+    page: search.page,
+    pageSize: search.pageSize,
+    status: search.status,
+    role: search.role,
+    username: search.username,
+  })
 
   return (
     <UsersProvider>
@@ -38,7 +48,18 @@ export function Users() {
           </div>
           <UsersPrimaryButtons />
         </div>
-        <UsersTable data={users} search={search} navigate={navigate} />
+        {isLoading ? (
+          <div className='space-y-4'>
+            <Skeleton className='h-12 w-full' />
+            <Skeleton className='h-96 w-full' />
+          </div>
+        ) : (
+          <UsersTable
+            data={data?.users || []}
+            search={search}
+            navigate={navigate}
+          />
+        )}
       </Main>
 
       <UsersDialogs />

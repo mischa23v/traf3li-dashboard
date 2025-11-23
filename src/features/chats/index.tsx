@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { Fragment } from 'react/jsx-runtime'
 import { format } from 'date-fns'
 import {
@@ -19,6 +19,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Separator } from '@/components/ui/separator'
+import { Skeleton } from '@/components/ui/skeleton'
 import { ConfigDrawer } from '@/components/config-drawer'
 import { Header } from '@/components/layout/header'
 import { Main } from '@/components/layout/main'
@@ -27,8 +28,7 @@ import { Search } from '@/components/search'
 import { ThemeSwitch } from '@/components/theme-switch'
 import { NewChat } from './components/new-chat'
 import { type ChatUser, type Convo } from './data/chat-types'
-// Fake Data
-import { conversations } from './data/convo.json'
+import { useConversations } from '@/hooks/useChats'
 
 export function Chats() {
   const [search, setSearch] = useState('')
@@ -39,10 +39,16 @@ export function Chats() {
   const [createConversationDialogOpened, setCreateConversationDialog] =
     useState(false)
 
+  // Fetch conversations from API
+  const { data: conversations, isLoading } = useConversations()
+
   // Filtered data based on the search query
-  const filteredChatList = conversations.filter(({ fullName }) =>
-    fullName.toLowerCase().includes(search.trim().toLowerCase())
-  )
+  const filteredChatList = useMemo(() => {
+    if (!conversations) return []
+    return conversations.filter(({ fullName }) =>
+      fullName.toLowerCase().includes(search.trim().toLowerCase())
+    )
+  }, [conversations, search])
 
   const currentMessage = selectedUser?.messages.reduce(
     (acc: Record<string, Convo[]>, obj) => {
@@ -61,7 +67,10 @@ export function Chats() {
     {}
   )
 
-  const users = conversations.map(({ messages, ...user }) => user)
+  const users = useMemo(() => {
+    if (!conversations) return []
+    return conversations.map(({ messages, ...user }) => user)
+  }, [conversations])
 
   return (
     <>
@@ -115,7 +124,20 @@ export function Chats() {
             </div>
 
             <ScrollArea className='-mx-3 h-full overflow-scroll p-3'>
-              {filteredChatList.map((chatUsr) => {
+              {isLoading ? (
+                <div className='space-y-2'>
+                  {Array.from({ length: 5 }).map((_, i) => (
+                    <div key={i} className='flex gap-2 px-2 py-2'>
+                      <Skeleton className='h-10 w-10 rounded-full' />
+                      <div className='flex-1 space-y-2'>
+                        <Skeleton className='h-4 w-3/4' />
+                        <Skeleton className='h-3 w-full' />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                filteredChatList.map((chatUsr) => {
                 const { id, profile, username, messages, fullName } = chatUsr
                 const lastConvo = messages[0]
                 const lastMsg =
@@ -154,7 +176,8 @@ export function Chats() {
                     <Separator className='my-1' />
                   </Fragment>
                 )
-              })}
+              })
+              )}
             </ScrollArea>
           </div>
 
