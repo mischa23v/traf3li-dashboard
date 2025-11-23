@@ -1,9 +1,9 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import {
     Search, Filter, Download, Plus, MoreHorizontal,
     Briefcase, Building, Car, Coffee, FileText, Home,
     Receipt, TrendingUp,
-    Clock, PieChart, Bell
+    Clock, PieChart, Bell, Loader2, AlertCircle
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -26,144 +26,92 @@ import { LanguageSwitcher } from '@/components/language-switcher'
 import { ThemeSwitch } from '@/components/theme-switch'
 import { ConfigDrawer } from '@/components/config-drawer'
 import { ProfileDropdown } from '@/components/profile-dropdown'
+import { Skeleton } from '@/components/ui/skeleton'
+import { useExpenses, useExpenseStats } from '@/hooks/useFinance'
+
+// Category icon mapping
+const getCategoryIcon = (category: string) => {
+    const lowerCategory = category?.toLowerCase() || ''
+    if (lowerCategory.includes('قانون') || lowerCategory.includes('legal')) return Building
+    if (lowerCategory.includes('استشار') || lowerCategory.includes('consult')) return Briefcase
+    if (lowerCategory.includes('مواصلات') || lowerCategory.includes('transport')) return Car
+    if (lowerCategory.includes('ضيافة') || lowerCategory.includes('hospitality')) return Coffee
+    if (lowerCategory.includes('مكتب') || lowerCategory.includes('office')) return Home
+    return Receipt
+}
 
 export default function ExpensesDashboard() {
     const [activeTab, setActiveTab] = useState('all')
     const [searchQuery, setSearchQuery] = useState('')
 
-    // Mock Data
-    const expenses = [
-        {
-            id: 'EXP-2025-001',
-            description: 'استئجار قاعة المحكمة',
-            category: 'رسوم قانونية',
-            categoryIcon: Building,
-            amount: 5000,
-            date: '15 نوفمبر 2025',
-            caseNumber: '4772077905',
-            caseName: 'قضية مشاري الرابح',
-            paymentMethod: 'بطاقة ائتمان',
-            status: 'مدفوع',
-            statusColor: 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200',
-            hasReceipt: true,
-            vendor: 'وزارة العدل'
-        },
-        {
-            id: 'EXP-2025-002',
-            description: 'اشتراك المكتبة القانونية الرقمية',
-            category: 'اشتراكات',
-            categoryIcon: FileText,
-            amount: 2500,
-            date: '14 نوفمبر 2025',
-            caseNumber: null,
-            caseName: 'مصروف عام',
-            paymentMethod: 'تحويل بنكي',
-            status: 'مدفوع',
-            statusColor: 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200',
-            hasReceipt: true,
-            vendor: 'شركة المعلومات القانونية'
-        },
-        {
-            id: 'EXP-2025-003',
-            description: 'استشارة خبير مالي',
-            category: 'استشارات',
-            categoryIcon: Briefcase,
-            amount: 8000,
-            date: '12 نوفمبر 2025',
-            caseNumber: '4772088016',
-            caseName: 'قضية عبدالله الغامدي',
-            paymentMethod: 'نقدي',
-            status: 'مدفوع',
-            statusColor: 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200',
-            hasReceipt: true,
-            vendor: 'مكتب الخبراء الماليين'
-        },
-        {
-            id: 'EXP-2025-004',
-            description: 'وقود السيارة - زيارات العملاء',
-            category: 'مواصلات',
-            categoryIcon: Car,
-            amount: 450,
-            date: '10 نوفمبر 2025',
-            caseNumber: '4772099127',
-            caseName: 'قضية فاطمة العتيبي',
-            paymentMethod: 'نقدي',
-            status: 'مدفوع',
-            statusColor: 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200',
-            hasReceipt: true,
-            vendor: 'محطة الوقود'
-        },
-        {
-            id: 'EXP-2025-005',
-            description: 'اجتماع عمل مع العميل',
-            category: 'ضيافة',
-            categoryIcon: Coffee,
-            amount: 320,
-            date: '9 نوفمبر 2025',
-            caseNumber: '4772100238',
-            caseName: 'قضية خالد القحطاني',
-            paymentMethod: 'بطاقة ائتمان',
-            status: 'مدفوع',
-            statusColor: 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200',
-            hasReceipt: true,
-            vendor: 'مقهى النخيل'
-        },
-        {
-            id: 'EXP-2025-006',
-            description: 'رسوم ترجمة مستندات قانونية',
-            category: 'خدمات',
-            categoryIcon: FileText,
-            amount: 1500,
-            date: '8 نوفمبر 2025',
-            caseNumber: '4772111349',
-            caseName: 'قضية سارة المطيري',
-            paymentMethod: 'تحويل بنكي',
-            status: 'معلق',
-            statusColor: 'bg-amber-100 text-amber-700 hover:bg-amber-200',
-            hasReceipt: false,
-            vendor: 'مكتب الترجمة المعتمد'
-        },
-        {
-            id: 'EXP-2025-007',
-            description: 'إيجار المكتب - نوفمبر',
-            category: 'إيجار',
-            categoryIcon: Home,
-            amount: 15000,
-            date: '1 نوفمبر 2025',
-            caseNumber: null,
-            caseName: 'مصروف عام',
-            paymentMethod: 'تحويل بنكي',
-            status: 'مدفوع',
-            statusColor: 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200',
-            hasReceipt: true,
-            vendor: 'شركة العقارات'
-        }
-    ]
+    // Fetch expenses data
+    const { data: expensesData, isLoading, isError, error, refetch } = useExpenses()
+    const { data: statsData } = useExpenseStats()
+
+    // Transform API data to component format
+    const expenses = useMemo(() => {
+        if (!expensesData?.data) return []
+        return expensesData.data.map((exp: any) => ({
+            id: exp.expenseId || exp._id,
+            _id: exp._id,
+            description: exp.description,
+            category: exp.category,
+            categoryIcon: getCategoryIcon(exp.category),
+            amount: exp.amount,
+            date: new Date(exp.date).toLocaleDateString('ar-SA'),
+            caseNumber: exp.caseId?.caseNumber || null,
+            caseName: exp.caseId ? `قضية ${exp.caseId.title || ''}` : 'مصروف عام',
+            paymentMethod: exp.paymentMethod,
+            status: exp.status === 'approved' ? 'مدفوع' : exp.status === 'pending' ? 'معلق' : exp.status,
+            statusColor: exp.status === 'approved'
+                ? 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200'
+                : exp.status === 'pending'
+                ? 'bg-amber-100 text-amber-700 hover:bg-amber-200'
+                : 'bg-slate-100 text-slate-700 hover:bg-slate-200',
+            hasReceipt: (exp.receipts && exp.receipts.length > 0) || false,
+            vendor: exp.vendor || 'غير محدد',
+            isBillable: exp.isBillable,
+        }))
+    }, [expensesData])
 
     // Filter Logic
-    const filteredExpenses = expenses.filter(exp => {
-        if (activeTab === 'all') return true
-        if (activeTab === 'case') return exp.caseNumber !== null
-        if (activeTab === 'general') return exp.caseNumber === null
-        if (activeTab === 'pending') return exp.status === 'معلق'
-        if (searchQuery && !exp.description.includes(searchQuery) && !exp.vendor.includes(searchQuery)) return false
-        return true
-    })
+    const filteredExpenses = useMemo(() => {
+        return expenses.filter(exp => {
+            if (activeTab === 'all') return true
+            if (activeTab === 'case') return exp.caseNumber !== null
+            if (activeTab === 'general') return exp.caseNumber === null
+            if (activeTab === 'pending') return exp.status === 'معلق'
+            if (searchQuery && !exp.description.includes(searchQuery) && !exp.vendor.includes(searchQuery)) {
+                return false
+            }
+            return true
+        })
+    }, [expenses, activeTab, searchQuery])
 
     // Calculate statistics
-    const totalExpenses = expenses.reduce((sum, exp) => sum + exp.amount, 0)
-    const caseExpenses = expenses.filter(exp => exp.caseNumber !== null).reduce((sum, exp) => sum + exp.amount, 0)
-    const generalExpenses = expenses.filter(exp => exp.caseNumber === null).reduce((sum, exp) => sum + exp.amount, 0)
-    const pendingExpenses = expenses.filter(exp => exp.status === 'معلق').reduce((sum, exp) => sum + exp.amount, 0)
+    const { totalExpenses, caseExpenses, generalExpenses, pendingExpenses, expensesByCategory } = useMemo(() => {
+        const total = expenses.reduce((sum, exp) => sum + exp.amount, 0)
+        const caseExp = expenses.filter(exp => exp.caseNumber !== null).reduce((sum, exp) => sum + exp.amount, 0)
+        const generalExp = expenses.filter(exp => exp.caseNumber === null).reduce((sum, exp) => sum + exp.amount, 0)
+        const pendingExp = expenses.filter(exp => exp.status === 'معلق').reduce((sum, exp) => sum + exp.amount, 0)
 
-    const expensesByCategory = expenses.reduce((acc: any, exp) => {
-        if (!acc[exp.category]) {
-            acc[exp.category] = { total: 0, count: 0 };
+        const byCategory = expenses.reduce((acc: any, exp) => {
+            if (!acc[exp.category]) {
+                acc[exp.category] = { total: 0, count: 0 }
+            }
+            acc[exp.category].total += exp.amount
+            acc[exp.category].count += 1
+            return acc
+        }, {})
+
+        return {
+            totalExpenses: total,
+            caseExpenses: caseExp,
+            generalExpenses: generalExp,
+            pendingExpenses: pendingExp,
+            expensesByCategory: byCategory,
         }
-        acc[exp.category].total += exp.amount;
-        acc[exp.category].count += 1;
-        return acc;
-    }, {});
+    }, [expenses])
 
     // Format currency
     const formatCurrency = (amount: number) => {
@@ -181,6 +129,111 @@ export default function ExpensesDashboard() {
         { title: 'كشف الحساب', href: '/dashboard/finance/statements', isActive: false },
     ]
 
+    // LOADING STATE
+    if (isLoading) {
+        return (
+            <>
+                <Header className="bg-navy shadow-none relative">
+                    <TopNav links={topNav} className="[&>a]:text-slate-300 [&>a:hover]:text-white [&>a[aria-current='page']]:text-white" />
+                    <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
+                        <DynamicIsland />
+                    </div>
+                    <div className='ms-auto flex items-center space-x-4'>
+                        <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white" />
+                        <ThemeSwitch className="text-slate-300 hover:bg-white/10 hover:text-white" />
+                        <ConfigDrawer className="text-slate-300 hover:bg-white/10 hover:text-white" />
+                        <ProfileDropdown className="text-slate-300 hover:bg-white/10 hover:text-white" />
+                    </div>
+                    <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-emerald-500/50 to-transparent"></div>
+                </Header>
+                <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8">
+                    <Skeleton className="h-32 w-full rounded-3xl" />
+                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                        <div className="lg:col-span-8 space-y-6">
+                            <Skeleton className="h-16 w-full rounded-2xl" />
+                            <Skeleton className="h-32 w-full rounded-3xl" />
+                            <Skeleton className="h-32 w-full rounded-3xl" />
+                        </div>
+                        <div className="lg:col-span-4 space-y-6">
+                            <Skeleton className="h-64 w-full rounded-2xl" />
+                        </div>
+                    </div>
+                </Main>
+            </>
+        )
+    }
+
+    // ERROR STATE
+    if (isError) {
+        return (
+            <>
+                <Header className="bg-navy shadow-none relative">
+                    <TopNav links={topNav} className="[&>a]:text-slate-300 [&>a:hover]:text-white [&>a[aria-current='page']]:text-white" />
+                    <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
+                        <DynamicIsland />
+                    </div>
+                    <div className='ms-auto flex items-center space-x-4'>
+                        <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white" />
+                        <ThemeSwitch className="text-slate-300 hover:bg-white/10 hover:text-white" />
+                        <ConfigDrawer className="text-slate-300 hover:bg-white/10 hover:text-white" />
+                        <ProfileDropdown className="text-slate-300 hover:bg-white/10 hover:text-white" />
+                    </div>
+                    <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-emerald-500/50 to-transparent"></div>
+                </Header>
+                <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8">
+                    <div className="bg-white rounded-3xl p-12 text-center border border-slate-100 shadow-sm">
+                        <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <AlertCircle className="h-8 w-8 text-red-500" />
+                        </div>
+                        <h3 className="text-xl font-bold text-slate-900 mb-2">فشل تحميل المصروفات</h3>
+                        <p className="text-slate-500 mb-6">{error?.message || 'حدث خطأ أثناء تحميل البيانات'}</p>
+                        <Button onClick={() => refetch()} className="bg-emerald-500 hover:bg-emerald-600 text-white px-8">
+                            <Loader2 className="ml-2 h-4 w-4" />
+                            إعادة المحاولة
+                        </Button>
+                    </div>
+                </Main>
+            </>
+        )
+    }
+
+    // EMPTY STATE
+    if (filteredExpenses.length === 0 && !searchQuery && activeTab === 'all') {
+        return (
+            <>
+                <Header className="bg-navy shadow-none relative">
+                    <TopNav links={topNav} className="[&>a]:text-slate-300 [&>a:hover]:text-white [&>a[aria-current='page']]:text-white" />
+                    <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
+                        <DynamicIsland />
+                    </div>
+                    <div className='ms-auto flex items-center space-x-4'>
+                        <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white" />
+                        <ThemeSwitch className="text-slate-300 hover:bg-white/10 hover:text-white" />
+                        <ConfigDrawer className="text-slate-300 hover:bg-white/10 hover:text-white" />
+                        <ProfileDropdown className="text-slate-300 hover:bg-white/10 hover:text-white" />
+                    </div>
+                    <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-emerald-500/50 to-transparent"></div>
+                </Header>
+                <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8">
+                    <div className="bg-white rounded-3xl p-12 text-center border border-slate-100 shadow-sm">
+                        <div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <Receipt className="h-8 w-8 text-brand-blue" />
+                        </div>
+                        <h3 className="text-xl font-bold text-slate-900 mb-2">لا توجد مصروفات بعد</h3>
+                        <p className="text-slate-500 mb-6">ابدأ بإضافة أول مصروف</p>
+                        <Button asChild className="bg-brand-blue hover:bg-blue-600 text-white px-8">
+                            <Link to="/dashboard/finance/expenses/new">
+                                <Plus className="ml-2 h-4 w-4" />
+                                إضافة مصروف جديد
+                            </Link>
+                        </Button>
+                    </div>
+                </Main>
+            </>
+        )
+    }
+
+    // SUCCESS STATE
     return (
         <>
             <Header className="bg-navy shadow-none relative">
