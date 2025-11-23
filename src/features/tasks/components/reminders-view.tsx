@@ -1,3 +1,4 @@
+import { useState, useMemo } from 'react'
 import { TasksSidebar } from './tasks-sidebar'
 import {
     Clock, MoreHorizontal, Plus,
@@ -14,14 +15,66 @@ import { ThemeSwitch } from '@/components/theme-switch'
 import { ConfigDrawer } from '@/components/config-drawer'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { Link } from '@tanstack/react-router'
+import { useReminders } from '@/hooks/useRemindersAndEvents'
+import { Skeleton } from '@/components/ui/skeleton'
+import { Alert, AlertDescription } from '@/components/ui/alert'
 
 export function RemindersView() {
-    const reminders = [
-        { id: '1', title: 'انتهاء مهلة الاستئناف - قضية 402', type: 'deadline', date: 'اليوم', time: '14:00', priority: 'critical', status: 'pending' },
-        { id: '2', title: 'تجديد رخصة المحاماة', type: 'admin', date: 'بعد يومين', time: '09:00', priority: 'high', status: 'pending' },
-        { id: '3', title: 'سداد رسوم الخبراء', type: 'payment', date: '25 نوفمبر', time: '11:30', priority: 'medium', status: 'completed' },
-        { id: '4', title: 'متابعة تنفيذ الحكم', type: 'followup', date: '28 نوفمبر', time: '10:00', priority: 'low', status: 'pending' },
-    ]
+    const [statusFilter, setStatusFilter] = useState<string>('all')
+
+    // API filters
+    const filters = useMemo(() => {
+        const f: any = {}
+        if (statusFilter === 'pending') {
+            f.status = 'pending'
+        } else if (statusFilter === 'completed') {
+            f.status = 'completed'
+        }
+        return f
+    }, [statusFilter])
+
+    // Fetch reminders
+    const { data: remindersData, isLoading, isError, error, refetch } = useReminders(filters)
+
+    // Transform API data
+    const reminders = useMemo(() => {
+        if (!remindersData?.data) return []
+
+        return remindersData.data.map((reminder: any) => {
+            const reminderDate = reminder.dueDate ? new Date(reminder.dueDate) : null
+            const today = new Date()
+            const tomorrow = new Date(today)
+            tomorrow.setDate(tomorrow.getDate() + 1)
+
+            let dateDisplay = 'غير محدد'
+            if (reminderDate) {
+                const reminderDateStr = reminderDate.toDateString()
+                const todayStr = today.toDateString()
+                const tomorrowStr = tomorrow.toDateString()
+
+                if (reminderDateStr === todayStr) {
+                    dateDisplay = 'اليوم'
+                } else if (reminderDateStr === tomorrowStr) {
+                    dateDisplay = 'غداً'
+                } else {
+                    dateDisplay = reminderDate.toLocaleDateString('ar-SA', { day: 'numeric', month: 'long' })
+                }
+            }
+
+            const timeDisplay = reminder.time || (reminderDate ? reminderDate.toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' }) : 'غير محدد')
+
+            return {
+                id: reminder._id,
+                title: reminder.title || reminder.message || 'تذكير غير محدد',
+                type: reminder.type || 'general',
+                date: dateDisplay,
+                time: timeDisplay,
+                priority: reminder.priority || 'medium',
+                status: reminder.status || 'pending',
+                _id: reminder._id,
+            }
+        })
+    }, [remindersData])
 
     const topNav = [
         { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
@@ -107,14 +160,90 @@ export function RemindersView() {
                             <div className="p-6 pb-2 flex justify-between items-center">
                                 <h3 className="font-bold text-navy text-xl">التذكيرات القادمة</h3>
                                 <div className="flex gap-2">
-                                    <Button size="sm" className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-full px-4">الكل</Button>
-                                    <Button size="sm" variant="ghost" className="text-slate-500 hover:text-navy rounded-full px-4">القضائية</Button>
-                                    <Button size="sm" variant="ghost" className="text-slate-500 hover:text-navy rounded-full px-4">الإدارية</Button>
+                                    <Button
+                                        size="sm"
+                                        onClick={() => setStatusFilter('all')}
+                                        className={statusFilter === 'all' ? 'bg-emerald-500 hover:bg-emerald-600 text-white rounded-full px-4' : 'bg-transparent text-slate-500 hover:text-navy hover:bg-slate-100 rounded-full px-4'}
+                                    >
+                                        الكل
+                                    </Button>
+                                    <Button
+                                        size="sm"
+                                        onClick={() => setStatusFilter('pending')}
+                                        variant="ghost"
+                                        className={statusFilter === 'pending' ? 'bg-emerald-500 text-white rounded-full px-4' : 'text-slate-500 hover:text-navy rounded-full px-4'}
+                                    >
+                                        النشطة
+                                    </Button>
+                                    <Button
+                                        size="sm"
+                                        onClick={() => setStatusFilter('completed')}
+                                        variant="ghost"
+                                        className={statusFilter === 'completed' ? 'bg-emerald-500 text-white rounded-full px-4' : 'text-slate-500 hover:text-navy rounded-full px-4'}
+                                    >
+                                        المكتملة
+                                    </Button>
                                 </div>
                             </div>
 
                             <div className="p-4 space-y-4">
-                                {reminders.map((reminder) => (
+                                {/* Loading State */}
+                                {isLoading && (
+                                    <>
+                                        {[1, 2, 3].map((i) => (
+                                            <div key={i} className="bg-[#F8F9FA] rounded-2xl p-6 border border-slate-100">
+                                                <div className="flex justify-between items-start mb-4">
+                                                    <div className="flex gap-4 items-center flex-1">
+                                                        <Skeleton className="w-12 h-12 rounded-xl" />
+                                                        <div className="flex-1 space-y-2">
+                                                            <Skeleton className="h-5 w-3/4" />
+                                                            <Skeleton className="h-4 w-1/2" />
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div className="flex items-center justify-between pt-4 border-t border-slate-200/50">
+                                                    <Skeleton className="h-10 w-32" />
+                                                    <Skeleton className="h-10 w-24" />
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </>
+                                )}
+
+                                {/* Error State */}
+                                {isError && !isLoading && (
+                                    <Alert className="border-red-200 bg-red-50">
+                                        <AlertCircle className="h-4 w-4 text-red-600" />
+                                        <AlertDescription className="text-red-800">
+                                            <div className="flex items-center justify-between">
+                                                <span>حدث خطأ أثناء تحميل التذكيرات: {error?.message || 'خطأ غير معروف'}</span>
+                                                <Button onClick={() => refetch()} variant="outline" size="sm" className="border-red-300 text-red-700 hover:bg-red-100">
+                                                    إعادة المحاولة
+                                                </Button>
+                                            </div>
+                                        </AlertDescription>
+                                    </Alert>
+                                )}
+
+                                {/* Empty State */}
+                                {!isLoading && !isError && reminders.length === 0 && (
+                                    <div className="text-center py-12">
+                                        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-emerald-50 mb-4">
+                                            <Bell className="h-8 w-8 text-emerald-500" />
+                                        </div>
+                                        <h4 className="text-lg font-bold text-navy mb-2">لا توجد تذكيرات</h4>
+                                        <p className="text-slate-500 mb-4">لم يتم العثور على تذكيرات</p>
+                                        <Button asChild className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl">
+                                            <Link to="/dashboard/tasks/reminders/new">
+                                                <Plus className="ml-2 h-4 w-4" />
+                                                إنشاء تذكير جديد
+                                            </Link>
+                                        </Button>
+                                    </div>
+                                )}
+
+                                {/* Success State */}
+                                {!isLoading && !isError && reminders.length > 0 && reminders.map((reminder) => (
                                     <div key={reminder.id} className="bg-[#F8F9FA] rounded-2xl p-6 border border-slate-100 hover:border-emerald-200 transition-all group">
                                         <div className="flex justify-between items-start mb-4">
                                             <div className="flex gap-4 items-center">
@@ -160,7 +289,7 @@ export function RemindersView() {
                                                 </div>
                                             </div>
                                             <div className="flex gap-2">
-                                                <Link to={`/dashboard/tasks/reminders/${reminder.id}` as any}>
+                                                <Link to={`/dashboard/tasks/reminders/${reminder._id}` as any}>
                                                     <Button variant="outline" className="border-slate-200 text-slate-600 hover:bg-slate-50 rounded-lg px-4">
                                                         التفاصيل
                                                     </Button>
@@ -168,21 +297,25 @@ export function RemindersView() {
                                                 <Button variant="outline" className="border-slate-200 text-slate-600 hover:bg-slate-50 rounded-lg px-4">
                                                     تأجيل
                                                 </Button>
-                                                <Button className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg px-6 shadow-lg shadow-emerald-500/20">
-                                                    إتمام
-                                                </Button>
+                                                {reminder.status !== 'completed' && (
+                                                    <Button className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg px-6 shadow-lg shadow-emerald-500/20">
+                                                        إتمام
+                                                    </Button>
+                                                )}
                                             </div>
                                         </div>
                                     </div>
                                 ))}
                             </div>
 
-                            <div className="p-4 pt-0 text-center">
-                                <Button variant="ghost" className="text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 w-full rounded-xl py-6">
-                                    عرض جميع التذكيرات
-                                    <ChevronLeft className="h-4 w-4 mr-2" />
-                                </Button>
-                            </div>
+                            {!isLoading && !isError && reminders.length > 0 && (
+                                <div className="p-4 pt-0 text-center">
+                                    <Button variant="ghost" className="text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 w-full rounded-xl py-6">
+                                        عرض جميع التذكيرات
+                                        <ChevronLeft className="h-4 w-4 mr-2" />
+                                    </Button>
+                                </div>
+                            )}
                         </div>
 
                     </div>
