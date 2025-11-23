@@ -1,9 +1,11 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo, useCallback } from 'react'
 import {
     Search, Download, Plus, MoreHorizontal,
     Clock, Play, Pause, Square, DollarSign,
-    User, FileText, Check, Timer, Bell
+    User, FileText, Check, Timer, Bell, AlertCircle
 } from 'lucide-react'
+import { Skeleton } from '@/components/ui/skeleton'
+import { useTimerStatus, useStartTimer, usePauseTimer, useResumeTimer, useStopTimer, useTimeEntries, useTimeStats } from '@/hooks/useFinance'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -29,19 +31,50 @@ import { ProfileDropdown } from '@/components/profile-dropdown'
 export default function TimeEntriesDashboard() {
     const [activeTab, setActiveTab] = useState('all')
     const [searchQuery, setSearchQuery] = useState('')
-    const [isTimerRunning, setIsTimerRunning] = useState(false)
     const [currentTime, setCurrentTime] = useState(0)
+    const [timerDescription, setTimerDescription] = useState('')
 
-    // Timer Logic
+    // API Filters
+    const filters = useMemo(() => {
+        const f: any = {}
+        if (activeTab === 'unbilled') {
+            f.isBilled = false
+        } else if (activeTab === 'billed') {
+            f.isBilled = true
+        }
+        return f
+    }, [activeTab])
+
+    // Fetch data
+    const { data: entriesData, isLoading, isError, error, refetch } = useTimeEntries(filters)
+    const { data: statsData } = useTimeStats()
+    const { data: timerData } = useTimerStatus()
+
+    // Timer mutations
+    const startTimerMutation = useStartTimer()
+    const pauseTimerMutation = usePauseTimer()
+    const resumeTimerMutation = useResumeTimer()
+    const stopTimerMutation = useStopTimer()
+
+    // Sync timer with backend data
+    useEffect(() => {
+        if (timerData?.data?.isRunning && timerData.data.elapsedSeconds !== undefined) {
+            setCurrentTime(timerData.data.elapsedSeconds)
+        } else if (!timerData?.data?.isRunning) {
+            setCurrentTime(0)
+        }
+    }, [timerData])
+
+    // Local timer tick
     useEffect(() => {
         let interval: NodeJS.Timeout
-        if (isTimerRunning) {
+        if (timerData?.data?.isRunning) {
             interval = setInterval(() => {
                 setCurrentTime(prev => prev + 1)
             }, 1000)
         }
         return () => clearInterval(interval)
-    }, [isTimerRunning])
+    }, [timerData?.data?.isRunning])
 
     const formatTime = (seconds: number) => {
         const hours = Math.floor(seconds / 3600)
@@ -50,88 +83,76 @@ export default function TimeEntriesDashboard() {
         return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`
     }
 
-    // Mock Data
-    const timeEntries = [
-        {
-            id: 'TE-001',
-            date: '17 نوفمبر 2025',
-            client: 'مشاري الرابح',
-            caseNumber: 'CASE-2025-001',
-            task: 'إعداد مذكرة دفاع في القضية التجارية',
-            hours: 3.5,
-            rate: 500,
-            amount: 1750,
-            status: 'unbilled',
-            lawyer: 'أحمد السالم',
-            billable: true
-        },
-        {
-            id: 'TE-002',
-            date: '17 نوفمبر 2025',
-            client: 'سارة المطيري',
-            caseNumber: 'CASE-2025-005',
-            task: 'مراجعة العقد وإبداء الملاحظات القانونية',
-            hours: 2.0,
-            rate: 450,
-            amount: 900,
-            status: 'unbilled',
-            lawyer: 'فاطمة الغامدي',
-            billable: true
-        },
-        {
-            id: 'TE-003',
-            date: '16 نوفمبر 2025',
-            client: 'محمد الدوسري',
-            caseNumber: 'CASE-2025-006',
-            task: 'حضور جلسة المحكمة والمرافعة',
-            hours: 4.0,
-            rate: 600,
-            amount: 2400,
-            status: 'billed',
-            lawyer: 'أحمد السالم',
-            billable: true
-        },
-        {
-            id: 'TE-004',
-            date: '16 نوفمبر 2025',
-            client: 'عمر العنزي',
-            caseNumber: 'CASE-2025-008',
-            task: 'البحث القانوني في سوابق قضائية مشابهة',
-            hours: 5.5,
-            rate: 350,
-            amount: 1925,
-            status: 'unbilled',
-            lawyer: 'خالد المري',
-            billable: true
-        },
-        {
-            id: 'TE-006',
-            date: '15 نوفمبر 2025',
-            client: 'داخلي',
-            caseNumber: 'INTERNAL',
-            task: 'اجتماع فريق العمل الأسبوعي',
-            hours: 1.5,
-            rate: 0,
-            amount: 0,
-            status: 'non-billable',
-            lawyer: 'الجميع',
-            billable: false
-        }
-    ]
+    // Transform API data
+    const timeEntries = useMemo(() => {
+        if (!entriesData?.data) return []
+        return entriesData.data.map((entry: any) => ({
+            id: entry._id,
+            date: new Date(entry.date).toLocaleDateString('ar-SA'),
+            client: entry.clientId?.name || entry.clientId?.firstName + ' ' + entry.clientId?.lastName || 'عميل غير محدد',
+            caseNumber: entry.caseId?.caseNumber || 'N/A',
+            task: entry.description || 'مهمة غير محددة',
+            hours: entry.hours || 0,
+            rate: entry.hourlyRate || 0,
+            amount: entry.totalAmount || (entry.hours * entry.hourlyRate) || 0,
+            status: entry.isBilled ? 'billed' : entry.isBillable ? 'unbilled' : 'non-billable',
+            lawyer: entry.userId?.firstName + ' ' + entry.userId?.lastName || 'غير محدد',
+            billable: entry.isBillable,
+            _id: entry._id,
+        }))
+    }, [entriesData])
 
-    // Filter Logic
-    const filteredEntries = timeEntries.filter(entry => {
-        if (activeTab === 'all') return true
-        if (activeTab === 'unbilled') return entry.status === 'unbilled'
-        if (activeTab === 'billed') return entry.status === 'billed'
-        if (searchQuery && !entry.client.includes(searchQuery) && !entry.task.includes(searchQuery)) return false
-        return true
-    })
+    // Filter entries by search
+    const filteredEntries = useMemo(() => {
+        if (!searchQuery) return timeEntries
+        const query = searchQuery.toLowerCase()
+        return timeEntries.filter(entry =>
+            entry.client.toLowerCase().includes(query) ||
+            entry.task.toLowerCase().includes(query) ||
+            entry.caseNumber.toLowerCase().includes(query)
+        )
+    }, [timeEntries, searchQuery])
 
     // Stats
-    const totalBillableHours = timeEntries.filter(e => e.billable).reduce((sum, e) => sum + e.hours, 0)
-    const totalUnbilledValue = timeEntries.filter(e => e.status === 'unbilled').reduce((sum, e) => sum + e.amount, 0)
-    const thisWeekHours = 38.5 // Mock
+    const { totalBillableHours, totalUnbilledValue, thisWeekHours } = useMemo(() => {
+        const billable = statsData?.data?.totalBillableHours ||
+            timeEntries.filter(e => e.billable).reduce((sum, e) => sum + e.hours, 0)
+
+        const unbilled = statsData?.data?.totalUnbilledValue ||
+            timeEntries.filter(e => e.status === 'unbilled').reduce((sum, e) => sum + e.amount, 0)
+
+        const weekly = statsData?.data?.weeklyHours || 0
+
+        return {
+            totalBillableHours: billable,
+            totalUnbilledValue: unbilled,
+            thisWeekHours: weekly
+        }
+    }, [timeEntries, statsData])
+
+    // Timer handlers
+    const handleStartTimer = useCallback(() => {
+        startTimerMutation.mutate({
+            description: timerDescription || 'مهمة جديدة',
+            isBillable: true
+        })
+    }, [timerDescription, startTimerMutation])
+
+    const handlePauseTimer = useCallback(() => {
+        pauseTimerMutation.mutate()
+    }, [pauseTimerMutation])
+
+    const handleResumeTimer = useCallback(() => {
+        resumeTimerMutation.mutate()
+    }, [resumeTimerMutation])
+
+    const handleStopTimer = useCallback(() => {
+        stopTimerMutation.mutate({
+            notes: timerDescription,
+            isBillable: true
+        })
+        setTimerDescription('')
+    }, [timerDescription, stopTimerMutation])
 
     // Format currency
     const formatCurrency = (amount: number) => {
@@ -294,7 +315,61 @@ export default function TimeEntriesDashboard() {
 
                             {/* Entries List - Vertical Stack Cards */}
                             <div className="space-y-4">
-                                {filteredEntries.map((entry) => (
+                                {/* Loading State */}
+                                {isLoading && (
+                                    <>
+                                        {[1, 2, 3].map((i) => (
+                                            <div key={i} className="bg-white rounded-2xl p-6 border border-slate-100">
+                                                <div className="flex gap-4 mb-4">
+                                                    <Skeleton className="w-12 h-12 rounded-xl" />
+                                                    <div className="flex-1 space-y-2">
+                                                        <Skeleton className="h-6 w-3/4" />
+                                                        <Skeleton className="h-4 w-1/2" />
+                                                    </div>
+                                                </div>
+                                                <Skeleton className="h-20 w-full" />
+                                            </div>
+                                        ))}
+                                    </>
+                                )}
+
+                                {/* Error State */}
+                                {isError && (
+                                    <div className="bg-white rounded-2xl p-12 border border-slate-100 text-center">
+                                        <div className="flex justify-center mb-4">
+                                            <div className="w-16 h-16 rounded-full bg-red-50 flex items-center justify-center">
+                                                <AlertCircle className="w-8 h-8 text-red-500" />
+                                            </div>
+                                        </div>
+                                        <h3 className="text-lg font-bold text-slate-900 mb-2">حدث خطأ أثناء تحميل السجلات</h3>
+                                        <p className="text-slate-500 mb-4">{error?.message || 'تعذر الاتصال بالخادم'}</p>
+                                        <Button onClick={() => refetch()} className="bg-[#022c22] hover:bg-[#022c22]/90">
+                                            إعادة المحاولة
+                                        </Button>
+                                    </div>
+                                )}
+
+                                {/* Empty State */}
+                                {!isLoading && !isError && filteredEntries.length === 0 && (
+                                    <div className="bg-white rounded-2xl p-12 border border-slate-100 text-center">
+                                        <div className="flex justify-center mb-4">
+                                            <div className="w-16 h-16 rounded-full bg-blue-50 flex items-center justify-center">
+                                                <Clock className="w-8 h-8 text-brand-blue" />
+                                            </div>
+                                        </div>
+                                        <h3 className="text-lg font-bold text-slate-900 mb-2">لا توجد سجلات وقت</h3>
+                                        <p className="text-slate-500 mb-4">ابدأ بتتبع وقتك باستخدام المؤقت أو سجل الوقت يدوياً</p>
+                                        <Button asChild className="bg-brand-blue hover:bg-blue-600">
+                                            <Link to="/dashboard/finance/time-tracking/new">
+                                                <Plus className="w-4 h-4 ml-2" />
+                                                تسجيل يدوي
+                                            </Link>
+                                        </Button>
+                                    </div>
+                                )}
+
+                                {/* Success State - Entries List */}
+                                {!isLoading && !isError && filteredEntries.map((entry) => (
                                     <div key={entry.id} className="bg-white rounded-2xl p-6 border border-slate-100 hover:border-blue-200 transition-all group shadow-sm">
                                         <div className="flex justify-between items-start mb-4">
                                             <div className="flex gap-4 items-start">
@@ -392,28 +467,37 @@ export default function TimeEntriesDashboard() {
                                     </div>
 
                                     <div className="flex gap-3 mb-6">
-                                        {!isTimerRunning ? (
+                                        {!timerData?.data?.isRunning ? (
                                             <Button
-                                                onClick={() => setIsTimerRunning(true)}
+                                                onClick={handleStartTimer}
+                                                disabled={startTimerMutation.isPending}
                                                 className="flex-1 bg-brand-blue hover:bg-blue-600 text-white h-12 rounded-xl text-lg"
                                             >
                                                 <Play className="w-5 h-5 ml-2" />
                                                 بدء
                                             </Button>
+                                        ) : timerData?.data?.isPaused ? (
+                                            <Button
+                                                onClick={handleResumeTimer}
+                                                disabled={resumeTimerMutation.isPending}
+                                                className="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white h-12 rounded-xl text-lg"
+                                            >
+                                                <Play className="w-5 h-5 ml-2" />
+                                                استئناف
+                                            </Button>
                                         ) : (
                                             <Button
-                                                onClick={() => setIsTimerRunning(false)}
+                                                onClick={handlePauseTimer}
+                                                disabled={pauseTimerMutation.isPending}
                                                 className="flex-1 bg-amber-500 hover:bg-amber-600 text-white h-12 rounded-xl text-lg"
                                             >
                                                 <Pause className="w-5 h-5 ml-2" />
-                                                إيقاف
+                                                إيقاف مؤقت
                                             </Button>
                                         )}
                                         <Button
-                                            onClick={() => {
-                                                setIsTimerRunning(false)
-                                                setCurrentTime(0)
-                                            }}
+                                            onClick={handleStopTimer}
+                                            disabled={stopTimerMutation.isPending || !timerData?.data?.isRunning}
                                             variant="outline"
                                             className="bg-white/10 border-white/20 text-white hover:bg-white/20 h-12 w-12 rounded-xl p-0"
                                         >
@@ -424,6 +508,8 @@ export default function TimeEntriesDashboard() {
                                     <div className="space-y-3">
                                         <Input
                                             placeholder="بماذا تعمل الآن؟"
+                                            value={timerDescription}
+                                            onChange={(e) => setTimerDescription(e.target.value)}
                                             className="bg-white/10 border-white/10 text-white placeholder:text-blue-200/50 rounded-xl"
                                         />
                                     </div>

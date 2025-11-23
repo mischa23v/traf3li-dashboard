@@ -272,6 +272,14 @@ export const useCreateTimeEntry = () => {
   })
 }
 
+export const useTimeEntry = (id: string) => {
+  return useQuery({
+    queryKey: ['timeEntries', id],
+    queryFn: () => financeService.getTimeEntry(id),
+    enabled: !!id,
+  })
+}
+
 export const useTimeStats = (filters?: {
   startDate?: string
   endDate?: string

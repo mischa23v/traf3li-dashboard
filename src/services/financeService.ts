@@ -536,6 +536,19 @@ const financeService = {
   },
 
   /**
+   * Get single time entry
+   */
+  getTimeEntry: async (id: string): Promise<{ data: TimeEntry }> => {
+    try {
+      const response = await apiClient.get(`/time-tracking/entries/${id}`)
+      return response.data
+    } catch (error: any) {
+      console.error('Get time entry error:', error)
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
    * Get time statistics
    */
   getTimeStats: async (filters?: { startDate?: string; endDate?: string; caseId?: string }): Promise<any> => {

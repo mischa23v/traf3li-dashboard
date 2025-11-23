@@ -1,10 +1,13 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import {
     FileText, Calendar, CheckSquare, Clock, MoreHorizontal, Plus, Upload,
     User, ArrowLeft, Briefcase,
     History, Link as LinkIcon, Flag, Send, Eye, Download, Search, Bell,
     CreditCard, DollarSign, CheckCircle2, AlertCircle, Timer
 } from 'lucide-react'
+import { Skeleton } from '@/components/ui/skeleton'
+import { useTimeEntry } from '@/hooks/useFinance'
+import { useParams } from '@tanstack/react-router'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -23,27 +26,39 @@ import { ConfigDrawer } from '@/components/config-drawer'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 
 export function TimeEntryDetailsView() {
-    // Mock Data for a single time entry
-    const entry = {
-        id: 'TE-2024-892',
-        task: 'صياغة مذكرة رد - قضية 402',
-        client: 'شركة الإنشاءات المتقدمة',
-        lawyer: 'أحمد المحامي',
-        date: '2024-11-22',
-        startTime: '09:00 AM',
-        endTime: '11:30 AM',
-        duration: '2h 30m',
-        rate: '500.00',
-        total: '1,250.00',
-        currency: 'SAR',
-        billable: true,
-        status: 'billed', // billed, unbilled
-        description: 'تمت مراجعة ملف القضية وصياغة الرد على مذكرة الخصم.',
-        history: [
-            { date: '2024-11-22 11:35 AM', action: 'تم تسجيل الوقت', user: 'أحمد المحامي' },
-            { date: '2024-11-22 02:00 PM', action: 'تمت الفوترة', user: 'النظام' }
-        ]
-    }
+    const { entryId } = useParams({ strict: false }) as { entryId: string }
+
+    // Fetch time entry data
+    const { data: entryData, isLoading, isError, error, refetch } = useTimeEntry(entryId)
+
+    // Transform API data
+    const entry = useMemo(() => {
+        if (!entryData?.data) return null
+        const e = entryData.data
+
+        // Format duration
+        const hours = Math.floor(e.hours || 0)
+        const minutes = Math.round(((e.hours || 0) - hours) * 60)
+        const duration = `${hours}h ${minutes}m`
+
+        return {
+            id: e._id,
+            task: e.description || 'مهمة غير محددة',
+            client: e.clientId?.name || e.clientId?.firstName + ' ' + e.clientId?.lastName || 'عميل غير محدد',
+            lawyer: e.userId?.firstName + ' ' + e.userId?.lastName || 'غير محدد',
+            date: new Date(e.date).toLocaleDateString('ar-SA'),
+            startTime: e.startTime ? new Date(e.startTime).toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' }) : 'N/A',
+            endTime: e.endTime ? new Date(e.endTime).toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' }) : 'N/A',
+            duration,
+            rate: new Intl.NumberFormat('ar-SA', { minimumFractionDigits: 2 }).format(e.hourlyRate || 0),
+            total: new Intl.NumberFormat('ar-SA', { minimumFractionDigits: 2 }).format(e.totalAmount || 0),
+            currency: 'ر.س',
+            billable: e.isBillable,
+            status: e.isBilled ? 'billed' : 'unbilled',
+            description: e.notes || e.description || 'لا توجد ملاحظات',
+            history: e.history || []
+        }
+    }, [entryData])
 
     const topNav = [
         { title: 'نظرة عامة', href: '/dashboard/finance/overview', isActive: false },
@@ -83,7 +98,63 @@ export function TimeEntryDetailsView() {
                     </Link>
                 </div>
 
-                <div className="max-w-[1600px] mx-auto bg-emerald-950 rounded-3xl p-8 shadow-xl shadow-emerald-900/20 mb-8 relative overflow-hidden">
+                {/* Loading State */}
+                {isLoading && (
+                    <div className="max-w-[1600px] mx-auto space-y-6">
+                        <Skeleton className="h-48 w-full rounded-3xl" />
+                        <div className="grid grid-cols-12 gap-6">
+                            <div className="col-span-12 lg:col-span-8">
+                                <Skeleton className="h-96 w-full rounded-2xl" />
+                            </div>
+                            <div className="col-span-12 lg:col-span-4">
+                                <Skeleton className="h-96 w-full rounded-2xl" />
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {/* Error State */}
+                {isError && (
+                    <div className="max-w-[1600px] mx-auto">
+                        <div className="bg-white rounded-2xl p-12 border border-slate-100 text-center">
+                            <div className="flex justify-center mb-4">
+                                <div className="w-16 h-16 rounded-full bg-red-50 flex items-center justify-center">
+                                    <AlertCircle className="w-8 h-8 text-red-500" />
+                                </div>
+                            </div>
+                            <h3 className="text-lg font-bold text-slate-900 mb-2">حدث خطأ أثناء تحميل سجل الوقت</h3>
+                            <p className="text-slate-500 mb-4">{error?.message || 'تعذر الاتصال بالخادم'}</p>
+                            <Button onClick={() => refetch()} className="bg-[#022c22] hover:bg-[#022c22]/90">
+                                إعادة المحاولة
+                            </Button>
+                        </div>
+                    </div>
+                )}
+
+                {/* Empty State */}
+                {!isLoading && !isError && !entry && (
+                    <div className="max-w-[1600px] mx-auto">
+                        <div className="bg-white rounded-2xl p-12 border border-slate-100 text-center">
+                            <div className="flex justify-center mb-4">
+                                <div className="w-16 h-16 rounded-full bg-blue-50 flex items-center justify-center">
+                                    <Clock className="w-8 h-8 text-brand-blue" />
+                                </div>
+                            </div>
+                            <h3 className="text-lg font-bold text-slate-900 mb-2">سجل الوقت غير موجود</h3>
+                            <p className="text-slate-500 mb-4">لم يتم العثور على سجل الوقت المطلوب</p>
+                            <Button asChild className="bg-brand-blue hover:bg-blue-600">
+                                <Link to="/dashboard/finance/time-tracking">
+                                    العودة إلى القائمة
+                                </Link>
+                            </Button>
+                        </div>
+                    </div>
+                )}
+
+                {/* Success State */}
+                {!isLoading && !isError && entry && (
+                    <>
+                        <div className="max-w-[1600px] mx-auto bg-emerald-950 rounded-3xl p-8 shadow-xl shadow-emerald-900/20 mb-8 relative overflow-hidden">
                     <div className="absolute top-0 left-0 w-full h-full overflow-hidden z-0 pointer-events-none">
                         <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-emerald-500/10 rounded-full blur-[100px]"></div>
                         <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-blue-500/10 rounded-full blur-[100px]"></div>
@@ -189,6 +260,8 @@ export function TimeEntryDetailsView() {
                         </div>
                     </div>
                 </div>
+                    </>
+                )}
             </Main>
         </>
     )
