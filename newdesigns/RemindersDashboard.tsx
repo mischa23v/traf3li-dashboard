@@ -1,7 +1,6 @@
 import {
-    Clock, AlertCircle, MoreHorizontal, Plus, FileText,
-    Briefcase, User, Download, Smartphone, Shield, Zap,
-    ChevronLeft, Bell, Calendar, CheckCircle2
+    Clock, AlertCircle, MoreHorizontal, Plus,
+    ChevronLeft, Bell, CheckCircle2
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'

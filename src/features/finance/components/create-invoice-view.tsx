@@ -160,7 +160,7 @@ export function CreateInvoiceView() {
                                         </div>
 
                                         <div className="space-y-3">
-                                            {items.map((item, index) => (
+                                            {items.map((item) => (
                                                 <div key={item.id} className="flex gap-4 items-start">
                                                     <div className="flex-1">
                                                         <Input placeholder="وصف الخدمة / المنتج" className="rounded-xl border-slate-200" />

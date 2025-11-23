@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import {
     FileText, Search, Filter, Download, Plus, MoreHorizontal,
-    Calendar, Eye, CheckCircle, Clock, AlertCircle, Briefcase,
-    TrendingUp, ArrowUpRight, ArrowDownRight, Bell
+    CheckCircle, Clock, AlertCircle, Briefcase,
+    TrendingUp, Bell
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'

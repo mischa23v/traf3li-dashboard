@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import {
     ArrowRight, Save, Calendar, Clock,
-    FileText, Briefcase, CheckCircle
+    FileText, Briefcase
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'

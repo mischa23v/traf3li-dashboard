@@ -1,7 +1,7 @@
 import {
     Clock, MapPin, MoreHorizontal, Plus, Calendar as CalendarIcon,
-    Briefcase, User, Users, Video, Shield, Zap,
-    ChevronLeft, Bell, CheckCircle2
+    Briefcase, Users, Video, Shield,
+    ChevronLeft
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'

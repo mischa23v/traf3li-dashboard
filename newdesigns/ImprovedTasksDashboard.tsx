@@ -35,8 +35,8 @@ import { Progress } from '@/components/ui/progress'
 
 export default function ImprovedTasksDashboard() {
     const [selectedFilter, setSelectedFilter] = useState('all')
-    const [selectedPriority, setSelectedPriority] = useState('all')
-    const [selectedAssignee, setSelectedAssignee] = useState('all')
+    const [selectedPriority] = useState('all')
+    const [selectedAssignee] = useState('all')
     const [searchTerm, setSearchTerm] = useState('')
 
     // Summary stats

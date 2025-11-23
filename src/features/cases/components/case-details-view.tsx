@@ -1,20 +1,19 @@
 import { useState } from 'react'
 import { Link } from '@tanstack/react-router'
 import {
-    FileText, Calendar, CheckSquare, Clock, MoreHorizontal, Plus, Upload,
-    User, AlertCircle, CheckCircle2, Scale, Building, Mail, Phone,
-    ChevronRight, Search, ArrowLeft, Gavel, Shield, Briefcase,
-    FileCheck, AlertTriangle, Download, Eye, History, Share2, Bell, MapPin,
-    DollarSign, TrendingUp
+    FileText, Calendar, Clock, MoreHorizontal, Plus, Upload,
+    User, Scale,
+    Search, ArrowLeft, Gavel, Shield,
+    FileCheck, AlertTriangle, Download, Eye, History, Bell,
+    DollarSign
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Progress } from '@/components/ui/progress'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Separator } from '@/components/ui/separator'
-import { Input } from '@/components/ui/input'
 import {
     DropdownMenu,
     DropdownMenuContent,

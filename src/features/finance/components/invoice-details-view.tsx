@@ -1,17 +1,11 @@
-import { useState } from 'react'
 import {
-    FileText, Calendar, CheckSquare, Clock, MoreHorizontal, Plus, Upload,
-    User, ArrowLeft, Briefcase,
-    History, Link as LinkIcon, Flag, Send, Eye, Download, Search, Bell,
-    CreditCard, DollarSign, CheckCircle2, AlertCircle
+    FileText, Calendar, ArrowLeft,
+    Download, Search, Bell, User, Clock, Send, History as HistoryIcon
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { Textarea } from '@/components/ui/textarea'
 import { Link } from '@tanstack/react-router'
 import { Header } from '@/components/layout/header'
 import { TopNav } from '@/components/layout/top-nav'
@@ -23,8 +17,6 @@ import { ConfigDrawer } from '@/components/config-drawer'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 
 export function InvoiceDetailsView() {
-    const [activeTab, setActiveTab] = useState('details')
-
     // Mock Data for a single invoice
     const invoice = {
         id: 'INV-2024-001',
@@ -183,7 +175,7 @@ export function InvoiceDetailsView() {
                             <Card className="border border-slate-100 shadow-sm rounded-2xl overflow-hidden">
                                 <CardHeader className="bg-white border-b border-slate-50 pb-4">
                                     <CardTitle className="text-lg font-bold text-navy flex items-center gap-2">
-                                        <History className="h-5 w-5 text-brand-blue" />
+                                        <HistoryIcon className="h-5 w-5 text-brand-blue" />
                                         سجل النشاط
                                     </CardTitle>
                                 </CardHeader>

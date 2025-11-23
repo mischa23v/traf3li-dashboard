@@ -10,9 +10,7 @@ import {
     FileText,
     Briefcase,
     AlertTriangle,
-    Gavel,
-    Calendar as CalendarIcon,
-    MoreHorizontal
+    Gavel
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {

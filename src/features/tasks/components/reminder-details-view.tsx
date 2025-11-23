@@ -1,15 +1,15 @@
 import { useState } from 'react'
 import {
-    Clock, AlertCircle, MoreHorizontal, CheckCircle2,
-    User, ArrowLeft, Briefcase,
-    History, Link as LinkIcon, Flag, Send, Bell, Calendar, Search
+    Clock, CheckCircle2,
+    ArrowLeft,
+    History, Bell, Calendar, Search, Flag, Briefcase, Send
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Textarea } from '@/components/ui/textarea'
 import { Link } from '@tanstack/react-router'
 import { Header } from '@/components/layout/header'
