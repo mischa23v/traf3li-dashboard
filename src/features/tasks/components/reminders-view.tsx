@@ -160,7 +160,7 @@ export function RemindersView() {
                                                 </div>
                                             </div>
                                             <div className="flex gap-2">
-                                                <Link to={`/dashboard/tasks/reminders/${reminder.id}`}>
+                                                <Link to={`/dashboard/tasks/reminders/${reminder.id}` as any}>
                                                     <Button variant="outline" className="border-slate-200 text-slate-600 hover:bg-slate-50 rounded-lg px-4">
                                                         التفاصيل
                                                     </Button>

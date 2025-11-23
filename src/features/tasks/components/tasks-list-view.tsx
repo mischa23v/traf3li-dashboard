@@ -148,7 +148,7 @@ export function TasksListView() {
                                                     <div className="font-bold text-navy">{task.deadline}</div>
                                                 </div>
                                             </div>
-                                            <Link to={`/tasks/${task.id}`}>
+                                            <Link to={`/tasks/${task.id}` as any}>
                                                 <Button className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg px-6 shadow-lg shadow-emerald-500/20">
                                                     عرض التفاصيل
                                                 </Button>

@@ -12,13 +12,6 @@ import {
   BookOpen,
   Settings,
   HelpCircle,
-  LogOut,
-  FileText,
-  Clock,
-  Bell,
-  Mail,
-  Search,
-  Shield
 } from 'lucide-react'
 
 type SidebarData = {
@@ -36,7 +29,7 @@ type SidebarData = {
     title: string
     items: {
       title: string
-      url: string
+      url?: string
       icon: React.ElementType
       items?: {
         title: string
@@ -76,7 +69,6 @@ export function useSidebarData(): SidebarData {
           },
           {
             title: 'المهام',
-            url: '/dashboard/tasks',
             icon: CheckSquare,
             items: [
               {
@@ -95,7 +87,6 @@ export function useSidebarData(): SidebarData {
           },
           {
             title: 'الرسائل',
-            url: '/dashboard/messages',
             icon: MessageSquare,
             items: [
               {
@@ -115,7 +106,6 @@ export function useSidebarData(): SidebarData {
         items: [
           {
             title: 'فرص وظيفية',
-            url: '/dashboard/jobs',
             icon: Briefcase,
             items: [
               {
@@ -145,7 +135,6 @@ export function useSidebarData(): SidebarData {
         items: [
           {
             title: 'الحسابات',
-            url: '/dashboard/finance',
             icon: DollarSign,
             items: [
               {
@@ -185,7 +174,6 @@ export function useSidebarData(): SidebarData {
         items: [
           {
             title: 'التقييمات والسمعة',
-            url: '/dashboard/reputation',
             icon: Star,
             items: [
               {
@@ -200,7 +188,6 @@ export function useSidebarData(): SidebarData {
           },
           {
             title: 'التقارير',
-            url: '/dashboard/reports',
             icon: BarChart,
             items: [
               {
@@ -219,7 +206,6 @@ export function useSidebarData(): SidebarData {
           },
           {
             title: 'مركز المعرفة',
-            url: '/dashboard/knowledge',
             icon: BookOpen,
             items: [
               {
@@ -243,7 +229,6 @@ export function useSidebarData(): SidebarData {
         items: [
           {
             title: 'الإعدادات',
-            url: '/dashboard/settings',
             icon: Settings,
             items: [
               {

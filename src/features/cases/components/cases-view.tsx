@@ -1,16 +1,11 @@
 import { useState } from 'react'
 import { Link } from '@tanstack/react-router'
 import {
-    ArrowRight,
     Calendar,
-    CheckSquare,
     Clock,
     FileText,
-    Filter,
-    MoreHorizontal,
     Plus,
     Search,
-    Settings,
     Upload,
     User,
     Briefcase,
@@ -18,18 +13,10 @@ import {
     Building2,
     DollarSign,
     FileCheck,
-    Mail,
-    Phone,
     MapPin,
-    ChevronRight,
-    ArrowLeft,
-    Gavel,
     Scale,
-    Shield,
     AlertCircle,
     Download,
-    Eye,
-    UserCheck,
     Bell
 } from 'lucide-react'
 import { Button } from "@/components/ui/button"
@@ -39,14 +26,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Progress } from "@/components/ui/progress"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Separator } from "@/components/ui/separator"
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { Input } from "@/components/ui/input"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Header } from '@/components/layout/header'
 import { TopNav } from '@/components/layout/top-nav'
 import { DynamicIsland } from '@/components/dynamic-island'
@@ -241,7 +220,7 @@ export function CasesView() {
                                         <span className="text-slate-400 text-sm">•</span>
                                         <span className="text-blue-200 text-sm font-mono">{caseData.id}</span>
                                     </div>
-                                    <Link to={`/dashboard/cases/${caseData.id}`} className="hover:underline decoration-emerald-400 underline-offset-4">
+                                    <Link to={`/dashboard/cases/${caseData.id}` as any} className="hover:underline decoration-emerald-400 underline-offset-4">
                                         <h1 className="text-3xl md:text-4xl font-bold leading-tight mb-2 hover:text-emerald-400 transition-colors">
                                             {caseData.title}
                                         </h1>
