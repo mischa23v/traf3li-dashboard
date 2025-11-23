@@ -44,7 +44,7 @@ export function useSidebarData(): SidebarData {
     user: {
       name: 'مشاري بن ناهد',
       email: 'meshari@lawyer.com',
-      avatar: '/avatars/shadcn.jpg',
+      avatar: '',
     },
     teams: [
       {
