@@ -384,3 +384,117 @@ export const useTransactionSummary = (filters?: any) => {
     staleTime: 5 * 60 * 1000,
   })
 }
+
+// ==================== STATEMENTS ====================
+
+export const useStatements = (filters?: any) => {
+  return useQuery({
+    queryKey: ['statements', filters],
+    queryFn: () => financeService.getStatements(filters),
+    staleTime: 2 * 60 * 1000,
+  })
+}
+
+export const useStatement = (id: string) => {
+  return useQuery({
+    queryKey: ['statements', id],
+    queryFn: () => financeService.getStatement(id),
+    enabled: !!id,
+  })
+}
+
+export const useCreateStatement = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (data: any) => financeService.createStatement(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['statements'] })
+      toast.success('تم إنشاء الكشف الحسابي بنجاح')
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'فشل إنشاء الكشف الحسابي')
+    },
+  })
+}
+
+export const useUpdateStatement = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: any }) =>
+      financeService.updateStatement(id, data),
+    onSuccess: (_, { id }) => {
+      queryClient.invalidateQueries({ queryKey: ['statements'] })
+      queryClient.invalidateQueries({ queryKey: ['statements', id] })
+      toast.success('تم تحديث الكشف الحسابي بنجاح')
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'فشل تحديث الكشف الحسابي')
+    },
+  })
+}
+
+export const useDeleteStatement = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (id: string) => financeService.deleteStatement(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['statements'] })
+      toast.success('تم حذف الكشف الحسابي بنجاح')
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'فشل حذف الكشف الحسابي')
+    },
+  })
+}
+
+export const useSendStatement = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (id: string) => financeService.sendStatement(id),
+    onSuccess: (_, id) => {
+      queryClient.invalidateQueries({ queryKey: ['statements'] })
+      queryClient.invalidateQueries({ queryKey: ['statements', id] })
+      toast.success('تم إرسال الكشف الحسابي بنجاح')
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'فشل إرسال الكشف الحسابي')
+    },
+  })
+}
+
+// ==================== ACTIVITIES ====================
+
+export const useActivities = (filters?: any) => {
+  return useQuery({
+    queryKey: ['activities', filters],
+    queryFn: () => financeService.getActivities(filters),
+    staleTime: 1 * 60 * 1000, // 1 minute
+  })
+}
+
+export const useActivity = (id: string) => {
+  return useQuery({
+    queryKey: ['activities', id],
+    queryFn: () => financeService.getActivity(id),
+    enabled: !!id,
+  })
+}
+
+export const useCreateActivity = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (data: any) => financeService.createActivity(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['activities'] })
+      toast.success('تم إنشاء النشاط المالي بنجاح')
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'فشل إنشاء النشاط المالي')
+    },
+  })
+}

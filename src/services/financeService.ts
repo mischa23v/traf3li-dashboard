@@ -260,6 +260,79 @@ export interface CreateTransactionData {
 }
 
 /**
+ * ==================== STATEMENTS ====================
+ */
+
+export interface Statement {
+  _id: string
+  statementNumber: string
+  clientId: string
+  clientName: string
+  period: string
+  startDate: string
+  endDate: string
+  items: StatementItem[]
+  totalAmount: number
+  status: 'draft' | 'sent' | 'paid' | 'archived'
+  generatedDate: string
+  dueDate?: string
+  notes?: string
+  createdAt: string
+  updatedAt: string
+}
+
+export interface StatementItem {
+  _id: string
+  type: 'invoice' | 'payment' | 'expense' | 'adjustment'
+  reference: string
+  description: string
+  date: string
+  amount: number
+}
+
+export interface CreateStatementData {
+  clientId: string
+  period: string
+  startDate: string
+  endDate: string
+  items?: StatementItem[]
+  notes?: string
+  status?: 'draft' | 'sent'
+}
+
+/**
+ * ==================== FINANCIAL ACTIVITY ====================
+ */
+
+export interface FinancialActivity {
+  _id: string
+  activityId: string
+  date: string
+  time: string
+  type: 'payment_received' | 'payment_sent' | 'invoice_created' | 'invoice_sent' | 'invoice_paid' | 'expense_created' | 'expense_approved' | 'transaction_created'
+  title: string
+  description: string
+  reference: string
+  amount: number
+  userId: string
+  userName: string
+  status: string
+  metadata?: any
+  createdAt: string
+  updatedAt: string
+}
+
+export interface CreateActivityData {
+  type: 'payment_received' | 'payment_sent' | 'invoice_created' | 'invoice_sent' | 'invoice_paid' | 'expense_created' | 'expense_approved' | 'transaction_created'
+  title: string
+  description: string
+  reference: string
+  amount: number
+  status?: string
+  metadata?: any
+}
+
+/**
  * Finance Service Object
  */
 const financeService = {
@@ -671,6 +744,126 @@ const financeService = {
       return response.data.summary || response.data.data
     } catch (error: any) {
       console.error('Get transaction summary error:', error)
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  // ==================== STATEMENTS ====================
+
+  /**
+   * Get all statements
+   */
+  getStatements: async (filters?: any): Promise<{ data: Statement[]; pagination: any }> => {
+    try {
+      const response = await apiClient.get('/statements', { params: filters })
+      return response.data
+    } catch (error: any) {
+      console.error('Get statements error:', error)
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Get single statement
+   */
+  getStatement: async (id: string): Promise<{ data: Statement }> => {
+    try {
+      const response = await apiClient.get(`/statements/${id}`)
+      return response.data
+    } catch (error: any) {
+      console.error('Get statement error:', error)
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Create statement
+   */
+  createStatement: async (data: CreateStatementData): Promise<Statement> => {
+    try {
+      const response = await apiClient.post('/statements', data)
+      return response.data.statement || response.data.data
+    } catch (error: any) {
+      console.error('Create statement error:', error)
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Update statement
+   */
+  updateStatement: async (id: string, data: Partial<CreateStatementData>): Promise<Statement> => {
+    try {
+      const response = await apiClient.put(`/statements/${id}`, data)
+      return response.data.statement || response.data.data
+    } catch (error: any) {
+      console.error('Update statement error:', error)
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Delete statement
+   */
+  deleteStatement: async (id: string): Promise<void> => {
+    try {
+      await apiClient.delete(`/statements/${id}`)
+    } catch (error: any) {
+      console.error('Delete statement error:', error)
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Send statement
+   */
+  sendStatement: async (id: string): Promise<Statement> => {
+    try {
+      const response = await apiClient.post(`/statements/${id}/send`)
+      return response.data.statement || response.data.data
+    } catch (error: any) {
+      console.error('Send statement error:', error)
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  // ==================== ACTIVITY ====================
+
+  /**
+   * Get all financial activities
+   */
+  getActivities: async (filters?: any): Promise<{ data: FinancialActivity[]; pagination: any }> => {
+    try {
+      const response = await apiClient.get('/activities', { params: filters })
+      return response.data
+    } catch (error: any) {
+      console.error('Get activities error:', error)
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Get single activity
+   */
+  getActivity: async (id: string): Promise<{ data: FinancialActivity }> => {
+    try {
+      const response = await apiClient.get(`/activities/${id}`)
+      return response.data
+    } catch (error: any) {
+      console.error('Get activity error:', error)
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Create activity
+   */
+  createActivity: async (data: CreateActivityData): Promise<FinancialActivity> => {
+    try {
+      const response = await apiClient.post('/activities', data)
+      return response.data.activity || response.data.data
+    } catch (error: any) {
+      console.error('Create activity error:', error)
       throw new Error(handleApiError(error))
     }
   },
