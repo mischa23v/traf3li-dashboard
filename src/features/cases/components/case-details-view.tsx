@@ -67,53 +67,9 @@ export function CaseDetailsView() {
         }
     }, [caseData])
 
-    const mockCaseInfo = {
-        id: '4772077905',
-        title: 'مشاري بن ناهد ضد المصنع السعودي العربي',
-        status: 'active',
-        type: 'labor',
-        court: 'المحكمة العمالية - الرياض',
-        judge: 'د. عبد العزيز المنصور',
-        startDate: '2024-01-15',
-        nextHearing: '2024-03-20',
-        completion: 65,
-        claimAmount: 12000,
-        expectedWin: 2400
-    }
-
-    const timeline = [
-        { date: '2024-01-15', title: 'فتح القضية', type: 'start', status: 'completed' },
-        { date: '2024-01-25', title: 'تقديم الدعوى', type: 'submission', status: 'completed' },
-        { date: '2024-02-10', title: 'الجلسة الأولى', type: 'hearing', status: 'completed' },
-        { date: '2024-03-20', title: 'جلسة مرافعة', type: 'hearing', status: 'upcoming' },
-        { date: '2024-04-05', title: 'النطق بالحكم', type: 'verdict', status: 'pending' },
-    ]
-
     const topNav = [
         { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
         { title: 'القضايا', href: '/dashboard/cases', isActive: true },
-    ]
-
-    // Mock Data for Invoices (Billing Tab)
-    const invoices = [
-        {
-            id: 'INV-2025-001',
-            amount: 4500,
-            status: 'معلقة',
-            issueDate: '15 يناير 2024',
-            dueDate: '15 فبراير 2024',
-            services: ['استشارة قانونية', 'صياغة عقود'],
-            statusColor: 'bg-amber-100 text-amber-700'
-        },
-        {
-            id: 'INV-2025-002',
-            amount: 3800,
-            status: 'مدفوعة',
-            issueDate: '10 يناير 2024',
-            dueDate: '10 فبراير 2024',
-            services: ['تمثيل قانوني'],
-            statusColor: 'bg-emerald-100 text-emerald-700'
-        }
     ]
 
     const formatCurrency = (amount: number) => {
