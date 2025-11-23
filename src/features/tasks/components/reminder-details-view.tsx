@@ -39,6 +39,28 @@ export function ReminderDetailsView() {
         const dateDisplay = reminderDate ? reminderDate.toLocaleDateString('ar-SA', { year: 'numeric', month: 'long', day: 'numeric' }) : 'غير محدد'
         const timeDisplay = r.time || (reminderDate ? reminderDate.toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' }) : 'غير محدد')
 
+        // Type narrow assignedTo
+        const assignee = !r.assignedTo
+            ? null
+            : typeof r.assignedTo === 'string'
+            ? { name: r.assignedTo, role: 'موظف', avatar: '/avatars/default.png' }
+            : {
+                name: (r.assignedTo.firstName || '') + ' ' + (r.assignedTo.lastName || '') || 'غير محدد',
+                role: r.assignedTo.role || 'موظف',
+                avatar: r.assignedTo.avatar || '/avatars/default.png'
+            }
+
+        // Type narrow caseId
+        const relatedTo = !r.caseId
+            ? null
+            : typeof r.caseId === 'string'
+            ? { type: 'case' as const, id: r.caseId, title: 'قضية' }
+            : {
+                type: 'case' as const,
+                id: r.caseId.caseNumber || 'N/A',
+                title: r.caseId.title || 'قضية غير محددة'
+            }
+
         return {
             id: r._id,
             title: r.title || r.message || 'تذكير غير محدد',
@@ -48,16 +70,8 @@ export function ReminderDetailsView() {
             date: dateDisplay,
             time: timeDisplay,
             status: r.status || 'pending',
-            assignee: r.assignedTo ? {
-                name: r.assignedTo.firstName + ' ' + r.assignedTo.lastName || 'غير محدد',
-                role: r.assignedTo.role || 'موظف',
-                avatar: r.assignedTo.avatar || '/avatars/default.png'
-            } : null,
-            relatedTo: r.caseId ? {
-                type: 'case',
-                id: r.caseId.caseNumber || 'N/A',
-                title: r.caseId.title || 'قضية غير محددة'
-            } : null,
+            assignee,
+            relatedTo,
             timeline: (r.history || []).map((h: any) => ({
                 date: h.timestamp ? new Date(h.timestamp).toLocaleDateString('ar-SA') : 'غير محدد',
                 title: h.description || h.action || 'تحديث',

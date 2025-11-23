@@ -57,8 +57,8 @@ export function EventDetailsView() {
             })),
             relatedTo: e.caseId ? {
                 type: 'case',
-                id: e.caseId.caseNumber || 'N/A',
-                title: e.caseId.title || 'قضية غير محددة'
+                id: typeof e.caseId === 'string' ? e.caseId : (e.caseId.caseNumber || 'N/A'),
+                title: typeof e.caseId === 'string' ? 'قضية' : (e.caseId.title || 'قضية غير محددة')
             } : null,
             timeline: (e.history || []).map((h: any) => ({
                 date: h.timestamp ? new Date(h.timestamp).toLocaleDateString('ar-SA') : 'غير محدد',

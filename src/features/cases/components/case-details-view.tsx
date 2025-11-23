@@ -43,12 +43,19 @@ export function CaseDetailsView() {
         if (!caseData) return null
         const c = caseData
 
+        // Type narrow clientId
+        const plaintiffName = !c.clientId
+            ? 'غير محدد'
+            : typeof c.clientId === 'string'
+            ? 'عميل'
+            : (c.clientId.name || 'غير محدد')
+
         return {
             id: c.caseNumber || c._id,
             title: c.title || 'قضية غير محددة',
             status: c.status || 'active',
             statusLabel: c.status === 'active' ? 'قيد النظر' : 'مغلقة',
-            plaintiff: c.clientId?.name || 'غير محدد',
+            plaintiff: plaintiffName,
             defendant: c.opposingParty || 'غير محدد',
             type: c.caseType || 'عامة',
             court: c.court || 'غير محدد',

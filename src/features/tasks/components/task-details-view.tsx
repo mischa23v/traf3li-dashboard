@@ -48,6 +48,33 @@ export function TaskDetailsView() {
         const completedSubtasks = subtasks.filter((st: any) => st.completed).length
         const completion = subtasks.length > 0 ? Math.round((completedSubtasks / subtasks.length) * 100) : 0
 
+        // Type narrow assignedTo
+        const assignee = typeof t.assignedTo === 'string'
+            ? { name: t.assignedTo, role: 'محامي', avatar: '/avatars/default.png' }
+            : {
+                name: (t.assignedTo.firstName || '') + ' ' + (t.assignedTo.lastName || '') || 'غير محدد',
+                role: t.assignedTo.role || 'محامي',
+                avatar: t.assignedTo.avatar || '/avatars/default.png'
+            }
+
+        // Type narrow caseId
+        const caseInfo = typeof t.caseId === 'string' || !t.caseId
+            ? { id: 'N/A', title: 'غير محدد', court: 'غير محدد' }
+            : {
+                id: t.caseId.caseNumber || 'N/A',
+                title: t.caseId.title || 'غير محدد',
+                court: t.caseId.court || 'غير محدد'
+            }
+
+        // Type narrow clientId
+        const clientInfo = typeof t.clientId === 'string' || !t.clientId
+            ? { name: 'غير محدد', type: 'فرد', phone: '' }
+            : {
+                name: t.clientId.name || 'غير محدد',
+                type: 'فرد',
+                phone: t.clientId.phone || ''
+            }
+
         return {
             id: t._id,
             title: t.title || t.description || 'مهمة غير محددة',
@@ -56,21 +83,9 @@ export function TaskDetailsView() {
             priority: t.priority || 'medium',
             dueDate: t.dueDate ? new Date(t.dueDate).toLocaleDateString('ar-SA') : 'غير محدد',
             completion,
-            assignee: {
-                name: t.assignedTo?.firstName + ' ' + t.assignedTo?.lastName || 'غير محدد',
-                role: t.assignedTo?.role || 'محامي',
-                avatar: t.assignedTo?.avatar || '/avatars/default.png'
-            },
-            client: {
-                name: t.caseId?.clientId?.name || t.clientId?.name || 'غير محدد',
-                type: t.caseId?.clientId?.type || 'فرد',
-                phone: t.caseId?.clientId?.phone || t.clientId?.phone || ''
-            },
-            case: {
-                id: t.caseId?.caseNumber || 'N/A',
-                title: t.caseId?.title || 'غير محدد',
-                court: t.caseId?.court || 'غير محدد'
-            },
+            assignee,
+            client: clientInfo,
+            case: caseInfo,
             subtasks: subtasks.map((st: any, idx: number) => ({
                 id: idx + 1,
                 title: st.title || st.description,

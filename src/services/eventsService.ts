@@ -17,7 +17,7 @@ export interface Event {
   endDate?: string
   allDay: boolean
   location?: string
-  caseId?: string
+  caseId?: string | { _id?: string; caseNumber?: string; title?: string }
   taskId?: string
   attendees?: string[]
   reminders?: EventReminder[]
@@ -31,6 +31,9 @@ export interface Event {
     endDate?: string
   }
   createdAt: string
+  date?: string
+  time?: string
+  history?: any[]
   updatedAt: string
 }
 

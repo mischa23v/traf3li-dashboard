@@ -43,8 +43,8 @@ export default function AccountsDashboard({ }: AccountsDashboardProps) {
         const growth = summaryData?.data?.growth || 0
 
         // Calculate outstanding from pending invoices
-        const outstanding = invoicesData?.data
-            ? invoicesData.data.reduce((sum: number, inv: any) => sum + (inv.balanceDue || inv.totalAmount || 0), 0)
+        const outstanding = invoicesData?.invoices
+            ? invoicesData.invoices.reduce((sum: number, inv: any) => sum + (inv.balanceDue || inv.totalAmount || 0), 0)
             : 0
 
         return {

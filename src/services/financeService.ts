@@ -14,8 +14,8 @@ export interface Invoice {
   invoiceNumber: string
   caseId?: string
   contractId?: string
-  lawyerId: string
-  clientId: string
+  lawyerId: string | { firstName: string; lastName: string; name?: string }
+  clientId: string | { firstName: string; lastName: string; name?: string }
   items: InvoiceItem[]
   subtotal: number
   vatRate: number
@@ -81,7 +81,7 @@ export interface Expense {
   amount: number
   category: string
   caseId?: string
-  userId: string
+  userId: string | { firstName: string; lastName: string; name?: string }
   date: string
   paymentMethod: string
   vendor?: string
@@ -93,6 +93,7 @@ export interface Expense {
   reimbursementStatus?: string
   receipts: Receipt[]
   notes?: string
+  history?: any[]
   createdAt: string
   updatedAt: string
 }
@@ -136,13 +137,14 @@ export interface TimeEntry {
   _id: string
   entryId: string
   description: string
-  lawyerId: string
+  lawyerId: string | { firstName: string; lastName: string; _id: string }
   clientId: string
   caseId: string
   date: string
   startTime?: string
   endTime?: string
   duration: number
+  hours?: number
   hourlyRate: number
   totalAmount: number
   isBillable: boolean
@@ -152,7 +154,9 @@ export interface TimeEntry {
   invoiceId?: string
   wasTimerBased: boolean
   timerStartedAt?: string
+  userId?: string | { firstName: string; lastName: string }
   notes?: string
+  history?: any[]
   createdAt: string
   updatedAt: string
 }
@@ -244,7 +248,13 @@ export interface Transaction {
   paymentMethod?: string
   date: string
   status: string
+  reference?: string
+  invoiceId?: string
+  expenseId?: string
+  bank?: string
+  account?: string
   notes?: string
+  history?: any[]
   createdAt: string
   updatedAt: string
 }

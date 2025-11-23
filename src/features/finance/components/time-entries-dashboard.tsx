@@ -58,8 +58,8 @@ export default function TimeEntriesDashboard() {
 
     // Sync timer with backend data
     useEffect(() => {
-        if (timerData?.isRunning && timerData.elapsedSeconds !== undefined) {
-            setCurrentTime(timerData.elapsedSeconds)
+        if (timerData?.isRunning && timerData.timer?.elapsedMinutes !== undefined) {
+            setCurrentTime(timerData.timer.elapsedMinutes * 60)
         } else if (!timerData?.isRunning) {
             setCurrentTime(0)
         }
@@ -85,8 +85,8 @@ export default function TimeEntriesDashboard() {
 
     // Transform API data
     const timeEntries = useMemo(() => {
-        if (!entriesData?.entries) return []
-        return entriesData.entries.map((entry: any) => ({
+        if (!entriesData?.data) return []
+        return entriesData.data.map((entry: any) => ({
             id: entry._id,
             date: new Date(entry.date).toLocaleDateString('ar-SA'),
             client: entry.clientId?.name || entry.clientId?.firstName + ' ' + entry.clientId?.lastName || 'عميل غير محدد',
@@ -133,8 +133,9 @@ export default function TimeEntriesDashboard() {
     // Timer handlers
     const handleStartTimer = useCallback(() => {
         startTimerMutation.mutate({
-            description: timerDescription || 'مهمة جديدة',
-            isBillable: true
+            caseId: '',
+            clientId: '',
+            description: timerDescription || 'مهمة جديدة'
         })
     }, [timerDescription, startTimerMutation])
 
@@ -476,7 +477,7 @@ export default function TimeEntriesDashboard() {
                                                 <Play className="w-5 h-5 ml-2" />
                                                 بدء
                                             </Button>
-                                        ) : timerData?.isPaused ? (
+                                        ) : timerData?.timer?.isPaused ? (
                                             <Button
                                                 onClick={handleResumeTimer}
                                                 disabled={resumeTimerMutation.isPending}

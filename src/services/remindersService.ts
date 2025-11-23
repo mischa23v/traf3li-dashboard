@@ -31,6 +31,12 @@ export interface Reminder {
   completedAt?: string
   notes?: string
   createdAt: string
+  dueDate?: string
+  time?: string
+  message?: string
+  assignedTo?: string | { firstName: string; lastName: string; role?: string; avatar?: string }
+  caseId?: string | { _id?: string; caseNumber?: string; title?: string }
+  history?: any[]
   updatedAt: string
 }
 

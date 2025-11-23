@@ -155,7 +155,7 @@ export function CalendarView() {
         const daysInMonth = lastDay.getDate()
         const startingDayOfWeek = firstDay.getDay()
 
-        const days = []
+        const days: Array<{ day: number | null; date: Date | null }> = []
         // Previous month filler
         for (let i = 0; i < startingDayOfWeek; i++) {
             days.push({ day: null, date: null })
@@ -178,7 +178,7 @@ export function CalendarView() {
         const diff = startOfWeek.getDate() - day
         startOfWeek.setDate(diff)
 
-        const days = []
+        const days: Date[] = []
         for (let i = 0; i < 7; i++) {
             const d = new Date(startOfWeek)
             d.setDate(startOfWeek.getDate() + i)
