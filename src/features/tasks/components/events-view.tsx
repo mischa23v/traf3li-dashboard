@@ -1,8 +1,9 @@
+import { useState, useMemo } from 'react'
 import { TasksSidebar } from './tasks-sidebar'
 import {
     Clock, MapPin, MoreHorizontal, Plus, Calendar as CalendarIcon,
     Briefcase, Users, Video, Shield,
-    ChevronLeft, Bell, Search
+    ChevronLeft, Bell, Search, AlertCircle
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -15,14 +16,65 @@ import { ThemeSwitch } from '@/components/theme-switch'
 import { ConfigDrawer } from '@/components/config-drawer'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { Link } from '@tanstack/react-router'
+import { useEvents } from '@/hooks/useRemindersAndEvents'
+import { Skeleton } from '@/components/ui/skeleton'
+import { Alert, AlertDescription } from '@/components/ui/alert'
 
 export function EventsView() {
-    const events = [
-        { id: '1', title: 'جلسة مرافعة - قضية 402', type: 'court', date: 'اليوم', time: '09:00 ص', location: 'المحكمة العامة - القاعة 4', attendees: ['أحمد المحامي', 'العميل'], status: 'upcoming' },
-        { id: '2', title: 'اجتماع مجلس الإدارة', type: 'meeting', date: 'غداً', time: '02:00 م', location: 'المقر الرئيسي - قاعة الاجتماعات', attendees: ['مجلس الإدارة', 'المستشار القانوني'], status: 'confirmed' },
-        { id: '3', title: 'ورشة عمل: التعديلات القانونية الجديدة', type: 'workshop', date: '24 نوفمبر', time: '10:00 ص', location: 'فندق الريتز كارلتون', attendees: ['الفريق القانوني'], status: 'registered' },
-        { id: '4', title: 'مكالمة فيديو مع عميل دولي', type: 'online', date: '26 نوفمبر', time: '04:30 م', location: 'Zoom Meeting', attendees: ['العميل', 'الشريك المدير'], status: 'pending' },
-    ]
+    const [eventTypeFilter, setEventTypeFilter] = useState<string>('all')
+
+    // API filters
+    const filters = useMemo(() => {
+        const f: any = {}
+        if (eventTypeFilter !== 'all') {
+            f.type = eventTypeFilter
+        }
+        return f
+    }, [eventTypeFilter])
+
+    // Fetch events
+    const { data: eventsData, isLoading, isError, error, refetch } = useEvents(filters)
+
+    // Transform API data
+    const events = useMemo(() => {
+        if (!eventsData?.data) return []
+
+        return eventsData.data.map((event: any) => {
+            const eventDate = event.date ? new Date(event.date) : null
+            const today = new Date()
+            const tomorrow = new Date(today)
+            tomorrow.setDate(tomorrow.getDate() + 1)
+
+            let dateDisplay = 'غير محدد'
+            if (eventDate) {
+                const eventDateStr = eventDate.toDateString()
+                const todayStr = today.toDateString()
+                const tomorrowStr = tomorrow.toDateString()
+
+                if (eventDateStr === todayStr) {
+                    dateDisplay = 'اليوم'
+                } else if (eventDateStr === tomorrowStr) {
+                    dateDisplay = 'غداً'
+                } else {
+                    dateDisplay = eventDate.toLocaleDateString('ar-SA', { day: 'numeric', month: 'long' })
+                }
+            }
+
+            const timeDisplay = event.time || (eventDate ? eventDate.toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' }) : 'غير محدد')
+
+            return {
+                id: event._id,
+                title: event.title || event.description || 'فعالية غير محددة',
+                type: event.type || 'meeting',
+                date: dateDisplay,
+                time: timeDisplay,
+                location: event.location || 'غير محدد',
+                attendees: event.attendees || [],
+                status: event.status || 'pending',
+                _id: event._id,
+            }
+        })
+    }, [eventsData])
 
     const topNav = [
         { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
@@ -107,14 +159,90 @@ export function EventsView() {
                             <div className="p-6 pb-2 flex justify-between items-center">
                                 <h3 className="font-bold text-navy text-xl">الفعاليات القادمة</h3>
                                 <div className="flex gap-2">
-                                    <Button size="sm" className="bg-blue-500 hover:bg-blue-600 text-white rounded-full px-4">الكل</Button>
-                                    <Button size="sm" variant="ghost" className="text-slate-500 hover:text-navy rounded-full px-4">الجلسات</Button>
-                                    <Button size="sm" variant="ghost" className="text-slate-500 hover:text-navy rounded-full px-4">الاجتماعات</Button>
+                                    <Button
+                                        size="sm"
+                                        onClick={() => setEventTypeFilter('all')}
+                                        className={eventTypeFilter === 'all' ? 'bg-blue-500 hover:bg-blue-600 text-white rounded-full px-4' : 'bg-transparent text-slate-500 hover:text-navy hover:bg-slate-100 rounded-full px-4'}
+                                    >
+                                        الكل
+                                    </Button>
+                                    <Button
+                                        size="sm"
+                                        onClick={() => setEventTypeFilter('court')}
+                                        variant="ghost"
+                                        className={eventTypeFilter === 'court' ? 'bg-blue-500 text-white rounded-full px-4' : 'text-slate-500 hover:text-navy rounded-full px-4'}
+                                    >
+                                        الجلسات
+                                    </Button>
+                                    <Button
+                                        size="sm"
+                                        onClick={() => setEventTypeFilter('meeting')}
+                                        variant="ghost"
+                                        className={eventTypeFilter === 'meeting' ? 'bg-blue-500 text-white rounded-full px-4' : 'text-slate-500 hover:text-navy rounded-full px-4'}
+                                    >
+                                        الاجتماعات
+                                    </Button>
                                 </div>
                             </div>
 
                             <div className="p-4 space-y-4">
-                                {events.map((event) => (
+                                {/* Loading State */}
+                                {isLoading && (
+                                    <>
+                                        {[1, 2, 3].map((i) => (
+                                            <div key={i} className="bg-[#F8F9FA] rounded-2xl p-6 border border-slate-100">
+                                                <div className="flex justify-between items-start mb-4">
+                                                    <div className="flex gap-4 items-center flex-1">
+                                                        <Skeleton className="w-12 h-12 rounded-xl" />
+                                                        <div className="flex-1 space-y-2">
+                                                            <Skeleton className="h-5 w-3/4" />
+                                                            <Skeleton className="h-4 w-1/2" />
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div className="flex items-center justify-between pt-4 border-t border-slate-200/50">
+                                                    <Skeleton className="h-10 w-32" />
+                                                    <Skeleton className="h-10 w-24" />
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </>
+                                )}
+
+                                {/* Error State */}
+                                {isError && !isLoading && (
+                                    <Alert className="border-red-200 bg-red-50">
+                                        <AlertCircle className="h-4 w-4 text-red-600" />
+                                        <AlertDescription className="text-red-800">
+                                            <div className="flex items-center justify-between">
+                                                <span>حدث خطأ أثناء تحميل الفعاليات: {error?.message || 'خطأ غير معروف'}</span>
+                                                <Button onClick={() => refetch()} variant="outline" size="sm" className="border-red-300 text-red-700 hover:bg-red-100">
+                                                    إعادة المحاولة
+                                                </Button>
+                                            </div>
+                                        </AlertDescription>
+                                    </Alert>
+                                )}
+
+                                {/* Empty State */}
+                                {!isLoading && !isError && events.length === 0 && (
+                                    <div className="text-center py-12">
+                                        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-blue-50 mb-4">
+                                            <CalendarIcon className="h-8 w-8 text-blue-500" />
+                                        </div>
+                                        <h4 className="text-lg font-bold text-navy mb-2">لا توجد فعاليات</h4>
+                                        <p className="text-slate-500 mb-4">لم يتم العثور على فعاليات قادمة</p>
+                                        <Button asChild className="bg-blue-500 hover:bg-blue-600 text-white rounded-xl">
+                                            <Link to="/dashboard/tasks/events/new">
+                                                <Plus className="ml-2 h-4 w-4" />
+                                                إنشاء فعالية جديدة
+                                            </Link>
+                                        </Button>
+                                    </div>
+                                )}
+
+                                {/* Success State */}
+                                {!isLoading && !isError && events.length > 0 && events.map((event) => (
                                     <div key={event.id} className="bg-[#F8F9FA] rounded-2xl p-6 border border-slate-100 hover:border-blue-200 transition-all group">
                                         <div className="flex justify-between items-start mb-4">
                                             <div className="flex gap-4 items-center">
@@ -150,24 +278,31 @@ export function EventsView() {
                                             <div className="flex items-center gap-6">
                                                 <div className="text-center">
                                                     <div className="text-xs text-slate-400 mb-1">الموقع</div>
-                                                    <div className="font-bold text-navy flex items-center gap-1">
+                                                    <div className="font-bold text-navy flex items-center gap-1 text-sm">
                                                         <MapPin className="h-3 w-3 text-slate-400" />
-                                                        {event.location}
+                                                        <span className="max-w-[200px] truncate">{event.location}</span>
                                                     </div>
                                                 </div>
                                                 <div className="text-center hidden sm:block">
                                                     <div className="text-xs text-slate-400 mb-1">الحضور</div>
                                                     <div className="flex -space-x-2 space-x-reverse justify-center">
-                                                        {event.attendees.map((attendee, i) => (
-                                                            <div key={i} className="w-6 h-6 rounded-full bg-slate-200 border-2 border-white flex items-center justify-center text-[10px] text-slate-600 font-bold" title={attendee}>
-                                                                {attendee.charAt(0)}
+                                                        {event.attendees.length > 0 ? event.attendees.slice(0, 3).map((attendee: any, i: number) => (
+                                                            <div key={i} className="w-6 h-6 rounded-full bg-slate-200 border-2 border-white flex items-center justify-center text-[10px] text-slate-600 font-bold" title={typeof attendee === 'string' ? attendee : attendee.name || 'حاضر'}>
+                                                                {typeof attendee === 'string' ? attendee.charAt(0) : (attendee.name || 'ح').charAt(0)}
                                                             </div>
-                                                        ))}
+                                                        )) : (
+                                                            <div className="text-xs text-slate-400">لا يوجد</div>
+                                                        )}
+                                                        {event.attendees.length > 3 && (
+                                                            <div className="w-6 h-6 rounded-full bg-slate-300 border-2 border-white flex items-center justify-center text-[10px] text-slate-700 font-bold">
+                                                                +{event.attendees.length - 3}
+                                                            </div>
+                                                        )}
                                                     </div>
                                                 </div>
                                             </div>
                                             <div className="flex gap-2">
-                                                <Link to={`/dashboard/tasks/events/${event.id}` as any}>
+                                                <Link to={`/dashboard/tasks/events/${event._id}` as any}>
                                                     <Button variant="outline" className="border-slate-200 text-slate-600 hover:bg-slate-50 rounded-lg px-4">
                                                         تفاصيل
                                                     </Button>
@@ -181,12 +316,14 @@ export function EventsView() {
                                 ))}
                             </div>
 
-                            <div className="p-4 pt-0 text-center">
-                                <Button variant="ghost" className="text-blue-600 hover:text-blue-700 hover:bg-blue-50 w-full rounded-xl py-6">
-                                    عرض جميع الفعاليات
-                                    <ChevronLeft className="h-4 w-4 mr-2" />
-                                </Button>
-                            </div>
+                            {!isLoading && !isError && events.length > 0 && (
+                                <div className="p-4 pt-0 text-center">
+                                    <Button variant="ghost" className="text-blue-600 hover:text-blue-700 hover:bg-blue-50 w-full rounded-xl py-6">
+                                        عرض جميع الفعاليات
+                                        <ChevronLeft className="h-4 w-4 mr-2" />
+                                    </Button>
+                                </div>
+                            )}
                         </div>
 
                     </div>
