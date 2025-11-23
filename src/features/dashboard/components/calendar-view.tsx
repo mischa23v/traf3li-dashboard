@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import {
     ChevronLeft,
     ChevronRight,
@@ -14,8 +14,12 @@ import {
     Calendar as CalendarIcon,
     MoreHorizontal,
     Search,
-    Bell
+    Bell,
+    Loader2,
+    AlertCircle,
 } from 'lucide-react'
+import { useCalendar } from '@/hooks/useCalendar'
+import { Skeleton } from '@/components/ui/skeleton'
 import { Button } from '@/components/ui/button'
 import {
     Card,
@@ -33,8 +37,8 @@ import { ConfigDrawer } from '@/components/config-drawer'
 import { DynamicIsland } from '@/components/dynamic-island'
 
 export function CalendarView() {
-    const [currentDate, setCurrentDate] = useState(new Date(2025, 10, 17)) // November 17, 2025
-    const [selectedDate, setSelectedDate] = useState<Date | null>(new Date(2025, 10, 17))
+    const [currentDate, setCurrentDate] = useState(new Date())
+    const [selectedDate, setSelectedDate] = useState<Date | null>(new Date())
     const [view, setView] = useState<'month' | 'week' | 'day'>('month')
 
     const topNav = [
@@ -54,97 +58,87 @@ export function CalendarView() {
             title: 'المهام',
             href: '/dashboard/tasks',
             isActive: false,
-            disabled: true,
+            disabled: false,
         },
     ]
 
-    // --- Enhanced Mock Data for Lawyers ---
-    const calendarItems = [
-        {
-            id: 1,
-            type: 'court',
-            title: 'جلسة استماع أولية',
-            caseName: 'شركة التقنية ضد المؤسسة التجارية',
-            caseNumber: '45-2025-تجاري',
-            date: new Date(2025, 10, 17),
-            time: '09:00 ص',
-            duration: '2 ساعة',
-            location: 'المحكمة التجارية - القاعة 4',
-            judge: 'فضيلة الشيخ عبد الله',
-            priority: 'critical',
-            color: 'red',
-        },
-        {
-            id: 2,
-            type: 'deadline',
-            title: 'الموعد النهائي لتقديم المذكرة الجوابية',
-            caseName: 'ورثة صالح الغامدي',
-            caseNumber: '12-2025-أحوال',
-            date: new Date(2025, 10, 17),
-            time: '02:00 م',
-            priority: 'high',
-            color: 'orange',
-        },
-        {
-            id: 3,
-            type: 'meeting',
-            title: 'اجتماع استراتيجي مع العميل',
-            caseName: 'قضية التصفية العقارية',
-            caseNumber: '88-2024-عقاري',
-            date: new Date(2025, 10, 18),
-            time: '11:00 ص',
-            location: 'مكتب المحاماة - غرفة الاجتماعات أ',
-            priority: 'normal',
-            color: 'blue',
-        },
-        {
-            id: 4,
-            type: 'filing',
-            title: 'إيداع صحيفة الدعوى',
-            caseName: 'منازعة عمالية - أحمد',
-            caseNumber: 'Pending',
-            date: new Date(2025, 10, 20),
-            time: '10:00 ص',
-            priority: 'medium',
-            color: 'purple',
-        },
-        {
-            id: 5,
-            type: 'court',
-            title: 'جلسة النطق بالحكم',
-            caseName: 'قضية التشهير الإلكتروني',
-            caseNumber: '101-2025-جزائي',
-            date: new Date(2025, 10, 24),
-            time: '08:30 ص',
-            location: 'المحكمة الجزائية',
-            priority: 'critical',
-            color: 'red',
-        },
-        // Adding more items for week view demonstration
-        {
-            id: 6,
-            type: 'meeting',
-            title: 'مراجعة العقود',
-            caseName: 'شركة المقاولات الكبرى',
-            caseNumber: '99-2025-عقود',
-            date: new Date(2025, 10, 19),
-            time: '10:30 ص',
-            location: 'مكتب المحاماة',
-            priority: 'normal',
-            color: 'blue',
-        },
-        {
-            id: 7,
-            type: 'deadline',
-            title: 'سداد رسوم الخبراء',
-            caseName: 'قضية التركة',
-            caseNumber: '15-2024-أحوال',
-            date: new Date(2025, 10, 21),
-            time: '12:00 م',
-            priority: 'high',
-            color: 'orange',
+    // Calculate date range based on current view
+    const dateRange = useMemo(() => {
+        const year = currentDate.getFullYear()
+        const month = currentDate.getMonth()
+
+        // Get first and last day of month (with buffer for calendar grid)
+        const firstDay = new Date(year, month, 1)
+        const lastDay = new Date(year, month + 1, 0)
+
+        // Add buffer days to cover calendar grid
+        const startDate = new Date(firstDay)
+        startDate.setDate(startDate.getDate() - firstDay.getDay())
+
+        const endDate = new Date(lastDay)
+        endDate.setDate(endDate.getDate() + (6 - lastDay.getDay()))
+
+        return {
+            startDate: startDate.toISOString().split('T')[0],
+            endDate: endDate.toISOString().split('T')[0],
         }
-    ]
+    }, [currentDate])
+
+    // Fetch calendar data from API
+    const { data: calendarData, isLoading, isError, error, refetch } = useCalendar(dateRange)
+
+    // Transform API data to component format
+    const calendarItems = useMemo(() => {
+        if (!calendarData?.data) return []
+
+        const items: any[] = []
+
+        // Map events
+        calendarData.data.events?.forEach((event: any) => {
+            items.push({
+                id: event.id,
+                type: event.eventType === 'hearing' ? 'court' : event.eventType || 'meeting',
+                title: event.title,
+                caseName: event.caseName,
+                caseNumber: event.caseNumber,
+                date: new Date(event.startDate),
+                time: new Date(event.startDate).toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' }),
+                location: event.location,
+                priority: event.priority || 'normal',
+                color: event.color || 'blue',
+            })
+        })
+
+        // Map tasks
+        calendarData.data.tasks?.forEach((task: any) => {
+            items.push({
+                id: task.id,
+                type: 'deadline',
+                title: task.title,
+                caseName: task.caseName,
+                caseNumber: task.caseNumber,
+                date: new Date(task.startDate),
+                time: new Date(task.startDate).toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' }),
+                priority: task.priority || 'normal',
+                color: 'orange',
+            })
+        })
+
+        // Map reminders
+        calendarData.data.reminders?.forEach((reminder: any) => {
+            items.push({
+                id: reminder.id,
+                type: 'deadline',
+                title: reminder.title,
+                date: new Date(reminder.startDate),
+                time: reminder.reminderTime || new Date(reminder.startDate).toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' }),
+                priority: reminder.priority || 'normal',
+                color: 'purple',
+            })
+        })
+
+        return items
+    }, [calendarData])
 
     const monthNames = [
         'يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو',
@@ -209,6 +203,79 @@ export function CalendarView() {
     const weekDays = getWeekDays(currentDate)
     const selectedDateItems = getItemsForDate(selectedDate)
 
+    // --- Loading State ---
+    if (isLoading) {
+        return (
+            <>
+                <Header className="bg-navy shadow-none relative">
+                    <TopNav links={topNav} className="[&>a]:text-slate-300 [&>a:hover]:text-white [&>a[aria-current='page']]:text-white" />
+                    <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
+                        <DynamicIsland />
+                    </div>
+                    <div className='ms-auto flex items-center space-x-4'>
+                        <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white">
+                            <Bell className="h-5 w-5" />
+                        </Button>
+                        <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white" />
+                        <ThemeSwitch className="text-slate-300 hover:bg-white/10 hover:text-white" />
+                        <ConfigDrawer className="text-slate-300 hover:bg-white/10 hover:text-white" />
+                        <ProfileDropdown className="text-slate-300 hover:bg-white/10 hover:text-white" />
+                    </div>
+                </Header>
+
+                <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8">
+                    <Skeleton className="h-48 w-full rounded-3xl" />
+                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                        <div className="lg:col-span-3">
+                            <Skeleton className="h-[700px] w-full rounded-3xl" />
+                        </div>
+                        <div className="lg:col-span-9 space-y-6">
+                            <Skeleton className="h-20 w-full rounded-3xl" />
+                            <Skeleton className="h-[750px] w-full rounded-3xl" />
+                        </div>
+                    </div>
+                </Main>
+            </>
+        )
+    }
+
+    // --- Error State ---
+    if (isError) {
+        return (
+            <>
+                <Header className="bg-navy shadow-none relative">
+                    <TopNav links={topNav} className="[&>a]:text-slate-300 [&>a:hover]:text-white [&>a[aria-current='page']]:text-white" />
+                    <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
+                        <DynamicIsland />
+                    </div>
+                    <div className='ms-auto flex items-center space-x-4'>
+                        <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white">
+                            <Bell className="h-5 w-5" />
+                        </Button>
+                        <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white" />
+                        <ThemeSwitch className="text-slate-300 hover:bg-white/10 hover:text-white" />
+                        <ConfigDrawer className="text-slate-300 hover:bg-white/10 hover:text-white" />
+                        <ProfileDropdown className="text-slate-300 hover:bg-white/10 hover:text-white" />
+                    </div>
+                </Header>
+
+                <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8">
+                    <div className="bg-white rounded-3xl p-12 text-center border border-slate-100 shadow-sm">
+                        <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <AlertCircle className="h-8 w-8 text-red-500" />
+                        </div>
+                        <h3 className="text-xl font-bold text-slate-900 mb-2">فشل تحميل التقويم</h3>
+                        <p className="text-slate-500 mb-6">{error?.message || 'حدث خطأ أثناء تحميل البيانات'}</p>
+                        <Button onClick={() => refetch()} className="bg-emerald-500 hover:bg-emerald-600 text-white px-8">
+                            <Loader2 className="ml-2 h-4 w-4" />
+                            إعادة المحاولة
+                        </Button>
+                    </div>
+                </Main>
+            </>
+        )
+    }
+
     return (
         <>
             {/* ===== Top Heading ===== */}
@@ -253,7 +320,21 @@ export function CalendarView() {
                                 <span className="text-slate-400 text-sm">نوفمبر 2025</span>
                             </div>
                             <h1 className="text-4xl font-bold leading-tight mb-2">جدول القضايا والجلسات</h1>
-                            <p className="text-slate-300 text-lg max-w-xl">لديك <span className="text-white font-bold border-b-2 border-brand-blue">3 جلسات قضائية</span> و <span className="text-white font-bold border-b-2 border-orange-500">موعدين نهائيين</span> هذا الأسبوع.</p>
+                            <p className="text-slate-300 text-lg max-w-xl">
+                                لديك{' '}
+                                <span className="text-white font-bold border-b-2 border-brand-blue">
+                                    {calendarData?.data.summary.eventCount || 0} {calendarData?.data.summary.eventCount === 1 ? 'حدث' : 'أحداث'}
+                                </span>
+                                {' '}و{' '}
+                                <span className="text-white font-bold border-b-2 border-orange-500">
+                                    {calendarData?.data.summary.taskCount || 0} {calendarData?.data.summary.taskCount === 1 ? 'مهمة' : 'مهام'}
+                                </span>
+                                {' '}و{' '}
+                                <span className="text-white font-bold border-b-2 border-purple-500">
+                                    {calendarData?.data.summary.reminderCount || 0} {calendarData?.data.summary.reminderCount === 1 ? 'تذكير' : 'تذكيرات'}
+                                </span>
+                                {' '}هذا الشهر.
+                            </p>
                         </div>
                         <div className="flex gap-3">
                             <Button className="bg-brand-blue hover:bg-blue-600 text-white rounded-xl h-12 px-8 font-bold shadow-lg shadow-blue-600/30 hover:scale-105 transition-all duration-300 border-0 text-base">
