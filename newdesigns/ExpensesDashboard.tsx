@@ -3,7 +3,7 @@ import {
     Search, Filter, Download, Plus, MoreHorizontal,
     Briefcase, Building, Car, Coffee, FileText, Home,
     Receipt, TrendingUp,
-    Clock, PieChart
+    Clock, PieChart, AlertCircle, Loader2, Package
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -17,142 +17,81 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Skeleton } from "@/components/ui/skeleton"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { useExpenses, useExpenseStats } from '@/hooks/useFinance'
+
+// Helper function to get category icon
+const getCategoryIcon = (category: string) => {
+    const iconMap: Record<string, any> = {
+        'رسوم قانونية': Building,
+        'اشتراكات': FileText,
+        'استشارات': Briefcase,
+        'مواصلات': Car,
+        'ضيافة': Coffee,
+        'خدمات': FileText,
+        'إيجار': Home,
+    }
+    return iconMap[category] || FileText
+}
 
 export default function ExpensesDashboard() {
     const [activeTab, setActiveTab] = useState('all')
     const [searchQuery, setSearchQuery] = useState('')
 
-    // Mock Data
-    const expenses = [
-        {
-            id: 'EXP-2025-001',
-            description: 'استئجار قاعة المحكمة',
-            category: 'رسوم قانونية',
-            categoryIcon: Building,
-            amount: 5000,
-            date: '15 نوفمبر 2025',
-            caseNumber: '4772077905',
-            caseName: 'قضية مشاري الرابح',
-            paymentMethod: 'بطاقة ائتمان',
-            status: 'مدفوع',
-            statusColor: 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200',
-            hasReceipt: true,
-            vendor: 'وزارة العدل'
-        },
-        {
-            id: 'EXP-2025-002',
-            description: 'اشتراك المكتبة القانونية الرقمية',
-            category: 'اشتراكات',
-            categoryIcon: FileText,
-            amount: 2500,
-            date: '14 نوفمبر 2025',
-            caseNumber: null,
-            caseName: 'مصروف عام',
-            paymentMethod: 'تحويل بنكي',
-            status: 'مدفوع',
-            statusColor: 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200',
-            hasReceipt: true,
-            vendor: 'شركة المعلومات القانونية'
-        },
-        {
-            id: 'EXP-2025-003',
-            description: 'استشارة خبير مالي',
-            category: 'استشارات',
-            categoryIcon: Briefcase,
-            amount: 8000,
-            date: '12 نوفمبر 2025',
-            caseNumber: '4772088016',
-            caseName: 'قضية عبدالله الغامدي',
-            paymentMethod: 'نقدي',
-            status: 'مدفوع',
-            statusColor: 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200',
-            hasReceipt: true,
-            vendor: 'مكتب الخبراء الماليين'
-        },
-        {
-            id: 'EXP-2025-004',
-            description: 'وقود السيارة - زيارات العملاء',
-            category: 'مواصلات',
-            categoryIcon: Car,
-            amount: 450,
-            date: '10 نوفمبر 2025',
-            caseNumber: '4772099127',
-            caseName: 'قضية فاطمة العتيبي',
-            paymentMethod: 'نقدي',
-            status: 'مدفوع',
-            statusColor: 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200',
-            hasReceipt: true,
-            vendor: 'محطة الوقود'
-        },
-        {
-            id: 'EXP-2025-005',
-            description: 'اجتماع عمل مع العميل',
-            category: 'ضيافة',
-            categoryIcon: Coffee,
-            amount: 320,
-            date: '9 نوفمبر 2025',
-            caseNumber: '4772100238',
-            caseName: 'قضية خالد القحطاني',
-            paymentMethod: 'بطاقة ائتمان',
-            status: 'مدفوع',
-            statusColor: 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200',
-            hasReceipt: true,
-            vendor: 'مقهى النخيل'
-        },
-        {
-            id: 'EXP-2025-006',
-            description: 'رسوم ترجمة مستندات قانونية',
-            category: 'خدمات',
-            categoryIcon: FileText,
-            amount: 1500,
-            date: '8 نوفمبر 2025',
-            caseNumber: '4772111349',
-            caseName: 'قضية سارة المطيري',
-            paymentMethod: 'تحويل بنكي',
-            status: 'معلق',
-            statusColor: 'bg-amber-100 text-amber-700 hover:bg-amber-200',
-            hasReceipt: false,
-            vendor: 'مكتب الترجمة المعتمد'
-        },
-        {
-            id: 'EXP-2025-007',
-            description: 'إيجار المكتب - نوفمبر',
-            category: 'إيجار',
-            categoryIcon: Home,
-            amount: 15000,
-            date: '1 نوفمبر 2025',
-            caseNumber: null,
-            caseName: 'مصروف عام',
-            paymentMethod: 'تحويل بنكي',
-            status: 'مدفوع',
-            statusColor: 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200',
-            hasReceipt: true,
-            vendor: 'شركة العقارات'
+    // Fetch expenses and stats from API
+    const { data: expensesData, isLoading: isLoadingExpenses, error: expensesError } = useExpenses()
+    const { data: statsData, isLoading: isLoadingStats, error: statsError } = useExpenseStats()
+
+    // Extract data with fallbacks
+    const expenses = expensesData?.expenses || []
+    const stats = statsData || {}
+
+    // Helper to get status color
+    const getStatusColor = (status: string) => {
+        const colorMap: Record<string, string> = {
+            'مدفوع': 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200',
+            'paid': 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200',
+            'معلق': 'bg-amber-100 text-amber-700 hover:bg-amber-200',
+            'pending': 'bg-amber-100 text-amber-700 hover:bg-amber-200',
+            'approved': 'bg-blue-100 text-blue-700 hover:bg-blue-200',
+            'rejected': 'bg-red-100 text-red-700 hover:bg-red-200',
         }
-    ]
+        return colorMap[status] || 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+    }
 
     // Filter Logic
-    const filteredExpenses = expenses.filter(exp => {
+    const filteredExpenses = expenses.filter((exp: any) => {
+        // Search filter
+        if (searchQuery) {
+            const query = searchQuery.toLowerCase()
+            const matchesDescription = exp.description?.toLowerCase().includes(query)
+            const matchesVendor = exp.vendor?.toLowerCase().includes(query)
+            if (!matchesDescription && !matchesVendor) return false
+        }
+
+        // Tab filter
         if (activeTab === 'all') return true
-        if (activeTab === 'case') return exp.caseNumber !== null
-        if (activeTab === 'general') return exp.caseNumber === null
-        if (activeTab === 'pending') return exp.status === 'معلق'
-        if (searchQuery && !exp.description.includes(searchQuery) && !exp.vendor.includes(searchQuery)) return false
+        if (activeTab === 'case') return exp.caseId !== null && exp.caseId !== undefined
+        if (activeTab === 'general') return !exp.caseId
+        if (activeTab === 'pending') return exp.status === 'pending' || exp.status === 'معلق'
+
         return true
     })
 
     // Calculate statistics
-    const totalExpenses = expenses.reduce((sum, exp) => sum + exp.amount, 0)
-    const caseExpenses = expenses.filter(exp => exp.caseNumber !== null).reduce((sum, exp) => sum + exp.amount, 0)
-    const generalExpenses = expenses.filter(exp => exp.caseNumber === null).reduce((sum, exp) => sum + exp.amount, 0)
-    const pendingExpenses = expenses.filter(exp => exp.status === 'معلق').reduce((sum, exp) => sum + exp.amount, 0)
+    const totalExpenses = expenses.reduce((sum: number, exp: any) => sum + (exp.amount || 0), 0)
+    const caseExpenses = expenses.filter((exp: any) => exp.caseId).reduce((sum: number, exp: any) => sum + (exp.amount || 0), 0)
+    const generalExpenses = expenses.filter((exp: any) => !exp.caseId).reduce((sum: number, exp: any) => sum + (exp.amount || 0), 0)
+    const pendingExpenses = expenses.filter((exp: any) => exp.status === 'معلق' || exp.status === 'pending').reduce((sum: number, exp: any) => sum + (exp.amount || 0), 0)
 
-    const expensesByCategory = expenses.reduce((acc: any, exp) => {
-        if (!acc[exp.category]) {
-            acc[exp.category] = { total: 0, count: 0 };
+    const expensesByCategory = expenses.reduce((acc: any, exp: any) => {
+        const category = exp.category || 'غير مصنف'
+        if (!acc[category]) {
+            acc[category] = { total: 0, count: 0 };
         }
-        acc[exp.category].total += exp.amount;
-        acc[exp.category].count += 1;
+        acc[category].total += exp.amount || 0;
+        acc[category].count += 1;
         return acc;
     }, {});
 
@@ -163,6 +102,119 @@ export default function ExpensesDashboard() {
             currency: 'SAR',
             minimumFractionDigits: 0
         }).format(amount)
+    }
+
+    // Loading state
+    if (isLoadingExpenses || isLoadingStats) {
+        return (
+            <div className="min-h-screen bg-slate-50/50 font-['IBM_Plex_Sans_Arabic'] p-6" dir="rtl">
+                <div className="max-w-7xl mx-auto space-y-6">
+                    <Card className="border-none shadow-sm bg-white rounded-3xl p-8">
+                        <div className="space-y-4">
+                            <Skeleton className="h-8 w-64" />
+                            <Skeleton className="h-4 w-96" />
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
+                                <Skeleton className="h-24" />
+                                <Skeleton className="h-24" />
+                                <Skeleton className="h-24" />
+                            </div>
+                        </div>
+                    </Card>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <Skeleton className="h-32" />
+                        <Skeleton className="h-32" />
+                        <Skeleton className="h-32" />
+                    </div>
+                    <div className="space-y-4">
+                        <Skeleton className="h-48" />
+                        <Skeleton className="h-48" />
+                        <Skeleton className="h-48" />
+                    </div>
+                </div>
+            </div>
+        )
+    }
+
+    // Error state
+    if (expensesError || statsError) {
+        return (
+            <div className="min-h-screen bg-slate-50/50 font-['IBM_Plex_Sans_Arabic'] p-6" dir="rtl">
+                <div className="max-w-7xl mx-auto space-y-6">
+                    <Alert variant="destructive" className="rounded-2xl">
+                        <AlertCircle className="h-5 w-5" />
+                        <AlertTitle>حدث خطأ في تحميل البيانات</AlertTitle>
+                        <AlertDescription>
+                            {expensesError?.message || statsError?.message || 'لا يمكن الاتصال بالخادم. يرجى التحقق من اتصالك بالإنترنت أو المحاولة لاحقاً.'}
+                        </AlertDescription>
+                    </Alert>
+                    <Card className="border-none shadow-sm bg-white rounded-3xl p-12 text-center">
+                        <AlertCircle className="w-16 h-16 mx-auto text-red-500 mb-4" />
+                        <h3 className="text-xl font-bold text-navy mb-2">تعذر تحميل المصروفات</h3>
+                        <p className="text-slate-500 mb-6">حدث خطأ أثناء الاتصال بالخادم. قد يكون هذا بسبب:</p>
+                        <ul className="text-right text-slate-600 space-y-2 max-w-md mx-auto mb-6">
+                            <li>• مشكلة في الاتصال بالإنترنت</li>
+                            <li>• الخادم غير متاح حالياً</li>
+                            <li>• عدم وجود صلاحيات الوصول</li>
+                        </ul>
+                        <Button
+                            onClick={() => window.location.reload()}
+                            className="bg-navy hover:bg-navy/90 text-white rounded-xl"
+                        >
+                            إعادة المحاولة
+                        </Button>
+                    </Card>
+                </div>
+            </div>
+        )
+    }
+
+    // Empty state
+    if (expenses.length === 0) {
+        return (
+            <div className="min-h-screen bg-slate-50/50 font-['IBM_Plex_Sans_Arabic'] p-6" dir="rtl">
+                <div className="max-w-7xl mx-auto space-y-6">
+                    <div className="bg-navy rounded-3xl p-8 relative overflow-hidden text-white shadow-xl shadow-navy/20">
+                        <div className="absolute top-0 left-0 w-full h-full overflow-hidden z-0 pointer-events-none">
+                            <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-brand-blue/20 rounded-full blur-[100px]"></div>
+                            <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-emerald-500/10 rounded-full blur-[100px]"></div>
+                        </div>
+                        <div className="relative z-10">
+                            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+                                <div>
+                                    <div className="flex items-center gap-3 mb-3">
+                                        <Badge className="bg-white/10 hover:bg-white/20 text-white border-0 backdrop-blur-sm">
+                                            <Receipt className="w-3 h-3 ml-2" />
+                                            المصروفات
+                                        </Badge>
+                                    </div>
+                                    <h1 className="text-3xl md:text-4xl font-bold leading-tight mb-2">
+                                        إدارة المصروفات
+                                    </h1>
+                                    <p className="text-blue-200/80">تتبع النفقات، الفواتير، والميزانية العامة</p>
+                                </div>
+                                <Button className="bg-emerald-500 hover:bg-emerald-600 text-white border-0 shadow-lg shadow-emerald-500/20 rounded-xl">
+                                    <Plus className="w-4 h-4 ml-2" />
+                                    مصروف جديد
+                                </Button>
+                            </div>
+                        </div>
+                    </div>
+                    <Card className="border-none shadow-sm bg-white rounded-3xl p-12 text-center">
+                        <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-slate-100 flex items-center justify-center">
+                            <Package className="w-10 h-10 text-slate-400" />
+                        </div>
+                        <h3 className="text-2xl font-bold text-navy mb-2">لا توجد مصروفات بعد</h3>
+                        <p className="text-slate-500 mb-6 max-w-md mx-auto">
+                            ابدأ بإضافة مصروفاتك الأولى لتتبع نفقات مكتبك القانوني بشكل احترافي
+                        </p>
+                        <Button className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl shadow-lg shadow-emerald-500/20">
+                            <Plus className="w-4 h-4 ml-2" />
+                            إضافة مصروف جديد
+                        </Button>
+                    </Card>
+                </div>
+            </div>
+        )
     }
 
     return (
@@ -348,10 +400,17 @@ export default function ExpensesDashboard() {
 
                         {/* Expenses List - Vertical Stack Cards */}
                         <div className="space-y-4">
-                            {filteredExpenses.map((expense) => {
-                                const Icon = expense.categoryIcon
+                            {filteredExpenses.map((expense: any) => {
+                                const Icon = getCategoryIcon(expense.category)
+                                const statusColor = getStatusColor(expense.status)
+                                const formattedDate = expense.date ? new Date(expense.date).toLocaleDateString('ar-SA', {
+                                    year: 'numeric',
+                                    month: 'long',
+                                    day: 'numeric'
+                                }) : 'غير محدد'
+
                                 return (
-                                    <div key={expense.id} className="bg-[#F8F9FA] rounded-2xl p-6 border border-slate-100 hover:border-emerald-200 transition-all group">
+                                    <div key={expense._id || expense.id} className="bg-[#F8F9FA] rounded-2xl p-6 border border-slate-100 hover:border-emerald-200 transition-all group">
                                         <div className="flex justify-between items-start mb-4">
                                             <div className="flex gap-4 items-center">
                                                 <div className="w-12 h-12 rounded-xl bg-white flex items-center justify-center shadow-sm text-slate-600">
@@ -359,12 +418,14 @@ export default function ExpensesDashboard() {
                                                 </div>
                                                 <div>
                                                     <div className="flex items-center gap-2 mb-1">
-                                                        <h4 className="font-bold text-navy text-lg">{expense.description}</h4>
-                                                        <Badge className={`${expense.statusColor} border-0 px-2 rounded-md`}>
-                                                            {expense.status}
+                                                        <h4 className="font-bold text-navy text-lg">{expense.description || 'بدون وصف'}</h4>
+                                                        <Badge className={`${statusColor} border-0 px-2 rounded-md`}>
+                                                            {expense.status || 'غير محدد'}
                                                         </Badge>
                                                     </div>
-                                                    <p className="text-slate-500 text-sm">{expense.vendor} • {expense.category}</p>
+                                                    <p className="text-slate-500 text-sm">
+                                                        {expense.vendor || 'غير محدد'} • {expense.category || 'غير مصنف'}
+                                                    </p>
                                                 </div>
                                             </div>
                                             <DropdownMenu>
@@ -385,16 +446,18 @@ export default function ExpensesDashboard() {
                                             <div className="flex items-center gap-6">
                                                 <div className="text-center">
                                                     <div className="text-xs text-slate-400 mb-1">المبلغ</div>
-                                                    <div className="font-bold text-navy text-lg">{formatCurrency(expense.amount)}</div>
+                                                    <div className="font-bold text-navy text-lg">{formatCurrency(expense.amount || 0)}</div>
                                                 </div>
                                                 <div className="text-center">
                                                     <div className="text-xs text-slate-400 mb-1">التاريخ</div>
-                                                    <div className="font-bold text-navy">{expense.date}</div>
+                                                    <div className="font-bold text-navy">{formattedDate}</div>
                                                 </div>
-                                                {expense.caseName && (
+                                                {expense.caseId && (
                                                     <div className="text-center hidden sm:block">
                                                         <div className="text-xs text-slate-400 mb-1">القضية</div>
-                                                        <div className="font-bold text-navy text-sm">{expense.caseName}</div>
+                                                        <div className="font-bold text-navy text-sm">
+                                                            {typeof expense.caseId === 'object' ? expense.caseId.caseNumber : expense.caseId}
+                                                        </div>
                                                     </div>
                                                 )}
                                             </div>
