@@ -2,7 +2,7 @@ import { useState } from 'react'
 import {
     FileText, Calendar, Clock, Plus, Upload,
     User, Scale,
-    ArrowLeft, Gavel, Shield,
+    ArrowLeft, Gavel, Shield, MoreHorizontal,
     AlertTriangle, Download, Eye, History, Share2
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'

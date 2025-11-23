@@ -2,15 +2,16 @@ import { useState } from 'react'
 import {
     Calendar, MoreHorizontal, Plus, Upload,
     User, ArrowLeft, Briefcase,
-    History, Link as LinkIcon, Flag, Send, Eye, Download, Search, Bell
+    History, Link as LinkIcon, Flag, Send, Eye, Download, Search, Bell, CheckSquare
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 import { Progress } from '@/components/ui/progress'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { Avatar, AvatarFallback } from '@/components/ui/avatar'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { Textarea } from '@/components/ui/textarea'
 import {
     DropdownMenu,
     DropdownMenuContent,

@@ -1,10 +1,11 @@
 import {
     ArrowLeft, Search, Bell,
-    Receipt
+    Receipt, User, Calendar, Download, History as HistoryIcon
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { ScrollArea } from '@/components/ui/scroll-area'
 import { Link } from '@tanstack/react-router'
 import { Header } from '@/components/layout/header'
 import { TopNav } from '@/components/layout/top-nav'
@@ -150,7 +151,7 @@ export function ExpenseDetailsView() {
                             <Card className="border border-slate-100 shadow-sm rounded-2xl overflow-hidden">
                                 <CardHeader className="bg-white border-b border-slate-50 pb-4">
                                     <CardTitle className="text-lg font-bold text-navy flex items-center gap-2">
-                                        <History className="h-5 w-5 text-brand-blue" />
+                                        <HistoryIcon className="h-5 w-5 text-brand-blue" />
                                         سجل النشاط
                                     </CardTitle>
                                 </CardHeader>
