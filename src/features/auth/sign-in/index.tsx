@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
+import { useNavigate } from '@tanstack/react-router';
 
 // ============================================
 // SVG ICONS
@@ -188,6 +189,8 @@ function OTPInput({ value, onChange, error, disabled }: { value: string; onChang
 // MAIN COMPONENT
 // ============================================
 export function SignIn() {
+  const navigate = useNavigate();
+
   // Steps: 'login' | 'otp' | 'success'
   const [step, setStep] = useState('login');
   const [showPassword, setShowPassword] = useState(false);
@@ -356,7 +359,7 @@ export function SignIn() {
               </p>
 
               <button
-                onClick={() => window.location.href = '/dashboard'}
+                onClick={() => navigate({ to: '/' })}
                 className="w-full py-4 rounded-xl bg-emerald-500 text-white font-bold hover:bg-emerald-600 transition-all shadow-lg shadow-emerald-500/20"
               >
                 الدخول إلى لوحة التحكم
