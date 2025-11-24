@@ -130,7 +130,7 @@ function OTPInput({ value, onChange, error, disabled }: { value: string; onChang
       {[0, 1, 2].map((index) => (
         <input
           key={index}
-          ref={(el) => (inputRefs.current[index] = el)}
+          ref={(el) => { inputRefs.current[index] = el; }}
           type="text"
           inputMode="numeric"
           maxLength={1}
@@ -158,7 +158,7 @@ function OTPInput({ value, onChange, error, disabled }: { value: string; onChang
       {[3, 4, 5].map((index) => (
         <input
           key={index}
-          ref={(el) => (inputRefs.current[index] = el)}
+          ref={(el) => { inputRefs.current[index] = el; }}
           type="text"
           inputMode="numeric"
           maxLength={1}
