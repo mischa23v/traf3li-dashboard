@@ -191,7 +191,7 @@ function OTPInput({ value, onChange, error, disabled }: { value: string; onChang
 export function SignIn() {
   const navigate = useNavigate();
 
-  // Steps: 'login' | 'otp' | 'success'
+  // Steps: 'login' | 'otp'
   const [step, setStep] = useState('login');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -305,7 +305,8 @@ export function SignIn() {
 
       // TEST: "123456" is the correct OTP
       if (otp === '123456') {
-        setStep('success');
+        // Navigate directly to dashboard after OTP verification
+        navigate({ to: '/' });
       } else {
         setOtpError('رمز التحقق غير صحيح');
         setTimeout(() => setOtp(''), 500);
@@ -339,44 +340,6 @@ export function SignIn() {
     setOtp('');
     setOtpError('');
   };
-
-  // ============================================
-  // SUCCESS STATE
-  // ============================================
-  if (step === 'success') {
-    return (
-      <div className="min-h-screen bg-[#F8F9FA]" dir="rtl" style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}>
-        <div className="min-h-screen flex items-center justify-center p-6">
-          <div className="w-full max-w-md text-center">
-            <div className="bg-white rounded-3xl shadow-sm border border-slate-100 p-10">
-              <div className="inline-flex items-center justify-center text-emerald-500 mb-6 animate-scaleIn">
-                <Icons.CheckCircle />
-              </div>
-
-              <h1 className="text-2xl font-bold text-[#0f172a] mb-3">تم تسجيل الدخول بنجاح</h1>
-              <p className="text-slate-500 mb-8">
-                مرحباً بك، {userData?.name}
-              </p>
-
-              <button
-                onClick={() => navigate({ to: '/' })}
-                className="w-full py-4 rounded-xl bg-emerald-500 text-white font-bold hover:bg-emerald-600 transition-all shadow-lg shadow-emerald-500/20"
-              >
-                الدخول إلى لوحة التحكم
-              </button>
-            </div>
-          </div>
-        </div>
-        <style>{`
-          @keyframes scaleIn {
-            from { opacity: 0; transform: scale(0.5); }
-            to { opacity: 1; transform: scale(1); }
-          }
-          .animate-scaleIn { animation: scaleIn 0.5s ease-out forwards; }
-        `}</style>
-      </div>
-    );
-  }
 
   // ============================================
   // OTP STEP
