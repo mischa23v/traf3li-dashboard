@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from '@tanstack/react-router';
+import { useAuthStore } from '@/stores/auth-store';
 
 // ============================================
 // SVG ICONS
@@ -305,6 +306,21 @@ export function SignIn() {
 
       // TEST: "123456" is the correct OTP
       if (otp === '123456') {
+        // Set user as authenticated in the store
+        const mockUser = {
+          _id: 'test-user-id',
+          username: 'test',
+          email: 'test@example.com',
+          role: 'admin' as const,
+          country: 'SA',
+          phone: '+966500000000',
+          isSeller: false,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        };
+
+        useAuthStore.getState().setUser(mockUser);
+
         // Navigate directly to dashboard after OTP verification
         navigate({ to: '/' });
       } else {
