@@ -116,7 +116,7 @@ const authService = {
 
       // Production login flow
       const response = await apiClient.post<AuthResponse>(
-        '/api/auth/login',
+        '/auth/login',
         credentials
       )
 
@@ -142,7 +142,7 @@ const authService = {
   register: async (data: RegisterData): Promise<void> => {
     try {
       const response = await apiClient.post<AuthResponse>(
-        '/api/auth/register',
+        '/auth/register',
         data
       )
 
@@ -161,7 +161,7 @@ const authService = {
    */
   logout: async (): Promise<void> => {
     try {
-      await apiClient.post('/api/auth/logout')
+      await apiClient.post('/auth/logout')
       localStorage.removeItem('user')
     } catch (error: any) {
       console.error('Logout error:', error)
@@ -176,7 +176,7 @@ const authService = {
    */
   getCurrentUser: async (): Promise<User | null> => {
     try {
-      const response = await apiClient.get<AuthResponse>('/api/auth/me')
+      const response = await apiClient.get<AuthResponse>('/auth/me')
 
       if (response.data.error || !response.data.user) {
         return null

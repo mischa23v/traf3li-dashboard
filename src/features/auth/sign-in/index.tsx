@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { useNavigate } from '@tanstack/react-router';
+import { useNavigate, Link } from '@tanstack/react-router';
 import { useAuthStore } from '@/stores/auth-store';
 
 // ============================================
@@ -603,11 +603,11 @@ export function SignIn() {
             <div className="px-6 py-4 bg-slate-50 border-t border-slate-100">
               <p className="text-center text-sm text-slate-500">
                 بتسجيل الدخول، أنت توافق على{' '}
-                <a href="/terms" className="text-emerald-600 hover:text-emerald-700 font-medium">
+                <a href="#" className="text-emerald-600 hover:text-emerald-700 font-medium">
                   الشروط والأحكام
                 </a>{' '}
                 و{' '}
-                <a href="/privacy" className="text-emerald-600 hover:text-emerald-700 font-medium">
+                <a href="#" className="text-emerald-600 hover:text-emerald-700 font-medium">
                   سياسة الخصوصية
                 </a>
               </p>
@@ -617,9 +617,9 @@ export function SignIn() {
           {/* Sign Up Link */}
           <p className="text-center text-slate-500 mt-6">
             ليس لديك حساب؟{' '}
-            <a href="/sign-up" className="text-emerald-600 hover:text-emerald-700 font-bold">
+            <Link to="/sign-up" className="text-emerald-600 hover:text-emerald-700 font-bold">
               إنشاء حساب جديد
-            </a>
+            </Link>
           </p>
         </div>
       </div>
