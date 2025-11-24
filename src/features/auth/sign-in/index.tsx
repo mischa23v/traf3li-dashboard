@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { useNavigate, Link } from '@tanstack/react-router';
+import { useNavigate, Link, useSearch } from '@tanstack/react-router';
 import { useAuthStore } from '@/stores/auth-store';
 
 // ============================================
@@ -187,6 +187,7 @@ function OTPInput({ value, onChange, error, disabled }: { value: string; onChang
 export function SignIn() {
   const navigate = useNavigate();
   const { login } = useAuthStore();
+  const search = useSearch({ from: '/(auth)/sign-in' });
 
   // Steps: 'login' | 'otp'
   const [step, setStep] = useState('login');
@@ -307,8 +308,9 @@ export function SignIn() {
           username: formData.usernameOrEmail,
           password: formData.password,
         });
-        // Navigate directly to dashboard
-        navigate({ to: '/' });
+        // Navigate to redirect URL or dashboard
+        const redirectTo = search.redirect || '/';
+        navigate({ to: redirectTo });
       } else {
         setOtpError('رمز التحقق غير صحيح');
         setTimeout(() => setOtp(''), 500);
