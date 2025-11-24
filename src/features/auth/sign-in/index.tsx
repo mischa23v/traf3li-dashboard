@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
-import { useNavigate } from '@tanstack/react-router';
+import { useNavigate, Link, useSearch } from '@tanstack/react-router';
+import { useAuthStore } from '@/stores/auth-store';
 
 // ============================================
 // SVG ICONS
@@ -48,11 +49,6 @@ const Icons = {
     <svg className="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-    </svg>
-  ),
-  CheckCircle: () => (
-    <svg className="w-20 h-20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
     </svg>
   ),
   XCircle: () => (
@@ -190,8 +186,10 @@ function OTPInput({ value, onChange, error, disabled }: { value: string; onChang
 // ============================================
 export function SignIn() {
   const navigate = useNavigate();
+  const { login } = useAuthStore();
+  const search = useSearch({ from: '/(auth)/sign-in' });
 
-  // Steps: 'login' | 'otp' | 'success'
+  // Steps: 'login' | 'otp'
   const [step, setStep] = useState('login');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -305,7 +303,14 @@ export function SignIn() {
 
       // TEST: "123456" is the correct OTP
       if (otp === '123456') {
-        setStep('success');
+        // Authenticate user with the auth store
+        await login({
+          username: formData.usernameOrEmail,
+          password: formData.password,
+        });
+        // Navigate to redirect URL or dashboard
+        const redirectTo = search.redirect || '/';
+        navigate({ to: redirectTo });
       } else {
         setOtpError('رمز التحقق غير صحيح');
         setTimeout(() => setOtp(''), 500);
@@ -339,44 +344,6 @@ export function SignIn() {
     setOtp('');
     setOtpError('');
   };
-
-  // ============================================
-  // SUCCESS STATE
-  // ============================================
-  if (step === 'success') {
-    return (
-      <div className="min-h-screen bg-[#F8F9FA]" dir="rtl" style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}>
-        <div className="min-h-screen flex items-center justify-center p-6">
-          <div className="w-full max-w-md text-center">
-            <div className="bg-white rounded-3xl shadow-sm border border-slate-100 p-10">
-              <div className="inline-flex items-center justify-center text-emerald-500 mb-6 animate-scaleIn">
-                <Icons.CheckCircle />
-              </div>
-
-              <h1 className="text-2xl font-bold text-[#0f172a] mb-3">تم تسجيل الدخول بنجاح</h1>
-              <p className="text-slate-500 mb-8">
-                مرحباً بك، {userData?.name}
-              </p>
-
-              <button
-                onClick={() => navigate({ to: '/' })}
-                className="w-full py-4 rounded-xl bg-emerald-500 text-white font-bold hover:bg-emerald-600 transition-all shadow-lg shadow-emerald-500/20"
-              >
-                الدخول إلى لوحة التحكم
-              </button>
-            </div>
-          </div>
-        </div>
-        <style>{`
-          @keyframes scaleIn {
-            from { opacity: 0; transform: scale(0.5); }
-            to { opacity: 1; transform: scale(1); }
-          }
-          .animate-scaleIn { animation: scaleIn 0.5s ease-out forwards; }
-        `}</style>
-      </div>
-    );
-  }
 
   // ============================================
   // OTP STEP
@@ -638,11 +605,11 @@ export function SignIn() {
             <div className="px-6 py-4 bg-slate-50 border-t border-slate-100">
               <p className="text-center text-sm text-slate-500">
                 بتسجيل الدخول، أنت توافق على{' '}
-                <a href="/terms" className="text-emerald-600 hover:text-emerald-700 font-medium">
+                <a href="#" className="text-emerald-600 hover:text-emerald-700 font-medium">
                   الشروط والأحكام
                 </a>{' '}
                 و{' '}
-                <a href="/privacy" className="text-emerald-600 hover:text-emerald-700 font-medium">
+                <a href="#" className="text-emerald-600 hover:text-emerald-700 font-medium">
                   سياسة الخصوصية
                 </a>
               </p>
@@ -652,9 +619,9 @@ export function SignIn() {
           {/* Sign Up Link */}
           <p className="text-center text-slate-500 mt-6">
             ليس لديك حساب؟{' '}
-            <a href="/sign-up" className="text-emerald-600 hover:text-emerald-700 font-bold">
+            <Link to="/sign-up" className="text-emerald-600 hover:text-emerald-700 font-bold">
               إنشاء حساب جديد
-            </a>
+            </Link>
           </p>
         </div>
       </div>
