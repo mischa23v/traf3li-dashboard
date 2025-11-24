@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from '@tanstack/react-router';
 
 // ============================================
 // SVG ICONS
@@ -158,6 +159,7 @@ const CASE_RANGES = ['1-10', '11-30', '31-50', '51-100', '+100'];
 // MAIN COMPONENT
 // ============================================
 export function SignUp() {
+  const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(0);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -335,10 +337,10 @@ export function SignUp() {
               </div>
 
               <button
-                onClick={() => window.location.reload()}
+                onClick={() => navigate({ to: '/sign-in' })}
                 className="w-full py-4 rounded-xl bg-emerald-500 text-white font-bold hover:bg-emerald-600 transition-all shadow-lg shadow-emerald-500/20"
               >
-                الدخول إلى لوحة التحكم
+                تسجيل الدخول
               </button>
 
               <p className="text-sm text-slate-400 mt-4">
