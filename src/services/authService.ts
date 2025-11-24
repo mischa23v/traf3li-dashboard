@@ -97,24 +97,10 @@ const authService = {
   /**
    * Login user
    * Backend sets HttpOnly cookie automatically
-   *
-   * DEVELOPMENT: Supports test credentials (test/test123)
    */
   login: async (credentials: LoginCredentials): Promise<User> => {
     try {
-      // DEVELOPMENT ONLY: Check for test credentials
-      const isTestCredentials =
-        (credentials.username === TEST_CREDENTIALS.username ||
-          credentials.username === TEST_CREDENTIALS.email) &&
-        credentials.password === TEST_CREDENTIALS.password
-
-      if (isTestCredentials) {
-        console.log('🧪 Using test credentials - Development mode')
-        localStorage.setItem('user', JSON.stringify(TEST_USER))
-        return TEST_USER
-      }
-
-      // Production login flow
+      // Call backend login API
       const response = await apiClient.post<AuthResponse>(
         '/auth/login',
         credentials

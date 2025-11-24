@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState } from 'react';
 import { useNavigate, Link, useSearch } from '@tanstack/react-router';
 import { useAuthStore } from '@/stores/auth-store';
 
@@ -32,11 +32,6 @@ const Icons = {
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
     </svg>
   ),
-  Phone: () => (
-    <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
-    </svg>
-  ),
   Google: () => (
     <svg className="w-5 h-5" viewBox="0 0 24 24">
       <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -56,130 +51,7 @@ const Icons = {
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
     </svg>
   ),
-  ChevronRight: () => (
-    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-    </svg>
-  ),
 };
-
-// ============================================
-// OTP INPUT COMPONENT
-// ============================================
-function OTPInput({ value, onChange, error, disabled }: { value: string; onChange: (val: string) => void; error: boolean; disabled: boolean }) {
-  const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
-  const [focusedIndex, setFocusedIndex] = useState(-1);
-
-  useEffect(() => {
-    if (inputRefs.current[0]) {
-      inputRefs.current[0].focus();
-    }
-  }, []);
-
-  const handleChange = (index: number, e: React.ChangeEvent<HTMLInputElement>) => {
-    const val = e.target.value;
-    if (val && !/^\d$/.test(val)) return;
-
-    const newValue = value.split('');
-    newValue[index] = val;
-    const newOtp = newValue.join('').slice(0, 6);
-    onChange(newOtp);
-
-    if (val && index < 5) {
-      inputRefs.current[index + 1]?.focus();
-    }
-  };
-
-  const handleKeyDown = (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Backspace') {
-      if (!value[index] && index > 0) {
-        inputRefs.current[index - 1]?.focus();
-        const newValue = value.split('');
-        newValue[index - 1] = '';
-        onChange(newValue.join(''));
-      } else {
-        const newValue = value.split('');
-        newValue[index] = '';
-        onChange(newValue.join(''));
-      }
-    } else if (e.key === 'ArrowLeft' && index > 0) {
-      inputRefs.current[index - 1]?.focus();
-    } else if (e.key === 'ArrowRight' && index < 5) {
-      inputRefs.current[index + 1]?.focus();
-    }
-  };
-
-  const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
-    e.preventDefault();
-    const pastedData = e.clipboardData.getData('text').replace(/\D/g, '').slice(0, 6);
-    onChange(pastedData);
-    const nextIndex = Math.min(pastedData.length, 5);
-    inputRefs.current[nextIndex]?.focus();
-  };
-
-  const handleFocus = (index: number) => {
-    setFocusedIndex(index);
-    inputRefs.current[index]?.select();
-  };
-
-  return (
-    <div className="flex items-center justify-center gap-2 sm:gap-3" dir="ltr">
-      {[0, 1, 2].map((index) => (
-        <input
-          key={index}
-          ref={(el) => { inputRefs.current[index] = el; }}
-          type="text"
-          inputMode="numeric"
-          maxLength={1}
-          value={value[index] || ''}
-          onChange={(e) => handleChange(index, e)}
-          onKeyDown={(e) => handleKeyDown(index, e)}
-          onPaste={handlePaste}
-          onFocus={() => handleFocus(index)}
-          onBlur={() => setFocusedIndex(-1)}
-          disabled={disabled}
-          className={`w-12 h-14 sm:w-14 sm:h-16 text-center text-2xl font-bold rounded-xl border-2 bg-slate-50 outline-none transition-all ${
-            error
-              ? 'border-red-400 bg-red-50 text-red-600'
-              : focusedIndex === index
-                ? 'border-[#0f172a] bg-white'
-                : value[index]
-                  ? 'border-emerald-400 bg-emerald-50 text-emerald-700'
-                  : 'border-slate-200'
-          } ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
-        />
-      ))}
-
-      <div className="w-3 h-1 bg-slate-300 rounded-full mx-1"></div>
-
-      {[3, 4, 5].map((index) => (
-        <input
-          key={index}
-          ref={(el) => { inputRefs.current[index] = el; }}
-          type="text"
-          inputMode="numeric"
-          maxLength={1}
-          value={value[index] || ''}
-          onChange={(e) => handleChange(index, e)}
-          onKeyDown={(e) => handleKeyDown(index, e)}
-          onPaste={handlePaste}
-          onFocus={() => handleFocus(index)}
-          onBlur={() => setFocusedIndex(-1)}
-          disabled={disabled}
-          className={`w-12 h-14 sm:w-14 sm:h-16 text-center text-2xl font-bold rounded-xl border-2 bg-slate-50 outline-none transition-all ${
-            error
-              ? 'border-red-400 bg-red-50 text-red-600'
-              : focusedIndex === index
-                ? 'border-[#0f172a] bg-white'
-                : value[index]
-                  ? 'border-emerald-400 bg-emerald-50 text-emerald-700'
-                  : 'border-slate-200'
-          } ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
-        />
-      ))}
-    </div>
-  );
-}
 
 // ============================================
 // MAIN COMPONENT
@@ -189,8 +61,6 @@ export function SignIn() {
   const { login } = useAuthStore();
   const search = useSearch({ from: '/(auth)/sign-in' });
 
-  // Steps: 'login' | 'otp'
-  const [step, setStep] = useState('login');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -201,25 +71,6 @@ export function SignIn() {
     usernameOrEmail: '',
     password: '',
   });
-
-  // OTP data
-  const [otp, setOtp] = useState('');
-  const [otpError, setOtpError] = useState('');
-  const [resendTimer, setResendTimer] = useState(60);
-  const [canResend, setCanResend] = useState(false);
-
-  // User data after login (for display)
-  const [userData, setUserData] = useState<{ name: string; phone: string; email: string } | null>(null);
-
-  // Countdown timer for resend
-  useEffect(() => {
-    if (step === 'otp' && resendTimer > 0 && !canResend) {
-      const timer = setTimeout(() => setResendTimer(resendTimer - 1), 1000);
-      return () => clearTimeout(timer);
-    } else if (resendTimer === 0) {
-      setCanResend(true);
-    }
-  }, [resendTimer, canResend, step]);
 
   const updateField = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -259,78 +110,20 @@ export function SignIn() {
     setApiError('');
 
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      // Call backend auth service
+      await login({
+        username: formData.usernameOrEmail,
+        password: formData.password,
+      });
 
-      // TEST CREDENTIALS: test / test123 OR test@example.com / test123
-      const validUsername = formData.usernameOrEmail === 'test' || formData.usernameOrEmail === 'test@example.com';
-      const validPassword = formData.password === 'test123';
-
-      if (validUsername && validPassword) {
-        // Success - move to OTP step
-        setUserData({
-          name: 'محمد أحمد',
-          phone: '05XXXXXXXX',
-          email: 'test@example.com'
-        });
-        setStep('otp');
-        setResendTimer(60);
-        setCanResend(false);
-      } else {
-        setApiError('اسم المستخدم أو كلمة المرور غير صحيحة');
-      }
-    } catch (error) {
-      setApiError('حدث خطأ، يرجى المحاولة مرة أخرى');
+      // Navigate to redirect URL or dashboard
+      const redirectTo = search.redirect || '/';
+      navigate({ to: redirectTo });
+    } catch (err: any) {
+      setApiError(err.message || 'حدث خطأ، يرجى المحاولة مرة أخرى');
     } finally {
       setIsLoading(false);
     }
-  };
-
-  // Handle OTP Submit
-  const handleOtpSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (otp.length !== 6) {
-      setOtpError('يرجى إدخال رمز التحقق المكون من 6 أرقام');
-      return;
-    }
-
-    setIsLoading(true);
-    setOtpError('');
-
-    try {
-      await new Promise(resolve => setTimeout(resolve, 1500));
-
-      // TEST: "123456" is the correct OTP
-      if (otp === '123456') {
-        // Authenticate user with the auth store
-        await login({
-          username: formData.usernameOrEmail,
-          password: formData.password,
-        });
-        // Navigate to redirect URL or dashboard
-        const redirectTo = search.redirect || '/';
-        navigate({ to: redirectTo });
-      } else {
-        setOtpError('رمز التحقق غير صحيح');
-        setTimeout(() => setOtp(''), 500);
-      }
-    } catch (err) {
-      setOtpError('حدث خطأ، يرجى المحاولة مرة أخرى');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  // Handle Resend OTP
-  const handleResend = async () => {
-    if (!canResend) return;
-
-    setCanResend(false);
-    setResendTimer(60);
-    setOtp('');
-    setOtpError('');
-    console.log('Resending OTP...');
   };
 
   // Handle Google Login
@@ -338,137 +131,6 @@ export function SignIn() {
     console.log('Google login clicked');
   };
 
-  // Go back to login
-  const handleBackToLogin = () => {
-    setStep('login');
-    setOtp('');
-    setOtpError('');
-  };
-
-  // ============================================
-  // OTP STEP
-  // ============================================
-  if (step === 'otp') {
-    return (
-      <div className="min-h-screen bg-[#F8F9FA]" dir="rtl" style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}>
-        <div className="min-h-screen flex items-center justify-center p-6">
-          <div className="w-full max-w-md">
-            {/* Header */}
-            <div className="text-center mb-8">
-              <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-[#0f172a] text-emerald-400 mb-6 shadow-xl">
-                <Icons.Scale />
-              </div>
-              <h1 className="text-3xl font-bold text-[#0f172a] mb-2">التحقق من الهوية</h1>
-              <p className="text-slate-500 text-lg">أدخل رمز التحقق للمتابعة</p>
-            </div>
-
-            {/* Card */}
-            <div className="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden">
-              <div className="p-6 pb-4">
-                {/* Icon */}
-                <div className="flex justify-center mb-4">
-                  <div className="w-16 h-16 rounded-2xl bg-emerald-50 flex items-center justify-center text-emerald-500">
-                    <Icons.Phone />
-                  </div>
-                </div>
-
-                {/* Info Text */}
-                <div className="text-center mb-4">
-                  <p className="text-slate-600 mb-1">
-                    تم إرسال رمز التحقق إلى رقم الجوال
-                  </p>
-                  <p className="font-bold text-[#0f172a]" dir="ltr">
-                    {userData?.phone}
-                  </p>
-                </div>
-              </div>
-
-              <form onSubmit={handleOtpSubmit} className="px-6 pb-6 space-y-5">
-                {/* OTP Input */}
-                <div>
-                  <label className="block text-sm font-medium text-[#0f172a] mb-3 text-center">
-                    رمز التحقق <span className="text-red-500">*</span>
-                  </label>
-                  <OTPInput
-                    value={otp}
-                    onChange={(val) => { setOtp(val); if (otpError) setOtpError(''); }}
-                    error={!!otpError}
-                    disabled={isLoading}
-                  />
-                  {otpError && (
-                    <div className="flex items-center justify-center gap-2 mt-3 text-red-500 text-sm animate-shake">
-                      <Icons.XCircle />
-                      <span>{otpError}</span>
-                    </div>
-                  )}
-                </div>
-
-                {/* Submit Button */}
-                <button
-                  type="submit"
-                  disabled={otp.length !== 6 || isLoading}
-                  className="w-full h-12 rounded-xl bg-emerald-500 text-white font-bold hover:bg-emerald-600 transition-all shadow-lg shadow-emerald-500/20 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                >
-                  {isLoading ? (
-                    <>
-                      <Icons.Spinner />
-                      جارٍ التحقق...
-                    </>
-                  ) : (
-                    'تأكيد'
-                  )}
-                </button>
-
-                {/* Resend */}
-                <div className="text-center">
-                  {canResend ? (
-                    <button
-                      type="button"
-                      onClick={handleResend}
-                      className="text-emerald-600 hover:text-emerald-700 font-medium text-sm"
-                    >
-                      إعادة إرسال الرمز
-                    </button>
-                  ) : (
-                    <p className="text-slate-500 text-sm">
-                      إعادة الإرسال بعد{' '}
-                      <span className="font-bold text-[#0f172a]">{resendTimer}</span>{' '}
-                      ثانية
-                    </p>
-                  )}
-                </div>
-              </form>
-
-              {/* Footer - Back Button */}
-              <div className="px-6 py-4 bg-slate-50 border-t border-slate-100">
-                <button
-                  type="button"
-                  onClick={handleBackToLogin}
-                  className="w-full flex items-center justify-center gap-2 text-slate-600 hover:text-[#0f172a] font-medium text-sm"
-                >
-                  <Icons.ChevronRight />
-                  العودة لتسجيل الدخول
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <style>{`
-          @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
-            20%, 40%, 60%, 80% { transform: translateX(5px); }
-          }
-          .animate-shake { animation: shake 0.5s ease-in-out; }
-        `}</style>
-      </div>
-    );
-  }
-
-  // ============================================
-  // LOGIN STEP
-  // ============================================
   return (
     <div className="min-h-screen bg-[#F8F9FA]" dir="rtl" style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}>
       <div className="min-h-screen flex items-center justify-center p-6">
@@ -512,6 +174,7 @@ export function SignIn() {
                     }`}
                     placeholder="أدخل اسم المستخدم أو البريد الإلكتروني"
                     dir="auto"
+                    autoComplete="username"
                     disabled={isLoading}
                   />
                 </div>
@@ -547,6 +210,7 @@ export function SignIn() {
                     placeholder="أدخل كلمة المرور"
                     dir="ltr"
                     style={{ textAlign: 'left' }}
+                    autoComplete="current-password"
                     disabled={isLoading}
                   />
                   <button
