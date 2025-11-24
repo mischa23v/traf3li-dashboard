@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from '@tanstack/react-router';
+import { useAuthStore } from '@/stores/auth-store';
 
 // ============================================
 // SVG ICONS
@@ -190,6 +191,7 @@ function OTPInput({ value, onChange, error, disabled }: { value: string; onChang
 // ============================================
 export function SignIn() {
   const navigate = useNavigate();
+  const { login } = useAuthStore();
 
   // Steps: 'login' | 'otp' | 'success'
   const [step, setStep] = useState('login');
@@ -305,6 +307,11 @@ export function SignIn() {
 
       // TEST: "123456" is the correct OTP
       if (otp === '123456') {
+        // Authenticate user with the auth store
+        await login({
+          username: formData.usernameOrEmail,
+          password: formData.password,
+        });
         setStep('success');
       } else {
         setOtpError('رمز التحقق غير صحيح');
