@@ -116,16 +116,19 @@ export function SignUpForm() {
       else if (formData.username.length < 3) newErrors.username = 'يجب أن لا يقل عن 3 أحرف';
       if (!formData.email.trim()) newErrors.email = 'الحقل مطلوب';
       else if (!validateEmail(formData.email)) newErrors.email = 'البريد الإلكتروني غير صحيح';
+      // Phone validation for client and dashboard lawyer (moved from step 2)
+      if (formData.userType === 'client' || formData.lawyerMode === 'dashboard') {
+        if (!formData.phone) newErrors.phone = 'الحقل مطلوب';
+        else if (!validatePhone(formData.phone)) newErrors.phone = 'رقم الجوال غير صحيح';
+      }
     }
     
-    // Step 2 - Password + Phone + Location (Client & Dashboard Lawyer)
+    // Step 2 - Password + Location (Client & Dashboard Lawyer) - Phone moved to step 1
     if (step === 2 && (formData.userType === 'client' || formData.lawyerMode === 'dashboard')) {
       if (!formData.password) newErrors.password = 'الحقل مطلوب';
       else if (formData.password.length < 8) newErrors.password = 'يجب أن تكون مكونة من 8 خانات على الأقل';
       if (!formData.confirmPassword) newErrors.confirmPassword = 'الحقل مطلوب';
       else if (formData.password !== formData.confirmPassword) newErrors.confirmPassword = 'كلمة المرور غير متطابقة';
-      if (!formData.phone) newErrors.phone = 'الحقل مطلوب';
-      else if (!validatePhone(formData.phone)) newErrors.phone = 'رقم الجوال غير صحيح';
       if (!formData.nationality) newErrors.nationality = 'الحقل مطلوب';
       if (!formData.region) newErrors.region = 'الحقل مطلوب';
       if (!formData.city.trim()) newErrors.city = 'الحقل مطلوب';
@@ -294,7 +297,7 @@ export function SignUpForm() {
         <div className="min-h-screen flex items-center justify-center p-6">
           <div className="w-full max-w-xl">
             <div className="text-center mb-8">
-              <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-[#0f172a] text-emerald-400 mb-6 shadow-xl"><Icons.Scale /></div>
+              <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-[#F8F9FA] text-[#0f172a] mb-6"><Icons.Scale /></div>
               <h1 className="text-3xl font-bold text-[#0f172a] mb-2">إنشاء حساب جديد</h1>
               <p className="text-slate-500 text-lg">اختر نوع الحساب</p>
             </div>
@@ -340,16 +343,16 @@ export function SignUpForm() {
   const getStepInfo = () => {
     if (formData.userType === 'client') {
       const steps = [
-        { title: 'البيانات الأساسية', icon: <Icons.User /> },
+        { title: 'البيانات الأساسية والجوال', icon: <Icons.User /> },
         { title: 'كلمة المرور والموقع', icon: <Icons.Lock /> },
         { title: 'الإقرارات والموافقات', icon: <Icons.Shield /> }
       ];
       return steps[currentStep - 1] || steps[0];
     }
-    
+
     if (formData.lawyerMode === 'dashboard') {
       const steps = [
-        { title: 'البيانات الأساسية', icon: <Icons.User /> },
+        { title: 'البيانات الأساسية والجوال', icon: <Icons.User /> },
         { title: 'كلمة المرور والموقع', icon: <Icons.Lock /> },
         { title: 'الإقرارات والموافقات', icon: <Icons.Shield /> }
       ];
@@ -377,7 +380,7 @@ export function SignUpForm() {
       <div className="min-h-screen flex items-center justify-center p-6">
         <div className="w-full max-w-xl">
           <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-[#0f172a] text-emerald-400 mb-6 shadow-xl"><Icons.Scale /></div>
+            <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-[#F8F9FA] text-[#0f172a] mb-6"><Icons.Scale /></div>
             <h1 className="text-3xl font-bold text-[#0f172a] mb-2">إنشاء حساب جديد</h1>
             <p className="text-slate-500">الخطوة {currentStep} من {totalSteps}</p>
           </div>
@@ -424,10 +427,21 @@ export function SignUpForm() {
                     </div>
                     {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
                   </div>
+                  {/* Phone field for client and dashboard lawyer (moved from step 2) */}
+                  {(formData.userType === 'client' || formData.lawyerMode === 'dashboard') && (
+                    <div>
+                      <label className="block text-sm font-medium text-[#0f172a] mb-2">رقم الجوال <span className="text-red-500">*</span></label>
+                      <div className="relative">
+                        <div className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400"><Icons.Phone /></div>
+                        <input type="tel" value={formData.phone} onChange={(e) => updateField('phone', e.target.value.replace(/\D/g, '').slice(0, 10))} className={`w-full h-12 pr-12 pl-4 rounded-xl border bg-slate-50 text-[#0f172a] outline-none transition-all ${errors.phone ? 'border-red-400' : 'border-slate-200 focus:border-[#0f172a]'}`} placeholder="05XXXXXXXX" dir="ltr" style={{ textAlign: 'left' }} maxLength={10} />
+                      </div>
+                      {errors.phone && <p className="text-red-500 text-xs mt-1">{errors.phone}</p>}
+                    </div>
+                  )}
                 </>
               )}
 
-              {/* STEP 2: Password + Phone + Location (Client & Dashboard Lawyer) */}
+              {/* STEP 2: Password + Location (Client & Dashboard Lawyer) - Phone moved to step 1 */}
               {currentStep === 2 && (formData.userType === 'client' || formData.lawyerMode === 'dashboard') && (
                 <>
                   <div>
@@ -447,14 +461,6 @@ export function SignUpForm() {
                       <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">{showConfirmPassword ? <Icons.EyeOff /> : <Icons.Eye />}</button>
                     </div>
                     {errors.confirmPassword && <p className="text-red-500 text-xs mt-1">{errors.confirmPassword}</p>}
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-[#0f172a] mb-2">رقم الجوال <span className="text-red-500">*</span></label>
-                    <div className="relative">
-                      <div className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400"><Icons.Phone /></div>
-                      <input type="tel" value={formData.phone} onChange={(e) => updateField('phone', e.target.value.replace(/\D/g, '').slice(0, 10))} className={`w-full h-12 pr-12 pl-4 rounded-xl border bg-slate-50 text-[#0f172a] outline-none transition-all ${errors.phone ? 'border-red-400' : 'border-slate-200 focus:border-[#0f172a]'}`} placeholder="05XXXXXXXX" dir="ltr" style={{ textAlign: 'left' }} maxLength={10} />
-                    </div>
-                    {errors.phone && <p className="text-red-500 text-xs mt-1">{errors.phone}</p>}
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-[#0f172a] mb-2">الجنسية <span className="text-red-500">*</span></label>
