@@ -863,7 +863,7 @@ export function SignUp() {
                         className={`w-6 h-6 rounded-lg border-2 flex items-center justify-center shrink-0 ${formData.agreedConflict ? 'bg-emerald-500 border-emerald-500 text-white' : 'border-slate-300'}`}>
                         {formData.agreedConflict && <Icons.Check />}
                       </button>
-                      <span className="text-[#0f172a]">أقر بموافقتي على <a href="#" className="text-emerald-600 font-medium">سياسة تعارض المصالح</a></span>
+                      <span className="text-[#0f172a]">أقر بموافقتي على <Link to="/conflict-policy" className="text-emerald-600 font-medium">سياسة تعارض المصالح</Link></span>
                     </div>
                   )}
                 </div>

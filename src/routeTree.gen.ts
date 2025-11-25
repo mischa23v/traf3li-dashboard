@@ -42,6 +42,7 @@ import { Route as authSignInRouteImport } from './routes/(auth)/sign-in'
 import { Route as authPrivacyRouteImport } from './routes/(auth)/privacy'
 import { Route as authOtpRouteImport } from './routes/(auth)/otp'
 import { Route as authForgotPasswordRouteImport } from './routes/(auth)/forgot-password'
+import { Route as authConflictPolicyRouteImport } from './routes/(auth)/conflict-policy'
 import { Route as ClerkAuthenticatedRouteRouteImport } from './routes/clerk/_authenticated/route'
 import { Route as ClerkauthRouteRouteImport } from './routes/clerk/(auth)/route'
 import { Route as AuthenticatedSettingsRouteRouteImport } from './routes/_authenticated/settings/route'
@@ -253,6 +254,11 @@ const authOtpRoute = authOtpRouteImport.update({
 const authForgotPasswordRoute = authForgotPasswordRouteImport.update({
   id: '/(auth)/forgot-password',
   path: '/forgot-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const authConflictPolicyRoute = authConflictPolicyRouteImport.update({
+  id: '/(auth)/conflict-policy',
+  path: '/conflict-policy',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ClerkAuthenticatedRouteRoute = ClerkAuthenticatedRouteRouteImport.update({
@@ -556,6 +562,7 @@ export interface FileRoutesByFullPath {
   '/tasks': typeof TasksRoute
   '/time-entries': typeof TimeEntriesRoute
   '/settings': typeof AuthenticatedSettingsRouteRouteWithChildren
+  '/conflict-policy': typeof authConflictPolicyRoute
   '/forgot-password': typeof authForgotPasswordRoute
   '/otp': typeof authOtpRoute
   '/privacy': typeof authPrivacyRoute
@@ -635,6 +642,7 @@ export interface FileRoutesByTo {
   '/task-details': typeof TaskDetailsRoute
   '/tasks': typeof TasksRoute
   '/time-entries': typeof TimeEntriesRoute
+  '/conflict-policy': typeof authConflictPolicyRoute
   '/forgot-password': typeof authForgotPasswordRoute
   '/otp': typeof authOtpRoute
   '/privacy': typeof authPrivacyRoute
@@ -719,6 +727,7 @@ export interface FileRoutesById {
   '/_authenticated/settings': typeof AuthenticatedSettingsRouteRouteWithChildren
   '/clerk/(auth)': typeof ClerkauthRouteRouteWithChildren
   '/clerk/_authenticated': typeof ClerkAuthenticatedRouteRouteWithChildren
+  '/(auth)/conflict-policy': typeof authConflictPolicyRoute
   '/(auth)/forgot-password': typeof authForgotPasswordRoute
   '/(auth)/otp': typeof authOtpRoute
   '/(auth)/privacy': typeof authPrivacyRoute
@@ -801,6 +810,7 @@ export interface FileRouteTypes {
     | '/tasks'
     | '/time-entries'
     | '/settings'
+    | '/conflict-policy'
     | '/forgot-password'
     | '/otp'
     | '/privacy'
@@ -880,6 +890,7 @@ export interface FileRouteTypes {
     | '/task-details'
     | '/tasks'
     | '/time-entries'
+    | '/conflict-policy'
     | '/forgot-password'
     | '/otp'
     | '/privacy'
@@ -963,6 +974,7 @@ export interface FileRouteTypes {
     | '/_authenticated/settings'
     | '/clerk/(auth)'
     | '/clerk/_authenticated'
+    | '/(auth)/conflict-policy'
     | '/(auth)/forgot-password'
     | '/(auth)/otp'
     | '/(auth)/privacy'
@@ -1044,6 +1056,7 @@ export interface RootRouteChildren {
   TaskDetailsRoute: typeof TaskDetailsRoute
   TasksRoute: typeof TasksRoute
   TimeEntriesRoute: typeof TimeEntriesRoute
+  authConflictPolicyRoute: typeof authConflictPolicyRoute
   authForgotPasswordRoute: typeof authForgotPasswordRoute
   authOtpRoute: typeof authOtpRoute
   authPrivacyRoute: typeof authPrivacyRoute
@@ -1289,6 +1302,13 @@ declare module '@tanstack/react-router' {
       path: '/forgot-password'
       fullPath: '/forgot-password'
       preLoaderRoute: typeof authForgotPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/(auth)/conflict-policy': {
+      id: '/(auth)/conflict-policy'
+      path: '/conflict-policy'
+      fullPath: '/conflict-policy'
+      preLoaderRoute: typeof authConflictPolicyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/clerk/_authenticated': {
@@ -1831,6 +1851,7 @@ const rootRouteChildren: RootRouteChildren = {
   TaskDetailsRoute: TaskDetailsRoute,
   TasksRoute: TasksRoute,
   TimeEntriesRoute: TimeEntriesRoute,
+  authConflictPolicyRoute: authConflictPolicyRoute,
   authForgotPasswordRoute: authForgotPasswordRoute,
   authOtpRoute: authOtpRoute,
   authPrivacyRoute: authPrivacyRoute,
