@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from '@tanstack/react-router';
+import { useNavigate, Link } from '@tanstack/react-router';
 
 // ============================================
 // SVG ICONS
@@ -846,7 +846,7 @@ export function SignUp() {
                       className={`w-6 h-6 rounded-lg border-2 flex items-center justify-center shrink-0 ${formData.agreedTerms ? 'bg-emerald-500 border-emerald-500 text-white' : 'border-slate-300'}`}>
                       {formData.agreedTerms && <Icons.Check />}
                     </button>
-                    <span className="text-[#0f172a]">أقر بموافقتي على <a href="#" className="text-emerald-600 font-medium">الشروط والأحكام</a></span>
+                    <span className="text-[#0f172a]">أقر بموافقتي على <Link to="/terms" className="text-emerald-600 font-medium">الشروط والأحكام</Link></span>
                   </div>
 
                   <div className={`flex items-start gap-3 p-4 rounded-xl border ${errors.agreedPrivacy ? 'border-red-300' : formData.agreedPrivacy ? 'border-emerald-200 bg-emerald-50/50' : 'border-slate-200'}`}>
@@ -854,7 +854,7 @@ export function SignUp() {
                       className={`w-6 h-6 rounded-lg border-2 flex items-center justify-center shrink-0 ${formData.agreedPrivacy ? 'bg-emerald-500 border-emerald-500 text-white' : 'border-slate-300'}`}>
                       {formData.agreedPrivacy && <Icons.Check />}
                     </button>
-                    <span className="text-[#0f172a]">أقر بموافقتي على <a href="#" className="text-emerald-600 font-medium">سياسة الخصوصية</a></span>
+                    <span className="text-[#0f172a]">أقر بموافقتي على <Link to="/privacy" className="text-emerald-600 font-medium">سياسة الخصوصية</Link></span>
                   </div>
 
                   {formData.userType === 'lawyer' && (

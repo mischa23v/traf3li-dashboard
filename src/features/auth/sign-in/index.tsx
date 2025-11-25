@@ -269,13 +269,13 @@ export function SignIn() {
             <div className="px-6 py-4 bg-slate-50 border-t border-slate-100">
               <p className="text-center text-sm text-slate-500">
                 بتسجيل الدخول، أنت توافق على{' '}
-                <a href="#" className="text-emerald-600 hover:text-emerald-700 font-medium">
+                <Link to="/terms" className="text-emerald-600 hover:text-emerald-700 font-medium">
                   الشروط والأحكام
-                </a>{' '}
+                </Link>{' '}
                 و{' '}
-                <a href="#" className="text-emerald-600 hover:text-emerald-700 font-medium">
+                <Link to="/privacy" className="text-emerald-600 hover:text-emerald-700 font-medium">
                   سياسة الخصوصية
-                </a>
+                </Link>
               </p>
             </div>
           </div>
