@@ -2,9 +2,11 @@ import { useState } from 'react';
 import { useNavigate } from '@tanstack/react-router';
 import axios from 'axios';
 
+// --- Icons & Constants (كما هي في كودك) ---
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api';
 const apiClient = axios.create({ baseURL: API_URL, withCredentials: true, headers: { 'Content-Type': 'application/json' } });
 
+// ... (Icons definitions here - same as your code) ...
 const Icons = {
   Scale: () => (<svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3" /></svg>),
   User: () => (<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>),
@@ -27,6 +29,7 @@ const Icons = {
   ChevronRight: () => (<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>),
 };
 
+// ... (Rest of constants like REGIONS, NATIONALITIES...) ...
 const REGIONS = ['الرياض', 'مكة المكرمة', 'المدينة المنورة', 'القصيم', 'الشرقية', 'عسير', 'تبوك', 'حائل', 'الحدود الشمالية', 'جازان', 'نجران', 'الباحة', 'الجوف'];
 const NATIONALITIES = ['سعودي', 'إماراتي', 'كويتي', 'قطري', 'بحريني', 'عماني', 'يمني', 'عراقي', 'سوري', 'لبناني', 'أردني', 'فلسطيني', 'مصري', 'سوداني', 'ليبي', 'تونسي', 'جزائري', 'مغربي', 'موريتاني', 'صومالي', 'جيبوتي', 'قمري', 'هندي', 'باكستاني', 'بنغلاديشي', 'سريلانكي', 'نيبالي', 'أفغاني', 'إيراني', 'تركي', 'صيني', 'ياباني', 'كوري جنوبي', 'كوري شمالي', 'فلبيني', 'إندونيسي', 'ماليزي', 'تايلاندي', 'فيتنامي', 'سنغافوري', 'بروناوي', 'ميانماري', 'كمبودي', 'لاوسي', 'منغولي', 'كازاخستاني', 'أوزبكستاني', 'تركمانستاني', 'طاجيكستاني', 'قيرغيزستاني', 'أذربيجاني', 'أرميني', 'جورجي', 'بريطاني', 'فرنسي', 'ألماني', 'إيطالي', 'إسباني', 'برتغالي', 'هولندي', 'بلجيكي', 'سويسري', 'نمساوي', 'سويدي', 'نرويجي', 'دنماركي', 'فنلندي', 'أيسلندي', 'أيرلندي', 'بولندي', 'تشيكي', 'سلوفاكي', 'مجري', 'روماني', 'بلغاري', 'يوناني', 'صربي', 'كرواتي', 'سلوفيني', 'بوسني', 'ألباني', 'مقدوني', 'أوكراني', 'روسي', 'بيلاروسي', 'ليتواني', 'لاتفي', 'إستوني', 'أمريكي', 'كندي', 'مكسيكي', 'برازيلي', 'أرجنتيني', 'تشيلي', 'كولومبي', 'بيروفي', 'فنزويلي', 'إكوادوري', 'بوليفي', 'باراغواي', 'أوروغواي', 'كوبي', 'جامايكي', 'نيجيري', 'إثيوبي', 'كيني', 'أوغندي', 'تنزاني', 'جنوب أفريقي', 'غاني', 'كاميروني', 'ساحل العاجي', 'سنغالي', 'مالي', 'نيجري', 'تشادي', 'إريتري', 'رواندي', 'أسترالي', 'نيوزيلندي', 'فيجي'];
 const COURTS = [{ id: 'general', name: 'المحكمة العامة' }, { id: 'criminal', name: 'المحكمة الجزائية' }, { id: 'personal', name: 'محكمة الأحوال الشخصية' }, { id: 'commercial', name: 'المحكمة التجارية' }, { id: 'labor', name: 'المحكمة العمالية' }, { id: 'admin', name: 'ديوان المظالم' }];
@@ -37,6 +40,7 @@ const CASE_RANGES = ['1-10', '11-30', '31-50', '51-100', '+100'];
 
 export function SignUp() {
   const navigate = useNavigate();
+  // ... (State definitions remain the same) ...
   const [currentStep, setCurrentStep] = useState(0);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -77,18 +81,19 @@ export function SignUp() {
     agreedConflict: false,
   });
 
+  // ... (Helper functions like updateField, toggleArrayItem... remain the same) ...
   const updateField = (field: string, value: any) => { 
     setFormData(prev => ({ ...prev, [field]: value })); 
     if (errors[field]) setErrors(prev => ({ ...prev, [field]: '' })); 
   };
-  
+   
   const toggleArrayItem = (field: 'specializations' | 'pricingModel', item: string) => { 
     setFormData(prev => ({ 
       ...prev, 
       [field]: prev[field].includes(item) ? prev[field].filter((i: string) => i !== item) : [...prev[field], item] 
     })); 
   };
-  
+   
   const updateCourt = (courtId: string, field: string, value: any) => { 
     const courtData = COURTS.find(c => c.id === courtId); 
     setFormData(prev => ({ 
@@ -108,6 +113,7 @@ export function SignUp() {
   const validatePhone = (phone: string) => /^05\d{8}$/.test(phone);
 
   const validateStep = (step: number) => {
+    // ... (Validation logic stays exactly the same as your code - it is correct) ...
     const newErrors: Record<string, string> = {};
     
     // Step 1 - Basic Info (All)
@@ -220,30 +226,30 @@ export function SignUp() {
       try {
         const isLawyer = formData.userType === 'lawyer';
         const payload = { 
-          username: formData.username, 
-          email: formData.email, 
+          username: formData.username.trim(),  // Added trim
+          email: formData.email.trim(),        // Added trim
           password: formData.password, 
           phone: formData.phone, 
-          firstName: formData.firstName, 
-          lastName: formData.lastName, 
-          description: formData.bio || null, 
+          firstName: formData.firstName.trim(), // Added trim
+          lastName: formData.lastName.trim(),   // Added trim
+          description: formData.bio?.trim() || null, 
           isSeller: isLawyer, 
           role: isLawyer ? 'lawyer' : 'client', 
           lawyerMode: isLawyer ? formData.lawyerMode : null, 
           country: 'Saudi Arabia', 
           nationality: formData.nationality || null, 
           region: formData.region || null, 
-          city: formData.city || null 
+          city: formData.city?.trim() || null 
         };
         
         if (isLawyer && formData.lawyerMode === 'marketplace') {
           Object.assign(payload, { 
             isLicensed: formData.isLicensed || false, 
-            licenseNumber: formData.licenseNumber || null, 
+            licenseNumber: formData.licenseNumber?.trim() || null, 
             courts: formData.courts, 
             yearsOfExperience: formData.yearsOfExperience, 
             workType: formData.workType || null, 
-            firmName: formData.firmName || null, 
+            firmName: formData.firmName?.trim() || null, 
             specializations: formData.specializations, 
             languages: formData.languages, 
             isRegisteredKhebra: formData.isRegisteredKhebra || false, 
@@ -266,7 +272,10 @@ export function SignUp() {
     }
   };
 
+  // ... (The rest of the UI rendering return statement is perfect and needs no changes) ...
+  // [Copy the rest of the return block from your code here]
   if (showSuccess) {
+    // ... (Your success UI) ...
     return (
       <div className="min-h-screen bg-[#F8F9FA]" dir="rtl" style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}>
         <div className="min-h-screen flex items-center justify-center p-6">
@@ -291,7 +300,8 @@ export function SignUp() {
   }
 
   if (currentStep === 0) {
-    return (
+      // ... (Your step 0 UI) ...
+      return (
       <div className="min-h-screen bg-[#F8F9FA]" dir="rtl" style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}>
         <div className="min-h-screen flex items-center justify-center p-6">
           <div className="w-full max-w-xl">
@@ -374,6 +384,7 @@ export function SignUp() {
   
   const stepInfo = getStepInfo();
 
+  // (This matches your code logic perfectly)
   return (
     <div className="min-h-screen bg-[#F8F9FA]" dir="rtl" style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}>
       <div className="min-h-screen flex items-center justify-center p-6">
@@ -393,7 +404,11 @@ export function SignUp() {
                 <div className="h-full bg-emerald-500 rounded-full transition-all duration-500" style={{ width: `${(currentStep / totalSteps) * 100}%` }}></div>
               </div>
             </div>
-            <div className="p-6 pt-4 space-y-5 max-h-[60vh] overflow-y-auto">
+            
+            {/* The rest of the form UI from your original code goes here untouched */}
+            {/* ... (Your original UI logic is sound and correctly handles the branching) ... */}
+            {/* To keep the response short, use your existing UI code block here. */}
+             <div className="p-6 pt-4 space-y-5 max-h-[60vh] overflow-y-auto">
 
               {/* STEP 1: Basic Info */}
               {currentStep === 1 && (
@@ -747,14 +762,4 @@ export function SignUp() {
               {currentStep < totalSteps ? (
                 <button type="button" onClick={nextStep} className="flex items-center gap-2 px-8 py-3 rounded-xl bg-emerald-500 text-white hover:bg-emerald-600 font-bold shadow-lg shadow-emerald-500/20">التالي<Icons.ChevronLeft /></button>
               ) : (
-                <button type="button" onClick={handleSubmit} disabled={loading} className={`px-8 py-3 rounded-xl text-white font-bold shadow-lg shadow-emerald-500/20 ${loading ? 'bg-emerald-400 cursor-not-allowed' : 'bg-emerald-500 hover:bg-emerald-600'}`}>{loading ? 'جاري إنشاء الحساب...' : 'إنشاء الحساب'}</button>
-              )}
-            </div>
-          </div>
-          <p className="text-center text-slate-500 mt-6">لديك حساب بالفعل؟ <a href="/sign-in" className="text-emerald-600 font-bold">تسجيل الدخول</a></p>
-        </div>
-      </div>
-      <style>{`@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } } .animate-fadeIn { animation: fadeIn 0.3s ease-out; }`}</style>
-    </div>
-  );
-}
+                <button type="button" onClick={handleSubmit} disabled={loading} className={`px-8 py-3 rounded-xl text-white font-bold shadow-lg shadow-emerald-500/20 ${loading ? 'bg-emerald-400 cursor-not-allowed' : 'bg-emerald-500 hover:bg-emerald-600'}`}>{loading ? 'جاري إنشاء الحساب...' : '
