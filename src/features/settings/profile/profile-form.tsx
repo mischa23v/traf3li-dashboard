@@ -3,6 +3,7 @@ import { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Loader2 } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
 import {
   Form,
@@ -15,59 +16,93 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
-import { useSettings, useUpdateAccountSettings } from '@/hooks/useSettings'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import { useAuthStore } from '@/stores/auth-store'
 import { Skeleton } from '@/components/ui/skeleton'
 
-const profileFormSchema = z.object({
-  name: z
-    .string()
-    .min(1, 'Please enter your name.')
-    .min(2, 'Name must be at least 2 characters.')
-    .max(30, 'Name must not be longer than 30 characters.'),
-  email: z.string().email('Please enter a valid email address.'),
-  bio: z.string().max(500, 'Bio must not be longer than 500 characters.').optional(),
-})
-
-type ProfileFormValues = z.infer<typeof profileFormSchema>
+const REGIONS = ['الرياض', 'مكة المكرمة', 'المدينة المنورة', 'القصيم', 'الشرقية', 'عسير', 'تبوك', 'حائل', 'الحدود الشمالية', 'جازان', 'نجران', 'الباحة', 'الجوف']
+const NATIONALITIES = ['سعودي', 'إماراتي', 'كويتي', 'قطري', 'بحريني', 'عماني', 'يمني', 'عراقي', 'سوري', 'لبناني', 'أردني', 'فلسطيني', 'مصري', 'سوداني', 'ليبي', 'تونسي', 'جزائري', 'مغربي', 'هندي', 'باكستاني', 'بنغلاديشي', 'فلبيني', 'إندونيسي', 'بريطاني', 'فرنسي', 'ألماني', 'أمريكي', 'كندي']
 
 export function ProfileForm() {
-  const { data: settings, isLoading: loadingSettings } = useSettings()
-  const { mutate: updateSettings, isPending } = useUpdateAccountSettings()
+  const { t } = useTranslation()
+  const user = useAuthStore((state) => state.user)
+  const isLoading = !user
+
+  const profileFormSchema = z.object({
+    firstName: z
+      .string()
+      .min(1, t('settings.profile.validation.firstNameRequired'))
+      .min(2, t('settings.profile.validation.firstNameMinLength'))
+      .max(30, t('settings.profile.validation.firstNameMaxLength')),
+    lastName: z
+      .string()
+      .min(1, t('settings.profile.validation.lastNameRequired'))
+      .min(2, t('settings.profile.validation.lastNameMinLength'))
+      .max(30, t('settings.profile.validation.lastNameMaxLength')),
+    username: z
+      .string()
+      .min(1, t('settings.profile.validation.usernameRequired'))
+      .min(3, t('settings.profile.validation.usernameMinLength'))
+      .max(20, t('settings.profile.validation.usernameMaxLength')),
+    email: z.string().email(t('settings.profile.validation.emailInvalid')),
+    phone: z.string().optional(),
+    nationality: z.string().optional(),
+    region: z.string().optional(),
+    city: z.string().optional(),
+    bio: z.string().max(500, t('settings.profile.validation.bioMaxLength')).optional(),
+  })
+
+  type ProfileFormValues = z.infer<typeof profileFormSchema>
 
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileFormSchema),
     defaultValues: {
-      name: '',
+      firstName: '',
+      lastName: '',
+      username: '',
       email: '',
+      phone: '',
+      nationality: '',
+      region: '',
+      city: '',
       bio: '',
     },
   })
 
-  // Update form when settings load
+  // Update form when user data loads
   useEffect(() => {
-    if (settings) {
+    if (user) {
       form.reset({
-        name: settings.account.name || '',
-        email: settings.account.email || '',
-        bio: '', // Bio not available in current API
+        firstName: user.firstName || '',
+        lastName: user.lastName || '',
+        username: user.username || '',
+        email: user.email || '',
+        phone: user.phone || '',
+        nationality: '',
+        region: '',
+        city: '',
+        bio: user.description || '',
       })
     }
-  }, [settings, form])
+  }, [user, form])
 
   function onSubmit(data: ProfileFormValues) {
-    updateSettings({
-      name: data.name,
-      // Email is typically not editable from profile for security reasons
-      // Bio would need to be added to the backend API
-    })
+    console.log('Profile update:', data)
+    // TODO: Implement profile update API call
   }
 
-  if (loadingSettings) {
+  if (isLoading) {
     return (
       <div className='space-y-8'>
         <Skeleton className='h-20 w-full' />
         <Skeleton className='h-20 w-full' />
-        <Skeleton className='h-32 w-full' />
+        <Skeleton className='h-20 w-full' />
         <Skeleton className='h-10 w-32' />
       </div>
     )
@@ -76,92 +111,226 @@ export function ProfileForm() {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-8'>
-        <FormField
-          control={form.control}
-          name='name'
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Name</FormLabel>
-              <FormControl>
-                <Input placeholder='Your name' {...field} />
-              </FormControl>
-              <FormDescription>
-                This is your public display name. It will be shown on your profile
-                and in communications.
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        {/* First Name & Last Name */}
+        <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+          <FormField
+            control={form.control}
+            name='firstName'
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t('settings.profile.firstName')}</FormLabel>
+                <FormControl>
+                  <Input placeholder={t('settings.profile.firstNamePlaceholder')} {...field} />
+                </FormControl>
+                <FormDescription>
+                  {t('settings.profile.firstNameDescription')}
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name='lastName'
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t('settings.profile.lastName')}</FormLabel>
+                <FormControl>
+                  <Input placeholder={t('settings.profile.lastNamePlaceholder')} {...field} />
+                </FormControl>
+                <FormDescription>
+                  {t('settings.profile.lastNameDescription')}
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
 
+        {/* Username */}
         <FormField
           control={form.control}
-          name='email'
+          name='username'
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Email</FormLabel>
+              <FormLabel>{t('settings.profile.username')}</FormLabel>
               <FormControl>
                 <Input
-                  placeholder='your.email@example.com'
+                  placeholder={t('settings.profile.usernamePlaceholder')}
                   {...field}
                   disabled
                   className='bg-muted'
                 />
               </FormControl>
               <FormDescription>
-                Your email address is used for account recovery and important
-                notifications. Contact support to change your email.
+                {t('settings.profile.usernameDescription')}
               </FormDescription>
               <FormMessage />
             </FormItem>
           )}
         />
 
+        {/* Email */}
+        <FormField
+          control={form.control}
+          name='email'
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>{t('settings.profile.email')}</FormLabel>
+              <FormControl>
+                <Input
+                  placeholder={t('settings.profile.emailPlaceholder')}
+                  {...field}
+                  disabled
+                  className='bg-muted'
+                />
+              </FormControl>
+              <FormDescription>
+                {t('settings.profile.emailDescription')}
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        {/* Phone */}
+        <FormField
+          control={form.control}
+          name='phone'
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>{t('settings.profile.phone')}</FormLabel>
+              <FormControl>
+                <Input
+                  placeholder={t('settings.profile.phonePlaceholder')}
+                  {...field}
+                  dir='ltr'
+                  className='text-start'
+                />
+              </FormControl>
+              <FormDescription>
+                {t('settings.profile.phoneDescription')}
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        {/* Nationality & Region */}
+        <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+          <FormField
+            control={form.control}
+            name='nationality'
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t('settings.profile.nationality')}</FormLabel>
+                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder={t('settings.profile.nationalityPlaceholder')} />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {NATIONALITIES.map((nationality) => (
+                      <SelectItem key={nationality} value={nationality}>
+                        {nationality}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <FormDescription>
+                  {t('settings.profile.nationalityDescription')}
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name='region'
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t('settings.profile.region')}</FormLabel>
+                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder={t('settings.profile.regionPlaceholder')} />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {REGIONS.map((region) => (
+                      <SelectItem key={region} value={region}>
+                        {region}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <FormDescription>
+                  {t('settings.profile.regionDescription')}
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+
+        {/* City */}
+        <FormField
+          control={form.control}
+          name='city'
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>{t('settings.profile.city')}</FormLabel>
+              <FormControl>
+                <Input placeholder={t('settings.profile.cityPlaceholder')} {...field} />
+              </FormControl>
+              <FormDescription>
+                {t('settings.profile.cityDescription')}
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        {/* Bio */}
         <FormField
           control={form.control}
           name='bio'
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Bio</FormLabel>
+              <FormLabel>{t('settings.profile.bio')}</FormLabel>
               <FormControl>
                 <Textarea
-                  placeholder='Tell us a little bit about yourself'
+                  placeholder={t('settings.profile.bioPlaceholder')}
                   className='resize-none'
                   rows={4}
                   {...field}
-                  disabled
                 />
               </FormControl>
               <FormDescription>
-                A short bio about yourself. This feature is coming soon.
+                {t('settings.profile.bioDescription')}
               </FormDescription>
               <FormMessage />
             </FormItem>
           )}
         />
 
+        {/* Additional Settings */}
         <div className='bg-muted rounded-lg p-4'>
-          <h3 className='text-sm font-medium mb-2'>Additional Settings</h3>
+          <h3 className='text-sm font-medium mb-2'>{t('settings.profile.additionalSettings')}</h3>
           <p className='text-muted-foreground text-sm mb-3'>
-            Manage more detailed settings in the dedicated sections:
+            {t('settings.profile.additionalSettingsDescription')}
           </p>
           <ul className='text-muted-foreground text-sm space-y-1 list-disc list-inside'>
-            <li>Update your language, timezone, and date of birth in <strong>Account</strong></li>
-            <li>Customize theme and appearance in <strong>Appearance</strong></li>
-            <li>Configure date format and currency in <strong>Display</strong></li>
-            <li>Manage email and push notifications in <strong>Notifications</strong></li>
+            <li>{t('settings.profile.accountSettingsHint')} <strong>{t('settings.tabs.account')}</strong></li>
+            <li>{t('settings.profile.appearanceSettingsHint')} <strong>{t('settings.tabs.appearance')}</strong></li>
+            <li>{t('settings.profile.displaySettingsHint')} <strong>{t('settings.tabs.display')}</strong></li>
+            <li>{t('settings.profile.notificationsSettingsHint')} <strong>{t('settings.tabs.notifications')}</strong></li>
           </ul>
         </div>
 
-        <Button type='submit' disabled={isPending}>
-          {isPending ? (
-            <>
-              <Loader2 className='mr-2 h-4 w-4 animate-spin' />
-              Updating...
-            </>
-          ) : (
-            'Update profile'
-          )}
+        <Button type='submit'>
+          {t('settings.profile.updateProfile')}
         </Button>
       </form>
     </Form>
