@@ -22,14 +22,9 @@ export function ProfileDropdown({ className }: { className?: string }) {
   const [open, setOpen] = useDialogState()
   const user = useAuthStore((state) => state.user)
 
-  // Get initials from username
+  // Get first two letters of username
   const getInitials = (name: string) => {
-    return name
-      .split(' ')
-      .map((n) => n[0])
-      .join('')
-      .toUpperCase()
-      .slice(0, 2)
+    return name.slice(0, 2).toUpperCase()
   }
 
   return (

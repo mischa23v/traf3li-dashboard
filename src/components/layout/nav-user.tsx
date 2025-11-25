@@ -37,6 +37,9 @@ export function NavUser({ user }: NavUserProps) {
   const { isMobile } = useSidebar()
   const [open, setOpen] = useDialogState()
 
+  // Get first two letters of username
+  const getInitials = (name: string) => name.slice(0, 2).toUpperCase()
+
   return (
     <>
       <SidebarMenu>
@@ -49,7 +52,7 @@ export function NavUser({ user }: NavUserProps) {
               >
                 <Avatar className='h-8 w-8 rounded-lg'>
                   <AvatarImage src={user.avatar} alt={user.name} />
-                  <AvatarFallback className='rounded-lg'>MN</AvatarFallback>
+                  <AvatarFallback className='rounded-lg'>{getInitials(user.name)}</AvatarFallback>
                 </Avatar>
                 <div className='grid flex-1 text-start text-sm leading-tight'>
                   <span className='truncate font-semibold'>{user.name}</span>
@@ -68,7 +71,7 @@ export function NavUser({ user }: NavUserProps) {
                 <div className='flex items-center gap-2 px-1 py-1.5 text-start text-sm'>
                   <Avatar className='h-8 w-8 rounded-lg'>
                     <AvatarImage src={user.avatar} alt={user.name} />
-                    <AvatarFallback className='rounded-lg'>MN</AvatarFallback>
+                    <AvatarFallback className='rounded-lg'>{getInitials(user.name)}</AvatarFallback>
                   </Avatar>
                   <div className='grid flex-1 text-start text-sm leading-tight'>
                     <span className='truncate font-semibold'>{user.name}</span>
