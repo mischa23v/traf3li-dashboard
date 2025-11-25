@@ -11,6 +11,8 @@ import apiClient, { handleApiError } from '@/lib/api'
 export interface User {
   _id: string
   username: string
+  firstName?: string
+  lastName?: string
   email: string
   role: 'client' | 'lawyer' | 'admin'
   image?: string

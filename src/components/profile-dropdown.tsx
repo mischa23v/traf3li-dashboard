@@ -22,7 +22,20 @@ export function ProfileDropdown({ className }: { className?: string }) {
   const [open, setOpen] = useDialogState()
   const user = useAuthStore((state) => state.user)
 
-  // Generate initials from user name
+  // Build full name from firstName and lastName, fallback to username
+  const getFullName = () => {
+    if (user?.firstName && user?.lastName) {
+      return `${user.firstName} ${user.lastName}`
+    }
+    if (user?.firstName) {
+      return user.firstName
+    }
+    return user?.username || 'Guest'
+  }
+
+  const fullName = getFullName()
+
+  // Generate initials from full name
   const getInitials = (name: string) => {
     if (!name) return 'U'
     const parts = name.trim().split(/\s+/)
@@ -32,7 +45,7 @@ export function ProfileDropdown({ className }: { className?: string }) {
     return name.slice(0, 2).toUpperCase()
   }
 
-  const initials = getInitials(user?.username || '')
+  const initials = getInitials(fullName)
 
   return (
     <>
@@ -40,7 +53,7 @@ export function ProfileDropdown({ className }: { className?: string }) {
         <DropdownMenuTrigger asChild>
           <Button variant='ghost' className={cn('relative h-8 w-8 rounded-full', className)}>
             <Avatar className='h-8 w-8'>
-              <AvatarImage src={user?.image} alt={user?.username} />
+              <AvatarImage src={user?.image} alt={fullName} />
               <AvatarFallback>{initials}</AvatarFallback>
             </Avatar>
           </Button>
@@ -48,7 +61,7 @@ export function ProfileDropdown({ className }: { className?: string }) {
         <DropdownMenuContent className='w-56' align='end' forceMount>
           <DropdownMenuLabel className='font-normal'>
             <div className='flex flex-col gap-1.5'>
-              <p className='text-sm leading-none font-medium'>{user?.username || 'Guest'}</p>
+              <p className='text-sm leading-none font-medium'>{fullName}</p>
               <p className='text-muted-foreground text-xs leading-none'>
                 {user?.email || ''}
               </p>

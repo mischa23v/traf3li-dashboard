@@ -43,9 +43,20 @@ type SidebarData = {
 export function useSidebarData(): SidebarData {
   const authUser = useAuthStore((state) => state.user)
 
+  // Build full name from firstName and lastName, fallback to username
+  const getFullName = () => {
+    if (authUser?.firstName && authUser?.lastName) {
+      return `${authUser.firstName} ${authUser.lastName}`
+    }
+    if (authUser?.firstName) {
+      return authUser.firstName
+    }
+    return authUser?.username || 'Guest'
+  }
+
   return {
     user: {
-      name: authUser?.username || 'Guest',
+      name: getFullName(),
       email: authUser?.email || '',
       avatar: authUser?.image || '/avatars/shadcn.jpg',
     },
