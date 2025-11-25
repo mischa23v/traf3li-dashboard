@@ -54,7 +54,7 @@ export function AccountForm() {
       .min(2, t('settings.account.validation.nameMinLength'))
       .max(30, t('settings.account.validation.nameMaxLength')),
     dob: z.date().optional(),
-    language: z.string({ required_error: t('settings.account.validation.languageRequired') }),
+    language: z.string().min(1, t('settings.account.validation.languageRequired')),
   })
 
   const form = useForm<AccountFormValues>({
