@@ -172,7 +172,7 @@ export function SignIn() {
                     className={`w-full h-12 pl-11 pr-4 rounded-xl border bg-slate-50 text-[#0f172a] outline-none transition-all text-left ${
                       errors.usernameOrEmail ? 'border-red-400' : 'border-slate-200 focus:border-[#0f172a]'
                     }`}
-                    placeholder="username or email"
+                    placeholder=""
                     dir="ltr"
                     autoComplete="username"
                     disabled={isLoading}
@@ -207,7 +207,7 @@ export function SignIn() {
                     className={`w-full h-12 pl-11 pr-12 rounded-xl border bg-slate-50 text-[#0f172a] outline-none transition-all text-left ${
                       errors.password ? 'border-red-400' : 'border-slate-200 focus:border-[#0f172a]'
                     }`}
-                    placeholder="password"
+                    placeholder=""
                     dir="ltr"
                     autoComplete="current-password"
                     disabled={isLoading}
