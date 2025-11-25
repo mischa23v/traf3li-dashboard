@@ -485,11 +485,11 @@ export function SignUpForm() {
                 <div className="space-y-3">
                   <div className={`flex items-start gap-3 p-4 rounded-xl border ${errors.agreedTerms ? 'border-red-300' : formData.agreedTerms ? 'border-emerald-200 bg-emerald-50/50' : 'border-slate-200'}`}>
                     <button type="button" onClick={() => updateField('agreedTerms', !formData.agreedTerms)} className={`w-6 h-6 rounded-lg border-2 flex items-center justify-center shrink-0 ${formData.agreedTerms ? 'bg-emerald-500 border-emerald-500 text-white' : 'border-slate-300'}`}>{formData.agreedTerms && <Icons.Check />}</button>
-                    <span className="text-[#0f172a]">أقر بموافقتي على <a href="#" className="text-emerald-600 font-medium">الشروط والأحكام</a></span>
+                    <span className="text-[#0f172a]">أقر بموافقتي على <a href="/terms" target="_blank" className="text-emerald-600 font-medium hover:underline">الشروط والأحكام</a></span>
                   </div>
                   <div className={`flex items-start gap-3 p-4 rounded-xl border ${errors.agreedPrivacy ? 'border-red-300' : formData.agreedPrivacy ? 'border-emerald-200 bg-emerald-50/50' : 'border-slate-200'}`}>
                     <button type="button" onClick={() => updateField('agreedPrivacy', !formData.agreedPrivacy)} className={`w-6 h-6 rounded-lg border-2 flex items-center justify-center shrink-0 ${formData.agreedPrivacy ? 'bg-emerald-500 border-emerald-500 text-white' : 'border-slate-300'}`}>{formData.agreedPrivacy && <Icons.Check />}</button>
-                    <span className="text-[#0f172a]">أقر بموافقتي على <a href="#" className="text-emerald-600 font-medium">سياسة الخصوصية</a></span>
+                    <span className="text-[#0f172a]">أقر بموافقتي على <a href="/privacy" target="_blank" className="text-emerald-600 font-medium hover:underline">سياسة الخصوصية</a></span>
                   </div>
                   {formData.userType === 'lawyer' && (
                     <div className={`flex items-start gap-3 p-4 rounded-xl border ${errors.agreedConflict ? 'border-red-300' : formData.agreedConflict ? 'border-emerald-200 bg-emerald-50/50' : 'border-slate-200'}`}>
@@ -723,11 +723,11 @@ export function SignUpForm() {
                     <div className="space-y-3">
                       <div className={`flex items-start gap-3 p-4 rounded-xl border ${errors.agreedTerms ? 'border-red-300' : formData.agreedTerms ? 'border-emerald-200 bg-emerald-50/50' : 'border-slate-200'}`}>
                         <button type="button" onClick={() => updateField('agreedTerms', !formData.agreedTerms)} className={`w-6 h-6 rounded-lg border-2 flex items-center justify-center shrink-0 ${formData.agreedTerms ? 'bg-emerald-500 border-emerald-500 text-white' : 'border-slate-300'}`}>{formData.agreedTerms && <Icons.Check />}</button>
-                        <span className="text-[#0f172a]">أقر بموافقتي على <a href="#" className="text-emerald-600 font-medium">الشروط والأحكام</a></span>
+                        <span className="text-[#0f172a]">أقر بموافقتي على <a href="/terms" target="_blank" className="text-emerald-600 font-medium hover:underline">الشروط والأحكام</a></span>
                       </div>
                       <div className={`flex items-start gap-3 p-4 rounded-xl border ${errors.agreedPrivacy ? 'border-red-300' : formData.agreedPrivacy ? 'border-emerald-200 bg-emerald-50/50' : 'border-slate-200'}`}>
                         <button type="button" onClick={() => updateField('agreedPrivacy', !formData.agreedPrivacy)} className={`w-6 h-6 rounded-lg border-2 flex items-center justify-center shrink-0 ${formData.agreedPrivacy ? 'bg-emerald-500 border-emerald-500 text-white' : 'border-slate-300'}`}>{formData.agreedPrivacy && <Icons.Check />}</button>
-                        <span className="text-[#0f172a]">أقر بموافقتي على <a href="#" className="text-emerald-600 font-medium">سياسة الخصوصية</a></span>
+                        <span className="text-[#0f172a]">أقر بموافقتي على <a href="/privacy" target="_blank" className="text-emerald-600 font-medium hover:underline">سياسة الخصوصية</a></span>
                       </div>
                       <div className={`flex items-start gap-3 p-4 rounded-xl border ${errors.agreedConflict ? 'border-red-300' : formData.agreedConflict ? 'border-emerald-200 bg-emerald-50/50' : 'border-slate-200'}`}>
                         <button type="button" onClick={() => updateField('agreedConflict', !formData.agreedConflict)} className={`w-6 h-6 rounded-lg border-2 flex items-center justify-center shrink-0 ${formData.agreedConflict ? 'bg-emerald-500 border-emerald-500 text-white' : 'border-slate-300'}`}>{formData.agreedConflict && <Icons.Check />}</button>
