@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { z } from 'zod'
 import { useForm } from 'react-hook-form'
+import { useTranslation } from 'react-i18next'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -41,6 +42,7 @@ const notificationsFormSchema = z.object({
 type NotificationsFormValues = z.infer<typeof notificationsFormSchema>
 
 export function NotificationsForm() {
+  const { t } = useTranslation()
   const { data: settings, isLoading: loadingSettings } = useSettings()
   const { mutate: updateSettings, isPending } = useUpdateNotificationSettings()
 
@@ -104,9 +106,9 @@ export function NotificationsForm() {
         {/* Email Notifications Section */}
         <div className='space-y-4'>
           <div>
-            <h3 className='text-lg font-medium'>Email Notifications</h3>
+            <h3 className='text-lg font-medium'>{t('settings.notifications.email.title')}</h3>
             <p className='text-muted-foreground text-sm'>
-              Manage your email notification preferences.
+              {t('settings.notifications.email.description')}
             </p>
           </div>
 
@@ -116,9 +118,9 @@ export function NotificationsForm() {
             render={({ field }) => (
               <FormItem className='flex flex-row items-center justify-between rounded-lg border p-4'>
                 <div className='space-y-0.5'>
-                  <FormLabel className='text-base'>Enable Email Notifications</FormLabel>
+                  <FormLabel className='text-base'>{t('settings.notifications.email.enabled')}</FormLabel>
                   <FormDescription>
-                    Receive notifications via email.
+                    {t('settings.notifications.email.enabledDescription')}
                   </FormDescription>
                 </div>
                 <FormControl>
@@ -137,9 +139,9 @@ export function NotificationsForm() {
             render={({ field }) => (
               <FormItem className='flex flex-row items-center justify-between rounded-lg border p-4'>
                 <div className='space-y-0.5'>
-                  <FormLabel className='text-base'>New Messages</FormLabel>
+                  <FormLabel className='text-base'>{t('settings.notifications.email.newMessages')}</FormLabel>
                   <FormDescription>
-                    Get notified when you receive new messages.
+                    {t('settings.notifications.email.newMessagesDescription')}
                   </FormDescription>
                 </div>
                 <FormControl>
@@ -158,9 +160,9 @@ export function NotificationsForm() {
             render={({ field }) => (
               <FormItem className='flex flex-row items-center justify-between rounded-lg border p-4'>
                 <div className='space-y-0.5'>
-                  <FormLabel className='text-base'>Task Reminders</FormLabel>
+                  <FormLabel className='text-base'>{t('settings.notifications.email.taskReminders')}</FormLabel>
                   <FormDescription>
-                    Get reminded about upcoming tasks and deadlines.
+                    {t('settings.notifications.email.taskRemindersDescription')}
                   </FormDescription>
                 </div>
                 <FormControl>
@@ -179,9 +181,9 @@ export function NotificationsForm() {
             render={({ field }) => (
               <FormItem className='flex flex-row items-center justify-between rounded-lg border p-4'>
                 <div className='space-y-0.5'>
-                  <FormLabel className='text-base'>Case Updates</FormLabel>
+                  <FormLabel className='text-base'>{t('settings.notifications.email.caseUpdates')}</FormLabel>
                   <FormDescription>
-                    Receive updates about your cases.
+                    {t('settings.notifications.email.caseUpdatesDescription')}
                   </FormDescription>
                 </div>
                 <FormControl>
@@ -200,9 +202,9 @@ export function NotificationsForm() {
             render={({ field }) => (
               <FormItem className='flex flex-row items-center justify-between rounded-lg border p-4'>
                 <div className='space-y-0.5'>
-                  <FormLabel className='text-base'>Financial Alerts</FormLabel>
+                  <FormLabel className='text-base'>{t('settings.notifications.email.financialAlerts')}</FormLabel>
                   <FormDescription>
-                    Get notified about payments, invoices, and financial updates.
+                    {t('settings.notifications.email.financialAlertsDescription')}
                   </FormDescription>
                 </div>
                 <FormControl>
@@ -219,9 +221,9 @@ export function NotificationsForm() {
         {/* Push Notifications Section */}
         <div className='space-y-4'>
           <div>
-            <h3 className='text-lg font-medium'>Push Notifications</h3>
+            <h3 className='text-lg font-medium'>{t('settings.notifications.push.title')}</h3>
             <p className='text-muted-foreground text-sm'>
-              Manage your push notification preferences for mobile devices.
+              {t('settings.notifications.push.description')}
             </p>
           </div>
 
@@ -231,9 +233,9 @@ export function NotificationsForm() {
             render={({ field }) => (
               <FormItem className='flex flex-row items-center justify-between rounded-lg border p-4'>
                 <div className='space-y-0.5'>
-                  <FormLabel className='text-base'>Enable Push Notifications</FormLabel>
+                  <FormLabel className='text-base'>{t('settings.notifications.push.enabled')}</FormLabel>
                   <FormDescription>
-                    Receive push notifications on your mobile device.
+                    {t('settings.notifications.push.enabledDescription')}
                   </FormDescription>
                 </div>
                 <FormControl>
@@ -252,9 +254,9 @@ export function NotificationsForm() {
             render={({ field }) => (
               <FormItem className='flex flex-row items-center justify-between rounded-lg border p-4'>
                 <div className='space-y-0.5'>
-                  <FormLabel className='text-base'>New Messages</FormLabel>
+                  <FormLabel className='text-base'>{t('settings.notifications.push.newMessages')}</FormLabel>
                   <FormDescription>
-                    Push notifications for new messages.
+                    {t('settings.notifications.push.newMessagesDescription')}
                   </FormDescription>
                 </div>
                 <FormControl>
@@ -273,9 +275,9 @@ export function NotificationsForm() {
             render={({ field }) => (
               <FormItem className='flex flex-row items-center justify-between rounded-lg border p-4'>
                 <div className='space-y-0.5'>
-                  <FormLabel className='text-base'>Task Reminders</FormLabel>
+                  <FormLabel className='text-base'>{t('settings.notifications.push.taskReminders')}</FormLabel>
                   <FormDescription>
-                    Push notifications for task reminders.
+                    {t('settings.notifications.push.taskRemindersDescription')}
                   </FormDescription>
                 </div>
                 <FormControl>
@@ -294,9 +296,9 @@ export function NotificationsForm() {
             render={({ field }) => (
               <FormItem className='flex flex-row items-center justify-between rounded-lg border p-4'>
                 <div className='space-y-0.5'>
-                  <FormLabel className='text-base'>Case Updates</FormLabel>
+                  <FormLabel className='text-base'>{t('settings.notifications.push.caseUpdates')}</FormLabel>
                   <FormDescription>
-                    Push notifications for case updates.
+                    {t('settings.notifications.push.caseUpdatesDescription')}
                   </FormDescription>
                 </div>
                 <FormControl>
@@ -313,9 +315,9 @@ export function NotificationsForm() {
         {/* In-App Notifications Section */}
         <div className='space-y-4'>
           <div>
-            <h3 className='text-lg font-medium'>In-App Notifications</h3>
+            <h3 className='text-lg font-medium'>{t('settings.notifications.inApp.title')}</h3>
             <p className='text-muted-foreground text-sm'>
-              Manage your in-app notification preferences.
+              {t('settings.notifications.inApp.description')}
             </p>
           </div>
 
@@ -325,9 +327,9 @@ export function NotificationsForm() {
             render={({ field }) => (
               <FormItem className='flex flex-row items-center justify-between rounded-lg border p-4'>
                 <div className='space-y-0.5'>
-                  <FormLabel className='text-base'>Enable In-App Notifications</FormLabel>
+                  <FormLabel className='text-base'>{t('settings.notifications.inApp.enabled')}</FormLabel>
                   <FormDescription>
-                    Show notifications within the application.
+                    {t('settings.notifications.inApp.enabledDescription')}
                   </FormDescription>
                 </div>
                 <FormControl>
@@ -346,9 +348,9 @@ export function NotificationsForm() {
             render={({ field }) => (
               <FormItem className='flex flex-row items-center justify-between rounded-lg border p-4'>
                 <div className='space-y-0.5'>
-                  <FormLabel className='text-base'>Notification Sounds</FormLabel>
+                  <FormLabel className='text-base'>{t('settings.notifications.inApp.sound')}</FormLabel>
                   <FormDescription>
-                    Play a sound when you receive notifications.
+                    {t('settings.notifications.inApp.soundDescription')}
                   </FormDescription>
                 </div>
                 <FormControl>
@@ -367,9 +369,9 @@ export function NotificationsForm() {
             render={({ field }) => (
               <FormItem className='flex flex-row items-center justify-between rounded-lg border p-4'>
                 <div className='space-y-0.5'>
-                  <FormLabel className='text-base'>Desktop Notifications</FormLabel>
+                  <FormLabel className='text-base'>{t('settings.notifications.inApp.desktop')}</FormLabel>
                   <FormDescription>
-                    Show desktop notifications even when the app is in the background.
+                    {t('settings.notifications.inApp.desktopDescription')}
                   </FormDescription>
                 </div>
                 <FormControl>
@@ -386,11 +388,11 @@ export function NotificationsForm() {
         <Button type='submit' disabled={isPending}>
           {isPending ? (
             <>
-              <Loader2 className='mr-2 h-4 w-4 animate-spin' />
-              Updating...
+              <Loader2 className='me-2 h-4 w-4 animate-spin' />
+              {t('settings.notifications.updating')}
             </>
           ) : (
-            'Update notifications'
+            t('settings.notifications.updateNotifications')
           )}
         </Button>
       </form>

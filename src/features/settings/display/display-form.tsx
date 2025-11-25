@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { z } from 'zod'
 import { useForm } from 'react-hook-form'
+import { useTranslation } from 'react-i18next'
 import { CaretSortIcon, CheckIcon } from '@radix-ui/react-icons'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Loader2 } from 'lucide-react'
@@ -33,21 +34,9 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { useSettings, useUpdateDisplaySettings } from '@/hooks/useSettings'
 import { Skeleton } from '@/components/ui/skeleton'
 
-const dateFormats = [
-  { label: 'MM/DD/YYYY', value: 'MM/DD/YYYY' },
-  { label: 'DD/MM/YYYY', value: 'DD/MM/YYYY' },
-  { label: 'YYYY-MM-DD', value: 'YYYY-MM-DD' },
-  { label: 'DD MMM YYYY', value: 'DD MMM YYYY' },
-] as const
+const dateFormatValues = ['MM/DD/YYYY', 'DD/MM/YYYY', 'YYYY-MM-DD', 'DD MMM YYYY'] as const
 
-const currencies = [
-  { label: 'US Dollar (USD)', value: 'USD' },
-  { label: 'Euro (EUR)', value: 'EUR' },
-  { label: 'Saudi Riyal (SAR)', value: 'SAR' },
-  { label: 'UAE Dirham (AED)', value: 'AED' },
-  { label: 'Egyptian Pound (EGP)', value: 'EGP' },
-  { label: 'British Pound (GBP)', value: 'GBP' },
-] as const
+const currencyValues = ['USD', 'EUR', 'SAR', 'AED', 'EGP', 'GBP'] as const
 
 const displayFormSchema = z.object({
   dateFormat: z.string(),
@@ -60,6 +49,7 @@ const displayFormSchema = z.object({
 type DisplayFormValues = z.infer<typeof displayFormSchema>
 
 export function DisplayForm() {
+  const { t } = useTranslation()
   const { data: settings, isLoading: loadingSettings } = useSettings()
   const { mutate: updateSettings, isPending } = useUpdateDisplaySettings()
 
@@ -117,7 +107,7 @@ export function DisplayForm() {
           name='dateFormat'
           render={({ field }) => (
             <FormItem className='flex flex-col'>
-              <FormLabel>Date Format</FormLabel>
+              <FormLabel>{t('settings.display.dateFormat')}</FormLabel>
               <Popover>
                 <PopoverTrigger asChild>
                   <FormControl>
@@ -129,38 +119,34 @@ export function DisplayForm() {
                         !field.value && 'text-muted-foreground'
                       )}
                     >
-                      {field.value
-                        ? dateFormats.find(
-                            (format) => format.value === field.value
-                          )?.label
-                        : 'Select format'}
+                      {field.value || t('settings.display.selectFormat')}
                       <CaretSortIcon className='ms-2 h-4 w-4 shrink-0 opacity-50' />
                     </Button>
                   </FormControl>
                 </PopoverTrigger>
                 <PopoverContent className='w-[200px] p-0'>
                   <Command>
-                    <CommandInput placeholder='Search format...' />
-                    <CommandEmpty>No format found.</CommandEmpty>
+                    <CommandInput placeholder={t('settings.display.searchFormat')} />
+                    <CommandEmpty>{t('settings.display.noFormatFound')}</CommandEmpty>
                     <CommandGroup>
                       <CommandList>
-                        {dateFormats.map((format) => (
+                        {dateFormatValues.map((format) => (
                           <CommandItem
-                            value={format.label}
-                            key={format.value}
+                            value={format}
+                            key={format}
                             onSelect={() => {
-                              form.setValue('dateFormat', format.value)
+                              form.setValue('dateFormat', format)
                             }}
                           >
                             <CheckIcon
                               className={cn(
                                 'size-4',
-                                format.value === field.value
+                                format === field.value
                                   ? 'opacity-100'
                                   : 'opacity-0'
                               )}
                             />
-                            {format.label}
+                            {format}
                           </CommandItem>
                         ))}
                       </CommandList>
@@ -169,7 +155,7 @@ export function DisplayForm() {
                 </PopoverContent>
               </Popover>
               <FormDescription>
-                Select how dates should be displayed throughout the dashboard.
+                {t('settings.display.dateFormatDescription')}
               </FormDescription>
               <FormMessage />
             </FormItem>
@@ -181,9 +167,9 @@ export function DisplayForm() {
           name='timeFormat'
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Time Format</FormLabel>
+              <FormLabel>{t('settings.display.timeFormat')}</FormLabel>
               <FormDescription>
-                Select how time should be displayed.
+                {t('settings.display.timeFormatDescription')}
               </FormDescription>
               <FormMessage />
               <RadioGroup
@@ -197,7 +183,7 @@ export function DisplayForm() {
                       <RadioGroupItem value='12h' className='sr-only' />
                     </FormControl>
                     <div className='border-muted hover:border-accent items-center rounded-md border-2 p-4 text-center'>
-                      <div className='text-sm font-medium'>12-hour</div>
+                      <div className='text-sm font-medium'>{t('settings.display.12hour')}</div>
                       <div className='text-muted-foreground text-xs mt-1'>
                         1:00 PM
                       </div>
@@ -210,7 +196,7 @@ export function DisplayForm() {
                       <RadioGroupItem value='24h' className='sr-only' />
                     </FormControl>
                     <div className='border-muted hover:border-accent items-center rounded-md border-2 p-4 text-center'>
-                      <div className='text-sm font-medium'>24-hour</div>
+                      <div className='text-sm font-medium'>{t('settings.display.24hour')}</div>
                       <div className='text-muted-foreground text-xs mt-1'>
                         13:00
                       </div>
@@ -227,7 +213,7 @@ export function DisplayForm() {
           name='currency'
           render={({ field }) => (
             <FormItem className='flex flex-col'>
-              <FormLabel>Currency</FormLabel>
+              <FormLabel>{t('settings.display.currency')}</FormLabel>
               <Popover>
                 <PopoverTrigger asChild>
                   <FormControl>
@@ -240,37 +226,35 @@ export function DisplayForm() {
                       )}
                     >
                       {field.value
-                        ? currencies.find(
-                            (currency) => currency.value === field.value
-                          )?.label
-                        : 'Select currency'}
+                        ? t(`settings.display.currencies.${field.value}`)
+                        : t('settings.display.selectCurrency')}
                       <CaretSortIcon className='ms-2 h-4 w-4 shrink-0 opacity-50' />
                     </Button>
                   </FormControl>
                 </PopoverTrigger>
                 <PopoverContent className='w-[250px] p-0'>
                   <Command>
-                    <CommandInput placeholder='Search currency...' />
-                    <CommandEmpty>No currency found.</CommandEmpty>
+                    <CommandInput placeholder={t('settings.display.searchCurrency')} />
+                    <CommandEmpty>{t('settings.display.noCurrencyFound')}</CommandEmpty>
                     <CommandGroup>
                       <CommandList>
-                        {currencies.map((currency) => (
+                        {currencyValues.map((currency) => (
                           <CommandItem
-                            value={currency.label}
-                            key={currency.value}
+                            value={t(`settings.display.currencies.${currency}`)}
+                            key={currency}
                             onSelect={() => {
-                              form.setValue('currency', currency.value)
+                              form.setValue('currency', currency)
                             }}
                           >
                             <CheckIcon
                               className={cn(
                                 'size-4',
-                                currency.value === field.value
+                                currency === field.value
                                   ? 'opacity-100'
                                   : 'opacity-0'
                               )}
                             />
-                            {currency.label}
+                            {t(`settings.display.currencies.${currency}`)}
                           </CommandItem>
                         ))}
                       </CommandList>
@@ -279,7 +263,7 @@ export function DisplayForm() {
                 </PopoverContent>
               </Popover>
               <FormDescription>
-                Select the currency for financial information.
+                {t('settings.display.currencyDescription')}
               </FormDescription>
               <FormMessage />
             </FormItem>
@@ -291,9 +275,9 @@ export function DisplayForm() {
           name='startOfWeek'
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Start of Week</FormLabel>
+              <FormLabel>{t('settings.display.startOfWeek')}</FormLabel>
               <FormDescription>
-                Select the first day of the week for calendar displays.
+                {t('settings.display.startOfWeekDescription')}
               </FormDescription>
               <FormMessage />
               <RadioGroup
@@ -307,7 +291,7 @@ export function DisplayForm() {
                       <RadioGroupItem value='sunday' className='sr-only' />
                     </FormControl>
                     <div className='border-muted hover:border-accent items-center rounded-md border-2 p-4 text-center'>
-                      <div className='text-sm font-medium'>Sunday</div>
+                      <div className='text-sm font-medium'>{t('settings.display.sunday')}</div>
                     </div>
                   </FormLabel>
                 </FormItem>
@@ -317,7 +301,7 @@ export function DisplayForm() {
                       <RadioGroupItem value='monday' className='sr-only' />
                     </FormControl>
                     <div className='border-muted hover:border-accent items-center rounded-md border-2 p-4 text-center'>
-                      <div className='text-sm font-medium'>Monday</div>
+                      <div className='text-sm font-medium'>{t('settings.display.monday')}</div>
                     </div>
                   </FormLabel>
                 </FormItem>
@@ -330,7 +314,7 @@ export function DisplayForm() {
           control={form.control}
           name='compactMode'
           render={({ field }) => (
-            <FormItem className='flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4'>
+            <FormItem className='flex flex-row items-start gap-x-3 space-y-0 rounded-md border p-4'>
               <FormControl>
                 <Checkbox
                   checked={field.value}
@@ -338,10 +322,9 @@ export function DisplayForm() {
                 />
               </FormControl>
               <div className='space-y-1 leading-none'>
-                <FormLabel>Compact Mode</FormLabel>
+                <FormLabel>{t('settings.display.compactMode')}</FormLabel>
                 <FormDescription>
-                  Reduce spacing and padding throughout the dashboard for a more
-                  compact layout.
+                  {t('settings.display.compactModeDescription')}
                 </FormDescription>
               </div>
             </FormItem>
@@ -351,11 +334,11 @@ export function DisplayForm() {
         <Button type='submit' disabled={isPending}>
           {isPending ? (
             <>
-              <Loader2 className='mr-2 h-4 w-4 animate-spin' />
-              Updating...
+              <Loader2 className='me-2 h-4 w-4 animate-spin' />
+              {t('settings.display.updating')}
             </>
           ) : (
-            'Update display'
+            t('settings.display.updateDisplay')
           )}
         </Button>
       </form>
