@@ -85,6 +85,8 @@
       "display": "Display"
     },
     "profile": {
+      "title": "Profile",
+      "description": "This is how others will see you on the site.",
       "username": "Username",
       "usernamePlaceholder": "shadcn",
       "usernameDescription": "This is your public display name. It can be your real name or a pseudonym. You can only change this once every 30 days.",
