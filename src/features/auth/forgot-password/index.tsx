@@ -412,7 +412,7 @@ export function ForgotPassword() {
                       className={`w-full h-12 pr-12 pl-12 rounded-xl border bg-slate-50 text-[#0f172a] outline-none transition-all ${
                         errors.newPassword ? 'border-red-400' : 'border-slate-200 focus:border-[#0f172a]'
                       }`}
-                      placeholder="أدخل كلمة المرور الجديدة"
+                      placeholder=""
                       dir="ltr"
                       style={{ textAlign: 'left' }}
                       disabled={isLoading}
@@ -446,7 +446,7 @@ export function ForgotPassword() {
                       className={`w-full h-12 pr-12 pl-12 rounded-xl border bg-slate-50 text-[#0f172a] outline-none transition-all ${
                         errors.confirmPassword ? 'border-red-400' : 'border-slate-200 focus:border-[#0f172a]'
                       }`}
-                      placeholder="أعد إدخال كلمة المرور"
+                      placeholder=""
                       dir="ltr"
                       style={{ textAlign: 'left' }}
                       disabled={isLoading}
@@ -644,7 +644,7 @@ export function ForgotPassword() {
                     className={`w-full h-12 pr-12 pl-4 rounded-xl border bg-slate-50 text-[#0f172a] outline-none transition-all ${
                       errors.email ? 'border-red-400' : 'border-slate-200 focus:border-[#0f172a]'
                     }`}
-                    placeholder="أدخل البريد الإلكتروني"
+                    placeholder=""
                     dir="ltr"
                     style={{ textAlign: 'left' }}
                     disabled={isLoading}

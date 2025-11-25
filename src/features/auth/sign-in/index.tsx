@@ -161,19 +161,19 @@ export function SignIn() {
                 <label className="block text-sm font-medium text-[#0f172a] mb-2">
                   اسم المستخدم أو البريد الإلكتروني <span className="text-red-500">*</span>
                 </label>
-                <div className="relative">
-                  <div className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400">
+                <div className="relative" dir="ltr">
+                  <div className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
                     <Icons.User />
                   </div>
                   <input
                     type="text"
                     value={formData.usernameOrEmail}
                     onChange={(e) => updateField('usernameOrEmail', e.target.value)}
-                    className={`w-full h-12 pr-12 pl-4 rounded-xl border bg-slate-50 text-[#0f172a] outline-none transition-all ${
+                    className={`w-full h-12 pl-11 pr-4 rounded-xl border bg-slate-50 text-[#0f172a] outline-none transition-all text-left ${
                       errors.usernameOrEmail ? 'border-red-400' : 'border-slate-200 focus:border-[#0f172a]'
                     }`}
-                    placeholder="أدخل اسم المستخدم أو البريد الإلكتروني"
-                    dir="auto"
+                    placeholder=""
+                    dir="ltr"
                     autoComplete="username"
                     disabled={isLoading}
                   />
@@ -196,27 +196,26 @@ export function SignIn() {
                     نسيت كلمة المرور؟
                   </a>
                 </div>
-                <div className="relative">
-                  <div className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400">
+                <div className="relative" dir="ltr">
+                  <div className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
                     <Icons.Lock />
                   </div>
                   <input
                     type={showPassword ? 'text' : 'password'}
                     value={formData.password}
                     onChange={(e) => updateField('password', e.target.value)}
-                    className={`w-full h-12 pr-12 pl-12 rounded-xl border bg-slate-50 text-[#0f172a] outline-none transition-all ${
+                    className={`w-full h-12 pl-11 pr-12 rounded-xl border bg-slate-50 text-[#0f172a] outline-none transition-all text-left ${
                       errors.password ? 'border-red-400' : 'border-slate-200 focus:border-[#0f172a]'
                     }`}
-                    placeholder="أدخل كلمة المرور"
+                    placeholder=""
                     dir="ltr"
-                    style={{ textAlign: 'left' }}
                     autoComplete="current-password"
                     disabled={isLoading}
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
                     disabled={isLoading}
                   >
                     {showPassword ? <Icons.EyeOff /> : <Icons.Eye />}
@@ -269,13 +268,13 @@ export function SignIn() {
             <div className="px-6 py-4 bg-slate-50 border-t border-slate-100">
               <p className="text-center text-sm text-slate-500">
                 بتسجيل الدخول، أنت توافق على{' '}
-                <a href="#" className="text-emerald-600 hover:text-emerald-700 font-medium">
+                <Link to="/terms" className="text-emerald-600 hover:text-emerald-700 font-medium">
                   الشروط والأحكام
-                </a>{' '}
+                </Link>{' '}
                 و{' '}
-                <a href="#" className="text-emerald-600 hover:text-emerald-700 font-medium">
+                <Link to="/privacy" className="text-emerald-600 hover:text-emerald-700 font-medium">
                   سياسة الخصوصية
-                </a>
+                </Link>
               </p>
             </div>
           </div>
