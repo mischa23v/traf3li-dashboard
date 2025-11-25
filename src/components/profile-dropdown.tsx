@@ -15,10 +15,24 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { SignOutDialog } from '@/components/sign-out-dialog'
+import { useAuthStore } from '@/stores/auth-store'
 
 export function ProfileDropdown({ className }: { className?: string }) {
   const { t } = useTranslation()
   const [open, setOpen] = useDialogState()
+  const user = useAuthStore((state) => state.user)
+
+  // Generate initials from user name
+  const getInitials = (name: string) => {
+    if (!name) return 'U'
+    const parts = name.trim().split(/\s+/)
+    if (parts.length >= 2) {
+      return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase()
+    }
+    return name.slice(0, 2).toUpperCase()
+  }
+
+  const initials = getInitials(user?.username || '')
 
   return (
     <>
@@ -26,16 +40,17 @@ export function ProfileDropdown({ className }: { className?: string }) {
         <DropdownMenuTrigger asChild>
           <Button variant='ghost' className={cn('relative h-8 w-8 rounded-full', className)}>
             <Avatar className='h-8 w-8'>
-              <AvatarFallback>SN</AvatarFallback>
+              <AvatarImage src={user?.image} alt={user?.username} />
+              <AvatarFallback>{initials}</AvatarFallback>
             </Avatar>
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent className='w-56' align='end' forceMount>
           <DropdownMenuLabel className='font-normal'>
             <div className='flex flex-col gap-1.5'>
-              <p className='text-sm leading-none font-medium'>{t('profile.dropdown.username')}</p>
+              <p className='text-sm leading-none font-medium'>{user?.username || 'Guest'}</p>
               <p className='text-muted-foreground text-xs leading-none'>
-                {t('profile.dropdown.email')}
+                {user?.email || ''}
               </p>
             </div>
           </DropdownMenuLabel>
