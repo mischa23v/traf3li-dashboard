@@ -2,22 +2,16 @@ import { useState } from 'react';
 import { useNavigate } from '@tanstack/react-router';
 import axios from 'axios';
 
-// ============================================
-// API CLIENT CONFIGURATION
-// ============================================
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api';
 
 const apiClient = axios.create({
   baseURL: API_URL,
-  withCredentials: true,  // CRITICAL: Required for HttpOnly cookies
+  withCredentials: true,
   headers: {
     'Content-Type': 'application/json'
   }
 });
 
-// ============================================
-// SVG ICONS
-// ============================================
 const Icons = {
   Scale: () => (
     <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -118,9 +112,6 @@ const Icons = {
   ),
 };
 
-// ============================================
-// DATA - Complete Lists
-// ============================================
 const REGIONS = ['الرياض', 'مكة المكرمة', 'المدينة المنورة', 'القصيم', 'الشرقية', 'عسير', 'تبوك', 'حائل', 'الحدود الشمالية', 'جازان', 'نجران', 'الباحة', 'الجوف'];
 
 const NATIONALITIES = [
@@ -168,10 +159,6 @@ const LANGUAGES = ['العربية', 'الإنجليزية', 'الصينية', '
 const WORK_TYPES = ['مكتب محاماة', 'شركة / قطاع خاص', 'عمل حر', 'جهة حكومية', 'إدارة قانونية'];
 
 const CASE_RANGES = ['1-10', '11-30', '31-50', '51-100', '+100'];
-
-// ============================================
-// MAIN COMPONENT
-// ============================================
 export function SignUp() {
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(0);
@@ -243,7 +230,6 @@ export function SignUp() {
     }));
   };
 
-  // Validation
   const validateEmail = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   const validatePhone = (phone: string) => /^05\d{8}$/.test(phone);
 
@@ -265,13 +251,13 @@ export function SignUp() {
       else if (!validatePhone(formData.phone)) newErrors.phone = 'رقم الجوال غير صحيح';
     }
 
-    if (step === 2 && formData.lawyerMode === 'marketplace') {
+    if (step === 2) {
       if (!formData.nationality) newErrors.nationality = 'الحقل مطلوب';
       if (!formData.region) newErrors.region = 'الحقل مطلوب';
       if (!formData.city.trim()) newErrors.city = 'الحقل مطلوب';
     }
 
-    if (step === 3 && formData.isLicensed === null) {
+    if (step === 3 && formData.userType === 'lawyer' && formData.isLicensed === null) {
       newErrors.isLicensed = 'يرجى الاختيار';
     }
 
@@ -297,8 +283,8 @@ export function SignUp() {
       if (!formData.acceptsRemote) newErrors.acceptsRemote = 'الحقل مطلوب';
     }
 
-    const isFinalStep = (formData.userType === 'client' && currentStep === 2) ||
-                        (formData.lawyerMode === 'dashboard' && currentStep === 2) ||
+    const isFinalStep = (formData.userType === 'client' && currentStep === 3) ||
+                        (formData.lawyerMode === 'dashboard' && currentStep === 3) ||
                         (formData.lawyerMode === 'marketplace' && currentStep === 8);
 
     if (isFinalStep) {
@@ -312,8 +298,8 @@ export function SignUp() {
   };
 
   const getTotalSteps = () => {
-    if (formData.userType === 'client') return 2;
-    if (formData.lawyerMode === 'dashboard') return 2;
+    if (formData.userType === 'client') return 3;
+    if (formData.lawyerMode === 'dashboard') return 3;
     return 8;
   };
 
@@ -326,9 +312,6 @@ export function SignUp() {
   
   const prevStep = () => setCurrentStep(prev => Math.max(prev - 1, 0));
 
-  // ============================================
-  // API SUBMIT HANDLER
-  // ============================================
   const handleSubmit = async () => {
     if (loading) return;
 
@@ -390,10 +373,6 @@ export function SignUp() {
       }
     }
   };
-
-// ============================================
-  // SUCCESS PAGE
-  // ============================================
   if (showSuccess) {
     return (
       <div className="min-h-screen bg-[#F8F9FA]" dir="rtl" style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}>
@@ -403,7 +382,6 @@ export function SignUp() {
               <div className="inline-flex items-center justify-center text-emerald-500 mb-6 animate-scaleIn">
                 <Icons.CheckCircle />
               </div>
-
               <h1 className="text-2xl font-bold text-[#0f172a] mb-3">تم إنشاء الحساب بنجاح</h1>
               <p className="text-slate-500 mb-8">
                 {formData.userType === 'lawyer'
@@ -411,20 +389,17 @@ export function SignUp() {
                   : 'يمكنك الآن البحث عن محامٍ مناسب لقضيتك.'
                 }
               </p>
-
               <div className="bg-slate-50 rounded-2xl p-4 mb-6 text-center">
                 <p className="text-sm text-slate-600 mb-2">تم التسجيل باسم</p>
                 <p className="font-bold text-[#0f172a]">{formData.firstName} {formData.lastName}</p>
                 <p className="text-sm text-slate-500">{formData.email}</p>
               </div>
-
               <button
                 onClick={() => navigate({ to: '/sign-in' })}
                 className="w-full py-4 rounded-xl bg-emerald-500 text-white font-bold hover:bg-emerald-600 transition-all shadow-lg shadow-emerald-500/20"
               >
                 تسجيل الدخول
               </button>
-
               <p className="text-sm text-slate-400 mt-4">
                 سيتم إرسال رسالة تأكيد على البريد الإلكتروني
               </p>
@@ -442,9 +417,6 @@ export function SignUp() {
     );
   }
 
-  // ============================================
-  // STEP 0: ROLE SELECTION
-  // ============================================
   if (currentStep === 0) {
     return (
       <div className="min-h-screen bg-[#F8F9FA]" dir="rtl" style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}>
@@ -457,7 +429,6 @@ export function SignUp() {
               <h1 className="text-3xl font-bold text-[#0f172a] mb-2">إنشاء حساب جديد</h1>
               <p className="text-slate-500 text-lg">اختر نوع الحساب</p>
             </div>
-
             <div className="bg-white rounded-3xl shadow-sm border border-slate-100 p-6">
               <div className="grid grid-cols-2 gap-4 mb-6">
                 <button onClick={() => { updateField('userType', 'client'); setCurrentStep(1); }}
@@ -470,7 +441,6 @@ export function SignUp() {
                   <h3 className="font-bold text-[#0f172a] mb-1">عميل</h3>
                   <p className="text-slate-500 text-sm">البحث عن محامٍ</p>
                 </button>
-
                 <button onClick={() => updateField('userType', 'lawyer')}
                   className={`p-6 rounded-2xl border-2 transition-all text-center hover:shadow-md ${
                     formData.userType === 'lawyer' ? 'border-emerald-500 bg-emerald-50' : 'border-slate-200 hover:border-slate-300'
@@ -482,7 +452,6 @@ export function SignUp() {
                   <p className="text-slate-500 text-sm">تقديم الخدمات القانونية</p>
                 </button>
               </div>
-
               {formData.userType === 'lawyer' && (
                 <div className="bg-[#F8F9FA] rounded-2xl p-5 border border-slate-100 animate-fadeIn">
                   <h3 className="font-bold text-[#0f172a] mb-4">نوع الاستخدام</h3>
@@ -499,7 +468,6 @@ export function SignUp() {
                         <p className="text-xs text-slate-500">استقبال عملاء جدد وإدارة القضايا</p>
                       </div>
                     </button>
-
                     <button onClick={() => { updateField('lawyerMode', 'dashboard'); setCurrentStep(1); }}
                       className={`w-full p-4 rounded-xl border-2 transition-all flex items-center gap-4 text-right ${
                         formData.lawyerMode === 'dashboard' ? 'border-emerald-500 bg-white' : 'border-slate-200 hover:border-slate-300 bg-white'
@@ -516,7 +484,6 @@ export function SignUp() {
                 </div>
               )}
             </div>
-
             <p className="text-center text-slate-500 mt-6">
               لديك حساب بالفعل؟{' '}
               <a href="/sign-in" className="text-emerald-600 hover:text-emerald-700 font-bold">تسجيل الدخول</a>
@@ -528,16 +495,16 @@ export function SignUp() {
     );
   }
 
-  // ============================================
-  // FORM STEPS - Header
-  // ============================================
   const totalSteps = getTotalSteps();
 
   const getStepInfo = () => {
     if (formData.userType === 'client' || formData.lawyerMode === 'dashboard') {
-      return currentStep === 1
-        ? { title: 'البيانات الأساسية', icon: <Icons.User /> }
-        : { title: 'الإقرارات والموافقات', icon: <Icons.Shield /> };
+      const steps = [
+        { title: 'البيانات الأساسية', icon: <Icons.User /> },
+        { title: 'بيانات الموقع', icon: <Icons.MapPin /> },
+        { title: 'الإقرارات والموافقات', icon: <Icons.Shield /> },
+      ];
+      return steps[currentStep - 1] || steps[0];
     }
     const steps = [
       { title: 'البيانات الأساسية', icon: <Icons.User /> },
@@ -565,7 +532,6 @@ export function SignUp() {
             <h1 className="text-3xl font-bold text-[#0f172a] mb-2">إنشاء حساب جديد</h1>
             <p className="text-slate-500">الخطوة {currentStep} من {totalSteps}</p>
           </div>
-
           <div className="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden">
             <div className="p-6 pb-0">
               <div className="flex items-center gap-3 mb-6">
@@ -578,10 +544,7 @@ export function SignUp() {
                 <div className="h-full bg-emerald-500 rounded-full transition-all duration-500" style={{ width: `${(currentStep / totalSteps) * 100}%` }}></div>
               </div>
             </div>
-
             <div className="p-6 pt-4 space-y-5 max-h-[60vh] overflow-y-auto">
-
-              {/* STEP 1: Basic Info */}
               {currentStep === 1 && (
                 <>
                   <div className="grid grid-cols-2 gap-4">
@@ -598,7 +561,6 @@ export function SignUp() {
                       {errors.lastName && <p className="text-red-500 text-xs mt-1">{errors.lastName}</p>}
                     </div>
                   </div>
-
                   <div>
                     <label className="block text-sm font-medium text-[#0f172a] mb-2">اسم المستخدم <span className="text-red-500">*</span></label>
                     <div className="relative">
@@ -610,7 +572,6 @@ export function SignUp() {
                     </div>
                     {errors.username && <p className="text-red-500 text-xs mt-1">{errors.username}</p>}
                   </div>
-
                   <div>
                     <label className="block text-sm font-medium text-[#0f172a] mb-2">البريد الإلكتروني <span className="text-red-500">*</span></label>
                     <div className="relative">
@@ -621,7 +582,6 @@ export function SignUp() {
                     </div>
                     {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
                   </div>
-
                   <div>
                     <label className="block text-sm font-medium text-[#0f172a] mb-2">كلمة المرور <span className="text-red-500">*</span></label>
                     <div className="relative">
@@ -635,7 +595,6 @@ export function SignUp() {
                     </div>
                     {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password}</p>}
                   </div>
-
                   <div>
                     <label className="block text-sm font-medium text-[#0f172a] mb-2">تأكيد كلمة المرور <span className="text-red-500">*</span></label>
                     <div className="relative">
@@ -649,7 +608,6 @@ export function SignUp() {
                     </div>
                     {errors.confirmPassword && <p className="text-red-500 text-xs mt-1">{errors.confirmPassword}</p>}
                   </div>
-
                   <div>
                     <label className="block text-sm font-medium text-[#0f172a] mb-2">رقم الجوال <span className="text-red-500">*</span></label>
                     <div className="relative">
@@ -664,8 +622,7 @@ export function SignUp() {
                 </>
               )}
 
-              {/* STEP 2: Location (ONLY for marketplace lawyers) */}
-              {currentStep === 2 && formData.lawyerMode === 'marketplace' && (
+              {currentStep === 2 && (
                 <>
                   <div>
                     <label className="block text-sm font-medium text-[#0f172a] mb-2">الجنسية <span className="text-red-500">*</span></label>
@@ -676,7 +633,6 @@ export function SignUp() {
                     </select>
                     {errors.nationality && <p className="text-red-500 text-xs mt-1">{errors.nationality}</p>}
                   </div>
-
                   <div>
                     <label className="block text-sm font-medium text-[#0f172a] mb-2">المنطقة <span className="text-red-500">*</span></label>
                     <select value={formData.region} onChange={(e) => updateField('region', e.target.value)}
@@ -686,7 +642,6 @@ export function SignUp() {
                     </select>
                     {errors.region && <p className="text-red-500 text-xs mt-1">{errors.region}</p>}
                   </div>
-
                   <div>
                     <label className="block text-sm font-medium text-[#0f172a] mb-2">المدينة <span className="text-red-500">*</span></label>
                     <input type="text" value={formData.city} onChange={(e) => updateField('city', e.target.value)}
@@ -696,8 +651,7 @@ export function SignUp() {
                 </>
               )}
 
-              {/* STEP 3: License */}
-              {currentStep === 3 && (
+              {currentStep === 3 && formData.lawyerMode === 'marketplace' && (
                 <div className={`bg-[#F8F9FA] rounded-2xl p-5 border ${errors.isLicensed ? 'border-red-300' : 'border-slate-100'}`}>
                   <h3 className="font-bold text-[#0f172a] mb-4">هل لديك رخصة محاماة سارية؟ <span className="text-red-500">*</span></h3>
                   <div className="flex gap-4">
@@ -711,7 +665,6 @@ export function SignUp() {
                     </button>
                   </div>
                   {errors.isLicensed && <p className="text-red-500 text-xs mt-2">{errors.isLicensed}</p>}
-
                   {formData.isLicensed && (
                     <div className="mt-4 animate-fadeIn">
                       <label className="block text-sm font-medium text-[#0f172a] mb-2">رقم الترخيص <span className="text-slate-400 text-xs">(اختياري)</span></label>
@@ -721,12 +674,10 @@ export function SignUp() {
                   )}
                 </div>
               )}
-              {/* STEP 4: Courts */}
               {currentStep === 4 && (
                 <div className="space-y-4">
                   <p className="text-slate-600 text-sm">المحاكم التي لديك خبرة بها <span className="text-red-500">*</span></p>
                   {errors.courts && <p className="text-red-500 text-xs bg-red-50 p-2 rounded-lg">{errors.courts}</p>}
-
                   <div className="grid grid-cols-2 gap-3">
                     {COURTS.map(court => {
                       const courtData = formData.courts[court.id] || {};
@@ -752,7 +703,6 @@ export function SignUp() {
                       );
                     })}
                   </div>
-
                   {Object.entries(formData.courts).filter(([_, v]) => v.selected).length > 0 && (
                     <div className="mt-4 p-4 bg-slate-50 rounded-xl space-y-3">
                       <p className="text-sm font-medium text-[#0f172a]">عدد القضايا (تقريبي)</p>
@@ -777,7 +727,6 @@ export function SignUp() {
                 </div>
               )}
 
-              {/* STEP 5: Experience */}
               {currentStep === 5 && (
                 <>
                   <div className="grid grid-cols-2 gap-4">
@@ -804,14 +753,12 @@ export function SignUp() {
                       {errors.workType && <p className="text-red-500 text-xs mt-1">{errors.workType}</p>}
                     </div>
                   </div>
-
                   <div>
                     <label className="block text-sm font-medium text-[#0f172a] mb-2">اسم جهة العمل <span className="text-slate-400 text-xs">(اختياري)</span></label>
                     <input type="text" value={formData.firmName} onChange={(e) => updateField('firmName', e.target.value)}
                       placeholder="المكتب أو الشركة"
                       className="w-full h-12 px-4 rounded-xl border border-slate-200 bg-slate-50 text-[#0f172a] placeholder-slate-400 outline-none focus:border-[#0f172a]" />
                   </div>
-
                   <div>
                     <label className="block text-sm font-medium text-[#0f172a] mb-3">التخصصات <span className="text-red-500">*</span></label>
                     {errors.specializations && <p className="text-red-500 text-xs mb-2">{errors.specializations}</p>}
@@ -827,7 +774,6 @@ export function SignUp() {
                       ))}
                     </div>
                   </div>
-
                   <div>
                     <label className="block text-sm font-medium text-[#0f172a] mb-3">اللغات <span className="text-red-500">*</span></label>
                     {errors.languages && <p className="text-red-500 text-xs mb-2">{errors.languages}</p>}
@@ -844,7 +790,6 @@ export function SignUp() {
                     </select>
                     <p className="text-xs text-slate-400 mt-1">اضغط مع الاستمرار لاختيار أكثر من لغة</p>
                   </div>
-
                   <div>
                     <label className="block text-sm font-medium text-[#0f172a] mb-2">نبذة عنك <span className="text-slate-400 text-xs">(اختياري)</span></label>
                     <textarea value={formData.bio} onChange={(e) => updateField('bio', e.target.value)} rows={3}
@@ -854,7 +799,7 @@ export function SignUp() {
                   </div>
                 </>
               )}
-              {/* STEP 6: Khebra (ONLY for marketplace lawyers) */}
+
               {currentStep === 6 && formData.lawyerMode === 'marketplace' && (
                 <div className={`bg-[#F8F9FA] rounded-2xl p-5 border ${errors.isRegisteredKhebra ? 'border-red-300' : 'border-slate-100'}`}>
                   <h3 className="font-bold text-[#0f172a] mb-4">هل لديك حساب في منصة خبرة؟ <span className="text-red-500">*</span></h3>
@@ -871,8 +816,6 @@ export function SignUp() {
                   {errors.isRegisteredKhebra && <p className="text-red-500 text-xs mt-2">{errors.isRegisteredKhebra}</p>}
                 </div>
               )}
-
-              {/* STEP 7: Marketplace Settings */}
               {currentStep === 7 && (
                 <>
                   <div>
@@ -887,7 +830,6 @@ export function SignUp() {
                       ))}
                     </div>
                   </div>
-
                   <div>
                     <label className="block text-sm font-medium text-[#0f172a] mb-3">نموذج التسعير <span className="text-red-500">*</span></label>
                     {errors.pricingModel && <p className="text-red-500 text-xs mb-2">{errors.pricingModel}</p>}
@@ -900,7 +842,6 @@ export function SignUp() {
                       ))}
                     </div>
                   </div>
-
                   <div>
                     <label className="block text-sm font-medium text-[#0f172a] mb-3">قبول العمل عن بعد <span className="text-red-500">*</span></label>
                     {errors.acceptsRemote && <p className="text-red-500 text-xs mb-2">{errors.acceptsRemote}</p>}
@@ -916,9 +857,8 @@ export function SignUp() {
                 </>
               )}
 
-              {/* STEP 8 (or 2 for clients/dashboard): Agreements */}
-              {((formData.userType === 'client' && currentStep === 2) ||
-                (formData.lawyerMode === 'dashboard' && currentStep === 2) ||
+              {((formData.userType === 'client' && currentStep === 3) ||
+                (formData.lawyerMode === 'dashboard' && currentStep === 3) ||
                 (formData.lawyerMode === 'marketplace' && currentStep === 8)) && (
                 <div className="space-y-3">
                   <div className={`flex items-start gap-3 p-4 rounded-xl border ${errors.agreedTerms ? 'border-red-300' : formData.agreedTerms ? 'border-emerald-200 bg-emerald-50/50' : 'border-slate-200'}`}>
@@ -928,7 +868,6 @@ export function SignUp() {
                     </button>
                     <span className="text-[#0f172a]">أقر بموافقتي على <a href="#" className="text-emerald-600 font-medium">الشروط والأحكام</a></span>
                   </div>
-
                   <div className={`flex items-start gap-3 p-4 rounded-xl border ${errors.agreedPrivacy ? 'border-red-300' : formData.agreedPrivacy ? 'border-emerald-200 bg-emerald-50/50' : 'border-slate-200'}`}>
                     <button type="button" onClick={() => updateField('agreedPrivacy', !formData.agreedPrivacy)}
                       className={`w-6 h-6 rounded-lg border-2 flex items-center justify-center shrink-0 ${formData.agreedPrivacy ? 'bg-emerald-500 border-emerald-500 text-white' : 'border-slate-300'}`}>
@@ -936,7 +875,6 @@ export function SignUp() {
                     </button>
                     <span className="text-[#0f172a]">أقر بموافقتي على <a href="#" className="text-emerald-600 font-medium">سياسة الخصوصية</a></span>
                   </div>
-
                   {formData.userType === 'lawyer' && (
                     <div className={`flex items-start gap-3 p-4 rounded-xl border ${errors.agreedConflict ? 'border-red-300' : formData.agreedConflict ? 'border-emerald-200 bg-emerald-50/50' : 'border-slate-200'}`}>
                       <button type="button" onClick={() => updateField('agreedConflict', !formData.agreedConflict)}
@@ -951,13 +889,11 @@ export function SignUp() {
 
             </div>
 
-            {/* Footer - Navigation Buttons */}
             <div className="p-6 pt-2 flex items-center justify-between border-t border-slate-100">
               <button type="button" onClick={prevStep} className="flex items-center gap-2 px-5 py-3 rounded-xl text-slate-600 hover:bg-slate-50 font-medium">
                 <Icons.ChevronRight />
                 السابق
               </button>
-
               {currentStep < totalSteps ? (
                 <button type="button" onClick={nextStep} className="flex items-center gap-2 px-8 py-3 rounded-xl bg-emerald-500 text-white hover:bg-emerald-600 font-bold shadow-lg shadow-emerald-500/20">
                   التالي
@@ -977,7 +913,6 @@ export function SignUp() {
               )}
             </div>
           </div>
-
           <p className="text-center text-slate-500 mt-6">
             لديك حساب بالفعل؟{' '}
             <a href="/sign-in" className="text-emerald-600 font-bold">تسجيل الدخول</a>
