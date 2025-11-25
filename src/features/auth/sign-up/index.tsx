@@ -369,7 +369,7 @@ export function SignUp() {
         <div className="min-h-screen flex items-center justify-center p-6">
           <div className="w-full max-w-xl">
             <div className="text-center mb-8">
-              <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-[#0f172a] text-emerald-400 mb-6 shadow-xl">
+              <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-[#F8F9FA] text-[#0f172a] mb-6">
                 <Icons.Scale />
               </div>
               <h1 className="text-3xl font-bold text-[#0f172a] mb-2">إنشاء حساب جديد</h1>
