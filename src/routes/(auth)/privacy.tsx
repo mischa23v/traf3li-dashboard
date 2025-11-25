@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
 
-export const Route = createFileRoute('/privacy')({
+export const Route = createFileRoute('/(auth)/privacy')({
   component: PrivacyPage,
 })
 
