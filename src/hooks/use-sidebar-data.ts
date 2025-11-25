@@ -13,6 +13,7 @@ import {
   Settings,
   HelpCircle,
 } from 'lucide-react'
+import { useAuthStore } from '@/stores/auth-store'
 
 type SidebarData = {
   user: {
@@ -40,11 +41,13 @@ type SidebarData = {
 }
 
 export function useSidebarData(): SidebarData {
+  const user = useAuthStore((state) => state.user)
+
   return {
     user: {
-      name: 'مشاري بن ناهد',
-      email: 'meshari@lawyer.com',
-      avatar: '/avatars/shadcn.jpg',
+      name: user?.username || 'مستخدم',
+      email: user?.email || '',
+      avatar: user?.image || '/avatars/shadcn.jpg',
     },
     teams: [
       {
