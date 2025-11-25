@@ -805,13 +805,13 @@ function PrivacyPage() {
               وجميع القوانين ذات الصلة.
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
-              <Link
-                to="/terms"
+              <a
+                href="/terms"
                 className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-white text-emerald-600 font-semibold hover:bg-emerald-50 transition-all border-2 border-emerald-200"
               >
                 <span>📋</span>
                 اطلع على الشروط والأحكام
-              </Link>
+              </a>
               <a
                 href="mailto:privacy@traf3li.com"
                 className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-emerald-500 text-white font-semibold hover:bg-emerald-600 transition-all"
