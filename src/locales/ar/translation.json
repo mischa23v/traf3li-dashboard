@@ -110,6 +110,128 @@
         "emailRequired": "الرجاء اختيار بريد إلكتروني للعرض.",
         "invalidUrl": "الرجاء إدخال عنوان URL صالح."
       }
+    },
+    "account": {
+      "title": "الحساب",
+      "description": "تحديث إعدادات حسابك. تعيين اللغة والمنطقة الزمنية المفضلة لديك.",
+      "name": "الاسم",
+      "namePlaceholder": "اسمك",
+      "nameDescription": "هذا هو الاسم الذي سيظهر في ملفك الشخصي وفي رسائل البريد الإلكتروني.",
+      "dob": "تاريخ الميلاد",
+      "dobDescription": "يُستخدم تاريخ ميلادك لحساب عمرك.",
+      "language": "اللغة",
+      "selectLanguage": "اختر اللغة",
+      "searchLanguage": "البحث عن لغة...",
+      "noLanguageFound": "لم يتم العثور على لغة.",
+      "languageDescription": "هذه هي اللغة التي ستُستخدم في لوحة التحكم.",
+      "updateAccount": "تحديث الحساب",
+      "updating": "جاري التحديث...",
+      "languages": {
+        "en": "الإنجليزية",
+        "ar": "العربية",
+        "fr": "الفرنسية",
+        "de": "الألمانية",
+        "es": "الإسبانية",
+        "pt": "البرتغالية",
+        "ru": "الروسية",
+        "ja": "اليابانية",
+        "ko": "الكورية",
+        "zh": "الصينية"
+      },
+      "validation": {
+        "nameRequired": "الرجاء إدخال اسمك.",
+        "nameMinLength": "يجب أن يتكون الاسم من حرفين على الأقل.",
+        "nameMaxLength": "يجب ألا يزيد الاسم عن 30 حرفاً.",
+        "languageRequired": "الرجاء اختيار لغة."
+      }
+    },
+    "appearance": {
+      "title": "المظهر",
+      "description": "تخصيص مظهر التطبيق. التبديل التلقائي بين السمات النهارية والليلية.",
+      "font": "الخط",
+      "fontDescription": "اختر الخط الذي تريد استخدامه في لوحة التحكم.",
+      "theme": "السمة",
+      "themeDescription": "اختر سمة لوحة التحكم.",
+      "light": "فاتح",
+      "dark": "داكن",
+      "updatePreferences": "تحديث التفضيلات",
+      "updating": "جاري التحديث..."
+    },
+    "notifications": {
+      "title": "الإشعارات",
+      "description": "تكوين كيفية تلقي الإشعارات.",
+      "email": {
+        "title": "إشعارات البريد الإلكتروني",
+        "description": "إدارة تفضيلات إشعارات البريد الإلكتروني.",
+        "enabled": "تفعيل إشعارات البريد الإلكتروني",
+        "enabledDescription": "تلقي الإشعارات عبر البريد الإلكتروني.",
+        "newMessages": "الرسائل الجديدة",
+        "newMessagesDescription": "الحصول على إشعار عند تلقي رسائل جديدة.",
+        "taskReminders": "تذكيرات المهام",
+        "taskRemindersDescription": "الحصول على تذكير بالمهام والمواعيد النهائية القادمة.",
+        "caseUpdates": "تحديثات القضايا",
+        "caseUpdatesDescription": "تلقي تحديثات حول قضاياك.",
+        "financialAlerts": "التنبيهات المالية",
+        "financialAlertsDescription": "الحصول على إشعارات حول المدفوعات والفواتير والتحديثات المالية."
+      },
+      "push": {
+        "title": "الإشعارات الفورية",
+        "description": "إدارة تفضيلات الإشعارات الفورية للأجهزة المحمولة.",
+        "enabled": "تفعيل الإشعارات الفورية",
+        "enabledDescription": "تلقي الإشعارات الفورية على جهازك المحمول.",
+        "newMessages": "الرسائل الجديدة",
+        "newMessagesDescription": "إشعارات فورية للرسائل الجديدة.",
+        "taskReminders": "تذكيرات المهام",
+        "taskRemindersDescription": "إشعارات فورية لتذكيرات المهام.",
+        "caseUpdates": "تحديثات القضايا",
+        "caseUpdatesDescription": "إشعارات فورية لتحديثات القضايا."
+      },
+      "inApp": {
+        "title": "الإشعارات داخل التطبيق",
+        "description": "إدارة تفضيلات الإشعارات داخل التطبيق.",
+        "enabled": "تفعيل الإشعارات داخل التطبيق",
+        "enabledDescription": "عرض الإشعارات داخل التطبيق.",
+        "sound": "أصوات الإشعارات",
+        "soundDescription": "تشغيل صوت عند تلقي الإشعارات.",
+        "desktop": "إشعارات سطح المكتب",
+        "desktopDescription": "عرض إشعارات سطح المكتب حتى عندما يكون التطبيق في الخلفية."
+      },
+      "updateNotifications": "تحديث الإشعارات",
+      "updating": "جاري التحديث..."
+    },
+    "display": {
+      "title": "العرض",
+      "description": "تشغيل أو إيقاف العناصر للتحكم فيما يُعرض في التطبيق.",
+      "dateFormat": "صيغة التاريخ",
+      "selectFormat": "اختر الصيغة",
+      "searchFormat": "البحث عن صيغة...",
+      "noFormatFound": "لم يتم العثور على صيغة.",
+      "dateFormatDescription": "اختر كيفية عرض التواريخ في لوحة التحكم.",
+      "timeFormat": "صيغة الوقت",
+      "timeFormatDescription": "اختر كيفية عرض الوقت.",
+      "12hour": "12 ساعة",
+      "24hour": "24 ساعة",
+      "currency": "العملة",
+      "selectCurrency": "اختر العملة",
+      "searchCurrency": "البحث عن عملة...",
+      "noCurrencyFound": "لم يتم العثور على عملة.",
+      "currencyDescription": "اختر العملة للمعلومات المالية.",
+      "currencies": {
+        "USD": "الدولار الأمريكي (USD)",
+        "EUR": "اليورو (EUR)",
+        "SAR": "الريال السعودي (SAR)",
+        "AED": "الدرهم الإماراتي (AED)",
+        "EGP": "الجنيه المصري (EGP)",
+        "GBP": "الجنيه الإسترليني (GBP)"
+      },
+      "startOfWeek": "بداية الأسبوع",
+      "startOfWeekDescription": "اختر اليوم الأول من الأسبوع لعرض التقويم.",
+      "sunday": "الأحد",
+      "monday": "الإثنين",
+      "compactMode": "الوضع المضغوط",
+      "compactModeDescription": "تقليل المسافات والحشو في لوحة التحكم للحصول على تخطيط أكثر إحكاماً.",
+      "updateDisplay": "تحديث العرض",
+      "updating": "جاري التحديث..."
     }
   },
   "tasks": {
