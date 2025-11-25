@@ -846,7 +846,7 @@ function TermsPage() {
                 </summary>
                 <p className="text-sm text-slate-700 mt-3 mr-6">
                   نعم، نستخدم أعلى معايير التشفير (AES-256-GCM) والأمان. 
-                  راجع <Link to="/privacy" className="text-emerald-600 hover:underline">سياسة الخصوصية</Link> للمزيد من التفاصيل.
+                  راجع <a href="/privacy" className="text-emerald-600 hover:underline">سياسة الخصوصية</a> للمزيد من التفاصيل.
                 </p>
               </details>
 
@@ -880,13 +880,13 @@ function TermsPage() {
               نحن ملتزمون بتوفير تجربة آمنة، شفافة، ومهنية لربط العملاء بأفضل المحامين في المملكة العربية السعودية.
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
-              <Link
-                to="/privacy"
+              <a
+                href="/privacy"
                 className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-white text-emerald-600 font-semibold hover:bg-emerald-50 transition-all border-2 border-emerald-200"
               >
                 <span>🔒</span>
                 اطلع على سياسة الخصوصية
-              </Link>
+              </a>
               <a
                 href="mailto:legal@traf3li.com"
                 className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-emerald-500 text-white font-semibold hover:bg-emerald-600 transition-all"
