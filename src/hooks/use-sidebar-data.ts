@@ -17,6 +17,7 @@ import {
   HelpCircle,
   Tags,
   FileText,
+  Bell,
 } from 'lucide-react'
 import { useAuthStore } from '@/stores/auth-store'
 
@@ -171,6 +172,11 @@ export function useSidebarData(): SidebarData {
             title: 'المستندات',
             url: '/dashboard/documents',
             icon: FileText,
+          },
+          {
+            title: 'المتابعات',
+            url: '/dashboard/followups',
+            icon: Bell,
           },
         ],
       },
