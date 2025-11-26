@@ -5,6 +5,9 @@ import {
   MessageSquare,
   Briefcase,
   Users,
+  UsersRound,
+  Contact,
+  Building2,
   Scale,
   DollarSign,
   Star,
@@ -12,6 +15,10 @@ import {
   BookOpen,
   Settings,
   HelpCircle,
+  Tags,
+  FileText,
+  Bell,
+  GitBranch,
 } from 'lucide-react'
 import { useAuthStore } from '@/stores/auth-store'
 
@@ -138,9 +145,44 @@ export function useSidebarData(): SidebarData {
             icon: Users,
           },
           {
+            title: 'فريق العمل',
+            url: '/dashboard/staff',
+            icon: UsersRound,
+          },
+          {
+            title: 'جهات الاتصال',
+            url: '/dashboard/contacts',
+            icon: Contact,
+          },
+          {
+            title: 'المنظمات',
+            url: '/dashboard/organizations',
+            icon: Building2,
+          },
+          {
             title: 'القضايا',
             url: '/dashboard/cases',
             icon: Scale,
+          },
+          {
+            title: 'سير العمل',
+            url: '/dashboard/case-workflows',
+            icon: GitBranch,
+          },
+          {
+            title: 'الوسوم',
+            url: '/dashboard/tags',
+            icon: Tags,
+          },
+          {
+            title: 'المستندات',
+            url: '/dashboard/documents',
+            icon: FileText,
+          },
+          {
+            title: 'المتابعات',
+            url: '/dashboard/followups',
+            icon: Bell,
           },
         ],
       },
