@@ -18,6 +18,7 @@ import {
   Tags,
   FileText,
   Bell,
+  GitBranch,
 } from 'lucide-react'
 import { useAuthStore } from '@/stores/auth-store'
 
@@ -162,6 +163,11 @@ export function useSidebarData(): SidebarData {
             title: 'القضايا',
             url: '/dashboard/cases',
             icon: Scale,
+          },
+          {
+            title: 'سير العمل',
+            url: '/dashboard/case-workflows',
+            icon: GitBranch,
           },
           {
             title: 'الوسوم',
