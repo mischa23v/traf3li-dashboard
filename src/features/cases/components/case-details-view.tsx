@@ -55,7 +55,18 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
+  DialogFooter,
 } from '@/components/ui/dialog'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
 import {
   Select,
   SelectContent,
@@ -74,9 +85,22 @@ import { ProfileDropdown } from '@/components/profile-dropdown'
 import {
   useCase,
   useAddCaseNote,
+  useUpdateCaseNote,
+  useDeleteCaseNote,
   useAddCaseHearing,
+  useUpdateCaseHearing,
+  useDeleteCaseHearing,
   useAddCaseClaim,
+  useUpdateCaseClaim,
+  useDeleteCaseClaim,
+  useAddCaseTimelineEvent,
+  useUpdateCaseTimelineEvent,
+  useDeleteCaseTimelineEvent,
+  useUploadCaseDocument,
+  useDownloadCaseDocument,
+  useDeleteCaseDocument,
   useUpdateCaseStatus,
+  useCaseAuditHistory,
 } from '@/hooks/useCasesAndClients'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Alert, AlertDescription } from '@/components/ui/alert'
@@ -122,31 +146,83 @@ const getDefendantName = (c: Case): string => {
 export function CaseDetailsView() {
   const { t } = useTranslation()
   const [activeTab, setActiveTab] = useState('overview')
+
+  // Note states
   const [noteText, setNoteText] = useState('')
   const [isAddNoteOpen, setIsAddNoteOpen] = useState(false)
+  const [editingNote, setEditingNote] = useState<CaseNote | null>(null)
+  const [isEditNoteOpen, setIsEditNoteOpen] = useState(false)
+  const [deleteNoteId, setDeleteNoteId] = useState<string | null>(null)
+
+  // Hearing states
   const [isAddHearingOpen, setIsAddHearingOpen] = useState(false)
   const [hearingDate, setHearingDate] = useState('')
   const [hearingLocation, setHearingLocation] = useState('')
   const [hearingNotes, setHearingNotes] = useState('')
+  const [editingHearing, setEditingHearing] = useState<CaseHearing | null>(null)
+  const [isEditHearingOpen, setIsEditHearingOpen] = useState(false)
+  const [deleteHearingId, setDeleteHearingId] = useState<string | null>(null)
+
+  // Claim states
   const [isAddClaimOpen, setIsAddClaimOpen] = useState(false)
   const [claimType, setClaimType] = useState('')
   const [claimAmount, setClaimAmount] = useState('')
   const [claimPeriod, setClaimPeriod] = useState('')
   const [claimDescription, setClaimDescription] = useState('')
+  const [editingClaim, setEditingClaim] = useState<Claim | null>(null)
+  const [isEditClaimOpen, setIsEditClaimOpen] = useState(false)
+  const [deleteClaimId, setDeleteClaimId] = useState<string | null>(null)
+
+  // Timeline states
+  const [isAddTimelineOpen, setIsAddTimelineOpen] = useState(false)
+  const [timelineEvent, setTimelineEvent] = useState('')
+  const [timelineDate, setTimelineDate] = useState('')
+  const [timelineType, setTimelineType] = useState<'court' | 'filing' | 'deadline' | 'general'>('general')
+  const [timelineStatus, setTimelineStatus] = useState<'upcoming' | 'completed'>('upcoming')
+  const [editingTimeline, setEditingTimeline] = useState<TimelineEvent | null>(null)
+  const [isEditTimelineOpen, setIsEditTimelineOpen] = useState(false)
+  const [deleteTimelineId, setDeleteTimelineId] = useState<string | null>(null)
+
   // Document states
   const [documentSubTab, setDocumentSubTab] = useState<'general' | 'judgments'>('general')
   const [isUploadDocOpen, setIsUploadDocOpen] = useState(false)
   const [uploadFile, setUploadFile] = useState<File | null>(null)
   const [uploadCategory, setUploadCategory] = useState<string>('')
   const [uploadDescription, setUploadDescription] = useState('')
-  const [isUploading, setIsUploading] = useState(false)
+  const [deleteDocId, setDeleteDocId] = useState<string | null>(null)
 
   const { caseId } = useParams({ strict: false }) as { caseId: string }
 
+  // Queries
   const { data: caseData, isLoading, isError, error, refetch } = useCase(caseId)
+  const { data: auditHistory } = useCaseAuditHistory(caseId)
+
+  // Note mutations
   const addNoteMutation = useAddCaseNote()
+  const updateNoteMutation = useUpdateCaseNote()
+  const deleteNoteMutation = useDeleteCaseNote()
+
+  // Hearing mutations
   const addHearingMutation = useAddCaseHearing()
+  const updateHearingMutation = useUpdateCaseHearing()
+  const deleteHearingMutation = useDeleteCaseHearing()
+
+  // Claim mutations
   const addClaimMutation = useAddCaseClaim()
+  const updateClaimMutation = useUpdateCaseClaim()
+  const deleteClaimMutation = useDeleteCaseClaim()
+
+  // Timeline mutations
+  const addTimelineMutation = useAddCaseTimelineEvent()
+  const updateTimelineMutation = useUpdateCaseTimelineEvent()
+  const deleteTimelineMutation = useDeleteCaseTimelineEvent()
+
+  // Document mutations
+  const uploadDocMutation = useUploadCaseDocument()
+  const downloadDocMutation = useDownloadCaseDocument()
+  const deleteDocMutation = useDeleteCaseDocument()
+
+  // Status mutation
   const updateStatusMutation = useUpdateCaseStatus()
 
   const topNav = [
@@ -272,6 +348,179 @@ export function CaseDetailsView() {
 
   const handleStatusChange = async (status: CaseStatus) => {
     await updateStatusMutation.mutateAsync({ id: caseId, status })
+  }
+
+  // Note handlers
+  const handleEditNote = (note: CaseNote) => {
+    setEditingNote(note)
+    setNoteText(note.text)
+    setIsEditNoteOpen(true)
+  }
+
+  const handleUpdateNote = async () => {
+    if (!editingNote?._id || !noteText.trim()) return
+    await updateNoteMutation.mutateAsync({
+      caseId,
+      noteId: editingNote._id,
+      data: { text: noteText },
+    })
+    setNoteText('')
+    setEditingNote(null)
+    setIsEditNoteOpen(false)
+  }
+
+  const handleDeleteNote = async () => {
+    if (!deleteNoteId) return
+    await deleteNoteMutation.mutateAsync({ caseId, noteId: deleteNoteId })
+    setDeleteNoteId(null)
+  }
+
+  // Hearing handlers
+  const handleEditHearing = (hearing: CaseHearing) => {
+    setEditingHearing(hearing)
+    setHearingDate(hearing.date ? new Date(hearing.date).toISOString().slice(0, 16) : '')
+    setHearingLocation(hearing.location)
+    setHearingNotes(hearing.notes || '')
+    setIsEditHearingOpen(true)
+  }
+
+  const handleUpdateHearing = async () => {
+    if (!editingHearing?._id || !hearingDate || !hearingLocation) return
+    await updateHearingMutation.mutateAsync({
+      caseId,
+      hearingId: editingHearing._id,
+      data: {
+        date: hearingDate,
+        location: hearingLocation,
+        notes: hearingNotes,
+      },
+    })
+    setHearingDate('')
+    setHearingLocation('')
+    setHearingNotes('')
+    setEditingHearing(null)
+    setIsEditHearingOpen(false)
+  }
+
+  const handleDeleteHearing = async () => {
+    if (!deleteHearingId) return
+    await deleteHearingMutation.mutateAsync({ caseId, hearingId: deleteHearingId })
+    setDeleteHearingId(null)
+  }
+
+  // Claim handlers
+  const handleEditClaim = (claim: Claim) => {
+    setEditingClaim(claim)
+    setClaimType(claim.type)
+    setClaimAmount(claim.amount.toString())
+    setClaimPeriod(claim.period || '')
+    setClaimDescription(claim.description || '')
+    setIsEditClaimOpen(true)
+  }
+
+  const handleUpdateClaim = async () => {
+    if (!editingClaim?._id || !claimType || !claimAmount) return
+    await updateClaimMutation.mutateAsync({
+      caseId,
+      claimId: editingClaim._id,
+      data: {
+        type: claimType,
+        amount: parseFloat(claimAmount),
+        period: claimPeriod || undefined,
+        description: claimDescription || undefined,
+      },
+    })
+    setClaimType('')
+    setClaimAmount('')
+    setClaimPeriod('')
+    setClaimDescription('')
+    setEditingClaim(null)
+    setIsEditClaimOpen(false)
+  }
+
+  const handleDeleteClaim = async () => {
+    if (!deleteClaimId) return
+    await deleteClaimMutation.mutateAsync({ caseId, claimId: deleteClaimId })
+    setDeleteClaimId(null)
+  }
+
+  // Timeline handlers
+  const handleAddTimeline = async () => {
+    if (!timelineEvent.trim() || !timelineDate) return
+    await addTimelineMutation.mutateAsync({
+      caseId,
+      data: {
+        event: timelineEvent,
+        date: timelineDate,
+        type: timelineType,
+        status: timelineStatus,
+      },
+    })
+    setTimelineEvent('')
+    setTimelineDate('')
+    setTimelineType('general')
+    setTimelineStatus('upcoming')
+    setIsAddTimelineOpen(false)
+  }
+
+  const handleEditTimeline = (event: TimelineEvent) => {
+    setEditingTimeline(event)
+    setTimelineEvent(event.event)
+    setTimelineDate(event.date ? event.date.split('T')[0] : '')
+    setTimelineType(event.type)
+    setTimelineStatus(event.status)
+    setIsEditTimelineOpen(true)
+  }
+
+  const handleUpdateTimeline = async () => {
+    if (!editingTimeline?._id || !timelineEvent.trim() || !timelineDate) return
+    await updateTimelineMutation.mutateAsync({
+      caseId,
+      eventId: editingTimeline._id,
+      data: {
+        event: timelineEvent,
+        date: timelineDate,
+        type: timelineType,
+        status: timelineStatus,
+      },
+    })
+    setTimelineEvent('')
+    setTimelineDate('')
+    setTimelineType('general')
+    setTimelineStatus('upcoming')
+    setEditingTimeline(null)
+    setIsEditTimelineOpen(false)
+  }
+
+  const handleDeleteTimeline = async () => {
+    if (!deleteTimelineId) return
+    await deleteTimelineMutation.mutateAsync({ caseId, eventId: deleteTimelineId })
+    setDeleteTimelineId(null)
+  }
+
+  // Document handlers
+  const handleUploadDocument = async () => {
+    if (!uploadFile || !uploadCategory) return
+    await uploadDocMutation.mutateAsync({
+      caseId,
+      file: uploadFile,
+      category: uploadCategory as any,
+      description: uploadDescription || undefined,
+    })
+    setUploadFile(null)
+    setUploadCategory('')
+    setUploadDescription('')
+    setIsUploadDocOpen(false)
+  }
+
+  const handleDownloadDocument = (docId: string) => {
+    downloadDocMutation.mutate({ caseId, docId })
+  }
+
+  const handleDeleteDocument = async () => {
+    if (!deleteDocId) return
+    await deleteDocMutation.mutateAsync({ caseId, docId: deleteDocId })
+    setDeleteDocId(null)
   }
 
   // Calculate total claims amount
@@ -471,10 +720,20 @@ export function CaseDetailsView() {
                 <Card className="rounded-3xl border-0 shadow-lg bg-white overflow-hidden flex flex-col">
                   <div className="bg-navy p-6 text-white relative overflow-hidden">
                     <div className="absolute top-0 right-0 w-24 h-24 bg-brand-blue blur-[40px] opacity-30"></div>
-                    <h3 className="text-lg font-bold relative z-10 mb-1 flex items-center gap-2">
-                      <History className="h-5 w-5 text-brand-blue" />
-                      {t('cases.timeline', 'الجدول الزمني')}
-                    </h3>
+                    <div className="flex items-center justify-between relative z-10">
+                      <h3 className="text-lg font-bold mb-1 flex items-center gap-2">
+                        <History className="h-5 w-5 text-brand-blue" />
+                        {t('cases.timeline', 'الجدول الزمني')}
+                      </h3>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className="h-8 w-8 p-0 text-white hover:bg-white/20"
+                        onClick={() => setIsAddTimelineOpen(true)}
+                      >
+                        <Plus className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </div>
                   <CardContent className="p-0 flex-1 bg-slate-50/50">
                     <ScrollArea className="h-[350px] p-6">
@@ -483,7 +742,7 @@ export function CaseDetailsView() {
                         <div className="space-y-6 relative">
                           {caseData.timeline && caseData.timeline.length > 0 ? (
                             caseData.timeline.map((event: TimelineEvent, i: number) => (
-                              <div key={i} className="flex gap-4 relative">
+                              <div key={event._id || i} className="flex gap-4 relative group">
                                 <div
                                   className={`
                                     w-3 h-3 rounded-full mt-1.5 z-10 ring-4 ring-white shrink-0
@@ -491,8 +750,34 @@ export function CaseDetailsView() {
                                   `}
                                 ></div>
                                 <div className="flex-1">
-                                  <div className="text-sm font-bold text-navy">{event.event}</div>
-                                  <div className="text-xs text-slate-500 mb-1">{formatShortDate(event.date)}</div>
+                                  <div className="flex items-start justify-between">
+                                    <div>
+                                      <div className="text-sm font-bold text-navy">{event.event}</div>
+                                      <div className="text-xs text-slate-500 mb-1">{formatShortDate(event.date)}</div>
+                                    </div>
+                                    <DropdownMenu>
+                                      <DropdownMenuTrigger asChild>
+                                        <Button
+                                          variant="ghost"
+                                          size="icon"
+                                          className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
+                                        >
+                                          <MoreHorizontal className="h-3 w-3" />
+                                        </Button>
+                                      </DropdownMenuTrigger>
+                                      <DropdownMenuContent align="end">
+                                        <DropdownMenuItem onClick={() => handleEditTimeline(event)}>
+                                          <Edit className="h-4 w-4 ml-2" /> {t('common.edit', 'تعديل')}
+                                        </DropdownMenuItem>
+                                        <DropdownMenuItem
+                                          className="text-red-600"
+                                          onClick={() => event._id && setDeleteTimelineId(event._id)}
+                                        >
+                                          <Trash2 className="h-4 w-4 ml-2" /> {t('common.delete', 'حذف')}
+                                        </DropdownMenuItem>
+                                      </DropdownMenuContent>
+                                    </DropdownMenu>
+                                  </div>
                                   <Badge
                                     variant="outline"
                                     className="text-[10px] px-1.5 py-0 h-5 bg-white border-slate-200 text-slate-600"
@@ -793,7 +1078,7 @@ export function CaseDetailsView() {
                       {caseData.hearings && caseData.hearings.length > 0 ? (
                         caseData.hearings.map((hearing: CaseHearing, i: number) => (
                           <div
-                            key={i}
+                            key={hearing._id || i}
                             className={`rounded-2xl p-6 border ${
                               new Date(hearing.date) > new Date()
                                 ? 'bg-blue-50 border-blue-200'
@@ -837,6 +1122,24 @@ export function CaseDetailsView() {
                                   <p className="text-sm text-slate-500 mt-2">{hearing.notes}</p>
                                 )}
                               </div>
+                              <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                  <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-navy">
+                                    <MoreHorizontal className="h-4 w-4" />
+                                  </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end">
+                                  <DropdownMenuItem onClick={() => handleEditHearing(hearing)}>
+                                    <Edit className="h-4 w-4 ml-2" /> {t('common.edit', 'تعديل')}
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem
+                                    className="text-red-600"
+                                    onClick={() => hearing._id && setDeleteHearingId(hearing._id)}
+                                  >
+                                    <Trash2 className="h-4 w-4 ml-2" /> {t('common.delete', 'حذف')}
+                                  </DropdownMenuItem>
+                                </DropdownMenuContent>
+                              </DropdownMenu>
                             </div>
                           </div>
                         ))
@@ -971,20 +1274,10 @@ export function CaseDetailsView() {
                               {/* Upload Button */}
                               <Button
                                 className="w-full bg-emerald-500 hover:bg-emerald-600"
-                                disabled={!uploadFile || !uploadCategory || isUploading}
-                                onClick={() => {
-                                  // TODO: Implement actual upload
-                                  setIsUploading(true)
-                                  setTimeout(() => {
-                                    setIsUploading(false)
-                                    setIsUploadDocOpen(false)
-                                    setUploadFile(null)
-                                    setUploadCategory('')
-                                    setUploadDescription('')
-                                  }, 2000)
-                                }}
+                                disabled={!uploadFile || !uploadCategory || uploadDocMutation.isPending}
+                                onClick={handleUploadDocument}
                               >
-                                {isUploading ? (
+                                {uploadDocMutation.isPending ? (
                                   <>
                                     <Loader2 className="h-4 w-4 ml-2 animate-spin" />
                                     {t('common.uploading', 'جاري الرفع...')}
@@ -1030,7 +1323,7 @@ export function CaseDetailsView() {
 
                           return filteredDocs.map((doc: CaseDocument, i: number) => (
                             <div
-                              key={i}
+                              key={doc._id || i}
                               className={`p-4 rounded-2xl border shadow-sm hover:shadow-md transition-all group relative h-[180px] flex flex-col justify-between ${
                                 doc.category === 'judgment' || doc.bucket === 'judgments'
                                   ? 'bg-amber-50 border-amber-200'
@@ -1060,11 +1353,16 @@ export function CaseDetailsView() {
                                     </Button>
                                   </DropdownMenuTrigger>
                                   <DropdownMenuContent align="end">
-                                    <DropdownMenuItem>
-                                      <Eye className="h-4 w-4 ml-2" /> {t('common.preview', 'معاينة')}
-                                    </DropdownMenuItem>
-                                    <DropdownMenuItem>
+                                    <DropdownMenuItem
+                                      onClick={() => doc._id && handleDownloadDocument(doc._id)}
+                                    >
                                       <Download className="h-4 w-4 ml-2" /> {t('common.download', 'تحميل')}
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem
+                                      className="text-red-600"
+                                      onClick={() => doc._id && setDeleteDocId(doc._id)}
+                                    >
+                                      <Trash2 className="h-4 w-4 ml-2" /> {t('common.delete', 'حذف')}
                                     </DropdownMenuItem>
                                   </DropdownMenuContent>
                                 </DropdownMenu>
@@ -1181,8 +1479,8 @@ export function CaseDetailsView() {
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             {caseData.claims.map((claim: Claim, i: number) => (
                               <div
-                                key={i}
-                                className="bg-white border border-slate-200 rounded-2xl p-5 hover:shadow-md transition-all group"
+                                key={claim._id || i}
+                                className="bg-white border border-slate-200 rounded-2xl p-5 hover:shadow-md transition-all group relative"
                               >
                                 <div className="flex justify-between items-start mb-3">
                                   <div className="flex items-center gap-2">
@@ -1194,9 +1492,24 @@ export function CaseDetailsView() {
                                       {claim.period && <div className="text-xs text-slate-500">{claim.period}</div>}
                                     </div>
                                   </div>
-                                  <Badge className="bg-blue-100 text-blue-700 hover:bg-blue-200 border-0">
-                                    {claim.type}
-                                  </Badge>
+                                  <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                      <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-navy">
+                                        <MoreHorizontal className="h-4 w-4" />
+                                      </Button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent align="end">
+                                      <DropdownMenuItem onClick={() => handleEditClaim(claim)}>
+                                        <Edit className="h-4 w-4 ml-2" /> {t('common.edit', 'تعديل')}
+                                      </DropdownMenuItem>
+                                      <DropdownMenuItem
+                                        className="text-red-600"
+                                        onClick={() => claim._id && setDeleteClaimId(claim._id)}
+                                      >
+                                        <Trash2 className="h-4 w-4 ml-2" /> {t('common.delete', 'حذف')}
+                                      </DropdownMenuItem>
+                                    </DropdownMenuContent>
+                                  </DropdownMenu>
                                 </div>
                                 {claim.description && (
                                   <p className="text-sm text-slate-500 mb-3">{claim.description}</p>
@@ -1255,7 +1568,7 @@ export function CaseDetailsView() {
 
                       {caseData.notes && caseData.notes.length > 0 ? (
                         caseData.notes.map((note: CaseNote, i: number) => (
-                          <div key={i} className="bg-slate-50 rounded-2xl p-4 border border-slate-100">
+                          <div key={note._id || i} className="bg-slate-50 rounded-2xl p-4 border border-slate-100">
                             <div className="flex justify-between items-start mb-2">
                               <div className="flex items-center gap-2">
                                 <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600">
@@ -1270,10 +1583,13 @@ export function CaseDetailsView() {
                                   </Button>
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="end">
-                                  <DropdownMenuItem>
+                                  <DropdownMenuItem onClick={() => handleEditNote(note)}>
                                     <Edit className="h-4 w-4 ml-2" /> {t('common.edit', 'تعديل')}
                                   </DropdownMenuItem>
-                                  <DropdownMenuItem className="text-red-600">
+                                  <DropdownMenuItem
+                                    className="text-red-600"
+                                    onClick={() => note._id && setDeleteNoteId(note._id)}
+                                  >
                                     <Trash2 className="h-4 w-4 ml-2" /> {t('common.delete', 'حذف')}
                                   </DropdownMenuItem>
                                 </DropdownMenuContent>
@@ -1296,6 +1612,400 @@ export function CaseDetailsView() {
           </>
         )}
       </Main>
+
+      {/* Edit Note Dialog */}
+      <Dialog open={isEditNoteOpen} onOpenChange={setIsEditNoteOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{t('cases.editNote', 'تعديل الملاحظة')}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <Textarea
+              value={noteText}
+              onChange={(e) => setNoteText(e.target.value)}
+              placeholder={t('cases.noteTextPlaceholder', 'نص الملاحظة...')}
+              className="min-h-[100px]"
+            />
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsEditNoteOpen(false)}>
+              {t('common.cancel', 'إلغاء')}
+            </Button>
+            <Button
+              onClick={handleUpdateNote}
+              disabled={updateNoteMutation.isPending}
+              className="bg-brand-blue"
+            >
+              {updateNoteMutation.isPending ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                t('common.save', 'حفظ')
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Note Confirmation */}
+      <AlertDialog open={!!deleteNoteId} onOpenChange={() => setDeleteNoteId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t('cases.deleteNoteConfirm', 'حذف الملاحظة')}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {t('cases.deleteNoteMessage', 'هل أنت متأكد من حذف هذه الملاحظة؟ لا يمكن التراجع عن هذا الإجراء.')}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t('common.cancel', 'إلغاء')}</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteNote}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              {t('common.delete', 'حذف')}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Edit Hearing Dialog */}
+      <Dialog open={isEditHearingOpen} onOpenChange={setIsEditHearingOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{t('cases.editHearing', 'تعديل الجلسة')}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div>
+              <Label>{t('cases.hearingDate', 'التاريخ والوقت')}</Label>
+              <Input
+                type="datetime-local"
+                value={hearingDate}
+                onChange={(e) => setHearingDate(e.target.value)}
+              />
+            </div>
+            <div>
+              <Label>{t('cases.location', 'المكان')}</Label>
+              <Input
+                value={hearingLocation}
+                onChange={(e) => setHearingLocation(e.target.value)}
+                placeholder={t('cases.locationPlaceholder', 'مثال: المحكمة العمالية - القاعة 5')}
+              />
+            </div>
+            <div>
+              <Label>{t('cases.notes', 'ملاحظات')}</Label>
+              <Textarea
+                value={hearingNotes}
+                onChange={(e) => setHearingNotes(e.target.value)}
+                placeholder={t('cases.hearingNotesPlaceholder', 'ملاحظات إضافية...')}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsEditHearingOpen(false)}>
+              {t('common.cancel', 'إلغاء')}
+            </Button>
+            <Button
+              onClick={handleUpdateHearing}
+              disabled={updateHearingMutation.isPending}
+              className="bg-brand-blue"
+            >
+              {updateHearingMutation.isPending ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                t('common.save', 'حفظ')
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Hearing Confirmation */}
+      <AlertDialog open={!!deleteHearingId} onOpenChange={() => setDeleteHearingId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t('cases.deleteHearingConfirm', 'حذف الجلسة')}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {t('cases.deleteHearingMessage', 'هل أنت متأكد من حذف هذه الجلسة؟ لا يمكن التراجع عن هذا الإجراء.')}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t('common.cancel', 'إلغاء')}</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteHearing}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              {t('common.delete', 'حذف')}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Edit Claim Dialog */}
+      <Dialog open={isEditClaimOpen} onOpenChange={setIsEditClaimOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{t('cases.editClaim', 'تعديل المطالبة')}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div>
+              <Label>{t('cases.claimType', 'نوع المطالبة')}</Label>
+              <Select value={claimType} onValueChange={setClaimType}>
+                <SelectTrigger>
+                  <SelectValue placeholder={t('cases.selectClaimType', 'اختر نوع المطالبة')} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="أجور متأخرة">{t('cases.claimTypes.wages', 'أجور متأخرة')}</SelectItem>
+                  <SelectItem value="مكافأة نهاية الخدمة">{t('cases.claimTypes.endOfService', 'مكافأة نهاية الخدمة')}</SelectItem>
+                  <SelectItem value="بدل إجازات">{t('cases.claimTypes.vacationAllowance', 'بدل إجازات')}</SelectItem>
+                  <SelectItem value="تعويض فصل تعسفي">{t('cases.claimTypes.terminationCompensation', 'تعويض فصل تعسفي')}</SelectItem>
+                  <SelectItem value="أخرى">{t('cases.claimTypes.other', 'أخرى')}</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label>{t('cases.amount', 'المبلغ')}</Label>
+              <Input
+                type="number"
+                value={claimAmount}
+                onChange={(e) => setClaimAmount(e.target.value)}
+                placeholder="0"
+              />
+            </div>
+            <div>
+              <Label>{t('cases.period', 'الفترة')} ({t('common.optional', 'اختياري')})</Label>
+              <Input
+                value={claimPeriod}
+                onChange={(e) => setClaimPeriod(e.target.value)}
+                placeholder={t('cases.periodPlaceholder', 'مثال: يناير 2024 - مارس 2024')}
+              />
+            </div>
+            <div>
+              <Label>{t('cases.description', 'الوصف')} ({t('common.optional', 'اختياري')})</Label>
+              <Textarea
+                value={claimDescription}
+                onChange={(e) => setClaimDescription(e.target.value)}
+                placeholder={t('cases.claimDescriptionPlaceholder', 'وصف المطالبة...')}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsEditClaimOpen(false)}>
+              {t('common.cancel', 'إلغاء')}
+            </Button>
+            <Button
+              onClick={handleUpdateClaim}
+              disabled={updateClaimMutation.isPending}
+              className="bg-brand-blue"
+            >
+              {updateClaimMutation.isPending ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                t('common.save', 'حفظ')
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Claim Confirmation */}
+      <AlertDialog open={!!deleteClaimId} onOpenChange={() => setDeleteClaimId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t('cases.deleteClaimConfirm', 'حذف المطالبة')}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {t('cases.deleteClaimMessage', 'هل أنت متأكد من حذف هذه المطالبة؟ لا يمكن التراجع عن هذا الإجراء.')}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t('common.cancel', 'إلغاء')}</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteClaim}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              {t('common.delete', 'حذف')}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Delete Document Confirmation */}
+      <AlertDialog open={!!deleteDocId} onOpenChange={() => setDeleteDocId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t('cases.deleteDocConfirm', 'حذف المستند')}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {t('cases.deleteDocMessage', 'هل أنت متأكد من حذف هذا المستند؟ لا يمكن التراجع عن هذا الإجراء.')}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t('common.cancel', 'إلغاء')}</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteDocument}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              {t('common.delete', 'حذف')}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Add Timeline Event Dialog */}
+      <Dialog open={isAddTimelineOpen} onOpenChange={setIsAddTimelineOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{t('cases.addTimelineEvent', 'إضافة حدث جديد')}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div>
+              <Label>{t('cases.eventName', 'اسم الحدث')}</Label>
+              <Input
+                value={timelineEvent}
+                onChange={(e) => setTimelineEvent(e.target.value)}
+                placeholder={t('cases.eventNamePlaceholder', 'مثال: تقديم المذكرة')}
+              />
+            </div>
+            <div>
+              <Label>{t('cases.eventDate', 'التاريخ')}</Label>
+              <Input
+                type="date"
+                value={timelineDate}
+                onChange={(e) => setTimelineDate(e.target.value)}
+              />
+            </div>
+            <div>
+              <Label>{t('cases.eventType', 'نوع الحدث')}</Label>
+              <Select value={timelineType} onValueChange={(v) => setTimelineType(v as any)}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="court">{t('cases.eventType.court', 'جلسة')}</SelectItem>
+                  <SelectItem value="filing">{t('cases.eventType.filing', 'تقديم')}</SelectItem>
+                  <SelectItem value="deadline">{t('cases.eventType.deadline', 'موعد نهائي')}</SelectItem>
+                  <SelectItem value="general">{t('cases.eventType.general', 'عام')}</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label>{t('cases.eventStatus', 'الحالة')}</Label>
+              <Select value={timelineStatus} onValueChange={(v) => setTimelineStatus(v as any)}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="upcoming">{t('cases.upcoming', 'قادم')}</SelectItem>
+                  <SelectItem value="completed">{t('cases.completed', 'مكتمل')}</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsAddTimelineOpen(false)}>
+              {t('common.cancel', 'إلغاء')}
+            </Button>
+            <Button
+              onClick={handleAddTimeline}
+              disabled={addTimelineMutation.isPending}
+              className="bg-brand-blue"
+            >
+              {addTimelineMutation.isPending ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                t('common.add', 'إضافة')
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Timeline Event Dialog */}
+      <Dialog open={isEditTimelineOpen} onOpenChange={setIsEditTimelineOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{t('cases.editTimelineEvent', 'تعديل الحدث')}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div>
+              <Label>{t('cases.eventName', 'اسم الحدث')}</Label>
+              <Input
+                value={timelineEvent}
+                onChange={(e) => setTimelineEvent(e.target.value)}
+                placeholder={t('cases.eventNamePlaceholder', 'مثال: تقديم المذكرة')}
+              />
+            </div>
+            <div>
+              <Label>{t('cases.eventDate', 'التاريخ')}</Label>
+              <Input
+                type="date"
+                value={timelineDate}
+                onChange={(e) => setTimelineDate(e.target.value)}
+              />
+            </div>
+            <div>
+              <Label>{t('cases.eventType', 'نوع الحدث')}</Label>
+              <Select value={timelineType} onValueChange={(v) => setTimelineType(v as any)}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="court">{t('cases.eventType.court', 'جلسة')}</SelectItem>
+                  <SelectItem value="filing">{t('cases.eventType.filing', 'تقديم')}</SelectItem>
+                  <SelectItem value="deadline">{t('cases.eventType.deadline', 'موعد نهائي')}</SelectItem>
+                  <SelectItem value="general">{t('cases.eventType.general', 'عام')}</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label>{t('cases.eventStatus', 'الحالة')}</Label>
+              <Select value={timelineStatus} onValueChange={(v) => setTimelineStatus(v as any)}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="upcoming">{t('cases.upcoming', 'قادم')}</SelectItem>
+                  <SelectItem value="completed">{t('cases.completed', 'مكتمل')}</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsEditTimelineOpen(false)}>
+              {t('common.cancel', 'إلغاء')}
+            </Button>
+            <Button
+              onClick={handleUpdateTimeline}
+              disabled={updateTimelineMutation.isPending}
+              className="bg-brand-blue"
+            >
+              {updateTimelineMutation.isPending ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                t('common.save', 'حفظ')
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Timeline Event Confirmation */}
+      <AlertDialog open={!!deleteTimelineId} onOpenChange={() => setDeleteTimelineId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t('cases.deleteTimelineConfirm', 'حذف الحدث')}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {t('cases.deleteTimelineMessage', 'هل أنت متأكد من حذف هذا الحدث؟ لا يمكن التراجع عن هذا الإجراء.')}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t('common.cancel', 'إلغاء')}</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteTimeline}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              {t('common.delete', 'حذف')}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   )
 }
