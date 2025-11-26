@@ -133,6 +133,13 @@ export function CaseDetailsView() {
   const [claimAmount, setClaimAmount] = useState('')
   const [claimPeriod, setClaimPeriod] = useState('')
   const [claimDescription, setClaimDescription] = useState('')
+  // Document states
+  const [documentSubTab, setDocumentSubTab] = useState<'general' | 'judgments'>('general')
+  const [isUploadDocOpen, setIsUploadDocOpen] = useState(false)
+  const [uploadFile, setUploadFile] = useState<File | null>(null)
+  const [uploadCategory, setUploadCategory] = useState<string>('')
+  const [uploadDescription, setUploadDescription] = useState('')
+  const [isUploading, setIsUploading] = useState(false)
 
   const { caseId } = useParams({ strict: false }) as { caseId: string }
 
@@ -844,74 +851,249 @@ export function CaseDetailsView() {
 
                   {/* Documents Tab */}
                   {activeTab === 'documents' && (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                      {/* Upload New Card */}
-                      <div className="border-2 border-dashed border-slate-200 rounded-2xl flex flex-col items-center justify-center p-6 cursor-pointer hover:border-brand-blue hover:bg-blue-50 transition-all group h-[180px]">
-                        <div className="w-12 h-12 rounded-full bg-slate-100 group-hover:bg-blue-100 flex items-center justify-center text-slate-400 group-hover:text-brand-blue mb-3 transition-colors">
-                          <Upload className="h-6 w-6" />
+                    <div className="space-y-6">
+                      {/* Document Sub-tabs Header */}
+                      <div className="flex items-center justify-between">
+                        <div className="flex gap-2 bg-slate-100 p-1 rounded-xl">
+                          <button
+                            onClick={() => setDocumentSubTab('general')}
+                            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                              documentSubTab === 'general'
+                                ? 'bg-white text-navy shadow-sm'
+                                : 'text-slate-500 hover:text-navy'
+                            }`}
+                          >
+                            <FileText className="h-4 w-4 inline-block ml-2" />
+                            {t('cases.documents.general', 'مستندات عامة')}
+                          </button>
+                          <button
+                            onClick={() => setDocumentSubTab('judgments')}
+                            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                              documentSubTab === 'judgments'
+                                ? 'bg-white text-navy shadow-sm'
+                                : 'text-slate-500 hover:text-navy'
+                            }`}
+                          >
+                            <Gavel className="h-4 w-4 inline-block ml-2" />
+                            {t('cases.documents.judgments', 'الأحكام')}
+                          </button>
                         </div>
-                        <span className="font-bold text-slate-600 group-hover:text-brand-blue">
-                          {t('cases.uploadDocument', 'رفع مستند جديد')}
-                        </span>
-                        <span className="text-xs text-slate-400 mt-1">PDF, DOCX, JPG</span>
+
+                        {/* Upload Button */}
+                        <Dialog open={isUploadDocOpen} onOpenChange={setIsUploadDocOpen}>
+                          <DialogTrigger asChild>
+                            <Button className="bg-brand-blue hover:bg-blue-600 text-white">
+                              <Upload className="h-4 w-4 ml-2" />
+                              {t('cases.uploadDocument', 'رفع مستند')}
+                            </Button>
+                          </DialogTrigger>
+                          <DialogContent className="sm:max-w-md">
+                            <DialogHeader>
+                              <DialogTitle>{t('cases.uploadDocument', 'رفع مستند جديد')}</DialogTitle>
+                              <DialogDescription>
+                                {t('cases.uploadDocumentDescription', 'اختر الملف ونوع المستند للرفع')}
+                              </DialogDescription>
+                            </DialogHeader>
+                            <div className="space-y-4">
+                              {/* File Drop Zone */}
+                              <div
+                                className="border-2 border-dashed border-slate-200 rounded-xl p-6 text-center cursor-pointer hover:border-brand-blue hover:bg-blue-50 transition-all"
+                                onClick={() => document.getElementById('file-upload')?.click()}
+                              >
+                                {uploadFile ? (
+                                  <div className="space-y-2">
+                                    <FileCheck className="h-10 w-10 mx-auto text-emerald-500" />
+                                    <p className="font-medium text-navy">{uploadFile.name}</p>
+                                    <p className="text-sm text-slate-500">{(uploadFile.size / 1024).toFixed(0)} KB</p>
+                                  </div>
+                                ) : (
+                                  <div className="space-y-2">
+                                    <Upload className="h-10 w-10 mx-auto text-slate-400" />
+                                    <p className="text-slate-500">{t('cases.dropFileHere', 'اضغط لاختيار ملف')}</p>
+                                    <p className="text-xs text-slate-400">PDF, DOCX, JPG, PNG (max 50MB)</p>
+                                  </div>
+                                )}
+                                <input
+                                  id="file-upload"
+                                  type="file"
+                                  className="hidden"
+                                  accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.tiff"
+                                  onChange={(e) => setUploadFile(e.target.files?.[0] || null)}
+                                />
+                              </div>
+
+                              {/* Document Type */}
+                              <div className="space-y-2">
+                                <Label>{t('cases.documentType', 'نوع المستند')}</Label>
+                                <Select value={uploadCategory} onValueChange={setUploadCategory}>
+                                  <SelectTrigger>
+                                    <SelectValue placeholder={t('cases.selectDocumentType', 'اختر نوع المستند')} />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="contract">{t('cases.docTypes.contract', 'عقد')}</SelectItem>
+                                    <SelectItem value="evidence">{t('cases.docTypes.evidence', 'دليل / مستند داعم')}</SelectItem>
+                                    <SelectItem value="correspondence">{t('cases.docTypes.correspondence', 'مراسلات')}</SelectItem>
+                                    <SelectItem value="pleading">{t('cases.docTypes.pleading', 'لائحة / مذكرة')}</SelectItem>
+                                    <SelectItem value="judgment">{t('cases.docTypes.judgment', 'حكم قضائي')}</SelectItem>
+                                    <SelectItem value="other">{t('cases.docTypes.other', 'أخرى')}</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                              </div>
+
+                              {/* Description */}
+                              <div className="space-y-2">
+                                <Label>{t('cases.documentDescription', 'وصف المستند (اختياري)')}</Label>
+                                <Textarea
+                                  value={uploadDescription}
+                                  onChange={(e) => setUploadDescription(e.target.value)}
+                                  placeholder={t('cases.documentDescriptionPlaceholder', 'وصف مختصر للمستند...')}
+                                  rows={2}
+                                />
+                              </div>
+
+                              {/* Bucket Info */}
+                              <div className="bg-slate-50 rounded-lg p-3 text-sm">
+                                <p className="text-slate-600">
+                                  {uploadCategory === 'judgment' ? (
+                                    <>
+                                      <Shield className="h-4 w-4 inline-block ml-1 text-amber-500" />
+                                      {t('cases.judgmentBucketInfo', 'سيتم حفظ الحكم في مخزن الأحكام المشفر')}
+                                    </>
+                                  ) : (
+                                    <>
+                                      <Shield className="h-4 w-4 inline-block ml-1 text-blue-500" />
+                                      {t('cases.generalBucketInfo', 'سيتم حفظ المستند في المخزن الآمن')}
+                                    </>
+                                  )}
+                                </p>
+                              </div>
+
+                              {/* Upload Button */}
+                              <Button
+                                className="w-full bg-emerald-500 hover:bg-emerald-600"
+                                disabled={!uploadFile || !uploadCategory || isUploading}
+                                onClick={() => {
+                                  // TODO: Implement actual upload
+                                  setIsUploading(true)
+                                  setTimeout(() => {
+                                    setIsUploading(false)
+                                    setIsUploadDocOpen(false)
+                                    setUploadFile(null)
+                                    setUploadCategory('')
+                                    setUploadDescription('')
+                                  }, 2000)
+                                }}
+                              >
+                                {isUploading ? (
+                                  <>
+                                    <Loader2 className="h-4 w-4 ml-2 animate-spin" />
+                                    {t('common.uploading', 'جاري الرفع...')}
+                                  </>
+                                ) : (
+                                  <>
+                                    <Upload className="h-4 w-4 ml-2" />
+                                    {t('cases.uploadDocument', 'رفع المستند')}
+                                  </>
+                                )}
+                              </Button>
+                            </div>
+                          </DialogContent>
+                        </Dialog>
                       </div>
 
-                      {caseData.documents && caseData.documents.length > 0 ? (
-                        caseData.documents.map((doc: CaseDocument, i: number) => (
-                          <div
-                            key={i}
-                            className="bg-slate-50 p-4 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-all group relative h-[180px] flex flex-col justify-between"
-                          >
-                            <div className="flex justify-between items-start">
-                              <div className="w-10 h-10 rounded-lg bg-white flex items-center justify-center text-slate-500 font-bold text-xs border border-slate-200">
-                                {doc.type?.split('/')[1]?.toUpperCase() || 'FILE'}
+                      {/* Document Grid */}
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {(() => {
+                          const filteredDocs = caseData.documents?.filter(
+                            (doc: CaseDocument) => documentSubTab === 'judgments'
+                              ? doc.bucket === 'judgments' || doc.category === 'judgment'
+                              : doc.bucket === 'general' || doc.bucket !== 'judgments'
+                          ) || []
+
+                          if (filteredDocs.length === 0) {
+                            return (
+                              <div className="col-span-full text-center py-12 text-slate-400">
+                                {documentSubTab === 'judgments' ? (
+                                  <>
+                                    <Gavel className="h-12 w-12 mx-auto mb-3 opacity-50" />
+                                    <p>{t('cases.noJudgments', 'لا توجد أحكام مسجلة')}</p>
+                                  </>
+                                ) : (
+                                  <>
+                                    <FileText className="h-12 w-12 mx-auto mb-3 opacity-50" />
+                                    <p>{t('cases.noDocuments', 'لا توجد مستندات')}</p>
+                                  </>
+                                )}
                               </div>
-                              <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                  <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    className="h-8 w-8 -ml-2 text-slate-400 hover:text-navy"
-                                  >
-                                    <MoreHorizontal className="h-4 w-4" />
-                                  </Button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end">
-                                  <DropdownMenuItem>
-                                    <Eye className="h-4 w-4 ml-2" /> {t('common.preview', 'معاينة')}
-                                  </DropdownMenuItem>
-                                  <DropdownMenuItem>
-                                    <Download className="h-4 w-4 ml-2" /> {t('common.download', 'تحميل')}
-                                  </DropdownMenuItem>
-                                </DropdownMenuContent>
-                              </DropdownMenu>
-                            </div>
-                            <div>
-                              <h4 className="font-bold text-navy text-sm mb-1 line-clamp-1" title={doc.filename}>
-                                {doc.filename}
-                              </h4>
-                              <div className="flex items-center gap-2 text-xs text-slate-400">
-                                <span>{(doc.size / 1024).toFixed(0)} KB</span>
-                                <span>•</span>
-                                <span>{formatShortDate(doc.uploadedAt)}</span>
+                            )
+                          }
+
+                          return filteredDocs.map((doc: CaseDocument, i: number) => (
+                            <div
+                              key={i}
+                              className={`p-4 rounded-2xl border shadow-sm hover:shadow-md transition-all group relative h-[180px] flex flex-col justify-between ${
+                                doc.category === 'judgment' || doc.bucket === 'judgments'
+                                  ? 'bg-amber-50 border-amber-200'
+                                  : 'bg-slate-50 border-slate-100'
+                              }`}
+                            >
+                              <div className="flex justify-between items-start">
+                                <div className={`w-10 h-10 rounded-lg flex items-center justify-center font-bold text-xs border ${
+                                  doc.category === 'judgment' || doc.bucket === 'judgments'
+                                    ? 'bg-amber-100 border-amber-300 text-amber-700'
+                                    : 'bg-white border-slate-200 text-slate-500'
+                                }`}>
+                                  {doc.category === 'judgment' ? (
+                                    <Gavel className="h-5 w-5" />
+                                  ) : (
+                                    doc.type?.split('/')[1]?.toUpperCase()?.slice(0, 4) || 'FILE'
+                                  )}
+                                </div>
+                                <DropdownMenu>
+                                  <DropdownMenuTrigger asChild>
+                                    <Button
+                                      variant="ghost"
+                                      size="icon"
+                                      className="h-8 w-8 -ml-2 text-slate-400 hover:text-navy"
+                                    >
+                                      <MoreHorizontal className="h-4 w-4" />
+                                    </Button>
+                                  </DropdownMenuTrigger>
+                                  <DropdownMenuContent align="end">
+                                    <DropdownMenuItem>
+                                      <Eye className="h-4 w-4 ml-2" /> {t('common.preview', 'معاينة')}
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem>
+                                      <Download className="h-4 w-4 ml-2" /> {t('common.download', 'تحميل')}
+                                    </DropdownMenuItem>
+                                  </DropdownMenuContent>
+                                </DropdownMenu>
+                              </div>
+                              <div>
+                                <h4 className="font-bold text-navy text-sm mb-1 line-clamp-1" title={doc.filename}>
+                                  {doc.filename}
+                                </h4>
+                                <div className="flex items-center gap-2 text-xs text-slate-400">
+                                  <span>{(doc.size / 1024).toFixed(0)} KB</span>
+                                  <span>•</span>
+                                  <span>{formatShortDate(doc.uploadedAt)}</span>
+                                </div>
+                                {doc.description && (
+                                  <p className="text-xs text-slate-500 mt-1 line-clamp-1">{doc.description}</p>
+                                )}
+                              </div>
+                              <div className="pt-3 border-t border-slate-200 flex gap-2">
+                                <Button variant="outline" size="sm" className="flex-1 h-8 text-xs bg-white border-slate-200 hover:bg-slate-50">
+                                  {t('common.preview', 'معاينة')}
+                                </Button>
+                                <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-brand-blue">
+                                  <Download className="h-4 w-4" />
+                                </Button>
                               </div>
                             </div>
-                            <div className="pt-3 border-t border-slate-200 flex gap-2">
-                              <Button variant="outline" size="sm" className="flex-1 h-8 text-xs bg-white border-slate-200 hover:bg-slate-50">
-                                {t('common.preview', 'معاينة')}
-                              </Button>
-                              <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-brand-blue">
-                                <Download className="h-4 w-4" />
-                              </Button>
-                            </div>
-                          </div>
-                        ))
-                      ) : (
-                        <div className="col-span-full text-center py-12 text-slate-400">
-                          <FileText className="h-12 w-12 mx-auto mb-3 opacity-50" />
-                          <p>{t('cases.noDocuments', 'لا توجد مستندات')}</p>
-                        </div>
-                      )}
+                          ))
+                        })()}
+                      </div>
                     </div>
                   )}
 

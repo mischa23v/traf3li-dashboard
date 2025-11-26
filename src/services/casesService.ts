@@ -73,12 +73,15 @@ export interface CaseNote {
 export interface CaseDocument {
   _id?: string
   filename: string
-  url: string
+  url?: string
+  fileKey?: string
   type: string
   size: number
   uploadedBy: string
   uploadedAt: string
-  category: 'contract' | 'evidence' | 'correspondence' | 'other'
+  category: 'contract' | 'evidence' | 'correspondence' | 'judgment' | 'pleading' | 'other'
+  bucket: 'general' | 'judgments'
+  description?: string
 }
 
 /**
