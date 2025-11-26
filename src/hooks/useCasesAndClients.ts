@@ -13,6 +13,7 @@ import casesService, {
   AddNoteData,
   AddDocumentData,
   AddHearingData,
+  AddClaimData,
   CaseStatus,
   CaseOutcome,
   Case,
@@ -21,6 +22,10 @@ import clientsService, {
   ClientFilters,
   CreateClientData,
 } from '@/services/clientsService'
+import lawyersService, {
+  LawyerFilters,
+  Lawyer,
+} from '@/services/lawyersService'
 
 // ==================== CASES ====================
 
@@ -187,6 +192,26 @@ export const useAddCaseHearing = () => {
 }
 
 /**
+ * Add claim to case mutation
+ */
+export const useAddCaseClaim = () => {
+  const queryClient = useQueryClient()
+  const { t } = useTranslation()
+
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: AddClaimData }) =>
+      casesService.addClaim(id, data),
+    onSuccess: (_, { id }) => {
+      queryClient.invalidateQueries({ queryKey: ['cases', id] })
+      toast.success(t('cases.claimAddSuccess', 'تمت إضافة المطالبة بنجاح'))
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || t('cases.claimAddError', 'فشل إضافة المطالبة'))
+    },
+  })
+}
+
+/**
  * Update case status mutation
  */
 export const useUpdateCaseStatus = () => {
@@ -317,6 +342,41 @@ export const useTopRevenueClients = (limit: number = 10) => {
   return useQuery({
     queryKey: ['clients', 'top-revenue', limit],
     queryFn: () => clientsService.getTopRevenue(limit),
+    staleTime: 5 * 60 * 1000,
+  })
+}
+
+// ==================== LAWYERS/TEAM ====================
+
+/**
+ * Get all lawyers/team members
+ */
+export const useLawyers = (filters?: LawyerFilters) => {
+  return useQuery({
+    queryKey: ['lawyers', filters],
+    queryFn: () => lawyersService.getAll(filters),
+    staleTime: 5 * 60 * 1000,
+  })
+}
+
+/**
+ * Get single lawyer by ID
+ */
+export const useLawyer = (id: string) => {
+  return useQuery({
+    queryKey: ['lawyers', id],
+    queryFn: () => lawyersService.getById(id),
+    enabled: !!id,
+  })
+}
+
+/**
+ * Get team members available for task assignment
+ */
+export const useTeamMembers = () => {
+  return useQuery({
+    queryKey: ['lawyers', 'team'],
+    queryFn: () => lawyersService.getTeamMembers(),
     staleTime: 5 * 60 * 1000,
   })
 }

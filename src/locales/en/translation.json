@@ -287,7 +287,19 @@
       "medium": "Medium",
       "high": "High",
       "critical": "Critical"
-    }
+    },
+    "client": "Client",
+    "selectClient": "Select client",
+    "noClients": "No clients found",
+    "linkedCase": "Linked Case (optional)",
+    "selectCase": "Select case",
+    "noCases": "No cases found",
+    "assignedTo": "Assigned To",
+    "selectAssignee": "Select assignee",
+    "noTeamMembers": "No team members found",
+    "viewCase": "View Case",
+    "viewClient": "View Client",
+    "viewAssignee": "View Assignee"
   },
   "users": {
     "title": "User List",
@@ -549,6 +561,25 @@
     "noDocuments": "No documents",
     "claims": "Claims",
     "addClaim": "Add Claim",
+    "addClaimDescription": "Add a new claim to the case",
+    "claimType": "Claim Type",
+    "selectClaimType": "Select claim type",
+    "claimAmount": "Amount (SAR)",
+    "claimPeriod": "Period (optional)",
+    "claimPeriodPlaceholder": "e.g., January 2024 - March 2024",
+    "claimDescription": "Description (optional)",
+    "claimDescriptionPlaceholder": "Additional details about the claim...",
+    "claimAddSuccess": "Claim added successfully",
+    "claimAddError": "Failed to add claim",
+    "claimTypes": {
+      "wages": "Unpaid Wages",
+      "endOfService": "End of Service Award",
+      "vacation": "Vacation Allowance",
+      "housing": "Housing Allowance",
+      "transport": "Transport Allowance",
+      "wrongfulTermination": "Wrongful Termination Compensation",
+      "other": "Other"
+    },
     "noClaims": "No claims",
     "items": "items",
     "totalAmount": "Total Amount",
@@ -584,7 +615,7 @@
       "high": "High",
       "critical": "Critical"
     },
-    "outcome": {
+    "outcomeValues": {
       "ongoing": "Ongoing",
       "won": "Won",
       "lost": "Lost",

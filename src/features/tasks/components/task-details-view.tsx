@@ -59,21 +59,26 @@ export function TaskDetailsView() {
 
         // Type narrow caseId
         const caseInfo = typeof t.caseId === 'string' || !t.caseId
-            ? { id: 'N/A', title: 'غير محدد', court: 'غير محدد' }
+            ? { id: 'N/A', title: 'غير محدد', court: 'غير محدد', _id: typeof t.caseId === 'string' ? t.caseId : null }
             : {
                 id: t.caseId.caseNumber || 'N/A',
                 title: t.caseId.title || 'غير محدد',
-                court: t.caseId.court || 'غير محدد'
+                court: t.caseId.court || 'غير محدد',
+                _id: (t.caseId as any)._id || null
             }
 
         // Type narrow clientId
         const clientInfo = typeof t.clientId === 'string' || !t.clientId
-            ? { name: 'غير محدد', type: 'فرد', phone: '' }
+            ? { name: 'غير محدد', type: 'فرد', phone: '', _id: typeof t.clientId === 'string' ? t.clientId : null }
             : {
                 name: t.clientId.name || 'غير محدد',
                 type: 'فرد',
-                phone: t.clientId.phone || ''
+                phone: t.clientId.phone || '',
+                _id: (t.clientId as any)._id || null
             }
+
+        // Type narrow assignedTo for linking
+        const assigneeId = typeof t.assignedTo === 'string' ? t.assignedTo : (t.assignedTo as any)?._id || null
 
         return {
             id: t._id,
@@ -84,6 +89,7 @@ export function TaskDetailsView() {
             dueDate: t.dueDate ? new Date(t.dueDate).toLocaleDateString('ar-SA') : 'غير محدد',
             completion,
             assignee,
+            assigneeId,
             client: clientInfo,
             case: caseInfo,
             subtasks: subtasks.map((st: any, idx: number) => ({
@@ -379,7 +385,14 @@ export function TaskDetailsView() {
                                                             <span className="text-slate-500">المحكمة</span>
                                                             <span className="font-medium text-slate-900">{task.case.court}</span>
                                                         </div>
-                                                        <Button variant="link" className="p-0 h-auto text-blue-600 text-sm">عرض ملف القضية</Button>
+                                                        {task.case._id ? (
+                                                            <a href={`/dashboard/cases/${task.case._id}`} className="text-blue-600 text-sm hover:underline inline-flex items-center gap-1">
+                                                                <LinkIcon className="h-3 w-3" />
+                                                                عرض ملف القضية
+                                                            </a>
+                                                        ) : (
+                                                            <span className="text-slate-400 text-sm">لا توجد قضية مرتبطة</span>
+                                                        )}
                                                     </CardContent>
                                                 </Card>
 
@@ -399,7 +412,14 @@ export function TaskDetailsView() {
                                                             <span className="text-slate-500">الصفة</span>
                                                             <span className="font-medium text-slate-900">{task.client.type}</span>
                                                         </div>
-                                                        <Button variant="link" className="p-0 h-auto text-blue-600 text-sm">عرض ملف العميل</Button>
+                                                        {task.client._id ? (
+                                                            <a href={`/dashboard/clients/${task.client._id}`} className="text-blue-600 text-sm hover:underline inline-flex items-center gap-1">
+                                                                <LinkIcon className="h-3 w-3" />
+                                                                عرض ملف العميل
+                                                            </a>
+                                                        ) : (
+                                                            <span className="text-slate-400 text-sm">لا يوجد عميل مرتبط</span>
+                                                        )}
                                                     </CardContent>
                                                 </Card>
                                             </div>

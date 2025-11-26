@@ -75,6 +75,7 @@ import {
   useCase,
   useAddCaseNote,
   useAddCaseHearing,
+  useAddCaseClaim,
   useUpdateCaseStatus,
 } from '@/hooks/useCasesAndClients'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -127,12 +128,18 @@ export function CaseDetailsView() {
   const [hearingDate, setHearingDate] = useState('')
   const [hearingLocation, setHearingLocation] = useState('')
   const [hearingNotes, setHearingNotes] = useState('')
+  const [isAddClaimOpen, setIsAddClaimOpen] = useState(false)
+  const [claimType, setClaimType] = useState('')
+  const [claimAmount, setClaimAmount] = useState('')
+  const [claimPeriod, setClaimPeriod] = useState('')
+  const [claimDescription, setClaimDescription] = useState('')
 
   const { caseId } = useParams({ strict: false }) as { caseId: string }
 
   const { data: caseData, isLoading, isError, error, refetch } = useCase(caseId)
   const addNoteMutation = useAddCaseNote()
   const addHearingMutation = useAddCaseHearing()
+  const addClaimMutation = useAddCaseClaim()
   const updateStatusMutation = useUpdateCaseStatus()
 
   const topNav = [
@@ -236,6 +243,24 @@ export function CaseDetailsView() {
     setHearingLocation('')
     setHearingNotes('')
     setIsAddHearingOpen(false)
+  }
+
+  const handleAddClaim = async () => {
+    if (!claimType.trim() || !claimAmount) return
+    await addClaimMutation.mutateAsync({
+      id: caseId,
+      data: {
+        type: claimType,
+        amount: parseFloat(claimAmount),
+        period: claimPeriod || undefined,
+        description: claimDescription || undefined,
+      },
+    })
+    setClaimType('')
+    setClaimAmount('')
+    setClaimPeriod('')
+    setClaimDescription('')
+    setIsAddClaimOpen(false)
   }
 
   const handleStatusChange = async (status: CaseStatus) => {
@@ -639,12 +664,12 @@ export function CaseDetailsView() {
                             <div className="text-sm text-slate-500">{t('cases.outcome', 'النتيجة')}</div>
                             <div className="font-bold text-navy">
                               {caseData.outcome === 'ongoing'
-                                ? t('cases.outcome.ongoing', 'جارية')
+                                ? t('cases.outcomeValues.ongoing', 'جارية')
                                 : caseData.outcome === 'won'
-                                  ? t('cases.outcome.won', 'فائزة')
+                                  ? t('cases.outcomeValues.won', 'فائزة')
                                   : caseData.outcome === 'lost'
-                                    ? t('cases.outcome.lost', 'خاسرة')
-                                    : t('cases.outcome.settled', 'تسوية')}
+                                    ? t('cases.outcomeValues.lost', 'خاسرة')
+                                    : t('cases.outcomeValues.settled', 'تسوية')}
                             </div>
                           </div>
                         </div>
@@ -895,10 +920,78 @@ export function CaseDetailsView() {
                     <div className="space-y-6">
                       <div className="flex justify-between items-center">
                         <h3 className="font-bold text-navy">{t('cases.claims', 'المطالبات')}</h3>
-                        <Button size="sm" className="bg-emerald-500 hover:bg-emerald-600 text-white border-0">
-                          <Plus className="h-4 w-4 ml-2" />
-                          {t('cases.addClaim', 'إضافة مطالبة')}
-                        </Button>
+                        <Dialog open={isAddClaimOpen} onOpenChange={setIsAddClaimOpen}>
+                          <DialogTrigger asChild>
+                            <Button size="sm" className="bg-emerald-500 hover:bg-emerald-600 text-white border-0">
+                              <Plus className="h-4 w-4 ml-2" />
+                              {t('cases.addClaim', 'إضافة مطالبة')}
+                            </Button>
+                          </DialogTrigger>
+                          <DialogContent>
+                            <DialogHeader>
+                              <DialogTitle>{t('cases.addClaim', 'إضافة مطالبة')}</DialogTitle>
+                              <DialogDescription>
+                                {t('cases.addClaimDescription', 'أضف مطالبة جديدة للقضية')}
+                              </DialogDescription>
+                            </DialogHeader>
+                            <div className="space-y-4">
+                              <div className="space-y-2">
+                                <Label htmlFor="claimType">{t('cases.claimType', 'نوع المطالبة')}</Label>
+                                <Select value={claimType} onValueChange={setClaimType}>
+                                  <SelectTrigger>
+                                    <SelectValue placeholder={t('cases.selectClaimType', 'اختر نوع المطالبة')} />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="أجور متأخرة">{t('cases.claimTypes.wages', 'أجور متأخرة')}</SelectItem>
+                                    <SelectItem value="مكافأة نهاية الخدمة">{t('cases.claimTypes.endOfService', 'مكافأة نهاية الخدمة')}</SelectItem>
+                                    <SelectItem value="بدل إجازات">{t('cases.claimTypes.vacation', 'بدل إجازات')}</SelectItem>
+                                    <SelectItem value="بدل سكن">{t('cases.claimTypes.housing', 'بدل سكن')}</SelectItem>
+                                    <SelectItem value="بدل نقل">{t('cases.claimTypes.transport', 'بدل نقل')}</SelectItem>
+                                    <SelectItem value="تعويض فصل تعسفي">{t('cases.claimTypes.wrongfulTermination', 'تعويض فصل تعسفي')}</SelectItem>
+                                    <SelectItem value="أخرى">{t('cases.claimTypes.other', 'أخرى')}</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                              </div>
+                              <div className="space-y-2">
+                                <Label htmlFor="claimAmount">{t('cases.claimAmount', 'المبلغ (ر.س)')}</Label>
+                                <Input
+                                  id="claimAmount"
+                                  type="number"
+                                  value={claimAmount}
+                                  onChange={(e) => setClaimAmount(e.target.value)}
+                                  placeholder="0.00"
+                                />
+                              </div>
+                              <div className="space-y-2">
+                                <Label htmlFor="claimPeriod">{t('cases.claimPeriod', 'الفترة (اختياري)')}</Label>
+                                <Input
+                                  id="claimPeriod"
+                                  value={claimPeriod}
+                                  onChange={(e) => setClaimPeriod(e.target.value)}
+                                  placeholder={t('cases.claimPeriodPlaceholder', 'مثال: يناير 2024 - مارس 2024')}
+                                />
+                              </div>
+                              <div className="space-y-2">
+                                <Label htmlFor="claimDescription">{t('cases.claimDescription', 'الوصف (اختياري)')}</Label>
+                                <Textarea
+                                  id="claimDescription"
+                                  value={claimDescription}
+                                  onChange={(e) => setClaimDescription(e.target.value)}
+                                  placeholder={t('cases.claimDescriptionPlaceholder', 'تفاصيل إضافية عن المطالبة...')}
+                                  rows={3}
+                                />
+                              </div>
+                              <Button
+                                onClick={handleAddClaim}
+                                disabled={addClaimMutation.isPending || !claimType || !claimAmount}
+                                className="w-full bg-emerald-500 hover:bg-emerald-600"
+                              >
+                                {addClaimMutation.isPending && <Loader2 className="h-4 w-4 ml-2 animate-spin" />}
+                                {t('common.add', 'إضافة')}
+                              </Button>
+                            </div>
+                          </DialogContent>
+                        </Dialog>
                       </div>
 
                       {caseData.claims && caseData.claims.length > 0 ? (
