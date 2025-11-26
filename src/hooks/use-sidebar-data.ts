@@ -257,21 +257,8 @@ export function useSidebarData(): SidebarData {
           },
           {
             title: 'التقارير',
+            url: '/dashboard/reports',
             icon: BarChart,
-            items: [
-              {
-                title: 'تقرير الإيرادات',
-                url: '/dashboard/reports/revenue',
-              },
-              {
-                title: 'تقرير القضايا',
-                url: '/dashboard/reports/cases',
-              },
-              {
-                title: 'تقرير الوقت',
-                url: '/dashboard/reports/time',
-              },
-            ],
           },
           {
             title: 'مركز المعرفة',
