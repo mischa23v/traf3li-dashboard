@@ -5,6 +5,9 @@ import {
   MessageSquare,
   Briefcase,
   Users,
+  UsersRound,
+  Contact,
+  Building2,
   Scale,
   DollarSign,
   Star,
@@ -136,6 +139,21 @@ export function useSidebarData(): SidebarData {
             title: 'العملاء',
             url: '/dashboard/clients',
             icon: Users,
+          },
+          {
+            title: 'فريق العمل',
+            url: '/dashboard/staff',
+            icon: UsersRound,
+          },
+          {
+            title: 'جهات الاتصال',
+            url: '/dashboard/contacts',
+            icon: Contact,
+          },
+          {
+            title: 'المنظمات',
+            url: '/dashboard/organizations',
+            icon: Building2,
           },
           {
             title: 'القضايا',
