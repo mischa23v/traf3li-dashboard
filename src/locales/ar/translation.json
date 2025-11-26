@@ -287,7 +287,19 @@
       "medium": "متوسطة",
       "high": "عالية",
       "critical": "حرجة"
-    }
+    },
+    "client": "العميل",
+    "selectClient": "اختر العميل",
+    "noClients": "لا يوجد عملاء",
+    "linkedCase": "القضية المرتبطة (اختياري)",
+    "selectCase": "اختر القضية",
+    "noCases": "لا توجد قضايا",
+    "assignedTo": "تعيين إلى",
+    "selectAssignee": "اختر المسؤول",
+    "noTeamMembers": "لا يوجد أعضاء فريق",
+    "viewCase": "عرض القضية",
+    "viewClient": "عرض العميل",
+    "viewAssignee": "عرض المسؤول"
   },
   "users": {
     "title": "قائمة المستخدمين",

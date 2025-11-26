@@ -22,6 +22,10 @@ import clientsService, {
   ClientFilters,
   CreateClientData,
 } from '@/services/clientsService'
+import lawyersService, {
+  LawyerFilters,
+  Lawyer,
+} from '@/services/lawyersService'
 
 // ==================== CASES ====================
 
@@ -338,6 +342,41 @@ export const useTopRevenueClients = (limit: number = 10) => {
   return useQuery({
     queryKey: ['clients', 'top-revenue', limit],
     queryFn: () => clientsService.getTopRevenue(limit),
+    staleTime: 5 * 60 * 1000,
+  })
+}
+
+// ==================== LAWYERS/TEAM ====================
+
+/**
+ * Get all lawyers/team members
+ */
+export const useLawyers = (filters?: LawyerFilters) => {
+  return useQuery({
+    queryKey: ['lawyers', filters],
+    queryFn: () => lawyersService.getAll(filters),
+    staleTime: 5 * 60 * 1000,
+  })
+}
+
+/**
+ * Get single lawyer by ID
+ */
+export const useLawyer = (id: string) => {
+  return useQuery({
+    queryKey: ['lawyers', id],
+    queryFn: () => lawyersService.getById(id),
+    enabled: !!id,
+  })
+}
+
+/**
+ * Get team members available for task assignment
+ */
+export const useTeamMembers = () => {
+  return useQuery({
+    queryKey: ['lawyers', 'team'],
+    queryFn: () => lawyersService.getTeamMembers(),
     staleTime: 5 * 60 * 1000,
   })
 }

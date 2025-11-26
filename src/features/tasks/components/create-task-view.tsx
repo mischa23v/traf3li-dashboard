@@ -1,7 +1,8 @@
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import {
     ArrowRight, Save, Calendar, User,
-    Flag, FileText, Briefcase
+    Flag, FileText, Briefcase, Users, Loader2, Scale
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -20,10 +21,17 @@ import { Main } from '@/components/layout/main'
 import { Link, useNavigate } from '@tanstack/react-router'
 import { TasksSidebar } from './tasks-sidebar'
 import { useCreateTask } from '@/hooks/useTasks'
+import { useClients, useCases, useTeamMembers } from '@/hooks/useCasesAndClients'
 
 export function CreateTaskView() {
+    const { t } = useTranslation()
     const navigate = useNavigate()
     const createTaskMutation = useCreateTask()
+
+    // Fetch real data from APIs
+    const { data: clients, isLoading: clientsLoading } = useClients()
+    const { data: cases, isLoading: casesLoading } = useCases()
+    const { data: teamMembers, isLoading: teamLoading } = useTeamMembers()
 
     const [formData, setFormData] = useState({
         title: '',
@@ -31,6 +39,7 @@ export function CreateTaskView() {
         dueDate: '',
         priority: 'medium',
         caseId: '',
+        assignedTo: '',
         description: ''
     })
 
@@ -46,7 +55,7 @@ export function CreateTaskView() {
             description: formData.description,
             dueDate: formData.dueDate,
             priority: formData.priority as 'low' | 'medium' | 'high' | 'critical',
-            assignedTo: '', // Will be populated later
+            assignedTo: formData.assignedTo,
             ...(formData.clientId && { clientId: formData.clientId }),
             ...(formData.caseId && { caseId: formData.caseId }),
         }
@@ -131,16 +140,29 @@ export function CreateTaskView() {
                                         <div className="space-y-2">
                                             <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
                                                 <User className="w-4 h-4 text-emerald-500" />
-                                                العميل
+                                                {t('tasks.client', 'العميل')}
                                             </label>
                                             <Select value={formData.clientId} onValueChange={(value) => handleChange('clientId', value)}>
                                                 <SelectTrigger className="rounded-xl border-slate-200 focus:ring-emerald-500">
-                                                    <SelectValue placeholder="اختر العميل" />
+                                                    <SelectValue placeholder={t('tasks.selectClient', 'اختر العميل')} />
                                                 </SelectTrigger>
                                                 <SelectContent>
-                                                    <SelectItem value="client1">شركة الإنشاءات</SelectItem>
-                                                    <SelectItem value="client2">مجموعة العقارية</SelectItem>
-                                                    <SelectItem value="client3">مؤسسة النور</SelectItem>
+                                                    {clientsLoading ? (
+                                                        <div className="flex items-center justify-center py-4">
+                                                            <Loader2 className="h-4 w-4 animate-spin" />
+                                                        </div>
+                                                    ) : clients?.data && clients.data.length > 0 ? (
+                                                        clients.data.map((client) => (
+                                                            <SelectItem key={client._id} value={client._id}>
+                                                                {client.fullName}
+                                                                {client.companyName && ` - ${client.companyName}`}
+                                                            </SelectItem>
+                                                        ))
+                                                    ) : (
+                                                        <div className="text-center py-4 text-slate-500 text-sm">
+                                                            {t('tasks.noClients', 'لا يوجد عملاء')}
+                                                        </div>
+                                                    )}
                                                 </SelectContent>
                                             </Select>
                                         </div>
@@ -178,20 +200,66 @@ export function CreateTaskView() {
                                         </div>
                                     </div>
 
-                                    <div className="space-y-2">
-                                        <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                            <Briefcase className="w-4 h-4 text-emerald-500" />
-                                            القضية المرتبطة (اختياري)
-                                        </label>
-                                        <Select value={formData.caseId} onValueChange={(value) => handleChange('caseId', value)}>
-                                            <SelectTrigger className="rounded-xl border-slate-200 focus:ring-emerald-500">
-                                                <SelectValue placeholder="اختر القضية" />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                <SelectItem value="case1">قضية تجارية 452</SelectItem>
-                                                <SelectItem value="case2">نزاع عقاري 102</SelectItem>
-                                            </SelectContent>
-                                        </Select>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        <div className="space-y-2">
+                                            <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                                                <Scale className="w-4 h-4 text-emerald-500" />
+                                                {t('tasks.linkedCase', 'القضية المرتبطة (اختياري)')}
+                                            </label>
+                                            <Select value={formData.caseId} onValueChange={(value) => handleChange('caseId', value)}>
+                                                <SelectTrigger className="rounded-xl border-slate-200 focus:ring-emerald-500">
+                                                    <SelectValue placeholder={t('tasks.selectCase', 'اختر القضية')} />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    {casesLoading ? (
+                                                        <div className="flex items-center justify-center py-4">
+                                                            <Loader2 className="h-4 w-4 animate-spin" />
+                                                        </div>
+                                                    ) : cases?.cases && cases.cases.length > 0 ? (
+                                                        cases.cases.map((caseItem) => (
+                                                            <SelectItem key={caseItem._id} value={caseItem._id}>
+                                                                {caseItem.caseNumber ? `${caseItem.caseNumber} - ` : ''}
+                                                                {caseItem.title}
+                                                            </SelectItem>
+                                                        ))
+                                                    ) : (
+                                                        <div className="text-center py-4 text-slate-500 text-sm">
+                                                            {t('tasks.noCases', 'لا توجد قضايا')}
+                                                        </div>
+                                                    )}
+                                                </SelectContent>
+                                            </Select>
+                                        </div>
+
+                                        <div className="space-y-2">
+                                            <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                                                <Users className="w-4 h-4 text-emerald-500" />
+                                                {t('tasks.assignedTo', 'تعيين إلى')}
+                                            </label>
+                                            <Select value={formData.assignedTo} onValueChange={(value) => handleChange('assignedTo', value)}>
+                                                <SelectTrigger className="rounded-xl border-slate-200 focus:ring-emerald-500">
+                                                    <SelectValue placeholder={t('tasks.selectAssignee', 'اختر المسؤول')} />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    {teamLoading ? (
+                                                        <div className="flex items-center justify-center py-4">
+                                                            <Loader2 className="h-4 w-4 animate-spin" />
+                                                        </div>
+                                                    ) : teamMembers && teamMembers.length > 0 ? (
+                                                        teamMembers.map((member) => (
+                                                            <SelectItem key={member._id} value={member._id}>
+                                                                {member.firstName} {member.lastName}
+                                                                {member.role && ` (${member.role})`}
+                                                            </SelectItem>
+                                                        ))
+                                                    ) : (
+                                                        <div className="text-center py-4 text-slate-500 text-sm">
+                                                            {t('tasks.noTeamMembers', 'لا يوجد أعضاء فريق')}
+                                                        </div>
+                                                    )}
+                                                </SelectContent>
+                                            </Select>
+                                        </div>
                                     </div>
 
                                     <div className="space-y-2">

@@ -287,7 +287,19 @@
       "medium": "Medium",
       "high": "High",
       "critical": "Critical"
-    }
+    },
+    "client": "Client",
+    "selectClient": "Select client",
+    "noClients": "No clients found",
+    "linkedCase": "Linked Case (optional)",
+    "selectCase": "Select case",
+    "noCases": "No cases found",
+    "assignedTo": "Assigned To",
+    "selectAssignee": "Select assignee",
+    "noTeamMembers": "No team members found",
+    "viewCase": "View Case",
+    "viewClient": "View Client",
+    "viewAssignee": "View Assignee"
   },
   "users": {
     "title": "User List",
