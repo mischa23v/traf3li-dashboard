@@ -21,6 +21,7 @@ import {
   GitBranch,
   Receipt,
   FileStack,
+  FileInput,
 } from 'lucide-react'
 import { useAuthStore } from '@/stores/auth-store'
 
@@ -312,6 +313,11 @@ export function useSidebarData(): SidebarData {
                 url: '/dashboard/settings/preferences',
               },
             ],
+          },
+          {
+            title: 'استيراد/تصدير',
+            url: '/dashboard/data-export',
+            icon: FileInput,
           },
           {
             title: 'مركز المساعدة',
