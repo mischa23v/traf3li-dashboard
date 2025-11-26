@@ -38,7 +38,7 @@ export function AppearanceForm() {
   const { mutate: updateSettings, isPending } = useUpdateAppearanceSettings()
 
   const form = useForm<AppearanceFormValues>({
-    resolver: zodResolver(appearanceFormSchema),
+    resolver: zodResolver(appearanceFormSchema) as any,
     defaultValues: {
       theme: theme as 'light' | 'dark' | 'system',
       font,

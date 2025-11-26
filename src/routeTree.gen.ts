@@ -61,11 +61,24 @@ import { Route as AuthenticatedSettingsAppearanceRouteImport } from './routes/_a
 import { Route as AuthenticatedSettingsAccountRouteImport } from './routes/_authenticated/settings/account'
 import { Route as AuthenticatedErrorsErrorRouteImport } from './routes/_authenticated/errors/$error'
 import { Route as AuthenticatedDashboardCalendarRouteImport } from './routes/_authenticated/dashboard.calendar'
+import { Route as AuthenticatedDashboardTagsIndexRouteImport } from './routes/_authenticated/dashboard.tags.index'
+import { Route as AuthenticatedDashboardStaffIndexRouteImport } from './routes/_authenticated/dashboard.staff.index'
+import { Route as AuthenticatedDashboardReportsIndexRouteImport } from './routes/_authenticated/dashboard.reports.index'
+import { Route as AuthenticatedDashboardOrganizationsIndexRouteImport } from './routes/_authenticated/dashboard.organizations.index'
+import { Route as AuthenticatedDashboardInvoiceTemplatesIndexRouteImport } from './routes/_authenticated/dashboard.invoice-templates.index'
+import { Route as AuthenticatedDashboardFollowupsIndexRouteImport } from './routes/_authenticated/dashboard.followups.index'
+import { Route as AuthenticatedDashboardDocumentsIndexRouteImport } from './routes/_authenticated/dashboard.documents.index'
+import { Route as AuthenticatedDashboardDataExportIndexRouteImport } from './routes/_authenticated/dashboard.data-export.index'
+import { Route as AuthenticatedDashboardContactsIndexRouteImport } from './routes/_authenticated/dashboard.contacts.index'
+import { Route as AuthenticatedDashboardClientsIndexRouteImport } from './routes/_authenticated/dashboard.clients.index'
 import { Route as AuthenticatedDashboardCasesIndexRouteImport } from './routes/_authenticated/dashboard.cases.index'
+import { Route as AuthenticatedDashboardCaseWorkflowsIndexRouteImport } from './routes/_authenticated/dashboard.case-workflows.index'
+import { Route as AuthenticatedDashboardBillingRatesIndexRouteImport } from './routes/_authenticated/dashboard.billing-rates.index'
 import { Route as AuthenticatedDashboardTasksNewRouteImport } from './routes/_authenticated/dashboard.tasks.new'
 import { Route as AuthenticatedDashboardTasksListRouteImport } from './routes/_authenticated/dashboard.tasks.list'
 import { Route as AuthenticatedDashboardMessagesChatRouteImport } from './routes/_authenticated/dashboard.messages.chat'
 import { Route as AuthenticatedDashboardFinanceOverviewRouteImport } from './routes/_authenticated/dashboard.finance.overview'
+import { Route as AuthenticatedDashboardClientsClientIdRouteImport } from './routes/_authenticated/dashboard.clients.$clientId'
 import { Route as AuthenticatedDashboardCasesCaseIdRouteImport } from './routes/_authenticated/dashboard.cases.$caseId'
 import { Route as AuthenticatedDashboardTasksRemindersIndexRouteImport } from './routes/_authenticated/dashboard.tasks.reminders.index'
 import { Route as AuthenticatedDashboardTasksEventsIndexRouteImport } from './routes/_authenticated/dashboard.tasks.events.index'
@@ -360,10 +373,82 @@ const AuthenticatedDashboardCalendarRoute =
     path: '/dashboard/calendar',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedDashboardTagsIndexRoute =
+  AuthenticatedDashboardTagsIndexRouteImport.update({
+    id: '/dashboard/tags/',
+    path: '/dashboard/tags/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedDashboardStaffIndexRoute =
+  AuthenticatedDashboardStaffIndexRouteImport.update({
+    id: '/dashboard/staff/',
+    path: '/dashboard/staff/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedDashboardReportsIndexRoute =
+  AuthenticatedDashboardReportsIndexRouteImport.update({
+    id: '/dashboard/reports/',
+    path: '/dashboard/reports/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedDashboardOrganizationsIndexRoute =
+  AuthenticatedDashboardOrganizationsIndexRouteImport.update({
+    id: '/dashboard/organizations/',
+    path: '/dashboard/organizations/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedDashboardInvoiceTemplatesIndexRoute =
+  AuthenticatedDashboardInvoiceTemplatesIndexRouteImport.update({
+    id: '/dashboard/invoice-templates/',
+    path: '/dashboard/invoice-templates/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedDashboardFollowupsIndexRoute =
+  AuthenticatedDashboardFollowupsIndexRouteImport.update({
+    id: '/dashboard/followups/',
+    path: '/dashboard/followups/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedDashboardDocumentsIndexRoute =
+  AuthenticatedDashboardDocumentsIndexRouteImport.update({
+    id: '/dashboard/documents/',
+    path: '/dashboard/documents/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedDashboardDataExportIndexRoute =
+  AuthenticatedDashboardDataExportIndexRouteImport.update({
+    id: '/dashboard/data-export/',
+    path: '/dashboard/data-export/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedDashboardContactsIndexRoute =
+  AuthenticatedDashboardContactsIndexRouteImport.update({
+    id: '/dashboard/contacts/',
+    path: '/dashboard/contacts/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedDashboardClientsIndexRoute =
+  AuthenticatedDashboardClientsIndexRouteImport.update({
+    id: '/dashboard/clients/',
+    path: '/dashboard/clients/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedDashboardCasesIndexRoute =
   AuthenticatedDashboardCasesIndexRouteImport.update({
     id: '/dashboard/cases/',
     path: '/dashboard/cases/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedDashboardCaseWorkflowsIndexRoute =
+  AuthenticatedDashboardCaseWorkflowsIndexRouteImport.update({
+    id: '/dashboard/case-workflows/',
+    path: '/dashboard/case-workflows/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedDashboardBillingRatesIndexRoute =
+  AuthenticatedDashboardBillingRatesIndexRouteImport.update({
+    id: '/dashboard/billing-rates/',
+    path: '/dashboard/billing-rates/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedDashboardTasksNewRoute =
@@ -388,6 +473,12 @@ const AuthenticatedDashboardFinanceOverviewRoute =
   AuthenticatedDashboardFinanceOverviewRouteImport.update({
     id: '/dashboard/finance/overview',
     path: '/dashboard/finance/overview',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedDashboardClientsClientIdRoute =
+  AuthenticatedDashboardClientsClientIdRouteImport.update({
+    id: '/dashboard/clients/$clientId',
+    path: '/dashboard/clients/$clientId',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedDashboardCasesCaseIdRoute =
@@ -592,11 +683,24 @@ export interface FileRoutesByFullPath {
   '/settings/': typeof AuthenticatedSettingsIndexRoute
   '/users': typeof AuthenticatedUsersIndexRoute
   '/dashboard/cases/$caseId': typeof AuthenticatedDashboardCasesCaseIdRoute
+  '/dashboard/clients/$clientId': typeof AuthenticatedDashboardClientsClientIdRoute
   '/dashboard/finance/overview': typeof AuthenticatedDashboardFinanceOverviewRoute
   '/dashboard/messages/chat': typeof AuthenticatedDashboardMessagesChatRoute
   '/dashboard/tasks/list': typeof AuthenticatedDashboardTasksListRoute
   '/dashboard/tasks/new': typeof AuthenticatedDashboardTasksNewRoute
+  '/dashboard/billing-rates': typeof AuthenticatedDashboardBillingRatesIndexRoute
+  '/dashboard/case-workflows': typeof AuthenticatedDashboardCaseWorkflowsIndexRoute
   '/dashboard/cases': typeof AuthenticatedDashboardCasesIndexRoute
+  '/dashboard/clients': typeof AuthenticatedDashboardClientsIndexRoute
+  '/dashboard/contacts': typeof AuthenticatedDashboardContactsIndexRoute
+  '/dashboard/data-export': typeof AuthenticatedDashboardDataExportIndexRoute
+  '/dashboard/documents': typeof AuthenticatedDashboardDocumentsIndexRoute
+  '/dashboard/followups': typeof AuthenticatedDashboardFollowupsIndexRoute
+  '/dashboard/invoice-templates': typeof AuthenticatedDashboardInvoiceTemplatesIndexRoute
+  '/dashboard/organizations': typeof AuthenticatedDashboardOrganizationsIndexRoute
+  '/dashboard/reports': typeof AuthenticatedDashboardReportsIndexRoute
+  '/dashboard/staff': typeof AuthenticatedDashboardStaffIndexRoute
+  '/dashboard/tags': typeof AuthenticatedDashboardTagsIndexRoute
   '/dashboard/finance/activity/$activityId': typeof AuthenticatedDashboardFinanceActivityActivityIdRoute
   '/dashboard/finance/activity/new': typeof AuthenticatedDashboardFinanceActivityNewRoute
   '/dashboard/finance/expenses/$expenseId': typeof AuthenticatedDashboardFinanceExpensesExpenseIdRoute
@@ -672,11 +776,24 @@ export interface FileRoutesByTo {
   '/settings': typeof AuthenticatedSettingsIndexRoute
   '/users': typeof AuthenticatedUsersIndexRoute
   '/dashboard/cases/$caseId': typeof AuthenticatedDashboardCasesCaseIdRoute
+  '/dashboard/clients/$clientId': typeof AuthenticatedDashboardClientsClientIdRoute
   '/dashboard/finance/overview': typeof AuthenticatedDashboardFinanceOverviewRoute
   '/dashboard/messages/chat': typeof AuthenticatedDashboardMessagesChatRoute
   '/dashboard/tasks/list': typeof AuthenticatedDashboardTasksListRoute
   '/dashboard/tasks/new': typeof AuthenticatedDashboardTasksNewRoute
+  '/dashboard/billing-rates': typeof AuthenticatedDashboardBillingRatesIndexRoute
+  '/dashboard/case-workflows': typeof AuthenticatedDashboardCaseWorkflowsIndexRoute
   '/dashboard/cases': typeof AuthenticatedDashboardCasesIndexRoute
+  '/dashboard/clients': typeof AuthenticatedDashboardClientsIndexRoute
+  '/dashboard/contacts': typeof AuthenticatedDashboardContactsIndexRoute
+  '/dashboard/data-export': typeof AuthenticatedDashboardDataExportIndexRoute
+  '/dashboard/documents': typeof AuthenticatedDashboardDocumentsIndexRoute
+  '/dashboard/followups': typeof AuthenticatedDashboardFollowupsIndexRoute
+  '/dashboard/invoice-templates': typeof AuthenticatedDashboardInvoiceTemplatesIndexRoute
+  '/dashboard/organizations': typeof AuthenticatedDashboardOrganizationsIndexRoute
+  '/dashboard/reports': typeof AuthenticatedDashboardReportsIndexRoute
+  '/dashboard/staff': typeof AuthenticatedDashboardStaffIndexRoute
+  '/dashboard/tags': typeof AuthenticatedDashboardTagsIndexRoute
   '/dashboard/finance/activity/$activityId': typeof AuthenticatedDashboardFinanceActivityActivityIdRoute
   '/dashboard/finance/activity/new': typeof AuthenticatedDashboardFinanceActivityNewRoute
   '/dashboard/finance/expenses/$expenseId': typeof AuthenticatedDashboardFinanceExpensesExpenseIdRoute
@@ -757,11 +874,24 @@ export interface FileRoutesById {
   '/_authenticated/settings/': typeof AuthenticatedSettingsIndexRoute
   '/_authenticated/users/': typeof AuthenticatedUsersIndexRoute
   '/_authenticated/dashboard/cases/$caseId': typeof AuthenticatedDashboardCasesCaseIdRoute
+  '/_authenticated/dashboard/clients/$clientId': typeof AuthenticatedDashboardClientsClientIdRoute
   '/_authenticated/dashboard/finance/overview': typeof AuthenticatedDashboardFinanceOverviewRoute
   '/_authenticated/dashboard/messages/chat': typeof AuthenticatedDashboardMessagesChatRoute
   '/_authenticated/dashboard/tasks/list': typeof AuthenticatedDashboardTasksListRoute
   '/_authenticated/dashboard/tasks/new': typeof AuthenticatedDashboardTasksNewRoute
+  '/_authenticated/dashboard/billing-rates/': typeof AuthenticatedDashboardBillingRatesIndexRoute
+  '/_authenticated/dashboard/case-workflows/': typeof AuthenticatedDashboardCaseWorkflowsIndexRoute
   '/_authenticated/dashboard/cases/': typeof AuthenticatedDashboardCasesIndexRoute
+  '/_authenticated/dashboard/clients/': typeof AuthenticatedDashboardClientsIndexRoute
+  '/_authenticated/dashboard/contacts/': typeof AuthenticatedDashboardContactsIndexRoute
+  '/_authenticated/dashboard/data-export/': typeof AuthenticatedDashboardDataExportIndexRoute
+  '/_authenticated/dashboard/documents/': typeof AuthenticatedDashboardDocumentsIndexRoute
+  '/_authenticated/dashboard/followups/': typeof AuthenticatedDashboardFollowupsIndexRoute
+  '/_authenticated/dashboard/invoice-templates/': typeof AuthenticatedDashboardInvoiceTemplatesIndexRoute
+  '/_authenticated/dashboard/organizations/': typeof AuthenticatedDashboardOrganizationsIndexRoute
+  '/_authenticated/dashboard/reports/': typeof AuthenticatedDashboardReportsIndexRoute
+  '/_authenticated/dashboard/staff/': typeof AuthenticatedDashboardStaffIndexRoute
+  '/_authenticated/dashboard/tags/': typeof AuthenticatedDashboardTagsIndexRoute
   '/_authenticated/dashboard/finance/activity/$activityId': typeof AuthenticatedDashboardFinanceActivityActivityIdRoute
   '/_authenticated/dashboard/finance/activity/new': typeof AuthenticatedDashboardFinanceActivityNewRoute
   '/_authenticated/dashboard/finance/expenses/$expenseId': typeof AuthenticatedDashboardFinanceExpensesExpenseIdRoute
@@ -840,11 +970,24 @@ export interface FileRouteTypes {
     | '/settings/'
     | '/users'
     | '/dashboard/cases/$caseId'
+    | '/dashboard/clients/$clientId'
     | '/dashboard/finance/overview'
     | '/dashboard/messages/chat'
     | '/dashboard/tasks/list'
     | '/dashboard/tasks/new'
+    | '/dashboard/billing-rates'
+    | '/dashboard/case-workflows'
     | '/dashboard/cases'
+    | '/dashboard/clients'
+    | '/dashboard/contacts'
+    | '/dashboard/data-export'
+    | '/dashboard/documents'
+    | '/dashboard/followups'
+    | '/dashboard/invoice-templates'
+    | '/dashboard/organizations'
+    | '/dashboard/reports'
+    | '/dashboard/staff'
+    | '/dashboard/tags'
     | '/dashboard/finance/activity/$activityId'
     | '/dashboard/finance/activity/new'
     | '/dashboard/finance/expenses/$expenseId'
@@ -920,11 +1063,24 @@ export interface FileRouteTypes {
     | '/settings'
     | '/users'
     | '/dashboard/cases/$caseId'
+    | '/dashboard/clients/$clientId'
     | '/dashboard/finance/overview'
     | '/dashboard/messages/chat'
     | '/dashboard/tasks/list'
     | '/dashboard/tasks/new'
+    | '/dashboard/billing-rates'
+    | '/dashboard/case-workflows'
     | '/dashboard/cases'
+    | '/dashboard/clients'
+    | '/dashboard/contacts'
+    | '/dashboard/data-export'
+    | '/dashboard/documents'
+    | '/dashboard/followups'
+    | '/dashboard/invoice-templates'
+    | '/dashboard/organizations'
+    | '/dashboard/reports'
+    | '/dashboard/staff'
+    | '/dashboard/tags'
     | '/dashboard/finance/activity/$activityId'
     | '/dashboard/finance/activity/new'
     | '/dashboard/finance/expenses/$expenseId'
@@ -1004,11 +1160,24 @@ export interface FileRouteTypes {
     | '/_authenticated/settings/'
     | '/_authenticated/users/'
     | '/_authenticated/dashboard/cases/$caseId'
+    | '/_authenticated/dashboard/clients/$clientId'
     | '/_authenticated/dashboard/finance/overview'
     | '/_authenticated/dashboard/messages/chat'
     | '/_authenticated/dashboard/tasks/list'
     | '/_authenticated/dashboard/tasks/new'
+    | '/_authenticated/dashboard/billing-rates/'
+    | '/_authenticated/dashboard/case-workflows/'
     | '/_authenticated/dashboard/cases/'
+    | '/_authenticated/dashboard/clients/'
+    | '/_authenticated/dashboard/contacts/'
+    | '/_authenticated/dashboard/data-export/'
+    | '/_authenticated/dashboard/documents/'
+    | '/_authenticated/dashboard/followups/'
+    | '/_authenticated/dashboard/invoice-templates/'
+    | '/_authenticated/dashboard/organizations/'
+    | '/_authenticated/dashboard/reports/'
+    | '/_authenticated/dashboard/staff/'
+    | '/_authenticated/dashboard/tags/'
     | '/_authenticated/dashboard/finance/activity/$activityId'
     | '/_authenticated/dashboard/finance/activity/new'
     | '/_authenticated/dashboard/finance/expenses/$expenseId'
@@ -1437,11 +1606,95 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardCalendarRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/dashboard/tags/': {
+      id: '/_authenticated/dashboard/tags/'
+      path: '/dashboard/tags'
+      fullPath: '/dashboard/tags'
+      preLoaderRoute: typeof AuthenticatedDashboardTagsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dashboard/staff/': {
+      id: '/_authenticated/dashboard/staff/'
+      path: '/dashboard/staff'
+      fullPath: '/dashboard/staff'
+      preLoaderRoute: typeof AuthenticatedDashboardStaffIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dashboard/reports/': {
+      id: '/_authenticated/dashboard/reports/'
+      path: '/dashboard/reports'
+      fullPath: '/dashboard/reports'
+      preLoaderRoute: typeof AuthenticatedDashboardReportsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dashboard/organizations/': {
+      id: '/_authenticated/dashboard/organizations/'
+      path: '/dashboard/organizations'
+      fullPath: '/dashboard/organizations'
+      preLoaderRoute: typeof AuthenticatedDashboardOrganizationsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dashboard/invoice-templates/': {
+      id: '/_authenticated/dashboard/invoice-templates/'
+      path: '/dashboard/invoice-templates'
+      fullPath: '/dashboard/invoice-templates'
+      preLoaderRoute: typeof AuthenticatedDashboardInvoiceTemplatesIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dashboard/followups/': {
+      id: '/_authenticated/dashboard/followups/'
+      path: '/dashboard/followups'
+      fullPath: '/dashboard/followups'
+      preLoaderRoute: typeof AuthenticatedDashboardFollowupsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dashboard/documents/': {
+      id: '/_authenticated/dashboard/documents/'
+      path: '/dashboard/documents'
+      fullPath: '/dashboard/documents'
+      preLoaderRoute: typeof AuthenticatedDashboardDocumentsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dashboard/data-export/': {
+      id: '/_authenticated/dashboard/data-export/'
+      path: '/dashboard/data-export'
+      fullPath: '/dashboard/data-export'
+      preLoaderRoute: typeof AuthenticatedDashboardDataExportIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dashboard/contacts/': {
+      id: '/_authenticated/dashboard/contacts/'
+      path: '/dashboard/contacts'
+      fullPath: '/dashboard/contacts'
+      preLoaderRoute: typeof AuthenticatedDashboardContactsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dashboard/clients/': {
+      id: '/_authenticated/dashboard/clients/'
+      path: '/dashboard/clients'
+      fullPath: '/dashboard/clients'
+      preLoaderRoute: typeof AuthenticatedDashboardClientsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/dashboard/cases/': {
       id: '/_authenticated/dashboard/cases/'
       path: '/dashboard/cases'
       fullPath: '/dashboard/cases'
       preLoaderRoute: typeof AuthenticatedDashboardCasesIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dashboard/case-workflows/': {
+      id: '/_authenticated/dashboard/case-workflows/'
+      path: '/dashboard/case-workflows'
+      fullPath: '/dashboard/case-workflows'
+      preLoaderRoute: typeof AuthenticatedDashboardCaseWorkflowsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dashboard/billing-rates/': {
+      id: '/_authenticated/dashboard/billing-rates/'
+      path: '/dashboard/billing-rates'
+      fullPath: '/dashboard/billing-rates'
+      preLoaderRoute: typeof AuthenticatedDashboardBillingRatesIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/dashboard/tasks/new': {
@@ -1470,6 +1723,13 @@ declare module '@tanstack/react-router' {
       path: '/dashboard/finance/overview'
       fullPath: '/dashboard/finance/overview'
       preLoaderRoute: typeof AuthenticatedDashboardFinanceOverviewRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dashboard/clients/$clientId': {
+      id: '/_authenticated/dashboard/clients/$clientId'
+      path: '/dashboard/clients/$clientId'
+      fullPath: '/dashboard/clients/$clientId'
+      preLoaderRoute: typeof AuthenticatedDashboardClientsClientIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/dashboard/cases/$caseId': {
@@ -1684,11 +1944,24 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedHelpCenterIndexRoute: typeof AuthenticatedHelpCenterIndexRoute
   AuthenticatedUsersIndexRoute: typeof AuthenticatedUsersIndexRoute
   AuthenticatedDashboardCasesCaseIdRoute: typeof AuthenticatedDashboardCasesCaseIdRoute
+  AuthenticatedDashboardClientsClientIdRoute: typeof AuthenticatedDashboardClientsClientIdRoute
   AuthenticatedDashboardFinanceOverviewRoute: typeof AuthenticatedDashboardFinanceOverviewRoute
   AuthenticatedDashboardMessagesChatRoute: typeof AuthenticatedDashboardMessagesChatRoute
   AuthenticatedDashboardTasksListRoute: typeof AuthenticatedDashboardTasksListRoute
   AuthenticatedDashboardTasksNewRoute: typeof AuthenticatedDashboardTasksNewRoute
+  AuthenticatedDashboardBillingRatesIndexRoute: typeof AuthenticatedDashboardBillingRatesIndexRoute
+  AuthenticatedDashboardCaseWorkflowsIndexRoute: typeof AuthenticatedDashboardCaseWorkflowsIndexRoute
   AuthenticatedDashboardCasesIndexRoute: typeof AuthenticatedDashboardCasesIndexRoute
+  AuthenticatedDashboardClientsIndexRoute: typeof AuthenticatedDashboardClientsIndexRoute
+  AuthenticatedDashboardContactsIndexRoute: typeof AuthenticatedDashboardContactsIndexRoute
+  AuthenticatedDashboardDataExportIndexRoute: typeof AuthenticatedDashboardDataExportIndexRoute
+  AuthenticatedDashboardDocumentsIndexRoute: typeof AuthenticatedDashboardDocumentsIndexRoute
+  AuthenticatedDashboardFollowupsIndexRoute: typeof AuthenticatedDashboardFollowupsIndexRoute
+  AuthenticatedDashboardInvoiceTemplatesIndexRoute: typeof AuthenticatedDashboardInvoiceTemplatesIndexRoute
+  AuthenticatedDashboardOrganizationsIndexRoute: typeof AuthenticatedDashboardOrganizationsIndexRoute
+  AuthenticatedDashboardReportsIndexRoute: typeof AuthenticatedDashboardReportsIndexRoute
+  AuthenticatedDashboardStaffIndexRoute: typeof AuthenticatedDashboardStaffIndexRoute
+  AuthenticatedDashboardTagsIndexRoute: typeof AuthenticatedDashboardTagsIndexRoute
   AuthenticatedDashboardFinanceActivityActivityIdRoute: typeof AuthenticatedDashboardFinanceActivityActivityIdRoute
   AuthenticatedDashboardFinanceActivityNewRoute: typeof AuthenticatedDashboardFinanceActivityNewRoute
   AuthenticatedDashboardFinanceExpensesExpenseIdRoute: typeof AuthenticatedDashboardFinanceExpensesExpenseIdRoute
@@ -1727,13 +2000,37 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedUsersIndexRoute: AuthenticatedUsersIndexRoute,
   AuthenticatedDashboardCasesCaseIdRoute:
     AuthenticatedDashboardCasesCaseIdRoute,
+  AuthenticatedDashboardClientsClientIdRoute:
+    AuthenticatedDashboardClientsClientIdRoute,
   AuthenticatedDashboardFinanceOverviewRoute:
     AuthenticatedDashboardFinanceOverviewRoute,
   AuthenticatedDashboardMessagesChatRoute:
     AuthenticatedDashboardMessagesChatRoute,
   AuthenticatedDashboardTasksListRoute: AuthenticatedDashboardTasksListRoute,
   AuthenticatedDashboardTasksNewRoute: AuthenticatedDashboardTasksNewRoute,
+  AuthenticatedDashboardBillingRatesIndexRoute:
+    AuthenticatedDashboardBillingRatesIndexRoute,
+  AuthenticatedDashboardCaseWorkflowsIndexRoute:
+    AuthenticatedDashboardCaseWorkflowsIndexRoute,
   AuthenticatedDashboardCasesIndexRoute: AuthenticatedDashboardCasesIndexRoute,
+  AuthenticatedDashboardClientsIndexRoute:
+    AuthenticatedDashboardClientsIndexRoute,
+  AuthenticatedDashboardContactsIndexRoute:
+    AuthenticatedDashboardContactsIndexRoute,
+  AuthenticatedDashboardDataExportIndexRoute:
+    AuthenticatedDashboardDataExportIndexRoute,
+  AuthenticatedDashboardDocumentsIndexRoute:
+    AuthenticatedDashboardDocumentsIndexRoute,
+  AuthenticatedDashboardFollowupsIndexRoute:
+    AuthenticatedDashboardFollowupsIndexRoute,
+  AuthenticatedDashboardInvoiceTemplatesIndexRoute:
+    AuthenticatedDashboardInvoiceTemplatesIndexRoute,
+  AuthenticatedDashboardOrganizationsIndexRoute:
+    AuthenticatedDashboardOrganizationsIndexRoute,
+  AuthenticatedDashboardReportsIndexRoute:
+    AuthenticatedDashboardReportsIndexRoute,
+  AuthenticatedDashboardStaffIndexRoute: AuthenticatedDashboardStaffIndexRoute,
+  AuthenticatedDashboardTagsIndexRoute: AuthenticatedDashboardTagsIndexRoute,
   AuthenticatedDashboardFinanceActivityActivityIdRoute:
     AuthenticatedDashboardFinanceActivityActivityIdRoute,
   AuthenticatedDashboardFinanceActivityNewRoute:

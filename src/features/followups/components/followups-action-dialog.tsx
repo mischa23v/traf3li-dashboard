@@ -51,7 +51,7 @@ export function FollowupsActionDialog({
   const updateFollowup = useUpdateFollowup()
 
   const form = useForm<CreateFollowupData>({
-    resolver: zodResolver(createFollowupSchema),
+    resolver: zodResolver(createFollowupSchema) as any,
     defaultValues: {
       title: '',
       description: '',

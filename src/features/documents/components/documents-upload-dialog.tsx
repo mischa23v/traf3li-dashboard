@@ -58,7 +58,7 @@ export function DocumentsUploadDialog({
   const uploadDocument = useUploadDocument()
 
   const form = useForm<CreateDocumentData>({
-    resolver: zodResolver(createDocumentSchema),
+    resolver: zodResolver(createDocumentSchema) as any,
     defaultValues: {
       category: 'other',
       caseId: defaultCaseId || '',

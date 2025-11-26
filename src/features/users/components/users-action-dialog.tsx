@@ -106,7 +106,7 @@ export function UsersActionDialog({
 }: UserActionDialogProps) {
   const isEdit = !!currentRow
   const form = useForm<UserForm>({
-    resolver: zodResolver(formSchema),
+    resolver: zodResolver(formSchema) as any,
     defaultValues: isEdit
       ? {
           ...currentRow,

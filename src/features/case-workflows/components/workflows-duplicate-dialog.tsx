@@ -47,7 +47,7 @@ export function WorkflowsDuplicateDialog({
   const duplicateWorkflow = useDuplicateWorkflow()
 
   const form = useForm<FormValues>({
-    resolver: zodResolver(formSchema),
+    resolver: zodResolver(formSchema) as any,
     defaultValues: {
       name: '',
       nameAr: '',

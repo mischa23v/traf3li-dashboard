@@ -66,7 +66,7 @@ export function CreateCaseForm({ onSuccess }: CreateCaseFormProps) {
     watch,
     formState: { errors, isSubmitting },
   } = useForm<CreateCaseFormData>({
-    resolver: zodResolver(createCaseSchema),
+    resolver: zodResolver(createCaseSchema) as any,
     defaultValues: {
       category: 'labor',
       priority: 'medium',

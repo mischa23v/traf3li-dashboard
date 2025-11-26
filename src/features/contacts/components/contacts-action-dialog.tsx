@@ -54,7 +54,7 @@ export function ContactsActionDialog({
   const { mutate: updateContact, isPending: isUpdating } = useUpdateContact()
 
   const form = useForm<CreateContactInput>({
-    resolver: zodResolver(createContactSchema),
+    resolver: zodResolver(createContactSchema) as any,
     defaultValues: {
       firstName: '',
       lastName: '',

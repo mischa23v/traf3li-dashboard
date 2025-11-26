@@ -61,7 +61,7 @@ export function ProfileForm() {
   type ProfileFormValues = z.infer<typeof profileFormSchema>
 
   const form = useForm<ProfileFormValues>({
-    resolver: zodResolver(profileFormSchema),
+    resolver: zodResolver(profileFormSchema) as any,
     defaultValues: {
       firstName: '',
       lastName: '',

@@ -7,7 +7,7 @@ import { Main } from '@/components/layout/main'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { Search } from '@/components/search'
 import { ThemeSwitch } from '@/components/theme-switch'
-import { useRates, useRateGroups } from '@/hooks/useBillingRates'
+import { useBillingRates, useRateGroups } from '@/hooks/useBillingRates'
 import { RatesProvider, useRatesContext } from './components/rates-provider'
 import { RatesTable } from './components/rates-table'
 import { GroupsTable } from './components/groups-table'
@@ -31,11 +31,11 @@ function BillingRatesContent() {
     setCurrentGroup,
   } = useRatesContext()
 
-  const { data: ratesData, isLoading: ratesLoading } = useRates()
+  const { data: ratesData, isLoading: ratesLoading } = useBillingRates()
   const { data: groupsData, isLoading: groupsLoading } = useRateGroups()
 
-  const rates = ratesData?.data || []
-  const groups = groupsData?.data || []
+  const rates = ratesData?.rates || []
+  const groups = groupsData?.groups || []
 
   const handleAddRate = () => {
     setCurrentRate(null)

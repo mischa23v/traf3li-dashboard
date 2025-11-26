@@ -19,13 +19,13 @@ export const tagSchema = z.object({
   nameAr: z.string().optional(),
   color: z.string().regex(/^#[0-9A-Fa-f]{6}$/, 'Invalid hex color'),
   description: z.string().optional(),
-  entityType: z.enum(tagEntityTypes).optional().default('all'),
-  usageCount: z.number().optional().default(0),
+  entityType: z.enum(tagEntityTypes).default('all'),
+  usageCount: z.number().default(0),
   createdAt: z.string(),
   updatedAt: z.string(),
 })
 
-export type Tag = z.infer<typeof tagSchema>
+export type Tag = z.output<typeof tagSchema>
 
 // Create tag schema
 export const createTagSchema = z.object({

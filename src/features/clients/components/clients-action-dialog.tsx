@@ -66,7 +66,7 @@ export function ClientsActionDialog({
   const isPending = isCreating || isUpdating
 
   const form = useForm<ClientForm>({
-    resolver: zodResolver(formSchema),
+    resolver: zodResolver(formSchema) as any,
     defaultValues: isEdit
       ? {
           fullName: currentRow.fullName,

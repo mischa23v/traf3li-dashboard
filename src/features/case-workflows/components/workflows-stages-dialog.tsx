@@ -97,7 +97,7 @@ export function WorkflowsStagesDialog({
   const [expandedStages, setExpandedStages] = useState<Set<string>>(new Set())
 
   const form = useForm<StageFormValues>({
-    resolver: zodResolver(stageFormSchema),
+    resolver: zodResolver(stageFormSchema) as any,
     defaultValues: {
       name: '',
       nameAr: '',

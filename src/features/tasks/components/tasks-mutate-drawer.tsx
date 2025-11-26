@@ -47,7 +47,7 @@ export function TasksMutateDrawer({
   const isUpdate = !!currentRow
 
   const form = useForm<TaskForm>({
-    resolver: zodResolver(formSchema),
+    resolver: zodResolver(formSchema) as any,
     defaultValues: currentRow ?? {
       title: '',
       status: '',

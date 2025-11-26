@@ -49,7 +49,7 @@ export function DocumentsEditDialog({
   const updateDocument = useUpdateDocument()
 
   const form = useForm<UpdateDocumentData>({
-    resolver: zodResolver(updateDocumentSchema),
+    resolver: zodResolver(updateDocumentSchema) as any,
     defaultValues: {
       category: currentRow.category,
       description: currentRow.description || '',

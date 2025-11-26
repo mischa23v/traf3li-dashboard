@@ -58,7 +58,7 @@ export function StaffActionDialog({
   const isPending = isCreating || isUpdating
 
   const form = useForm<StaffForm>({
-    resolver: zodResolver(formSchema),
+    resolver: zodResolver(formSchema) as any,
     defaultValues: isEdit
       ? {
           firstName: currentRow.firstName,

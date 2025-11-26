@@ -14,8 +14,7 @@ import {
   type VisibilityState,
 } from '@tanstack/react-table'
 import { useState } from 'react'
-import { DataTable } from '@/components/data-table/data-table'
-import { DataTableToolbar } from '@/components/data-table/data-table-toolbar'
+import { DataTable, DataTableToolbar } from '@/components/data-table'
 import { type Contact } from '../data/schema'
 import { contactStatusColors, contactTypes, contactCategories } from '../data/data'
 import { useContactsColumns } from './contacts-columns'
@@ -89,21 +88,21 @@ export function ContactsTable({ data, search, navigate }: ContactsTableProps) {
     <div className='space-y-4'>
       <DataTableToolbar
         table={table}
-        filterColumn='name'
-        filterPlaceholder={t('contacts.searchPlaceholder')}
-        facetedFilters={[
+        searchKey='name'
+        searchPlaceholder={t('contacts.searchPlaceholder')}
+        filters={[
           {
-            column: 'type',
+            columnId: 'type',
             title: t('contacts.columns.type'),
             options: typeOptions,
           },
           {
-            column: 'category',
+            columnId: 'category',
             title: t('contacts.columns.category'),
             options: categoryOptions,
           },
           {
-            column: 'status',
+            columnId: 'status',
             title: t('contacts.columns.status'),
             options: statusOptions,
           },

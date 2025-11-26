@@ -99,7 +99,7 @@ export const completedRequirementSchema = z.object({
   requirementId: z.string(),
   completedAt: z.string(),
   completedBy: z.string(),
-  metadata: z.record(z.any()).optional(),
+  metadata: z.record(z.string(), z.any()).optional(),
 })
 
 export type CompletedRequirement = z.infer<typeof completedRequirementSchema>

@@ -77,7 +77,7 @@ export function RateViewDialog({
             <div>
               <p className="text-sm text-muted-foreground">{t('billingRates.amount')}</p>
               <p className="text-xl font-bold">
-                {formatAmount(currentRate.amount, currentRate.currency)}
+                {formatAmount(currentRate.amount, currentRate.currency, isRTL)}
               </p>
               {currentRate.unit && (
                 <p className="text-sm text-muted-foreground">
@@ -103,7 +103,7 @@ export function RateViewDialog({
                       {t('billingRates.minimumCharge')}
                     </p>
                     <p className="font-medium">
-                      {formatAmount(currentRate.minimumCharge, currentRate.currency)}
+                      {formatAmount(currentRate.minimumCharge, currentRate.currency, isRTL)}
                     </p>
                   </div>
                 )}
