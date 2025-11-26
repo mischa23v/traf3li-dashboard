@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { Loader2, User, Building, Phone, MapPin, FileText, Calendar } from 'lucide-react'
+import { Loader2, User, Building, Phone, MapPin, FileText, Calendar, ChevronDown } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
@@ -16,11 +16,10 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from '@/components/ui/accordion'
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from '@/components/ui/collapsible'
 import { useCreateCase } from '@/hooks/useCasesAndClients'
 import type { CaseCategory, CasePriority, CreateCaseData, LaborCaseDetails } from '@/services/casesService'
 
@@ -57,6 +56,7 @@ interface CreateCaseFormProps {
 export function CreateCaseForm({ onSuccess }: CreateCaseFormProps) {
   const { t } = useTranslation()
   const [isLaborCase, setIsLaborCase] = useState(false)
+  const [laborDetailsOpen, setLaborDetailsOpen] = useState(false)
   const createCaseMutation = useCreateCase()
 
   const {
@@ -277,70 +277,73 @@ export function CreateCaseForm({ onSuccess }: CreateCaseFormProps) {
 
       {/* Labor Case Details (Expandable) */}
       {selectedCategory === 'labor' && (
-        <Accordion type="single" collapsible className="bg-blue-50 rounded-lg">
-          <AccordionItem value="labor-details" className="border-0">
-            <AccordionTrigger className="px-4 hover:no-underline">
-              <span className="font-bold text-navy">{t('cases.form.laborDetails', 'تفاصيل القضية العمالية')}</span>
-            </AccordionTrigger>
-            <AccordionContent className="px-4 pb-4">
-              {/* Plaintiff Details */}
-              <div className="space-y-4 mb-6">
-                <h4 className="font-medium text-blue-700 flex items-center gap-2">
-                  <User className="h-4 w-4" />
-                  {t('cases.form.plaintiffDetails', 'بيانات المدعي (العامل)')}
-                </h4>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="plaintiffName">{t('cases.form.name', 'الاسم')}</Label>
-                    <Input id="plaintiffName" {...register('plaintiffName')} />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="plaintiffNationalId">{t('cases.form.nationalId', 'رقم الهوية')}</Label>
-                    <Input id="plaintiffNationalId" {...register('plaintiffNationalId')} />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="plaintiffPhone">{t('cases.form.phone', 'الهاتف')}</Label>
-                    <Input id="plaintiffPhone" {...register('plaintiffPhone')} />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="plaintiffCity">{t('cases.form.city', 'المدينة')}</Label>
-                    <Input id="plaintiffCity" {...register('plaintiffCity')} />
-                  </div>
+        <Collapsible
+          open={laborDetailsOpen}
+          onOpenChange={setLaborDetailsOpen}
+          className="bg-blue-50 rounded-lg"
+        >
+          <CollapsibleTrigger className="flex w-full items-center justify-between px-4 py-4 font-bold text-navy hover:bg-blue-100 rounded-lg transition-colors">
+            <span>{t('cases.form.laborDetails', 'تفاصيل القضية العمالية')}</span>
+            <ChevronDown className={`h-4 w-4 transition-transform ${laborDetailsOpen ? 'rotate-180' : ''}`} />
+          </CollapsibleTrigger>
+          <CollapsibleContent className="px-4 pb-4">
+            {/* Plaintiff Details */}
+            <div className="space-y-4 mb-6">
+              <h4 className="font-medium text-blue-700 flex items-center gap-2">
+                <User className="h-4 w-4" />
+                {t('cases.form.plaintiffDetails', 'بيانات المدعي (العامل)')}
+              </h4>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="plaintiffName">{t('cases.form.name', 'الاسم')}</Label>
+                  <Input id="plaintiffName" {...register('plaintiffName')} />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="plaintiffAddress">{t('cases.form.address', 'العنوان')}</Label>
-                  <Input id="plaintiffAddress" {...register('plaintiffAddress')} />
+                  <Label htmlFor="plaintiffNationalId">{t('cases.form.nationalId', 'رقم الهوية')}</Label>
+                  <Input id="plaintiffNationalId" {...register('plaintiffNationalId')} />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="plaintiffPhone">{t('cases.form.phone', 'الهاتف')}</Label>
+                  <Input id="plaintiffPhone" {...register('plaintiffPhone')} />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="plaintiffCity">{t('cases.form.city', 'المدينة')}</Label>
+                  <Input id="plaintiffCity" {...register('plaintiffCity')} />
                 </div>
               </div>
+              <div className="space-y-2">
+                <Label htmlFor="plaintiffAddress">{t('cases.form.address', 'العنوان')}</Label>
+                <Input id="plaintiffAddress" {...register('plaintiffAddress')} />
+              </div>
+            </div>
 
-              {/* Company Details */}
-              <div className="space-y-4">
-                <h4 className="font-medium text-amber-700 flex items-center gap-2">
-                  <Building className="h-4 w-4" />
-                  {t('cases.form.companyDetails', 'بيانات الشركة (المدعى عليه)')}
-                </h4>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="companyName">{t('cases.form.companyName', 'اسم الشركة')}</Label>
-                    <Input id="companyName" {...register('companyName')} />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="companyRegistrationNumber">{t('cases.form.registrationNumber', 'السجل التجاري')}</Label>
-                    <Input id="companyRegistrationNumber" {...register('companyRegistrationNumber')} />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="companyCity">{t('cases.form.city', 'المدينة')}</Label>
-                    <Input id="companyCity" {...register('companyCity')} />
-                  </div>
+            {/* Company Details */}
+            <div className="space-y-4">
+              <h4 className="font-medium text-amber-700 flex items-center gap-2">
+                <Building className="h-4 w-4" />
+                {t('cases.form.companyDetails', 'بيانات الشركة (المدعى عليه)')}
+              </h4>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="companyName">{t('cases.form.companyName', 'اسم الشركة')}</Label>
+                  <Input id="companyName" {...register('companyName')} />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="companyAddress">{t('cases.form.address', 'العنوان')}</Label>
-                  <Input id="companyAddress" {...register('companyAddress')} />
+                  <Label htmlFor="companyRegistrationNumber">{t('cases.form.registrationNumber', 'السجل التجاري')}</Label>
+                  <Input id="companyRegistrationNumber" {...register('companyRegistrationNumber')} />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="companyCity">{t('cases.form.city', 'المدينة')}</Label>
+                  <Input id="companyCity" {...register('companyCity')} />
                 </div>
               </div>
-            </AccordionContent>
-          </AccordionItem>
-        </Accordion>
+              <div className="space-y-2">
+                <Label htmlFor="companyAddress">{t('cases.form.address', 'العنوان')}</Label>
+                <Input id="companyAddress" {...register('companyAddress')} />
+              </div>
+            </div>
+          </CollapsibleContent>
+        </Collapsible>
       )}
 
       {/* Submit Button */}
