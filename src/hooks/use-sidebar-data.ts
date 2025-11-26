@@ -19,6 +19,9 @@ import {
   FileText,
   Bell,
   GitBranch,
+  Receipt,
+  FileStack,
+  FileInput,
 } from 'lucide-react'
 import { useAuthStore } from '@/stores/auth-store'
 
@@ -223,6 +226,16 @@ export function useSidebarData(): SidebarData {
               },
             ],
           },
+          {
+            title: 'أسعار الفوترة',
+            url: '/dashboard/billing-rates',
+            icon: Receipt,
+          },
+          {
+            title: 'قوالب الفواتير',
+            url: '/dashboard/invoice-templates',
+            icon: FileStack,
+          },
         ],
       },
       {
@@ -244,21 +257,8 @@ export function useSidebarData(): SidebarData {
           },
           {
             title: 'التقارير',
+            url: '/dashboard/reports',
             icon: BarChart,
-            items: [
-              {
-                title: 'تقرير الإيرادات',
-                url: '/dashboard/reports/revenue',
-              },
-              {
-                title: 'تقرير القضايا',
-                url: '/dashboard/reports/cases',
-              },
-              {
-                title: 'تقرير الوقت',
-                url: '/dashboard/reports/time',
-              },
-            ],
           },
           {
             title: 'مركز المعرفة',
@@ -300,6 +300,11 @@ export function useSidebarData(): SidebarData {
                 url: '/dashboard/settings/preferences',
               },
             ],
+          },
+          {
+            title: 'استيراد/تصدير',
+            url: '/dashboard/data-export',
+            icon: FileInput,
           },
           {
             title: 'مركز المساعدة',
