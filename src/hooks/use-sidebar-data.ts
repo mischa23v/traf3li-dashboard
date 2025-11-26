@@ -20,6 +20,7 @@ import {
   Bell,
   GitBranch,
   Receipt,
+  FileStack,
 } from 'lucide-react'
 import { useAuthStore } from '@/stores/auth-store'
 
@@ -228,6 +229,11 @@ export function useSidebarData(): SidebarData {
             title: 'أسعار الفوترة',
             url: '/dashboard/billing-rates',
             icon: Receipt,
+          },
+          {
+            title: 'قوالب الفواتير',
+            url: '/dashboard/invoice-templates',
+            icon: FileStack,
           },
         ],
       },
