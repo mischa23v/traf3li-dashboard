@@ -41,7 +41,7 @@ const formSchema = z.object({
   isActive: z.boolean().default(true),
 })
 
-type FormValues = z.infer<typeof formSchema>
+type FormValues = z.output<typeof formSchema>
 
 interface GroupActionDialogProps {
   open: boolean
@@ -62,7 +62,7 @@ export function GroupActionDialog({
   const updateGroup = useUpdateRateGroup()
 
   const form = useForm<FormValues>({
-    resolver: zodResolver(formSchema),
+    resolver: zodResolver(formSchema) as any,
     defaultValues: {
       name: '',
       nameAr: '',

@@ -54,7 +54,7 @@ export function OrganizationsActionDialog({
   const { mutate: updateOrganization, isPending: isUpdating } = useUpdateOrganization()
 
   const form = useForm<CreateOrganizationInput>({
-    resolver: zodResolver(createOrganizationSchema),
+    resolver: zodResolver(createOrganizationSchema) as any,
     defaultValues: {
       name: '',
       nameAr: '',

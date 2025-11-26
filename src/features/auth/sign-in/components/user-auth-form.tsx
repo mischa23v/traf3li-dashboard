@@ -50,7 +50,7 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
   const formSchema = createFormSchema(t)
 
   const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+    resolver: zodResolver(formSchema) as any,
     defaultValues: {
       username: '',
       password: '',

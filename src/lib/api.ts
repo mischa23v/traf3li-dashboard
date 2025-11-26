@@ -196,4 +196,7 @@ export const getCacheSize = () => {
   return requestCache.size
 }
 
+// Alias export for compatibility with services that import 'api'
+export const api = apiClient
+
 export default apiClient

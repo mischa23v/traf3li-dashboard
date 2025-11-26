@@ -71,7 +71,7 @@ export function RateActionDialog({
   const updateRate = useUpdateRate()
 
   const form = useForm<FormValues>({
-    resolver: zodResolver(formSchema),
+    resolver: zodResolver(formSchema) as any,
     defaultValues: {
       name: '',
       nameAr: '',

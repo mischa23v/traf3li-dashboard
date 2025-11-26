@@ -47,7 +47,7 @@ export function NotificationsForm() {
   const { mutate: updateSettings, isPending } = useUpdateNotificationSettings()
 
   const form = useForm<NotificationsFormValues>({
-    resolver: zodResolver(notificationsFormSchema),
+    resolver: zodResolver(notificationsFormSchema) as any,
     defaultValues: {
       email: {
         enabled: true,

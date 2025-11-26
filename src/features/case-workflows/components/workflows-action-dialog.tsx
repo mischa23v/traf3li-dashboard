@@ -67,7 +67,7 @@ export function WorkflowsActionDialog({
   const updateWorkflow = useUpdateWorkflow()
 
   const form = useForm<FormValues>({
-    resolver: zodResolver(formSchema),
+    resolver: zodResolver(formSchema) as any,
     defaultValues: {
       name: '',
       nameAr: '',

@@ -44,7 +44,7 @@ export function TasksImportDialog({
   onOpenChange,
 }: TaskImportDialogProps) {
   const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+    resolver: zodResolver(formSchema) as any,
     defaultValues: { file: undefined },
   })
 

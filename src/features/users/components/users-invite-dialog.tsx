@@ -47,7 +47,7 @@ export function UsersInviteDialog({
   onOpenChange,
 }: UserInviteDialogProps) {
   const form = useForm<UserInviteForm>({
-    resolver: zodResolver(formSchema),
+    resolver: zodResolver(formSchema) as any,
     defaultValues: { email: '', role: '', desc: '' },
   })
 

@@ -1,7 +1,7 @@
 import { ColumnDef } from '@tanstack/react-table'
 import { Badge } from '@/components/ui/badge'
 import { Checkbox } from '@/components/ui/checkbox'
-import { DataTableColumnHeader } from '@/components/data-table/data-table-column-header'
+import { DataTableColumnHeader } from '@/components/data-table'
 import { DataTableRowActions } from './data-table-row-actions'
 import { type Tag } from '../data/schema'
 import { getEntityTypeInfo } from '../data/data'

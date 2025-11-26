@@ -14,8 +14,7 @@ import {
   type VisibilityState,
 } from '@tanstack/react-table'
 import { useState } from 'react'
-import { DataTable } from '@/components/data-table/data-table'
-import { DataTableToolbar } from '@/components/data-table/data-table-toolbar'
+import { DataTable, DataTableToolbar } from '@/components/data-table'
 import { type Organization } from '../data/schema'
 import { organizationStatusColors, organizationTypes } from '../data/data'
 import { useOrganizationsColumns } from './organizations-columns'
@@ -83,16 +82,16 @@ export function OrganizationsTable({ data, search, navigate }: OrganizationsTabl
     <div className='space-y-4'>
       <DataTableToolbar
         table={table}
-        filterColumn='name'
-        filterPlaceholder={t('organizations.searchPlaceholder')}
-        facetedFilters={[
+        searchKey='name'
+        searchPlaceholder={t('organizations.searchPlaceholder')}
+        filters={[
           {
-            column: 'type',
+            columnId: 'type',
             title: t('organizations.columns.type'),
             options: typeOptions,
           },
           {
-            column: 'status',
+            columnId: 'status',
             title: t('organizations.columns.status'),
             options: statusOptions,
           },

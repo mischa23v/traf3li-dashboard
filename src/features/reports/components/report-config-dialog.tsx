@@ -87,7 +87,7 @@ export function ReportConfigDialog({
   const updateMutation = useUpdateSavedReport()
 
   const form = useForm<ReportConfigFormValues>({
-    resolver: zodResolver(reportConfigSchema),
+    resolver: zodResolver(reportConfigSchema) as any,
     defaultValues: {
       name: '',
       description: '',

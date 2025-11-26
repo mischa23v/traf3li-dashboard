@@ -7,8 +7,8 @@ export interface Tag {
   nameAr?: string
   color: string // Hex color
   description?: string
-  entityType?: 'case' | 'client' | 'contact' | 'document' | 'all' // Which entities can use this tag
-  usageCount?: number
+  entityType: 'case' | 'client' | 'contact' | 'document' | 'all' // Which entities can use this tag
+  usageCount: number
   createdAt: string
   updatedAt: string
 }

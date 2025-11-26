@@ -20,7 +20,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { DataTablePagination } from '@/components/data-table/data-table-pagination'
+import { DataTablePagination } from '@/components/data-table'
 import { DataTableToolbar } from './data-table-toolbar'
 import { useWorkflowsColumns } from './workflows-columns'
 import type { WorkflowTemplate } from '../data/schema'

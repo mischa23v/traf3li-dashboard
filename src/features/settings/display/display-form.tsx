@@ -54,7 +54,7 @@ export function DisplayForm() {
   const { mutate: updateSettings, isPending } = useUpdateDisplaySettings()
 
   const form = useForm<DisplayFormValues>({
-    resolver: zodResolver(displayFormSchema),
+    resolver: zodResolver(displayFormSchema) as any,
     defaultValues: {
       dateFormat: 'DD/MM/YYYY',
       timeFormat: '24h',

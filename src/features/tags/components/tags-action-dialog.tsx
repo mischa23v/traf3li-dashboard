@@ -51,7 +51,7 @@ export function TagsActionDialog({
   const updateTag = useUpdateTag()
 
   const form = useForm<CreateTagData>({
-    resolver: zodResolver(createTagSchema),
+    resolver: zodResolver(createTagSchema) as any,
     defaultValues: {
       name: '',
       nameAr: '',

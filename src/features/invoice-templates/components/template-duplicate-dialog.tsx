@@ -46,7 +46,7 @@ export function TemplateDuplicateDialog({
   const duplicateTemplate = useDuplicateTemplate()
 
   const form = useForm<FormValues>({
-    resolver: zodResolver(formSchema),
+    resolver: zodResolver(formSchema) as any,
     defaultValues: {
       name: currentTemplate ? `${currentTemplate.name} (Copy)` : '',
       nameAr: currentTemplate ? `${currentTemplate.nameAr} (نسخة)` : '',
