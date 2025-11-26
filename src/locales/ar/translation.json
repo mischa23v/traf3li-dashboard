@@ -1056,5 +1056,31 @@
       "notes": "ملاحظات",
       "notesPlaceholder": "أضف ملاحظات عن المنظمة..."
     }
+  },
+  "tags": {
+    "title": "إدارة الوسوم",
+    "description": "إنشاء وإدارة الوسوم لتنظيم البيانات",
+    "searchTags": "البحث عن وسم...",
+    "addTag": "إضافة وسم",
+    "editTag": "تعديل الوسم",
+    "deleteTag": "حذف الوسم",
+    "viewTag": "عرض الوسم",
+    "addTagDescription": "أضف وسم جديد للنظام",
+    "editTagDescription": "تعديل بيانات الوسم الحالي",
+    "viewTagDetails": "عرض تفاصيل الوسم",
+    "noTags": "لا توجد وسوم",
+    "tagName": "اسم الوسم",
+    "nameEn": "الاسم بالإنجليزية",
+    "nameAr": "الاسم بالعربية",
+    "nameEnPlaceholder": "أدخل اسم الوسم بالإنجليزية",
+    "nameArPlaceholder": "أدخل اسم الوسم بالعربية",
+    "color": "اللون",
+    "entityType": "نوع الكيان",
+    "selectEntityType": "اختر نوع الكيان",
+    "usageCount": "عدد الاستخدام",
+    "timesUsed": "مرة",
+    "descriptionPlaceholder": "أدخل وصف الوسم...",
+    "deleteTagConfirmation": "هل أنت متأكد من حذف الوسم \"{{name}}\"؟ لا يمكن التراجع عن هذا الإجراء.",
+    "deleteTagWarning": "هذا الوسم مستخدم {{count}} مرة وسيتم إزالته من جميع الكيانات المرتبطة."
   }
 }

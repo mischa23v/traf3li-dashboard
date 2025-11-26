@@ -15,6 +15,7 @@ import {
   BookOpen,
   Settings,
   HelpCircle,
+  Tags,
 } from 'lucide-react'
 import { useAuthStore } from '@/stores/auth-store'
 
@@ -159,6 +160,11 @@ export function useSidebarData(): SidebarData {
             title: 'القضايا',
             url: '/dashboard/cases',
             icon: Scale,
+          },
+          {
+            title: 'الوسوم',
+            url: '/dashboard/tags',
+            icon: Tags,
           },
         ],
       },

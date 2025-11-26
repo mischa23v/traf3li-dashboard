@@ -1056,5 +1056,31 @@
       "notes": "Notes",
       "notesPlaceholder": "Add notes about the organization..."
     }
+  },
+  "tags": {
+    "title": "Tag Management",
+    "description": "Create and manage tags to organize your data",
+    "searchTags": "Search for a tag...",
+    "addTag": "Add Tag",
+    "editTag": "Edit Tag",
+    "deleteTag": "Delete Tag",
+    "viewTag": "View Tag",
+    "addTagDescription": "Add a new tag to the system",
+    "editTagDescription": "Update the current tag information",
+    "viewTagDetails": "View tag details",
+    "noTags": "No tags found",
+    "tagName": "Tag Name",
+    "nameEn": "Name (English)",
+    "nameAr": "Name (Arabic)",
+    "nameEnPlaceholder": "Enter tag name in English",
+    "nameArPlaceholder": "Enter tag name in Arabic",
+    "color": "Color",
+    "entityType": "Entity Type",
+    "selectEntityType": "Select entity type",
+    "usageCount": "Usage Count",
+    "timesUsed": "time(s) used",
+    "descriptionPlaceholder": "Enter tag description...",
+    "deleteTagConfirmation": "Are you sure you want to delete the tag \"{{name}}\"? This action cannot be undone.",
+    "deleteTagWarning": "This tag is used {{count}} time(s) and will be removed from all associated entities."
   }
 }
