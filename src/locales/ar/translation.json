@@ -654,7 +654,32 @@
       "hearings": "الجلسات",
       "documents": "المستندات",
       "claims": "المطالبات",
-      "notes": "الملاحظات"
+      "notes": "الملاحظات",
+      "history": "سجل التغييرات"
+    },
+    "auditHistory": {
+      "title": "سجل التغييرات",
+      "entries": "سجل",
+      "noHistory": "لا يوجد سجل تغييرات",
+      "noHistoryDesc": "سيتم تسجيل جميع التغييرات على هذه القضية هنا",
+      "unknownUser": "مستخدم غير معروف",
+      "changes": "التغييرات",
+      "before": "قبل",
+      "after": "بعد",
+      "actions": {
+        "create": "إنشاء",
+        "update": "تحديث",
+        "delete": "حذف",
+        "view": "عرض"
+      },
+      "resources": {
+        "case": "القضية",
+        "document": "مستند",
+        "hearing": "جلسة",
+        "note": "ملاحظة",
+        "claim": "مطالبة",
+        "timeline": "حدث"
+      }
     },
     "form": {
       "basicInfo": "المعلومات الأساسية",
@@ -1128,6 +1153,9 @@
     "changeNote": "ملاحظة التغيير",
     "changeNotePlaceholder": "وصف التغييرات في هذا الإصدار...",
     "versionRestoreSuccess": "تم استعادة الإصدار بنجاح",
+    "totalVersions": "إصدار",
+    "firstVersion": "هذا هو الإصدار الأول من المستند",
+    "restoreVersion": "استعادة هذا الإصدار",
     "share": "مشاركة",
     "shareDocument": "مشاركة المستند",
     "shareDocumentDescription": "إنشاء رابط مشاركة للمستند: {{name}}",

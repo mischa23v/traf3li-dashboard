@@ -31,6 +31,11 @@ import {
   Trash2,
   MessageSquare,
   Loader2,
+  ClipboardList,
+  PenLine,
+  FilePlus,
+  FileX,
+  Settings,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -115,6 +120,7 @@ import type {
   CaseNote,
   Claim,
   TimelineEvent,
+  AuditLogEntry,
 } from '@/services/casesService'
 
 // Helper functions
@@ -907,7 +913,7 @@ export function CaseDetailsView() {
                 <div className="bg-white p-2 rounded-[20px] border border-slate-100 shadow-sm overflow-x-auto">
                   <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
                     <TabsList className="bg-slate-50 p-1 rounded-xl h-auto w-full justify-start gap-2">
-                      {['overview', 'hearings', 'documents', 'claims', 'notes'].map((tab) => (
+                      {['overview', 'hearings', 'documents', 'claims', 'notes', 'history'].map((tab) => (
                         <TabsTrigger
                           key={tab}
                           value={tab}
@@ -925,7 +931,9 @@ export function CaseDetailsView() {
                                 ? t('cases.tabs.documents', 'المستندات')
                                 : tab === 'claims'
                                   ? t('cases.tabs.claims', 'المطالبات')
-                                  : t('cases.tabs.notes', 'الملاحظات')}
+                                  : tab === 'notes'
+                                    ? t('cases.tabs.notes', 'الملاحظات')
+                                    : t('cases.tabs.history', 'سجل التغييرات')}
                         </TabsTrigger>
                       ))}
                     </TabsList>
@@ -1602,6 +1610,200 @@ export function CaseDetailsView() {
                         <div className="text-center py-12 text-slate-400">
                           <MessageSquare className="h-12 w-12 mx-auto mb-3 opacity-50" />
                           <p>{t('cases.noNotes', 'لا توجد ملاحظات')}</p>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Audit History Tab */}
+                  {activeTab === 'history' && (
+                    <div className="space-y-6">
+                      <div className="flex justify-between items-center mb-4">
+                        <h3 className="font-bold text-navy flex items-center gap-2">
+                          <ClipboardList className="h-5 w-5 text-brand-blue" />
+                          {t('cases.auditHistory.title', 'سجل التغييرات')}
+                        </h3>
+                        <Badge variant="outline" className="text-slate-500">
+                          {auditHistory?.logs?.length || 0} {t('cases.auditHistory.entries', 'سجل')}
+                        </Badge>
+                      </div>
+
+                      {/* Audit History Timeline */}
+                      {auditHistory?.logs && auditHistory.logs.length > 0 ? (
+                        <div className="relative">
+                          {/* Timeline line */}
+                          <div className="absolute top-4 bottom-4 right-6 w-0.5 bg-gradient-to-b from-brand-blue via-slate-200 to-slate-100"></div>
+
+                          <div className="space-y-4">
+                            {auditHistory.logs.map((log: AuditLogEntry, index: number) => {
+                              const getActionIcon = () => {
+                                switch (log.action) {
+                                  case 'create':
+                                    return <FilePlus className="h-4 w-4" />
+                                  case 'update':
+                                    return <PenLine className="h-4 w-4" />
+                                  case 'delete':
+                                    return <FileX className="h-4 w-4" />
+                                  case 'view':
+                                    return <Eye className="h-4 w-4" />
+                                  default:
+                                    return <Settings className="h-4 w-4" />
+                                }
+                              }
+
+                              const getActionColor = () => {
+                                switch (log.action) {
+                                  case 'create':
+                                    return 'bg-green-100 text-green-600 border-green-200'
+                                  case 'update':
+                                    return 'bg-blue-100 text-blue-600 border-blue-200'
+                                  case 'delete':
+                                    return 'bg-red-100 text-red-600 border-red-200'
+                                  case 'view':
+                                    return 'bg-slate-100 text-slate-600 border-slate-200'
+                                  default:
+                                    return 'bg-slate-100 text-slate-600 border-slate-200'
+                                }
+                              }
+
+                              const getResourceLabel = () => {
+                                switch (log.resource) {
+                                  case 'case':
+                                    return t('cases.auditHistory.resources.case', 'القضية')
+                                  case 'document':
+                                    return t('cases.auditHistory.resources.document', 'مستند')
+                                  case 'hearing':
+                                    return t('cases.auditHistory.resources.hearing', 'جلسة')
+                                  case 'note':
+                                    return t('cases.auditHistory.resources.note', 'ملاحظة')
+                                  case 'claim':
+                                    return t('cases.auditHistory.resources.claim', 'مطالبة')
+                                  case 'timeline':
+                                    return t('cases.auditHistory.resources.timeline', 'حدث')
+                                  default:
+                                    return log.resource
+                                }
+                              }
+
+                              const getActionLabel = () => {
+                                switch (log.action) {
+                                  case 'create':
+                                    return t('cases.auditHistory.actions.create', 'إنشاء')
+                                  case 'update':
+                                    return t('cases.auditHistory.actions.update', 'تحديث')
+                                  case 'delete':
+                                    return t('cases.auditHistory.actions.delete', 'حذف')
+                                  case 'view':
+                                    return t('cases.auditHistory.actions.view', 'عرض')
+                                  default:
+                                    return log.action
+                                }
+                              }
+
+                              const getUserName = () => {
+                                if (typeof log.userId === 'object' && log.userId) {
+                                  if (log.userId.firstName && log.userId.lastName) {
+                                    return `${log.userId.firstName} ${log.userId.lastName}`
+                                  }
+                                  return log.userId.username || t('cases.auditHistory.unknownUser', 'مستخدم غير معروف')
+                                }
+                                return t('cases.auditHistory.unknownUser', 'مستخدم غير معروف')
+                              }
+
+                              return (
+                                <div key={log._id || index} className="flex gap-4 relative">
+                                  {/* Timeline dot */}
+                                  <div className={`
+                                    w-12 h-12 rounded-full flex items-center justify-center shrink-0 z-10
+                                    ${getActionColor()} border-2 shadow-sm
+                                  `}>
+                                    {getActionIcon()}
+                                  </div>
+
+                                  {/* Content card */}
+                                  <div className="flex-1 bg-slate-50 rounded-2xl p-4 border border-slate-100 hover:border-slate-200 transition-colors">
+                                    <div className="flex items-start justify-between mb-2">
+                                      <div className="flex items-center gap-2">
+                                        <Badge variant="outline" className={`${getActionColor()} font-medium`}>
+                                          {getActionLabel()} {getResourceLabel()}
+                                        </Badge>
+                                      </div>
+                                      <span className="text-xs text-slate-400 flex items-center gap-1">
+                                        <Clock className="h-3 w-3" />
+                                        {new Date(log.timestamp).toLocaleDateString('ar-SA', {
+                                          day: 'numeric',
+                                          month: 'short',
+                                          year: 'numeric',
+                                          hour: '2-digit',
+                                          minute: '2-digit',
+                                        })}
+                                      </span>
+                                    </div>
+
+                                    <div className="flex items-center gap-2 text-sm text-slate-600 mb-3">
+                                      <div className="w-6 h-6 rounded-full bg-navy/10 flex items-center justify-center text-navy text-xs font-bold">
+                                        {getUserName().charAt(0)}
+                                      </div>
+                                      <span className="font-medium">{getUserName()}</span>
+                                    </div>
+
+                                    {/* Changes details */}
+                                    {log.changes && (log.changes.before || log.changes.after) && (
+                                      <div className="mt-3 pt-3 border-t border-slate-200">
+                                        <div className="text-xs text-slate-500 mb-2 font-medium">
+                                          {t('cases.auditHistory.changes', 'التغييرات')}:
+                                        </div>
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                          {log.changes.before && Object.keys(log.changes.before).length > 0 && (
+                                            <div className="bg-red-50/50 rounded-lg p-3 border border-red-100">
+                                              <div className="text-xs text-red-600 font-medium mb-2 flex items-center gap-1">
+                                                <span className="w-2 h-2 rounded-full bg-red-500"></span>
+                                                {t('cases.auditHistory.before', 'قبل')}
+                                              </div>
+                                              <div className="space-y-1">
+                                                {Object.entries(log.changes.before).map(([key, value]) => (
+                                                  <div key={key} className="text-xs">
+                                                    <span className="text-slate-500">{key}:</span>{' '}
+                                                    <span className="text-slate-700 font-medium">
+                                                      {typeof value === 'object' ? JSON.stringify(value) : String(value)}
+                                                    </span>
+                                                  </div>
+                                                ))}
+                                              </div>
+                                            </div>
+                                          )}
+                                          {log.changes.after && Object.keys(log.changes.after).length > 0 && (
+                                            <div className="bg-green-50/50 rounded-lg p-3 border border-green-100">
+                                              <div className="text-xs text-green-600 font-medium mb-2 flex items-center gap-1">
+                                                <span className="w-2 h-2 rounded-full bg-green-500"></span>
+                                                {t('cases.auditHistory.after', 'بعد')}
+                                              </div>
+                                              <div className="space-y-1">
+                                                {Object.entries(log.changes.after).map(([key, value]) => (
+                                                  <div key={key} className="text-xs">
+                                                    <span className="text-slate-500">{key}:</span>{' '}
+                                                    <span className="text-slate-700 font-medium">
+                                                      {typeof value === 'object' ? JSON.stringify(value) : String(value)}
+                                                    </span>
+                                                  </div>
+                                                ))}
+                                              </div>
+                                            </div>
+                                          )}
+                                        </div>
+                                      </div>
+                                    )}
+                                  </div>
+                                </div>
+                              )
+                            })}
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="text-center py-12 text-slate-400">
+                          <ClipboardList className="h-12 w-12 mx-auto mb-3 opacity-50" />
+                          <p>{t('cases.auditHistory.noHistory', 'لا يوجد سجل تغييرات')}</p>
+                          <p className="text-sm mt-2">{t('cases.auditHistory.noHistoryDesc', 'سيتم تسجيل جميع التغييرات على هذه القضية هنا')}</p>
                         </div>
                       )}
                     </div>

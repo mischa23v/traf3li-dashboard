@@ -32,7 +32,16 @@ import {
   X,
   Clock,
   User,
+  History,
+  CheckCircle2,
+  GitBranch,
 } from 'lucide-react'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip'
 import { cn } from '@/lib/utils'
 
 interface DocumentsVersionsDialogProps {
@@ -199,90 +208,164 @@ export function DocumentsVersionsDialog({
             )}
           </div>
 
-          {/* Version history */}
+          {/* Version history with visual timeline */}
           <div>
-            <h3 className='font-medium mb-3'>{t('documents.previousVersions')}</h3>
-            <ScrollArea className='h-[300px]'>
+            <div className='flex items-center justify-between mb-4'>
+              <h3 className='font-medium flex items-center gap-2'>
+                <History className='h-4 w-4 text-primary' />
+                {t('documents.previousVersions')}
+              </h3>
+              <Badge variant='secondary' className='text-xs'>
+                {(versions?.length || 0) + 1} {t('documents.totalVersions', 'versions')}
+              </Badge>
+            </div>
+            <ScrollArea className='h-[350px]'>
               {isLoading ? (
                 <div className='text-center py-8 text-muted-foreground'>
                   {t('common.loading')}
                 </div>
-              ) : versions.length === 0 ? (
-                <div className='text-center py-8 text-muted-foreground'>
-                  {t('documents.noVersions')}
-                </div>
               ) : (
-                <div className='space-y-3'>
-                  {/* Current version */}
-                  <div className='flex items-start gap-3 p-3 border rounded-lg bg-primary/5'>
-                    <div className='flex-1'>
-                      <div className='flex items-center gap-2'>
-                        <span className='font-medium'>{currentRow.originalName}</span>
-                        <Badge>{t('documents.currentVersion')}</Badge>
-                      </div>
-                      <div className='flex items-center gap-4 mt-1 text-sm text-muted-foreground'>
-                        <span className='flex items-center gap-1'>
-                          <Clock className='h-3 w-3' />
-                          {formatDate(currentRow.updatedAt)}
-                        </span>
-                        <span>{formatFileSize(currentRow.fileSize)}</span>
-                      </div>
-                    </div>
-                    <Button
-                      variant='outline'
-                      size='sm'
-                      onClick={() =>
-                        downloadDocument.mutate({
-                          id: currentRow._id,
-                          fileName: currentRow.originalName,
-                        })
-                      }
-                    >
-                      <Download className='h-4 w-4' />
-                    </Button>
-                  </div>
+                <TooltipProvider>
+                  <div className='relative'>
+                    {/* Timeline line */}
+                    <div className='absolute top-6 bottom-6 start-5 w-0.5 bg-gradient-to-b from-primary via-muted-foreground/30 to-muted-foreground/10' />
 
-                  {/* Previous versions */}
-                  {versions.map((version) => (
-                    <div
-                      key={version._id}
-                      className='flex items-start gap-3 p-3 border rounded-lg'
-                    >
-                      <div className='flex-1'>
-                        <div className='flex items-center gap-2'>
-                          <span className='font-medium'>{version.originalName}</span>
-                          <Badge variant='outline'>v{version.version}</Badge>
+                    <div className='space-y-4'>
+                      {/* Current version */}
+                      <div className='relative flex gap-4'>
+                        {/* Timeline node */}
+                        <div className='relative z-10 flex-shrink-0'>
+                          <div className='w-10 h-10 rounded-full bg-primary flex items-center justify-center shadow-lg shadow-primary/30'>
+                            <CheckCircle2 className='h-5 w-5 text-primary-foreground' />
+                          </div>
                         </div>
-                        <div className='flex flex-wrap items-center gap-x-4 gap-y-1 mt-1 text-sm text-muted-foreground'>
-                          <span className='flex items-center gap-1'>
-                            <Clock className='h-3 w-3' />
-                            {formatDate(version.createdAt)}
-                          </span>
-                          <span>{formatFileSize(version.fileSize)}</span>
-                          <span className='flex items-center gap-1'>
-                            <User className='h-3 w-3' />
-                            {getUploaderName(version.uploadedBy)}
-                          </span>
+                        {/* Content */}
+                        <div className='flex-1 bg-primary/5 border-2 border-primary/20 rounded-xl p-4 hover:border-primary/40 transition-colors'>
+                          <div className='flex items-start justify-between'>
+                            <div className='flex-1'>
+                              <div className='flex items-center gap-2 mb-2'>
+                                <FileText className='h-4 w-4 text-primary' />
+                                <span className='font-semibold'>{currentRow.originalName}</span>
+                                <Badge className='bg-primary text-primary-foreground'>
+                                  {t('documents.currentVersion')}
+                                </Badge>
+                              </div>
+                              <div className='flex flex-wrap items-center gap-3 text-sm text-muted-foreground'>
+                                <span className='flex items-center gap-1'>
+                                  <Clock className='h-3 w-3' />
+                                  {formatDate(currentRow.updatedAt)}
+                                </span>
+                                <span className='px-2 py-0.5 bg-muted rounded-full text-xs'>
+                                  {formatFileSize(currentRow.fileSize)}
+                                </span>
+                              </div>
+                            </div>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Button
+                                  variant='outline'
+                                  size='sm'
+                                  className='hover:bg-primary hover:text-primary-foreground'
+                                  onClick={() =>
+                                    downloadDocument.mutate({
+                                      id: currentRow._id,
+                                      fileName: currentRow.originalName,
+                                    })
+                                  }
+                                >
+                                  <Download className='h-4 w-4' />
+                                </Button>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                {t('common.download')}
+                              </TooltipContent>
+                            </Tooltip>
+                          </div>
                         </div>
-                        {version.changeNote && (
-                          <p className='text-sm mt-1 italic'>
-                            "{version.changeNote}"
-                          </p>
-                        )}
                       </div>
-                      <div className='flex gap-1'>
-                        <Button
-                          variant='outline'
-                          size='sm'
-                          onClick={() => handleRestore(version._id)}
-                          disabled={restoreVersion.isPending}
-                        >
-                          <RotateCcw className='h-4 w-4' />
-                        </Button>
-                      </div>
+
+                      {/* Previous versions */}
+                      {versions.length === 0 ? (
+                        <div className='relative flex gap-4'>
+                          <div className='relative z-10 flex-shrink-0'>
+                            <div className='w-10 h-10 rounded-full bg-muted flex items-center justify-center'>
+                              <GitBranch className='h-4 w-4 text-muted-foreground' />
+                            </div>
+                          </div>
+                          <div className='flex-1 text-center py-6 text-muted-foreground'>
+                            <p className='text-sm'>{t('documents.noVersions')}</p>
+                            <p className='text-xs mt-1'>{t('documents.firstVersion', 'This is the first version of the document')}</p>
+                          </div>
+                        </div>
+                      ) : (
+                        versions.map((version, index) => (
+                          <div key={version._id} className='relative flex gap-4'>
+                            {/* Timeline node */}
+                            <div className='relative z-10 flex-shrink-0'>
+                              <div className='w-10 h-10 rounded-full bg-muted border-2 border-muted-foreground/20 flex items-center justify-center'>
+                                <span className='text-xs font-bold text-muted-foreground'>
+                                  v{version.version}
+                                </span>
+                              </div>
+                            </div>
+                            {/* Content */}
+                            <div className='flex-1 bg-muted/30 border border-muted-foreground/10 rounded-xl p-4 hover:border-muted-foreground/30 hover:bg-muted/50 transition-all group'>
+                              <div className='flex items-start justify-between'>
+                                <div className='flex-1'>
+                                  <div className='flex items-center gap-2 mb-2'>
+                                    <FileText className='h-4 w-4 text-muted-foreground' />
+                                    <span className='font-medium'>{version.originalName}</span>
+                                    <Badge variant='outline' className='text-xs'>
+                                      v{version.version}
+                                    </Badge>
+                                  </div>
+                                  <div className='flex flex-wrap items-center gap-3 text-sm text-muted-foreground'>
+                                    <span className='flex items-center gap-1'>
+                                      <Clock className='h-3 w-3' />
+                                      {formatDate(version.createdAt)}
+                                    </span>
+                                    <span className='px-2 py-0.5 bg-muted rounded-full text-xs'>
+                                      {formatFileSize(version.fileSize)}
+                                    </span>
+                                    <span className='flex items-center gap-1'>
+                                      <User className='h-3 w-3' />
+                                      {getUploaderName(version.uploadedBy)}
+                                    </span>
+                                  </div>
+                                  {version.changeNote && (
+                                    <div className='mt-2 p-2 bg-muted/50 rounded-lg border-s-2 border-muted-foreground/30'>
+                                      <p className='text-xs text-muted-foreground italic'>
+                                        "{version.changeNote}"
+                                      </p>
+                                    </div>
+                                  )}
+                                </div>
+                                <div className='flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity'>
+                                  <Tooltip>
+                                    <TooltipTrigger asChild>
+                                      <Button
+                                        variant='outline'
+                                        size='sm'
+                                        onClick={() => handleRestore(version._id)}
+                                        disabled={restoreVersion.isPending}
+                                        className='hover:bg-amber-500 hover:text-white hover:border-amber-500'
+                                      >
+                                        <RotateCcw className='h-4 w-4' />
+                                      </Button>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                      {t('documents.restoreVersion', 'Restore this version')}
+                                    </TooltipContent>
+                                  </Tooltip>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        ))
+                      )}
                     </div>
-                  ))}
-                </div>
+                  </div>
+                </TooltipProvider>
               )}
             </ScrollArea>
           </div>

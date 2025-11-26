@@ -654,7 +654,32 @@
       "hearings": "Hearings",
       "documents": "Documents",
       "claims": "Claims",
-      "notes": "Notes"
+      "notes": "Notes",
+      "history": "Audit Trail"
+    },
+    "auditHistory": {
+      "title": "Audit Trail",
+      "entries": "entries",
+      "noHistory": "No audit trail",
+      "noHistoryDesc": "All changes to this case will be recorded here",
+      "unknownUser": "Unknown user",
+      "changes": "Changes",
+      "before": "Before",
+      "after": "After",
+      "actions": {
+        "create": "Created",
+        "update": "Updated",
+        "delete": "Deleted",
+        "view": "Viewed"
+      },
+      "resources": {
+        "case": "Case",
+        "document": "Document",
+        "hearing": "Hearing",
+        "note": "Note",
+        "claim": "Claim",
+        "timeline": "Event"
+      }
     },
     "form": {
       "basicInfo": "Basic Information",
@@ -1128,6 +1153,9 @@
     "changeNote": "Change Note",
     "changeNotePlaceholder": "Describe changes in this version...",
     "versionRestoreSuccess": "Version restored successfully",
+    "totalVersions": "versions",
+    "firstVersion": "This is the first version of the document",
+    "restoreVersion": "Restore this version",
     "share": "Share",
     "shareDocument": "Share Document",
     "shareDocumentDescription": "Create a shareable link for: {{name}}",
