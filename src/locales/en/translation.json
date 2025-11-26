@@ -584,7 +584,7 @@
       "high": "High",
       "critical": "Critical"
     },
-    "outcome": {
+    "outcomeValues": {
       "ongoing": "Ongoing",
       "won": "Won",
       "lost": "Lost",

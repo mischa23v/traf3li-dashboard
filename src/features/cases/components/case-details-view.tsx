@@ -639,12 +639,12 @@ export function CaseDetailsView() {
                             <div className="text-sm text-slate-500">{t('cases.outcome', 'النتيجة')}</div>
                             <div className="font-bold text-navy">
                               {caseData.outcome === 'ongoing'
-                                ? t('cases.outcome.ongoing', 'جارية')
+                                ? t('cases.outcomeValues.ongoing', 'جارية')
                                 : caseData.outcome === 'won'
-                                  ? t('cases.outcome.won', 'فائزة')
+                                  ? t('cases.outcomeValues.won', 'فائزة')
                                   : caseData.outcome === 'lost'
-                                    ? t('cases.outcome.lost', 'خاسرة')
-                                    : t('cases.outcome.settled', 'تسوية')}
+                                    ? t('cases.outcomeValues.lost', 'خاسرة')
+                                    : t('cases.outcomeValues.settled', 'تسوية')}
                             </div>
                           </div>
                         </div>

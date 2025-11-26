@@ -584,7 +584,7 @@
       "high": "عالية",
       "critical": "عاجلة"
     },
-    "outcome": {
+    "outcomeValues": {
       "ongoing": "جارية",
       "won": "فائزة",
       "lost": "خاسرة",
