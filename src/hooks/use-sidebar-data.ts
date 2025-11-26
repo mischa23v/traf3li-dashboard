@@ -16,6 +16,7 @@ import {
   Settings,
   HelpCircle,
   Tags,
+  FileText,
 } from 'lucide-react'
 import { useAuthStore } from '@/stores/auth-store'
 
@@ -165,6 +166,11 @@ export function useSidebarData(): SidebarData {
             title: 'الوسوم',
             url: '/dashboard/tags',
             icon: Tags,
+          },
+          {
+            title: 'المستندات',
+            url: '/dashboard/documents',
+            icon: FileText,
           },
         ],
       },
