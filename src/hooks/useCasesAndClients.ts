@@ -13,6 +13,7 @@ import casesService, {
   AddNoteData,
   AddDocumentData,
   AddHearingData,
+  AddClaimData,
   CaseStatus,
   CaseOutcome,
   Case,
@@ -182,6 +183,26 @@ export const useAddCaseHearing = () => {
     },
     onError: (error: Error) => {
       toast.error(error.message || t('cases.hearingAddError', 'فشل إضافة الجلسة'))
+    },
+  })
+}
+
+/**
+ * Add claim to case mutation
+ */
+export const useAddCaseClaim = () => {
+  const queryClient = useQueryClient()
+  const { t } = useTranslation()
+
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: AddClaimData }) =>
+      casesService.addClaim(id, data),
+    onSuccess: (_, { id }) => {
+      queryClient.invalidateQueries({ queryKey: ['cases', id] })
+      toast.success(t('cases.claimAddSuccess', 'تمت إضافة المطالبة بنجاح'))
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || t('cases.claimAddError', 'فشل إضافة المطالبة'))
     },
   })
 }

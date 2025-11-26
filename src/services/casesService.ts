@@ -447,6 +447,20 @@ const casesService = {
   },
 
   /**
+   * Add claim to case
+   * POST /api/cases/:id/claim
+   */
+  addClaim: async (id: string, data: AddClaimData): Promise<Case> => {
+    try {
+      const response = await apiClient.post<CaseResponse>(`/cases/${id}/claim`, data)
+      return response.data.case
+    } catch (error: any) {
+      console.error('Add claim error:', error)
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
    * Update case status
    * PATCH /api/cases/:id/status
    */
