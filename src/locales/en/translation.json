@@ -424,6 +424,7 @@
   "common": {
     "search": "Search",
     "loading": "Loading...",
+    "uploading": "Uploading...",
     "submit": "Submit",
     "cancel": "Cancel",
     "delete": "Delete",
@@ -558,7 +559,28 @@
     "attended": "Attended",
     "missed": "Missed",
     "uploadDocument": "Upload New Document",
+    "uploadDocumentDescription": "Select the file and document type to upload",
     "noDocuments": "No documents",
+    "noJudgments": "No judgments recorded",
+    "dropFileHere": "Click to select a file",
+    "documentType": "Document Type",
+    "selectDocumentType": "Select document type",
+    "documentDescription": "Document Description (optional)",
+    "documentDescriptionPlaceholder": "Brief description of the document...",
+    "judgmentBucketInfo": "The judgment will be saved in the encrypted judgments storage",
+    "generalBucketInfo": "The document will be saved in secure storage",
+    "documents": {
+      "general": "General Documents",
+      "judgments": "Judgments"
+    },
+    "docTypes": {
+      "contract": "Contract",
+      "evidence": "Evidence / Supporting Document",
+      "correspondence": "Correspondence",
+      "pleading": "Pleading / Memorandum",
+      "judgment": "Court Judgment",
+      "other": "Other"
+    },
     "claims": "Claims",
     "addClaim": "Add Claim",
     "addClaimDescription": "Add a new claim to the case",
@@ -668,6 +690,7 @@
   "common": {
     "search": "Search",
     "loading": "Loading...",
+    "uploading": "Uploading...",
     "submit": "Submit",
     "cancel": "Cancel",
     "delete": "Delete",

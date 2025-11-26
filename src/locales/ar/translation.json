@@ -424,6 +424,7 @@
   "common": {
     "search": "بحث",
     "loading": "جاري التحميل...",
+    "uploading": "جاري الرفع...",
     "submit": "إرسال",
     "cancel": "إلغاء",
     "delete": "حذف",
@@ -558,7 +559,28 @@
     "attended": "حضور",
     "missed": "فائتة",
     "uploadDocument": "رفع مستند جديد",
+    "uploadDocumentDescription": "اختر الملف ونوع المستند للرفع",
     "noDocuments": "لا توجد مستندات",
+    "noJudgments": "لا توجد أحكام مسجلة",
+    "dropFileHere": "اضغط لاختيار ملف",
+    "documentType": "نوع المستند",
+    "selectDocumentType": "اختر نوع المستند",
+    "documentDescription": "وصف المستند (اختياري)",
+    "documentDescriptionPlaceholder": "وصف مختصر للمستند...",
+    "judgmentBucketInfo": "سيتم حفظ الحكم في مخزن الأحكام المشفر",
+    "generalBucketInfo": "سيتم حفظ المستند في المخزن الآمن",
+    "documents": {
+      "general": "مستندات عامة",
+      "judgments": "الأحكام"
+    },
+    "docTypes": {
+      "contract": "عقد",
+      "evidence": "دليل / مستند داعم",
+      "correspondence": "مراسلات",
+      "pleading": "لائحة / مذكرة",
+      "judgment": "حكم قضائي",
+      "other": "أخرى"
+    },
     "claims": "المطالبات",
     "addClaim": "إضافة مطالبة",
     "addClaimDescription": "أضف مطالبة جديدة للقضية",
@@ -668,6 +690,7 @@
   "common": {
     "search": "بحث",
     "loading": "جاري التحميل...",
+    "uploading": "جاري الرفع...",
     "submit": "إرسال",
     "cancel": "إلغاء",
     "delete": "حذف",

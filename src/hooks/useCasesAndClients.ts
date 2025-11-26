@@ -14,9 +14,17 @@ import casesService, {
   AddDocumentData,
   AddHearingData,
   AddClaimData,
+  UpdateNoteData,
+  UpdateHearingData,
+  UpdateClaimData,
+  AddTimelineEventData,
+  UpdateTimelineEventData,
+  GetUploadUrlData,
+  ConfirmUploadData,
   CaseStatus,
   CaseOutcome,
   Case,
+  AuditLogEntry,
 } from '@/services/casesService'
 import clientsService, {
   ClientFilters,
@@ -378,5 +386,306 @@ export const useTeamMembers = () => {
     queryKey: ['lawyers', 'team'],
     queryFn: () => lawyersService.getTeamMembers(),
     staleTime: 5 * 60 * 1000,
+  })
+}
+
+// ==================== NOTES CRUD ====================
+
+/**
+ * Update note in case mutation
+ */
+export const useUpdateCaseNote = () => {
+  const queryClient = useQueryClient()
+  const { t } = useTranslation()
+
+  return useMutation({
+    mutationFn: ({ caseId, noteId, data }: { caseId: string; noteId: string; data: UpdateNoteData }) =>
+      casesService.updateNote(caseId, noteId, data),
+    onSuccess: (_, { caseId }) => {
+      queryClient.invalidateQueries({ queryKey: ['cases', caseId] })
+      toast.success(t('cases.noteUpdateSuccess', 'تم تحديث الملاحظة بنجاح'))
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || t('cases.noteUpdateError', 'فشل تحديث الملاحظة'))
+    },
+  })
+}
+
+/**
+ * Delete note from case mutation
+ */
+export const useDeleteCaseNote = () => {
+  const queryClient = useQueryClient()
+  const { t } = useTranslation()
+
+  return useMutation({
+    mutationFn: ({ caseId, noteId }: { caseId: string; noteId: string }) =>
+      casesService.deleteNote(caseId, noteId),
+    onSuccess: (_, { caseId }) => {
+      queryClient.invalidateQueries({ queryKey: ['cases', caseId] })
+      toast.success(t('cases.noteDeleteSuccess', 'تم حذف الملاحظة بنجاح'))
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || t('cases.noteDeleteError', 'فشل حذف الملاحظة'))
+    },
+  })
+}
+
+// ==================== HEARINGS CRUD ====================
+
+/**
+ * Update hearing in case mutation
+ */
+export const useUpdateCaseHearing = () => {
+  const queryClient = useQueryClient()
+  const { t } = useTranslation()
+
+  return useMutation({
+    mutationFn: ({ caseId, hearingId, data }: { caseId: string; hearingId: string; data: UpdateHearingData }) =>
+      casesService.updateHearing(caseId, hearingId, data),
+    onSuccess: (_, { caseId }) => {
+      queryClient.invalidateQueries({ queryKey: ['cases', caseId] })
+      toast.success(t('cases.hearingUpdateSuccess', 'تم تحديث الجلسة بنجاح'))
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || t('cases.hearingUpdateError', 'فشل تحديث الجلسة'))
+    },
+  })
+}
+
+/**
+ * Delete hearing from case mutation
+ */
+export const useDeleteCaseHearing = () => {
+  const queryClient = useQueryClient()
+  const { t } = useTranslation()
+
+  return useMutation({
+    mutationFn: ({ caseId, hearingId }: { caseId: string; hearingId: string }) =>
+      casesService.deleteHearing(caseId, hearingId),
+    onSuccess: (_, { caseId }) => {
+      queryClient.invalidateQueries({ queryKey: ['cases', caseId] })
+      toast.success(t('cases.hearingDeleteSuccess', 'تم حذف الجلسة بنجاح'))
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || t('cases.hearingDeleteError', 'فشل حذف الجلسة'))
+    },
+  })
+}
+
+// ==================== CLAIMS CRUD ====================
+
+/**
+ * Update claim in case mutation
+ */
+export const useUpdateCaseClaim = () => {
+  const queryClient = useQueryClient()
+  const { t } = useTranslation()
+
+  return useMutation({
+    mutationFn: ({ caseId, claimId, data }: { caseId: string; claimId: string; data: UpdateClaimData }) =>
+      casesService.updateClaim(caseId, claimId, data),
+    onSuccess: (_, { caseId }) => {
+      queryClient.invalidateQueries({ queryKey: ['cases', caseId] })
+      toast.success(t('cases.claimUpdateSuccess', 'تم تحديث المطالبة بنجاح'))
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || t('cases.claimUpdateError', 'فشل تحديث المطالبة'))
+    },
+  })
+}
+
+/**
+ * Delete claim from case mutation
+ */
+export const useDeleteCaseClaim = () => {
+  const queryClient = useQueryClient()
+  const { t } = useTranslation()
+
+  return useMutation({
+    mutationFn: ({ caseId, claimId }: { caseId: string; claimId: string }) =>
+      casesService.deleteClaim(caseId, claimId),
+    onSuccess: (_, { caseId }) => {
+      queryClient.invalidateQueries({ queryKey: ['cases', caseId] })
+      toast.success(t('cases.claimDeleteSuccess', 'تم حذف المطالبة بنجاح'))
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || t('cases.claimDeleteError', 'فشل حذف المطالبة'))
+    },
+  })
+}
+
+// ==================== TIMELINE CRUD ====================
+
+/**
+ * Add timeline event to case mutation
+ */
+export const useAddCaseTimelineEvent = () => {
+  const queryClient = useQueryClient()
+  const { t } = useTranslation()
+
+  return useMutation({
+    mutationFn: ({ caseId, data }: { caseId: string; data: AddTimelineEventData }) =>
+      casesService.addTimelineEvent(caseId, data),
+    onSuccess: (_, { caseId }) => {
+      queryClient.invalidateQueries({ queryKey: ['cases', caseId] })
+      toast.success(t('cases.timelineAddSuccess', 'تمت إضافة الحدث بنجاح'))
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || t('cases.timelineAddError', 'فشل إضافة الحدث'))
+    },
+  })
+}
+
+/**
+ * Update timeline event in case mutation
+ */
+export const useUpdateCaseTimelineEvent = () => {
+  const queryClient = useQueryClient()
+  const { t } = useTranslation()
+
+  return useMutation({
+    mutationFn: ({ caseId, eventId, data }: { caseId: string; eventId: string; data: UpdateTimelineEventData }) =>
+      casesService.updateTimelineEvent(caseId, eventId, data),
+    onSuccess: (_, { caseId }) => {
+      queryClient.invalidateQueries({ queryKey: ['cases', caseId] })
+      toast.success(t('cases.timelineUpdateSuccess', 'تم تحديث الحدث بنجاح'))
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || t('cases.timelineUpdateError', 'فشل تحديث الحدث'))
+    },
+  })
+}
+
+/**
+ * Delete timeline event from case mutation
+ */
+export const useDeleteCaseTimelineEvent = () => {
+  const queryClient = useQueryClient()
+  const { t } = useTranslation()
+
+  return useMutation({
+    mutationFn: ({ caseId, eventId }: { caseId: string; eventId: string }) =>
+      casesService.deleteTimelineEvent(caseId, eventId),
+    onSuccess: (_, { caseId }) => {
+      queryClient.invalidateQueries({ queryKey: ['cases', caseId] })
+      toast.success(t('cases.timelineDeleteSuccess', 'تم حذف الحدث بنجاح'))
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || t('cases.timelineDeleteError', 'فشل حذف الحدث'))
+    },
+  })
+}
+
+// ==================== DOCUMENT MANAGEMENT ====================
+
+/**
+ * Upload document to case (full flow: get URL -> upload to S3 -> confirm)
+ */
+export const useUploadCaseDocument = () => {
+  const queryClient = useQueryClient()
+  const { t } = useTranslation()
+
+  return useMutation({
+    mutationFn: async ({
+      caseId,
+      file,
+      category,
+      description,
+    }: {
+      caseId: string
+      file: File
+      category: 'contract' | 'evidence' | 'correspondence' | 'judgment' | 'pleading' | 'other'
+      description?: string
+    }) => {
+      // Step 1: Get presigned upload URL
+      const { uploadUrl, fileKey, bucket } = await casesService.getDocumentUploadUrl(caseId, {
+        filename: file.name,
+        contentType: file.type,
+        category,
+      })
+
+      // Step 2: Upload file directly to S3
+      await casesService.uploadFileToS3(uploadUrl, file)
+
+      // Step 3: Confirm upload and save metadata to DB
+      return casesService.confirmDocumentUpload(caseId, {
+        filename: file.name,
+        fileKey,
+        bucket,
+        type: file.type,
+        size: file.size,
+        category,
+        description,
+      })
+    },
+    onSuccess: (_, { caseId }) => {
+      queryClient.invalidateQueries({ queryKey: ['cases', caseId] })
+      toast.success(t('cases.documentUploadSuccess', 'تم رفع المستند بنجاح'))
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || t('cases.documentUploadError', 'فشل رفع المستند'))
+    },
+  })
+}
+
+/**
+ * Download case document
+ */
+export const useDownloadCaseDocument = () => {
+  const { t } = useTranslation()
+
+  return useMutation({
+    mutationFn: async ({ caseId, docId }: { caseId: string; docId: string }) => {
+      const { downloadUrl, filename } = await casesService.getDocumentDownloadUrl(caseId, docId)
+
+      // Create a temporary link and trigger download
+      const link = document.createElement('a')
+      link.href = downloadUrl
+      link.download = filename
+      link.target = '_blank'
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+
+      return { downloadUrl, filename }
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || t('cases.documentDownloadError', 'فشل تحميل المستند'))
+    },
+  })
+}
+
+/**
+ * Delete case document
+ */
+export const useDeleteCaseDocument = () => {
+  const queryClient = useQueryClient()
+  const { t } = useTranslation()
+
+  return useMutation({
+    mutationFn: ({ caseId, docId }: { caseId: string; docId: string }) =>
+      casesService.deleteDocument(caseId, docId),
+    onSuccess: (_, { caseId }) => {
+      queryClient.invalidateQueries({ queryKey: ['cases', caseId] })
+      toast.success(t('cases.documentDeleteSuccess', 'تم حذف المستند بنجاح'))
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || t('cases.documentDeleteError', 'فشل حذف المستند'))
+    },
+  })
+}
+
+// ==================== AUDIT HISTORY ====================
+
+/**
+ * Get audit history for case
+ */
+export const useCaseAuditHistory = (caseId: string) => {
+  return useQuery({
+    queryKey: ['cases', caseId, 'audit'],
+    queryFn: () => casesService.getAuditHistory(caseId),
+    enabled: !!caseId,
+    staleTime: 1 * 60 * 1000,
   })
 }
