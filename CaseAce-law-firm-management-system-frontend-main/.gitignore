@@ -1,4 +1,0 @@
-node_modules
-.env
-/vendor/
-package-lock.json
