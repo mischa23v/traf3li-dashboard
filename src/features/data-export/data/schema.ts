@@ -41,7 +41,7 @@ export type ImportJobStatus = z.infer<typeof importJobStatusSchema>
 export const exportOptionsSchema = z.object({
   format: exportFormatSchema,
   entityType: entityTypeSchema,
-  filters: z.record(z.unknown()).optional(),
+  filters: z.record(z.string(), z.unknown()).optional(),
   columns: z.array(z.string()).optional(),
   includeRelated: z.boolean().optional(),
   dateRange: z
@@ -80,7 +80,7 @@ export type ExportJob = z.infer<typeof exportJobSchema>
 export const importOptionsSchema = z.object({
   entityType: entityTypeSchema,
   file: z.instanceof(File),
-  mapping: z.record(z.string()).optional(),
+  mapping: z.record(z.string(), z.string()).optional(),
   skipDuplicates: z.boolean().optional(),
   updateExisting: z.boolean().optional(),
   dryRun: z.boolean().optional(),
@@ -120,8 +120,8 @@ export type ImportJob = z.infer<typeof importJobSchema>
  */
 export const importPreviewSchema = z.object({
   columns: z.array(z.string()),
-  sampleData: z.array(z.record(z.unknown())),
-  suggestedMapping: z.record(z.string()),
+  sampleData: z.array(z.record(z.string(), z.unknown())),
+  suggestedMapping: z.record(z.string(), z.string()),
   totalRows: z.number(),
 })
 export type ImportPreview = z.infer<typeof importPreviewSchema>
@@ -136,7 +136,7 @@ export const exportTemplateSchema = z.object({
   entityType: entityTypeSchema,
   format: exportFormatSchema,
   columns: z.array(z.string()),
-  filters: z.record(z.unknown()).optional(),
+  filters: z.record(z.string(), z.unknown()).optional(),
   isDefault: z.boolean().optional(),
   createdAt: z.string(),
 })

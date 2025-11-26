@@ -1,0 +1,331 @@
+import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
+import {
+  Scale, Search, Filter, BookOpen, Download, ExternalLink,
+  Calendar, ChevronRight, ChevronLeft, FileText, Bookmark,
+  Eye, Clock, Building2
+} from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Badge } from '@/components/ui/badge'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import { Header } from '@/components/layout/header'
+import { Main } from '@/components/layout/main'
+import { TopNav } from '@/components/layout/top-nav'
+import { ThemeSwitch } from '@/components/theme-switch'
+import { ConfigDrawer } from '@/components/config-drawer'
+import { ProfileDropdown } from '@/components/profile-dropdown'
+import { LanguageSwitcher } from '@/components/language-switcher'
+import { DynamicIsland } from '@/components/dynamic-island'
+
+// Mock laws data
+const mockLaws = [
+  {
+    id: '1',
+    title: 'نظام العمل',
+    titleEn: 'Labor Law',
+    description: 'نظام العمل الصادر بالمرسوم الملكي رقم م/51 وتاريخ 23/8/1426هـ',
+    descriptionEn: 'Labor Law issued by Royal Decree No. M/51 dated 23/8/1426H',
+    category: 'labor',
+    issueDate: '1426/08/23',
+    lastUpdate: '1444/06/15',
+    articles: 245,
+    views: 12500,
+    downloads: 3200,
+    isBookmarked: true,
+  },
+  {
+    id: '2',
+    title: 'نظام الشركات',
+    titleEn: 'Companies Law',
+    description: 'نظام الشركات الصادر بالمرسوم الملكي رقم م/3 وتاريخ 28/1/1437هـ',
+    descriptionEn: 'Companies Law issued by Royal Decree No. M/3 dated 28/1/1437H',
+    category: 'commercial',
+    issueDate: '1437/01/28',
+    lastUpdate: '1443/12/01',
+    articles: 230,
+    views: 9800,
+    downloads: 2100,
+    isBookmarked: false,
+  },
+  {
+    id: '3',
+    title: 'نظام المرافعات الشرعية',
+    titleEn: 'Sharia Procedure Law',
+    description: 'نظام المرافعات الشرعية الصادر بالمرسوم الملكي رقم م/1 وتاريخ 22/1/1435هـ',
+    descriptionEn: 'Sharia Procedure Law issued by Royal Decree No. M/1 dated 22/1/1435H',
+    category: 'civil',
+    issueDate: '1435/01/22',
+    lastUpdate: '1442/09/10',
+    articles: 300,
+    views: 15200,
+    downloads: 4500,
+    isBookmarked: true,
+  },
+  {
+    id: '4',
+    title: 'نظام التنفيذ',
+    titleEn: 'Enforcement Law',
+    description: 'نظام التنفيذ الصادر بالمرسوم الملكي رقم م/53 وتاريخ 13/8/1433هـ',
+    descriptionEn: 'Enforcement Law issued by Royal Decree No. M/53 dated 13/8/1433H',
+    category: 'civil',
+    issueDate: '1433/08/13',
+    lastUpdate: '1444/03/20',
+    articles: 98,
+    views: 8900,
+    downloads: 2800,
+    isBookmarked: false,
+  },
+]
+
+const categories = [
+  { value: 'all', label: 'جميع الأنظمة', labelEn: 'All Laws' },
+  { value: 'labor', label: 'أنظمة العمل', labelEn: 'Labor Laws' },
+  { value: 'commercial', label: 'أنظمة تجارية', labelEn: 'Commercial Laws' },
+  { value: 'civil', label: 'أنظمة مدنية', labelEn: 'Civil Laws' },
+  { value: 'criminal', label: 'أنظمة جنائية', labelEn: 'Criminal Laws' },
+  { value: 'administrative', label: 'أنظمة إدارية', labelEn: 'Administrative Laws' },
+]
+
+export function LawsView() {
+  const { i18n } = useTranslation()
+  const isRTL = i18n.language === 'ar'
+  const [searchQuery, setSearchQuery] = useState('')
+  const [categoryFilter, setCategoryFilter] = useState('all')
+  const [bookmarkedLaws, setBookmarkedLaws] = useState<string[]>(['1', '3'])
+
+  const topNav = [
+    { title: isRTL ? 'القوانين' : 'Laws', href: '/dashboard/knowledge/laws', isActive: true },
+    { title: isRTL ? 'الأحكام' : 'Judgments', href: '/dashboard/knowledge/judgments', isActive: false },
+    { title: isRTL ? 'النماذج' : 'Forms', href: '/dashboard/knowledge/forms', isActive: false },
+  ]
+
+  const toggleBookmark = (lawId: string) => {
+    setBookmarkedLaws(prev =>
+      prev.includes(lawId)
+        ? prev.filter(id => id !== lawId)
+        : [...prev, lawId]
+    )
+  }
+
+  const getCategoryBadge = (category: string) => {
+    const config: Record<string, { color: string; label: string; labelEn: string }> = {
+      labor: { color: 'bg-blue-100 text-blue-700', label: 'عمل', labelEn: 'Labor' },
+      commercial: { color: 'bg-emerald-100 text-emerald-700', label: 'تجاري', labelEn: 'Commercial' },
+      civil: { color: 'bg-purple-100 text-purple-700', label: 'مدني', labelEn: 'Civil' },
+      criminal: { color: 'bg-red-100 text-red-700', label: 'جنائي', labelEn: 'Criminal' },
+      administrative: { color: 'bg-amber-100 text-amber-700', label: 'إداري', labelEn: 'Administrative' },
+    }
+    const cat = config[category] || { color: 'bg-slate-100 text-slate-700', label: category, labelEn: category }
+    return <Badge className={`${cat.color} hover:${cat.color}`}>{isRTL ? cat.label : cat.labelEn}</Badge>
+  }
+
+  const filteredLaws = mockLaws.filter(law => {
+    const matchesSearch = law.title.includes(searchQuery) ||
+      law.titleEn.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      law.description.includes(searchQuery)
+    const matchesCategory = categoryFilter === 'all' || law.category === categoryFilter
+    return matchesSearch && matchesCategory
+  })
+
+  return (
+    <>
+      <Header className="bg-navy shadow-none relative">
+        <TopNav links={topNav} className="[&>a]:text-slate-300 [&>a:hover]:text-white [&>a[aria-current='page']]:text-white" />
+        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
+          <DynamicIsland />
+        </div>
+        <div className='ms-auto flex items-center space-x-4'>
+          <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white" />
+          <ThemeSwitch className="text-slate-300 hover:bg-white/10 hover:text-white" />
+          <ConfigDrawer className="text-slate-300 hover:bg-white/10 hover:text-white" />
+          <ProfileDropdown className="text-slate-300 hover:bg-white/10 hover:text-white" />
+        </div>
+        <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-emerald-500/50 to-transparent"></div>
+      </Header>
+
+      <Main className="bg-slate-50">
+        <div className="space-y-6">
+          {/* Page Header */}
+          <div>
+            <h1 className="text-2xl font-bold text-navy">
+              {isRTL ? 'الأنظمة والقوانين' : 'Laws & Regulations'}
+            </h1>
+            <p className="text-slate-500 mt-1">
+              {isRTL ? 'مكتبة شاملة للأنظمة واللوائح السعودية' : 'Comprehensive library of Saudi laws and regulations'}
+            </p>
+          </div>
+
+          {/* Search and Filters */}
+          <Card>
+            <CardContent className="p-4">
+              <div className="flex flex-col sm:flex-row gap-4">
+                <div className="relative flex-1">
+                  <Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                  <Input
+                    placeholder={isRTL ? 'بحث في الأنظمة...' : 'Search laws...'}
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="ps-10"
+                  />
+                </div>
+                <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+                  <SelectTrigger className="w-full sm:w-[200px]">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {categories.map((cat) => (
+                      <SelectItem key={cat.value} value={cat.value}>
+                        {isRTL ? cat.label : cat.labelEn}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Stats */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <Card>
+              <CardContent className="p-4 text-center">
+                <Scale className="h-8 w-8 mx-auto text-navy mb-2" />
+                <div className="text-2xl font-bold text-navy">{mockLaws.length}</div>
+                <div className="text-sm text-slate-500">{isRTL ? 'نظام متاح' : 'Available Laws'}</div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="p-4 text-center">
+                <FileText className="h-8 w-8 mx-auto text-emerald-600 mb-2" />
+                <div className="text-2xl font-bold text-navy">873</div>
+                <div className="text-sm text-slate-500">{isRTL ? 'إجمالي المواد' : 'Total Articles'}</div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="p-4 text-center">
+                <Eye className="h-8 w-8 mx-auto text-blue-600 mb-2" />
+                <div className="text-2xl font-bold text-navy">46.4K</div>
+                <div className="text-sm text-slate-500">{isRTL ? 'إجمالي المشاهدات' : 'Total Views'}</div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="p-4 text-center">
+                <Download className="h-8 w-8 mx-auto text-purple-600 mb-2" />
+                <div className="text-2xl font-bold text-navy">12.6K</div>
+                <div className="text-sm text-slate-500">{isRTL ? 'إجمالي التحميلات' : 'Total Downloads'}</div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Laws List */}
+          <div className="space-y-4">
+            {filteredLaws.map((law) => (
+              <Card key={law.id} className="hover:shadow-lg transition-shadow group">
+                <CardContent className="p-6">
+                  <div className="flex flex-col md:flex-row md:items-start gap-4">
+                    {/* Icon */}
+                    <div className="h-14 w-14 bg-navy/10 rounded-xl flex items-center justify-center shrink-0">
+                      <Scale className="h-7 w-7 text-navy" />
+                    </div>
+
+                    {/* Content */}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-start justify-between gap-4">
+                        <div>
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <h3 className="font-bold text-lg text-navy group-hover:text-emerald-600 transition-colors">
+                              {isRTL ? law.title : law.titleEn}
+                            </h3>
+                            {getCategoryBadge(law.category)}
+                          </div>
+                          <p className="text-slate-600 mt-2 line-clamp-2">
+                            {isRTL ? law.description : law.descriptionEn}
+                          </p>
+                        </div>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => toggleBookmark(law.id)}
+                          className={bookmarkedLaws.includes(law.id) ? 'text-amber-500' : 'text-slate-400'}
+                        >
+                          <Bookmark className={`h-5 w-5 ${bookmarkedLaws.includes(law.id) ? 'fill-current' : ''}`} />
+                        </Button>
+                      </div>
+
+                      <div className="flex flex-wrap items-center gap-4 mt-4 text-sm text-slate-500">
+                        <span className="flex items-center">
+                          <Calendar className="h-4 w-4 me-1" />
+                          {isRTL ? 'تاريخ الإصدار:' : 'Issued:'} {law.issueDate}
+                        </span>
+                        <span className="flex items-center">
+                          <Clock className="h-4 w-4 me-1" />
+                          {isRTL ? 'آخر تحديث:' : 'Updated:'} {law.lastUpdate}
+                        </span>
+                        <span className="flex items-center">
+                          <FileText className="h-4 w-4 me-1" />
+                          {law.articles} {isRTL ? 'مادة' : 'articles'}
+                        </span>
+                      </div>
+
+                      <div className="flex items-center justify-between mt-4 pt-4 border-t border-slate-100">
+                        <div className="flex items-center gap-4 text-sm text-slate-500">
+                          <span className="flex items-center">
+                            <Eye className="h-4 w-4 me-1" />
+                            {law.views.toLocaleString()}
+                          </span>
+                          <span className="flex items-center">
+                            <Download className="h-4 w-4 me-1" />
+                            {law.downloads.toLocaleString()}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Button variant="outline" size="sm">
+                            <Download className="h-4 w-4 me-1" />
+                            {isRTL ? 'تحميل' : 'Download'}
+                          </Button>
+                          <Button size="sm" className="bg-emerald-500 hover:bg-emerald-600">
+                            <ExternalLink className="h-4 w-4 me-1" />
+                            {isRTL ? 'عرض' : 'View'}
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+
+          {filteredLaws.length === 0 && (
+            <Card>
+              <CardContent className="p-12 text-center">
+                <Scale className="h-12 w-12 mx-auto text-slate-300 mb-4" />
+                <h3 className="text-lg font-medium text-slate-900">
+                  {isRTL ? 'لا توجد أنظمة مطابقة' : 'No matching laws found'}
+                </h3>
+                <p className="text-slate-500 mt-1">
+                  {isRTL ? 'جرب تعديل معايير البحث' : 'Try adjusting your search criteria'}
+                </p>
+              </CardContent>
+            </Card>
+          )}
+        </div>
+      </Main>
+    </>
+  )
+}
+
+export default LawsView
