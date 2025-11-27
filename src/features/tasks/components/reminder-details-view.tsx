@@ -1,16 +1,16 @@
 import { useState, useMemo } from 'react'
-import { useParams } from '@tanstack/react-router'
+import { useParams, useNavigate } from '@tanstack/react-router'
 import {
-    Clock, AlertCircle, MoreHorizontal, CheckCircle2,
-    User, ArrowLeft, Briefcase,
-    History, Link as LinkIcon, Flag, Send, Bell, Calendar, Search
+    Clock, AlertCircle, CheckCircle2, Trash2, Edit3, Loader2,
+    ArrowLeft, Briefcase, XCircle,
+    History, Flag, Send, Bell, Calendar, Search
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Textarea } from '@/components/ui/textarea'
 import { Link } from '@tanstack/react-router'
 import { Header } from '@/components/layout/header'
@@ -21,15 +21,70 @@ import { LanguageSwitcher } from '@/components/language-switcher'
 import { ThemeSwitch } from '@/components/theme-switch'
 import { ConfigDrawer } from '@/components/config-drawer'
 import { ProfileDropdown } from '@/components/profile-dropdown'
-import { useReminder } from '@/hooks/useRemindersAndEvents'
+import {
+    useReminder,
+    useDeleteReminder,
+    useCompleteReminder,
+    useDismissReminder,
+    useSnoozeReminder,
+    useReopenReminder
+} from '@/hooks/useRemindersAndEvents'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Alert, AlertDescription } from '@/components/ui/alert'
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+
+const SNOOZE_OPTIONS = [
+    { value: 15, label: '15 دقيقة' },
+    { value: 30, label: '30 دقيقة' },
+    { value: 60, label: 'ساعة واحدة' },
+    { value: 180, label: '3 ساعات' },
+    { value: 1440, label: 'يوم واحد' },
+    { value: 10080, label: 'أسبوع' },
+]
 
 export function ReminderDetailsView() {
     const [activeTab, setActiveTab] = useState('overview')
     const { reminderId } = useParams({ strict: false }) as { reminderId: string }
+    const navigate = useNavigate()
+    const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
 
     const { data: reminderData, isLoading, isError, error, refetch } = useReminder(reminderId)
+
+    // Mutations
+    const deleteReminderMutation = useDeleteReminder()
+    const completeReminderMutation = useCompleteReminder()
+    const dismissReminderMutation = useDismissReminder()
+    const snoozeReminderMutation = useSnoozeReminder()
+    const reopenReminderMutation = useReopenReminder()
+
+    const handleDelete = () => {
+        deleteReminderMutation.mutate(reminderId, {
+            onSuccess: () => {
+                navigate({ to: '/dashboard/tasks/reminders' })
+            }
+        })
+    }
+
+    const handleComplete = () => {
+        if (reminderData?.status === 'completed') {
+            reopenReminderMutation.mutate(reminderId)
+        } else {
+            completeReminderMutation.mutate(reminderId)
+        }
+    }
+
+    const handleDismiss = () => {
+        dismissReminderMutation.mutate(reminderId)
+    }
+
+    const handleSnooze = (duration: number) => {
+        snoozeReminderMutation.mutate({ id: reminderId, duration })
+    }
 
     const reminder = useMemo(() => {
         if (!reminderData) return null
@@ -229,16 +284,103 @@ export function ReminderDetailsView() {
                         </div>
 
                         {/* Actions */}
-                        <div className="flex flex-col gap-4 min-w-[250px]">
+                        <div className="flex flex-col gap-4 min-w-[280px]">
                             <div className="flex gap-3">
-                                <Button variant="outline" className="flex-1 border-white/10 text-white hover:bg-white/10 hover:text-white backdrop-blur-sm">
-                                    <Clock className="h-4 w-4 ml-2" />
-                                    تأجيل
+                                <Link to="/dashboard/tasks/create-reminder" search={{ editId: reminderId }}>
+                                    <Button variant="outline" className="border-white/10 text-white hover:bg-white/10 hover:text-white backdrop-blur-sm">
+                                        <Edit3 className="h-4 w-4 ml-2" />
+                                        تعديل
+                                    </Button>
+                                </Link>
+                                <Button
+                                    onClick={handleComplete}
+                                    disabled={completeReminderMutation.isPending || reopenReminderMutation.isPending}
+                                    className={`flex-1 ${reminder.status === 'completed' ? 'bg-amber-500 hover:bg-amber-600' : 'bg-emerald-500 hover:bg-emerald-600'} text-white shadow-lg border-0`}
+                                >
+                                    {(completeReminderMutation.isPending || reopenReminderMutation.isPending) ? (
+                                        <Loader2 className="h-4 w-4 animate-spin ml-2" />
+                                    ) : (
+                                        <CheckCircle2 className="h-4 w-4 ml-2" />
+                                    )}
+                                    {reminder.status === 'completed' ? 'إعادة فتح' : 'إتمام'}
                                 </Button>
-                                <Button className="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white shadow-lg shadow-emerald-500/20 border-0">
-                                    <CheckCircle2 className="h-4 w-4 ml-2" />
-                                    إتمام
+                            </div>
+                            <div className="flex gap-3">
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                        <Button
+                                            variant="outline"
+                                            className="flex-1 border-white/10 text-white hover:bg-white/10 hover:text-white backdrop-blur-sm"
+                                            disabled={snoozeReminderMutation.isPending}
+                                        >
+                                            {snoozeReminderMutation.isPending ? (
+                                                <Loader2 className="h-4 w-4 animate-spin ml-2" />
+                                            ) : (
+                                                <Clock className="h-4 w-4 ml-2" />
+                                            )}
+                                            تأجيل
+                                        </Button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent align="end" className="w-48">
+                                        {SNOOZE_OPTIONS.map(option => (
+                                            <DropdownMenuItem
+                                                key={option.value}
+                                                onClick={() => handleSnooze(option.value)}
+                                            >
+                                                {option.label}
+                                            </DropdownMenuItem>
+                                        ))}
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
+                                <Button
+                                    variant="outline"
+                                    onClick={handleDismiss}
+                                    disabled={dismissReminderMutation.isPending}
+                                    className="border-white/10 text-white hover:bg-white/10 hover:text-white backdrop-blur-sm"
+                                >
+                                    {dismissReminderMutation.isPending ? (
+                                        <Loader2 className="h-4 w-4 animate-spin ml-2" />
+                                    ) : (
+                                        <XCircle className="h-4 w-4 ml-2" />
+                                    )}
+                                    تجاهل
                                 </Button>
+                            </div>
+                            <div className="flex gap-3">
+                                {!showDeleteConfirm ? (
+                                    <Button
+                                        variant="outline"
+                                        onClick={() => setShowDeleteConfirm(true)}
+                                        className="flex-1 border-red-500/30 text-red-300 hover:bg-red-500/20 hover:text-red-200 backdrop-blur-sm"
+                                    >
+                                        <Trash2 className="h-4 w-4 ml-2" />
+                                        حذف
+                                    </Button>
+                                ) : (
+                                    <div className="flex gap-2 flex-1">
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
+                                            onClick={() => setShowDeleteConfirm(false)}
+                                            className="border-white/10 text-white hover:bg-white/10"
+                                        >
+                                            إلغاء
+                                        </Button>
+                                        <Button
+                                            variant="destructive"
+                                            size="sm"
+                                            onClick={handleDelete}
+                                            disabled={deleteReminderMutation.isPending}
+                                            className="flex-1 bg-red-500 hover:bg-red-600"
+                                        >
+                                            {deleteReminderMutation.isPending ? (
+                                                <Loader2 className="h-4 w-4 animate-spin" />
+                                            ) : (
+                                                'تأكيد الحذف'
+                                            )}
+                                        </Button>
+                                    </div>
+                                )}
                             </div>
                         </div>
                     </div>
