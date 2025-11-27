@@ -117,7 +117,7 @@ export function CreateAccountActivityView() {
                                         <div className="space-y-2">
                                             <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
                                                 <FileText className="w-4 h-4 text-emerald-500" />
-                                                عنوان النشاط
+                                                عنوان النشاط <span className="text-red-500">*</span>
                                             </label>
                                             <Input
                                                 placeholder="مثال: استلام دفعة من العميل"
@@ -130,7 +130,7 @@ export function CreateAccountActivityView() {
                                         <div className="space-y-2">
                                             <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
                                                 <Activity className="w-4 h-4 text-emerald-500" />
-                                                نوع النشاط
+                                                نوع النشاط <span className="text-red-500">*</span>
                                             </label>
                                             <Select
                                                 value={formData.type}

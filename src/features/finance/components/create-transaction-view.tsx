@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import {
     ArrowRight, Save, Calendar, ArrowRightLeft,
-    FileText, DollarSign, CreditCard, TrendingUp
+    FileText, DollarSign, CreditCard, TrendingUp, Tag, Loader2
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -27,26 +27,27 @@ export function CreateTransactionView() {
 
     const [formData, setFormData] = useState({
         description: '',
-        type: '',
+        type: '' as 'income' | 'expense' | 'transfer' | '',
         amount: '',
-        date: '',
-        fromAccount: '',
-        toAccount: '',
+        category: '',
+        paymentMethod: '',
+        date: new Date().toISOString().split('T')[0],
         notes: '',
     })
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
 
+        if (!formData.type) return
+
         const transactionData = {
             description: formData.description,
             type: formData.type as 'expense' | 'income' | 'transfer',
             amount: Number(formData.amount),
-            category: 'general',
+            category: formData.category,
             date: formData.date,
-            fromAccount: formData.fromAccount,
-            ...(formData.toAccount && { toAccount: formData.toAccount }),
-            notes: formData.notes,
+            ...(formData.paymentMethod && { paymentMethod: formData.paymentMethod }),
+            ...(formData.notes && { notes: formData.notes }),
         }
 
         createTransactionMutation.mutate(transactionData, {
@@ -65,6 +66,36 @@ export function CreateTransactionView() {
         { title: 'تتبع الوقت', href: '/dashboard/finance/time-tracking', isActive: false },
         { title: 'نشاط الحساب', href: '/dashboard/finance/activity', isActive: false },
     ]
+
+    // Categories based on transaction type
+    const getCategoriesForType = (type: string) => {
+        if (type === 'income') {
+            return [
+                { value: 'legal_fees', label: 'أتعاب قانونية' },
+                { value: 'consultation', label: 'استشارات' },
+                { value: 'retainer', label: 'مقدم أتعاب' },
+                { value: 'court_fees', label: 'رسوم محكمة' },
+                { value: 'other_income', label: 'إيرادات أخرى' },
+            ]
+        } else if (type === 'expense') {
+            return [
+                { value: 'office', label: 'مستلزمات مكتبية' },
+                { value: 'transport', label: 'مواصلات' },
+                { value: 'hospitality', label: 'ضيافة' },
+                { value: 'government', label: 'رسوم حكومية' },
+                { value: 'subscriptions', label: 'اشتراكات' },
+                { value: 'rent', label: 'إيجار' },
+                { value: 'utilities', label: 'خدمات' },
+                { value: 'other_expense', label: 'مصروفات أخرى' },
+            ]
+        } else if (type === 'transfer') {
+            return [
+                { value: 'internal_transfer', label: 'تحويل داخلي' },
+                { value: 'bank_transfer', label: 'تحويل بنكي' },
+            ]
+        }
+        return []
+    }
 
     return (
         <>
@@ -118,23 +149,13 @@ export function CreateTransactionView() {
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                         <div className="space-y-2">
                                             <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                                <FileText className="w-4 h-4 text-emerald-500" />
-                                                وصف المعاملة
-                                            </label>
-                                            <Input
-                                                placeholder="مثال: تحويل رصيد للفرع الرئيسي"
-                                                value={formData.description}
-                                                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                                                className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500"
-                                                required
-                                            />
-                                        </div>
-                                        <div className="space-y-2">
-                                            <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
                                                 <ArrowRightLeft className="w-4 h-4 text-emerald-500" />
-                                                نوع المعاملة
+                                                نوع المعاملة <span className="text-red-500">*</span>
                                             </label>
-                                            <Select value={formData.type} onValueChange={(value) => setFormData({ ...formData, type: value })}>
+                                            <Select
+                                                value={formData.type}
+                                                onValueChange={(value) => setFormData({ ...formData, type: value as any, category: '' })}
+                                            >
                                                 <SelectTrigger className="rounded-xl border-slate-200 focus:ring-emerald-500">
                                                     <SelectValue placeholder="اختر النوع" />
                                                 </SelectTrigger>
@@ -145,17 +166,55 @@ export function CreateTransactionView() {
                                                 </SelectContent>
                                             </Select>
                                         </div>
+                                        <div className="space-y-2">
+                                            <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                                                <Tag className="w-4 h-4 text-emerald-500" />
+                                                التصنيف <span className="text-red-500">*</span>
+                                            </label>
+                                            <Select
+                                                value={formData.category}
+                                                onValueChange={(value) => setFormData({ ...formData, category: value })}
+                                                disabled={!formData.type}
+                                            >
+                                                <SelectTrigger className="rounded-xl border-slate-200 focus:ring-emerald-500">
+                                                    <SelectValue placeholder={formData.type ? "اختر التصنيف" : "اختر النوع أولاً"} />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    {getCategoriesForType(formData.type).map((cat) => (
+                                                        <SelectItem key={cat.value} value={cat.value}>
+                                                            {cat.label}
+                                                        </SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
+                                        </div>
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                                            <FileText className="w-4 h-4 text-emerald-500" />
+                                            وصف المعاملة <span className="text-red-500">*</span>
+                                        </label>
+                                        <Input
+                                            placeholder="مثال: أتعاب قضية الشركة العقارية"
+                                            value={formData.description}
+                                            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                                            className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500"
+                                            required
+                                        />
                                     </div>
 
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                         <div className="space-y-2">
                                             <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
                                                 <DollarSign className="w-4 h-4 text-emerald-500" />
-                                                المبلغ
+                                                المبلغ (ر.س) <span className="text-red-500">*</span>
                                             </label>
                                             <Input
                                                 type="number"
                                                 placeholder="0.00"
+                                                min="0"
+                                                step="0.01"
                                                 value={formData.amount}
                                                 onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
                                                 className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500"
@@ -165,7 +224,7 @@ export function CreateTransactionView() {
                                         <div className="space-y-2">
                                             <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
                                                 <Calendar className="w-4 h-4 text-emerald-500" />
-                                                التاريخ
+                                                التاريخ <span className="text-red-500">*</span>
                                             </label>
                                             <Input
                                                 type="date"
@@ -177,39 +236,22 @@ export function CreateTransactionView() {
                                         </div>
                                     </div>
 
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                        <div className="space-y-2">
-                                            <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                                <CreditCard className="w-4 h-4 text-emerald-500" />
-                                                من حساب
-                                            </label>
-                                            <Select value={formData.fromAccount} onValueChange={(value) => setFormData({ ...formData, fromAccount: value })}>
-                                                <SelectTrigger className="rounded-xl border-slate-200 focus:ring-emerald-500">
-                                                    <SelectValue placeholder="اختر الحساب" />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    <SelectItem value="main">الحساب الرئيسي</SelectItem>
-                                                    <SelectItem value="cash">الخزينة</SelectItem>
-                                                    <SelectItem value="bank">البنك الأهلي</SelectItem>
-                                                </SelectContent>
-                                            </Select>
-                                        </div>
-                                        <div className="space-y-2">
-                                            <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                                <CreditCard className="w-4 h-4 text-emerald-500" />
-                                                إلى حساب (اختياري)
-                                            </label>
-                                            <Select value={formData.toAccount} onValueChange={(value) => setFormData({ ...formData, toAccount: value })}>
-                                                <SelectTrigger className="rounded-xl border-slate-200 focus:ring-emerald-500">
-                                                    <SelectValue placeholder="اختر الحساب" />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    <SelectItem value="main">الحساب الرئيسي</SelectItem>
-                                                    <SelectItem value="cash">الخزينة</SelectItem>
-                                                    <SelectItem value="bank">البنك الأهلي</SelectItem>
-                                                </SelectContent>
-                                            </Select>
-                                        </div>
+                                    <div className="space-y-2">
+                                        <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                                            <CreditCard className="w-4 h-4 text-emerald-500" />
+                                            طريقة الدفع
+                                        </label>
+                                        <Select value={formData.paymentMethod} onValueChange={(value) => setFormData({ ...formData, paymentMethod: value })}>
+                                            <SelectTrigger className="rounded-xl border-slate-200 focus:ring-emerald-500">
+                                                <SelectValue placeholder="اختر طريقة الدفع" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="cash">نقداً</SelectItem>
+                                                <SelectItem value="card">بطاقة ائتمان</SelectItem>
+                                                <SelectItem value="transfer">تحويل بنكي</SelectItem>
+                                                <SelectItem value="check">شيك</SelectItem>
+                                            </SelectContent>
+                                        </Select>
                                     </div>
 
                                     <div className="space-y-2">
@@ -239,6 +281,7 @@ export function CreateTransactionView() {
                                     >
                                         {createTransactionMutation.isPending ? (
                                             <span className="flex items-center gap-2">
+                                                <Loader2 className="w-4 h-4 animate-spin" />
                                                 جاري الحفظ...
                                             </span>
                                         ) : (

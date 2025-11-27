@@ -1,7 +1,7 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import {
     ArrowRight, Save, Calendar, Clock,
-    FileText, Briefcase, CheckCircle
+    FileText, Briefcase, DollarSign, Loader2, CheckSquare
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -21,40 +21,56 @@ import { Main } from '@/components/layout/main'
 import { Link, useNavigate } from '@tanstack/react-router'
 import { FinanceSidebar } from './finance-sidebar'
 import { useCreateTimeEntry } from '@/hooks/useFinance'
+import { useCases } from '@/hooks/useCasesAndClients'
 
 export function CreateTimeEntryView() {
     const navigate = useNavigate()
     const createTimeEntryMutation = useCreateTimeEntry()
 
+    // Load cases from API
+    const { data: casesData, isLoading: loadingCases } = useCases()
+
     const [formData, setFormData] = useState({
         description: '',
         caseId: '',
-        date: '',
+        date: new Date().toISOString().split('T')[0],
         startTime: '',
         endTime: '',
+        hourlyRate: '500',
         isBillable: true,
         notes: '',
     })
 
+    // Get selected case details
+    const selectedCase = useMemo(() => {
+        if (!formData.caseId || !casesData?.data) return null
+        return casesData.data.find((c: any) => c._id === formData.caseId)
+    }, [formData.caseId, casesData])
+
+    // Calculate duration in minutes
+    const calculatedDuration = useMemo(() => {
+        if (!formData.startTime || !formData.endTime) return 0
+        const start = new Date(`2000-01-01T${formData.startTime}`)
+        const end = new Date(`2000-01-01T${formData.endTime}`)
+        const diffMs = end.getTime() - start.getTime()
+        if (diffMs < 0) return 0
+        return Math.round(diffMs / (1000 * 60)) // Duration in minutes
+    }, [formData.startTime, formData.endTime])
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
 
-        // Calculate duration in hours
-        const start = new Date(`2000-01-01T${formData.startTime}`)
-        const end = new Date(`2000-01-01T${formData.endTime}`)
-        const durationHours = (end.getTime() - start.getTime()) / (1000 * 60 * 60)
+        if (!formData.caseId || calculatedDuration <= 0) return
 
         const timeEntryData = {
             description: formData.description,
             caseId: formData.caseId,
-            clientId: '', // Will be populated from case
+            clientId: selectedCase?.clientId?._id || selectedCase?.clientId || '',
             date: formData.date,
-            startTime: formData.startTime,
-            endTime: formData.endTime,
-            duration: durationHours,
-            hourlyRate: 0,
+            duration: calculatedDuration, // Duration in minutes
+            hourlyRate: Number(formData.hourlyRate),
             isBillable: formData.isBillable,
-            notes: formData.notes,
+            ...(formData.notes && { notes: formData.notes }),
         }
 
         createTimeEntryMutation.mutate(timeEntryData, {
@@ -73,6 +89,15 @@ export function CreateTimeEntryView() {
         { title: 'تتبع الوقت', href: '/dashboard/finance/time-tracking', isActive: true },
         { title: 'نشاط الحساب', href: '/dashboard/finance/activity', isActive: false },
     ]
+
+    // Format duration for display
+    const formatDuration = (minutes: number) => {
+        const hours = Math.floor(minutes / 60)
+        const mins = minutes % 60
+        if (hours === 0) return `${mins} دقيقة`
+        if (mins === 0) return `${hours} ساعة`
+        return `${hours} ساعة و ${mins} دقيقة`
+    }
 
     return (
         <>
@@ -126,40 +151,35 @@ export function CreateTimeEntryView() {
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                         <div className="space-y-2">
                                             <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                                <FileText className="w-4 h-4 text-emerald-500" />
-                                                وصف العمل
-                                            </label>
-                                            <Input
-                                                placeholder="مثال: مراجعة مستندات القضية"
-                                                value={formData.description}
-                                                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                                                className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500"
-                                                required
-                                            />
-                                        </div>
-                                        <div className="space-y-2">
-                                            <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
                                                 <Briefcase className="w-4 h-4 text-emerald-500" />
-                                                القضية / المشروع
+                                                القضية / المشروع <span className="text-red-500">*</span>
                                             </label>
-                                            <Select value={formData.caseId} onValueChange={(value) => setFormData({ ...formData, caseId: value })}>
+                                            <Select
+                                                value={formData.caseId}
+                                                onValueChange={(value) => setFormData({ ...formData, caseId: value })}
+                                                disabled={loadingCases}
+                                            >
                                                 <SelectTrigger className="rounded-xl border-slate-200 focus:ring-emerald-500">
-                                                    <SelectValue placeholder="اختر القضية" />
+                                                    <SelectValue placeholder={loadingCases ? "جاري التحميل..." : "اختر القضية"} />
                                                 </SelectTrigger>
                                                 <SelectContent>
-                                                    <SelectItem value="case1">قضية تجارية 452</SelectItem>
-                                                    <SelectItem value="case2">استشارة قانونية - شركة الأمل</SelectItem>
-                                                    <SelectItem value="internal">عمل داخلي</SelectItem>
+                                                    {casesData?.data?.map((caseItem: any) => (
+                                                        <SelectItem key={caseItem._id} value={caseItem._id}>
+                                                            {caseItem.caseNumber} - {caseItem.title}
+                                                        </SelectItem>
+                                                    ))}
                                                 </SelectContent>
                                             </Select>
+                                            {selectedCase && (
+                                                <p className="text-xs text-slate-500">
+                                                    العميل: {selectedCase.clientId?.name || selectedCase.clientId?.fullName || 'غير محدد'}
+                                                </p>
+                                            )}
                                         </div>
-                                    </div>
-
-                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                                         <div className="space-y-2">
                                             <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
                                                 <Calendar className="w-4 h-4 text-emerald-500" />
-                                                التاريخ
+                                                التاريخ <span className="text-red-500">*</span>
                                             </label>
                                             <Input
                                                 type="date"
@@ -169,10 +189,27 @@ export function CreateTimeEntryView() {
                                                 required
                                             />
                                         </div>
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                                            <FileText className="w-4 h-4 text-emerald-500" />
+                                            وصف العمل <span className="text-red-500">*</span>
+                                        </label>
+                                        <Input
+                                            placeholder="مثال: مراجعة مستندات القضية وإعداد المذكرة"
+                                            value={formData.description}
+                                            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                                            className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500"
+                                            required
+                                        />
+                                    </div>
+
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                                         <div className="space-y-2">
                                             <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
                                                 <Clock className="w-4 h-4 text-emerald-500" />
-                                                وقت البدء
+                                                وقت البدء <span className="text-red-500">*</span>
                                             </label>
                                             <Input
                                                 type="time"
@@ -185,7 +222,7 @@ export function CreateTimeEntryView() {
                                         <div className="space-y-2">
                                             <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
                                                 <Clock className="w-4 h-4 text-emerald-500" />
-                                                وقت الانتهاء
+                                                وقت الانتهاء <span className="text-red-500">*</span>
                                             </label>
                                             <Input
                                                 type="time"
@@ -195,9 +232,44 @@ export function CreateTimeEntryView() {
                                                 required
                                             />
                                         </div>
+                                        <div className="space-y-2">
+                                            <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                                                <DollarSign className="w-4 h-4 text-emerald-500" />
+                                                سعر الساعة (ر.س)
+                                            </label>
+                                            <Input
+                                                type="number"
+                                                placeholder="500"
+                                                min="0"
+                                                value={formData.hourlyRate}
+                                                onChange={(e) => setFormData({ ...formData, hourlyRate: e.target.value })}
+                                                className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500"
+                                            />
+                                        </div>
                                     </div>
 
-                                    <div className="flex items-center space-x-2 space-x-reverse">
+                                    {calculatedDuration > 0 && (
+                                        <div className="p-4 bg-emerald-50 rounded-xl border border-emerald-100">
+                                            <div className="flex items-center justify-between">
+                                                <div>
+                                                    <p className="text-sm text-emerald-700 font-medium">المدة المحسوبة</p>
+                                                    <p className="text-lg font-bold text-emerald-800">{formatDuration(calculatedDuration)}</p>
+                                                </div>
+                                                {formData.isBillable && Number(formData.hourlyRate) > 0 && (
+                                                    <div className="text-left">
+                                                        <p className="text-sm text-emerald-700 font-medium">القيمة التقديرية</p>
+                                                        <p className="text-lg font-bold text-emerald-800">
+                                                            {new Intl.NumberFormat('ar-SA', { minimumFractionDigits: 0 }).format(
+                                                                (calculatedDuration / 60) * Number(formData.hourlyRate)
+                                                            )} ر.س
+                                                        </p>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    <div className="flex items-center space-x-2 space-x-reverse p-4 bg-slate-50 rounded-xl">
                                         <Checkbox
                                             id="billable"
                                             checked={formData.isBillable}
@@ -206,9 +278,10 @@ export function CreateTimeEntryView() {
                                         />
                                         <label
                                             htmlFor="billable"
-                                            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                                            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 flex items-center gap-2"
                                         >
-                                            قابل للفوترة (Billable)
+                                            <CheckSquare className="w-4 h-4 text-emerald-500" />
+                                            قابل للفوترة (يمكن تحميله على العميل)
                                         </label>
                                     </div>
 
@@ -235,10 +308,11 @@ export function CreateTimeEntryView() {
                                     <Button
                                         type="submit"
                                         className="bg-emerald-500 hover:bg-emerald-600 text-white min-w-[140px] rounded-xl shadow-lg shadow-emerald-500/20"
-                                        disabled={createTimeEntryMutation.isPending}
+                                        disabled={createTimeEntryMutation.isPending || calculatedDuration <= 0}
                                     >
                                         {createTimeEntryMutation.isPending ? (
                                             <span className="flex items-center gap-2">
+                                                <Loader2 className="w-4 h-4 animate-spin" />
                                                 جاري الحفظ...
                                             </span>
                                         ) : (

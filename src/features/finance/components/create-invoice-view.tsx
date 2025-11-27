@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import {
     ArrowRight, Save, Calendar, User,
-    FileText, DollarSign, Hash, Plus, Trash2
+    FileText, DollarSign, Plus, Trash2, Briefcase, Loader2
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -20,15 +20,20 @@ import { Main } from '@/components/layout/main'
 import { Link, useNavigate } from '@tanstack/react-router'
 import { FinanceSidebar } from './finance-sidebar'
 import { useCreateInvoice } from '@/hooks/useFinance'
+import { useClients, useCases } from '@/hooks/useCasesAndClients'
 
 export function CreateInvoiceView() {
     const navigate = useNavigate()
     const createInvoiceMutation = useCreateInvoice()
 
+    // Load clients and cases from API
+    const { data: clientsData, isLoading: loadingClients } = useClients()
+    const { data: casesData, isLoading: loadingCases } = useCases()
+
     const [formData, setFormData] = useState({
-        invoiceNumber: '',
         clientId: '',
-        issueDate: '',
+        caseId: '',
+        issueDate: new Date().toISOString().split('T')[0],
         dueDate: '',
         notes: '',
     })
@@ -59,9 +64,8 @@ export function CreateInvoiceView() {
         const totalAmount = subtotal + vatAmount
 
         const invoiceData = {
-            invoiceNumber: formData.invoiceNumber,
             clientId: formData.clientId,
-            issueDate: formData.issueDate,
+            ...(formData.caseId && { caseId: formData.caseId }),
             dueDate: formData.dueDate,
             items: items.map(item => ({
                 description: item.description,
@@ -145,30 +149,46 @@ export function CreateInvoiceView() {
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                         <div className="space-y-2">
                                             <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                                <Hash className="w-4 h-4 text-emerald-500" />
-                                                رقم الفاتورة
+                                                <User className="w-4 h-4 text-emerald-500" />
+                                                العميل <span className="text-red-500">*</span>
                                             </label>
-                                            <Input
-                                                placeholder="INV-2025-001"
-                                                value={formData.invoiceNumber}
-                                                onChange={(e) => setFormData({ ...formData, invoiceNumber: e.target.value })}
-                                                className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500"
-                                                required
-                                            />
+                                            <Select
+                                                value={formData.clientId}
+                                                onValueChange={(value) => setFormData({ ...formData, clientId: value })}
+                                                disabled={loadingClients}
+                                            >
+                                                <SelectTrigger className="rounded-xl border-slate-200 focus:ring-emerald-500">
+                                                    <SelectValue placeholder={loadingClients ? "جاري التحميل..." : "اختر العميل"} />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    {clientsData?.data?.map((client: any) => (
+                                                        <SelectItem key={client._id} value={client._id}>
+                                                            {client.fullName || client.name || `${client.firstName || ''} ${client.lastName || ''}`.trim()}
+                                                        </SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
                                         </div>
                                         <div className="space-y-2">
                                             <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                                <User className="w-4 h-4 text-emerald-500" />
-                                                العميل
+                                                <Briefcase className="w-4 h-4 text-emerald-500" />
+                                                القضية (اختياري)
                                             </label>
-                                            <Select value={formData.clientId} onValueChange={(value) => setFormData({ ...formData, clientId: value })}>
+                                            <Select
+                                                value={formData.caseId}
+                                                onValueChange={(value) => setFormData({ ...formData, caseId: value })}
+                                                disabled={loadingCases}
+                                            >
                                                 <SelectTrigger className="rounded-xl border-slate-200 focus:ring-emerald-500">
-                                                    <SelectValue placeholder="اختر العميل" />
+                                                    <SelectValue placeholder={loadingCases ? "جاري التحميل..." : "اختر القضية"} />
                                                 </SelectTrigger>
                                                 <SelectContent>
-                                                    <SelectItem value="client1">شركة الإنشاءات</SelectItem>
-                                                    <SelectItem value="client2">مجموعة العقارية</SelectItem>
-                                                    <SelectItem value="client3">مؤسسة النور</SelectItem>
+                                                    <SelectItem value="">بدون قضية</SelectItem>
+                                                    {casesData?.data?.map((caseItem: any) => (
+                                                        <SelectItem key={caseItem._id} value={caseItem._id}>
+                                                            {caseItem.caseNumber} - {caseItem.title}
+                                                        </SelectItem>
+                                                    ))}
                                                 </SelectContent>
                                             </Select>
                                         </div>
@@ -185,13 +205,13 @@ export function CreateInvoiceView() {
                                                 value={formData.issueDate}
                                                 onChange={(e) => setFormData({ ...formData, issueDate: e.target.value })}
                                                 className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500"
-                                                required
+                                                readOnly
                                             />
                                         </div>
                                         <div className="space-y-2">
                                             <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
                                                 <Calendar className="w-4 h-4 text-emerald-500" />
-                                                تاريخ الاستحقاق
+                                                تاريخ الاستحقاق <span className="text-red-500">*</span>
                                             </label>
                                             <Input
                                                 type="date"
@@ -280,6 +300,7 @@ export function CreateInvoiceView() {
                                     >
                                         {createInvoiceMutation.isPending ? (
                                             <span className="flex items-center gap-2">
+                                                <Loader2 className="w-4 h-4 animate-spin" />
                                                 جاري الحفظ...
                                             </span>
                                         ) : (
