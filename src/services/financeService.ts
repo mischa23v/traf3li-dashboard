@@ -675,6 +675,19 @@ const financeService = {
   },
 
   /**
+   * Get single payment
+   */
+  getPayment: async (id: string): Promise<{ payment: Payment }> => {
+    try {
+      const response = await apiClient.get(`/payments/${id}`)
+      return { payment: response.data.payment || response.data.data || response.data }
+    } catch (error: any) {
+      console.error('Get payment error:', error)
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
    * Complete payment
    */
   completePayment: async (id: string): Promise<Payment> => {
@@ -683,6 +696,32 @@ const financeService = {
       return response.data.payment || response.data.data
     } catch (error: any) {
       console.error('Complete payment error:', error)
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Record payment for invoice
+   */
+  recordPaymentForInvoice: async (invoiceId: string, data: CreatePaymentData): Promise<Payment> => {
+    try {
+      const response = await apiClient.post(`/invoices/${invoiceId}/payments`, data)
+      return response.data.payment || response.data.data
+    } catch (error: any) {
+      console.error('Record payment error:', error)
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Get payments summary
+   */
+  getPaymentsSummary: async (filters?: any): Promise<any> => {
+    try {
+      const response = await apiClient.get('/payments/summary', { params: filters })
+      return response.data.summary || response.data.data || response.data
+    } catch (error: any) {
+      console.error('Get payments summary error:', error)
       throw new Error(handleApiError(error))
     }
   },
