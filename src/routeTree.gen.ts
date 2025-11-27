@@ -101,6 +101,7 @@ import { Route as AuthenticatedDashboardTasksEventsIndexRouteImport } from './ro
 import { Route as AuthenticatedDashboardFinanceTransactionsIndexRouteImport } from './routes/_authenticated/dashboard.finance.transactions.index'
 import { Route as AuthenticatedDashboardFinanceTimeTrackingIndexRouteImport } from './routes/_authenticated/dashboard.finance.time-tracking.index'
 import { Route as AuthenticatedDashboardFinanceStatementsIndexRouteImport } from './routes/_authenticated/dashboard.finance.statements.index'
+import { Route as AuthenticatedDashboardFinanceReportsIndexRouteImport } from './routes/_authenticated/dashboard.finance.reports.index'
 import { Route as AuthenticatedDashboardFinanceQuotesIndexRouteImport } from './routes/_authenticated/dashboard.finance.quotes.index'
 import { Route as AuthenticatedDashboardFinancePaymentsIndexRouteImport } from './routes/_authenticated/dashboard.finance.payments.index'
 import { Route as AuthenticatedDashboardFinanceInvoicesIndexRouteImport } from './routes/_authenticated/dashboard.finance.invoices.index'
@@ -112,10 +113,16 @@ import { Route as AuthenticatedDashboardTasksEventsNewRouteImport } from './rout
 import { Route as AuthenticatedDashboardTasksEventsEventIdRouteImport } from './routes/_authenticated/dashboard.tasks.events.$eventId'
 import { Route as AuthenticatedDashboardFinanceTransactionsNewRouteImport } from './routes/_authenticated/dashboard.finance.transactions.new'
 import { Route as AuthenticatedDashboardFinanceTransactionsTransactionIdRouteImport } from './routes/_authenticated/dashboard.finance.transactions.$transactionId'
+import { Route as AuthenticatedDashboardFinanceTimeTrackingWeeklyRouteImport } from './routes/_authenticated/dashboard.finance.time-tracking.weekly'
 import { Route as AuthenticatedDashboardFinanceTimeTrackingNewRouteImport } from './routes/_authenticated/dashboard.finance.time-tracking.new'
+import { Route as AuthenticatedDashboardFinanceTimeTrackingMonthlyRouteImport } from './routes/_authenticated/dashboard.finance.time-tracking.monthly'
 import { Route as AuthenticatedDashboardFinanceTimeTrackingEntryIdRouteImport } from './routes/_authenticated/dashboard.finance.time-tracking.$entryId'
 import { Route as AuthenticatedDashboardFinanceStatementsNewRouteImport } from './routes/_authenticated/dashboard.finance.statements.new'
 import { Route as AuthenticatedDashboardFinanceStatementsStatementIdRouteImport } from './routes/_authenticated/dashboard.finance.statements.$statementId'
+import { Route as AuthenticatedDashboardFinanceReportsTimeEntriesRouteImport } from './routes/_authenticated/dashboard.finance.reports.time-entries'
+import { Route as AuthenticatedDashboardFinanceReportsRevenueByClientRouteImport } from './routes/_authenticated/dashboard.finance.reports.revenue-by-client'
+import { Route as AuthenticatedDashboardFinanceReportsOutstandingInvoicesRouteImport } from './routes/_authenticated/dashboard.finance.reports.outstanding-invoices'
+import { Route as AuthenticatedDashboardFinanceReportsAccountsAgingRouteImport } from './routes/_authenticated/dashboard.finance.reports.accounts-aging'
 import { Route as AuthenticatedDashboardFinanceQuotesNewRouteImport } from './routes/_authenticated/dashboard.finance.quotes.new'
 import { Route as AuthenticatedDashboardFinanceQuotesQuoteIdRouteImport } from './routes/_authenticated/dashboard.finance.quotes.$quoteId'
 import { Route as AuthenticatedDashboardFinancePaymentsPaymentIdRouteImport } from './routes/_authenticated/dashboard.finance.payments.$paymentId'
@@ -125,6 +132,12 @@ import { Route as AuthenticatedDashboardFinanceExpensesNewRouteImport } from './
 import { Route as AuthenticatedDashboardFinanceExpensesExpenseIdRouteImport } from './routes/_authenticated/dashboard.finance.expenses.$expenseId'
 import { Route as AuthenticatedDashboardFinanceActivityNewRouteImport } from './routes/_authenticated/dashboard.finance.activity.new'
 import { Route as AuthenticatedDashboardFinanceActivityActivityIdRouteImport } from './routes/_authenticated/dashboard.finance.activity.$activityId'
+import { Route as AuthenticatedDashboardFinanceTransactionsTransactionIdEditRouteImport } from './routes/_authenticated/dashboard.finance.transactions.$transactionId.edit'
+import { Route as AuthenticatedDashboardFinanceTimeTrackingEntryIdEditRouteImport } from './routes/_authenticated/dashboard.finance.time-tracking.$entryId.edit'
+import { Route as AuthenticatedDashboardFinanceStatementsStatementIdEditRouteImport } from './routes/_authenticated/dashboard.finance.statements.$statementId.edit'
+import { Route as AuthenticatedDashboardFinanceInvoicesInvoiceIdEditRouteImport } from './routes/_authenticated/dashboard.finance.invoices.$invoiceId.edit'
+import { Route as AuthenticatedDashboardFinanceExpensesExpenseIdEditRouteImport } from './routes/_authenticated/dashboard.finance.expenses.$expenseId.edit'
+import { Route as AuthenticatedDashboardFinanceActivityActivityIdEditRouteImport } from './routes/_authenticated/dashboard.finance.activity.$activityId.edit'
 
 const TimeEntriesRoute = TimeEntriesRouteImport.update({
   id: '/time-entries',
@@ -634,6 +647,12 @@ const AuthenticatedDashboardFinanceStatementsIndexRoute =
     path: '/dashboard/finance/statements/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedDashboardFinanceReportsIndexRoute =
+  AuthenticatedDashboardFinanceReportsIndexRouteImport.update({
+    id: '/dashboard/finance/reports/',
+    path: '/dashboard/finance/reports/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedDashboardFinanceQuotesIndexRoute =
   AuthenticatedDashboardFinanceQuotesIndexRouteImport.update({
     id: '/dashboard/finance/quotes/',
@@ -700,10 +719,22 @@ const AuthenticatedDashboardFinanceTransactionsTransactionIdRoute =
     path: '/dashboard/finance/transactions/$transactionId',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedDashboardFinanceTimeTrackingWeeklyRoute =
+  AuthenticatedDashboardFinanceTimeTrackingWeeklyRouteImport.update({
+    id: '/dashboard/finance/time-tracking/weekly',
+    path: '/dashboard/finance/time-tracking/weekly',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedDashboardFinanceTimeTrackingNewRoute =
   AuthenticatedDashboardFinanceTimeTrackingNewRouteImport.update({
     id: '/dashboard/finance/time-tracking/new',
     path: '/dashboard/finance/time-tracking/new',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedDashboardFinanceTimeTrackingMonthlyRoute =
+  AuthenticatedDashboardFinanceTimeTrackingMonthlyRouteImport.update({
+    id: '/dashboard/finance/time-tracking/monthly',
+    path: '/dashboard/finance/time-tracking/monthly',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedDashboardFinanceTimeTrackingEntryIdRoute =
@@ -722,6 +753,30 @@ const AuthenticatedDashboardFinanceStatementsStatementIdRoute =
   AuthenticatedDashboardFinanceStatementsStatementIdRouteImport.update({
     id: '/dashboard/finance/statements/$statementId',
     path: '/dashboard/finance/statements/$statementId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedDashboardFinanceReportsTimeEntriesRoute =
+  AuthenticatedDashboardFinanceReportsTimeEntriesRouteImport.update({
+    id: '/dashboard/finance/reports/time-entries',
+    path: '/dashboard/finance/reports/time-entries',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedDashboardFinanceReportsRevenueByClientRoute =
+  AuthenticatedDashboardFinanceReportsRevenueByClientRouteImport.update({
+    id: '/dashboard/finance/reports/revenue-by-client',
+    path: '/dashboard/finance/reports/revenue-by-client',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedDashboardFinanceReportsOutstandingInvoicesRoute =
+  AuthenticatedDashboardFinanceReportsOutstandingInvoicesRouteImport.update({
+    id: '/dashboard/finance/reports/outstanding-invoices',
+    path: '/dashboard/finance/reports/outstanding-invoices',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedDashboardFinanceReportsAccountsAgingRoute =
+  AuthenticatedDashboardFinanceReportsAccountsAgingRouteImport.update({
+    id: '/dashboard/finance/reports/accounts-aging',
+    path: '/dashboard/finance/reports/accounts-aging',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedDashboardFinanceQuotesNewRoute =
@@ -777,6 +832,44 @@ const AuthenticatedDashboardFinanceActivityActivityIdRoute =
     id: '/dashboard/finance/activity/$activityId',
     path: '/dashboard/finance/activity/$activityId',
     getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedDashboardFinanceTransactionsTransactionIdEditRoute =
+  AuthenticatedDashboardFinanceTransactionsTransactionIdEditRouteImport.update({
+    id: '/edit',
+    path: '/edit',
+    getParentRoute: () =>
+      AuthenticatedDashboardFinanceTransactionsTransactionIdRoute,
+  } as any)
+const AuthenticatedDashboardFinanceTimeTrackingEntryIdEditRoute =
+  AuthenticatedDashboardFinanceTimeTrackingEntryIdEditRouteImport.update({
+    id: '/edit',
+    path: '/edit',
+    getParentRoute: () => AuthenticatedDashboardFinanceTimeTrackingEntryIdRoute,
+  } as any)
+const AuthenticatedDashboardFinanceStatementsStatementIdEditRoute =
+  AuthenticatedDashboardFinanceStatementsStatementIdEditRouteImport.update({
+    id: '/edit',
+    path: '/edit',
+    getParentRoute: () =>
+      AuthenticatedDashboardFinanceStatementsStatementIdRoute,
+  } as any)
+const AuthenticatedDashboardFinanceInvoicesInvoiceIdEditRoute =
+  AuthenticatedDashboardFinanceInvoicesInvoiceIdEditRouteImport.update({
+    id: '/edit',
+    path: '/edit',
+    getParentRoute: () => AuthenticatedDashboardFinanceInvoicesInvoiceIdRoute,
+  } as any)
+const AuthenticatedDashboardFinanceExpensesExpenseIdEditRoute =
+  AuthenticatedDashboardFinanceExpensesExpenseIdEditRouteImport.update({
+    id: '/edit',
+    path: '/edit',
+    getParentRoute: () => AuthenticatedDashboardFinanceExpensesExpenseIdRoute,
+  } as any)
+const AuthenticatedDashboardFinanceActivityActivityIdEditRoute =
+  AuthenticatedDashboardFinanceActivityActivityIdEditRouteImport.update({
+    id: '/edit',
+    path: '/edit',
+    getParentRoute: () => AuthenticatedDashboardFinanceActivityActivityIdRoute,
   } as any)
 
 export interface FileRoutesByFullPath {
@@ -864,20 +957,26 @@ export interface FileRoutesByFullPath {
   '/dashboard/reports': typeof AuthenticatedDashboardReportsIndexRoute
   '/dashboard/staff': typeof AuthenticatedDashboardStaffIndexRoute
   '/dashboard/tags': typeof AuthenticatedDashboardTagsIndexRoute
-  '/dashboard/finance/activity/$activityId': typeof AuthenticatedDashboardFinanceActivityActivityIdRoute
+  '/dashboard/finance/activity/$activityId': typeof AuthenticatedDashboardFinanceActivityActivityIdRouteWithChildren
   '/dashboard/finance/activity/new': typeof AuthenticatedDashboardFinanceActivityNewRoute
-  '/dashboard/finance/expenses/$expenseId': typeof AuthenticatedDashboardFinanceExpensesExpenseIdRoute
+  '/dashboard/finance/expenses/$expenseId': typeof AuthenticatedDashboardFinanceExpensesExpenseIdRouteWithChildren
   '/dashboard/finance/expenses/new': typeof AuthenticatedDashboardFinanceExpensesNewRoute
-  '/dashboard/finance/invoices/$invoiceId': typeof AuthenticatedDashboardFinanceInvoicesInvoiceIdRoute
+  '/dashboard/finance/invoices/$invoiceId': typeof AuthenticatedDashboardFinanceInvoicesInvoiceIdRouteWithChildren
   '/dashboard/finance/invoices/new': typeof AuthenticatedDashboardFinanceInvoicesNewRoute
   '/dashboard/finance/payments/$paymentId': typeof AuthenticatedDashboardFinancePaymentsPaymentIdRoute
   '/dashboard/finance/quotes/$quoteId': typeof AuthenticatedDashboardFinanceQuotesQuoteIdRoute
   '/dashboard/finance/quotes/new': typeof AuthenticatedDashboardFinanceQuotesNewRoute
-  '/dashboard/finance/statements/$statementId': typeof AuthenticatedDashboardFinanceStatementsStatementIdRoute
+  '/dashboard/finance/reports/accounts-aging': typeof AuthenticatedDashboardFinanceReportsAccountsAgingRoute
+  '/dashboard/finance/reports/outstanding-invoices': typeof AuthenticatedDashboardFinanceReportsOutstandingInvoicesRoute
+  '/dashboard/finance/reports/revenue-by-client': typeof AuthenticatedDashboardFinanceReportsRevenueByClientRoute
+  '/dashboard/finance/reports/time-entries': typeof AuthenticatedDashboardFinanceReportsTimeEntriesRoute
+  '/dashboard/finance/statements/$statementId': typeof AuthenticatedDashboardFinanceStatementsStatementIdRouteWithChildren
   '/dashboard/finance/statements/new': typeof AuthenticatedDashboardFinanceStatementsNewRoute
-  '/dashboard/finance/time-tracking/$entryId': typeof AuthenticatedDashboardFinanceTimeTrackingEntryIdRoute
+  '/dashboard/finance/time-tracking/$entryId': typeof AuthenticatedDashboardFinanceTimeTrackingEntryIdRouteWithChildren
+  '/dashboard/finance/time-tracking/monthly': typeof AuthenticatedDashboardFinanceTimeTrackingMonthlyRoute
   '/dashboard/finance/time-tracking/new': typeof AuthenticatedDashboardFinanceTimeTrackingNewRoute
-  '/dashboard/finance/transactions/$transactionId': typeof AuthenticatedDashboardFinanceTransactionsTransactionIdRoute
+  '/dashboard/finance/time-tracking/weekly': typeof AuthenticatedDashboardFinanceTimeTrackingWeeklyRoute
+  '/dashboard/finance/transactions/$transactionId': typeof AuthenticatedDashboardFinanceTransactionsTransactionIdRouteWithChildren
   '/dashboard/finance/transactions/new': typeof AuthenticatedDashboardFinanceTransactionsNewRoute
   '/dashboard/tasks/events/$eventId': typeof AuthenticatedDashboardTasksEventsEventIdRoute
   '/dashboard/tasks/events/new': typeof AuthenticatedDashboardTasksEventsNewRoute
@@ -888,11 +987,18 @@ export interface FileRoutesByFullPath {
   '/dashboard/finance/invoices': typeof AuthenticatedDashboardFinanceInvoicesIndexRoute
   '/dashboard/finance/payments': typeof AuthenticatedDashboardFinancePaymentsIndexRoute
   '/dashboard/finance/quotes': typeof AuthenticatedDashboardFinanceQuotesIndexRoute
+  '/dashboard/finance/reports': typeof AuthenticatedDashboardFinanceReportsIndexRoute
   '/dashboard/finance/statements': typeof AuthenticatedDashboardFinanceStatementsIndexRoute
   '/dashboard/finance/time-tracking': typeof AuthenticatedDashboardFinanceTimeTrackingIndexRoute
   '/dashboard/finance/transactions': typeof AuthenticatedDashboardFinanceTransactionsIndexRoute
   '/dashboard/tasks/events': typeof AuthenticatedDashboardTasksEventsIndexRoute
   '/dashboard/tasks/reminders': typeof AuthenticatedDashboardTasksRemindersIndexRoute
+  '/dashboard/finance/activity/$activityId/edit': typeof AuthenticatedDashboardFinanceActivityActivityIdEditRoute
+  '/dashboard/finance/expenses/$expenseId/edit': typeof AuthenticatedDashboardFinanceExpensesExpenseIdEditRoute
+  '/dashboard/finance/invoices/$invoiceId/edit': typeof AuthenticatedDashboardFinanceInvoicesInvoiceIdEditRoute
+  '/dashboard/finance/statements/$statementId/edit': typeof AuthenticatedDashboardFinanceStatementsStatementIdEditRoute
+  '/dashboard/finance/time-tracking/$entryId/edit': typeof AuthenticatedDashboardFinanceTimeTrackingEntryIdEditRoute
+  '/dashboard/finance/transactions/$transactionId/edit': typeof AuthenticatedDashboardFinanceTransactionsTransactionIdEditRoute
 }
 export interface FileRoutesByTo {
   '/clerk': typeof ClerkAuthenticatedRouteRouteWithChildren
@@ -978,20 +1084,26 @@ export interface FileRoutesByTo {
   '/dashboard/reports': typeof AuthenticatedDashboardReportsIndexRoute
   '/dashboard/staff': typeof AuthenticatedDashboardStaffIndexRoute
   '/dashboard/tags': typeof AuthenticatedDashboardTagsIndexRoute
-  '/dashboard/finance/activity/$activityId': typeof AuthenticatedDashboardFinanceActivityActivityIdRoute
+  '/dashboard/finance/activity/$activityId': typeof AuthenticatedDashboardFinanceActivityActivityIdRouteWithChildren
   '/dashboard/finance/activity/new': typeof AuthenticatedDashboardFinanceActivityNewRoute
-  '/dashboard/finance/expenses/$expenseId': typeof AuthenticatedDashboardFinanceExpensesExpenseIdRoute
+  '/dashboard/finance/expenses/$expenseId': typeof AuthenticatedDashboardFinanceExpensesExpenseIdRouteWithChildren
   '/dashboard/finance/expenses/new': typeof AuthenticatedDashboardFinanceExpensesNewRoute
-  '/dashboard/finance/invoices/$invoiceId': typeof AuthenticatedDashboardFinanceInvoicesInvoiceIdRoute
+  '/dashboard/finance/invoices/$invoiceId': typeof AuthenticatedDashboardFinanceInvoicesInvoiceIdRouteWithChildren
   '/dashboard/finance/invoices/new': typeof AuthenticatedDashboardFinanceInvoicesNewRoute
   '/dashboard/finance/payments/$paymentId': typeof AuthenticatedDashboardFinancePaymentsPaymentIdRoute
   '/dashboard/finance/quotes/$quoteId': typeof AuthenticatedDashboardFinanceQuotesQuoteIdRoute
   '/dashboard/finance/quotes/new': typeof AuthenticatedDashboardFinanceQuotesNewRoute
-  '/dashboard/finance/statements/$statementId': typeof AuthenticatedDashboardFinanceStatementsStatementIdRoute
+  '/dashboard/finance/reports/accounts-aging': typeof AuthenticatedDashboardFinanceReportsAccountsAgingRoute
+  '/dashboard/finance/reports/outstanding-invoices': typeof AuthenticatedDashboardFinanceReportsOutstandingInvoicesRoute
+  '/dashboard/finance/reports/revenue-by-client': typeof AuthenticatedDashboardFinanceReportsRevenueByClientRoute
+  '/dashboard/finance/reports/time-entries': typeof AuthenticatedDashboardFinanceReportsTimeEntriesRoute
+  '/dashboard/finance/statements/$statementId': typeof AuthenticatedDashboardFinanceStatementsStatementIdRouteWithChildren
   '/dashboard/finance/statements/new': typeof AuthenticatedDashboardFinanceStatementsNewRoute
-  '/dashboard/finance/time-tracking/$entryId': typeof AuthenticatedDashboardFinanceTimeTrackingEntryIdRoute
+  '/dashboard/finance/time-tracking/$entryId': typeof AuthenticatedDashboardFinanceTimeTrackingEntryIdRouteWithChildren
+  '/dashboard/finance/time-tracking/monthly': typeof AuthenticatedDashboardFinanceTimeTrackingMonthlyRoute
   '/dashboard/finance/time-tracking/new': typeof AuthenticatedDashboardFinanceTimeTrackingNewRoute
-  '/dashboard/finance/transactions/$transactionId': typeof AuthenticatedDashboardFinanceTransactionsTransactionIdRoute
+  '/dashboard/finance/time-tracking/weekly': typeof AuthenticatedDashboardFinanceTimeTrackingWeeklyRoute
+  '/dashboard/finance/transactions/$transactionId': typeof AuthenticatedDashboardFinanceTransactionsTransactionIdRouteWithChildren
   '/dashboard/finance/transactions/new': typeof AuthenticatedDashboardFinanceTransactionsNewRoute
   '/dashboard/tasks/events/$eventId': typeof AuthenticatedDashboardTasksEventsEventIdRoute
   '/dashboard/tasks/events/new': typeof AuthenticatedDashboardTasksEventsNewRoute
@@ -1002,11 +1114,18 @@ export interface FileRoutesByTo {
   '/dashboard/finance/invoices': typeof AuthenticatedDashboardFinanceInvoicesIndexRoute
   '/dashboard/finance/payments': typeof AuthenticatedDashboardFinancePaymentsIndexRoute
   '/dashboard/finance/quotes': typeof AuthenticatedDashboardFinanceQuotesIndexRoute
+  '/dashboard/finance/reports': typeof AuthenticatedDashboardFinanceReportsIndexRoute
   '/dashboard/finance/statements': typeof AuthenticatedDashboardFinanceStatementsIndexRoute
   '/dashboard/finance/time-tracking': typeof AuthenticatedDashboardFinanceTimeTrackingIndexRoute
   '/dashboard/finance/transactions': typeof AuthenticatedDashboardFinanceTransactionsIndexRoute
   '/dashboard/tasks/events': typeof AuthenticatedDashboardTasksEventsIndexRoute
   '/dashboard/tasks/reminders': typeof AuthenticatedDashboardTasksRemindersIndexRoute
+  '/dashboard/finance/activity/$activityId/edit': typeof AuthenticatedDashboardFinanceActivityActivityIdEditRoute
+  '/dashboard/finance/expenses/$expenseId/edit': typeof AuthenticatedDashboardFinanceExpensesExpenseIdEditRoute
+  '/dashboard/finance/invoices/$invoiceId/edit': typeof AuthenticatedDashboardFinanceInvoicesInvoiceIdEditRoute
+  '/dashboard/finance/statements/$statementId/edit': typeof AuthenticatedDashboardFinanceStatementsStatementIdEditRoute
+  '/dashboard/finance/time-tracking/$entryId/edit': typeof AuthenticatedDashboardFinanceTimeTrackingEntryIdEditRoute
+  '/dashboard/finance/transactions/$transactionId/edit': typeof AuthenticatedDashboardFinanceTransactionsTransactionIdEditRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -1097,20 +1216,26 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/reports/': typeof AuthenticatedDashboardReportsIndexRoute
   '/_authenticated/dashboard/staff/': typeof AuthenticatedDashboardStaffIndexRoute
   '/_authenticated/dashboard/tags/': typeof AuthenticatedDashboardTagsIndexRoute
-  '/_authenticated/dashboard/finance/activity/$activityId': typeof AuthenticatedDashboardFinanceActivityActivityIdRoute
+  '/_authenticated/dashboard/finance/activity/$activityId': typeof AuthenticatedDashboardFinanceActivityActivityIdRouteWithChildren
   '/_authenticated/dashboard/finance/activity/new': typeof AuthenticatedDashboardFinanceActivityNewRoute
-  '/_authenticated/dashboard/finance/expenses/$expenseId': typeof AuthenticatedDashboardFinanceExpensesExpenseIdRoute
+  '/_authenticated/dashboard/finance/expenses/$expenseId': typeof AuthenticatedDashboardFinanceExpensesExpenseIdRouteWithChildren
   '/_authenticated/dashboard/finance/expenses/new': typeof AuthenticatedDashboardFinanceExpensesNewRoute
-  '/_authenticated/dashboard/finance/invoices/$invoiceId': typeof AuthenticatedDashboardFinanceInvoicesInvoiceIdRoute
+  '/_authenticated/dashboard/finance/invoices/$invoiceId': typeof AuthenticatedDashboardFinanceInvoicesInvoiceIdRouteWithChildren
   '/_authenticated/dashboard/finance/invoices/new': typeof AuthenticatedDashboardFinanceInvoicesNewRoute
   '/_authenticated/dashboard/finance/payments/$paymentId': typeof AuthenticatedDashboardFinancePaymentsPaymentIdRoute
   '/_authenticated/dashboard/finance/quotes/$quoteId': typeof AuthenticatedDashboardFinanceQuotesQuoteIdRoute
   '/_authenticated/dashboard/finance/quotes/new': typeof AuthenticatedDashboardFinanceQuotesNewRoute
-  '/_authenticated/dashboard/finance/statements/$statementId': typeof AuthenticatedDashboardFinanceStatementsStatementIdRoute
+  '/_authenticated/dashboard/finance/reports/accounts-aging': typeof AuthenticatedDashboardFinanceReportsAccountsAgingRoute
+  '/_authenticated/dashboard/finance/reports/outstanding-invoices': typeof AuthenticatedDashboardFinanceReportsOutstandingInvoicesRoute
+  '/_authenticated/dashboard/finance/reports/revenue-by-client': typeof AuthenticatedDashboardFinanceReportsRevenueByClientRoute
+  '/_authenticated/dashboard/finance/reports/time-entries': typeof AuthenticatedDashboardFinanceReportsTimeEntriesRoute
+  '/_authenticated/dashboard/finance/statements/$statementId': typeof AuthenticatedDashboardFinanceStatementsStatementIdRouteWithChildren
   '/_authenticated/dashboard/finance/statements/new': typeof AuthenticatedDashboardFinanceStatementsNewRoute
-  '/_authenticated/dashboard/finance/time-tracking/$entryId': typeof AuthenticatedDashboardFinanceTimeTrackingEntryIdRoute
+  '/_authenticated/dashboard/finance/time-tracking/$entryId': typeof AuthenticatedDashboardFinanceTimeTrackingEntryIdRouteWithChildren
+  '/_authenticated/dashboard/finance/time-tracking/monthly': typeof AuthenticatedDashboardFinanceTimeTrackingMonthlyRoute
   '/_authenticated/dashboard/finance/time-tracking/new': typeof AuthenticatedDashboardFinanceTimeTrackingNewRoute
-  '/_authenticated/dashboard/finance/transactions/$transactionId': typeof AuthenticatedDashboardFinanceTransactionsTransactionIdRoute
+  '/_authenticated/dashboard/finance/time-tracking/weekly': typeof AuthenticatedDashboardFinanceTimeTrackingWeeklyRoute
+  '/_authenticated/dashboard/finance/transactions/$transactionId': typeof AuthenticatedDashboardFinanceTransactionsTransactionIdRouteWithChildren
   '/_authenticated/dashboard/finance/transactions/new': typeof AuthenticatedDashboardFinanceTransactionsNewRoute
   '/_authenticated/dashboard/tasks/events/$eventId': typeof AuthenticatedDashboardTasksEventsEventIdRoute
   '/_authenticated/dashboard/tasks/events/new': typeof AuthenticatedDashboardTasksEventsNewRoute
@@ -1121,11 +1246,18 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/finance/invoices/': typeof AuthenticatedDashboardFinanceInvoicesIndexRoute
   '/_authenticated/dashboard/finance/payments/': typeof AuthenticatedDashboardFinancePaymentsIndexRoute
   '/_authenticated/dashboard/finance/quotes/': typeof AuthenticatedDashboardFinanceQuotesIndexRoute
+  '/_authenticated/dashboard/finance/reports/': typeof AuthenticatedDashboardFinanceReportsIndexRoute
   '/_authenticated/dashboard/finance/statements/': typeof AuthenticatedDashboardFinanceStatementsIndexRoute
   '/_authenticated/dashboard/finance/time-tracking/': typeof AuthenticatedDashboardFinanceTimeTrackingIndexRoute
   '/_authenticated/dashboard/finance/transactions/': typeof AuthenticatedDashboardFinanceTransactionsIndexRoute
   '/_authenticated/dashboard/tasks/events/': typeof AuthenticatedDashboardTasksEventsIndexRoute
   '/_authenticated/dashboard/tasks/reminders/': typeof AuthenticatedDashboardTasksRemindersIndexRoute
+  '/_authenticated/dashboard/finance/activity/$activityId/edit': typeof AuthenticatedDashboardFinanceActivityActivityIdEditRoute
+  '/_authenticated/dashboard/finance/expenses/$expenseId/edit': typeof AuthenticatedDashboardFinanceExpensesExpenseIdEditRoute
+  '/_authenticated/dashboard/finance/invoices/$invoiceId/edit': typeof AuthenticatedDashboardFinanceInvoicesInvoiceIdEditRoute
+  '/_authenticated/dashboard/finance/statements/$statementId/edit': typeof AuthenticatedDashboardFinanceStatementsStatementIdEditRoute
+  '/_authenticated/dashboard/finance/time-tracking/$entryId/edit': typeof AuthenticatedDashboardFinanceTimeTrackingEntryIdEditRoute
+  '/_authenticated/dashboard/finance/transactions/$transactionId/edit': typeof AuthenticatedDashboardFinanceTransactionsTransactionIdEditRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -1223,10 +1355,16 @@ export interface FileRouteTypes {
     | '/dashboard/finance/payments/$paymentId'
     | '/dashboard/finance/quotes/$quoteId'
     | '/dashboard/finance/quotes/new'
+    | '/dashboard/finance/reports/accounts-aging'
+    | '/dashboard/finance/reports/outstanding-invoices'
+    | '/dashboard/finance/reports/revenue-by-client'
+    | '/dashboard/finance/reports/time-entries'
     | '/dashboard/finance/statements/$statementId'
     | '/dashboard/finance/statements/new'
     | '/dashboard/finance/time-tracking/$entryId'
+    | '/dashboard/finance/time-tracking/monthly'
     | '/dashboard/finance/time-tracking/new'
+    | '/dashboard/finance/time-tracking/weekly'
     | '/dashboard/finance/transactions/$transactionId'
     | '/dashboard/finance/transactions/new'
     | '/dashboard/tasks/events/$eventId'
@@ -1238,11 +1376,18 @@ export interface FileRouteTypes {
     | '/dashboard/finance/invoices'
     | '/dashboard/finance/payments'
     | '/dashboard/finance/quotes'
+    | '/dashboard/finance/reports'
     | '/dashboard/finance/statements'
     | '/dashboard/finance/time-tracking'
     | '/dashboard/finance/transactions'
     | '/dashboard/tasks/events'
     | '/dashboard/tasks/reminders'
+    | '/dashboard/finance/activity/$activityId/edit'
+    | '/dashboard/finance/expenses/$expenseId/edit'
+    | '/dashboard/finance/invoices/$invoiceId/edit'
+    | '/dashboard/finance/statements/$statementId/edit'
+    | '/dashboard/finance/time-tracking/$entryId/edit'
+    | '/dashboard/finance/transactions/$transactionId/edit'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/clerk'
@@ -1337,10 +1482,16 @@ export interface FileRouteTypes {
     | '/dashboard/finance/payments/$paymentId'
     | '/dashboard/finance/quotes/$quoteId'
     | '/dashboard/finance/quotes/new'
+    | '/dashboard/finance/reports/accounts-aging'
+    | '/dashboard/finance/reports/outstanding-invoices'
+    | '/dashboard/finance/reports/revenue-by-client'
+    | '/dashboard/finance/reports/time-entries'
     | '/dashboard/finance/statements/$statementId'
     | '/dashboard/finance/statements/new'
     | '/dashboard/finance/time-tracking/$entryId'
+    | '/dashboard/finance/time-tracking/monthly'
     | '/dashboard/finance/time-tracking/new'
+    | '/dashboard/finance/time-tracking/weekly'
     | '/dashboard/finance/transactions/$transactionId'
     | '/dashboard/finance/transactions/new'
     | '/dashboard/tasks/events/$eventId'
@@ -1352,11 +1503,18 @@ export interface FileRouteTypes {
     | '/dashboard/finance/invoices'
     | '/dashboard/finance/payments'
     | '/dashboard/finance/quotes'
+    | '/dashboard/finance/reports'
     | '/dashboard/finance/statements'
     | '/dashboard/finance/time-tracking'
     | '/dashboard/finance/transactions'
     | '/dashboard/tasks/events'
     | '/dashboard/tasks/reminders'
+    | '/dashboard/finance/activity/$activityId/edit'
+    | '/dashboard/finance/expenses/$expenseId/edit'
+    | '/dashboard/finance/invoices/$invoiceId/edit'
+    | '/dashboard/finance/statements/$statementId/edit'
+    | '/dashboard/finance/time-tracking/$entryId/edit'
+    | '/dashboard/finance/transactions/$transactionId/edit'
   id:
     | '__root__'
     | '/_authenticated'
@@ -1455,10 +1613,16 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/finance/payments/$paymentId'
     | '/_authenticated/dashboard/finance/quotes/$quoteId'
     | '/_authenticated/dashboard/finance/quotes/new'
+    | '/_authenticated/dashboard/finance/reports/accounts-aging'
+    | '/_authenticated/dashboard/finance/reports/outstanding-invoices'
+    | '/_authenticated/dashboard/finance/reports/revenue-by-client'
+    | '/_authenticated/dashboard/finance/reports/time-entries'
     | '/_authenticated/dashboard/finance/statements/$statementId'
     | '/_authenticated/dashboard/finance/statements/new'
     | '/_authenticated/dashboard/finance/time-tracking/$entryId'
+    | '/_authenticated/dashboard/finance/time-tracking/monthly'
     | '/_authenticated/dashboard/finance/time-tracking/new'
+    | '/_authenticated/dashboard/finance/time-tracking/weekly'
     | '/_authenticated/dashboard/finance/transactions/$transactionId'
     | '/_authenticated/dashboard/finance/transactions/new'
     | '/_authenticated/dashboard/tasks/events/$eventId'
@@ -1470,11 +1634,18 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/finance/invoices/'
     | '/_authenticated/dashboard/finance/payments/'
     | '/_authenticated/dashboard/finance/quotes/'
+    | '/_authenticated/dashboard/finance/reports/'
     | '/_authenticated/dashboard/finance/statements/'
     | '/_authenticated/dashboard/finance/time-tracking/'
     | '/_authenticated/dashboard/finance/transactions/'
     | '/_authenticated/dashboard/tasks/events/'
     | '/_authenticated/dashboard/tasks/reminders/'
+    | '/_authenticated/dashboard/finance/activity/$activityId/edit'
+    | '/_authenticated/dashboard/finance/expenses/$expenseId/edit'
+    | '/_authenticated/dashboard/finance/invoices/$invoiceId/edit'
+    | '/_authenticated/dashboard/finance/statements/$statementId/edit'
+    | '/_authenticated/dashboard/finance/time-tracking/$entryId/edit'
+    | '/_authenticated/dashboard/finance/transactions/$transactionId/edit'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -2159,6 +2330,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardFinanceStatementsIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/dashboard/finance/reports/': {
+      id: '/_authenticated/dashboard/finance/reports/'
+      path: '/dashboard/finance/reports'
+      fullPath: '/dashboard/finance/reports'
+      preLoaderRoute: typeof AuthenticatedDashboardFinanceReportsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/dashboard/finance/quotes/': {
       id: '/_authenticated/dashboard/finance/quotes/'
       path: '/dashboard/finance/quotes'
@@ -2236,11 +2414,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardFinanceTransactionsTransactionIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/dashboard/finance/time-tracking/weekly': {
+      id: '/_authenticated/dashboard/finance/time-tracking/weekly'
+      path: '/dashboard/finance/time-tracking/weekly'
+      fullPath: '/dashboard/finance/time-tracking/weekly'
+      preLoaderRoute: typeof AuthenticatedDashboardFinanceTimeTrackingWeeklyRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/dashboard/finance/time-tracking/new': {
       id: '/_authenticated/dashboard/finance/time-tracking/new'
       path: '/dashboard/finance/time-tracking/new'
       fullPath: '/dashboard/finance/time-tracking/new'
       preLoaderRoute: typeof AuthenticatedDashboardFinanceTimeTrackingNewRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dashboard/finance/time-tracking/monthly': {
+      id: '/_authenticated/dashboard/finance/time-tracking/monthly'
+      path: '/dashboard/finance/time-tracking/monthly'
+      fullPath: '/dashboard/finance/time-tracking/monthly'
+      preLoaderRoute: typeof AuthenticatedDashboardFinanceTimeTrackingMonthlyRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/dashboard/finance/time-tracking/$entryId': {
@@ -2262,6 +2454,34 @@ declare module '@tanstack/react-router' {
       path: '/dashboard/finance/statements/$statementId'
       fullPath: '/dashboard/finance/statements/$statementId'
       preLoaderRoute: typeof AuthenticatedDashboardFinanceStatementsStatementIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dashboard/finance/reports/time-entries': {
+      id: '/_authenticated/dashboard/finance/reports/time-entries'
+      path: '/dashboard/finance/reports/time-entries'
+      fullPath: '/dashboard/finance/reports/time-entries'
+      preLoaderRoute: typeof AuthenticatedDashboardFinanceReportsTimeEntriesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dashboard/finance/reports/revenue-by-client': {
+      id: '/_authenticated/dashboard/finance/reports/revenue-by-client'
+      path: '/dashboard/finance/reports/revenue-by-client'
+      fullPath: '/dashboard/finance/reports/revenue-by-client'
+      preLoaderRoute: typeof AuthenticatedDashboardFinanceReportsRevenueByClientRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dashboard/finance/reports/outstanding-invoices': {
+      id: '/_authenticated/dashboard/finance/reports/outstanding-invoices'
+      path: '/dashboard/finance/reports/outstanding-invoices'
+      fullPath: '/dashboard/finance/reports/outstanding-invoices'
+      preLoaderRoute: typeof AuthenticatedDashboardFinanceReportsOutstandingInvoicesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dashboard/finance/reports/accounts-aging': {
+      id: '/_authenticated/dashboard/finance/reports/accounts-aging'
+      path: '/dashboard/finance/reports/accounts-aging'
+      fullPath: '/dashboard/finance/reports/accounts-aging'
+      preLoaderRoute: typeof AuthenticatedDashboardFinanceReportsAccountsAgingRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/dashboard/finance/quotes/new': {
@@ -2327,6 +2547,48 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardFinanceActivityActivityIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/dashboard/finance/transactions/$transactionId/edit': {
+      id: '/_authenticated/dashboard/finance/transactions/$transactionId/edit'
+      path: '/edit'
+      fullPath: '/dashboard/finance/transactions/$transactionId/edit'
+      preLoaderRoute: typeof AuthenticatedDashboardFinanceTransactionsTransactionIdEditRouteImport
+      parentRoute: typeof AuthenticatedDashboardFinanceTransactionsTransactionIdRoute
+    }
+    '/_authenticated/dashboard/finance/time-tracking/$entryId/edit': {
+      id: '/_authenticated/dashboard/finance/time-tracking/$entryId/edit'
+      path: '/edit'
+      fullPath: '/dashboard/finance/time-tracking/$entryId/edit'
+      preLoaderRoute: typeof AuthenticatedDashboardFinanceTimeTrackingEntryIdEditRouteImport
+      parentRoute: typeof AuthenticatedDashboardFinanceTimeTrackingEntryIdRoute
+    }
+    '/_authenticated/dashboard/finance/statements/$statementId/edit': {
+      id: '/_authenticated/dashboard/finance/statements/$statementId/edit'
+      path: '/edit'
+      fullPath: '/dashboard/finance/statements/$statementId/edit'
+      preLoaderRoute: typeof AuthenticatedDashboardFinanceStatementsStatementIdEditRouteImport
+      parentRoute: typeof AuthenticatedDashboardFinanceStatementsStatementIdRoute
+    }
+    '/_authenticated/dashboard/finance/invoices/$invoiceId/edit': {
+      id: '/_authenticated/dashboard/finance/invoices/$invoiceId/edit'
+      path: '/edit'
+      fullPath: '/dashboard/finance/invoices/$invoiceId/edit'
+      preLoaderRoute: typeof AuthenticatedDashboardFinanceInvoicesInvoiceIdEditRouteImport
+      parentRoute: typeof AuthenticatedDashboardFinanceInvoicesInvoiceIdRoute
+    }
+    '/_authenticated/dashboard/finance/expenses/$expenseId/edit': {
+      id: '/_authenticated/dashboard/finance/expenses/$expenseId/edit'
+      path: '/edit'
+      fullPath: '/dashboard/finance/expenses/$expenseId/edit'
+      preLoaderRoute: typeof AuthenticatedDashboardFinanceExpensesExpenseIdEditRouteImport
+      parentRoute: typeof AuthenticatedDashboardFinanceExpensesExpenseIdRoute
+    }
+    '/_authenticated/dashboard/finance/activity/$activityId/edit': {
+      id: '/_authenticated/dashboard/finance/activity/$activityId/edit'
+      path: '/edit'
+      fullPath: '/dashboard/finance/activity/$activityId/edit'
+      preLoaderRoute: typeof AuthenticatedDashboardFinanceActivityActivityIdEditRouteImport
+      parentRoute: typeof AuthenticatedDashboardFinanceActivityActivityIdRoute
+    }
   }
 }
 
@@ -2351,6 +2613,96 @@ const AuthenticatedSettingsRouteRouteChildren: AuthenticatedSettingsRouteRouteCh
 const AuthenticatedSettingsRouteRouteWithChildren =
   AuthenticatedSettingsRouteRoute._addFileChildren(
     AuthenticatedSettingsRouteRouteChildren,
+  )
+
+interface AuthenticatedDashboardFinanceActivityActivityIdRouteChildren {
+  AuthenticatedDashboardFinanceActivityActivityIdEditRoute: typeof AuthenticatedDashboardFinanceActivityActivityIdEditRoute
+}
+
+const AuthenticatedDashboardFinanceActivityActivityIdRouteChildren: AuthenticatedDashboardFinanceActivityActivityIdRouteChildren =
+  {
+    AuthenticatedDashboardFinanceActivityActivityIdEditRoute:
+      AuthenticatedDashboardFinanceActivityActivityIdEditRoute,
+  }
+
+const AuthenticatedDashboardFinanceActivityActivityIdRouteWithChildren =
+  AuthenticatedDashboardFinanceActivityActivityIdRoute._addFileChildren(
+    AuthenticatedDashboardFinanceActivityActivityIdRouteChildren,
+  )
+
+interface AuthenticatedDashboardFinanceExpensesExpenseIdRouteChildren {
+  AuthenticatedDashboardFinanceExpensesExpenseIdEditRoute: typeof AuthenticatedDashboardFinanceExpensesExpenseIdEditRoute
+}
+
+const AuthenticatedDashboardFinanceExpensesExpenseIdRouteChildren: AuthenticatedDashboardFinanceExpensesExpenseIdRouteChildren =
+  {
+    AuthenticatedDashboardFinanceExpensesExpenseIdEditRoute:
+      AuthenticatedDashboardFinanceExpensesExpenseIdEditRoute,
+  }
+
+const AuthenticatedDashboardFinanceExpensesExpenseIdRouteWithChildren =
+  AuthenticatedDashboardFinanceExpensesExpenseIdRoute._addFileChildren(
+    AuthenticatedDashboardFinanceExpensesExpenseIdRouteChildren,
+  )
+
+interface AuthenticatedDashboardFinanceInvoicesInvoiceIdRouteChildren {
+  AuthenticatedDashboardFinanceInvoicesInvoiceIdEditRoute: typeof AuthenticatedDashboardFinanceInvoicesInvoiceIdEditRoute
+}
+
+const AuthenticatedDashboardFinanceInvoicesInvoiceIdRouteChildren: AuthenticatedDashboardFinanceInvoicesInvoiceIdRouteChildren =
+  {
+    AuthenticatedDashboardFinanceInvoicesInvoiceIdEditRoute:
+      AuthenticatedDashboardFinanceInvoicesInvoiceIdEditRoute,
+  }
+
+const AuthenticatedDashboardFinanceInvoicesInvoiceIdRouteWithChildren =
+  AuthenticatedDashboardFinanceInvoicesInvoiceIdRoute._addFileChildren(
+    AuthenticatedDashboardFinanceInvoicesInvoiceIdRouteChildren,
+  )
+
+interface AuthenticatedDashboardFinanceStatementsStatementIdRouteChildren {
+  AuthenticatedDashboardFinanceStatementsStatementIdEditRoute: typeof AuthenticatedDashboardFinanceStatementsStatementIdEditRoute
+}
+
+const AuthenticatedDashboardFinanceStatementsStatementIdRouteChildren: AuthenticatedDashboardFinanceStatementsStatementIdRouteChildren =
+  {
+    AuthenticatedDashboardFinanceStatementsStatementIdEditRoute:
+      AuthenticatedDashboardFinanceStatementsStatementIdEditRoute,
+  }
+
+const AuthenticatedDashboardFinanceStatementsStatementIdRouteWithChildren =
+  AuthenticatedDashboardFinanceStatementsStatementIdRoute._addFileChildren(
+    AuthenticatedDashboardFinanceStatementsStatementIdRouteChildren,
+  )
+
+interface AuthenticatedDashboardFinanceTimeTrackingEntryIdRouteChildren {
+  AuthenticatedDashboardFinanceTimeTrackingEntryIdEditRoute: typeof AuthenticatedDashboardFinanceTimeTrackingEntryIdEditRoute
+}
+
+const AuthenticatedDashboardFinanceTimeTrackingEntryIdRouteChildren: AuthenticatedDashboardFinanceTimeTrackingEntryIdRouteChildren =
+  {
+    AuthenticatedDashboardFinanceTimeTrackingEntryIdEditRoute:
+      AuthenticatedDashboardFinanceTimeTrackingEntryIdEditRoute,
+  }
+
+const AuthenticatedDashboardFinanceTimeTrackingEntryIdRouteWithChildren =
+  AuthenticatedDashboardFinanceTimeTrackingEntryIdRoute._addFileChildren(
+    AuthenticatedDashboardFinanceTimeTrackingEntryIdRouteChildren,
+  )
+
+interface AuthenticatedDashboardFinanceTransactionsTransactionIdRouteChildren {
+  AuthenticatedDashboardFinanceTransactionsTransactionIdEditRoute: typeof AuthenticatedDashboardFinanceTransactionsTransactionIdEditRoute
+}
+
+const AuthenticatedDashboardFinanceTransactionsTransactionIdRouteChildren: AuthenticatedDashboardFinanceTransactionsTransactionIdRouteChildren =
+  {
+    AuthenticatedDashboardFinanceTransactionsTransactionIdEditRoute:
+      AuthenticatedDashboardFinanceTransactionsTransactionIdEditRoute,
+  }
+
+const AuthenticatedDashboardFinanceTransactionsTransactionIdRouteWithChildren =
+  AuthenticatedDashboardFinanceTransactionsTransactionIdRoute._addFileChildren(
+    AuthenticatedDashboardFinanceTransactionsTransactionIdRouteChildren,
   )
 
 interface AuthenticatedRouteRouteChildren {
@@ -2398,20 +2750,26 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardReportsIndexRoute: typeof AuthenticatedDashboardReportsIndexRoute
   AuthenticatedDashboardStaffIndexRoute: typeof AuthenticatedDashboardStaffIndexRoute
   AuthenticatedDashboardTagsIndexRoute: typeof AuthenticatedDashboardTagsIndexRoute
-  AuthenticatedDashboardFinanceActivityActivityIdRoute: typeof AuthenticatedDashboardFinanceActivityActivityIdRoute
+  AuthenticatedDashboardFinanceActivityActivityIdRoute: typeof AuthenticatedDashboardFinanceActivityActivityIdRouteWithChildren
   AuthenticatedDashboardFinanceActivityNewRoute: typeof AuthenticatedDashboardFinanceActivityNewRoute
-  AuthenticatedDashboardFinanceExpensesExpenseIdRoute: typeof AuthenticatedDashboardFinanceExpensesExpenseIdRoute
+  AuthenticatedDashboardFinanceExpensesExpenseIdRoute: typeof AuthenticatedDashboardFinanceExpensesExpenseIdRouteWithChildren
   AuthenticatedDashboardFinanceExpensesNewRoute: typeof AuthenticatedDashboardFinanceExpensesNewRoute
-  AuthenticatedDashboardFinanceInvoicesInvoiceIdRoute: typeof AuthenticatedDashboardFinanceInvoicesInvoiceIdRoute
+  AuthenticatedDashboardFinanceInvoicesInvoiceIdRoute: typeof AuthenticatedDashboardFinanceInvoicesInvoiceIdRouteWithChildren
   AuthenticatedDashboardFinanceInvoicesNewRoute: typeof AuthenticatedDashboardFinanceInvoicesNewRoute
   AuthenticatedDashboardFinancePaymentsPaymentIdRoute: typeof AuthenticatedDashboardFinancePaymentsPaymentIdRoute
   AuthenticatedDashboardFinanceQuotesQuoteIdRoute: typeof AuthenticatedDashboardFinanceQuotesQuoteIdRoute
   AuthenticatedDashboardFinanceQuotesNewRoute: typeof AuthenticatedDashboardFinanceQuotesNewRoute
-  AuthenticatedDashboardFinanceStatementsStatementIdRoute: typeof AuthenticatedDashboardFinanceStatementsStatementIdRoute
+  AuthenticatedDashboardFinanceReportsAccountsAgingRoute: typeof AuthenticatedDashboardFinanceReportsAccountsAgingRoute
+  AuthenticatedDashboardFinanceReportsOutstandingInvoicesRoute: typeof AuthenticatedDashboardFinanceReportsOutstandingInvoicesRoute
+  AuthenticatedDashboardFinanceReportsRevenueByClientRoute: typeof AuthenticatedDashboardFinanceReportsRevenueByClientRoute
+  AuthenticatedDashboardFinanceReportsTimeEntriesRoute: typeof AuthenticatedDashboardFinanceReportsTimeEntriesRoute
+  AuthenticatedDashboardFinanceStatementsStatementIdRoute: typeof AuthenticatedDashboardFinanceStatementsStatementIdRouteWithChildren
   AuthenticatedDashboardFinanceStatementsNewRoute: typeof AuthenticatedDashboardFinanceStatementsNewRoute
-  AuthenticatedDashboardFinanceTimeTrackingEntryIdRoute: typeof AuthenticatedDashboardFinanceTimeTrackingEntryIdRoute
+  AuthenticatedDashboardFinanceTimeTrackingEntryIdRoute: typeof AuthenticatedDashboardFinanceTimeTrackingEntryIdRouteWithChildren
+  AuthenticatedDashboardFinanceTimeTrackingMonthlyRoute: typeof AuthenticatedDashboardFinanceTimeTrackingMonthlyRoute
   AuthenticatedDashboardFinanceTimeTrackingNewRoute: typeof AuthenticatedDashboardFinanceTimeTrackingNewRoute
-  AuthenticatedDashboardFinanceTransactionsTransactionIdRoute: typeof AuthenticatedDashboardFinanceTransactionsTransactionIdRoute
+  AuthenticatedDashboardFinanceTimeTrackingWeeklyRoute: typeof AuthenticatedDashboardFinanceTimeTrackingWeeklyRoute
+  AuthenticatedDashboardFinanceTransactionsTransactionIdRoute: typeof AuthenticatedDashboardFinanceTransactionsTransactionIdRouteWithChildren
   AuthenticatedDashboardFinanceTransactionsNewRoute: typeof AuthenticatedDashboardFinanceTransactionsNewRoute
   AuthenticatedDashboardTasksEventsEventIdRoute: typeof AuthenticatedDashboardTasksEventsEventIdRoute
   AuthenticatedDashboardTasksEventsNewRoute: typeof AuthenticatedDashboardTasksEventsNewRoute
@@ -2422,6 +2780,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardFinanceInvoicesIndexRoute: typeof AuthenticatedDashboardFinanceInvoicesIndexRoute
   AuthenticatedDashboardFinancePaymentsIndexRoute: typeof AuthenticatedDashboardFinancePaymentsIndexRoute
   AuthenticatedDashboardFinanceQuotesIndexRoute: typeof AuthenticatedDashboardFinanceQuotesIndexRoute
+  AuthenticatedDashboardFinanceReportsIndexRoute: typeof AuthenticatedDashboardFinanceReportsIndexRoute
   AuthenticatedDashboardFinanceStatementsIndexRoute: typeof AuthenticatedDashboardFinanceStatementsIndexRoute
   AuthenticatedDashboardFinanceTimeTrackingIndexRoute: typeof AuthenticatedDashboardFinanceTimeTrackingIndexRoute
   AuthenticatedDashboardFinanceTransactionsIndexRoute: typeof AuthenticatedDashboardFinanceTransactionsIndexRoute
@@ -2503,15 +2862,15 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDashboardStaffIndexRoute: AuthenticatedDashboardStaffIndexRoute,
   AuthenticatedDashboardTagsIndexRoute: AuthenticatedDashboardTagsIndexRoute,
   AuthenticatedDashboardFinanceActivityActivityIdRoute:
-    AuthenticatedDashboardFinanceActivityActivityIdRoute,
+    AuthenticatedDashboardFinanceActivityActivityIdRouteWithChildren,
   AuthenticatedDashboardFinanceActivityNewRoute:
     AuthenticatedDashboardFinanceActivityNewRoute,
   AuthenticatedDashboardFinanceExpensesExpenseIdRoute:
-    AuthenticatedDashboardFinanceExpensesExpenseIdRoute,
+    AuthenticatedDashboardFinanceExpensesExpenseIdRouteWithChildren,
   AuthenticatedDashboardFinanceExpensesNewRoute:
     AuthenticatedDashboardFinanceExpensesNewRoute,
   AuthenticatedDashboardFinanceInvoicesInvoiceIdRoute:
-    AuthenticatedDashboardFinanceInvoicesInvoiceIdRoute,
+    AuthenticatedDashboardFinanceInvoicesInvoiceIdRouteWithChildren,
   AuthenticatedDashboardFinanceInvoicesNewRoute:
     AuthenticatedDashboardFinanceInvoicesNewRoute,
   AuthenticatedDashboardFinancePaymentsPaymentIdRoute:
@@ -2520,16 +2879,28 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
     AuthenticatedDashboardFinanceQuotesQuoteIdRoute,
   AuthenticatedDashboardFinanceQuotesNewRoute:
     AuthenticatedDashboardFinanceQuotesNewRoute,
+  AuthenticatedDashboardFinanceReportsAccountsAgingRoute:
+    AuthenticatedDashboardFinanceReportsAccountsAgingRoute,
+  AuthenticatedDashboardFinanceReportsOutstandingInvoicesRoute:
+    AuthenticatedDashboardFinanceReportsOutstandingInvoicesRoute,
+  AuthenticatedDashboardFinanceReportsRevenueByClientRoute:
+    AuthenticatedDashboardFinanceReportsRevenueByClientRoute,
+  AuthenticatedDashboardFinanceReportsTimeEntriesRoute:
+    AuthenticatedDashboardFinanceReportsTimeEntriesRoute,
   AuthenticatedDashboardFinanceStatementsStatementIdRoute:
-    AuthenticatedDashboardFinanceStatementsStatementIdRoute,
+    AuthenticatedDashboardFinanceStatementsStatementIdRouteWithChildren,
   AuthenticatedDashboardFinanceStatementsNewRoute:
     AuthenticatedDashboardFinanceStatementsNewRoute,
   AuthenticatedDashboardFinanceTimeTrackingEntryIdRoute:
-    AuthenticatedDashboardFinanceTimeTrackingEntryIdRoute,
+    AuthenticatedDashboardFinanceTimeTrackingEntryIdRouteWithChildren,
+  AuthenticatedDashboardFinanceTimeTrackingMonthlyRoute:
+    AuthenticatedDashboardFinanceTimeTrackingMonthlyRoute,
   AuthenticatedDashboardFinanceTimeTrackingNewRoute:
     AuthenticatedDashboardFinanceTimeTrackingNewRoute,
+  AuthenticatedDashboardFinanceTimeTrackingWeeklyRoute:
+    AuthenticatedDashboardFinanceTimeTrackingWeeklyRoute,
   AuthenticatedDashboardFinanceTransactionsTransactionIdRoute:
-    AuthenticatedDashboardFinanceTransactionsTransactionIdRoute,
+    AuthenticatedDashboardFinanceTransactionsTransactionIdRouteWithChildren,
   AuthenticatedDashboardFinanceTransactionsNewRoute:
     AuthenticatedDashboardFinanceTransactionsNewRoute,
   AuthenticatedDashboardTasksEventsEventIdRoute:
@@ -2550,6 +2921,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
     AuthenticatedDashboardFinancePaymentsIndexRoute,
   AuthenticatedDashboardFinanceQuotesIndexRoute:
     AuthenticatedDashboardFinanceQuotesIndexRoute,
+  AuthenticatedDashboardFinanceReportsIndexRoute:
+    AuthenticatedDashboardFinanceReportsIndexRoute,
   AuthenticatedDashboardFinanceStatementsIndexRoute:
     AuthenticatedDashboardFinanceStatementsIndexRoute,
   AuthenticatedDashboardFinanceTimeTrackingIndexRoute:

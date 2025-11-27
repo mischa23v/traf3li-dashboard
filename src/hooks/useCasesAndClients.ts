@@ -753,3 +753,22 @@ export const useCaseAuditHistory = (caseId: string) => {
     staleTime: 1 * 60 * 1000,
   })
 }
+
+/**
+ * Combined hook for fetching cases and clients together
+ * Useful for dropdowns and filters that need both data sources
+ */
+export const useCasesAndClients = () => {
+  const casesQuery = useCases()
+  const clientsQuery = useClients()
+
+  return {
+    data: {
+      cases: casesQuery.data?.data || [],
+      clients: clientsQuery.data?.data || [],
+    },
+    isLoading: casesQuery.isLoading || clientsQuery.isLoading,
+    isError: casesQuery.isError || clientsQuery.isError,
+    error: casesQuery.error || clientsQuery.error,
+  }
+}
