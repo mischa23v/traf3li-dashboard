@@ -365,7 +365,7 @@ export function CreateEventView() {
 
     return (
         <>
-            <Header className="bg-navy shadow-none relative">
+            <Header className="bg-emerald-950 shadow-none relative">
                 <TopNav links={topNav} className="[&>a]:text-slate-300 [&>a:hover]:text-white [&>a[aria-current='page']]:text-white" />
                 <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
                     <DynamicIsland />
@@ -382,7 +382,7 @@ export function CreateEventView() {
                     <div className="lg:col-span-2 space-y-8">
 
                         {/* HERO CARD */}
-                        <div className="bg-navy rounded-3xl p-8 relative overflow-hidden text-white shadow-xl shadow-navy/20 flex flex-col md:flex-row items-center justify-between gap-8">
+                        <div className="bg-emerald-950 rounded-3xl p-8 relative overflow-hidden text-white shadow-xl shadow-navy/20 flex flex-col md:flex-row items-center justify-between gap-8">
                             <div className="relative z-10 max-w-lg">
                                 <div className="flex items-center gap-4 mb-4">
                                     <Link to="/dashboard/tasks/events">
@@ -399,10 +399,10 @@ export function CreateEventView() {
                             {/* Abstract Visual Decoration */}
                             <div className="hidden md:block relative w-64 h-64">
                                 <div className="absolute inset-0 bg-gradient-to-tr from-blue-500 to-purple-500 rounded-full opacity-20 blur-3xl animate-pulse"></div>
-                                <div className="absolute inset-4 bg-navy rounded-2xl border border-white/10 flex items-center justify-center transform rotate-6 shadow-2xl">
+                                <div className="absolute inset-4 bg-emerald-950 rounded-2xl border border-white/10 flex items-center justify-center transform rotate-6 shadow-2xl">
                                     <Calendar className="h-24 w-24 text-blue-400" />
                                 </div>
-                                <div className="absolute inset-4 bg-navy/80 rounded-2xl border border-white/10 flex items-center justify-center transform -rotate-6 backdrop-blur-sm">
+                                <div className="absolute inset-4 bg-emerald-950/80 rounded-2xl border border-white/10 flex items-center justify-center transform -rotate-6 backdrop-blur-sm">
                                     <MapPin className="h-24 w-24 text-purple-400" />
                                 </div>
                             </div>
@@ -1150,7 +1150,7 @@ export function CreateEventView() {
                                 {/* Submit */}
                                 <div className="flex items-center justify-end gap-4 pt-6 border-t border-slate-100">
                                     <Link to="/dashboard/tasks/events">
-                                        <Button type="button" variant="ghost" className="text-slate-500 hover:text-navy">
+                                        <Button type="button" variant="ghost" className="text-slate-500 hover:text-slate-800">
                                             إلغاء
                                         </Button>
                                     </Link>

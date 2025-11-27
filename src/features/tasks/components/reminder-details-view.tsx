@@ -145,7 +145,7 @@ export function ReminderDetailsView() {
 
     return (
         <>
-            <Header className="bg-navy shadow-none relative">
+            <Header className="bg-emerald-950 shadow-none relative">
                 <TopNav links={topNav} className="[&>a]:text-slate-300 [&>a:hover]:text-white [&>a[aria-current='page']]:text-white" />
 
                 {/* Dynamic Island - Centered */}
@@ -160,7 +160,7 @@ export function ReminderDetailsView() {
                     </div>
                     <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white">
                         <Bell className="h-5 w-5" />
-                        <span className="absolute top-2 right-2 h-2 w-2 bg-red-500 rounded-full border border-navy"></span>
+                        <span className="absolute top-2 right-2 h-2 w-2 bg-red-500 rounded-full border border-emerald-950"></span>
                     </Button>
                     <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white" />
                     <ThemeSwitch className="text-slate-300 hover:bg-white/10 hover:text-white" />
@@ -175,7 +175,7 @@ export function ReminderDetailsView() {
 
                 {/* Breadcrumb / Back Link */}
                 <div className="max-w-[1600px] mx-auto mb-6">
-                    <Link to="/dashboard/tasks/reminders" className="inline-flex items-center text-slate-500 hover:text-navy transition-colors">
+                    <Link to="/dashboard/tasks/reminders" className="inline-flex items-center text-slate-500 hover:text-slate-800 transition-colors">
                         <ArrowLeft className="h-4 w-4 ml-2" />
                         العودة إلى التذكيرات
                     </Link>
@@ -227,7 +227,7 @@ export function ReminderDetailsView() {
                             <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-slate-100 mb-4">
                                 <Bell className="h-8 w-8 text-slate-400" />
                             </div>
-                            <h4 className="text-lg font-bold text-navy mb-2">لم يتم العثور على التذكير</h4>
+                            <h4 className="text-lg font-bold text-slate-800 mb-2">لم يتم العثور على التذكير</h4>
                             <p className="text-slate-500 mb-4">التذكير المطلوب غير موجود أو تم حذفه</p>
                             <Button asChild className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl">
                                 <Link to="/dashboard/tasks/reminders">
@@ -395,7 +395,7 @@ export function ReminderDetailsView() {
                             {/* Timeline Card */}
                             <Card className="border border-slate-100 shadow-sm rounded-2xl overflow-hidden">
                                 <CardHeader className="bg-white border-b border-slate-50 pb-4">
-                                    <CardTitle className="text-lg font-bold text-navy flex items-center gap-2">
+                                    <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
                                         <History className="h-5 w-5 text-brand-blue" />
                                         الجدول الزمني
                                     </CardTitle>
@@ -413,7 +413,7 @@ export function ReminderDetailsView() {
                                                                 event.status === 'upcoming' ? 'bg-amber-500' : 'bg-slate-300'}
                                                         `}></div>
                                                         <div className="flex-1">
-                                                            <div className="text-sm font-bold text-navy">{event.title}</div>
+                                                            <div className="text-sm font-bold text-slate-800">{event.title}</div>
                                                             <div className="text-xs text-slate-500 mb-1">{event.date}</div>
                                                         </div>
                                                     </div>
@@ -427,7 +427,7 @@ export function ReminderDetailsView() {
                             {/* Related To Card */}
                             <Card className="border border-slate-100 shadow-sm rounded-2xl">
                                 <CardHeader className="pb-3">
-                                    <CardTitle className="text-base font-bold text-navy">مرتبط بـ</CardTitle>
+                                    <CardTitle className="text-base font-bold text-slate-800">مرتبط بـ</CardTitle>
                                 </CardHeader>
                                 <CardContent className="space-y-4">
                                     <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-xl border border-slate-100">
@@ -435,7 +435,7 @@ export function ReminderDetailsView() {
                                             <Briefcase className="h-5 w-5" />
                                         </div>
                                         <div>
-                                            <div className="text-sm font-bold text-navy line-clamp-1" title={reminder.relatedTo?.title}>{reminder.relatedTo?.title}</div>
+                                            <div className="text-sm font-bold text-slate-800 line-clamp-1" title={reminder.relatedTo?.title}>{reminder.relatedTo?.title}</div>
                                             <div className="text-xs text-slate-500 font-medium">{reminder.relatedTo?.id}</div>
                                         </div>
                                     </div>
@@ -462,7 +462,7 @@ export function ReminderDetailsView() {
                                         <TabsContent value="overview" className="mt-0 space-y-6">
                                             <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
                                                 <CardHeader>
-                                                    <CardTitle className="text-lg font-bold text-navy">وصف التذكير</CardTitle>
+                                                    <CardTitle className="text-lg font-bold text-slate-800">وصف التذكير</CardTitle>
                                                 </CardHeader>
                                                 <CardContent>
                                                     <p className="text-slate-600 leading-relaxed">
@@ -477,7 +477,7 @@ export function ReminderDetailsView() {
                                                 <CardContent className="p-6">
                                                     <div className="flex gap-3">
                                                         <Avatar className="w-10 h-10">
-                                                            <AvatarFallback className="bg-navy text-white">أنا</AvatarFallback>
+                                                            <AvatarFallback className="bg-emerald-950 text-white">أنا</AvatarFallback>
                                                         </Avatar>
                                                         <div className="flex-1 relative">
                                                             <Textarea placeholder="أضف ملاحظة..." className="min-h-[80px] rounded-xl resize-none pr-12 bg-slate-50 border-slate-200 focus:border-brand-blue" />

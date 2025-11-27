@@ -157,7 +157,7 @@ export function WeeklyTimeEntriesView() {
     if (isLoading) {
         return (
             <>
-                <Header className="bg-navy shadow-none relative">
+                <Header className="bg-emerald-950 shadow-none relative">
                     <TopNav links={topNav} className="[&>a]:text-slate-300 [&>a:hover]:text-white [&>a[aria-current='page']]:text-white" />
                     <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
                         <DynamicIsland />
@@ -176,7 +176,7 @@ export function WeeklyTimeEntriesView() {
     if (isError) {
         return (
             <>
-                <Header className="bg-navy shadow-none relative">
+                <Header className="bg-emerald-950 shadow-none relative">
                     <TopNav links={topNav} className="[&>a]:text-slate-300 [&>a:hover]:text-white [&>a[aria-current='page']]:text-white" />
                     <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
                         <DynamicIsland />
@@ -201,7 +201,7 @@ export function WeeklyTimeEntriesView() {
 
     return (
         <>
-            <Header className="bg-navy shadow-none relative">
+            <Header className="bg-emerald-950 shadow-none relative">
                 <TopNav links={topNav} className="[&>a]:text-slate-300 [&>a:hover]:text-white [&>a[aria-current='page']]:text-white" />
                 <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
                     <DynamicIsland />
@@ -263,7 +263,7 @@ export function WeeklyTimeEntriesView() {
                                 هذا الأسبوع
                             </Button>
                         </div>
-                        <div className="text-lg font-bold text-navy">
+                        <div className="text-lg font-bold text-slate-800">
                             {formatDate(weekDates[0], 'full')} - {formatDate(weekDates[6], 'full')}
                         </div>
                         <div className="flex items-center gap-2">
@@ -291,7 +291,7 @@ export function WeeklyTimeEntriesView() {
                                         <div className={`text-sm font-bold ${isToday(date) ? 'text-purple-600' : 'text-slate-600'}`}>
                                             {formatDate(date, 'day')}
                                         </div>
-                                        <div className={`text-xl font-bold ${isToday(date) ? 'text-purple-600' : 'text-navy'}`}>
+                                        <div className={`text-xl font-bold ${isToday(date) ? 'text-purple-600' : 'text-slate-800'}`}>
                                             {formatDate(date, 'short')}
                                         </div>
                                     </div>
@@ -318,7 +318,7 @@ export function WeeklyTimeEntriesView() {
                                     {projects.map((project) => (
                                         <div key={project.id} className="grid grid-cols-8 border-b border-slate-100 hover:bg-slate-50/50">
                                             <div className="p-4 border-l border-slate-100">
-                                                <div className="font-medium text-navy truncate">{project.name}</div>
+                                                <div className="font-medium text-slate-800 truncate">{project.name}</div>
                                                 <div className="text-sm text-slate-500 truncate">{project.client}</div>
                                             </div>
                                             {weekDates.map((date, idx) => {
@@ -346,7 +346,7 @@ export function WeeklyTimeEntriesView() {
 
                                     {/* Totals Row */}
                                     <div className="grid grid-cols-8 bg-slate-50">
-                                        <div className="p-4 border-l border-slate-100 font-bold text-navy">
+                                        <div className="p-4 border-l border-slate-100 font-bold text-slate-800">
                                             الإجمالي اليومي
                                         </div>
                                         {weekDates.map((date, idx) => {
@@ -358,7 +358,7 @@ export function WeeklyTimeEntriesView() {
                                                     key={idx}
                                                     className={`p-4 border-l border-slate-100 text-center ${isToday(date) ? 'bg-purple-100/50' : ''}`}
                                                 >
-                                                    <div className="font-bold text-navy text-lg">
+                                                    <div className="font-bold text-slate-800 text-lg">
                                                         {formatMinutesToTime(total)}
                                                     </div>
                                                 </div>
@@ -377,7 +377,7 @@ export function WeeklyTimeEntriesView() {
                                 <div className="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center mx-auto mb-3">
                                     <Clock className="w-6 h-6 text-purple-600" />
                                 </div>
-                                <div className="text-3xl font-bold text-navy mb-1">
+                                <div className="text-3xl font-bold text-slate-800 mb-1">
                                     {formatMinutesToTime(weeklyTotal)}
                                 </div>
                                 <div className="text-sm text-slate-500">إجمالي ساعات الأسبوع</div>
@@ -389,7 +389,7 @@ export function WeeklyTimeEntriesView() {
                                 <div className="w-12 h-12 rounded-full bg-emerald-100 flex items-center justify-center mx-auto mb-3">
                                     <Calendar className="w-6 h-6 text-emerald-600" />
                                 </div>
-                                <div className="text-3xl font-bold text-navy mb-1">
+                                <div className="text-3xl font-bold text-slate-800 mb-1">
                                     {projects.length}
                                 </div>
                                 <div className="text-sm text-slate-500">مشروع نشط</div>
@@ -401,7 +401,7 @@ export function WeeklyTimeEntriesView() {
                                 <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center mx-auto mb-3">
                                     <Clock className="w-6 h-6 text-blue-600" />
                                 </div>
-                                <div className="text-3xl font-bold text-navy mb-1">
+                                <div className="text-3xl font-bold text-slate-800 mb-1">
                                     {weeklyTotal > 0 ? Math.round((weeklyTotal / 60) / 7 * 10) / 10 : 0}
                                 </div>
                                 <div className="text-sm text-slate-500">متوسط الساعات اليومي</div>

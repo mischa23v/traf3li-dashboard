@@ -61,7 +61,7 @@ export default function PaymentDetailsView() {
     if (isLoading) {
         return (
             <>
-                <Header className="bg-navy shadow-none relative">
+                <Header className="bg-emerald-950 shadow-none relative">
                     <TopNav links={topNav} className="[&>a]:text-slate-300" />
                     <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
                         <DynamicIsland />
@@ -86,7 +86,7 @@ export default function PaymentDetailsView() {
     if (isError || !payment) {
         return (
             <>
-                <Header className="bg-navy shadow-none relative">
+                <Header className="bg-emerald-950 shadow-none relative">
                     <TopNav links={topNav} className="[&>a]:text-slate-300" />
                     <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
                         <DynamicIsland />
@@ -107,7 +107,7 @@ export default function PaymentDetailsView() {
                         </Button>
                         <Card className="border-0 shadow-sm rounded-3xl p-12 text-center">
                             <AlertCircle className="h-16 w-16 text-rose-400 mx-auto mb-4" />
-                            <h3 className="text-xl font-bold text-navy mb-2">فشل تحميل الدفعة</h3>
+                            <h3 className="text-xl font-bold text-slate-800 mb-2">فشل تحميل الدفعة</h3>
                             <p className="text-slate-500">{error?.message || 'الدفعة غير موجودة'}</p>
                         </Card>
                     </div>
@@ -121,7 +121,7 @@ export default function PaymentDetailsView() {
 
     return (
         <>
-            <Header className="bg-navy shadow-none relative">
+            <Header className="bg-emerald-950 shadow-none relative">
                 <TopNav links={topNav} className="[&>a]:text-slate-300 [&>a:hover]:text-white [&>a[aria-current='page']]:text-white" />
                 <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
                     <DynamicIsland />
@@ -137,7 +137,7 @@ export default function PaymentDetailsView() {
                 <div className="max-w-4xl mx-auto">
                     {/* Back Button & Actions */}
                     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-                        <Button asChild variant="ghost" className="text-slate-600 hover:text-navy">
+                        <Button asChild variant="ghost" className="text-slate-600 hover:text-slate-800">
                             <Link to="/dashboard/finance/payments">
                                 <ArrowRight className="h-4 w-4 ml-2" />
                                 العودة للمدفوعات
@@ -189,7 +189,7 @@ export default function PaymentDetailsView() {
                             {/* Payment Details */}
                             <Card className="border-0 shadow-sm rounded-3xl">
                                 <CardHeader className="border-b border-slate-100">
-                                    <CardTitle className="text-lg font-bold text-navy flex items-center gap-2">
+                                    <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
                                         <CreditCard className="h-5 w-5 text-brand-blue" />
                                         تفاصيل الدفعة
                                     </CardTitle>
@@ -198,11 +198,11 @@ export default function PaymentDetailsView() {
                                     <div className="grid grid-cols-2 gap-6">
                                         <div>
                                             <p className="text-sm text-slate-500 mb-1">رقم الدفعة</p>
-                                            <p className="font-medium text-navy">{payment.paymentNumber}</p>
+                                            <p className="font-medium text-slate-800">{payment.paymentNumber}</p>
                                         </div>
                                         <div>
                                             <p className="text-sm text-slate-500 mb-1">طريقة الدفع</p>
-                                            <p className="font-medium text-navy">{payment.paymentMethod || 'تحويل بنكي'}</p>
+                                            <p className="font-medium text-slate-800">{payment.paymentMethod || 'تحويل بنكي'}</p>
                                         </div>
                                         <div>
                                             <p className="text-sm text-slate-500 mb-1">المبلغ</p>
@@ -212,12 +212,12 @@ export default function PaymentDetailsView() {
                                         </div>
                                         <div>
                                             <p className="text-sm text-slate-500 mb-1">العملة</p>
-                                            <p className="font-medium text-navy">{payment.currency}</p>
+                                            <p className="font-medium text-slate-800">{payment.currency}</p>
                                         </div>
                                         {payment.transactionId && (
                                             <div className="col-span-2">
                                                 <p className="text-sm text-slate-500 mb-1">رقم المعاملة</p>
-                                                <p className="font-medium text-navy font-mono">{payment.transactionId}</p>
+                                                <p className="font-medium text-slate-800 font-mono">{payment.transactionId}</p>
                                             </div>
                                         )}
                                     </div>
@@ -227,7 +227,7 @@ export default function PaymentDetailsView() {
                             {/* Client Info */}
                             <Card className="border-0 shadow-sm rounded-3xl">
                                 <CardHeader className="border-b border-slate-100">
-                                    <CardTitle className="text-lg font-bold text-navy flex items-center gap-2">
+                                    <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
                                         <User className="h-5 w-5 text-brand-blue" />
                                         معلومات العميل
                                     </CardTitle>
@@ -236,7 +236,7 @@ export default function PaymentDetailsView() {
                                     <div className="grid grid-cols-2 gap-4">
                                         <div>
                                             <p className="text-sm text-slate-500 mb-1">اسم العميل</p>
-                                            <p className="font-medium text-navy">
+                                            <p className="font-medium text-slate-800">
                                                 {typeof payment.clientId === 'object'
                                                     ? `${payment.clientId.firstName || ''} ${payment.clientId.lastName || ''}`.trim()
                                                     : 'غير محدد'}
@@ -250,7 +250,7 @@ export default function PaymentDetailsView() {
                             {payment.notes && (
                                 <Card className="border-0 shadow-sm rounded-3xl">
                                     <CardHeader className="border-b border-slate-100">
-                                        <CardTitle className="text-lg font-bold text-navy">ملاحظات</CardTitle>
+                                        <CardTitle className="text-lg font-bold text-slate-800">ملاحظات</CardTitle>
                                     </CardHeader>
                                     <CardContent className="p-6">
                                         <p className="text-slate-600 whitespace-pre-wrap">{payment.notes}</p>
@@ -265,7 +265,7 @@ export default function PaymentDetailsView() {
                             {payment.invoiceId && (
                                 <Card className="border-0 shadow-sm rounded-3xl">
                                     <CardHeader className="border-b border-slate-100">
-                                        <CardTitle className="text-lg font-bold text-navy flex items-center gap-2">
+                                        <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
                                             <FileText className="h-5 w-5 text-brand-blue" />
                                             الفاتورة المرتبطة
                                         </CardTitle>
@@ -277,7 +277,7 @@ export default function PaymentDetailsView() {
                                             className="flex items-center justify-between p-4 bg-slate-50 rounded-xl hover:bg-slate-100 transition-colors"
                                         >
                                             <div>
-                                                <p className="font-medium text-navy">فاتورة</p>
+                                                <p className="font-medium text-slate-800">فاتورة</p>
                                                 <p className="text-sm text-slate-500">عرض الفاتورة</p>
                                             </div>
                                             <ArrowRight className="h-5 w-5 text-slate-400 rotate-180" />
@@ -289,7 +289,7 @@ export default function PaymentDetailsView() {
                             {/* Dates */}
                             <Card className="border-0 shadow-sm rounded-3xl">
                                 <CardHeader className="border-b border-slate-100">
-                                    <CardTitle className="text-lg font-bold text-navy flex items-center gap-2">
+                                    <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
                                         <Calendar className="h-5 w-5 text-brand-blue" />
                                         التواريخ
                                     </CardTitle>
@@ -297,11 +297,11 @@ export default function PaymentDetailsView() {
                                 <CardContent className="p-6 space-y-4">
                                     <div>
                                         <p className="text-sm text-slate-500 mb-1">تاريخ الدفع</p>
-                                        <p className="font-medium text-navy">{formatDate(payment.paymentDate)}</p>
+                                        <p className="font-medium text-slate-800">{formatDate(payment.paymentDate)}</p>
                                     </div>
                                     <div>
                                         <p className="text-sm text-slate-500 mb-1">تاريخ الإنشاء</p>
-                                        <p className="font-medium text-navy">{formatDate(payment.createdAt)}</p>
+                                        <p className="font-medium text-slate-800">{formatDate(payment.createdAt)}</p>
                                     </div>
                                 </CardContent>
                             </Card>
@@ -309,7 +309,7 @@ export default function PaymentDetailsView() {
                             {/* Quick Actions */}
                             <Card className="border-0 shadow-sm rounded-3xl">
                                 <CardHeader className="border-b border-slate-100">
-                                    <CardTitle className="text-lg font-bold text-navy">إجراءات سريعة</CardTitle>
+                                    <CardTitle className="text-lg font-bold text-slate-800">إجراءات سريعة</CardTitle>
                                 </CardHeader>
                                 <CardContent className="p-6 space-y-3">
                                     <Button variant="outline" className="w-full justify-start">

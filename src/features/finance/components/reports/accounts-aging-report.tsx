@@ -94,7 +94,7 @@ export function AccountsAgingReport() {
     if (isLoading) {
         return (
             <>
-                <Header className="bg-navy shadow-none relative">
+                <Header className="bg-emerald-950 shadow-none relative">
                     <TopNav links={topNav} className="[&>a]:text-slate-300 [&>a:hover]:text-white [&>a[aria-current='page']]:text-white" />
                     <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
                         <DynamicIsland />
@@ -118,7 +118,7 @@ export function AccountsAgingReport() {
     if (isError) {
         return (
             <>
-                <Header className="bg-navy shadow-none relative">
+                <Header className="bg-emerald-950 shadow-none relative">
                     <TopNav links={topNav} className="[&>a]:text-slate-300 [&>a:hover]:text-white [&>a[aria-current='page']]:text-white" />
                     <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
                         <DynamicIsland />
@@ -198,7 +198,7 @@ export function AccountsAgingReport() {
 
     return (
         <>
-            <Header className="bg-navy shadow-none relative">
+            <Header className="bg-emerald-950 shadow-none relative">
                 <TopNav links={topNav} className="[&>a]:text-slate-300 [&>a:hover]:text-white [&>a[aria-current='page']]:text-white" />
                 <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
                     <DynamicIsland />
@@ -285,7 +285,7 @@ export function AccountsAgingReport() {
                                     </div>
                                     <span className="text-sm text-slate-500">إجمالي المستحقات</span>
                                 </div>
-                                <div className="text-2xl font-bold text-navy">{formatCurrency(mockSummary.totalOutstanding)}</div>
+                                <div className="text-2xl font-bold text-slate-800">{formatCurrency(mockSummary.totalOutstanding)}</div>
                             </CardContent>
                         </Card>
 
@@ -346,7 +346,7 @@ export function AccountsAgingReport() {
                     <Card className="border-0 shadow-sm rounded-3xl">
                         <CardHeader className="border-b border-slate-100 pb-4">
                             <div className="flex items-center justify-between">
-                                <CardTitle className="text-xl font-bold text-navy flex items-center gap-2">
+                                <CardTitle className="text-xl font-bold text-slate-800 flex items-center gap-2">
                                     <Users className="w-5 h-5 text-amber-500" />
                                     تفاصيل العملاء
                                 </CardTitle>
@@ -384,7 +384,7 @@ export function AccountsAgingReport() {
                                                                 <ChevronDown className="w-4 h-4 text-slate-400" />
                                                             )}
                                                         </TableCell>
-                                                        <TableCell className="font-medium text-navy">{client.clientName}</TableCell>
+                                                        <TableCell className="font-medium text-slate-800">{client.clientName}</TableCell>
                                                         <TableCell className="text-center">
                                                             <span className={client.zeroToThirtyDays > 0 ? 'text-emerald-600 font-medium' : 'text-slate-400'}>
                                                                 {formatCurrency(client.zeroToThirtyDays)}
@@ -405,7 +405,7 @@ export function AccountsAgingReport() {
                                                                 {formatCurrency(client.ninetyPlusDays)}
                                                             </span>
                                                         </TableCell>
-                                                        <TableCell className="text-left font-bold text-navy">{formatCurrency(client.total)}</TableCell>
+                                                        <TableCell className="text-left font-bold text-slate-800">{formatCurrency(client.total)}</TableCell>
                                                     </TableRow>
                                                 </CollapsibleTrigger>
                                                 <CollapsibleContent asChild>
@@ -418,7 +418,7 @@ export function AccountsAgingReport() {
                                                                         <div key={invoice.invoiceNumber} className="flex items-center justify-between bg-white p-3 rounded-xl border border-slate-100">
                                                                             <div className="flex items-center gap-3">
                                                                                 <FileText className="w-4 h-4 text-slate-400" />
-                                                                                <span className="font-medium text-navy">{invoice.invoiceNumber}</span>
+                                                                                <span className="font-medium text-slate-800">{invoice.invoiceNumber}</span>
                                                                             </div>
                                                                             <div className="flex items-center gap-6">
                                                                                 <span className="text-sm text-slate-500">
@@ -433,7 +433,7 @@ export function AccountsAgingReport() {
                                                                                 `}>
                                                                                     متأخر {invoice.daysOverdue} يوم
                                                                                 </Badge>
-                                                                                <span className="font-bold text-navy">{formatCurrency(invoice.amount)}</span>
+                                                                                <span className="font-bold text-slate-800">{formatCurrency(invoice.amount)}</span>
                                                                             </div>
                                                                         </div>
                                                                     ))}

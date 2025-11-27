@@ -134,7 +134,7 @@ export function TaskDetailsView() {
 
     return (
         <>
-            <Header className="bg-navy shadow-none relative">
+            <Header className="bg-emerald-950 shadow-none relative">
                 <TopNav links={topNav} className="[&>a]:text-slate-300 [&>a:hover]:text-white [&>a[aria-current='page']]:text-white" />
 
                 {/* Dynamic Island - Centered */}
@@ -149,7 +149,7 @@ export function TaskDetailsView() {
                     </div>
                     <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white">
                         <Bell className="h-5 w-5" />
-                        <span className="absolute top-2 right-2 h-2 w-2 bg-red-500 rounded-full border border-navy"></span>
+                        <span className="absolute top-2 right-2 h-2 w-2 bg-red-500 rounded-full border border-emerald-950"></span>
                     </Button>
                     <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white" />
                     <ThemeSwitch className="text-slate-300 hover:bg-white/10 hover:text-white" />
@@ -164,7 +164,7 @@ export function TaskDetailsView() {
 
                 {/* Breadcrumb / Back Link */}
                 <div className="max-w-[1600px] mx-auto mb-6">
-                    <Link to="/dashboard/tasks/list" className="inline-flex items-center text-slate-500 hover:text-navy transition-colors">
+                    <Link to="/dashboard/tasks/list" className="inline-flex items-center text-slate-500 hover:text-slate-800 transition-colors">
                         <ArrowLeft className="h-4 w-4 ml-2" />
                         العودة إلى قائمة المهام
                     </Link>
@@ -352,8 +352,8 @@ export function TaskDetailsView() {
                             {/* Timeline Card */}
                             <Card className="border border-slate-100 shadow-sm rounded-2xl overflow-hidden">
                                 <CardHeader className="bg-white border-b border-slate-50 pb-4">
-                                    <CardTitle className="text-lg font-bold text-navy flex items-center gap-2">
-                                        <History className="h-5 w-5 text-brand-blue" />
+                                    <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
+                                        <History className="h-5 w-5 text-emerald-600" />
                                         الجدول الزمني
                                     </CardTitle>
                                 </CardHeader>
@@ -372,7 +372,7 @@ export function TaskDetailsView() {
                                                                 event.status === 'upcoming' ? 'bg-amber-500' : 'bg-slate-300'}
                                                         `}></div>
                                                         <div className="flex-1">
-                                                            <div className="text-sm font-bold text-navy">{event.title}</div>
+                                                            <div className="text-sm font-bold text-slate-800">{event.title}</div>
                                                             <div className="text-xs text-slate-500 mb-1">{event.date}</div>
                                                         </div>
                                                     </div>
@@ -386,7 +386,7 @@ export function TaskDetailsView() {
                             {/* Assignee Card */}
                             <Card className="border border-slate-100 shadow-sm rounded-2xl">
                                 <CardHeader className="pb-3">
-                                    <CardTitle className="text-base font-bold text-navy">فريق العمل</CardTitle>
+                                    <CardTitle className="text-base font-bold text-slate-800">فريق العمل</CardTitle>
                                 </CardHeader>
                                 <CardContent className="space-y-4">
                                     <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-xl border border-slate-100">
@@ -395,7 +395,7 @@ export function TaskDetailsView() {
                                             <AvatarFallback className="bg-brand-blue text-white">AS</AvatarFallback>
                                         </Avatar>
                                         <div>
-                                            <div className="text-sm font-bold text-navy">{task.assignee.name}</div>
+                                            <div className="text-sm font-bold text-slate-800">{task.assignee.name}</div>
                                             <div className="text-xs text-slate-500 font-medium">{task.assignee.role}</div>
                                         </div>
                                     </div>
@@ -416,7 +416,7 @@ export function TaskDetailsView() {
                                                     className="
                                                         data-[state=active]:bg-transparent data-[state=active]:shadow-none 
                                                         data-[state=active]:border-b-2 data-[state=active]:border-brand-blue 
-                                                        data-[state=active]:text-brand-blue
+                                                        data-[state=active]:text-emerald-600
                                                         text-slate-500 font-medium text-base pb-4 rounded-none px-2
                                                     "
                                                 >
@@ -432,7 +432,7 @@ export function TaskDetailsView() {
                                         <TabsContent value="overview" className="mt-0 space-y-6">
                                             <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
                                                 <CardHeader>
-                                                    <CardTitle className="text-lg font-bold text-navy">وصف المهمة</CardTitle>
+                                                    <CardTitle className="text-lg font-bold text-slate-800">وصف المهمة</CardTitle>
                                                 </CardHeader>
                                                 <CardContent>
                                                     <p className="text-slate-600 leading-relaxed">
@@ -444,7 +444,7 @@ export function TaskDetailsView() {
                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                                 <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
                                                     <CardHeader className="pb-3">
-                                                        <CardTitle className="text-base font-bold text-navy flex items-center gap-2">
+                                                        <CardTitle className="text-base font-bold text-slate-800 flex items-center gap-2">
                                                             <Briefcase className="w-4 h-4 text-blue-600" />
                                                             تفاصيل القضية
                                                         </CardTitle>
@@ -471,7 +471,7 @@ export function TaskDetailsView() {
 
                                                 <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
                                                     <CardHeader className="pb-3">
-                                                        <CardTitle className="text-base font-bold text-navy flex items-center gap-2">
+                                                        <CardTitle className="text-base font-bold text-slate-800 flex items-center gap-2">
                                                             <User className="w-4 h-4 text-amber-600" />
                                                             بيانات العميل
                                                         </CardTitle>
@@ -506,12 +506,12 @@ export function TaskDetailsView() {
                                                             <div className={`w-5 h-5 rounded-md border flex items-center justify-center cursor-pointer ${subtask.completed ? 'bg-brand-blue border-brand-blue text-white' : 'border-slate-300'}`}>
                                                                 {subtask.completed && <CheckSquare className="w-3 h-3" />}
                                                             </div>
-                                                            <span className={`flex-1 font-medium ${subtask.completed ? 'text-slate-400 line-through' : 'text-navy'}`}>
+                                                            <span className={`flex-1 font-medium ${subtask.completed ? 'text-slate-400 line-through' : 'text-slate-800'}`}>
                                                                 {subtask.title}
                                                             </span>
                                                         </div>
                                                     ))}
-                                                    <Button variant="ghost" className="w-full justify-start text-slate-500 hover:text-brand-blue hover:bg-blue-50 rounded-xl">
+                                                    <Button variant="ghost" className="w-full justify-start text-slate-500 hover:text-emerald-600 hover:bg-blue-50 rounded-xl">
                                                         <Plus className="w-5 h-5 ml-2" /> إضافة مهمة فرعية
                                                     </Button>
                                                 </CardContent>
@@ -522,10 +522,10 @@ export function TaskDetailsView() {
                                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                                                 {/* Upload New Card */}
                                                 <div className="border-2 border-dashed border-slate-200 rounded-2xl flex flex-col items-center justify-center p-6 cursor-pointer hover:border-brand-blue hover:bg-blue-50 transition-all group h-[180px]">
-                                                    <div className="w-12 h-12 rounded-full bg-slate-100 group-hover:bg-blue-100 flex items-center justify-center text-slate-400 group-hover:text-brand-blue mb-3 transition-colors">
+                                                    <div className="w-12 h-12 rounded-full bg-slate-100 group-hover:bg-blue-100 flex items-center justify-center text-slate-400 group-hover:text-emerald-600 mb-3 transition-colors">
                                                         <Upload className="h-6 w-6" />
                                                     </div>
-                                                    <span className="font-bold text-slate-600 group-hover:text-brand-blue">رفع مستند جديد</span>
+                                                    <span className="font-bold text-slate-600 group-hover:text-emerald-600">رفع مستند جديد</span>
                                                     <span className="text-xs text-slate-400 mt-1">PDF, DOCX, JPG</span>
                                                 </div>
 
@@ -541,7 +541,7 @@ export function TaskDetailsView() {
                                                             </div>
                                                             <DropdownMenu>
                                                                 <DropdownMenuTrigger asChild>
-                                                                    <Button variant="ghost" size="icon" className="h-8 w-8 -ml-2 text-slate-400 hover:text-navy">
+                                                                    <Button variant="ghost" size="icon" className="h-8 w-8 -ml-2 text-slate-400 hover:text-slate-800">
                                                                         <MoreHorizontal className="h-4 w-4" />
                                                                     </Button>
                                                                 </DropdownMenuTrigger>
@@ -556,7 +556,7 @@ export function TaskDetailsView() {
                                                             </DropdownMenu>
                                                         </div>
                                                         <div>
-                                                            <h4 className="font-bold text-navy text-sm mb-1 line-clamp-1" title={doc.name}>{doc.name}</h4>
+                                                            <h4 className="font-bold text-slate-800 text-sm mb-1 line-clamp-1" title={doc.name}>{doc.name}</h4>
                                                             <div className="flex items-center gap-2 text-xs text-slate-400">
                                                                 <span>{doc.size}</span>
                                                                 <span>•</span>
@@ -565,7 +565,7 @@ export function TaskDetailsView() {
                                                         </div>
                                                         <div className="pt-3 border-t border-slate-50 flex gap-2">
                                                             <Button variant="outline" size="sm" className="flex-1 h-8 text-xs">معاينة</Button>
-                                                            <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-brand-blue">
+                                                            <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-emerald-600">
                                                                 <Download className="h-4 w-4" />
                                                             </Button>
                                                         </div>
@@ -585,7 +585,7 @@ export function TaskDetailsView() {
                                                                 </Avatar>
                                                                 <div className="flex-1 bg-slate-50 p-4 rounded-2xl rounded-tr-none">
                                                                     <div className="flex justify-between items-center mb-2">
-                                                                        <span className="font-bold text-sm text-navy">{comment.user}</span>
+                                                                        <span className="font-bold text-sm text-slate-800">{comment.user}</span>
                                                                         <span className="text-xs text-slate-400">{comment.time}</span>
                                                                     </div>
                                                                     <p className="text-sm text-slate-600">{comment.text}</p>
@@ -595,7 +595,7 @@ export function TaskDetailsView() {
                                                     </div>
                                                     <div className="flex gap-3">
                                                         <Avatar className="w-10 h-10">
-                                                            <AvatarFallback className="bg-navy text-white">أنا</AvatarFallback>
+                                                            <AvatarFallback className="bg-emerald-950 text-white">أنا</AvatarFallback>
                                                         </Avatar>
                                                         <div className="flex-1 relative">
                                                             <Textarea placeholder="اكتب تعليقاً..." className="min-h-[80px] rounded-xl resize-none pr-12 bg-slate-50 border-slate-200 focus:border-brand-blue" />

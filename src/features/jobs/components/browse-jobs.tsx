@@ -201,7 +201,7 @@ export function BrowseJobs() {
 
   return (
     <>
-      <Header className="bg-navy shadow-none relative">
+      <Header className="bg-emerald-950 shadow-none relative">
         <TopNav links={topNav} className="[&>a]:text-slate-300 [&>a:hover]:text-white [&>a[aria-current='page']]:text-white" />
         <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
           <DynamicIsland />
@@ -219,7 +219,7 @@ export function BrowseJobs() {
         <div className="space-y-6">
           {/* Page Header */}
           <div>
-            <h1 className="text-2xl font-bold text-navy">
+            <h1 className="text-2xl font-bold text-slate-800">
               {isRTL ? 'تصفح الوظائف' : 'Browse Jobs'}
             </h1>
             <p className="text-slate-500 mt-1">
@@ -315,7 +315,7 @@ export function BrowseJobs() {
                       <div className="flex items-start justify-between gap-4">
                         <div>
                           <div className="flex items-center gap-2 flex-wrap">
-                            <h3 className="font-bold text-lg text-navy group-hover:text-emerald-600 transition-colors">
+                            <h3 className="font-bold text-lg text-slate-800 group-hover:text-emerald-600 transition-colors">
                               {isRTL ? job.title : job.titleEn}
                             </h3>
                             {job.urgent && (
@@ -405,7 +405,7 @@ export function BrowseJobs() {
               <Button variant="outline" size="icon" disabled>
                 {isRTL ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
               </Button>
-              <Button variant="outline" className="bg-navy text-white hover:bg-navy/90">1</Button>
+              <Button variant="outline" className="bg-emerald-950 text-white hover:bg-emerald-950/90">1</Button>
               <Button variant="outline">2</Button>
               <Button variant="outline">3</Button>
               <Button variant="outline" size="icon">

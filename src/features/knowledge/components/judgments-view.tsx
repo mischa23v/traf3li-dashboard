@@ -155,7 +155,7 @@ export function JudgmentsView() {
 
   return (
     <>
-      <Header className="bg-navy shadow-none relative">
+      <Header className="bg-emerald-950 shadow-none relative">
         <TopNav links={topNav} className="[&>a]:text-slate-300 [&>a:hover]:text-white [&>a[aria-current='page']]:text-white" />
         <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
           <DynamicIsland />
@@ -173,7 +173,7 @@ export function JudgmentsView() {
         <div className="space-y-6">
           {/* Page Header */}
           <div>
-            <h1 className="text-2xl font-bold text-navy">
+            <h1 className="text-2xl font-bold text-slate-800">
               {isRTL ? 'الأحكام القضائية' : 'Court Judgments'}
             </h1>
             <p className="text-slate-500 mt-1">
@@ -226,29 +226,29 @@ export function JudgmentsView() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <Card>
               <CardContent className="p-4 text-center">
-                <Gavel className="h-8 w-8 mx-auto text-navy mb-2" />
-                <div className="text-2xl font-bold text-navy">{mockJudgments.length}</div>
+                <Gavel className="h-8 w-8 mx-auto text-slate-800 mb-2" />
+                <div className="text-2xl font-bold text-slate-800">{mockJudgments.length}</div>
                 <div className="text-sm text-slate-500">{isRTL ? 'حكم متاح' : 'Available Judgments'}</div>
               </CardContent>
             </Card>
             <Card>
               <CardContent className="p-4 text-center">
                 <Building2 className="h-8 w-8 mx-auto text-emerald-600 mb-2" />
-                <div className="text-2xl font-bold text-navy">5</div>
+                <div className="text-2xl font-bold text-slate-800">5</div>
                 <div className="text-sm text-slate-500">{isRTL ? 'محكمة' : 'Courts'}</div>
               </CardContent>
             </Card>
             <Card>
               <CardContent className="p-4 text-center">
                 <Eye className="h-8 w-8 mx-auto text-blue-600 mb-2" />
-                <div className="text-2xl font-bold text-navy">7.8K</div>
+                <div className="text-2xl font-bold text-slate-800">7.8K</div>
                 <div className="text-sm text-slate-500">{isRTL ? 'إجمالي المشاهدات' : 'Total Views'}</div>
               </CardContent>
             </Card>
             <Card>
               <CardContent className="p-4 text-center">
                 <Download className="h-8 w-8 mx-auto text-purple-600 mb-2" />
-                <div className="text-2xl font-bold text-navy">1.9K</div>
+                <div className="text-2xl font-bold text-slate-800">1.9K</div>
                 <div className="text-sm text-slate-500">{isRTL ? 'إجمالي التحميلات' : 'Total Downloads'}</div>
               </CardContent>
             </Card>
@@ -270,7 +270,7 @@ export function JudgmentsView() {
                       <div className="flex items-start justify-between gap-4">
                         <div>
                           <div className="flex items-center gap-2 flex-wrap">
-                            <h3 className="font-bold text-lg text-navy group-hover:text-emerald-600 transition-colors">
+                            <h3 className="font-bold text-lg text-slate-800 group-hover:text-emerald-600 transition-colors">
                               {isRTL ? judgment.title : judgment.titleEn}
                             </h3>
                             {getCategoryBadge(judgment.category)}

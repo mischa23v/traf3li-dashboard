@@ -78,7 +78,7 @@ export function ReportsDashboard() {
 
     return (
         <>
-            <Header className="bg-navy shadow-none relative">
+            <Header className="bg-emerald-950 shadow-none relative">
                 <TopNav links={topNav} className="[&>a]:text-slate-300 [&>a:hover]:text-white [&>a[aria-current='page']]:text-white" />
                 <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
                     <DynamicIsland />
@@ -128,7 +128,7 @@ export function ReportsDashboard() {
                                                 {report.icon}
                                             </div>
                                             <div className="flex-1">
-                                                <h3 className="text-xl font-bold text-navy mb-2 group-hover:text-brand-blue transition-colors">
+                                                <h3 className="text-xl font-bold text-slate-800 mb-2 group-hover:text-brand-blue transition-colors">
                                                     {report.title}
                                                 </h3>
                                                 <p className="text-slate-600 text-sm leading-relaxed">
@@ -151,7 +151,7 @@ export function ReportsDashboard() {
                     {/* Quick Stats */}
                     <Card className="border-0 shadow-sm rounded-3xl bg-white">
                         <CardHeader className="border-b border-slate-100 pb-4">
-                            <CardTitle className="text-xl font-bold text-navy flex items-center gap-2">
+                            <CardTitle className="text-xl font-bold text-slate-800 flex items-center gap-2">
                                 <BarChart3 className="w-5 h-5 text-indigo-500" />
                                 ملخص سريع
                             </CardTitle>
@@ -162,28 +162,28 @@ export function ReportsDashboard() {
                                     <div className="w-12 h-12 rounded-full bg-amber-100 flex items-center justify-center mx-auto mb-3">
                                         <Clock className="w-6 h-6 text-amber-600" />
                                     </div>
-                                    <div className="text-2xl font-bold text-navy">12</div>
+                                    <div className="text-2xl font-bold text-slate-800">12</div>
                                     <div className="text-sm text-slate-500">فاتورة متأخرة</div>
                                 </div>
                                 <div className="text-center">
                                     <div className="w-12 h-12 rounded-full bg-emerald-100 flex items-center justify-center mx-auto mb-3">
                                         <TrendingUp className="w-6 h-6 text-emerald-600" />
                                     </div>
-                                    <div className="text-2xl font-bold text-navy">78%</div>
+                                    <div className="text-2xl font-bold text-slate-800">78%</div>
                                     <div className="text-sm text-slate-500">معدل التحصيل</div>
                                 </div>
                                 <div className="text-center">
                                     <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center mx-auto mb-3">
                                         <Users className="w-6 h-6 text-blue-600" />
                                     </div>
-                                    <div className="text-2xl font-bold text-navy">24</div>
+                                    <div className="text-2xl font-bold text-slate-800">24</div>
                                     <div className="text-sm text-slate-500">عميل نشط</div>
                                 </div>
                                 <div className="text-center">
                                     <div className="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center mx-auto mb-3">
                                         <Calendar className="w-6 h-6 text-purple-600" />
                                     </div>
-                                    <div className="text-2xl font-bold text-navy">156</div>
+                                    <div className="text-2xl font-bold text-slate-800">156</div>
                                     <div className="text-sm text-slate-500">ساعة هذا الشهر</div>
                                 </div>
                             </div>

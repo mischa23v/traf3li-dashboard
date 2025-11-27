@@ -31,7 +31,7 @@ export function AuthenticatedLayout({ children }: AuthenticatedLayoutProps) {
               // If layout is fixed and sidebar is inset,
               // set the height to 100svh - spacing (total margins) to prevent overflow
               'peer-data-[variant=inset]:has-data-[layout=fixed]:h-[calc(100svh-(var(--spacing)*4))]',
-              'bg-white text-[#0f172a]'
+              'bg-[#F8F9FA] text-slate-800'
             )}
           >
             {children ?? <Outlet />}

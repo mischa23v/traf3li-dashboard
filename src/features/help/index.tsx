@@ -143,7 +143,7 @@ export function HelpCenter() {
 
   return (
     <>
-      <Header className="bg-navy shadow-none relative">
+      <Header className="bg-emerald-950 shadow-none relative">
         <div className="flex-1" />
         <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
           <DynamicIsland />
@@ -164,7 +164,7 @@ export function HelpCenter() {
             <div className="inline-flex items-center justify-center h-16 w-16 bg-emerald-100 rounded-full mb-4">
               <HelpCircle className="h-8 w-8 text-emerald-600" />
             </div>
-            <h1 className="text-3xl font-bold text-navy mb-2">
+            <h1 className="text-3xl font-bold text-slate-800 mb-2">
               {isRTL ? 'مركز المساعدة' : 'Help Center'}
             </h1>
             <p className="text-slate-500 mb-6">
@@ -192,7 +192,7 @@ export function HelpCenter() {
                   )}>
                     <category.icon className="h-6 w-6" />
                   </div>
-                  <h3 className="font-bold text-navy mb-1">
+                  <h3 className="font-bold text-slate-800 mb-1">
                     {isRTL ? category.title : category.titleEn}
                   </h3>
                   <p className="text-sm text-slate-500">
@@ -219,7 +219,7 @@ export function HelpCenter() {
                 {faqs.map((faq, index) => (
                   <AccordionItem key={index} value={`item-${index}`}>
                     <AccordionTrigger className="text-start hover:no-underline">
-                      <span className="font-medium text-navy">
+                      <span className="font-medium text-slate-800">
                         {isRTL ? faq.question : faq.questionEn}
                       </span>
                     </AccordionTrigger>
@@ -234,7 +234,7 @@ export function HelpCenter() {
 
           {/* Contact Section */}
           <div>
-            <h2 className="text-xl font-bold text-navy mb-4 text-center">
+            <h2 className="text-xl font-bold text-slate-800 mb-4 text-center">
               {isRTL ? 'تواصل معنا' : 'Contact Us'}
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -246,7 +246,7 @@ export function HelpCenter() {
                         <method.icon className="h-6 w-6 text-emerald-600" />
                       </div>
                       <div className="flex-1">
-                        <h3 className="font-bold text-navy mb-1">
+                        <h3 className="font-bold text-slate-800 mb-1">
                           {isRTL ? method.title : method.titleEn}
                         </h3>
                         <p className="text-sm text-slate-500 mb-3">
@@ -271,7 +271,7 @@ export function HelpCenter() {
           </div>
 
           {/* Support Hours */}
-          <Card className="bg-navy text-white">
+          <Card className="bg-emerald-950 text-white">
             <CardContent className="p-6">
               <div className="flex flex-col md:flex-row items-center justify-between gap-4">
                 <div className="flex items-center gap-4">

@@ -97,7 +97,7 @@ export default function QuoteDetailsView() {
     if (isLoading) {
         return (
             <>
-                <Header className="bg-navy shadow-none relative">
+                <Header className="bg-emerald-950 shadow-none relative">
                     <TopNav links={topNav} className="[&>a]:text-slate-300" />
                     <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
                         <DynamicIsland />
@@ -122,7 +122,7 @@ export default function QuoteDetailsView() {
     if (isError || !quote) {
         return (
             <>
-                <Header className="bg-navy shadow-none relative">
+                <Header className="bg-emerald-950 shadow-none relative">
                     <TopNav links={topNav} className="[&>a]:text-slate-300" />
                     <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
                         <DynamicIsland />
@@ -143,7 +143,7 @@ export default function QuoteDetailsView() {
                         </Button>
                         <Card className="border-0 shadow-sm rounded-3xl p-12 text-center">
                             <AlertCircle className="h-16 w-16 text-rose-400 mx-auto mb-4" />
-                            <h3 className="text-xl font-bold text-navy mb-2">فشل تحميل عرض السعر</h3>
+                            <h3 className="text-xl font-bold text-slate-800 mb-2">فشل تحميل عرض السعر</h3>
                             <p className="text-slate-500">{error?.message || 'عرض السعر غير موجود'}</p>
                         </Card>
                     </div>
@@ -157,7 +157,7 @@ export default function QuoteDetailsView() {
 
     return (
         <>
-            <Header className="bg-navy shadow-none relative">
+            <Header className="bg-emerald-950 shadow-none relative">
                 <TopNav links={topNav} className="[&>a]:text-slate-300 [&>a:hover]:text-white [&>a[aria-current='page']]:text-white" />
                 <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
                     <DynamicIsland />
@@ -173,7 +173,7 @@ export default function QuoteDetailsView() {
                 <div className="max-w-5xl mx-auto">
                     {/* Back Button & Actions */}
                     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-                        <Button asChild variant="ghost" className="text-slate-600 hover:text-navy">
+                        <Button asChild variant="ghost" className="text-slate-600 hover:text-slate-800">
                             <Link to="/dashboard/finance/quotes">
                                 <ArrowRight className="h-4 w-4 ml-2" />
                                 العودة لعروض الأسعار
@@ -236,7 +236,7 @@ export default function QuoteDetailsView() {
 
                     {/* Quote Header Card */}
                     <Card className="border-0 shadow-sm rounded-3xl overflow-hidden mb-6">
-                        <div className="bg-navy text-white p-6">
+                        <div className="bg-emerald-950 text-white p-6">
                             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                                 <div>
                                     <div className="flex items-center gap-3 mb-2">
@@ -276,7 +276,7 @@ export default function QuoteDetailsView() {
                             {/* Client Info */}
                             <Card className="border-0 shadow-sm rounded-3xl">
                                 <CardHeader className="border-b border-slate-100">
-                                    <CardTitle className="text-lg font-bold text-navy flex items-center gap-2">
+                                    <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
                                         <User className="h-5 w-5 text-brand-blue" />
                                         معلومات العميل
                                     </CardTitle>
@@ -285,7 +285,7 @@ export default function QuoteDetailsView() {
                                     <div className="grid grid-cols-2 gap-4">
                                         <div>
                                             <p className="text-sm text-slate-500 mb-1">اسم العميل</p>
-                                            <p className="font-medium text-navy">
+                                            <p className="font-medium text-slate-800">
                                                 {typeof quote.clientId === 'object'
                                                     ? `${quote.clientId.firstName || ''} ${quote.clientId.lastName || ''}`.trim() || quote.clientId.name
                                                     : 'غير محدد'}
@@ -294,7 +294,7 @@ export default function QuoteDetailsView() {
                                         {quote.caseId && (
                                             <div>
                                                 <p className="text-sm text-slate-500 mb-1">القضية</p>
-                                                <p className="font-medium text-navy">
+                                                <p className="font-medium text-slate-800">
                                                     {typeof quote.caseId === 'object'
                                                         ? quote.caseId.caseNumber || quote.caseId.title
                                                         : quote.caseId}
@@ -308,7 +308,7 @@ export default function QuoteDetailsView() {
                             {/* Items Table */}
                             <Card className="border-0 shadow-sm rounded-3xl">
                                 <CardHeader className="border-b border-slate-100">
-                                    <CardTitle className="text-lg font-bold text-navy flex items-center gap-2">
+                                    <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
                                         <FileText className="h-5 w-5 text-brand-blue" />
                                         بنود عرض السعر
                                     </CardTitle>
@@ -328,7 +328,7 @@ export default function QuoteDetailsView() {
                                                 {quote.items.map((item, index) => (
                                                     <tr key={item._id || index} className="hover:bg-slate-50/50">
                                                         <td className="p-4">
-                                                            <div className="font-medium text-navy">{item.itemName}</div>
+                                                            <div className="font-medium text-slate-800">{item.itemName}</div>
                                                             {item.description && (
                                                                 <div className="text-sm text-slate-500 mt-1">{item.description}</div>
                                                             )}
@@ -337,7 +337,7 @@ export default function QuoteDetailsView() {
                                                         <td className="p-4 text-center text-slate-600">
                                                             {formatCurrency(item.price, quote.currency)}
                                                         </td>
-                                                        <td className="p-4 text-left font-medium text-navy">
+                                                        <td className="p-4 text-left font-medium text-slate-800">
                                                             {formatCurrency(item.total, quote.currency)}
                                                         </td>
                                                     </tr>
@@ -352,7 +352,7 @@ export default function QuoteDetailsView() {
                             {quote.notes && (
                                 <Card className="border-0 shadow-sm rounded-3xl">
                                     <CardHeader className="border-b border-slate-100">
-                                        <CardTitle className="text-lg font-bold text-navy">ملاحظات</CardTitle>
+                                        <CardTitle className="text-lg font-bold text-slate-800">ملاحظات</CardTitle>
                                     </CardHeader>
                                     <CardContent className="p-6">
                                         <p className="text-slate-600 whitespace-pre-wrap">{quote.notes}</p>
@@ -366,7 +366,7 @@ export default function QuoteDetailsView() {
                             {/* Summary */}
                             <Card className="border-0 shadow-sm rounded-3xl">
                                 <CardHeader className="border-b border-slate-100">
-                                    <CardTitle className="text-lg font-bold text-navy flex items-center gap-2">
+                                    <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
                                         <DollarSign className="h-5 w-5 text-brand-blue" />
                                         ملخص عرض السعر
                                     </CardTitle>
@@ -388,8 +388,8 @@ export default function QuoteDetailsView() {
                                     </div>
                                     <Separator />
                                     <div className="flex justify-between text-lg">
-                                        <span className="font-bold text-navy">الإجمالي</span>
-                                        <span className="font-bold text-navy">{formatCurrency(quote.total, quote.currency)}</span>
+                                        <span className="font-bold text-slate-800">الإجمالي</span>
+                                        <span className="font-bold text-slate-800">{formatCurrency(quote.total, quote.currency)}</span>
                                     </div>
                                 </CardContent>
                             </Card>
@@ -397,7 +397,7 @@ export default function QuoteDetailsView() {
                             {/* Dates */}
                             <Card className="border-0 shadow-sm rounded-3xl">
                                 <CardHeader className="border-b border-slate-100">
-                                    <CardTitle className="text-lg font-bold text-navy flex items-center gap-2">
+                                    <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
                                         <Calendar className="h-5 w-5 text-brand-blue" />
                                         التواريخ
                                     </CardTitle>
@@ -405,11 +405,11 @@ export default function QuoteDetailsView() {
                                 <CardContent className="p-6 space-y-4">
                                     <div>
                                         <p className="text-sm text-slate-500 mb-1">تاريخ الإنشاء</p>
-                                        <p className="font-medium text-navy">{formatDate(quote.date)}</p>
+                                        <p className="font-medium text-slate-800">{formatDate(quote.date)}</p>
                                     </div>
                                     <div>
                                         <p className="text-sm text-slate-500 mb-1">تاريخ الانتهاء</p>
-                                        <p className={`font-medium ${isExpired ? 'text-rose-600' : 'text-navy'}`}>
+                                        <p className={`font-medium ${isExpired ? 'text-rose-600' : 'text-slate-800'}`}>
                                             {formatDate(quote.expiredDate)}
                                             {isExpired && ' (منتهي)'}
                                         </p>
@@ -432,7 +432,7 @@ export default function QuoteDetailsView() {
                             {/* Quick Actions */}
                             <Card className="border-0 shadow-sm rounded-3xl">
                                 <CardHeader className="border-b border-slate-100">
-                                    <CardTitle className="text-lg font-bold text-navy">إجراءات سريعة</CardTitle>
+                                    <CardTitle className="text-lg font-bold text-slate-800">إجراءات سريعة</CardTitle>
                                 </CardHeader>
                                 <CardContent className="p-6 space-y-3">
                                     <Button variant="outline" className="w-full justify-start">

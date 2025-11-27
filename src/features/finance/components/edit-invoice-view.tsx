@@ -207,7 +207,7 @@ export function EditInvoiceView() {
     if (loadingInvoice) {
         return (
             <>
-                <Header className="bg-navy shadow-none relative">
+                <Header className="bg-emerald-950 shadow-none relative">
                     <TopNav links={topNav} className="[&>a]:text-slate-300 [&>a:hover]:text-white [&>a[aria-current='page']]:text-white" />
                     <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
                         <DynamicIsland />
@@ -223,7 +223,7 @@ export function EditInvoiceView() {
 
     return (
         <>
-            <Header className="bg-navy shadow-none relative">
+            <Header className="bg-emerald-950 shadow-none relative">
                 <TopNav links={topNav} className="[&>a]:text-slate-300 [&>a:hover]:text-white [&>a[aria-current='page']]:text-white" />
                 <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
                     <DynamicIsland />
@@ -421,7 +421,7 @@ export function EditInvoiceView() {
                                                             className="rounded-xl border-slate-200 text-center"
                                                         />
                                                     </div>
-                                                    <div className="col-span-2 text-center font-bold text-navy">
+                                                    <div className="col-span-2 text-center font-bold text-slate-800">
                                                         {formatCurrency(item.total)}
                                                     </div>
                                                     <div className="col-span-1 flex justify-center">
@@ -498,7 +498,7 @@ export function EditInvoiceView() {
                                             <span>ضريبة القيمة المضافة (15%):</span>
                                             <span className="font-medium">{formatCurrency(vatAmount)}</span>
                                         </div>
-                                        <div className="flex justify-between text-xl font-bold text-navy pt-3 border-t border-slate-200">
+                                        <div className="flex justify-between text-xl font-bold text-slate-800 pt-3 border-t border-slate-200">
                                             <span>الإجمالي:</span>
                                             <span>{formatCurrency(total)}</span>
                                         </div>
@@ -522,7 +522,7 @@ export function EditInvoiceView() {
                                 {/* Actions */}
                                 <div className="flex items-center justify-end gap-4 pt-6 border-t border-slate-100">
                                     <Link to="/dashboard/finance/invoices/$invoiceId" params={{ invoiceId: invoiceId || '' }}>
-                                        <Button type="button" variant="ghost" className="text-slate-500 hover:text-navy">
+                                        <Button type="button" variant="ghost" className="text-slate-500 hover:text-slate-800">
                                             إلغاء
                                         </Button>
                                     </Link>

@@ -185,7 +185,7 @@ export default function PaymentsDashboard() {
     if (isLoading) {
         return (
             <>
-                <Header className="bg-navy shadow-none relative">
+                <Header className="bg-emerald-950 shadow-none relative">
                     <TopNav links={topNav} className="[&>a]:text-slate-300 [&>a:hover]:text-white [&>a[aria-current='page']]:text-white" />
                     <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
                         <DynamicIsland />
@@ -230,7 +230,7 @@ export default function PaymentsDashboard() {
     if (isError) {
         return (
             <>
-                <Header className="bg-navy shadow-none relative">
+                <Header className="bg-emerald-950 shadow-none relative">
                     <TopNav links={topNav} className="[&>a]:text-slate-300 [&>a:hover]:text-white [&>a[aria-current='page']]:text-white" />
                     <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
                         <DynamicIsland />
@@ -272,7 +272,7 @@ export default function PaymentsDashboard() {
     if (filteredPayments.length === 0 && !searchQuery && activeTab === 'all') {
         return (
             <>
-                <Header className="bg-navy shadow-none relative">
+                <Header className="bg-emerald-950 shadow-none relative">
                     <TopNav links={topNav} className="[&>a]:text-slate-300 [&>a:hover]:text-white [&>a[aria-current='page']]:text-white" />
                     <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
                         <DynamicIsland />
@@ -315,7 +315,7 @@ export default function PaymentsDashboard() {
     // SUCCESS STATE
     return (
         <>
-            <Header className="bg-navy shadow-none relative">
+            <Header className="bg-emerald-950 shadow-none relative">
                 <TopNav links={topNav} className="[&>a]:text-slate-300 [&>a:hover]:text-white [&>a[aria-current='page']]:text-white" />
 
                 {/* Dynamic Island - Centered */}
@@ -439,7 +439,7 @@ export default function PaymentsDashboard() {
                                             <PopoverContent className="w-80" align="end">
                                                 <div className="space-y-4">
                                                     <div className="flex items-center justify-between">
-                                                        <h4 className="font-bold text-navy">تصفية متقدمة</h4>
+                                                        <h4 className="font-bold text-slate-800">تصفية متقدمة</h4>
                                                         {activeFilterCount > 0 && (
                                                             <Button variant="ghost" size="sm" onClick={clearFilters} className="text-slate-500 hover:text-red-500">
                                                                 <X className="w-4 h-4 ml-1" />
@@ -574,7 +574,7 @@ export default function PaymentsDashboard() {
                                                 </div>
                                                 <div>
                                                     <div className="flex items-center gap-2 mb-1">
-                                                        <h4 className="font-bold text-navy text-lg">{payment.id}</h4>
+                                                        <h4 className="font-bold text-slate-800 text-lg">{payment.id}</h4>
                                                         <Badge className={`${status.bgColor} ${status.color} border-0 px-2 py-0.5`}>
                                                             <StatusIcon className="w-3 h-3 ml-1" />
                                                             {status.label}
@@ -589,7 +589,7 @@ export default function PaymentsDashboard() {
                                             <div className="flex items-center gap-8 border-t md:border-t-0 border-slate-100 pt-4 md:pt-0">
                                                 <div className="text-center md:text-right">
                                                     <div className="text-xs text-slate-400 mb-1">تاريخ الدفع</div>
-                                                    <div className="font-bold text-navy">{payment.date}</div>
+                                                    <div className="font-bold text-slate-800">{payment.date}</div>
                                                 </div>
                                                 <div className="text-center md:text-right">
                                                     <div className="text-xs text-slate-400 mb-1">طريقة الدفع</div>
@@ -687,7 +687,7 @@ export default function PaymentsDashboard() {
                                             </div>
                                             <Badge className="bg-emerald-100 text-emerald-600 hover:bg-emerald-200 border-0">مكتملة</Badge>
                                         </div>
-                                        <div className="text-2xl font-bold text-navy">{formatCurrency(stats.totalCompleted)}</div>
+                                        <div className="text-2xl font-bold text-slate-800">{formatCurrency(stats.totalCompleted)}</div>
                                         <div className="text-sm text-slate-500">إجمالي المدفوعات المكتملة</div>
                                     </CardContent>
                                 </Card>
@@ -699,7 +699,7 @@ export default function PaymentsDashboard() {
                                             </div>
                                             <Badge className="bg-amber-100 text-amber-600 hover:bg-amber-200 border-0">معلقة</Badge>
                                         </div>
-                                        <div className="text-2xl font-bold text-navy">{formatCurrency(stats.totalPending)}</div>
+                                        <div className="text-2xl font-bold text-slate-800">{formatCurrency(stats.totalPending)}</div>
                                         <div className="text-sm text-slate-500">مدفوعات قيد المعالجة</div>
                                     </CardContent>
                                 </Card>
@@ -711,7 +711,7 @@ export default function PaymentsDashboard() {
                                             </div>
                                             <Badge className="bg-purple-100 text-purple-600 hover:bg-purple-200 border-0">مستردة</Badge>
                                         </div>
-                                        <div className="text-2xl font-bold text-navy">{formatCurrency(stats.totalRefunded)}</div>
+                                        <div className="text-2xl font-bold text-slate-800">{formatCurrency(stats.totalRefunded)}</div>
                                         <div className="text-sm text-slate-500">إجمالي المبالغ المستردة</div>
                                     </CardContent>
                                 </Card>
@@ -723,7 +723,7 @@ export default function PaymentsDashboard() {
                                             </div>
                                             <Badge className="bg-blue-100 text-brand-blue hover:bg-blue-200 border-0">هذا الشهر</Badge>
                                         </div>
-                                        <div className="text-2xl font-bold text-navy">{formatCurrency(stats.totalThisMonth)}</div>
+                                        <div className="text-2xl font-bold text-slate-800">{formatCurrency(stats.totalThisMonth)}</div>
                                         <div className="text-sm text-slate-500">تم تحصيلها هذا الشهر</div>
                                     </CardContent>
                                 </Card>

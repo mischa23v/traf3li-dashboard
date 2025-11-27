@@ -7,43 +7,50 @@
 
 @layer base {
   :root {
-    --background: 210 40% 98%;
-    --foreground: 222.2 84% 4.9%;
+    --background: 210 20% 98%;
+    --foreground: 215 25% 27%;
 
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card-foreground: 215 25% 27%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover-foreground: 215 25% 27%;
 
-    --primary: 221.2 83.2% 53.3%;
-    --primary-foreground: 210 40% 98%;
+    /* Emerald-500 as primary */
+    --primary: 160 84% 39%;
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 210 20% 96%;
+    --secondary-foreground: 215 25% 27%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --muted: 210 20% 96%;
+    --muted-foreground: 215 16% 47%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    --accent: 210 20% 96%;
+    --accent-foreground: 215 25% 27%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 221.2 83.2% 53.3%;
+    --border: 214 32% 91%;
+    --input: 214 32% 91%;
+    --ring: 160 84% 39%;
 
-    --radius: 0.5rem;
+    --radius: 0.75rem;
 
-    /* GOSI Custom Colors */
-    --gosi-navy: #022c22;
-    --gosi-blue: #2563eb;
-    /* Reverted to Blue */
-    --gosi-bg: #f8f9fa;
+    /* TRAF3LI Custom Colors */
+    --traf3li-hero: #022c22;
+    --traf3li-primary: #10b981;
+    --traf3li-primary-dark: #059669;
+    --traf3li-bg: #f8f9fa;
 
-
+    /* Emerald scale for direct use */
+    --emerald-50: #ecfdf5;
+    --emerald-100: #d1fae5;
+    --emerald-500: #10b981;
+    --emerald-600: #059669;
+    --emerald-700: #047857;
+    --emerald-950: #022c22;
   }
 
   .dark {
@@ -130,33 +137,29 @@
   }
 }
 
-/* Custom GOSI Utilities */
-@utility bg-navy {
-  background-color: var(--gosi-navy);
+/* Custom TRAF3LI Utilities */
+@utility bg-hero {
+  background-color: var(--traf3li-hero);
 }
 
-@utility bg-brand-blue {
-  background-color: var(--gosi-blue);
+@utility bg-traf3li-primary {
+  background-color: var(--traf3li-primary);
 }
 
-@utility text-brand-blue {
-  color: var(--gosi-blue);
+@utility text-traf3li-primary {
+  color: var(--traf3li-primary);
 }
 
-@utility border-brand-blue {
-  border-color: var(--gosi-blue);
+@utility border-traf3li-primary {
+  border-color: var(--traf3li-primary);
 }
 
-@utility shadow-navy/20 {
-  box-shadow: 0 10px 15px -3px rgba(2, 44, 34, 0.2);
+@utility shadow-emerald/20 {
+  box-shadow: 0 10px 15px -3px rgba(16, 185, 129, 0.2);
 }
 
-@utility shadow-blue-600/20 {
-  box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.2);
-}
-
-@utility shadow-blue-600/30 {
-  box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.3);
+@utility shadow-emerald/30 {
+  box-shadow: 0 10px 15px -3px rgba(16, 185, 129, 0.3);
 }
 
 @utility container {

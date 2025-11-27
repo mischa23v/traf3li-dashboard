@@ -137,7 +137,7 @@ export function ReputationOverview() {
 
   return (
     <>
-      <Header className="bg-navy shadow-none relative">
+      <Header className="bg-emerald-950 shadow-none relative">
         <TopNav links={topNav} className="[&>a]:text-slate-300 [&>a:hover]:text-white [&>a[aria-current='page']]:text-white" />
         <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
           <DynamicIsland />
@@ -155,7 +155,7 @@ export function ReputationOverview() {
         <div className="space-y-6">
           {/* Page Header */}
           <div>
-            <h1 className="text-2xl font-bold text-navy">
+            <h1 className="text-2xl font-bold text-slate-800">
               {isRTL ? 'التقييمات والسمعة' : 'Ratings & Reputation'}
             </h1>
             <p className="text-slate-500 mt-1">
@@ -219,7 +219,7 @@ export function ReputationOverview() {
                       <stat.icon className={`h-5 w-5 ${stat.color}`} />
                     </div>
                     <div>
-                      <div className="text-2xl font-bold text-navy">{stat.value}</div>
+                      <div className="text-2xl font-bold text-slate-800">{stat.value}</div>
                       <div className="text-xs text-slate-500">{isRTL ? stat.label : stat.labelEn}</div>
                     </div>
                   </div>
@@ -263,12 +263,12 @@ export function ReputationOverview() {
               <CardContent className="space-y-4">
                 {recentReviews.map((review) => (
                   <div key={review.id} className="flex gap-4 p-4 bg-slate-50 rounded-lg">
-                    <div className="h-10 w-10 rounded-full bg-navy text-white flex items-center justify-center font-bold shrink-0">
+                    <div className="h-10 w-10 rounded-full bg-emerald-950 text-white flex items-center justify-center font-bold shrink-0">
                       {(isRTL ? review.clientName : review.clientNameEn).charAt(0)}
                     </div>
                     <div className="flex-1">
                       <div className="flex items-center justify-between mb-1">
-                        <span className="font-medium text-navy">
+                        <span className="font-medium text-slate-800">
                           {isRTL ? review.clientName : review.clientNameEn}
                         </span>
                         <span className="text-xs text-slate-500">{review.date}</span>

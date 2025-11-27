@@ -135,7 +135,7 @@ export function MyServices() {
 
   return (
     <>
-      <Header className="bg-navy shadow-none relative">
+      <Header className="bg-emerald-950 shadow-none relative">
         <TopNav links={topNav} className="[&>a]:text-slate-300 [&>a:hover]:text-white [&>a[aria-current='page']]:text-white" />
         <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
           <DynamicIsland />
@@ -154,7 +154,7 @@ export function MyServices() {
           {/* Page Header */}
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-              <h1 className="text-2xl font-bold text-navy">
+              <h1 className="text-2xl font-bold text-slate-800">
                 {isRTL ? 'خدماتي' : 'My Services'}
               </h1>
               <p className="text-slate-500 mt-1">
@@ -174,7 +174,7 @@ export function MyServices() {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm text-slate-500">{isRTL ? 'إجمالي الخدمات' : 'Total Services'}</p>
-                    <p className="text-2xl font-bold text-navy">{mockServices.length}</p>
+                    <p className="text-2xl font-bold text-slate-800">{mockServices.length}</p>
                   </div>
                   <div className="h-12 w-12 bg-blue-100 rounded-full flex items-center justify-center">
                     <Briefcase className="h-6 w-6 text-blue-600" />
@@ -187,7 +187,7 @@ export function MyServices() {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm text-slate-500">{isRTL ? 'الطلبات المكتملة' : 'Completed Orders'}</p>
-                    <p className="text-2xl font-bold text-navy">35</p>
+                    <p className="text-2xl font-bold text-slate-800">35</p>
                   </div>
                   <div className="h-12 w-12 bg-emerald-100 rounded-full flex items-center justify-center">
                     <CheckCircle className="h-6 w-6 text-emerald-600" />
@@ -200,7 +200,7 @@ export function MyServices() {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm text-slate-500">{isRTL ? 'المشاهدات' : 'Total Views'}</p>
-                    <p className="text-2xl font-bold text-navy">746</p>
+                    <p className="text-2xl font-bold text-slate-800">746</p>
                   </div>
                   <div className="h-12 w-12 bg-purple-100 rounded-full flex items-center justify-center">
                     <Eye className="h-6 w-6 text-purple-600" />
@@ -213,7 +213,7 @@ export function MyServices() {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm text-slate-500">{isRTL ? 'متوسط التقييم' : 'Avg Rating'}</p>
-                    <p className="text-2xl font-bold text-navy">4.8</p>
+                    <p className="text-2xl font-bold text-slate-800">4.8</p>
                   </div>
                   <div className="h-12 w-12 bg-amber-100 rounded-full flex items-center justify-center">
                     <Star className="h-6 w-6 text-amber-600" />
@@ -313,7 +313,7 @@ export function MyServices() {
                   <div className="flex items-center justify-between text-sm text-slate-500">
                     <div className="flex items-center">
                       <DollarSign className="h-4 w-4 me-1" />
-                      <span className="font-medium text-navy">{service.price} {isRTL ? 'ر.س' : 'SAR'}</span>
+                      <span className="font-medium text-slate-800">{service.price} {isRTL ? 'ر.س' : 'SAR'}</span>
                       <span className="ms-1">/ {service.priceType === 'hourly' ? (isRTL ? 'ساعة' : 'hour') : (isRTL ? 'ثابت' : 'fixed')}</span>
                     </div>
                     <div className="flex items-center gap-3">

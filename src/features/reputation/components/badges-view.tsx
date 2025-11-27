@@ -150,7 +150,7 @@ export function BadgesView() {
 
   return (
     <>
-      <Header className="bg-navy shadow-none relative">
+      <Header className="bg-emerald-950 shadow-none relative">
         <TopNav links={topNav} className="[&>a]:text-slate-300 [&>a:hover]:text-white [&>a[aria-current='page']]:text-white" />
         <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
           <DynamicIsland />
@@ -168,7 +168,7 @@ export function BadgesView() {
         <div className="space-y-6">
           {/* Page Header */}
           <div>
-            <h1 className="text-2xl font-bold text-navy">
+            <h1 className="text-2xl font-bold text-slate-800">
               {isRTL ? 'شاراتي' : 'My Badges'}
             </h1>
             <p className="text-slate-500 mt-1">
@@ -180,7 +180,7 @@ export function BadgesView() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <Card>
               <CardContent className="p-4 text-center">
-                <div className="text-3xl font-bold text-navy">{earnedBadges.length}</div>
+                <div className="text-3xl font-bold text-slate-800">{earnedBadges.length}</div>
                 <div className="text-sm text-slate-500">{isRTL ? 'شارات مكتسبة' : 'Badges Earned'}</div>
               </CardContent>
             </Card>
@@ -206,7 +206,7 @@ export function BadgesView() {
 
           {/* Earned Badges */}
           <div>
-            <h2 className="text-xl font-bold text-navy mb-4 flex items-center gap-2">
+            <h2 className="text-xl font-bold text-slate-800 mb-4 flex items-center gap-2">
               <Unlock className="h-5 w-5 text-emerald-500" />
               {isRTL ? 'الشارات المكتسبة' : 'Earned Badges'}
             </h2>
@@ -220,7 +220,7 @@ export function BadgesView() {
                       </div>
                       <div className="flex-1">
                         <div className="flex items-center justify-between mb-1">
-                          <h3 className="font-bold text-navy">
+                          <h3 className="font-bold text-slate-800">
                             {isRTL ? badge.name : badge.nameEn}
                           </h3>
                           {getRarityBadge(badge.rarity)}
@@ -242,7 +242,7 @@ export function BadgesView() {
 
           {/* Locked Badges */}
           <div>
-            <h2 className="text-xl font-bold text-navy mb-4 flex items-center gap-2">
+            <h2 className="text-xl font-bold text-slate-800 mb-4 flex items-center gap-2">
               <Lock className="h-5 w-5 text-slate-400" />
               {isRTL ? 'شارات قيد الفتح' : 'Badges In Progress'}
             </h2>

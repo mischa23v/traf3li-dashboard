@@ -118,7 +118,7 @@ export function EventDetailsView() {
 
     return (
         <>
-            <Header className="bg-navy shadow-none relative">
+            <Header className="bg-emerald-950 shadow-none relative">
                 <TopNav links={topNav} className="[&>a]:text-slate-300 [&>a:hover]:text-white [&>a[aria-current='page']]:text-white" />
 
                 {/* Dynamic Island - Centered */}
@@ -133,7 +133,7 @@ export function EventDetailsView() {
                     </div>
                     <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white">
                         <Bell className="h-5 w-5" />
-                        <span className="absolute top-2 right-2 h-2 w-2 bg-red-500 rounded-full border border-navy"></span>
+                        <span className="absolute top-2 right-2 h-2 w-2 bg-red-500 rounded-full border border-emerald-950"></span>
                     </Button>
                     <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white" />
                     <ThemeSwitch className="text-slate-300 hover:bg-white/10 hover:text-white" />
@@ -148,7 +148,7 @@ export function EventDetailsView() {
 
                 {/* Breadcrumb / Back Link */}
                 <div className="max-w-[1600px] mx-auto mb-6">
-                    <Link to="/dashboard/tasks/events" className="inline-flex items-center text-slate-500 hover:text-navy transition-colors">
+                    <Link to="/dashboard/tasks/events" className="inline-flex items-center text-slate-500 hover:text-slate-800 transition-colors">
                         <ArrowLeft className="h-4 w-4 ml-2" />
                         العودة إلى الفعاليات
                     </Link>
@@ -200,7 +200,7 @@ export function EventDetailsView() {
                             <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-slate-100 mb-4">
                                 <CalendarIcon className="h-8 w-8 text-slate-400" />
                             </div>
-                            <h4 className="text-lg font-bold text-navy mb-2">لم يتم العثور على الفعالية</h4>
+                            <h4 className="text-lg font-bold text-slate-800 mb-2">لم يتم العثور على الفعالية</h4>
                             <p className="text-slate-500 mb-4">الفعالية المطلوبة غير موجودة أو تم حذفها</p>
                             <Button asChild className="bg-blue-500 hover:bg-blue-600 text-white rounded-xl">
                                 <Link to="/dashboard/tasks/events">
@@ -376,7 +376,7 @@ export function EventDetailsView() {
                             {/* Timeline Card */}
                             <Card className="border border-slate-100 shadow-sm rounded-2xl overflow-hidden">
                                 <CardHeader className="bg-white border-b border-slate-50 pb-4">
-                                    <CardTitle className="text-lg font-bold text-navy flex items-center gap-2">
+                                    <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
                                         <History className="h-5 w-5 text-brand-blue" />
                                         الجدول الزمني
                                     </CardTitle>
@@ -394,7 +394,7 @@ export function EventDetailsView() {
                                                                 evt.status === 'upcoming' ? 'bg-amber-500' : 'bg-slate-300'}
                                                         `}></div>
                                                         <div className="flex-1">
-                                                            <div className="text-sm font-bold text-navy">{evt.title}</div>
+                                                            <div className="text-sm font-bold text-slate-800">{evt.title}</div>
                                                             <div className="text-xs text-slate-500 mb-1">{evt.date}</div>
                                                         </div>
                                                     </div>
@@ -409,7 +409,7 @@ export function EventDetailsView() {
                             {event.relatedTo && (
                                 <Card className="border border-slate-100 shadow-sm rounded-2xl">
                                     <CardHeader className="pb-3">
-                                        <CardTitle className="text-base font-bold text-navy">مرتبط بـ</CardTitle>
+                                        <CardTitle className="text-base font-bold text-slate-800">مرتبط بـ</CardTitle>
                                     </CardHeader>
                                     <CardContent className="space-y-4">
                                         <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-xl border border-slate-100">
@@ -417,7 +417,7 @@ export function EventDetailsView() {
                                                 <Briefcase className="h-5 w-5" />
                                             </div>
                                             <div>
-                                                <div className="text-sm font-bold text-navy line-clamp-1" title={event.relatedTo?.title}>{event.relatedTo?.title}</div>
+                                                <div className="text-sm font-bold text-slate-800 line-clamp-1" title={event.relatedTo?.title}>{event.relatedTo?.title}</div>
                                                 <div className="text-xs text-slate-500 font-medium">{event.relatedTo?.id}</div>
                                             </div>
                                         </div>
@@ -448,7 +448,7 @@ export function EventDetailsView() {
                                         <TabsContent value="overview" className="mt-0 space-y-6">
                                             <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
                                                 <CardHeader>
-                                                    <CardTitle className="text-lg font-bold text-navy">تفاصيل الفعالية</CardTitle>
+                                                    <CardTitle className="text-lg font-bold text-slate-800">تفاصيل الفعالية</CardTitle>
                                                 </CardHeader>
                                                 <CardContent>
                                                     <p className="text-slate-600 leading-relaxed">
@@ -467,7 +467,7 @@ export function EventDetailsView() {
                                                                 {attendee.name.charAt(0)}
                                                             </div>
                                                             <div className="flex-1">
-                                                                <div className="font-bold text-navy">{attendee.name}</div>
+                                                                <div className="font-bold text-slate-800">{attendee.name}</div>
                                                                 <div className="text-xs text-slate-500">{attendee.role}</div>
                                                             </div>
                                                             <Badge variant={attendee.status === 'confirmed' ? 'default' : 'secondary'} className={attendee.status === 'confirmed' ? 'bg-emerald-500' : ''}>
@@ -484,7 +484,7 @@ export function EventDetailsView() {
                                                 <CardContent className="p-6">
                                                     <div className="flex gap-3">
                                                         <Avatar className="w-10 h-10">
-                                                            <AvatarFallback className="bg-navy text-white">أنا</AvatarFallback>
+                                                            <AvatarFallback className="bg-emerald-950 text-white">أنا</AvatarFallback>
                                                         </Avatar>
                                                         <div className="flex-1 relative">
                                                             <Textarea placeholder="أضف ملاحظة..." className="min-h-[80px] rounded-xl resize-none pr-12 bg-slate-50 border-slate-200 focus:border-brand-blue" />

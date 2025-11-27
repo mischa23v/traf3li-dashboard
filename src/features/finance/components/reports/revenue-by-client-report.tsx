@@ -78,7 +78,7 @@ export function RevenueByClientReport() {
     if (isLoading) {
         return (
             <>
-                <Header className="bg-navy shadow-none relative">
+                <Header className="bg-emerald-950 shadow-none relative">
                     <TopNav links={topNav} className="[&>a]:text-slate-300 [&>a:hover]:text-white [&>a[aria-current='page']]:text-white" />
                     <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
                         <DynamicIsland />
@@ -102,7 +102,7 @@ export function RevenueByClientReport() {
     if (isError) {
         return (
             <>
-                <Header className="bg-navy shadow-none relative">
+                <Header className="bg-emerald-950 shadow-none relative">
                     <TopNav links={topNav} className="[&>a]:text-slate-300 [&>a:hover]:text-white [&>a[aria-current='page']]:text-white" />
                     <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
                         <DynamicIsland />
@@ -198,7 +198,7 @@ export function RevenueByClientReport() {
 
     return (
         <>
-            <Header className="bg-navy shadow-none relative">
+            <Header className="bg-emerald-950 shadow-none relative">
                 <TopNav links={topNav} className="[&>a]:text-slate-300 [&>a:hover]:text-white [&>a[aria-current='page']]:text-white" />
                 <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
                     <DynamicIsland />
@@ -303,7 +303,7 @@ export function RevenueByClientReport() {
                                     </div>
                                     <span className="text-sm text-slate-500">إجمالي الإيرادات</span>
                                 </div>
-                                <div className="text-2xl font-bold text-navy">{formatCurrency(mockSummary.totalRevenue)}</div>
+                                <div className="text-2xl font-bold text-slate-800">{formatCurrency(mockSummary.totalRevenue)}</div>
                             </CardContent>
                         </Card>
 
@@ -315,7 +315,7 @@ export function RevenueByClientReport() {
                                     </div>
                                     <span className="text-sm text-slate-500">المبالغ المحصلة</span>
                                 </div>
-                                <div className="text-2xl font-bold text-navy">{formatCurrency(mockSummary.totalPaid)}</div>
+                                <div className="text-2xl font-bold text-slate-800">{formatCurrency(mockSummary.totalPaid)}</div>
                                 <div className="mt-2">
                                     <Progress
                                         value={(mockSummary.totalPaid / mockSummary.totalRevenue) * 100}
@@ -337,7 +337,7 @@ export function RevenueByClientReport() {
                                     </div>
                                     <span className="text-sm text-slate-500">المبالغ المستحقة</span>
                                 </div>
-                                <div className="text-2xl font-bold text-navy">{formatCurrency(mockSummary.totalOutstanding)}</div>
+                                <div className="text-2xl font-bold text-slate-800">{formatCurrency(mockSummary.totalOutstanding)}</div>
                                 <div className="mt-2">
                                     <Progress
                                         value={(mockSummary.totalOutstanding / mockSummary.totalRevenue) * 100}
@@ -359,7 +359,7 @@ export function RevenueByClientReport() {
                                     </div>
                                     <span className="text-sm text-slate-500">عدد العملاء</span>
                                 </div>
-                                <div className="text-2xl font-bold text-navy">{mockSummary.clientCount}</div>
+                                <div className="text-2xl font-bold text-slate-800">{mockSummary.clientCount}</div>
                             </CardContent>
                         </Card>
                     </div>
@@ -370,7 +370,7 @@ export function RevenueByClientReport() {
                         {/* Revenue Chart */}
                         <Card className="border-0 shadow-sm rounded-3xl lg:col-span-1">
                             <CardHeader className="border-b border-slate-100 pb-4">
-                                <CardTitle className="text-lg font-bold text-navy flex items-center gap-2">
+                                <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
                                     <BarChart3 className="w-5 h-5 text-emerald-500" />
                                     توزيع الإيرادات
                                 </CardTitle>
@@ -383,7 +383,7 @@ export function RevenueByClientReport() {
                                                 <span className="font-medium text-slate-700 truncate max-w-[150px]">
                                                     {index + 1}. {client.clientName}
                                                 </span>
-                                                <span className="font-bold text-navy">{formatCurrency(client.totalRevenue)}</span>
+                                                <span className="font-bold text-slate-800">{formatCurrency(client.totalRevenue)}</span>
                                             </div>
                                             <div className="h-3 bg-slate-100 rounded-full overflow-hidden">
                                                 <div
@@ -401,7 +401,7 @@ export function RevenueByClientReport() {
                         <Card className="border-0 shadow-sm rounded-3xl lg:col-span-2">
                             <CardHeader className="border-b border-slate-100 pb-4">
                                 <div className="flex items-center justify-between">
-                                    <CardTitle className="text-lg font-bold text-navy flex items-center gap-2">
+                                    <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
                                         <Users className="w-5 h-5 text-emerald-500" />
                                         تفاصيل العملاء
                                     </CardTitle>
@@ -425,13 +425,13 @@ export function RevenueByClientReport() {
                                     <TableBody>
                                         {sortedClients.map((client) => (
                                             <TableRow key={client.clientId} className="hover:bg-slate-50">
-                                                <TableCell className="font-medium text-navy">{client.clientName}</TableCell>
+                                                <TableCell className="font-medium text-slate-800">{client.clientName}</TableCell>
                                                 <TableCell className="text-center">
                                                     <Badge variant="outline" className="border-slate-200">
                                                         {client.invoiceCount}
                                                     </Badge>
                                                 </TableCell>
-                                                <TableCell className="text-center font-bold text-navy">
+                                                <TableCell className="text-center font-bold text-slate-800">
                                                     {formatCurrency(client.totalRevenue)}
                                                 </TableCell>
                                                 <TableCell className="text-center">

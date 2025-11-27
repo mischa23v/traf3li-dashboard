@@ -143,7 +143,7 @@ export function LawsView() {
 
   return (
     <>
-      <Header className="bg-navy shadow-none relative">
+      <Header className="bg-emerald-950 shadow-none relative">
         <TopNav links={topNav} className="[&>a]:text-slate-300 [&>a:hover]:text-white [&>a[aria-current='page']]:text-white" />
         <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
           <DynamicIsland />
@@ -161,7 +161,7 @@ export function LawsView() {
         <div className="space-y-6">
           {/* Page Header */}
           <div>
-            <h1 className="text-2xl font-bold text-navy">
+            <h1 className="text-2xl font-bold text-slate-800">
               {isRTL ? 'الأنظمة والقوانين' : 'Laws & Regulations'}
             </h1>
             <p className="text-slate-500 mt-1">
@@ -202,29 +202,29 @@ export function LawsView() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <Card>
               <CardContent className="p-4 text-center">
-                <Scale className="h-8 w-8 mx-auto text-navy mb-2" />
-                <div className="text-2xl font-bold text-navy">{mockLaws.length}</div>
+                <Scale className="h-8 w-8 mx-auto text-slate-800 mb-2" />
+                <div className="text-2xl font-bold text-slate-800">{mockLaws.length}</div>
                 <div className="text-sm text-slate-500">{isRTL ? 'نظام متاح' : 'Available Laws'}</div>
               </CardContent>
             </Card>
             <Card>
               <CardContent className="p-4 text-center">
                 <FileText className="h-8 w-8 mx-auto text-emerald-600 mb-2" />
-                <div className="text-2xl font-bold text-navy">873</div>
+                <div className="text-2xl font-bold text-slate-800">873</div>
                 <div className="text-sm text-slate-500">{isRTL ? 'إجمالي المواد' : 'Total Articles'}</div>
               </CardContent>
             </Card>
             <Card>
               <CardContent className="p-4 text-center">
                 <Eye className="h-8 w-8 mx-auto text-blue-600 mb-2" />
-                <div className="text-2xl font-bold text-navy">46.4K</div>
+                <div className="text-2xl font-bold text-slate-800">46.4K</div>
                 <div className="text-sm text-slate-500">{isRTL ? 'إجمالي المشاهدات' : 'Total Views'}</div>
               </CardContent>
             </Card>
             <Card>
               <CardContent className="p-4 text-center">
                 <Download className="h-8 w-8 mx-auto text-purple-600 mb-2" />
-                <div className="text-2xl font-bold text-navy">12.6K</div>
+                <div className="text-2xl font-bold text-slate-800">12.6K</div>
                 <div className="text-sm text-slate-500">{isRTL ? 'إجمالي التحميلات' : 'Total Downloads'}</div>
               </CardContent>
             </Card>
@@ -237,8 +237,8 @@ export function LawsView() {
                 <CardContent className="p-6">
                   <div className="flex flex-col md:flex-row md:items-start gap-4">
                     {/* Icon */}
-                    <div className="h-14 w-14 bg-navy/10 rounded-xl flex items-center justify-center shrink-0">
-                      <Scale className="h-7 w-7 text-navy" />
+                    <div className="h-14 w-14 bg-emerald-950/10 rounded-xl flex items-center justify-center shrink-0">
+                      <Scale className="h-7 w-7 text-slate-800" />
                     </div>
 
                     {/* Content */}
@@ -246,7 +246,7 @@ export function LawsView() {
                       <div className="flex items-start justify-between gap-4">
                         <div>
                           <div className="flex items-center gap-2 flex-wrap">
-                            <h3 className="font-bold text-lg text-navy group-hover:text-emerald-600 transition-colors">
+                            <h3 className="font-bold text-lg text-slate-800 group-hover:text-emerald-600 transition-colors">
                               {isRTL ? law.title : law.titleEn}
                             </h3>
                             {getCategoryBadge(law.category)}

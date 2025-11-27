@@ -99,7 +99,7 @@ export function CreateTransactionView() {
 
     return (
         <>
-            <Header className="bg-navy shadow-none relative">
+            <Header className="bg-emerald-950 shadow-none relative">
                 <TopNav links={topNav} className="[&>a]:text-slate-300 [&>a:hover]:text-white [&>a[aria-current='page']]:text-white" />
                 <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
                     <DynamicIsland />
@@ -270,7 +270,7 @@ export function CreateTransactionView() {
 
                                 <div className="flex items-center justify-end gap-4 pt-6 border-t border-slate-100">
                                     <Link to="/dashboard/finance/transactions">
-                                        <Button type="button" variant="ghost" className="text-slate-500 hover:text-navy">
+                                        <Button type="button" variant="ghost" className="text-slate-500 hover:text-slate-800">
                                             إلغاء
                                         </Button>
                                     </Link>

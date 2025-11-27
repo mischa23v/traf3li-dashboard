@@ -137,7 +137,7 @@ export function EmailView() {
 
   return (
     <>
-      <Header className="bg-navy shadow-none relative">
+      <Header className="bg-emerald-950 shadow-none relative">
         <TopNav links={topNav} className="[&>a]:text-slate-300 [&>a:hover]:text-white [&>a[aria-current='page']]:text-white" />
         <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
           <DynamicIsland />
@@ -167,7 +167,7 @@ export function EmailView() {
                   onClick={() => setSelectedFolder(folder.id)}
                   className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm transition-colors ${
                     selectedFolder === folder.id
-                      ? 'bg-navy text-white'
+                      ? 'bg-emerald-950 text-white'
                       : 'text-slate-700 hover:bg-slate-100'
                   }`}
                 >
@@ -242,7 +242,7 @@ export function EmailView() {
                   </Button>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between mb-1">
-                      <span className={`font-medium ${!email.isRead ? 'text-navy' : 'text-slate-600'}`}>
+                      <span className={`font-medium ${!email.isRead ? 'text-slate-800' : 'text-slate-600'}`}>
                         {isRTL ? email.from : email.fromEn}
                       </span>
                       <span className="text-xs text-slate-500">
@@ -331,16 +331,16 @@ export function EmailView() {
                     </DropdownMenu>
                   </div>
                 </div>
-                <h2 className="text-xl font-bold text-navy mb-2">
+                <h2 className="text-xl font-bold text-slate-800 mb-2">
                   {isRTL ? selectedEmailData.subject : selectedEmailData.subjectEn}
                 </h2>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="h-10 w-10 rounded-full bg-navy text-white flex items-center justify-center font-bold">
+                    <div className="h-10 w-10 rounded-full bg-emerald-950 text-white flex items-center justify-center font-bold">
                       {(isRTL ? selectedEmailData.from : selectedEmailData.fromEn).charAt(0)}
                     </div>
                     <div>
-                      <div className="font-medium text-navy">
+                      <div className="font-medium text-slate-800">
                         {isRTL ? selectedEmailData.from : selectedEmailData.fromEn}
                       </div>
                       <div className="text-sm text-slate-500">{selectedEmailData.email}</div>
@@ -365,7 +365,7 @@ export function EmailView() {
 
                 {selectedEmailData.hasAttachment && (
                   <div className="mt-6 pt-6 border-t border-slate-200">
-                    <h4 className="font-medium text-navy mb-3">
+                    <h4 className="font-medium text-slate-800 mb-3">
                       {isRTL ? 'المرفقات' : 'Attachments'}
                     </h4>
                     <div className="flex gap-3">
