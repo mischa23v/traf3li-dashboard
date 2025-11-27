@@ -1,126 +1,119 @@
 import { useState } from 'react'
-import { Check, X } from 'lucide-react'
-import { showSubmittedData } from '@/lib/show-submitted-data'
-import { Badge } from '@/components/ui/badge'
+import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from '@/components/ui/command'
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
-import { type ChatUser } from '../data/chat-types'
-
-type User = Omit<ChatUser, 'messages'>
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Textarea } from '@/components/ui/textarea'
+import { useCreateConversation, useSendMessage } from '@/hooks/useChat'
+import { useAuthStore } from '@/stores/auth-store'
 
 type NewChatProps = {
-  users: User[]
   open: boolean
   onOpenChange: (open: boolean) => void
 }
-export function NewChat({ users, onOpenChange, open }: NewChatProps) {
-  const [selectedUsers, setSelectedUsers] = useState<User[]>([])
 
-  const handleSelectUser = (user: User) => {
-    if (!selectedUsers.find((u) => u.id === user.id)) {
-      setSelectedUsers([...selectedUsers, user])
-    } else {
-      handleRemoveUser(user.id)
-    }
-  }
+export function NewChat({ onOpenChange, open }: NewChatProps) {
+  const [recipientId, setRecipientId] = useState('')
+  const [initialMessage, setInitialMessage] = useState('')
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const handleRemoveUser = (userId: string) => {
-    setSelectedUsers(selectedUsers.filter((user) => user.id !== userId))
-  }
+  const user = useAuthStore((state) => state.user)
+  const createConversation = useCreateConversation()
+  const sendMessage = useSendMessage()
 
   const handleOpenChange = (newOpen: boolean) => {
     onOpenChange(newOpen)
-    // Reset selected users when dialog closes
+    // Reset form when dialog closes
     if (!newOpen) {
-      setSelectedUsers([])
+      setRecipientId('')
+      setInitialMessage('')
+    }
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+
+    if (!recipientId.trim()) {
+      toast.error('Please enter a recipient ID')
+      return
+    }
+
+    if (!user?._id) {
+      toast.error('You must be logged in to start a conversation')
+      return
+    }
+
+    setIsSubmitting(true)
+
+    try {
+      // Create the conversation
+      const conversation = await createConversation.mutateAsync({
+        to: recipientId.trim(),
+        from: user._id,
+      })
+
+      // If there's an initial message, send it
+      if (initialMessage.trim() && conversation.conversationID) {
+        await sendMessage.mutateAsync({
+          conversationID: conversation.conversationID,
+          description: initialMessage.trim(),
+        })
+      }
+
+      toast.success('Conversation created successfully')
+      handleOpenChange(false)
+    } catch (error: any) {
+      console.error('Failed to create conversation:', error)
+      toast.error(error.message || 'Failed to create conversation')
+    } finally {
+      setIsSubmitting(false)
     }
   }
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className='sm:max-w-[600px]'>
+      <DialogContent className='sm:max-w-[425px]'>
         <DialogHeader>
-          <DialogTitle>New message</DialogTitle>
+          <DialogTitle>New Conversation</DialogTitle>
         </DialogHeader>
-        <div className='flex flex-col gap-4'>
-          <div className='flex flex-wrap items-baseline-last gap-2'>
-            <span className='text-muted-foreground min-h-6 text-sm'>To:</span>
-            {selectedUsers.map((user) => (
-              <Badge key={user.id} variant='default'>
-                {user.fullName}
-                <button
-                  className='ring-offset-background focus:ring-ring ms-1 rounded-full outline-hidden focus:ring-2 focus:ring-offset-2'
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      handleRemoveUser(user.id)
-                    }
-                  }}
-                  onClick={() => handleRemoveUser(user.id)}
-                >
-                  <X className='text-muted-foreground hover:text-foreground h-3 w-3' />
-                </button>
-              </Badge>
-            ))}
-          </div>
-          <Command className='rounded-lg border'>
-            <CommandInput
-              placeholder='Search people...'
-              className='text-foreground'
+        <form onSubmit={handleSubmit} className='flex flex-col gap-4'>
+          <div className='space-y-2'>
+            <Label htmlFor='recipientId'>Recipient ID</Label>
+            <Input
+              id='recipientId'
+              placeholder='Enter user ID to start a conversation'
+              value={recipientId}
+              onChange={(e) => setRecipientId(e.target.value)}
+              disabled={isSubmitting}
             />
-            <CommandList>
-              <CommandEmpty>No people found.</CommandEmpty>
-              <CommandGroup>
-                {users.map((user) => (
-                  <CommandItem
-                    key={user.id}
-                    onSelect={() => handleSelectUser(user)}
-                    className='hover:bg-accent hover:text-accent-foreground flex items-center justify-between gap-2'
-                  >
-                    <div className='flex items-center gap-2'>
-                      <img
-                        src={user.profile || '/placeholder.svg'}
-                        alt={user.fullName}
-                        className='h-8 w-8 rounded-full'
-                      />
-                      <div className='flex flex-col'>
-                        <span className='text-sm font-medium'>
-                          {user.fullName}
-                        </span>
-                        <span className='text-accent-foreground/70 text-xs'>
-                          {user.username}
-                        </span>
-                      </div>
-                    </div>
-
-                    {selectedUsers.find((u) => u.id === user.id) && (
-                      <Check className='h-4 w-4' />
-                    )}
-                  </CommandItem>
-                ))}
-              </CommandGroup>
-            </CommandList>
-          </Command>
+            <p className='text-muted-foreground text-xs'>
+              Enter the user ID of the person you want to chat with
+            </p>
+          </div>
+          <div className='space-y-2'>
+            <Label htmlFor='initialMessage'>Initial Message (optional)</Label>
+            <Textarea
+              id='initialMessage'
+              placeholder='Type your first message...'
+              value={initialMessage}
+              onChange={(e) => setInitialMessage(e.target.value)}
+              disabled={isSubmitting}
+              rows={3}
+            />
+          </div>
           <Button
-            variant={'default'}
-            onClick={() => showSubmittedData(selectedUsers)}
-            disabled={selectedUsers.length === 0}
+            type='submit'
+            disabled={!recipientId.trim() || isSubmitting}
           >
-            Chat
+            {isSubmitting ? 'Creating...' : 'Start Conversation'}
           </Button>
-        </div>
+        </form>
       </DialogContent>
     </Dialog>
   )
