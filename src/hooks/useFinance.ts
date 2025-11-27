@@ -531,3 +531,68 @@ export const useCreateActivity = () => {
     },
   })
 }
+
+// ==================== REPORTS ====================
+
+export const useAccountsAgingReport = (filters?: { clientId?: string }) => {
+  return useQuery({
+    queryKey: ['reports', 'accounts-aging', filters],
+    queryFn: () => financeService.getAccountsAgingReport(filters),
+    staleTime: 5 * 60 * 1000,
+  })
+}
+
+export const useRevenueByClientReport = (filters?: { startDate?: string; endDate?: string; clientId?: string }) => {
+  return useQuery({
+    queryKey: ['reports', 'revenue-by-client', filters],
+    queryFn: () => financeService.getRevenueByClientReport(filters),
+    staleTime: 5 * 60 * 1000,
+  })
+}
+
+export const useOutstandingInvoicesReport = (filters?: { clientId?: string }) => {
+  return useQuery({
+    queryKey: ['reports', 'outstanding-invoices', filters],
+    queryFn: () => financeService.getOutstandingInvoicesReport(filters),
+    staleTime: 5 * 60 * 1000,
+  })
+}
+
+export const useTimeEntriesReport = (filters?: { startDate?: string; endDate?: string; clientId?: string; caseId?: string }) => {
+  return useQuery({
+    queryKey: ['reports', 'time-entries', filters],
+    queryFn: () => financeService.getTimeEntriesReport(filters),
+    staleTime: 5 * 60 * 1000,
+  })
+}
+
+export const useExportReport = () => {
+  return useMutation({
+    mutationFn: ({ reportType, format, filters }: { reportType: string; format: 'csv' | 'pdf'; filters?: any }) =>
+      financeService.exportReport(reportType, format, filters),
+    onSuccess: (blob, { reportType, format }) => {
+      // Create download link
+      const url = window.URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `${reportType}-report.${format}`
+      document.body.appendChild(a)
+      a.click()
+      document.body.removeChild(a)
+      window.URL.revokeObjectURL(url)
+      toast.success('تم تصدير التقرير بنجاح')
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'فشل تصدير التقرير')
+    },
+  })
+}
+
+export const useWeeklyTimeEntries = (weekStartDate: string) => {
+  return useQuery({
+    queryKey: ['timeEntries', 'weekly', weekStartDate],
+    queryFn: () => financeService.getWeeklyTimeEntries(weekStartDate),
+    staleTime: 2 * 60 * 1000,
+    enabled: !!weekStartDate,
+  })
+}

@@ -916,6 +916,211 @@ const financeService = {
       throw new Error(handleApiError(error))
     }
   },
+
+  // ==================== REPORTS ====================
+
+  /**
+   * Get accounts aging report
+   * Shows invoices grouped by aging buckets (0-30, 31-60, 61-90, 90+ days)
+   */
+  getAccountsAgingReport: async (filters?: { clientId?: string }): Promise<AccountsAgingReport> => {
+    try {
+      const response = await apiClient.get('/reports/accounts-aging', { params: filters })
+      return response.data.report || response.data.data || response.data
+    } catch (error: any) {
+      console.error('Get accounts aging report error:', error)
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Get revenue by client report
+   */
+  getRevenueByClientReport: async (filters?: { startDate?: string; endDate?: string; clientId?: string }): Promise<RevenueByClientReport> => {
+    try {
+      const response = await apiClient.get('/reports/revenue-by-client', { params: filters })
+      return response.data.report || response.data.data || response.data
+    } catch (error: any) {
+      console.error('Get revenue by client report error:', error)
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Get outstanding invoices report
+   */
+  getOutstandingInvoicesReport: async (filters?: { clientId?: string }): Promise<OutstandingInvoicesReport> => {
+    try {
+      const response = await apiClient.get('/reports/outstanding-invoices', { params: filters })
+      return response.data.report || response.data.data || response.data
+    } catch (error: any) {
+      console.error('Get outstanding invoices report error:', error)
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Get time entries report
+   */
+  getTimeEntriesReport: async (filters?: { startDate?: string; endDate?: string; clientId?: string; caseId?: string }): Promise<TimeEntriesReport> => {
+    try {
+      const response = await apiClient.get('/reports/time-entries', { params: filters })
+      return response.data.report || response.data.data || response.data
+    } catch (error: any) {
+      console.error('Get time entries report error:', error)
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Export report to CSV/PDF
+   */
+  exportReport: async (reportType: string, format: 'csv' | 'pdf', filters?: any): Promise<Blob> => {
+    try {
+      const response = await apiClient.get(`/reports/${reportType}/export`, {
+        params: { format, ...filters },
+        responseType: 'blob'
+      })
+      return response.data
+    } catch (error: any) {
+      console.error('Export report error:', error)
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Get weekly time entries for calendar view
+   */
+  getWeeklyTimeEntries: async (weekStartDate: string): Promise<WeeklyTimeEntriesData> => {
+    try {
+      const response = await apiClient.get('/time-tracking/weekly', { params: { weekStartDate } })
+      return response.data.data || response.data
+    } catch (error: any) {
+      console.error('Get weekly time entries error:', error)
+      throw new Error(handleApiError(error))
+    }
+  },
+}
+
+/**
+ * ==================== REPORT TYPES ====================
+ */
+
+export interface AccountsAgingReport {
+  summary: {
+    totalOutstanding: number
+    zeroToThirtyDays: number
+    thirtyOneToSixtyDays: number
+    sixtyOneToNinetyDays: number
+    ninetyPlusDays: number
+  }
+  clients: {
+    clientId: string
+    clientName: string
+    zeroToThirtyDays: number
+    thirtyOneToSixtyDays: number
+    sixtyOneToNinetyDays: number
+    ninetyPlusDays: number
+    total: number
+    invoices: {
+      invoiceNumber: string
+      amount: number
+      dueDate: string
+      daysOverdue: number
+    }[]
+  }[]
+  generatedAt: string
+}
+
+export interface RevenueByClientReport {
+  summary: {
+    totalRevenue: number
+    totalPaid: number
+    totalOutstanding: number
+    clientCount: number
+  }
+  clients: {
+    clientId: string
+    clientName: string
+    totalRevenue: number
+    paidAmount: number
+    outstandingAmount: number
+    invoiceCount: number
+    lastPaymentDate?: string
+  }[]
+  period: {
+    startDate: string
+    endDate: string
+  }
+  generatedAt: string
+}
+
+export interface OutstandingInvoicesReport {
+  summary: {
+    totalOutstanding: number
+    invoiceCount: number
+    averageDaysOutstanding: number
+  }
+  invoices: {
+    invoiceNumber: string
+    clientName: string
+    amount: number
+    balanceDue: number
+    issueDate: string
+    dueDate: string
+    daysOutstanding: number
+    status: string
+  }[]
+  generatedAt: string
+}
+
+export interface TimeEntriesReport {
+  summary: {
+    totalHours: number
+    billableHours: number
+    nonBillableHours: number
+    totalAmount: number
+    billableAmount: number
+  }
+  entries: {
+    date: string
+    clientName: string
+    caseName: string
+    description: string
+    hours: number
+    hourlyRate: number
+    amount: number
+    isBillable: boolean
+    lawyerName: string
+  }[]
+  period: {
+    startDate: string
+    endDate: string
+  }
+  generatedAt: string
+}
+
+export interface WeeklyTimeEntriesData {
+  weekStartDate: string
+  weekEndDate: string
+  projects: {
+    projectId: string
+    projectName: string
+    clientName: string
+    entries: {
+      [date: string]: {
+        entryId: string
+        duration: number
+        description: string
+        isBillable: boolean
+      }[]
+    }
+    totalHours: number
+  }[]
+  dailyTotals: {
+    [date: string]: number
+  }
+  weeklyTotal: number
 }
 
 export default financeService

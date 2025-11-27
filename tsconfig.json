@@ -8,7 +8,9 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"]
-    }
+    },
+    "skipLibCheck": true
   },
-  "exclude": ["newdesigns", "newdesigns/**/*", "test", "test/**/*", "**/node_modules/**"]
+  "include": ["src/**/*", "vite.config.ts"],
+  "exclude": ["newdesigns", "newdesigns/**/*", "test", "test/**/*", "**/node_modules/**", "miru-web-develop", "miru-web-develop/**/*"]
 }

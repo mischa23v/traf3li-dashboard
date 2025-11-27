@@ -1,7 +1,8 @@
 import { useState, useMemo } from 'react'
 import {
     Search, Filter, Plus, MoreHorizontal,
-    FileText, AlertCircle, CheckCircle, Bell, Loader2
+    FileText, AlertCircle, CheckCircle, Bell, Loader2,
+    Calendar, ChevronLeft, ChevronRight, Download, X
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -13,6 +14,18 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select"
+import {
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
+} from "@/components/ui/popover"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Link } from '@tanstack/react-router'
 import { Header } from '@/components/layout/header'
@@ -24,20 +37,56 @@ import { ThemeSwitch } from '@/components/theme-switch'
 import { ConfigDrawer } from '@/components/config-drawer'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { Skeleton } from '@/components/ui/skeleton'
-import { useInvoices, useOverdueInvoices } from '@/hooks/useFinance'
+import { useInvoices, useOverdueInvoices, useExportReport } from '@/hooks/useFinance'
+import { useClients } from '@/hooks/useCasesAndClients'
 
 export default function InvoicesDashboard() {
     const [activeTab, setActiveTab] = useState('all')
     const [searchQuery, setSearchQuery] = useState('')
+    const [currentPage, setCurrentPage] = useState(1)
+    const [itemsPerPage, setItemsPerPage] = useState(10)
+    const [startDate, setStartDate] = useState('')
+    const [endDate, setEndDate] = useState('')
+    const [selectedClient, setSelectedClient] = useState('')
+    const [showFilters, setShowFilters] = useState(false)
+
+    // Fetch clients for filter
+    const { data: clientsData } = useClients()
+    const { mutate: exportReport, isPending: isExporting } = useExportReport()
 
     // API Filters
     const filters = useMemo(() => {
-        const f: any = {}
+        const f: any = { page: currentPage, limit: itemsPerPage }
         if (activeTab !== 'all') {
             f.status = activeTab
         }
+        if (startDate) f.startDate = startDate
+        if (endDate) f.endDate = endDate
+        if (selectedClient && selectedClient !== 'all') f.clientId = selectedClient
         return f
-    }, [activeTab])
+    }, [activeTab, currentPage, itemsPerPage, startDate, endDate, selectedClient])
+
+    // Active filter count
+    const activeFilterCount = useMemo(() => {
+        let count = 0
+        if (startDate) count++
+        if (endDate) count++
+        if (selectedClient && selectedClient !== 'all') count++
+        return count
+    }, [startDate, endDate, selectedClient])
+
+    // Clear all filters
+    const clearFilters = () => {
+        setStartDate('')
+        setEndDate('')
+        setSelectedClient('')
+        setCurrentPage(1)
+    }
+
+    // Handle export
+    const handleExport = (format: 'csv' | 'pdf') => {
+        exportReport({ reportType: 'invoices', format, filters })
+    }
 
     // Fetch data
     const { data: invoicesData, isLoading, isError, error, refetch } = useInvoices(filters)
@@ -312,47 +361,164 @@ export default function InvoicesDashboard() {
                         <div className="lg:col-span-8 space-y-6">
 
                             {/* Filters Bar */}
-                            <div className="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex flex-wrap items-center justify-between gap-4">
-                                <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full md:w-auto">
-                                    <TabsList className="justify-start bg-slate-50 p-1 rounded-xl border border-slate-200 h-auto">
-                                        <TabsTrigger
-                                            value="all"
-                                            className="rounded-lg px-4 py-2 data-[state=active]:bg-[#022c22] data-[state=active]:text-white transition-all duration-300"
-                                        >
-                                            الكل
-                                        </TabsTrigger>
-                                        <TabsTrigger
-                                            value="pending"
-                                            className="rounded-lg px-4 py-2 data-[state=active]:bg-amber-500 data-[state=active]:text-white transition-all duration-300"
-                                        >
-                                            معلقة
-                                        </TabsTrigger>
-                                        <TabsTrigger
-                                            value="paid"
-                                            className="rounded-lg px-4 py-2 data-[state=active]:bg-emerald-600 data-[state=active]:text-white transition-all duration-300"
-                                        >
-                                            مدفوعة
-                                        </TabsTrigger>
-                                        <TabsTrigger
-                                            value="overdue"
-                                            className="rounded-lg px-4 py-2 data-[state=active]:bg-red-500 data-[state=active]:text-white transition-all duration-300"
-                                        >
-                                            متأخرة
-                                        </TabsTrigger>
-                                    </TabsList>
-                                </Tabs>
+                            <div className="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 space-y-4">
+                                <div className="flex flex-wrap items-center justify-between gap-4">
+                                    <Tabs value={activeTab} onValueChange={(v) => { setActiveTab(v); setCurrentPage(1); }} className="w-full md:w-auto">
+                                        <TabsList className="justify-start bg-slate-50 p-1 rounded-xl border border-slate-200 h-auto">
+                                            <TabsTrigger
+                                                value="all"
+                                                className="rounded-lg px-4 py-2 data-[state=active]:bg-[#022c22] data-[state=active]:text-white transition-all duration-300"
+                                            >
+                                                الكل
+                                            </TabsTrigger>
+                                            <TabsTrigger
+                                                value="pending"
+                                                className="rounded-lg px-4 py-2 data-[state=active]:bg-amber-500 data-[state=active]:text-white transition-all duration-300"
+                                            >
+                                                معلقة
+                                            </TabsTrigger>
+                                            <TabsTrigger
+                                                value="paid"
+                                                className="rounded-lg px-4 py-2 data-[state=active]:bg-emerald-600 data-[state=active]:text-white transition-all duration-300"
+                                            >
+                                                مدفوعة
+                                            </TabsTrigger>
+                                            <TabsTrigger
+                                                value="overdue"
+                                                className="rounded-lg px-4 py-2 data-[state=active]:bg-red-500 data-[state=active]:text-white transition-all duration-300"
+                                            >
+                                                متأخرة
+                                            </TabsTrigger>
+                                        </TabsList>
+                                    </Tabs>
 
-                                <div className="flex items-center gap-3 flex-1 justify-end">
-                                    <div className="relative w-full max-w-xs">
-                                        <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                                        <Input
-                                            placeholder="بحث في الفواتير..."
-                                            className="pr-10 rounded-xl border-slate-200 focus:ring-[#022c22] focus:border-[#022c22]"
-                                            value={searchQuery}
-                                            onChange={(e) => setSearchQuery(e.target.value)}
-                                        />
+                                    <div className="flex items-center gap-3">
+                                        <div className="relative w-full max-w-xs">
+                                            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                                            <Input
+                                                placeholder="بحث في الفواتير..."
+                                                className="pr-10 rounded-xl border-slate-200 focus:ring-[#022c22] focus:border-[#022c22]"
+                                                value={searchQuery}
+                                                onChange={(e) => setSearchQuery(e.target.value)}
+                                            />
+                                        </div>
+                                        <Popover open={showFilters} onOpenChange={setShowFilters}>
+                                            <PopoverTrigger asChild>
+                                                <Button variant="outline" className="rounded-xl border-slate-200 relative">
+                                                    <Filter className="w-4 h-4 ml-2" />
+                                                    تصفية متقدمة
+                                                    {activeFilterCount > 0 && (
+                                                        <Badge className="absolute -top-2 -left-2 h-5 w-5 p-0 flex items-center justify-center bg-brand-blue text-white text-xs">
+                                                            {activeFilterCount}
+                                                        </Badge>
+                                                    )}
+                                                </Button>
+                                            </PopoverTrigger>
+                                            <PopoverContent className="w-80" align="end">
+                                                <div className="space-y-4">
+                                                    <div className="flex items-center justify-between">
+                                                        <h4 className="font-bold text-navy">تصفية متقدمة</h4>
+                                                        {activeFilterCount > 0 && (
+                                                            <Button variant="ghost" size="sm" onClick={clearFilters} className="text-slate-500 hover:text-red-500">
+                                                                <X className="w-4 h-4 ml-1" />
+                                                                مسح
+                                                            </Button>
+                                                        )}
+                                                    </div>
+                                                    <div className="space-y-2">
+                                                        <label className="text-sm font-medium text-slate-700">العميل</label>
+                                                        <Select value={selectedClient} onValueChange={setSelectedClient}>
+                                                            <SelectTrigger className="rounded-xl">
+                                                                <SelectValue placeholder="جميع العملاء" />
+                                                            </SelectTrigger>
+                                                            <SelectContent>
+                                                                <SelectItem value="all">جميع العملاء</SelectItem>
+                                                                {clientsData?.data?.map((client: any) => (
+                                                                    <SelectItem key={client._id} value={client._id}>
+                                                                        {client.fullName || client.name}
+                                                                    </SelectItem>
+                                                                ))}
+                                                            </SelectContent>
+                                                        </Select>
+                                                    </div>
+                                                    <div className="grid grid-cols-2 gap-3">
+                                                        <div className="space-y-2">
+                                                            <label className="text-sm font-medium text-slate-700 flex items-center gap-1">
+                                                                <Calendar className="w-3 h-3" />
+                                                                من تاريخ
+                                                            </label>
+                                                            <Input
+                                                                type="date"
+                                                                value={startDate}
+                                                                onChange={(e) => setStartDate(e.target.value)}
+                                                                className="rounded-xl"
+                                                            />
+                                                        </div>
+                                                        <div className="space-y-2">
+                                                            <label className="text-sm font-medium text-slate-700 flex items-center gap-1">
+                                                                <Calendar className="w-3 h-3" />
+                                                                إلى تاريخ
+                                                            </label>
+                                                            <Input
+                                                                type="date"
+                                                                value={endDate}
+                                                                onChange={(e) => setEndDate(e.target.value)}
+                                                                className="rounded-xl"
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                    <div className="pt-2 border-t border-slate-100 flex gap-2">
+                                                        <Button
+                                                            variant="outline"
+                                                            size="sm"
+                                                            onClick={() => handleExport('csv')}
+                                                            disabled={isExporting}
+                                                            className="flex-1 rounded-xl"
+                                                        >
+                                                            <Download className="w-4 h-4 ml-1" />
+                                                            CSV
+                                                        </Button>
+                                                        <Button
+                                                            variant="outline"
+                                                            size="sm"
+                                                            onClick={() => handleExport('pdf')}
+                                                            disabled={isExporting}
+                                                            className="flex-1 rounded-xl"
+                                                        >
+                                                            <Download className="w-4 h-4 ml-1" />
+                                                            PDF
+                                                        </Button>
+                                                    </div>
+                                                </div>
+                                            </PopoverContent>
+                                        </Popover>
                                     </div>
                                 </div>
+
+                                {/* Active Filters Display */}
+                                {activeFilterCount > 0 && (
+                                    <div className="flex items-center gap-2 flex-wrap">
+                                        <span className="text-sm text-slate-500">الفلاتر النشطة:</span>
+                                        {selectedClient && selectedClient !== 'all' && (
+                                            <Badge variant="outline" className="bg-blue-50 border-blue-200 text-blue-700 gap-1">
+                                                العميل
+                                                <X className="w-3 h-3 cursor-pointer" onClick={() => setSelectedClient('')} />
+                                            </Badge>
+                                        )}
+                                        {startDate && (
+                                            <Badge variant="outline" className="bg-purple-50 border-purple-200 text-purple-700 gap-1">
+                                                من: {new Date(startDate).toLocaleDateString('ar-SA')}
+                                                <X className="w-3 h-3 cursor-pointer" onClick={() => setStartDate('')} />
+                                            </Badge>
+                                        )}
+                                        {endDate && (
+                                            <Badge variant="outline" className="bg-purple-50 border-purple-200 text-purple-700 gap-1">
+                                                إلى: {new Date(endDate).toLocaleDateString('ar-SA')}
+                                                <X className="w-3 h-3 cursor-pointer" onClick={() => setEndDate('')} />
+                                            </Badge>
+                                        )}
+                                    </div>
+                                )}
                             </div>
 
                             {/* List Items */}
@@ -433,6 +599,60 @@ export default function InvoicesDashboard() {
                                     </div>
                                 ))}
                             </div>
+
+                            {/* Pagination */}
+                            {filteredInvoices.length > 0 && (
+                                <div className="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex flex-wrap items-center justify-between gap-4">
+                                    <div className="flex items-center gap-2">
+                                        <span className="text-sm text-slate-500">عرض</span>
+                                        <Select value={itemsPerPage.toString()} onValueChange={(v) => { setItemsPerPage(parseInt(v)); setCurrentPage(1); }}>
+                                            <SelectTrigger className="w-[70px] h-9 rounded-lg">
+                                                <SelectValue />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="5">5</SelectItem>
+                                                <SelectItem value="10">10</SelectItem>
+                                                <SelectItem value="20">20</SelectItem>
+                                                <SelectItem value="50">50</SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                        <span className="text-sm text-slate-500">من {invoicesData?.total || filteredInvoices.length} فاتورة</span>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <Button
+                                            variant="outline"
+                                            size="icon"
+                                            onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                                            disabled={currentPage === 1}
+                                            className="rounded-lg h-9 w-9"
+                                        >
+                                            <ChevronRight className="w-4 h-4" />
+                                        </Button>
+                                        <div className="flex items-center gap-1">
+                                            {Array.from({ length: Math.min(5, Math.ceil((invoicesData?.total || filteredInvoices.length) / itemsPerPage)) }, (_, i) => i + 1).map((page) => (
+                                                <Button
+                                                    key={page}
+                                                    variant={currentPage === page ? "default" : "outline"}
+                                                    size="icon"
+                                                    onClick={() => setCurrentPage(page)}
+                                                    className={`rounded-lg h-9 w-9 ${currentPage === page ? 'bg-brand-blue text-white' : ''}`}
+                                                >
+                                                    {page}
+                                                </Button>
+                                            ))}
+                                        </div>
+                                        <Button
+                                            variant="outline"
+                                            size="icon"
+                                            onClick={() => setCurrentPage(p => p + 1)}
+                                            disabled={currentPage >= Math.ceil((invoicesData?.total || filteredInvoices.length) / itemsPerPage)}
+                                            className="rounded-lg h-9 w-9"
+                                        >
+                                            <ChevronLeft className="w-4 h-4" />
+                                        </Button>
+                                    </div>
+                                </div>
+                            )}
                         </div>
 
                         {/* Sidebar - Summary */}
