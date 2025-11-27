@@ -319,6 +319,14 @@ export const useCreatePayment = () => {
   })
 }
 
+export const usePayment = (id: string) => {
+  return useQuery({
+    queryKey: ['payments', id],
+    queryFn: () => financeService.getPayment(id),
+    enabled: !!id,
+  })
+}
+
 export const useCompletePayment = () => {
   const queryClient = useQueryClient()
 
@@ -332,6 +340,31 @@ export const useCompletePayment = () => {
     onError: (error: Error) => {
       toast.error(error.message || 'فشل إكمال الدفعة')
     },
+  })
+}
+
+export const useRecordPaymentForInvoice = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({ invoiceId, data }: { invoiceId: string; data: any }) =>
+      financeService.recordPaymentForInvoice(invoiceId, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['payments'] })
+      queryClient.invalidateQueries({ queryKey: ['invoices'] })
+      toast.success('تم تسجيل الدفعة بنجاح')
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'فشل تسجيل الدفعة')
+    },
+  })
+}
+
+export const usePaymentsSummary = (filters?: any) => {
+  return useQuery({
+    queryKey: ['payments', 'summary', filters],
+    queryFn: () => financeService.getPaymentsSummary(filters),
+    staleTime: 5 * 60 * 1000,
   })
 }
 

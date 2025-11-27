@@ -22,6 +22,11 @@ import {
   Receipt,
   FileStack,
   FileInput,
+  CreditCard,
+  ClipboardList,
+  Percent,
+  Building,
+  Wallet,
 } from 'lucide-react'
 import { useAuthStore } from '@/stores/auth-store'
 
@@ -205,6 +210,14 @@ export function useSidebarData(): SidebarData {
                 url: '/dashboard/finance/invoices',
               },
               {
+                title: 'عروض الأسعار',
+                url: '/dashboard/finance/quotes',
+              },
+              {
+                title: 'المدفوعات',
+                url: '/dashboard/finance/payments',
+              },
+              {
                 title: 'المصروفات',
                 url: '/dashboard/finance/expenses',
               },
@@ -298,6 +311,22 @@ export function useSidebarData(): SidebarData {
               {
                 title: 'التفضيلات',
                 url: '/dashboard/settings/preferences',
+              },
+              {
+                title: 'بيانات الشركة',
+                url: '/dashboard/settings/company',
+              },
+              {
+                title: 'إعدادات الفواتير',
+                url: '/dashboard/settings/finance',
+              },
+              {
+                title: 'الضرائب',
+                url: '/dashboard/settings/taxes',
+              },
+              {
+                title: 'طرق الدفع',
+                url: '/dashboard/settings/payment-modes',
               },
             ],
           },
