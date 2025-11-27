@@ -1,3 +1,5 @@
 export { AccountsAgingReport } from './accounts-aging-report'
 export { RevenueByClientReport } from './revenue-by-client-report'
 export { ReportsDashboard } from './reports-dashboard'
+export { OutstandingInvoicesReport } from './outstanding-invoices-report'
+export { TimeEntriesReport } from './time-entries-report'

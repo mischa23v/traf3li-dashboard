@@ -596,3 +596,162 @@ export const useWeeklyTimeEntries = (weekStartDate: string) => {
     enabled: !!weekStartDate,
   })
 }
+
+// ==================== DELETE MUTATIONS ====================
+
+export const useDeleteInvoice = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (id: string) => financeService.deleteInvoice(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['invoices'] })
+      toast.success('تم حذف الفاتورة بنجاح')
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'فشل حذف الفاتورة')
+    },
+  })
+}
+
+export const useDeleteExpense = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (id: string) => financeService.deleteExpense(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['expenses'] })
+      toast.success('تم حذف المصروف بنجاح')
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'فشل حذف المصروف')
+    },
+  })
+}
+
+export const useUpdateTimeEntry = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: Partial<CreateTimeEntryData> }) =>
+      financeService.updateTimeEntry(id, data),
+    onSuccess: (_, { id }) => {
+      queryClient.invalidateQueries({ queryKey: ['timeEntries'] })
+      queryClient.invalidateQueries({ queryKey: ['timeEntries', id] })
+      toast.success('تم تحديث إدخال الوقت بنجاح')
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'فشل تحديث إدخال الوقت')
+    },
+  })
+}
+
+export const useDeleteTimeEntry = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (id: string) => financeService.deleteTimeEntry(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['timeEntries'] })
+      toast.success('تم حذف إدخال الوقت بنجاح')
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'فشل حذف إدخال الوقت')
+    },
+  })
+}
+
+export const useUpdateTransaction = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: Partial<CreateTransactionData> }) =>
+      financeService.updateTransaction(id, data),
+    onSuccess: (_, { id }) => {
+      queryClient.invalidateQueries({ queryKey: ['transactions'] })
+      queryClient.invalidateQueries({ queryKey: ['transactions', id] })
+      toast.success('تم تحديث المعاملة بنجاح')
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'فشل تحديث المعاملة')
+    },
+  })
+}
+
+export const useDeleteTransaction = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (id: string) => financeService.deleteTransaction(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['transactions'] })
+      toast.success('تم حذف المعاملة بنجاح')
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'فشل حذف المعاملة')
+    },
+  })
+}
+
+export const useDownloadStatement = () => {
+  return useMutation({
+    mutationFn: ({ id, format }: { id: string; format: 'pdf' | 'xlsx' }) =>
+      financeService.downloadStatement(id, format),
+    onSuccess: (blob, { id, format }) => {
+      const url = window.URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `statement-${id}.${format}`
+      document.body.appendChild(a)
+      a.click()
+      document.body.removeChild(a)
+      window.URL.revokeObjectURL(url)
+      toast.success('تم تحميل الكشف بنجاح')
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'فشل تحميل الكشف')
+    },
+  })
+}
+
+// ==================== ACCOUNT ACTIVITY ====================
+
+export const useAccountActivity = (id: string) => {
+  return useQuery({
+    queryKey: ['activities', id],
+    queryFn: () => financeService.getActivity(id),
+    enabled: !!id,
+  })
+}
+
+export const useUpdateAccountActivity = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: any }) =>
+      financeService.updateActivity(id, data),
+    onSuccess: (_, { id }) => {
+      queryClient.invalidateQueries({ queryKey: ['activities'] })
+      queryClient.invalidateQueries({ queryKey: ['activities', id] })
+      toast.success('تم تحديث النشاط بنجاح')
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'فشل تحديث النشاط')
+    },
+  })
+}
+
+export const useDeleteAccountActivity = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (id: string) => financeService.deleteActivity(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['activities'] })
+      toast.success('تم حذف النشاط بنجاح')
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'فشل حذف النشاط')
+    },
+  })
+}

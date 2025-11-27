@@ -417,6 +417,18 @@ const financeService = {
   },
 
   /**
+   * Delete invoice
+   */
+  deleteInvoice: async (id: string): Promise<void> => {
+    try {
+      await apiClient.delete(`/invoices/${id}`)
+    } catch (error: any) {
+      console.error('Delete invoice error:', error)
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
    * Get overdue invoices
    */
   getOverdueInvoices: async (): Promise<Invoice[]> => {
@@ -514,6 +526,18 @@ const financeService = {
       return response.data.stats || response.data.data
     } catch (error: any) {
       console.error('Get expense stats error:', error)
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Delete expense
+   */
+  deleteExpense: async (id: string): Promise<void> => {
+    try {
+      await apiClient.delete(`/expenses/${id}`)
+    } catch (error: any) {
+      console.error('Delete expense error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -642,6 +666,31 @@ const financeService = {
       return response.data
     } catch (error: any) {
       console.error('Get time stats error:', error)
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Update time entry
+   */
+  updateTimeEntry: async (id: string, data: Partial<CreateTimeEntryData>): Promise<TimeEntry> => {
+    try {
+      const response = await apiClient.patch(`/time-tracking/entries/${id}`, data)
+      return response.data.timeEntry || response.data.data
+    } catch (error: any) {
+      console.error('Update time entry error:', error)
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Delete time entry
+   */
+  deleteTimeEntry: async (id: string): Promise<void> => {
+    try {
+      await apiClient.delete(`/time-tracking/entries/${id}`)
+    } catch (error: any) {
+      console.error('Delete time entry error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -797,6 +846,31 @@ const financeService = {
     }
   },
 
+  /**
+   * Update transaction
+   */
+  updateTransaction: async (id: string, data: Partial<CreateTransactionData>): Promise<Transaction> => {
+    try {
+      const response = await apiClient.patch(`/transactions/${id}`, data)
+      return response.data.transaction || response.data.data
+    } catch (error: any) {
+      console.error('Update transaction error:', error)
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Delete transaction
+   */
+  deleteTransaction: async (id: string): Promise<void> => {
+    try {
+      await apiClient.delete(`/transactions/${id}`)
+    } catch (error: any) {
+      console.error('Delete transaction error:', error)
+      throw new Error(handleApiError(error))
+    }
+  },
+
   // ==================== STATEMENTS ====================
 
   /**
@@ -876,6 +950,22 @@ const financeService = {
     }
   },
 
+  /**
+   * Download statement
+   */
+  downloadStatement: async (id: string, format: 'pdf' | 'xlsx'): Promise<Blob> => {
+    try {
+      const response = await apiClient.get(`/statements/${id}/download`, {
+        params: { format },
+        responseType: 'blob'
+      })
+      return response.data
+    } catch (error: any) {
+      console.error('Download statement error:', error)
+      throw new Error(handleApiError(error))
+    }
+  },
+
   // ==================== ACTIVITY ====================
 
   /**
@@ -913,6 +1003,31 @@ const financeService = {
       return response.data.activity || response.data.data
     } catch (error: any) {
       console.error('Create activity error:', error)
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Update activity
+   */
+  updateActivity: async (id: string, data: Partial<CreateActivityData>): Promise<FinancialActivity> => {
+    try {
+      const response = await apiClient.patch(`/activities/${id}`, data)
+      return response.data.activity || response.data.data
+    } catch (error: any) {
+      console.error('Update activity error:', error)
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Delete activity
+   */
+  deleteActivity: async (id: string): Promise<void> => {
+    try {
+      await apiClient.delete(`/activities/${id}`)
+    } catch (error: any) {
+      console.error('Delete activity error:', error)
       throw new Error(handleApiError(error))
     }
   },
