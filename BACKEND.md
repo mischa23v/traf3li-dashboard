@@ -1330,6 +1330,929 @@ Update notification settings.
 
 ---
 
+## Bank Accounts API (Akaunting-Inspired)
+
+This API provides comprehensive bank account management including accounts, transfers, transactions, and reconciliation.
+
+### Bank Accounts
+
+#### GET `/bank-accounts`
+Get all bank accounts.
+
+**Query Parameters:**
+| Param | Type | Description |
+|-------|------|-------------|
+| type | string | `checking`, `savings`, `credit_card`, `cash`, `investment`, `loan`, `other` |
+| currency | string | Filter by currency (e.g., `SAR`, `USD`) |
+| isActive | boolean | Filter by active status |
+| search | string | Search by name, account number |
+| page | number | Page number |
+| limit | number | Items per page |
+
+**Response:**
+```json
+{
+  "accounts": [
+    {
+      "_id": "string",
+      "accountNumber": "string",
+      "name": "الحساب الرئيسي",
+      "nameAr": "الحساب الرئيسي",
+      "type": "checking | savings | credit_card | cash | investment | loan | other",
+      "bankName": "البنك الأهلي",
+      "bankCode": "string",
+      "currency": "SAR",
+      "balance": 150000,
+      "availableBalance": 145000,
+      "openingBalance": 100000,
+      "isDefault": true,
+      "isActive": true,
+      "iban": "SA0380000000608010167519",
+      "swiftCode": "NCBKSAJE",
+      "routingNumber": "string",
+      "branchName": "فرع الرياض",
+      "branchCode": "001",
+      "accountHolder": "شركة ترافلي للمحاماة",
+      "accountHolderAddress": "الرياض، المملكة العربية السعودية",
+      "minBalance": 10000,
+      "overdraftLimit": 50000,
+      "interestRate": 0,
+      "description": "الحساب الرئيسي للشركة",
+      "notes": "string",
+      "color": "#0f766e",
+      "icon": "bank",
+      "connection": {
+        "_id": "string",
+        "provider": "plaid | yodlee | saltedge",
+        "institutionId": "string",
+        "institutionName": "البنك الأهلي",
+        "status": "connected | disconnected | error | expired",
+        "lastSyncedAt": "ISO date",
+        "expiresAt": "ISO date",
+        "error": "string"
+      },
+      "lastSyncedAt": "ISO date",
+      "createdAt": "ISO date",
+      "updatedAt": "ISO date"
+    }
+  ],
+  "total": 5
+}
+```
+
+#### GET `/bank-accounts/:id`
+Get single bank account with details.
+
+#### POST `/bank-accounts`
+Create a new bank account.
+
+**Request:**
+```json
+{
+  "name": "الحساب الرئيسي",
+  "nameAr": "الحساب الرئيسي",
+  "type": "checking",
+  "bankName": "البنك الأهلي",
+  "accountNumber": "608010167519",
+  "currency": "SAR",
+  "openingBalance": 100000,
+  "iban": "SA0380000000608010167519",
+  "swiftCode": "NCBKSAJE",
+  "accountHolder": "شركة ترافلي للمحاماة",
+  "accountHolderAddress": "الرياض، المملكة العربية السعودية",
+  "branchName": "فرع الرياض",
+  "isDefault": false,
+  "description": "حساب جديد",
+  "color": "#0f766e"
+}
+```
+
+#### PUT `/bank-accounts/:id`
+Update bank account.
+
+#### DELETE `/bank-accounts/:id`
+Delete bank account.
+
+#### POST `/bank-accounts/:id/set-default`
+Set account as default.
+
+#### GET `/bank-accounts/:id/balance-history`
+Get account balance history.
+
+**Query Parameters:**
+| Param | Type | Description |
+|-------|------|-------------|
+| period | string | `week`, `month`, `quarter`, `year` |
+
+**Response:**
+```json
+{
+  "data": [
+    { "date": "2024-01-01", "balance": 100000 },
+    { "date": "2024-01-02", "balance": 105000 },
+    { "date": "2024-01-03", "balance": 102000 }
+  ]
+}
+```
+
+#### GET `/bank-accounts/summary`
+Get summary of all accounts.
+
+**Response:**
+```json
+{
+  "summary": {
+    "totalBalance": 500000,
+    "totalAccounts": 5,
+    "byType": [
+      { "type": "checking", "count": 2, "balance": 300000 },
+      { "type": "savings", "count": 1, "balance": 150000 },
+      { "type": "cash", "count": 2, "balance": 50000 }
+    ],
+    "byCurrency": [
+      { "currency": "SAR", "balance": 450000 },
+      { "currency": "USD", "balance": 50000 }
+    ]
+  }
+}
+```
+
+### Bank Transfers
+
+#### GET `/bank-transfers`
+Get all transfers between accounts.
+
+**Query Parameters:**
+| Param | Type | Description |
+|-------|------|-------------|
+| fromAccountId | string | Source account ID |
+| toAccountId | string | Destination account ID |
+| status | string | `pending`, `completed`, `failed`, `cancelled` |
+| startDate | string | Date range start |
+| endDate | string | Date range end |
+| page | number | Page number |
+| limit | number | Items per page |
+
+**Response:**
+```json
+{
+  "transfers": [
+    {
+      "_id": "string",
+      "transferNumber": "TRF-0001",
+      "fromAccountId": "string",
+      "fromAccount": { "_id": "string", "name": "الحساب الرئيسي", "bankName": "البنك الأهلي" },
+      "toAccountId": "string",
+      "toAccount": { "_id": "string", "name": "حساب التوفير", "bankName": "البنك الأهلي" },
+      "amount": 50000,
+      "fromCurrency": "SAR",
+      "toCurrency": "SAR",
+      "exchangeRate": 1,
+      "fee": 0,
+      "date": "ISO date",
+      "status": "pending | completed | failed | cancelled",
+      "reference": "string",
+      "description": "تحويل للتوفير",
+      "notes": "string",
+      "createdBy": "string",
+      "approvedBy": "string",
+      "approvedAt": "ISO date",
+      "createdAt": "ISO date",
+      "updatedAt": "ISO date"
+    }
+  ],
+  "total": 50
+}
+```
+
+#### GET `/bank-transfers/:id`
+Get single transfer.
+
+#### POST `/bank-transfers`
+Create transfer between accounts.
+
+**Request:**
+```json
+{
+  "fromAccountId": "string",
+  "toAccountId": "string",
+  "amount": 50000,
+  "date": "ISO date",
+  "exchangeRate": 1,
+  "fee": 0,
+  "reference": "string",
+  "description": "تحويل للتوفير"
+}
+```
+
+**Response:**
+```json
+{
+  "transfer": {
+    "_id": "string",
+    "transferNumber": "TRF-0001",
+    "status": "completed"
+  }
+}
+```
+
+#### POST `/bank-transfers/:id/cancel`
+Cancel a pending transfer.
+
+### Bank Transactions
+
+Transactions imported from bank statements or created manually for reconciliation.
+
+#### GET `/bank-transactions`
+Get bank transactions.
+
+**Query Parameters:**
+| Param | Type | Description |
+|-------|------|-------------|
+| accountId | string | Bank account ID |
+| startDate | string | Date range start |
+| endDate | string | Date range end |
+| type | string | `credit`, `debit` |
+| matched | boolean | Matched with system records |
+| isReconciled | boolean | Reconciliation status |
+| search | string | Search term |
+| page | number | Page number |
+| limit | number | Items per page |
+
+**Response:**
+```json
+{
+  "transactions": [
+    {
+      "_id": "string",
+      "accountId": "string",
+      "transactionId": "TXN-0001",
+      "date": "ISO date",
+      "type": "credit | debit",
+      "amount": 5000,
+      "balance": 155000,
+      "description": "تحويل وارد - عميل أحمد",
+      "reference": "REF123456",
+      "category": "client_payment",
+      "payee": "أحمد محمد",
+      "matched": true,
+      "matchedTransactionId": "string",
+      "matchedType": "invoice | expense | payment | transfer",
+      "reconciliationId": "string",
+      "isReconciled": true,
+      "importBatchId": "string",
+      "rawData": {},
+      "createdAt": "ISO date",
+      "updatedAt": "ISO date"
+    }
+  ],
+  "total": 200
+}
+```
+
+#### POST `/bank-transactions`
+Create manual transaction entry.
+
+**Request:**
+```json
+{
+  "accountId": "string",
+  "date": "ISO date",
+  "type": "credit | debit",
+  "amount": 5000,
+  "description": "دفعة نقدية",
+  "reference": "string",
+  "category": "string",
+  "payee": "string"
+}
+```
+
+#### POST `/bank-accounts/:accountId/import`
+Import transactions from file (CSV, OFX, QIF).
+
+**Request:** `multipart/form-data` with `file` field
+
+**Response:**
+```json
+{
+  "imported": 150,
+  "duplicates": 5,
+  "errors": [
+    { "row": 10, "error": "Invalid date format" }
+  ]
+}
+```
+
+#### POST `/bank-transactions/:transactionId/match`
+Match transaction with system record.
+
+**Request:**
+```json
+{
+  "type": "invoice | expense | payment | transfer",
+  "recordId": "string"
+}
+```
+
+#### POST `/bank-transactions/:transactionId/unmatch`
+Remove match from transaction.
+
+### Bank Reconciliation
+
+#### GET `/bank-reconciliations`
+Get reconciliation sessions.
+
+**Query Parameters:**
+| Param | Type | Description |
+|-------|------|-------------|
+| accountId | string | Bank account ID |
+
+**Response:**
+```json
+{
+  "reconciliations": [
+    {
+      "_id": "string",
+      "reconciliationNumber": "REC-0001",
+      "accountId": "string",
+      "account": { "_id": "string", "name": "الحساب الرئيسي" },
+      "startDate": "ISO date",
+      "endDate": "ISO date",
+      "openingBalance": 100000,
+      "closingBalance": 150000,
+      "statementBalance": 150000,
+      "difference": 0,
+      "status": "pending | in_progress | completed | cancelled",
+      "transactions": [
+        {
+          "transactionId": "string",
+          "amount": 5000,
+          "date": "ISO date",
+          "type": "credit",
+          "description": "دفعة عميل",
+          "isCleared": true,
+          "clearedAt": "ISO date"
+        }
+      ],
+      "totalCredits": 80000,
+      "totalDebits": 30000,
+      "clearedCredits": 75000,
+      "clearedDebits": 25000,
+      "startedBy": "string",
+      "startedAt": "ISO date",
+      "completedBy": "string",
+      "completedAt": "ISO date",
+      "notes": "string",
+      "createdAt": "ISO date",
+      "updatedAt": "ISO date"
+    }
+  ]
+}
+```
+
+#### GET `/bank-reconciliations/:id`
+Get single reconciliation with all transactions.
+
+#### POST `/bank-reconciliations`
+Start a new reconciliation session.
+
+**Request:**
+```json
+{
+  "accountId": "string",
+  "endDate": "ISO date",
+  "statementBalance": 150000
+}
+```
+
+**Response:**
+```json
+{
+  "reconciliation": {
+    "_id": "string",
+    "reconciliationNumber": "REC-0001",
+    "status": "in_progress",
+    "openingBalance": 100000,
+    "closingBalance": 0,
+    "statementBalance": 150000,
+    "difference": -150000,
+    "transactions": [...]
+  }
+}
+```
+
+#### POST `/bank-reconciliations/:id/clear`
+Clear/check off a transaction in reconciliation.
+
+**Request:**
+```json
+{
+  "transactionId": "string"
+}
+```
+
+#### POST `/bank-reconciliations/:id/unclear`
+Uncheck a cleared transaction.
+
+**Request:**
+```json
+{
+  "transactionId": "string"
+}
+```
+
+#### POST `/bank-reconciliations/:id/complete`
+Complete and finalize reconciliation.
+
+**Note:** Will fail if difference is not zero. Returns error with unreconciled amount.
+
+#### POST `/bank-reconciliations/:id/cancel`
+Cancel reconciliation session.
+
+### Bank Connections (Optional - for automated sync)
+
+#### POST `/bank-connections/connect`
+Initiate bank connection OAuth flow.
+
+**Request:**
+```json
+{
+  "provider": "plaid | yodlee | saltedge"
+}
+```
+
+**Response:**
+```json
+{
+  "authUrl": "https://provider.com/oauth/authorize?..."
+}
+```
+
+#### POST `/bank-connections/callback`
+Complete bank connection after OAuth.
+
+**Request:**
+```json
+{
+  "code": "oauth_code",
+  "state": "state_token"
+}
+```
+
+#### POST `/bank-accounts/:id/sync`
+Sync transactions from connected bank.
+
+**Response:**
+```json
+{
+  "synced": 50,
+  "newTransactions": 10,
+  "lastSyncedAt": "ISO date"
+}
+```
+
+#### POST `/bank-accounts/:id/disconnect`
+Disconnect bank account from provider.
+
+---
+
+## Bills/Payables API (Akaunting-Inspired)
+
+This API manages vendor bills (accounts payable), vendors, and bill payments.
+
+### Vendors
+
+#### GET `/vendors`
+Get all vendors.
+
+**Query Parameters:**
+| Param | Type | Description |
+|-------|------|-------------|
+| search | string | Search by name, email |
+| isActive | boolean | Filter by active status |
+| country | string | Filter by country |
+| page | number | Page number |
+| limit | number | Items per page |
+
+**Response:**
+```json
+{
+  "vendors": [
+    {
+      "_id": "string",
+      "vendorId": "VND-0001",
+      "name": "شركة الأثاث المكتبي",
+      "nameAr": "شركة الأثاث المكتبي",
+      "email": "info@furniture.com",
+      "phone": "+966500000000",
+      "taxNumber": "300000000000003",
+      "address": "شارع الملك فهد",
+      "city": "الرياض",
+      "country": "SA",
+      "postalCode": "12345",
+      "bankName": "البنك الأهلي",
+      "bankAccountNumber": "1234567890",
+      "bankIban": "SA0380000000001234567890",
+      "currency": "SAR",
+      "paymentTerms": 30,
+      "defaultCategory": "office_supplies",
+      "notes": "مورد موثوق",
+      "isActive": true,
+      "createdAt": "ISO date",
+      "updatedAt": "ISO date"
+    }
+  ],
+  "total": 25
+}
+```
+
+#### GET `/vendors/:id`
+Get single vendor.
+
+#### POST `/vendors`
+Create vendor.
+
+**Request:**
+```json
+{
+  "name": "شركة الأثاث المكتبي",
+  "nameAr": "شركة الأثاث المكتبي",
+  "email": "info@furniture.com",
+  "phone": "+966500000000",
+  "taxNumber": "300000000000003",
+  "address": "شارع الملك فهد",
+  "city": "الرياض",
+  "country": "SA",
+  "postalCode": "12345",
+  "bankName": "البنك الأهلي",
+  "bankAccountNumber": "1234567890",
+  "bankIban": "SA0380000000001234567890",
+  "currency": "SAR",
+  "paymentTerms": 30,
+  "defaultCategory": "office_supplies",
+  "notes": "string"
+}
+```
+
+#### PUT `/vendors/:id`
+Update vendor.
+
+#### DELETE `/vendors/:id`
+Delete vendor.
+
+#### GET `/vendors/:id/summary`
+Get vendor summary with bills.
+
+**Response:**
+```json
+{
+  "summary": {
+    "totalBills": 15,
+    "totalAmount": 75000,
+    "totalPaid": 60000,
+    "totalOutstanding": 15000,
+    "bills": [...]
+  }
+}
+```
+
+### Bills
+
+#### GET `/bills`
+Get all bills (payables).
+
+**Query Parameters:**
+| Param | Type | Description |
+|-------|------|-------------|
+| status | string | `draft`, `received`, `pending`, `partial`, `paid`, `overdue`, `cancelled` |
+| vendorId | string | Filter by vendor |
+| caseId | string | Filter by case |
+| categoryId | string | Filter by category |
+| startDate | string | Bill date range start |
+| endDate | string | Bill date range end |
+| overdue | boolean | Filter overdue bills |
+| search | string | Search term |
+| page | number | Page number |
+| limit | number | Items per page |
+
+**Response:**
+```json
+{
+  "bills": [
+    {
+      "_id": "string",
+      "billNumber": "BILL-0001",
+      "vendorId": "string",
+      "vendor": { "_id": "string", "name": "شركة الأثاث", "vendorId": "VND-0001" },
+      "items": [
+        {
+          "_id": "string",
+          "description": "كراسي مكتبية",
+          "descriptionAr": "كراسي مكتبية",
+          "quantity": 10,
+          "unitPrice": 500,
+          "taxRate": 0.15,
+          "taxAmount": 750,
+          "discount": 0,
+          "total": 5750,
+          "categoryId": "string"
+        }
+      ],
+      "subtotal": 5000,
+      "taxRate": 0.15,
+      "taxAmount": 750,
+      "discountType": "fixed | percentage",
+      "discountValue": 0,
+      "discountAmount": 0,
+      "totalAmount": 5750,
+      "amountPaid": 0,
+      "balanceDue": 5750,
+      "currency": "SAR",
+      "exchangeRate": 1,
+      "billDate": "ISO date",
+      "dueDate": "ISO date",
+      "paidDate": "ISO date",
+      "status": "draft | received | pending | partial | paid | overdue | cancelled",
+      "caseId": "string",
+      "categoryId": "string",
+      "attachments": [
+        {
+          "_id": "string",
+          "fileName": "invoice.pdf",
+          "fileUrl": "https://...",
+          "fileType": "application/pdf",
+          "fileSize": 102400,
+          "uploadedAt": "ISO date"
+        }
+      ],
+      "isRecurring": false,
+      "recurringConfig": {
+        "frequency": "monthly",
+        "interval": 1,
+        "startDate": "ISO date",
+        "endDate": "ISO date",
+        "nextBillDate": "ISO date",
+        "autoGenerate": true,
+        "autoSend": false
+      },
+      "parentBillId": "string",
+      "notes": "string",
+      "internalNotes": "ملاحظات داخلية",
+      "reference": "المرجع الخارجي",
+      "history": [
+        {
+          "action": "created | updated | sent | paid",
+          "performedBy": "string",
+          "performedAt": "ISO date",
+          "details": {}
+        }
+      ],
+      "createdAt": "ISO date",
+      "updatedAt": "ISO date"
+    }
+  ],
+  "total": 100
+}
+```
+
+#### GET `/bills/:id`
+Get single bill with full details.
+
+#### POST `/bills`
+Create a new bill.
+
+**Request:**
+```json
+{
+  "vendorId": "string",
+  "items": [
+    {
+      "description": "كراسي مكتبية",
+      "descriptionAr": "كراسي مكتبية",
+      "quantity": 10,
+      "unitPrice": 500,
+      "taxRate": 0.15,
+      "categoryId": "string"
+    }
+  ],
+  "billDate": "ISO date",
+  "dueDate": "ISO date",
+  "taxRate": 0.15,
+  "discountType": "fixed",
+  "discountValue": 0,
+  "caseId": "string",
+  "categoryId": "string",
+  "notes": "string",
+  "internalNotes": "string",
+  "reference": "string",
+  "isRecurring": false,
+  "recurringConfig": {
+    "frequency": "monthly",
+    "interval": 1,
+    "startDate": "ISO date",
+    "endDate": "ISO date",
+    "autoGenerate": true,
+    "autoSend": false
+  }
+}
+```
+
+#### PUT `/bills/:id`
+Update bill.
+
+#### DELETE `/bills/:id`
+Delete bill.
+
+#### POST `/bills/:id/receive`
+Mark bill as received (from draft).
+
+#### POST `/bills/:id/cancel`
+Cancel bill.
+
+#### POST `/bills/:id/attachments`
+Upload attachment to bill.
+
+**Request:** `multipart/form-data` with `file` field
+
+#### DELETE `/bills/:id/attachments/:attachmentId`
+Delete bill attachment.
+
+#### POST `/bills/:id/duplicate`
+Duplicate a bill.
+
+#### GET `/bills/overdue`
+Get all overdue bills.
+
+#### GET `/bills/summary`
+Get bills summary/statistics.
+
+**Query Parameters:**
+| Param | Type | Description |
+|-------|------|-------------|
+| startDate | string | Date range start |
+| endDate | string | Date range end |
+| vendorId | string | Filter by vendor |
+
+**Response:**
+```json
+{
+  "summary": {
+    "totalBills": 100,
+    "totalAmount": 500000,
+    "totalPaid": 400000,
+    "totalOutstanding": 100000,
+    "totalOverdue": 25000,
+    "byStatus": [
+      { "status": "paid", "count": 80, "amount": 400000 },
+      { "status": "pending", "count": 15, "amount": 75000 },
+      { "status": "overdue", "count": 5, "amount": 25000 }
+    ],
+    "byCategory": [
+      { "categoryId": "office_supplies", "categoryName": "مستلزمات مكتبية", "amount": 150000 },
+      { "categoryId": "utilities", "categoryName": "خدمات", "amount": 100000 }
+    ]
+  }
+}
+```
+
+### Recurring Bills
+
+#### GET `/bills/recurring`
+Get all recurring bill templates.
+
+#### POST `/bills/:id/stop-recurring`
+Stop a recurring bill from generating new bills.
+
+#### POST `/bills/:id/generate-next`
+Manually generate the next bill from recurring template.
+
+### Bill Payments
+
+#### GET `/bill-payments`
+Get bill payments.
+
+**Query Parameters:**
+| Param | Type | Description |
+|-------|------|-------------|
+| billId | string | Filter by bill |
+| vendorId | string | Filter by vendor |
+| startDate | string | Payment date range start |
+| endDate | string | Payment date range end |
+| page | number | Page number |
+| limit | number | Items per page |
+
+**Response:**
+```json
+{
+  "payments": [
+    {
+      "_id": "string",
+      "paymentNumber": "BPAY-0001",
+      "billId": "string",
+      "bill": { "_id": "string", "billNumber": "BILL-0001", "totalAmount": 5750 },
+      "vendorId": "string",
+      "vendor": { "_id": "string", "name": "شركة الأثاث" },
+      "amount": 5750,
+      "currency": "SAR",
+      "paymentDate": "ISO date",
+      "paymentMethod": "bank_transfer | cash | check | credit_card",
+      "bankAccountId": "string",
+      "reference": "TRX123456",
+      "notes": "دفعة كاملة",
+      "status": "pending | completed | failed | cancelled",
+      "createdAt": "ISO date",
+      "updatedAt": "ISO date"
+    }
+  ],
+  "total": 50
+}
+```
+
+#### GET `/bill-payments/:id`
+Get single bill payment.
+
+#### POST `/bill-payments`
+Record a payment for a bill.
+
+**Request:**
+```json
+{
+  "billId": "string",
+  "amount": 5750,
+  "paymentDate": "ISO date",
+  "paymentMethod": "bank_transfer",
+  "bankAccountId": "string",
+  "reference": "TRX123456",
+  "notes": "دفعة كاملة"
+}
+```
+
+**Response:**
+```json
+{
+  "payment": {
+    "_id": "string",
+    "paymentNumber": "BPAY-0001",
+    "status": "completed"
+  }
+}
+```
+
+#### POST `/bill-payments/:id/cancel`
+Cancel a bill payment.
+
+### Bills Reports
+
+#### GET `/bills/reports/aging`
+Get payables aging report.
+
+**Query Parameters:**
+| Param | Type | Description |
+|-------|------|-------------|
+| vendorId | string | Filter by vendor |
+
+**Response:**
+```json
+{
+  "report": {
+    "summary": {
+      "total": 100000,
+      "current": 40000,
+      "days1to30": 30000,
+      "days31to60": 15000,
+      "days61to90": 10000,
+      "days90plus": 5000
+    },
+    "vendors": [
+      {
+        "vendorId": "string",
+        "vendorName": "شركة الأثاث",
+        "current": 10000,
+        "days1to30": 5000,
+        "days31to60": 0,
+        "days61to90": 0,
+        "days90plus": 0,
+        "total": 15000
+      }
+    ],
+    "generatedAt": "ISO date"
+  }
+}
+```
+
+#### GET `/bills/export`
+Export bills to file.
+
+**Query Parameters:**
+| Param | Type | Description |
+|-------|------|-------------|
+| format | string | `csv`, `pdf`, `xlsx` |
+| ...filters | various | Same as GET `/bills` filters |
+
+**Response:** File download (binary)
+
+---
+
 ## Error Codes
 
 | Status | Description |
