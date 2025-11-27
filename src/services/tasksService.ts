@@ -17,6 +17,47 @@ export type RecurrenceFrequency = 'daily' | 'weekly' | 'biweekly' | 'monthly' | 
 export type RecurrenceType = 'due_date' | 'completion_date' // From Donetick: based on due date or completion date
 export type AssigneeStrategy = 'fixed' | 'round_robin' | 'random' | 'least_assigned' // From Donetick: assignee rotation
 
+// Saudi Legal Task Types
+export type TaskType =
+  | 'court_hearing'
+  | 'filing_deadline'
+  | 'appeal_deadline'
+  | 'document_drafting'
+  | 'contract_review'
+  | 'client_meeting'
+  | 'client_call'
+  | 'consultation'
+  | 'najiz_procedure'
+  | 'legal_research'
+  | 'enforcement_followup'
+  | 'notarization'
+  | 'billing_task'
+  | 'administrative'
+  | 'follow_up'
+  | 'other'
+
+// Saudi Court Types
+export type CourtType =
+  | 'general_court'
+  | 'criminal_court'
+  | 'family_court'
+  | 'commercial_court'
+  | 'labor_court'
+  | 'appeal_court'
+  | 'supreme_court'
+  | 'administrative_court'
+  | 'enforcement_court'
+
+// Deadline Types
+export type DeadlineType = 'statutory' | 'court_ordered' | 'contractual' | 'internal' | 'none'
+
+// Billing Types
+export type BillingType = 'hourly' | 'fixed_fee' | 'retainer' | 'pro_bono' | 'not_billable'
+export type InvoiceStatus = 'not_invoiced' | 'invoiced' | 'paid' | 'written_off'
+
+// Marketplace Origin
+export type MarketplaceOrigin = 'marketplace_job' | 'marketplace_gig' | 'direct_client' | 'referral' | 'other'
+
 /**
  * ==================== INTERFACES ====================
  */
@@ -124,11 +165,74 @@ export interface TaskHistory {
   details?: string
 }
 
+// Hijri Date Support
+export interface HijriDate {
+  year: number
+  month: number
+  day: number
+  formatted: string // e.g., "15/06/1446"
+}
+
+// Statutory Reference (Saudi Legal)
+export interface StatutoryReference {
+  lawName: string // e.g., "نظام المرافعات الشرعية"
+  articleNumber: string // e.g., "المادة 76"
+  daysAllowed: number // e.g., 30
+}
+
+// Task Billing
+export interface TaskBilling {
+  isBillable: boolean
+  billingType: BillingType
+  hourlyRate?: number
+  fixedAmount?: number
+  currency: string // Default: 'SAR'
+  billableAmount?: number
+  invoiceStatus: InvoiceStatus
+  linkedInvoiceId?: string
+}
+
+// Related Document
+export interface RelatedDocument {
+  documentId: string
+  documentName: string
+  documentType: string
+}
+
+// Knowledge Links (Future AI Integration)
+export interface KnowledgeLinks {
+  linkedJudgments?: {
+    judgmentId: string
+    judgmentNumber: string
+    courtType: string
+    year: number
+    summary: string
+  }[]
+  linkedLaws?: {
+    lawId: string
+    lawName: string
+    lawNumber: string
+    articleNumber: string
+  }[]
+  researchNotes?: string
+}
+
+// Marketplace Tracking
+export interface MarketplaceTracking {
+  originSource: MarketplaceOrigin
+  marketplaceJobId?: string
+  marketplaceOrderId?: string
+  clientSatisfactionRating?: number // 1-5
+}
+
 export interface Task {
   _id: string
+  id?: string // Alternative ID field
   // Basic info
   title: string
   description?: string
+  // Task Type (Saudi Legal-specific)
+  taskType: TaskType
   // Status & Priority
   status: TaskStatus
   priority: TaskPriority
@@ -139,6 +243,12 @@ export interface Task {
   dueTime?: string
   startDate?: string
   completedAt?: string
+  // Hijri Date (Saudi Calendar)
+  dueDateHijri?: HijriDate
+  // Deadline Type (Saudi Legal-specific)
+  deadlineType: DeadlineType
+  statutoryReference?: StatutoryReference
+  warningDaysBefore: number // Default: 3
   // Assignment
   assignedTo?: string | {
     _id: string
@@ -148,6 +258,7 @@ export interface Task {
     avatar?: string
     role?: string
   }
+  assignedToMultiple?: string[] // Multiple assignees
   createdBy: string | {
     _id: string
     firstName: string
@@ -168,6 +279,15 @@ export interface Task {
     email?: string
   }
   parentTaskId?: string // For sub-task hierarchy
+  eventId?: string // Linked calendar event
+  reminderId?: string // Linked reminder
+  invoiceId?: string // Linked invoice
+  // Court Info (Saudi Legal-specific)
+  courtType?: CourtType
+  courtCaseNumber?: string // e.g., "٤٤٠١٢٣٤٥٦"
+  caseYear?: number // e.g., 1446
+  // Billing (Saudi Legal-specific)
+  billing?: TaskBilling
   // Features
   subtasks?: Subtask[]
   checklists?: Checklist[]
@@ -177,13 +297,22 @@ export interface Task {
   attachments?: Attachment[]
   comments?: Comment[]
   history?: TaskHistory[]
-  // Metadata
+  relatedDocuments?: RelatedDocument[]
+  // Knowledge Links (Future AI Integration)
+  knowledgeLinks?: KnowledgeLinks
+  // Marketplace Tracking
+  marketplaceTracking?: MarketplaceTracking
+  // Template
   isTemplate?: boolean
   templateId?: string
+  templateName?: string
+  isPublic?: boolean // Public template
+  // Metadata
   points?: number // Gamification (Donetick feature)
   estimatedMinutes?: number
   actualMinutes?: number
   progress?: number // 0-100 calculated from subtasks
+  notes?: string // Max 5000 chars
   // Timestamps
   createdAt: string
   updatedAt: string
@@ -195,46 +324,85 @@ export interface Task {
 export interface CreateTaskData {
   title: string
   description?: string
+  // Task Type (Saudi Legal-specific)
+  taskType?: TaskType
+  // Status & Priority
   status?: TaskStatus
   priority?: TaskPriority
   label?: TaskLabel
   tags?: string[]
+  // Dates
   dueDate?: string
   dueTime?: string
   startDate?: string
+  // Deadline Type (Saudi Legal-specific)
+  deadlineType?: DeadlineType
+  warningDaysBefore?: number
+  // Assignment
   assignedTo?: string
+  assignedToMultiple?: string[]
+  // Relations
   caseId?: string
   clientId?: string
   parentTaskId?: string
+  // Court Info (Saudi Legal-specific)
+  courtType?: CourtType
+  courtCaseNumber?: string
+  caseYear?: number
+  // Billing (Saudi Legal-specific)
+  billing?: Partial<TaskBilling>
+  // Features
   subtasks?: Omit<Subtask, '_id'>[]
   checklists?: Omit<Checklist, '_id'>[]
   recurring?: RecurringConfig
   reminders?: Omit<TaskReminder, '_id' | 'sent' | 'sentAt'>[]
+  // Metadata
   estimatedMinutes?: number
+  notes?: string
+  // Template
   isTemplate?: boolean
   templateId?: string
+  templateName?: string
+  isPublic?: boolean
 }
 
 /**
  * Task Filters
  */
 export interface TaskFilters {
+  // Status & Priority
   status?: TaskStatus | TaskStatus[]
   priority?: TaskPriority | TaskPriority[]
   label?: TaskLabel
+  // Task Type (Saudi Legal-specific)
+  taskType?: TaskType | TaskType[]
+  // Deadline Type (Saudi Legal-specific)
+  deadlineType?: DeadlineType
+  // Court Type (Saudi Legal-specific)
+  courtType?: CourtType
+  // Assignment
   assignedTo?: string
   createdBy?: string
+  // Relations
   caseId?: string
   clientId?: string
+  // Billing (Saudi Legal-specific)
+  isBillable?: boolean
+  invoiceStatus?: InvoiceStatus
+  // Template
   isTemplate?: boolean
+  // Features
   hasSubtasks?: boolean
   isRecurring?: boolean
+  // Date Filters
   overdue?: boolean
   dueDateFrom?: string
   dueDateTo?: string
+  // Search
   search?: string
   tags?: string[]
-  sortBy?: 'dueDate' | 'priority' | 'createdAt' | 'updatedAt' | 'title'
+  // Sorting & Pagination
+  sortBy?: 'dueDate' | 'priority' | 'createdAt' | 'updatedAt' | 'title' | 'taskType' | 'deadlineType'
   sortOrder?: 'asc' | 'desc'
   page?: number
   limit?: number
@@ -247,13 +415,23 @@ export interface TaskStats {
   total: number
   byStatus: Record<TaskStatus, number>
   byPriority: Record<TaskPriority, number>
+  // Saudi Legal-specific stats
+  byTaskType?: Partial<Record<TaskType, number>>
+  byDeadlineType?: Partial<Record<DeadlineType, number>>
+  byCourtType?: Partial<Record<CourtType, number>>
+  // Date-based stats
   overdue: number
   dueToday: number
   dueThisWeek: number
   completedThisWeek: number
   completedThisMonth: number
+  // Time stats
   averageCompletionTime?: number // in minutes
   totalTimeTracked?: number // in minutes
+  // Billing stats (Saudi Legal)
+  totalBillableAmount?: number
+  totalBilledAmount?: number
+  unbilledTasks?: number
 }
 
 /**
