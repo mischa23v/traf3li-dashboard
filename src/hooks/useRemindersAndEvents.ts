@@ -133,6 +133,41 @@ export const useDismissReminder = () => {
   })
 }
 
+export const useSnoozeReminder = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({ id, duration }: { id: string; duration: number }) =>
+      remindersService.snoozeReminder(id, duration),
+    onSuccess: (_, { id }) => {
+      queryClient.invalidateQueries({ queryKey: ['reminders'] })
+      queryClient.invalidateQueries({ queryKey: ['reminders', id] })
+      queryClient.invalidateQueries({ queryKey: ['calendar'] })
+      toast.success('تم تأجيل التذكير بنجاح')
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'فشل تأجيل التذكير')
+    },
+  })
+}
+
+export const useReopenReminder = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (id: string) => remindersService.reopenReminder(id),
+    onSuccess: (_, id) => {
+      queryClient.invalidateQueries({ queryKey: ['reminders'] })
+      queryClient.invalidateQueries({ queryKey: ['reminders', id] })
+      queryClient.invalidateQueries({ queryKey: ['calendar'] })
+      toast.success('تم إعادة فتح التذكير')
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'فشل إعادة فتح التذكير')
+    },
+  })
+}
+
 // ==================== EVENTS ====================
 
 export const useEvents = (filters?: EventFilters) => {
@@ -215,5 +250,49 @@ export const useCompleteEvent = () => {
     onError: (error: Error) => {
       toast.error(error.message || 'فشل إكمال الحدث')
     },
+  })
+}
+
+export const useCancelEvent = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({ id, reason }: { id: string; reason?: string }) =>
+      eventsService.cancelEvent(id, reason),
+    onSuccess: (_, { id }) => {
+      queryClient.invalidateQueries({ queryKey: ['events'] })
+      queryClient.invalidateQueries({ queryKey: ['events', id] })
+      queryClient.invalidateQueries({ queryKey: ['calendar'] })
+      toast.success('تم إلغاء الحدث بنجاح')
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'فشل إلغاء الحدث')
+    },
+  })
+}
+
+export const useRSVPEvent = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({ id, status, notes }: { id: string; status: 'accepted' | 'declined' | 'tentative'; notes?: string }) =>
+      eventsService.rsvpEvent(id, status, notes),
+    onSuccess: (_, { id }) => {
+      queryClient.invalidateQueries({ queryKey: ['events'] })
+      queryClient.invalidateQueries({ queryKey: ['events', id] })
+      queryClient.invalidateQueries({ queryKey: ['calendar'] })
+      toast.success('تم تسجيل الحضور بنجاح')
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'فشل تسجيل الحضور')
+    },
+  })
+}
+
+export const useUpcomingEvents = (days: number = 7) => {
+  return useQuery({
+    queryKey: ['events', 'upcoming', days],
+    queryFn: () => eventsService.getUpcoming(days),
+    staleTime: 1 * 60 * 1000,
   })
 }

@@ -1,16 +1,16 @@
 import { useState, useMemo } from 'react'
-import { useParams } from '@tanstack/react-router'
+import { useParams, useNavigate } from '@tanstack/react-router'
 import {
-    Calendar as CalendarIcon, MapPin, Users, Video, MoreHorizontal, CheckCircle2,
-    User, ArrowLeft, Briefcase,
-    History, Link as LinkIcon, Flag, Send, Bell, Search, Clock, AlertCircle, Shield
+    Calendar as CalendarIcon, MapPin, CheckCircle2, Trash2, Edit3, Loader2,
+    ArrowLeft, Briefcase, XCircle, Check, X, HelpCircle,
+    History, Link as LinkIcon, Send, Bell, Search, Clock, AlertCircle
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Textarea } from '@/components/ui/textarea'
 import { Link } from '@tanstack/react-router'
 import { Header } from '@/components/layout/header'
@@ -21,16 +21,56 @@ import { LanguageSwitcher } from '@/components/language-switcher'
 import { ThemeSwitch } from '@/components/theme-switch'
 import { ConfigDrawer } from '@/components/config-drawer'
 import { ProfileDropdown } from '@/components/profile-dropdown'
-import { useEvent } from '@/hooks/useRemindersAndEvents'
+import {
+    useEvent,
+    useDeleteEvent,
+    useCompleteEvent,
+    useCancelEvent,
+    useRSVPEvent
+} from '@/hooks/useRemindersAndEvents'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Alert, AlertDescription } from '@/components/ui/alert'
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 
 export function EventDetailsView() {
     const [activeTab, setActiveTab] = useState('overview')
     const { eventId } = useParams({ strict: false }) as { eventId: string }
+    const navigate = useNavigate()
+    const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
 
     // Fetch event data
     const { data: eventData, isLoading, isError, error, refetch } = useEvent(eventId)
+
+    // Mutations
+    const deleteEventMutation = useDeleteEvent()
+    const completeEventMutation = useCompleteEvent()
+    const cancelEventMutation = useCancelEvent()
+    const rsvpEventMutation = useRSVPEvent()
+
+    const handleDelete = () => {
+        deleteEventMutation.mutate(eventId, {
+            onSuccess: () => {
+                navigate({ to: '/dashboard/tasks/events' })
+            }
+        })
+    }
+
+    const handleComplete = () => {
+        completeEventMutation.mutate(eventId)
+    }
+
+    const handleCancel = () => {
+        cancelEventMutation.mutate({ id: eventId, reason: 'تم الإلغاء من قبل المستخدم' })
+    }
+
+    const handleRSVP = (status: 'accepted' | 'declined' | 'tentative') => {
+        rsvpEventMutation.mutate({ id: eventId, status })
+    }
 
     // Transform API data
     const event = useMemo(() => {
@@ -217,16 +257,111 @@ export function EventDetailsView() {
                         </div>
 
                         {/* Actions */}
-                        <div className="flex flex-col gap-4 min-w-[250px]">
+                        <div className="flex flex-col gap-4 min-w-[280px]">
+                            <div className="flex gap-3">
+                                <Link to="/dashboard/tasks/create-event" search={{ editId: eventId }}>
+                                    <Button variant="outline" className="border-white/10 text-white hover:bg-white/10 hover:text-white backdrop-blur-sm">
+                                        <Edit3 className="h-4 w-4 ml-2" />
+                                        تعديل
+                                    </Button>
+                                </Link>
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                        <Button
+                                            className="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white shadow-lg shadow-emerald-500/20 border-0"
+                                            disabled={rsvpEventMutation.isPending}
+                                        >
+                                            {rsvpEventMutation.isPending ? (
+                                                <Loader2 className="h-4 w-4 animate-spin ml-2" />
+                                            ) : (
+                                                <CheckCircle2 className="h-4 w-4 ml-2" />
+                                            )}
+                                            تأكيد الحضور
+                                        </Button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent align="end" className="w-48">
+                                        <DropdownMenuItem onClick={() => handleRSVP('accepted')}>
+                                            <Check className="h-4 w-4 ml-2 text-emerald-500" />
+                                            سأحضر
+                                        </DropdownMenuItem>
+                                        <DropdownMenuItem onClick={() => handleRSVP('tentative')}>
+                                            <HelpCircle className="h-4 w-4 ml-2 text-amber-500" />
+                                            غير متأكد
+                                        </DropdownMenuItem>
+                                        <DropdownMenuItem onClick={() => handleRSVP('declined')}>
+                                            <X className="h-4 w-4 ml-2 text-red-500" />
+                                            لن أحضر
+                                        </DropdownMenuItem>
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
+                            </div>
+                            <div className="flex gap-3">
+                                <Button
+                                    variant="outline"
+                                    onClick={handleComplete}
+                                    disabled={completeEventMutation.isPending}
+                                    className="flex-1 border-white/10 text-white hover:bg-white/10 hover:text-white backdrop-blur-sm"
+                                >
+                                    {completeEventMutation.isPending ? (
+                                        <Loader2 className="h-4 w-4 animate-spin ml-2" />
+                                    ) : (
+                                        <CheckCircle2 className="h-4 w-4 ml-2" />
+                                    )}
+                                    إكمال
+                                </Button>
+                                <Button
+                                    variant="outline"
+                                    onClick={handleCancel}
+                                    disabled={cancelEventMutation.isPending}
+                                    className="border-amber-500/30 text-amber-300 hover:bg-amber-500/20 hover:text-amber-200 backdrop-blur-sm"
+                                >
+                                    {cancelEventMutation.isPending ? (
+                                        <Loader2 className="h-4 w-4 animate-spin ml-2" />
+                                    ) : (
+                                        <XCircle className="h-4 w-4 ml-2" />
+                                    )}
+                                    إلغاء الفعالية
+                                </Button>
+                            </div>
                             <div className="flex gap-3">
                                 <Button variant="outline" className="flex-1 border-white/10 text-white hover:bg-white/10 hover:text-white backdrop-blur-sm">
                                     <LinkIcon className="h-4 w-4 ml-2" />
                                     نسخ الرابط
                                 </Button>
-                                <Button className="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white shadow-lg shadow-emerald-500/20 border-0">
-                                    <CheckCircle2 className="h-4 w-4 ml-2" />
-                                    تأكيد الحضور
-                                </Button>
+                                {!showDeleteConfirm ? (
+                                    <Button
+                                        variant="outline"
+                                        onClick={() => setShowDeleteConfirm(true)}
+                                        className="border-red-500/30 text-red-300 hover:bg-red-500/20 hover:text-red-200 backdrop-blur-sm"
+                                    >
+                                        <Trash2 className="h-4 w-4 ml-2" />
+                                        حذف
+                                    </Button>
+                                ) : (
+                                    <div className="flex gap-2">
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
+                                            onClick={() => setShowDeleteConfirm(false)}
+                                            className="border-white/10 text-white hover:bg-white/10"
+                                        >
+                                            إلغاء
+                                        </Button>
+                                        <Button
+                                            variant="destructive"
+                                            size="sm"
+                                            onClick={handleDelete}
+                                            disabled={deleteEventMutation.isPending}
+                                            className="bg-red-500 hover:bg-red-600"
+                                        >
+                                            {deleteEventMutation.isPending ? (
+                                                <Loader2 className="h-4 w-4 animate-spin" />
+                                            ) : (
+                                                'تأكيد الحذف'
+                                            )}
+                                        </Button>
+                                    </div>
+                                )}
                             </div>
                         </div>
                     </div>

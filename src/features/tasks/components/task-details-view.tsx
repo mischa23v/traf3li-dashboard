@@ -1,12 +1,12 @@
 import { useState, useMemo } from 'react'
 import {
     FileText, Calendar, CheckSquare, Clock, MoreHorizontal, Plus, Upload,
-    User, ArrowLeft, Briefcase,
+    User, ArrowLeft, Briefcase, Trash2, Edit3, Loader2,
     History, Link as LinkIcon, Flag, Send, Eye, Download, Search, Bell, AlertCircle
 } from 'lucide-react'
 import { Skeleton } from '@/components/ui/skeleton'
-import { useTask } from '@/hooks/useTasks'
-import { useParams } from '@tanstack/react-router'
+import { useTask, useDeleteTask, useCompleteTask, useReopenTask } from '@/hooks/useTasks'
+import { useParams, useNavigate } from '@tanstack/react-router'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -33,10 +33,33 @@ import { ProfileDropdown } from '@/components/profile-dropdown'
 
 export function TaskDetailsView() {
     const { taskId } = useParams({ strict: false }) as { taskId: string }
+    const navigate = useNavigate()
     const [activeTab, setActiveTab] = useState('overview')
+    const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
 
     // Fetch task data
     const { data: taskData, isLoading, isError, error, refetch } = useTask(taskId)
+
+    // Mutations
+    const deleteTaskMutation = useDeleteTask()
+    const completeTaskMutation = useCompleteTask()
+    const reopenTaskMutation = useReopenTask()
+
+    const handleDelete = () => {
+        deleteTaskMutation.mutate(taskId, {
+            onSuccess: () => {
+                navigate({ to: '/dashboard/tasks/list' })
+            }
+        })
+    }
+
+    const handleComplete = () => {
+        if (taskData?.status === 'done') {
+            reopenTaskMutation.mutate(taskId)
+        } else {
+            completeTaskMutation.mutate(taskId)
+        }
+    }
 
     // Transform API data
     const task = useMemo(() => {
@@ -249,14 +272,64 @@ export function TaskDetailsView() {
                         {/* Actions & Status */}
                         <div className="flex flex-col gap-4 min-w-[250px]">
                             <div className="flex gap-3">
+                                <Link to="/dashboard/tasks/create" search={{ editId: taskId }}>
+                                    <Button variant="outline" className="border-white/10 text-white hover:bg-white/10 hover:text-white backdrop-blur-sm">
+                                        <Edit3 className="h-4 w-4 ml-2" />
+                                        تعديل
+                                    </Button>
+                                </Link>
+                                <Button
+                                    onClick={handleComplete}
+                                    disabled={completeTaskMutation.isPending || reopenTaskMutation.isPending}
+                                    className={`flex-1 ${task.status === 'done' ? 'bg-amber-500 hover:bg-amber-600' : 'bg-emerald-500 hover:bg-emerald-600'} text-white shadow-lg border-0`}
+                                >
+                                    {(completeTaskMutation.isPending || reopenTaskMutation.isPending) ? (
+                                        <Loader2 className="h-4 w-4 animate-spin ml-2" />
+                                    ) : (
+                                        <CheckSquare className="h-4 w-4 ml-2" />
+                                    )}
+                                    {task.status === 'done' ? 'إعادة فتح' : 'إكمال المهمة'}
+                                </Button>
+                            </div>
+                            <div className="flex gap-3">
                                 <Button variant="outline" className="flex-1 border-white/10 text-white hover:bg-white/10 hover:text-white backdrop-blur-sm">
                                     <LinkIcon className="h-4 w-4 ml-2" />
                                     نسخ الرابط
                                 </Button>
-                                <Button className="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white shadow-lg shadow-emerald-500/20 border-0">
-                                    <CheckSquare className="h-4 w-4 ml-2" />
-                                    إكمال المهمة
-                                </Button>
+                                {!showDeleteConfirm ? (
+                                    <Button
+                                        variant="outline"
+                                        onClick={() => setShowDeleteConfirm(true)}
+                                        className="border-red-500/30 text-red-300 hover:bg-red-500/20 hover:text-red-200 backdrop-blur-sm"
+                                    >
+                                        <Trash2 className="h-4 w-4 ml-2" />
+                                        حذف
+                                    </Button>
+                                ) : (
+                                    <div className="flex gap-2">
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
+                                            onClick={() => setShowDeleteConfirm(false)}
+                                            className="border-white/10 text-white hover:bg-white/10"
+                                        >
+                                            إلغاء
+                                        </Button>
+                                        <Button
+                                            variant="destructive"
+                                            size="sm"
+                                            onClick={handleDelete}
+                                            disabled={deleteTaskMutation.isPending}
+                                            className="bg-red-500 hover:bg-red-600"
+                                        >
+                                            {deleteTaskMutation.isPending ? (
+                                                <Loader2 className="h-4 w-4 animate-spin" />
+                                            ) : (
+                                                'تأكيد الحذف'
+                                            )}
+                                        </Button>
+                                    </div>
+                                )}
                             </div>
 
                             <div className="bg-white/5 rounded-2xl p-4 border border-white/10 backdrop-blur-sm">
