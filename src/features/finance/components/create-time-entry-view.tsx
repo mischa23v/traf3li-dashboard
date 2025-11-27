@@ -1,12 +1,12 @@
 import { useState, useMemo } from 'react'
 import {
     ArrowRight, Save, Calendar, Clock,
-    FileText, Briefcase, DollarSign, Loader2, CheckSquare
+    FileText, Briefcase, DollarSign, Loader2, CheckSquare,
+    User, Tag, Timer
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
-import { Checkbox } from '@/components/ui/checkbox'
 import {
     Select,
     SelectContent,
@@ -21,21 +21,57 @@ import { Main } from '@/components/layout/main'
 import { Link, useNavigate } from '@tanstack/react-router'
 import { FinanceSidebar } from './finance-sidebar'
 import { useCreateTimeEntry } from '@/hooks/useFinance'
-import { useCases } from '@/hooks/useCasesAndClients'
+import { useCases, useClients, useTeamMembers } from '@/hooks/useCasesAndClients'
+
+// Task types matching miru-web / legal work types
+const taskTypes = [
+    { value: 'consultation', label: 'استشارة قانونية', labelEn: 'Legal Consultation' },
+    { value: 'research', label: 'بحث قانوني', labelEn: 'Legal Research' },
+    { value: 'document_review', label: 'مراجعة مستندات', labelEn: 'Document Review' },
+    { value: 'document_drafting', label: 'صياغة مستندات', labelEn: 'Document Drafting' },
+    { value: 'court_appearance', label: 'حضور جلسة', labelEn: 'Court Appearance' },
+    { value: 'meeting', label: 'اجتماع', labelEn: 'Meeting' },
+    { value: 'phone_call', label: 'مكالمة هاتفية', labelEn: 'Phone Call' },
+    { value: 'email_correspondence', label: 'مراسلات بريدية', labelEn: 'Email Correspondence' },
+    { value: 'negotiation', label: 'تفاوض', labelEn: 'Negotiation' },
+    { value: 'contract_review', label: 'مراجعة عقود', labelEn: 'Contract Review' },
+    { value: 'filing', label: 'إيداع مستندات', labelEn: 'Filing' },
+    { value: 'travel', label: 'سفر وانتقال', labelEn: 'Travel' },
+    { value: 'administrative', label: 'إداري', labelEn: 'Administrative' },
+    { value: 'other', label: 'أخرى', labelEn: 'Other' },
+]
+
+// Bill status options matching miru-web
+const billStatusOptions = [
+    { value: 'unbilled', label: 'غير مفوتر', labelEn: 'Unbilled' },
+    { value: 'billed', label: 'مفوتر', labelEn: 'Billed' },
+    { value: 'non_billable', label: 'غير قابل للفوترة', labelEn: 'Non-billable' },
+]
 
 export function CreateTimeEntryView() {
     const navigate = useNavigate()
     const createTimeEntryMutation = useCreateTimeEntry()
 
-    // Load cases from API
+    // Load cases, clients and team members from API
     const { data: casesData, isLoading: loadingCases } = useCases()
+    const { data: clientsData, isLoading: loadingClients } = useClients()
+    const { data: teamData, isLoading: loadingTeam } = useTeamMembers()
+
+    // Duration input mode: 'time' (start/end) or 'manual' (direct input)
+    const [durationMode, setDurationMode] = useState<'time' | 'manual'>('time')
 
     const [formData, setFormData] = useState({
         description: '',
         caseId: '',
+        clientId: '',
+        assigneeId: '',
+        taskType: '',
+        billStatus: 'unbilled' as 'unbilled' | 'billed' | 'non_billable',
         date: new Date().toISOString().split('T')[0],
         startTime: '',
         endTime: '',
+        manualHours: '',
+        manualMinutes: '',
         hourlyRate: '500',
         isBillable: true,
         notes: '',
@@ -47,30 +83,52 @@ export function CreateTimeEntryView() {
         return casesData.data.find((c: any) => c._id === formData.caseId)
     }, [formData.caseId, casesData])
 
-    // Calculate duration in minutes
+    // Get selected client details
+    const selectedClient = useMemo(() => {
+        if (!formData.clientId || !clientsData?.data) return null
+        return clientsData.data.find((c: any) => c._id === formData.clientId)
+    }, [formData.clientId, clientsData])
+
+    // Calculate duration in minutes (handles both time mode and manual mode)
     const calculatedDuration = useMemo(() => {
-        if (!formData.startTime || !formData.endTime) return 0
-        const start = new Date(`2000-01-01T${formData.startTime}`)
-        const end = new Date(`2000-01-01T${formData.endTime}`)
-        const diffMs = end.getTime() - start.getTime()
-        if (diffMs < 0) return 0
-        return Math.round(diffMs / (1000 * 60)) // Duration in minutes
-    }, [formData.startTime, formData.endTime])
+        if (durationMode === 'time') {
+            if (!formData.startTime || !formData.endTime) return 0
+            const start = new Date(`2000-01-01T${formData.startTime}`)
+            const end = new Date(`2000-01-01T${formData.endTime}`)
+            const diffMs = end.getTime() - start.getTime()
+            if (diffMs < 0) return 0
+            return Math.round(diffMs / (1000 * 60)) // Duration in minutes
+        } else {
+            // Manual mode: convert hours and minutes to total minutes
+            const hours = parseInt(formData.manualHours) || 0
+            const minutes = parseInt(formData.manualMinutes) || 0
+            return (hours * 60) + minutes
+        }
+    }, [durationMode, formData.startTime, formData.endTime, formData.manualHours, formData.manualMinutes])
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
 
-        if (!formData.caseId || calculatedDuration <= 0) return
+        if (!formData.caseId || calculatedDuration <= 0 || !formData.taskType) return
+
+        // Determine clientId: prefer direct selection, fall back to case's client
+        const resolvedClientId = formData.clientId || selectedCase?.clientId?._id || selectedCase?.clientId || ''
 
         const timeEntryData = {
             description: formData.description,
             caseId: formData.caseId,
-            clientId: selectedCase?.clientId?._id || selectedCase?.clientId || '',
+            clientId: resolvedClientId,
+            taskType: formData.taskType,
+            billStatus: formData.billStatus,
             date: formData.date,
             duration: calculatedDuration, // Duration in minutes
             hourlyRate: Number(formData.hourlyRate),
             isBillable: formData.isBillable,
+            ...(formData.assigneeId && { assigneeId: formData.assigneeId }),
             ...(formData.notes && { notes: formData.notes }),
+            // Include time info for reference
+            ...(durationMode === 'time' && formData.startTime && { startTime: formData.startTime }),
+            ...(durationMode === 'time' && formData.endTime && { endTime: formData.endTime }),
         }
 
         createTimeEntryMutation.mutate(timeEntryData, {
@@ -178,6 +236,84 @@ export function CreateTimeEntryView() {
                                         </div>
                                         <div className="space-y-2">
                                             <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                                                <User className="w-4 h-4 text-emerald-500" />
+                                                العميل (مباشر)
+                                            </label>
+                                            <Select
+                                                value={formData.clientId}
+                                                onValueChange={(value) => setFormData({ ...formData, clientId: value })}
+                                                disabled={loadingClients}
+                                            >
+                                                <SelectTrigger className="rounded-xl border-slate-200 focus:ring-emerald-500">
+                                                    <SelectValue placeholder={loadingClients ? "جاري التحميل..." : "اختر العميل (اختياري)"} />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    <SelectItem value="">بدون عميل محدد</SelectItem>
+                                                    {clientsData?.data?.map((client: any) => (
+                                                        <SelectItem key={client._id} value={client._id}>
+                                                            {client.fullName || client.name}
+                                                        </SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
+                                            {selectedClient && (
+                                                <p className="text-xs text-slate-500">
+                                                    {selectedClient.email || selectedClient.phone || ''}
+                                                </p>
+                                            )}
+                                        </div>
+                                    </div>
+
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        <div className="space-y-2">
+                                            <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                                                <Tag className="w-4 h-4 text-emerald-500" />
+                                                نوع المهمة <span className="text-red-500">*</span>
+                                            </label>
+                                            <Select
+                                                value={formData.taskType}
+                                                onValueChange={(value) => setFormData({ ...formData, taskType: value })}
+                                            >
+                                                <SelectTrigger className="rounded-xl border-slate-200 focus:ring-emerald-500">
+                                                    <SelectValue placeholder="اختر نوع المهمة" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    {taskTypes.map((type) => (
+                                                        <SelectItem key={type.value} value={type.value}>
+                                                            {type.label}
+                                                        </SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                                                <User className="w-4 h-4 text-emerald-500" />
+                                                المسؤول عن المهمة
+                                            </label>
+                                            <Select
+                                                value={formData.assigneeId}
+                                                onValueChange={(value) => setFormData({ ...formData, assigneeId: value })}
+                                                disabled={loadingTeam}
+                                            >
+                                                <SelectTrigger className="rounded-xl border-slate-200 focus:ring-emerald-500">
+                                                    <SelectValue placeholder={loadingTeam ? "جاري التحميل..." : "اختر عضو الفريق"} />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    <SelectItem value="">المستخدم الحالي</SelectItem>
+                                                    {teamData?.data?.map((member: any) => (
+                                                        <SelectItem key={member._id} value={member._id}>
+                                                            {member.fullName || member.name || member.email}
+                                                        </SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
+                                        </div>
+                                    </div>
+
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        <div className="space-y-2">
+                                            <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
                                                 <Calendar className="w-4 h-4 text-emerald-500" />
                                                 التاريخ <span className="text-red-500">*</span>
                                             </label>
@@ -188,6 +324,27 @@ export function CreateTimeEntryView() {
                                                 className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500"
                                                 required
                                             />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                                                <CheckSquare className="w-4 h-4 text-emerald-500" />
+                                                حالة الفوترة <span className="text-red-500">*</span>
+                                            </label>
+                                            <Select
+                                                value={formData.billStatus}
+                                                onValueChange={(value: 'unbilled' | 'billed' | 'non_billable') => setFormData({ ...formData, billStatus: value, isBillable: value !== 'non_billable' })}
+                                            >
+                                                <SelectTrigger className="rounded-xl border-slate-200 focus:ring-emerald-500">
+                                                    <SelectValue placeholder="اختر حالة الفوترة" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    {billStatusOptions.map((status) => (
+                                                        <SelectItem key={status.value} value={status.value}>
+                                                            {status.label}
+                                                        </SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
                                         </div>
                                     </div>
 
@@ -205,48 +362,128 @@ export function CreateTimeEntryView() {
                                         />
                                     </div>
 
-                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                                        <div className="space-y-2">
-                                            <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                                <Clock className="w-4 h-4 text-emerald-500" />
-                                                وقت البدء <span className="text-red-500">*</span>
-                                            </label>
-                                            <Input
-                                                type="time"
-                                                value={formData.startTime}
-                                                onChange={(e) => setFormData({ ...formData, startTime: e.target.value })}
-                                                className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500"
-                                                required
-                                            />
+                                    {/* Duration Mode Toggle */}
+                                    <div className="p-4 bg-slate-50 rounded-xl border border-slate-100">
+                                        <div className="flex items-center gap-4 mb-4">
+                                            <Timer className="w-5 h-5 text-emerald-500" />
+                                            <span className="text-sm font-medium text-slate-700">طريقة إدخال المدة</span>
                                         </div>
-                                        <div className="space-y-2">
-                                            <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                                <Clock className="w-4 h-4 text-emerald-500" />
-                                                وقت الانتهاء <span className="text-red-500">*</span>
-                                            </label>
-                                            <Input
-                                                type="time"
-                                                value={formData.endTime}
-                                                onChange={(e) => setFormData({ ...formData, endTime: e.target.value })}
-                                                className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500"
-                                                required
-                                            />
-                                        </div>
-                                        <div className="space-y-2">
-                                            <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                                <DollarSign className="w-4 h-4 text-emerald-500" />
-                                                سعر الساعة (ر.س)
-                                            </label>
-                                            <Input
-                                                type="number"
-                                                placeholder="500"
-                                                min="0"
-                                                value={formData.hourlyRate}
-                                                onChange={(e) => setFormData({ ...formData, hourlyRate: e.target.value })}
-                                                className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500"
-                                            />
+                                        <div className="flex gap-2">
+                                            <Button
+                                                type="button"
+                                                variant={durationMode === 'time' ? 'default' : 'outline'}
+                                                size="sm"
+                                                onClick={() => setDurationMode('time')}
+                                                className={durationMode === 'time' ? 'bg-emerald-500 hover:bg-emerald-600' : ''}
+                                            >
+                                                <Clock className="w-4 h-4 ml-2" />
+                                                وقت البدء والانتهاء
+                                            </Button>
+                                            <Button
+                                                type="button"
+                                                variant={durationMode === 'manual' ? 'default' : 'outline'}
+                                                size="sm"
+                                                onClick={() => setDurationMode('manual')}
+                                                className={durationMode === 'manual' ? 'bg-emerald-500 hover:bg-emerald-600' : ''}
+                                            >
+                                                <Timer className="w-4 h-4 ml-2" />
+                                                إدخال المدة يدوياً
+                                            </Button>
                                         </div>
                                     </div>
+
+                                    {durationMode === 'time' ? (
+                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                            <div className="space-y-2">
+                                                <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                                                    <Clock className="w-4 h-4 text-emerald-500" />
+                                                    وقت البدء <span className="text-red-500">*</span>
+                                                </label>
+                                                <Input
+                                                    type="time"
+                                                    value={formData.startTime}
+                                                    onChange={(e) => setFormData({ ...formData, startTime: e.target.value })}
+                                                    className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500"
+                                                    required={durationMode === 'time'}
+                                                />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                                                    <Clock className="w-4 h-4 text-emerald-500" />
+                                                    وقت الانتهاء <span className="text-red-500">*</span>
+                                                </label>
+                                                <Input
+                                                    type="time"
+                                                    value={formData.endTime}
+                                                    onChange={(e) => setFormData({ ...formData, endTime: e.target.value })}
+                                                    className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500"
+                                                    required={durationMode === 'time'}
+                                                />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                                                    <DollarSign className="w-4 h-4 text-emerald-500" />
+                                                    سعر الساعة (ر.س)
+                                                </label>
+                                                <Input
+                                                    type="number"
+                                                    placeholder="500"
+                                                    min="0"
+                                                    value={formData.hourlyRate}
+                                                    onChange={(e) => setFormData({ ...formData, hourlyRate: e.target.value })}
+                                                    className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500"
+                                                />
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                            <div className="space-y-2">
+                                                <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                                                    <Timer className="w-4 h-4 text-emerald-500" />
+                                                    الساعات <span className="text-red-500">*</span>
+                                                </label>
+                                                <Input
+                                                    type="number"
+                                                    placeholder="0"
+                                                    min="0"
+                                                    max="24"
+                                                    value={formData.manualHours}
+                                                    onChange={(e) => setFormData({ ...formData, manualHours: e.target.value })}
+                                                    className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500"
+                                                    required={durationMode === 'manual'}
+                                                />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                                                    <Timer className="w-4 h-4 text-emerald-500" />
+                                                    الدقائق
+                                                </label>
+                                                <Input
+                                                    type="number"
+                                                    placeholder="0"
+                                                    min="0"
+                                                    max="59"
+                                                    value={formData.manualMinutes}
+                                                    onChange={(e) => setFormData({ ...formData, manualMinutes: e.target.value })}
+                                                    className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500"
+                                                />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                                                    <DollarSign className="w-4 h-4 text-emerald-500" />
+                                                    سعر الساعة (ر.س)
+                                                </label>
+                                                <Input
+                                                    type="number"
+                                                    placeholder="500"
+                                                    min="0"
+                                                    value={formData.hourlyRate}
+                                                    onChange={(e) => setFormData({ ...formData, hourlyRate: e.target.value })}
+                                                    className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500"
+                                                />
+                                            </div>
+                                        </div>
+                                    )}
 
                                     {calculatedDuration > 0 && (
                                         <div className="p-4 bg-emerald-50 rounded-xl border border-emerald-100">
@@ -269,21 +506,6 @@ export function CreateTimeEntryView() {
                                         </div>
                                     )}
 
-                                    <div className="flex items-center space-x-2 space-x-reverse p-4 bg-slate-50 rounded-xl">
-                                        <Checkbox
-                                            id="billable"
-                                            checked={formData.isBillable}
-                                            onCheckedChange={(checked) => setFormData({ ...formData, isBillable: checked as boolean })}
-                                            className="data-[state=checked]:bg-emerald-500 border-slate-300"
-                                        />
-                                        <label
-                                            htmlFor="billable"
-                                            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 flex items-center gap-2"
-                                        >
-                                            <CheckSquare className="w-4 h-4 text-emerald-500" />
-                                            قابل للفوترة (يمكن تحميله على العميل)
-                                        </label>
-                                    </div>
 
                                     <div className="space-y-2">
                                         <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
@@ -308,7 +530,7 @@ export function CreateTimeEntryView() {
                                     <Button
                                         type="submit"
                                         className="bg-emerald-500 hover:bg-emerald-600 text-white min-w-[140px] rounded-xl shadow-lg shadow-emerald-500/20"
-                                        disabled={createTimeEntryMutation.isPending || calculatedDuration <= 0}
+                                        disabled={createTimeEntryMutation.isPending || calculatedDuration <= 0 || !formData.taskType}
                                     >
                                         {createTimeEntryMutation.isPending ? (
                                             <span className="flex items-center gap-2">
