@@ -320,6 +320,7 @@ export function CaseDetailsView() {
 
   const handleAddHearing = async () => {
     if (!hearingDate || !hearingLocation) return
+    const caseDetails = caseData?.data
     await addHearingMutation.mutateAsync({
       id: caseId,
       data: {
@@ -327,6 +328,11 @@ export function CaseDetailsView() {
         location: hearingLocation,
         notes: hearingNotes,
       },
+      // Pass case info for calendar event creation
+      caseInfo: caseDetails ? {
+        title: caseDetails.title,
+        caseNumber: caseDetails.caseNumber,
+      } : undefined,
     })
     setHearingDate('')
     setHearingLocation('')
