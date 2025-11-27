@@ -27,11 +27,15 @@ export function CreateStatementView() {
     const { mutate: createStatement, isPending } = useCreateStatement()
     const { data: clientsData, isLoading: loadingClients } = useClients()
 
+    // Get first day of current month and today for default dates
+    const today = new Date()
+    const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1)
+
     const [formData, setFormData] = useState({
         clientId: '',
         period: '',
-        startDate: '',
-        endDate: '',
+        startDate: firstDayOfMonth.toISOString().split('T')[0],
+        endDate: today.toISOString().split('T')[0],
         notes: '',
         status: 'draft' as 'draft' | 'sent'
     })
@@ -109,7 +113,7 @@ export function CreateStatementView() {
                                         <div className="space-y-2">
                                             <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
                                                 <User className="w-4 h-4 text-emerald-500" />
-                                                العميل
+                                                العميل <span className="text-red-500">*</span>
                                             </label>
                                             <Select
                                                 value={formData.clientId}

@@ -1,11 +1,12 @@
 import { useState } from 'react'
 import {
     ArrowRight, Save, Calendar, Tag,
-    FileText, DollarSign, CreditCard, Upload
+    FileText, DollarSign, CreditCard, Upload, Briefcase, Building, Loader2, CheckSquare
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
+import { Checkbox } from '@/components/ui/checkbox'
 import {
     Select,
     SelectContent,
@@ -20,17 +21,24 @@ import { Main } from '@/components/layout/main'
 import { Link, useNavigate } from '@tanstack/react-router'
 import { FinanceSidebar } from './finance-sidebar'
 import { useCreateExpense } from '@/hooks/useFinance'
+import { useCases } from '@/hooks/useCasesAndClients'
 
 export function CreateExpenseView() {
     const navigate = useNavigate()
     const createExpenseMutation = useCreateExpense()
 
+    // Load cases from API
+    const { data: casesData, isLoading: loadingCases } = useCases()
+
     const [formData, setFormData] = useState({
         description: '',
         amount: '',
         category: '',
-        date: '',
+        date: new Date().toISOString().split('T')[0],
         paymentMethod: '',
+        vendor: '',
+        caseId: '',
+        isBillable: false,
         notes: '',
     })
 
@@ -43,6 +51,9 @@ export function CreateExpenseView() {
             category: formData.category,
             date: formData.date,
             paymentMethod: formData.paymentMethod,
+            ...(formData.vendor && { vendor: formData.vendor }),
+            ...(formData.caseId && { caseId: formData.caseId }),
+            isBillable: formData.isBillable,
             notes: formData.notes,
         }
 
@@ -180,7 +191,7 @@ export function CreateExpenseView() {
                                         <div className="space-y-2">
                                             <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
                                                 <CreditCard className="w-4 h-4 text-emerald-500" />
-                                                طريقة الدفع
+                                                طريقة الدفع <span className="text-red-500">*</span>
                                             </label>
                                             <Select value={formData.paymentMethod} onValueChange={(value) => setFormData({ ...formData, paymentMethod: value })}>
                                                 <SelectTrigger className="rounded-xl border-slate-200 focus:ring-emerald-500">
@@ -195,11 +206,65 @@ export function CreateExpenseView() {
                                         </div>
                                         <div className="space-y-2">
                                             <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                                                <Building className="w-4 h-4 text-emerald-500" />
+                                                المورد / الجهة
+                                            </label>
+                                            <Input
+                                                placeholder="مثال: مكتبة الرياض"
+                                                value={formData.vendor}
+                                                onChange={(e) => setFormData({ ...formData, vendor: e.target.value })}
+                                                className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500"
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        <div className="space-y-2">
+                                            <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                                                <Briefcase className="w-4 h-4 text-emerald-500" />
+                                                القضية (اختياري)
+                                            </label>
+                                            <Select
+                                                value={formData.caseId}
+                                                onValueChange={(value) => setFormData({ ...formData, caseId: value })}
+                                                disabled={loadingCases}
+                                            >
+                                                <SelectTrigger className="rounded-xl border-slate-200 focus:ring-emerald-500">
+                                                    <SelectValue placeholder={loadingCases ? "جاري التحميل..." : "اختر القضية"} />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    <SelectItem value="">بدون قضية (مصروف عام)</SelectItem>
+                                                    {casesData?.data?.map((caseItem: any) => (
+                                                        <SelectItem key={caseItem._id} value={caseItem._id}>
+                                                            {caseItem.caseNumber} - {caseItem.title}
+                                                        </SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
                                                 <Upload className="w-4 h-4 text-emerald-500" />
                                                 إرفاق الإيصال
                                             </label>
                                             <Input type="file" className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 file:text-emerald-600 file:bg-emerald-50 file:border-0 file:rounded-lg file:mr-4 file:px-4 file:py-2 hover:file:bg-emerald-100" />
                                         </div>
+                                    </div>
+
+                                    <div className="flex items-center space-x-2 space-x-reverse p-4 bg-slate-50 rounded-xl">
+                                        <Checkbox
+                                            id="billable"
+                                            checked={formData.isBillable}
+                                            onCheckedChange={(checked) => setFormData({ ...formData, isBillable: checked as boolean })}
+                                            className="data-[state=checked]:bg-emerald-500 border-slate-300"
+                                        />
+                                        <label
+                                            htmlFor="billable"
+                                            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 flex items-center gap-2"
+                                        >
+                                            <CheckSquare className="w-4 h-4 text-emerald-500" />
+                                            قابل للفوترة (يمكن تحميله على العميل)
+                                        </label>
                                     </div>
 
                                     <div className="space-y-2">
@@ -229,6 +294,7 @@ export function CreateExpenseView() {
                                     >
                                         {createExpenseMutation.isPending ? (
                                             <span className="flex items-center gap-2">
+                                                <Loader2 className="w-4 h-4 animate-spin" />
                                                 جاري الحفظ...
                                             </span>
                                         ) : (
