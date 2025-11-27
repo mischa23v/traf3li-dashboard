@@ -14,7 +14,7 @@ import { ThemeSwitch } from '@/components/theme-switch'
 import { ConfigDrawer } from '@/components/config-drawer'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { useConversations, useMessages, useSendMessage, useMarkAsRead } from '@/hooks/useChat'
-import { useUser } from '@clerk/clerk-react'
+import { useAuthStore } from '@/stores/auth-store'
 
 export function ChatView() {
     const [activeChat, setActiveChat] = useState<string | null>(null)
@@ -22,7 +22,7 @@ export function ChatView() {
     const [selectedFiles, setSelectedFiles] = useState<File[]>([])
     const fileInputRef = useRef<HTMLInputElement>(null)
     const messagesEndRef = useRef<HTMLDivElement>(null)
-    const { user } = useUser()
+    const user = useAuthStore((state) => state.user)
 
     // Fetch conversations and messages
     const { data: conversations, isLoading: loadingConversations, error: conversationsError } = useConversations()
@@ -55,7 +55,7 @@ export function ChatView() {
     // Get the other user in the conversation
     const getOtherUser = () => {
         if (!activeConversation || !user) return null
-        const isSeller = activeConversation.sellerID._id === user.id
+        const isSeller = activeConversation.sellerID._id === user._id
         return isSeller ? activeConversation.buyerID : activeConversation.sellerID
     }
 
@@ -181,7 +181,7 @@ export function ChatView() {
                             ) : (
                                 <div className="space-y-2">
                                     {conversations.map((conversation) => {
-                                        const isSeller = conversation.sellerID._id === user?.id
+                                        const isSeller = conversation.sellerID._id === user?._id
                                         const otherParty = isSeller ? conversation.buyerID : conversation.sellerID
                                         const unreadCount = getUnreadCount(conversation)
 
@@ -296,7 +296,7 @@ export function ChatView() {
                             ) : (
                                 <div className="space-y-6">
                                     {messages.map((msg) => {
-                                        const isMyMessage = msg.userID._id === user?.id
+                                        const isMyMessage = msg.userID._id === user?._id
                                         const isRead = msg.readBy.length > 1 // More than just sender
 
                                         return (
