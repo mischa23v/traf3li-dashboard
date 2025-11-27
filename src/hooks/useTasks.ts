@@ -160,6 +160,7 @@ export const useUpdateTaskStatus = () => {
     onSuccess: (_, { id }) => {
       queryClient.invalidateQueries({ queryKey: ['tasks'] })
       queryClient.invalidateQueries({ queryKey: ['tasks', id] })
+      queryClient.invalidateQueries({ queryKey: ['calendar'] })
       toast.success('تم تحديث حالة المهمة')
     },
     onError: (error: Error) => {
@@ -194,6 +195,7 @@ export const useReopenTask = () => {
     onSuccess: (_, id) => {
       queryClient.invalidateQueries({ queryKey: ['tasks'] })
       queryClient.invalidateQueries({ queryKey: ['tasks', id] })
+      queryClient.invalidateQueries({ queryKey: ['calendar'] })
       toast.success('تم إعادة فتح المهمة')
     },
     onError: (error: Error) => {

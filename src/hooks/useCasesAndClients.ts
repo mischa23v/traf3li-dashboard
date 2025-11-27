@@ -1,6 +1,7 @@
 /**
  * Cases and Clients Hooks
  * TanStack Query hooks for cases and clients operations
+ * Includes automatic calendar/event sync for hearings
  */
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
@@ -34,6 +35,8 @@ import lawyersService, {
   LawyerFilters,
   Lawyer,
 } from '@/services/lawyersService'
+import eventsService from '@/services/eventsService'
+import remindersService from '@/services/remindersService'
 
 // ==================== CASES ====================
 
@@ -181,17 +184,70 @@ export const useAddCaseDocument = () => {
 
 /**
  * Add hearing to case mutation
+ * Automatically creates a calendar event and reminder for the hearing
  */
 export const useAddCaseHearing = () => {
   const queryClient = useQueryClient()
   const { t } = useTranslation()
 
   return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: AddHearingData }) =>
-      casesService.addHearing(id, data),
+    mutationFn: async ({ id, data, caseInfo }: {
+      id: string
+      data: AddHearingData
+      caseInfo?: { title?: string; caseNumber?: string }
+    }) => {
+      // First, add the hearing to the case
+      const result = await casesService.addHearing(id, data)
+
+      // Then, automatically create a calendar event for this hearing
+      try {
+        const hearingTitle = caseInfo?.title
+          ? `جلسة محكمة - ${caseInfo.title}`
+          : 'جلسة محكمة'
+
+        await eventsService.createEvent({
+          title: hearingTitle,
+          description: data.notes || `جلسة محكمة${caseInfo?.caseNumber ? ` - قضية رقم ${caseInfo.caseNumber}` : ''}`,
+          type: 'hearing',
+          startDate: data.date,
+          endDate: data.date,
+          allDay: false,
+          location: data.location ? { type: 'physical', address: data.location } : undefined,
+          caseId: id,
+          status: 'scheduled',
+          priority: 'high',
+        })
+
+        // Also create a reminder 1 day before the hearing
+        const hearingDate = new Date(data.date)
+        const reminderDate = new Date(hearingDate)
+        reminderDate.setDate(reminderDate.getDate() - 1)
+
+        await remindersService.createReminder({
+          title: `تذكير: ${hearingTitle}`,
+          description: `موعد الجلسة غداً في ${data.location || 'المحكمة'}`,
+          type: 'hearing',
+          reminderDate: reminderDate.toISOString(),
+          priority: 'high',
+          relatedCase: id,
+          notification: {
+            channels: ['push', 'email'],
+          },
+        })
+      } catch (syncError) {
+        // Log but don't fail the operation if event/reminder creation fails
+        console.warn('Failed to create calendar event/reminder for hearing:', syncError)
+      }
+
+      return result
+    },
     onSuccess: (_, { id }) => {
       queryClient.invalidateQueries({ queryKey: ['cases', id] })
-      toast.success(t('cases.hearingAddSuccess', 'تمت إضافة الجلسة بنجاح'))
+      queryClient.invalidateQueries({ queryKey: ['cases'] })
+      queryClient.invalidateQueries({ queryKey: ['calendar'] })
+      queryClient.invalidateQueries({ queryKey: ['events'] })
+      queryClient.invalidateQueries({ queryKey: ['reminders'] })
+      toast.success(t('cases.hearingAddSuccess', 'تمت إضافة الجلسة بنجاح وتم إنشاء حدث في التقويم'))
     },
     onError: (error: Error) => {
       toast.error(error.message || t('cases.hearingAddError', 'فشل إضافة الجلسة'))
@@ -435,6 +491,7 @@ export const useDeleteCaseNote = () => {
 
 /**
  * Update hearing in case mutation
+ * Also invalidates calendar queries to keep calendar in sync
  */
 export const useUpdateCaseHearing = () => {
   const queryClient = useQueryClient()
@@ -445,6 +502,9 @@ export const useUpdateCaseHearing = () => {
       casesService.updateHearing(caseId, hearingId, data),
     onSuccess: (_, { caseId }) => {
       queryClient.invalidateQueries({ queryKey: ['cases', caseId] })
+      queryClient.invalidateQueries({ queryKey: ['cases'] })
+      queryClient.invalidateQueries({ queryKey: ['calendar'] })
+      queryClient.invalidateQueries({ queryKey: ['events'] })
       toast.success(t('cases.hearingUpdateSuccess', 'تم تحديث الجلسة بنجاح'))
     },
     onError: (error: Error) => {
@@ -455,6 +515,7 @@ export const useUpdateCaseHearing = () => {
 
 /**
  * Delete hearing from case mutation
+ * Also invalidates calendar queries to keep calendar in sync
  */
 export const useDeleteCaseHearing = () => {
   const queryClient = useQueryClient()
@@ -465,6 +526,9 @@ export const useDeleteCaseHearing = () => {
       casesService.deleteHearing(caseId, hearingId),
     onSuccess: (_, { caseId }) => {
       queryClient.invalidateQueries({ queryKey: ['cases', caseId] })
+      queryClient.invalidateQueries({ queryKey: ['cases'] })
+      queryClient.invalidateQueries({ queryKey: ['calendar'] })
+      queryClient.invalidateQueries({ queryKey: ['events'] })
       toast.success(t('cases.hearingDeleteSuccess', 'تم حذف الجلسة بنجاح'))
     },
     onError: (error: Error) => {
