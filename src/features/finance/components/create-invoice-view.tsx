@@ -1,7 +1,7 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import {
     ArrowRight, Save, Calendar, User,
-    FileText, DollarSign, Plus, Trash2, Briefcase, Loader2
+    FileText, DollarSign, Plus, Trash2, Briefcase, Loader2, Percent, Hash, Send
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -19,12 +19,13 @@ import { DynamicIsland } from '@/components/dynamic-island'
 import { Main } from '@/components/layout/main'
 import { Link, useNavigate } from '@tanstack/react-router'
 import { FinanceSidebar } from './finance-sidebar'
-import { useCreateInvoice } from '@/hooks/useFinance'
+import { useCreateInvoice, useSendInvoice } from '@/hooks/useFinance'
 import { useClients, useCases } from '@/hooks/useCasesAndClients'
 
 export function CreateInvoiceView() {
     const navigate = useNavigate()
     const createInvoiceMutation = useCreateInvoice()
+    const sendInvoiceMutation = useSendInvoice()
 
     // Load clients and cases from API
     const { data: clientsData, isLoading: loadingClients } = useClients()
@@ -33,12 +34,17 @@ export function CreateInvoiceView() {
     const [formData, setFormData] = useState({
         clientId: '',
         caseId: '',
+        reference: '',
         issueDate: new Date().toISOString().split('T')[0],
         dueDate: '',
+        discountType: 'percentage' as 'percentage' | 'fixed',
+        discountValue: 0,
+        paymentTerms: '30',
         notes: '',
     })
 
     const [items, setItems] = useState([{ id: 1, description: '', quantity: 1, price: 0 }])
+    const [sendAfterCreate, setSendAfterCreate] = useState(false)
 
     const handleAddItem = () => {
         setItems([...items, { id: items.length + 1, description: '', quantity: 1, price: 0 }])
@@ -54,18 +60,54 @@ export function CreateInvoiceView() {
         setItems(items.map(item => item.id === id ? { ...item, [field]: value } : item))
     }
 
+    // Calculate totals
+    const calculations = useMemo(() => {
+        const subtotal = items.reduce((sum, item) => sum + (item.quantity * item.price), 0)
+
+        // Calculate discount
+        let discountAmount = 0
+        if (formData.discountType === 'percentage') {
+            discountAmount = subtotal * (formData.discountValue / 100)
+        } else {
+            discountAmount = formData.discountValue
+        }
+
+        const afterDiscount = subtotal - discountAmount
+        const vatRate = 0.15 // 15% Saudi VAT
+        const vatAmount = afterDiscount * vatRate
+        const totalAmount = afterDiscount + vatAmount
+
+        return {
+            subtotal,
+            discountAmount,
+            afterDiscount,
+            vatRate,
+            vatAmount,
+            totalAmount,
+        }
+    }, [items, formData.discountType, formData.discountValue])
+
+    // Set due date based on payment terms
+    const handlePaymentTermsChange = (terms: string) => {
+        setFormData({ ...formData, paymentTerms: terms })
+        if (terms && formData.issueDate) {
+            const issueDate = new Date(formData.issueDate)
+            issueDate.setDate(issueDate.getDate() + parseInt(terms))
+            setFormData(prev => ({
+                ...prev,
+                paymentTerms: terms,
+                dueDate: issueDate.toISOString().split('T')[0]
+            }))
+        }
+    }
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
-
-        // Calculate totals
-        const subtotal = items.reduce((sum, item) => sum + (item.quantity * item.price), 0)
-        const vatRate = 0.15
-        const vatAmount = subtotal * vatRate
-        const totalAmount = subtotal + vatAmount
 
         const invoiceData = {
             clientId: formData.clientId,
             ...(formData.caseId && { caseId: formData.caseId }),
+            ...(formData.reference && { reference: formData.reference }),
             dueDate: formData.dueDate,
             items: items.map(item => ({
                 description: item.description,
@@ -73,16 +115,31 @@ export function CreateInvoiceView() {
                 unitPrice: item.price,
                 total: item.quantity * item.price,
             })),
-            subtotal,
-            vatRate,
-            vatAmount,
-            totalAmount,
+            subtotal: calculations.subtotal,
+            discountType: formData.discountType,
+            discountValue: formData.discountValue,
+            discountAmount: calculations.discountAmount,
+            vatRate: calculations.vatRate,
+            vatAmount: calculations.vatAmount,
+            totalAmount: calculations.totalAmount,
             notes: formData.notes,
         }
 
         createInvoiceMutation.mutate(invoiceData, {
-            onSuccess: () => {
-                navigate({ to: '/dashboard/finance/invoices' })
+            onSuccess: (data) => {
+                if (sendAfterCreate && data?._id) {
+                    sendInvoiceMutation.mutate(data._id, {
+                        onSuccess: () => {
+                            navigate({ to: '/dashboard/finance/invoices' })
+                        },
+                        onError: () => {
+                            // Even if send fails, invoice was created
+                            navigate({ to: '/dashboard/finance/invoices' })
+                        }
+                    })
+                } else {
+                    navigate({ to: '/dashboard/finance/invoices' })
+                }
             },
         })
     }
@@ -197,6 +254,44 @@ export function CreateInvoiceView() {
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                         <div className="space-y-2">
                                             <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                                                <Hash className="w-4 h-4 text-emerald-500" />
+                                                رقم المرجع (اختياري)
+                                            </label>
+                                            <Input
+                                                placeholder="مثال: PO-12345"
+                                                value={formData.reference}
+                                                onChange={(e) => setFormData({ ...formData, reference: e.target.value })}
+                                                className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500"
+                                            />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                                                <Calendar className="w-4 h-4 text-emerald-500" />
+                                                شروط الدفع
+                                            </label>
+                                            <Select
+                                                value={formData.paymentTerms}
+                                                onValueChange={handlePaymentTermsChange}
+                                            >
+                                                <SelectTrigger className="rounded-xl border-slate-200 focus:ring-emerald-500">
+                                                    <SelectValue placeholder="اختر شروط الدفع" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    <SelectItem value="0">فوري (عند الاستلام)</SelectItem>
+                                                    <SelectItem value="7">7 أيام</SelectItem>
+                                                    <SelectItem value="15">15 يوم</SelectItem>
+                                                    <SelectItem value="30">30 يوم</SelectItem>
+                                                    <SelectItem value="45">45 يوم</SelectItem>
+                                                    <SelectItem value="60">60 يوم</SelectItem>
+                                                    <SelectItem value="90">90 يوم</SelectItem>
+                                                </SelectContent>
+                                            </Select>
+                                        </div>
+                                    </div>
+
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        <div className="space-y-2">
+                                            <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
                                                 <Calendar className="w-4 h-4 text-emerald-500" />
                                                 تاريخ الإصدار
                                             </label>
@@ -205,7 +300,6 @@ export function CreateInvoiceView() {
                                                 value={formData.issueDate}
                                                 onChange={(e) => setFormData({ ...formData, issueDate: e.target.value })}
                                                 className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500"
-                                                readOnly
                                             />
                                         </div>
                                         <div className="space-y-2">
@@ -237,7 +331,15 @@ export function CreateInvoiceView() {
                                         </div>
 
                                         <div className="space-y-3">
-                                            {items.map((item, index) => (
+                                            {/* Header */}
+                                            <div className="flex gap-4 items-center text-xs font-medium text-slate-500 px-1">
+                                                <div className="flex-1">الوصف</div>
+                                                <div className="w-24 text-center">الكمية</div>
+                                                <div className="w-32 text-center">السعر (ر.س)</div>
+                                                <div className="w-32 text-center">الإجمالي</div>
+                                                <div className="w-10"></div>
+                                            </div>
+                                            {items.map((item) => (
                                                 <div key={item.id} className="flex gap-4 items-start">
                                                     <div className="flex-1">
                                                         <Input
@@ -250,26 +352,97 @@ export function CreateInvoiceView() {
                                                     <div className="w-24">
                                                         <Input
                                                             type="number"
-                                                            placeholder="الكمية"
+                                                            min="1"
+                                                            placeholder="1"
                                                             value={item.quantity}
                                                             onChange={(e) => handleItemChange(item.id, 'quantity', Number(e.target.value))}
-                                                            className="rounded-xl border-slate-200"
+                                                            className="rounded-xl border-slate-200 text-center"
                                                         />
                                                     </div>
                                                     <div className="w-32">
                                                         <Input
                                                             type="number"
-                                                            placeholder="السعر"
+                                                            min="0"
+                                                            step="0.01"
+                                                            placeholder="0.00"
                                                             value={item.price}
                                                             onChange={(e) => handleItemChange(item.id, 'price', Number(e.target.value))}
-                                                            className="rounded-xl border-slate-200"
+                                                            className="rounded-xl border-slate-200 text-center"
                                                         />
+                                                    </div>
+                                                    <div className="w-32 flex items-center justify-center h-10 bg-slate-50 rounded-xl text-sm font-medium">
+                                                        {(item.quantity * item.price).toLocaleString('ar-SA')} ر.س
                                                     </div>
                                                     <Button type="button" onClick={() => handleRemoveItem(item.id)} variant="ghost" size="icon" className="text-red-500 hover:bg-red-50 rounded-xl">
                                                         <Trash2 className="w-4 h-4" />
                                                     </Button>
                                                 </div>
                                             ))}
+                                        </div>
+                                    </div>
+
+                                    {/* Discount Section */}
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 p-4 bg-slate-50 rounded-xl">
+                                        <div className="space-y-2">
+                                            <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                                                <Percent className="w-4 h-4 text-emerald-500" />
+                                                نوع الخصم
+                                            </label>
+                                            <Select
+                                                value={formData.discountType}
+                                                onValueChange={(value: 'percentage' | 'fixed') => setFormData({ ...formData, discountType: value })}
+                                            >
+                                                <SelectTrigger className="rounded-xl border-slate-200 focus:ring-emerald-500 bg-white">
+                                                    <SelectValue />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    <SelectItem value="percentage">نسبة مئوية (%)</SelectItem>
+                                                    <SelectItem value="fixed">مبلغ ثابت (ر.س)</SelectItem>
+                                                </SelectContent>
+                                            </Select>
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label className="text-sm font-medium text-slate-700">
+                                                قيمة الخصم
+                                            </label>
+                                            <Input
+                                                type="number"
+                                                min="0"
+                                                step="0.01"
+                                                placeholder="0"
+                                                value={formData.discountValue}
+                                                onChange={(e) => setFormData({ ...formData, discountValue: Number(e.target.value) })}
+                                                className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 bg-white"
+                                            />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label className="text-sm font-medium text-slate-700">مبلغ الخصم</label>
+                                            <div className="h-10 flex items-center px-3 bg-white rounded-xl border border-slate-200 text-sm font-medium text-red-600">
+                                                -{calculations.discountAmount.toLocaleString('ar-SA')} ر.س
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Totals Section */}
+                                    <div className="bg-emerald-50 rounded-xl p-6 space-y-3">
+                                        <div className="flex justify-between text-sm">
+                                            <span className="text-slate-600">المجموع الفرعي</span>
+                                            <span className="font-medium">{calculations.subtotal.toLocaleString('ar-SA')} ر.س</span>
+                                        </div>
+                                        {calculations.discountAmount > 0 && (
+                                            <div className="flex justify-between text-sm text-red-600">
+                                                <span>الخصم ({formData.discountType === 'percentage' ? `${formData.discountValue}%` : 'مبلغ ثابت'})</span>
+                                                <span>-{calculations.discountAmount.toLocaleString('ar-SA')} ر.س</span>
+                                            </div>
+                                        )}
+                                        <div className="flex justify-between text-sm">
+                                            <span className="text-slate-600">ضريبة القيمة المضافة (15%)</span>
+                                            <span className="font-medium">{calculations.vatAmount.toLocaleString('ar-SA')} ر.س</span>
+                                        </div>
+                                        <hr className="border-emerald-200" />
+                                        <div className="flex justify-between text-lg font-bold">
+                                            <span className="text-emerald-800">الإجمالي</span>
+                                            <span className="text-emerald-600">{calculations.totalAmount.toLocaleString('ar-SA')} ر.س</span>
                                         </div>
                                     </div>
 
@@ -285,6 +458,21 @@ export function CreateInvoiceView() {
                                             className="min-h-[100px] rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500"
                                         />
                                     </div>
+
+                                    {/* Send after create option */}
+                                    <div className="flex items-center gap-3 p-4 bg-blue-50 rounded-xl">
+                                        <input
+                                            type="checkbox"
+                                            id="sendAfterCreate"
+                                            checked={sendAfterCreate}
+                                            onChange={(e) => setSendAfterCreate(e.target.checked)}
+                                            className="h-4 w-4 text-blue-600 rounded border-slate-300"
+                                        />
+                                        <label htmlFor="sendAfterCreate" className="text-sm font-medium text-blue-800 flex items-center gap-2">
+                                            <Send className="w-4 h-4" />
+                                            إرسال الفاتورة للعميل بعد الإنشاء
+                                        </label>
+                                    </div>
                                 </div>
 
                                 <div className="flex items-center justify-end gap-4 pt-6 border-t border-slate-100">
@@ -296,9 +484,9 @@ export function CreateInvoiceView() {
                                     <Button
                                         type="submit"
                                         className="bg-emerald-500 hover:bg-emerald-600 text-white min-w-[140px] rounded-xl shadow-lg shadow-emerald-500/20"
-                                        disabled={createInvoiceMutation.isPending}
+                                        disabled={createInvoiceMutation.isPending || sendInvoiceMutation.isPending}
                                     >
-                                        {createInvoiceMutation.isPending ? (
+                                        {createInvoiceMutation.isPending || sendInvoiceMutation.isPending ? (
                                             <span className="flex items-center gap-2">
                                                 <Loader2 className="w-4 h-4 animate-spin" />
                                                 جاري الحفظ...
@@ -306,7 +494,7 @@ export function CreateInvoiceView() {
                                         ) : (
                                             <span className="flex items-center gap-2">
                                                 <Save className="w-4 h-4" />
-                                                حفظ الفاتورة
+                                                {sendAfterCreate ? 'حفظ وإرسال' : 'حفظ الفاتورة'}
                                             </span>
                                         )}
                                     </Button>

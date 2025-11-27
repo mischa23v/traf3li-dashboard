@@ -6,7 +6,6 @@
     "lib": ["ES2020", "DOM", "DOM.Iterable"],
     "module": "ESNext",
     "skipLibCheck": true,
-    "rootDir": "src",
 
     /* Bundler mode */
     "moduleResolution": "Bundler",
@@ -31,5 +30,5 @@
     "noUncheckedSideEffectImports": true
   },
   "include": ["src/**/*.ts", "src/**/*.tsx"],
-  "exclude": ["**/node_modules/**", "newdesigns/**", "test/**", "**/*.test.ts", "**/*.test.tsx"]
+  "exclude": ["node_modules", "newdesigns", "test", "miru-web-develop", "dist", "**/*.test.ts", "**/*.test.tsx"]
 }

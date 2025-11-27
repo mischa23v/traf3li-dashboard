@@ -1,7 +1,8 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import {
     ArrowRight, Save, Calendar, Tag,
-    FileText, DollarSign, CreditCard, Upload, Briefcase, Building, Loader2, CheckSquare
+    FileText, DollarSign, CreditCard, Upload, Briefcase, Building, Loader2, CheckSquare,
+    User, RotateCcw, Receipt
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -21,14 +22,31 @@ import { Main } from '@/components/layout/main'
 import { Link, useNavigate } from '@tanstack/react-router'
 import { FinanceSidebar } from './finance-sidebar'
 import { useCreateExpense } from '@/hooks/useFinance'
-import { useCases } from '@/hooks/useCasesAndClients'
+import { useCases, useClients } from '@/hooks/useCasesAndClients'
+
+// Expense categories matching miru-web
+const expenseCategories = [
+    { value: 'office_supplies', label: 'مستلزمات مكتبية', labelEn: 'Office Supplies' },
+    { value: 'travel', label: 'سفر وانتقالات', labelEn: 'Travel' },
+    { value: 'transport', label: 'مواصلات', labelEn: 'Transportation' },
+    { value: 'meals', label: 'وجبات وضيافة', labelEn: 'Meals & Entertainment' },
+    { value: 'software', label: 'برمجيات واشتراكات', labelEn: 'Software & Subscriptions' },
+    { value: 'equipment', label: 'معدات وأجهزة', labelEn: 'Equipment' },
+    { value: 'communication', label: 'اتصالات', labelEn: 'Communication' },
+    { value: 'government_fees', label: 'رسوم حكومية', labelEn: 'Government Fees' },
+    { value: 'professional_services', label: 'خدمات مهنية', labelEn: 'Professional Services' },
+    { value: 'marketing', label: 'تسويق وإعلان', labelEn: 'Marketing' },
+    { value: 'training', label: 'تدريب وتطوير', labelEn: 'Training' },
+    { value: 'other', label: 'أخرى', labelEn: 'Other' },
+]
 
 export function CreateExpenseView() {
     const navigate = useNavigate()
     const createExpenseMutation = useCreateExpense()
 
-    // Load cases from API
+    // Load cases and clients from API
     const { data: casesData, isLoading: loadingCases } = useCases()
+    const { data: clientsData, isLoading: loadingClients } = useClients()
 
     const [formData, setFormData] = useState({
         description: '',
@@ -38,9 +56,27 @@ export function CreateExpenseView() {
         paymentMethod: '',
         vendor: '',
         caseId: '',
+        clientId: '',
+        expenseType: 'company' as 'company' | 'personal',
         isBillable: false,
+        isReimbursable: false,
+        taxAmount: '',
+        receiptNumber: '',
         notes: '',
     })
+
+    // Get selected client
+    const selectedClient = useMemo(() => {
+        if (!formData.clientId || !clientsData?.data) return null
+        return clientsData.data.find((c: any) => c._id === formData.clientId)
+    }, [formData.clientId, clientsData])
+
+    // Calculate total with tax
+    const totalAmount = useMemo(() => {
+        const amount = Number(formData.amount) || 0
+        const tax = Number(formData.taxAmount) || 0
+        return amount + tax
+    }, [formData.amount, formData.taxAmount])
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
@@ -51,10 +87,15 @@ export function CreateExpenseView() {
             category: formData.category,
             date: formData.date,
             paymentMethod: formData.paymentMethod,
+            expenseType: formData.expenseType,
+            isBillable: formData.isBillable,
+            isReimbursable: formData.isReimbursable,
             ...(formData.vendor && { vendor: formData.vendor }),
             ...(formData.caseId && { caseId: formData.caseId }),
-            isBillable: formData.isBillable,
-            notes: formData.notes,
+            ...(formData.clientId && { clientId: formData.clientId }),
+            ...(formData.taxAmount && { taxAmount: Number(formData.taxAmount) }),
+            ...(formData.receiptNumber && { receiptNumber: formData.receiptNumber }),
+            ...(formData.notes && { notes: formData.notes }),
         }
 
         createExpenseMutation.mutate(expenseData, {
@@ -123,11 +164,40 @@ export function CreateExpenseView() {
                         <div className="bg-white rounded-3xl p-8 shadow-sm border border-slate-100">
                             <form onSubmit={handleSubmit} className="space-y-8">
                                 <div className="space-y-6">
+                                    {/* Expense Type Selector */}
+                                    <div className="p-4 bg-slate-50 rounded-xl">
+                                        <label className="text-sm font-medium text-slate-700 mb-3 block">نوع المصروف</label>
+                                        <div className="flex gap-4">
+                                            <label className="flex items-center gap-2 cursor-pointer">
+                                                <input
+                                                    type="radio"
+                                                    name="expenseType"
+                                                    value="company"
+                                                    checked={formData.expenseType === 'company'}
+                                                    onChange={(e) => setFormData({ ...formData, expenseType: e.target.value as 'company' | 'personal' })}
+                                                    className="w-4 h-4 text-emerald-500 focus:ring-emerald-500"
+                                                />
+                                                <span className="text-sm font-medium text-slate-700">مصروف الشركة</span>
+                                            </label>
+                                            <label className="flex items-center gap-2 cursor-pointer">
+                                                <input
+                                                    type="radio"
+                                                    name="expenseType"
+                                                    value="personal"
+                                                    checked={formData.expenseType === 'personal'}
+                                                    onChange={(e) => setFormData({ ...formData, expenseType: e.target.value as 'company' | 'personal' })}
+                                                    className="w-4 h-4 text-emerald-500 focus:ring-emerald-500"
+                                                />
+                                                <span className="text-sm font-medium text-slate-700">مصروف شخصي (قابل للسداد)</span>
+                                            </label>
+                                        </div>
+                                    </div>
+
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                         <div className="space-y-2">
                                             <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
                                                 <FileText className="w-4 h-4 text-emerald-500" />
-                                                وصف المصروف
+                                                وصف المصروف <span className="text-red-500">*</span>
                                             </label>
                                             <Input
                                                 placeholder="مثال: شراء قرطاسية للمكتب"
@@ -139,43 +209,8 @@ export function CreateExpenseView() {
                                         </div>
                                         <div className="space-y-2">
                                             <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                                <DollarSign className="w-4 h-4 text-emerald-500" />
-                                                المبلغ
-                                            </label>
-                                            <Input
-                                                type="number"
-                                                placeholder="0.00"
-                                                value={formData.amount}
-                                                onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
-                                                className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500"
-                                                required
-                                            />
-                                        </div>
-                                    </div>
-
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                        <div className="space-y-2">
-                                            <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                                <Tag className="w-4 h-4 text-emerald-500" />
-                                                التصنيف
-                                            </label>
-                                            <Select value={formData.category} onValueChange={(value) => setFormData({ ...formData, category: value })}>
-                                                <SelectTrigger className="rounded-xl border-slate-200 focus:ring-emerald-500">
-                                                    <SelectValue placeholder="اختر التصنيف" />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    <SelectItem value="office">مستلزمات مكتبية</SelectItem>
-                                                    <SelectItem value="transport">مواصلات وانتقالات</SelectItem>
-                                                    <SelectItem value="hospitality">ضيافة</SelectItem>
-                                                    <SelectItem value="government">رسوم حكومية</SelectItem>
-                                                    <SelectItem value="other">أخرى</SelectItem>
-                                                </SelectContent>
-                                            </Select>
-                                        </div>
-                                        <div className="space-y-2">
-                                            <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
                                                 <Calendar className="w-4 h-4 text-emerald-500" />
-                                                التاريخ
+                                                التاريخ <span className="text-red-500">*</span>
                                             </label>
                                             <Input
                                                 type="date"
@@ -187,7 +222,70 @@ export function CreateExpenseView() {
                                         </div>
                                     </div>
 
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                        <div className="space-y-2">
+                                            <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                                                <DollarSign className="w-4 h-4 text-emerald-500" />
+                                                المبلغ (ر.س) <span className="text-red-500">*</span>
+                                            </label>
+                                            <Input
+                                                type="number"
+                                                placeholder="0.00"
+                                                min="0"
+                                                step="0.01"
+                                                value={formData.amount}
+                                                onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
+                                                className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500"
+                                                required
+                                            />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                                                <DollarSign className="w-4 h-4 text-emerald-500" />
+                                                الضريبة (ر.س)
+                                            </label>
+                                            <Input
+                                                type="number"
+                                                placeholder="0.00"
+                                                min="0"
+                                                step="0.01"
+                                                value={formData.taxAmount}
+                                                onChange={(e) => setFormData({ ...formData, taxAmount: e.target.value })}
+                                                className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500"
+                                            />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                                                <DollarSign className="w-4 h-4 text-emerald-500" />
+                                                الإجمالي
+                                            </label>
+                                            <div className="h-10 px-3 py-2 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center">
+                                                <span className="text-emerald-700 font-bold">
+                                                    {new Intl.NumberFormat('ar-SA', { minimumFractionDigits: 2 }).format(totalAmount)} ر.س
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        <div className="space-y-2">
+                                            <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                                                <Tag className="w-4 h-4 text-emerald-500" />
+                                                التصنيف <span className="text-red-500">*</span>
+                                            </label>
+                                            <Select value={formData.category} onValueChange={(value) => setFormData({ ...formData, category: value })}>
+                                                <SelectTrigger className="rounded-xl border-slate-200 focus:ring-emerald-500">
+                                                    <SelectValue placeholder="اختر التصنيف" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    {expenseCategories.map((cat) => (
+                                                        <SelectItem key={cat.value} value={cat.value}>
+                                                            {cat.label}
+                                                        </SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
+                                        </div>
                                         <div className="space-y-2">
                                             <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
                                                 <CreditCard className="w-4 h-4 text-emerald-500" />
@@ -200,10 +298,16 @@ export function CreateExpenseView() {
                                                 <SelectContent>
                                                     <SelectItem value="cash">نقداً</SelectItem>
                                                     <SelectItem value="card">بطاقة ائتمان</SelectItem>
+                                                    <SelectItem value="debit">بطاقة خصم</SelectItem>
                                                     <SelectItem value="transfer">تحويل بنكي</SelectItem>
+                                                    <SelectItem value="check">شيك</SelectItem>
+                                                    <SelectItem value="petty_cash">صندوق النثريات</SelectItem>
                                                 </SelectContent>
                                             </Select>
                                         </div>
+                                    </div>
+
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                         <div className="space-y-2">
                                             <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
                                                 <Building className="w-4 h-4 text-emerald-500" />
@@ -216,13 +320,53 @@ export function CreateExpenseView() {
                                                 className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500"
                                             />
                                         </div>
+                                        <div className="space-y-2">
+                                            <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                                                <Receipt className="w-4 h-4 text-emerald-500" />
+                                                رقم الإيصال / الفاتورة
+                                            </label>
+                                            <Input
+                                                placeholder="مثال: INV-001"
+                                                value={formData.receiptNumber}
+                                                onChange={(e) => setFormData({ ...formData, receiptNumber: e.target.value })}
+                                                className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500"
+                                            />
+                                        </div>
                                     </div>
 
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                         <div className="space-y-2">
                                             <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                                                <User className="w-4 h-4 text-emerald-500" />
+                                                العميل (اختياري)
+                                            </label>
+                                            <Select
+                                                value={formData.clientId}
+                                                onValueChange={(value) => setFormData({ ...formData, clientId: value })}
+                                                disabled={loadingClients}
+                                            >
+                                                <SelectTrigger className="rounded-xl border-slate-200 focus:ring-emerald-500">
+                                                    <SelectValue placeholder={loadingClients ? "جاري التحميل..." : "اختر العميل"} />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    <SelectItem value="">بدون عميل (مصروف عام)</SelectItem>
+                                                    {clientsData?.data?.map((client: any) => (
+                                                        <SelectItem key={client._id} value={client._id}>
+                                                            {client.name || client.fullName}
+                                                        </SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
+                                            {selectedClient && (
+                                                <p className="text-xs text-slate-500">
+                                                    البريد: {selectedClient.email || 'غير محدد'}
+                                                </p>
+                                            )}
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
                                                 <Briefcase className="w-4 h-4 text-emerald-500" />
-                                                القضية (اختياري)
+                                                القضية / المشروع (اختياري)
                                             </label>
                                             <Select
                                                 value={formData.caseId}
@@ -233,7 +377,7 @@ export function CreateExpenseView() {
                                                     <SelectValue placeholder={loadingCases ? "جاري التحميل..." : "اختر القضية"} />
                                                 </SelectTrigger>
                                                 <SelectContent>
-                                                    <SelectItem value="">بدون قضية (مصروف عام)</SelectItem>
+                                                    <SelectItem value="">بدون قضية</SelectItem>
                                                     {casesData?.data?.map((caseItem: any) => (
                                                         <SelectItem key={caseItem._id} value={caseItem._id}>
                                                             {caseItem.caseNumber} - {caseItem.title}
@@ -242,29 +386,54 @@ export function CreateExpenseView() {
                                                 </SelectContent>
                                             </Select>
                                         </div>
-                                        <div className="space-y-2">
-                                            <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                                <Upload className="w-4 h-4 text-emerald-500" />
-                                                إرفاق الإيصال
-                                            </label>
-                                            <Input type="file" className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 file:text-emerald-600 file:bg-emerald-50 file:border-0 file:rounded-lg file:mr-4 file:px-4 file:py-2 hover:file:bg-emerald-100" />
-                                        </div>
                                     </div>
 
-                                    <div className="flex items-center space-x-2 space-x-reverse p-4 bg-slate-50 rounded-xl">
-                                        <Checkbox
-                                            id="billable"
-                                            checked={formData.isBillable}
-                                            onCheckedChange={(checked) => setFormData({ ...formData, isBillable: checked as boolean })}
-                                            className="data-[state=checked]:bg-emerald-500 border-slate-300"
-                                        />
-                                        <label
-                                            htmlFor="billable"
-                                            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 flex items-center gap-2"
-                                        >
-                                            <CheckSquare className="w-4 h-4 text-emerald-500" />
-                                            قابل للفوترة (يمكن تحميله على العميل)
+                                    <div className="space-y-2">
+                                        <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                                            <Upload className="w-4 h-4 text-emerald-500" />
+                                            إرفاق الإيصال
                                         </label>
+                                        <Input
+                                            type="file"
+                                            accept="image/*,.pdf"
+                                            className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 file:text-emerald-600 file:bg-emerald-50 file:border-0 file:rounded-lg file:mr-4 file:px-4 file:py-2 hover:file:bg-emerald-100"
+                                        />
+                                        <p className="text-xs text-slate-500">يمكنك إرفاق صورة أو ملف PDF للإيصال</p>
+                                    </div>
+
+                                    {/* Checkboxes Section */}
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div className="flex items-center space-x-2 space-x-reverse p-4 bg-slate-50 rounded-xl">
+                                            <Checkbox
+                                                id="billable"
+                                                checked={formData.isBillable}
+                                                onCheckedChange={(checked) => setFormData({ ...formData, isBillable: checked as boolean })}
+                                                className="data-[state=checked]:bg-emerald-500 border-slate-300"
+                                            />
+                                            <label
+                                                htmlFor="billable"
+                                                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 flex items-center gap-2"
+                                            >
+                                                <CheckSquare className="w-4 h-4 text-emerald-500" />
+                                                قابل للفوترة (تحميله على العميل)
+                                            </label>
+                                        </div>
+                                        <div className="flex items-center space-x-2 space-x-reverse p-4 bg-slate-50 rounded-xl">
+                                            <Checkbox
+                                                id="reimbursable"
+                                                checked={formData.isReimbursable}
+                                                onCheckedChange={(checked) => setFormData({ ...formData, isReimbursable: checked as boolean })}
+                                                className="data-[state=checked]:bg-blue-500 border-slate-300"
+                                                disabled={formData.expenseType !== 'personal'}
+                                            />
+                                            <label
+                                                htmlFor="reimbursable"
+                                                className={`text-sm font-medium leading-none flex items-center gap-2 ${formData.expenseType !== 'personal' ? 'opacity-50' : ''}`}
+                                            >
+                                                <RotateCcw className="w-4 h-4 text-blue-500" />
+                                                قابل للسداد (رد المبلغ للموظف)
+                                            </label>
+                                        </div>
                                     </div>
 
                                     <div className="space-y-2">

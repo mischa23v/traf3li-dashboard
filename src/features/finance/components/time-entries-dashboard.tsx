@@ -227,6 +227,12 @@ export default function TimeEntriesDashboard() {
                                     <p className="text-blue-200/80">تتبع الوقت، الفوترة، وإدارة إنتاجية الفريق</p>
                                 </div>
                                 <div className="flex gap-3">
+                                    <Button asChild variant="outline" className="bg-white/5 border-white/10 text-white hover:bg-white/10 rounded-xl">
+                                        <Link to="/dashboard/finance/time-tracking/weekly">
+                                            <Clock className="w-4 h-4 ml-2" />
+                                            العرض الأسبوعي
+                                        </Link>
+                                    </Button>
                                     <Button variant="outline" className="bg-white/5 border-white/10 text-white hover:bg-white/10 rounded-xl">
                                         <Download className="w-4 h-4 ml-2" />
                                         تصدير التقرير
