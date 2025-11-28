@@ -11,7 +11,6 @@ import {
   Scale,
   DollarSign,
   Star,
-  BarChart,
   BookOpen,
   Settings,
   HelpCircle,
@@ -87,6 +86,11 @@ export function useSidebarData(): SidebarData {
             url: '/dashboard/calendar',
             icon: Calendar,
           },
+        ],
+      },
+      {
+        title: 'المهام',
+        items: [
           {
             title: 'المهام',
             icon: CheckSquare,
@@ -104,7 +108,7 @@ export function useSidebarData(): SidebarData {
                 url: '/dashboard/tasks/events',
               },
               {
-                title: 'الملاحظات والمراجع',
+                title: 'الملاحظات',
                 url: '/dashboard/wiki',
               },
             ],
@@ -238,12 +242,11 @@ export function useSidebarData(): SidebarData {
                 title: 'شاراتي',
                 url: '/dashboard/reputation/badges',
               },
+              {
+                title: 'التقارير',
+                url: '/dashboard/reports',
+              },
             ],
-          },
-          {
-            title: 'التقارير',
-            url: '/dashboard/reports',
-            icon: BarChart,
           },
           {
             title: 'مركز المعرفة',
@@ -266,7 +269,7 @@ export function useSidebarData(): SidebarData {
         ],
       },
       {
-        title: 'النظام',
+        title: 'الإعدادات',
         items: [
           {
             title: 'الإعدادات',
