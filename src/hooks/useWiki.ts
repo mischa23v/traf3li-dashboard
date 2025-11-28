@@ -15,7 +15,8 @@ import {
   wikiTemplateService,
   wikiAttachmentService,
   wikiAttachmentVersionService,
-  wikiExportService
+  wikiExportService,
+  wikiVoiceMemoService
 } from '@/services/wikiService'
 import type {
   CreateWikiPageInput,
@@ -27,6 +28,7 @@ import type {
   CreateWikiCommentInput,
   WikiAttachmentCategory,
   UpdateAttachmentInput,
+  UpdateVoiceMemoInput,
   WikiExportFormat,
   WikiLinkableEntityType
 } from '@/types/wiki'
@@ -71,7 +73,11 @@ export const wikiKeys = {
   // Folder keys
   folders: () => [...wikiKeys.all, 'folders'] as const,
   folderTree: () => [...wikiKeys.all, 'folders', 'tree'] as const,
-  folder: (folderId: string) => [...wikiKeys.all, 'folder', folderId] as const
+  folder: (folderId: string) => [...wikiKeys.all, 'folder', folderId] as const,
+
+  // Voice memo keys
+  voiceMemos: (pageId: string) =>
+    [...wikiKeys.all, 'voice-memos', pageId] as const
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -1201,6 +1207,150 @@ export const useMoveWikiFolder = () => {
       queryClient.invalidateQueries({ queryKey: wikiKeys.folders() })
       queryClient.invalidateQueries({ queryKey: wikiKeys.folderTree() })
       queryClient.invalidateQueries({ queryKey: wikiKeys.standaloneTree() })
+    }
+  })
+}
+
+// ═══════════════════════════════════════════════════════════════
+// VOICE MEMO HOOKS
+// ═══════════════════════════════════════════════════════════════
+
+/**
+ * Fetch voice memos for a wiki page
+ */
+export const useWikiVoiceMemos = (pageId: string) => {
+  return useQuery({
+    queryKey: wikiKeys.voiceMemos(pageId),
+    queryFn: () => wikiVoiceMemoService.list(pageId),
+    enabled: !!pageId
+  })
+}
+
+/**
+ * Upload a voice memo (handles the 3-step process)
+ */
+export const useUploadWikiVoiceMemo = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async ({
+      pageId,
+      file,
+      duration,
+      title,
+      isConfidential
+    }: {
+      pageId: string
+      file: Blob
+      duration: number
+      title?: string
+      isConfidential?: boolean
+    }) => {
+      // Step 1: Get presigned URL
+      const { uploadUrl, fileKey } = await wikiVoiceMemoService.getUploadUrl(
+        pageId,
+        {
+          fileName: `voice-memo-${Date.now()}.mp3`,
+          fileType: 'audio/mpeg',
+          duration,
+          isConfidential
+        }
+      )
+
+      // Step 2: Upload directly to S3
+      await fetch(uploadUrl, {
+        method: 'PUT',
+        body: file,
+        headers: { 'Content-Type': 'audio/mpeg' }
+      })
+
+      // Step 3: Confirm upload
+      return wikiVoiceMemoService.confirmUpload(pageId, {
+        fileKey,
+        fileType: 'audio/mpeg',
+        fileSize: file.size,
+        duration,
+        title: title || `Voice Memo - ${new Date().toLocaleString()}`,
+        isConfidential
+      })
+    },
+    onSuccess: (_, { pageId }) => {
+      queryClient.invalidateQueries({ queryKey: wikiKeys.voiceMemos(pageId) })
+      queryClient.invalidateQueries({ queryKey: wikiKeys.page(pageId) })
+    }
+  })
+}
+
+/**
+ * Get voice memo streaming/download URL
+ */
+export const useWikiVoiceMemoUrl = () => {
+  return useMutation({
+    mutationFn: ({ pageId, memoId }: { pageId: string; memoId: string }) =>
+      wikiVoiceMemoService.getUrl(pageId, memoId)
+  })
+}
+
+/**
+ * Update voice memo metadata
+ */
+export const useUpdateWikiVoiceMemo = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({
+      pageId,
+      memoId,
+      data
+    }: {
+      pageId: string
+      memoId: string
+      data: UpdateVoiceMemoInput
+    }) => wikiVoiceMemoService.update(pageId, memoId, data),
+    onSuccess: (_, { pageId }) => {
+      queryClient.invalidateQueries({ queryKey: wikiKeys.voiceMemos(pageId) })
+      queryClient.invalidateQueries({ queryKey: wikiKeys.page(pageId) })
+    }
+  })
+}
+
+/**
+ * Delete a voice memo
+ */
+export const useDeleteWikiVoiceMemo = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({ pageId, memoId }: { pageId: string; memoId: string }) =>
+      wikiVoiceMemoService.delete(pageId, memoId),
+    onSuccess: (_, { pageId }) => {
+      queryClient.invalidateQueries({ queryKey: wikiKeys.voiceMemos(pageId) })
+      queryClient.invalidateQueries({ queryKey: wikiKeys.page(pageId) })
+    }
+  })
+}
+
+/**
+ * Seal or unseal a voice memo
+ */
+export const useSealWikiVoiceMemo = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({
+      pageId,
+      memoId,
+      seal,
+      reason
+    }: {
+      pageId: string
+      memoId: string
+      seal: boolean
+      reason?: string
+    }) => wikiVoiceMemoService.seal(pageId, memoId, seal, reason),
+    onSuccess: (_, { pageId }) => {
+      queryClient.invalidateQueries({ queryKey: wikiKeys.voiceMemos(pageId) })
+      queryClient.invalidateQueries({ queryKey: wikiKeys.page(pageId) })
     }
   })
 }

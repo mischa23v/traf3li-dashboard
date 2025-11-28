@@ -13,6 +13,7 @@ import type {
   WikiBacklink,
   WikiComment,
   WikiAttachment,
+  WikiVoiceMemo,
   AttachmentVersion,
   AttachmentVersionHistoryResponse,
   WikiPageTreeResponse,
@@ -22,6 +23,8 @@ import type {
   WikiLinkGraph,
   WikiRevisionStats,
   WikiLinkableEntityType,
+  WikiVoiceMemosResponse,
+  VoiceMemoUrlResponse,
   CreateWikiPageInput,
   UpdateWikiPageInput,
   CreateWikiCollectionInput,
@@ -34,6 +37,9 @@ import type {
   UpdateAttachmentInput,
   UploadVersionInput,
   ConfirmVersionInput,
+  UploadVoiceMemoInput,
+  ConfirmVoiceMemoInput,
+  UpdateVoiceMemoInput,
   WikiExportFormat,
   WikiExportResponse
 } from '@/types/wiki'
@@ -1278,5 +1284,132 @@ export const wikiExportService = {
    */
   getPreview: async (pageId: string): Promise<WikiExportResponse> => {
     return wikiExportService.export(pageId, 'preview')
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// VOICE MEMO OPERATIONS
+// ═══════════════════════════════════════════════════════════════
+
+export const wikiVoiceMemoService = {
+  /**
+   * List all voice memos for a page
+   */
+  list: async (pageId: string): Promise<WikiVoiceMemosResponse> => {
+    try {
+      const response = await apiClient.get<ApiResponse<WikiVoiceMemosResponse>>(
+        `/wiki/${pageId}/voice-memos`
+      )
+      return response.data.data
+    } catch (error) {
+      throw handleApiError(error)
+    }
+  },
+
+  /**
+   * Get presigned URL for uploading a voice memo (Step 1)
+   */
+  getUploadUrl: async (
+    pageId: string,
+    data: UploadVoiceMemoInput
+  ): Promise<{ uploadUrl: string; fileKey: string; expiresIn: number }> => {
+    try {
+      const response = await apiClient.post<
+        ApiResponse<{ uploadUrl: string; fileKey: string; expiresIn: number }>
+      >(`/wiki/${pageId}/voice-memos/upload`, data)
+      return response.data.data
+    } catch (error) {
+      throw handleApiError(error)
+    }
+  },
+
+  /**
+   * Confirm voice memo upload after uploading to S3 (Step 3)
+   */
+  confirmUpload: async (
+    pageId: string,
+    data: ConfirmVoiceMemoInput
+  ): Promise<{ voiceMemo: WikiVoiceMemo; voiceMemoCount: number }> => {
+    try {
+      const response = await apiClient.post<
+        ApiResponse<{ voiceMemo: WikiVoiceMemo; voiceMemoCount: number }>
+      >(`/wiki/${pageId}/voice-memos/confirm`, data)
+      return response.data.data
+    } catch (error) {
+      throw handleApiError(error)
+    }
+  },
+
+  /**
+   * Get presigned URL for streaming/downloading a voice memo
+   */
+  getUrl: async (
+    pageId: string,
+    memoId: string
+  ): Promise<VoiceMemoUrlResponse> => {
+    try {
+      const response = await apiClient.get<ApiResponse<VoiceMemoUrlResponse>>(
+        `/wiki/${pageId}/voice-memos/${memoId}/url`
+      )
+      return response.data.data
+    } catch (error) {
+      throw handleApiError(error)
+    }
+  },
+
+  /**
+   * Update voice memo metadata
+   */
+  update: async (
+    pageId: string,
+    memoId: string,
+    data: UpdateVoiceMemoInput
+  ): Promise<WikiVoiceMemo> => {
+    try {
+      const response = await apiClient.put<ApiResponse<WikiVoiceMemo>>(
+        `/wiki/${pageId}/voice-memos/${memoId}`,
+        data
+      )
+      return response.data.data
+    } catch (error) {
+      throw handleApiError(error)
+    }
+  },
+
+  /**
+   * Delete a voice memo
+   */
+  delete: async (
+    pageId: string,
+    memoId: string
+  ): Promise<{ voiceMemoCount: number }> => {
+    try {
+      const response = await apiClient.delete<
+        ApiResponse<{ voiceMemoCount: number }>
+      >(`/wiki/${pageId}/voice-memos/${memoId}`)
+      return response.data.data
+    } catch (error) {
+      throw handleApiError(error)
+    }
+  },
+
+  /**
+   * Seal or unseal a voice memo
+   */
+  seal: async (
+    pageId: string,
+    memoId: string,
+    seal: boolean,
+    reason?: string
+  ): Promise<WikiVoiceMemo> => {
+    try {
+      const response = await apiClient.post<ApiResponse<WikiVoiceMemo>>(
+        `/wiki/${pageId}/voice-memos/${memoId}/seal`,
+        { seal, reason }
+      )
+      return response.data.data
+    } catch (error) {
+      throw handleApiError(error)
+    }
   }
 }

@@ -253,6 +253,11 @@ export interface WikiPage {
   // Attachments
   attachments?: WikiAttachment[]
 
+  // Voice Memos
+  voiceMemos?: WikiVoiceMemo[]
+  voiceMemoCount?: number
+  totalVoiceMemoDuration?: number
+
   // Collaborators
   collaborators?: WikiCollaborator[]
   createdBy:
@@ -755,4 +760,95 @@ export interface ConfirmVersionInput {
   fileType?: string
   fileSize?: number
   changeNote?: string
+}
+
+// ═══════════════════════════════════════════════════════════════
+// VOICE MEMO TYPES
+// ═══════════════════════════════════════════════════════════════
+
+export type WikiVoiceMemoFormat = 'mp3' | 'wav' | 'webm' | 'ogg' | 'm4a'
+
+export interface WikiVoiceMemo {
+  _id: string
+  memoId: string
+
+  // File info
+  title: string
+  titleAr?: string
+  fileUrl: string
+  fileKey: string
+  fileSize: number
+  duration: number // in seconds
+  format: WikiVoiceMemoFormat
+
+  // Transcription
+  transcription?: string
+  transcriptionAr?: string
+  isTranscribed: boolean
+  transcribedAt?: string
+
+  // Security
+  isSealed: boolean
+  sealedAt?: string
+  sealedBy?: string | { _id: string; firstName: string; lastName: string }
+  sealReason?: string
+  isConfidential: boolean
+
+  // Recording info
+  recordedBy:
+    | string
+    | { _id: string; firstName: string; lastName: string; avatar?: string }
+  recordedAt: string
+
+  // Metadata
+  description?: string
+  descriptionAr?: string
+
+  // Timestamps
+  createdAt: string
+  updatedAt: string
+}
+
+export interface WikiVoiceMemosResponse {
+  voiceMemos: WikiVoiceMemo[]
+  count: number
+  totalDuration: number
+}
+
+export interface UploadVoiceMemoInput {
+  fileName: string
+  fileType: string
+  duration?: number
+  isConfidential?: boolean
+}
+
+export interface ConfirmVoiceMemoInput {
+  fileKey: string
+  fileType: string
+  fileSize: number
+  duration: number
+  title?: string
+  titleAr?: string
+  description?: string
+  descriptionAr?: string
+  isConfidential?: boolean
+}
+
+export interface UpdateVoiceMemoInput {
+  title?: string
+  titleAr?: string
+  description?: string
+  descriptionAr?: string
+  transcription?: string
+  transcriptionAr?: string
+}
+
+export interface VoiceMemoUrlResponse {
+  streamUrl: string
+  downloadUrl: string
+  fileName: string
+  fileType: string
+  fileSize: number
+  duration: number
+  expiresIn: number
 }
