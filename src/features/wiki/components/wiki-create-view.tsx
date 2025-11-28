@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, lazy, Suspense } from 'react'
 import { Link, useParams, useNavigate, useSearch } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 import {
@@ -17,7 +17,9 @@ import {
   Shield,
   Eye,
   Search,
-  Bell
+  Bell,
+  Calendar,
+  Palette
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -46,6 +48,11 @@ import { ConfigDrawer } from '@/components/config-drawer'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { ScrollArea } from '@/components/ui/scroll-area'
+import { Skeleton } from '@/components/ui/skeleton'
+
+// Lazy load the rich text editor to reduce initial bundle size
+const RichTextEditor = lazy(() => import('@/components/rich-text-editor'))
+
 import {
   useWikiPage,
   useWikiCollections,
@@ -135,8 +142,15 @@ export function WikiCreateView() {
     tags: [],
     isTemplate: false,
     visibility: 'case_team',
-    isConfidential: false
+    isConfidential: false,
+    // Calendar integration
+    showOnCalendar: false,
+    calendarDate: '',
+    calendarEndDate: '',
+    calendarColor: '#8b5cf6'
   })
+
+  const [showCalendarSettings, setShowCalendarSettings] = useState(false)
 
   const [confidentialityLevel, setConfidentialityLevel] = useState<WikiConfidentialityLevel>('internal')
   const [tagInput, setTagInput] = useState('')
@@ -159,9 +173,17 @@ export function WikiCreateView() {
         tags: page.tags || [],
         isTemplate: page.isTemplate,
         visibility: page.visibility,
-        isConfidential: page.isConfidential
+        isConfidential: page.isConfidential,
+        // Calendar fields
+        showOnCalendar: page.showOnCalendar || false,
+        calendarDate: page.calendarDate || '',
+        calendarEndDate: page.calendarEndDate || '',
+        calendarColor: page.calendarColor || '#8b5cf6'
       })
       setConfidentialityLevel(page.confidentialityLevel)
+      if (page.showOnCalendar) {
+        setShowCalendarSettings(true)
+      }
     }
   }, [isEditMode, existingPageData])
 
@@ -454,12 +476,16 @@ export function WikiCreateView() {
                       <FileText className="w-4 h-4 text-emerald-500" />
                       {t('wiki.form.content')}
                     </label>
-                    <Textarea
-                      placeholder={isArabic ? 'اكتب محتوى الصفحة هنا...' : 'Write page content here...'}
-                      className="min-h-[200px] rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500"
-                      value={formData.contentText}
-                      onChange={(e) => handleChange('contentText', e.target.value)}
-                    />
+                    <Suspense fallback={
+                      <Skeleton className="min-h-[200px] w-full rounded-xl" />
+                    }>
+                      <RichTextEditor
+                        value={formData.contentText || ''}
+                        onChange={(content) => handleChange('contentText', content)}
+                        placeholder={isArabic ? 'اكتب محتوى الصفحة هنا...' : 'Write page content here...'}
+                        minHeight="250px"
+                      />
+                    </Suspense>
                   </div>
 
                   {/* Tags */}
@@ -564,6 +590,98 @@ export function WikiCreateView() {
                             {isArabic ? 'تمييز كمستند سري' : 'Mark as confidential document'}
                           </label>
                         </div>
+                      </div>
+                    </CollapsibleContent>
+                  </div>
+                </Collapsible>
+
+                {/* Calendar Settings */}
+                <Collapsible open={showCalendarSettings} onOpenChange={setShowCalendarSettings}>
+                  <div className="border-t border-slate-100 pt-6">
+                    <CollapsibleTrigger asChild>
+                      <Button variant="ghost" className="w-full justify-between p-0 h-auto hover:bg-transparent">
+                        <h3 className="text-lg font-semibold text-slate-800 flex items-center gap-2">
+                          <Calendar className="w-5 h-5 text-emerald-500" />
+                          {isArabic ? 'إعدادات التقويم' : 'Calendar Settings'}
+                        </h3>
+                        {showCalendarSettings ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
+                      </Button>
+                    </CollapsibleTrigger>
+                    <CollapsibleContent className="mt-4">
+                      <div className="space-y-4 p-4 bg-slate-50 rounded-xl">
+                        <div className="flex items-center gap-3">
+                          <Checkbox
+                            id="showOnCalendar"
+                            checked={formData.showOnCalendar}
+                            onCheckedChange={(checked) => handleChange('showOnCalendar', checked === true)}
+                          />
+                          <div>
+                            <label htmlFor="showOnCalendar" className="text-sm font-medium text-slate-700 cursor-pointer">
+                              {isArabic ? 'إظهار في التقويم' : 'Show on Calendar'}
+                            </label>
+                            <p className="text-xs text-slate-500">
+                              {isArabic ? 'عرض هذه الصفحة كحدث في التقويم' : 'Display this page as an event in the calendar'}
+                            </p>
+                          </div>
+                        </div>
+
+                        {formData.showOnCalendar && (
+                          <div className="space-y-4 pt-2">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                              <div className="space-y-2">
+                                <label className="text-sm font-medium text-slate-700">
+                                  {isArabic ? 'تاريخ التقويم' : 'Calendar Date'}
+                                </label>
+                                <Input
+                                  type="datetime-local"
+                                  className="rounded-xl"
+                                  value={formData.calendarDate}
+                                  onChange={(e) => handleChange('calendarDate', e.target.value)}
+                                />
+                              </div>
+                              <div className="space-y-2">
+                                <label className="text-sm font-medium text-slate-700">
+                                  {isArabic ? 'تاريخ الانتهاء' : 'End Date'} <span className="text-slate-400">({isArabic ? 'اختياري' : 'optional'})</span>
+                                </label>
+                                <Input
+                                  type="datetime-local"
+                                  className="rounded-xl"
+                                  value={formData.calendarEndDate}
+                                  onChange={(e) => handleChange('calendarEndDate', e.target.value)}
+                                />
+                              </div>
+                            </div>
+                            <div className="space-y-2">
+                              <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                                <Palette className="w-4 h-4 text-emerald-500" />
+                                {isArabic ? 'لون التقويم' : 'Calendar Color'}
+                              </label>
+                              <div className="flex items-center gap-3">
+                                <input
+                                  type="color"
+                                  value={formData.calendarColor || '#8b5cf6'}
+                                  onChange={(e) => handleChange('calendarColor', e.target.value)}
+                                  className="w-10 h-10 rounded-lg border border-slate-200 cursor-pointer"
+                                />
+                                <div className="flex gap-2">
+                                  {['#8b5cf6', '#10b981', '#f59e0b', '#ef4444', '#3b82f6', '#ec4899'].map((color) => (
+                                    <button
+                                      key={color}
+                                      type="button"
+                                      onClick={() => handleChange('calendarColor', color)}
+                                      className={`w-8 h-8 rounded-lg border-2 transition-all ${
+                                        formData.calendarColor === color
+                                          ? 'border-slate-800 scale-110'
+                                          : 'border-transparent hover:border-slate-300'
+                                      }`}
+                                      style={{ backgroundColor: color }}
+                                    />
+                                  ))}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        )}
                       </div>
                     </CollapsibleContent>
                   </div>

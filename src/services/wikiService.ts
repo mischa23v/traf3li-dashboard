@@ -11,6 +11,9 @@ import type {
   WikiRevision,
   WikiBacklink,
   WikiComment,
+  WikiAttachment,
+  AttachmentVersion,
+  AttachmentVersionHistoryResponse,
   WikiPageTreeResponse,
   WikiLinkGraph,
   WikiRevisionStats,
@@ -18,7 +21,14 @@ import type {
   UpdateWikiPageInput,
   CreateWikiCollectionInput,
   UpdateWikiCollectionInput,
-  CreateWikiCommentInput
+  CreateWikiCommentInput,
+  UploadAttachmentInput,
+  ConfirmAttachmentInput,
+  UpdateAttachmentInput,
+  UploadVersionInput,
+  ConfirmVersionInput,
+  WikiExportFormat,
+  WikiExportResponse
 } from '@/types/wiki'
 
 const BASE_URL = '/api'
@@ -638,5 +648,329 @@ export const wikiTemplateService = {
     } catch (error) {
       throw handleApiError(error)
     }
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// ATTACHMENTS
+// ═══════════════════════════════════════════════════════════════
+
+export const wikiAttachmentService = {
+  /**
+   * List attachments for a page
+   */
+  list: async (
+    pageId: string
+  ): Promise<{ attachments: WikiAttachment[]; count: number }> => {
+    try {
+      const response = await apiClient.get<
+        ApiResponse<{ attachments: WikiAttachment[]; count: number }>
+      >(`${BASE_URL}/wiki/${pageId}/attachments`)
+      return response.data.data
+    } catch (error) {
+      throw handleApiError(error)
+    }
+  },
+
+  /**
+   * Get presigned URL for uploading an attachment (Step 1)
+   */
+  getUploadUrl: async (
+    pageId: string,
+    data: UploadAttachmentInput
+  ): Promise<{ uploadUrl: string; fileKey: string; expiresIn: number }> => {
+    try {
+      const response = await apiClient.post<
+        ApiResponse<{ uploadUrl: string; fileKey: string; expiresIn: number }>
+      >(`${BASE_URL}/wiki/${pageId}/attachments/upload`, data)
+      return response.data.data
+    } catch (error) {
+      throw handleApiError(error)
+    }
+  },
+
+  /**
+   * Confirm attachment upload after uploading to S3 (Step 3)
+   */
+  confirmUpload: async (
+    pageId: string,
+    data: ConfirmAttachmentInput
+  ): Promise<{ attachment: WikiAttachment; attachmentCount: number }> => {
+    try {
+      const response = await apiClient.post<
+        ApiResponse<{ attachment: WikiAttachment; attachmentCount: number }>
+      >(`${BASE_URL}/wiki/${pageId}/attachments/confirm`, data)
+      return response.data.data
+    } catch (error) {
+      throw handleApiError(error)
+    }
+  },
+
+  /**
+   * Get presigned URL for downloading an attachment
+   */
+  getDownloadUrl: async (
+    pageId: string,
+    attachmentId: string
+  ): Promise<{
+    downloadUrl: string
+    fileName: string
+    fileType: string
+    fileSize: number
+    expiresIn: number
+  }> => {
+    try {
+      const response = await apiClient.get<
+        ApiResponse<{
+          downloadUrl: string
+          fileName: string
+          fileType: string
+          fileSize: number
+          expiresIn: number
+        }>
+      >(`${BASE_URL}/wiki/${pageId}/attachments/${attachmentId}/download`)
+      return response.data.data
+    } catch (error) {
+      throw handleApiError(error)
+    }
+  },
+
+  /**
+   * Update attachment metadata
+   */
+  update: async (
+    pageId: string,
+    attachmentId: string,
+    data: UpdateAttachmentInput
+  ): Promise<WikiAttachment> => {
+    try {
+      const response = await apiClient.put<ApiResponse<WikiAttachment>>(
+        `${BASE_URL}/wiki/${pageId}/attachments/${attachmentId}`,
+        data
+      )
+      return response.data.data
+    } catch (error) {
+      throw handleApiError(error)
+    }
+  },
+
+  /**
+   * Delete an attachment
+   */
+  delete: async (
+    pageId: string,
+    attachmentId: string
+  ): Promise<{ attachmentCount: number }> => {
+    try {
+      const response = await apiClient.delete<
+        ApiResponse<{ attachmentCount: number }>
+      >(`${BASE_URL}/wiki/${pageId}/attachments/${attachmentId}`)
+      return response.data.data
+    } catch (error) {
+      throw handleApiError(error)
+    }
+  },
+
+  /**
+   * Seal or unseal an attachment
+   */
+  seal: async (
+    pageId: string,
+    attachmentId: string,
+    seal: boolean
+  ): Promise<WikiAttachment> => {
+    try {
+      const response = await apiClient.post<ApiResponse<WikiAttachment>>(
+        `${BASE_URL}/wiki/${pageId}/attachments/${attachmentId}/seal`,
+        { seal }
+      )
+      return response.data.data
+    } catch (error) {
+      throw handleApiError(error)
+    }
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// ATTACHMENT VERSIONING
+// ═══════════════════════════════════════════════════════════════
+
+export const wikiAttachmentVersionService = {
+  /**
+   * Get version history for an attachment
+   */
+  getHistory: async (
+    pageId: string,
+    attachmentId: string
+  ): Promise<AttachmentVersionHistoryResponse> => {
+    try {
+      const response = await apiClient.get<
+        ApiResponse<AttachmentVersionHistoryResponse>
+      >(`${BASE_URL}/wiki/${pageId}/attachments/${attachmentId}/versions`)
+      return response.data.data
+    } catch (error) {
+      throw handleApiError(error)
+    }
+  },
+
+  /**
+   * Get presigned URL for uploading a new version (Step 1)
+   */
+  getUploadUrl: async (
+    pageId: string,
+    attachmentId: string,
+    data: UploadVersionInput
+  ): Promise<{ uploadUrl: string; fileKey: string; expiresIn: number }> => {
+    try {
+      const response = await apiClient.post<
+        ApiResponse<{ uploadUrl: string; fileKey: string; expiresIn: number }>
+      >(
+        `${BASE_URL}/wiki/${pageId}/attachments/${attachmentId}/versions/upload`,
+        data
+      )
+      return response.data.data
+    } catch (error) {
+      throw handleApiError(error)
+    }
+  },
+
+  /**
+   * Confirm new version upload (Step 3)
+   */
+  confirmUpload: async (
+    pageId: string,
+    attachmentId: string,
+    data: ConfirmVersionInput
+  ): Promise<{
+    attachment: WikiAttachment
+    version: AttachmentVersion
+    versionCount: number
+  }> => {
+    try {
+      const response = await apiClient.post<
+        ApiResponse<{
+          attachment: WikiAttachment
+          version: AttachmentVersion
+          versionCount: number
+        }>
+      >(
+        `${BASE_URL}/wiki/${pageId}/attachments/${attachmentId}/versions/confirm`,
+        data
+      )
+      return response.data.data
+    } catch (error) {
+      throw handleApiError(error)
+    }
+  },
+
+  /**
+   * Download a specific version
+   */
+  getDownloadUrl: async (
+    pageId: string,
+    attachmentId: string,
+    versionNumber: number
+  ): Promise<{
+    downloadUrl: string
+    fileName: string
+    fileType: string
+    fileSize: number
+    expiresIn: number
+  }> => {
+    try {
+      const response = await apiClient.get<
+        ApiResponse<{
+          downloadUrl: string
+          fileName: string
+          fileType: string
+          fileSize: number
+          expiresIn: number
+        }>
+      >(
+        `${BASE_URL}/wiki/${pageId}/attachments/${attachmentId}/versions/${versionNumber}/download`
+      )
+      return response.data.data
+    } catch (error) {
+      throw handleApiError(error)
+    }
+  },
+
+  /**
+   * Restore a previous version
+   */
+  restore: async (
+    pageId: string,
+    attachmentId: string,
+    versionNumber: number
+  ): Promise<{
+    attachment: WikiAttachment
+    version: AttachmentVersion
+    versionCount: number
+  }> => {
+    try {
+      const response = await apiClient.post<
+        ApiResponse<{
+          attachment: WikiAttachment
+          version: AttachmentVersion
+          versionCount: number
+        }>
+      >(
+        `${BASE_URL}/wiki/${pageId}/attachments/${attachmentId}/versions/${versionNumber}/restore`
+      )
+      return response.data.data
+    } catch (error) {
+      throw handleApiError(error)
+    }
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// EXPORT OPERATIONS
+// ═══════════════════════════════════════════════════════════════
+
+export const wikiExportService = {
+  /**
+   * Export a page to a specific format (PDF, LaTeX, Markdown, or HTML preview)
+   */
+  export: async (
+    pageId: string,
+    format: WikiExportFormat
+  ): Promise<WikiExportResponse> => {
+    try {
+      const response = await apiClient.get<ApiResponse<WikiExportResponse>>(
+        `${BASE_URL}/wiki/${pageId}/export/${format}`
+      )
+      return response.data.data
+    } catch (error) {
+      throw handleApiError(error)
+    }
+  },
+
+  /**
+   * Get PDF export
+   */
+  exportPdf: async (pageId: string): Promise<WikiExportResponse> => {
+    return wikiExportService.export(pageId, 'pdf')
+  },
+
+  /**
+   * Get LaTeX export
+   */
+  exportLatex: async (pageId: string): Promise<WikiExportResponse> => {
+    return wikiExportService.export(pageId, 'latex')
+  },
+
+  /**
+   * Get Markdown export
+   */
+  exportMarkdown: async (pageId: string): Promise<WikiExportResponse> => {
+    return wikiExportService.export(pageId, 'markdown')
+  },
+
+  /**
+   * Get HTML preview
+   */
+  getPreview: async (pageId: string): Promise<WikiExportResponse> => {
+    return wikiExportService.export(pageId, 'preview')
   }
 }

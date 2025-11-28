@@ -23,7 +23,9 @@ import {
   MoreVertical,
   Copy,
   Download,
-  Share2
+  Share2,
+  FileCode,
+  FileType
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -57,7 +59,8 @@ import {
   useDeleteWikiPage,
   useSealWikiPage,
   useUnsealWikiPage,
-  useCreateWikiComment
+  useCreateWikiComment,
+  useExportWikiPage
 } from '@/hooks/useWiki'
 import type { WikiPageStatus, WikiPageType } from '@/types/wiki'
 import {
@@ -93,6 +96,7 @@ export function WikiDetailsView() {
   const sealMutation = useSealWikiPage()
   const unsealMutation = useUnsealWikiPage()
   const createCommentMutation = useCreateWikiComment()
+  const exportMutation = useExportWikiPage()
 
   const page = pageData?.page
   const backlinks = pageData?.backlinks || []
@@ -351,10 +355,36 @@ export function WikiDetailsView() {
                           <Copy className="h-4 w-4 me-2" />
                           {t('wiki.actions.copyLink')}
                         </DropdownMenuItem>
-                        <DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem
+                          onClick={() => exportMutation.mutate({ pageId: page._id, format: 'pdf' })}
+                          disabled={exportMutation.isPending}
+                        >
                           <Download className="h-4 w-4 me-2" />
                           {t('wiki.actions.exportPdf')}
                         </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() => exportMutation.mutate({ pageId: page._id, format: 'latex' })}
+                          disabled={exportMutation.isPending}
+                        >
+                          <FileCode className="h-4 w-4 me-2" />
+                          {t('wiki.actions.exportLatex')}
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() => exportMutation.mutate({ pageId: page._id, format: 'markdown' })}
+                          disabled={exportMutation.isPending}
+                        >
+                          <FileType className="h-4 w-4 me-2" />
+                          {t('wiki.actions.exportMarkdown')}
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() => exportMutation.mutate({ pageId: page._id, format: 'preview' })}
+                          disabled={exportMutation.isPending}
+                        >
+                          <Eye className="h-4 w-4 me-2" />
+                          {t('wiki.actions.preview')}
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
                         <DropdownMenuItem>
                           <Share2 className="h-4 w-4 me-2" />
                           {isArabic ? 'مشاركة' : 'Share'}

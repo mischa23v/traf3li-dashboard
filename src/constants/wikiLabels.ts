@@ -6,7 +6,8 @@ import type {
   WikiCollectionType,
   WikiRevisionChangeType,
   WikiBacklinkType,
-  WikiCommentStatus
+  WikiCommentStatus,
+  WikiAttachmentCategory
 } from '@/types/wiki'
 
 // ═══════════════════════════════════════════════════════════════
@@ -292,6 +293,87 @@ export const commentStatusLabelsAr: Record<WikiCommentStatus, string> = {
 }
 
 // ═══════════════════════════════════════════════════════════════
+// ATTACHMENT CATEGORY LABELS
+// ═══════════════════════════════════════════════════════════════
+
+export const attachmentCategoryLabels: Record<WikiAttachmentCategory, string> =
+  {
+    pleading: 'Pleading',
+    evidence: 'Evidence',
+    exhibit: 'Exhibit',
+    contract: 'Contract',
+    correspondence: 'Correspondence',
+    research: 'Research',
+    judgment: 'Judgment',
+    other: 'Other'
+  }
+
+export const attachmentCategoryLabelsAr: Record<
+  WikiAttachmentCategory,
+  string
+> = {
+  pleading: 'مرافعة',
+  evidence: 'دليل',
+  exhibit: 'مستند',
+  contract: 'عقد',
+  correspondence: 'مراسلة',
+  research: 'بحث',
+  judgment: 'حكم',
+  other: 'أخرى'
+}
+
+export const attachmentCategoryIcons: Record<WikiAttachmentCategory, string> = {
+  pleading: 'ScrollText',
+  evidence: 'Paperclip',
+  exhibit: 'FileImage',
+  contract: 'FileContract',
+  correspondence: 'Mail',
+  research: 'Search',
+  judgment: 'Scale',
+  other: 'File'
+}
+
+// ═══════════════════════════════════════════════════════════════
+// ATTACHMENT VERSION LABELS
+// ═══════════════════════════════════════════════════════════════
+
+export const attachmentVersionLabels = {
+  versionHistory: 'Version History',
+  currentVersion: 'Current Version',
+  version: 'Version',
+  uploadNewVersion: 'Upload New Version',
+  restoreVersion: 'Restore Version',
+  downloadVersion: 'Download Version',
+  changeNote: 'Change Note',
+  uploadedBy: 'Uploaded By',
+  uploadedAt: 'Uploaded At',
+  restored: 'Restored',
+  restoredFrom: 'Restored from version',
+  noVersionHistory: 'No version history',
+  confirmRestore: 'Are you sure you want to restore this version?',
+  versionRestored: 'Version restored successfully',
+  versionUploaded: 'New version uploaded successfully'
+}
+
+export const attachmentVersionLabelsAr = {
+  versionHistory: 'سجل الإصدارات',
+  currentVersion: 'الإصدار الحالي',
+  version: 'الإصدار',
+  uploadNewVersion: 'رفع إصدار جديد',
+  restoreVersion: 'استعادة الإصدار',
+  downloadVersion: 'تحميل الإصدار',
+  changeNote: 'ملاحظة التغيير',
+  uploadedBy: 'رفع بواسطة',
+  uploadedAt: 'تاريخ الرفع',
+  restored: 'مستعاد',
+  restoredFrom: 'مستعاد من الإصدار',
+  noVersionHistory: 'لا يوجد سجل إصدارات',
+  confirmRestore: 'هل أنت متأكد من استعادة هذا الإصدار؟',
+  versionRestored: 'تم استعادة الإصدار بنجاح',
+  versionUploaded: 'تم رفع الإصدار الجديد بنجاح'
+}
+
+// ═══════════════════════════════════════════════════════════════
 // HELPER FUNCTIONS
 // ═══════════════════════════════════════════════════════════════
 
@@ -343,3 +425,17 @@ export const getCommentStatusLabel = (
   status: WikiCommentStatus,
   locale: 'en' | 'ar' = 'en'
 ) => getLabel(commentStatusLabels, commentStatusLabelsAr, status, locale)
+
+export const getAttachmentCategoryLabel = (
+  category: WikiAttachmentCategory,
+  locale: 'en' | 'ar' = 'en'
+) =>
+  getLabel(attachmentCategoryLabels, attachmentCategoryLabelsAr, category, locale)
+
+export const getAttachmentVersionLabel = (
+  key: keyof typeof attachmentVersionLabels,
+  locale: 'en' | 'ar' = 'en'
+) =>
+  locale === 'ar'
+    ? attachmentVersionLabelsAr[key]
+    : attachmentVersionLabels[key]
