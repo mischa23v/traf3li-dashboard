@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, FormEvent } from 'react'
 import { Fragment } from 'react/jsx-runtime'
 import { format } from 'date-fns'
 import {
@@ -27,50 +27,94 @@ import { ProfileDropdown } from '@/components/profile-dropdown'
 import { Search } from '@/components/search'
 import { ThemeSwitch } from '@/components/theme-switch'
 import { NewChat } from './components/new-chat'
-import { type ChatUser, type Convo } from './data/chat-types'
-import { useConversations } from '@/hooks/useChats'
+import { useConversations, useMessages, useSendMessage, type Conversation, type Message } from '@/hooks/useChat'
+import { useAuthStore } from '@/stores/auth-store'
+import type { ChatParticipant } from './data/chat-types'
+
+// Helper to get the other participant in a conversation
+function getOtherParticipant(conversation: Conversation, currentUserId: string): ChatParticipant {
+  if (conversation.sellerID._id === currentUserId) {
+    return conversation.buyerID
+  }
+  return conversation.sellerID
+}
+
+// Helper to get display name for a participant
+function getDisplayName(participant: ChatParticipant): string {
+  return participant.username || participant.email || 'Unknown User'
+}
+
+// Helper to get initials for avatar fallback
+function getInitials(participant: ChatParticipant): string {
+  const name = getDisplayName(participant)
+  return name.substring(0, 2).toUpperCase()
+}
 
 export function Chats() {
   const [search, setSearch] = useState('')
-  const [selectedUser, setSelectedUser] = useState<ChatUser | null>(null)
-  const [mobileSelectedUser, setMobileSelectedUser] = useState<ChatUser | null>(
-    null
-  )
-  const [createConversationDialogOpened, setCreateConversationDialog] =
-    useState(false)
+  const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null)
+  const [mobileSelectedConversation, setMobileSelectedConversation] = useState<Conversation | null>(null)
+  const [createConversationDialogOpened, setCreateConversationDialog] = useState(false)
+  const [messageInput, setMessageInput] = useState('')
+
+  // Get current user from auth store
+  const user = useAuthStore((state) => state.user)
+  const currentUserId = user?._id || ''
 
   // Fetch conversations from API
   const { data: conversations, isLoading } = useConversations()
 
+  // Fetch messages for selected conversation
+  const { data: messages, isLoading: messagesLoading } = useMessages(
+    selectedConversation?.conversationID || null
+  )
+
+  // Send message mutation
+  const sendMessageMutation = useSendMessage()
+
   // Filtered data based on the search query
   const filteredChatList = useMemo(() => {
     if (!conversations) return []
-    return conversations.filter(({ fullName }) =>
-      fullName.toLowerCase().includes(search.trim().toLowerCase())
-    )
-  }, [conversations, search])
+    return conversations.filter((conversation) => {
+      const otherParticipant = getOtherParticipant(conversation, currentUserId)
+      const displayName = getDisplayName(otherParticipant)
+      return displayName.toLowerCase().includes(search.trim().toLowerCase())
+    })
+  }, [conversations, search, currentUserId])
 
-  const currentMessage = selectedUser?.messages.reduce(
-    (acc: Record<string, Convo[]>, obj) => {
-      const key = format(obj.timestamp, 'd MMM, yyyy')
-
-      // Create an array for the category if it doesn't exist
+  // Group messages by date
+  const groupedMessages = useMemo(() => {
+    if (!messages) return {}
+    return messages.reduce((acc: Record<string, Message[]>, msg) => {
+      const key = format(new Date(msg.createdAt), 'd MMM, yyyy')
       if (!acc[key]) {
         acc[key] = []
       }
-
-      // Push the current object to the array
-      acc[key].push(obj)
-
+      acc[key].push(msg)
       return acc
-    },
-    {}
-  )
+    }, {})
+  }, [messages])
 
-  const users = useMemo(() => {
-    if (!conversations) return []
-    return conversations.map(({ messages, ...user }) => user)
-  }, [conversations])
+  // Handle send message
+  const handleSendMessage = async (e: FormEvent) => {
+    e.preventDefault()
+    if (!messageInput.trim() || !selectedConversation) return
+
+    try {
+      await sendMessageMutation.mutateAsync({
+        conversationID: selectedConversation.conversationID,
+        description: messageInput.trim(),
+      })
+      setMessageInput('')
+    } catch (error) {
+      console.error('Failed to send message:', error)
+    }
+  }
+
+  // Get other participant for selected conversation
+  const selectedParticipant = selectedConversation
+    ? getOtherParticipant(selectedConversation, currentUserId)
+    : null
 
   return (
     <>
@@ -136,57 +180,64 @@ export function Chats() {
                     </div>
                   ))}
                 </div>
+              ) : filteredChatList.length === 0 ? (
+                <div className='text-muted-foreground text-center py-8'>
+                  No conversations yet
+                </div>
               ) : (
-                filteredChatList.map((chatUsr) => {
-                const { id, profile, username, messages, fullName } = chatUsr
-                const lastConvo = messages[0]
-                const lastMsg =
-                  lastConvo.sender === 'You'
-                    ? `You: ${lastConvo.message}`
-                    : lastConvo.message
-                return (
-                  <Fragment key={id}>
-                    <button
-                      type='button'
-                      className={cn(
-                        'group hover:bg-accent hover:text-accent-foreground',
-                        `flex w-full rounded-md px-2 py-2 text-start text-sm`,
-                        selectedUser?.id === id && 'sm:bg-muted'
-                      )}
-                      onClick={() => {
-                        setSelectedUser(chatUsr)
-                        setMobileSelectedUser(chatUsr)
-                      }}
-                    >
-                      <div className='flex gap-2'>
-                        <Avatar>
-                          <AvatarImage src={profile} alt={username} />
-                          <AvatarFallback>{username}</AvatarFallback>
-                        </Avatar>
-                        <div>
-                          <span className='col-start-2 row-span-2 font-medium'>
-                            {fullName}
-                          </span>
-                          <span className='text-muted-foreground group-hover:text-accent-foreground/90 col-start-2 row-span-2 row-start-2 line-clamp-2 text-ellipsis'>
-                            {lastMsg}
-                          </span>
+                filteredChatList.map((conversation) => {
+                  const otherParticipant = getOtherParticipant(conversation, currentUserId)
+                  const displayName = getDisplayName(otherParticipant)
+                  const isUnread = conversation.sellerID._id === currentUserId
+                    ? !conversation.readBySeller
+                    : !conversation.readByBuyer
+
+                  return (
+                    <Fragment key={conversation._id}>
+                      <button
+                        type='button'
+                        className={cn(
+                          'group hover:bg-accent hover:text-accent-foreground',
+                          `flex w-full rounded-md px-2 py-2 text-start text-sm`,
+                          selectedConversation?._id === conversation._id && 'sm:bg-muted'
+                        )}
+                        onClick={() => {
+                          setSelectedConversation(conversation)
+                          setMobileSelectedConversation(conversation)
+                        }}
+                      >
+                        <div className='flex gap-2'>
+                          <Avatar>
+                            <AvatarImage src={otherParticipant.image} alt={displayName} />
+                            <AvatarFallback>{getInitials(otherParticipant)}</AvatarFallback>
+                          </Avatar>
+                          <div>
+                            <span className={cn(
+                              'col-start-2 row-span-2',
+                              isUnread ? 'font-bold' : 'font-medium'
+                            )}>
+                              {displayName}
+                            </span>
+                            <span className='text-muted-foreground group-hover:text-accent-foreground/90 col-start-2 row-span-2 row-start-2 line-clamp-2 text-ellipsis'>
+                              {conversation.lastMessage || 'No messages yet'}
+                            </span>
+                          </div>
                         </div>
-                      </div>
-                    </button>
-                    <Separator className='my-1' />
-                  </Fragment>
-                )
-              })
+                      </button>
+                      <Separator className='my-1' />
+                    </Fragment>
+                  )
+                })
               )}
             </ScrollArea>
           </div>
 
           {/* Right Side */}
-          {selectedUser ? (
+          {selectedConversation && selectedParticipant ? (
             <div
               className={cn(
                 'bg-background absolute inset-0 start-full z-50 hidden w-full flex-1 flex-col border shadow-xs sm:static sm:z-auto sm:flex sm:rounded-md',
-                mobileSelectedUser && 'start-0 flex'
+                mobileSelectedConversation && 'start-0 flex'
               )}
             >
               {/* Top Part */}
@@ -197,24 +248,24 @@ export function Chats() {
                     size='icon'
                     variant='ghost'
                     className='-ms-2 h-full sm:hidden'
-                    onClick={() => setMobileSelectedUser(null)}
+                    onClick={() => setMobileSelectedConversation(null)}
                   >
                     <ArrowLeft className='rtl:rotate-180' />
                   </Button>
                   <div className='flex items-center gap-2 lg:gap-4'>
                     <Avatar className='size-9 lg:size-11'>
                       <AvatarImage
-                        src={selectedUser.profile}
-                        alt={selectedUser.username}
+                        src={selectedParticipant.image}
+                        alt={getDisplayName(selectedParticipant)}
                       />
-                      <AvatarFallback>{selectedUser.username}</AvatarFallback>
+                      <AvatarFallback>{getInitials(selectedParticipant)}</AvatarFallback>
                     </Avatar>
                     <div>
                       <span className='col-start-2 row-span-2 text-sm font-medium lg:text-base'>
-                        {selectedUser.fullName}
+                        {getDisplayName(selectedParticipant)}
                       </span>
                       <span className='text-muted-foreground col-start-2 row-span-2 row-start-2 line-clamp-1 block max-w-32 text-xs text-nowrap text-ellipsis lg:max-w-none lg:text-sm'>
-                        {selectedUser.title}
+                        {selectedParticipant.email || ''}
                       </span>
                     </div>
                   </div>
@@ -251,38 +302,51 @@ export function Chats() {
                 <div className='flex size-full flex-1'>
                   <div className='chat-text-container relative -me-4 flex flex-1 flex-col overflow-y-hidden'>
                     <div className='chat-flex flex h-40 w-full grow flex-col-reverse justify-start gap-4 overflow-y-auto py-2 pe-4 pb-4'>
-                      {currentMessage &&
-                        Object.keys(currentMessage).map((key) => (
+                      {messagesLoading ? (
+                        <div className='space-y-2'>
+                          {Array.from({ length: 3 }).map((_, i) => (
+                            <Skeleton key={i} className='h-12 w-48' />
+                          ))}
+                        </div>
+                      ) : messages && messages.length === 0 ? (
+                        <div className='text-muted-foreground text-center py-8'>
+                          No messages yet. Start the conversation!
+                        </div>
+                      ) : (
+                        Object.keys(groupedMessages).map((key) => (
                           <Fragment key={key}>
-                            {currentMessage[key].map((msg, index) => (
-                              <div
-                                key={`${msg.sender}-${msg.timestamp}-${index}`}
-                                className={cn(
-                                  'chat-box max-w-72 px-3 py-2 break-words shadow-lg',
-                                  msg.sender === 'You'
-                                    ? 'bg-primary/90 text-primary-foreground/75 self-end rounded-[16px_16px_0_16px]'
-                                    : 'bg-muted self-start rounded-[16px_16px_16px_0]'
-                                )}
-                              >
-                                {msg.message}{' '}
-                                <span
+                            {groupedMessages[key].map((msg, index) => {
+                              const isCurrentUser = msg.userID._id === currentUserId
+                              return (
+                                <div
+                                  key={`${msg._id}-${index}`}
                                   className={cn(
-                                    'text-foreground/75 mt-1 block text-xs font-light italic',
-                                    msg.sender === 'You' &&
-                                      'text-primary-foreground/85 text-end'
+                                    'chat-box max-w-72 px-3 py-2 break-words shadow-lg',
+                                    isCurrentUser
+                                      ? 'bg-primary/90 text-primary-foreground/75 self-end rounded-[16px_16px_0_16px]'
+                                      : 'bg-muted self-start rounded-[16px_16px_16px_0]'
                                   )}
                                 >
-                                  {format(msg.timestamp, 'h:mm a')}
-                                </span>
-                              </div>
-                            ))}
+                                  {msg.description}{' '}
+                                  <span
+                                    className={cn(
+                                      'text-foreground/75 mt-1 block text-xs font-light italic',
+                                      isCurrentUser && 'text-primary-foreground/85 text-end'
+                                    )}
+                                  >
+                                    {format(new Date(msg.createdAt), 'h:mm a')}
+                                  </span>
+                                </div>
+                              )
+                            })}
                             <div className='text-center text-xs'>{key}</div>
                           </Fragment>
-                        ))}
+                        ))
+                      )}
                     </div>
                   </div>
                 </div>
-                <form className='flex w-full flex-none gap-2'>
+                <form onSubmit={handleSendMessage} className='flex w-full flex-none gap-2'>
                   <div className='border-input bg-card focus-within:ring-ring flex flex-1 items-center gap-2 rounded-md border px-2 py-1 focus-within:ring-1 focus-within:outline-hidden lg:gap-4'>
                     <div className='space-x-1'>
                       <Button
@@ -322,17 +386,25 @@ export function Chats() {
                         type='text'
                         placeholder='Type your messages...'
                         className='h-8 w-full bg-inherit focus-visible:outline-hidden'
+                        value={messageInput}
+                        onChange={(e) => setMessageInput(e.target.value)}
                       />
                     </label>
                     <Button
+                      type='submit'
                       variant='ghost'
                       size='icon'
                       className='hidden sm:inline-flex'
+                      disabled={!messageInput.trim() || sendMessageMutation.isPending}
                     >
                       <Send size={20} />
                     </Button>
                   </div>
-                  <Button className='h-full sm:hidden'>
+                  <Button
+                    type='submit'
+                    className='h-full sm:hidden'
+                    disabled={!messageInput.trim() || sendMessageMutation.isPending}
+                  >
                     <Send size={18} /> Send
                   </Button>
                 </form>
@@ -362,7 +434,6 @@ export function Chats() {
           )}
         </section>
         <NewChat
-          users={users}
           onOpenChange={setCreateConversationDialog}
           open={createConversationDialogOpened}
         />

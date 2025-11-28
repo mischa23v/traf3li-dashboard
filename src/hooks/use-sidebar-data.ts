@@ -27,6 +27,7 @@ import {
   Percent,
   Building,
   Wallet,
+  Package,
 } from 'lucide-react'
 import { useAuthStore } from '@/stores/auth-store'
 
@@ -116,17 +117,13 @@ export function useSidebarData(): SidebarData {
           },
           {
             title: 'الرسائل',
+            url: '/dashboard/messages/chat',
             icon: MessageSquare,
-            items: [
-              {
-                title: 'الدردشة',
-                url: '/dashboard/messages/chat',
-              },
-              {
-                title: 'البريد الإلكتروني',
-                url: '/dashboard/messages/email',
-              },
-            ],
+          },
+          {
+            title: 'التطبيقات',
+            url: '/dashboard/apps',
+            icon: Package,
           },
         ],
       },
