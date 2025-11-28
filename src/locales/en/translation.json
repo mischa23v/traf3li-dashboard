@@ -740,7 +740,9 @@
     "unknownError": "Unknown error",
     "preview": "Preview",
     "download": "Download",
-    "warning": "Warning"
+    "warning": "Warning",
+    "openInNewTab": "Open in New Tab",
+    "selectFile": "Select File"
   },
   "clients": {
     "title": "Client Management",
@@ -1891,7 +1893,9 @@
       },
       "uploadSuccess": "Attachment uploaded successfully",
       "deleteSuccess": "Attachment deleted successfully",
-      "uploadError": "Failed to upload attachment"
+      "uploadError": "Failed to upload attachment",
+      "previewError": "Failed to load preview",
+      "previewNotAvailable": "Preview not available for this file type"
     },
     "attachmentVersions": {
       "title": "Version History",

@@ -740,7 +740,9 @@
     "unknownError": "خطأ غير معروف",
     "preview": "معاينة",
     "download": "تحميل",
-    "warning": "تحذير"
+    "warning": "تحذير",
+    "openInNewTab": "فتح في علامة تبويب جديدة",
+    "selectFile": "اختر ملف"
   },
   "clients": {
     "title": "إدارة العملاء",
@@ -1891,7 +1893,9 @@
       },
       "uploadSuccess": "تم رفع المرفق بنجاح",
       "deleteSuccess": "تم حذف المرفق بنجاح",
-      "uploadError": "فشل في رفع المرفق"
+      "uploadError": "فشل في رفع المرفق",
+      "previewError": "فشل في تحميل المعاينة",
+      "previewNotAvailable": "المعاينة غير متاحة لهذا النوع من الملفات"
     },
     "attachmentVersions": {
       "title": "سجل الإصدارات",
