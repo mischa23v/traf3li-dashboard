@@ -18,7 +18,6 @@ import {
   FileText,
   FileInput,
   Package,
-  NotebookPen,
 } from 'lucide-react'
 import { useAuthStore } from '@/stores/auth-store'
 
@@ -104,19 +103,9 @@ export function useSidebarData(): SidebarData {
                 title: 'الأحداث',
                 url: '/dashboard/tasks/events',
               },
-            ],
-          },
-          {
-            title: 'الملاحظات والمراجع',
-            icon: NotebookPen,
-            items: [
               {
-                title: 'جميع الملاحظات',
+                title: 'الملاحظات والمراجع',
                 url: '/dashboard/wiki',
-              },
-              {
-                title: 'إنشاء ملاحظة',
-                url: '/dashboard/wiki/new',
               },
             ],
           },
@@ -166,20 +155,6 @@ export function useSidebarData(): SidebarData {
         title: 'الأعمال',
         items: [
           {
-            title: 'فرص وظيفية',
-            icon: Briefcase,
-            items: [
-              {
-                title: 'خدماتي',
-                url: '/dashboard/jobs/my-services',
-              },
-              {
-                title: 'تصفح الوظائف',
-                url: '/dashboard/jobs/browse',
-              },
-            ],
-          },
-          {
             title: 'القضايا',
             url: '/dashboard/cases',
             icon: Scale,
@@ -188,6 +163,16 @@ export function useSidebarData(): SidebarData {
             title: 'المستندات',
             url: '/dashboard/documents',
             icon: FileText,
+          },
+          {
+            title: 'خدماتي',
+            url: '/dashboard/jobs/my-services',
+            icon: Briefcase,
+          },
+          {
+            title: 'تصفح الوظائف',
+            url: '/dashboard/jobs/browse',
+            icon: Briefcase,
           },
         ],
       },
