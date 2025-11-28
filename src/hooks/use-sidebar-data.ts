@@ -11,14 +11,12 @@ import {
   Scale,
   DollarSign,
   Star,
-  BarChart,
   BookOpen,
   Settings,
   HelpCircle,
   FileText,
   FileInput,
   Package,
-  NotebookPen,
 } from 'lucide-react'
 import { useAuthStore } from '@/stores/auth-store'
 
@@ -88,37 +86,30 @@ export function useSidebarData(): SidebarData {
             url: '/dashboard/calendar',
             icon: Calendar,
           },
+        ],
+      },
+      {
+        title: 'المهام',
+        items: [
           {
             title: 'المهام',
+            url: '/dashboard/tasks/list',
             icon: CheckSquare,
-            items: [
-              {
-                title: 'المهام',
-                url: '/dashboard/tasks/list',
-              },
-              {
-                title: 'التذكيرات',
-                url: '/dashboard/tasks/reminders',
-              },
-              {
-                title: 'الأحداث',
-                url: '/dashboard/tasks/events',
-              },
-            ],
           },
           {
-            title: 'الملاحظات والمراجع',
-            icon: NotebookPen,
-            items: [
-              {
-                title: 'جميع الملاحظات',
-                url: '/dashboard/wiki',
-              },
-              {
-                title: 'إنشاء ملاحظة',
-                url: '/dashboard/wiki/new',
-              },
-            ],
+            title: 'التذكيرات',
+            url: '/dashboard/tasks/reminders',
+            icon: CheckSquare,
+          },
+          {
+            title: 'الأحداث',
+            url: '/dashboard/tasks/events',
+            icon: CheckSquare,
+          },
+          {
+            title: 'الملاحظات',
+            url: '/dashboard/wiki',
+            icon: CheckSquare,
           },
         ],
       },
@@ -166,20 +157,6 @@ export function useSidebarData(): SidebarData {
         title: 'الأعمال',
         items: [
           {
-            title: 'فرص وظيفية',
-            icon: Briefcase,
-            items: [
-              {
-                title: 'خدماتي',
-                url: '/dashboard/jobs/my-services',
-              },
-              {
-                title: 'تصفح الوظائف',
-                url: '/dashboard/jobs/browse',
-              },
-            ],
-          },
-          {
             title: 'القضايا',
             url: '/dashboard/cases',
             icon: Scale,
@@ -188,6 +165,16 @@ export function useSidebarData(): SidebarData {
             title: 'المستندات',
             url: '/dashboard/documents',
             icon: FileText,
+          },
+          {
+            title: 'خدماتي',
+            url: '/dashboard/jobs/my-services',
+            icon: Briefcase,
+          },
+          {
+            title: 'تصفح الوظائف',
+            url: '/dashboard/jobs/browse',
+            icon: Briefcase,
           },
         ],
       },
@@ -253,12 +240,11 @@ export function useSidebarData(): SidebarData {
                 title: 'شاراتي',
                 url: '/dashboard/reputation/badges',
               },
+              {
+                title: 'التقارير',
+                url: '/dashboard/reports',
+              },
             ],
-          },
-          {
-            title: 'التقارير',
-            url: '/dashboard/reports',
-            icon: BarChart,
           },
           {
             title: 'مركز المعرفة',
@@ -281,7 +267,7 @@ export function useSidebarData(): SidebarData {
         ],
       },
       {
-        title: 'النظام',
+        title: 'الإعدادات',
         items: [
           {
             title: 'الإعدادات',
