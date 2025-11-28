@@ -2,6 +2,7 @@
  * Reminders Service
  * Production-ready reminder management with advanced features
  * Handles all reminder-related API calls including snooze, recurring, notification channels
+ * Enhanced for Saudi Legal Practice Management
  */
 
 import apiClient, { handleApiError } from '@/lib/api'
@@ -10,22 +11,65 @@ import apiClient, { handleApiError } from '@/lib/api'
  * ==================== ENUMS ====================
  */
 
-export type ReminderPriority = 'low' | 'medium' | 'high' | 'urgent' | 'critical'
-export type ReminderType = 'task' | 'hearing' | 'deadline' | 'meeting' | 'payment' | 'general' | 'follow_up' | 'court_date' | 'document_submission' | 'client_call'
-export type ReminderStatus = 'pending' | 'snoozed' | 'triggered' | 'completed' | 'dismissed' | 'expired'
+export type ReminderPriority = 'low' | 'medium' | 'high' | 'critical'
+
+// Legacy Type (for backwards compatibility)
+export type ReminderTypeLegacy =
+  | 'task_due'
+  | 'hearing'
+  | 'deadline'
+  | 'meeting'
+  | 'payment'
+  | 'contract_renewal'
+  | 'statute_limitation'
+  | 'follow_up'
+  | 'general'
+  | 'task'
+
+// Enhanced Reminder Type (Saudi Legal)
+export type ReminderType =
+  | 'general'
+  | 'court_hearing'
+  | 'filing_deadline'
+  | 'appeal_deadline'
+  | 'client_meeting'
+  | 'client_call'
+  | 'payment_due'
+  | 'document_deadline'
+  | 'contract_renewal'
+  | 'follow_up'
+  | 'statutory_deadline'
+  | 'najiz_deadline'
+  | 'other'
+
+// Enhanced Status
+export type ReminderStatus = 'pending' | 'snoozed' | 'triggered' | 'completed' | 'dismissed' | 'expired' | 'delegated'
+
+// Deadline Type (Saudi Legal)
+export type DeadlineType = 'statutory' | 'court_ordered' | 'contractual' | 'internal' | 'none'
+
+// Notification Channels
 export type NotificationChannel = 'push' | 'email' | 'sms' | 'whatsapp' | 'in_app'
+
+// Recurrence Frequency
 export type RecurrenceFrequency = 'daily' | 'weekly' | 'biweekly' | 'monthly' | 'quarterly' | 'yearly' | 'custom'
+
+// Recurrence End Type
 export type RecurrenceEndType = 'never' | 'after_occurrences' | 'on_date'
+
+// Acknowledgment Action
+export type AcknowledgmentAction = 'completed' | 'dismissed' | 'snoozed' | 'delegated'
 
 /**
  * ==================== INTERFACES ====================
  */
 
 export interface SnoozeConfig {
-  snoozedAt: string
-  snoozeUntil: string
+  snoozedAt?: string
+  snoozeUntil?: string
   snoozeCount: number
-  reason?: string
+  snoozeReason?: string
+  maxSnoozeCount: number // Default: 5
 }
 
 export interface RecurringConfig {
@@ -50,14 +94,27 @@ export interface RecurringConfig {
   skipHolidays?: boolean
 }
 
+export interface AdvanceNotification {
+  beforeMinutes: number
+  channels: NotificationChannel[]
+  sent: boolean
+}
+
+export interface EscalationConfig {
+  enabled: boolean
+  escalateAfterMinutes: number
+  escalateTo?: string // User ID
+  escalateToMultiple?: string[] // Multiple escalation targets
+  escalated: boolean
+  escalationLevel: number
+}
+
 export interface NotificationConfig {
   channels: NotificationChannel[]
-  // Advance notification times (in minutes before reminder)
-  advanceNotifications?: number[]
-  // Escalation if not acknowledged
-  escalationEnabled?: boolean
-  escalationDelayMinutes?: number
-  escalationTo?: string[] // User IDs
+  // Enhanced advance notifications
+  advanceNotifications?: AdvanceNotification[]
+  // Escalation configuration
+  escalation?: EscalationConfig
   // Do not disturb override
   overrideDnd?: boolean
   // Sound/vibration preferences
@@ -85,15 +142,52 @@ export interface ReminderHistory {
   newValue?: any
 }
 
+export interface Attachment {
+  _id?: string
+  fileName: string
+  fileUrl: string
+  fileType: string
+  fileSize?: number
+  uploadedBy: string
+  uploadedAt: string
+}
+
 export interface Reminder {
   _id: string
+  id?: string // Alternative ID field
+  reminderId?: string // Auto-generated: REM-202511-0001
   // Basic info
   title: string
   description?: string
   message?: string
-  notes?: string
+  notes?: string // Max 1000 chars
+  // Date/Time
+  reminderDateTime?: string // Required - combined date/time
+  reminderDate?: string // Legacy
+  reminderTime?: string // Legacy "HH:mm"
+  dueDate?: string
+  time?: string
+  timezone?: string
+  // Type (Legacy)
+  type?: ReminderTypeLegacy
+  // Enhanced Reminder Type (Saudi Legal)
+  reminderType: ReminderType
+  // Status & Priority
+  status: ReminderStatus
+  priority: ReminderPriority
+  tags?: string[]
+  // Deadline Info (Saudi Legal)
+  deadlineType: DeadlineType
+  actualDeadlineDate?: string // The actual deadline date
+  daysBeforeDeadline?: number // Remind X days before
   // User assignment
-  userId: string
+  userId: string | {
+    _id: string
+    firstName: string
+    lastName: string
+    email?: string
+    avatar?: string
+  }
   assignedTo?: string | {
     _id: string
     firstName: string
@@ -107,17 +201,6 @@ export interface Reminder {
     firstName: string
     lastName: string
   }
-  // Timing
-  reminderDate: string
-  reminderTime: string
-  dueDate?: string
-  time?: string
-  timezone?: string
-  // Classification
-  priority: ReminderPriority
-  type: ReminderType
-  status: ReminderStatus
-  tags?: string[]
   // Relations
   relatedCase?: string | {
     _id: string
@@ -129,8 +212,25 @@ export interface Reminder {
     caseNumber?: string
     title?: string
   }
-  relatedTask?: string
-  relatedEvent?: string
+  relatedTask?: string | {
+    _id: string
+    title?: string
+  }
+  relatedEvent?: string | {
+    _id: string
+    title?: string
+  }
+  relatedInvoice?: string | {
+    _id: string
+    invoiceNumber?: string
+  }
+  clientId?: string | {
+    _id: string
+    name?: string
+    fullName?: string
+    phone?: string
+    email?: string
+  }
   relatedClient?: string | {
     _id: string
     name?: string
@@ -138,19 +238,42 @@ export interface Reminder {
   }
   // Snooze
   snooze?: SnoozeConfig
-  maxSnoozeCount?: number
   // Recurring
   recurring?: RecurringConfig
   isRecurringInstance?: boolean
   parentReminderId?: string
   // Notifications
   notification?: NotificationConfig
-  notificationSent: boolean
+  notificationSent?: boolean
   notificationSentAt?: string
   lastNotificationAt?: string
+  // Delegation
+  delegatedTo?: string | {
+    _id: string
+    firstName: string
+    lastName: string
+  }
+  delegatedAt?: string
+  delegationNote?: string
   // Acknowledgment
+  acknowledgedAt?: string
+  acknowledgedBy?: string | {
+    _id: string
+    firstName: string
+    lastName: string
+  }
+  acknowledgmentAction?: AcknowledgmentAction
   acknowledgment?: ReminderAcknowledgment
+  // Completion
   completedAt?: string
+  completedBy?: string | {
+    _id: string
+    firstName: string
+    lastName: string
+  }
+  completionNote?: string
+  // Attachments
+  attachments?: Attachment[]
   // Audit
   history?: ReminderHistory[]
   // Timestamps
@@ -166,41 +289,72 @@ export interface CreateReminderData {
   description?: string
   message?: string
   notes?: string
-  reminderDate: string
-  reminderTime: string
+  // Date/Time
+  reminderDateTime?: string // Preferred - combined date/time
+  reminderDate?: string // Legacy
+  reminderTime?: string // Legacy
   timezone?: string
+  // Type
+  type?: ReminderTypeLegacy // Legacy
+  reminderType?: ReminderType // Enhanced Saudi Legal type
+  // Status & Priority
   priority?: ReminderPriority
-  type?: ReminderType
+  status?: ReminderStatus
   tags?: string[]
+  // Deadline Info (Saudi Legal)
+  deadlineType?: DeadlineType
+  actualDeadlineDate?: string
+  daysBeforeDeadline?: number
+  // Assignment
   assignedTo?: string
+  // Relations
   relatedCase?: string
   relatedTask?: string
   relatedEvent?: string
+  relatedInvoice?: string
+  clientId?: string
   relatedClient?: string
+  // Snooze
   maxSnoozeCount?: number
-  recurring?: RecurringConfig
-  notification?: NotificationConfig
+  // Recurring
+  recurring?: Partial<RecurringConfig>
+  // Notification
+  notification?: Partial<NotificationConfig>
 }
 
 /**
  * Reminder Filters
  */
 export interface ReminderFilters {
+  // Status & Priority
   status?: ReminderStatus | ReminderStatus[]
   priority?: ReminderPriority | ReminderPriority[]
-  type?: ReminderType | ReminderType[]
+  // Type
+  type?: ReminderTypeLegacy | ReminderTypeLegacy[] // Legacy
+  reminderType?: ReminderType | ReminderType[] // Enhanced Saudi Legal
+  // Deadline Type (Saudi Legal)
+  deadlineType?: DeadlineType
+  // Assignment
   assignedTo?: string
+  // Relations
   relatedCase?: string
+  relatedTask?: string
+  relatedEvent?: string
+  clientId?: string
   relatedClient?: string
+  // Features
   isRecurring?: boolean
   tags?: string[]
+  // Date Filters
   startDate?: string
   endDate?: string
+  // Quick Filters
   search?: string
   overdue?: boolean
   today?: boolean
   upcoming?: boolean
-  sortBy?: 'reminderDate' | 'priority' | 'createdAt' | 'updatedAt'
+  // Sorting & Pagination
+  sortBy?: 'reminderDateTime' | 'reminderDate' | 'priority' | 'createdAt' | 'updatedAt'
   sortOrder?: 'asc' | 'desc'
   page?: number
   limit?: number
@@ -210,10 +364,14 @@ export interface ReminderFilters {
  * Snooze Options
  */
 export interface SnoozeOptions {
+  snoozeMinutes?: number // OR use snoozeUntil
+  snoozeUntil?: string // Specific datetime ISO string
+  snoozeReason?: string
+  // Legacy options (for convenience)
   minutes?: number
   hours?: number
   days?: number
-  until?: string // Specific datetime
+  until?: string
   reason?: string
 }
 
@@ -222,16 +380,24 @@ export interface SnoozeOptions {
  */
 export interface ReminderStats {
   total: number
-  byStatus: Record<ReminderStatus, number>
-  byPriority: Record<ReminderPriority, number>
-  byType: Record<ReminderType, number>
+  byStatus: Partial<Record<ReminderStatus, number>>
+  byPriority: Partial<Record<ReminderPriority, number>>
+  byType?: Partial<Record<ReminderTypeLegacy, number>> // Legacy
+  // Saudi Legal-specific stats
+  byReminderType?: Partial<Record<ReminderType, number>>
+  byDeadlineType?: Partial<Record<DeadlineType, number>>
+  // Quick stats
   pending: number
   snoozed: number
+  delegated?: number
   overdue: number
   dueToday: number
+  dueThisWeek?: number
   completedThisWeek: number
   completedThisMonth: number
+  // Metrics
   averageSnoozeCount?: number
+  averageResponseTime?: number // in minutes
 }
 
 /**
@@ -322,9 +488,9 @@ const remindersService = {
   /**
    * Mark reminder as completed
    */
-  completeReminder: async (id: string, notes?: string): Promise<Reminder> => {
+  completeReminder: async (id: string, completionNote?: string): Promise<Reminder> => {
     try {
-      const response = await apiClient.post(`/reminders/${id}/complete`, { notes })
+      const response = await apiClient.post(`/reminders/${id}/complete`, { completionNote })
       return response.data.reminder || response.data.data
     } catch (error: any) {
       console.error('Complete reminder error:', error)
@@ -365,7 +531,26 @@ const remindersService = {
    */
   snoozeReminder: async (id: string, options: SnoozeOptions): Promise<Reminder> => {
     try {
-      const response = await apiClient.post(`/reminders/${id}/snooze`, options)
+      // Convert legacy options to new API format
+      const payload: { snoozeMinutes?: number; snoozeUntil?: string; snoozeReason?: string } = {}
+
+      if (options.snoozeMinutes) {
+        payload.snoozeMinutes = options.snoozeMinutes
+      } else if (options.snoozeUntil) {
+        payload.snoozeUntil = options.snoozeUntil
+      } else if (options.minutes) {
+        payload.snoozeMinutes = options.minutes
+      } else if (options.hours) {
+        payload.snoozeMinutes = options.hours * 60
+      } else if (options.days) {
+        payload.snoozeMinutes = options.days * 24 * 60
+      } else if (options.until) {
+        payload.snoozeUntil = options.until
+      }
+
+      payload.snoozeReason = options.snoozeReason || options.reason
+
+      const response = await apiClient.post(`/reminders/${id}/snooze`, payload)
       return response.data.reminder || response.data.data
     } catch (error: any) {
       console.error('Snooze reminder error:', error)
@@ -420,9 +605,9 @@ const remindersService = {
   /**
    * Delegate reminder to another user
    */
-  delegateReminder: async (id: string, toUserId: string, message?: string): Promise<Reminder> => {
+  delegateReminder: async (id: string, delegateTo: string, delegationNote?: string): Promise<Reminder> => {
     try {
-      const response = await apiClient.post(`/reminders/${id}/delegate`, { toUserId, message })
+      const response = await apiClient.post(`/reminders/${id}/delegate`, { delegateTo, delegationNote })
       return response.data.reminder || response.data.data
     } catch (error: any) {
       console.error('Delegate reminder error:', error)
@@ -492,6 +677,38 @@ const remindersService = {
       }
     } catch (error: any) {
       console.error('Get snoozed reminders error:', error)
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Get snoozed reminders that are now due
+   */
+  getSnoozedDue: async (): Promise<{ data: Reminder[]; count: number }> => {
+    try {
+      const response = await apiClient.get('/reminders/snoozed-due')
+      return {
+        data: response.data.data || response.data.reminders || [],
+        count: response.data.count || response.data.total || 0
+      }
+    } catch (error: any) {
+      console.error('Get snoozed due reminders error:', error)
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Get delegated reminders
+   */
+  getDelegated: async (): Promise<{ data: Reminder[]; count: number }> => {
+    try {
+      const response = await apiClient.get('/reminders/delegated')
+      return {
+        data: response.data.data || response.data.reminders || [],
+        count: response.data.count || response.data.total || 0
+      }
+    } catch (error: any) {
+      console.error('Get delegated reminders error:', error)
       throw new Error(handleApiError(error))
     }
   },
