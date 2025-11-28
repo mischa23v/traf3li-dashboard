@@ -26,6 +26,8 @@ import {
   FilePlus,
   History,
   CheckSquare,
+  BookOpen,
+  Scale,
 } from 'lucide-react'
 import { ClerkLogo } from '@/assets/clerk-logo'
 import { type SidebarData } from '../types'
@@ -71,6 +73,21 @@ export const sidebarData: SidebarData = {
           title: 'Task Details',
           url: '/task-details',
           icon: FileText,
+        },
+        {
+          title: 'sidebar.cases',
+          icon: Scale,
+          items: [
+            {
+              title: 'sidebar.allCases',
+              url: '/dashboard/cases',
+            },
+            {
+              title: 'wiki.title',
+              url: '/dashboard/cases',
+              icon: BookOpen,
+            },
+          ],
         },
         {
           title: 'Apps',
