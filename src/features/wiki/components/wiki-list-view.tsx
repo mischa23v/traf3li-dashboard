@@ -29,7 +29,6 @@ import { ConfigDrawer } from '@/components/config-drawer'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Alert, AlertDescription } from '@/components/ui/alert'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -50,11 +49,11 @@ import type { WikiPageType, WikiPageStatus } from '@/types/wiki'
 import {
   pageTypeLabels,
   pageTypeLabelsAr,
-  pageTypeIcons,
   pageStatusLabels,
   pageStatusLabelsAr,
   pageStatusColors
 } from '@/constants/wikiLabels'
+import { WikiSidebar } from './wiki-sidebar'
 
 export function WikiListView() {
   const { t, i18n } = useTranslation()
@@ -94,21 +93,11 @@ export function WikiListView() {
     })
   }, [pages, searchQuery])
 
-  // Stats
-  const stats = useMemo(() => {
-    if (!pages) return { total: 0, collections: 0, pinned: 0, recent: 0 }
-    return {
-      total: pages.length,
-      collections: collections?.length || 0,
-      pinned: pages.filter(p => p.isPinned).length,
-      recent: pages.filter(p => {
-        const updated = new Date(p.updatedAt)
-        const weekAgo = new Date()
-        weekAgo.setDate(weekAgo.getDate() - 7)
-        return updated > weekAgo
-      }).length
-    }
-  }, [pages, collections])
+  // Recent Pages for Sidebar
+  const recentPages = useMemo(() => {
+    if (!pages) return []
+    return [...pages].sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()).slice(0, 5)
+  }, [pages])
 
   const handleTogglePin = (pageId: string) => {
     togglePinMutation.mutate(pageId)
@@ -143,7 +132,7 @@ export function WikiListView() {
           <DynamicIsland />
         </div>
 
-        <div className='ms-auto flex items-center space-x-4'>
+        <div className="ms-auto flex items-center space-x-4">
           <div className="relative hidden md:block">
             <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
             <input
@@ -168,128 +157,54 @@ export function WikiListView() {
 
       <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-r border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-
-          {/* LEFT COLUMN (Widgets) */}
-          <div className="space-y-6">
-            {/* Stats Card */}
-            <Card className="border border-slate-100 shadow-sm rounded-2xl overflow-hidden">
-              <CardHeader className="bg-white border-b border-slate-50 pb-4">
-                <CardTitle className="text-lg font-bold text-navy flex items-center gap-2">
-                  <BookOpen className="h-5 w-5 text-emerald-500" />
-                  {t('wiki.stats.totalPages')}
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="p-4 space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="bg-slate-50 rounded-xl p-4 text-center">
-                    <div className="text-2xl font-bold text-navy">{stats.total}</div>
-                    <div className="text-xs text-slate-500">{t('wiki.stats.totalPages')}</div>
-                  </div>
-                  <div className="bg-slate-50 rounded-xl p-4 text-center">
-                    <div className="text-2xl font-bold text-navy">{stats.collections}</div>
-                    <div className="text-xs text-slate-500">{t('wiki.stats.collections')}</div>
-                  </div>
-                  <div className="bg-emerald-50 rounded-xl p-4 text-center">
-                    <div className="text-2xl font-bold text-emerald-600">{stats.pinned}</div>
-                    <div className="text-xs text-emerald-600">{t('wiki.stats.pinnedPages')}</div>
-                  </div>
-                  <div className="bg-blue-50 rounded-xl p-4 text-center">
-                    <div className="text-2xl font-bold text-blue-600">{stats.recent}</div>
-                    <div className="text-xs text-blue-600">{t('wiki.stats.recentUpdates')}</div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Collections Card */}
-            <Card className="border border-slate-100 shadow-sm rounded-2xl overflow-hidden">
-              <CardHeader className="bg-white border-b border-slate-50 pb-4">
-                <CardTitle className="text-lg font-bold text-navy flex items-center gap-2">
-                  <FolderOpen className="h-5 w-5 text-emerald-500" />
-                  {t('wiki.stats.collections')}
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="p-4">
-                {collections && collections.length > 0 ? (
-                  <div className="space-y-2">
-                    {collections.slice(0, 5).map((collection) => (
-                      <div
-                        key={collection._id}
-                        className="flex items-center gap-3 p-3 rounded-xl bg-slate-50 hover:bg-slate-100 transition-colors cursor-pointer"
-                      >
-                        <div
-                          className="w-8 h-8 rounded-lg flex items-center justify-center"
-                          style={{ backgroundColor: collection.color + '20' }}
-                        >
-                          <FolderOpen className="h-4 w-4" style={{ color: collection.color }} />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="text-sm font-medium text-navy truncate">
-                            {isArabic ? collection.nameAr || collection.name : collection.name}
-                          </div>
-                          <div className="text-xs text-slate-500">
-                            {collection.pageCount} {isArabic ? 'صفحات' : 'pages'}
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="text-center py-6 text-slate-500 text-sm">
-                    {t('wiki.noCollections')}
-                  </div>
-                )}
-                <Button
-                  asChild
-                  variant="ghost"
-                  className="w-full mt-4 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50"
-                >
-                  <Link to={`/dashboard/cases/${caseId}/wiki/collections` as any}>
-                    {t('wiki.newCollection')}
-                    <Plus className="h-4 w-4 ms-2" />
-                  </Link>
-                </Button>
-              </CardContent>
-            </Card>
+        {/* HERO CARD */}
+        <div className="bg-navy rounded-3xl p-8 relative overflow-hidden text-white shadow-xl shadow-navy/20 flex flex-col md:flex-row items-center justify-between gap-8 group">
+          <div className="absolute -bottom-32 -left-32 w-96 h-96 bg-brand-blue rounded-full blur-[120px] opacity-40 group-hover:opacity-50 transition-opacity duration-700"></div>
+          <div className="relative z-10 max-w-lg">
+            <div className="flex items-center gap-2 mb-2">
+              <Badge className="bg-blue-500/20 text-blue-100 hover:bg-blue-500/30 border-0 px-3 py-1">
+                <BookOpen className="w-3 h-3 ml-2" />
+                {isArabic ? 'الموسوعة القانونية' : 'Legal Wiki'}
+              </Badge>
+              <span className="text-slate-400 text-sm">
+                {caseName}
+              </span>
+            </div>
+            <h2 className="text-3xl font-bold mb-4 leading-tight">
+              {t('wiki.title')}
+            </h2>
+            <p className="text-blue-200 text-lg mb-8 leading-relaxed">
+              {t('wiki.description')}
+            </p>
+            <div className="flex gap-3">
+              <Button asChild className="bg-emerald-500 hover:bg-emerald-600 text-white h-12 px-8 rounded-xl font-bold shadow-lg shadow-emerald-500/20 border-0">
+                <Link to={`/dashboard/cases/${caseId}/wiki/new` as any}>
+                  <Plus className="me-2 h-5 w-5" />
+                  {t('wiki.newPage')}
+                </Link>
+              </Button>
+              <Button className="bg-white text-slate-900 hover:bg-slate-100 h-12 px-8 rounded-xl font-bold shadow-lg border-0 transition-all hover:scale-105">
+                <FolderOpen className="me-2 h-5 w-5" />
+                {t('wiki.newCollection')}
+              </Button>
+            </div>
           </div>
+          {/* Abstract Visual Decoration */}
+          <div className="hidden md:block relative w-64 h-64">
+            <div className="absolute inset-0 bg-gradient-to-tr from-emerald-500 to-blue-500 rounded-full opacity-20 blur-3xl animate-pulse"></div>
+            <div className="absolute inset-4 bg-navy rounded-2xl border border-white/10 flex items-center justify-center transform rotate-6 shadow-2xl">
+              <BookOpen className="h-24 w-24 text-emerald-400" />
+            </div>
+            <div className="absolute inset-4 bg-navy/80 rounded-2xl border border-white/10 flex items-center justify-center transform -rotate-6 backdrop-blur-sm">
+              <FileText className="h-24 w-24 text-blue-400" />
+            </div>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
           {/* RIGHT COLUMN (Main Content) */}
           <div className="lg:col-span-2 space-y-8">
-
-            {/* HERO CARD */}
-            <div className="bg-navy rounded-3xl p-8 relative overflow-hidden text-white shadow-xl shadow-navy/20 flex flex-col md:flex-row items-center justify-between gap-8">
-              <div className="relative z-10 max-w-lg">
-                <h2 className="text-3xl font-bold mb-4 leading-tight">
-                  {t('wiki.title')} - {caseName}
-                </h2>
-                <p className="text-blue-200 text-lg mb-8 leading-relaxed">
-                  {t('wiki.description')}
-                </p>
-                <div className="flex gap-3">
-                  <Button asChild className="bg-emerald-500 hover:bg-emerald-600 text-white h-12 px-8 rounded-xl font-bold shadow-lg shadow-emerald-500/20 border-0">
-                    <Link to={`/dashboard/cases/${caseId}/wiki/new` as any}>
-                      <Plus className="me-2 h-5 w-5" />
-                      {t('wiki.newPage')}
-                    </Link>
-                  </Button>
-                  <Button className="bg-white text-slate-900 hover:bg-slate-100 h-12 px-8 rounded-xl font-bold shadow-lg border-0 transition-all hover:scale-105">
-                    <FolderOpen className="me-2 h-5 w-5" />
-                    {t('wiki.newCollection')}
-                  </Button>
-                </div>
-              </div>
-              {/* Abstract Visual Decoration */}
-              <div className="hidden md:block relative w-64 h-64">
-                <div className="absolute inset-0 bg-gradient-to-tr from-emerald-500 to-blue-500 rounded-full opacity-20 blur-3xl animate-pulse"></div>
-                <div className="absolute inset-4 bg-navy rounded-2xl border border-white/10 flex items-center justify-center transform rotate-6 shadow-2xl">
-                  <BookOpen className="h-24 w-24 text-emerald-400" />
-                </div>
-                <div className="absolute inset-4 bg-navy/80 rounded-2xl border border-white/10 flex items-center justify-center transform -rotate-6 backdrop-blur-sm">
-                  <FileText className="h-24 w-24 text-blue-400" />
-                </div>
-              </div>
-            </div>
 
             {/* MAIN WIKI LIST */}
             <div className="bg-white rounded-3xl p-1 shadow-sm border border-slate-100">
@@ -506,6 +421,9 @@ export function WikiListView() {
             </div>
 
           </div>
+
+          {/* LEFT COLUMN (Sidebar) - Now on the right in RTL, left in LTR but grid order handles it */}
+          <WikiSidebar recentPages={recentPages} collections={collections || []} isLoading={isLoading} />
         </div>
       </Main>
     </>

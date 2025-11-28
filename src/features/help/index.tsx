@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import {
   HelpCircle, Search, Book, MessageCircle, Phone, Mail,
   ChevronDown, ChevronUp, ExternalLink, FileText, Video,
-  Headphones, Clock, CheckCircle, ArrowRight
+  Headphones, Clock, CheckCircle, ArrowRight, Bell
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -28,6 +28,9 @@ import { ProfileDropdown } from '@/components/profile-dropdown'
 import { LanguageSwitcher } from '@/components/language-switcher'
 import { DynamicIsland } from '@/components/dynamic-island'
 import { cn } from '@/lib/utils'
+import { TopNav } from '@/components/layout/top-nav'
+import { Badge } from '@/components/ui/badge'
+import { HelpSidebar } from './components/help-sidebar'
 
 const categories = [
   {
@@ -137,177 +140,186 @@ const contactMethods = [
 ]
 
 export function HelpCenter() {
-  const { i18n } = useTranslation()
+  const { i18n, t } = useTranslation()
   const isRTL = i18n.language === 'ar'
   const [searchQuery, setSearchQuery] = useState('')
+
+  const topNav = [
+    { title: isRTL ? 'مركز المساعدة' : 'Help Center', href: '/dashboard/help', isActive: true },
+    { title: isRTL ? 'تذاكر الدعم' : 'Support Tickets', href: '/dashboard/help/tickets', isActive: false },
+  ]
 
   return (
     <>
       <Header className="bg-navy shadow-none relative">
-        <div className="flex-1" />
+        <TopNav links={topNav} className="[&>a]:text-slate-300 [&>a:hover]:text-white [&>a[aria-current='page']]:text-white" />
+
+        {/* Dynamic Island - Centered */}
         <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
           <DynamicIsland />
         </div>
-        <div className='ms-auto flex items-center space-x-4'>
+
+        <div className="ms-auto flex items-center space-x-4">
+          <div className="relative hidden md:block">
+            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+            <input
+              type="text"
+              placeholder={t('common.search', 'بحث...')}
+              className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pr-9 pl-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+            />
+          </div>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white"
+          >
+            <Bell className="h-5 w-5" />
+            <span className="absolute top-2 right-2 h-2 w-2 bg-red-500 rounded-full border border-navy"></span>
+          </Button>
           <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white" />
           <ThemeSwitch className="text-slate-300 hover:bg-white/10 hover:text-white" />
           <ConfigDrawer className="text-slate-300 hover:bg-white/10 hover:text-white" />
           <ProfileDropdown className="text-slate-300 hover:bg-white/10 hover:text-white" />
         </div>
+        {/* Bottom Gradient Line */}
         <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-emerald-500/50 to-transparent"></div>
       </Header>
 
-      <Main className="bg-slate-50">
-        <div className="max-w-5xl mx-auto space-y-8">
-          {/* Hero Section */}
-          <div className="text-center py-8">
-            <div className="inline-flex items-center justify-center h-16 w-16 bg-emerald-100 rounded-full mb-4">
-              <HelpCircle className="h-8 w-8 text-emerald-600" />
+      <Main
+        fluid={true}
+        className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-r border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']"
+      >
+        {/* HERO BANNER */}
+        <div className="bg-navy rounded-3xl p-8 relative overflow-hidden text-white shadow-xl shadow-navy/20 group">
+          <div className="absolute -bottom-32 -left-32 w-96 h-96 bg-brand-blue rounded-full blur-[120px] opacity-40 group-hover:opacity-50 transition-opacity duration-700"></div>
+          <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
+            <div>
+              <div className="flex items-center gap-2 mb-2">
+                <Badge className="bg-blue-500/20 text-blue-100 hover:bg-blue-500/30 border-0 px-3 py-1">
+                  <HelpCircle className="w-3 h-3 ml-2" />
+                  {isRTL ? 'مركز المساعدة' : 'Help Center'}
+                </Badge>
+                <span className="text-slate-400 text-sm">
+                  {new Date().toLocaleDateString('ar-SA', { month: 'long', year: 'numeric' })}
+                </span>
+              </div>
+              <h1 className="text-4xl font-bold leading-tight mb-2">
+                {isRTL ? 'كيف يمكننا مساعدتك؟' : 'How can we help you?'}
+              </h1>
+              <p className="text-slate-300 text-lg max-w-xl">
+                {isRTL ? 'ابحث في قاعدة المعرفة أو تواصل مع فريق الدعم' : 'Search our knowledge base or contact support'}
+              </p>
             </div>
-            <h1 className="text-3xl font-bold text-navy mb-2">
-              {isRTL ? 'مركز المساعدة' : 'Help Center'}
-            </h1>
-            <p className="text-slate-500 mb-6">
-              {isRTL ? 'كيف يمكننا مساعدتك اليوم؟' : 'How can we help you today?'}
-            </p>
-            <div className="relative max-w-xl mx-auto">
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* --- Main Content --- */}
+          <div className="lg:col-span-2 flex flex-col gap-6">
+
+            {/* Search Box */}
+            <div className="relative">
               <Search className="absolute start-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
               <Input
                 placeholder={isRTL ? 'ابحث في المساعدة...' : 'Search for help...'}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="ps-12 h-12 text-lg"
+                className="ps-12 h-14 text-lg rounded-2xl border-slate-200 shadow-sm bg-white"
               />
             </div>
-          </div>
 
-          {/* Categories */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {categories.map((category) => (
-              <Card key={category.id} className="hover:shadow-lg transition-shadow cursor-pointer group">
-                <CardContent className="p-6 text-center">
-                  <div className={cn(
-                    "h-12 w-12 rounded-xl mx-auto mb-4 flex items-center justify-center group-hover:scale-110 transition-transform",
-                    category.color
-                  )}>
-                    <category.icon className="h-6 w-6" />
-                  </div>
-                  <h3 className="font-bold text-navy mb-1">
-                    {isRTL ? category.title : category.titleEn}
-                  </h3>
-                  <p className="text-sm text-slate-500">
-                    {category.articles} {isRTL ? 'مقال' : 'articles'}
-                  </p>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-
-          {/* FAQ Section */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <HelpCircle className="h-5 w-5 text-emerald-600" />
-                {isRTL ? 'الأسئلة الشائعة' : 'Frequently Asked Questions'}
-              </CardTitle>
-              <CardDescription>
-                {isRTL ? 'إجابات سريعة على الأسئلة الأكثر شيوعاً' : 'Quick answers to commonly asked questions'}
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Accordion type="single" collapsible className="w-full">
-                {faqs.map((faq, index) => (
-                  <AccordionItem key={index} value={`item-${index}`}>
-                    <AccordionTrigger className="text-start hover:no-underline">
-                      <span className="font-medium text-navy">
-                        {isRTL ? faq.question : faq.questionEn}
-                      </span>
-                    </AccordionTrigger>
-                    <AccordionContent className="text-slate-600">
-                      {isRTL ? faq.answer : faq.answerEn}
-                    </AccordionContent>
-                  </AccordionItem>
-                ))}
-              </Accordion>
-            </CardContent>
-          </Card>
-
-          {/* Contact Section */}
-          <div>
-            <h2 className="text-xl font-bold text-navy mb-4 text-center">
-              {isRTL ? 'تواصل معنا' : 'Contact Us'}
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {contactMethods.map((method, index) => (
-                <Card key={index} className="hover:shadow-lg transition-shadow">
-                  <CardContent className="p-6">
-                    <div className="flex items-start gap-4">
-                      <div className="h-12 w-12 bg-emerald-100 rounded-xl flex items-center justify-center shrink-0">
-                        <method.icon className="h-6 w-6 text-emerald-600" />
-                      </div>
-                      <div className="flex-1">
-                        <h3 className="font-bold text-navy mb-1">
-                          {isRTL ? method.title : method.titleEn}
-                        </h3>
-                        <p className="text-sm text-slate-500 mb-3">
-                          {isRTL ? method.description : method.descriptionEn}
-                        </p>
-                        {method.available && (
-                          <div className="flex items-center gap-1 text-xs text-emerald-600 mb-3">
-                            <span className="h-2 w-2 bg-emerald-500 rounded-full animate-pulse" />
-                            {isRTL ? 'متاح الآن' : 'Available now'}
-                          </div>
-                        )}
-                        <Button variant="outline" size="sm" className="w-full">
-                          {isRTL ? method.action : method.actionEn}
-                          <ArrowRight className={cn("h-4 w-4 ms-1", isRTL && "rotate-180")} />
-                        </Button>
-                      </div>
+            {/* Categories */}
+            <div className="grid grid-cols-2 gap-4">
+              {categories.map((category) => (
+                <Card key={category.id} className="hover:shadow-lg transition-all duration-300 cursor-pointer group border-slate-100">
+                  <CardContent className="p-6 text-center">
+                    <div className={cn(
+                      "h-14 w-14 rounded-2xl mx-auto mb-4 flex items-center justify-center group-hover:scale-110 transition-transform",
+                      category.color
+                    )}>
+                      <category.icon className="h-7 w-7" />
                     </div>
+                    <h3 className="font-bold text-navy mb-1 text-lg">
+                      {isRTL ? category.title : category.titleEn}
+                    </h3>
+                    <p className="text-sm text-slate-500">
+                      {category.articles} {isRTL ? 'مقال' : 'articles'}
+                    </p>
                   </CardContent>
                 </Card>
               ))}
             </div>
-          </div>
 
-          {/* Support Hours */}
-          <Card className="bg-navy text-white">
-            <CardContent className="p-6">
-              <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-                <div className="flex items-center gap-4">
-                  <div className="h-12 w-12 bg-white/10 rounded-xl flex items-center justify-center">
-                    <Headphones className="h-6 w-6" />
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-lg">
-                      {isRTL ? 'دعم على مدار الساعة' : '24/7 Support'}
-                    </h3>
-                    <p className="text-white/70">
-                      {isRTL ? 'فريق الدعم متاح لمساعدتك في أي وقت' : 'Our support team is available to help you anytime'}
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2 text-white/80">
-                  <Clock className="h-5 w-5" />
-                  <span>
-                    {isRTL ? 'متوسط وقت الرد: 5 دقائق' : 'Average response time: 5 minutes'}
-                  </span>
-                </div>
+            {/* FAQ Section */}
+            <Card className="border-slate-100 shadow-sm">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-navy">
+                  <HelpCircle className="h-5 w-5 text-emerald-600" />
+                  {isRTL ? 'الأسئلة الشائعة' : 'Frequently Asked Questions'}
+                </CardTitle>
+                <CardDescription>
+                  {isRTL ? 'إجابات سريعة على الأسئلة الأكثر شيوعاً' : 'Quick answers to commonly asked questions'}
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Accordion type="single" collapsible className="w-full">
+                  {faqs.map((faq, index) => (
+                    <AccordionItem key={index} value={`item-${index}`} className="border-slate-100">
+                      <AccordionTrigger className="text-start hover:no-underline hover:text-emerald-600 transition-colors">
+                        <span className="font-medium text-navy">
+                          {isRTL ? faq.question : faq.questionEn}
+                        </span>
+                      </AccordionTrigger>
+                      <AccordionContent className="text-slate-600 leading-relaxed">
+                        {isRTL ? faq.answer : faq.answerEn}
+                      </AccordionContent>
+                    </AccordionItem>
+                  ))}
+                </Accordion>
+              </CardContent>
+            </Card>
+
+            {/* Contact Section */}
+            <div>
+              <h2 className="text-xl font-bold text-navy mb-4">
+                {isRTL ? 'تواصل معنا' : 'Contact Us'}
+              </h2>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {contactMethods.map((method, index) => (
+                  <Card key={index} className="hover:shadow-lg transition-shadow border-slate-100">
+                    <CardContent className="p-6">
+                      <div className="flex flex-col items-center text-center gap-3">
+                        <div className="h-12 w-12 bg-emerald-50 rounded-xl flex items-center justify-center shrink-0 text-emerald-600">
+                          <method.icon className="h-6 w-6" />
+                        </div>
+                        <div className="flex-1">
+                          <h3 className="font-bold text-navy mb-1">
+                            {isRTL ? method.title : method.titleEn}
+                          </h3>
+                          <p className="text-sm text-slate-500 mb-3">
+                            {isRTL ? method.description : method.descriptionEn}
+                          </p>
+                          {method.available && (
+                            <div className="flex items-center justify-center gap-1 text-xs text-emerald-600 mb-3">
+                              <span className="h-2 w-2 bg-emerald-500 rounded-full animate-pulse" />
+                              {isRTL ? 'متاح الآن' : 'Available now'}
+                            </div>
+                          )}
+                          <Button variant="outline" size="sm" className="w-full border-slate-200">
+                            {isRTL ? method.action : method.actionEn}
+                            <ArrowRight className={cn("h-4 w-4 ms-1", isRTL && "rotate-180")} />
+                          </Button>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
               </div>
-            </CardContent>
-          </Card>
-
-          {/* Documentation Link */}
-          <div className="text-center py-4">
-            <p className="text-slate-500 mb-3">
-              {isRTL ? 'هل تبحث عن معلومات تقنية مفصلة؟' : 'Looking for detailed technical information?'}
-            </p>
-            <Button variant="outline">
-              <Book className="h-4 w-4 me-2" />
-              {isRTL ? 'استعرض الوثائق الكاملة' : 'Browse Full Documentation'}
-              <ExternalLink className="h-4 w-4 ms-2" />
-            </Button>
+            </div>
           </div>
+
+          {/* Sidebar */}
+          <HelpSidebar context="center" />
         </div>
       </Main>
     </>

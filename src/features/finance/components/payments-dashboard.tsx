@@ -39,6 +39,7 @@ import { ProfileDropdown } from '@/components/profile-dropdown'
 import { Skeleton } from '@/components/ui/skeleton'
 import { usePayments, usePaymentsSummary, useExportReport } from '@/hooks/useFinance'
 import { useClients } from '@/hooks/useCasesAndClients'
+import { FinanceSidebar } from './finance-sidebar'
 
 const statusConfig: Record<string, { label: string; color: string; bgColor: string; icon: React.ElementType }> = {
     pending: { label: 'معلق', color: 'text-amber-700', bgColor: 'bg-amber-100', icon: Clock },
@@ -101,31 +102,33 @@ export default function PaymentsDashboard() {
 
     // Transform API data to component format
     const payments = useMemo(() => {
-        if (!paymentsData?.payments) return []
-        return paymentsData.payments.map((payment: any) => ({
-            id: payment.paymentNumber || payment._id,
-            client: typeof payment.clientId === 'object'
-                ? `${payment.clientId.firstName || ''} ${payment.clientId.lastName || ''}`.trim() || payment.clientId.name
-                : 'عميل غير محدد',
-            amount: payment.amount || 0,
-            currency: payment.currency || 'SAR',
+        if (!paymentsData?.data) return []
+        return paymentsData.data.map((payment: any) => ({
+            id: payment._id,
+            invoiceNumber: payment.invoiceId?.invoiceNumber || '-',
+            clientName: payment.invoiceId?.clientId?.name || 'عميل غير معروف',
+            amount: payment.amount,
             date: new Date(payment.paymentDate).toLocaleDateString('ar-SA'),
+            method: payment.paymentMethod,
             status: payment.status,
-            paymentMethod: payment.paymentMethod || 'تحويل بنكي',
-            invoiceNumber: payment.invoiceId?.invoiceNumber || null,
-            _id: payment._id,
+            reference: payment.reference || '-',
+            notes: payment.notes
         }))
     }, [paymentsData])
 
-    // Filter Logic (client-side search)
+    // Filter Logic
     const filteredPayments = useMemo(() => {
         return payments.filter(payment => {
-            if (searchQuery && !payment.client.includes(searchQuery) && !payment.id.includes(searchQuery)) {
+            if (activeTab === 'all') return true
+            if (activeTab === 'completed') return payment.status === 'completed'
+            if (activeTab === 'pending') return payment.status === 'pending'
+            if (activeTab === 'failed') return payment.status === 'failed'
+            if (searchQuery && !payment.clientName.includes(searchQuery) && !payment.invoiceNumber.includes(searchQuery)) {
                 return false
             }
             return true
         })
-    }, [payments, searchQuery])
+    }, [payments, activeTab, searchQuery])
 
     // Calculate statistics
     const stats = useMemo(() => {
@@ -138,9 +141,9 @@ export default function PaymentsDashboard() {
             }
         }
 
-        if (!paymentsData?.payments) return { totalCompleted: 0, totalPending: 0, totalRefunded: 0, totalThisMonth: 0 }
+        if (!paymentsData?.data) return { totalCompleted: 0, totalPending: 0, totalRefunded: 0, totalThisMonth: 0 }
 
-        const allPayments = paymentsData.payments
+        const allPayments = paymentsData.data
         const totalCompleted = allPayments
             .filter((p: any) => p.status === 'completed')
             .reduce((sum: number, p: any) => sum + (p.amount || 0), 0)
@@ -268,49 +271,7 @@ export default function PaymentsDashboard() {
         )
     }
 
-    // EMPTY STATE
-    if (filteredPayments.length === 0 && !searchQuery && activeTab === 'all') {
-        return (
-            <>
-                <Header className="bg-navy shadow-none relative">
-                    <TopNav links={topNav} className="[&>a]:text-slate-300 [&>a:hover]:text-white [&>a[aria-current='page']]:text-white" />
-                    <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
-                        <DynamicIsland />
-                    </div>
-                    <div className='ms-auto flex items-center space-x-4'>
-                        <div className="relative hidden md:block">
-                            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                            <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pr-9 pl-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
-                        </div>
-                        <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white">
-                            <Bell className="h-5 w-5" />
-                            <span className="absolute top-2 right-2 h-2 w-2 bg-red-500 rounded-full border border-navy"></span>
-                        </Button>
-                        <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white" />
-                        <ThemeSwitch className="text-slate-300 hover:bg-white/10 hover:text-white" />
-                        <ConfigDrawer className="text-slate-300 hover:bg-white/10 hover:text-white" />
-                        <ProfileDropdown className="text-slate-300 hover:bg-white/10 hover:text-white" />
-                    </div>
-                    <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-emerald-500/50 to-transparent"></div>
-                </Header>
-                <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8">
-                    <div className="bg-white rounded-3xl p-12 text-center border border-slate-100 shadow-sm">
-                        <div className="w-16 h-16 bg-emerald-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <CreditCard className="h-8 w-8 text-emerald-600" />
-                        </div>
-                        <h3 className="text-xl font-bold text-slate-900 mb-2">لا توجد مدفوعات بعد</h3>
-                        <p className="text-slate-500 mb-6">ستظهر المدفوعات هنا عند تسجيل دفعات للفواتير</p>
-                        <Button asChild className="bg-emerald-600 hover:bg-emerald-700 text-white px-8">
-                            <Link to="/dashboard/finance/invoices">
-                                <CreditCard className="ml-2 h-4 w-4" />
-                                عرض الفواتير
-                            </Link>
-                        </Button>
-                    </div>
-                </Main>
-            </>
-        )
-    }
+
 
     // SUCCESS STATE
     return (
@@ -344,391 +305,362 @@ export default function PaymentsDashboard() {
             <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-r border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
                 <div className="max-w-7xl mx-auto space-y-6">
 
-                    {/* Hero Section - Contained Navy Card */}
-                    <div className="bg-[#022c22] rounded-3xl p-8 relative overflow-hidden text-white shadow-xl shadow-[#022c22]/20 mb-8">
-                        <div className="absolute top-0 left-0 w-full h-full overflow-hidden z-0 pointer-events-none">
-                            <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-emerald-500/20 rounded-full blur-[100px]"></div>
-                            <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-teal-500/10 rounded-full blur-[100px]"></div>
-                        </div>
-
-                        <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-                            <div>
-                                <div className="flex items-center gap-3 mb-3">
-                                    <Badge className="bg-white/10 hover:bg-white/20 text-white border-0 backdrop-blur-sm">
-                                        <CreditCard className="w-3 h-3 ml-2" />
-                                        المدفوعات
-                                    </Badge>
-                                    <span className="text-emerald-200 text-sm">نوفمبر 2025</span>
-                                </div>
-                                <h1 className="text-3xl md:text-4xl font-bold leading-tight mb-2">
-                                    إدارة المدفوعات
-                                </h1>
-                                <p className="text-emerald-200/80">متابعة المدفوعات المستلمة والمعلقة</p>
+                    {/* Hero Section - New Design */}
+                    <div className="bg-[#022c22] rounded-3xl p-8 relative overflow-hidden text-white shadow-xl shadow-emerald-900/20 flex flex-col md:flex-row items-center justify-between gap-8 mb-8">
+                        <div className="relative z-10 max-w-lg">
+                            <div className="flex items-center gap-3 mb-3">
+                                <Badge className="bg-white/10 hover:bg-white/20 text-white border-0 backdrop-blur-sm">
+                                    <CreditCard className="w-3 h-3 ml-2" />
+                                    المدفوعات
+                                </Badge>
+                                <span className="text-emerald-200 text-sm">نوفمبر 2025</span>
                             </div>
+                            <h2 className="text-3xl font-bold mb-4 leading-tight">إدارة المدفوعات والتحصيل</h2>
+                            <p className="text-emerald-200 text-lg mb-8 leading-relaxed">
+                                تتبع جميع عمليات الدفع، راقب التحصيلات، وقم بإدارة السجلات المالية بدقة.
+                            </p>
                             <div className="flex gap-3">
-                                <Button asChild className="bg-emerald-600 hover:bg-emerald-700 text-white border-0 shadow-lg shadow-emerald-500/20 rounded-xl">
-                                    <Link to="/dashboard/finance/invoices">
-                                        <CreditCard className="w-4 h-4 ml-2" />
+                                <Button asChild className="bg-emerald-500 hover:bg-emerald-600 text-white h-12 px-8 rounded-xl font-bold shadow-lg shadow-emerald-500/20 border-0">
+                                    <Link to="/dashboard/finance/payments/new">
+                                        <Plus className="ml-2 h-5 w-5" />
                                         سجل دفعة جديدة
                                     </Link>
                                 </Button>
+                                <Button variant="ghost" className="bg-white/10 text-white hover:bg-white/20 h-12 px-8 rounded-xl font-bold border-0 backdrop-blur-sm">
+                                    <Download className="ml-2 h-5 w-5" />
+                                    تصدير التقرير
+                                </Button>
                             </div>
+                        </div>
+
+                        {/* Abstract Visual Decoration */}
+                        <div className="absolute top-0 left-0 w-full h-full overflow-hidden z-0 pointer-events-none">
+                            <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-emerald-500/10 rounded-full blur-[100px]"></div>
+                            <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-blue-500/10 rounded-full blur-[100px]"></div>
+                            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80%] h-[80%] border border-white/5 rounded-full"></div>
+                            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[60%] h-[60%] border border-white/5 rounded-full"></div>
                         </div>
                     </div>
 
                     {/* Main Content */}
-                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
                         {/* Payments List */}
-                        <div className="lg:col-span-8 space-y-6">
-
-                            {/* Filters Bar */}
-                            <div className="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 space-y-4">
-                                <div className="flex flex-wrap items-center justify-between gap-4">
-                                    <Tabs value={activeTab} onValueChange={(v) => { setActiveTab(v); setCurrentPage(1); }} className="w-full md:w-auto">
-                                        <TabsList className="justify-start bg-slate-50 p-1 rounded-xl border border-slate-200 h-auto">
-                                            <TabsTrigger
-                                                value="all"
-                                                className="rounded-lg px-4 py-2 data-[state=active]:bg-[#022c22] data-[state=active]:text-white transition-all duration-300"
-                                            >
-                                                الكل
-                                            </TabsTrigger>
-                                            <TabsTrigger
-                                                value="completed"
-                                                className="rounded-lg px-4 py-2 data-[state=active]:bg-emerald-600 data-[state=active]:text-white transition-all duration-300"
-                                            >
-                                                مكتملة
-                                            </TabsTrigger>
-                                            <TabsTrigger
-                                                value="pending"
-                                                className="rounded-lg px-4 py-2 data-[state=active]:bg-amber-500 data-[state=active]:text-white transition-all duration-300"
-                                            >
-                                                معلقة
-                                            </TabsTrigger>
-                                            <TabsTrigger
-                                                value="refunded"
-                                                className="rounded-lg px-4 py-2 data-[state=active]:bg-purple-500 data-[state=active]:text-white transition-all duration-300"
-                                            >
-                                                مستردة
-                                            </TabsTrigger>
-                                        </TabsList>
-                                    </Tabs>
-
-                                    <div className="flex items-center gap-3">
-                                        <div className="relative w-full max-w-xs">
-                                            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                                            <Input
-                                                placeholder="بحث في المدفوعات..."
-                                                className="pr-10 rounded-xl border-slate-200 focus:ring-[#022c22] focus:border-[#022c22]"
-                                                value={searchQuery}
-                                                onChange={(e) => setSearchQuery(e.target.value)}
-                                            />
-                                        </div>
-                                        <Popover open={showFilters} onOpenChange={setShowFilters}>
-                                            <PopoverTrigger asChild>
-                                                <Button variant="outline" className="rounded-xl border-slate-200 relative">
-                                                    <Filter className="w-4 h-4 ml-2" />
-                                                    تصفية متقدمة
-                                                    {activeFilterCount > 0 && (
-                                                        <Badge className="absolute -top-2 -left-2 h-5 w-5 p-0 flex items-center justify-center bg-emerald-600 text-white text-xs">
-                                                            {activeFilterCount}
-                                                        </Badge>
-                                                    )}
-                                                </Button>
-                                            </PopoverTrigger>
-                                            <PopoverContent className="w-80" align="end">
-                                                <div className="space-y-4">
-                                                    <div className="flex items-center justify-between">
-                                                        <h4 className="font-bold text-navy">تصفية متقدمة</h4>
-                                                        {activeFilterCount > 0 && (
-                                                            <Button variant="ghost" size="sm" onClick={clearFilters} className="text-slate-500 hover:text-red-500">
-                                                                <X className="w-4 h-4 ml-1" />
-                                                                مسح
-                                                            </Button>
-                                                        )}
-                                                    </div>
-                                                    <div className="space-y-2">
-                                                        <label className="text-sm font-medium text-slate-700">العميل</label>
-                                                        <Select value={selectedClient} onValueChange={setSelectedClient}>
-                                                            <SelectTrigger className="rounded-xl">
-                                                                <SelectValue placeholder="جميع العملاء" />
-                                                            </SelectTrigger>
-                                                            <SelectContent>
-                                                                <SelectItem value="all">جميع العملاء</SelectItem>
-                                                                {clientsData?.data?.map((client: any) => (
-                                                                    <SelectItem key={client._id} value={client._id}>
-                                                                        {client.fullName || client.name}
-                                                                    </SelectItem>
-                                                                ))}
-                                                            </SelectContent>
-                                                        </Select>
-                                                    </div>
-                                                    <div className="grid grid-cols-2 gap-3">
-                                                        <div className="space-y-2">
-                                                            <label className="text-sm font-medium text-slate-700 flex items-center gap-1">
-                                                                <Calendar className="w-3 h-3" />
-                                                                من تاريخ
-                                                            </label>
-                                                            <Input
-                                                                type="date"
-                                                                value={startDate}
-                                                                onChange={(e) => setStartDate(e.target.value)}
-                                                                className="rounded-xl"
-                                                            />
-                                                        </div>
-                                                        <div className="space-y-2">
-                                                            <label className="text-sm font-medium text-slate-700 flex items-center gap-1">
-                                                                <Calendar className="w-3 h-3" />
-                                                                إلى تاريخ
-                                                            </label>
-                                                            <Input
-                                                                type="date"
-                                                                value={endDate}
-                                                                onChange={(e) => setEndDate(e.target.value)}
-                                                                className="rounded-xl"
-                                                            />
-                                                        </div>
-                                                    </div>
-                                                    <div className="pt-2 border-t border-slate-100 flex gap-2">
-                                                        <Button
-                                                            variant="outline"
-                                                            size="sm"
-                                                            onClick={() => handleExport('csv')}
-                                                            disabled={isExporting}
-                                                            className="flex-1 rounded-xl"
-                                                        >
-                                                            <Download className="w-4 h-4 ml-1" />
-                                                            CSV
-                                                        </Button>
-                                                        <Button
-                                                            variant="outline"
-                                                            size="sm"
-                                                            onClick={() => handleExport('pdf')}
-                                                            disabled={isExporting}
-                                                            className="flex-1 rounded-xl"
-                                                        >
-                                                            <Download className="w-4 h-4 ml-1" />
-                                                            PDF
-                                                        </Button>
-                                                    </div>
-                                                </div>
-                                            </PopoverContent>
-                                        </Popover>
+                        <div className="lg:col-span-2 space-y-6">
+                            {filteredPayments.length === 0 && !searchQuery && activeTab === 'all' ? (
+                                <div className="bg-white rounded-3xl p-12 text-center border border-slate-100 shadow-sm">
+                                    <div className="w-16 h-16 bg-emerald-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                                        <CreditCard className="h-8 w-8 text-emerald-600" />
                                     </div>
+                                    <h3 className="text-xl font-bold text-slate-900 mb-2">لا توجد مدفوعات بعد</h3>
+                                    <p className="text-slate-500 mb-6">ستظهر المدفوعات هنا عند تسجيل دفعات للفواتير</p>
+                                    <Button asChild className="bg-emerald-600 hover:bg-emerald-700 text-white px-8">
+                                        <Link to="/dashboard/finance/invoices">
+                                            <CreditCard className="ml-2 h-4 w-4" />
+                                            عرض الفواتير
+                                        </Link>
+                                    </Button>
                                 </div>
+                            ) : (
+                                <>
+                                    {/* Filters Bar */}
+                                    <div className="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 space-y-4">
+                                        <div className="flex flex-wrap items-center justify-between gap-4">
+                                            <Tabs value={activeTab} onValueChange={(v) => { setActiveTab(v); setCurrentPage(1); }} className="w-full md:w-auto">
+                                                <TabsList className="justify-start bg-slate-50 p-1 rounded-xl border border-slate-200 h-auto">
+                                                    <TabsTrigger
+                                                        value="all"
+                                                        className="rounded-lg px-4 py-2 data-[state=active]:bg-[#022c22] data-[state=active]:text-white transition-all duration-300"
+                                                    >
+                                                        الكل
+                                                    </TabsTrigger>
+                                                    <TabsTrigger
+                                                        value="completed"
+                                                        className="rounded-lg px-4 py-2 data-[state=active]:bg-emerald-600 data-[state=active]:text-white transition-all duration-300"
+                                                    >
+                                                        مكتملة
+                                                    </TabsTrigger>
+                                                    <TabsTrigger
+                                                        value="pending"
+                                                        className="rounded-lg px-4 py-2 data-[state=active]:bg-amber-500 data-[state=active]:text-white transition-all duration-300"
+                                                    >
+                                                        معلقة
+                                                    </TabsTrigger>
+                                                    <TabsTrigger
+                                                        value="refunded"
+                                                        className="rounded-lg px-4 py-2 data-[state=active]:bg-purple-500 data-[state=active]:text-white transition-all duration-300"
+                                                    >
+                                                        مستردة
+                                                    </TabsTrigger>
+                                                </TabsList>
+                                            </Tabs>
 
-                                {/* Active Filters Display */}
-                                {activeFilterCount > 0 && (
-                                    <div className="flex items-center gap-2 flex-wrap">
-                                        <span className="text-sm text-slate-500">الفلاتر النشطة:</span>
-                                        {selectedClient && selectedClient !== 'all' && (
-                                            <Badge variant="outline" className="bg-blue-50 border-blue-200 text-blue-700 gap-1">
-                                                العميل
-                                                <X className="w-3 h-3 cursor-pointer" onClick={() => setSelectedClient('')} />
-                                            </Badge>
-                                        )}
-                                        {startDate && (
-                                            <Badge variant="outline" className="bg-purple-50 border-purple-200 text-purple-700 gap-1">
-                                                من: {new Date(startDate).toLocaleDateString('ar-SA')}
-                                                <X className="w-3 h-3 cursor-pointer" onClick={() => setStartDate('')} />
-                                            </Badge>
-                                        )}
-                                        {endDate && (
-                                            <Badge variant="outline" className="bg-purple-50 border-purple-200 text-purple-700 gap-1">
-                                                إلى: {new Date(endDate).toLocaleDateString('ar-SA')}
-                                                <X className="w-3 h-3 cursor-pointer" onClick={() => setEndDate('')} />
-                                            </Badge>
-                                        )}
-                                    </div>
-                                )}
-                            </div>
-
-                            {/* List Items */}
-                            <div className="space-y-4">
-                                {filteredPayments.length === 0 ? (
-                                    <div className="bg-white p-12 rounded-3xl text-center border border-slate-100">
-                                        <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                                            <Search className="h-8 w-8 text-slate-400" />
-                                        </div>
-                                        <h3 className="text-lg font-bold text-slate-900 mb-2">لا توجد نتائج</h3>
-                                        <p className="text-slate-500 mb-4">لم نجد مدفوعات تطابق البحث أو الفلاتر المحددة</p>
-                                        <Button
-                                            variant="outline"
-                                            onClick={() => {
-                                                setSearchQuery('')
-                                                setActiveTab('all')
-                                            }}
-                                            className="border-slate-200 hover:bg-slate-50"
-                                        >
-                                            مسح الفلاتر
-                                        </Button>
-                                    </div>
-                                ) : filteredPayments.map((payment) => {
-                                    const status = statusConfig[payment.status] || statusConfig.pending
-                                    const StatusIcon = status.icon
-                                    return (
-                                        <div key={payment.id} className="bg-white p-6 rounded-[24px] border border-slate-100 shadow-sm hover:shadow-md transition-all flex flex-col md:flex-row md:items-center justify-between gap-4">
-                                            <div className="flex items-center gap-4">
-                                                <div className="w-14 h-14 rounded-2xl bg-emerald-50 flex items-center justify-center text-emerald-600">
-                                                    <CreditCard className="w-7 h-7" />
+                                            <div className="flex items-center gap-3">
+                                                <div className="relative w-full max-w-xs">
+                                                    <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                                                    <Input
+                                                        placeholder="بحث في المدفوعات..."
+                                                        className="pr-10 rounded-xl border-slate-200 focus:ring-[#022c22] focus:border-[#022c22]"
+                                                        value={searchQuery}
+                                                        onChange={(e) => setSearchQuery(e.target.value)}
+                                                    />
                                                 </div>
-                                                <div>
-                                                    <div className="flex items-center gap-2 mb-1">
-                                                        <h4 className="font-bold text-navy text-lg">{payment.id}</h4>
-                                                        <Badge className={`${status.bgColor} ${status.color} border-0 px-2 py-0.5`}>
-                                                            <StatusIcon className="w-3 h-3 ml-1" />
-                                                            {status.label}
-                                                        </Badge>
-                                                    </div>
-                                                    <p className="text-slate-500 font-medium">{payment.client}</p>
-                                                    {payment.invoiceNumber && (
-                                                        <p className="text-xs text-slate-400">فاتورة: {payment.invoiceNumber}</p>
-                                                    )}
-                                                </div>
-                                            </div>
-                                            <div className="flex items-center gap-8 border-t md:border-t-0 border-slate-100 pt-4 md:pt-0">
-                                                <div className="text-center md:text-right">
-                                                    <div className="text-xs text-slate-400 mb-1">تاريخ الدفع</div>
-                                                    <div className="font-bold text-navy">{payment.date}</div>
-                                                </div>
-                                                <div className="text-center md:text-right">
-                                                    <div className="text-xs text-slate-400 mb-1">طريقة الدفع</div>
-                                                    <div className="font-medium text-slate-700">{payment.paymentMethod}</div>
-                                                </div>
-                                                <div className="text-center md:text-right">
-                                                    <div className="text-xs text-slate-400 mb-1">المبلغ</div>
-                                                    <div className="font-bold text-xl text-emerald-600">{formatCurrency(payment.amount)}</div>
-                                                </div>
-                                                <DropdownMenu>
-                                                    <DropdownMenuTrigger asChild>
-                                                        <Button variant="ghost" size="icon" className="rounded-full hover:bg-slate-50">
-                                                            <MoreHorizontal className="w-5 h-5 text-slate-400" />
+                                                <Popover open={showFilters} onOpenChange={setShowFilters}>
+                                                    <PopoverTrigger asChild>
+                                                        <Button variant="outline" className="rounded-xl border-slate-200 relative">
+                                                            <Filter className="w-4 h-4 ml-2" />
+                                                            تصفية متقدمة
+                                                            {activeFilterCount > 0 && (
+                                                                <Badge className="absolute -top-2 -left-2 h-5 w-5 p-0 flex items-center justify-center bg-emerald-600 text-white text-xs">
+                                                                    {activeFilterCount}
+                                                                </Badge>
+                                                            )}
                                                         </Button>
-                                                    </DropdownMenuTrigger>
-                                                    <DropdownMenuContent align="end">
-                                                        <DropdownMenuItem asChild>
-                                                            <Link to="/dashboard/finance/payments/$paymentId" params={{ paymentId: payment._id }}>
-                                                                عرض التفاصيل
-                                                            </Link>
-                                                        </DropdownMenuItem>
-                                                        <DropdownMenuItem>تحميل الإيصال</DropdownMenuItem>
-                                                        <DropdownMenuItem>إرسال بالبريد</DropdownMenuItem>
-                                                    </DropdownMenuContent>
-                                                </DropdownMenu>
+                                                    </PopoverTrigger>
+                                                    <PopoverContent className="w-80" align="end">
+                                                        <div className="space-y-4">
+                                                            <div className="flex items-center justify-between">
+                                                                <h4 className="font-bold text-navy">تصفية متقدمة</h4>
+                                                                {activeFilterCount > 0 && (
+                                                                    <Button variant="ghost" size="sm" onClick={clearFilters} className="text-slate-500 hover:text-red-500">
+                                                                        <X className="w-4 h-4 ml-1" />
+                                                                        مسح
+                                                                    </Button>
+                                                                )}
+                                                            </div>
+                                                            <div className="space-y-2">
+                                                                <label className="text-sm font-medium text-slate-700">العميل</label>
+                                                                <Select value={selectedClient} onValueChange={setSelectedClient}>
+                                                                    <SelectTrigger className="rounded-xl">
+                                                                        <SelectValue placeholder="جميع العملاء" />
+                                                                    </SelectTrigger>
+                                                                    <SelectContent>
+                                                                        <SelectItem value="all">جميع العملاء</SelectItem>
+                                                                        {clientsData?.data?.map((client: any) => (
+                                                                            <SelectItem key={client._id} value={client._id}>
+                                                                                {client.fullName || client.name}
+                                                                            </SelectItem>
+                                                                        ))}
+                                                                    </SelectContent>
+                                                                </Select>
+                                                            </div>
+                                                            <div className="grid grid-cols-2 gap-3">
+                                                                <div className="space-y-2">
+                                                                    <label className="text-sm font-medium text-slate-700 flex items-center gap-1">
+                                                                        <Calendar className="w-3 h-3" />
+                                                                        من تاريخ
+                                                                    </label>
+                                                                    <Input
+                                                                        type="date"
+                                                                        value={startDate}
+                                                                        onChange={(e) => setStartDate(e.target.value)}
+                                                                        className="rounded-xl"
+                                                                    />
+                                                                </div>
+                                                                <div className="space-y-2">
+                                                                    <label className="text-sm font-medium text-slate-700 flex items-center gap-1">
+                                                                        <Calendar className="w-3 h-3" />
+                                                                        إلى تاريخ
+                                                                    </label>
+                                                                    <Input
+                                                                        type="date"
+                                                                        value={endDate}
+                                                                        onChange={(e) => setEndDate(e.target.value)}
+                                                                        className="rounded-xl"
+                                                                    />
+                                                                </div>
+                                                            </div>
+                                                            <div className="pt-2 border-t border-slate-100 flex gap-2">
+                                                                <Button
+                                                                    variant="outline"
+                                                                    size="sm"
+                                                                    onClick={() => handleExport('csv')}
+                                                                    disabled={isExporting}
+                                                                    className="flex-1 rounded-xl"
+                                                                >
+                                                                    <Download className="w-4 h-4 ml-1" />
+                                                                    CSV
+                                                                </Button>
+                                                                <Button
+                                                                    variant="outline"
+                                                                    size="sm"
+                                                                    onClick={() => handleExport('pdf')}
+                                                                    disabled={isExporting}
+                                                                    className="flex-1 rounded-xl"
+                                                                >
+                                                                    <Download className="w-4 h-4 ml-1" />
+                                                                    PDF
+                                                                </Button>
+                                                            </div>
+                                                        </div>
+                                                    </PopoverContent>
+                                                </Popover>
                                             </div>
                                         </div>
-                                    )
-                                })}
-                            </div>
 
-                            {/* Pagination */}
-                            {filteredPayments.length > 0 && (
-                                <div className="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex flex-wrap items-center justify-between gap-4">
-                                    <div className="flex items-center gap-2">
-                                        <span className="text-sm text-slate-500">عرض</span>
-                                        <Select value={itemsPerPage.toString()} onValueChange={(v) => { setItemsPerPage(parseInt(v)); setCurrentPage(1); }}>
-                                            <SelectTrigger className="w-[70px] h-9 rounded-lg">
-                                                <SelectValue />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                <SelectItem value="5">5</SelectItem>
-                                                <SelectItem value="10">10</SelectItem>
-                                                <SelectItem value="20">20</SelectItem>
-                                                <SelectItem value="50">50</SelectItem>
-                                            </SelectContent>
-                                        </Select>
-                                        <span className="text-sm text-slate-500">من {paymentsData?.total || filteredPayments.length} دفعة</span>
+                                        {/* Active Filters Display */}
+                                        {activeFilterCount > 0 && (
+                                            <div className="flex items-center gap-2 flex-wrap">
+                                                <span className="text-sm text-slate-500">الفلاتر النشطة:</span>
+                                                {selectedClient && selectedClient !== 'all' && (
+                                                    <Badge variant="outline" className="bg-blue-50 border-blue-200 text-blue-700 gap-1">
+                                                        العميل
+                                                        <X className="w-3 h-3 cursor-pointer" onClick={() => setSelectedClient('')} />
+                                                    </Badge>
+                                                )}
+                                                {startDate && (
+                                                    <Badge variant="outline" className="bg-purple-50 border-purple-200 text-purple-700 gap-1">
+                                                        من: {new Date(startDate).toLocaleDateString('ar-SA')}
+                                                        <X className="w-3 h-3 cursor-pointer" onClick={() => setStartDate('')} />
+                                                    </Badge>
+                                                )}
+                                                {endDate && (
+                                                    <Badge variant="outline" className="bg-purple-50 border-purple-200 text-purple-700 gap-1">
+                                                        إلى: {new Date(endDate).toLocaleDateString('ar-SA')}
+                                                        <X className="w-3 h-3 cursor-pointer" onClick={() => setEndDate('')} />
+                                                    </Badge>
+                                                )}
+                                            </div>
+                                        )}
                                     </div>
-                                    <div className="flex items-center gap-2">
-                                        <Button
-                                            variant="outline"
-                                            size="icon"
-                                            onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-                                            disabled={currentPage === 1}
-                                            className="rounded-lg h-9 w-9"
-                                        >
-                                            <ChevronRight className="w-4 h-4" />
-                                        </Button>
-                                        <div className="flex items-center gap-1">
-                                            {Array.from({ length: Math.min(5, Math.ceil((paymentsData?.total || filteredPayments.length) / itemsPerPage)) }, (_, i) => i + 1).map((page) => (
+
+                                    {/* List Items */}
+                                    <div className="space-y-4">
+                                        {filteredPayments.length === 0 ? (
+                                            <div className="bg-white p-12 rounded-3xl text-center border border-slate-100">
+                                                <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                                                    <Search className="h-8 w-8 text-slate-400" />
+                                                </div>
+                                                <h3 className="text-lg font-bold text-slate-900 mb-2">لا توجد نتائج</h3>
+                                                <p className="text-slate-500 mb-4">لم نجد مدفوعات تطابق البحث أو الفلاتر المحددة</p>
                                                 <Button
-                                                    key={page}
-                                                    variant={currentPage === page ? "default" : "outline"}
-                                                    size="icon"
-                                                    onClick={() => setCurrentPage(page)}
-                                                    className={`rounded-lg h-9 w-9 ${currentPage === page ? 'bg-emerald-600 text-white' : ''}`}
+                                                    variant="outline"
+                                                    onClick={() => {
+                                                        setSearchQuery('')
+                                                        setActiveTab('all')
+                                                    }}
+                                                    className="border-slate-200 hover:bg-slate-50"
                                                 >
-                                                    {page}
+                                                    مسح الفلاتر
                                                 </Button>
-                                            ))}
-                                        </div>
-                                        <Button
-                                            variant="outline"
-                                            size="icon"
-                                            onClick={() => setCurrentPage(p => p + 1)}
-                                            disabled={currentPage >= Math.ceil((paymentsData?.total || filteredPayments.length) / itemsPerPage)}
-                                            className="rounded-lg h-9 w-9"
-                                        >
-                                            <ChevronLeft className="w-4 h-4" />
-                                        </Button>
+                                            </div>
+                                        ) : filteredPayments.map((payment) => {
+                                            const status = statusConfig[payment.status] || statusConfig.pending
+                                            const StatusIcon = status.icon
+                                            return (
+                                                <div key={payment.id} className="bg-white p-6 rounded-[24px] border border-slate-100 shadow-sm hover:shadow-md transition-all flex flex-col md:flex-row md:items-center justify-between gap-4">
+                                                    <div className="flex items-center gap-4">
+                                                        <div className="w-14 h-14 rounded-2xl bg-emerald-50 flex items-center justify-center text-emerald-600">
+                                                            <CreditCard className="w-7 h-7" />
+                                                        </div>
+                                                        <div>
+                                                            <div className="flex items-center gap-2 mb-1">
+                                                                <h4 className="font-bold text-navy text-lg">{payment.id}</h4>
+                                                                <Badge className={`${status.bgColor} ${status.color} border-0 px-2 py-0.5`}>
+                                                                    <StatusIcon className="w-3 h-3 ml-1" />
+                                                                    {status.label}
+                                                                </Badge>
+                                                            </div>
+                                                            <p className="text-slate-500 font-medium">{payment.clientName}</p>
+                                                            {payment.invoiceNumber && (
+                                                                <p className="text-xs text-slate-400">فاتورة: {payment.invoiceNumber}</p>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                    <div className="flex items-center gap-8 border-t md:border-t-0 border-slate-100 pt-4 md:pt-0">
+                                                        <div className="text-center md:text-right">
+                                                            <div className="text-xs text-slate-400 mb-1">تاريخ الدفع</div>
+                                                            <div className="font-bold text-navy">{payment.date}</div>
+                                                        </div>
+                                                        <div className="text-center md:text-right">
+                                                            <div className="text-xs text-slate-400 mb-1">طريقة الدفع</div>
+                                                            <div className="font-medium text-slate-700">{payment.method}</div>
+                                                        </div>
+                                                        <div className="text-center md:text-right">
+                                                            <div className="text-xs text-slate-400 mb-1">المبلغ</div>
+                                                            <div className="font-bold text-xl text-emerald-600">{formatCurrency(payment.amount)}</div>
+                                                        </div>
+                                                        <DropdownMenu>
+                                                            <DropdownMenuTrigger asChild>
+                                                                <Button variant="ghost" size="icon" className="rounded-full hover:bg-slate-50">
+                                                                    <MoreHorizontal className="w-5 h-5 text-slate-400" />
+                                                                </Button>
+                                                            </DropdownMenuTrigger>
+                                                            <DropdownMenuContent align="end">
+                                                                <DropdownMenuItem asChild>
+                                                                    <Link to="/dashboard/finance/payments/$paymentId" params={{ paymentId: payment.id }}>
+                                                                        عرض التفاصيل
+                                                                    </Link>
+                                                                </DropdownMenuItem>
+                                                                <DropdownMenuItem>تحميل الإيصال</DropdownMenuItem>
+                                                                <DropdownMenuItem>إرسال بالبريد</DropdownMenuItem>
+                                                            </DropdownMenuContent>
+                                                        </DropdownMenu>
+                                                    </div>
+                                                </div>
+                                            )
+                                        })}
                                     </div>
-                                </div>
+
+                                    {/* Pagination */}
+                                    {filteredPayments.length > 0 && (
+                                        <div className="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex flex-wrap items-center justify-between gap-4">
+                                            <div className="flex items-center gap-2">
+                                                <span className="text-sm text-slate-500">عرض</span>
+                                                <Select value={itemsPerPage.toString()} onValueChange={(v) => { setItemsPerPage(parseInt(v)); setCurrentPage(1); }}>
+                                                    <SelectTrigger className="w-[70px] h-9 rounded-lg">
+                                                        <SelectValue />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                        <SelectItem value="5">5</SelectItem>
+                                                        <SelectItem value="10">10</SelectItem>
+                                                        <SelectItem value="20">20</SelectItem>
+                                                        <SelectItem value="50">50</SelectItem>
+                                                    </SelectContent>
+                                                </Select>
+                                                <span className="text-sm text-slate-500">من {paymentsData?.pagination?.total || filteredPayments.length} دفعة</span>
+                                            </div>
+                                            <div className="flex items-center gap-2">
+                                                <Button
+                                                    variant="outline"
+                                                    size="icon"
+                                                    onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                                                    disabled={currentPage === 1}
+                                                    className="rounded-lg h-9 w-9"
+                                                >
+                                                    <ChevronRight className="w-4 h-4" />
+                                                </Button>
+                                                <div className="flex items-center gap-1">
+                                                    {Array.from({ length: Math.min(5, Math.ceil((paymentsData?.pagination?.total || filteredPayments.length) / itemsPerPage)) }, (_, i) => i + 1).map((page) => (
+                                                        <Button
+                                                            key={page}
+                                                            variant={currentPage === page ? "default" : "outline"}
+                                                            size="icon"
+                                                            onClick={() => setCurrentPage(page)}
+                                                            className={`rounded-lg h-9 w-9 ${currentPage === page ? 'bg-emerald-600 text-white' : ''}`}
+                                                        >
+                                                            {page}
+                                                        </Button>
+                                                    ))}
+                                                </div>
+                                                <Button
+                                                    variant="outline"
+                                                    size="icon"
+                                                    onClick={() => setCurrentPage(p => p + 1)}
+                                                    disabled={currentPage >= Math.ceil((paymentsData?.pagination?.total || filteredPayments.length) / itemsPerPage)}
+                                                    className="rounded-lg h-9 w-9"
+                                                >
+                                                    <ChevronLeft className="w-4 h-4" />
+                                                </Button>
+                                            </div>
+                                        </div>
+                                    )}
+                                </>
                             )}
                         </div>
 
-                        {/* Sidebar - Summary */}
-                        <div className="lg:col-span-4 space-y-6">
-                            <div className="grid grid-cols-1 gap-4">
-                                <Card className="bg-white border-slate-100 shadow-sm rounded-2xl">
-                                    <CardContent className="p-5">
-                                        <div className="flex justify-between items-start mb-2">
-                                            <div className="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-600">
-                                                <CheckCircle className="w-5 h-5" />
-                                            </div>
-                                            <Badge className="bg-emerald-100 text-emerald-600 hover:bg-emerald-200 border-0">مكتملة</Badge>
-                                        </div>
-                                        <div className="text-2xl font-bold text-navy">{formatCurrency(stats.totalCompleted)}</div>
-                                        <div className="text-sm text-slate-500">إجمالي المدفوعات المكتملة</div>
-                                    </CardContent>
-                                </Card>
-                                <Card className="bg-white border-slate-100 shadow-sm rounded-2xl">
-                                    <CardContent className="p-5">
-                                        <div className="flex justify-between items-start mb-2">
-                                            <div className="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center text-amber-600">
-                                                <Clock className="w-5 h-5" />
-                                            </div>
-                                            <Badge className="bg-amber-100 text-amber-600 hover:bg-amber-200 border-0">معلقة</Badge>
-                                        </div>
-                                        <div className="text-2xl font-bold text-navy">{formatCurrency(stats.totalPending)}</div>
-                                        <div className="text-sm text-slate-500">مدفوعات قيد المعالجة</div>
-                                    </CardContent>
-                                </Card>
-                                <Card className="bg-white border-slate-100 shadow-sm rounded-2xl">
-                                    <CardContent className="p-5">
-                                        <div className="flex justify-between items-start mb-2">
-                                            <div className="w-10 h-10 rounded-xl bg-purple-50 flex items-center justify-center text-purple-600">
-                                                <Receipt className="w-5 h-5" />
-                                            </div>
-                                            <Badge className="bg-purple-100 text-purple-600 hover:bg-purple-200 border-0">مستردة</Badge>
-                                        </div>
-                                        <div className="text-2xl font-bold text-navy">{formatCurrency(stats.totalRefunded)}</div>
-                                        <div className="text-sm text-slate-500">إجمالي المبالغ المستردة</div>
-                                    </CardContent>
-                                </Card>
-                                <Card className="bg-white border-slate-100 shadow-sm rounded-2xl">
-                                    <CardContent className="p-5">
-                                        <div className="flex justify-between items-start mb-2">
-                                            <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-brand-blue">
-                                                <Calendar className="w-5 h-5" />
-                                            </div>
-                                            <Badge className="bg-blue-100 text-brand-blue hover:bg-blue-200 border-0">هذا الشهر</Badge>
-                                        </div>
-                                        <div className="text-2xl font-bold text-navy">{formatCurrency(stats.totalThisMonth)}</div>
-                                        <div className="text-sm text-slate-500">تم تحصيلها هذا الشهر</div>
-                                    </CardContent>
-                                </Card>
-                            </div>
-                        </div>
+                        {/* Sidebar */}
+                        <FinanceSidebar context="payments" />
 
                     </div>
                 </div>

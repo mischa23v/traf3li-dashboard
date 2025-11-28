@@ -8,39 +8,39 @@ import { Badge } from '@/components/ui/badge'
 import { Link } from '@tanstack/react-router'
 import { cn } from '@/lib/utils'
 
-interface TasksSidebarProps {
-    context?: 'tasks' | 'reminders' | 'events'
+interface SettingsSidebarProps {
+    context?: 'tags' | 'billing-rates' | 'invoice-templates'
     isSelectionMode?: boolean
     onToggleSelectionMode?: () => void
     selectedCount?: number
     onDeleteSelected?: () => void
 }
 
-export function TasksSidebar({
-    context = 'tasks',
+export function SettingsSidebar({
+    context = 'tags',
     isSelectionMode = false,
     onToggleSelectionMode,
     selectedCount = 0,
     onDeleteSelected
-}: TasksSidebarProps) {
+}: SettingsSidebarProps) {
     const [activeTab, setActiveTab] = useState<'calendar' | 'notifications'>('calendar')
 
     const links = {
-        tasks: {
-            create: '/dashboard/tasks/new',
-            viewAll: '/dashboard/tasks/list'
+        tags: {
+            create: '/dashboard/tags/new',
+            viewAll: '/dashboard/tags'
         },
-        reminders: {
-            create: '/dashboard/tasks/reminders/new',
-            viewAll: '/dashboard/tasks/reminders'
+        'billing-rates': {
+            create: '/dashboard/billing-rates/new',
+            viewAll: '/dashboard/billing-rates'
         },
-        events: {
-            create: '/dashboard/tasks/events/new',
-            viewAll: '/dashboard/tasks/events'
+        'invoice-templates': {
+            create: '/dashboard/invoice-templates/new',
+            viewAll: '/dashboard/invoice-templates'
         }
     }
 
-    const currentLinks = links[context]
+    const currentLinks = links[context] || links.tags
 
     return (
         <div className="space-y-8 lg:col-span-1">

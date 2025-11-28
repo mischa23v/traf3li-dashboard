@@ -6,21 +6,25 @@ import {
   Clock,
   FileText,
   Briefcase,
-  TrendingUp
+  TrendingUp,
+  FolderOpen,
+  Plus
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { Link } from '@tanstack/react-router'
-import type { WikiPage } from '@/types/wiki'
+import { Link, useParams } from '@tanstack/react-router'
+import type { WikiPage, WikiCollection } from '@/types/wiki'
 
 interface WikiSidebarProps {
   recentPages?: WikiPage[]
+  collections?: WikiCollection[]
   isLoading?: boolean
 }
 
-export function WikiSidebar({ recentPages = [], isLoading }: WikiSidebarProps) {
-  const { i18n } = useTranslation()
+export function WikiSidebar({ recentPages = [], collections = [], isLoading }: WikiSidebarProps) {
+  const { i18n, t } = useTranslation()
   const isArabic = i18n.language === 'ar'
+  const { caseId } = useParams({ strict: false }) as { caseId: string }
 
   // Calculate stats
   const totalPages = recentPages.length
@@ -88,11 +92,57 @@ export function WikiSidebar({ recentPages = [], isLoading }: WikiSidebarProps) {
             </div>
           </div>
           <Button asChild variant="outline" className="w-full border-emerald-500 text-emerald-600 hover:bg-emerald-50 rounded-xl h-12 font-bold">
-            <Link to="/dashboard/cases">
-              <Briefcase className="h-4 w-4 ms-2" />
+            <Link to={`/dashboard/cases/${caseId}/wiki/new` as any}>
+              <Plus className="h-4 w-4 ms-2" />
               {isArabic ? 'إنشاء صفحة جديدة' : 'Create New Page'}
             </Link>
           </Button>
+        </div>
+      </div>
+
+      {/* COLLECTIONS WIDGET */}
+      <div className="bg-white rounded-3xl overflow-hidden shadow-sm border border-slate-100 hover:shadow-md transition-all duration-300">
+        <div className="p-6 pb-4 border-b border-slate-50 flex justify-between items-center">
+          <h3 className="font-bold text-lg text-navy flex items-center gap-2">
+            <FolderOpen className="h-5 w-5 text-emerald-500" />
+            {t('wiki.stats.collections')}
+          </h3>
+          <Button variant="ghost" size="sm" asChild className="h-8 w-8 p-0 rounded-full hover:bg-emerald-50 text-emerald-600">
+            <Link to={`/dashboard/cases/${caseId}/wiki/collections` as any}>
+              <Plus className="h-4 w-4" />
+            </Link>
+          </Button>
+        </div>
+        <div className="p-4">
+          {collections && collections.length > 0 ? (
+            <div className="space-y-2">
+              {collections.slice(0, 5).map((collection) => (
+                <div
+                  key={collection._id}
+                  className="flex items-center gap-3 p-3 rounded-xl bg-slate-50 hover:bg-slate-100 transition-colors cursor-pointer group"
+                >
+                  <div
+                    className="w-8 h-8 rounded-lg flex items-center justify-center transition-transform group-hover:scale-110"
+                    style={{ backgroundColor: collection.color + '20' }}
+                  >
+                    <FolderOpen className="h-4 w-4" style={{ color: collection.color }} />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="text-sm font-medium text-navy truncate group-hover:text-emerald-600 transition-colors">
+                      {isArabic ? collection.nameAr || collection.name : collection.name}
+                    </div>
+                    <div className="text-xs text-slate-500">
+                      {collection.pageCount} {isArabic ? 'صفحات' : 'pages'}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-6 text-slate-500 text-sm">
+              {t('wiki.noCollections')}
+            </div>
+          )}
         </div>
       </div>
 
@@ -102,7 +152,7 @@ export function WikiSidebar({ recentPages = [], isLoading }: WikiSidebarProps) {
           <h3 className="font-bold text-navy text-lg">
             {isArabic ? 'آخر التحديثات' : 'Recent Activity'}
           </h3>
-          <Badge className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-full px-3">
+          <Badge className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-full px-3 border-0">
             {isArabic ? 'نشط' : 'Active'}
           </Badge>
         </div>
@@ -126,7 +176,7 @@ export function WikiSidebar({ recentPages = [], isLoading }: WikiSidebarProps) {
                 </div>
               </div>
               <div className={`flex-1 bg-${i === 0 ? 'blue' : i === 1 ? 'purple' : 'emerald'}-50 rounded-xl p-3 border-r-4 border-${i === 0 ? 'blue' : i === 1 ? 'purple' : 'emerald'}-500`}>
-                <Link to={`/dashboard/cases/${page.caseId}/wiki/${page._id}` as any}>
+                <Link to={`/dashboard/cases/${caseId}/wiki/${page._id}` as any}>
                   <div className="font-bold text-navy text-sm mb-1 hover:text-emerald-600 transition-colors line-clamp-1">
                     {isArabic ? page.titleAr || page.title : page.title}
                   </div>
@@ -138,37 +188,6 @@ export function WikiSidebar({ recentPages = [], isLoading }: WikiSidebarProps) {
               </div>
             </div>
           ))}
-        </div>
-        {!isLoading && recentPages.length > 3 && (
-          <Button variant="ghost" className="w-full mt-2 text-slate-500 hover:text-navy">
-            {isArabic ? 'عرض المزيد' : 'View More'}
-          </Button>
-        )}
-      </div>
-
-      {/* QUICK STATS WIDGET */}
-      <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-100 hover:shadow-md transition-all duration-300">
-        <div className="flex justify-between items-center mb-6">
-          <h3 className="font-bold text-navy text-lg">
-            {isArabic ? 'نظرة سريعة' : 'Quick Overview'}
-          </h3>
-          <div className="bg-blue-50 p-2 rounded-full">
-            <TrendingUp className="h-5 w-5 text-blue-500" />
-          </div>
-        </div>
-        <div className="space-y-4">
-          <div className="flex items-center justify-between p-3 bg-slate-50 rounded-xl">
-            <span className="text-slate-600 text-sm">{isArabic ? 'إجمالي الصفحات' : 'Total Pages'}</span>
-            <span className="font-bold text-navy">{isLoading ? '-' : totalPages}</span>
-          </div>
-          <div className="flex items-center justify-between p-3 bg-slate-50 rounded-xl">
-            <span className="text-slate-600 text-sm">{isArabic ? 'صفحات مثبتة' : 'Pinned Pages'}</span>
-            <span className="font-bold text-amber-500">{isLoading ? '-' : pinnedCount}</span>
-          </div>
-          <div className="flex items-center justify-between p-3 bg-slate-50 rounded-xl">
-            <span className="text-slate-600 text-sm">{isArabic ? 'صفحات مختومة' : 'Sealed Pages'}</span>
-            <span className="font-bold text-red-500">{isLoading ? '-' : sealedCount}</span>
-          </div>
         </div>
       </div>
 

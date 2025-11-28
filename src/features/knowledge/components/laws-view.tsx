@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import {
   Scale, Search, Filter, BookOpen, Download, ExternalLink,
   Calendar, ChevronRight, ChevronLeft, FileText, Bookmark,
-  Eye, Clock, Building2
+  Eye, Clock, Building2, Bell
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -30,6 +30,7 @@ import { ConfigDrawer } from '@/components/config-drawer'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { LanguageSwitcher } from '@/components/language-switcher'
 import { DynamicIsland } from '@/components/dynamic-island'
+import { KnowledgeSidebar } from './knowledge-sidebar'
 
 // Mock laws data
 const mockLaws = [
@@ -101,7 +102,7 @@ const categories = [
 ]
 
 export function LawsView() {
-  const { i18n } = useTranslation()
+  const { i18n, t } = useTranslation()
   const isRTL = i18n.language === 'ar'
   const [searchQuery, setSearchQuery] = useState('')
   const [categoryFilter, setCategoryFilter] = useState('all')
@@ -130,7 +131,7 @@ export function LawsView() {
       administrative: { color: 'bg-amber-100 text-amber-700', label: 'إداري', labelEn: 'Administrative' },
     }
     const cat = config[category] || { color: 'bg-slate-100 text-slate-700', label: category, labelEn: category }
-    return <Badge className={`${cat.color} hover:${cat.color}`}>{isRTL ? cat.label : cat.labelEn}</Badge>
+    return <Badge className={`${cat.color} hover:${cat.color} border-0`}>{isRTL ? cat.label : cat.labelEn}</Badge>
   }
 
   const filteredLaws = mockLaws.filter(law => {
@@ -145,183 +146,240 @@ export function LawsView() {
     <>
       <Header className="bg-navy shadow-none relative">
         <TopNav links={topNav} className="[&>a]:text-slate-300 [&>a:hover]:text-white [&>a[aria-current='page']]:text-white" />
+
+        {/* Dynamic Island - Centered */}
         <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
           <DynamicIsland />
         </div>
-        <div className='ms-auto flex items-center space-x-4'>
+
+        <div className="ms-auto flex items-center space-x-4">
+          <div className="relative hidden md:block">
+            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+            <input
+              type="text"
+              placeholder={t('common.search', 'بحث...')}
+              className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pr-9 pl-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+            />
+          </div>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white"
+          >
+            <Bell className="h-5 w-5" />
+            <span className="absolute top-2 right-2 h-2 w-2 bg-red-500 rounded-full border border-navy"></span>
+          </Button>
           <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white" />
           <ThemeSwitch className="text-slate-300 hover:bg-white/10 hover:text-white" />
           <ConfigDrawer className="text-slate-300 hover:bg-white/10 hover:text-white" />
           <ProfileDropdown className="text-slate-300 hover:bg-white/10 hover:text-white" />
         </div>
+        {/* Bottom Gradient Line */}
         <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-emerald-500/50 to-transparent"></div>
       </Header>
 
-      <Main className="bg-slate-50">
-        <div className="space-y-6">
-          {/* Page Header */}
-          <div>
-            <h1 className="text-2xl font-bold text-navy">
-              {isRTL ? 'الأنظمة والقوانين' : 'Laws & Regulations'}
-            </h1>
-            <p className="text-slate-500 mt-1">
-              {isRTL ? 'مكتبة شاملة للأنظمة واللوائح السعودية' : 'Comprehensive library of Saudi laws and regulations'}
-            </p>
-          </div>
-
-          {/* Search and Filters */}
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex flex-col sm:flex-row gap-4">
-                <div className="relative flex-1">
-                  <Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                  <Input
-                    placeholder={isRTL ? 'بحث في الأنظمة...' : 'Search laws...'}
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="ps-10"
-                  />
-                </div>
-                <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-                  <SelectTrigger className="w-full sm:w-[200px]">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {categories.map((cat) => (
-                      <SelectItem key={cat.value} value={cat.value}>
-                        {isRTL ? cat.label : cat.labelEn}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+      <Main
+        fluid={true}
+        className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-r border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']"
+      >
+        {/* HERO BANNER */}
+        <div className="bg-navy rounded-3xl p-8 relative overflow-hidden text-white shadow-xl shadow-navy/20 group">
+          <div className="absolute -bottom-32 -left-32 w-96 h-96 bg-brand-blue rounded-full blur-[120px] opacity-40 group-hover:opacity-50 transition-opacity duration-700"></div>
+          <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
+            <div>
+              <div className="flex items-center gap-2 mb-2">
+                <Badge className="bg-blue-500/20 text-blue-100 hover:bg-blue-500/30 border-0 px-3 py-1">
+                  <Scale className="w-3 h-3 ml-2" />
+                  {isRTL ? 'المكتبة القانونية' : 'Legal Library'}
+                </Badge>
+                <span className="text-slate-400 text-sm">
+                  {new Date().toLocaleDateString('ar-SA', { month: 'long', year: 'numeric' })}
+                </span>
               </div>
-            </CardContent>
-          </Card>
-
-          {/* Stats */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <Card>
-              <CardContent className="p-4 text-center">
-                <Scale className="h-8 w-8 mx-auto text-navy mb-2" />
-                <div className="text-2xl font-bold text-navy">{mockLaws.length}</div>
-                <div className="text-sm text-slate-500">{isRTL ? 'نظام متاح' : 'Available Laws'}</div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="p-4 text-center">
-                <FileText className="h-8 w-8 mx-auto text-emerald-600 mb-2" />
-                <div className="text-2xl font-bold text-navy">873</div>
-                <div className="text-sm text-slate-500">{isRTL ? 'إجمالي المواد' : 'Total Articles'}</div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="p-4 text-center">
-                <Eye className="h-8 w-8 mx-auto text-blue-600 mb-2" />
-                <div className="text-2xl font-bold text-navy">46.4K</div>
-                <div className="text-sm text-slate-500">{isRTL ? 'إجمالي المشاهدات' : 'Total Views'}</div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="p-4 text-center">
-                <Download className="h-8 w-8 mx-auto text-purple-600 mb-2" />
-                <div className="text-2xl font-bold text-navy">12.6K</div>
-                <div className="text-sm text-slate-500">{isRTL ? 'إجمالي التحميلات' : 'Total Downloads'}</div>
-              </CardContent>
-            </Card>
+              <h1 className="text-4xl font-bold leading-tight mb-2">
+                {isRTL ? 'الأنظمة واللوائح' : 'Laws & Regulations'}
+              </h1>
+              <p className="text-slate-300 text-lg max-w-xl">
+                {isRTL ? 'مكتبة شاملة للأنظمة واللوائح السعودية' : 'Comprehensive library of Saudi laws and regulations'}
+              </p>
+            </div>
           </div>
+        </div>
 
-          {/* Laws List */}
-          <div className="space-y-4">
-            {filteredLaws.map((law) => (
-              <Card key={law.id} className="hover:shadow-lg transition-shadow group">
-                <CardContent className="p-6">
-                  <div className="flex flex-col md:flex-row md:items-start gap-4">
-                    {/* Icon */}
-                    <div className="h-14 w-14 bg-navy/10 rounded-xl flex items-center justify-center shrink-0">
-                      <Scale className="h-7 w-7 text-navy" />
-                    </div>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* --- Main Content --- */}
+          <div className="lg:col-span-2 flex flex-col gap-6">
 
-                    {/* Content */}
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-start justify-between gap-4">
-                        <div>
-                          <div className="flex items-center gap-2 flex-wrap">
-                            <h3 className="font-bold text-lg text-navy group-hover:text-emerald-600 transition-colors">
-                              {isRTL ? law.title : law.titleEn}
-                            </h3>
-                            {getCategoryBadge(law.category)}
-                          </div>
-                          <p className="text-slate-600 mt-2 line-clamp-2">
-                            {isRTL ? law.description : law.descriptionEn}
-                          </p>
-                        </div>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => toggleBookmark(law.id)}
-                          className={bookmarkedLaws.includes(law.id) ? 'text-amber-500' : 'text-slate-400'}
-                        >
-                          <Bookmark className={`h-5 w-5 ${bookmarkedLaws.includes(law.id) ? 'fill-current' : ''}`} />
-                        </Button>
-                      </div>
-
-                      <div className="flex flex-wrap items-center gap-4 mt-4 text-sm text-slate-500">
-                        <span className="flex items-center">
-                          <Calendar className="h-4 w-4 me-1" />
-                          {isRTL ? 'تاريخ الإصدار:' : 'Issued:'} {law.issueDate}
-                        </span>
-                        <span className="flex items-center">
-                          <Clock className="h-4 w-4 me-1" />
-                          {isRTL ? 'آخر تحديث:' : 'Updated:'} {law.lastUpdate}
-                        </span>
-                        <span className="flex items-center">
-                          <FileText className="h-4 w-4 me-1" />
-                          {law.articles} {isRTL ? 'مادة' : 'articles'}
-                        </span>
-                      </div>
-
-                      <div className="flex items-center justify-between mt-4 pt-4 border-t border-slate-100">
-                        <div className="flex items-center gap-4 text-sm text-slate-500">
-                          <span className="flex items-center">
-                            <Eye className="h-4 w-4 me-1" />
-                            {law.views.toLocaleString()}
-                          </span>
-                          <span className="flex items-center">
-                            <Download className="h-4 w-4 me-1" />
-                            {law.downloads.toLocaleString()}
-                          </span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <Button variant="outline" size="sm">
-                            <Download className="h-4 w-4 me-1" />
-                            {isRTL ? 'تحميل' : 'Download'}
-                          </Button>
-                          <Button size="sm" className="bg-emerald-500 hover:bg-emerald-600">
-                            <ExternalLink className="h-4 w-4 me-1" />
-                            {isRTL ? 'عرض' : 'View'}
-                          </Button>
-                        </div>
-                      </div>
-                    </div>
+            {/* Search and Filters */}
+            <Card className="border-slate-100 shadow-sm">
+              <CardContent className="p-4">
+                <div className="flex flex-col sm:flex-row gap-4">
+                  <div className="relative flex-1">
+                    <Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                    <Input
+                      placeholder={isRTL ? 'بحث في الأنظمة...' : 'Search laws...'}
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="ps-10 rounded-xl border-slate-200"
+                    />
                   </div>
+                  <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+                    <SelectTrigger className="w-full sm:w-[200px] rounded-xl border-slate-200">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {categories.map((cat) => (
+                        <SelectItem key={cat.value} value={cat.value}>
+                          {isRTL ? cat.label : cat.labelEn}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Stats */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <Card className="border-slate-100 shadow-sm">
+                <CardContent className="p-4 text-center">
+                  <div className="h-12 w-12 bg-navy/5 rounded-full flex items-center justify-center mx-auto mb-3">
+                    <Scale className="h-6 w-6 text-navy" />
+                  </div>
+                  <div className="text-2xl font-bold text-navy">{mockLaws.length}</div>
+                  <div className="text-xs text-slate-500 mt-1">{isRTL ? 'نظام متاح' : 'Available Laws'}</div>
                 </CardContent>
               </Card>
-            ))}
+              <Card className="border-slate-100 shadow-sm">
+                <CardContent className="p-4 text-center">
+                  <div className="h-12 w-12 bg-emerald-50 rounded-full flex items-center justify-center mx-auto mb-3">
+                    <FileText className="h-6 w-6 text-emerald-600" />
+                  </div>
+                  <div className="text-2xl font-bold text-navy">873</div>
+                  <div className="text-xs text-slate-500 mt-1">{isRTL ? 'إجمالي المواد' : 'Total Articles'}</div>
+                </CardContent>
+              </Card>
+              <Card className="border-slate-100 shadow-sm">
+                <CardContent className="p-4 text-center">
+                  <div className="h-12 w-12 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-3">
+                    <Eye className="h-6 w-6 text-blue-600" />
+                  </div>
+                  <div className="text-2xl font-bold text-navy">46.4K</div>
+                  <div className="text-xs text-slate-500 mt-1">{isRTL ? 'إجمالي المشاهدات' : 'Total Views'}</div>
+                </CardContent>
+              </Card>
+              <Card className="border-slate-100 shadow-sm">
+                <CardContent className="p-4 text-center">
+                  <div className="h-12 w-12 bg-purple-50 rounded-full flex items-center justify-center mx-auto mb-3">
+                    <Download className="h-6 w-6 text-purple-600" />
+                  </div>
+                  <div className="text-2xl font-bold text-navy">12.6K</div>
+                  <div className="text-xs text-slate-500 mt-1">{isRTL ? 'إجمالي التحميلات' : 'Total Downloads'}</div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Laws List */}
+            <div className="space-y-4">
+              {filteredLaws.map((law) => (
+                <Card key={law.id} className="hover:shadow-lg transition-all duration-300 group border-slate-100">
+                  <CardContent className="p-6">
+                    <div className="flex flex-col md:flex-row md:items-start gap-4">
+                      {/* Icon */}
+                      <div className="h-14 w-14 bg-navy/5 rounded-2xl flex items-center justify-center shrink-0 border border-navy/10 group-hover:bg-navy group-hover:text-white transition-colors duration-300">
+                        <Scale className="h-7 w-7 text-navy group-hover:text-white transition-colors" />
+                      </div>
+
+                      {/* Content */}
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-start justify-between gap-4">
+                          <div>
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <h3 className="font-bold text-lg text-navy group-hover:text-emerald-600 transition-colors">
+                                {isRTL ? law.title : law.titleEn}
+                              </h3>
+                              {getCategoryBadge(law.category)}
+                            </div>
+                            <p className="text-slate-600 mt-2 line-clamp-2 text-sm leading-relaxed">
+                              {isRTL ? law.description : law.descriptionEn}
+                            </p>
+                          </div>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => toggleBookmark(law.id)}
+                            className={bookmarkedLaws.includes(law.id) ? 'text-amber-500 hover:text-amber-600' : 'text-slate-300 hover:text-navy'}
+                          >
+                            <Bookmark className={`h-5 w-5 ${bookmarkedLaws.includes(law.id) ? 'fill-current' : ''}`} />
+                          </Button>
+                        </div>
+
+                        <div className="flex flex-wrap items-center gap-4 mt-4 text-sm text-slate-500">
+                          <span className="flex items-center bg-slate-50 px-2 py-1 rounded-lg">
+                            <Calendar className="h-3.5 w-3.5 me-1 text-slate-400" />
+                            {isRTL ? 'تاريخ الإصدار:' : 'Issued:'} {law.issueDate}
+                          </span>
+                          <span className="flex items-center bg-slate-50 px-2 py-1 rounded-lg">
+                            <Clock className="h-3.5 w-3.5 me-1 text-slate-400" />
+                            {isRTL ? 'آخر تحديث:' : 'Updated:'} {law.lastUpdate}
+                          </span>
+                          <span className="flex items-center bg-slate-50 px-2 py-1 rounded-lg">
+                            <FileText className="h-3.5 w-3.5 me-1 text-slate-400" />
+                            {law.articles} {isRTL ? 'مادة' : 'articles'}
+                          </span>
+                        </div>
+
+                        <div className="flex items-center justify-between mt-4 pt-4 border-t border-slate-50">
+                          <div className="flex items-center gap-4 text-sm text-slate-500">
+                            <span className="flex items-center text-xs">
+                              <Eye className="h-3.5 w-3.5 me-1" />
+                              {law.views.toLocaleString()}
+                            </span>
+                            <span className="flex items-center text-xs">
+                              <Download className="h-3.5 w-3.5 me-1" />
+                              {law.downloads.toLocaleString()}
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Button variant="outline" size="sm" className="h-9 rounded-lg border-slate-200">
+                              <Download className="h-4 w-4 me-1" />
+                              {isRTL ? 'تحميل' : 'Download'}
+                            </Button>
+                            <Button size="sm" className="bg-emerald-500 hover:bg-emerald-600 h-9 rounded-lg shadow-lg shadow-emerald-500/20">
+                              <ExternalLink className="h-4 w-4 me-1" />
+                              {isRTL ? 'عرض' : 'View'}
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+
+            {filteredLaws.length === 0 && (
+              <Card className="border-dashed border-2 border-slate-200 bg-slate-50/50">
+                <CardContent className="p-12 text-center">
+                  <div className="h-16 w-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Scale className="h-8 w-8 text-slate-300" />
+                  </div>
+                  <h3 className="text-lg font-bold text-navy">
+                    {isRTL ? 'لا توجد أنظمة مطابقة' : 'No matching laws found'}
+                  </h3>
+                  <p className="text-slate-500 mt-1 max-w-xs mx-auto">
+                    {isRTL ? 'جرب تعديل معايير البحث' : 'Try adjusting your search criteria'}
+                  </p>
+                  <Button variant="outline" className="mt-4 border-slate-200">
+                    {isRTL ? 'مسح الفلاتر' : 'Clear Filters'}
+                  </Button>
+                </CardContent>
+              </Card>
+            )}
           </div>
 
-          {filteredLaws.length === 0 && (
-            <Card>
-              <CardContent className="p-12 text-center">
-                <Scale className="h-12 w-12 mx-auto text-slate-300 mb-4" />
-                <h3 className="text-lg font-medium text-slate-900">
-                  {isRTL ? 'لا توجد أنظمة مطابقة' : 'No matching laws found'}
-                </h3>
-                <p className="text-slate-500 mt-1">
-                  {isRTL ? 'جرب تعديل معايير البحث' : 'Try adjusting your search criteria'}
-                </p>
-              </CardContent>
-            </Card>
-          )}
+          {/* Sidebar */}
+          <KnowledgeSidebar context="laws" />
         </div>
       </Main>
     </>

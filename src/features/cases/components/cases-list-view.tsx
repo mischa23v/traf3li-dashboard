@@ -57,6 +57,7 @@ import {
 } from '@/components/ui/dialog'
 import { CreateCaseForm } from './create-case-form'
 import type { Case, CaseStatus, CaseCategory, CasePriority, ClientRef, LawyerRef } from '@/services/casesService'
+import { PracticeSidebar } from './practice-sidebar'
 
 // Helper functions
 const getClientName = (c: Case): string => {
@@ -296,111 +297,9 @@ export function CasesListView() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-          {/* --- Left Sidebar (Quick Stats & Activity) --- */}
-          <div className="lg:col-span-3 flex flex-col gap-6">
-            {/* Stats Card - Like CaseAce */}
-            <Card className="rounded-3xl border-0 shadow-lg bg-white overflow-hidden">
-              <div className="bg-navy p-6 text-white relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-500 blur-[40px] opacity-20"></div>
-                <h3 className="text-lg font-bold relative z-10 mb-1">
-                  {t('cases.performanceSummary', 'ملخص الأداء')}
-                </h3>
-                <p className="text-emerald-200 text-sm relative z-10">
-                  {t('cases.currentMonthStats', 'إحصائيات الشهر الحالي')}
-                </p>
-              </div>
-              <CardContent className="p-6 space-y-6">
-                {/* Stats Grid */}
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center text-brand-blue">
-                      <Briefcase className="h-5 w-5" />
-                    </div>
-                    <div>
-                      <div className="text-sm text-slate-500">{t('cases.total', 'الكل')}</div>
-                      <div className="font-bold text-navy">{statistics.total}</div>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-green-50 flex items-center justify-center text-green-600">
-                      <CheckCircle2 className="h-5 w-5" />
-                    </div>
-                    <div>
-                      <div className="text-sm text-slate-500">{t('cases.active', 'نشطة')}</div>
-                      <div className="font-bold text-navy">{statistics.active}</div>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-emerald-50 flex items-center justify-center text-emerald-600">
-                      <Trophy className="h-5 w-5" />
-                    </div>
-                    <div>
-                      <div className="text-sm text-slate-500">{t('cases.won', 'فائزة')}</div>
-                      <div className="font-bold text-navy">{statistics.won}</div>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-amber-50 flex items-center justify-center text-amber-600">
-                      <PauseCircle className="h-5 w-5" />
-                    </div>
-                    <div>
-                      <div className="text-sm text-slate-500">{t('cases.onHold', 'معلقة')}</div>
-                      <div className="font-bold text-navy">{statistics.onHold}</div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Success Rate */}
-                <div className="space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-slate-500">{t('cases.successRate', 'نسبة النجاح')}</span>
-                    <span className="font-bold text-navy">{successRate}%</span>
-                  </div>
-                  <Progress value={successRate} className="h-2" indicatorClassName="bg-emerald-500" />
-                </div>
-
-                {/* Total Claim Amount */}
-                <div className="pt-4 border-t border-slate-100">
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-slate-500">{t('cases.totalClaims', 'إجمالي المطالبات')}</span>
-                    <span className="font-bold text-lg text-emerald-600">
-                      {formatCurrency(statistics.totalClaimAmount)} {t('common.sar', 'ر.س')}
-                    </span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Status Breakdown Card */}
-            <Card className="rounded-3xl border-0 shadow-lg bg-white flex-1 overflow-hidden">
-              <div className="p-6 border-b border-slate-100">
-                <h3 className="font-bold text-navy text-lg">{t('cases.statusBreakdown', 'توزيع الحالات')}</h3>
-              </div>
-              <CardContent className="p-6">
-                <div className="space-y-3">
-                  {[
-                    { label: t('cases.status.active', 'نشطة'), count: statistics.active, color: 'bg-blue-500' },
-                    { label: t('cases.status.won', 'فائزة'), count: statistics.won, color: 'bg-emerald-500' },
-                    { label: t('cases.status.settled', 'تسوية'), count: statistics.settled, color: 'bg-amber-500' },
-                    { label: t('cases.status.lost', 'خاسرة'), count: statistics.lost, color: 'bg-red-500' },
-                    { label: t('cases.status.closed', 'مغلقة'), count: statistics.closed, color: 'bg-slate-500' },
-                  ].map((item, i) => (
-                    <div key={i} className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <div className={`w-3 h-3 rounded-full ${item.color}`}></div>
-                        <span className="text-sm text-slate-600">{item.label}</span>
-                      </div>
-                      <span className="font-bold text-navy">{item.count}</span>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* --- Main Content (Cases List) --- */}
-          <div className="lg:col-span-9 flex flex-col gap-6">
+          <div className="lg:col-span-2 flex flex-col gap-6">
             {/* Filters Toolbar */}
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-white p-2 pr-4 rounded-[20px] border border-slate-100 shadow-sm">
               <div className="flex items-center gap-2 w-full sm:w-auto">
@@ -660,6 +559,9 @@ export function CasesListView() {
               </div>
             )}
           </div>
+
+          {/* Sidebar */}
+          <PracticeSidebar context="cases" />
         </div>
       </Main>
     </>

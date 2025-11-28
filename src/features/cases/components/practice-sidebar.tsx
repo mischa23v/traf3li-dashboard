@@ -8,39 +8,55 @@ import { Badge } from '@/components/ui/badge'
 import { Link } from '@tanstack/react-router'
 import { cn } from '@/lib/utils'
 
-interface TasksSidebarProps {
-    context?: 'tasks' | 'reminders' | 'events'
+interface PracticeSidebarProps {
+    context?: 'clients' | 'organizations' | 'cases' | 'workflows' | 'documents' | 'followups' | 'contacts'
     isSelectionMode?: boolean
     onToggleSelectionMode?: () => void
     selectedCount?: number
     onDeleteSelected?: () => void
 }
 
-export function TasksSidebar({
-    context = 'tasks',
+export function PracticeSidebar({
+    context = 'clients',
     isSelectionMode = false,
     onToggleSelectionMode,
     selectedCount = 0,
     onDeleteSelected
-}: TasksSidebarProps) {
+}: PracticeSidebarProps) {
     const [activeTab, setActiveTab] = useState<'calendar' | 'notifications'>('calendar')
 
     const links = {
-        tasks: {
-            create: '/dashboard/tasks/new',
-            viewAll: '/dashboard/tasks/list'
+        clients: {
+            create: '/dashboard/clients/new',
+            viewAll: '/dashboard/clients'
         },
-        reminders: {
-            create: '/dashboard/tasks/reminders/new',
-            viewAll: '/dashboard/tasks/reminders'
+        organizations: {
+            create: '/dashboard/organizations/new',
+            viewAll: '/dashboard/organizations'
         },
-        events: {
-            create: '/dashboard/tasks/events/new',
-            viewAll: '/dashboard/tasks/events'
+        cases: {
+            create: '/dashboard/cases/new',
+            viewAll: '/dashboard/cases'
+        },
+        workflows: {
+            create: '/dashboard/case-workflows/new',
+            viewAll: '/dashboard/case-workflows'
+        },
+        documents: {
+            create: '/dashboard/documents/new',
+            viewAll: '/dashboard/documents'
+        },
+        followups: {
+            create: '/dashboard/followups/new',
+            viewAll: '/dashboard/followups'
+        },
+        contacts: {
+            create: '/dashboard/contacts/new',
+            viewAll: '/dashboard/contacts'
         }
     }
 
-    const currentLinks = links[context]
+    const currentLinks = links[context] || links.clients
 
     return (
         <div className="space-y-8 lg:col-span-1">

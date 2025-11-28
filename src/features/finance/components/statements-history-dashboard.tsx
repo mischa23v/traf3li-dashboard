@@ -26,6 +26,7 @@ import { ThemeSwitch } from '@/components/theme-switch'
 import { ConfigDrawer } from '@/components/config-drawer'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { useStatements } from '@/hooks/useFinance'
+import { FinanceSidebar } from './finance-sidebar'
 
 export default function StatementsHistoryDashboard() {
     const [activeTab, setActiveTab] = useState('all')
@@ -92,47 +93,48 @@ export default function StatementsHistoryDashboard() {
             <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-r border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
                 <div className="max-w-7xl mx-auto space-y-6">
 
-                    {/* Hero Section - Contained Navy Card */}
-                    <div className="bg-[#022c22] rounded-3xl p-8 relative overflow-hidden text-white shadow-xl shadow-[#022c22]/20 mb-8">
-                        <div className="absolute top-0 left-0 w-full h-full overflow-hidden z-0 pointer-events-none">
-                            <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-brand-blue/20 rounded-full blur-[100px]"></div>
-                            <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-purple-500/10 rounded-full blur-[100px]"></div>
-                        </div>
-
-                        <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-                            <div>
-                                <div className="flex items-center gap-3 mb-3">
-                                    <Badge className="bg-white/10 hover:bg-white/20 text-white border-0 backdrop-blur-sm">
-                                        <FileClock className="w-3 h-3 ml-2" />
-                                        الأرشيف
-                                    </Badge>
-                                    <span className="text-blue-200 text-sm">2025</span>
-                                </div>
-                                <h1 className="text-3xl md:text-4xl font-bold leading-tight mb-2">
-                                    سجل كشوف الحساب
-                                </h1>
-                                <p className="text-blue-200/80">إدارة ومراجعة جميع كشوف الحسابات الصادرة للعملاء</p>
+                    {/* Hero Section - New Design */}
+                    <div className="bg-[#022c22] rounded-3xl p-8 relative overflow-hidden text-white shadow-xl shadow-emerald-900/20 flex flex-col md:flex-row items-center justify-between gap-8 mb-8">
+                        <div className="relative z-10 max-w-lg">
+                            <div className="flex items-center gap-3 mb-3">
+                                <Badge className="bg-white/10 hover:bg-white/20 text-white border-0 backdrop-blur-sm">
+                                    <FileClock className="w-3 h-3 ml-2" />
+                                    الأرشيف
+                                </Badge>
+                                <span className="text-emerald-200 text-sm">2025</span>
                             </div>
+                            <h2 className="text-3xl font-bold mb-4 leading-tight">سجل كشوف الحساب</h2>
+                            <p className="text-emerald-200 text-lg mb-8 leading-relaxed">
+                                استعرض أرشيف كشوف الحسابات، تابع المدفوعات، وقم بإدارة السجلات المالية للعملاء.
+                            </p>
                             <div className="flex gap-3">
-                                <Button variant="outline" className="bg-white/5 border-white/10 text-white hover:bg-white/10 rounded-xl">
-                                    <Download className="w-4 h-4 ml-2" />
-                                    تصدير السجل
-                                </Button>
-                                <Button asChild className="bg-brand-blue hover:bg-blue-600 text-white border-0 shadow-lg shadow-blue-500/20 rounded-xl">
+                                <Button asChild className="bg-emerald-500 hover:bg-emerald-600 text-white h-12 px-8 rounded-xl font-bold shadow-lg shadow-emerald-500/20 border-0">
                                     <Link to="/dashboard/finance/statements/new">
-                                        <Plus className="w-4 h-4 ml-2" />
+                                        <Plus className="ml-2 h-5 w-5" />
                                         إنشاء كشف جديد
                                     </Link>
                                 </Button>
+                                <Button variant="ghost" className="bg-white/10 text-white hover:bg-white/20 h-12 px-8 rounded-xl font-bold border-0 backdrop-blur-sm">
+                                    <Download className="ml-2 h-5 w-5" />
+                                    تصدير السجل
+                                </Button>
                             </div>
+                        </div>
+
+                        {/* Abstract Visual Decoration */}
+                        <div className="absolute top-0 left-0 w-full h-full overflow-hidden z-0 pointer-events-none">
+                            <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-emerald-500/10 rounded-full blur-[100px]"></div>
+                            <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-blue-500/10 rounded-full blur-[100px]"></div>
+                            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80%] h-[80%] border border-white/5 rounded-full"></div>
+                            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[60%] h-[60%] border border-white/5 rounded-full"></div>
                         </div>
                     </div>
 
                     {/* Main Content */}
-                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
                         {/* Statements List */}
-                        <div className="lg:col-span-8 space-y-6">
+                        <div className="lg:col-span-2 space-y-6">
 
                             {/* Filters Bar */}
                             <div className="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex flex-wrap items-center justify-between gap-4">
@@ -203,13 +205,15 @@ export default function StatementsHistoryDashboard() {
                                         </Button>
                                     </div>
                                 ) : filteredStatements.length === 0 ? (
-                                    <div className="bg-white rounded-2xl p-12 text-center border border-slate-100">
-                                        <FileText className="h-16 w-16 text-slate-300 mx-auto mb-4" />
-                                        <h3 className="text-xl font-bold mb-2 text-slate-900">لا توجد كشوف حساب</h3>
-                                        <p className="text-slate-500 mb-4">ابدأ بإنشاء كشف حساب جديد للعملاء</p>
-                                        <Button asChild className="bg-brand-blue hover:bg-blue-600">
+                                    <div className="bg-white rounded-3xl p-12 text-center border border-slate-100 shadow-sm">
+                                        <div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                                            <FileText className="h-8 w-8 text-brand-blue" />
+                                        </div>
+                                        <h3 className="text-xl font-bold text-slate-900 mb-2">لا توجد كشوف حساب</h3>
+                                        <p className="text-slate-500 mb-6">ابدأ بإنشاء كشف حساب جديد للعملاء</p>
+                                        <Button asChild className="bg-brand-blue hover:bg-blue-600 text-white px-8">
                                             <Link to="/dashboard/finance/statements/new">
-                                                <Plus className="w-4 h-4 ml-2" />
+                                                <Plus className="ml-2 h-4 w-4" />
                                                 إنشاء كشف جديد
                                             </Link>
                                         </Button>
@@ -282,46 +286,8 @@ export default function StatementsHistoryDashboard() {
                             </div>
                         </div>
 
-                        {/* Sidebar - Summary */}
-                        <div className="lg:col-span-4 space-y-6">
-                            <Card className="border-none shadow-sm bg-white rounded-3xl overflow-hidden hover:shadow-md transition-all duration-300">
-                                <CardHeader className="border-b border-slate-100 pb-4">
-                                    <CardTitle className="text-lg font-bold text-[#022c22] flex items-center gap-2">
-                                        <Building className="w-5 h-5 text-brand-blue" />
-                                        ملخص الشهر
-                                    </CardTitle>
-                                </CardHeader>
-                                <CardContent className="p-6 space-y-4">
-                                    <div className="flex items-center justify-between text-sm">
-                                        <span className="text-slate-500">الكشوفات المصدرة</span>
-                                        <span className="font-bold text-[#022c22]">{data?.data?.length || 0}</span>
-                                    </div>
-                                    <div className="flex items-center justify-between text-sm">
-                                        <span className="text-slate-500">إجمالي المبالغ</span>
-                                        <span className="font-bold text-emerald-600">{formatCurrency(data?.data?.reduce((sum: number, st: any) => sum + st.totalAmount, 0) || 0)}</span>
-                                    </div>
-                                    <div className="flex items-center justify-between text-sm">
-                                        <span className="text-slate-500">بانتظار الدفع</span>
-                                        <span className="font-bold text-amber-600">{formatCurrency(data?.data?.filter((st: any) => st.status === 'sent').reduce((sum: number, st: any) => sum + st.totalAmount, 0) || 0)}</span>
-                                    </div>
-                                </CardContent>
-                            </Card>
-
-                            <Card className="bg-[#022c22] text-white border-none rounded-3xl p-6">
-                                <div className="flex items-start gap-4">
-                                    <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center flex-shrink-0">
-                                        <Send className="w-5 h-5 text-brand-blue" />
-                                    </div>
-                                    <div>
-                                        <h3 className="font-bold text-lg mb-1">إرسال جماعي</h3>
-                                        <p className="text-blue-200 text-sm mb-4">يمكنك إرسال تذكيرات لجميع العملاء الذين لم يسددوا كشوفاتهم بعد.</p>
-                                        <Button className="w-full bg-brand-blue hover:bg-blue-600 text-white border-0">
-                                            إرسال تذكيرات
-                                        </Button>
-                                    </div>
-                                </div>
-                            </Card>
-                        </div>
+                        {/* Sidebar */}
+                        <FinanceSidebar context="statements" />
 
                     </div>
                 </div>

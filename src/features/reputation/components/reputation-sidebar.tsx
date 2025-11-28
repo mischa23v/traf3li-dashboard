@@ -8,39 +8,35 @@ import { Badge } from '@/components/ui/badge'
 import { Link } from '@tanstack/react-router'
 import { cn } from '@/lib/utils'
 
-interface TasksSidebarProps {
-    context?: 'tasks' | 'reminders' | 'events'
+interface ReputationSidebarProps {
+    context?: 'overview' | 'badges'
     isSelectionMode?: boolean
     onToggleSelectionMode?: () => void
     selectedCount?: number
     onDeleteSelected?: () => void
 }
 
-export function TasksSidebar({
-    context = 'tasks',
+export function ReputationSidebar({
+    context = 'overview',
     isSelectionMode = false,
     onToggleSelectionMode,
     selectedCount = 0,
     onDeleteSelected
-}: TasksSidebarProps) {
+}: ReputationSidebarProps) {
     const [activeTab, setActiveTab] = useState<'calendar' | 'notifications'>('calendar')
 
     const links = {
-        tasks: {
-            create: '/dashboard/tasks/new',
-            viewAll: '/dashboard/tasks/list'
+        overview: {
+            create: '/dashboard/reputation/overview/new', // Assuming this route exists or is relevant
+            viewAll: '/dashboard/reputation/overview'
         },
-        reminders: {
-            create: '/dashboard/tasks/reminders/new',
-            viewAll: '/dashboard/tasks/reminders'
-        },
-        events: {
-            create: '/dashboard/tasks/events/new',
-            viewAll: '/dashboard/tasks/events'
+        badges: {
+            create: '/dashboard/reputation/badges/new',
+            viewAll: '/dashboard/reputation/badges'
         }
     }
 
-    const currentLinks = links[context]
+    const currentLinks = links[context] || links.overview
 
     return (
         <div className="space-y-8 lg:col-span-1">

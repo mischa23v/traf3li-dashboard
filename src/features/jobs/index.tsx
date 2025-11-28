@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import {
   Briefcase, Plus, Search, Filter, MoreVertical,
   Clock, DollarSign, MapPin, Star, Eye, Edit, Trash2,
-  CheckCircle, XCircle, AlertCircle
+  CheckCircle, XCircle, AlertCircle, Bell
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -36,6 +36,7 @@ import { ConfigDrawer } from '@/components/config-drawer'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { LanguageSwitcher } from '@/components/language-switcher'
 import { DynamicIsland } from '@/components/dynamic-island'
+import { JobsSidebar } from './components/jobs-sidebar'
 
 // Mock data for my services
 const mockServices = [
@@ -116,11 +117,11 @@ export function MyServices() {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'active':
-        return <Badge className="bg-emerald-100 text-emerald-700 hover:bg-emerald-100"><CheckCircle className="h-3 w-3 me-1" />{isRTL ? 'نشط' : 'Active'}</Badge>
+        return <Badge className="bg-emerald-100 text-emerald-700 hover:bg-emerald-100 border-0"><CheckCircle className="h-3 w-3 me-1" />{isRTL ? 'نشط' : 'Active'}</Badge>
       case 'paused':
-        return <Badge className="bg-amber-100 text-amber-700 hover:bg-amber-100"><AlertCircle className="h-3 w-3 me-1" />{isRTL ? 'متوقف' : 'Paused'}</Badge>
+        return <Badge className="bg-amber-100 text-amber-700 hover:bg-amber-100 border-0"><AlertCircle className="h-3 w-3 me-1" />{isRTL ? 'متوقف' : 'Paused'}</Badge>
       case 'draft':
-        return <Badge className="bg-slate-100 text-slate-700 hover:bg-slate-100"><XCircle className="h-3 w-3 me-1" />{isRTL ? 'مسودة' : 'Draft'}</Badge>
+        return <Badge className="bg-slate-100 text-slate-700 hover:bg-slate-100 border-0"><XCircle className="h-3 w-3 me-1" />{isRTL ? 'مسودة' : 'Draft'}</Badge>
       default:
         return null
     }
@@ -137,214 +138,253 @@ export function MyServices() {
     <>
       <Header className="bg-navy shadow-none relative">
         <TopNav links={topNav} className="[&>a]:text-slate-300 [&>a:hover]:text-white [&>a[aria-current='page']]:text-white" />
+
+        {/* Dynamic Island - Centered */}
         <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
           <DynamicIsland />
         </div>
-        <div className='ms-auto flex items-center space-x-4'>
+
+        <div className="ms-auto flex items-center space-x-4">
+          <div className="relative hidden md:block">
+            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+            <input
+              type="text"
+              placeholder={t('common.search', 'بحث...')}
+              className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pr-9 pl-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+            />
+          </div>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white"
+          >
+            <Bell className="h-5 w-5" />
+            <span className="absolute top-2 right-2 h-2 w-2 bg-red-500 rounded-full border border-navy"></span>
+          </Button>
           <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white" />
           <ThemeSwitch className="text-slate-300 hover:bg-white/10 hover:text-white" />
           <ConfigDrawer className="text-slate-300 hover:bg-white/10 hover:text-white" />
           <ProfileDropdown className="text-slate-300 hover:bg-white/10 hover:text-white" />
         </div>
+        {/* Bottom Gradient Line */}
         <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-emerald-500/50 to-transparent"></div>
       </Header>
 
-      <Main className="bg-slate-50">
-        <div className="space-y-6">
-          {/* Page Header */}
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <Main
+        fluid={true}
+        className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-r border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']"
+      >
+        {/* HERO BANNER */}
+        <div className="bg-navy rounded-3xl p-8 relative overflow-hidden text-white shadow-xl shadow-navy/20 group">
+          <div className="absolute -bottom-32 -left-32 w-96 h-96 bg-brand-blue rounded-full blur-[120px] opacity-40 group-hover:opacity-50 transition-opacity duration-700"></div>
+          <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
             <div>
-              <h1 className="text-2xl font-bold text-navy">
+              <div className="flex items-center gap-2 mb-2">
+                <Badge className="bg-blue-500/20 text-blue-100 hover:bg-blue-500/30 border-0 px-3 py-1">
+                  <Briefcase className="w-3 h-3 ml-2" />
+                  {isRTL ? 'الوظائف والخدمات' : 'Jobs & Services'}
+                </Badge>
+                <span className="text-slate-400 text-sm">
+                  {new Date().toLocaleDateString('ar-SA', { month: 'long', year: 'numeric' })}
+                </span>
+              </div>
+              <h1 className="text-4xl font-bold leading-tight mb-2">
                 {isRTL ? 'خدماتي' : 'My Services'}
               </h1>
-              <p className="text-slate-500 mt-1">
-                {isRTL ? 'إدارة الخدمات القانونية التي تقدمها' : 'Manage your legal services'}
+              <p className="text-slate-300 text-lg max-w-xl">
+                {isRTL ? 'إدارة الخدمات القانونية التي تقدمها وتتبع الطلبات' : 'Manage your legal services and track orders'}
               </p>
             </div>
-            <Button className="bg-emerald-500 hover:bg-emerald-600">
-              <Plus className="h-4 w-4 me-2" />
+            <Button className="bg-emerald-500 hover:bg-emerald-600 text-white h-12 px-6 rounded-xl shadow-lg shadow-emerald-500/20 border-0">
+              <Plus className="h-5 w-5 me-2" />
               {isRTL ? 'إضافة خدمة جديدة' : 'Add New Service'}
             </Button>
           </div>
+        </div>
 
-          {/* Stats Cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <Card>
-              <CardContent className="p-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-slate-500">{isRTL ? 'إجمالي الخدمات' : 'Total Services'}</p>
-                    <p className="text-2xl font-bold text-navy">{mockServices.length}</p>
-                  </div>
-                  <div className="h-12 w-12 bg-blue-100 rounded-full flex items-center justify-center">
-                    <Briefcase className="h-6 w-6 text-blue-600" />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="p-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-slate-500">{isRTL ? 'الطلبات المكتملة' : 'Completed Orders'}</p>
-                    <p className="text-2xl font-bold text-navy">35</p>
-                  </div>
-                  <div className="h-12 w-12 bg-emerald-100 rounded-full flex items-center justify-center">
-                    <CheckCircle className="h-6 w-6 text-emerald-600" />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="p-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-slate-500">{isRTL ? 'المشاهدات' : 'Total Views'}</p>
-                    <p className="text-2xl font-bold text-navy">746</p>
-                  </div>
-                  <div className="h-12 w-12 bg-purple-100 rounded-full flex items-center justify-center">
-                    <Eye className="h-6 w-6 text-purple-600" />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="p-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-slate-500">{isRTL ? 'متوسط التقييم' : 'Avg Rating'}</p>
-                    <p className="text-2xl font-bold text-navy">4.8</p>
-                  </div>
-                  <div className="h-12 w-12 bg-amber-100 rounded-full flex items-center justify-center">
-                    <Star className="h-6 w-6 text-amber-600" />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* --- Main Content --- */}
+          <div className="lg:col-span-2 flex flex-col gap-6">
 
-          {/* Filters */}
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex flex-col sm:flex-row gap-4">
-                <div className="relative flex-1">
-                  <Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                  <Input
-                    placeholder={isRTL ? 'بحث في الخدمات...' : 'Search services...'}
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="ps-10"
-                  />
-                </div>
-                <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-                  <SelectTrigger className="w-full sm:w-[180px]">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {categories.map((cat) => (
-                      <SelectItem key={cat.value} value={cat.value}>
-                        {isRTL ? cat.label : cat.labelEn}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <Select value={statusFilter} onValueChange={setStatusFilter}>
-                  <SelectTrigger className="w-full sm:w-[180px]">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {statuses.map((status) => (
-                      <SelectItem key={status.value} value={status.value}>
-                        {isRTL ? status.label : status.labelEn}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Services Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredServices.map((service) => (
-              <Card key={service.id} className="hover:shadow-lg transition-shadow">
-                <CardHeader className="pb-3">
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <CardTitle className="text-lg">
-                        {isRTL ? service.title : service.titleEn}
-                      </CardTitle>
-                      <CardDescription className="mt-1 line-clamp-2">
-                        {service.description}
-                      </CardDescription>
-                    </div>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon" className="h-8 w-8">
-                          <MoreVertical className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem>
-                          <Eye className="h-4 w-4 me-2" />
-                          {isRTL ? 'عرض' : 'View'}
-                        </DropdownMenuItem>
-                        <DropdownMenuItem>
-                          <Edit className="h-4 w-4 me-2" />
-                          {isRTL ? 'تعديل' : 'Edit'}
-                        </DropdownMenuItem>
-                        <DropdownMenuItem className="text-red-600">
-                          <Trash2 className="h-4 w-4 me-2" />
-                          {isRTL ? 'حذف' : 'Delete'}
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </div>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    {getStatusBadge(service.status)}
-                    <div className="flex items-center text-amber-500">
-                      <Star className="h-4 w-4 fill-current" />
-                      <span className="ms-1 text-sm font-medium">{service.rating}</span>
-                      <span className="text-slate-400 text-xs ms-1">({service.reviewCount})</span>
+            {/* Stats Cards */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <Card className="border-slate-100 shadow-sm">
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="h-10 w-10 bg-blue-50 rounded-lg flex items-center justify-center">
+                      <Briefcase className="h-5 w-5 text-blue-600" />
                     </div>
                   </div>
-                  <div className="flex items-center justify-between text-sm text-slate-500">
-                    <div className="flex items-center">
-                      <DollarSign className="h-4 w-4 me-1" />
-                      <span className="font-medium text-navy">{service.price} {isRTL ? 'ر.س' : 'SAR'}</span>
-                      <span className="ms-1">/ {service.priceType === 'hourly' ? (isRTL ? 'ساعة' : 'hour') : (isRTL ? 'ثابت' : 'fixed')}</span>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <span className="flex items-center">
-                        <Eye className="h-4 w-4 me-1" />
-                        {service.views}
-                      </span>
-                      <span className="flex items-center">
-                        <Briefcase className="h-4 w-4 me-1" />
-                        {service.orders}
-                      </span>
-                    </div>
-                  </div>
+                  <p className="text-2xl font-bold text-navy">{mockServices.length}</p>
+                  <p className="text-xs text-slate-500">{isRTL ? 'إجمالي الخدمات' : 'Total Services'}</p>
                 </CardContent>
               </Card>
-            ))}
-          </div>
+              <Card className="border-slate-100 shadow-sm">
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="h-10 w-10 bg-emerald-50 rounded-lg flex items-center justify-center">
+                      <CheckCircle className="h-5 w-5 text-emerald-600" />
+                    </div>
+                  </div>
+                  <p className="text-2xl font-bold text-navy">35</p>
+                  <p className="text-xs text-slate-500">{isRTL ? 'الطلبات المكتملة' : 'Completed Orders'}</p>
+                </CardContent>
+              </Card>
+              <Card className="border-slate-100 shadow-sm">
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="h-10 w-10 bg-purple-50 rounded-lg flex items-center justify-center">
+                      <Eye className="h-5 w-5 text-purple-600" />
+                    </div>
+                  </div>
+                  <p className="text-2xl font-bold text-navy">746</p>
+                  <p className="text-xs text-slate-500">{isRTL ? 'المشاهدات' : 'Total Views'}</p>
+                </CardContent>
+              </Card>
+              <Card className="border-slate-100 shadow-sm">
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="h-10 w-10 bg-amber-50 rounded-lg flex items-center justify-center">
+                      <Star className="h-5 w-5 text-amber-600" />
+                    </div>
+                  </div>
+                  <p className="text-2xl font-bold text-navy">4.8</p>
+                  <p className="text-xs text-slate-500">{isRTL ? 'متوسط التقييم' : 'Avg Rating'}</p>
+                </CardContent>
+              </Card>
+            </div>
 
-          {filteredServices.length === 0 && (
-            <Card>
-              <CardContent className="p-12 text-center">
-                <Briefcase className="h-12 w-12 mx-auto text-slate-300 mb-4" />
-                <h3 className="text-lg font-medium text-slate-900">
-                  {isRTL ? 'لا توجد خدمات' : 'No services found'}
-                </h3>
-                <p className="text-slate-500 mt-1">
-                  {isRTL ? 'قم بإضافة خدمة جديدة أو تعديل معايير البحث' : 'Add a new service or adjust your search criteria'}
-                </p>
+            {/* Filters */}
+            <Card className="border-slate-100 shadow-sm">
+              <CardContent className="p-4">
+                <div className="flex flex-col sm:flex-row gap-4">
+                  <div className="relative flex-1">
+                    <Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                    <Input
+                      placeholder={isRTL ? 'بحث في الخدمات...' : 'Search services...'}
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="ps-10 rounded-xl border-slate-200"
+                    />
+                  </div>
+                  <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+                    <SelectTrigger className="w-full sm:w-[180px] rounded-xl border-slate-200">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {categories.map((cat) => (
+                        <SelectItem key={cat.value} value={cat.value}>
+                          {isRTL ? cat.label : cat.labelEn}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <Select value={statusFilter} onValueChange={setStatusFilter}>
+                    <SelectTrigger className="w-full sm:w-[180px] rounded-xl border-slate-200">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {statuses.map((status) => (
+                        <SelectItem key={status.value} value={status.value}>
+                          {isRTL ? status.label : status.labelEn}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
               </CardContent>
             </Card>
-          )}
+
+            {/* Services Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {filteredServices.map((service) => (
+                <Card key={service.id} className="hover:shadow-lg transition-all duration-300 border-slate-100 group">
+                  <CardHeader className="pb-3">
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <CardTitle className="text-lg font-bold text-navy group-hover:text-emerald-600 transition-colors">
+                          {isRTL ? service.title : service.titleEn}
+                        </CardTitle>
+                        <CardDescription className="mt-1 line-clamp-2 text-sm">
+                          {service.description}
+                        </CardDescription>
+                      </div>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-navy">
+                            <MoreVertical className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem>
+                            <Eye className="h-4 w-4 me-2" />
+                            {isRTL ? 'عرض' : 'View'}
+                          </DropdownMenuItem>
+                          <DropdownMenuItem>
+                            <Edit className="h-4 w-4 me-2" />
+                            {isRTL ? 'تعديل' : 'Edit'}
+                          </DropdownMenuItem>
+                          <DropdownMenuItem className="text-red-600">
+                            <Trash2 className="h-4 w-4 me-2" />
+                            {isRTL ? 'حذف' : 'Delete'}
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      {getStatusBadge(service.status)}
+                      <div className="flex items-center bg-amber-50 px-2 py-1 rounded-lg text-amber-600 border border-amber-100">
+                        <Star className="h-3.5 w-3.5 fill-current" />
+                        <span className="ms-1 text-sm font-bold">{service.rating}</span>
+                        <span className="text-amber-400 text-xs ms-1">({service.reviewCount})</span>
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between text-sm pt-4 border-t border-slate-50">
+                      <div className="flex items-center font-bold text-navy">
+                        <DollarSign className="h-4 w-4 me-1 text-emerald-500" />
+                        <span>{service.price} {isRTL ? 'ر.س' : 'SAR'}</span>
+                        <span className="ms-1 text-slate-400 font-normal text-xs">/ {service.priceType === 'hourly' ? (isRTL ? 'ساعة' : 'hour') : (isRTL ? 'ثابت' : 'fixed')}</span>
+                      </div>
+                      <div className="flex items-center gap-3 text-slate-400">
+                        <span className="flex items-center text-xs">
+                          <Eye className="h-3.5 w-3.5 me-1" />
+                          {service.views}
+                        </span>
+                        <span className="flex items-center text-xs">
+                          <Briefcase className="h-3.5 w-3.5 me-1" />
+                          {service.orders}
+                        </span>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+
+            {filteredServices.length === 0 && (
+              <Card className="border-dashed border-2 border-slate-200 bg-slate-50/50">
+                <CardContent className="p-12 text-center">
+                  <div className="h-16 w-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Briefcase className="h-8 w-8 text-slate-300" />
+                  </div>
+                  <h3 className="text-lg font-bold text-navy">
+                    {isRTL ? 'لا توجد خدمات' : 'No services found'}
+                  </h3>
+                  <p className="text-slate-500 mt-1 max-w-xs mx-auto">
+                    {isRTL ? 'قم بإضافة خدمة جديدة أو تعديل معايير البحث' : 'Add a new service or adjust your search criteria'}
+                  </p>
+                  <Button variant="outline" className="mt-4 border-slate-200">
+                    {isRTL ? 'مسح الفلاتر' : 'Clear Filters'}
+                  </Button>
+                </CardContent>
+              </Card>
+            )}
+          </div>
+
+          {/* Sidebar */}
+          <JobsSidebar context="my-services" />
         </div>
       </Main>
     </>

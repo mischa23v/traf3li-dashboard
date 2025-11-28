@@ -1,122 +1,260 @@
+import { useState } from 'react'
 import {
-    FileText, AlertCircle, CheckCircle, TrendingUp, ArrowUpRight, ArrowDownLeft
+    Clock, Bell, CheckCircle2, MapPin, Calendar as CalendarIcon,
+    Zap, Plus, CheckSquare, Trash2, List, X, ChevronRight
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { Card, CardContent } from '@/components/ui/card'
 import { Link } from '@tanstack/react-router'
+import { cn } from '@/lib/utils'
 
-export function FinanceSidebar() {
-    const formatCurrency = (amount: number) => {
-        return new Intl.NumberFormat('ar-SA', {
-            style: 'currency',
-            currency: 'SAR',
-            minimumFractionDigits: 0
-        }).format(amount)
+interface FinanceSidebarProps {
+    context?: 'invoices' | 'quotes' | 'payments' | 'expenses' | 'statements' | 'transactions' | 'activity'
+    isSelectionMode?: boolean
+    onToggleSelectionMode?: () => void
+    selectedCount?: number
+    onDeleteSelected?: () => void
+}
+
+export function FinanceSidebar({
+    context = 'invoices',
+    isSelectionMode = false,
+    onToggleSelectionMode,
+    selectedCount = 0,
+    onDeleteSelected
+}: FinanceSidebarProps) {
+    const [activeTab, setActiveTab] = useState<'calendar' | 'notifications'>('calendar')
+
+    const links = {
+        invoices: {
+            create: '/dashboard/finance/invoices/new',
+            viewAll: '/dashboard/finance/invoices'
+        },
+        quotes: {
+            create: '/dashboard/finance/quotes/new',
+            viewAll: '/dashboard/finance/quotes'
+        },
+        payments: {
+            create: '/dashboard/finance/payments/new',
+            viewAll: '/dashboard/finance/payments'
+        },
+        expenses: {
+            create: '/dashboard/finance/expenses/new',
+            viewAll: '/dashboard/finance/expenses'
+        },
+        statements: {
+            create: '/dashboard/finance/statements/new',
+            viewAll: '/dashboard/finance/statements'
+        },
+        transactions: {
+            create: '/dashboard/finance/transactions/new',
+            viewAll: '/dashboard/finance/transactions'
+        },
+        activity: {
+            create: '/dashboard/finance/activity/new',
+            viewAll: '/dashboard/finance/activity'
+        }
     }
+
+    const currentLinks = links[context] || links.invoices
 
     return (
         <div className="space-y-8 lg:col-span-1">
 
-            {/* FINANCIAL SUMMARY WIDGET */}
-            <div className="bg-white rounded-3xl overflow-hidden shadow-sm border border-slate-100 group hover:shadow-md transition-all duration-300">
-                <div className="p-6 pb-0 flex justify-between items-center">
-                    <h3 className="font-bold text-lg text-[#022c22]">الملخص المالي</h3>
-                    <div className="bg-emerald-50 p-2 rounded-full">
-                        <TrendingUp className="h-5 w-5 text-emerald-500" />
-                    </div>
+            {/* QUICK ACTIONS WIDGET */}
+            <div className="bg-gradient-to-br from-emerald-900 to-slate-900 rounded-3xl p-6 shadow-xl shadow-emerald-900/20 ring-1 ring-white/10 relative overflow-hidden">
+                {/* Background Glow */}
+                <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl -mr-32 -mt-32 pointer-events-none"></div>
+                <div className="absolute bottom-0 left-0 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl -ml-32 -mb-32 pointer-events-none"></div>
+
+                {/* Header */}
+                <div className="flex items-center justify-between mb-6 relative z-10">
+                    <h3 className="font-bold text-lg text-white">إجراءات سريعة</h3>
                 </div>
-                <div className="p-6 space-y-4">
-                    <Card className="bg-slate-50 border-0 shadow-none rounded-2xl">
-                        <CardContent className="p-4 flex items-center justify-between">
-                            <div>
-                                <div className="text-xs text-slate-500 mb-1">إجمالي الدخل</div>
-                                <div className="text-lg font-bold text-emerald-600">{formatCurrency(150000)}</div>
-                            </div>
-                            <div className="bg-emerald-100 p-2 rounded-full">
-                                <ArrowUpRight className="h-4 w-4 text-emerald-600" />
-                            </div>
-                        </CardContent>
-                    </Card>
-                    <Card className="bg-slate-50 border-0 shadow-none rounded-2xl">
-                        <CardContent className="p-4 flex items-center justify-between">
-                            <div>
-                                <div className="text-xs text-slate-500 mb-1">إجمالي المصروفات</div>
-                                <div className="text-lg font-bold text-rose-600">{formatCurrency(45000)}</div>
-                            </div>
-                            <div className="bg-rose-100 p-2 rounded-full">
-                                <ArrowDownLeft className="h-4 w-4 text-rose-600" />
-                            </div>
-                        </CardContent>
-                    </Card>
+
+                {/* Content */}
+                <div className="relative z-10 grid grid-cols-2 gap-4 animate-in fade-in slide-in-from-bottom-2 duration-300">
+                    {/* Create Button - White + Green Text + Glow */}
+                    <Button asChild className="bg-white hover:bg-emerald-50 text-emerald-600 h-auto py-6 flex flex-col items-center justify-center gap-2 rounded-3xl shadow-lg shadow-white/10 transition-all duration-300 hover:scale-[1.02] border-0">
+                        <Link to={currentLinks.create}>
+                            <Plus className="h-7 w-7" />
+                            <span className="text-sm font-bold">إنشاء</span>
+                        </Link>
+                    </Button>
+
+                    {/* Select Button - White + Dark Text + Glow */}
+                    <Button
+                        variant="ghost"
+                        className={cn(
+                            "h-auto py-6 flex flex-col items-center justify-center gap-2 rounded-3xl transition-all duration-300 hover:scale-[1.02] shadow-lg",
+                            isSelectionMode
+                                ? "bg-emerald-100 text-emerald-800 ring-2 ring-emerald-400 shadow-emerald-500/20"
+                                : "bg-white hover:bg-slate-50 text-emerald-950 shadow-white/10"
+                        )}
+                        onClick={onToggleSelectionMode}
+                    >
+                        {isSelectionMode ? <X className="h-6 w-6" /> : <CheckSquare className="h-6 w-6" />}
+                        <span className="text-sm font-bold">{isSelectionMode ? 'إلغاء' : 'تحديد'}</span>
+                    </Button>
+
+                    {/* Delete Button - White + Red Text + Glow */}
+                    <Button
+                        variant="ghost"
+                        className="bg-white hover:bg-red-50 text-red-500 hover:text-red-600 h-auto py-6 flex flex-col items-center justify-center gap-2 rounded-3xl disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 hover:scale-[1.02] shadow-lg shadow-white/10"
+                        onClick={onDeleteSelected}
+                        disabled={!isSelectionMode || selectedCount === 0}
+                    >
+                        <Trash2 className="h-6 w-6" />
+                        <span className="text-sm font-bold">
+                            {selectedCount > 0 ? `حذف (${selectedCount})` : 'حذف'}
+                        </span>
+                    </Button>
+
+                    {/* View All Button - White + Dark Text + Glow */}
+                    <Button asChild variant="ghost" className="bg-white hover:bg-slate-50 text-emerald-950 h-auto py-6 flex flex-col items-center justify-center gap-2 rounded-3xl transition-all duration-300 hover:scale-[1.02] shadow-lg shadow-white/10">
+                        <Link to={currentLinks.viewAll}>
+                            <List className="h-6 w-6" />
+                            <span className="text-sm font-bold">عرض جميع</span>
+                        </Link>
+                    </Button>
                 </div>
             </div>
 
-            {/* INVOICE STATS WIDGET */}
-            <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-100 hover:shadow-md transition-all duration-300">
-                <div className="flex justify-between items-center mb-6">
-                    <h3 className="font-bold text-[#022c22] text-lg">حالة الفواتير</h3>
-                    <Badge className="bg-blue-500 hover:bg-blue-600 text-white rounded-full px-3">نوفمبر</Badge>
+            {/* MERGED CALENDAR & AGENDA WIDGET */}
+            <div className="bg-[#022c22] rounded-3xl p-6 shadow-lg shadow-emerald-900/20 group hover:shadow-xl transition-all duration-300 relative overflow-hidden">
+                {/* Background Pattern */}
+                <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/5 rounded-full blur-3xl -mr-32 -mt-32 pointer-events-none"></div>
+                <div className="absolute bottom-0 left-0 w-64 h-64 bg-emerald-500/5 rounded-full blur-3xl -ml-32 -mb-32 pointer-events-none"></div>
+
+                {/* Decorative Lines */}
+                <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-emerald-500/20 to-transparent"></div>
+                <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-emerald-500/20 to-transparent"></div>
+
+                <div className="flex justify-between items-center mb-6 relative z-10">
+                    <div className="flex bg-[#033a2d] p-1 rounded-xl">
+                        <button
+                            onClick={() => setActiveTab('calendar')}
+                            className={cn(
+                                "px-4 py-2 text-sm font-bold rounded-lg transition-all duration-200",
+                                activeTab === 'calendar'
+                                    ? "bg-emerald-500 text-white shadow-lg shadow-emerald-500/20"
+                                    : "text-emerald-200 hover:text-white hover:bg-emerald-500/10"
+                            )}
+                        >
+                            التقويم
+                        </button>
+                        <button
+                            onClick={() => setActiveTab('notifications')}
+                            className={cn(
+                                "px-4 py-2 text-sm font-bold rounded-lg transition-all duration-200",
+                                activeTab === 'notifications'
+                                    ? "bg-emerald-500 text-white shadow-lg shadow-emerald-500/20"
+                                    : "text-emerald-200 hover:text-white hover:bg-emerald-500/10"
+                            )}
+                        >
+                            التنبيهات
+                        </button>
+                    </div>
+                    {activeTab === 'calendar' && (
+                        <Badge className="bg-emerald-500/20 text-emerald-100 border-0 rounded-full px-3 hover:bg-emerald-500/30">نوفمبر</Badge>
+                    )}
                 </div>
-                <div className="space-y-4">
-                    <div className="flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-100">
-                        <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-blue-600 shadow-sm">
-                                <FileText className="h-5 w-5" />
+
+                {/* Inner White Container */}
+                <div className="bg-[#f8fafc] rounded-2xl p-4 relative z-10 min-h-[300px] border border-white/5 shadow-inner">
+                    {activeTab === 'calendar' ? (
+                        <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
+                            {/* Calendar Strip */}
+                            <div className="grid grid-cols-5 gap-2 text-center mb-8">
+                                {['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس'].map((day, i) => (
+                                    <div key={i} className={`rounded-xl p-2 transition-all duration-200 cursor-pointer ${i === 1 ? 'bg-[#022c22] text-white shadow-lg shadow-emerald-900/20 scale-105' : 'hover:bg-white text-slate-500'}`}>
+                                        <div className={`text-[10px] mb-1 ${i === 1 ? 'text-emerald-200' : ''}`}>{day}</div>
+                                        <div className="font-bold text-lg">{19 + i}</div>
+                                        {i === 1 && <div className="w-1.5 h-1.5 bg-emerald-400 rounded-full mx-auto mt-1"></div>}
+                                    </div>
+                                ))}
                             </div>
-                            <div>
-                                <div className="font-bold text-[#022c22] text-sm">مستحقة</div>
-                                <div className="text-xs text-slate-400">5 فواتير</div>
+
+                            {/* Timeline / Agenda */}
+                            <div className="space-y-6 relative">
+                                {/* Vertical Line */}
+                                <div className="absolute top-2 bottom-2 right-[3.5rem] w-[2px] bg-slate-200"></div>
+
+                                {/* Event 1 */}
+                                <div className="flex gap-4 relative group">
+                                    <div className="w-14 text-center shrink-0 pt-1">
+                                        <div className="text-sm font-bold text-slate-700 group-hover:text-emerald-600 transition-colors">09:00</div>
+                                        <div className="text-[10px] text-slate-400">صباحاً</div>
+                                    </div>
+                                    <div className="absolute right-[3.25rem] top-2 w-3 h-3 bg-emerald-500 rounded-full border-2 border-white shadow-sm z-10"></div>
+                                    <div className="flex-1 bg-white rounded-xl p-3 border-r-4 border-emerald-500 shadow-sm hover:shadow-md transition-all">
+                                        <div className="font-bold text-slate-800 text-sm mb-1">جلسة مرافعة</div>
+                                        <div className="text-xs text-slate-500 flex items-center gap-1">
+                                            <MapPin className="h-3 w-3" />
+                                            المحكمة العامة
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Event 2 */}
+                                <div className="flex gap-4 relative group">
+                                    <div className="w-14 text-center shrink-0 pt-1">
+                                        <div className="text-sm font-bold text-slate-700 group-hover:text-purple-600 transition-colors">02:00</div>
+                                        <div className="text-[10px] text-slate-400">مساءً</div>
+                                    </div>
+                                    <div className="absolute right-[3.25rem] top-2 w-3 h-3 bg-purple-500 rounded-full border-2 border-white shadow-sm z-10"></div>
+                                    <div className="flex-1 bg-white rounded-xl p-3 border-r-4 border-purple-500 shadow-sm hover:shadow-md transition-all">
+                                        <div className="font-bold text-slate-800 text-sm mb-1">غداء عمل</div>
+                                        <div className="text-xs text-slate-500 flex items-center gap-1">
+                                            <MapPin className="h-3 w-3" />
+                                            مطعم الشرفة
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Event 3 */}
+                                <div className="flex gap-4 relative group">
+                                    <div className="w-14 text-center shrink-0 pt-1">
+                                        <div className="text-sm font-bold text-slate-700 group-hover:text-blue-600 transition-colors">04:30</div>
+                                        <div className="text-[10px] text-slate-400">مساءً</div>
+                                    </div>
+                                    <div className="absolute right-[3.25rem] top-2 w-3 h-3 bg-blue-500 rounded-full border-2 border-white shadow-sm z-10"></div>
+                                    <div className="flex-1 bg-white rounded-xl p-3 border-r-4 border-blue-500 shadow-sm hover:shadow-md transition-all">
+                                        <div className="font-bold text-slate-800 text-sm mb-1">مراجعة العقود</div>
+                                        <div className="text-xs text-slate-500 flex items-center gap-1">
+                                            <Clock className="h-3 w-3" />
+                                            المكتب الرئيسي
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
+
+                            <Button variant="ghost" className="w-full mt-6 text-slate-500 hover:text-emerald-700 hover:bg-emerald-50 group">
+                                <span>عرض الجدول الكامل</span>
+                                <ChevronRight className="w-4 h-4 mr-2 transition-transform group-hover:-translate-x-1" />
+                            </Button>
                         </div>
-                        <div className="font-bold text-[#022c22]">{formatCurrency(52900)}</div>
-                    </div>
-                    <div className="flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-100">
-                        <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-rose-600 shadow-sm">
-                                <AlertCircle className="h-5 w-5" />
-                            </div>
-                            <div>
-                                <div className="font-bold text-[#022c22] text-sm">متأخرة</div>
-                                <div className="text-xs text-slate-400">2 فاتورة</div>
-                            </div>
+                    ) : (
+                        <div className="space-y-3 animate-in fade-in slide-in-from-bottom-2 duration-300">
+                            {[1, 2, 3].map((_, i) => (
+                                <div key={i} className="flex gap-3 p-3 rounded-xl bg-white border border-slate-100 hover:shadow-md transition-all cursor-pointer group">
+                                    <div className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center text-blue-500 shrink-0 group-hover:bg-blue-500 group-hover:text-white transition-colors">
+                                        <Bell className="w-5 h-5" />
+                                    </div>
+                                    <div>
+                                        <p className="text-sm font-bold text-slate-800 group-hover:text-blue-600 transition-colors">تذكير جديد</p>
+                                        <p className="text-xs text-slate-500 mt-1">لديك اجتماع في تمام الساعة 2:00 مساءً</p>
+                                    </div>
+                                </div>
+                            ))}
+                            <Button variant="ghost" className="w-full text-xs text-slate-400 hover:text-emerald-600 hover:bg-emerald-50">
+                                عرض كل التنبيهات
+                            </Button>
                         </div>
-                        <div className="font-bold text-[#022c22]">{formatCurrency(12500)}</div>
-                    </div>
+                    )}
                 </div>
             </div>
 
-            {/* RECENT ACTIVITY WIDGET */}
-            <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-100 hover:shadow-md transition-all duration-300">
-                <div className="flex justify-between items-center mb-6">
-                    <h3 className="font-bold text-[#022c22] text-lg">آخر النشاطات</h3>
-                </div>
-                <div className="space-y-4">
-                    <div className="flex gap-4 relative pb-4 border-b border-slate-50 last:border-0">
-                        <div className="w-14 text-center shrink-0">
-                            <div className="text-sm font-bold text-[#022c22]">10:30</div>
-                            <div className="text-xs text-slate-400">ص</div>
-                        </div>
-                        <div className="flex-1">
-                            <div className="font-bold text-[#022c22] text-sm mb-1">تم دفع فاتورة #1023</div>
-                            <div className="text-xs text-slate-500">شركة الإنشاءات الحديثة</div>
-                        </div>
-                    </div>
-                    <div className="flex gap-4 relative pb-4 border-b border-slate-50 last:border-0">
-                        <div className="w-14 text-center shrink-0">
-                            <div className="text-sm font-bold text-[#022c22]">09:15</div>
-                            <div className="text-xs text-slate-400">ص</div>
-                        </div>
-                        <div className="flex-1">
-                            <div className="font-bold text-[#022c22] text-sm mb-1">تسجيل مصروف جديد</div>
-                            <div className="text-xs text-slate-500">ضيافة واجتماعات</div>
-                        </div>
-                    </div>
-                </div>
-                <Button asChild variant="ghost" className="w-full mt-2 text-slate-500 hover:text-[#022c22]">
-                    <Link to="/dashboard/finance/activity">عرض سجل النشاطات</Link>
-                </Button>
-            </div>
 
         </div>
     )

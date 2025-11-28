@@ -370,19 +370,16 @@ export function CreateEventView() {
                 <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
                     <DynamicIsland />
                 </div>
-                <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-blue-500/50 to-transparent"></div>
+                <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-emerald-500/50 to-transparent"></div>
             </Header>
 
             <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-r border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
-                    {/* Sidebar Widgets */}
-                    <TasksSidebar />
-
-                    {/* Main Form Content */}
+                    {/* RIGHT COLUMN (Main Content) */}
                     <div className="lg:col-span-2 space-y-8">
 
                         {/* HERO CARD */}
-                        <div className="bg-navy rounded-3xl p-8 relative overflow-hidden text-white shadow-xl shadow-navy/20 flex flex-col md:flex-row items-center justify-between gap-8">
+                        <div className="bg-blue-900 rounded-3xl p-8 relative overflow-hidden text-white shadow-xl shadow-blue-900/20 flex flex-col md:flex-row items-center justify-between gap-8">
                             <div className="relative z-10 max-w-lg">
                                 <div className="flex items-center gap-4 mb-4">
                                     <Link to="/dashboard/tasks/events">
@@ -390,20 +387,20 @@ export function CreateEventView() {
                                             <ArrowRight className="w-5 h-5" />
                                         </Button>
                                     </Link>
-                                    <h2 className="text-3xl font-bold leading-tight">إنشاء فعالية جديدة</h2>
+                                    <h2 className="text-3xl font-bold leading-tight">إضافة حدث جديد</h2>
                                 </div>
                                 <p className="text-blue-200 text-lg mb-8 leading-relaxed">
-                                    أضف جلسة، اجتماع، أو فعالية جديدة إلى الجدول لتنظيم وقتك بكفاءة.
+                                    أضف فعالية جديدة إلى جدولك، حدد المشاركين، وأرسل الدعوات تلقائياً.
                                 </p>
                             </div>
                             {/* Abstract Visual Decoration */}
                             <div className="hidden md:block relative w-64 h-64">
-                                <div className="absolute inset-0 bg-gradient-to-tr from-blue-500 to-purple-500 rounded-full opacity-20 blur-3xl animate-pulse"></div>
-                                <div className="absolute inset-4 bg-navy rounded-2xl border border-white/10 flex items-center justify-center transform rotate-6 shadow-2xl">
+                                <div className="absolute inset-0 bg-gradient-to-tr from-blue-500 to-indigo-500 rounded-full opacity-20 blur-3xl animate-pulse"></div>
+                                <div className="absolute inset-4 bg-blue-900 rounded-2xl border border-white/10 flex items-center justify-center transform rotate-6 shadow-2xl">
                                     <Calendar className="h-24 w-24 text-blue-400" />
                                 </div>
-                                <div className="absolute inset-4 bg-navy/80 rounded-2xl border border-white/10 flex items-center justify-center transform -rotate-6 backdrop-blur-sm">
-                                    <MapPin className="h-24 w-24 text-purple-400" />
+                                <div className="absolute inset-4 bg-blue-900/80 rounded-2xl border border-white/10 flex items-center justify-center transform -rotate-6 backdrop-blur-sm">
+                                    <Clock className="h-24 w-24 text-indigo-400" />
                                 </div>
                             </div>
                         </div>
@@ -413,56 +410,32 @@ export function CreateEventView() {
                             <form onSubmit={handleSubmit} className="space-y-8">
                                 {/* Basic Info */}
                                 <div className="space-y-6">
+                                    <div className="space-y-2">
+                                        <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                                            <FileText className="w-4 h-4 text-blue-500" />
+                                            عنوان الحدث <span className="text-red-500">*</span>
+                                        </label>
+                                        <Input
+                                            placeholder="مثال: اجتماع مراجعة العقد"
+                                            className="rounded-xl border-slate-200 focus:border-blue-500 focus:ring-blue-500"
+                                            required
+                                            value={formData.title}
+                                            onChange={(e) => handleChange('title', e.target.value)}
+                                        />
+                                    </div>
+
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                         <div className="space-y-2">
-                                            <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                                <Calendar className="w-4 h-4 text-blue-500" />
-                                                عنوان الفعالية <span className="text-red-500">*</span>
-                                            </label>
-                                            <Input
-                                                placeholder="مثال: جلسة مرافعة"
-                                                className="rounded-xl border-slate-200 focus:border-blue-500 focus:ring-blue-500"
-                                                required
-                                                value={formData.title}
-                                                onChange={(e) => handleChange('title', e.target.value)}
-                                            />
-                                        </div>
-                                        <div className="space-y-2">
-                                            <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                                <Briefcase className="w-4 h-4 text-blue-500" />
-                                                نوع الفعالية <span className="text-red-500">*</span>
-                                            </label>
+                                            <label className="text-sm font-medium text-slate-700">نوع الحدث</label>
                                             <Select value={formData.type} onValueChange={(value) => handleChange('type', value)}>
-                                                <SelectTrigger className="rounded-xl border-slate-200 focus:ring-blue-500">
-                                                    <SelectValue placeholder="اختر النوع" />
+                                                <SelectTrigger className="rounded-xl">
+                                                    <SelectValue />
                                                 </SelectTrigger>
                                                 <SelectContent>
                                                     {EVENT_TYPES.map(option => (
                                                         <SelectItem key={option.value} value={option.value}>
-                                                            <Badge variant="secondary" className={cn("text-xs", option.color)}>
-                                                                {option.label}
-                                                            </Badge>
-                                                        </SelectItem>
-                                                    ))}
-                                                </SelectContent>
-                                            </Select>
-                                        </div>
-                                    </div>
-
-                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                                        <div className="space-y-2">
-                                            <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                                الأولوية
-                                            </label>
-                                            <Select value={formData.priority} onValueChange={(value) => handleChange('priority', value)}>
-                                                <SelectTrigger className="rounded-xl border-slate-200 focus:ring-blue-500">
-                                                    <SelectValue />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    {PRIORITY_OPTIONS.map(option => (
-                                                        <SelectItem key={option.value} value={option.value}>
                                                             <div className="flex items-center gap-2">
-                                                                <span className={cn("w-2 h-2 rounded-full", option.color)} />
+                                                                <span className={cn("w-2 h-2 rounded-full", option.color.split(' ')[0])} />
                                                                 {option.label}
                                                             </div>
                                                         </SelectItem>
@@ -471,11 +444,9 @@ export function CreateEventView() {
                                             </Select>
                                         </div>
                                         <div className="space-y-2">
-                                            <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                                الحالة
-                                            </label>
+                                            <label className="text-sm font-medium text-slate-700">الحالة</label>
                                             <Select value={formData.status} onValueChange={(value) => handleChange('status', value)}>
-                                                <SelectTrigger className="rounded-xl border-slate-200 focus:ring-blue-500">
+                                                <SelectTrigger className="rounded-xl">
                                                     <SelectValue />
                                                 </SelectTrigger>
                                                 <SelectContent>
@@ -487,216 +458,48 @@ export function CreateEventView() {
                                                 </SelectContent>
                                             </Select>
                                         </div>
-                                        <div className="space-y-2">
-                                            <label className="text-sm font-medium text-slate-700">اللون</label>
-                                            <div className="flex gap-2">
-                                                {EVENT_COLORS.map(color => (
-                                                    <button
-                                                        key={color}
-                                                        type="button"
-                                                        className={cn(
-                                                            "w-8 h-8 rounded-full transition-all",
-                                                            formData.color === color && "ring-2 ring-offset-2 ring-slate-400"
-                                                        )}
-                                                        style={{ backgroundColor: color }}
-                                                        onClick={() => handleChange('color', color)}
-                                                    />
-                                                ))}
-                                            </div>
-                                        </div>
                                     </div>
 
-                                    {/* Date & Time */}
-                                    <div className="space-y-4">
-                                        <div className="flex items-center gap-3">
-                                            <Checkbox
-                                                id="allDay"
-                                                checked={formData.allDay}
-                                                onCheckedChange={(checked) => handleChange('allDay', checked === true)}
-                                            />
-                                            <label htmlFor="allDay" className="text-sm font-medium text-slate-700">
-                                                طوال اليوم
-                                            </label>
-                                        </div>
-
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                            <div className="space-y-2">
-                                                <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                                    <Calendar className="w-4 h-4 text-blue-500" />
-                                                    تاريخ البداية <span className="text-red-500">*</span>
-                                                </label>
-                                                <Input
-                                                    type="date"
-                                                    className="rounded-xl border-slate-200 focus:border-blue-500 focus:ring-blue-500"
-                                                    required
-                                                    value={formData.startDate}
-                                                    onChange={(e) => handleChange('startDate', e.target.value)}
-                                                />
-                                            </div>
-                                            {!formData.allDay && (
-                                                <div className="space-y-2">
-                                                    <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                                        <Clock className="w-4 h-4 text-blue-500" />
-                                                        وقت البداية <span className="text-red-500">*</span>
-                                                    </label>
-                                                    <Input
-                                                        type="time"
-                                                        className="rounded-xl border-slate-200 focus:border-blue-500 focus:ring-blue-500"
-                                                        required
-                                                        value={formData.startTime}
-                                                        onChange={(e) => handleChange('startTime', e.target.value)}
-                                                    />
-                                                </div>
-                                            )}
-                                        </div>
-
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                            <div className="space-y-2">
-                                                <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                                    <Calendar className="w-4 h-4 text-blue-500" />
-                                                    تاريخ النهاية
-                                                </label>
-                                                <Input
-                                                    type="date"
-                                                    className="rounded-xl border-slate-200 focus:border-blue-500 focus:ring-blue-500"
-                                                    value={formData.endDate}
-                                                    onChange={(e) => handleChange('endDate', e.target.value)}
-                                                />
-                                            </div>
-                                            {!formData.allDay && (
-                                                <div className="space-y-2">
-                                                    <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                                        <Clock className="w-4 h-4 text-blue-500" />
-                                                        وقت النهاية
-                                                    </label>
-                                                    <Input
-                                                        type="time"
-                                                        className="rounded-xl border-slate-200 focus:border-blue-500 focus:ring-blue-500"
-                                                        value={formData.endTime}
-                                                        onChange={(e) => handleChange('endTime', e.target.value)}
-                                                    />
-                                                </div>
-                                            )}
-                                        </div>
-
-                                        {!formData.allDay && (
-                                            <div className="space-y-2">
-                                                <label className="text-sm font-medium text-slate-700">المدة (دقائق)</label>
-                                                <Input
-                                                    type="number"
-                                                    min="5"
-                                                    step="5"
-                                                    className="rounded-xl border-slate-200 focus:border-blue-500 focus:ring-blue-500 w-32"
-                                                    value={formData.duration}
-                                                    onChange={(e) => handleChange('duration', parseInt(e.target.value) || 60)}
-                                                />
-                                            </div>
-                                        )}
-                                    </div>
-
-                                    {/* Relations */}
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                         <div className="space-y-2">
-                                            <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                                <Scale className="w-4 h-4 text-blue-500" />
-                                                القضية المرتبطة
-                                            </label>
-                                            <Select value={formData.caseId} onValueChange={(value) => handleChange('caseId', value)}>
-                                                <SelectTrigger className="rounded-xl border-slate-200 focus:ring-blue-500">
-                                                    <SelectValue placeholder="اختر القضية (اختياري)" />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    {casesLoading ? (
-                                                        <div className="flex items-center justify-center py-4">
-                                                            <Loader2 className="h-4 w-4 animate-spin" />
-                                                        </div>
-                                                    ) : cases?.cases && cases.cases.length > 0 ? (
-                                                        cases.cases.map((caseItem) => (
-                                                            <SelectItem key={caseItem._id} value={caseItem._id}>
-                                                                {caseItem.caseNumber ? `${caseItem.caseNumber} - ` : ''}
-                                                                {caseItem.title}
-                                                            </SelectItem>
-                                                        ))
-                                                    ) : (
-                                                        <div className="text-center py-4 text-slate-500 text-sm">
-                                                            لا توجد قضايا
-                                                        </div>
-                                                    )}
-                                                </SelectContent>
-                                            </Select>
+                                            <label className="text-sm font-medium text-slate-700">تاريخ البداية</label>
+                                            <Input
+                                                type="date"
+                                                className="rounded-xl"
+                                                required
+                                                value={formData.startDate}
+                                                onChange={(e) => handleChange('startDate', e.target.value)}
+                                            />
                                         </div>
                                         <div className="space-y-2">
-                                            <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                                <User className="w-4 h-4 text-blue-500" />
-                                                العميل
-                                            </label>
-                                            <Select value={formData.clientId} onValueChange={(value) => handleChange('clientId', value)}>
-                                                <SelectTrigger className="rounded-xl border-slate-200 focus:ring-blue-500">
-                                                    <SelectValue placeholder="اختر العميل (اختياري)" />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    {clientsLoading ? (
-                                                        <div className="flex items-center justify-center py-4">
-                                                            <Loader2 className="h-4 w-4 animate-spin" />
-                                                        </div>
-                                                    ) : clients?.data && clients.data.length > 0 ? (
-                                                        clients.data.map((client) => (
-                                                            <SelectItem key={client._id} value={client._id}>
-                                                                {client.fullName}
-                                                            </SelectItem>
-                                                        ))
-                                                    ) : (
-                                                        <div className="text-center py-4 text-slate-500 text-sm">
-                                                            لا يوجد عملاء
-                                                        </div>
-                                                    )}
-                                                </SelectContent>
-                                            </Select>
-                                        </div>
-                                    </div>
-
-                                    {/* Tags */}
-                                    <div className="space-y-2">
-                                        <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                            الوسوم
-                                        </label>
-                                        <div className="flex flex-wrap gap-2 mb-2">
-                                            {formData.tags.map(tag => (
-                                                <Badge key={tag} variant="secondary" className="gap-1">
-                                                    {tag}
-                                                    <button type="button" onClick={() => removeTag(tag)} className="hover:text-red-500">
-                                                        <X className="w-3 h-3" />
-                                                    </button>
-                                                </Badge>
-                                            ))}
-                                        </div>
-                                        <div className="flex gap-2">
+                                            <label className="text-sm font-medium text-slate-700">وقت البداية</label>
                                             <Input
-                                                placeholder="أضف وسم..."
-                                                className="rounded-xl border-slate-200 focus:border-blue-500 focus:ring-blue-500 flex-1"
-                                                value={tagInput}
-                                                onChange={(e) => setTagInput(e.target.value)}
-                                                onKeyDown={(e) => {
-                                                    if (e.key === 'Enter') {
-                                                        e.preventDefault()
-                                                        addTag()
-                                                    }
-                                                }}
+                                                type="time"
+                                                className="rounded-xl"
+                                                required={!formData.allDay}
+                                                disabled={formData.allDay}
+                                                value={formData.startTime}
+                                                onChange={(e) => handleChange('startTime', e.target.value)}
                                             />
-                                            <Button type="button" variant="outline" onClick={addTag} className="rounded-xl">
-                                                <Plus className="w-4 h-4" />
-                                            </Button>
                                         </div>
                                     </div>
 
-                                    <div className="space-y-2">
-                                        <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                            <FileText className="w-4 h-4 text-blue-500" />
-                                            تفاصيل إضافية
+                                    <div className="flex items-center gap-2">
+                                        <Checkbox
+                                            id="allDay"
+                                            checked={formData.allDay}
+                                            onCheckedChange={(checked) => handleChange('allDay', checked === true)}
+                                        />
+                                        <label htmlFor="allDay" className="text-sm font-medium text-slate-700">
+                                            طوال اليوم
                                         </label>
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <label className="text-sm font-medium text-slate-700">الوصف</label>
                                         <Textarea
-                                            placeholder="أدخل جدول الأعمال أو ملاحظات..."
-                                            className="min-h-[120px] rounded-xl border-slate-200 focus:border-blue-500 focus:ring-blue-500"
+                                            placeholder="تفاصيل إضافية..."
+                                            className="min-h-[100px] rounded-xl"
                                             value={formData.description}
                                             onChange={(e) => handleChange('description', e.target.value)}
                                         />
@@ -717,102 +520,60 @@ export function CreateEventView() {
                                         </CollapsibleTrigger>
                                         <CollapsibleContent className="mt-4">
                                             <div className="space-y-4 p-4 bg-slate-50 rounded-xl">
-                                                <div className="flex gap-2">
+                                                <div className="flex gap-4">
                                                     {LOCATION_TYPES.map(type => (
-                                                        <Button
-                                                            key={type.value}
-                                                            type="button"
-                                                            variant={locationType === type.value ? "default" : "outline"}
-                                                            size="sm"
-                                                            onClick={() => setLocationType(type.value as any)}
-                                                            className="rounded-full"
-                                                        >
-                                                            {type.value === 'physical' && <MapPin className="w-4 h-4 ml-1" />}
-                                                            {type.value === 'virtual' && <Video className="w-4 h-4 ml-1" />}
-                                                            {type.label}
-                                                        </Button>
+                                                        <div key={type.value} className="flex items-center gap-2">
+                                                            <input
+                                                                type="radio"
+                                                                name="locationType"
+                                                                id={`loc-${type.value}`}
+                                                                checked={locationType === type.value}
+                                                                onChange={() => setLocationType(type.value as any)}
+                                                                className="text-blue-500 focus:ring-blue-500"
+                                                            />
+                                                            <label htmlFor={`loc-${type.value}`} className="text-sm text-slate-700">{type.label}</label>
+                                                        </div>
                                                     ))}
                                                 </div>
 
                                                 {(locationType === 'physical' || locationType === 'hybrid') && (
-                                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                                        <div className="space-y-2">
-                                                            <label className="text-sm font-medium text-slate-700">العنوان</label>
-                                                            <Input
-                                                                placeholder="مثال: المحكمة العامة"
-                                                                className="rounded-xl"
-                                                                value={locationData.address}
-                                                                onChange={(e) => setLocationData(prev => ({ ...prev, address: e.target.value }))}
-                                                            />
-                                                        </div>
-                                                        <div className="space-y-2">
-                                                            <label className="text-sm font-medium text-slate-700">المبنى</label>
-                                                            <Input
-                                                                placeholder="مثال: المبنى الرئيسي"
-                                                                className="rounded-xl"
-                                                                value={locationData.building}
-                                                                onChange={(e) => setLocationData(prev => ({ ...prev, building: e.target.value }))}
-                                                            />
-                                                        </div>
-                                                        <div className="space-y-2">
-                                                            <label className="text-sm font-medium text-slate-700">القاعة/الغرفة</label>
-                                                            <Input
-                                                                placeholder="مثال: القاعة 4"
-                                                                className="rounded-xl"
-                                                                value={locationData.room}
-                                                                onChange={(e) => setLocationData(prev => ({ ...prev, room: e.target.value }))}
-                                                            />
-                                                        </div>
+                                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                        <Input
+                                                            placeholder="العنوان"
+                                                            className="rounded-xl"
+                                                            value={locationData.address}
+                                                            onChange={(e) => setLocationData(prev => ({ ...prev, address: e.target.value }))}
+                                                        />
+                                                        <Input
+                                                            placeholder="الغرفة / القاعة"
+                                                            className="rounded-xl"
+                                                            value={locationData.room}
+                                                            onChange={(e) => setLocationData(prev => ({ ...prev, room: e.target.value }))}
+                                                        />
                                                     </div>
                                                 )}
 
                                                 {(locationType === 'virtual' || locationType === 'hybrid') && (
                                                     <div className="space-y-4">
-                                                        <div className="space-y-2">
-                                                            <label className="text-sm font-medium text-slate-700">المنصة</label>
+                                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                                             <Select
                                                                 value={locationData.platform}
-                                                                onValueChange={(value) => setLocationData(prev => ({ ...prev, platform: value as any }))}
+                                                                onValueChange={(value: any) => setLocationData(prev => ({ ...prev, platform: value }))}
                                                             >
                                                                 <SelectTrigger className="rounded-xl">
                                                                     <SelectValue placeholder="اختر المنصة" />
                                                                 </SelectTrigger>
                                                                 <SelectContent>
-                                                                    {VIRTUAL_PLATFORMS.map(platform => (
-                                                                        <SelectItem key={platform.value} value={platform.value}>
-                                                                            {platform.label}
-                                                                        </SelectItem>
+                                                                    {VIRTUAL_PLATFORMS.map(p => (
+                                                                        <SelectItem key={p.value} value={p.value}>{p.label}</SelectItem>
                                                                     ))}
                                                                 </SelectContent>
                                                             </Select>
-                                                        </div>
-                                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                                            <div className="space-y-2">
-                                                                <label className="text-sm font-medium text-slate-700">رابط الاجتماع</label>
-                                                                <Input
-                                                                    placeholder="https://..."
-                                                                    className="rounded-xl"
-                                                                    value={locationData.meetingUrl}
-                                                                    onChange={(e) => setLocationData(prev => ({ ...prev, meetingUrl: e.target.value }))}
-                                                                />
-                                                            </div>
-                                                            <div className="space-y-2">
-                                                                <label className="text-sm font-medium text-slate-700">معرف الاجتماع</label>
-                                                                <Input
-                                                                    placeholder="Meeting ID"
-                                                                    className="rounded-xl"
-                                                                    value={locationData.meetingId}
-                                                                    onChange={(e) => setLocationData(prev => ({ ...prev, meetingId: e.target.value }))}
-                                                                />
-                                                            </div>
-                                                        </div>
-                                                        <div className="space-y-2">
-                                                            <label className="text-sm font-medium text-slate-700">كلمة المرور</label>
                                                             <Input
-                                                                placeholder="Password"
-                                                                className="rounded-xl w-48"
-                                                                value={locationData.password}
-                                                                onChange={(e) => setLocationData(prev => ({ ...prev, password: e.target.value }))}
+                                                                placeholder="رابط الاجتماع"
+                                                                className="rounded-xl"
+                                                                value={locationData.meetingUrl}
+                                                                onChange={(e) => setLocationData(prev => ({ ...prev, meetingUrl: e.target.value }))}
                                                             />
                                                         </div>
                                                     </div>
@@ -829,7 +590,7 @@ export function CreateEventView() {
                                             <Button variant="ghost" className="w-full justify-between p-0 h-auto hover:bg-transparent">
                                                 <h3 className="text-lg font-semibold text-slate-800 flex items-center gap-2">
                                                     <Users className="w-5 h-5 text-blue-500" />
-                                                    الحضور
+                                                    المشاركون
                                                 </h3>
                                                 {showAttendees ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
                                             </Button>
@@ -838,16 +599,14 @@ export function CreateEventView() {
                                             <div className="space-y-4 p-4 bg-slate-50 rounded-xl">
                                                 {attendees.map((attendee) => (
                                                     <div key={attendee.id} className="flex items-center gap-3 p-3 bg-white rounded-xl border border-slate-100">
-                                                        <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold">
+                                                        <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold">
                                                             {attendee.name.charAt(0)}
                                                         </div>
                                                         <div className="flex-1">
-                                                            <span className="font-medium text-slate-700">{attendee.name}</span>
-                                                            {attendee.email && <span className="text-sm text-slate-500 block">{attendee.email}</span>}
+                                                            <div className="font-medium text-slate-700">{attendee.name}</div>
+                                                            <div className="text-xs text-slate-500">{attendee.email}</div>
                                                         </div>
-                                                        <Badge variant="secondary" className="text-xs">
-                                                            {attendee.role === 'organizer' ? 'منظم' : attendee.role === 'required' ? 'مطلوب' : 'اختياري'}
-                                                        </Badge>
+                                                        <Badge variant="outline">{attendee.role}</Badge>
                                                         <Button
                                                             type="button"
                                                             variant="ghost"
@@ -1175,6 +934,8 @@ export function CreateEventView() {
                             </form>
                         </div>
                     </div>
+                    {/* LEFT COLUMN (Widgets) */}
+                    <TasksSidebar context="events" />
                 </div>
             </Main>
         </>
