@@ -275,6 +275,12 @@ export interface WikiPage {
   aiKeywords?: string[]
   lastAiProcessedAt?: string
 
+  // Calendar Integration
+  showOnCalendar?: boolean
+  calendarDate?: string
+  calendarEndDate?: string
+  calendarColor?: string
+
   // Timestamps
   createdAt: string
   updatedAt: string
@@ -513,6 +519,20 @@ export interface CreateWikiPageInput {
   isTemplate?: boolean
   visibility?: WikiVisibility
   isConfidential?: boolean
+  // Calendar Integration
+  showOnCalendar?: boolean
+  calendarDate?: string
+  calendarEndDate?: string
+  calendarColor?: string
+}
+
+export type WikiExportFormat = 'pdf' | 'latex' | 'markdown' | 'preview'
+
+export interface WikiExportResponse {
+  format: WikiExportFormat
+  fileName?: string
+  downloadUrl?: string
+  html?: string
 }
 
 export interface UpdateWikiPageInput extends Partial<CreateWikiPageInput> {

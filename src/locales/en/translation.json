@@ -1767,6 +1767,9 @@
       "moveTo": "Move To",
       "copyLink": "Copy Link",
       "exportPdf": "Export as PDF",
+      "exportLatex": "Export as LaTeX",
+      "exportMarkdown": "Export as Markdown",
+      "preview": "Preview",
       "viewHistory": "View History",
       "restoreVersion": "Restore Version",
       "compare": "Compare Versions"

@@ -26,7 +26,9 @@ import type {
   ConfirmAttachmentInput,
   UpdateAttachmentInput,
   UploadVersionInput,
-  ConfirmVersionInput
+  ConfirmVersionInput,
+  WikiExportFormat,
+  WikiExportResponse
 } from '@/types/wiki'
 
 const BASE_URL = '/api'
@@ -919,5 +921,56 @@ export const wikiAttachmentVersionService = {
     } catch (error) {
       throw handleApiError(error)
     }
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// EXPORT OPERATIONS
+// ═══════════════════════════════════════════════════════════════
+
+export const wikiExportService = {
+  /**
+   * Export a page to a specific format (PDF, LaTeX, Markdown, or HTML preview)
+   */
+  export: async (
+    pageId: string,
+    format: WikiExportFormat
+  ): Promise<WikiExportResponse> => {
+    try {
+      const response = await apiClient.get<ApiResponse<WikiExportResponse>>(
+        `${BASE_URL}/wiki/${pageId}/export/${format}`
+      )
+      return response.data.data
+    } catch (error) {
+      throw handleApiError(error)
+    }
+  },
+
+  /**
+   * Get PDF export
+   */
+  exportPdf: async (pageId: string): Promise<WikiExportResponse> => {
+    return wikiExportService.export(pageId, 'pdf')
+  },
+
+  /**
+   * Get LaTeX export
+   */
+  exportLatex: async (pageId: string): Promise<WikiExportResponse> => {
+    return wikiExportService.export(pageId, 'latex')
+  },
+
+  /**
+   * Get Markdown export
+   */
+  exportMarkdown: async (pageId: string): Promise<WikiExportResponse> => {
+    return wikiExportService.export(pageId, 'markdown')
+  },
+
+  /**
+   * Get HTML preview
+   */
+  getPreview: async (pageId: string): Promise<WikiExportResponse> => {
+    return wikiExportService.export(pageId, 'preview')
   }
 }

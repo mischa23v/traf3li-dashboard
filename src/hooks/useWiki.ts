@@ -12,7 +12,8 @@ import {
   wikiCommentService,
   wikiTemplateService,
   wikiAttachmentService,
-  wikiAttachmentVersionService
+  wikiAttachmentVersionService,
+  wikiExportService
 } from '@/services/wikiService'
 import type {
   CreateWikiPageInput,
@@ -21,7 +22,8 @@ import type {
   UpdateWikiCollectionInput,
   CreateWikiCommentInput,
   WikiAttachmentCategory,
-  UpdateAttachmentInput
+  UpdateAttachmentInput,
+  WikiExportFormat
 } from '@/types/wiki'
 
 // ═══════════════════════════════════════════════════════════════
@@ -864,6 +866,42 @@ export const useRestoreAttachmentVersion = () => {
         queryKey: wikiKeys.attachmentVersions(pageId, attachmentId)
       })
       queryClient.invalidateQueries({ queryKey: wikiKeys.attachments(pageId) })
+    }
+  })
+}
+
+// ═══════════════════════════════════════════════════════════════
+// EXPORT HOOKS
+// ═══════════════════════════════════════════════════════════════
+
+/**
+ * Export a wiki page to a specific format
+ */
+export const useExportWikiPage = () => {
+  return useMutation({
+    mutationFn: async ({
+      pageId,
+      format
+    }: {
+      pageId: string
+      format: WikiExportFormat
+    }) => {
+      const response = await wikiExportService.export(pageId, format)
+
+      // Handle the response based on format
+      if (format === 'preview' && response.html) {
+        // Open HTML preview in new tab
+        const newWindow = window.open()
+        if (newWindow) {
+          newWindow.document.write(response.html)
+          newWindow.document.close()
+        }
+      } else if (response.downloadUrl) {
+        // Trigger download for other formats
+        window.open(response.downloadUrl, '_blank')
+      }
+
+      return response
     }
   })
 }

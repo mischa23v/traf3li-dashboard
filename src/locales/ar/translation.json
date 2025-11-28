@@ -1767,6 +1767,9 @@
       "moveTo": "نقل إلى",
       "copyLink": "نسخ الرابط",
       "exportPdf": "تصدير كـ PDF",
+      "exportLatex": "تصدير كـ LaTeX",
+      "exportMarkdown": "تصدير كـ Markdown",
+      "preview": "معاينة",
       "viewHistory": "عرض السجل",
       "restoreVersion": "استعادة الإصدار",
       "compare": "مقارنة الإصدارات"
