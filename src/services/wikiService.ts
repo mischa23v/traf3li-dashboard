@@ -8,25 +8,38 @@ import apiClient, { handleApiError } from '@/lib/api'
 import type {
   WikiPage,
   WikiCollection,
+  WikiFolder,
   WikiRevision,
   WikiBacklink,
   WikiComment,
   WikiAttachment,
+  WikiVoiceMemo,
   AttachmentVersion,
   AttachmentVersionHistoryResponse,
   WikiPageTreeResponse,
+  WikiStandaloneTreeResponse,
+  WikiTagsResponse,
+  WikiFolderTreeItem,
   WikiLinkGraph,
   WikiRevisionStats,
+  WikiLinkableEntityType,
+  WikiVoiceMemosResponse,
+  VoiceMemoUrlResponse,
   CreateWikiPageInput,
   UpdateWikiPageInput,
   CreateWikiCollectionInput,
   UpdateWikiCollectionInput,
+  CreateWikiFolderInput,
+  UpdateWikiFolderInput,
   CreateWikiCommentInput,
   UploadAttachmentInput,
   ConfirmAttachmentInput,
   UpdateAttachmentInput,
   UploadVersionInput,
   ConfirmVersionInput,
+  UploadVoiceMemoInput,
+  ConfirmVoiceMemoInput,
+  UpdateVoiceMemoInput,
   WikiExportFormat,
   WikiExportResponse
 } from '@/types/wiki'
@@ -304,6 +317,307 @@ export const wikiPageService = {
     try {
       const response = await apiClient.get<ApiResponse<WikiLinkGraph>>(
         `/cases/${caseId}/wiki/graph`
+      )
+      return response.data.data
+    } catch (error) {
+      throw handleApiError(error)
+    }
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// STANDALONE PAGE OPERATIONS (No caseId required)
+// ═══════════════════════════════════════════════════════════════
+
+export const wikiStandaloneService = {
+  /**
+   * List all user's pages with optional filters (no case required)
+   */
+  listPages: async (params?: {
+    pageType?: string
+    collectionId?: string
+    folderId?: string
+    parentPageId?: string | null
+    tags?: string // comma-separated
+    caseId?: string // optional filter
+    clientId?: string // optional filter
+    sortBy?: 'title' | 'created' | 'updated'
+    limit?: number
+    skip?: number
+  }): Promise<WikiPage[]> => {
+    try {
+      const response = await apiClient.get<ApiResponse<WikiPage[]>>(
+        `/wiki/pages`,
+        { params }
+      )
+      return response.data.data
+    } catch (error) {
+      throw handleApiError(error)
+    }
+  },
+
+  /**
+   * Get user's page tree for sidebar (no case required)
+   */
+  getTree: async (params?: {
+    folderId?: string
+    collectionId?: string
+  }): Promise<WikiStandaloneTreeResponse> => {
+    try {
+      const response = await apiClient.get<ApiResponse<WikiStandaloneTreeResponse>>(
+        `/wiki/tree`,
+        { params }
+      )
+      return response.data.data
+    } catch (error) {
+      throw handleApiError(error)
+    }
+  },
+
+  /**
+   * Create a standalone page (no caseId required)
+   * Links to cases/clients/etc are OPTIONAL - add later
+   */
+  createPage: async (data: CreateWikiPageInput): Promise<WikiPage> => {
+    try {
+      const response = await apiClient.post<ApiResponse<WikiPage>>(
+        `/wiki/pages`,
+        data
+      )
+      return response.data.data
+    } catch (error) {
+      throw handleApiError(error)
+    }
+  },
+
+  /**
+   * Search pages with optional filters
+   */
+  searchPages: async (
+    query: string,
+    params?: {
+      pageType?: string
+      caseId?: string
+      clientId?: string
+      tags?: string
+      limit?: number
+    }
+  ): Promise<WikiPage[]> => {
+    try {
+      const response = await apiClient.get<ApiResponse<WikiPage[]>>(
+        `/wiki/pages/search`,
+        { params: { q: query, ...params } }
+      )
+      return response.data.data
+    } catch (error) {
+      throw handleApiError(error)
+    }
+  },
+
+  /**
+   * Get all pinned pages for user
+   */
+  getPinnedPages: async (): Promise<WikiPage[]> => {
+    try {
+      const response = await apiClient.get<ApiResponse<WikiPage[]>>(
+        `/wiki/pages/pinned`
+      )
+      return response.data.data
+    } catch (error) {
+      throw handleApiError(error)
+    }
+  },
+
+  /**
+   * Get all user tags across all pages
+   */
+  getTags: async (): Promise<WikiTagsResponse> => {
+    try {
+      const response = await apiClient.get<ApiResponse<WikiTagsResponse>>(
+        `/wiki/tags`
+      )
+      return response.data.data
+    } catch (error) {
+      throw handleApiError(error)
+    }
+  },
+
+  /**
+   * Link an entity to a page (case, client, task, event, reminder, document, wiki)
+   */
+  linkEntity: async (
+    pageId: string,
+    entityType: WikiLinkableEntityType,
+    entityId: string
+  ): Promise<WikiPage> => {
+    try {
+      const response = await apiClient.post<ApiResponse<WikiPage>>(
+        `/wiki/${pageId}/link`,
+        { entityType, entityId }
+      )
+      return response.data.data
+    } catch (error) {
+      throw handleApiError(error)
+    }
+  },
+
+  /**
+   * Unlink an entity from a page
+   */
+  unlinkEntity: async (
+    pageId: string,
+    entityType: WikiLinkableEntityType,
+    entityId: string
+  ): Promise<WikiPage> => {
+    try {
+      const response = await apiClient.delete<ApiResponse<WikiPage>>(
+        `/wiki/${pageId}/link`,
+        { data: { entityType, entityId } }
+      )
+      return response.data.data
+    } catch (error) {
+      throw handleApiError(error)
+    }
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// FOLDER OPERATIONS (Standalone user-centric folders)
+// ═══════════════════════════════════════════════════════════════
+
+export const wikiFolderService = {
+  /**
+   * List folders with optional filters
+   */
+  list: async (params?: {
+    parentFolderId?: string | null
+    caseId?: string
+    excludeCaseFolders?: boolean
+  }): Promise<WikiFolder[]> => {
+    try {
+      const queryParams: Record<string, string> = {}
+      if (params?.parentFolderId === null) queryParams.parentFolderId = 'null'
+      else if (params?.parentFolderId) queryParams.parentFolderId = params.parentFolderId
+      if (params?.caseId) queryParams.caseId = params.caseId
+      if (params?.excludeCaseFolders) queryParams.excludeCaseFolders = 'true'
+
+      const response = await apiClient.get<ApiResponse<WikiFolder[]>>(
+        `/wiki/folders`,
+        { params: queryParams }
+      )
+      return response.data.data
+    } catch (error) {
+      throw handleApiError(error)
+    }
+  },
+
+  /**
+   * Get folder tree for sidebar
+   */
+  getTree: async (params?: {
+    caseId?: string
+    excludeCaseFolders?: boolean
+  }): Promise<WikiFolderTreeItem[]> => {
+    try {
+      const response = await apiClient.get<ApiResponse<WikiFolderTreeItem[]>>(
+        `/wiki/folders/tree`,
+        { params }
+      )
+      return response.data.data
+    } catch (error) {
+      throw handleApiError(error)
+    }
+  },
+
+  /**
+   * Create a new folder (no case required)
+   */
+  create: async (data: CreateWikiFolderInput): Promise<WikiFolder> => {
+    try {
+      const response = await apiClient.post<ApiResponse<WikiFolder>>(
+        `/wiki/folders`,
+        data
+      )
+      return response.data.data
+    } catch (error) {
+      throw handleApiError(error)
+    }
+  },
+
+  /**
+   * Get a single folder by ID
+   */
+  get: async (folderId: string): Promise<WikiFolder> => {
+    try {
+      const response = await apiClient.get<ApiResponse<WikiFolder>>(
+        `/wiki/folders/${folderId}`
+      )
+      return response.data.data
+    } catch (error) {
+      throw handleApiError(error)
+    }
+  },
+
+  /**
+   * Update a folder
+   */
+  update: async (
+    folderId: string,
+    data: UpdateWikiFolderInput
+  ): Promise<WikiFolder> => {
+    try {
+      const response = await apiClient.put<ApiResponse<WikiFolder>>(
+        `/wiki/folders/${folderId}`,
+        data
+      )
+      return response.data.data
+    } catch (error) {
+      throw handleApiError(error)
+    }
+  },
+
+  /**
+   * Delete a folder
+   */
+  delete: async (folderId: string): Promise<ApiMessageResponse> => {
+    try {
+      const response = await apiClient.delete<ApiMessageResponse>(
+        `/wiki/folders/${folderId}`
+      )
+      return response.data
+    } catch (error) {
+      throw handleApiError(error)
+    }
+  },
+
+  /**
+   * Initialize default folders for new user
+   */
+  initDefaults: async (): Promise<WikiFolder[]> => {
+    try {
+      const response = await apiClient.post<ApiResponse<WikiFolder[]>>(
+        `/wiki/folders/init`
+      )
+      return response.data.data
+    } catch (error) {
+      throw handleApiError(error)
+    }
+  },
+
+  /**
+   * Move a folder to a different parent
+   */
+  move: async (
+    folderId: string,
+    data: {
+      parentFolderId?: string | null
+      order?: number
+    }
+  ): Promise<WikiFolder> => {
+    try {
+      const response = await apiClient.put<ApiResponse<WikiFolder>>(
+        `/wiki/folders/${folderId}/move`,
+        data
       )
       return response.data.data
     } catch (error) {
@@ -970,5 +1284,132 @@ export const wikiExportService = {
    */
   getPreview: async (pageId: string): Promise<WikiExportResponse> => {
     return wikiExportService.export(pageId, 'preview')
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// VOICE MEMO OPERATIONS
+// ═══════════════════════════════════════════════════════════════
+
+export const wikiVoiceMemoService = {
+  /**
+   * List all voice memos for a page
+   */
+  list: async (pageId: string): Promise<WikiVoiceMemosResponse> => {
+    try {
+      const response = await apiClient.get<ApiResponse<WikiVoiceMemosResponse>>(
+        `/wiki/${pageId}/voice-memos`
+      )
+      return response.data.data
+    } catch (error) {
+      throw handleApiError(error)
+    }
+  },
+
+  /**
+   * Get presigned URL for uploading a voice memo (Step 1)
+   */
+  getUploadUrl: async (
+    pageId: string,
+    data: UploadVoiceMemoInput
+  ): Promise<{ uploadUrl: string; fileKey: string; expiresIn: number }> => {
+    try {
+      const response = await apiClient.post<
+        ApiResponse<{ uploadUrl: string; fileKey: string; expiresIn: number }>
+      >(`/wiki/${pageId}/voice-memos/upload`, data)
+      return response.data.data
+    } catch (error) {
+      throw handleApiError(error)
+    }
+  },
+
+  /**
+   * Confirm voice memo upload after uploading to S3 (Step 3)
+   */
+  confirmUpload: async (
+    pageId: string,
+    data: ConfirmVoiceMemoInput
+  ): Promise<{ voiceMemo: WikiVoiceMemo; voiceMemoCount: number }> => {
+    try {
+      const response = await apiClient.post<
+        ApiResponse<{ voiceMemo: WikiVoiceMemo; voiceMemoCount: number }>
+      >(`/wiki/${pageId}/voice-memos/confirm`, data)
+      return response.data.data
+    } catch (error) {
+      throw handleApiError(error)
+    }
+  },
+
+  /**
+   * Get presigned URL for streaming/downloading a voice memo
+   */
+  getUrl: async (
+    pageId: string,
+    memoId: string
+  ): Promise<VoiceMemoUrlResponse> => {
+    try {
+      const response = await apiClient.get<ApiResponse<VoiceMemoUrlResponse>>(
+        `/wiki/${pageId}/voice-memos/${memoId}/url`
+      )
+      return response.data.data
+    } catch (error) {
+      throw handleApiError(error)
+    }
+  },
+
+  /**
+   * Update voice memo metadata
+   */
+  update: async (
+    pageId: string,
+    memoId: string,
+    data: UpdateVoiceMemoInput
+  ): Promise<WikiVoiceMemo> => {
+    try {
+      const response = await apiClient.put<ApiResponse<WikiVoiceMemo>>(
+        `/wiki/${pageId}/voice-memos/${memoId}`,
+        data
+      )
+      return response.data.data
+    } catch (error) {
+      throw handleApiError(error)
+    }
+  },
+
+  /**
+   * Delete a voice memo
+   */
+  delete: async (
+    pageId: string,
+    memoId: string
+  ): Promise<{ voiceMemoCount: number }> => {
+    try {
+      const response = await apiClient.delete<
+        ApiResponse<{ voiceMemoCount: number }>
+      >(`/wiki/${pageId}/voice-memos/${memoId}`)
+      return response.data.data
+    } catch (error) {
+      throw handleApiError(error)
+    }
+  },
+
+  /**
+   * Seal or unseal a voice memo
+   */
+  seal: async (
+    pageId: string,
+    memoId: string,
+    seal: boolean,
+    reason?: string
+  ): Promise<WikiVoiceMemo> => {
+    try {
+      const response = await apiClient.post<ApiResponse<WikiVoiceMemo>>(
+        `/wiki/${pageId}/voice-memos/${memoId}/seal`,
+        { seal, reason }
+      )
+      return response.data.data
+    } catch (error) {
+      throw handleApiError(error)
+    }
   }
 }

@@ -15,19 +15,10 @@ import {
   BookOpen,
   Settings,
   HelpCircle,
-  Tags,
   FileText,
-  Bell,
-  GitBranch,
-  Receipt,
-  FileStack,
   FileInput,
-  CreditCard,
-  ClipboardList,
-  Percent,
-  Building,
-  Wallet,
   Package,
+  NotebookPen,
 } from 'lucide-react'
 import { useAuthStore } from '@/stores/auth-store'
 
@@ -113,12 +104,27 @@ export function useSidebarData(): SidebarData {
                 title: 'الأحداث',
                 url: '/dashboard/tasks/events',
               },
+            ],
+          },
+          {
+            title: 'الملاحظات والمراجع',
+            icon: NotebookPen,
+            items: [
               {
-                title: 'مراجع والملاحضات',
+                title: 'جميع الملاحظات',
                 url: '/dashboard/wiki',
+              },
+              {
+                title: 'إنشاء ملاحظة',
+                url: '/dashboard/wiki/new',
               },
             ],
           },
+        ],
+      },
+      {
+        title: 'التواصل',
+        items: [
           {
             title: 'الرسائل',
             url: '/dashboard/messages/chat',
@@ -128,6 +134,31 @@ export function useSidebarData(): SidebarData {
             title: 'التطبيقات',
             url: '/dashboard/apps',
             icon: Package,
+          },
+        ],
+      },
+      {
+        title: 'إدارة العلاقات',
+        items: [
+          {
+            title: 'العملاء',
+            url: '/dashboard/clients',
+            icon: Users,
+          },
+          {
+            title: 'فريق العمل',
+            url: '/dashboard/staff',
+            icon: UsersRound,
+          },
+          {
+            title: 'جهات الاتصال',
+            url: '/dashboard/contacts',
+            icon: Contact,
+          },
+          {
+            title: 'المنظمات',
+            url: '/dashboard/organizations',
+            icon: Building2,
           },
         ],
       },
@@ -149,49 +180,14 @@ export function useSidebarData(): SidebarData {
             ],
           },
           {
-            title: 'العملاء',
-            url: '/dashboard/clients',
-            icon: Users,
-          },
-          {
-            title: 'فريق العمل',
-            url: '/dashboard/staff',
-            icon: UsersRound,
-          },
-          {
-            title: 'جهات الاتصال',
-            url: '/dashboard/contacts',
-            icon: Contact,
-          },
-          {
-            title: 'المنظمات',
-            url: '/dashboard/organizations',
-            icon: Building2,
-          },
-          {
             title: 'القضايا',
             url: '/dashboard/cases',
             icon: Scale,
           },
           {
-            title: 'سير العمل',
-            url: '/dashboard/case-workflows',
-            icon: GitBranch,
-          },
-          {
-            title: 'الوسوم',
-            url: '/dashboard/tags',
-            icon: Tags,
-          },
-          {
             title: 'المستندات',
             url: '/dashboard/documents',
             icon: FileText,
-          },
-          {
-            title: 'المتابعات',
-            url: '/dashboard/followups',
-            icon: Bell,
           },
         ],
       },
@@ -239,16 +235,6 @@ export function useSidebarData(): SidebarData {
                 url: '/dashboard/finance/activity',
               },
             ],
-          },
-          {
-            title: 'أسعار الفوترة',
-            url: '/dashboard/billing-rates',
-            icon: Receipt,
-          },
-          {
-            title: 'قوالب الفواتير',
-            url: '/dashboard/invoice-templates',
-            icon: FileStack,
           },
         ],
       },

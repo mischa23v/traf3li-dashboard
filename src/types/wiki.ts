@@ -182,14 +182,23 @@ export interface WikiPage {
   // Hierarchy
   parentPageId?: string | WikiPage
   collectionId?: string | WikiCollection
-  caseId: string
+  folderId?: string | WikiFolder // Standalone folder reference
+  caseId?: string // Optional - for standalone wiki
   lawyerId: string
   clientId?: string
   order: number
   depth: number
   fullPath?: string
 
-  // Entity Links
+  // Entity Links (all optional - link later pattern)
+  linkedCaseIds?: string[] // Link to multiple cases
+  linkedClientIds?: string[] // Link to multiple clients
+  linkedTaskIds?: string[] // Renamed for consistency
+  linkedEventIds?: string[] // Renamed for consistency
+  linkedReminderIds?: string[] // Renamed for consistency
+  linkedDocumentIds?: string[] // Renamed for consistency
+  linkedWikiPageIds?: string[] // Link to other wiki pages
+  // Legacy fields for backward compatibility
   linkedTasks?: string[]
   linkedEvents?: string[]
   linkedReminders?: string[]
@@ -243,6 +252,11 @@ export interface WikiPage {
 
   // Attachments
   attachments?: WikiAttachment[]
+
+  // Voice Memos
+  voiceMemos?: WikiVoiceMemo[]
+  voiceMemoCount?: number
+  totalVoiceMemoDuration?: number
 
   // Collaborators
   collaborators?: WikiCollaborator[]
@@ -305,7 +319,7 @@ export interface WikiCollection {
   depth: number
 
   // Associations
-  caseId: string
+  caseId?: string // Optional for standalone collections
   lawyerId: string
 
   // Collection Type
@@ -331,6 +345,83 @@ export interface WikiCollection {
 
   // Tree view
   children?: WikiCollection[]
+}
+
+// ═══════════════════════════════════════════════════════════════
+// STANDALONE WIKI FOLDER (User-centric organization)
+// ═══════════════════════════════════════════════════════════════
+
+export interface WikiFolder {
+  _id: string
+  folderId: string
+
+  // Names & Display
+  name: string
+  nameAr?: string
+  urlSlug?: string
+  description?: string
+  descriptionAr?: string
+  icon: string
+  color: string
+
+  // Hierarchy
+  parentFolderId?: string | WikiFolder
+  order: number
+  depth: number
+
+  // Associations
+  lawyerId: string
+  caseId?: string // Optional - folder can be case-specific or standalone
+
+  // Metadata
+  pageCount: number
+  subFolderCount: number
+
+  // Permissions
+  visibility: WikiVisibility
+
+  // Defaults for New Pages
+  defaultPageType?: WikiPageType
+  defaultConfidentialityLevel?: WikiConfidentialityLevel
+
+  // Audit
+  createdBy: string
+  lastModifiedBy?: string
+  createdAt: string
+  updatedAt: string
+
+  // Tree view
+  children?: WikiFolder[]
+}
+
+// ═══════════════════════════════════════════════════════════════
+// ENTITY LINKING TYPES
+// ═══════════════════════════════════════════════════════════════
+
+export type WikiLinkableEntityType =
+  | 'case'
+  | 'client'
+  | 'task'
+  | 'event'
+  | 'reminder'
+  | 'document'
+  | 'wiki'
+
+export interface WikiLinkEntityRequest {
+  entityType: WikiLinkableEntityType
+  entityId: string
+}
+
+export interface WikiUnlinkEntityRequest {
+  entityType: WikiLinkableEntityType
+  entityId: string
+}
+
+export interface WikiLinkedEntity {
+  entityType: WikiLinkableEntityType
+  entityId: string
+  linkedAt: string
+  linkedBy?: string
 }
 
 export interface WikiRevision {
@@ -475,6 +566,20 @@ export interface WikiPageTreeResponse {
   collections: WikiCollectionTreeItem[]
 }
 
+export interface WikiFolderTreeItem extends WikiFolder {
+  children?: WikiFolderTreeItem[]
+}
+
+export interface WikiStandaloneTreeResponse {
+  pages: WikiPageTreeItem[]
+  folders: WikiFolderTreeItem[]
+}
+
+export interface WikiTagsResponse {
+  tags: string[]
+  tagCounts: Record<string, number>
+}
+
 export interface WikiLinkGraph {
   nodes: Array<{
     id: string
@@ -511,6 +616,18 @@ export interface CreateWikiPageInput {
   pageType?: WikiPageType
   parentPageId?: string
   collectionId?: string
+  folderId?: string // Standalone folder reference
+  // All entity links are OPTIONAL - link later pattern
+  caseId?: string // Optional - link to a case
+  clientId?: string // Optional - link to a client
+  linkedCaseIds?: string[] // Optional - link to multiple cases
+  linkedClientIds?: string[] // Optional - link to multiple clients
+  linkedTaskIds?: string[] // Optional - link to tasks
+  linkedEventIds?: string[] // Optional - link to events
+  linkedReminderIds?: string[] // Optional - link to reminders
+  linkedDocumentIds?: string[] // Optional - link to documents
+  linkedWikiPageIds?: string[] // Optional - link to other wiki pages
+  // Legacy fields for backward compatibility
   linkedTasks?: string[]
   linkedEvents?: string[]
   linkedReminders?: string[]
@@ -556,6 +673,27 @@ export interface CreateWikiCollectionInput {
 
 export interface UpdateWikiCollectionInput
   extends Partial<CreateWikiCollectionInput> {}
+
+// ═══════════════════════════════════════════════════════════════
+// STANDALONE FOLDER FORM TYPES
+// ═══════════════════════════════════════════════════════════════
+
+export interface CreateWikiFolderInput {
+  name: string
+  nameAr?: string
+  description?: string
+  descriptionAr?: string
+  icon?: string
+  color?: string
+  parentFolderId?: string
+  caseId?: string // Optional - folder can be case-specific
+  defaultPageType?: WikiPageType
+  defaultConfidentialityLevel?: WikiConfidentialityLevel
+  visibility?: WikiVisibility
+}
+
+export interface UpdateWikiFolderInput
+  extends Partial<CreateWikiFolderInput> {}
 
 export interface CreateWikiCommentInput {
   content: string
@@ -622,4 +760,95 @@ export interface ConfirmVersionInput {
   fileType?: string
   fileSize?: number
   changeNote?: string
+}
+
+// ═══════════════════════════════════════════════════════════════
+// VOICE MEMO TYPES
+// ═══════════════════════════════════════════════════════════════
+
+export type WikiVoiceMemoFormat = 'mp3' | 'wav' | 'webm' | 'ogg' | 'm4a'
+
+export interface WikiVoiceMemo {
+  _id: string
+  memoId: string
+
+  // File info
+  title: string
+  titleAr?: string
+  fileUrl: string
+  fileKey: string
+  fileSize: number
+  duration: number // in seconds
+  format: WikiVoiceMemoFormat
+
+  // Transcription
+  transcription?: string
+  transcriptionAr?: string
+  isTranscribed: boolean
+  transcribedAt?: string
+
+  // Security
+  isSealed: boolean
+  sealedAt?: string
+  sealedBy?: string | { _id: string; firstName: string; lastName: string }
+  sealReason?: string
+  isConfidential: boolean
+
+  // Recording info
+  recordedBy:
+    | string
+    | { _id: string; firstName: string; lastName: string; avatar?: string }
+  recordedAt: string
+
+  // Metadata
+  description?: string
+  descriptionAr?: string
+
+  // Timestamps
+  createdAt: string
+  updatedAt: string
+}
+
+export interface WikiVoiceMemosResponse {
+  voiceMemos: WikiVoiceMemo[]
+  count: number
+  totalDuration: number
+}
+
+export interface UploadVoiceMemoInput {
+  fileName: string
+  fileType: string
+  duration?: number
+  isConfidential?: boolean
+}
+
+export interface ConfirmVoiceMemoInput {
+  fileKey: string
+  fileType: string
+  fileSize: number
+  duration: number
+  title?: string
+  titleAr?: string
+  description?: string
+  descriptionAr?: string
+  isConfidential?: boolean
+}
+
+export interface UpdateVoiceMemoInput {
+  title?: string
+  titleAr?: string
+  description?: string
+  descriptionAr?: string
+  transcription?: string
+  transcriptionAr?: string
+}
+
+export interface VoiceMemoUrlResponse {
+  streamUrl: string
+  downloadUrl: string
+  fileName: string
+  fileType: string
+  fileSize: number
+  duration: number
+  expiresIn: number
 }
