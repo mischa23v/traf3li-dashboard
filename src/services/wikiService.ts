@@ -31,8 +31,6 @@ import type {
   WikiExportResponse
 } from '@/types/wiki'
 
-const BASE_URL = '/api'
-
 // ═══════════════════════════════════════════════════════════════
 // API RESPONSE TYPES
 // ═══════════════════════════════════════════════════════════════
@@ -67,7 +65,7 @@ export const wikiPageService = {
   ): Promise<WikiPage[]> => {
     try {
       const response = await apiClient.get<ApiResponse<WikiPage[]>>(
-        `${BASE_URL}/cases/${caseId}/wiki`,
+        `/cases/${caseId}/wiki`,
         { params }
       )
       return response.data.data
@@ -82,7 +80,7 @@ export const wikiPageService = {
   getTree: async (caseId: string): Promise<WikiPageTreeResponse> => {
     try {
       const response = await apiClient.get<ApiResponse<WikiPageTreeResponse>>(
-        `${BASE_URL}/cases/${caseId}/wiki/tree`
+        `/cases/${caseId}/wiki/tree`
       )
       return response.data.data
     } catch (error) {
@@ -99,7 +97,7 @@ export const wikiPageService = {
   ): Promise<WikiPage> => {
     try {
       const response = await apiClient.post<ApiResponse<WikiPage>>(
-        `${BASE_URL}/cases/${caseId}/wiki`,
+        `/cases/${caseId}/wiki`,
         data
       )
       return response.data.data
@@ -125,7 +123,7 @@ export const wikiPageService = {
           backlinks: WikiBacklink[]
           revisionStats: WikiRevisionStats
         }>
-      >(`${BASE_URL}/wiki/${pageId}`)
+      >(`/wiki/${pageId}`)
       return response.data.data
     } catch (error) {
       throw handleApiError(error)
@@ -141,7 +139,7 @@ export const wikiPageService = {
   ): Promise<WikiPage> => {
     try {
       const response = await apiClient.put<ApiResponse<WikiPage>>(
-        `${BASE_URL}/wiki/${pageId}`,
+        `/wiki/${pageId}`,
         data
       )
       return response.data.data
@@ -159,7 +157,7 @@ export const wikiPageService = {
   ): Promise<ApiMessageResponse> => {
     try {
       const response = await apiClient.delete<ApiMessageResponse>(
-        `${BASE_URL}/wiki/${pageId}`,
+        `/wiki/${pageId}`,
         { params: { permanent } }
       )
       return response.data
@@ -181,7 +179,7 @@ export const wikiPageService = {
   ): Promise<WikiPage> => {
     try {
       const response = await apiClient.put<ApiResponse<WikiPage>>(
-        `${BASE_URL}/wiki/${pageId}/move`,
+        `/wiki/${pageId}/move`,
         data
       )
       return response.data.data
@@ -197,7 +195,7 @@ export const wikiPageService = {
     try {
       const response = await apiClient.post<
         ApiResponse<{ isPinned: boolean }>
-      >(`${BASE_URL}/wiki/${pageId}/pin`)
+      >(`/wiki/${pageId}/pin`)
       return response.data.data
     } catch (error) {
       throw handleApiError(error)
@@ -210,7 +208,7 @@ export const wikiPageService = {
   getPinned: async (caseId: string): Promise<WikiPage[]> => {
     try {
       const response = await apiClient.get<ApiResponse<WikiPage[]>>(
-        `${BASE_URL}/cases/${caseId}/wiki/pinned`
+        `/cases/${caseId}/wiki/pinned`
       )
       return response.data.data
     } catch (error) {
@@ -224,7 +222,7 @@ export const wikiPageService = {
   seal: async (pageId: string, reason: string): Promise<WikiPage> => {
     try {
       const response = await apiClient.post<ApiResponse<WikiPage>>(
-        `${BASE_URL}/wiki/${pageId}/seal`,
+        `/wiki/${pageId}/seal`,
         { reason }
       )
       return response.data.data
@@ -239,7 +237,7 @@ export const wikiPageService = {
   unseal: async (pageId: string): Promise<WikiPage> => {
     try {
       const response = await apiClient.post<ApiResponse<WikiPage>>(
-        `${BASE_URL}/wiki/${pageId}/unseal`
+        `/wiki/${pageId}/unseal`
       )
       return response.data.data
     } catch (error) {
@@ -260,7 +258,7 @@ export const wikiPageService = {
   ): Promise<WikiPage[]> => {
     try {
       const response = await apiClient.get<ApiResponse<WikiPage[]>>(
-        `${BASE_URL}/cases/${caseId}/wiki/search`,
+        `/cases/${caseId}/wiki/search`,
         { params: { q: query, ...params } }
       )
       return response.data.data
@@ -275,7 +273,7 @@ export const wikiPageService = {
   globalSearch: async (query: string, limit = 20): Promise<WikiPage[]> => {
     try {
       const response = await apiClient.get<ApiResponse<WikiPage[]>>(
-        `${BASE_URL}/wiki/search`,
+        `/wiki/search`,
         { params: { q: query, limit } }
       )
       return response.data.data
@@ -290,7 +288,7 @@ export const wikiPageService = {
   getRecent: async (limit = 10): Promise<WikiPage[]> => {
     try {
       const response = await apiClient.get<ApiResponse<WikiPage[]>>(
-        `${BASE_URL}/wiki/recent`,
+        `/wiki/recent`,
         { params: { limit } }
       )
       return response.data.data
@@ -305,7 +303,7 @@ export const wikiPageService = {
   getLinkGraph: async (caseId: string): Promise<WikiLinkGraph> => {
     try {
       const response = await apiClient.get<ApiResponse<WikiLinkGraph>>(
-        `${BASE_URL}/cases/${caseId}/wiki/graph`
+        `/cases/${caseId}/wiki/graph`
       )
       return response.data.data
     } catch (error) {
@@ -329,7 +327,7 @@ export const wikiRevisionService = {
     try {
       const response = await apiClient.get<
         ApiResponse<{ history: WikiRevision[]; stats: WikiRevisionStats }>
-      >(`${BASE_URL}/wiki/${pageId}/history`, { params })
+      >(`/wiki/${pageId}/history`, { params })
       return response.data.data
     } catch (error) {
       throw handleApiError(error)
@@ -345,7 +343,7 @@ export const wikiRevisionService = {
   ): Promise<WikiRevision> => {
     try {
       const response = await apiClient.get<ApiResponse<WikiRevision>>(
-        `${BASE_URL}/wiki/${pageId}/revisions/${version}`
+        `/wiki/${pageId}/revisions/${version}`
       )
       return response.data.data
     } catch (error) {
@@ -372,7 +370,7 @@ export const wikiRevisionService = {
           after: WikiRevision
           versionDiff: number
         }>
-      >(`${BASE_URL}/wiki/${pageId}/diff`, { params: { v1, v2 } })
+      >(`/wiki/${pageId}/diff`, { params: { v1, v2 } })
       return response.data.data
     } catch (error) {
       throw handleApiError(error)
@@ -385,7 +383,7 @@ export const wikiRevisionService = {
   restore: async (pageId: string, version: number): Promise<WikiPage> => {
     try {
       const response = await apiClient.post<ApiResponse<WikiPage>>(
-        `${BASE_URL}/wiki/${pageId}/restore/${version}`
+        `/wiki/${pageId}/restore/${version}`
       )
       return response.data.data
     } catch (error) {
@@ -412,7 +410,7 @@ export const wikiCollectionService = {
       else if (parentCollectionId) params.parentCollectionId = parentCollectionId
 
       const response = await apiClient.get<ApiResponse<WikiCollection[]>>(
-        `${BASE_URL}/cases/${caseId}/wiki/collections`,
+        `/cases/${caseId}/wiki/collections`,
         { params }
       )
       return response.data.data
@@ -430,7 +428,7 @@ export const wikiCollectionService = {
   ): Promise<WikiCollection> => {
     try {
       const response = await apiClient.post<ApiResponse<WikiCollection>>(
-        `${BASE_URL}/cases/${caseId}/wiki/collections`,
+        `/cases/${caseId}/wiki/collections`,
         data
       )
       return response.data.data
@@ -448,7 +446,7 @@ export const wikiCollectionService = {
   ): Promise<WikiCollection> => {
     try {
       const response = await apiClient.put<ApiResponse<WikiCollection>>(
-        `${BASE_URL}/wiki/collections/${collectionId}`,
+        `/wiki/collections/${collectionId}`,
         data
       )
       return response.data.data
@@ -463,7 +461,7 @@ export const wikiCollectionService = {
   delete: async (collectionId: string): Promise<ApiMessageResponse> => {
     try {
       const response = await apiClient.delete<ApiMessageResponse>(
-        `${BASE_URL}/wiki/collections/${collectionId}`
+        `/wiki/collections/${collectionId}`
       )
       return response.data
     } catch (error) {
@@ -477,7 +475,7 @@ export const wikiCollectionService = {
   initDefaults: async (caseId: string): Promise<WikiCollection[]> => {
     try {
       const response = await apiClient.post<ApiResponse<WikiCollection[]>>(
-        `${BASE_URL}/cases/${caseId}/wiki/init-collections`
+        `/cases/${caseId}/wiki/init-collections`
       )
       return response.data.data
     } catch (error) {
@@ -497,7 +495,7 @@ export const wikiBacklinkService = {
   getBacklinks: async (pageId: string): Promise<WikiBacklink[]> => {
     try {
       const response = await apiClient.get<ApiResponse<WikiBacklink[]>>(
-        `${BASE_URL}/wiki/${pageId}/backlinks`
+        `/wiki/${pageId}/backlinks`
       )
       return response.data.data
     } catch (error) {
@@ -511,7 +509,7 @@ export const wikiBacklinkService = {
   getOutgoingLinks: async (pageId: string): Promise<WikiBacklink[]> => {
     try {
       const response = await apiClient.get<ApiResponse<WikiBacklink[]>>(
-        `${BASE_URL}/wiki/${pageId}/links`
+        `/wiki/${pageId}/links`
       )
       return response.data.data
     } catch (error) {
@@ -534,7 +532,7 @@ export const wikiCommentService = {
   ): Promise<WikiComment[]> => {
     try {
       const response = await apiClient.get<ApiResponse<WikiComment[]>>(
-        `${BASE_URL}/wiki/${pageId}/comments`,
+        `/wiki/${pageId}/comments`,
         { params }
       )
       return response.data.data
@@ -552,7 +550,7 @@ export const wikiCommentService = {
   ): Promise<WikiComment> => {
     try {
       const response = await apiClient.post<ApiResponse<WikiComment>>(
-        `${BASE_URL}/wiki/${pageId}/comments`,
+        `/wiki/${pageId}/comments`,
         data
       )
       return response.data.data
@@ -567,7 +565,7 @@ export const wikiCommentService = {
   update: async (commentId: string, content: string): Promise<WikiComment> => {
     try {
       const response = await apiClient.put<ApiResponse<WikiComment>>(
-        `${BASE_URL}/wiki/comments/${commentId}`,
+        `/wiki/comments/${commentId}`,
         { content }
       )
       return response.data.data
@@ -582,7 +580,7 @@ export const wikiCommentService = {
   delete: async (commentId: string): Promise<ApiMessageResponse> => {
     try {
       const response = await apiClient.delete<ApiMessageResponse>(
-        `${BASE_URL}/wiki/comments/${commentId}`
+        `/wiki/comments/${commentId}`
       )
       return response.data
     } catch (error) {
@@ -599,7 +597,7 @@ export const wikiCommentService = {
   ): Promise<WikiComment> => {
     try {
       const response = await apiClient.post<ApiResponse<WikiComment>>(
-        `${BASE_URL}/wiki/comments/${commentId}/resolve`,
+        `/wiki/comments/${commentId}/resolve`,
         { note }
       )
       return response.data.data
@@ -620,7 +618,7 @@ export const wikiTemplateService = {
   list: async (): Promise<WikiPage[]> => {
     try {
       const response = await apiClient.get<ApiResponse<WikiPage[]>>(
-        `${BASE_URL}/wiki/templates`
+        `/wiki/templates`
       )
       return response.data.data
     } catch (error) {
@@ -641,7 +639,7 @@ export const wikiTemplateService = {
   ): Promise<WikiPage> => {
     try {
       const response = await apiClient.post<ApiResponse<WikiPage>>(
-        `${BASE_URL}/wiki/templates/${templateId}/create`,
+        `/wiki/templates/${templateId}/create`,
         data
       )
       return response.data.data
@@ -665,7 +663,7 @@ export const wikiAttachmentService = {
     try {
       const response = await apiClient.get<
         ApiResponse<{ attachments: WikiAttachment[]; count: number }>
-      >(`${BASE_URL}/wiki/${pageId}/attachments`)
+      >(`/wiki/${pageId}/attachments`)
       return response.data.data
     } catch (error) {
       throw handleApiError(error)
@@ -682,7 +680,7 @@ export const wikiAttachmentService = {
     try {
       const response = await apiClient.post<
         ApiResponse<{ uploadUrl: string; fileKey: string; expiresIn: number }>
-      >(`${BASE_URL}/wiki/${pageId}/attachments/upload`, data)
+      >(`/wiki/${pageId}/attachments/upload`, data)
       return response.data.data
     } catch (error) {
       throw handleApiError(error)
@@ -699,7 +697,7 @@ export const wikiAttachmentService = {
     try {
       const response = await apiClient.post<
         ApiResponse<{ attachment: WikiAttachment; attachmentCount: number }>
-      >(`${BASE_URL}/wiki/${pageId}/attachments/confirm`, data)
+      >(`/wiki/${pageId}/attachments/confirm`, data)
       return response.data.data
     } catch (error) {
       throw handleApiError(error)
@@ -728,7 +726,7 @@ export const wikiAttachmentService = {
           fileSize: number
           expiresIn: number
         }>
-      >(`${BASE_URL}/wiki/${pageId}/attachments/${attachmentId}/download`)
+      >(`/wiki/${pageId}/attachments/${attachmentId}/download`)
       return response.data.data
     } catch (error) {
       throw handleApiError(error)
@@ -745,7 +743,7 @@ export const wikiAttachmentService = {
   ): Promise<WikiAttachment> => {
     try {
       const response = await apiClient.put<ApiResponse<WikiAttachment>>(
-        `${BASE_URL}/wiki/${pageId}/attachments/${attachmentId}`,
+        `/wiki/${pageId}/attachments/${attachmentId}`,
         data
       )
       return response.data.data
@@ -764,7 +762,7 @@ export const wikiAttachmentService = {
     try {
       const response = await apiClient.delete<
         ApiResponse<{ attachmentCount: number }>
-      >(`${BASE_URL}/wiki/${pageId}/attachments/${attachmentId}`)
+      >(`/wiki/${pageId}/attachments/${attachmentId}`)
       return response.data.data
     } catch (error) {
       throw handleApiError(error)
@@ -781,7 +779,7 @@ export const wikiAttachmentService = {
   ): Promise<WikiAttachment> => {
     try {
       const response = await apiClient.post<ApiResponse<WikiAttachment>>(
-        `${BASE_URL}/wiki/${pageId}/attachments/${attachmentId}/seal`,
+        `/wiki/${pageId}/attachments/${attachmentId}/seal`,
         { seal }
       )
       return response.data.data
@@ -806,7 +804,7 @@ export const wikiAttachmentVersionService = {
     try {
       const response = await apiClient.get<
         ApiResponse<AttachmentVersionHistoryResponse>
-      >(`${BASE_URL}/wiki/${pageId}/attachments/${attachmentId}/versions`)
+      >(`/wiki/${pageId}/attachments/${attachmentId}/versions`)
       return response.data.data
     } catch (error) {
       throw handleApiError(error)
@@ -825,7 +823,7 @@ export const wikiAttachmentVersionService = {
       const response = await apiClient.post<
         ApiResponse<{ uploadUrl: string; fileKey: string; expiresIn: number }>
       >(
-        `${BASE_URL}/wiki/${pageId}/attachments/${attachmentId}/versions/upload`,
+        `/wiki/${pageId}/attachments/${attachmentId}/versions/upload`,
         data
       )
       return response.data.data
@@ -854,7 +852,7 @@ export const wikiAttachmentVersionService = {
           versionCount: number
         }>
       >(
-        `${BASE_URL}/wiki/${pageId}/attachments/${attachmentId}/versions/confirm`,
+        `/wiki/${pageId}/attachments/${attachmentId}/versions/confirm`,
         data
       )
       return response.data.data
@@ -887,7 +885,7 @@ export const wikiAttachmentVersionService = {
           expiresIn: number
         }>
       >(
-        `${BASE_URL}/wiki/${pageId}/attachments/${attachmentId}/versions/${versionNumber}/download`
+        `/wiki/${pageId}/attachments/${attachmentId}/versions/${versionNumber}/download`
       )
       return response.data.data
     } catch (error) {
@@ -915,7 +913,7 @@ export const wikiAttachmentVersionService = {
           versionCount: number
         }>
       >(
-        `${BASE_URL}/wiki/${pageId}/attachments/${attachmentId}/versions/${versionNumber}/restore`
+        `/wiki/${pageId}/attachments/${attachmentId}/versions/${versionNumber}/restore`
       )
       return response.data.data
     } catch (error) {
@@ -938,7 +936,7 @@ export const wikiExportService = {
   ): Promise<WikiExportResponse> => {
     try {
       const response = await apiClient.get<ApiResponse<WikiExportResponse>>(
-        `${BASE_URL}/wiki/${pageId}/export/${format}`
+        `/wiki/${pageId}/export/${format}`
       )
       return response.data.data
     } catch (error) {

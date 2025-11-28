@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { Link } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 import {
@@ -11,8 +11,9 @@ import {
   Pin,
   Lock,
   Shield,
-  Briefcase,
-  ArrowLeft
+  Plus,
+  ChevronLeft,
+  Settings
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -26,7 +27,7 @@ import { ConfigDrawer } from '@/components/config-drawer'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Alert, AlertDescription } from '@/components/ui/alert'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { WikiSidebar } from './wiki-sidebar'
 import { useRecentWikiPages, useWikiGlobalSearch } from '@/hooks/useWiki'
 import type { WikiPageType, WikiPageStatus } from '@/types/wiki'
 import {
@@ -42,6 +43,7 @@ export function WikiGlobalView() {
   const isArabic = i18n.language === 'ar'
 
   const [searchQuery, setSearchQuery] = useState('')
+  const [statusFilter, setStatusFilter] = useState<string>('all')
 
   // Fetch recent pages across all cases
   const { data: recentPages, isLoading, isError, error, refetch } = useRecentWikiPages(20)
@@ -49,7 +51,13 @@ export function WikiGlobalView() {
   // Global search
   const { data: searchResults, isLoading: isSearching } = useWikiGlobalSearch(searchQuery, 20)
 
-  const displayPages = searchQuery.length >= 2 ? searchResults : recentPages
+  // Filter by status
+  const filteredPages = useMemo(() => {
+    const pages = searchQuery.length >= 2 ? searchResults : recentPages
+    if (!pages) return []
+    if (statusFilter === 'all') return pages
+    return pages.filter(page => page.status === statusFilter)
+  }, [searchQuery, searchResults, recentPages, statusFilter])
 
   const getPageTypeLabel = (type: WikiPageType) =>
     isArabic ? pageTypeLabelsAr[type] : pageTypeLabels[type]
@@ -58,8 +66,11 @@ export function WikiGlobalView() {
     isArabic ? pageStatusLabelsAr[status] : pageStatusLabels[status]
 
   const topNav = [
-    { title: isArabic ? 'الرئيسية' : 'Home', href: '/', isActive: false },
-    { title: isArabic ? 'ويكي' : 'Wiki', href: '/dashboard/wiki' as any, isActive: true },
+    { title: isArabic ? 'نظرة عامة' : 'Overview', href: '/dashboard/overview', isActive: false },
+    { title: isArabic ? 'المهام' : 'Tasks', href: '/dashboard/tasks/list', isActive: false },
+    { title: isArabic ? 'التذكيرات' : 'Reminders', href: '/dashboard/tasks/reminders', isActive: false },
+    { title: isArabic ? 'الأحداث' : 'Events', href: '/dashboard/tasks/events', isActive: false },
+    { title: isArabic ? 'مراجع والملاحضات' : 'References & Notes', href: '/dashboard/wiki' as any, isActive: true },
   ]
 
   return (
@@ -76,7 +87,7 @@ export function WikiGlobalView() {
             <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
             <input
               type="text"
-              placeholder={t('wiki.searchPlaceholder')}
+              placeholder={isArabic ? 'بحث...' : 'Search...'}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pr-9 pl-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
@@ -98,59 +109,8 @@ export function WikiGlobalView() {
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
-          {/* LEFT COLUMN (Info Card) */}
-          <div className="space-y-6">
-            <Card className="border border-slate-100 shadow-sm rounded-2xl overflow-hidden">
-              <CardHeader className="bg-white border-b border-slate-50 pb-4">
-                <CardTitle className="text-lg font-bold text-navy flex items-center gap-2">
-                  <BookOpen className="h-5 w-5 text-emerald-500" />
-                  {isArabic ? 'نظرة عامة' : 'Overview'}
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="p-4 space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="bg-slate-50 rounded-xl p-4 text-center">
-                    <div className="text-2xl font-bold text-navy">{recentPages?.length || 0}</div>
-                    <div className="text-xs text-slate-500">{isArabic ? 'آخر الصفحات' : 'Recent Pages'}</div>
-                  </div>
-                  <div className="bg-emerald-50 rounded-xl p-4 text-center">
-                    <div className="text-2xl font-bold text-emerald-600">
-                      {recentPages?.filter(p => p.isPinned).length || 0}
-                    </div>
-                    <div className="text-xs text-emerald-600">{isArabic ? 'مثبتة' : 'Pinned'}</div>
-                  </div>
-                </div>
-                <p className="text-sm text-slate-500 leading-relaxed">
-                  {isArabic
-                    ? 'هنا يمكنك تصفح جميع صفحات الويكي من مختلف القضايا. للوصول إلى ويكي قضية محددة، انتقل إلى صفحة القضية.'
-                    : 'Browse all wiki pages across your cases. To access a specific case wiki, navigate to the case page.'}
-                </p>
-              </CardContent>
-            </Card>
-
-            {/* Quick Access to Cases */}
-            <Card className="border border-slate-100 shadow-sm rounded-2xl overflow-hidden">
-              <CardHeader className="bg-white border-b border-slate-50 pb-4">
-                <CardTitle className="text-lg font-bold text-navy flex items-center gap-2">
-                  <Briefcase className="h-5 w-5 text-emerald-500" />
-                  {isArabic ? 'القضايا' : 'Cases'}
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="p-4">
-                <p className="text-sm text-slate-500 mb-4">
-                  {isArabic
-                    ? 'لإنشاء صفحة ويكي جديدة، انتقل إلى قضية محددة.'
-                    : 'To create a new wiki page, navigate to a specific case.'}
-                </p>
-                <Button asChild className="w-full bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl">
-                  <Link to="/dashboard/cases">
-                    <Briefcase className="me-2 h-4 w-4" />
-                    {isArabic ? 'عرض القضايا' : 'View Cases'}
-                  </Link>
-                </Button>
-              </CardContent>
-            </Card>
-          </div>
+          {/* LEFT COLUMN (Widgets) */}
+          <WikiSidebar recentPages={recentPages} isLoading={isLoading} />
 
           {/* RIGHT COLUMN (Main Content) */}
           <div className="lg:col-span-2 space-y-8">
@@ -159,19 +119,23 @@ export function WikiGlobalView() {
             <div className="bg-navy rounded-3xl p-8 relative overflow-hidden text-white shadow-xl shadow-navy/20 flex flex-col md:flex-row items-center justify-between gap-8">
               <div className="relative z-10 max-w-lg">
                 <h2 className="text-3xl font-bold mb-4 leading-tight">
-                  {t('wiki.title')}
+                  {isArabic ? 'نظام المراجع والملاحظات' : 'References & Notes System'}
                 </h2>
                 <p className="text-blue-200 text-lg mb-8 leading-relaxed">
                   {isArabic
-                    ? 'تصفح جميع صفحات الويكي من مختلف القضايا في مكان واحد. ابحث عن المعلومات واستعرض أحدث التحديثات.'
-                    : 'Browse all wiki pages from different cases in one place. Search for information and review the latest updates.'}
+                    ? 'تصفح جميع صفحات الملاحظات والمراجع من مختلف القضايا. ابحث عن المعلومات واستعرض أحدث التحديثات بسهولة.'
+                    : 'Browse all notes and reference pages from different cases. Search for information and review the latest updates easily.'}
                 </p>
                 <div className="flex gap-3">
-                  <Button asChild className="bg-white text-slate-900 hover:bg-slate-100 h-12 px-8 rounded-xl font-bold shadow-lg border-0 transition-all hover:scale-105">
-                    <Link to="/dashboard/cases">
-                      <Briefcase className="me-2 h-5 w-5" />
-                      {isArabic ? 'انتقل للقضايا' : 'Go to Cases'}
+                  <Button asChild className="bg-emerald-500 hover:bg-emerald-600 text-white h-12 px-8 rounded-xl font-bold shadow-lg shadow-emerald-500/20 border-0">
+                    <Link to="/dashboard/wiki/new">
+                      <Plus className="ms-2 h-5 w-5" />
+                      {isArabic ? 'صفحة جديدة' : 'New Page'}
                     </Link>
+                  </Button>
+                  <Button className="bg-white text-slate-900 hover:bg-slate-100 h-12 px-8 rounded-xl font-bold shadow-lg border-0 transition-all hover:scale-105">
+                    <Settings className="ms-2 h-5 w-5" />
+                    {isArabic ? 'الإعدادات' : 'Settings'}
                   </Button>
                 </div>
               </div>
@@ -195,12 +159,40 @@ export function WikiGlobalView() {
                     ? (isArabic ? `نتائج البحث: "${searchQuery}"` : `Search Results: "${searchQuery}"`)
                     : (isArabic ? 'آخر الصفحات' : 'Recent Pages')}
                 </h3>
-                {/* Mobile search */}
-                <div className="relative md:hidden w-full">
+                <div className="flex gap-2">
+                  <Button
+                    size="sm"
+                    onClick={() => setStatusFilter('all')}
+                    className={statusFilter === 'all' ? 'bg-emerald-500 hover:bg-emerald-600 text-white rounded-full px-4' : 'bg-transparent text-slate-500 hover:text-navy hover:bg-slate-100 rounded-full px-4'}
+                  >
+                    {isArabic ? 'الكل' : 'All'}
+                  </Button>
+                  <Button
+                    size="sm"
+                    onClick={() => setStatusFilter('published')}
+                    variant="ghost"
+                    className={statusFilter === 'published' ? 'bg-emerald-500 text-white rounded-full px-4' : 'text-slate-500 hover:text-navy rounded-full px-4'}
+                  >
+                    {isArabic ? 'منشورة' : 'Published'}
+                  </Button>
+                  <Button
+                    size="sm"
+                    onClick={() => setStatusFilter('draft')}
+                    variant="ghost"
+                    className={statusFilter === 'draft' ? 'bg-emerald-500 text-white rounded-full px-4' : 'text-slate-500 hover:text-navy rounded-full px-4'}
+                  >
+                    {isArabic ? 'مسودات' : 'Drafts'}
+                  </Button>
+                </div>
+              </div>
+
+              {/* Mobile search */}
+              <div className="px-6 pb-4 md:hidden">
+                <div className="relative w-full">
                   <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                   <input
                     type="text"
-                    placeholder={t('wiki.searchPlaceholder')}
+                    placeholder={isArabic ? 'بحث...' : 'Search...'}
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="h-10 w-full rounded-xl border border-slate-200 pr-10 pl-4 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
@@ -238,7 +230,9 @@ export function WikiGlobalView() {
                     <AlertCircle className="h-4 w-4 text-red-600" />
                     <AlertDescription className="text-red-800">
                       <div className="flex items-center justify-between">
-                        <span>{isArabic ? 'حدث خطأ أثناء تحميل الصفحات' : 'Error loading pages'}: {error?.message}</span>
+                        <span>
+                          {isArabic ? 'حدث خطأ أثناء تحميل الصفحات' : 'Error loading pages'}: {error?.message}
+                        </span>
                         <Button onClick={() => refetch()} variant="outline" size="sm" className="border-red-300 text-red-700 hover:bg-red-100">
                           {isArabic ? 'إعادة المحاولة' : 'Retry'}
                         </Button>
@@ -248,7 +242,7 @@ export function WikiGlobalView() {
                 )}
 
                 {/* Empty State */}
-                {!isLoading && !isSearching && !isError && (!displayPages || displayPages.length === 0) && (
+                {!isLoading && !isSearching && !isError && filteredPages.length === 0 && (
                   <div className="text-center py-12">
                     <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-emerald-50 mb-4">
                       <BookOpen className="h-8 w-8 text-emerald-500" />
@@ -261,19 +255,19 @@ export function WikiGlobalView() {
                     <p className="text-slate-500 mb-4">
                       {searchQuery.length >= 2
                         ? (isArabic ? 'جرب البحث بكلمات مختلفة' : 'Try searching with different keywords')
-                        : (isArabic ? 'ابدأ بإنشاء صفحة ويكي في إحدى قضاياك' : 'Start by creating a wiki page in one of your cases')}
+                        : (isArabic ? 'ابدأ بإنشاء صفحة جديدة في إحدى قضاياك' : 'Start by creating a new page in one of your cases')}
                     </p>
                     <Button asChild className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl">
-                      <Link to="/dashboard/cases">
-                        <Briefcase className="me-2 h-4 w-4" />
-                        {isArabic ? 'انتقل للقضايا' : 'Go to Cases'}
+                      <Link to="/dashboard/wiki/new">
+                        <Plus className="ms-2 h-4 w-4" />
+                        {isArabic ? 'إنشاء صفحة جديدة' : 'Create New Page'}
                       </Link>
                     </Button>
                   </div>
                 )}
 
                 {/* Success State - Page List */}
-                {!isLoading && !isSearching && !isError && displayPages && displayPages.length > 0 && displayPages.map((page) => (
+                {!isLoading && !isSearching && !isError && filteredPages.length > 0 && filteredPages.map((page) => (
                   <div key={page._id} className="bg-[#F8F9FA] rounded-2xl p-6 border border-slate-100 hover:border-emerald-200 transition-all group">
                     <div className="flex justify-between items-start mb-4">
                       <div className="flex gap-4 items-center">
@@ -332,15 +326,14 @@ export function WikiGlobalView() {
                         </div>
                       </div>
                       <div className="flex gap-2">
-                        <Link to={`/dashboard/cases/${page.caseId}/wiki` as any}>
+                        <Link to={`/dashboard/cases/${page.caseId}/wiki/${page._id}` as any}>
                           <Button variant="outline" className="border-slate-200 text-slate-600 hover:bg-slate-50 rounded-lg px-4">
-                            <ArrowLeft className="me-2 h-4 w-4" />
-                            {isArabic ? 'ويكي القضية' : 'Case Wiki'}
+                            {isArabic ? 'التفاصيل' : 'Details'}
                           </Button>
                         </Link>
                         <Link to={`/dashboard/cases/${page.caseId}/wiki/${page._id}` as any}>
                           <Button className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg px-6 shadow-lg shadow-emerald-500/20">
-                            {t('wiki.viewPage')}
+                            {isArabic ? 'عرض الصفحة' : 'View Page'}
                           </Button>
                         </Link>
                       </div>
@@ -348,6 +341,15 @@ export function WikiGlobalView() {
                   </div>
                 ))}
               </div>
+
+              {!isLoading && !isSearching && !isError && filteredPages.length > 0 && (
+                <div className="p-4 pt-0 text-center">
+                  <Button variant="ghost" className="text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 w-full rounded-xl py-6">
+                    {isArabic ? 'عرض جميع الصفحات' : 'View All Pages'}
+                    <ChevronLeft className="h-4 w-4 me-2" />
+                  </Button>
+                </div>
+              )}
             </div>
 
           </div>
