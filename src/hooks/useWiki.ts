@@ -10,14 +10,18 @@ import {
   wikiCollectionService,
   wikiBacklinkService,
   wikiCommentService,
-  wikiTemplateService
+  wikiTemplateService,
+  wikiAttachmentService,
+  wikiAttachmentVersionService
 } from '@/services/wikiService'
 import type {
   CreateWikiPageInput,
   UpdateWikiPageInput,
   CreateWikiCollectionInput,
   UpdateWikiCollectionInput,
-  CreateWikiCommentInput
+  CreateWikiCommentInput,
+  WikiAttachmentCategory,
+  UpdateAttachmentInput
 } from '@/types/wiki'
 
 // ═══════════════════════════════════════════════════════════════
@@ -42,7 +46,11 @@ export const wikiKeys = {
   search: (caseId: string, query: string) =>
     [...wikiKeys.all, 'search', caseId, query] as const,
   globalSearch: (query: string) =>
-    [...wikiKeys.all, 'globalSearch', query] as const
+    [...wikiKeys.all, 'globalSearch', query] as const,
+  attachments: (pageId: string) =>
+    [...wikiKeys.all, 'attachments', pageId] as const,
+  attachmentVersions: (pageId: string, attachmentId: string) =>
+    [...wikiKeys.all, 'attachment-versions', pageId, attachmentId] as const
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -567,6 +575,295 @@ export const useCreateFromTemplate = () => {
     onSuccess: (_, { data }) => {
       queryClient.invalidateQueries({ queryKey: wikiKeys.pages(data.caseId) })
       queryClient.invalidateQueries({ queryKey: wikiKeys.pageTree(data.caseId) })
+    }
+  })
+}
+
+// ═══════════════════════════════════════════════════════════════
+// ATTACHMENT HOOKS
+// ═══════════════════════════════════════════════════════════════
+
+/**
+ * Fetch attachments for a wiki page
+ */
+export const useWikiAttachments = (pageId: string) => {
+  return useQuery({
+    queryKey: wikiKeys.attachments(pageId),
+    queryFn: () => wikiAttachmentService.list(pageId),
+    enabled: !!pageId
+  })
+}
+
+/**
+ * Upload a wiki attachment (handles the 3-step process)
+ */
+export const useUploadWikiAttachment = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async ({
+      pageId,
+      file,
+      category,
+      isConfidential
+    }: {
+      pageId: string
+      file: File
+      category?: WikiAttachmentCategory
+      isConfidential?: boolean
+    }) => {
+      // Step 1: Get presigned URL
+      const { uploadUrl, fileKey } = await wikiAttachmentService.getUploadUrl(
+        pageId,
+        {
+          fileName: file.name,
+          fileType: file.type,
+          documentCategory: category,
+          isConfidential
+        }
+      )
+
+      // Step 2: Upload directly to S3
+      await fetch(uploadUrl, {
+        method: 'PUT',
+        body: file,
+        headers: { 'Content-Type': file.type }
+      })
+
+      // Step 3: Confirm upload
+      return wikiAttachmentService.confirmUpload(pageId, {
+        fileName: file.name,
+        fileKey,
+        fileType: file.type,
+        fileSize: file.size,
+        documentCategory: category,
+        isConfidential
+      })
+    },
+    onSuccess: (_, { pageId }) => {
+      queryClient.invalidateQueries({ queryKey: wikiKeys.attachments(pageId) })
+      queryClient.invalidateQueries({ queryKey: wikiKeys.page(pageId) })
+    }
+  })
+}
+
+/**
+ * Update wiki attachment metadata
+ */
+export const useUpdateWikiAttachment = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({
+      pageId,
+      attachmentId,
+      data
+    }: {
+      pageId: string
+      attachmentId: string
+      data: UpdateAttachmentInput
+    }) => wikiAttachmentService.update(pageId, attachmentId, data),
+    onSuccess: (_, { pageId }) => {
+      queryClient.invalidateQueries({ queryKey: wikiKeys.attachments(pageId) })
+      queryClient.invalidateQueries({ queryKey: wikiKeys.page(pageId) })
+    }
+  })
+}
+
+/**
+ * Delete a wiki attachment
+ */
+export const useDeleteWikiAttachment = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({
+      pageId,
+      attachmentId
+    }: {
+      pageId: string
+      attachmentId: string
+    }) => wikiAttachmentService.delete(pageId, attachmentId),
+    onSuccess: (_, { pageId }) => {
+      queryClient.invalidateQueries({ queryKey: wikiKeys.attachments(pageId) })
+      queryClient.invalidateQueries({ queryKey: wikiKeys.page(pageId) })
+    }
+  })
+}
+
+/**
+ * Download a wiki attachment
+ */
+export const useDownloadWikiAttachment = () => {
+  return useMutation({
+    mutationFn: async ({
+      pageId,
+      attachmentId
+    }: {
+      pageId: string
+      attachmentId: string
+    }) => {
+      const { downloadUrl, fileName } =
+        await wikiAttachmentService.getDownloadUrl(pageId, attachmentId)
+
+      // Trigger download
+      const link = document.createElement('a')
+      link.href = downloadUrl
+      link.download = fileName
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+
+      return { downloadUrl, fileName }
+    }
+  })
+}
+
+/**
+ * Seal or unseal a wiki attachment
+ */
+export const useSealWikiAttachment = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({
+      pageId,
+      attachmentId,
+      seal
+    }: {
+      pageId: string
+      attachmentId: string
+      seal: boolean
+    }) => wikiAttachmentService.seal(pageId, attachmentId, seal),
+    onSuccess: (_, { pageId }) => {
+      queryClient.invalidateQueries({ queryKey: wikiKeys.attachments(pageId) })
+      queryClient.invalidateQueries({ queryKey: wikiKeys.page(pageId) })
+    }
+  })
+}
+
+// ═══════════════════════════════════════════════════════════════
+// ATTACHMENT VERSION HOOKS
+// ═══════════════════════════════════════════════════════════════
+
+/**
+ * Get version history for an attachment
+ */
+export const useAttachmentVersionHistory = (
+  pageId: string,
+  attachmentId: string,
+  options?: { enabled?: boolean }
+) => {
+  return useQuery({
+    queryKey: wikiKeys.attachmentVersions(pageId, attachmentId),
+    queryFn: () => wikiAttachmentVersionService.getHistory(pageId, attachmentId),
+    enabled: options?.enabled !== false && !!pageId && !!attachmentId
+  })
+}
+
+/**
+ * Upload a new version of an attachment
+ */
+export const useUploadAttachmentVersion = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async ({
+      pageId,
+      attachmentId,
+      file,
+      changeNote
+    }: {
+      pageId: string
+      attachmentId: string
+      file: File
+      changeNote?: string
+    }) => {
+      // Step 1: Get presigned URL
+      const { uploadUrl, fileKey } =
+        await wikiAttachmentVersionService.getUploadUrl(pageId, attachmentId, {
+          fileName: file.name,
+          fileType: file.type
+        })
+
+      // Step 2: Upload to S3
+      await fetch(uploadUrl, {
+        method: 'PUT',
+        body: file,
+        headers: { 'Content-Type': file.type }
+      })
+
+      // Step 3: Confirm upload
+      return wikiAttachmentVersionService.confirmUpload(pageId, attachmentId, {
+        fileName: file.name,
+        fileKey,
+        fileType: file.type,
+        fileSize: file.size,
+        changeNote
+      })
+    },
+    onSuccess: (_, { pageId, attachmentId }) => {
+      queryClient.invalidateQueries({ queryKey: wikiKeys.page(pageId) })
+      queryClient.invalidateQueries({
+        queryKey: wikiKeys.attachmentVersions(pageId, attachmentId)
+      })
+      queryClient.invalidateQueries({ queryKey: wikiKeys.attachments(pageId) })
+    }
+  })
+}
+
+/**
+ * Download a specific version of an attachment
+ */
+export const useDownloadAttachmentVersion = () => {
+  return useMutation({
+    mutationFn: async ({
+      pageId,
+      attachmentId,
+      versionNumber
+    }: {
+      pageId: string
+      attachmentId: string
+      versionNumber: number
+    }) => {
+      const { downloadUrl, fileName } =
+        await wikiAttachmentVersionService.getDownloadUrl(
+          pageId,
+          attachmentId,
+          versionNumber
+        )
+
+      // Open in new tab
+      window.open(downloadUrl, '_blank')
+
+      return { downloadUrl, fileName }
+    }
+  })
+}
+
+/**
+ * Restore a previous version of an attachment
+ */
+export const useRestoreAttachmentVersion = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({
+      pageId,
+      attachmentId,
+      versionNumber
+    }: {
+      pageId: string
+      attachmentId: string
+      versionNumber: number
+    }) =>
+      wikiAttachmentVersionService.restore(pageId, attachmentId, versionNumber),
+    onSuccess: (_, { pageId, attachmentId }) => {
+      queryClient.invalidateQueries({ queryKey: wikiKeys.page(pageId) })
+      queryClient.invalidateQueries({
+        queryKey: wikiKeys.attachmentVersions(pageId, attachmentId)
+      })
+      queryClient.invalidateQueries({ queryKey: wikiKeys.attachments(pageId) })
     }
   })
 }

@@ -1868,6 +1868,48 @@
     "restoreSuccess": "Version restored successfully",
     "commentAddSuccess": "Comment added successfully",
     "commentResolveSuccess": "Comment resolved successfully",
-    "linkCopied": "Link copied to clipboard"
+    "linkCopied": "Link copied to clipboard",
+    "attachments": {
+      "title": "Attachments",
+      "upload": "Upload",
+      "uploadDescription": "Drag files here or click to select",
+      "download": "Download",
+      "delete": "Delete",
+      "deleteConfirmation": "Are you sure you want to delete this attachment?",
+      "noAttachments": "No attachments",
+      "sealed": "Sealed",
+      "confidential": "Confidential",
+      "categories": {
+        "pleading": "Pleading",
+        "evidence": "Evidence",
+        "exhibit": "Exhibit",
+        "contract": "Contract",
+        "correspondence": "Correspondence",
+        "research": "Research",
+        "judgment": "Judgment",
+        "other": "Other"
+      },
+      "uploadSuccess": "Attachment uploaded successfully",
+      "deleteSuccess": "Attachment deleted successfully",
+      "uploadError": "Failed to upload attachment"
+    },
+    "attachmentVersions": {
+      "title": "Version History",
+      "currentVersion": "Current Version",
+      "version": "Version",
+      "uploadNewVersion": "Upload New Version",
+      "restoreVersion": "Restore Version",
+      "downloadVersion": "Download Version",
+      "changeNote": "Change Note",
+      "changeNotePlaceholder": "Describe what changed (optional)",
+      "uploadedBy": "Uploaded by",
+      "uploadedAt": "Uploaded at",
+      "restored": "Restored",
+      "restoredFrom": "Restored from version",
+      "noVersionHistory": "No version history",
+      "confirmRestore": "Are you sure you want to restore this version?",
+      "restoreSuccess": "Version restored successfully",
+      "uploadSuccess": "New version uploaded successfully"
+    }
   }
 }

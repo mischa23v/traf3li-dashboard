@@ -1868,6 +1868,48 @@
     "restoreSuccess": "تم استعادة الإصدار بنجاح",
     "commentAddSuccess": "تم إضافة التعليق بنجاح",
     "commentResolveSuccess": "تم حل التعليق بنجاح",
-    "linkCopied": "تم نسخ الرابط إلى الحافظة"
+    "linkCopied": "تم نسخ الرابط إلى الحافظة",
+    "attachments": {
+      "title": "المرفقات",
+      "upload": "رفع",
+      "uploadDescription": "اسحب الملفات هنا أو انقر للاختيار",
+      "download": "تحميل",
+      "delete": "حذف",
+      "deleteConfirmation": "هل أنت متأكد من حذف هذا المرفق؟",
+      "noAttachments": "لا توجد مرفقات",
+      "sealed": "مختوم",
+      "confidential": "سري",
+      "categories": {
+        "pleading": "مرافعة",
+        "evidence": "دليل",
+        "exhibit": "مستند",
+        "contract": "عقد",
+        "correspondence": "مراسلة",
+        "research": "بحث",
+        "judgment": "حكم",
+        "other": "أخرى"
+      },
+      "uploadSuccess": "تم رفع المرفق بنجاح",
+      "deleteSuccess": "تم حذف المرفق بنجاح",
+      "uploadError": "فشل في رفع المرفق"
+    },
+    "attachmentVersions": {
+      "title": "سجل الإصدارات",
+      "currentVersion": "الإصدار الحالي",
+      "version": "الإصدار",
+      "uploadNewVersion": "رفع إصدار جديد",
+      "restoreVersion": "استعادة الإصدار",
+      "downloadVersion": "تحميل الإصدار",
+      "changeNote": "ملاحظة التغيير",
+      "changeNotePlaceholder": "صف التغييرات (اختياري)",
+      "uploadedBy": "رفع بواسطة",
+      "uploadedAt": "تاريخ الرفع",
+      "restored": "مستعاد",
+      "restoredFrom": "مستعاد من الإصدار",
+      "noVersionHistory": "لا يوجد سجل إصدارات",
+      "confirmRestore": "هل أنت متأكد من استعادة هذا الإصدار؟",
+      "restoreSuccess": "تم استعادة الإصدار بنجاح",
+      "uploadSuccess": "تم رفع الإصدار الجديد بنجاح"
+    }
   }
 }

@@ -77,6 +77,16 @@ export type WikiBacklinkType =
   | 'citation'
   | 'see_also'
 
+export type WikiAttachmentCategory =
+  | 'pleading'
+  | 'evidence'
+  | 'exhibit'
+  | 'contract'
+  | 'correspondence'
+  | 'research'
+  | 'judgment'
+  | 'other'
+
 // ═══════════════════════════════════════════════════════════════
 // INTERFACES
 // ═══════════════════════════════════════════════════════════════
@@ -102,12 +112,53 @@ export interface WikiPermission {
 }
 
 export interface WikiAttachment {
-  documentId: string
+  _id: string
+  attachmentId: string
   fileName: string
+  fileNameAr?: string
+  fileUrl: string
+  fileKey: string
   fileType: string
   fileSize: number
-  uploadedBy: string
+  uploadedBy:
+    | string
+    | {
+        _id: string
+        firstName: string
+        lastName: string
+        avatar?: string
+      }
   uploadedAt: string
+  isSealed: boolean
+  isConfidential: boolean
+  documentCategory: WikiAttachmentCategory
+  // Version tracking
+  currentVersion?: number
+  versionCount?: number
+  description?: string
+  descriptionAr?: string
+  lastModifiedBy?: string | { _id: string; firstName: string; lastName: string }
+  lastModifiedAt?: string
+}
+
+export interface AttachmentVersion {
+  versionNumber: number
+  fileName: string
+  fileUrl: string
+  fileKey: string
+  fileType?: string
+  fileSize?: number
+  uploadedBy?: {
+    _id: string
+    firstName: string
+    lastName: string
+    avatar?: string
+  }
+  uploadedAt: string
+  changeNote?: string
+  isCurrent?: boolean
+  isRestored?: boolean
+  restoredFrom?: number
 }
 
 export interface WikiPage {
@@ -496,4 +547,59 @@ export interface CreateWikiCommentInput {
   quotedText?: string
   blockId?: string
   mentions?: string[]
+}
+
+// ═══════════════════════════════════════════════════════════════
+// ATTACHMENT FORM TYPES
+// ═══════════════════════════════════════════════════════════════
+
+export interface UploadAttachmentInput {
+  fileName: string
+  fileType: string
+  documentCategory?: WikiAttachmentCategory
+  isConfidential?: boolean
+}
+
+export interface ConfirmAttachmentInput {
+  fileName: string
+  fileNameAr?: string
+  fileKey: string
+  fileUrl?: string
+  fileType: string
+  fileSize: number
+  documentCategory?: WikiAttachmentCategory
+  isConfidential?: boolean
+}
+
+export interface UpdateAttachmentInput {
+  fileName?: string
+  fileNameAr?: string
+  documentCategory?: WikiAttachmentCategory
+  isConfidential?: boolean
+}
+
+// ═══════════════════════════════════════════════════════════════
+// ATTACHMENT VERSION TYPES
+// ═══════════════════════════════════════════════════════════════
+
+export interface AttachmentVersionHistoryResponse {
+  attachmentId: string
+  fileName: string
+  currentVersion: number
+  versionCount: number
+  versions: AttachmentVersion[]
+}
+
+export interface UploadVersionInput {
+  fileName: string
+  fileType: string
+}
+
+export interface ConfirmVersionInput {
+  fileName: string
+  fileKey: string
+  fileUrl?: string
+  fileType?: string
+  fileSize?: number
+  changeNote?: string
 }
