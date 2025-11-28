@@ -114,7 +114,7 @@ export function useSidebarData(): SidebarData {
                 url: '/dashboard/tasks/events',
               },
               {
-                title: 'ويكي',
+                title: 'مراجع والملاحضات',
                 url: '/dashboard/wiki',
               },
             ],
