@@ -128,7 +128,7 @@ export function WikiGlobalView() {
                 </p>
                 <div className="flex gap-3">
                   <Button asChild className="bg-emerald-500 hover:bg-emerald-600 text-white h-12 px-8 rounded-xl font-bold shadow-lg shadow-emerald-500/20 border-0">
-                    <Link to="/dashboard/cases">
+                    <Link to="/dashboard/wiki/new">
                       <Plus className="ms-2 h-5 w-5" />
                       {isArabic ? 'صفحة جديدة' : 'New Page'}
                     </Link>
@@ -258,7 +258,7 @@ export function WikiGlobalView() {
                         : (isArabic ? 'ابدأ بإنشاء صفحة جديدة في إحدى قضاياك' : 'Start by creating a new page in one of your cases')}
                     </p>
                     <Button asChild className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl">
-                      <Link to="/dashboard/cases">
+                      <Link to="/dashboard/wiki/new">
                         <Plus className="ms-2 h-4 w-4" />
                         {isArabic ? 'إنشاء صفحة جديدة' : 'Create New Page'}
                       </Link>
