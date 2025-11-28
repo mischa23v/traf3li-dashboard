@@ -1638,9 +1638,13 @@
     "noDataAvailable": "No data available for this report",
     "generateReport": "Generate Report"
   },
+  "sidebar": {
+    "cases": "Cases",
+    "allCases": "All Cases"
+  },
   "wiki": {
-    "title": "Case Wiki",
-    "description": "Case documentation and knowledge base",
+    "title": "References & Notes",
+    "description": "Case documentation, references and legal notes",
     "searchPlaceholder": "Search pages...",
     "newPage": "New Page",
     "newCollection": "New Collection",

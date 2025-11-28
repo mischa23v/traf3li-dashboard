@@ -75,15 +75,15 @@ export const sidebarData: SidebarData = {
           icon: FileText,
         },
         {
-          title: 'Cases',
+          title: 'sidebar.cases',
           icon: Scale,
           items: [
             {
-              title: 'All Cases',
+              title: 'sidebar.allCases',
               url: '/dashboard/cases',
             },
             {
-              title: 'Case Wiki',
+              title: 'wiki.title',
               url: '/dashboard/cases',
               icon: BookOpen,
             },

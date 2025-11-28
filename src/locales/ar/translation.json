@@ -1638,9 +1638,13 @@
     "noDataAvailable": "لا توجد بيانات متاحة لهذا التقرير",
     "generateReport": "إنشاء التقرير"
   },
+  "sidebar": {
+    "cases": "القضايا",
+    "allCases": "جميع القضايا"
+  },
   "wiki": {
-    "title": "ويكي القضية",
-    "description": "توثيق القضية وقاعدة المعرفة",
+    "title": "مراجع وملاحظات",
+    "description": "توثيق القضية والمراجع والملاحظات القانونية",
     "searchPlaceholder": "البحث في الصفحات...",
     "newPage": "صفحة جديدة",
     "newCollection": "مجموعة جديدة",
