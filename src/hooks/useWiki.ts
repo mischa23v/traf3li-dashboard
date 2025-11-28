@@ -6,6 +6,8 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import {
   wikiPageService,
+  wikiStandaloneService,
+  wikiFolderService,
   wikiRevisionService,
   wikiCollectionService,
   wikiBacklinkService,
@@ -20,10 +22,13 @@ import type {
   UpdateWikiPageInput,
   CreateWikiCollectionInput,
   UpdateWikiCollectionInput,
+  CreateWikiFolderInput,
+  UpdateWikiFolderInput,
   CreateWikiCommentInput,
   WikiAttachmentCategory,
   UpdateAttachmentInput,
-  WikiExportFormat
+  WikiExportFormat,
+  WikiLinkableEntityType
 } from '@/types/wiki'
 
 // ═══════════════════════════════════════════════════════════════
@@ -32,6 +37,7 @@ import type {
 
 export const wikiKeys = {
   all: ['wiki'] as const,
+  // Case-specific keys
   pages: (caseId: string) => [...wikiKeys.all, 'pages', caseId] as const,
   pageTree: (caseId: string) => [...wikiKeys.all, 'tree', caseId] as const,
   page: (pageId: string) => [...wikiKeys.all, 'page', pageId] as const,
@@ -52,7 +58,20 @@ export const wikiKeys = {
   attachments: (pageId: string) =>
     [...wikiKeys.all, 'attachments', pageId] as const,
   attachmentVersions: (pageId: string, attachmentId: string) =>
-    [...wikiKeys.all, 'attachment-versions', pageId, attachmentId] as const
+    [...wikiKeys.all, 'attachment-versions', pageId, attachmentId] as const,
+
+  // Standalone wiki keys (no case required)
+  standalonePages: () => [...wikiKeys.all, 'standalone', 'pages'] as const,
+  standaloneTree: () => [...wikiKeys.all, 'standalone', 'tree'] as const,
+  standalonePinned: () => [...wikiKeys.all, 'standalone', 'pinned'] as const,
+  standaloneTags: () => [...wikiKeys.all, 'standalone', 'tags'] as const,
+  standaloneSearch: (query: string) =>
+    [...wikiKeys.all, 'standalone', 'search', query] as const,
+
+  // Folder keys
+  folders: () => [...wikiKeys.all, 'folders'] as const,
+  folderTree: () => [...wikiKeys.all, 'folders', 'tree'] as const,
+  folder: (folderId: string) => [...wikiKeys.all, 'folder', folderId] as const
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -902,6 +921,286 @@ export const useExportWikiPage = () => {
       }
 
       return response
+    }
+  })
+}
+
+// ═══════════════════════════════════════════════════════════════
+// STANDALONE WIKI HOOKS (No caseId required)
+// ═══════════════════════════════════════════════════════════════
+
+/**
+ * Fetch all user's wiki pages with optional filters (no case required)
+ */
+export const useStandaloneWikiPages = (
+  params?: Parameters<typeof wikiStandaloneService.listPages>[0]
+) => {
+  return useQuery({
+    queryKey: [...wikiKeys.standalonePages(), params],
+    queryFn: () => wikiStandaloneService.listPages(params)
+  })
+}
+
+/**
+ * Fetch user's page tree for sidebar (no case required)
+ */
+export const useStandaloneWikiTree = (params?: {
+  folderId?: string
+  collectionId?: string
+}) => {
+  return useQuery({
+    queryKey: [...wikiKeys.standaloneTree(), params],
+    queryFn: () => wikiStandaloneService.getTree(params)
+  })
+}
+
+/**
+ * Create a standalone wiki page (no caseId required)
+ * All links to cases/clients/etc are OPTIONAL - add later
+ */
+export const useCreateStandaloneWikiPage = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (data: CreateWikiPageInput) =>
+      wikiStandaloneService.createPage(data),
+    onSuccess: (page) => {
+      queryClient.invalidateQueries({ queryKey: wikiKeys.standalonePages() })
+      queryClient.invalidateQueries({ queryKey: wikiKeys.standaloneTree() })
+      // Also invalidate case-specific queries if the page is linked to a case
+      if (page.caseId) {
+        queryClient.invalidateQueries({ queryKey: wikiKeys.pages(page.caseId) })
+        queryClient.invalidateQueries({
+          queryKey: wikiKeys.pageTree(page.caseId)
+        })
+      }
+    }
+  })
+}
+
+/**
+ * Search wiki pages with optional filters
+ */
+export const useStandaloneWikiSearch = (
+  query: string,
+  params?: {
+    pageType?: string
+    caseId?: string
+    clientId?: string
+    tags?: string
+    limit?: number
+  }
+) => {
+  return useQuery({
+    queryKey: [...wikiKeys.standaloneSearch(query), params],
+    queryFn: () => wikiStandaloneService.searchPages(query, params),
+    enabled: query.length >= 2
+  })
+}
+
+/**
+ * Get all pinned wiki pages for user
+ */
+export const useStandalonePinnedPages = () => {
+  return useQuery({
+    queryKey: wikiKeys.standalonePinned(),
+    queryFn: () => wikiStandaloneService.getPinnedPages()
+  })
+}
+
+/**
+ * Get all user tags across all wiki pages
+ */
+export const useWikiTags = () => {
+  return useQuery({
+    queryKey: wikiKeys.standaloneTags(),
+    queryFn: () => wikiStandaloneService.getTags()
+  })
+}
+
+/**
+ * Link an entity to a wiki page (case, client, task, event, reminder, document, wiki)
+ */
+export const useLinkWikiEntity = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({
+      pageId,
+      entityType,
+      entityId
+    }: {
+      pageId: string
+      entityType: WikiLinkableEntityType
+      entityId: string
+    }) => wikiStandaloneService.linkEntity(pageId, entityType, entityId),
+    onSuccess: (page) => {
+      queryClient.invalidateQueries({ queryKey: wikiKeys.page(page._id) })
+      queryClient.invalidateQueries({ queryKey: wikiKeys.standalonePages() })
+      if (page.caseId) {
+        queryClient.invalidateQueries({ queryKey: wikiKeys.pages(page.caseId) })
+      }
+    }
+  })
+}
+
+/**
+ * Unlink an entity from a wiki page
+ */
+export const useUnlinkWikiEntity = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({
+      pageId,
+      entityType,
+      entityId
+    }: {
+      pageId: string
+      entityType: WikiLinkableEntityType
+      entityId: string
+    }) => wikiStandaloneService.unlinkEntity(pageId, entityType, entityId),
+    onSuccess: (page) => {
+      queryClient.invalidateQueries({ queryKey: wikiKeys.page(page._id) })
+      queryClient.invalidateQueries({ queryKey: wikiKeys.standalonePages() })
+      if (page.caseId) {
+        queryClient.invalidateQueries({ queryKey: wikiKeys.pages(page.caseId) })
+      }
+    }
+  })
+}
+
+// ═══════════════════════════════════════════════════════════════
+// FOLDER HOOKS (Standalone user-centric folders)
+// ═══════════════════════════════════════════════════════════════
+
+/**
+ * Fetch folders with optional filters
+ */
+export const useWikiFolders = (params?: {
+  parentFolderId?: string | null
+  caseId?: string
+  excludeCaseFolders?: boolean
+}) => {
+  return useQuery({
+    queryKey: [...wikiKeys.folders(), params],
+    queryFn: () => wikiFolderService.list(params)
+  })
+}
+
+/**
+ * Fetch folder tree for sidebar
+ */
+export const useWikiFolderTree = (params?: {
+  caseId?: string
+  excludeCaseFolders?: boolean
+}) => {
+  return useQuery({
+    queryKey: [...wikiKeys.folderTree(), params],
+    queryFn: () => wikiFolderService.getTree(params)
+  })
+}
+
+/**
+ * Fetch a single folder by ID
+ */
+export const useWikiFolder = (folderId: string) => {
+  return useQuery({
+    queryKey: wikiKeys.folder(folderId),
+    queryFn: () => wikiFolderService.get(folderId),
+    enabled: !!folderId
+  })
+}
+
+/**
+ * Create a new folder (no case required)
+ */
+export const useCreateWikiFolder = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (data: CreateWikiFolderInput) => wikiFolderService.create(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: wikiKeys.folders() })
+      queryClient.invalidateQueries({ queryKey: wikiKeys.folderTree() })
+      queryClient.invalidateQueries({ queryKey: wikiKeys.standaloneTree() })
+    }
+  })
+}
+
+/**
+ * Update a folder
+ */
+export const useUpdateWikiFolder = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({
+      folderId,
+      data
+    }: {
+      folderId: string
+      data: UpdateWikiFolderInput
+    }) => wikiFolderService.update(folderId, data),
+    onSuccess: (_, { folderId }) => {
+      queryClient.invalidateQueries({ queryKey: wikiKeys.folder(folderId) })
+      queryClient.invalidateQueries({ queryKey: wikiKeys.folders() })
+      queryClient.invalidateQueries({ queryKey: wikiKeys.folderTree() })
+      queryClient.invalidateQueries({ queryKey: wikiKeys.standaloneTree() })
+    }
+  })
+}
+
+/**
+ * Delete a folder
+ */
+export const useDeleteWikiFolder = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (folderId: string) => wikiFolderService.delete(folderId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: wikiKeys.folders() })
+      queryClient.invalidateQueries({ queryKey: wikiKeys.folderTree() })
+      queryClient.invalidateQueries({ queryKey: wikiKeys.standaloneTree() })
+    }
+  })
+}
+
+/**
+ * Initialize default folders for new user
+ */
+export const useInitWikiFolders = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: () => wikiFolderService.initDefaults(),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: wikiKeys.folders() })
+      queryClient.invalidateQueries({ queryKey: wikiKeys.folderTree() })
+      queryClient.invalidateQueries({ queryKey: wikiKeys.standaloneTree() })
+    }
+  })
+}
+
+/**
+ * Move a folder to a different parent
+ */
+export const useMoveWikiFolder = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({
+      folderId,
+      data
+    }: {
+      folderId: string
+      data: { parentFolderId?: string | null; order?: number }
+    }) => wikiFolderService.move(folderId, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: wikiKeys.folders() })
+      queryClient.invalidateQueries({ queryKey: wikiKeys.folderTree() })
+      queryClient.invalidateQueries({ queryKey: wikiKeys.standaloneTree() })
     }
   })
 }

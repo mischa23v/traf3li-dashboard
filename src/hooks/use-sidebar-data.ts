@@ -28,6 +28,7 @@ import {
   Building,
   Wallet,
   Package,
+  NotebookPen,
 } from 'lucide-react'
 import { useAuthStore } from '@/stores/auth-store'
 
@@ -113,9 +114,19 @@ export function useSidebarData(): SidebarData {
                 title: 'الأحداث',
                 url: '/dashboard/tasks/events',
               },
+            ],
+          },
+          {
+            title: 'الملاحظات والمراجع',
+            icon: NotebookPen,
+            items: [
               {
-                title: 'مراجع والملاحضات',
+                title: 'جميع الملاحظات',
                 url: '/dashboard/wiki',
+              },
+              {
+                title: 'إنشاء ملاحظة',
+                url: '/dashboard/wiki/new',
               },
             ],
           },
