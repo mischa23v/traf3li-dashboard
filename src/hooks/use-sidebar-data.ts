@@ -93,25 +93,23 @@ export function useSidebarData(): SidebarData {
         items: [
           {
             title: 'المهام',
+            url: '/dashboard/tasks/list',
             icon: CheckSquare,
-            items: [
-              {
-                title: 'المهام',
-                url: '/dashboard/tasks/list',
-              },
-              {
-                title: 'التذكيرات',
-                url: '/dashboard/tasks/reminders',
-              },
-              {
-                title: 'الأحداث',
-                url: '/dashboard/tasks/events',
-              },
-              {
-                title: 'الملاحظات',
-                url: '/dashboard/wiki',
-              },
-            ],
+          },
+          {
+            title: 'التذكيرات',
+            url: '/dashboard/tasks/reminders',
+            icon: CheckSquare,
+          },
+          {
+            title: 'الأحداث',
+            url: '/dashboard/tasks/events',
+            icon: CheckSquare,
+          },
+          {
+            title: 'الملاحظات',
+            url: '/dashboard/wiki',
+            icon: CheckSquare,
           },
         ],
       },
