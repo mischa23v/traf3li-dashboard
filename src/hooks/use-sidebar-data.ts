@@ -8,6 +8,7 @@ import {
   DollarSign,
   Star,
   Settings,
+  Wrench,
 } from 'lucide-react'
 import { useAuthStore } from '@/stores/auth-store'
 
@@ -195,10 +196,6 @@ export function useSidebarData(): SidebarData {
                 url: '/dashboard/finance/invoices',
               },
               {
-                title: 'عروض الأسعار',
-                url: '/dashboard/finance/quotes',
-              },
-              {
                 title: 'المدفوعات',
                 url: '/dashboard/finance/payments',
               },
@@ -242,10 +239,6 @@ export function useSidebarData(): SidebarData {
                 url: '/dashboard/reputation/badges',
               },
               {
-                title: 'التقارير',
-                url: '/dashboard/reports',
-              },
-              {
                 title: 'القوانين',
                 url: '/dashboard/knowledge/laws',
               },
@@ -256,6 +249,25 @@ export function useSidebarData(): SidebarData {
               {
                 title: 'النماذج',
                 url: '/dashboard/knowledge/forms',
+              },
+            ],
+          },
+        ],
+      },
+      {
+        title: 'الأدوات',
+        items: [
+          {
+            title: 'الأدوات',
+            icon: Wrench,
+            items: [
+              {
+                title: 'التقارير',
+                url: '/dashboard/reports',
+              },
+              {
+                title: 'استيراد/تصدير',
+                url: '/dashboard/data-export',
               },
             ],
           },
@@ -279,26 +291,6 @@ export function useSidebarData(): SidebarData {
               {
                 title: 'التفضيلات',
                 url: '/dashboard/settings/preferences',
-              },
-              {
-                title: 'بيانات الشركة',
-                url: '/dashboard/settings/company',
-              },
-              {
-                title: 'إعدادات الفواتير',
-                url: '/dashboard/settings/finance',
-              },
-              {
-                title: 'الضرائب',
-                url: '/dashboard/settings/taxes',
-              },
-              {
-                title: 'طرق الدفع',
-                url: '/dashboard/settings/payment-modes',
-              },
-              {
-                title: 'استيراد/تصدير',
-                url: '/dashboard/data-export',
               },
               {
                 title: 'مركز المساعدة',
