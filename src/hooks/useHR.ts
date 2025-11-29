@@ -1023,3 +1023,41 @@ export const useBulkDeleteEvaluations = () => {
     },
   })
 }
+
+// ==================== ALIAS EXPORTS ====================
+// These aliases provide alternative naming conventions for hooks
+
+// Leave aliases
+export const useLeaveRequest = useLeave
+export const useDeleteLeaveRequest = useDeleteLeave
+export const useUpdateLeaveRequestStatus = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({ id, status }: { id: string; status: 'approved' | 'rejected' }) => {
+      if (status === 'approved') {
+        return leaveService.approveLeave(id)
+      } else {
+        return leaveService.rejectLeave(id, '')
+      }
+    },
+    onSuccess: (_, { id }) => {
+      queryClient.invalidateQueries({ queryKey: ['leaves'] })
+      queryClient.invalidateQueries({ queryKey: ['leaves', id] })
+    },
+    onError: (error: Error) => {
+      toast({
+        title: 'خطأ',
+        description: error.message || 'فشل في تحديث حالة الإجازة',
+        variant: 'destructive',
+      })
+    },
+  })
+}
+
+// Attendance aliases
+export const useDeleteAttendanceRecord = useDeleteAttendance
+
+// Salary aliases
+export const useSalaryRecord = useSalary
+export const useDeleteSalaryRecord = useDeleteSalary
