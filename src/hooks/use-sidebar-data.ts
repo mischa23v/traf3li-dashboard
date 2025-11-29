@@ -10,6 +10,7 @@ import {
   Settings,
   BookOpen,
   TrendingUp,
+  UserCog,
 } from 'lucide-react'
 import { useAuthStore } from '@/stores/auth-store'
 
@@ -239,19 +240,35 @@ export function useSidebarData(): SidebarData {
         ],
       },
       {
-        title: 'التميز المهني',
+        title: 'الموارد البشرية',
         items: [
           {
-            title: 'التميز المهني',
-            icon: Star,
+            title: 'الموارد البشرية',
+            icon: UserCog,
             items: [
               {
-                title: 'نظرة عامة',
-                url: '/dashboard/reputation/overview',
+                title: 'الموظفين',
+                url: '/dashboard/hr/employees',
               },
               {
-                title: 'شاراتي',
-                url: '/dashboard/reputation/badges',
+                title: 'الرواتب',
+                url: '/dashboard/hr/salaries',
+              },
+              {
+                title: 'مسيرات الرواتب',
+                url: '/dashboard/hr/payroll',
+              },
+              {
+                title: 'الإجازات',
+                url: '/dashboard/hr/leaves',
+              },
+              {
+                title: 'الحضور والانصراف',
+                url: '/dashboard/hr/attendance',
+              },
+              {
+                title: 'التقييمات',
+                url: '/dashboard/hr/evaluations',
               },
             ],
           },
@@ -275,6 +292,25 @@ export function useSidebarData(): SidebarData {
               {
                 title: 'النماذج',
                 url: '/dashboard/knowledge/forms',
+              },
+            ],
+          },
+        ],
+      },
+      {
+        title: 'التميز المهني',
+        items: [
+          {
+            title: 'التميز المهني',
+            icon: Star,
+            items: [
+              {
+                title: 'نظرة عامة',
+                url: '/dashboard/reputation/overview',
+              },
+              {
+                title: 'شاراتي',
+                url: '/dashboard/reputation/badges',
               },
             ],
           },
