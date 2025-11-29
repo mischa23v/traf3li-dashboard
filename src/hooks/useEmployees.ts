@@ -244,3 +244,30 @@ export const useDeleteEmployeeDocument = () => {
     },
   })
 }
+
+/**
+ * Bulk delete employees
+ */
+export const useBulkDeleteEmployees = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async (employeeIds: string[]) => {
+      const results = await Promise.allSettled(
+        employeeIds.map((id) => employeeService.deleteEmployee(id))
+      )
+      const failed = results.filter((r) => r.status === 'rejected')
+      if (failed.length > 0) {
+        throw new Error(`فشل حذف ${failed.length} من ${employeeIds.length} موظف`)
+      }
+      return results
+    },
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['employees'] })
+      toast.success(`تم حذف ${variables.length} موظف بنجاح`)
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'فشل حذف الموظفين')
+    },
+  })
+}
