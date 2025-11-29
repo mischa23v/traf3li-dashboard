@@ -1,0 +1,842 @@
+/**
+ * CRM Service
+ * Handles all CRM-related API calls (Leads, Pipelines, Referrals, Activities)
+ */
+
+import apiClient, { handleApiError } from '@/lib/api'
+import type {
+  // Lead types
+  Lead,
+  CreateLeadData,
+  LeadFilters,
+  LeadStats,
+  LeadStatus,
+  // Pipeline types
+  Pipeline,
+  CreatePipelineData,
+  CreateStageData,
+  PipelineStage,
+  PipelineFilters,
+  PipelineView,
+  PipelineStats,
+  // Referral types
+  Referral,
+  CreateReferralData,
+  ReferralFilters,
+  ReferralStats,
+  FeePaymentData,
+  // Activity types
+  CrmActivity,
+  CreateActivityData,
+  ActivityFilters,
+  ActivityStats,
+  LogCallData,
+  LogEmailData,
+  LogMeetingData,
+  AddNoteData,
+} from '@/types/crm'
+
+// ═══════════════════════════════════════════════════════════════
+// LEAD SERVICE
+// ═══════════════════════════════════════════════════════════════
+export const leadService = {
+  /**
+   * Get all leads with optional filters
+   */
+  getLeads: async (
+    filters?: LeadFilters
+  ): Promise<{ data: Lead[]; pagination: any }> => {
+    try {
+      const response = await apiClient.get('/leads', { params: filters })
+      return response.data
+    } catch (error: any) {
+      console.error('Get leads error:', error)
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Get single lead with activities
+   */
+  getLead: async (
+    id: string
+  ): Promise<{ lead: Lead; activities: CrmActivity[] }> => {
+    try {
+      const response = await apiClient.get(`/leads/${id}`)
+      return response.data.data
+    } catch (error: any) {
+      console.error('Get lead error:', error)
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Create new lead
+   */
+  createLead: async (data: CreateLeadData): Promise<Lead> => {
+    try {
+      const response = await apiClient.post('/leads', data)
+      return response.data.data || response.data.lead
+    } catch (error: any) {
+      console.error('Create lead error:', error)
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Update lead
+   */
+  updateLead: async (id: string, data: Partial<Lead>): Promise<Lead> => {
+    try {
+      const response = await apiClient.put(`/leads/${id}`, data)
+      return response.data.data || response.data.lead
+    } catch (error: any) {
+      console.error('Update lead error:', error)
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Delete lead
+   */
+  deleteLead: async (id: string): Promise<void> => {
+    try {
+      await apiClient.delete(`/leads/${id}`)
+    } catch (error: any) {
+      console.error('Delete lead error:', error)
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Update lead status
+   */
+  updateLeadStatus: async (
+    id: string,
+    data: { status: LeadStatus; notes?: string; lostReason?: string }
+  ): Promise<Lead> => {
+    try {
+      const response = await apiClient.post(`/leads/${id}/status`, data)
+      return response.data.data || response.data.lead
+    } catch (error: any) {
+      console.error('Update lead status error:', error)
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Move lead to different pipeline stage
+   */
+  moveLeadToStage: async (
+    id: string,
+    data: { stageId: string; notes?: string }
+  ): Promise<Lead> => {
+    try {
+      const response = await apiClient.post(`/leads/${id}/move`, data)
+      return response.data.data || response.data.lead
+    } catch (error: any) {
+      console.error('Move lead to stage error:', error)
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Convert lead to client
+   */
+  convertToClient: async (
+    id: string
+  ): Promise<{ lead: Lead; client: any }> => {
+    try {
+      const response = await apiClient.post(`/leads/${id}/convert`)
+      return response.data.data
+    } catch (error: any) {
+      console.error('Convert lead to client error:', error)
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Get lead statistics
+   */
+  getStats: async (params?: {
+    startDate?: string
+    endDate?: string
+  }): Promise<LeadStats> => {
+    try {
+      const response = await apiClient.get('/leads/stats', { params })
+      return response.data.data
+    } catch (error: any) {
+      console.error('Get lead stats error:', error)
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Get leads by pipeline (Kanban view)
+   */
+  getByPipeline: async (pipelineId?: string): Promise<PipelineView> => {
+    try {
+      const url = pipelineId
+        ? `/leads/pipeline/${pipelineId}`
+        : '/leads/pipeline'
+      const response = await apiClient.get(url)
+      return response.data.data
+    } catch (error: any) {
+      console.error('Get leads by pipeline error:', error)
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Get leads needing follow-up
+   */
+  getNeedingFollowUp: async (limit?: number): Promise<Lead[]> => {
+    try {
+      const response = await apiClient.get('/leads/follow-up', {
+        params: { limit },
+      })
+      return response.data.data
+    } catch (error: any) {
+      console.error('Get leads needing follow-up error:', error)
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Get lead activities
+   */
+  getActivities: async (
+    id: string,
+    params?: { type?: string; page?: number }
+  ): Promise<CrmActivity[]> => {
+    try {
+      const response = await apiClient.get(`/leads/${id}/activities`, {
+        params,
+      })
+      return response.data.data
+    } catch (error: any) {
+      console.error('Get lead activities error:', error)
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Log activity for lead
+   */
+  logActivity: async (
+    id: string,
+    data: CreateActivityData
+  ): Promise<CrmActivity> => {
+    try {
+      const response = await apiClient.post(`/leads/${id}/activities`, data)
+      return response.data.data
+    } catch (error: any) {
+      console.error('Log lead activity error:', error)
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Schedule follow-up for lead
+   */
+  scheduleFollowUp: async (
+    id: string,
+    data: { date: string; note?: string }
+  ): Promise<Lead> => {
+    try {
+      const response = await apiClient.post(`/leads/${id}/follow-up`, data)
+      return response.data.data || response.data.lead
+    } catch (error: any) {
+      console.error('Schedule follow-up error:', error)
+      throw new Error(handleApiError(error))
+    }
+  },
+}
+
+// ═══════════════════════════════════════════════════════════════
+// PIPELINE SERVICE
+// ═══════════════════════════════════════════════════════════════
+export const pipelineService = {
+  /**
+   * Get all pipelines
+   */
+  getPipelines: async (
+    params?: PipelineFilters
+  ): Promise<{ data: Pipeline[]; pagination: any }> => {
+    try {
+      const response = await apiClient.get('/crm-pipelines', { params })
+      return response.data
+    } catch (error: any) {
+      console.error('Get pipelines error:', error)
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Get single pipeline with stage counts
+   */
+  getPipeline: async (
+    id: string
+  ): Promise<{ pipeline: Pipeline; stageCounts: Record<string, number> }> => {
+    try {
+      const response = await apiClient.get(`/crm-pipelines/${id}`)
+      return response.data.data
+    } catch (error: any) {
+      console.error('Get pipeline error:', error)
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Create new pipeline
+   */
+  createPipeline: async (data: CreatePipelineData): Promise<Pipeline> => {
+    try {
+      const response = await apiClient.post('/crm-pipelines', data)
+      return response.data.data || response.data.pipeline
+    } catch (error: any) {
+      console.error('Create pipeline error:', error)
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Update pipeline
+   */
+  updatePipeline: async (
+    id: string,
+    data: Partial<Pipeline>
+  ): Promise<Pipeline> => {
+    try {
+      const response = await apiClient.put(`/crm-pipelines/${id}`, data)
+      return response.data.data || response.data.pipeline
+    } catch (error: any) {
+      console.error('Update pipeline error:', error)
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Delete pipeline
+   */
+  deletePipeline: async (id: string): Promise<void> => {
+    try {
+      await apiClient.delete(`/crm-pipelines/${id}`)
+    } catch (error: any) {
+      console.error('Delete pipeline error:', error)
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Add stage to pipeline
+   */
+  addStage: async (id: string, data: CreateStageData): Promise<Pipeline> => {
+    try {
+      const response = await apiClient.post(`/crm-pipelines/${id}/stages`, data)
+      return response.data.data || response.data.pipeline
+    } catch (error: any) {
+      console.error('Add stage error:', error)
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Update pipeline stage
+   */
+  updateStage: async (
+    id: string,
+    stageId: string,
+    data: Partial<PipelineStage>
+  ): Promise<Pipeline> => {
+    try {
+      const response = await apiClient.put(
+        `/crm-pipelines/${id}/stages/${stageId}`,
+        data
+      )
+      return response.data.data || response.data.pipeline
+    } catch (error: any) {
+      console.error('Update stage error:', error)
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Remove stage from pipeline
+   */
+  removeStage: async (id: string, stageId: string): Promise<void> => {
+    try {
+      await apiClient.delete(`/crm-pipelines/${id}/stages/${stageId}`)
+    } catch (error: any) {
+      console.error('Remove stage error:', error)
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Reorder pipeline stages
+   */
+  reorderStages: async (
+    id: string,
+    stageOrders: { stageId: string; order: number }[]
+  ): Promise<Pipeline> => {
+    try {
+      const response = await apiClient.post(
+        `/crm-pipelines/${id}/stages/reorder`,
+        { stageOrders }
+      )
+      return response.data.data || response.data.pipeline
+    } catch (error: any) {
+      console.error('Reorder stages error:', error)
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Get pipeline statistics
+   */
+  getStats: async (id: string): Promise<PipelineStats> => {
+    try {
+      const response = await apiClient.get(`/crm-pipelines/${id}/stats`)
+      return response.data.data
+    } catch (error: any) {
+      console.error('Get pipeline stats error:', error)
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Set pipeline as default
+   */
+  setDefault: async (id: string): Promise<Pipeline> => {
+    try {
+      const response = await apiClient.post(`/crm-pipelines/${id}/default`)
+      return response.data.data || response.data.pipeline
+    } catch (error: any) {
+      console.error('Set default pipeline error:', error)
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Duplicate pipeline
+   */
+  duplicate: async (
+    id: string,
+    data?: { name?: string; nameAr?: string }
+  ): Promise<Pipeline> => {
+    try {
+      const response = await apiClient.post(
+        `/crm-pipelines/${id}/duplicate`,
+        data
+      )
+      return response.data.data || response.data.pipeline
+    } catch (error: any) {
+      console.error('Duplicate pipeline error:', error)
+      throw new Error(handleApiError(error))
+    }
+  },
+}
+
+// ═══════════════════════════════════════════════════════════════
+// REFERRAL SERVICE
+// ═══════════════════════════════════════════════════════════════
+export const referralService = {
+  /**
+   * Get all referrals
+   */
+  getReferrals: async (
+    filters?: ReferralFilters
+  ): Promise<{ data: Referral[]; pagination: any }> => {
+    try {
+      const response = await apiClient.get('/referrals', { params: filters })
+      return response.data
+    } catch (error: any) {
+      console.error('Get referrals error:', error)
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Get single referral
+   */
+  getReferral: async (id: string): Promise<Referral> => {
+    try {
+      const response = await apiClient.get(`/referrals/${id}`)
+      return response.data.data
+    } catch (error: any) {
+      console.error('Get referral error:', error)
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Create new referral
+   */
+  createReferral: async (data: CreateReferralData): Promise<Referral> => {
+    try {
+      const response = await apiClient.post('/referrals', data)
+      return response.data.data || response.data.referral
+    } catch (error: any) {
+      console.error('Create referral error:', error)
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Update referral
+   */
+  updateReferral: async (
+    id: string,
+    data: Partial<Referral>
+  ): Promise<Referral> => {
+    try {
+      const response = await apiClient.put(`/referrals/${id}`, data)
+      return response.data.data || response.data.referral
+    } catch (error: any) {
+      console.error('Update referral error:', error)
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Delete referral
+   */
+  deleteReferral: async (id: string): Promise<void> => {
+    try {
+      await apiClient.delete(`/referrals/${id}`)
+    } catch (error: any) {
+      console.error('Delete referral error:', error)
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Get referral statistics
+   */
+  getStats: async (params?: {
+    startDate?: string
+    endDate?: string
+  }): Promise<ReferralStats> => {
+    try {
+      const response = await apiClient.get('/referrals/stats', { params })
+      return response.data.data
+    } catch (error: any) {
+      console.error('Get referral stats error:', error)
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Get top referrers
+   */
+  getTopReferrers: async (limit?: number): Promise<Referral[]> => {
+    try {
+      const response = await apiClient.get('/referrals/top', {
+        params: { limit },
+      })
+      return response.data.data
+    } catch (error: any) {
+      console.error('Get top referrers error:', error)
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Add lead referral
+   */
+  addLeadReferral: async (
+    id: string,
+    data: { leadId: string; caseValue?: number }
+  ): Promise<Referral> => {
+    try {
+      const response = await apiClient.post(`/referrals/${id}/leads`, data)
+      return response.data.data || response.data.referral
+    } catch (error: any) {
+      console.error('Add lead referral error:', error)
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Mark lead as converted
+   */
+  markConverted: async (
+    id: string,
+    leadId: string,
+    clientId: string
+  ): Promise<Referral> => {
+    try {
+      const response = await apiClient.post(
+        `/referrals/${id}/leads/${leadId}/convert`,
+        { clientId }
+      )
+      return response.data.data || response.data.referral
+    } catch (error: any) {
+      console.error('Mark converted error:', error)
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Record fee payment
+   */
+  recordPayment: async (
+    id: string,
+    data: FeePaymentData
+  ): Promise<Referral> => {
+    try {
+      const response = await apiClient.post(`/referrals/${id}/payments`, data)
+      return response.data.data || response.data.referral
+    } catch (error: any) {
+      console.error('Record payment error:', error)
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Calculate referral fee
+   */
+  calculateFee: async (
+    id: string,
+    caseValue: number
+  ): Promise<{ feeAmount: number }> => {
+    try {
+      const response = await apiClient.get(`/referrals/${id}/calculate-fee`, {
+        params: { caseValue },
+      })
+      return response.data.data
+    } catch (error: any) {
+      console.error('Calculate fee error:', error)
+      throw new Error(handleApiError(error))
+    }
+  },
+}
+
+// ═══════════════════════════════════════════════════════════════
+// ACTIVITY SERVICE
+// ═══════════════════════════════════════════════════════════════
+export const crmActivityService = {
+  /**
+   * Get all activities
+   */
+  getActivities: async (
+    params?: ActivityFilters
+  ): Promise<{ data: CrmActivity[]; pagination: any }> => {
+    try {
+      const response = await apiClient.get('/crm-activities', { params })
+      return response.data
+    } catch (error: any) {
+      console.error('Get activities error:', error)
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Get single activity
+   */
+  getActivity: async (id: string): Promise<CrmActivity> => {
+    try {
+      const response = await apiClient.get(`/crm-activities/${id}`)
+      return response.data.data
+    } catch (error: any) {
+      console.error('Get activity error:', error)
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Create activity
+   */
+  createActivity: async (data: CreateActivityData): Promise<CrmActivity> => {
+    try {
+      const response = await apiClient.post('/crm-activities', data)
+      return response.data.data
+    } catch (error: any) {
+      console.error('Create activity error:', error)
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Update activity
+   */
+  updateActivity: async (
+    id: string,
+    data: Partial<CrmActivity>
+  ): Promise<CrmActivity> => {
+    try {
+      const response = await apiClient.put(`/crm-activities/${id}`, data)
+      return response.data.data
+    } catch (error: any) {
+      console.error('Update activity error:', error)
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Delete activity
+   */
+  deleteActivity: async (id: string): Promise<void> => {
+    try {
+      await apiClient.delete(`/crm-activities/${id}`)
+    } catch (error: any) {
+      console.error('Delete activity error:', error)
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Get activity timeline
+   */
+  getTimeline: async (params?: {
+    entityTypes?: string
+    types?: string
+    limit?: number
+  }): Promise<CrmActivity[]> => {
+    try {
+      const response = await apiClient.get('/crm-activities/timeline', {
+        params,
+      })
+      return response.data.data
+    } catch (error: any) {
+      console.error('Get timeline error:', error)
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Get activity statistics
+   */
+  getStats: async (params?: {
+    startDate?: string
+    endDate?: string
+  }): Promise<ActivityStats> => {
+    try {
+      const response = await apiClient.get('/crm-activities/stats', { params })
+      return response.data.data
+    } catch (error: any) {
+      console.error('Get activity stats error:', error)
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Get entity activities
+   */
+  getEntityActivities: async (
+    entityType: string,
+    entityId: string,
+    params?: { type?: string }
+  ): Promise<CrmActivity[]> => {
+    try {
+      const response = await apiClient.get(
+        `/crm-activities/entity/${entityType}/${entityId}`,
+        { params }
+      )
+      return response.data.data
+    } catch (error: any) {
+      console.error('Get entity activities error:', error)
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Get upcoming tasks
+   */
+  getUpcomingTasks: async (params?: {
+    assignedTo?: string
+    endDate?: string
+    limit?: number
+  }): Promise<CrmActivity[]> => {
+    try {
+      const response = await apiClient.get('/crm-activities/tasks/upcoming', {
+        params,
+      })
+      return response.data.data
+    } catch (error: any) {
+      console.error('Get upcoming tasks error:', error)
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Complete task
+   */
+  completeTask: async (
+    id: string,
+    outcomeNotes?: string
+  ): Promise<CrmActivity> => {
+    try {
+      const response = await apiClient.post(`/crm-activities/${id}/complete`, {
+        outcomeNotes,
+      })
+      return response.data.data
+    } catch (error: any) {
+      console.error('Complete task error:', error)
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Log call activity
+   */
+  logCall: async (data: LogCallData): Promise<CrmActivity> => {
+    try {
+      const response = await apiClient.post('/crm-activities/log/call', data)
+      return response.data.data
+    } catch (error: any) {
+      console.error('Log call error:', error)
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Log email activity
+   */
+  logEmail: async (data: LogEmailData): Promise<CrmActivity> => {
+    try {
+      const response = await apiClient.post('/crm-activities/log/email', data)
+      return response.data.data
+    } catch (error: any) {
+      console.error('Log email error:', error)
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Log meeting activity
+   */
+  logMeeting: async (data: LogMeetingData): Promise<CrmActivity> => {
+    try {
+      const response = await apiClient.post('/crm-activities/log/meeting', data)
+      return response.data.data
+    } catch (error: any) {
+      console.error('Log meeting error:', error)
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Add note
+   */
+  addNote: async (data: AddNoteData): Promise<CrmActivity> => {
+    try {
+      const response = await apiClient.post('/crm-activities/log/note', data)
+      return response.data.data
+    } catch (error: any) {
+      console.error('Add note error:', error)
+      throw new Error(handleApiError(error))
+    }
+  },
+}
+
+// Export all services as default object
+const crmService = {
+  lead: leadService,
+  pipeline: pipelineService,
+  referral: referralService,
+  activity: crmActivityService,
+}
+
+export default crmService
