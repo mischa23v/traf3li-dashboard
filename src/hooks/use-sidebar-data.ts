@@ -81,7 +81,7 @@ export function useSidebarData(): SidebarData {
         ],
       },
       {
-        title: 'المهام',
+        title: 'الإنتاجية',
         items: [
           {
             title: 'المهام',
