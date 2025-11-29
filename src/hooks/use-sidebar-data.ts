@@ -84,24 +84,26 @@ export function useSidebarData(): SidebarData {
         title: 'الإنتاجية',
         items: [
           {
-            title: 'المهام',
-            url: '/dashboard/tasks/list',
+            title: 'الإنتاجية',
             icon: CheckSquare,
-          },
-          {
-            title: 'التذكيرات',
-            url: '/dashboard/tasks/reminders',
-            icon: CheckSquare,
-          },
-          {
-            title: 'الأحداث',
-            url: '/dashboard/tasks/events',
-            icon: CheckSquare,
-          },
-          {
-            title: 'الملاحظات',
-            url: '/dashboard/wiki',
-            icon: CheckSquare,
+            items: [
+              {
+                title: 'المهام',
+                url: '/dashboard/tasks/list',
+              },
+              {
+                title: 'التذكيرات',
+                url: '/dashboard/tasks/reminders',
+              },
+              {
+                title: 'الأحداث',
+                url: '/dashboard/tasks/events',
+              },
+              {
+                title: 'الملاحظات',
+                url: '/dashboard/wiki',
+              },
+            ],
           },
         ],
       },
