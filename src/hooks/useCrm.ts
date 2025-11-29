@@ -661,6 +661,58 @@ export const useDeleteReferral = () => {
 }
 
 /**
+ * Update referral status
+ */
+export const useUpdateReferralStatus = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({
+      referralId,
+      status,
+    }: {
+      referralId: string
+      status: string
+    }) => referralService.updateReferral(referralId, { status }),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['referrals'] })
+      queryClient.invalidateQueries({
+        queryKey: ['referrals', variables.referralId],
+      })
+      toast.success('تم تحديث حالة الإحالة بنجاح')
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'فشل تحديث حالة الإحالة')
+    },
+  })
+}
+
+/**
+ * Mark referral reward as paid
+ */
+export const useMarkReferralPaid = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (referralId: string) =>
+      referralService.updateReferral(referralId, {
+        rewardPaid: true,
+        rewardPaidAt: new Date().toISOString()
+      }),
+    onSuccess: (_, referralId) => {
+      queryClient.invalidateQueries({ queryKey: ['referrals'] })
+      queryClient.invalidateQueries({
+        queryKey: ['referrals', referralId],
+      })
+      toast.success('تم تأكيد دفع المكافأة بنجاح')
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'فشل تأكيد الدفع')
+    },
+  })
+}
+
+/**
  * Add lead referral
  */
 export const useAddLeadReferral = () => {
