@@ -10,6 +10,7 @@ import {
   Settings,
   BookOpen,
   TrendingUp,
+  UserCog,
 } from 'lucide-react'
 import { useAuthStore } from '@/stores/auth-store'
 
@@ -233,6 +234,41 @@ export function useSidebarData(): SidebarData {
               {
                 title: 'تتبع الوقت',
                 url: '/dashboard/finance/time-tracking',
+              },
+            ],
+          },
+        ],
+      },
+      {
+        title: 'الموارد البشرية',
+        items: [
+          {
+            title: 'الموارد البشرية',
+            icon: UserCog,
+            items: [
+              {
+                title: 'الموظفين',
+                url: '/dashboard/hr/employees',
+              },
+              {
+                title: 'الرواتب',
+                url: '/dashboard/hr/salaries',
+              },
+              {
+                title: 'مسيرات الرواتب',
+                url: '/dashboard/hr/payroll',
+              },
+              {
+                title: 'الإجازات',
+                url: '/dashboard/hr/leaves',
+              },
+              {
+                title: 'الحضور والانصراف',
+                url: '/dashboard/hr/attendance',
+              },
+              {
+                title: 'التقييمات',
+                url: '/dashboard/hr/evaluations',
               },
             ],
           },
