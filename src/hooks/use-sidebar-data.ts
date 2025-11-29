@@ -3,20 +3,11 @@ import {
   Calendar,
   CheckSquare,
   MessageSquare,
-  Briefcase,
   Users,
-  UsersRound,
-  Contact,
-  Building2,
   Scale,
   DollarSign,
   Star,
-  BookOpen,
   Settings,
-  HelpCircle,
-  FileText,
-  FileInput,
-  Package,
 } from 'lucide-react'
 import { useAuthStore } from '@/stores/auth-store'
 
@@ -93,23 +84,25 @@ export function useSidebarData(): SidebarData {
         items: [
           {
             title: 'المهام',
-            url: '/dashboard/tasks/list',
             icon: CheckSquare,
-          },
-          {
-            title: 'التذكيرات',
-            url: '/dashboard/tasks/reminders',
-            icon: CheckSquare,
-          },
-          {
-            title: 'الأحداث',
-            url: '/dashboard/tasks/events',
-            icon: CheckSquare,
-          },
-          {
-            title: 'الملاحظات',
-            url: '/dashboard/wiki',
-            icon: CheckSquare,
+            items: [
+              {
+                title: 'المهام',
+                url: '/dashboard/tasks/list',
+              },
+              {
+                title: 'التذكيرات',
+                url: '/dashboard/tasks/reminders',
+              },
+              {
+                title: 'الأحداث',
+                url: '/dashboard/tasks/events',
+              },
+              {
+                title: 'الملاحظات',
+                url: '/dashboard/wiki',
+              },
+            ],
           },
         ],
       },
@@ -117,14 +110,18 @@ export function useSidebarData(): SidebarData {
         title: 'التواصل',
         items: [
           {
-            title: 'الرسائل',
-            url: '/dashboard/messages/chat',
+            title: 'التواصل',
             icon: MessageSquare,
-          },
-          {
-            title: 'التطبيقات',
-            url: '/dashboard/apps',
-            icon: Package,
+            items: [
+              {
+                title: 'الرسائل',
+                url: '/dashboard/messages/chat',
+              },
+              {
+                title: 'التطبيقات',
+                url: '/dashboard/apps',
+              },
+            ],
           },
         ],
       },
@@ -132,24 +129,26 @@ export function useSidebarData(): SidebarData {
         title: 'إدارة العلاقات',
         items: [
           {
-            title: 'العملاء',
-            url: '/dashboard/clients',
+            title: 'إدارة العلاقات',
             icon: Users,
-          },
-          {
-            title: 'فريق العمل',
-            url: '/dashboard/staff',
-            icon: UsersRound,
-          },
-          {
-            title: 'جهات الاتصال',
-            url: '/dashboard/contacts',
-            icon: Contact,
-          },
-          {
-            title: 'المنظمات',
-            url: '/dashboard/organizations',
-            icon: Building2,
+            items: [
+              {
+                title: 'العملاء',
+                url: '/dashboard/clients',
+              },
+              {
+                title: 'فريق العمل',
+                url: '/dashboard/staff',
+              },
+              {
+                title: 'جهات الاتصال',
+                url: '/dashboard/contacts',
+              },
+              {
+                title: 'المنظمات',
+                url: '/dashboard/organizations',
+              },
+            ],
           },
         ],
       },
@@ -157,24 +156,26 @@ export function useSidebarData(): SidebarData {
         title: 'الأعمال',
         items: [
           {
-            title: 'القضايا',
-            url: '/dashboard/cases',
+            title: 'الأعمال',
             icon: Scale,
-          },
-          {
-            title: 'المستندات',
-            url: '/dashboard/documents',
-            icon: FileText,
-          },
-          {
-            title: 'خدماتي',
-            url: '/dashboard/jobs/my-services',
-            icon: Briefcase,
-          },
-          {
-            title: 'تصفح الوظائف',
-            url: '/dashboard/jobs/browse',
-            icon: Briefcase,
+            items: [
+              {
+                title: 'القضايا',
+                url: '/dashboard/cases',
+              },
+              {
+                title: 'المستندات',
+                url: '/dashboard/documents',
+              },
+              {
+                title: 'خدماتي',
+                url: '/dashboard/jobs/my-services',
+              },
+              {
+                title: 'تصفح الوظائف',
+                url: '/dashboard/jobs/browse',
+              },
+            ],
           },
         ],
       },
@@ -182,7 +183,7 @@ export function useSidebarData(): SidebarData {
         title: 'المالية',
         items: [
           {
-            title: 'الحسابات',
+            title: 'المالية',
             icon: DollarSign,
             items: [
               {
@@ -229,7 +230,7 @@ export function useSidebarData(): SidebarData {
         title: 'التميز المهني',
         items: [
           {
-            title: 'التقييمات والسمعة',
+            title: 'التميز المهني',
             icon: Star,
             items: [
               {
@@ -244,12 +245,6 @@ export function useSidebarData(): SidebarData {
                 title: 'التقارير',
                 url: '/dashboard/reports',
               },
-            ],
-          },
-          {
-            title: 'مركز المعرفة',
-            icon: BookOpen,
-            items: [
               {
                 title: 'القوانين',
                 url: '/dashboard/knowledge/laws',
@@ -301,17 +296,15 @@ export function useSidebarData(): SidebarData {
                 title: 'طرق الدفع',
                 url: '/dashboard/settings/payment-modes',
               },
+              {
+                title: 'استيراد/تصدير',
+                url: '/dashboard/data-export',
+              },
+              {
+                title: 'مركز المساعدة',
+                url: '/dashboard/help',
+              },
             ],
-          },
-          {
-            title: 'استيراد/تصدير',
-            url: '/dashboard/data-export',
-            icon: FileInput,
-          },
-          {
-            title: 'مركز المساعدة',
-            url: '/dashboard/help',
-            icon: HelpCircle,
           },
         ],
       },
