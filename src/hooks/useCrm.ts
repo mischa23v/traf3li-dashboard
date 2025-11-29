@@ -968,6 +968,34 @@ export const useDeleteActivity = () => {
 }
 
 /**
+ * Update activity status
+ */
+export const useUpdateActivityStatus = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({
+      activityId,
+      status,
+    }: {
+      activityId: string
+      status: string
+    }) => crmActivityService.updateActivity(activityId, { status }),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['activities'] })
+      queryClient.invalidateQueries({ queryKey: ['activity-timeline'] })
+      queryClient.invalidateQueries({
+        queryKey: ['activities', variables.activityId],
+      })
+      toast.success('تم تحديث حالة النشاط بنجاح')
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'فشل تحديث حالة النشاط')
+    },
+  })
+}
+
+/**
  * Complete task
  */
 export const useCompleteTask = () => {
