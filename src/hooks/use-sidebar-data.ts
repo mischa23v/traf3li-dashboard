@@ -9,6 +9,7 @@ import {
   Star,
   Settings,
   BookOpen,
+  TrendingUp,
 } from 'lucide-react'
 import { useAuthStore } from '@/stores/auth-store'
 
@@ -69,14 +70,18 @@ export function useSidebarData(): SidebarData {
         title: 'الرئيسية',
         items: [
           {
-            title: 'نظرة عامة',
-            url: '/',
+            title: 'الرئيسية',
             icon: LayoutDashboard,
-          },
-          {
-            title: 'التقويم',
-            url: '/dashboard/calendar',
-            icon: Calendar,
+            items: [
+              {
+                title: 'نظرة عامة',
+                url: '/',
+              },
+              {
+                title: 'التقويم',
+                url: '/dashboard/calendar',
+              },
+            ],
           },
         ],
       },
@@ -118,19 +123,15 @@ export function useSidebarData(): SidebarData {
         ],
       },
       {
-        title: 'إدارة العلاقات',
+        title: 'العملاء والتواصل',
         items: [
           {
-            title: 'إدارة العلاقات',
+            title: 'العملاء والتواصل',
             icon: Users,
             items: [
               {
                 title: 'العملاء',
                 url: '/dashboard/clients',
-              },
-              {
-                title: 'فريق العمل',
-                url: '/dashboard/staff',
               },
               {
                 title: 'جهات الاتصال',
@@ -139,6 +140,37 @@ export function useSidebarData(): SidebarData {
               {
                 title: 'المنظمات',
                 url: '/dashboard/organizations',
+              },
+              {
+                title: 'فريق العمل',
+                url: '/dashboard/staff',
+              },
+            ],
+          },
+        ],
+      },
+      {
+        title: 'المبيعات',
+        items: [
+          {
+            title: 'المبيعات',
+            icon: TrendingUp,
+            items: [
+              {
+                title: 'العملاء المحتملين',
+                url: '/dashboard/crm/leads',
+              },
+              {
+                title: 'مسار المبيعات',
+                url: '/dashboard/crm/pipeline',
+              },
+              {
+                title: 'الإحالات',
+                url: '/dashboard/crm/referrals',
+              },
+              {
+                title: 'سجل الأنشطة',
+                url: '/dashboard/crm/activities',
               },
             ],
           },
