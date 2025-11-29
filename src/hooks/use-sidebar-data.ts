@@ -8,7 +8,7 @@ import {
   DollarSign,
   Star,
   Settings,
-  Wrench,
+  BookOpen,
 } from 'lucide-react'
 import { useAuthStore } from '@/stores/auth-store'
 
@@ -85,44 +85,33 @@ export function useSidebarData(): SidebarData {
         items: [
           {
             title: 'المهام',
+            url: '/dashboard/tasks/list',
             icon: CheckSquare,
-            items: [
-              {
-                title: 'المهام',
-                url: '/dashboard/tasks/list',
-              },
-              {
-                title: 'التذكيرات',
-                url: '/dashboard/tasks/reminders',
-              },
-              {
-                title: 'الأحداث',
-                url: '/dashboard/tasks/events',
-              },
-              {
-                title: 'الملاحظات',
-                url: '/dashboard/wiki',
-              },
-            ],
+          },
+          {
+            title: 'التذكيرات',
+            url: '/dashboard/tasks/reminders',
+            icon: CheckSquare,
+          },
+          {
+            title: 'الأحداث',
+            url: '/dashboard/tasks/events',
+            icon: CheckSquare,
+          },
+          {
+            title: 'الملاحظات',
+            url: '/dashboard/wiki',
+            icon: CheckSquare,
           },
         ],
       },
       {
-        title: 'التواصل',
+        title: 'الرسائل',
         items: [
           {
-            title: 'التواصل',
+            title: 'الرسائل',
+            url: '/dashboard/messages/chat',
             icon: MessageSquare,
-            items: [
-              {
-                title: 'الرسائل',
-                url: '/dashboard/messages/chat',
-              },
-              {
-                title: 'التطبيقات',
-                url: '/dashboard/apps',
-              },
-            ],
           },
         ],
       },
@@ -204,20 +193,12 @@ export function useSidebarData(): SidebarData {
                 url: '/dashboard/finance/expenses',
               },
               {
-                title: 'كشوف الحساب',
-                url: '/dashboard/finance/statements',
-              },
-              {
                 title: 'المعاملات',
                 url: '/dashboard/finance/transactions',
               },
               {
                 title: 'تتبع الوقت',
                 url: '/dashboard/finance/time-tracking',
-              },
-              {
-                title: 'نشاط الحساب',
-                url: '/dashboard/finance/activity',
               },
             ],
           },
@@ -238,6 +219,17 @@ export function useSidebarData(): SidebarData {
                 title: 'شاراتي',
                 url: '/dashboard/reputation/badges',
               },
+            ],
+          },
+        ],
+      },
+      {
+        title: 'المكتبة',
+        items: [
+          {
+            title: 'المكتبة',
+            icon: BookOpen,
+            items: [
               {
                 title: 'القوانين',
                 url: '/dashboard/knowledge/laws',
@@ -249,25 +241,6 @@ export function useSidebarData(): SidebarData {
               {
                 title: 'النماذج',
                 url: '/dashboard/knowledge/forms',
-              },
-            ],
-          },
-        ],
-      },
-      {
-        title: 'الأدوات',
-        items: [
-          {
-            title: 'الأدوات',
-            icon: Wrench,
-            items: [
-              {
-                title: 'التقارير',
-                url: '/dashboard/reports',
-              },
-              {
-                title: 'استيراد/تصدير',
-                url: '/dashboard/data-export',
               },
             ],
           },
@@ -291,6 +264,14 @@ export function useSidebarData(): SidebarData {
               {
                 title: 'التفضيلات',
                 url: '/dashboard/settings/preferences',
+              },
+              {
+                title: 'التطبيقات',
+                url: '/dashboard/apps',
+              },
+              {
+                title: 'استيراد/تصدير',
+                url: '/dashboard/data-export',
               },
               {
                 title: 'مركز المساعدة',
