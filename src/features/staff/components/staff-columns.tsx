@@ -48,8 +48,8 @@ export const useStaffColumns = (): ColumnDef<Staff>[] => {
       ),
       cell: ({ row }) => {
         const { firstName, lastName, avatar } = row.original
-        const fullName = `${firstName} ${lastName}`
-        const initials = `${firstName[0] || ''}${lastName[0] || ''}`.toUpperCase()
+        const fullName = `${firstName || ''} ${lastName || ''}`.trim() || '-'
+        const initials = `${firstName?.[0] || ''}${lastName?.[0] || ''}`.toUpperCase() || '?'
 
         return (
           <div className='flex items-center gap-3'>
