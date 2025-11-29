@@ -97,10 +97,18 @@ import { Route as AuthenticatedDashboardKnowledgeFormsRouteImport } from './rout
 import { Route as AuthenticatedDashboardJobsMyServicesRouteImport } from './routes/_authenticated/dashboard.jobs.my-services'
 import { Route as AuthenticatedDashboardJobsBrowseRouteImport } from './routes/_authenticated/dashboard.jobs.browse'
 import { Route as AuthenticatedDashboardFinanceOverviewRouteImport } from './routes/_authenticated/dashboard.finance.overview'
+import { Route as AuthenticatedDashboardCrmPipelineRouteImport } from './routes/_authenticated/dashboard.crm.pipeline'
+import { Route as AuthenticatedDashboardCrmActivitiesRouteImport } from './routes/_authenticated/dashboard.crm.activities'
 import { Route as AuthenticatedDashboardClientsClientIdRouteImport } from './routes/_authenticated/dashboard.clients.$clientId'
 import { Route as AuthenticatedDashboardCasesCaseIdRouteImport } from './routes/_authenticated/dashboard.cases.$caseId'
 import { Route as AuthenticatedDashboardTasksRemindersIndexRouteImport } from './routes/_authenticated/dashboard.tasks.reminders.index'
 import { Route as AuthenticatedDashboardTasksEventsIndexRouteImport } from './routes/_authenticated/dashboard.tasks.events.index'
+import { Route as AuthenticatedDashboardHrSalariesIndexRouteImport } from './routes/_authenticated/dashboard.hr.salaries.index'
+import { Route as AuthenticatedDashboardHrPayrollIndexRouteImport } from './routes/_authenticated/dashboard.hr.payroll.index'
+import { Route as AuthenticatedDashboardHrLeavesIndexRouteImport } from './routes/_authenticated/dashboard.hr.leaves.index'
+import { Route as AuthenticatedDashboardHrEvaluationsIndexRouteImport } from './routes/_authenticated/dashboard.hr.evaluations.index'
+import { Route as AuthenticatedDashboardHrEmployeesIndexRouteImport } from './routes/_authenticated/dashboard.hr.employees.index'
+import { Route as AuthenticatedDashboardHrAttendanceIndexRouteImport } from './routes/_authenticated/dashboard.hr.attendance.index'
 import { Route as AuthenticatedDashboardFinanceTransactionsIndexRouteImport } from './routes/_authenticated/dashboard.finance.transactions.index'
 import { Route as AuthenticatedDashboardFinanceTimeTrackingIndexRouteImport } from './routes/_authenticated/dashboard.finance.time-tracking.index'
 import { Route as AuthenticatedDashboardFinanceStatementsIndexRouteImport } from './routes/_authenticated/dashboard.finance.statements.index'
@@ -110,6 +118,8 @@ import { Route as AuthenticatedDashboardFinancePaymentsIndexRouteImport } from '
 import { Route as AuthenticatedDashboardFinanceInvoicesIndexRouteImport } from './routes/_authenticated/dashboard.finance.invoices.index'
 import { Route as AuthenticatedDashboardFinanceExpensesIndexRouteImport } from './routes/_authenticated/dashboard.finance.expenses.index'
 import { Route as AuthenticatedDashboardFinanceActivityIndexRouteImport } from './routes/_authenticated/dashboard.finance.activity.index'
+import { Route as AuthenticatedDashboardCrmReferralsIndexRouteImport } from './routes/_authenticated/dashboard.crm.referrals.index'
+import { Route as AuthenticatedDashboardCrmLeadsIndexRouteImport } from './routes/_authenticated/dashboard.crm.leads.index'
 import { Route as AuthenticatedDashboardTasksRemindersNewRouteImport } from './routes/_authenticated/dashboard.tasks.reminders.new'
 import { Route as AuthenticatedDashboardTasksRemindersReminderIdRouteImport } from './routes/_authenticated/dashboard.tasks.reminders.$reminderId'
 import { Route as AuthenticatedDashboardTasksEventsNewRouteImport } from './routes/_authenticated/dashboard.tasks.events.new'
@@ -135,6 +145,12 @@ import { Route as AuthenticatedDashboardFinanceExpensesNewRouteImport } from './
 import { Route as AuthenticatedDashboardFinanceExpensesExpenseIdRouteImport } from './routes/_authenticated/dashboard.finance.expenses.$expenseId'
 import { Route as AuthenticatedDashboardFinanceActivityNewRouteImport } from './routes/_authenticated/dashboard.finance.activity.new'
 import { Route as AuthenticatedDashboardFinanceActivityActivityIdRouteImport } from './routes/_authenticated/dashboard.finance.activity.$activityId'
+import { Route as AuthenticatedDashboardCrmReferralsNewRouteImport } from './routes/_authenticated/dashboard.crm.referrals.new'
+import { Route as AuthenticatedDashboardCrmReferralsReferralIdRouteImport } from './routes/_authenticated/dashboard.crm.referrals.$referralId'
+import { Route as AuthenticatedDashboardCrmLeadsNewRouteImport } from './routes/_authenticated/dashboard.crm.leads.new'
+import { Route as AuthenticatedDashboardCrmLeadsLeadIdRouteImport } from './routes/_authenticated/dashboard.crm.leads.$leadId'
+import { Route as AuthenticatedDashboardCrmActivitiesNewRouteImport } from './routes/_authenticated/dashboard.crm.activities.new'
+import { Route as AuthenticatedDashboardCrmActivitiesActivityIdRouteImport } from './routes/_authenticated/dashboard.crm.activities.$activityId'
 import { Route as AuthenticatedDashboardCasesCaseIdWikiIndexRouteImport } from './routes/_authenticated/dashboard.cases.$caseId.wiki.index'
 import { Route as AuthenticatedDashboardFinanceTransactionsTransactionIdEditRouteImport } from './routes/_authenticated/dashboard.finance.transactions.$transactionId.edit'
 import { Route as AuthenticatedDashboardFinanceTimeTrackingEntryIdEditRouteImport } from './routes/_authenticated/dashboard.finance.time-tracking.$entryId.edit'
@@ -630,6 +646,18 @@ const AuthenticatedDashboardFinanceOverviewRoute =
     path: '/dashboard/finance/overview',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedDashboardCrmPipelineRoute =
+  AuthenticatedDashboardCrmPipelineRouteImport.update({
+    id: '/dashboard/crm/pipeline',
+    path: '/dashboard/crm/pipeline',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedDashboardCrmActivitiesRoute =
+  AuthenticatedDashboardCrmActivitiesRouteImport.update({
+    id: '/dashboard/crm/activities',
+    path: '/dashboard/crm/activities',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedDashboardClientsClientIdRoute =
   AuthenticatedDashboardClientsClientIdRouteImport.update({
     id: '/dashboard/clients/$clientId',
@@ -652,6 +680,42 @@ const AuthenticatedDashboardTasksEventsIndexRoute =
   AuthenticatedDashboardTasksEventsIndexRouteImport.update({
     id: '/dashboard/tasks/events/',
     path: '/dashboard/tasks/events/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedDashboardHrSalariesIndexRoute =
+  AuthenticatedDashboardHrSalariesIndexRouteImport.update({
+    id: '/dashboard/hr/salaries/',
+    path: '/dashboard/hr/salaries/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedDashboardHrPayrollIndexRoute =
+  AuthenticatedDashboardHrPayrollIndexRouteImport.update({
+    id: '/dashboard/hr/payroll/',
+    path: '/dashboard/hr/payroll/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedDashboardHrLeavesIndexRoute =
+  AuthenticatedDashboardHrLeavesIndexRouteImport.update({
+    id: '/dashboard/hr/leaves/',
+    path: '/dashboard/hr/leaves/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedDashboardHrEvaluationsIndexRoute =
+  AuthenticatedDashboardHrEvaluationsIndexRouteImport.update({
+    id: '/dashboard/hr/evaluations/',
+    path: '/dashboard/hr/evaluations/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedDashboardHrEmployeesIndexRoute =
+  AuthenticatedDashboardHrEmployeesIndexRouteImport.update({
+    id: '/dashboard/hr/employees/',
+    path: '/dashboard/hr/employees/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedDashboardHrAttendanceIndexRoute =
+  AuthenticatedDashboardHrAttendanceIndexRouteImport.update({
+    id: '/dashboard/hr/attendance/',
+    path: '/dashboard/hr/attendance/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedDashboardFinanceTransactionsIndexRoute =
@@ -706,6 +770,18 @@ const AuthenticatedDashboardFinanceActivityIndexRoute =
   AuthenticatedDashboardFinanceActivityIndexRouteImport.update({
     id: '/dashboard/finance/activity/',
     path: '/dashboard/finance/activity/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedDashboardCrmReferralsIndexRoute =
+  AuthenticatedDashboardCrmReferralsIndexRouteImport.update({
+    id: '/dashboard/crm/referrals/',
+    path: '/dashboard/crm/referrals/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedDashboardCrmLeadsIndexRoute =
+  AuthenticatedDashboardCrmLeadsIndexRouteImport.update({
+    id: '/dashboard/crm/leads/',
+    path: '/dashboard/crm/leads/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedDashboardTasksRemindersNewRoute =
@@ -858,6 +934,42 @@ const AuthenticatedDashboardFinanceActivityActivityIdRoute =
     path: '/dashboard/finance/activity/$activityId',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedDashboardCrmReferralsNewRoute =
+  AuthenticatedDashboardCrmReferralsNewRouteImport.update({
+    id: '/dashboard/crm/referrals/new',
+    path: '/dashboard/crm/referrals/new',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedDashboardCrmReferralsReferralIdRoute =
+  AuthenticatedDashboardCrmReferralsReferralIdRouteImport.update({
+    id: '/dashboard/crm/referrals/$referralId',
+    path: '/dashboard/crm/referrals/$referralId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedDashboardCrmLeadsNewRoute =
+  AuthenticatedDashboardCrmLeadsNewRouteImport.update({
+    id: '/dashboard/crm/leads/new',
+    path: '/dashboard/crm/leads/new',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedDashboardCrmLeadsLeadIdRoute =
+  AuthenticatedDashboardCrmLeadsLeadIdRouteImport.update({
+    id: '/dashboard/crm/leads/$leadId',
+    path: '/dashboard/crm/leads/$leadId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedDashboardCrmActivitiesNewRoute =
+  AuthenticatedDashboardCrmActivitiesNewRouteImport.update({
+    id: '/new',
+    path: '/new',
+    getParentRoute: () => AuthenticatedDashboardCrmActivitiesRoute,
+  } as any)
+const AuthenticatedDashboardCrmActivitiesActivityIdRoute =
+  AuthenticatedDashboardCrmActivitiesActivityIdRouteImport.update({
+    id: '/$activityId',
+    path: '/$activityId',
+    getParentRoute: () => AuthenticatedDashboardCrmActivitiesRoute,
+  } as any)
 const AuthenticatedDashboardCasesCaseIdWikiIndexRoute =
   AuthenticatedDashboardCasesCaseIdWikiIndexRouteImport.update({
     id: '/wiki/',
@@ -974,6 +1086,8 @@ export interface FileRoutesByFullPath {
   '/users': typeof AuthenticatedUsersIndexRoute
   '/dashboard/cases/$caseId': typeof AuthenticatedDashboardCasesCaseIdRouteWithChildren
   '/dashboard/clients/$clientId': typeof AuthenticatedDashboardClientsClientIdRoute
+  '/dashboard/crm/activities': typeof AuthenticatedDashboardCrmActivitiesRouteWithChildren
+  '/dashboard/crm/pipeline': typeof AuthenticatedDashboardCrmPipelineRoute
   '/dashboard/finance/overview': typeof AuthenticatedDashboardFinanceOverviewRoute
   '/dashboard/jobs/browse': typeof AuthenticatedDashboardJobsBrowseRoute
   '/dashboard/jobs/my-services': typeof AuthenticatedDashboardJobsMyServicesRoute
@@ -1009,6 +1123,12 @@ export interface FileRoutesByFullPath {
   '/dashboard/staff': typeof AuthenticatedDashboardStaffIndexRoute
   '/dashboard/tags': typeof AuthenticatedDashboardTagsIndexRoute
   '/dashboard/wiki': typeof AuthenticatedDashboardWikiIndexRoute
+  '/dashboard/crm/activities/$activityId': typeof AuthenticatedDashboardCrmActivitiesActivityIdRoute
+  '/dashboard/crm/activities/new': typeof AuthenticatedDashboardCrmActivitiesNewRoute
+  '/dashboard/crm/leads/$leadId': typeof AuthenticatedDashboardCrmLeadsLeadIdRoute
+  '/dashboard/crm/leads/new': typeof AuthenticatedDashboardCrmLeadsNewRoute
+  '/dashboard/crm/referrals/$referralId': typeof AuthenticatedDashboardCrmReferralsReferralIdRoute
+  '/dashboard/crm/referrals/new': typeof AuthenticatedDashboardCrmReferralsNewRoute
   '/dashboard/finance/activity/$activityId': typeof AuthenticatedDashboardFinanceActivityActivityIdRouteWithChildren
   '/dashboard/finance/activity/new': typeof AuthenticatedDashboardFinanceActivityNewRoute
   '/dashboard/finance/expenses/$expenseId': typeof AuthenticatedDashboardFinanceExpensesExpenseIdRouteWithChildren
@@ -1034,6 +1154,8 @@ export interface FileRoutesByFullPath {
   '/dashboard/tasks/events/new': typeof AuthenticatedDashboardTasksEventsNewRoute
   '/dashboard/tasks/reminders/$reminderId': typeof AuthenticatedDashboardTasksRemindersReminderIdRoute
   '/dashboard/tasks/reminders/new': typeof AuthenticatedDashboardTasksRemindersNewRoute
+  '/dashboard/crm/leads': typeof AuthenticatedDashboardCrmLeadsIndexRoute
+  '/dashboard/crm/referrals': typeof AuthenticatedDashboardCrmReferralsIndexRoute
   '/dashboard/finance/activity': typeof AuthenticatedDashboardFinanceActivityIndexRoute
   '/dashboard/finance/expenses': typeof AuthenticatedDashboardFinanceExpensesIndexRoute
   '/dashboard/finance/invoices': typeof AuthenticatedDashboardFinanceInvoicesIndexRoute
@@ -1043,6 +1165,12 @@ export interface FileRoutesByFullPath {
   '/dashboard/finance/statements': typeof AuthenticatedDashboardFinanceStatementsIndexRoute
   '/dashboard/finance/time-tracking': typeof AuthenticatedDashboardFinanceTimeTrackingIndexRoute
   '/dashboard/finance/transactions': typeof AuthenticatedDashboardFinanceTransactionsIndexRoute
+  '/dashboard/hr/attendance': typeof AuthenticatedDashboardHrAttendanceIndexRoute
+  '/dashboard/hr/employees': typeof AuthenticatedDashboardHrEmployeesIndexRoute
+  '/dashboard/hr/evaluations': typeof AuthenticatedDashboardHrEvaluationsIndexRoute
+  '/dashboard/hr/leaves': typeof AuthenticatedDashboardHrLeavesIndexRoute
+  '/dashboard/hr/payroll': typeof AuthenticatedDashboardHrPayrollIndexRoute
+  '/dashboard/hr/salaries': typeof AuthenticatedDashboardHrSalariesIndexRoute
   '/dashboard/tasks/events': typeof AuthenticatedDashboardTasksEventsIndexRoute
   '/dashboard/tasks/reminders': typeof AuthenticatedDashboardTasksRemindersIndexRoute
   '/dashboard/cases/$caseId/wiki/new': typeof AuthenticatedDashboardCasesCaseIdWikiNewRoute
@@ -1108,6 +1236,8 @@ export interface FileRoutesByTo {
   '/users': typeof AuthenticatedUsersIndexRoute
   '/dashboard/cases/$caseId': typeof AuthenticatedDashboardCasesCaseIdRouteWithChildren
   '/dashboard/clients/$clientId': typeof AuthenticatedDashboardClientsClientIdRoute
+  '/dashboard/crm/activities': typeof AuthenticatedDashboardCrmActivitiesRouteWithChildren
+  '/dashboard/crm/pipeline': typeof AuthenticatedDashboardCrmPipelineRoute
   '/dashboard/finance/overview': typeof AuthenticatedDashboardFinanceOverviewRoute
   '/dashboard/jobs/browse': typeof AuthenticatedDashboardJobsBrowseRoute
   '/dashboard/jobs/my-services': typeof AuthenticatedDashboardJobsMyServicesRoute
@@ -1143,6 +1273,12 @@ export interface FileRoutesByTo {
   '/dashboard/staff': typeof AuthenticatedDashboardStaffIndexRoute
   '/dashboard/tags': typeof AuthenticatedDashboardTagsIndexRoute
   '/dashboard/wiki': typeof AuthenticatedDashboardWikiIndexRoute
+  '/dashboard/crm/activities/$activityId': typeof AuthenticatedDashboardCrmActivitiesActivityIdRoute
+  '/dashboard/crm/activities/new': typeof AuthenticatedDashboardCrmActivitiesNewRoute
+  '/dashboard/crm/leads/$leadId': typeof AuthenticatedDashboardCrmLeadsLeadIdRoute
+  '/dashboard/crm/leads/new': typeof AuthenticatedDashboardCrmLeadsNewRoute
+  '/dashboard/crm/referrals/$referralId': typeof AuthenticatedDashboardCrmReferralsReferralIdRoute
+  '/dashboard/crm/referrals/new': typeof AuthenticatedDashboardCrmReferralsNewRoute
   '/dashboard/finance/activity/$activityId': typeof AuthenticatedDashboardFinanceActivityActivityIdRouteWithChildren
   '/dashboard/finance/activity/new': typeof AuthenticatedDashboardFinanceActivityNewRoute
   '/dashboard/finance/expenses/$expenseId': typeof AuthenticatedDashboardFinanceExpensesExpenseIdRouteWithChildren
@@ -1168,6 +1304,8 @@ export interface FileRoutesByTo {
   '/dashboard/tasks/events/new': typeof AuthenticatedDashboardTasksEventsNewRoute
   '/dashboard/tasks/reminders/$reminderId': typeof AuthenticatedDashboardTasksRemindersReminderIdRoute
   '/dashboard/tasks/reminders/new': typeof AuthenticatedDashboardTasksRemindersNewRoute
+  '/dashboard/crm/leads': typeof AuthenticatedDashboardCrmLeadsIndexRoute
+  '/dashboard/crm/referrals': typeof AuthenticatedDashboardCrmReferralsIndexRoute
   '/dashboard/finance/activity': typeof AuthenticatedDashboardFinanceActivityIndexRoute
   '/dashboard/finance/expenses': typeof AuthenticatedDashboardFinanceExpensesIndexRoute
   '/dashboard/finance/invoices': typeof AuthenticatedDashboardFinanceInvoicesIndexRoute
@@ -1177,6 +1315,12 @@ export interface FileRoutesByTo {
   '/dashboard/finance/statements': typeof AuthenticatedDashboardFinanceStatementsIndexRoute
   '/dashboard/finance/time-tracking': typeof AuthenticatedDashboardFinanceTimeTrackingIndexRoute
   '/dashboard/finance/transactions': typeof AuthenticatedDashboardFinanceTransactionsIndexRoute
+  '/dashboard/hr/attendance': typeof AuthenticatedDashboardHrAttendanceIndexRoute
+  '/dashboard/hr/employees': typeof AuthenticatedDashboardHrEmployeesIndexRoute
+  '/dashboard/hr/evaluations': typeof AuthenticatedDashboardHrEvaluationsIndexRoute
+  '/dashboard/hr/leaves': typeof AuthenticatedDashboardHrLeavesIndexRoute
+  '/dashboard/hr/payroll': typeof AuthenticatedDashboardHrPayrollIndexRoute
+  '/dashboard/hr/salaries': typeof AuthenticatedDashboardHrSalariesIndexRoute
   '/dashboard/tasks/events': typeof AuthenticatedDashboardTasksEventsIndexRoute
   '/dashboard/tasks/reminders': typeof AuthenticatedDashboardTasksRemindersIndexRoute
   '/dashboard/cases/$caseId/wiki/new': typeof AuthenticatedDashboardCasesCaseIdWikiNewRoute
@@ -1247,6 +1391,8 @@ export interface FileRoutesById {
   '/_authenticated/users/': typeof AuthenticatedUsersIndexRoute
   '/_authenticated/dashboard/cases/$caseId': typeof AuthenticatedDashboardCasesCaseIdRouteWithChildren
   '/_authenticated/dashboard/clients/$clientId': typeof AuthenticatedDashboardClientsClientIdRoute
+  '/_authenticated/dashboard/crm/activities': typeof AuthenticatedDashboardCrmActivitiesRouteWithChildren
+  '/_authenticated/dashboard/crm/pipeline': typeof AuthenticatedDashboardCrmPipelineRoute
   '/_authenticated/dashboard/finance/overview': typeof AuthenticatedDashboardFinanceOverviewRoute
   '/_authenticated/dashboard/jobs/browse': typeof AuthenticatedDashboardJobsBrowseRoute
   '/_authenticated/dashboard/jobs/my-services': typeof AuthenticatedDashboardJobsMyServicesRoute
@@ -1282,6 +1428,12 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/staff/': typeof AuthenticatedDashboardStaffIndexRoute
   '/_authenticated/dashboard/tags/': typeof AuthenticatedDashboardTagsIndexRoute
   '/_authenticated/dashboard/wiki/': typeof AuthenticatedDashboardWikiIndexRoute
+  '/_authenticated/dashboard/crm/activities/$activityId': typeof AuthenticatedDashboardCrmActivitiesActivityIdRoute
+  '/_authenticated/dashboard/crm/activities/new': typeof AuthenticatedDashboardCrmActivitiesNewRoute
+  '/_authenticated/dashboard/crm/leads/$leadId': typeof AuthenticatedDashboardCrmLeadsLeadIdRoute
+  '/_authenticated/dashboard/crm/leads/new': typeof AuthenticatedDashboardCrmLeadsNewRoute
+  '/_authenticated/dashboard/crm/referrals/$referralId': typeof AuthenticatedDashboardCrmReferralsReferralIdRoute
+  '/_authenticated/dashboard/crm/referrals/new': typeof AuthenticatedDashboardCrmReferralsNewRoute
   '/_authenticated/dashboard/finance/activity/$activityId': typeof AuthenticatedDashboardFinanceActivityActivityIdRouteWithChildren
   '/_authenticated/dashboard/finance/activity/new': typeof AuthenticatedDashboardFinanceActivityNewRoute
   '/_authenticated/dashboard/finance/expenses/$expenseId': typeof AuthenticatedDashboardFinanceExpensesExpenseIdRouteWithChildren
@@ -1307,6 +1459,8 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/tasks/events/new': typeof AuthenticatedDashboardTasksEventsNewRoute
   '/_authenticated/dashboard/tasks/reminders/$reminderId': typeof AuthenticatedDashboardTasksRemindersReminderIdRoute
   '/_authenticated/dashboard/tasks/reminders/new': typeof AuthenticatedDashboardTasksRemindersNewRoute
+  '/_authenticated/dashboard/crm/leads/': typeof AuthenticatedDashboardCrmLeadsIndexRoute
+  '/_authenticated/dashboard/crm/referrals/': typeof AuthenticatedDashboardCrmReferralsIndexRoute
   '/_authenticated/dashboard/finance/activity/': typeof AuthenticatedDashboardFinanceActivityIndexRoute
   '/_authenticated/dashboard/finance/expenses/': typeof AuthenticatedDashboardFinanceExpensesIndexRoute
   '/_authenticated/dashboard/finance/invoices/': typeof AuthenticatedDashboardFinanceInvoicesIndexRoute
@@ -1316,6 +1470,12 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/finance/statements/': typeof AuthenticatedDashboardFinanceStatementsIndexRoute
   '/_authenticated/dashboard/finance/time-tracking/': typeof AuthenticatedDashboardFinanceTimeTrackingIndexRoute
   '/_authenticated/dashboard/finance/transactions/': typeof AuthenticatedDashboardFinanceTransactionsIndexRoute
+  '/_authenticated/dashboard/hr/attendance/': typeof AuthenticatedDashboardHrAttendanceIndexRoute
+  '/_authenticated/dashboard/hr/employees/': typeof AuthenticatedDashboardHrEmployeesIndexRoute
+  '/_authenticated/dashboard/hr/evaluations/': typeof AuthenticatedDashboardHrEvaluationsIndexRoute
+  '/_authenticated/dashboard/hr/leaves/': typeof AuthenticatedDashboardHrLeavesIndexRoute
+  '/_authenticated/dashboard/hr/payroll/': typeof AuthenticatedDashboardHrPayrollIndexRoute
+  '/_authenticated/dashboard/hr/salaries/': typeof AuthenticatedDashboardHrSalariesIndexRoute
   '/_authenticated/dashboard/tasks/events/': typeof AuthenticatedDashboardTasksEventsIndexRoute
   '/_authenticated/dashboard/tasks/reminders/': typeof AuthenticatedDashboardTasksRemindersIndexRoute
   '/_authenticated/dashboard/cases/$caseId/wiki/new': typeof AuthenticatedDashboardCasesCaseIdWikiNewRoute
@@ -1384,6 +1544,8 @@ export interface FileRouteTypes {
     | '/users'
     | '/dashboard/cases/$caseId'
     | '/dashboard/clients/$clientId'
+    | '/dashboard/crm/activities'
+    | '/dashboard/crm/pipeline'
     | '/dashboard/finance/overview'
     | '/dashboard/jobs/browse'
     | '/dashboard/jobs/my-services'
@@ -1419,6 +1581,12 @@ export interface FileRouteTypes {
     | '/dashboard/staff'
     | '/dashboard/tags'
     | '/dashboard/wiki'
+    | '/dashboard/crm/activities/$activityId'
+    | '/dashboard/crm/activities/new'
+    | '/dashboard/crm/leads/$leadId'
+    | '/dashboard/crm/leads/new'
+    | '/dashboard/crm/referrals/$referralId'
+    | '/dashboard/crm/referrals/new'
     | '/dashboard/finance/activity/$activityId'
     | '/dashboard/finance/activity/new'
     | '/dashboard/finance/expenses/$expenseId'
@@ -1444,6 +1612,8 @@ export interface FileRouteTypes {
     | '/dashboard/tasks/events/new'
     | '/dashboard/tasks/reminders/$reminderId'
     | '/dashboard/tasks/reminders/new'
+    | '/dashboard/crm/leads'
+    | '/dashboard/crm/referrals'
     | '/dashboard/finance/activity'
     | '/dashboard/finance/expenses'
     | '/dashboard/finance/invoices'
@@ -1453,6 +1623,12 @@ export interface FileRouteTypes {
     | '/dashboard/finance/statements'
     | '/dashboard/finance/time-tracking'
     | '/dashboard/finance/transactions'
+    | '/dashboard/hr/attendance'
+    | '/dashboard/hr/employees'
+    | '/dashboard/hr/evaluations'
+    | '/dashboard/hr/leaves'
+    | '/dashboard/hr/payroll'
+    | '/dashboard/hr/salaries'
     | '/dashboard/tasks/events'
     | '/dashboard/tasks/reminders'
     | '/dashboard/cases/$caseId/wiki/new'
@@ -1518,6 +1694,8 @@ export interface FileRouteTypes {
     | '/users'
     | '/dashboard/cases/$caseId'
     | '/dashboard/clients/$clientId'
+    | '/dashboard/crm/activities'
+    | '/dashboard/crm/pipeline'
     | '/dashboard/finance/overview'
     | '/dashboard/jobs/browse'
     | '/dashboard/jobs/my-services'
@@ -1553,6 +1731,12 @@ export interface FileRouteTypes {
     | '/dashboard/staff'
     | '/dashboard/tags'
     | '/dashboard/wiki'
+    | '/dashboard/crm/activities/$activityId'
+    | '/dashboard/crm/activities/new'
+    | '/dashboard/crm/leads/$leadId'
+    | '/dashboard/crm/leads/new'
+    | '/dashboard/crm/referrals/$referralId'
+    | '/dashboard/crm/referrals/new'
     | '/dashboard/finance/activity/$activityId'
     | '/dashboard/finance/activity/new'
     | '/dashboard/finance/expenses/$expenseId'
@@ -1578,6 +1762,8 @@ export interface FileRouteTypes {
     | '/dashboard/tasks/events/new'
     | '/dashboard/tasks/reminders/$reminderId'
     | '/dashboard/tasks/reminders/new'
+    | '/dashboard/crm/leads'
+    | '/dashboard/crm/referrals'
     | '/dashboard/finance/activity'
     | '/dashboard/finance/expenses'
     | '/dashboard/finance/invoices'
@@ -1587,6 +1773,12 @@ export interface FileRouteTypes {
     | '/dashboard/finance/statements'
     | '/dashboard/finance/time-tracking'
     | '/dashboard/finance/transactions'
+    | '/dashboard/hr/attendance'
+    | '/dashboard/hr/employees'
+    | '/dashboard/hr/evaluations'
+    | '/dashboard/hr/leaves'
+    | '/dashboard/hr/payroll'
+    | '/dashboard/hr/salaries'
     | '/dashboard/tasks/events'
     | '/dashboard/tasks/reminders'
     | '/dashboard/cases/$caseId/wiki/new'
@@ -1656,6 +1848,8 @@ export interface FileRouteTypes {
     | '/_authenticated/users/'
     | '/_authenticated/dashboard/cases/$caseId'
     | '/_authenticated/dashboard/clients/$clientId'
+    | '/_authenticated/dashboard/crm/activities'
+    | '/_authenticated/dashboard/crm/pipeline'
     | '/_authenticated/dashboard/finance/overview'
     | '/_authenticated/dashboard/jobs/browse'
     | '/_authenticated/dashboard/jobs/my-services'
@@ -1691,6 +1885,12 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/staff/'
     | '/_authenticated/dashboard/tags/'
     | '/_authenticated/dashboard/wiki/'
+    | '/_authenticated/dashboard/crm/activities/$activityId'
+    | '/_authenticated/dashboard/crm/activities/new'
+    | '/_authenticated/dashboard/crm/leads/$leadId'
+    | '/_authenticated/dashboard/crm/leads/new'
+    | '/_authenticated/dashboard/crm/referrals/$referralId'
+    | '/_authenticated/dashboard/crm/referrals/new'
     | '/_authenticated/dashboard/finance/activity/$activityId'
     | '/_authenticated/dashboard/finance/activity/new'
     | '/_authenticated/dashboard/finance/expenses/$expenseId'
@@ -1716,6 +1916,8 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/tasks/events/new'
     | '/_authenticated/dashboard/tasks/reminders/$reminderId'
     | '/_authenticated/dashboard/tasks/reminders/new'
+    | '/_authenticated/dashboard/crm/leads/'
+    | '/_authenticated/dashboard/crm/referrals/'
     | '/_authenticated/dashboard/finance/activity/'
     | '/_authenticated/dashboard/finance/expenses/'
     | '/_authenticated/dashboard/finance/invoices/'
@@ -1725,6 +1927,12 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/finance/statements/'
     | '/_authenticated/dashboard/finance/time-tracking/'
     | '/_authenticated/dashboard/finance/transactions/'
+    | '/_authenticated/dashboard/hr/attendance/'
+    | '/_authenticated/dashboard/hr/employees/'
+    | '/_authenticated/dashboard/hr/evaluations/'
+    | '/_authenticated/dashboard/hr/leaves/'
+    | '/_authenticated/dashboard/hr/payroll/'
+    | '/_authenticated/dashboard/hr/salaries/'
     | '/_authenticated/dashboard/tasks/events/'
     | '/_authenticated/dashboard/tasks/reminders/'
     | '/_authenticated/dashboard/cases/$caseId/wiki/new'
@@ -2393,6 +2601,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardFinanceOverviewRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/dashboard/crm/pipeline': {
+      id: '/_authenticated/dashboard/crm/pipeline'
+      path: '/dashboard/crm/pipeline'
+      fullPath: '/dashboard/crm/pipeline'
+      preLoaderRoute: typeof AuthenticatedDashboardCrmPipelineRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dashboard/crm/activities': {
+      id: '/_authenticated/dashboard/crm/activities'
+      path: '/dashboard/crm/activities'
+      fullPath: '/dashboard/crm/activities'
+      preLoaderRoute: typeof AuthenticatedDashboardCrmActivitiesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/dashboard/clients/$clientId': {
       id: '/_authenticated/dashboard/clients/$clientId'
       path: '/dashboard/clients/$clientId'
@@ -2419,6 +2641,48 @@ declare module '@tanstack/react-router' {
       path: '/dashboard/tasks/events'
       fullPath: '/dashboard/tasks/events'
       preLoaderRoute: typeof AuthenticatedDashboardTasksEventsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dashboard/hr/salaries/': {
+      id: '/_authenticated/dashboard/hr/salaries/'
+      path: '/dashboard/hr/salaries'
+      fullPath: '/dashboard/hr/salaries'
+      preLoaderRoute: typeof AuthenticatedDashboardHrSalariesIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dashboard/hr/payroll/': {
+      id: '/_authenticated/dashboard/hr/payroll/'
+      path: '/dashboard/hr/payroll'
+      fullPath: '/dashboard/hr/payroll'
+      preLoaderRoute: typeof AuthenticatedDashboardHrPayrollIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dashboard/hr/leaves/': {
+      id: '/_authenticated/dashboard/hr/leaves/'
+      path: '/dashboard/hr/leaves'
+      fullPath: '/dashboard/hr/leaves'
+      preLoaderRoute: typeof AuthenticatedDashboardHrLeavesIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dashboard/hr/evaluations/': {
+      id: '/_authenticated/dashboard/hr/evaluations/'
+      path: '/dashboard/hr/evaluations'
+      fullPath: '/dashboard/hr/evaluations'
+      preLoaderRoute: typeof AuthenticatedDashboardHrEvaluationsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dashboard/hr/employees/': {
+      id: '/_authenticated/dashboard/hr/employees/'
+      path: '/dashboard/hr/employees'
+      fullPath: '/dashboard/hr/employees'
+      preLoaderRoute: typeof AuthenticatedDashboardHrEmployeesIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dashboard/hr/attendance/': {
+      id: '/_authenticated/dashboard/hr/attendance/'
+      path: '/dashboard/hr/attendance'
+      fullPath: '/dashboard/hr/attendance'
+      preLoaderRoute: typeof AuthenticatedDashboardHrAttendanceIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/dashboard/finance/transactions/': {
@@ -2482,6 +2746,20 @@ declare module '@tanstack/react-router' {
       path: '/dashboard/finance/activity'
       fullPath: '/dashboard/finance/activity'
       preLoaderRoute: typeof AuthenticatedDashboardFinanceActivityIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dashboard/crm/referrals/': {
+      id: '/_authenticated/dashboard/crm/referrals/'
+      path: '/dashboard/crm/referrals'
+      fullPath: '/dashboard/crm/referrals'
+      preLoaderRoute: typeof AuthenticatedDashboardCrmReferralsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dashboard/crm/leads/': {
+      id: '/_authenticated/dashboard/crm/leads/'
+      path: '/dashboard/crm/leads'
+      fullPath: '/dashboard/crm/leads'
+      preLoaderRoute: typeof AuthenticatedDashboardCrmLeadsIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/dashboard/tasks/reminders/new': {
@@ -2659,6 +2937,48 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardFinanceActivityActivityIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/dashboard/crm/referrals/new': {
+      id: '/_authenticated/dashboard/crm/referrals/new'
+      path: '/dashboard/crm/referrals/new'
+      fullPath: '/dashboard/crm/referrals/new'
+      preLoaderRoute: typeof AuthenticatedDashboardCrmReferralsNewRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dashboard/crm/referrals/$referralId': {
+      id: '/_authenticated/dashboard/crm/referrals/$referralId'
+      path: '/dashboard/crm/referrals/$referralId'
+      fullPath: '/dashboard/crm/referrals/$referralId'
+      preLoaderRoute: typeof AuthenticatedDashboardCrmReferralsReferralIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dashboard/crm/leads/new': {
+      id: '/_authenticated/dashboard/crm/leads/new'
+      path: '/dashboard/crm/leads/new'
+      fullPath: '/dashboard/crm/leads/new'
+      preLoaderRoute: typeof AuthenticatedDashboardCrmLeadsNewRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dashboard/crm/leads/$leadId': {
+      id: '/_authenticated/dashboard/crm/leads/$leadId'
+      path: '/dashboard/crm/leads/$leadId'
+      fullPath: '/dashboard/crm/leads/$leadId'
+      preLoaderRoute: typeof AuthenticatedDashboardCrmLeadsLeadIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dashboard/crm/activities/new': {
+      id: '/_authenticated/dashboard/crm/activities/new'
+      path: '/new'
+      fullPath: '/dashboard/crm/activities/new'
+      preLoaderRoute: typeof AuthenticatedDashboardCrmActivitiesNewRouteImport
+      parentRoute: typeof AuthenticatedDashboardCrmActivitiesRoute
+    }
+    '/_authenticated/dashboard/crm/activities/$activityId': {
+      id: '/_authenticated/dashboard/crm/activities/$activityId'
+      path: '/$activityId'
+      fullPath: '/dashboard/crm/activities/$activityId'
+      preLoaderRoute: typeof AuthenticatedDashboardCrmActivitiesActivityIdRouteImport
+      parentRoute: typeof AuthenticatedDashboardCrmActivitiesRoute
+    }
     '/_authenticated/dashboard/cases/$caseId/wiki/': {
       id: '/_authenticated/dashboard/cases/$caseId/wiki/'
       path: '/wiki'
@@ -2779,6 +3099,24 @@ const AuthenticatedDashboardCasesCaseIdRouteWithChildren =
     AuthenticatedDashboardCasesCaseIdRouteChildren,
   )
 
+interface AuthenticatedDashboardCrmActivitiesRouteChildren {
+  AuthenticatedDashboardCrmActivitiesActivityIdRoute: typeof AuthenticatedDashboardCrmActivitiesActivityIdRoute
+  AuthenticatedDashboardCrmActivitiesNewRoute: typeof AuthenticatedDashboardCrmActivitiesNewRoute
+}
+
+const AuthenticatedDashboardCrmActivitiesRouteChildren: AuthenticatedDashboardCrmActivitiesRouteChildren =
+  {
+    AuthenticatedDashboardCrmActivitiesActivityIdRoute:
+      AuthenticatedDashboardCrmActivitiesActivityIdRoute,
+    AuthenticatedDashboardCrmActivitiesNewRoute:
+      AuthenticatedDashboardCrmActivitiesNewRoute,
+  }
+
+const AuthenticatedDashboardCrmActivitiesRouteWithChildren =
+  AuthenticatedDashboardCrmActivitiesRoute._addFileChildren(
+    AuthenticatedDashboardCrmActivitiesRouteChildren,
+  )
+
 interface AuthenticatedDashboardFinanceActivityActivityIdRouteChildren {
   AuthenticatedDashboardFinanceActivityActivityIdEditRoute: typeof AuthenticatedDashboardFinanceActivityActivityIdEditRoute
 }
@@ -2882,6 +3220,8 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedUsersIndexRoute: typeof AuthenticatedUsersIndexRoute
   AuthenticatedDashboardCasesCaseIdRoute: typeof AuthenticatedDashboardCasesCaseIdRouteWithChildren
   AuthenticatedDashboardClientsClientIdRoute: typeof AuthenticatedDashboardClientsClientIdRoute
+  AuthenticatedDashboardCrmActivitiesRoute: typeof AuthenticatedDashboardCrmActivitiesRouteWithChildren
+  AuthenticatedDashboardCrmPipelineRoute: typeof AuthenticatedDashboardCrmPipelineRoute
   AuthenticatedDashboardFinanceOverviewRoute: typeof AuthenticatedDashboardFinanceOverviewRoute
   AuthenticatedDashboardJobsBrowseRoute: typeof AuthenticatedDashboardJobsBrowseRoute
   AuthenticatedDashboardJobsMyServicesRoute: typeof AuthenticatedDashboardJobsMyServicesRoute
@@ -2917,6 +3257,10 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardStaffIndexRoute: typeof AuthenticatedDashboardStaffIndexRoute
   AuthenticatedDashboardTagsIndexRoute: typeof AuthenticatedDashboardTagsIndexRoute
   AuthenticatedDashboardWikiIndexRoute: typeof AuthenticatedDashboardWikiIndexRoute
+  AuthenticatedDashboardCrmLeadsLeadIdRoute: typeof AuthenticatedDashboardCrmLeadsLeadIdRoute
+  AuthenticatedDashboardCrmLeadsNewRoute: typeof AuthenticatedDashboardCrmLeadsNewRoute
+  AuthenticatedDashboardCrmReferralsReferralIdRoute: typeof AuthenticatedDashboardCrmReferralsReferralIdRoute
+  AuthenticatedDashboardCrmReferralsNewRoute: typeof AuthenticatedDashboardCrmReferralsNewRoute
   AuthenticatedDashboardFinanceActivityActivityIdRoute: typeof AuthenticatedDashboardFinanceActivityActivityIdRouteWithChildren
   AuthenticatedDashboardFinanceActivityNewRoute: typeof AuthenticatedDashboardFinanceActivityNewRoute
   AuthenticatedDashboardFinanceExpensesExpenseIdRoute: typeof AuthenticatedDashboardFinanceExpensesExpenseIdRouteWithChildren
@@ -2942,6 +3286,8 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardTasksEventsNewRoute: typeof AuthenticatedDashboardTasksEventsNewRoute
   AuthenticatedDashboardTasksRemindersReminderIdRoute: typeof AuthenticatedDashboardTasksRemindersReminderIdRoute
   AuthenticatedDashboardTasksRemindersNewRoute: typeof AuthenticatedDashboardTasksRemindersNewRoute
+  AuthenticatedDashboardCrmLeadsIndexRoute: typeof AuthenticatedDashboardCrmLeadsIndexRoute
+  AuthenticatedDashboardCrmReferralsIndexRoute: typeof AuthenticatedDashboardCrmReferralsIndexRoute
   AuthenticatedDashboardFinanceActivityIndexRoute: typeof AuthenticatedDashboardFinanceActivityIndexRoute
   AuthenticatedDashboardFinanceExpensesIndexRoute: typeof AuthenticatedDashboardFinanceExpensesIndexRoute
   AuthenticatedDashboardFinanceInvoicesIndexRoute: typeof AuthenticatedDashboardFinanceInvoicesIndexRoute
@@ -2951,6 +3297,12 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardFinanceStatementsIndexRoute: typeof AuthenticatedDashboardFinanceStatementsIndexRoute
   AuthenticatedDashboardFinanceTimeTrackingIndexRoute: typeof AuthenticatedDashboardFinanceTimeTrackingIndexRoute
   AuthenticatedDashboardFinanceTransactionsIndexRoute: typeof AuthenticatedDashboardFinanceTransactionsIndexRoute
+  AuthenticatedDashboardHrAttendanceIndexRoute: typeof AuthenticatedDashboardHrAttendanceIndexRoute
+  AuthenticatedDashboardHrEmployeesIndexRoute: typeof AuthenticatedDashboardHrEmployeesIndexRoute
+  AuthenticatedDashboardHrEvaluationsIndexRoute: typeof AuthenticatedDashboardHrEvaluationsIndexRoute
+  AuthenticatedDashboardHrLeavesIndexRoute: typeof AuthenticatedDashboardHrLeavesIndexRoute
+  AuthenticatedDashboardHrPayrollIndexRoute: typeof AuthenticatedDashboardHrPayrollIndexRoute
+  AuthenticatedDashboardHrSalariesIndexRoute: typeof AuthenticatedDashboardHrSalariesIndexRoute
   AuthenticatedDashboardTasksEventsIndexRoute: typeof AuthenticatedDashboardTasksEventsIndexRoute
   AuthenticatedDashboardTasksRemindersIndexRoute: typeof AuthenticatedDashboardTasksRemindersIndexRoute
 }
@@ -2970,6 +3322,10 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
     AuthenticatedDashboardCasesCaseIdRouteWithChildren,
   AuthenticatedDashboardClientsClientIdRoute:
     AuthenticatedDashboardClientsClientIdRoute,
+  AuthenticatedDashboardCrmActivitiesRoute:
+    AuthenticatedDashboardCrmActivitiesRouteWithChildren,
+  AuthenticatedDashboardCrmPipelineRoute:
+    AuthenticatedDashboardCrmPipelineRoute,
   AuthenticatedDashboardFinanceOverviewRoute:
     AuthenticatedDashboardFinanceOverviewRoute,
   AuthenticatedDashboardJobsBrowseRoute: AuthenticatedDashboardJobsBrowseRoute,
@@ -3031,6 +3387,14 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDashboardStaffIndexRoute: AuthenticatedDashboardStaffIndexRoute,
   AuthenticatedDashboardTagsIndexRoute: AuthenticatedDashboardTagsIndexRoute,
   AuthenticatedDashboardWikiIndexRoute: AuthenticatedDashboardWikiIndexRoute,
+  AuthenticatedDashboardCrmLeadsLeadIdRoute:
+    AuthenticatedDashboardCrmLeadsLeadIdRoute,
+  AuthenticatedDashboardCrmLeadsNewRoute:
+    AuthenticatedDashboardCrmLeadsNewRoute,
+  AuthenticatedDashboardCrmReferralsReferralIdRoute:
+    AuthenticatedDashboardCrmReferralsReferralIdRoute,
+  AuthenticatedDashboardCrmReferralsNewRoute:
+    AuthenticatedDashboardCrmReferralsNewRoute,
   AuthenticatedDashboardFinanceActivityActivityIdRoute:
     AuthenticatedDashboardFinanceActivityActivityIdRouteWithChildren,
   AuthenticatedDashboardFinanceActivityNewRoute:
@@ -3081,6 +3445,10 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
     AuthenticatedDashboardTasksRemindersReminderIdRoute,
   AuthenticatedDashboardTasksRemindersNewRoute:
     AuthenticatedDashboardTasksRemindersNewRoute,
+  AuthenticatedDashboardCrmLeadsIndexRoute:
+    AuthenticatedDashboardCrmLeadsIndexRoute,
+  AuthenticatedDashboardCrmReferralsIndexRoute:
+    AuthenticatedDashboardCrmReferralsIndexRoute,
   AuthenticatedDashboardFinanceActivityIndexRoute:
     AuthenticatedDashboardFinanceActivityIndexRoute,
   AuthenticatedDashboardFinanceExpensesIndexRoute:
@@ -3099,6 +3467,18 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
     AuthenticatedDashboardFinanceTimeTrackingIndexRoute,
   AuthenticatedDashboardFinanceTransactionsIndexRoute:
     AuthenticatedDashboardFinanceTransactionsIndexRoute,
+  AuthenticatedDashboardHrAttendanceIndexRoute:
+    AuthenticatedDashboardHrAttendanceIndexRoute,
+  AuthenticatedDashboardHrEmployeesIndexRoute:
+    AuthenticatedDashboardHrEmployeesIndexRoute,
+  AuthenticatedDashboardHrEvaluationsIndexRoute:
+    AuthenticatedDashboardHrEvaluationsIndexRoute,
+  AuthenticatedDashboardHrLeavesIndexRoute:
+    AuthenticatedDashboardHrLeavesIndexRoute,
+  AuthenticatedDashboardHrPayrollIndexRoute:
+    AuthenticatedDashboardHrPayrollIndexRoute,
+  AuthenticatedDashboardHrSalariesIndexRoute:
+    AuthenticatedDashboardHrSalariesIndexRoute,
   AuthenticatedDashboardTasksEventsIndexRoute:
     AuthenticatedDashboardTasksEventsIndexRoute,
   AuthenticatedDashboardTasksRemindersIndexRoute:
