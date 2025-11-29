@@ -8,6 +8,8 @@ import {
   DollarSign,
   Star,
   Settings,
+  BookOpen,
+  TrendingUp,
 } from 'lucide-react'
 import { useAuthStore } from '@/stores/auth-store'
 
@@ -68,22 +70,26 @@ export function useSidebarData(): SidebarData {
         title: 'الرئيسية',
         items: [
           {
-            title: 'نظرة عامة',
-            url: '/',
+            title: 'الرئيسية',
             icon: LayoutDashboard,
-          },
-          {
-            title: 'التقويم',
-            url: '/dashboard/calendar',
-            icon: Calendar,
+            items: [
+              {
+                title: 'نظرة عامة',
+                url: '/',
+              },
+              {
+                title: 'التقويم',
+                url: '/dashboard/calendar',
+              },
+            ],
           },
         ],
       },
       {
-        title: 'المهام',
+        title: 'الإنتاجية',
         items: [
           {
-            title: 'المهام',
+            title: 'الإنتاجية',
             icon: CheckSquare,
             items: [
               {
@@ -107,38 +113,25 @@ export function useSidebarData(): SidebarData {
         ],
       },
       {
-        title: 'التواصل',
+        title: 'الرسائل',
         items: [
           {
-            title: 'التواصل',
+            title: 'الرسائل',
+            url: '/dashboard/messages/chat',
             icon: MessageSquare,
-            items: [
-              {
-                title: 'الرسائل',
-                url: '/dashboard/messages/chat',
-              },
-              {
-                title: 'التطبيقات',
-                url: '/dashboard/apps',
-              },
-            ],
           },
         ],
       },
       {
-        title: 'إدارة العلاقات',
+        title: 'العملاء والتواصل',
         items: [
           {
-            title: 'إدارة العلاقات',
+            title: 'العملاء والتواصل',
             icon: Users,
             items: [
               {
                 title: 'العملاء',
                 url: '/dashboard/clients',
-              },
-              {
-                title: 'فريق العمل',
-                url: '/dashboard/staff',
               },
               {
                 title: 'جهات الاتصال',
@@ -147,6 +140,37 @@ export function useSidebarData(): SidebarData {
               {
                 title: 'المنظمات',
                 url: '/dashboard/organizations',
+              },
+              {
+                title: 'فريق العمل',
+                url: '/dashboard/staff',
+              },
+            ],
+          },
+        ],
+      },
+      {
+        title: 'المبيعات',
+        items: [
+          {
+            title: 'المبيعات',
+            icon: TrendingUp,
+            items: [
+              {
+                title: 'العملاء المحتملين',
+                url: '/dashboard/crm/leads',
+              },
+              {
+                title: 'مسار المبيعات',
+                url: '/dashboard/crm/pipeline',
+              },
+              {
+                title: 'الإحالات',
+                url: '/dashboard/crm/referrals',
+              },
+              {
+                title: 'سجل الأنشطة',
+                url: '/dashboard/crm/activities',
               },
             ],
           },
@@ -195,10 +219,6 @@ export function useSidebarData(): SidebarData {
                 url: '/dashboard/finance/invoices',
               },
               {
-                title: 'عروض الأسعار',
-                url: '/dashboard/finance/quotes',
-              },
-              {
                 title: 'المدفوعات',
                 url: '/dashboard/finance/payments',
               },
@@ -207,20 +227,12 @@ export function useSidebarData(): SidebarData {
                 url: '/dashboard/finance/expenses',
               },
               {
-                title: 'كشوف الحساب',
-                url: '/dashboard/finance/statements',
-              },
-              {
                 title: 'المعاملات',
                 url: '/dashboard/finance/transactions',
               },
               {
                 title: 'تتبع الوقت',
                 url: '/dashboard/finance/time-tracking',
-              },
-              {
-                title: 'نشاط الحساب',
-                url: '/dashboard/finance/activity',
               },
             ],
           },
@@ -241,10 +253,17 @@ export function useSidebarData(): SidebarData {
                 title: 'شاراتي',
                 url: '/dashboard/reputation/badges',
               },
-              {
-                title: 'التقارير',
-                url: '/dashboard/reports',
-              },
+            ],
+          },
+        ],
+      },
+      {
+        title: 'المكتبة',
+        items: [
+          {
+            title: 'المكتبة',
+            icon: BookOpen,
+            items: [
               {
                 title: 'القوانين',
                 url: '/dashboard/knowledge/laws',
@@ -281,20 +300,8 @@ export function useSidebarData(): SidebarData {
                 url: '/dashboard/settings/preferences',
               },
               {
-                title: 'بيانات الشركة',
-                url: '/dashboard/settings/company',
-              },
-              {
-                title: 'إعدادات الفواتير',
-                url: '/dashboard/settings/finance',
-              },
-              {
-                title: 'الضرائب',
-                url: '/dashboard/settings/taxes',
-              },
-              {
-                title: 'طرق الدفع',
-                url: '/dashboard/settings/payment-modes',
+                title: 'التطبيقات',
+                url: '/dashboard/apps',
               },
               {
                 title: 'استيراد/تصدير',
