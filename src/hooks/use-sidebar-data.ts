@@ -275,25 +275,6 @@ export function useSidebarData(): SidebarData {
         ],
       },
       {
-        title: 'التميز المهني',
-        items: [
-          {
-            title: 'التميز المهني',
-            icon: Star,
-            items: [
-              {
-                title: 'نظرة عامة',
-                url: '/dashboard/reputation/overview',
-              },
-              {
-                title: 'شاراتي',
-                url: '/dashboard/reputation/badges',
-              },
-            ],
-          },
-        ],
-      },
-      {
         title: 'المكتبة',
         items: [
           {
@@ -311,6 +292,25 @@ export function useSidebarData(): SidebarData {
               {
                 title: 'النماذج',
                 url: '/dashboard/knowledge/forms',
+              },
+            ],
+          },
+        ],
+      },
+      {
+        title: 'التميز المهني',
+        items: [
+          {
+            title: 'التميز المهني',
+            icon: Star,
+            items: [
+              {
+                title: 'نظرة عامة',
+                url: '/dashboard/reputation/overview',
+              },
+              {
+                title: 'شاراتي',
+                url: '/dashboard/reputation/badges',
               },
             ],
           },
