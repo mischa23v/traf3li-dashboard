@@ -26,7 +26,7 @@ import { DynamicIsland } from '@/components/dynamic-island'
 import { Main } from '@/components/layout/main'
 import { Link, useNavigate } from '@tanstack/react-router'
 import { CrmSidebar } from './crm-sidebar'
-import { useLogActivity, useLeads } from '@/hooks/useCrm'
+import { useCreateActivity, useLeads } from '@/hooks/useCrm'
 import type { ActivityType, ActivityEntityType } from '@/types/crm'
 
 const ACTIVITY_TYPES: { value: ActivityType; label: string; icon: typeof Phone }[] = [
@@ -66,7 +66,7 @@ const ACTIVITY_STATUS = [
 
 export function CreateActivityView() {
   const navigate = useNavigate()
-  const logActivityMutation = useLogActivity()
+  const createActivityMutation = useCreateActivity()
   const { data: leadsData } = useLeads({})
 
   // Form state
@@ -140,7 +140,7 @@ export function CreateActivityView() {
       }),
     }
 
-    logActivityMutation.mutate(activityData, {
+    createActivityMutation.mutate(activityData, {
       onSuccess: () => {
         navigate({ to: '/dashboard/crm/activities' })
       }
@@ -507,9 +507,9 @@ export function CreateActivityView() {
                   <Button
                     type="submit"
                     className="bg-blue-500 hover:bg-blue-600 text-white min-w-[140px] rounded-xl shadow-lg shadow-blue-500/20"
-                    disabled={logActivityMutation.isPending}
+                    disabled={createActivityMutation.isPending}
                   >
-                    {logActivityMutation.isPending ? (
+                    {createActivityMutation.isPending ? (
                       <span className="flex items-center gap-2">
                         <Loader2 className="w-4 h-4 animate-spin" />
                         جاري الحفظ...
