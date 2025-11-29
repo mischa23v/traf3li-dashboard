@@ -2012,5 +2012,409 @@
       "restoreSuccess": "تم استعادة الإصدار بنجاح",
       "uploadSuccess": "تم رفع الإصدار الجديد بنجاح"
     }
+  },
+  "hr": {
+    "title": "الموارد البشرية",
+    "description": "إدارة الموظفين والإجازات والحضور والرواتب",
+    "employees": {
+      "title": "الموظفون",
+      "description": "إدارة الموظفين ومعلوماتهم",
+      "searchPlaceholder": "البحث عن موظفين...",
+      "addEmployee": "إضافة موظف",
+      "editEmployee": "تعديل موظف",
+      "deleteEmployee": "حذف موظف",
+      "viewEmployee": "عرض موظف",
+      "addEmployeeDescription": "إضافة موظف جديد للنظام",
+      "editEmployeeDescription": "تحديث معلومات الموظف",
+      "viewEmployeeDescription": "عرض تفاصيل الموظف الكاملة",
+      "noEmployees": "لا يوجد موظفون",
+      "selected": "تم تحديد {{count}} موظف",
+      "deleteConfirmation": "هل أنت متأكد من حذف {{name}}؟ لا يمكن التراجع عن هذا الإجراء.",
+      "deleteInputPlaceholder": "أدخل اسم الموظف للتأكيد",
+      "deleteWarning": "سيتم حذف جميع البيانات المرتبطة بهذا الموظف نهائياً",
+      "stats": {
+        "total": "إجمالي الموظفين",
+        "active": "الموظفون النشطون",
+        "onLeave": "في إجازة",
+        "newThisMonth": "الجدد هذا الشهر"
+      },
+      "columns": {
+        "employeeId": "رقم الموظف",
+        "name": "الاسم",
+        "email": "البريد الإلكتروني",
+        "phone": "الهاتف",
+        "department": "القسم",
+        "position": "المنصب",
+        "employmentType": "نوع التوظيف",
+        "joiningDate": "تاريخ الانضمام",
+        "status": "الحالة"
+      },
+      "statuses": {
+        "active": "نشط",
+        "on_leave": "في إجازة",
+        "terminated": "منتهي",
+        "suspended": "موقوف",
+        "probation": "فترة تجربة"
+      },
+      "employmentTypes": {
+        "full_time": "دوام كامل",
+        "part_time": "دوام جزئي",
+        "contract": "عقد",
+        "intern": "متدرب",
+        "freelance": "مستقل"
+      },
+      "departments": {
+        "hr": "الموارد البشرية",
+        "finance": "المالية",
+        "it": "تقنية المعلومات",
+        "legal": "الشؤون القانونية",
+        "operations": "العمليات",
+        "marketing": "التسويق",
+        "sales": "المبيعات",
+        "admin": "الإدارة"
+      },
+      "genders": {
+        "male": "ذكر",
+        "female": "أنثى"
+      },
+      "maritalStatuses": {
+        "single": "أعزب",
+        "married": "متزوج",
+        "divorced": "مطلق",
+        "widowed": "أرمل"
+      },
+      "form": {
+        "basicInfo": "المعلومات الأساسية",
+        "contactInfo": "معلومات الاتصال",
+        "employmentInfo": "معلومات التوظيف",
+        "documentsInfo": "المستندات",
+        "firstName": "الاسم الأول",
+        "firstNamePlaceholder": "أدخل الاسم الأول",
+        "lastName": "الاسم الأخير",
+        "lastNamePlaceholder": "أدخل الاسم الأخير",
+        "email": "البريد الإلكتروني",
+        "emailPlaceholder": "email@example.com",
+        "phone": "رقم الهاتف",
+        "phonePlaceholder": "+966 5XX XXX XXXX",
+        "nationalId": "رقم الهوية",
+        "nationalIdPlaceholder": "أدخل رقم الهوية",
+        "dateOfBirth": "تاريخ الميلاد",
+        "gender": "الجنس",
+        "selectGender": "اختر الجنس",
+        "maritalStatus": "الحالة الاجتماعية",
+        "selectMaritalStatus": "اختر الحالة الاجتماعية",
+        "nationality": "الجنسية",
+        "nationalityPlaceholder": "أدخل الجنسية",
+        "address": "العنوان",
+        "addressPlaceholder": "أدخل العنوان",
+        "city": "المدينة",
+        "cityPlaceholder": "أدخل المدينة",
+        "department": "القسم",
+        "selectDepartment": "اختر القسم",
+        "position": "المنصب",
+        "positionPlaceholder": "أدخل المنصب",
+        "employmentType": "نوع التوظيف",
+        "selectEmploymentType": "اختر نوع التوظيف",
+        "joiningDate": "تاريخ الانضمام",
+        "manager": "المدير",
+        "selectManager": "اختر المدير",
+        "status": "الحالة",
+        "selectStatus": "اختر الحالة",
+        "notes": "ملاحظات",
+        "notesPlaceholder": "أضف ملاحظات عن الموظف..."
+      }
+    },
+    "leaves": {
+      "title": "إدارة الإجازات",
+      "description": "إدارة طلبات الإجازات والأرصدة",
+      "searchPlaceholder": "البحث في طلبات الإجازات...",
+      "requestLeave": "طلب إجازة",
+      "addLeave": "إضافة طلب إجازة",
+      "editLeave": "تعديل طلب إجازة",
+      "deleteLeave": "حذف طلب إجازة",
+      "viewLeave": "عرض طلب إجازة",
+      "approveLeave": "الموافقة على الإجازة",
+      "rejectLeave": "رفض الإجازة",
+      "cancelLeave": "إلغاء الإجازة",
+      "noLeaves": "لا توجد طلبات إجازة",
+      "recentRequests": "الطلبات الأخيرة",
+      "recentRequestsDesc": "أحدث طلبات الإجازات من الموظفين",
+      "stats": {
+        "pending": "الطلبات المعلقة",
+        "approved": "الموافق عليها",
+        "rejected": "المرفوضة",
+        "onLeaveToday": "في إجازة اليوم"
+      },
+      "columns": {
+        "employee": "الموظف",
+        "leaveType": "نوع الإجازة",
+        "startDate": "تاريخ البداية",
+        "endDate": "تاريخ النهاية",
+        "days": "الأيام",
+        "status": "الحالة",
+        "reason": "السبب"
+      },
+      "types": {
+        "annual": "إجازة سنوية",
+        "sick": "إجازة مرضية",
+        "unpaid": "إجازة بدون راتب",
+        "maternity": "إجازة أمومة",
+        "paternity": "إجازة أبوة",
+        "emergency": "إجازة طارئة",
+        "hajj": "إجازة حج",
+        "bereavement": "إجازة وفاة",
+        "marriage": "إجازة زواج",
+        "study": "إجازة دراسية",
+        "other": "أخرى"
+      },
+      "statuses": {
+        "pending": "معلق",
+        "approved": "موافق عليه",
+        "rejected": "مرفوض",
+        "cancelled": "ملغي"
+      },
+      "form": {
+        "leaveType": "نوع الإجازة",
+        "selectLeaveType": "اختر نوع الإجازة",
+        "startDate": "تاريخ البداية",
+        "endDate": "تاريخ النهاية",
+        "reason": "السبب",
+        "reasonPlaceholder": "أدخل سبب الإجازة...",
+        "attachments": "المرفقات",
+        "uploadAttachment": "رفع مرفق"
+      }
+    },
+    "attendance": {
+      "title": "إدارة الحضور",
+      "description": "تتبع حضور الموظفين وسجلات الوقت",
+      "searchPlaceholder": "البحث في الحضور...",
+      "checkIn": "تسجيل الحضور",
+      "checkOut": "تسجيل الانصراف",
+      "addAttendance": "إضافة حضور",
+      "editAttendance": "تعديل حضور",
+      "noAttendance": "لا توجد سجلات حضور",
+      "todayAttendance": "حضور اليوم",
+      "todayAttendanceDesc": "تتبع الحضور في الوقت الفعلي",
+      "stats": {
+        "present": "الحاضرون اليوم",
+        "absent": "الغائبون اليوم",
+        "late": "المتأخرون اليوم",
+        "onLeave": "في إجازة"
+      },
+      "columns": {
+        "employee": "الموظف",
+        "date": "التاريخ",
+        "checkIn": "الحضور",
+        "checkOut": "الانصراف",
+        "workHours": "ساعات العمل",
+        "overtime": "العمل الإضافي",
+        "status": "الحالة"
+      },
+      "statuses": {
+        "present": "حاضر",
+        "absent": "غائب",
+        "late": "متأخر",
+        "half_day": "نصف يوم",
+        "on_leave": "في إجازة",
+        "holiday": "عطلة",
+        "weekend": "نهاية الأسبوع",
+        "work_from_home": "العمل من المنزل"
+      },
+      "checkMethods": {
+        "manual": "يدوي",
+        "biometric": "البصمة",
+        "mobile": "تطبيق الجوال",
+        "web": "البوابة الإلكترونية",
+        "qr_code": "رمز QR"
+      },
+      "form": {
+        "employee": "الموظف",
+        "selectEmployee": "اختر الموظف",
+        "date": "التاريخ",
+        "checkInTime": "وقت الحضور",
+        "checkOutTime": "وقت الانصراف",
+        "status": "الحالة",
+        "selectStatus": "اختر الحالة",
+        "notes": "ملاحظات",
+        "notesPlaceholder": "أضف ملاحظات..."
+      }
+    },
+    "salaries": {
+      "title": "إدارة الرواتب",
+      "description": "إدارة رواتب الموظفين والتعويضات",
+      "searchPlaceholder": "البحث في الرواتب...",
+      "addSalary": "إضافة راتب",
+      "editSalary": "تعديل راتب",
+      "viewSalary": "عرض راتب",
+      "noSalaries": "لا توجد سجلات رواتب",
+      "salaryHistory": "سجل الرواتب",
+      "salaryHistoryDesc": "سجلات رواتب الموظفين والتعويضات",
+      "stats": {
+        "total": "إجمالي الرواتب",
+        "avgSalary": "متوسط الراتب",
+        "active": "الرواتب النشطة",
+        "pending": "قيد المراجعة"
+      },
+      "columns": {
+        "employee": "الموظف",
+        "basicSalary": "الراتب الأساسي",
+        "housingAllowance": "بدل السكن",
+        "transportAllowance": "بدل النقل",
+        "totalGross": "الإجمالي",
+        "effectiveDate": "تاريخ السريان",
+        "status": "الحالة"
+      },
+      "statuses": {
+        "active": "نشط",
+        "inactive": "غير نشط",
+        "pending": "معلق"
+      },
+      "allowanceTypes": {
+        "housing": "بدل السكن",
+        "transport": "بدل النقل",
+        "food": "بدل الطعام",
+        "phone": "بدل الهاتف",
+        "other": "بدل آخر"
+      },
+      "deductionTypes": {
+        "gosi": "التأمينات الاجتماعية",
+        "tax": "الضريبة",
+        "loan": "قرض",
+        "advance": "سلفة",
+        "other": "خصم آخر"
+      },
+      "form": {
+        "employee": "الموظف",
+        "selectEmployee": "اختر الموظف",
+        "basicSalary": "الراتب الأساسي",
+        "basicSalaryPlaceholder": "أدخل الراتب الأساسي",
+        "housingAllowance": "بدل السكن",
+        "transportAllowance": "بدل النقل",
+        "effectiveDate": "تاريخ السريان",
+        "status": "الحالة",
+        "selectStatus": "اختر الحالة",
+        "notes": "ملاحظات",
+        "notesPlaceholder": "أضف ملاحظات..."
+      }
+    },
+    "payroll": {
+      "title": "إدارة المسيرات",
+      "description": "معالجة وإدارة مسيرات الرواتب الشهرية",
+      "searchPlaceholder": "البحث في المسيرات...",
+      "generatePayroll": "إنشاء مسير",
+      "viewPayroll": "عرض المسير",
+      "processPayroll": "معالجة المسير",
+      "approvePayroll": "اعتماد المسير",
+      "noPayrolls": "لا توجد سجلات مسيرات",
+      "payrollHistory": "سجل المسيرات",
+      "payrollHistoryDesc": "سجلات معالجة مسيرات الرواتب الشهرية",
+      "stats": {
+        "total": "إجمالي المسيرات",
+        "pending": "بانتظار الاعتماد",
+        "completed": "مكتملة",
+        "totalPaid": "إجمالي المدفوع"
+      },
+      "columns": {
+        "payrollId": "رقم المسير",
+        "period": "الفترة",
+        "employees": "الموظفون",
+        "totalGross": "الإجمالي",
+        "totalDeductions": "الخصومات",
+        "totalNet": "الصافي",
+        "status": "الحالة"
+      },
+      "statuses": {
+        "draft": "مسودة",
+        "pending_approval": "بانتظار الموافقة",
+        "approved": "معتمد",
+        "processing": "قيد المعالجة",
+        "completed": "مكتمل",
+        "cancelled": "ملغي"
+      },
+      "form": {
+        "period": "الفترة",
+        "month": "الشهر",
+        "selectMonth": "اختر الشهر",
+        "year": "السنة",
+        "selectYear": "اختر السنة",
+        "notes": "ملاحظات",
+        "notesPlaceholder": "أضف ملاحظات..."
+      }
+    },
+    "evaluations": {
+      "title": "تقييم الأداء",
+      "description": "إدارة تقييمات أداء الموظفين",
+      "searchPlaceholder": "البحث في التقييمات...",
+      "createEvaluation": "إنشاء تقييم",
+      "editEvaluation": "تعديل تقييم",
+      "viewEvaluation": "عرض تقييم",
+      "noEvaluations": "لا توجد تقييمات",
+      "recentEvaluations": "التقييمات الأخيرة",
+      "recentEvaluationsDesc": "أحدث تقييمات أداء الموظفين",
+      "stats": {
+        "total": "إجمالي التقييمات",
+        "pending": "المراجعات المعلقة",
+        "avgScore": "متوسط الدرجة",
+        "completed": "المكتملة"
+      },
+      "columns": {
+        "employee": "الموظف",
+        "type": "النوع",
+        "period": "الفترة",
+        "score": "الدرجة",
+        "performance": "مستوى الأداء",
+        "status": "الحالة"
+      },
+      "types": {
+        "annual": "تقييم سنوي",
+        "semi_annual": "تقييم نصف سنوي",
+        "quarterly": "تقييم ربع سنوي",
+        "probation": "تقييم فترة التجربة",
+        "project": "تقييم مشروع",
+        "promotion": "تقييم ترقية",
+        "performance_improvement": "تقييم تحسين الأداء",
+        "special": "تقييم خاص"
+      },
+      "statuses": {
+        "draft": "مسودة",
+        "self_assessment": "التقييم الذاتي",
+        "manager_review": "مراجعة المدير",
+        "hr_review": "مراجعة الموارد البشرية",
+        "completed": "مكتمل",
+        "acknowledged": "تم الإقرار"
+      },
+      "performanceLevels": {
+        "exceptional": "استثنائي",
+        "exceeds": "يفوق التوقعات",
+        "meets": "يلبي التوقعات",
+        "needs_improvement": "يحتاج تحسين",
+        "unsatisfactory": "غير مُرضٍ"
+      },
+      "competencyCategories": {
+        "technical": "المهارات الفنية",
+        "communication": "التواصل",
+        "leadership": "القيادة",
+        "teamwork": "العمل الجماعي",
+        "problem_solving": "حل المشكلات",
+        "time_management": "إدارة الوقت",
+        "adaptability": "التكيف",
+        "initiative": "المبادرة",
+        "customer_focus": "التركيز على العميل",
+        "other": "أخرى"
+      },
+      "form": {
+        "employee": "الموظف",
+        "selectEmployee": "اختر الموظف",
+        "evaluationType": "نوع التقييم",
+        "selectType": "اختر النوع",
+        "periodStart": "بداية الفترة",
+        "periodEnd": "نهاية الفترة",
+        "goals": "الأهداف",
+        "competencies": "الكفاءات",
+        "feedback": "التغذية الراجعة",
+        "notes": "ملاحظات",
+        "notesPlaceholder": "أضف ملاحظات..."
+      }
+    }
   }
 }
