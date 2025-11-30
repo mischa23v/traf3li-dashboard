@@ -42,6 +42,7 @@ import { cn } from '@/lib/utils'
 import { format, parseISO } from 'date-fns'
 import { ar } from 'date-fns/locale'
 import { toast } from '@/hooks/use-toast'
+import { ProductivityHero } from '@/components/productivity-hero'
 
 function EmployeeDetailSkeleton() {
     return (
@@ -146,11 +147,39 @@ export function EmployeeDetail() {
                     ) : (
                         <>
                             {/* Hero Card */}
-                            <div className="bg-emerald-950 rounded-3xl p-8 relative overflow-hidden text-white shadow-xl shadow-emerald-900/20">
-                                <div className="absolute inset-0 bg-gradient-to-br from-emerald-900/50 via-transparent to-teal-900/30" />
-                                <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl" />
-
-                                <div className="relative z-10">
+                            <ProductivityHero
+                                badge="الموارد البشرية"
+                                title={`${employee.firstName} ${employee.lastName}`}
+                                type="hr"
+                                hideButtons={true}
+                                stats={[
+                                    {
+                                        label: "القسم",
+                                        value: employee.department,
+                                        icon: <Building2 className="w-4 h-4 text-emerald-400" />,
+                                        status: 'normal'
+                                    },
+                                    {
+                                        label: "تاريخ التعيين",
+                                        value: employee.hireDate ? format(parseISO(employee.hireDate), 'd MMM yyyy', { locale: ar }) : '-',
+                                        icon: <Calendar className="w-4 h-4 text-blue-400" />,
+                                        status: 'normal'
+                                    },
+                                    {
+                                        label: "الراتب الأساسي",
+                                        value: formatCurrency(employee.baseSalary || 0),
+                                        icon: <DollarSign className="w-4 h-4 text-amber-400" />,
+                                        status: 'normal'
+                                    },
+                                    {
+                                        label: "رصيد الإجازات",
+                                        value: `${employee.annualLeaveBalance || 0} يوم`,
+                                        icon: <Clock className="w-4 h-4 text-purple-400" />,
+                                        status: 'normal'
+                                    }
+                                ]}
+                            >
+                                <div className="flex flex-col gap-4 w-full">
                                     <div className="flex items-center gap-4 mb-6">
                                         <Link to="/dashboard/hr/employees">
                                             <Button variant="ghost" size="icon" className="rounded-full bg-white/10 hover:bg-white/20 text-white">
@@ -166,7 +195,6 @@ export function EmployeeDetail() {
                                                     </AvatarFallback>
                                                 </Avatar>
                                                 <div>
-                                                    <h2 className="text-3xl font-bold">{employee.firstName} {employee.lastName}</h2>
                                                     <p className="text-white/60 mt-1">{employee.position}</p>
                                                     <div className="flex items-center gap-3 mt-2">
                                                         <Badge variant="outline" className={cn("font-medium border-white/20 text-white", statusConfig[employee.status]?.color)}>
@@ -212,58 +240,8 @@ export function EmployeeDetail() {
                                             </DropdownMenu>
                                         </div>
                                     </div>
-
-                                    {/* Quick Stats */}
-                                    <div className="grid grid-cols-4 gap-4 mt-6">
-                                        <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4">
-                                            <div className="flex items-center gap-3">
-                                                <div className="w-10 h-10 rounded-xl bg-emerald-500/20 flex items-center justify-center">
-                                                    <Building2 className="w-5 h-5 text-emerald-400" />
-                                                </div>
-                                                <div>
-                                                    <p className="text-sm text-white/60">القسم</p>
-                                                    <p className="font-semibold text-white">{employee.department}</p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4">
-                                            <div className="flex items-center gap-3">
-                                                <div className="w-10 h-10 rounded-xl bg-blue-500/20 flex items-center justify-center">
-                                                    <Calendar className="w-5 h-5 text-blue-400" />
-                                                </div>
-                                                <div>
-                                                    <p className="text-sm text-white/60">تاريخ التعيين</p>
-                                                    <p className="font-semibold text-white">
-                                                        {employee.hireDate ? format(parseISO(employee.hireDate), 'd MMM yyyy', { locale: ar }) : '-'}
-                                                    </p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4">
-                                            <div className="flex items-center gap-3">
-                                                <div className="w-10 h-10 rounded-xl bg-amber-500/20 flex items-center justify-center">
-                                                    <DollarSign className="w-5 h-5 text-amber-400" />
-                                                </div>
-                                                <div>
-                                                    <p className="text-sm text-white/60">الراتب الأساسي</p>
-                                                    <p className="font-semibold text-white">{formatCurrency(employee.baseSalary || 0)}</p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4">
-                                            <div className="flex items-center gap-3">
-                                                <div className="w-10 h-10 rounded-xl bg-purple-500/20 flex items-center justify-center">
-                                                    <Clock className="w-5 h-5 text-purple-400" />
-                                                </div>
-                                                <div>
-                                                    <p className="text-sm text-white/60">رصيد الإجازات</p>
-                                                    <p className="font-semibold text-white">{employee.annualLeaveBalance || 0} يوم</p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
                                 </div>
-                            </div>
+                            </ProductivityHero>
 
                             {/* Main content grid */}
                             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">

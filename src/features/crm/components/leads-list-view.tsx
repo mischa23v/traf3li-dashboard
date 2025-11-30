@@ -36,6 +36,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import type { Lead, LeadStatus } from '@/types/crm'
 import { CrmSidebar } from './crm-sidebar'
+import { ProductivityHero } from '@/components/productivity-hero'
 
 const statusLabels: Record<LeadStatus, string> = {
   new: 'جديد',
@@ -167,46 +168,26 @@ export function LeadsListView() {
         className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-r border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']"
       >
         {/* HERO CARD */}
-        <div className="bg-[#022c22] rounded-3xl p-8 relative overflow-hidden text-white shadow-xl shadow-emerald-900/20 flex flex-col md:flex-row items-center justify-between gap-8">
-          <div className="relative z-10 max-w-lg">
-            <h2 className="text-3xl font-bold mb-4 leading-tight">
-              إدارة العملاء المحتملين
-            </h2>
-            <p className="text-emerald-200 text-lg mb-8 leading-relaxed">
-              تتبع العملاء المحتملين من أول تواصل حتى التحويل. نظم مسار مبيعاتك
-              وزد من معدل تحويل العملاء.
-            </p>
-            <div className="flex gap-3">
-              <Button
-                asChild
-                className="bg-emerald-500 hover:bg-emerald-600 text-white h-12 px-8 rounded-xl font-bold shadow-lg shadow-emerald-500/20 border-0"
-              >
-                <Link to="/dashboard/crm/leads/new">
-                  <Plus className="ml-2 h-5 w-5" />
-                  عميل محتمل جديد
-                </Link>
-              </Button>
-              <Button
-                asChild
-                className="bg-white text-slate-900 hover:bg-slate-100 h-12 px-8 rounded-xl font-bold shadow-lg border-0 transition-all hover:scale-105"
-              >
-                <Link to="/dashboard/crm/pipeline">
-                  <TrendingUp className="ml-2 h-5 w-5" />
-                  مسار المبيعات
-                </Link>
-              </Button>
-            </div>
-          </div>
-          <div className="hidden md:block relative w-64 h-64">
-            <div className="absolute inset-0 bg-gradient-to-tr from-emerald-500 to-teal-500 rounded-full opacity-20 blur-3xl animate-pulse"></div>
-            <div className="absolute inset-4 bg-emerald-950 rounded-2xl border border-white/10 flex items-center justify-center transform rotate-6 shadow-2xl">
-              <UserPlus className="h-24 w-24 text-emerald-400" />
-            </div>
-            <div className="absolute inset-4 bg-emerald-950/80 rounded-2xl border border-white/10 flex items-center justify-center transform -rotate-6 backdrop-blur-sm">
-              <Users className="h-24 w-24 text-teal-400" />
-            </div>
-          </div>
-        </div>
+        <ProductivityHero badge="إدارة العملاء المحتملين" title="إدارة العملاء المحتملين" type="leads" hideButtons={true}>
+          <Button
+            asChild
+            className="bg-emerald-500 hover:bg-emerald-600 text-white h-12 px-8 rounded-xl font-bold shadow-lg shadow-emerald-500/20 border-0"
+          >
+            <Link to="/dashboard/crm/leads/new">
+              <Plus className="ml-2 h-5 w-5" />
+              عميل محتمل جديد
+            </Link>
+          </Button>
+          <Button
+            asChild
+            className="bg-white text-slate-900 hover:bg-slate-100 h-12 px-8 rounded-xl font-bold shadow-lg border-0 transition-all hover:scale-105"
+          >
+            <Link to="/dashboard/crm/pipeline">
+              <TrendingUp className="ml-2 h-5 w-5" />
+              مسار المبيعات
+            </Link>
+          </Button>
+        </ProductivityHero>
 
         {/* MAIN GRID LAYOUT */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -306,11 +287,10 @@ export function LeadsListView() {
                   leads.map((lead: Lead) => (
                     <div
                       key={lead._id}
-                      className={`bg-[#F8F9FA] rounded-2xl p-6 border transition-all group ${
-                        selectedLeadIds.includes(lead._id)
-                          ? 'border-emerald-500 bg-emerald-50/30'
-                          : 'border-slate-100 hover:border-emerald-200'
-                      }`}
+                      className={`bg-[#F8F9FA] rounded-2xl p-6 border transition-all group ${selectedLeadIds.includes(lead._id)
+                        ? 'border-emerald-500 bg-emerald-50/30'
+                        : 'border-slate-100 hover:border-emerald-200'
+                        }`}
                     >
                       <div className="flex justify-between items-start mb-4">
                         <div className="flex gap-4 items-center">

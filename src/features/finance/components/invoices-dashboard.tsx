@@ -40,6 +40,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { useInvoices, useOverdueInvoices, useExportReport } from '@/hooks/useFinance'
 import { useClients } from '@/hooks/useCasesAndClients'
 import { FinanceSidebar } from './finance-sidebar'
+import { ProductivityHero } from '@/components/productivity-hero'
 
 export default function InvoicesDashboard() {
     const [activeTab, setActiveTab] = useState('all')
@@ -282,41 +283,45 @@ export default function InvoicesDashboard() {
                 <div className="max-w-7xl mx-auto space-y-6">
 
                     {/* Hero Section - New Design */}
-                    <div className="bg-[#022c22] rounded-3xl p-8 relative overflow-hidden text-white shadow-xl shadow-emerald-900/20 flex flex-col md:flex-row items-center justify-between gap-8 mb-8">
-                        <div className="relative z-10 max-w-lg">
-                            <div className="flex items-center gap-3 mb-3">
-                                <Badge className="bg-white/10 hover:bg-white/20 text-white border-0 backdrop-blur-sm">
-                                    <FileText className="w-3 h-3 ml-2" />
-                                    الفواتير
-                                </Badge>
-                                <span className="text-emerald-200 text-sm">نوفمبر 2025</span>
-                            </div>
-                            <h2 className="text-3xl font-bold mb-4 leading-tight">إدارة الفواتير والمدفوعات</h2>
-                            <p className="text-emerald-200 text-lg mb-8 leading-relaxed">
-                                تابع الفواتير المستحقة، راقب التدفقات النقدية، وأدر عمليات التحصيل بكفاءة عالية.
-                            </p>
-                            <div className="flex gap-3">
-                                <Button asChild className="bg-emerald-500 hover:bg-emerald-600 text-white h-12 px-8 rounded-xl font-bold shadow-lg shadow-emerald-500/20 border-0">
-                                    <Link to="/dashboard/finance/invoices/new">
-                                        <Plus className="ml-2 h-5 w-5" />
-                                        فاتورة جديدة
-                                    </Link>
-                                </Button>
-                                <Button variant="ghost" className="bg-white/10 text-white hover:bg-white/20 h-12 px-8 rounded-xl font-bold border-0 backdrop-blur-sm">
-                                    <Download className="ml-2 h-5 w-5" />
-                                    تصدير التقرير
-                                </Button>
-                            </div>
+                    <ProductivityHero
+                        badge="الفواتير"
+                        title="إدارة الفواتير والمدفوعات"
+                        type="invoices"
+                        hideButtons={true}
+                        stats={[
+                            {
+                                label: "إجمالي المعلق",
+                                value: formatCurrency(stats.totalPending),
+                                icon: <AlertCircle className="w-4 h-4 text-amber-400" />,
+                                status: stats.totalPending > 0 ? 'attention' : 'normal'
+                            },
+                            {
+                                label: "إجمالي المتأخر",
+                                value: formatCurrency(stats.totalOverdue),
+                                icon: <AlertCircle className="w-4 h-4 text-rose-400" />,
+                                status: stats.totalOverdue > 0 ? 'attention' : 'normal'
+                            },
+                            {
+                                label: "مدفوعات هذا الشهر",
+                                value: formatCurrency(stats.totalPaidThisMonth),
+                                icon: <CheckCircle className="w-4 h-4 text-emerald-400" />,
+                                status: 'normal'
+                            }
+                        ]}
+                    >
+                        <div className="flex gap-3">
+                            <Button asChild className="bg-emerald-500 hover:bg-emerald-600 text-white h-10 px-5 rounded-xl font-bold shadow-lg shadow-emerald-500/20 border-0">
+                                <Link to="/dashboard/finance/invoices/new">
+                                    <Plus className="ml-2 h-4 w-4" />
+                                    فاتورة جديدة
+                                </Link>
+                            </Button>
+                            <Button variant="ghost" className="bg-white/10 text-white hover:bg-white/20 h-10 px-5 rounded-xl font-bold border-0 backdrop-blur-sm">
+                                <Download className="ml-2 h-4 w-4" />
+                                تصدير التقرير
+                            </Button>
                         </div>
-
-                        {/* Abstract Visual Decoration */}
-                        <div className="absolute top-0 left-0 w-full h-full overflow-hidden z-0 pointer-events-none">
-                            <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-emerald-500/10 rounded-full blur-[100px]"></div>
-                            <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-blue-500/10 rounded-full blur-[100px]"></div>
-                            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80%] h-[80%] border border-white/5 rounded-full"></div>
-                            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[60%] h-[60%] border border-white/5 rounded-full"></div>
-                        </div>
-                    </div>
+                    </ProductivityHero>
 
                     {/* Main Content */}
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">

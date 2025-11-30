@@ -19,6 +19,7 @@ import {
   useMoveLeadToStage,
   useConvertLead,
 } from '@/hooks/useCrm'
+import { ProductivityHero } from '@/components/productivity-hero'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Header } from '@/components/layout/header'
@@ -151,17 +152,13 @@ export function PipelineView() {
         className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-6 rounded-tr-3xl shadow-inner border-r border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']"
       >
         {/* Header with Pipeline Selector */}
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <div>
-            <h2 className="text-2xl font-bold text-navy">مسار المبيعات</h2>
-            <p className="text-slate-500">اسحب وأفلت العملاء المحتملين بين المراحل</p>
-          </div>
+        <ProductivityHero badge="مسار المبيعات" title="مسار المبيعات" type="pipeline" hideButtons={true}>
           <div className="flex items-center gap-4">
             <Select
               value={selectedPipelineId}
               onValueChange={setSelectedPipelineId}
             >
-              <SelectTrigger className="w-[200px] rounded-xl">
+              <SelectTrigger className="w-[200px] rounded-xl bg-white/10 border-white/10 text-white">
                 <SelectValue placeholder="اختر مسار المبيعات" />
               </SelectTrigger>
               <SelectContent>
@@ -174,7 +171,7 @@ export function PipelineView() {
             </Select>
             <Button
               asChild
-              className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl"
+              className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl shadow-lg border-0"
             >
               <Link to="/dashboard/crm/leads/new">
                 <Plus className="ml-2 h-4 w-4" />
@@ -182,7 +179,7 @@ export function PipelineView() {
               </Link>
             </Button>
           </div>
-        </div>
+        </ProductivityHero>
 
         {/* Pipeline Board */}
         {isLoading ? (
@@ -265,11 +262,10 @@ export function PipelineView() {
                   <div
                     onDragOver={handleDragOver}
                     onDrop={(e) => handleDrop(e, stage.stageId)}
-                    className={`min-h-[400px] p-3 rounded-b-xl border border-t-0 transition-colors ${
-                      draggedLeadId
-                        ? 'bg-emerald-50 border-emerald-200'
-                        : 'bg-slate-50 border-slate-200'
-                    }`}
+                    className={`min-h-[400px] p-3 rounded-b-xl border border-t-0 transition-colors ${draggedLeadId
+                      ? 'bg-emerald-50 border-emerald-200'
+                      : 'bg-slate-50 border-slate-200'
+                      }`}
                   >
                     {stageLeads.length === 0 ? (
                       <div className="h-full flex items-center justify-center text-slate-400 text-sm">
@@ -283,11 +279,10 @@ export function PipelineView() {
                             draggable
                             onDragStart={(e) => handleDragStart(e, lead._id)}
                             onDragEnd={handleDragEnd}
-                            className={`bg-white p-4 rounded-xl shadow-sm cursor-grab active:cursor-grabbing border border-transparent hover:border-emerald-300 transition-all ${
-                              draggedLeadId === lead._id
-                                ? 'opacity-50 ring-2 ring-emerald-400'
-                                : ''
-                            }`}
+                            className={`bg-white p-4 rounded-xl shadow-sm cursor-grab active:cursor-grabbing border border-transparent hover:border-emerald-300 transition-all ${draggedLeadId === lead._id
+                              ? 'opacity-50 ring-2 ring-emerald-400'
+                              : ''
+                              }`}
                           >
                             <div className="flex items-start justify-between mb-3">
                               <div className="flex items-center gap-2">

@@ -49,6 +49,7 @@ import { ProfileDropdown } from '@/components/profile-dropdown'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Skeleton } from '@/components/ui/skeleton'
+import { ProductivityHero } from '@/components/productivity-hero'
 
 // Lazy load the rich text editor to reduce initial bundle size
 const RichTextEditor = lazy(() => import('@/components/rich-text-editor'))
@@ -303,11 +304,10 @@ export function WikiCreateView() {
                         <div
                           key={collection._id}
                           onClick={() => handleChange('collectionId', collection._id)}
-                          className={`flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-colors ${
-                            formData.collectionId === collection._id
-                              ? 'bg-emerald-50 border border-emerald-200'
-                              : 'bg-slate-50 hover:bg-slate-100'
-                          }`}
+                          className={`flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-colors ${formData.collectionId === collection._id
+                            ? 'bg-emerald-50 border border-emerald-200'
+                            : 'bg-slate-50 hover:bg-slate-100'
+                            }`}
                         >
                           <div
                             className="w-8 h-8 rounded-lg flex items-center justify-center"
@@ -350,36 +350,7 @@ export function WikiCreateView() {
           <div className="lg:col-span-2 space-y-8">
 
             {/* HERO CARD */}
-            <div className="bg-emerald-950 rounded-3xl p-8 relative overflow-hidden text-white shadow-xl shadow-emerald-900/20 flex flex-col md:flex-row items-center justify-between gap-8">
-              <div className="relative z-10 max-w-lg">
-                <div className="flex items-center gap-4 mb-4">
-                  <Link to={`/dashboard/cases/${caseId}/wiki` as any}>
-                    <Button variant="ghost" size="icon" className="rounded-full bg-white/10 hover:bg-white/20 text-white">
-                      <ArrowRight className="w-5 h-5" />
-                    </Button>
-                  </Link>
-                  <h2 className="text-3xl font-bold leading-tight">
-                    {isEditMode ? t('wiki.editPage') : t('wiki.createPage')}
-                  </h2>
-                </div>
-                <p className="text-emerald-200 text-lg mb-4 leading-relaxed">
-                  {isEditMode ? t('wiki.editPageDescription') : t('wiki.createPageDescription')}
-                </p>
-                <Badge variant="outline" className="border-emerald-500/30 text-emerald-300">
-                  {caseName}
-                </Badge>
-              </div>
-              {/* Abstract Visual Decoration */}
-              <div className="hidden md:block relative w-64 h-64">
-                <div className="absolute inset-0 bg-gradient-to-tr from-emerald-500 to-teal-500 rounded-full opacity-20 blur-3xl animate-pulse"></div>
-                <div className="absolute inset-4 bg-emerald-950 rounded-2xl border border-white/10 flex items-center justify-center transform rotate-6 shadow-2xl">
-                  <BookOpen className="h-24 w-24 text-emerald-400" />
-                </div>
-                <div className="absolute inset-4 bg-emerald-950/80 rounded-2xl border border-white/10 flex items-center justify-center transform -rotate-6 backdrop-blur-sm">
-                  <FileText className="h-24 w-24 text-teal-400" />
-                </div>
-              </div>
-            </div>
+            <ProductivityHero badge="الموسوعة القانونية" title={isEditMode ? t('wiki.editPage') : t('wiki.createPage')} type="wiki" hideButtons={true} />
 
             {/* Form Card */}
             <div className="bg-white rounded-3xl p-8 shadow-sm border border-slate-100">
@@ -669,11 +640,10 @@ export function WikiCreateView() {
                                       key={color}
                                       type="button"
                                       onClick={() => handleChange('calendarColor', color)}
-                                      className={`w-8 h-8 rounded-lg border-2 transition-all ${
-                                        formData.calendarColor === color
-                                          ? 'border-slate-800 scale-110'
-                                          : 'border-transparent hover:border-slate-300'
-                                      }`}
+                                      className={`w-8 h-8 rounded-lg border-2 transition-all ${formData.calendarColor === color
+                                        ? 'border-slate-800 scale-110'
+                                        : 'border-transparent hover:border-slate-300'
+                                        }`}
                                       style={{ backgroundColor: color }}
                                     />
                                   ))}

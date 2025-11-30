@@ -20,6 +20,7 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
 import { PracticeSidebar } from '../cases/components/practice-sidebar'
+import { ProductivityHero } from '@/components/productivity-hero'
 
 export default function Documents() {
   const { t } = useTranslation()
@@ -85,31 +86,9 @@ export default function Documents() {
         className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-r border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']"
       >
         {/* HERO BANNER */}
-        <div className="bg-navy rounded-3xl p-8 relative overflow-hidden text-white shadow-xl shadow-navy/20 group">
-          <div className="absolute -bottom-32 -left-32 w-96 h-96 bg-brand-blue rounded-full blur-[120px] opacity-40 group-hover:opacity-50 transition-opacity duration-700"></div>
-          <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
-            <div>
-              <div className="flex items-center gap-2 mb-2">
-                <Badge className="bg-blue-500/20 text-blue-100 hover:bg-blue-500/30 border-0 px-3 py-1">
-                  <Scale className="w-3 h-3 ml-2" />
-                  {t('cases.management', 'إدارة القضايا')}
-                </Badge>
-                <span className="text-slate-400 text-sm">
-                  {new Date().toLocaleDateString('ar-SA', { month: 'long', year: 'numeric' })}
-                </span>
-              </div>
-              <h1 className="text-4xl font-bold leading-tight mb-2">
-                {t('documents.title', 'المستندات والوثائق')}
-              </h1>
-              <p className="text-slate-300 text-lg max-w-xl">
-                {t('documents.description', 'إدارة وتنظيم جميع المستندات والملفات القانونية')}
-              </p>
-            </div>
-            <div className="flex gap-3">
-              <DocumentsPrimaryButtons />
-            </div>
-          </div>
-        </div>
+        <ProductivityHero badge={t('cases.management', 'إدارة القضايا')} title={t('documents.title', 'المستندات والوثائق')} type="documents" hideButtons={true}>
+          <DocumentsPrimaryButtons />
+        </ProductivityHero>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* --- Main Content --- */}

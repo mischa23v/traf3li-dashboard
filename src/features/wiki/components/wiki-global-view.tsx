@@ -29,6 +29,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { WikiSidebar } from './wiki-sidebar'
 import { useRecentWikiPages, useWikiGlobalSearch } from '@/hooks/useWiki'
+import { ProductivityHero } from '@/components/productivity-hero'
 import type { WikiPageType, WikiPageStatus } from '@/types/wiki'
 import {
   pageTypeLabels,
@@ -107,49 +108,13 @@ export function WikiGlobalView() {
 
       <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-r border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* HERO CARD & STATS */}
+        <ProductivityHero badge="المراجع والملاحظات" type="wiki" />
 
-          {/* LEFT COLUMN (Widgets) */}
-          <WikiSidebar recentPages={recentPages} isLoading={isLoading} />
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
           {/* RIGHT COLUMN (Main Content) */}
           <div className="lg:col-span-2 space-y-8">
-
-            {/* HERO CARD */}
-            <div className="bg-navy rounded-3xl p-8 relative overflow-hidden text-white shadow-xl shadow-navy/20 flex flex-col md:flex-row items-center justify-between gap-8">
-              <div className="relative z-10 max-w-lg">
-                <h2 className="text-3xl font-bold mb-4 leading-tight">
-                  {isArabic ? 'نظام المراجع والملاحظات' : 'References & Notes System'}
-                </h2>
-                <p className="text-blue-200 text-lg mb-8 leading-relaxed">
-                  {isArabic
-                    ? 'تصفح جميع صفحات الملاحظات والمراجع من مختلف القضايا. ابحث عن المعلومات واستعرض أحدث التحديثات بسهولة.'
-                    : 'Browse all notes and reference pages from different cases. Search for information and review the latest updates easily.'}
-                </p>
-                <div className="flex gap-3">
-                  <Button asChild className="bg-emerald-500 hover:bg-emerald-600 text-white h-12 px-8 rounded-xl font-bold shadow-lg shadow-emerald-500/20 border-0">
-                    <Link to="/dashboard/wiki/new">
-                      <Plus className="ms-2 h-5 w-5" />
-                      {isArabic ? 'صفحة جديدة' : 'New Page'}
-                    </Link>
-                  </Button>
-                  <Button className="bg-white text-slate-900 hover:bg-slate-100 h-12 px-8 rounded-xl font-bold shadow-lg border-0 transition-all hover:scale-105">
-                    <Settings className="ms-2 h-5 w-5" />
-                    {isArabic ? 'الإعدادات' : 'Settings'}
-                  </Button>
-                </div>
-              </div>
-              {/* Abstract Visual Decoration */}
-              <div className="hidden md:block relative w-64 h-64">
-                <div className="absolute inset-0 bg-gradient-to-tr from-emerald-500 to-blue-500 rounded-full opacity-20 blur-3xl animate-pulse"></div>
-                <div className="absolute inset-4 bg-navy rounded-2xl border border-white/10 flex items-center justify-center transform rotate-6 shadow-2xl">
-                  <BookOpen className="h-24 w-24 text-emerald-400" />
-                </div>
-                <div className="absolute inset-4 bg-navy/80 rounded-2xl border border-white/10 flex items-center justify-center transform -rotate-6 backdrop-blur-sm">
-                  <FileText className="h-24 w-24 text-blue-400" />
-                </div>
-              </div>
-            </div>
 
             {/* MAIN WIKI LIST */}
             <div className="bg-white rounded-3xl p-1 shadow-sm border border-slate-100">
@@ -353,6 +318,9 @@ export function WikiGlobalView() {
             </div>
 
           </div>
+
+          {/* LEFT COLUMN (Widgets) */}
+          <WikiSidebar recentPages={recentPages} isLoading={isLoading} />
         </div>
       </Main>
     </>

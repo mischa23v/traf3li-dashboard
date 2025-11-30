@@ -15,7 +15,8 @@ import {
   Lock,
   Shield,
   FolderOpen,
-  Filter
+  Filter,
+  Folder
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -43,7 +44,9 @@ import {
   SelectTrigger,
   SelectValue
 } from '@/components/ui/select'
-import { useWikiPages, useWikiCollections, useToggleWikiPagePin, useDeleteWikiPage } from '@/hooks/useWiki'
+import { useWikiPages, useWikiCollections, useToggleWikiPagePin, useDeleteWikiPage, useWikiStats } from '@/hooks/useWiki'
+import { StatCard } from '@/components/stat-card'
+import { ProductivityHero } from '@/components/productivity-hero'
 import { useCase } from '@/hooks/useCasesAndClients'
 import type { WikiPageType, WikiPageStatus } from '@/types/wiki'
 import {
@@ -72,6 +75,7 @@ export function WikiListView() {
     search: searchQuery || undefined
   })
   const { data: collections } = useWikiCollections(caseId)
+  const { data: stats } = useWikiStats(caseId)
 
   // Mutations
   const togglePinMutation = useToggleWikiPagePin()
@@ -157,49 +161,8 @@ export function WikiListView() {
 
       <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-r border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
 
-        {/* HERO CARD */}
-        <div className="bg-navy rounded-3xl p-8 relative overflow-hidden text-white shadow-xl shadow-navy/20 flex flex-col md:flex-row items-center justify-between gap-8 group">
-          <div className="absolute -bottom-32 -left-32 w-96 h-96 bg-brand-blue rounded-full blur-[120px] opacity-40 group-hover:opacity-50 transition-opacity duration-700"></div>
-          <div className="relative z-10 max-w-lg">
-            <div className="flex items-center gap-2 mb-2">
-              <Badge className="bg-blue-500/20 text-blue-100 hover:bg-blue-500/30 border-0 px-3 py-1">
-                <BookOpen className="w-3 h-3 ml-2" />
-                {isArabic ? 'الموسوعة القانونية' : 'Legal Wiki'}
-              </Badge>
-              <span className="text-slate-400 text-sm">
-                {caseName}
-              </span>
-            </div>
-            <h2 className="text-3xl font-bold mb-4 leading-tight">
-              {t('wiki.title')}
-            </h2>
-            <p className="text-blue-200 text-lg mb-8 leading-relaxed">
-              {t('wiki.description')}
-            </p>
-            <div className="flex gap-3">
-              <Button asChild className="bg-emerald-500 hover:bg-emerald-600 text-white h-12 px-8 rounded-xl font-bold shadow-lg shadow-emerald-500/20 border-0">
-                <Link to={`/dashboard/cases/${caseId}/wiki/new` as any}>
-                  <Plus className="me-2 h-5 w-5" />
-                  {t('wiki.newPage')}
-                </Link>
-              </Button>
-              <Button className="bg-white text-slate-900 hover:bg-slate-100 h-12 px-8 rounded-xl font-bold shadow-lg border-0 transition-all hover:scale-105">
-                <FolderOpen className="me-2 h-5 w-5" />
-                {t('wiki.newCollection')}
-              </Button>
-            </div>
-          </div>
-          {/* Abstract Visual Decoration */}
-          <div className="hidden md:block relative w-64 h-64">
-            <div className="absolute inset-0 bg-gradient-to-tr from-emerald-500 to-blue-500 rounded-full opacity-20 blur-3xl animate-pulse"></div>
-            <div className="absolute inset-4 bg-navy rounded-2xl border border-white/10 flex items-center justify-center transform rotate-6 shadow-2xl">
-              <BookOpen className="h-24 w-24 text-emerald-400" />
-            </div>
-            <div className="absolute inset-4 bg-navy/80 rounded-2xl border border-white/10 flex items-center justify-center transform -rotate-6 backdrop-blur-sm">
-              <FileText className="h-24 w-24 text-blue-400" />
-            </div>
-          </div>
-        </div>
+        {/* HERO CARD & STATS */}
+        <ProductivityHero badge="الموسوعة القانونية" title="الموسوعة القانونية" type="wiki" />
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
 

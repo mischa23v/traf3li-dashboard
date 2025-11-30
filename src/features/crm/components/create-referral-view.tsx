@@ -29,6 +29,7 @@ import { DynamicIsland } from '@/components/dynamic-island'
 import { Main } from '@/components/layout/main'
 import { Link, useNavigate } from '@tanstack/react-router'
 import { CrmSidebar } from './crm-sidebar'
+import { ProductivityHero } from '@/components/productivity-hero'
 import { useCreateReferral } from '@/hooks/useCrm'
 import type { ReferralType, ReferralStatus, FeeType } from '@/types/crm'
 
@@ -173,31 +174,13 @@ export function CreateReferralView() {
           <div className="lg:col-span-2 space-y-8">
 
             {/* HERO CARD */}
-            <div className="bg-purple-950 rounded-3xl p-8 relative overflow-hidden text-white shadow-xl shadow-purple-900/20 flex flex-col md:flex-row items-center justify-between gap-8">
-              <div className="relative z-10 max-w-lg">
-                <div className="flex items-center gap-4 mb-4">
-                  <Link to="/dashboard/crm/referrals">
-                    <Button variant="ghost" size="icon" className="rounded-full bg-white/10 hover:bg-white/20 text-white">
-                      <ArrowRight className="w-5 h-5" />
-                    </Button>
-                  </Link>
-                  <h2 className="text-3xl font-bold leading-tight">إضافة مصدر إحالة جديد</h2>
-                </div>
-                <p className="text-purple-200 text-lg mb-8 leading-relaxed">
-                  سجل مصدر إحالة جديد لتتبع العملاء المحالين وإدارة اتفاقيات العمولة.
-                </p>
-              </div>
-              {/* Abstract Visual Decoration */}
-              <div className="hidden md:block relative w-64 h-64">
-                <div className="absolute inset-0 bg-gradient-to-tr from-purple-500 to-pink-500 rounded-full opacity-20 blur-3xl animate-pulse"></div>
-                <div className="absolute inset-4 bg-purple-950 rounded-2xl border border-white/10 flex items-center justify-center transform rotate-6 shadow-2xl">
-                  <LinkIcon className="h-24 w-24 text-purple-400" />
-                </div>
-                <div className="absolute inset-4 bg-purple-950/80 rounded-2xl border border-white/10 flex items-center justify-center transform -rotate-6 backdrop-blur-sm">
-                  <Users className="h-24 w-24 text-pink-400" />
-                </div>
-              </div>
-            </div>
+            <ProductivityHero badge="إدارة مصادر الإحالة" title="إضافة مصدر إحالة جديد" type="referrals" hideButtons={true}>
+              <Link to="/dashboard/crm/referrals">
+                <Button variant="ghost" size="icon" className="rounded-full bg-white/10 hover:bg-white/20 text-white">
+                  <ArrowRight className="w-5 h-5" />
+                </Button>
+              </Link>
+            </ProductivityHero>
 
             {/* Form Card */}
             <div className="bg-white rounded-3xl p-8 shadow-sm border border-slate-100">

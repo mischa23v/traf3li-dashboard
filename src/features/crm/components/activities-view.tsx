@@ -30,6 +30,7 @@ import type { CrmActivity, ActivityType } from '@/types/crm'
 import { formatDistanceToNow, format } from 'date-fns'
 import { ar } from 'date-fns/locale'
 import { CrmSidebar } from './crm-sidebar'
+import { ProductivityHero } from '@/components/productivity-hero'
 
 const activityIcons: Record<ActivityType, React.ReactNode> = {
   call: <Phone className="h-5 w-5" />,
@@ -169,20 +170,14 @@ export function ActivitiesView() {
         className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-r border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']"
       >
         {/* Header */}
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <div>
-            <h2 className="text-2xl font-bold text-navy">سجل الأنشطة</h2>
-            <p className="text-slate-500">
-              جميع الأنشطة والتفاعلات مع العملاء المحتملين
-            </p>
-          </div>
+        <ProductivityHero badge="سجل الأنشطة" title="سجل الأنشطة" type="activities" hideButtons={true}>
           <div className="flex items-center gap-3">
-            <Button variant="outline" className="rounded-xl">
+            <Button variant="outline" className="rounded-xl border-white/10 text-white hover:bg-white/10 hover:text-white backdrop-blur-sm">
               <Filter className="ml-2 h-4 w-4" />
               تصفية
             </Button>
           </div>
-        </div>
+        </ProductivityHero>
 
         {/* Stats Cards */}
         {stats && (
@@ -314,18 +309,16 @@ export function ActivitiesView() {
                       {dayActivities.map((activity: CrmActivity) => (
                         <div
                           key={activity._id}
-                          className={`p-4 rounded-xl border-r-4 bg-slate-50 hover:bg-slate-100 transition-colors ${
-                            activityColors[activity.type]?.split(' ')[2] ||
+                          className={`p-4 rounded-xl border-r-4 bg-slate-50 hover:bg-slate-100 transition-colors ${activityColors[activity.type]?.split(' ')[2] ||
                             'border-slate-200'
-                          }`}
+                            }`}
                         >
                           <div className="flex items-start gap-4">
                             {/* Icon */}
                             <div
-                              className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                                activityColors[activity.type]?.split(' ').slice(0, 2).join(' ') ||
+                              className={`w-10 h-10 rounded-full flex items-center justify-center ${activityColors[activity.type]?.split(' ').slice(0, 2).join(' ') ||
                                 'bg-slate-100 text-slate-600'
-                              }`}
+                                }`}
                             >
                               {activityIcons[activity.type]}
                             </div>

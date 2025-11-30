@@ -30,6 +30,7 @@ import {
 } from 'lucide-react'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useLead, useDeleteLead, useConvertLead, useUpdateLeadStatus, useScheduleFollowUp } from '@/hooks/useCrm'
+import { ProductivityHero } from '@/components/productivity-hero'
 import { useParams, useNavigate } from '@tanstack/react-router'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -288,170 +289,83 @@ export function LeadDetailsView() {
         {!isLoading && !isError && lead && (
           <>
             {/* Lead Hero Content */}
-            <div className="max-w-[1600px] mx-auto bg-emerald-950 rounded-3xl p-8 shadow-xl shadow-emerald-900/20 mb-8 relative overflow-hidden">
-              {/* Background Decoration */}
-              <div className="absolute top-0 left-0 w-full h-full overflow-hidden z-0 pointer-events-none">
-                <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-emerald-500/10 rounded-full blur-[100px]"></div>
-                <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-blue-500/10 rounded-full blur-[100px]"></div>
-              </div>
-
-              <div className="relative z-10 flex flex-col lg:flex-row gap-8 items-start justify-between text-white">
-                {/* Main Info */}
-                <div className="flex-1">
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="bg-white/10 p-2 rounded-xl backdrop-blur-md border border-white/10 text-emerald-400">
-                      <Users className="h-6 w-6" />
-                    </div>
-                    <Badge
-                      className={`${statusColors[lead.status]} border-0 rounded-lg px-3 py-1`}
-                    >
-                      {statusLabels[lead.status]}
-                    </Badge>
-                    <Badge
-                      variant="outline"
-                      className="border-emerald-500/30 text-emerald-300 bg-emerald-500/10"
-                    >
-                      {lead.leadId}
-                    </Badge>
-                  </div>
-                  <h1 className="text-3xl font-bold mb-4 leading-tight text-white">
-                    {lead.displayName}
-                  </h1>
-                  <div className="flex flex-wrap gap-6 text-sm text-slate-300">
-                    {lead.phone && (
-                      <div className="flex items-center gap-2">
-                        <Phone className="h-4 w-4 text-emerald-400" />
-                        <span dir="ltr">{lead.phone}</span>
-                      </div>
-                    )}
-                    {lead.email && (
-                      <div className="flex items-center gap-2">
-                        <Mail className="h-4 w-4 text-emerald-400" />
-                        <span>{lead.email}</span>
-                      </div>
-                    )}
-                    {lead.source?.type && (
-                      <div className="flex items-center gap-2">
-                        <Target className="h-4 w-4 text-emerald-400" />
-                        <span>
-                          المصدر:{' '}
-                          <span className="text-white font-medium">
-                            {sourceLabels[lead.source.type] || lead.source.type}
-                          </span>
-                        </span>
-                      </div>
-                    )}
-                    {lead.estimatedValue > 0 && (
-                      <div className="flex items-center gap-2">
-                        <DollarSign className="h-4 w-4 text-emerald-400" />
-                        <span className="text-emerald-200 font-bold">
-                          {lead.estimatedValue.toLocaleString('ar-SA')} ر.س
-                        </span>
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                {/* Actions & Status */}
-                <div className="flex flex-col gap-4 min-w-[280px]">
-                  <div className="flex gap-3">
-                    <Link to={`/dashboard/crm/leads/${leadId}/edit`}>
-                      <Button
-                        variant="outline"
-                        className="border-white/10 text-white hover:bg-white/10 hover:text-white backdrop-blur-sm"
-                      >
-                        <Edit3 className="h-4 w-4 ml-2" />
-                        تعديل
-                      </Button>
-                    </Link>
+            <ProductivityHero badge="العملاء المحتملين" title={lead.displayName} type="leads" hideButtons={true}>
+              <div className="flex flex-wrap gap-3">
+                <Link to={`/dashboard/crm/leads/${leadId}/edit`}>
+                  <Button
+                    variant="outline"
+                    className="border-white/10 text-white hover:bg-white/10 hover:text-white backdrop-blur-sm"
+                  >
+                    <Edit3 className="h-4 w-4 ml-2" />
+                    تعديل
+                  </Button>
+                </Link>
+                <Button
+                  onClick={handleConvert}
+                  disabled={
+                    convertLeadMutation.isPending || lead.convertedToClient
+                  }
+                  className="bg-emerald-500 hover:bg-emerald-600 text-white shadow-lg border-0"
+                >
+                  {convertLeadMutation.isPending ? (
+                    <Loader2 className="h-4 w-4 animate-spin ml-2" />
+                  ) : (
+                    <ArrowUpRight className="h-4 w-4 ml-2" />
+                  )}
+                  {lead.convertedToClient ? 'تم التحويل' : 'تحويل لعميل'}
+                </Button>
+                <Select
+                  value={lead.status}
+                  onValueChange={(value) =>
+                    handleStatusChange(value as LeadStatus)
+                  }
+                >
+                  <SelectTrigger className="w-[180px] border-white/10 bg-white/5 text-white">
+                    <SelectValue placeholder="تغيير الحالة" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {Object.entries(statusLabels).map(([value, label]) => (
+                      <SelectItem key={value} value={value}>
+                        {label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {!showDeleteConfirm ? (
+                  <Button
+                    variant="outline"
+                    onClick={() => setShowDeleteConfirm(true)}
+                    className="border-red-500/30 text-red-300 hover:bg-red-500/20 hover:text-red-200 backdrop-blur-sm"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                ) : (
+                  <div className="flex gap-2">
                     <Button
-                      onClick={handleConvert}
-                      disabled={
-                        convertLeadMutation.isPending || lead.convertedToClient
-                      }
-                      className="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white shadow-lg border-0"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setShowDeleteConfirm(false)}
+                      className="border-white/10 text-white hover:bg-white/10"
                     >
-                      {convertLeadMutation.isPending ? (
-                        <Loader2 className="h-4 w-4 animate-spin ml-2" />
+                      إلغاء
+                    </Button>
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      onClick={handleDelete}
+                      disabled={deleteLeadMutation.isPending}
+                      className="bg-red-500 hover:bg-red-600"
+                    >
+                      {deleteLeadMutation.isPending ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
                       ) : (
-                        <ArrowUpRight className="h-4 w-4 ml-2" />
+                        'تأكيد'
                       )}
-                      {lead.convertedToClient ? 'تم التحويل' : 'تحويل لعميل'}
                     </Button>
                   </div>
-                  <div className="flex gap-3">
-                    <Select
-                      value={lead.status}
-                      onValueChange={(value) =>
-                        handleStatusChange(value as LeadStatus)
-                      }
-                    >
-                      <SelectTrigger className="flex-1 border-white/10 bg-white/5 text-white">
-                        <SelectValue placeholder="تغيير الحالة" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {Object.entries(statusLabels).map(([value, label]) => (
-                          <SelectItem key={value} value={value}>
-                            {label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    {!showDeleteConfirm ? (
-                      <Button
-                        variant="outline"
-                        onClick={() => setShowDeleteConfirm(true)}
-                        className="border-red-500/30 text-red-300 hover:bg-red-500/20 hover:text-red-200 backdrop-blur-sm"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    ) : (
-                      <div className="flex gap-2">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => setShowDeleteConfirm(false)}
-                          className="border-white/10 text-white hover:bg-white/10"
-                        >
-                          إلغاء
-                        </Button>
-                        <Button
-                          variant="destructive"
-                          size="sm"
-                          onClick={handleDelete}
-                          disabled={deleteLeadMutation.isPending}
-                          className="bg-red-500 hover:bg-red-600"
-                        >
-                          {deleteLeadMutation.isPending ? (
-                            <Loader2 className="h-4 w-4 animate-spin" />
-                          ) : (
-                            'تأكيد'
-                          )}
-                        </Button>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Qualification Score */}
-                  {lead.qualification?.score && (
-                    <div className="bg-white/5 rounded-2xl p-4 border border-white/10 backdrop-blur-sm">
-                      <div className="flex justify-between items-center mb-2">
-                        <span className="text-sm text-slate-300">
-                          نقاط التأهيل
-                        </span>
-                        <span className="text-lg font-bold text-emerald-400">
-                          {lead.qualification.score}%
-                        </span>
-                      </div>
-                      <Progress
-                        value={lead.qualification.score}
-                        className="h-2 bg-white/10"
-                      />
-                    </div>
-                  )}
-                </div>
+                )}
               </div>
-            </div>
+            </ProductivityHero>
 
             {/* MAIN CONTENT GRID */}
             <div className="max-w-[1600px] mx-auto pb-12">
@@ -821,13 +735,13 @@ export function LeadDetailsView() {
                                   </p>
                                   <Badge className="bg-purple-100 text-purple-700">
                                     {lead.qualification?.authority ===
-                                    'decision_maker'
+                                      'decision_maker'
                                       ? 'صانع قرار'
                                       : lead.qualification?.authority ===
-                                          'influencer'
+                                        'influencer'
                                         ? 'مؤثر'
                                         : lead.qualification?.authority ===
-                                            'researcher'
+                                          'researcher'
                                           ? 'باحث'
                                           : 'غير محدد'}
                                   </Badge>
@@ -854,13 +768,13 @@ export function LeadDetailsView() {
                                     {lead.qualification?.timeline === 'immediate'
                                       ? 'فوري'
                                       : lead.qualification?.timeline ===
-                                          'this_month'
+                                        'this_month'
                                         ? 'هذا الشهر'
                                         : lead.qualification?.timeline ===
-                                            'this_quarter'
+                                          'this_quarter'
                                           ? 'هذا الربع'
                                           : lead.qualification?.timeline ===
-                                              'this_year'
+                                            'this_year'
                                             ? 'هذا العام'
                                             : 'غير محدد'}
                                   </Badge>

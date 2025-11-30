@@ -1,17 +1,5 @@
 import { TasksSidebar } from './tasks-sidebar'
 import { useState, useMemo } from 'react'
-import {
-    MoreHorizontal, Plus,
-    Briefcase, Smartphone, Shield,
-    ChevronLeft, Search, Bell, AlertCircle
-} from 'lucide-react'
-import { Skeleton } from '@/components/ui/skeleton'
-import { useTasks, useBulkDeleteTasks } from '@/hooks/useTasks'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import { Header } from '@/components/layout/header'
-import { TopNav } from '@/components/layout/top-nav'
-import { DynamicIsland } from '@/components/dynamic-island'
 import { Main } from '@/components/layout/main'
 import { LanguageSwitcher } from '@/components/language-switcher'
 import { ThemeSwitch } from '@/components/theme-switch'
@@ -20,6 +8,15 @@ import { ProfileDropdown } from '@/components/profile-dropdown'
 import { Link } from '@tanstack/react-router'
 import { Checkbox } from '@/components/ui/checkbox'
 import { toast } from 'sonner'
+import { ProductivityHero } from '@/components/productivity-hero'
+import { useTasks, useTaskStats, useBulkDeleteTasks } from '@/hooks/useTasks'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { Skeleton } from '@/components/ui/skeleton'
+import { Header } from '@/components/layout/header'
+import { TopNav } from '@/components/layout/top-nav'
+import { DynamicIsland } from '@/components/dynamic-island'
+import { Search, Bell, AlertCircle, Briefcase, Plus, MoreHorizontal, ChevronLeft } from 'lucide-react'
 
 export function TasksListView() {
     const [activeStatusTab, setActiveStatusTab] = useState('active')
@@ -39,6 +36,7 @@ export function TasksListView() {
 
     // Fetch tasks
     const { data: tasksData, isLoading, isError, error, refetch } = useTasks(filters)
+    const { data: stats } = useTaskStats()
     const { mutate: bulkDeleteTasks } = useBulkDeleteTasks()
 
     // Transform API data
@@ -121,37 +119,8 @@ export function TasksListView() {
 
             <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-r border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
 
-                {/* HERO CARD (Matches "App Promo" style) */}
-                <div className="bg-[#022c22] rounded-3xl p-8 relative overflow-hidden text-white shadow-xl shadow-emerald-900/20 flex flex-col md:flex-row items-center justify-between gap-8">
-                    <div className="relative z-10 max-w-lg">
-                        <h2 className="text-3xl font-bold mb-4 leading-tight">المساعد الذكي للمهام القانونية بين يديك</h2>
-                        <p className="text-emerald-200 text-lg mb-8 leading-relaxed">
-                            قم بإدارة قضاياك، تابع المواعيد النهائية، واحصل على تحليلات ذكية لأدائك المهني في مكان واحد.
-                        </p>
-                        <div className="flex gap-3">
-                            <Button asChild className="bg-emerald-500 hover:bg-emerald-600 text-white h-12 px-8 rounded-xl font-bold shadow-lg shadow-emerald-500/20 border-0">
-                                <Link to="/dashboard/tasks/new">
-                                    <Plus className="ml-2 h-5 w-5" />
-                                    مهمة جديدة
-                                </Link>
-                            </Button>
-                            <Button className="bg-white text-slate-900 hover:bg-slate-100 h-12 px-8 rounded-xl font-bold shadow-lg border-0 transition-all hover:scale-105">
-                                <Smartphone className="ml-2 h-5 w-5" />
-                                تحميل التطبيق
-                            </Button>
-                        </div>
-                    </div>
-                    {/* Abstract Visual Decoration */}
-                    <div className="hidden md:block relative w-64 h-64">
-                        <div className="absolute inset-0 bg-gradient-to-tr from-emerald-500 to-teal-500 rounded-full opacity-20 blur-3xl animate-pulse"></div>
-                        <div className="absolute inset-4 bg-emerald-950 rounded-2xl border border-white/10 flex items-center justify-center transform rotate-6 shadow-2xl">
-                            <Shield className="h-24 w-24 text-emerald-400" />
-                        </div>
-                        <div className="absolute inset-4 bg-emerald-950/80 rounded-2xl border border-white/10 flex items-center justify-center transform -rotate-6 backdrop-blur-sm">
-                            <Briefcase className="h-24 w-24 text-teal-400" />
-                        </div>
-                    </div>
-                </div>
+                {/* HERO CARD & STATS */}
+                <ProductivityHero badge="إدارة المهام" title="المهام" type="tasks" />
 
                 {/* MAIN GRID LAYOUT */}
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -295,7 +264,6 @@ export function TasksListView() {
                                 </Button>
                             </div>
                         </div>
-
                     </div>
 
                     {/* LEFT COLUMN (Widgets) */}

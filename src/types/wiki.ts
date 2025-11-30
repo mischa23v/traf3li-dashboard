@@ -121,13 +121,13 @@ export interface WikiAttachment {
   fileType: string
   fileSize: number
   uploadedBy:
-    | string
-    | {
-        _id: string
-        firstName: string
-        lastName: string
-        avatar?: string
-      }
+  | string
+  | {
+    _id: string
+    firstName: string
+    lastName: string
+    avatar?: string
+  }
   uploadedAt: string
   isSealed: boolean
   isConfidential: boolean
@@ -261,11 +261,11 @@ export interface WikiPage {
   // Collaborators
   collaborators?: WikiCollaborator[]
   createdBy:
-    | string
-    | { _id: string; firstName: string; lastName: string; avatar?: string }
+  | string
+  | { _id: string; firstName: string; lastName: string; avatar?: string }
   lastModifiedBy?:
-    | string
-    | { _id: string; firstName: string; lastName: string; avatar?: string }
+  | string
+  | { _id: string; firstName: string; lastName: string; avatar?: string }
 
   // Metadata
   viewCount: number
@@ -455,8 +455,8 @@ export interface WikiRevision {
 
   // Author & Audit
   createdBy:
-    | string
-    | { _id: string; firstName: string; lastName: string; avatar?: string }
+  | string
+  | { _id: string; firstName: string; lastName: string; avatar?: string }
   ipAddress?: string
   userAgent?: string
   createdAt: string
@@ -512,8 +512,8 @@ export interface WikiComment {
 
   // Author
   userId:
-    | string
-    | { _id: string; firstName: string; lastName: string; avatar?: string }
+  | string
+  | { _id: string; firstName: string; lastName: string; avatar?: string }
 
   // Mentions
   mentions?: string[]
@@ -603,6 +603,16 @@ export interface WikiRevisionStats {
   lastRevision: string | null
 }
 
+export interface WikiStats {
+  total: number
+  byStatus: Record<WikiPageStatus, number>
+  byType: Record<WikiPageType, number>
+  pinned: number
+  sealed: number
+  confidential: number
+  recentlyUpdated: number
+}
+
 // ═══════════════════════════════════════════════════════════════
 // FORM TYPES
 // ═══════════════════════════════════════════════════════════════
@@ -672,7 +682,7 @@ export interface CreateWikiCollectionInput {
 }
 
 export interface UpdateWikiCollectionInput
-  extends Partial<CreateWikiCollectionInput> {}
+  extends Partial<CreateWikiCollectionInput> { }
 
 // ═══════════════════════════════════════════════════════════════
 // STANDALONE FOLDER FORM TYPES
@@ -693,7 +703,7 @@ export interface CreateWikiFolderInput {
 }
 
 export interface UpdateWikiFolderInput
-  extends Partial<CreateWikiFolderInput> {}
+  extends Partial<CreateWikiFolderInput> { }
 
 export interface CreateWikiCommentInput {
   content: string
@@ -796,8 +806,8 @@ export interface WikiVoiceMemo {
 
   // Recording info
   recordedBy:
-    | string
-    | { _id: string; firstName: string; lastName: string; avatar?: string }
+  | string
+  | { _id: string; firstName: string; lastName: string; avatar?: string }
   recordedAt: string
 
   // Metadata

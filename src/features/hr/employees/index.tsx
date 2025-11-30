@@ -22,6 +22,7 @@ import { useEmployees, useBulkDeleteEmployees, useEmployeeStats } from '@/hooks/
 import { Employee } from '@/types/hr'
 import { cn } from '@/lib/utils'
 import { toast } from '@/hooks/use-toast'
+import { ProductivityHero } from '@/components/productivity-hero'
 
 const routeApi = getRouteApi('/_authenticated/dashboard/hr/employees')
 
@@ -269,28 +270,40 @@ export function EmployeesPage() {
             <Main className="bg-[#f8f9fa] min-h-screen">
                 <div className="bg-[#022c22] rounded-tr-3xl min-h-screen -mt-4 -mr-4 -ml-4 p-6">
                     {/* Hero Card */}
-                    <div className="bg-emerald-950 rounded-3xl p-8 relative overflow-hidden text-white shadow-xl shadow-emerald-900/20">
-                        {/* Gradient effects */}
-                        <div className="absolute inset-0 bg-gradient-to-br from-emerald-900/50 via-transparent to-teal-900/30" />
-                        <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl" />
-                        <div className="absolute bottom-0 left-0 w-64 h-64 bg-teal-500/10 rounded-full blur-2xl" />
-
-                        <div className="relative z-10">
-                            {/* Back button and title */}
-                            <div className="flex items-center gap-4 mb-4">
-                                <Link to="/dashboard">
-                                    <Button variant="ghost" size="icon" className="rounded-full bg-white/10 hover:bg-white/20 text-white">
-                                        <ArrowRight className="w-5 h-5" />
-                                    </Button>
-                                </Link>
-                                <div>
-                                    <h2 className="text-3xl font-bold leading-tight">الموظفين</h2>
-                                    <p className="text-white/60 mt-1">إدارة بيانات الموظفين</p>
-                                </div>
-                            </div>
-
-                            {/* Search and filters */}
-                            <div className="flex flex-wrap items-center gap-3 mt-6">
+                    <ProductivityHero
+                        badge="الموارد البشرية"
+                        title="الموظفين"
+                        type="hr"
+                        hideButtons={true}
+                        stats={[
+                            {
+                                label: "إجمالي الموظفين",
+                                value: stats?.total || defaultStats.total,
+                                icon: <Users className="w-4 h-4 text-emerald-400" />,
+                                status: 'normal'
+                            },
+                            {
+                                label: "موظف نشط",
+                                value: stats?.active || defaultStats.active,
+                                icon: <Briefcase className="w-4 h-4 text-blue-400" />,
+                                status: 'normal'
+                            },
+                            {
+                                label: "في إجازة",
+                                value: stats?.onLeave || defaultStats.onLeave,
+                                icon: <Building2 className="w-4 h-4 text-amber-400" />,
+                                status: 'normal'
+                            },
+                            {
+                                label: "جديد هذا الشهر",
+                                value: stats?.newThisMonth || defaultStats.newThisMonth,
+                                icon: <UserPlus className="w-4 h-4 text-purple-400" />,
+                                status: 'normal'
+                            }
+                        ]}
+                    >
+                        <div className="flex flex-col gap-4 w-full">
+                            <div className="flex flex-wrap items-center gap-3">
                                 <div className="relative flex-1 min-w-[200px] max-w-md">
                                     <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-white/40" />
                                     <input
@@ -330,11 +343,8 @@ export function EmployeesPage() {
                                     </Button>
                                 </Link>
                             </div>
-
-                            {/* Stats */}
-                            <EmployeeStats stats={stats || defaultStats} />
                         </div>
-                    </div>
+                    </ProductivityHero>
 
                     {/* Main content grid */}
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">

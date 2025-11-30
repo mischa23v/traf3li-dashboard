@@ -29,6 +29,7 @@ import { DynamicIsland } from '@/components/dynamic-island'
 import { Main } from '@/components/layout/main'
 import { Link, useNavigate } from '@tanstack/react-router'
 import { TasksSidebar } from './tasks-sidebar'
+import { ProductivityHero } from '@/components/productivity-hero'
 import { useCreateEvent } from '@/hooks/useRemindersAndEvents'
 import { useClients, useCases, useTeamMembers } from '@/hooks/useCasesAndClients'
 import { cn } from '@/lib/utils'
@@ -379,31 +380,7 @@ export function CreateEventView() {
                     <div className="lg:col-span-2 space-y-8">
 
                         {/* HERO CARD */}
-                        <div className="bg-blue-900 rounded-3xl p-8 relative overflow-hidden text-white shadow-xl shadow-blue-900/20 flex flex-col md:flex-row items-center justify-between gap-8">
-                            <div className="relative z-10 max-w-lg">
-                                <div className="flex items-center gap-4 mb-4">
-                                    <Link to="/dashboard/tasks/events">
-                                        <Button variant="ghost" size="icon" className="rounded-full bg-white/10 hover:bg-white/20 text-white">
-                                            <ArrowRight className="w-5 h-5" />
-                                        </Button>
-                                    </Link>
-                                    <h2 className="text-3xl font-bold leading-tight">إضافة حدث جديد</h2>
-                                </div>
-                                <p className="text-blue-200 text-lg mb-8 leading-relaxed">
-                                    أضف فعالية جديدة إلى جدولك، حدد المشاركين، وأرسل الدعوات تلقائياً.
-                                </p>
-                            </div>
-                            {/* Abstract Visual Decoration */}
-                            <div className="hidden md:block relative w-64 h-64">
-                                <div className="absolute inset-0 bg-gradient-to-tr from-blue-500 to-indigo-500 rounded-full opacity-20 blur-3xl animate-pulse"></div>
-                                <div className="absolute inset-4 bg-blue-900 rounded-2xl border border-white/10 flex items-center justify-center transform rotate-6 shadow-2xl">
-                                    <Calendar className="h-24 w-24 text-blue-400" />
-                                </div>
-                                <div className="absolute inset-4 bg-blue-900/80 rounded-2xl border border-white/10 flex items-center justify-center transform -rotate-6 backdrop-blur-sm">
-                                    <Clock className="h-24 w-24 text-indigo-400" />
-                                </div>
-                            </div>
-                        </div>
+                        <ProductivityHero badge="الأحداث" title="إضافة حدث جديد" type="events" hideButtons={true} />
 
                         {/* Form Card */}
                         <div className="bg-white rounded-3xl p-8 shadow-sm border border-slate-100">

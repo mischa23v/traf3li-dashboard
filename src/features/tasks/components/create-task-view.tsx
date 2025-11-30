@@ -28,6 +28,7 @@ import { DynamicIsland } from '@/components/dynamic-island'
 import { Main } from '@/components/layout/main'
 import { Link, useNavigate } from '@tanstack/react-router'
 import { TasksSidebar } from './tasks-sidebar'
+import { ProductivityHero } from '@/components/productivity-hero'
 import { useCreateTask, useTaskTemplates, useCreateFromTemplate } from '@/hooks/useTasks'
 import { useClients, useCases, useTeamMembers } from '@/hooks/useCasesAndClients'
 import { cn } from '@/lib/utils'
@@ -295,31 +296,7 @@ export function CreateTaskView() {
                     <div className="lg:col-span-2 space-y-8">
 
                         {/* HERO CARD */}
-                        <div className="bg-emerald-950 rounded-3xl p-8 relative overflow-hidden text-white shadow-xl shadow-emerald-900/20 flex flex-col md:flex-row items-center justify-between gap-8">
-                            <div className="relative z-10 max-w-lg">
-                                <div className="flex items-center gap-4 mb-4">
-                                    <Link to="/dashboard/tasks/list">
-                                        <Button variant="ghost" size="icon" className="rounded-full bg-white/10 hover:bg-white/20 text-white">
-                                            <ArrowRight className="w-5 h-5" />
-                                        </Button>
-                                    </Link>
-                                    <h2 className="text-3xl font-bold leading-tight">إنشاء مهمة جديدة</h2>
-                                </div>
-                                <p className="text-emerald-200 text-lg mb-8 leading-relaxed">
-                                    أدخل تفاصيل المهمة الجديدة لإضافتها إلى النظام ومتابعتها مع الفريق.
-                                </p>
-                            </div>
-                            {/* Abstract Visual Decoration */}
-                            <div className="hidden md:block relative w-64 h-64">
-                                <div className="absolute inset-0 bg-gradient-to-tr from-emerald-500 to-teal-500 rounded-full opacity-20 blur-3xl animate-pulse"></div>
-                                <div className="absolute inset-4 bg-emerald-950 rounded-2xl border border-white/10 flex items-center justify-center transform rotate-6 shadow-2xl">
-                                    <FileText className="h-24 w-24 text-emerald-400" />
-                                </div>
-                                <div className="absolute inset-4 bg-emerald-950/80 rounded-2xl border border-white/10 flex items-center justify-center transform -rotate-6 backdrop-blur-sm">
-                                    <Briefcase className="h-24 w-24 text-teal-400" />
-                                </div>
-                            </div>
-                        </div>
+                        <ProductivityHero badge="إدارة المهام" title="إنشاء مهمة جديدة" type="tasks" hideButtons={true} />
 
                         {/* Templates Section */}
                         {templates && templates.length > 0 && (

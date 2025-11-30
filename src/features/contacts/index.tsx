@@ -18,6 +18,7 @@ import { Button } from '@/components/ui/button'
 import { Search, Bell, Users, Plus } from 'lucide-react'
 import { PracticeSidebar } from '@/features/cases/components/practice-sidebar'
 import { Badge } from '@/components/ui/badge'
+import { ProductivityHero } from '@/components/productivity-hero'
 
 const route = getRouteApi('/_authenticated/dashboard/contacts/')
 
@@ -80,29 +81,9 @@ export function Contacts() {
         className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-r border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']"
       >
         {/* HERO BANNER */}
-        <div className="bg-navy rounded-3xl p-8 relative overflow-hidden text-white shadow-xl shadow-navy/20 group">
-          <div className="absolute -bottom-32 -left-32 w-96 h-96 bg-brand-blue rounded-full blur-[120px] opacity-40 group-hover:opacity-50 transition-opacity duration-700"></div>
-          <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
-            <div>
-              <div className="flex items-center gap-2 mb-2">
-                <Badge className="bg-blue-500/20 text-blue-100 hover:bg-blue-500/30 border-0 px-3 py-1">
-                  <Users className="w-3 h-3 ml-2" />
-                  {isRTL ? 'إدارة العلاقات' : 'Relationship Management'}
-                </Badge>
-                <span className="text-slate-400 text-sm">
-                  {new Date().toLocaleDateString('ar-SA', { month: 'long', year: 'numeric' })}
-                </span>
-              </div>
-              <h1 className="text-4xl font-bold leading-tight mb-2">
-                {t('contacts.title')}
-              </h1>
-              <p className="text-slate-300 text-lg max-w-xl">
-                {t('contacts.description')}
-              </p>
-            </div>
-            <ContactsPrimaryButtons />
-          </div>
-        </div>
+        <ProductivityHero badge={isRTL ? 'إدارة العلاقات' : 'Relationship Management'} title={t('contacts.title')} type="contacts" hideButtons={true}>
+          <ContactsPrimaryButtons />
+        </ProductivityHero>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* --- Main Content --- */}

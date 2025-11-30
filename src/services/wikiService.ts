@@ -41,7 +41,8 @@ import type {
   ConfirmVoiceMemoInput,
   UpdateVoiceMemoInput,
   WikiExportFormat,
-  WikiExportResponse
+  WikiExportResponse,
+  WikiStats
 } from '@/types/wiki'
 
 // ═══════════════════════════════════════════════════════════════
@@ -80,6 +81,20 @@ export const wikiPageService = {
       const response = await apiClient.get<ApiResponse<WikiPage[]>>(
         `/cases/${caseId}/wiki`,
         { params }
+      )
+      return response.data.data
+    } catch (error) {
+      throw handleApiError(error)
+    }
+  },
+
+  /**
+   * Get wiki stats for a case
+   */
+  getStats: async (caseId: string): Promise<WikiStats> => {
+    try {
+      const response = await apiClient.get<ApiResponse<WikiStats>>(
+        `/cases/${caseId}/wiki/stats`
       )
       return response.data.data
     } catch (error) {

@@ -25,6 +25,7 @@ import {
 } from 'lucide-react'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useReferral, useDeleteReferral, useUpdateReferral, useRecordReferralPayment } from '@/hooks/useCrm'
+import { ProductivityHero } from '@/components/productivity-hero'
 import { useParams, useNavigate } from '@tanstack/react-router'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -240,142 +241,69 @@ export function ReferralDetailsView() {
         {!isLoading && !isError && referral && (
           <>
             {/* Referral Hero Content */}
-            <div className="max-w-[1600px] mx-auto bg-purple-950 rounded-3xl p-8 shadow-xl shadow-purple-900/20 mb-8 relative overflow-hidden">
-              {/* Background Decoration */}
-              <div className="absolute top-0 left-0 w-full h-full overflow-hidden z-0 pointer-events-none">
-                <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-purple-500/10 rounded-full blur-[100px]"></div>
-                <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-pink-500/10 rounded-full blur-[100px]"></div>
-              </div>
-
-              <div className="relative z-10 flex flex-col lg:flex-row gap-8 items-start justify-between text-white">
-                {/* Main Info */}
-                <div className="flex-1">
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="bg-white/10 p-2 rounded-xl backdrop-blur-md border border-white/10 text-purple-400">
-                      <LinkIcon className="h-6 w-6" />
-                    </div>
-                    <Badge
-                      className={`${statusColors[referral.status]} border-0 rounded-lg px-3 py-1`}
-                    >
-                      {statusLabels[referral.status]}
-                    </Badge>
-                    <Badge
+            <ProductivityHero badge="إدارة مصادر الإحالة" title={referral.nameAr || referral.name} type="referrals" hideButtons={true}>
+              <div className="flex flex-wrap gap-3">
+                <Link to={`/dashboard/crm/referrals/${referralId}/edit`}>
+                  <Button
+                    variant="outline"
+                    className="border-white/10 text-white hover:bg-white/10 hover:text-white backdrop-blur-sm"
+                  >
+                    <Edit3 className="h-4 w-4 ml-2" />
+                    تعديل
+                  </Button>
+                </Link>
+                <Select
+                  value={referral.status}
+                  onValueChange={(value) =>
+                    handleStatusChange(value as ReferralStatus)
+                  }
+                >
+                  <SelectTrigger className="w-[180px] border-white/10 bg-white/5 text-white">
+                    <SelectValue placeholder="تغيير الحالة" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {Object.entries(statusLabels).map(([value, label]) => (
+                      <SelectItem key={value} value={value}>
+                        {label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {!showDeleteConfirm ? (
+                  <Button
+                    variant="outline"
+                    onClick={() => setShowDeleteConfirm(true)}
+                    className="border-red-500/30 text-red-300 hover:bg-red-500/20 hover:text-red-200 backdrop-blur-sm"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                ) : (
+                  <div className="flex gap-2">
+                    <Button
                       variant="outline"
-                      className="border-purple-500/30 text-purple-300 bg-purple-500/10"
+                      size="sm"
+                      onClick={() => setShowDeleteConfirm(false)}
+                      className="border-white/10 text-white hover:bg-white/10"
                     >
-                      {typeLabels[referral.type]}
-                    </Badge>
-                    {referral.priority === 'vip' && (
-                      <Star className="h-5 w-5 text-yellow-400 fill-yellow-400" />
-                    )}
-                  </div>
-                  <h1 className="text-3xl font-bold mb-4 leading-tight text-white">
-                    {referral.nameAr || referral.name}
-                  </h1>
-                  <div className="flex flex-wrap gap-6 text-sm text-slate-300">
-                    {referral.externalSource?.phone && (
-                      <div className="flex items-center gap-2">
-                        <Phone className="h-4 w-4 text-purple-400" />
-                        <span dir="ltr">{referral.externalSource.phone}</span>
-                      </div>
-                    )}
-                    {referral.externalSource?.email && (
-                      <div className="flex items-center gap-2">
-                        <Mail className="h-4 w-4 text-purple-400" />
-                        <span>{referral.externalSource.email}</span>
-                      </div>
-                    )}
-                    {referral.externalSource?.company && (
-                      <div className="flex items-center gap-2">
-                        <Building className="h-4 w-4 text-purple-400" />
-                        <span>{referral.externalSource.company}</span>
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                {/* Actions & Stats */}
-                <div className="flex flex-col gap-4 min-w-[280px]">
-                  <div className="flex gap-3">
-                    <Link to={`/dashboard/crm/referrals/${referralId}/edit`}>
-                      <Button
-                        variant="outline"
-                        className="border-white/10 text-white hover:bg-white/10 hover:text-white backdrop-blur-sm"
-                      >
-                        <Edit3 className="h-4 w-4 ml-2" />
-                        تعديل
-                      </Button>
-                    </Link>
-                  </div>
-                  <div className="flex gap-3">
-                    <Select
-                      value={referral.status}
-                      onValueChange={(value) =>
-                        handleStatusChange(value as ReferralStatus)
-                      }
+                      إلغاء
+                    </Button>
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      onClick={handleDelete}
+                      disabled={deleteReferralMutation.isPending}
+                      className="bg-red-500 hover:bg-red-600"
                     >
-                      <SelectTrigger className="flex-1 border-white/10 bg-white/5 text-white">
-                        <SelectValue placeholder="تغيير الحالة" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {Object.entries(statusLabels).map(([value, label]) => (
-                          <SelectItem key={value} value={value}>
-                            {label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    {!showDeleteConfirm ? (
-                      <Button
-                        variant="outline"
-                        onClick={() => setShowDeleteConfirm(true)}
-                        className="border-red-500/30 text-red-300 hover:bg-red-500/20 hover:text-red-200 backdrop-blur-sm"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    ) : (
-                      <div className="flex gap-2">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => setShowDeleteConfirm(false)}
-                          className="border-white/10 text-white hover:bg-white/10"
-                        >
-                          إلغاء
-                        </Button>
-                        <Button
-                          variant="destructive"
-                          size="sm"
-                          onClick={handleDelete}
-                          disabled={deleteReferralMutation.isPending}
-                          className="bg-red-500 hover:bg-red-600"
-                        >
-                          {deleteReferralMutation.isPending ? (
-                            <Loader2 className="h-4 w-4 animate-spin" />
-                          ) : (
-                            'تأكيد'
-                          )}
-                        </Button>
-                      </div>
-                    )}
+                      {deleteReferralMutation.isPending ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        'تأكيد'
+                      )}
+                    </Button>
                   </div>
-
-                  {/* Conversion Rate */}
-                  <div className="bg-white/5 rounded-2xl p-4 border border-white/10 backdrop-blur-sm">
-                    <div className="flex justify-between items-center mb-2">
-                      <span className="text-sm text-slate-300">معدل التحويل</span>
-                      <span className="text-lg font-bold text-emerald-400">
-                        {referral.conversionRate}%
-                      </span>
-                    </div>
-                    <Progress
-                      value={parseFloat(referral.conversionRate) || 0}
-                      className="h-2 bg-white/10"
-                    />
-                  </div>
-                </div>
+                )}
               </div>
-            </div>
+            </ProductivityHero>
 
             {/* MAIN CONTENT GRID */}
             <div className="max-w-[1600px] mx-auto pb-12">

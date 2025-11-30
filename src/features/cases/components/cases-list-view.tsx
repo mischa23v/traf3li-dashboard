@@ -58,6 +58,7 @@ import {
 import { CreateCaseForm } from './create-case-form'
 import type { Case, CaseStatus, CaseCategory, CasePriority, ClientRef, LawyerRef } from '@/services/casesService'
 import { PracticeSidebar } from './practice-sidebar'
+import { ProductivityHero } from '@/components/productivity-hero'
 
 // Helper functions
 const getClientName = (c: Case): string => {
@@ -248,54 +249,27 @@ export function CasesListView() {
         className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-r border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']"
       >
         {/* HERO BANNER */}
-        <div className="bg-navy rounded-3xl p-8 relative overflow-hidden text-white shadow-xl shadow-navy/20 group">
-          <div className="absolute -bottom-32 -left-32 w-96 h-96 bg-brand-blue rounded-full blur-[120px] opacity-40 group-hover:opacity-50 transition-opacity duration-700"></div>
-          <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
-            <div>
-              <div className="flex items-center gap-2 mb-2">
-                <Badge className="bg-blue-500/20 text-blue-100 hover:bg-blue-500/30 border-0 px-3 py-1">
-                  <Scale className="w-3 h-3 ml-2" />
-                  {t('cases.management', 'إدارة القضايا')}
-                </Badge>
-                <span className="text-slate-400 text-sm">
-                  {new Date().toLocaleDateString('ar-SA', { month: 'long', year: 'numeric' })}
-                </span>
-              </div>
-              <h1 className="text-4xl font-bold leading-tight mb-2">
-                {t('cases.title', 'ملفات القضايا والمرافعات')}
-              </h1>
-              <p className="text-slate-300 text-lg max-w-xl">
-                {t('cases.subtitle', 'لديك')}{' '}
-                <span className="text-white font-bold border-b-2 border-brand-blue">
-                  {statistics.active} {t('cases.activeCases', 'قضايا نشطة')}
-                </span>{' '}
-                {t('cases.and', 'و')}{' '}
-                <span className="text-white font-bold border-b-2 border-orange-500">
-                  {statistics.highPriority} {t('cases.highPriority', 'عاجلة')}
-                </span>
-              </p>
-            </div>
-            <div className="flex gap-3">
-              <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-                <DialogTrigger asChild>
-                  <Button className="bg-brand-blue hover:bg-blue-600 text-white rounded-xl h-12 px-8 font-bold shadow-lg shadow-blue-600/30 hover:scale-105 transition-all duration-300 border-0 text-base">
-                    <Plus className="ml-2 h-5 w-5" />
-                    {t('cases.newCase', 'قضية جديدة')}
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-                  <DialogHeader>
-                    <DialogTitle>{t('cases.createNewCase', 'إنشاء قضية جديدة')}</DialogTitle>
-                    <DialogDescription>
-                      {t('cases.createDescription', 'أدخل بيانات القضية الجديدة')}
-                    </DialogDescription>
-                  </DialogHeader>
-                  <CreateCaseForm onSuccess={() => setIsCreateDialogOpen(false)} />
-                </DialogContent>
-              </Dialog>
-            </div>
+        <ProductivityHero badge={t('cases.management', 'إدارة القضايا')} title={t('cases.title', 'ملفات القضايا والمرافعات')} type="cases" hideButtons={true}>
+          <div className="flex gap-3">
+            <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+              <DialogTrigger asChild>
+                <Button className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl h-10 px-5 font-bold shadow-lg shadow-emerald-500/20 border-0 text-sm">
+                  <Plus className="ml-2 h-4 w-4" />
+                  {t('cases.newCase', 'قضية جديدة')}
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+                <DialogHeader>
+                  <DialogTitle>{t('cases.createNewCase', 'إنشاء قضية جديدة')}</DialogTitle>
+                  <DialogDescription>
+                    {t('cases.createDescription', 'أدخل بيانات القضية الجديدة')}
+                  </DialogDescription>
+                </DialogHeader>
+                <CreateCaseForm onSuccess={() => setIsCreateDialogOpen(false)} />
+              </DialogContent>
+            </Dialog>
           </div>
-        </div>
+        </ProductivityHero>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* --- Main Content (Cases List) --- */}

@@ -41,6 +41,7 @@ export const wikiKeys = {
   all: ['wiki'] as const,
   // Case-specific keys
   pages: (caseId: string) => [...wikiKeys.all, 'pages', caseId] as const,
+  stats: (caseId: string) => [...wikiKeys.all, 'stats', caseId] as const,
   pageTree: (caseId: string) => [...wikiKeys.all, 'tree', caseId] as const,
   page: (pageId: string) => [...wikiKeys.all, 'page', pageId] as const,
   pageHistory: (pageId: string) =>
@@ -94,6 +95,17 @@ export const useWikiPages = (
   return useQuery({
     queryKey: [...wikiKeys.pages(caseId), params],
     queryFn: () => wikiPageService.list(caseId, params),
+    enabled: !!caseId
+  })
+}
+
+/**
+ * Fetch wiki stats for a case
+ */
+export const useWikiStats = (caseId: string) => {
+  return useQuery({
+    queryKey: wikiKeys.stats(caseId),
+    queryFn: () => wikiPageService.getStats(caseId),
     enabled: !!caseId
   })
 }
@@ -158,8 +170,10 @@ export const useUpdateWikiPage = () => {
     }) => wikiPageService.update(pageId, data),
     onSuccess: (page) => {
       queryClient.invalidateQueries({ queryKey: wikiKeys.page(page._id) })
-      queryClient.invalidateQueries({ queryKey: wikiKeys.pages(page.caseId) })
-      queryClient.invalidateQueries({ queryKey: wikiKeys.pageTree(page.caseId) })
+      if (page.caseId) {
+        queryClient.invalidateQueries({ queryKey: wikiKeys.pages(page.caseId) })
+        queryClient.invalidateQueries({ queryKey: wikiKeys.pageTree(page.caseId) })
+      }
       queryClient.invalidateQueries({ queryKey: wikiKeys.pageHistory(page._id) })
     }
   })

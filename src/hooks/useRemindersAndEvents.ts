@@ -99,6 +99,14 @@ export const useOverdueReminders = () => {
   })
 }
 
+export const useReminderStats = (filters?: { assignedTo?: string; dateFrom?: string; dateTo?: string }) => {
+  return useQuery({
+    queryKey: ['reminders', 'stats', filters],
+    queryFn: () => remindersService.getStats(filters),
+    staleTime: 5 * 60 * 1000,
+  })
+}
+
 export const useCompleteReminder = () => {
   const queryClient = useQueryClient()
 
@@ -138,7 +146,7 @@ export const useSnoozeReminder = () => {
 
   return useMutation({
     mutationFn: ({ id, duration }: { id: string; duration: number }) =>
-      remindersService.snoozeReminder(id, duration),
+      remindersService.snoozeReminder(id, { minutes: duration }),
     onSuccess: (_, { id }) => {
       queryClient.invalidateQueries({ queryKey: ['reminders'] })
       queryClient.invalidateQueries({ queryKey: ['reminders', id] })
@@ -276,7 +284,7 @@ export const useRSVPEvent = () => {
 
   return useMutation({
     mutationFn: ({ id, status, notes }: { id: string; status: 'accepted' | 'declined' | 'tentative'; notes?: string }) =>
-      eventsService.rsvpEvent(id, status, notes),
+      eventsService.rsvpToEvent(id, { status, note: notes }),
     onSuccess: (_, { id }) => {
       queryClient.invalidateQueries({ queryKey: ['events'] })
       queryClient.invalidateQueries({ queryKey: ['events', id] })
@@ -294,5 +302,13 @@ export const useUpcomingEvents = (days: number = 7) => {
     queryKey: ['events', 'upcoming', days],
     queryFn: () => eventsService.getUpcoming(days),
     staleTime: 1 * 60 * 1000,
+  })
+}
+
+export const useEventStats = (filters?: { dateFrom?: string; dateTo?: string; caseId?: string }) => {
+  return useQuery({
+    queryKey: ['events', 'stats', filters],
+    queryFn: () => eventsService.getStats(filters),
+    staleTime: 5 * 60 * 1000,
   })
 }

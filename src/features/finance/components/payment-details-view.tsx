@@ -18,6 +18,7 @@ import { LanguageSwitcher } from '@/components/language-switcher'
 import { ThemeSwitch } from '@/components/theme-switch'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { usePayment } from '@/hooks/useFinance'
+import { ProductivityHero } from '@/components/productivity-hero'
 
 const statusConfig: Record<string, { label: string; color: string; icon: React.ElementType }> = {
     pending: { label: 'معلق', color: 'bg-amber-100 text-amber-700', icon: Clock },
@@ -160,28 +161,45 @@ export default function PaymentDetailsView() {
                     </div>
 
                     {/* Payment Header Card */}
-                    <Card className="border-0 shadow-sm rounded-3xl overflow-hidden mb-6">
-                        <div className="bg-emerald-600 text-white p-6">
-                            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                                <div>
-                                    <div className="flex items-center gap-3 mb-2">
-                                        <h1 className="text-2xl font-bold">إيصال دفع #{payment.paymentNumber}</h1>
-                                        <Badge className={`${status.color} border-0`}>
-                                            <StatusIcon className="h-3 w-3 ml-1" />
-                                            {status.label}
-                                        </Badge>
-                                    </div>
-                                    <p className="text-emerald-100">
-                                        تاريخ الدفع: {formatDate(payment.paymentDate)}
-                                    </p>
-                                </div>
-                                <div className="text-left">
-                                    <div className="text-3xl font-bold">{formatCurrency(payment.amount, payment.currency)}</div>
-                                    <p className="text-emerald-100 text-sm">المبلغ المدفوع</p>
-                                </div>
-                            </div>
+                    <ProductivityHero
+                        badge={`إيصال دفع #${payment.paymentNumber}`}
+                        title={formatCurrency(payment.amount, payment.currency)}
+                        type="payments"
+                        hideButtons={true}
+                        stats={[
+                            {
+                                label: "تاريخ الدفع",
+                                value: formatDate(payment.paymentDate),
+                                icon: <Calendar className="w-4 h-4 text-emerald-400" />,
+                                status: 'normal'
+                            },
+                            {
+                                label: "طريقة الدفع",
+                                value: payment.paymentMethod || 'تحويل بنكي',
+                                icon: <CreditCard className="w-4 h-4 text-emerald-400" />,
+                                status: 'normal'
+                            },
+                            {
+                                label: "الحالة",
+                                value: status.label,
+                                icon: <StatusIcon className="w-4 h-4 text-emerald-400" />,
+                                status: 'normal'
+                            }
+                        ]}
+                    >
+                        <div className="flex gap-3">
+                            <Button asChild variant="ghost" className="bg-white/10 text-white hover:bg-white/20 h-10 px-5 rounded-xl font-bold border-0 backdrop-blur-sm">
+                                <Link to="/dashboard/finance/payments">
+                                    <ArrowRight className="h-4 w-4 ml-2" />
+                                    العودة للمدفوعات
+                                </Link>
+                            </Button>
+                            <Button variant="outline" className="bg-white/10 text-white hover:bg-white/20 h-10 px-5 rounded-xl font-bold border-0 backdrop-blur-sm">
+                                <Download className="h-4 w-4 ml-2" />
+                                تحميل الإيصال
+                            </Button>
                         </div>
-                    </Card>
+                    </ProductivityHero>
 
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                         {/* Main Content */}

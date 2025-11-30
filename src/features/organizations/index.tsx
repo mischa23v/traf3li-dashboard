@@ -18,6 +18,7 @@ import { Plus, Building2, Search as SearchIcon, Bell } from 'lucide-react'
 import { TopNav } from '@/components/layout/top-nav'
 import { DynamicIsland } from '@/components/dynamic-island'
 import { LanguageSwitcher } from '@/components/language-switcher'
+import { ProductivityHero } from '@/components/productivity-hero'
 
 const route = getRouteApi('/_authenticated/dashboard/organizations/')
 
@@ -78,28 +79,9 @@ function OrganizationsContent() {
       <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8">
         <div className="max-w-7xl mx-auto space-y-6">
           {/* Hero Card */}
-          <div className="relative overflow-hidden rounded-3xl bg-navy p-8 lg:p-12 shadow-2xl shadow-emerald-900/20 ring-1 ring-white/10">
-            <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl -mr-48 -mt-48 pointer-events-none"></div>
-            <div className="absolute bottom-0 left-0 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl -ml-48 -mb-48 pointer-events-none"></div>
-
-            <div className="relative z-10 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
-              <div className="space-y-4">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-emerald-400 text-sm font-medium">
-                  <Building2 className="w-4 h-4" />
-                  <span>إدارة المنظمات</span>
-                </div>
-                <h1 className="text-4xl lg:text-5xl font-bold text-white tracking-tight">
-                  {t('organizations.title')}
-                </h1>
-                <p className="text-slate-400 text-lg max-w-xl leading-relaxed">
-                  {t('organizations.description')}
-                </p>
-              </div>
-              <div className="flex flex-wrap gap-4">
-                <OrganizationsPrimaryButtons />
-              </div>
-            </div>
-          </div>
+          <ProductivityHero badge="إدارة المنظمات" title={t('organizations.title')} type="organizations" hideButtons={true}>
+            <OrganizationsPrimaryButtons />
+          </ProductivityHero>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <div className="lg:col-span-2 space-y-6">

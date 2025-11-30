@@ -29,6 +29,7 @@ import { ProfileDropdown } from '@/components/profile-dropdown'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useTransactions, useAccountBalance, useTransactionSummary } from '@/hooks/useFinance'
 import { FinanceSidebar } from './finance-sidebar'
+import { ProductivityHero } from '@/components/productivity-hero'
 
 // Helper function to get icon based on category
 const getCategoryIcon = (category: string, type: string) => {
@@ -211,42 +212,45 @@ export default function TransactionsDashboard() {
             <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-r border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
                 <div className="max-w-7xl mx-auto space-y-6">
 
-                    {/* Hero Section - New Design */}
-                    <div className="bg-[#022c22] rounded-3xl p-8 relative overflow-hidden text-white shadow-xl shadow-emerald-900/20 flex flex-col md:flex-row items-center justify-between gap-8 mb-8">
-                        <div className="relative z-10 max-w-lg">
-                            <div className="flex items-center gap-3 mb-3">
-                                <Badge className="bg-white/10 hover:bg-white/20 text-white border-0 backdrop-blur-sm">
-                                    <Wallet className="w-3 h-3 ml-2" />
-                                    المالية
-                                </Badge>
-                                <span className="text-emerald-200 text-sm">نوفمبر 2025</span>
-                            </div>
-                            <h2 className="text-3xl font-bold mb-4 leading-tight">سجل المعاملات المالية</h2>
-                            <p className="text-emerald-200 text-lg mb-8 leading-relaxed">
-                                تتبع حركة الأموال، راقب الإيرادات والمصروفات، وقم بإدارة التدفقات النقدية بكفاءة.
-                            </p>
-                            <div className="flex gap-3">
-                                <Button asChild className="bg-emerald-500 hover:bg-emerald-600 text-white h-12 px-8 rounded-xl font-bold shadow-lg shadow-emerald-500/20 border-0">
-                                    <Link to="/dashboard/finance/transactions/new">
-                                        <Plus className="ml-2 h-5 w-5" />
-                                        معاملة جديدة
-                                    </Link>
-                                </Button>
-                                <Button variant="ghost" className="bg-white/10 text-white hover:bg-white/20 h-12 px-8 rounded-xl font-bold border-0 backdrop-blur-sm">
-                                    <Download className="ml-2 h-5 w-5" />
-                                    تصدير الكشف
-                                </Button>
-                            </div>
+                    <ProductivityHero
+                        badge="المالية"
+                        title="سجل المعاملات المالية"
+                        type="finance"
+                        hideButtons={true}
+                        stats={[
+                            {
+                                label: "صافي الربح",
+                                value: formatCurrency(netProfit),
+                                icon: <TrendingUp className="w-4 h-4 text-emerald-400" />,
+                                status: 'normal'
+                            },
+                            {
+                                label: "إجمالي الدخل",
+                                value: formatCurrency(totalIncome),
+                                icon: <ArrowUpRight className="w-4 h-4 text-blue-400" />,
+                                status: 'normal'
+                            },
+                            {
+                                label: "إجمالي المصروفات",
+                                value: formatCurrency(totalExpenses),
+                                icon: <ArrowDownRight className="w-4 h-4 text-red-400" />,
+                                status: 'normal'
+                            }
+                        ]}
+                    >
+                        <div className="flex gap-3">
+                            <Button asChild className="bg-emerald-500 hover:bg-emerald-600 text-white h-10 px-5 rounded-xl font-bold shadow-lg shadow-emerald-500/20 border-0">
+                                <Link to="/dashboard/finance/transactions/new">
+                                    <Plus className="ml-2 h-4 w-4" />
+                                    معاملة جديدة
+                                </Link>
+                            </Button>
+                            <Button variant="ghost" className="bg-white/10 text-white hover:bg-white/20 h-10 px-5 rounded-xl font-bold border-0 backdrop-blur-sm">
+                                <Download className="ml-2 h-4 w-4" />
+                                تصدير الكشف
+                            </Button>
                         </div>
-
-                        {/* Abstract Visual Decoration */}
-                        <div className="absolute top-0 left-0 w-full h-full overflow-hidden z-0 pointer-events-none">
-                            <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-emerald-500/10 rounded-full blur-[100px]"></div>
-                            <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-blue-500/10 rounded-full blur-[100px]"></div>
-                            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80%] h-[80%] border border-white/5 rounded-full"></div>
-                            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[60%] h-[60%] border border-white/5 rounded-full"></div>
-                        </div>
-                    </div>
+                    </ProductivityHero>
 
                     {/* Stats Grid - Remaining Metrics */}
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

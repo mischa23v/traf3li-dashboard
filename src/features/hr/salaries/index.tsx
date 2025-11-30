@@ -23,6 +23,7 @@ import { useSalaries, useBulkDeleteSalaries } from '@/hooks/useHR'
 import { SalaryRecord } from '@/types/hr'
 import { cn } from '@/lib/utils'
 import { toast } from '@/hooks/use-toast'
+import { ProductivityHero } from '@/components/productivity-hero'
 
 const routeApi = getRouteApi('/_authenticated/dashboard/hr/salaries')
 
@@ -212,6 +213,19 @@ export function SalariesPage() {
     const { data: salaries = [], isLoading, error } = useSalaries()
     const bulkDeleteMutation = useBulkDeleteSalaries()
 
+    const stats = useMemo(() => {
+        const totalGross = salaries.reduce((acc, r) => acc + r.grossSalary, 0)
+        const totalNet = salaries.reduce((acc, r) => acc + r.netSalary, 0)
+        const totalDeductions = salaries.reduce((acc, r) => acc + r.totalDeductions, 0)
+        const paid = salaries.filter(r => r.status === 'paid').length
+
+        return { totalGross, totalNet, totalDeductions, paid, total: salaries.length }
+    }, [salaries])
+
+    const formatCurrency = (amount: number) => {
+        return new Intl.NumberFormat('ar-SA', { style: 'currency', currency: 'SAR' }).format(amount)
+    }
+
     // Filter salaries
     const filteredSalaries = useMemo(() => {
         return salaries.filter(salary => {
@@ -286,28 +300,40 @@ export function SalariesPage() {
             <Main className="bg-[#f8f9fa] min-h-screen">
                 <div className="bg-[#022c22] rounded-tr-3xl min-h-screen -mt-4 -mr-4 -ml-4 p-6">
                     {/* Hero Card */}
-                    <div className="bg-emerald-950 rounded-3xl p-8 relative overflow-hidden text-white shadow-xl shadow-emerald-900/20">
-                        {/* Gradient effects */}
-                        <div className="absolute inset-0 bg-gradient-to-br from-emerald-900/50 via-transparent to-teal-900/30" />
-                        <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl" />
-                        <div className="absolute bottom-0 left-0 w-64 h-64 bg-teal-500/10 rounded-full blur-2xl" />
-
-                        <div className="relative z-10">
-                            {/* Back button and title */}
-                            <div className="flex items-center gap-4 mb-4">
-                                <Link to="/dashboard">
-                                    <Button variant="ghost" size="icon" className="rounded-full bg-white/10 hover:bg-white/20 text-white">
-                                        <ArrowRight className="w-5 h-5" />
-                                    </Button>
-                                </Link>
-                                <div>
-                                    <h2 className="text-3xl font-bold leading-tight">الرواتب</h2>
-                                    <p className="text-white/60 mt-1">إدارة رواتب الموظفين</p>
-                                </div>
-                            </div>
-
-                            {/* Search and filters */}
-                            <div className="flex flex-wrap items-center gap-3 mt-6">
+                    <ProductivityHero
+                        badge="الموارد البشرية"
+                        title="الرواتب"
+                        type="hr"
+                        hideButtons={true}
+                        stats={[
+                            {
+                                label: "إجمالي الرواتب",
+                                value: formatCurrency(stats.totalGross),
+                                icon: <Wallet className="w-4 h-4 text-emerald-400" />,
+                                status: 'normal'
+                            },
+                            {
+                                label: "صافي الرواتب",
+                                value: formatCurrency(stats.totalNet),
+                                icon: <CreditCard className="w-4 h-4 text-blue-400" />,
+                                status: 'normal'
+                            },
+                            {
+                                label: "إجمالي الخصومات",
+                                value: formatCurrency(stats.totalDeductions),
+                                icon: <DollarSign className="w-4 h-4 text-red-400" />,
+                                status: 'normal'
+                            },
+                            {
+                                label: "مدفوع",
+                                value: `${stats.paid}/${stats.total}`,
+                                icon: <CheckCircle className="w-4 h-4 text-amber-400" />,
+                                status: 'normal'
+                            }
+                        ]}
+                    >
+                        <div className="flex flex-col gap-4 w-full">
+                            <div className="flex flex-wrap items-center gap-3">
                                 <div className="relative flex-1 min-w-[200px] max-w-md">
                                     <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-white/40" />
                                     <input
@@ -346,11 +372,8 @@ export function SalariesPage() {
                                     </Button>
                                 </Link>
                             </div>
-
-                            {/* Stats */}
-                            <SalaryStats records={salaries} />
                         </div>
-                    </div>
+                    </ProductivityHero>
 
                     {/* Main content grid */}
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">

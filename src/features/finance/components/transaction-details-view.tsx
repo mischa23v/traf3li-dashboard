@@ -24,6 +24,7 @@ import { ProfileDropdown } from '@/components/profile-dropdown'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useTransaction } from '@/hooks/useFinance'
 import { useParams } from '@tanstack/react-router'
+import { ProductivityHero } from '@/components/productivity-hero'
 
 export function TransactionDetailsView() {
     const { transactionId } = useParams({ strict: false }) as { transactionId: string }
@@ -204,49 +205,41 @@ export function TransactionDetailsView() {
                     </Link>
                 </div>
 
-                <div className="max-w-[1600px] mx-auto bg-emerald-950 rounded-3xl p-8 shadow-xl shadow-emerald-900/20 mb-8 relative overflow-hidden">
-                    <div className="absolute top-0 left-0 w-full h-full overflow-hidden z-0 pointer-events-none">
-                        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-emerald-500/10 rounded-full blur-[100px]"></div>
-                        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-blue-500/10 rounded-full blur-[100px]"></div>
+                <ProductivityHero
+                    badge={`المرجع: ${transaction.reference}`}
+                    title={transaction.description}
+                    type="finance"
+                    hideButtons={true}
+                    stats={[
+                        {
+                            label: "المبلغ",
+                            value: `${transaction.type === 'income' ? '+' : '-'}${transaction.amount} ${transaction.currency}`,
+                            icon: <DollarSign className="w-4 h-4 text-emerald-400" />,
+                            status: transaction.type === 'income' ? 'normal' : 'attention'
+                        },
+                        {
+                            label: "التاريخ",
+                            value: `${transaction.date} - ${transaction.time}`,
+                            icon: <Calendar className="w-4 h-4 text-emerald-400" />,
+                            status: 'normal'
+                        },
+                        {
+                            label: "الحالة",
+                            value: transaction.status === 'completed' ? 'مكتملة' : 'قيد المعالجة',
+                            icon: <CheckCircle2 className="w-4 h-4 text-emerald-400" />,
+                            status: 'normal'
+                        }
+                    ]}
+                >
+                    <div className="flex gap-3">
+                        <Button asChild variant="ghost" className="bg-white/10 text-white hover:bg-white/20 h-10 px-5 rounded-xl font-bold border-0 backdrop-blur-sm">
+                            <Link to="/dashboard/finance/transactions">
+                                <ArrowLeft className="h-4 w-4 ml-2" />
+                                العودة إلى المعاملات
+                            </Link>
+                        </Button>
                     </div>
-
-                    <div className="relative z-10 flex flex-col lg:flex-row gap-8 items-start justify-between text-white">
-                        <div className="flex-1">
-                            <div className="flex items-center gap-3 mb-4">
-                                <div className="bg-white/10 p-2 rounded-xl backdrop-blur-md border border-white/10 text-emerald-400">
-                                    <ArrowRightLeft className="h-6 w-6" />
-                                </div>
-                                <span className="text-emerald-100 font-medium">تفاصيل المعاملة</span>
-                                <span className="text-white/20">•</span>
-                                <Badge variant="outline" className="mr-2 border-emerald-500/30 text-emerald-300 bg-emerald-500/10">
-                                    {transaction.status === 'completed' ? 'مكتملة' : 'قيد المعالجة'}
-                                </Badge>
-                            </div>
-                            <h1 className="text-3xl font-bold mb-4 leading-tight text-white">
-                                {transaction.description}
-                            </h1>
-                            <div className="flex flex-wrap gap-6 text-sm text-slate-300">
-                                <div className="flex items-center gap-2">
-                                    <CreditCard className="h-4 w-4 text-emerald-400" />
-                                    <span>المرجع: <span className="text-white font-medium">{transaction.reference}</span></span>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    <Calendar className="h-4 w-4 text-emerald-400" />
-                                    <span>التاريخ: <span className="text-white font-medium">{transaction.date} - {transaction.time}</span></span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="flex flex-col gap-4 min-w-[250px]">
-                            <div className="text-left lg:text-left">
-                                <div className="text-slate-300 text-sm mb-1">المبلغ</div>
-                                <div className={`text-3xl font-bold ${transaction.type === 'income' ? 'text-emerald-400' : 'text-red-400'}`}>
-                                    {transaction.type === 'income' ? '+' : '-'}{transaction.amount} <span className="text-lg text-white">{transaction.currency}</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                </ProductivityHero>
 
                 <div className="max-w-[1600px] mx-auto pb-12">
                     <div className="grid grid-cols-12 gap-6">

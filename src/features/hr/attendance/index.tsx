@@ -25,70 +25,11 @@ import { cn } from '@/lib/utils'
 import { format, parseISO } from 'date-fns'
 import { ar } from 'date-fns/locale'
 import { toast } from '@/hooks/use-toast'
+import { ProductivityHero } from '@/components/productivity-hero'
 
 const routeApi = getRouteApi('/_authenticated/dashboard/hr/attendance')
 
-// Stats cards for the hero section
-function AttendanceStats({ records }: { records: AttendanceRecord[] }) {
-    const stats = useMemo(() => {
-        const today = new Date().toISOString().split('T')[0]
-        const todayRecords = records.filter(r => r.date === today)
-        const presentToday = todayRecords.filter(r => r.status === 'present').length
-        const absentToday = todayRecords.filter(r => r.status === 'absent').length
-        const lateToday = todayRecords.filter(r => r.status === 'late').length
 
-        return { presentToday, absentToday, lateToday, total: records.length }
-    }, [records])
-
-    return (
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
-            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4">
-                <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-emerald-500/20 flex items-center justify-center">
-                        <CheckCircle className="w-5 h-5 text-emerald-400" />
-                    </div>
-                    <div>
-                        <p className="text-2xl font-bold text-white">{stats.presentToday}</p>
-                        <p className="text-xs text-white/60">حاضر اليوم</p>
-                    </div>
-                </div>
-            </div>
-            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4">
-                <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-red-500/20 flex items-center justify-center">
-                        <XCircle className="w-5 h-5 text-red-400" />
-                    </div>
-                    <div>
-                        <p className="text-2xl font-bold text-white">{stats.absentToday}</p>
-                        <p className="text-xs text-white/60">غائب اليوم</p>
-                    </div>
-                </div>
-            </div>
-            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4">
-                <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-amber-500/20 flex items-center justify-center">
-                        <Clock className="w-5 h-5 text-amber-400" />
-                    </div>
-                    <div>
-                        <p className="text-2xl font-bold text-white">{stats.lateToday}</p>
-                        <p className="text-xs text-white/60">متأخر اليوم</p>
-                    </div>
-                </div>
-            </div>
-            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4">
-                <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-blue-500/20 flex items-center justify-center">
-                        <Calendar className="w-5 h-5 text-blue-400" />
-                    </div>
-                    <div>
-                        <p className="text-2xl font-bold text-white">{stats.total}</p>
-                        <p className="text-xs text-white/60">إجمالي السجلات</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    )
-}
 
 // Attendance card component
 function AttendanceCard({
@@ -232,6 +173,41 @@ export function AttendancePage() {
     const { data: records = [], isLoading, error } = useAttendanceRecords()
     const bulkDeleteMutation = useBulkDeleteAttendance()
 
+    const stats = useMemo(() => {
+        const today = new Date().toISOString().split('T')[0]
+        const todayRecords = records.filter(r => r.date === today)
+        const presentToday = todayRecords.filter(r => r.status === 'present').length
+        const absentToday = todayRecords.filter(r => r.status === 'absent').length
+        const lateToday = todayRecords.filter(r => r.status === 'late').length
+
+        return [
+            {
+                label: "حاضر اليوم",
+                value: presentToday,
+                icon: <CheckCircle className="w-4 h-4 text-emerald-400" />,
+                status: 'normal'
+            },
+            {
+                label: "غائب اليوم",
+                value: absentToday,
+                icon: <XCircle className="w-4 h-4 text-red-400" />,
+                status: 'attention'
+            },
+            {
+                label: "متأخر اليوم",
+                value: lateToday,
+                icon: <Clock className="w-4 h-4 text-amber-400" />,
+                status: 'normal'
+            },
+            {
+                label: "إجمالي السجلات",
+                value: records.length,
+                icon: <Calendar className="w-4 h-4 text-blue-400" />,
+                status: 'normal'
+            }
+        ]
+    }, [records])
+
     // Filter records
     const filteredRecords = useMemo(() => {
         return records.filter(record => {
@@ -306,14 +282,14 @@ export function AttendancePage() {
             <Main className="bg-[#f8f9fa] min-h-screen">
                 <div className="bg-[#022c22] rounded-tr-3xl min-h-screen -mt-4 -mr-4 -ml-4 p-6">
                     {/* Hero Card */}
-                    <div className="bg-emerald-950 rounded-3xl p-8 relative overflow-hidden text-white shadow-xl shadow-emerald-900/20">
-                        {/* Gradient effects */}
-                        <div className="absolute inset-0 bg-gradient-to-br from-emerald-900/50 via-transparent to-teal-900/30" />
-                        <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl" />
-                        <div className="absolute bottom-0 left-0 w-64 h-64 bg-teal-500/10 rounded-full blur-2xl" />
-
-                        <div className="relative z-10">
-                            {/* Back button and title */}
+                    <ProductivityHero
+                        badge="الموارد البشرية"
+                        title="الحضور والانصراف"
+                        type="hr"
+                        stats={stats}
+                        hideButtons={true}
+                    >
+                        <div className="flex flex-col gap-4 w-full">
                             <div className="flex items-center gap-4 mb-4">
                                 <Link to="/dashboard">
                                     <Button variant="ghost" size="icon" className="rounded-full bg-white/10 hover:bg-white/20 text-white">
@@ -326,8 +302,7 @@ export function AttendancePage() {
                                 </div>
                             </div>
 
-                            {/* Search and filters */}
-                            <div className="flex flex-wrap items-center gap-3 mt-6">
+                            <div className="flex flex-wrap items-center gap-3">
                                 <div className="relative flex-1 min-w-[200px] max-w-md">
                                     <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-white/40" />
                                     <input
@@ -367,11 +342,8 @@ export function AttendancePage() {
                                     </Button>
                                 </Link>
                             </div>
-
-                            {/* Stats */}
-                            <AttendanceStats records={records} />
                         </div>
-                    </div>
+                    </ProductivityHero>
 
                     {/* Main content grid */}
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">

@@ -32,6 +32,7 @@ import { ProfileDropdown } from '@/components/profile-dropdown'
 import { LanguageSwitcher } from '@/components/language-switcher'
 import { DynamicIsland } from '@/components/dynamic-island'
 import { JobsSidebar } from './jobs-sidebar'
+import { ProductivityHero } from '@/components/productivity-hero'
 
 // Mock data for job listings
 const mockJobs = [
@@ -241,28 +242,7 @@ export function BrowseJobs() {
         className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-r border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']"
       >
         {/* HERO BANNER */}
-        <div className="bg-navy rounded-3xl p-8 relative overflow-hidden text-white shadow-xl shadow-navy/20 group">
-          <div className="absolute -bottom-32 -left-32 w-96 h-96 bg-brand-blue rounded-full blur-[120px] opacity-40 group-hover:opacity-50 transition-opacity duration-700"></div>
-          <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
-            <div>
-              <div className="flex items-center gap-2 mb-2">
-                <Badge className="bg-blue-500/20 text-blue-100 hover:bg-blue-500/30 border-0 px-3 py-1">
-                  <Briefcase className="w-3 h-3 ml-2" />
-                  {isRTL ? 'الوظائف والخدمات' : 'Jobs & Services'}
-                </Badge>
-                <span className="text-slate-400 text-sm">
-                  {new Date().toLocaleDateString('ar-SA', { month: 'long', year: 'numeric' })}
-                </span>
-              </div>
-              <h1 className="text-4xl font-bold leading-tight mb-2">
-                {isRTL ? 'تصفح الوظائف' : 'Browse Jobs'}
-              </h1>
-              <p className="text-slate-300 text-lg max-w-xl">
-                {isRTL ? 'اكتشف فرص العمل القانونية المتاحة وتقدم لها' : 'Discover and apply for available legal job opportunities'}
-              </p>
-            </div>
-          </div>
-        </div>
+        <ProductivityHero badge={isRTL ? 'الوظائف والخدمات' : 'Jobs & Services'} title={isRTL ? 'تصفح الوظائف' : 'Browse Jobs'} type="jobs" hideButtons={true} />
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* --- Main Content --- */}

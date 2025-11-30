@@ -20,6 +20,7 @@ import { ThemeSwitch } from '@/components/theme-switch'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { useQuote, useSendQuote, useConvertQuoteToInvoice, useDeleteQuote } from '@/hooks/useQuotes'
 import type { Quote, QuoteStatus } from '@/services/quoteService'
+import { ProductivityHero } from '@/components/productivity-hero'
 
 const statusConfig: Record<QuoteStatus, { label: string; color: string; icon: React.ElementType }> = {
     draft: { label: 'مسودة', color: 'bg-slate-100 text-slate-700', icon: FileText },
@@ -171,20 +172,46 @@ export default function QuoteDetailsView() {
 
             <Main className="bg-[#f8f9fa] p-6 lg:p-8 space-y-6">
                 <div className="max-w-5xl mx-auto">
-                    {/* Back Button & Actions */}
-                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-                        <Button asChild variant="ghost" className="text-slate-600 hover:text-navy">
-                            <Link to="/dashboard/finance/quotes">
-                                <ArrowRight className="h-4 w-4 ml-2" />
-                                العودة لعروض الأسعار
-                            </Link>
-                        </Button>
+                    <ProductivityHero
+                        badge="عرض سعر"
+                        title={`عرض سعر #${quote.quoteNumber}`}
+                        type="finance"
+                        hideButtons={true}
+                        stats={[
+                            {
+                                label: "العميل",
+                                value: typeof quote.clientId === 'object'
+                                    ? `${quote.clientId.firstName || ''} ${quote.clientId.lastName || ''}`.trim() || quote.clientId.name
+                                    : 'غير محدد',
+                                icon: <User className="w-4 h-4 text-emerald-400" />,
+                                status: 'normal'
+                            },
+                            {
+                                label: "تاريخ الإصدار",
+                                value: formatDate(quote.date),
+                                icon: <Calendar className="w-4 h-4 text-emerald-400" />,
+                                status: 'normal'
+                            },
+                            {
+                                label: "تاريخ الانتهاء",
+                                value: formatDate(quote.expiredDate),
+                                icon: <Clock className="w-4 h-4 text-emerald-400" />,
+                                status: isExpired ? 'attention' : 'normal'
+                            },
+                            {
+                                label: "الإجمالي",
+                                value: formatCurrency(quote.total, quote.currency),
+                                icon: <DollarSign className="w-4 h-4 text-emerald-400" />,
+                                status: 'normal'
+                            }
+                        ]}
+                    >
                         <div className="flex gap-2 flex-wrap">
                             {quote.status === 'draft' && (
                                 <Button
                                     onClick={handleSendQuote}
                                     disabled={sendQuoteMutation.isPending}
-                                    className="bg-blue-600 hover:bg-blue-700"
+                                    className="bg-blue-600 hover:bg-blue-700 text-white border-0"
                                 >
                                     {sendQuoteMutation.isPending ? (
                                         <Loader2 className="h-4 w-4 ml-2 animate-spin" />
@@ -198,7 +225,7 @@ export default function QuoteDetailsView() {
                                 <Button
                                     onClick={handleConvertToInvoice}
                                     disabled={convertMutation.isPending}
-                                    className="bg-emerald-600 hover:bg-emerald-700"
+                                    className="bg-emerald-600 hover:bg-emerald-700 text-white border-0"
                                 >
                                     {convertMutation.isPending ? (
                                         <Loader2 className="h-4 w-4 ml-2 animate-spin" />
@@ -208,23 +235,19 @@ export default function QuoteDetailsView() {
                                     تحويل لفاتورة
                                 </Button>
                             )}
-                            <Button asChild variant="outline">
+                            <Button asChild variant="outline" className="bg-white/10 text-white hover:bg-white/20 border-0 backdrop-blur-sm">
                                 <Link to="/dashboard/finance/quotes/$quoteId/edit" params={{ quoteId: quote._id }}>
                                     <Edit className="h-4 w-4 ml-2" />
                                     تعديل
                                 </Link>
                             </Button>
-                            <Button variant="outline">
+                            <Button variant="outline" className="bg-white/10 text-white hover:bg-white/20 border-0 backdrop-blur-sm">
                                 <Download className="h-4 w-4 ml-2" />
                                 تحميل PDF
                             </Button>
-                            <Button variant="outline">
-                                <Printer className="h-4 w-4 ml-2" />
-                                طباعة
-                            </Button>
                             <Button
                                 variant="outline"
-                                className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                                className="bg-white/10 text-white hover:bg-red-500/20 hover:text-red-200 border-0 backdrop-blur-sm"
                                 onClick={handleDelete}
                                 disabled={deleteMutation.isPending}
                             >
@@ -232,43 +255,7 @@ export default function QuoteDetailsView() {
                                 حذف
                             </Button>
                         </div>
-                    </div>
-
-                    {/* Quote Header Card */}
-                    <Card className="border-0 shadow-sm rounded-3xl overflow-hidden mb-6">
-                        <div className="bg-navy text-white p-6">
-                            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                                <div>
-                                    <div className="flex items-center gap-3 mb-2">
-                                        <h1 className="text-2xl font-bold">عرض سعر #{quote.quoteNumber}</h1>
-                                        <Badge className={`${status.color} border-0`}>
-                                            <StatusIcon className="h-3 w-3 ml-1" />
-                                            {status.label}
-                                        </Badge>
-                                        {isExpired && quote.status !== 'accepted' && (
-                                            <Badge className="bg-rose-100 text-rose-700 border-0">
-                                                <AlertCircle className="h-3 w-3 ml-1" />
-                                                منتهي الصلاحية
-                                            </Badge>
-                                        )}
-                                        {quote.convertedToInvoice && (
-                                            <Badge className="bg-emerald-100 text-emerald-700 border-0">
-                                                <CheckCircle className="h-3 w-3 ml-1" />
-                                                تم التحويل لفاتورة
-                                            </Badge>
-                                        )}
-                                    </div>
-                                    <p className="text-blue-100">
-                                        تاريخ الإنشاء: {formatDate(quote.date)}
-                                    </p>
-                                </div>
-                                <div className="text-left">
-                                    <div className="text-3xl font-bold">{formatCurrency(quote.total, quote.currency)}</div>
-                                    <p className="text-blue-100 text-sm">الإجمالي شامل الضريبة</p>
-                                </div>
-                            </div>
-                        </div>
-                    </Card>
+                    </ProductivityHero>
 
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                         {/* Main Content */}

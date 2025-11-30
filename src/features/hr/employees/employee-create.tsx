@@ -25,6 +25,7 @@ import { HRSidebar } from '../components/hr-sidebar'
 import { useCreateEmployee } from '@/hooks/useHR'
 import { useNavigate, Link } from '@tanstack/react-router'
 import { toast } from '@/hooks/use-toast'
+import { ProductivityHero } from '@/components/productivity-hero'
 
 export function EmployeeCreate() {
     const navigate = useNavigate()
@@ -117,24 +118,18 @@ export function EmployeeCreate() {
             <Main className="bg-[#f8f9fa] min-h-screen">
                 <div className="bg-[#022c22] rounded-tr-3xl min-h-screen -mt-4 -mr-4 -ml-4 p-6">
                     {/* Hero Card */}
-                    <div className="bg-emerald-950 rounded-3xl p-8 relative overflow-hidden text-white shadow-xl shadow-emerald-900/20">
-                        <div className="absolute inset-0 bg-gradient-to-br from-emerald-900/50 via-transparent to-teal-900/30" />
-                        <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl" />
-
-                        <div className="relative z-10">
-                            <div className="flex items-center gap-4 mb-4">
-                                <Link to="/dashboard/hr/employees">
-                                    <Button variant="ghost" size="icon" className="rounded-full bg-white/10 hover:bg-white/20 text-white">
-                                        <ArrowRight className="w-5 h-5" />
-                                    </Button>
-                                </Link>
-                                <div>
-                                    <h2 className="text-3xl font-bold leading-tight">إضافة موظف جديد</h2>
-                                    <p className="text-white/60 mt-1">أدخل بيانات الموظف الجديد</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    <ProductivityHero
+                        badge="الموارد البشرية"
+                        title="إضافة موظف جديد"
+                        type="hr"
+                        hideButtons={true}
+                    >
+                        <Link to="/dashboard/hr/employees">
+                            <Button variant="ghost" size="icon" className="rounded-full bg-white/10 hover:bg-white/20 text-white">
+                                <ArrowRight className="w-5 h-5" />
+                            </Button>
+                        </Link>
+                    </ProductivityHero>
 
                     {/* Main content grid */}
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">

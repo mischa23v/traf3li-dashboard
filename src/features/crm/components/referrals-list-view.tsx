@@ -35,6 +35,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import type { Referral, ReferralType, ReferralStatus } from '@/types/crm'
 import { CrmSidebar } from './crm-sidebar'
+import { ProductivityHero } from '@/components/productivity-hero'
 
 const typeLabels: Record<ReferralType, string> = {
   client: 'عميل',
@@ -167,37 +168,17 @@ export function ReferralsListView() {
         className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-r border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']"
       >
         {/* HERO CARD */}
-        <div className="bg-[#022c22] rounded-3xl p-8 relative overflow-hidden text-white shadow-xl shadow-emerald-900/20 flex flex-col md:flex-row items-center justify-between gap-8">
-          <div className="relative z-10 max-w-lg">
-            <h2 className="text-3xl font-bold mb-4 leading-tight">
-              إدارة مصادر الإحالة
-            </h2>
-            <p className="text-emerald-200 text-lg mb-8 leading-relaxed">
-              تتبع مصادر الإحالة، احسب العمولات، وكافئ شركاءك الذين يجلبون لك
-              العملاء الجدد.
-            </p>
-            <div className="flex gap-3">
-              <Button
-                asChild
-                className="bg-emerald-500 hover:bg-emerald-600 text-white h-12 px-8 rounded-xl font-bold shadow-lg shadow-emerald-500/20 border-0"
-              >
-                <Link to="/dashboard/crm/referrals/new">
-                  <Plus className="ml-2 h-5 w-5" />
-                  مصدر إحالة جديد
-                </Link>
-              </Button>
-            </div>
-          </div>
-          <div className="hidden md:block relative w-64 h-64">
-            <div className="absolute inset-0 bg-gradient-to-tr from-emerald-500 to-teal-500 rounded-full opacity-20 blur-3xl animate-pulse"></div>
-            <div className="absolute inset-4 bg-emerald-950 rounded-2xl border border-white/10 flex items-center justify-center transform rotate-6 shadow-2xl">
-              <LinkIcon className="h-24 w-24 text-emerald-400" />
-            </div>
-            <div className="absolute inset-4 bg-emerald-950/80 rounded-2xl border border-white/10 flex items-center justify-center transform -rotate-6 backdrop-blur-sm">
-              <Users className="h-24 w-24 text-teal-400" />
-            </div>
-          </div>
-        </div>
+        <ProductivityHero badge="إدارة مصادر الإحالة" title="إدارة مصادر الإحالة" type="referrals" hideButtons={true}>
+          <Button
+            asChild
+            className="bg-emerald-500 hover:bg-emerald-600 text-white h-12 px-8 rounded-xl font-bold shadow-lg shadow-emerald-500/20 border-0"
+          >
+            <Link to="/dashboard/crm/referrals/new">
+              <Plus className="ml-2 h-5 w-5" />
+              مصدر إحالة جديد
+            </Link>
+          </Button>
+        </ProductivityHero>
 
         {/* Stats Cards */}
         {stats && (
@@ -344,11 +325,10 @@ export function ReferralsListView() {
                   referrals.map((referral: Referral) => (
                     <div
                       key={referral._id}
-                      className={`bg-[#F8F9FA] rounded-2xl p-6 border transition-all group ${
-                        selectedReferralIds.includes(referral._id)
-                          ? 'border-emerald-500 bg-emerald-50/30'
-                          : 'border-slate-100 hover:border-emerald-200'
-                      }`}
+                      className={`bg-[#F8F9FA] rounded-2xl p-6 border transition-all group ${selectedReferralIds.includes(referral._id)
+                        ? 'border-emerald-500 bg-emerald-50/30'
+                        : 'border-slate-100 hover:border-emerald-200'
+                        }`}
                     >
                       <div className="flex justify-between items-start mb-4">
                         <div className="flex gap-4 items-center">

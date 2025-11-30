@@ -122,6 +122,7 @@ import type {
   TimelineEvent,
   AuditLogEntry,
 } from '@/services/casesService'
+import { ProductivityHero } from '@/components/productivity-hero'
 
 // Helper functions
 const getClientName = (c: Case): string => {
@@ -650,79 +651,19 @@ export function CaseDetailsView() {
         {!isLoading && !isError && caseData && (
           <>
             {/* HERO BANNER */}
-            <div className="bg-navy rounded-3xl p-8 relative overflow-hidden text-white shadow-xl shadow-navy/20 group">
-              <div className="absolute -bottom-32 -left-32 w-96 h-96 bg-brand-blue rounded-full blur-[120px] opacity-40 group-hover:opacity-50 transition-opacity duration-700"></div>
-              <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Link to="/dashboard/cases">
-                      <Button
-                        variant="ghost"
-                        className="text-white hover:bg-white/10 rounded-full h-8 w-8 p-0 mr-2"
-                      >
-                        <ArrowLeft className="h-4 w-4" />
-                      </Button>
-                    </Link>
-                    <div className="bg-white/10 p-1.5 rounded-lg backdrop-blur-md border border-white/10">
-                      <Scale className="h-4 w-4 text-brand-blue" />
-                    </div>
-                    <span className="text-blue-200 font-medium">{getCategoryLabel(caseData.category)}</span>
-                    <span className="text-white/20">•</span>
-                    <span className="text-slate-300">{caseData.court || t('cases.notSpecified', 'غير محدد')}</span>
-                    <span
-                      className={`px-3 py-1 ${getStatusColor(caseData.status)} text-white rounded-full text-xs font-medium`}
-                    >
-                      {getStatusLabel(caseData.status)}
-                    </span>
-                  </div>
-                  <h1 className="text-3xl md:text-4xl font-bold leading-tight mb-4">{caseData.title}</h1>
-                  <div className="flex flex-wrap gap-6 text-sm text-slate-300">
-                    {caseData.judge && (
-                      <div className="flex items-center gap-2">
-                        <User className="h-4 w-4 text-slate-400" />
-                        <span>{t('cases.judge', 'القاضي')}: {caseData.judge}</span>
-                      </div>
-                    )}
-                    <div className="flex items-center gap-2">
-                      <Calendar className="h-4 w-4 text-slate-400" />
-                      <span>{t('cases.startDate', 'تاريخ البدء')}: {formatDate(caseData.startDate)}</span>
-                    </div>
-                    {caseData.nextHearing && (
-                      <div className="flex items-center gap-2">
-                        <Clock className="h-4 w-4 text-amber-400" />
-                        <span className="text-amber-100 font-bold">
-                          {t('cases.nextHearing', 'الجلسة القادمة')}: {formatDate(caseData.nextHearing)}
-                        </span>
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                {/* Status Card in Hero */}
-                <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-6 min-w-[300px]">
-                  <div className="flex justify-between items-center mb-4">
-                    <span className="text-slate-300">{t('cases.progress', 'نسبة الإنجاز')}</span>
-                    <span className="text-2xl font-bold text-brand-blue">{caseData.progress}%</span>
-                  </div>
-                  <Progress
-                    value={caseData.progress}
-                    className="h-2 bg-white/10 mb-6"
-                    indicatorClassName="bg-brand-blue"
-                  />
-                  <div className="flex justify-between items-center pt-4 border-t border-white/10">
-                    <div className="text-center flex-1">
-                      <div className="text-xs text-slate-400 mb-1">{t('cases.claimAmount', 'المطالبة')}</div>
-                      <div className="font-bold text-lg">{formatCurrency(caseData.claimAmount)} {t('common.sar', 'ر.س')}</div>
-                    </div>
-                    <div className="w-px h-10 bg-white/10"></div>
-                    <div className="text-center flex-1">
-                      <div className="text-xs text-slate-400 mb-1">{t('cases.expectedWin', 'المتوقع')}</div>
-                      <div className="font-bold text-lg text-emerald-400">{formatCurrency(caseData.expectedWinAmount)} {t('common.sar', 'ر.س')}</div>
-                    </div>
-                  </div>
-                </div>
+            <ProductivityHero badge={getCategoryLabel(caseData.category)} title={caseData.title} type="cases" hideButtons={true}>
+              <div className="flex gap-3">
+                <Link to="/dashboard/cases">
+                  <Button
+                    variant="ghost"
+                    className="bg-white/10 text-white hover:bg-white/20 rounded-xl h-10 px-4"
+                  >
+                    <ArrowLeft className="h-4 w-4 ml-2" />
+                    {t('cases.backToCases', 'العودة إلى القضايا')}
+                  </Button>
+                </Link>
               </div>
-            </div>
+            </ProductivityHero>
 
             {/* MAIN CONTENT GRID */}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
@@ -1093,11 +1034,10 @@ export function CaseDetailsView() {
                         caseData.hearings.map((hearing: CaseHearing, i: number) => (
                           <div
                             key={hearing._id || i}
-                            className={`rounded-2xl p-6 border ${
-                              new Date(hearing.date) > new Date()
-                                ? 'bg-blue-50 border-blue-200'
-                                : 'bg-slate-50 border-slate-200 opacity-75'
-                            }`}
+                            className={`rounded-2xl p-6 border ${new Date(hearing.date) > new Date()
+                              ? 'bg-blue-50 border-blue-200'
+                              : 'bg-slate-50 border-slate-200 opacity-75'
+                              }`}
                           >
                             <div className="flex items-start justify-between mb-4 gap-4">
                               <div className="flex-1">
@@ -1174,22 +1114,20 @@ export function CaseDetailsView() {
                         <div className="flex gap-2 bg-slate-100 p-1 rounded-xl">
                           <button
                             onClick={() => setDocumentSubTab('general')}
-                            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                              documentSubTab === 'general'
-                                ? 'bg-white text-navy shadow-sm'
-                                : 'text-slate-500 hover:text-navy'
-                            }`}
+                            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${documentSubTab === 'general'
+                              ? 'bg-white text-navy shadow-sm'
+                              : 'text-slate-500 hover:text-navy'
+                              }`}
                           >
                             <FileText className="h-4 w-4 inline-block ml-2" />
                             {t('cases.documents.general', 'مستندات عامة')}
                           </button>
                           <button
                             onClick={() => setDocumentSubTab('judgments')}
-                            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                              documentSubTab === 'judgments'
-                                ? 'bg-white text-navy shadow-sm'
-                                : 'text-slate-500 hover:text-navy'
-                            }`}
+                            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${documentSubTab === 'judgments'
+                              ? 'bg-white text-navy shadow-sm'
+                              : 'text-slate-500 hover:text-navy'
+                              }`}
                           >
                             <Gavel className="h-4 w-4 inline-block ml-2" />
                             {t('cases.documents.judgments', 'الأحكام')}
@@ -1338,18 +1276,16 @@ export function CaseDetailsView() {
                           return filteredDocs.map((doc: CaseDocument, i: number) => (
                             <div
                               key={doc._id || i}
-                              className={`p-4 rounded-2xl border shadow-sm hover:shadow-md transition-all group relative h-[180px] flex flex-col justify-between ${
-                                doc.category === 'judgment' || doc.bucket === 'judgments'
-                                  ? 'bg-amber-50 border-amber-200'
-                                  : 'bg-slate-50 border-slate-100'
-                              }`}
+                              className={`p-4 rounded-2xl border shadow-sm hover:shadow-md transition-all group relative h-[180px] flex flex-col justify-between ${doc.category === 'judgment' || doc.bucket === 'judgments'
+                                ? 'bg-amber-50 border-amber-200'
+                                : 'bg-slate-50 border-slate-100'
+                                }`}
                             >
                               <div className="flex justify-between items-start">
-                                <div className={`w-10 h-10 rounded-lg flex items-center justify-center font-bold text-xs border ${
-                                  doc.category === 'judgment' || doc.bucket === 'judgments'
-                                    ? 'bg-amber-100 border-amber-300 text-amber-700'
-                                    : 'bg-white border-slate-200 text-slate-500'
-                                }`}>
+                                <div className={`w-10 h-10 rounded-lg flex items-center justify-center font-bold text-xs border ${doc.category === 'judgment' || doc.bucket === 'judgments'
+                                  ? 'bg-amber-100 border-amber-300 text-amber-700'
+                                  : 'bg-white border-slate-200 text-slate-500'
+                                  }`}>
                                   {doc.category === 'judgment' ? (
                                     <Gavel className="h-5 w-5" />
                                   ) : (

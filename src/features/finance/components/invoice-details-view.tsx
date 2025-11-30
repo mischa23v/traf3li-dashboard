@@ -24,6 +24,7 @@ import { ProfileDropdown } from '@/components/profile-dropdown'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useInvoice } from '@/hooks/useFinance'
 import { useParams } from '@tanstack/react-router'
+import { ProductivityHero } from '@/components/productivity-hero'
 
 export function InvoiceDetailsView() {
     const { invoiceId } = useParams({ strict: false }) as { invoiceId: string }
@@ -245,61 +246,47 @@ export function InvoiceDetailsView() {
                     </Link>
                 </div>
 
-                <div className="max-w-[1600px] mx-auto bg-emerald-950 rounded-3xl p-8 shadow-xl shadow-emerald-900/20 mb-8 relative overflow-hidden">
-                    <div className="absolute top-0 left-0 w-full h-full overflow-hidden z-0 pointer-events-none">
-                        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-emerald-500/10 rounded-full blur-[100px]"></div>
-                        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-blue-500/10 rounded-full blur-[100px]"></div>
-                    </div>
-
-                    <div className="relative z-10 flex flex-col lg:flex-row gap-8 items-start justify-between text-white">
-                        <div className="flex-1">
-                            <div className="flex items-center gap-3 mb-4">
-                                <div className="bg-white/10 p-2 rounded-xl backdrop-blur-md border border-white/10 text-emerald-400">
-                                    <FileText className="h-6 w-6" />
-                                </div>
-                                <span className="text-emerald-100 font-medium">فاتورة ضريبية</span>
-                                <span className="text-white/20">•</span>
-                                <Badge variant="outline" className="mr-2 border-emerald-500/30 text-emerald-300 bg-emerald-500/10">
-                                    {invoice.status === 'paid' ? 'مدفوعة' : invoice.status === 'pending' ? 'قيد الانتظار' : 'متأخرة'}
-                                </Badge>
-                            </div>
-                            <h1 className="text-3xl font-bold mb-4 leading-tight text-white">
-                                {invoice.id}
-                            </h1>
-                            <div className="flex flex-wrap gap-6 text-sm text-slate-300">
-                                <div className="flex items-center gap-2">
-                                    <User className="h-4 w-4 text-emerald-400" />
-                                    <span>العميل: <span className="text-white font-medium">{invoice.client}</span></span>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    <Calendar className="h-4 w-4 text-emerald-400" />
-                                    <span>تاريخ الإصدار: <span className="text-white font-medium">{invoice.issueDate}</span></span>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    <Clock className="h-4 w-4 text-emerald-400" />
-                                    <span>تاريخ الاستحقاق: <span className="text-white font-medium">{invoice.dueDate}</span></span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="flex flex-col gap-4 min-w-[250px]">
-                            <div className="text-left lg:text-left">
-                                <div className="text-slate-300 text-sm mb-1">الإجمالي المستحق</div>
-                                <div className="text-3xl font-bold text-white">{invoice.amount} <span className="text-lg text-emerald-400">{invoice.currency}</span></div>
-                            </div>
-                            <div className="flex gap-3">
-                                <Button variant="outline" className="flex-1 border-white/10 text-white hover:bg-white/10 hover:text-white backdrop-blur-sm">
-                                    <Download className="h-4 w-4 ml-2" />
-                                    تحميل PDF
-                                </Button>
-                                <Button className="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white shadow-lg shadow-emerald-500/20 border-0">
-                                    <Send className="h-4 w-4 ml-2" />
-                                    إرسال
-                                </Button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                <ProductivityHero
+                    badge="فاتورة ضريبية"
+                    title={invoice.id}
+                    type="invoices"
+                    hideButtons={true}
+                    stats={[
+                        {
+                            label: "العميل",
+                            value: invoice.client,
+                            icon: <User className="w-4 h-4 text-emerald-400" />,
+                            status: 'normal'
+                        },
+                        {
+                            label: "تاريخ الإصدار",
+                            value: invoice.issueDate,
+                            icon: <Calendar className="w-4 h-4 text-emerald-400" />,
+                            status: 'normal'
+                        },
+                        {
+                            label: "تاريخ الاستحقاق",
+                            value: invoice.dueDate,
+                            icon: <Clock className="w-4 h-4 text-emerald-400" />,
+                            status: 'normal'
+                        },
+                        {
+                            label: "الإجمالي المستحق",
+                            value: `${invoice.amount} ${invoice.currency}`,
+                            icon: <DollarSign className="w-4 h-4 text-emerald-400" />,
+                            status: 'attention'
+                        }
+                    ]}
+                >
+                    <Button variant="outline" className="flex-1 border-white/10 text-white hover:bg-white/10 hover:text-white backdrop-blur-sm">
+                        <Download className="h-4 w-4 ml-2" />
+                        تحميل PDF
+                    </Button>
+                    <Button className="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white shadow-lg shadow-emerald-500/20 border-0">
+                        <Send className="h-4 w-4 ml-2" />
+                        إرسال
+                    </Button>
+                </ProductivityHero>
 
                 <div className="max-w-[1600px] mx-auto pb-12">
                     <div className="grid grid-cols-12 gap-6">
