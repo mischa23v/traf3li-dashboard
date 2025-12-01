@@ -1,35 +1,33 @@
 /**
  * Dashboard Service
  * Handles all dashboard-related API calls
+ * Adapted to match backend API response structure
  */
 
 import apiClient, { handleApiError } from '@/lib/api'
 
 /**
- * Dashboard Stats Interface
+ * Backend Hero Stats Response
  */
-export interface DashboardStats {
-  revenue: {
-    current: number
-    previous: number
-    percentageChange: number
-  }
-  activeCases: {
-    total: number
-    requiresAction: number
-  }
-  newClients: {
-    total: number
-    thisWeek: number
-  }
-  unreadMessages: {
-    total: number
-    uniqueClients: number
-  }
+export interface DashboardHeroStatsResponse {
+  cases: { total: number; active: number; closed: number }
+  tasks: { total: number; active: number; completed: number }
+  invoices: { total: number; paid: number; pending: number }
+  orders: { total: number; completed: number; active: number }
 }
 
 /**
- * Dashboard Hero Stats Interface
+ * Dashboard Stats Interface (derived from hero-stats)
+ */
+export interface DashboardStats {
+  cases: { total: number; active: number; closed: number }
+  tasks: { total: number; active: number; completed: number }
+  invoices: { total: number; paid: number; pending: number }
+  orders: { total: number; completed: number; active: number }
+}
+
+/**
+ * Dashboard Hero Stats Interface (for hero banner)
  */
 export interface DashboardHeroStats {
   upcomingSessions: number
@@ -38,50 +36,51 @@ export interface DashboardHeroStats {
 }
 
 /**
- * Dashboard Event Interface
+ * Dashboard Event Interface (from backend)
  */
 export interface DashboardEvent {
   _id: string
-  time: string
   title: string
-  type: 'session' | 'meeting' | 'deadline'
+  startDate: string
+  endDate: string
   location: string
-  color: string
+  type: 'meeting' | 'session' | 'deadline'
+  status: string
 }
 
 /**
- * Dashboard Financial Summary Interface
+ * Dashboard Financial Summary Interface (from backend)
  */
 export interface DashboardFinancialSummary {
-  expectedIncome: number
-  pendingInvoices: Array<{
-    _id: string
-    clientName: string
-    amount: number
-    dueDate: string
-    isOverdue: boolean
-  }>
+  revenue: number
+  expenses: number
+  profit: number
+  pendingInvoices: number
+  paidInvoices: number
+  netIncome: number
 }
 
 /**
- * Dashboard Recent Message Interface
+ * Dashboard Recent Message Interface (from backend)
  */
 export interface DashboardRecentMessage {
   _id: string
-  name: string
-  message: string
-  timestamp: string
-  isOnline: boolean
-  avatar?: string
+  text: string
+  conversationID: string
+  userID: {
+    username: string
+    image?: string
+  }
+  createdAt: string
 }
 
 /**
- * Get Dashboard Statistics
+ * Get Dashboard Statistics (uses hero-stats endpoint)
  */
 export const getDashboardStats = async (): Promise<DashboardStats> => {
   try {
-    const response = await apiClient.get('/dashboard/stats')
-    return response.data.data
+    const response = await apiClient.get('/dashboard/hero-stats')
+    return response.data.stats
   } catch (error) {
     throw handleApiError(error)
   }
@@ -89,11 +88,19 @@ export const getDashboardStats = async (): Promise<DashboardStats> => {
 
 /**
  * Get Dashboard Hero Statistics
+ * Transforms backend stats into hero banner format
  */
 export const getDashboardHeroStats = async (): Promise<DashboardHeroStats> => {
   try {
     const response = await apiClient.get('/dashboard/hero-stats')
-    return response.data.data
+    const stats = response.data.stats as DashboardHeroStatsResponse
+
+    // Transform to hero format
+    return {
+      upcomingSessions: stats.cases?.active || 0,
+      urgentTasks: stats.tasks?.active || 0,
+      newMessages: stats.orders?.active || 0,
+    }
   } catch (error) {
     throw handleApiError(error)
   }
@@ -105,7 +112,7 @@ export const getDashboardHeroStats = async (): Promise<DashboardHeroStats> => {
 export const getTodayEvents = async (): Promise<DashboardEvent[]> => {
   try {
     const response = await apiClient.get('/dashboard/today-events')
-    return response.data.data
+    return response.data.events || []
   } catch (error) {
     throw handleApiError(error)
   }
@@ -118,7 +125,7 @@ export const getFinancialSummary =
   async (): Promise<DashboardFinancialSummary> => {
     try {
       const response = await apiClient.get('/dashboard/financial-summary')
-      return response.data.data
+      return response.data.summary
     } catch (error) {
       throw handleApiError(error)
     }
@@ -134,7 +141,7 @@ export const getRecentMessages = async (
     const response = await apiClient.get('/dashboard/recent-messages', {
       params: { limit },
     })
-    return response.data.data
+    return response.data.messages || []
   } catch (error) {
     throw handleApiError(error)
   }

@@ -143,74 +143,83 @@ export function Dashboard() {
               <Loader2 className="h-8 w-8 animate-spin text-navy" />
             </div>
           ) : statsError ? (
-            <div className="col-span-full flex items-center justify-center py-12 text-red-600">
-              <AlertCircle className="h-5 w-5 ml-2" />
-              <span>فشل تحميل الإحصائيات</span>
+            <div className="col-span-full flex flex-col items-center justify-center py-12 text-slate-500">
+              <AlertCircle className="h-10 w-10 mb-3 text-slate-300" />
+              <span className="text-sm font-medium">لا توجد بيانات متاحة حالياً</span>
+              <span className="text-xs text-slate-400 mt-1">
+                {(statsError as any)?.status === 404
+                  ? 'لم يتم العثور على إحصائيات'
+                  : (statsError as any)?.message || 'يرجى المحاولة لاحقاً'}
+              </span>
+            </div>
+          ) : !stats ? (
+            <div className="col-span-full flex flex-col items-center justify-center py-12 text-slate-500">
+              <AlertCircle className="h-10 w-10 mb-3 text-slate-300" />
+              <span className="text-sm font-medium">لا توجد بيانات</span>
             </div>
           ) : (
             <>
-              {/* Revenue */}
+              {/* Cases */}
               <Card className="rounded-3xl border-slate-100 shadow-sm hover:shadow-md transition-all duration-300 group">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-bold text-slate-500">الإيرادات (هذا الشهر)</CardTitle>
-                  <div className="h-10 w-10 rounded-xl bg-green-50 flex items-center justify-center group-hover:bg-green-100 transition-colors">
-                    <DollarSign className="h-5 w-5 text-green-600" />
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold text-navy">{stats?.revenue.current.toLocaleString('ar-SA')} ر.س</div>
-                  <p className={`text-xs flex items-center mt-1 font-bold ${(stats?.revenue.percentageChange ?? 0) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                    {(stats?.revenue.percentageChange ?? 0) >= 0 ? <ArrowUpRight className="h-3 w-3 ml-1" /> : <ArrowDownRight className="h-3 w-3 ml-1" />}
-                    {Math.abs(stats?.revenue.percentageChange ?? 0)}% من الشهر الماضي
-                  </p>
-                </CardContent>
-              </Card>
-
-              {/* Active Cases */}
-              <Card className="rounded-3xl border-slate-100 shadow-sm hover:shadow-md transition-all duration-300 group">
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-bold text-slate-500">القضايا النشطة</CardTitle>
+                  <CardTitle className="text-sm font-bold text-slate-500">القضايا</CardTitle>
                   <div className="h-10 w-10 rounded-xl bg-blue-50 flex items-center justify-center group-hover:bg-blue-100 transition-colors">
                     <Scale className="h-5 w-5 text-brand-blue" />
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold text-navy">{stats?.activeCases.total || 0} قضية</div>
+                  <div className="text-2xl font-bold text-navy">{stats?.cases?.total || 0} قضية</div>
                   <p className="text-xs text-slate-400 mt-1 font-medium">
-                    {stats?.activeCases.requiresAction || 0} قضايا تتطلب إجراء
+                    {stats?.cases?.active || 0} نشطة · {stats?.cases?.closed || 0} مغلقة
                   </p>
                 </CardContent>
               </Card>
 
-              {/* New Clients */}
+              {/* Tasks */}
               <Card className="rounded-3xl border-slate-100 shadow-sm hover:shadow-md transition-all duration-300 group">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-bold text-slate-500">العملاء الجدد</CardTitle>
+                  <CardTitle className="text-sm font-bold text-slate-500">المهام</CardTitle>
                   <div className="h-10 w-10 rounded-xl bg-purple-50 flex items-center justify-center group-hover:bg-purple-100 transition-colors">
                     <Users className="h-5 w-5 text-purple-600" />
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold text-navy">+{stats?.newClients.total || 0} عملاء</div>
+                  <div className="text-2xl font-bold text-navy">{stats?.tasks?.total || 0} مهمة</div>
                   <p className="text-xs text-purple-600 flex items-center mt-1 font-bold">
                     <ArrowUpRight className="h-3 w-3 ml-1" />
-                    +{stats?.newClients.thisWeek || 0} هذا الأسبوع
+                    {stats?.tasks?.active || 0} نشطة
                   </p>
                 </CardContent>
               </Card>
 
-              {/* Unread Messages */}
+              {/* Invoices */}
               <Card className="rounded-3xl border-slate-100 shadow-sm hover:shadow-md transition-all duration-300 group">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-bold text-slate-500">الرسائل غير المقروءة</CardTitle>
+                  <CardTitle className="text-sm font-bold text-slate-500">الفواتير</CardTitle>
+                  <div className="h-10 w-10 rounded-xl bg-green-50 flex items-center justify-center group-hover:bg-green-100 transition-colors">
+                    <DollarSign className="h-5 w-5 text-green-600" />
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-navy">{stats?.invoices?.total || 0} فاتورة</div>
+                  <p className="text-xs text-slate-400 mt-1 font-medium">
+                    {stats?.invoices?.paid || 0} مدفوعة · {stats?.invoices?.pending || 0} معلقة
+                  </p>
+                </CardContent>
+              </Card>
+
+              {/* Orders */}
+              <Card className="rounded-3xl border-slate-100 shadow-sm hover:shadow-md transition-all duration-300 group">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-bold text-slate-500">الطلبات</CardTitle>
                   <div className="h-10 w-10 rounded-xl bg-amber-50 flex items-center justify-center group-hover:bg-amber-100 transition-colors">
                     <MessageSquare className="h-5 w-5 text-amber-600" />
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold text-navy">{stats?.unreadMessages.total || 0} رسائل</div>
+                  <div className="text-2xl font-bold text-navy">{stats?.orders?.total || 0} طلب</div>
                   <p className="text-xs text-slate-400 mt-1 font-medium">
-                    من {stats?.unreadMessages.uniqueClients || 0} عملاء مختلفين
+                    {stats?.orders?.completed || 0} مكتملة · {stats?.orders?.active || 0} نشطة
                   </p>
                 </CardContent>
               </Card>
@@ -247,29 +256,34 @@ export function Dashboard() {
                   </div>
                 ) : (
                   <div className="divide-y divide-slate-100">
-                    {todayEvents.map((event) => (
-                      <Link
-                        key={event._id}
-                        to="/tasks/$taskId"
-                        params={{ taskId: event._id }}
-                        className="flex items-center p-6 hover:bg-slate-50/80 transition-colors group cursor-pointer block"
-                      >
-                        <div className="w-20 font-bold text-slate-600 text-sm">{event.time}</div>
-                        <div className={`w-1.5 h-12 rounded-full bg-${event.color}-500 mr-4 ml-2`}></div>
-                        <div className="flex-1">
-                          <h4 className="font-bold text-navy text-lg group-hover:text-brand-blue transition-colors">{event.title}</h4>
-                          <div className="flex items-center gap-4 mt-1 text-xs font-medium text-slate-500">
-                            <span className="flex items-center gap-1"><MapPinIcon className="h-3 w-3" /> {event.location}</span>
-                            <span className={`bg-${event.color}-50 text-${event.color}-700 px-2 py-0.5 rounded-md font-bold`}>
-                              {event.type === 'session' ? 'جلسة' : event.type === 'meeting' ? 'اجتماع' : 'موعد نهائي'}
-                            </span>
+                    {todayEvents.map((event) => {
+                      const eventTime = new Date(event.startDate).toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' })
+                      const colorMap = { meeting: 'blue', session: 'green', deadline: 'amber' }
+                      const eventColor = colorMap[event.type] || 'blue'
+                      return (
+                        <Link
+                          key={event._id}
+                          to="/tasks/$taskId"
+                          params={{ taskId: event._id }}
+                          className="flex items-center p-6 hover:bg-slate-50/80 transition-colors group cursor-pointer block"
+                        >
+                          <div className="w-20 font-bold text-slate-600 text-sm">{eventTime}</div>
+                          <div className={`w-1.5 h-12 rounded-full bg-${eventColor}-500 mr-4 ml-2`}></div>
+                          <div className="flex-1">
+                            <h4 className="font-bold text-navy text-lg group-hover:text-brand-blue transition-colors">{event.title}</h4>
+                            <div className="flex items-center gap-4 mt-1 text-xs font-medium text-slate-500">
+                              <span className="flex items-center gap-1"><MapPinIcon className="h-3 w-3" /> {event.location}</span>
+                              <span className={`bg-${eventColor}-50 text-${eventColor}-700 px-2 py-0.5 rounded-md font-bold`}>
+                                {event.type === 'session' ? 'جلسة' : event.type === 'meeting' ? 'اجتماع' : 'موعد نهائي'}
+                              </span>
+                            </div>
                           </div>
-                        </div>
-                        <Button variant="ghost" size="icon" className="text-slate-300 group-hover:text-brand-blue">
-                          <ChevronLeft className="h-5 w-5" />
-                        </Button>
-                      </Link>
-                    ))}
+                          <Button variant="ghost" size="icon" className="text-slate-300 group-hover:text-brand-blue">
+                            <ChevronLeft className="h-5 w-5" />
+                          </Button>
+                        </Link>
+                      )
+                    })}
                   </div>
                 )}
               </CardContent>
@@ -345,38 +359,43 @@ export function Dashboard() {
                   <div className="flex items-center justify-center py-8">
                     <Loader2 className="h-6 w-6 animate-spin text-navy" />
                   </div>
+                ) : !financialSummary ? (
+                  <div className="flex flex-col items-center justify-center py-8 text-slate-400">
+                    <DollarSign className="h-12 w-12 mb-3 opacity-30" />
+                    <p className="text-sm font-medium">لا توجد بيانات مالية</p>
+                  </div>
                 ) : (
                   <div className="space-y-6">
                     <div className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl">
                       <div className="flex items-center gap-3">
                         <div className="h-10 w-10 rounded-full bg-white flex items-center justify-center shadow-sm text-green-600">
-                          <ArrowDownRight className="h-5 w-5" />
+                          <ArrowUpRight className="h-5 w-5" />
                         </div>
                         <div>
-                          <p className="text-xs text-slate-600 font-bold">الدخل المتوقع</p>
-                          <p className="font-bold text-navy">{financialSummary?.expectedIncome.toLocaleString('ar-SA') || 0} ر.س</p>
+                          <p className="text-xs text-slate-600 font-bold">الإيرادات</p>
+                          <p className="font-bold text-navy">{financialSummary.revenue?.toLocaleString('ar-SA') || 0} ر.س</p>
                         </div>
                       </div>
                     </div>
 
-                    <div className="space-y-3">
-                      <h4 className="text-sm font-bold text-slate-600">الفواتير المستحقة</h4>
-                      {!financialSummary?.pendingInvoices || financialSummary.pendingInvoices.length === 0 ? (
-                        <p className="text-xs text-slate-400 py-4 text-center">لا توجد فواتير مستحقة</p>
-                      ) : (
-                        financialSummary.pendingInvoices.map((inv) => (
-                          <div key={inv._id} className="flex items-center justify-between border-b border-slate-100 pb-3 last:border-0 last:pb-0">
-                            <div>
-                              <p className="text-sm font-bold text-navy">{inv.clientName}</p>
-                              <p className={`text-xs font-bold ${inv.isOverdue ? 'text-rose-600' : 'text-amber-600'}`}>
-                                {inv.isOverdue ? 'متأخر' : 'يستحق'} {new Date(inv.dueDate).toLocaleDateString('ar-SA')}
-                              </p>
-                            </div>
-                            <span className="font-bold text-slate-700">{inv.amount.toLocaleString('ar-SA')}</span>
-                          </div>
-                        ))
-                      )}
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="p-3 bg-green-50 rounded-xl">
+                        <p className="text-xs text-slate-600 font-bold">المدفوعة</p>
+                        <p className="font-bold text-green-600">{financialSummary.paidInvoices?.toLocaleString('ar-SA') || 0} ر.س</p>
+                      </div>
+                      <div className="p-3 bg-amber-50 rounded-xl">
+                        <p className="text-xs text-slate-600 font-bold">المعلقة</p>
+                        <p className="font-bold text-amber-600">{financialSummary.pendingInvoices?.toLocaleString('ar-SA') || 0} ر.س</p>
+                      </div>
                     </div>
+
+                    <div className="p-4 bg-slate-50 rounded-2xl">
+                      <div className="flex items-center justify-between">
+                        <p className="text-sm font-bold text-slate-600">صافي الدخل</p>
+                        <p className="font-bold text-navy text-lg">{financialSummary.netIncome?.toLocaleString('ar-SA') || 0} ر.س</p>
+                      </div>
+                    </div>
+
                     <Button className="w-full bg-navy text-white hover:bg-navy/90 rounded-xl">الذهاب للمالية</Button>
                   </div>
                 )}
@@ -404,24 +423,27 @@ export function Dashboard() {
                   </div>
                 ) : (
                   <div className="space-y-4">
-                    {recentMessages.map((chat) => (
-                      <div key={chat._id} className="flex items-center gap-3 p-2 hover:bg-slate-50 rounded-xl transition-colors cursor-pointer">
-                        <div className="relative">
-                          <Avatar className="h-10 w-10 border border-slate-100">
-                            <AvatarImage src={chat.avatar} />
-                            <AvatarFallback>{chat.name[0]}</AvatarFallback>
-                          </Avatar>
-                          {chat.isOnline && <span className="absolute bottom-0 right-0 h-3 w-3 bg-green-500 border-2 border-white rounded-full"></span>}
-                        </div>
-                        <div className="flex-1 overflow-hidden">
-                          <div className="flex justify-between items-center">
-                            <h5 className="font-bold text-sm text-navy truncate">{chat.name}</h5>
-                            <span className="text-[10px] text-slate-400">{chat.timestamp}</span>
+                    {recentMessages.map((chat) => {
+                      const username = chat.userID?.username || 'مستخدم'
+                      const timestamp = new Date(chat.createdAt).toLocaleString('ar-SA', { hour: '2-digit', minute: '2-digit' })
+                      return (
+                        <div key={chat._id} className="flex items-center gap-3 p-2 hover:bg-slate-50 rounded-xl transition-colors cursor-pointer">
+                          <div className="relative">
+                            <Avatar className="h-10 w-10 border border-slate-100">
+                              <AvatarImage src={chat.userID?.image} />
+                              <AvatarFallback>{username[0]}</AvatarFallback>
+                            </Avatar>
                           </div>
-                          <p className="text-xs text-slate-500 truncate">{chat.message}</p>
+                          <div className="flex-1 overflow-hidden">
+                            <div className="flex justify-between items-center">
+                              <h5 className="font-bold text-sm text-navy truncate">{username}</h5>
+                              <span className="text-[10px] text-slate-400">{timestamp}</span>
+                            </div>
+                            <p className="text-xs text-slate-500 truncate">{chat.text}</p>
+                          </div>
                         </div>
-                      </div>
-                    ))}
+                      )
+                    })}
                   </div>
                 )}
               </CardContent>
