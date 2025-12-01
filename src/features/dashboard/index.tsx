@@ -143,9 +143,19 @@ export function Dashboard() {
               <Loader2 className="h-8 w-8 animate-spin text-navy" />
             </div>
           ) : statsError ? (
-            <div className="col-span-full flex items-center justify-center py-12 text-red-600">
-              <AlertCircle className="h-5 w-5 ml-2" />
-              <span>فشل تحميل الإحصائيات</span>
+            <div className="col-span-full flex flex-col items-center justify-center py-12 text-slate-500">
+              <AlertCircle className="h-10 w-10 mb-3 text-slate-300" />
+              <span className="text-sm font-medium">لا توجد بيانات متاحة حالياً</span>
+              <span className="text-xs text-slate-400 mt-1">
+                {(statsError as any)?.status === 404
+                  ? 'لم يتم العثور على إحصائيات'
+                  : (statsError as any)?.message || 'يرجى المحاولة لاحقاً'}
+              </span>
+            </div>
+          ) : !stats ? (
+            <div className="col-span-full flex flex-col items-center justify-center py-12 text-slate-500">
+              <AlertCircle className="h-10 w-10 mb-3 text-slate-300" />
+              <span className="text-sm font-medium">لا توجد بيانات</span>
             </div>
           ) : (
             <>
