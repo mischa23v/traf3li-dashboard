@@ -73,7 +73,7 @@ export const useCreateContact = () => {
   return useMutation({
     mutationFn: (data: CreateContactData) => contactsService.createContact(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: contactsKeys.all })
+      queryClient.refetchQueries({ queryKey: contactsKeys.all })
       toast({
         title: t('status.success'),
         description: t('status.createdSuccessfully'),
@@ -98,8 +98,8 @@ export const useUpdateContact = () => {
     mutationFn: ({ id, data }: { id: string; data: UpdateContactData }) =>
       contactsService.updateContact(id, data),
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: contactsKeys.all })
-      queryClient.invalidateQueries({ queryKey: contactsKeys.detail(variables.id) })
+      queryClient.refetchQueries({ queryKey: contactsKeys.all })
+      queryClient.refetchQueries({ queryKey: contactsKeys.detail(variables.id) })
       toast({
         title: t('status.success'),
         description: t('status.updatedSuccessfully'),
@@ -123,7 +123,7 @@ export const useDeleteContact = () => {
   return useMutation({
     mutationFn: (id: string) => contactsService.deleteContact(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: contactsKeys.all })
+      queryClient.refetchQueries({ queryKey: contactsKeys.all })
       toast({
         title: t('status.success'),
         description: t('status.deletedSuccessfully'),
@@ -147,7 +147,7 @@ export const useBulkDeleteContacts = () => {
   return useMutation({
     mutationFn: (ids: string[]) => contactsService.bulkDeleteContacts(ids),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: contactsKeys.all })
+      queryClient.refetchQueries({ queryKey: contactsKeys.all })
       toast({
         title: t('status.success'),
         description: t('status.deletedSuccessfully'),
@@ -172,8 +172,8 @@ export const useLinkContactToCase = () => {
     mutationFn: ({ contactId, caseId }: { contactId: string; caseId: string }) =>
       contactsService.linkToCase(contactId, caseId),
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: contactsKeys.detail(variables.contactId) })
-      queryClient.invalidateQueries({ queryKey: contactsKeys.byCase(variables.caseId) })
+      queryClient.refetchQueries({ queryKey: contactsKeys.detail(variables.contactId) })
+      queryClient.refetchQueries({ queryKey: contactsKeys.byCase(variables.caseId) })
       toast({
         title: t('status.success'),
         description: t('status.updatedSuccessfully'),
@@ -198,8 +198,8 @@ export const useUnlinkContactFromCase = () => {
     mutationFn: ({ contactId, caseId }: { contactId: string; caseId: string }) =>
       contactsService.unlinkFromCase(contactId, caseId),
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: contactsKeys.detail(variables.contactId) })
-      queryClient.invalidateQueries({ queryKey: contactsKeys.byCase(variables.caseId) })
+      queryClient.refetchQueries({ queryKey: contactsKeys.detail(variables.contactId) })
+      queryClient.refetchQueries({ queryKey: contactsKeys.byCase(variables.caseId) })
       toast({
         title: t('status.success'),
         description: t('status.updatedSuccessfully'),

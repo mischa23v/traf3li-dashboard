@@ -91,7 +91,7 @@ export const useCreateConversation = () => {
             return response.data as Conversation
         },
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['conversations'] })
+            queryClient.refetchQueries({ queryKey: ['conversations'] })
         },
     })
 }
@@ -125,8 +125,8 @@ export const useSendMessage = () => {
             return response.data as Message
         },
         onSuccess: (_, variables) => {
-            queryClient.invalidateQueries({ queryKey: ['messages', variables.conversationID] })
-            queryClient.invalidateQueries({ queryKey: ['conversations'] })
+            queryClient.refetchQueries({ queryKey: ['messages', variables.conversationID] })
+            queryClient.refetchQueries({ queryKey: ['conversations'] })
         },
     })
 }
@@ -141,8 +141,8 @@ export const useMarkAsRead = () => {
             return response.data
         },
         onSuccess: (_, conversationID) => {
-            queryClient.invalidateQueries({ queryKey: ['messages', conversationID] })
-            queryClient.invalidateQueries({ queryKey: ['conversations'] })
+            queryClient.refetchQueries({ queryKey: ['messages', conversationID] })
+            queryClient.refetchQueries({ queryKey: ['conversations'] })
         },
     })
 }
@@ -157,7 +157,7 @@ export const useUpdateConversation = () => {
             return response.data as Conversation
         },
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['conversations'] })
+            queryClient.refetchQueries({ queryKey: ['conversations'] })
         },
     })
 }

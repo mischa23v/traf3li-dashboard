@@ -27,9 +27,9 @@ export function useRunConflictCheck() {
     mutationFn: (request: ConflictCheckRequest) =>
       conflictCheckService.runConflictCheck(request),
     onSuccess: (data, variables) => {
-      queryClient.invalidateQueries({ queryKey: conflictCheckKeys.lists() })
+      queryClient.refetchQueries({ queryKey: conflictCheckKeys.lists() })
       if (variables.entityId) {
-        queryClient.invalidateQueries({
+        queryClient.refetchQueries({
           queryKey: conflictCheckKeys.entity(variables.entityType, variables.entityId),
         })
       }
@@ -102,7 +102,7 @@ export function useResolveConflictMatch() {
       resolution: { status: 'cleared' | 'flagged' | 'waived'; notes: string }
     }) => conflictCheckService.resolveConflictMatch(checkId, matchId, resolution),
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({
+      queryClient.refetchQueries({
         queryKey: conflictCheckKeys.detail(variables.checkId),
       })
     },
@@ -122,10 +122,10 @@ export function useAddConflictWaiver() {
       waiver: Omit<ConflictWaiver, 'waivedBy' | 'waivedAt'>
     }) => conflictCheckService.addConflictWaiver(checkId, waiver),
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({
+      queryClient.refetchQueries({
         queryKey: conflictCheckKeys.detail(variables.checkId),
       })
-      queryClient.invalidateQueries({ queryKey: conflictCheckKeys.lists() })
+      queryClient.refetchQueries({ queryKey: conflictCheckKeys.lists() })
     },
   })
 }
@@ -138,10 +138,10 @@ export function useClearConflictCheck() {
     mutationFn: ({ checkId, notes }: { checkId: string; notes: string }) =>
       conflictCheckService.clearConflictCheck(checkId, notes),
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({
+      queryClient.refetchQueries({
         queryKey: conflictCheckKeys.detail(variables.checkId),
       })
-      queryClient.invalidateQueries({ queryKey: conflictCheckKeys.lists() })
+      queryClient.refetchQueries({ queryKey: conflictCheckKeys.lists() })
     },
   })
 }

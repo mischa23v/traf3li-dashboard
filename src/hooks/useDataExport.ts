@@ -32,7 +32,7 @@ export function useStartExport() {
   return useMutation({
     mutationFn: (options: ExportOptions) => dataExportService.startExport(options),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: exportKeys.exports() })
+      queryClient.refetchQueries({ queryKey: exportKeys.exports() })
       toast({
         title: t('common.success'),
         description: t('dataExport.exportStarted'),
@@ -107,7 +107,7 @@ export function useCancelExport() {
   return useMutation({
     mutationFn: (jobId: string) => dataExportService.cancelExport(jobId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: exportKeys.exports() })
+      queryClient.refetchQueries({ queryKey: exportKeys.exports() })
       toast({
         title: t('common.success'),
         description: t('dataExport.exportCancelled'),
@@ -150,7 +150,7 @@ export function useStartImport() {
   return useMutation({
     mutationFn: (options: ImportOptions) => dataExportService.startImport(options),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: exportKeys.imports() })
+      queryClient.refetchQueries({ queryKey: exportKeys.imports() })
       toast({
         title: t('common.success'),
         description: t('dataExport.importStarted'),
@@ -198,7 +198,7 @@ export function useCancelImport() {
   return useMutation({
     mutationFn: (jobId: string) => dataExportService.cancelImport(jobId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: exportKeys.imports() })
+      queryClient.refetchQueries({ queryKey: exportKeys.imports() })
       toast({
         title: t('common.success'),
         description: t('dataExport.importCancelled'),
@@ -259,7 +259,7 @@ export function useCreateExportTemplate() {
   return useMutation({
     mutationFn: dataExportService.createTemplate,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: exportKeys.templates() })
+      queryClient.refetchQueries({ queryKey: exportKeys.templates() })
       toast({
         title: t('common.success'),
         description: t('dataExport.templateCreated'),
@@ -283,7 +283,7 @@ export function useDeleteExportTemplate() {
   return useMutation({
     mutationFn: (id: string) => dataExportService.deleteTemplate(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: exportKeys.templates() })
+      queryClient.refetchQueries({ queryKey: exportKeys.templates() })
       toast({
         title: t('common.success'),
         description: t('dataExport.templateDeleted'),

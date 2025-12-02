@@ -35,7 +35,7 @@ export const useCreateConversation = () => {
     mutationFn: (data: CreateConversationData) =>
       conversationsService.createConversation(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['conversations'] })
+      queryClient.refetchQueries({ queryKey: ['conversations'] })
       toast.success('تم إنشاء المحادثة بنجاح')
     },
     onError: (error: Error) => {
@@ -70,10 +70,10 @@ export const useSendMessage = () => {
       data: SendMessageData
     }) => conversationsService.sendMessage(conversationId, data),
     onSuccess: (_, { conversationId }) => {
-      queryClient.invalidateQueries({
+      queryClient.refetchQueries({
         queryKey: ['conversations', conversationId, 'messages'],
       })
-      queryClient.invalidateQueries({ queryKey: ['conversations'] })
+      queryClient.refetchQueries({ queryKey: ['conversations'] })
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل إرسال الرسالة')
@@ -88,10 +88,10 @@ export const useMarkAsRead = () => {
     mutationFn: (conversationId: string) =>
       conversationsService.markAsRead(conversationId),
     onSuccess: (_, conversationId) => {
-      queryClient.invalidateQueries({
+      queryClient.refetchQueries({
         queryKey: ['conversations', conversationId],
       })
-      queryClient.invalidateQueries({ queryKey: ['conversations'] })
+      queryClient.refetchQueries({ queryKey: ['conversations'] })
     },
   })
 }
@@ -102,7 +102,7 @@ export const useDeleteConversation = () => {
   return useMutation({
     mutationFn: (id: string) => conversationsService.deleteConversation(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['conversations'] })
+      queryClient.refetchQueries({ queryKey: ['conversations'] })
       toast.success('تم حذف المحادثة بنجاح')
     },
     onError: (error: Error) => {

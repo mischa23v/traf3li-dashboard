@@ -80,8 +80,8 @@ export function useCreateRate() {
   return useMutation({
     mutationFn: (data: CreateRateData) => billingRatesService.createRate(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: billingKeys.rates() })
-      queryClient.invalidateQueries({ queryKey: billingKeys.statistics() })
+      queryClient.refetchQueries({ queryKey: billingKeys.rates() })
+      queryClient.refetchQueries({ queryKey: billingKeys.statistics() })
     },
   })
 }
@@ -97,7 +97,7 @@ export function useUpdateRate() {
       billingRatesService.updateRate(id, data),
     onSuccess: (rate) => {
       queryClient.setQueryData(billingKeys.rateDetail(rate._id), rate)
-      queryClient.invalidateQueries({ queryKey: billingKeys.rates() })
+      queryClient.refetchQueries({ queryKey: billingKeys.rates() })
     },
   })
 }
@@ -111,8 +111,8 @@ export function useDeleteRate() {
   return useMutation({
     mutationFn: (id: string) => billingRatesService.deleteRate(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: billingKeys.rates() })
-      queryClient.invalidateQueries({ queryKey: billingKeys.statistics() })
+      queryClient.refetchQueries({ queryKey: billingKeys.rates() })
+      queryClient.refetchQueries({ queryKey: billingKeys.statistics() })
     },
   })
 }
@@ -151,8 +151,8 @@ export function useCreateRateGroup() {
   return useMutation({
     mutationFn: (data: CreateRateGroupData) => billingRatesService.createRateGroup(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: billingKeys.groups() })
-      queryClient.invalidateQueries({ queryKey: billingKeys.statistics() })
+      queryClient.refetchQueries({ queryKey: billingKeys.groups() })
+      queryClient.refetchQueries({ queryKey: billingKeys.statistics() })
     },
   })
 }
@@ -168,7 +168,7 @@ export function useUpdateRateGroup() {
       billingRatesService.updateRateGroup(id, data),
     onSuccess: (group) => {
       queryClient.setQueryData(billingKeys.groupDetail(group._id), group)
-      queryClient.invalidateQueries({ queryKey: billingKeys.groups() })
+      queryClient.refetchQueries({ queryKey: billingKeys.groups() })
     },
   })
 }
@@ -182,8 +182,8 @@ export function useDeleteRateGroup() {
   return useMutation({
     mutationFn: (id: string) => billingRatesService.deleteRateGroup(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: billingKeys.groups() })
-      queryClient.invalidateQueries({ queryKey: billingKeys.statistics() })
+      queryClient.refetchQueries({ queryKey: billingKeys.groups() })
+      queryClient.refetchQueries({ queryKey: billingKeys.statistics() })
     },
   })
 }
@@ -199,7 +199,7 @@ export function useAddRateToGroup() {
       billingRatesService.addRateToGroup(groupId, rateId),
     onSuccess: (group) => {
       queryClient.setQueryData(billingKeys.groupDetail(group._id), group)
-      queryClient.invalidateQueries({ queryKey: billingKeys.groups() })
+      queryClient.refetchQueries({ queryKey: billingKeys.groups() })
     },
   })
 }
@@ -215,7 +215,7 @@ export function useRemoveRateFromGroup() {
       billingRatesService.removeRateFromGroup(groupId, rateId),
     onSuccess: (group) => {
       queryClient.setQueryData(billingKeys.groupDetail(group._id), group)
-      queryClient.invalidateQueries({ queryKey: billingKeys.groups() })
+      queryClient.refetchQueries({ queryKey: billingKeys.groups() })
     },
   })
 }
@@ -254,8 +254,8 @@ export function useCreateRateCard() {
   return useMutation({
     mutationFn: (data: CreateRateCardData) => billingRatesService.createRateCard(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: billingKeys.rateCards() })
-      queryClient.invalidateQueries({ queryKey: billingKeys.statistics() })
+      queryClient.refetchQueries({ queryKey: billingKeys.rateCards() })
+      queryClient.refetchQueries({ queryKey: billingKeys.statistics() })
     },
   })
 }
@@ -270,7 +270,7 @@ export function useUpdateRateCard() {
     mutationFn: ({ id, data }: { id: string; data: UpdateRateCardData }) =>
       billingRatesService.updateRateCard(id, data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: billingKeys.rateCards() })
+      queryClient.refetchQueries({ queryKey: billingKeys.rateCards() })
     },
   })
 }
@@ -284,8 +284,8 @@ export function useDeleteRateCard() {
   return useMutation({
     mutationFn: (id: string) => billingRatesService.deleteRateCard(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: billingKeys.rateCards() })
-      queryClient.invalidateQueries({ queryKey: billingKeys.statistics() })
+      queryClient.refetchQueries({ queryKey: billingKeys.rateCards() })
+      queryClient.refetchQueries({ queryKey: billingKeys.statistics() })
     },
   })
 }
@@ -313,8 +313,8 @@ export function useCreateTimeEntry() {
   return useMutation({
     mutationFn: (data: CreateTimeEntryData) => billingRatesService.createTimeEntry(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: billingKeys.timeEntries() })
-      queryClient.invalidateQueries({ queryKey: billingKeys.statistics() })
+      queryClient.refetchQueries({ queryKey: billingKeys.timeEntries() })
+      queryClient.refetchQueries({ queryKey: billingKeys.statistics() })
     },
   })
 }
@@ -329,7 +329,7 @@ export function useUpdateTimeEntry() {
     mutationFn: ({ id, data }: { id: string; data: UpdateTimeEntryData }) =>
       billingRatesService.updateTimeEntry(id, data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: billingKeys.timeEntries() })
+      queryClient.refetchQueries({ queryKey: billingKeys.timeEntries() })
     },
   })
 }
@@ -343,8 +343,8 @@ export function useDeleteTimeEntry() {
   return useMutation({
     mutationFn: (id: string) => billingRatesService.deleteTimeEntry(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: billingKeys.timeEntries() })
-      queryClient.invalidateQueries({ queryKey: billingKeys.statistics() })
+      queryClient.refetchQueries({ queryKey: billingKeys.timeEntries() })
+      queryClient.refetchQueries({ queryKey: billingKeys.statistics() })
     },
   })
 }
@@ -358,7 +358,7 @@ export function useApproveTimeEntries() {
   return useMutation({
     mutationFn: (ids: string[]) => billingRatesService.approveTimeEntries(ids),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: billingKeys.timeEntries() })
+      queryClient.refetchQueries({ queryKey: billingKeys.timeEntries() })
     },
   })
 }

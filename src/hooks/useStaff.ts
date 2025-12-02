@@ -91,7 +91,7 @@ export const useCreateStaff = () => {
   return useMutation({
     mutationFn: (data: CreateStaffData) => staffService.createStaff(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['staff'] })
+      queryClient.refetchQueries({ queryKey: ['staff'] })
       toast.success('تم إضافة عضو الفريق بنجاح')
     },
     onError: (error: Error) => {
@@ -112,8 +112,8 @@ export const useUpdateStaff = () => {
       data: UpdateStaffData
     }) => staffService.updateStaff(staffId, data),
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['staff'] })
-      queryClient.invalidateQueries({ queryKey: ['staff', variables.staffId] })
+      queryClient.refetchQueries({ queryKey: ['staff'] })
+      queryClient.refetchQueries({ queryKey: ['staff', variables.staffId] })
       toast.success('تم تحديث بيانات عضو الفريق بنجاح')
     },
     onError: (error: Error) => {
@@ -128,7 +128,7 @@ export const useDeleteStaff = () => {
   return useMutation({
     mutationFn: (staffId: string) => staffService.deleteStaff(staffId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['staff'] })
+      queryClient.refetchQueries({ queryKey: ['staff'] })
       toast.success('تم حذف عضو الفريق بنجاح')
     },
     onError: (error: Error) => {
@@ -143,7 +143,7 @@ export const useBulkDeleteStaff = () => {
   return useMutation({
     mutationFn: (staffIds: string[]) => staffService.bulkDeleteStaff(staffIds),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['staff'] })
+      queryClient.refetchQueries({ queryKey: ['staff'] })
       toast.success('تم حذف أعضاء الفريق بنجاح')
     },
     onError: (error: Error) => {

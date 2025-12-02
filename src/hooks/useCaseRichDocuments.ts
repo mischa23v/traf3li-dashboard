@@ -76,8 +76,8 @@ export const useCreateCaseRichDocument = () => {
       data: CreateRichDocumentInput
     }) => caseRichDocumentService.create(caseId, data),
     onSuccess: (_, { caseId }) => {
-      queryClient.invalidateQueries({ queryKey: richDocumentKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: richDocumentKeys.list(caseId) })
+      queryClient.refetchQueries({ queryKey: richDocumentKeys.lists() })
+      queryClient.refetchQueries({ queryKey: richDocumentKeys.list(caseId) })
     }
   })
 }
@@ -99,11 +99,11 @@ export const useUpdateCaseRichDocument = () => {
       data: UpdateRichDocumentInput
     }) => caseRichDocumentService.update(caseId, docId, data),
     onSuccess: (document, { caseId, docId }) => {
-      queryClient.invalidateQueries({ queryKey: richDocumentKeys.list(caseId) })
-      queryClient.invalidateQueries({
+      queryClient.refetchQueries({ queryKey: richDocumentKeys.list(caseId) })
+      queryClient.refetchQueries({
         queryKey: richDocumentKeys.detail(caseId, docId)
       })
-      queryClient.invalidateQueries({
+      queryClient.refetchQueries({
         queryKey: richDocumentKeys.versions(caseId, docId)
       })
     }
@@ -120,8 +120,8 @@ export const useDeleteCaseRichDocument = () => {
     mutationFn: ({ caseId, docId }: { caseId: string; docId: string }) =>
       caseRichDocumentService.delete(caseId, docId),
     onSuccess: (_, { caseId }) => {
-      queryClient.invalidateQueries({ queryKey: richDocumentKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: richDocumentKeys.list(caseId) })
+      queryClient.refetchQueries({ queryKey: richDocumentKeys.lists() })
+      queryClient.refetchQueries({ queryKey: richDocumentKeys.list(caseId) })
     }
   })
 }
@@ -162,11 +162,11 @@ export const useRestoreCaseRichDocumentVersion = () => {
       versionNumber: number
     }) => caseRichDocumentService.restoreVersion(caseId, docId, versionNumber),
     onSuccess: (_, { caseId, docId }) => {
-      queryClient.invalidateQueries({ queryKey: richDocumentKeys.list(caseId) })
-      queryClient.invalidateQueries({
+      queryClient.refetchQueries({ queryKey: richDocumentKeys.list(caseId) })
+      queryClient.refetchQueries({
         queryKey: richDocumentKeys.detail(caseId, docId)
       })
-      queryClient.invalidateQueries({
+      queryClient.refetchQueries({
         queryKey: richDocumentKeys.versions(caseId, docId)
       })
     }

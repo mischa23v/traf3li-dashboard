@@ -97,8 +97,8 @@ export const useCreateFollowup = () => {
   return useMutation({
     mutationFn: (data: CreateFollowupData) => followupsService.createFollowup(data),
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: followupsKeys.all })
-      queryClient.invalidateQueries({
+      queryClient.refetchQueries({ queryKey: followupsKeys.all })
+      queryClient.refetchQueries({
         queryKey: followupsKeys.entity(variables.entityType, variables.entityId),
       })
       toast({
@@ -125,8 +125,8 @@ export const useUpdateFollowup = () => {
     mutationFn: ({ id, data }: { id: string; data: UpdateFollowupData }) =>
       followupsService.updateFollowup(id, data),
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: followupsKeys.all })
-      queryClient.invalidateQueries({ queryKey: followupsKeys.detail(variables.id) })
+      queryClient.refetchQueries({ queryKey: followupsKeys.all })
+      queryClient.refetchQueries({ queryKey: followupsKeys.detail(variables.id) })
       toast({
         title: t('status.success'),
         description: t('status.updatedSuccessfully'),
@@ -150,7 +150,7 @@ export const useDeleteFollowup = () => {
   return useMutation({
     mutationFn: (id: string) => followupsService.deleteFollowup(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: followupsKeys.all })
+      queryClient.refetchQueries({ queryKey: followupsKeys.all })
       toast({
         title: t('status.success'),
         description: t('status.deletedSuccessfully'),
@@ -175,8 +175,8 @@ export const useCompleteFollowup = () => {
     mutationFn: ({ id, notes }: { id: string; notes?: string }) =>
       followupsService.completeFollowup(id, notes),
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: followupsKeys.all })
-      queryClient.invalidateQueries({ queryKey: followupsKeys.detail(variables.id) })
+      queryClient.refetchQueries({ queryKey: followupsKeys.all })
+      queryClient.refetchQueries({ queryKey: followupsKeys.detail(variables.id) })
       toast({
         title: t('status.success'),
         description: t('followups.completeSuccess'),
@@ -201,8 +201,8 @@ export const useCancelFollowup = () => {
     mutationFn: ({ id, reason }: { id: string; reason?: string }) =>
       followupsService.cancelFollowup(id, reason),
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: followupsKeys.all })
-      queryClient.invalidateQueries({ queryKey: followupsKeys.detail(variables.id) })
+      queryClient.refetchQueries({ queryKey: followupsKeys.all })
+      queryClient.refetchQueries({ queryKey: followupsKeys.detail(variables.id) })
       toast({
         title: t('status.success'),
         description: t('followups.cancelSuccess'),
@@ -236,8 +236,8 @@ export const useRescheduleFollowup = () => {
       reason?: string
     }) => followupsService.rescheduleFollowup(id, newDueDate, newDueTime, reason),
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: followupsKeys.all })
-      queryClient.invalidateQueries({ queryKey: followupsKeys.detail(variables.id) })
+      queryClient.refetchQueries({ queryKey: followupsKeys.all })
+      queryClient.refetchQueries({ queryKey: followupsKeys.detail(variables.id) })
       toast({
         title: t('status.success'),
         description: t('followups.rescheduleSuccess'),
@@ -262,7 +262,7 @@ export const useAddFollowupNote = () => {
     mutationFn: ({ id, note }: { id: string; note: string }) =>
       followupsService.addFollowupNote(id, note),
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: followupsKeys.detail(variables.id) })
+      queryClient.refetchQueries({ queryKey: followupsKeys.detail(variables.id) })
       toast({
         title: t('status.success'),
         description: t('followups.noteAdded'),
@@ -286,7 +286,7 @@ export const useBulkCompleteFollowups = () => {
   return useMutation({
     mutationFn: (ids: string[]) => followupsService.bulkCompleteFollowups(ids),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: followupsKeys.all })
+      queryClient.refetchQueries({ queryKey: followupsKeys.all })
       toast({
         title: t('status.success'),
         description: t('followups.bulkCompleteSuccess'),
@@ -310,7 +310,7 @@ export const useBulkDeleteFollowups = () => {
   return useMutation({
     mutationFn: (ids: string[]) => followupsService.bulkDeleteFollowups(ids),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: followupsKeys.all })
+      queryClient.refetchQueries({ queryKey: followupsKeys.all })
       toast({
         title: t('status.success'),
         description: t('followups.bulkDeleteSuccess'),
