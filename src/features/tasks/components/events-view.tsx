@@ -3,7 +3,7 @@ import { TasksSidebar } from './tasks-sidebar'
 import {
     Calendar as CalendarIcon, MoreHorizontal, Plus,
     MapPin, Clock, Search, AlertCircle, ChevronLeft, Bell, Users,
-    CalendarCheck, CalendarPlus, CalendarRange, Eye, Trash2, CheckCircle, XCircle
+    CalendarCheck, CalendarPlus, CalendarRange, Eye, Trash2, CheckCircle, XCircle, CalendarClock
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -16,7 +16,7 @@ import { ThemeSwitch } from '@/components/theme-switch'
 import { ConfigDrawer } from '@/components/config-drawer'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { Link, useNavigate } from '@tanstack/react-router'
-import { useEvents, useDeleteEvent, useRSVPEvent, useCompleteEvent, useCancelEvent, useEventStats } from '@/hooks/useRemindersAndEvents'
+import { useEvents, useDeleteEvent, useRSVPEvent, useCompleteEvent, useCancelEvent, usePostponeEvent, useEventStats } from '@/hooks/useRemindersAndEvents'
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -29,6 +29,16 @@ import { ProductivityHero } from '@/components/productivity-hero'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Checkbox } from '@/components/ui/checkbox'
+import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog'
 import { toast } from 'sonner'
 
 export function EventsView() {
@@ -60,6 +70,13 @@ export function EventsView() {
     const { mutate: rsvpEvent } = useRSVPEvent()
     const completeEventMutation = useCompleteEvent()
     const cancelEventMutation = useCancelEvent()
+    const postponeEventMutation = usePostponeEvent()
+
+    // Postpone dialog state
+    const [postponeEventId, setPostponeEventId] = useState<string | null>(null)
+    const [postponeDate, setPostponeDate] = useState('')
+    const [postponeTime, setPostponeTime] = useState('')
+    const [postponeReason, setPostponeReason] = useState('')
 
     // Transform API data
     const events = useMemo(() => {
@@ -100,6 +117,22 @@ export function EventsView() {
 
     const handleCancelEvent = (eventId: string) => {
         cancelEventMutation.mutate({ id: eventId })
+    }
+
+    const handlePostponeEvent = () => {
+        if (!postponeEventId || !postponeDate || !postponeTime) return
+        const newDateTime = new Date(`${postponeDate}T${postponeTime}:00`).toISOString()
+        postponeEventMutation.mutate(
+            { id: postponeEventId, newDateTime, reason: postponeReason || undefined },
+            {
+                onSuccess: () => {
+                    setPostponeEventId(null)
+                    setPostponeDate('')
+                    setPostponeTime('')
+                    setPostponeReason('')
+                }
+            }
+        )
     }
 
     // Selection Handlers
@@ -322,6 +355,12 @@ export function EventsView() {
                                                             إلغاء
                                                         </DropdownMenuItem>
                                                     )}
+                                                    {event.status !== 'completed' && event.status !== 'cancelled' && (
+                                                        <DropdownMenuItem onClick={() => setPostponeEventId(event.id)}>
+                                                            <CalendarClock className="h-4 w-4 ml-2" />
+                                                            تأجيل
+                                                        </DropdownMenuItem>
+                                                    )}
                                                     <DropdownMenuSeparator />
                                                     <DropdownMenuItem
                                                         onClick={() => handleDeleteEvent(event.id)}
@@ -386,6 +425,61 @@ export function EventsView() {
                     />
                 </div>
             </Main>
+
+            {/* Postpone Event Dialog */}
+            <Dialog open={!!postponeEventId} onOpenChange={(open) => !open && setPostponeEventId(null)}>
+                <DialogContent className="sm:max-w-[425px]">
+                    <DialogHeader>
+                        <DialogTitle>تأجيل الحدث</DialogTitle>
+                        <DialogDescription>
+                            حدد التاريخ والوقت الجديد للحدث
+                        </DialogDescription>
+                    </DialogHeader>
+                    <div className="grid gap-4 py-4">
+                        <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium">التاريخ الجديد</label>
+                                <Input
+                                    type="date"
+                                    value={postponeDate}
+                                    onChange={(e) => setPostponeDate(e.target.value)}
+                                    className="rounded-xl"
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium">الوقت الجديد</label>
+                                <Input
+                                    type="time"
+                                    value={postponeTime}
+                                    onChange={(e) => setPostponeTime(e.target.value)}
+                                    className="rounded-xl"
+                                />
+                            </div>
+                        </div>
+                        <div className="space-y-2">
+                            <label className="text-sm font-medium">سبب التأجيل (اختياري)</label>
+                            <Textarea
+                                placeholder="أدخل سبب التأجيل..."
+                                value={postponeReason}
+                                onChange={(e) => setPostponeReason(e.target.value)}
+                                className="rounded-xl"
+                            />
+                        </div>
+                    </div>
+                    <DialogFooter>
+                        <Button variant="outline" onClick={() => setPostponeEventId(null)}>
+                            إلغاء
+                        </Button>
+                        <Button
+                            onClick={handlePostponeEvent}
+                            disabled={!postponeDate || !postponeTime || postponeEventMutation.isPending}
+                            className="bg-blue-500 hover:bg-blue-600"
+                        >
+                            {postponeEventMutation.isPending ? 'جاري التأجيل...' : 'تأجيل'}
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </>
     )
 }
