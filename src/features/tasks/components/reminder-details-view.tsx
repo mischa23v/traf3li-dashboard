@@ -245,6 +245,113 @@ export function ReminderDetailsView() {
                     <>
                         <ProductivityHero badge="التذكيرات" title={reminder.title} type="reminders" hideButtons={false} />
 
+                        {/* ACTION BUTTONS */}
+                        <div className="max-w-[1600px] mx-auto">
+                            <div className="bg-white rounded-2xl p-4 shadow-sm border border-slate-100 flex flex-wrap gap-3 items-center justify-between">
+                                <div className="flex flex-wrap gap-3">
+                                    {/* Complete/Reopen Button */}
+                                    <Button
+                                        onClick={handleComplete}
+                                        disabled={completeReminderMutation.isPending || reopenReminderMutation.isPending}
+                                        className={reminder.status === 'completed'
+                                            ? "bg-amber-500 hover:bg-amber-600 text-white rounded-xl"
+                                            : "bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl"
+                                        }
+                                    >
+                                        {(completeReminderMutation.isPending || reopenReminderMutation.isPending) ? (
+                                            <Loader2 className="h-4 w-4 ml-2 animate-spin" />
+                                        ) : (
+                                            <CheckCircle2 className="h-4 w-4 ml-2" />
+                                        )}
+                                        {reminder.status === 'completed' ? 'إعادة فتح' : 'إكمال'}
+                                    </Button>
+
+                                    {/* Dismiss Button */}
+                                    {reminder.status !== 'dismissed' && reminder.status !== 'completed' && (
+                                        <Button
+                                            onClick={handleDismiss}
+                                            disabled={dismissReminderMutation.isPending}
+                                            variant="outline"
+                                            className="border-slate-300 text-slate-700 hover:bg-slate-50 rounded-xl"
+                                        >
+                                            {dismissReminderMutation.isPending ? (
+                                                <Loader2 className="h-4 w-4 ml-2 animate-spin" />
+                                            ) : (
+                                                <XCircle className="h-4 w-4 ml-2" />
+                                            )}
+                                            تجاهل
+                                        </Button>
+                                    )}
+
+                                    {/* Snooze Dropdown */}
+                                    {reminder.status !== 'completed' && reminder.status !== 'dismissed' && (
+                                        <DropdownMenu>
+                                            <DropdownMenuTrigger asChild>
+                                                <Button
+                                                    variant="outline"
+                                                    disabled={snoozeReminderMutation.isPending}
+                                                    className="border-slate-300 text-slate-700 hover:bg-slate-50 rounded-xl"
+                                                >
+                                                    {snoozeReminderMutation.isPending ? (
+                                                        <Loader2 className="h-4 w-4 ml-2 animate-spin" />
+                                                    ) : (
+                                                        <Clock className="h-4 w-4 ml-2" />
+                                                    )}
+                                                    تأجيل
+                                                </Button>
+                                            </DropdownMenuTrigger>
+                                            <DropdownMenuContent align="start" className="w-48">
+                                                {SNOOZE_OPTIONS.map((option) => (
+                                                    <DropdownMenuItem
+                                                        key={option.value}
+                                                        onClick={() => handleSnooze(option.value)}
+                                                    >
+                                                        {option.label}
+                                                    </DropdownMenuItem>
+                                                ))}
+                                            </DropdownMenuContent>
+                                        </DropdownMenu>
+                                    )}
+                                </div>
+
+                                {/* Delete Button */}
+                                <div className="flex gap-3">
+                                    {showDeleteConfirm ? (
+                                        <>
+                                            <Button
+                                                onClick={() => setShowDeleteConfirm(false)}
+                                                variant="outline"
+                                                className="rounded-xl"
+                                            >
+                                                إلغاء
+                                            </Button>
+                                            <Button
+                                                onClick={handleDelete}
+                                                disabled={deleteReminderMutation.isPending}
+                                                className="bg-red-600 hover:bg-red-700 text-white rounded-xl"
+                                            >
+                                                {deleteReminderMutation.isPending ? (
+                                                    <Loader2 className="h-4 w-4 ml-2 animate-spin" />
+                                                ) : (
+                                                    <Trash2 className="h-4 w-4 ml-2" />
+                                                )}
+                                                تأكيد الحذف
+                                            </Button>
+                                        </>
+                                    ) : (
+                                        <Button
+                                            onClick={() => setShowDeleteConfirm(true)}
+                                            variant="outline"
+                                            className="border-red-200 text-red-600 hover:bg-red-50 rounded-xl"
+                                        >
+                                            <Trash2 className="h-4 w-4 ml-2" />
+                                            حذف
+                                        </Button>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+
                         {/* MAIN CONTENT GRID */}
                         <div className="max-w-[1600px] mx-auto pb-12">
                             <div className="grid grid-cols-12 gap-6">

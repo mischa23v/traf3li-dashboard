@@ -218,6 +218,129 @@ export function EventDetailsView() {
                     <>
                         <ProductivityHero badge="الأحداث" title={event.title} type="events" hideButtons={false} />
 
+                        {/* ACTION BUTTONS */}
+                        <div className="max-w-[1600px] mx-auto">
+                            <div className="bg-white rounded-2xl p-4 shadow-sm border border-slate-100 flex flex-wrap gap-3 items-center justify-between">
+                                <div className="flex flex-wrap gap-3">
+                                    {/* Complete Button */}
+                                    {event.status !== 'completed' && event.status !== 'cancelled' && (
+                                        <Button
+                                            onClick={handleComplete}
+                                            disabled={completeEventMutation.isPending}
+                                            className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl"
+                                        >
+                                            {completeEventMutation.isPending ? (
+                                                <Loader2 className="h-4 w-4 ml-2 animate-spin" />
+                                            ) : (
+                                                <CheckCircle2 className="h-4 w-4 ml-2" />
+                                            )}
+                                            إكمال
+                                        </Button>
+                                    )}
+
+                                    {/* Cancel Button */}
+                                    {event.status !== 'cancelled' && event.status !== 'completed' && (
+                                        <Button
+                                            onClick={handleCancel}
+                                            disabled={cancelEventMutation.isPending}
+                                            variant="outline"
+                                            className="border-amber-300 text-amber-700 hover:bg-amber-50 rounded-xl"
+                                        >
+                                            {cancelEventMutation.isPending ? (
+                                                <Loader2 className="h-4 w-4 ml-2 animate-spin" />
+                                            ) : (
+                                                <XCircle className="h-4 w-4 ml-2" />
+                                            )}
+                                            إلغاء الفعالية
+                                        </Button>
+                                    )}
+
+                                    {/* RSVP Dropdown */}
+                                    {event.status !== 'completed' && event.status !== 'cancelled' && (
+                                        <DropdownMenu>
+                                            <DropdownMenuTrigger asChild>
+                                                <Button
+                                                    variant="outline"
+                                                    disabled={rsvpEventMutation.isPending}
+                                                    className="border-blue-300 text-blue-700 hover:bg-blue-50 rounded-xl"
+                                                >
+                                                    {rsvpEventMutation.isPending ? (
+                                                        <Loader2 className="h-4 w-4 ml-2 animate-spin" />
+                                                    ) : (
+                                                        <CalendarIcon className="h-4 w-4 ml-2" />
+                                                    )}
+                                                    تأكيد الحضور
+                                                </Button>
+                                            </DropdownMenuTrigger>
+                                            <DropdownMenuContent align="start" className="w-48">
+                                                <DropdownMenuItem onClick={() => handleRSVP('accepted')}>
+                                                    <Check className="h-4 w-4 ml-2 text-emerald-500" />
+                                                    سأحضر
+                                                </DropdownMenuItem>
+                                                <DropdownMenuItem onClick={() => handleRSVP('tentative')}>
+                                                    <HelpCircle className="h-4 w-4 ml-2 text-amber-500" />
+                                                    ربما
+                                                </DropdownMenuItem>
+                                                <DropdownMenuItem onClick={() => handleRSVP('declined')}>
+                                                    <X className="h-4 w-4 ml-2 text-red-500" />
+                                                    لن أحضر
+                                                </DropdownMenuItem>
+                                            </DropdownMenuContent>
+                                        </DropdownMenu>
+                                    )}
+
+                                    {/* Status Badge */}
+                                    <Badge
+                                        variant="outline"
+                                        className={
+                                            event.status === 'completed' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' :
+                                            event.status === 'cancelled' ? 'bg-red-50 text-red-700 border-red-200' :
+                                            'bg-blue-50 text-blue-700 border-blue-200'
+                                        }
+                                    >
+                                        {event.status === 'completed' ? 'مكتملة' :
+                                         event.status === 'cancelled' ? 'ملغاة' : 'مجدولة'}
+                                    </Badge>
+                                </div>
+
+                                {/* Delete Button */}
+                                <div className="flex gap-3">
+                                    {showDeleteConfirm ? (
+                                        <>
+                                            <Button
+                                                onClick={() => setShowDeleteConfirm(false)}
+                                                variant="outline"
+                                                className="rounded-xl"
+                                            >
+                                                إلغاء
+                                            </Button>
+                                            <Button
+                                                onClick={handleDelete}
+                                                disabled={deleteEventMutation.isPending}
+                                                className="bg-red-600 hover:bg-red-700 text-white rounded-xl"
+                                            >
+                                                {deleteEventMutation.isPending ? (
+                                                    <Loader2 className="h-4 w-4 ml-2 animate-spin" />
+                                                ) : (
+                                                    <Trash2 className="h-4 w-4 ml-2" />
+                                                )}
+                                                تأكيد الحذف
+                                            </Button>
+                                        </>
+                                    ) : (
+                                        <Button
+                                            onClick={() => setShowDeleteConfirm(true)}
+                                            variant="outline"
+                                            className="border-red-200 text-red-600 hover:bg-red-50 rounded-xl"
+                                        >
+                                            <Trash2 className="h-4 w-4 ml-2" />
+                                            حذف
+                                        </Button>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+
                         {/* MAIN CONTENT GRID */}
                         <div className="max-w-[1600px] mx-auto pb-12">
                             <div className="grid grid-cols-12 gap-6">

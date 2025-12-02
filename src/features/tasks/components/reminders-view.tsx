@@ -2,7 +2,8 @@ import { useState, useMemo } from 'react'
 import { TasksSidebar } from './tasks-sidebar'
 import {
     Clock, MoreHorizontal, Plus,
-    Calendar as CalendarIcon, Search, AlertCircle, ChevronLeft, Bell
+    Calendar as CalendarIcon, Search, AlertCircle, ChevronLeft, Bell,
+    Eye, Trash2, CheckCircle, XCircle
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -14,8 +15,15 @@ import { LanguageSwitcher } from '@/components/language-switcher'
 import { ThemeSwitch } from '@/components/theme-switch'
 import { ConfigDrawer } from '@/components/config-drawer'
 import { ProfileDropdown } from '@/components/profile-dropdown'
-import { Link } from '@tanstack/react-router'
-import { useReminders, useDeleteReminder, useReminderStats } from '@/hooks/useRemindersAndEvents'
+import { Link, useNavigate } from '@tanstack/react-router'
+import { useReminders, useDeleteReminder, useCompleteReminder, useDismissReminder, useReminderStats } from '@/hooks/useRemindersAndEvents'
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 import { StatCard } from '@/components/stat-card'
 import { ProductivityHero } from '@/components/productivity-hero'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -24,6 +32,7 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { toast } from 'sonner'
 
 export function RemindersView() {
+    const navigate = useNavigate()
     const [activeTab, setActiveTab] = useState('upcoming')
     const [isSelectionMode, setIsSelectionMode] = useState(false)
     const [selectedReminderIds, setSelectedReminderIds] = useState<string[]>([])
@@ -43,6 +52,32 @@ export function RemindersView() {
     const { data: remindersData, isLoading, isError, error, refetch } = useReminders(filters)
     const { data: stats } = useReminderStats()
     const { mutateAsync: deleteReminder } = useDeleteReminder()
+    const completeReminderMutation = useCompleteReminder()
+    const dismissReminderMutation = useDismissReminder()
+
+    // Single reminder actions
+    const handleViewReminder = (reminderId: string) => {
+        navigate({ to: '/dashboard/tasks/reminders/$reminderId', params: { reminderId } })
+    }
+
+    const handleDeleteReminder = async (reminderId: string) => {
+        if (confirm('هل أنت متأكد من حذف هذا التذكير؟')) {
+            try {
+                await deleteReminder(reminderId)
+                toast.success('تم حذف التذكير بنجاح')
+            } catch (error) {
+                toast.error('فشل حذف التذكير')
+            }
+        }
+    }
+
+    const handleCompleteReminder = (reminderId: string) => {
+        completeReminderMutation.mutate(reminderId)
+    }
+
+    const handleDismissReminder = (reminderId: string) => {
+        dismissReminderMutation.mutate(reminderId)
+    }
 
     // Transform API data
     const reminders = useMemo(() => {
@@ -246,9 +281,40 @@ export function RemindersView() {
                                                     </p>
                                                 </div>
                                             </div>
-                                            <Button variant="ghost" size="icon" className="text-slate-400 hover:text-navy">
-                                                <MoreHorizontal className="h-5 w-5" />
-                                            </Button>
+                                            <DropdownMenu>
+                                                <DropdownMenuTrigger asChild>
+                                                    <Button variant="ghost" size="icon" className="text-slate-400 hover:text-navy">
+                                                        <MoreHorizontal className="h-5 w-5" />
+                                                    </Button>
+                                                </DropdownMenuTrigger>
+                                                <DropdownMenuContent align="end" className="w-48">
+                                                    <DropdownMenuItem onClick={() => handleViewReminder(reminder.id)}>
+                                                        <Eye className="h-4 w-4 ml-2" />
+                                                        عرض التفاصيل
+                                                    </DropdownMenuItem>
+                                                    <DropdownMenuSeparator />
+                                                    {reminder.status !== 'completed' && (
+                                                        <DropdownMenuItem onClick={() => handleCompleteReminder(reminder.id)}>
+                                                            <CheckCircle className="h-4 w-4 ml-2" />
+                                                            إكمال
+                                                        </DropdownMenuItem>
+                                                    )}
+                                                    {reminder.status !== 'dismissed' && (
+                                                        <DropdownMenuItem onClick={() => handleDismissReminder(reminder.id)}>
+                                                            <XCircle className="h-4 w-4 ml-2" />
+                                                            تجاهل
+                                                        </DropdownMenuItem>
+                                                    )}
+                                                    <DropdownMenuSeparator />
+                                                    <DropdownMenuItem
+                                                        onClick={() => handleDeleteReminder(reminder.id)}
+                                                        className="text-red-600 focus:text-red-600"
+                                                    >
+                                                        <Trash2 className="h-4 w-4 ml-2" />
+                                                        حذف
+                                                    </DropdownMenuItem>
+                                                </DropdownMenuContent>
+                                            </DropdownMenu>
                                         </div>
 
                                         <div className="flex items-center justify-between pt-4 border-t border-slate-200/50">

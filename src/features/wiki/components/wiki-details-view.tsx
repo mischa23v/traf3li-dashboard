@@ -270,6 +270,176 @@ export function WikiDetailsView() {
           <>
             <ProductivityHero badge="الموسوعة القانونية" title={isArabic ? page.titleAr || page.title : page.title} type="wiki" hideButtons={false} />
 
+            {/* ACTION BUTTONS */}
+            <div className="max-w-[1600px] mx-auto">
+              <div className="bg-white rounded-2xl p-4 shadow-sm border border-slate-100 flex flex-wrap gap-3 items-center justify-between">
+                <div className="flex flex-wrap gap-3 items-center">
+                  {/* Edit Button */}
+                  {!page.isSealed && (
+                    <Button
+                      asChild
+                      className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl"
+                    >
+                      <Link to={`/dashboard/cases/${caseId}/wiki/${pageId}/edit` as any}>
+                        <Edit3 className="h-4 w-4 me-2" />
+                        {isArabic ? 'تحرير' : 'Edit'}
+                      </Link>
+                    </Button>
+                  )}
+
+                  {/* Toggle Pin Button */}
+                  <Button
+                    onClick={handleTogglePin}
+                    disabled={togglePinMutation.isPending}
+                    variant="outline"
+                    className={page.isPinned
+                      ? "border-amber-300 text-amber-700 hover:bg-amber-50 rounded-xl"
+                      : "border-slate-300 text-slate-700 hover:bg-slate-50 rounded-xl"
+                    }
+                  >
+                    {togglePinMutation.isPending ? (
+                      <Loader2 className="h-4 w-4 me-2 animate-spin" />
+                    ) : (
+                      <Pin className={`h-4 w-4 me-2 ${page.isPinned ? 'fill-amber-500' : ''}`} />
+                    )}
+                    {page.isPinned
+                      ? (isArabic ? 'إلغاء التثبيت' : 'Unpin')
+                      : (isArabic ? 'تثبيت' : 'Pin')
+                    }
+                  </Button>
+
+                  {/* Seal/Unseal Button */}
+                  {page.isSealed ? (
+                    <Button
+                      onClick={handleUnseal}
+                      disabled={unsealMutation.isPending}
+                      variant="outline"
+                      className="border-emerald-300 text-emerald-700 hover:bg-emerald-50 rounded-xl"
+                    >
+                      {unsealMutation.isPending ? (
+                        <Loader2 className="h-4 w-4 me-2 animate-spin" />
+                      ) : (
+                        <Lock className="h-4 w-4 me-2" />
+                      )}
+                      {isArabic ? 'فك الختم' : 'Unseal'}
+                    </Button>
+                  ) : (
+                    <Button
+                      onClick={handleSeal}
+                      disabled={sealMutation.isPending}
+                      variant="outline"
+                      className="border-slate-300 text-slate-700 hover:bg-slate-50 rounded-xl"
+                    >
+                      {sealMutation.isPending ? (
+                        <Loader2 className="h-4 w-4 me-2 animate-spin" />
+                      ) : (
+                        <Shield className="h-4 w-4 me-2" />
+                      )}
+                      {isArabic ? 'ختم' : 'Seal'}
+                    </Button>
+                  )}
+
+                  {/* Export Dropdown */}
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        variant="outline"
+                        disabled={exportMutation.isPending}
+                        className="border-slate-300 text-slate-700 hover:bg-slate-50 rounded-xl"
+                      >
+                        {exportMutation.isPending ? (
+                          <Loader2 className="h-4 w-4 me-2 animate-spin" />
+                        ) : (
+                          <Download className="h-4 w-4 me-2" />
+                        )}
+                        {isArabic ? 'تصدير' : 'Export'}
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="start" className="w-48">
+                      <DropdownMenuItem onClick={() => exportMutation.mutate({ pageId: page._id, format: 'pdf' })}>
+                        <FileType className="h-4 w-4 me-2" />
+                        PDF
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => exportMutation.mutate({ pageId: page._id, format: 'html' })}>
+                        <FileCode className="h-4 w-4 me-2" />
+                        HTML
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => exportMutation.mutate({ pageId: page._id, format: 'markdown' })}>
+                        <FileText className="h-4 w-4 me-2" />
+                        Markdown
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+
+                  {/* Copy Link Button */}
+                  <Button
+                    onClick={handleCopyLink}
+                    variant="outline"
+                    className="border-slate-300 text-slate-700 hover:bg-slate-50 rounded-xl"
+                  >
+                    <Copy className="h-4 w-4 me-2" />
+                    {isArabic ? 'نسخ الرابط' : 'Copy Link'}
+                  </Button>
+
+                  {/* Status Badges */}
+                  {page.isPinned && (
+                    <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-200">
+                      <Pin className="h-3 w-3 me-1 fill-amber-500" />
+                      {isArabic ? 'مثبت' : 'Pinned'}
+                    </Badge>
+                  )}
+                  {page.isSealed && (
+                    <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200">
+                      <Lock className="h-3 w-3 me-1" />
+                      {isArabic ? 'مختوم' : 'Sealed'}
+                    </Badge>
+                  )}
+                  <Badge
+                    variant="outline"
+                    className={pageStatusColors[page.status as WikiPageStatus] || 'bg-slate-50 text-slate-700 border-slate-200'}
+                  >
+                    {getStatusLabel(page.status as WikiPageStatus)}
+                  </Badge>
+                </div>
+
+                {/* Delete Button */}
+                <div className="flex gap-3">
+                  {showDeleteConfirm ? (
+                    <>
+                      <Button
+                        onClick={() => setShowDeleteConfirm(false)}
+                        variant="outline"
+                        className="rounded-xl"
+                      >
+                        {isArabic ? 'إلغاء' : 'Cancel'}
+                      </Button>
+                      <Button
+                        onClick={handleDelete}
+                        disabled={deleteMutation.isPending}
+                        className="bg-red-600 hover:bg-red-700 text-white rounded-xl"
+                      >
+                        {deleteMutation.isPending ? (
+                          <Loader2 className="h-4 w-4 me-2 animate-spin" />
+                        ) : (
+                          <Trash2 className="h-4 w-4 me-2" />
+                        )}
+                        {isArabic ? 'تأكيد الحذف' : 'Confirm Delete'}
+                      </Button>
+                    </>
+                  ) : (
+                    <Button
+                      onClick={() => setShowDeleteConfirm(true)}
+                      variant="outline"
+                      className="border-red-200 text-red-600 hover:bg-red-50 rounded-xl"
+                    >
+                      <Trash2 className="h-4 w-4 me-2" />
+                      {isArabic ? 'حذف' : 'Delete'}
+                    </Button>
+                  )}
+                </div>
+              </div>
+            </div>
+
             {/* MAIN CONTENT GRID */}
             <div className="max-w-[1600px] mx-auto pb-12">
               <div className="grid grid-cols-12 gap-6">

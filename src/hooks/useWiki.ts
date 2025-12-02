@@ -310,6 +310,25 @@ export const useWikiGlobalSearch = (query: string, limit = 20) => {
 }
 
 /**
+ * Fetch global wiki stats across all cases
+ */
+export const useWikiGlobalStats = () => {
+  return useQuery({
+    queryKey: [...wikiKeys.all, 'globalStats'],
+    queryFn: async () => {
+      // Fetch recent pages and derive stats from them
+      const pages = await wikiPageService.getRecent(100)
+      return {
+        totalPages: pages?.length || 0,
+        publishedPages: pages?.filter(p => p.status === 'published').length || 0,
+        draftPages: pages?.filter(p => p.status === 'draft').length || 0,
+        pinnedPages: pages?.filter(p => p.isPinned).length || 0
+      }
+    }
+  })
+}
+
+/**
  * Fetch link graph for visualization
  */
 export const useWikiLinkGraph = (caseId: string) => {
