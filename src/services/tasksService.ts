@@ -1429,6 +1429,18 @@ const tasksService = {
       throw new Error(handleApiError(error))
     }
   },
+
+  /**
+   * Delete voice memo
+   */
+  deleteVoiceMemo: async (taskId: string, memoId: string): Promise<void> => {
+    try {
+      await apiClient.delete(`/tasks/${taskId}/voice-memos/${memoId}`)
+    } catch (error: any) {
+      console.error('Delete voice memo error:', error)
+      throw new Error(handleApiError(error))
+    }
+  },
 }
 
 // Task Document interface
