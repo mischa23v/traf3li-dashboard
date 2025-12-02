@@ -82,17 +82,23 @@ export function EventsView() {
     const events = useMemo(() => {
         if (!eventsData?.events) return []
 
-        return eventsData.events.map((event: any) => ({
-            id: event._id,
-            title: event.title || 'حدث بدون عنوان',
-            date: event.startDate ? new Date(event.startDate).toLocaleDateString('ar-SA', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) : 'غير محدد',
-            time: event.startDate ? new Date(event.startDate).toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' }) : 'غير محدد',
-            location: event.location || 'عن بعد',
-            type: event.type || 'meeting',
-            status: event.status || 'scheduled',
-            attendees: event.attendees?.length || 0,
-            _id: event._id,
-        }))
+        return eventsData.events.map((event: any) => {
+            // Handle different date field names from API
+            const eventDate = event.startDate || event.startDateTime || event.date
+            const parsedDate = eventDate ? new Date(eventDate) : null
+
+            return {
+                id: event._id,
+                title: event.title || 'حدث بدون عنوان',
+                date: parsedDate ? parsedDate.toLocaleDateString('ar-SA', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) : 'غير محدد',
+                time: parsedDate ? parsedDate.toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' }) : (event.time || 'غير محدد'),
+                location: typeof event.location === 'string' ? event.location : (event.location?.name || event.location?.address || 'عن بعد'),
+                type: event.type || 'meeting',
+                status: event.status || 'scheduled',
+                attendees: event.attendees?.length || 0,
+                _id: event._id,
+            }
+        })
     }, [eventsData])
 
     // Single event actions
