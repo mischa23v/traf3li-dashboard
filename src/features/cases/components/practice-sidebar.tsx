@@ -1,12 +1,16 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import {
-    Clock, Bell, CheckCircle2, MapPin, Calendar as CalendarIcon,
-    Zap, Plus, CheckSquare, Trash2, List, X, ChevronRight
+    Clock, Bell, MapPin, Calendar as CalendarIcon,
+    Plus, CheckSquare, Trash2, List, X, ChevronRight, Loader2, AlertCircle
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Link } from '@tanstack/react-router'
 import { cn } from '@/lib/utils'
+import { useCalendar } from '@/hooks/useCalendar'
+import { useUpcomingReminders } from '@/hooks/useRemindersAndEvents'
+import { format, addDays, startOfDay, endOfDay, isSameDay } from 'date-fns'
+import { arSA } from 'date-fns/locale'
 
 interface PracticeSidebarProps {
     context?: 'clients' | 'organizations' | 'cases' | 'workflows' | 'documents' | 'followups' | 'contacts'
@@ -24,6 +28,34 @@ export function PracticeSidebar({
     onDeleteSelected
 }: PracticeSidebarProps) {
     const [activeTab, setActiveTab] = useState<'calendar' | 'notifications'>('calendar')
+    const [selectedDate, setSelectedDate] = useState(new Date())
+
+    // Calculate date range for the strip (Today + 4 days)
+    const startDate = useMemo(() => startOfDay(new Date()).toISOString(), [])
+    const endDate = useMemo(() => endOfDay(addDays(new Date(), 4)).toISOString(), [])
+
+    // Fetch calendar data for the calendar tab
+    const { data: calendarData, isLoading: isCalendarLoading } = useCalendar({
+        startDate,
+        endDate
+    })
+
+    // Fetch upcoming reminders for the notifications tab
+    const { data: upcomingRemindersData, isLoading: isRemindersLoading } = useUpcomingReminders(7)
+
+    // Filter events for the selected date
+    const selectedDateEvents = useMemo(() => {
+        if (!calendarData?.data?.combined) return []
+        return calendarData.data.combined.filter(event =>
+            isSameDay(new Date(event.startDate), selectedDate)
+        ).sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime())
+    }, [calendarData, selectedDate])
+
+    // Get upcoming reminders (limit to 5)
+    const upcomingReminders = useMemo(() => {
+        if (!upcomingRemindersData?.data) return []
+        return upcomingRemindersData.data.slice(0, 5)
+    }, [upcomingRemindersData])
 
     const links = {
         clients: {
@@ -57,6 +89,43 @@ export function PracticeSidebar({
     }
 
     const currentLinks = links[context] || links.clients
+
+    // Generate 5 days for the strip
+    const calendarStripDays = useMemo(() => {
+        return Array.from({ length: 5 }).map((_, i) => {
+            const date = addDays(new Date(), i)
+            return {
+                date,
+                dayName: format(date, 'EEEE', { locale: arSA }),
+                dayNumber: format(date, 'd')
+            }
+        })
+    }, [])
+
+    // Get color based on event type
+    const getEventColor = (event: { type?: string; isOverdue?: boolean }) => {
+        if (event.isOverdue) return 'red'
+        if (event.type === 'event') return 'blue'
+        if (event.type === 'task') return 'amber'
+        return 'emerald'
+    }
+
+    // Get priority color for reminders
+    const getPriorityColor = (priority?: string) => {
+        switch (priority) {
+            case 'critical': return 'red'
+            case 'high': return 'orange'
+            case 'medium': return 'blue'
+            default: return 'blue'
+        }
+    }
+
+    // Format reminder time
+    const formatReminderTime = (dateString?: string) => {
+        if (!dateString) return ''
+        const date = new Date(dateString)
+        return format(date, 'h:mm a', { locale: arSA })
+    }
 
     return (
         <div className="space-y-8 lg:col-span-1">
@@ -156,7 +225,14 @@ export function PracticeSidebar({
                         </button>
                     </div>
                     {activeTab === 'calendar' && (
-                        <Badge className="bg-emerald-500/20 text-emerald-100 border-0 rounded-full px-3 hover:bg-emerald-500/30">نوفمبر</Badge>
+                        <Badge className="bg-emerald-500/20 text-emerald-100 border-0 rounded-full px-3 hover:bg-emerald-500/30">
+                            {format(new Date(), 'MMMM', { locale: arSA })}
+                        </Badge>
+                    )}
+                    {activeTab === 'notifications' && upcomingReminders.length > 0 && (
+                        <Badge className="bg-emerald-500/20 text-emerald-100 border-0 rounded-full px-3 hover:bg-emerald-500/30">
+                            {upcomingReminders.length}
+                        </Badge>
                     )}
                 </div>
 
@@ -166,89 +242,143 @@ export function PracticeSidebar({
                         <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
                             {/* Calendar Strip */}
                             <div className="grid grid-cols-5 gap-2 text-center mb-8">
-                                {['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس'].map((day, i) => (
-                                    <div key={i} className={`rounded-xl p-2 transition-all duration-200 cursor-pointer ${i === 1 ? 'bg-[#022c22] text-white shadow-lg shadow-emerald-900/20 scale-105' : 'hover:bg-white text-slate-500'}`}>
-                                        <div className={`text-[10px] mb-1 ${i === 1 ? 'text-emerald-200' : ''}`}>{day}</div>
-                                        <div className="font-bold text-lg">{19 + i}</div>
-                                        {i === 1 && <div className="w-1.5 h-1.5 bg-emerald-400 rounded-full mx-auto mt-1"></div>}
-                                    </div>
-                                ))}
+                                {calendarStripDays.map((day, i) => {
+                                    const isSelected = isSameDay(day.date, selectedDate)
+                                    return (
+                                        <div
+                                            key={i}
+                                            onClick={() => setSelectedDate(day.date)}
+                                            className={cn(
+                                                "rounded-xl p-2 transition-all duration-200 cursor-pointer",
+                                                isSelected
+                                                    ? "bg-[#022c22] text-white shadow-lg shadow-emerald-900/20 scale-105"
+                                                    : "hover:bg-white text-slate-500"
+                                            )}
+                                        >
+                                            <div className={cn("text-[10px] mb-1", isSelected && "text-emerald-200")}>{day.dayName}</div>
+                                            <div className="font-bold text-lg">{day.dayNumber}</div>
+                                            {isSelected && <div className="w-1.5 h-1.5 bg-emerald-400 rounded-full mx-auto mt-1"></div>}
+                                        </div>
+                                    )
+                                })}
                             </div>
 
                             {/* Timeline / Agenda */}
-                            <div className="space-y-6 relative">
-                                {/* Vertical Line */}
-                                <div className="absolute top-2 bottom-2 right-[3.5rem] w-[2px] bg-slate-200"></div>
+                            <div className="space-y-6 relative min-h-[200px]">
+                                {isCalendarLoading ? (
+                                    <div className="flex items-center justify-center h-full py-12">
+                                        <Loader2 className="h-6 w-6 animate-spin text-emerald-600" />
+                                    </div>
+                                ) : selectedDateEvents.length === 0 ? (
+                                    <div className="flex flex-col items-center justify-center py-8 text-slate-400">
+                                        <CalendarIcon className="h-10 w-10 mb-2 opacity-20" />
+                                        <p className="text-xs font-medium">لا توجد أحداث لهذا اليوم</p>
+                                    </div>
+                                ) : (
+                                    <>
+                                        {/* Vertical Line */}
+                                        <div className="absolute top-2 bottom-2 right-[3.5rem] w-[2px] bg-slate-200"></div>
 
-                                {/* Event 1 */}
-                                <div className="flex gap-4 relative group">
-                                    <div className="w-14 text-center shrink-0 pt-1">
-                                        <div className="text-sm font-bold text-slate-700 group-hover:text-emerald-600 transition-colors">09:00</div>
-                                        <div className="text-[10px] text-slate-400">صباحاً</div>
-                                    </div>
-                                    <div className="absolute right-[3.25rem] top-2 w-3 h-3 bg-emerald-500 rounded-full border-2 border-white shadow-sm z-10"></div>
-                                    <div className="flex-1 bg-white rounded-xl p-3 border-r-4 border-emerald-500 shadow-sm hover:shadow-md transition-all">
-                                        <div className="font-bold text-slate-800 text-sm mb-1">جلسة مرافعة</div>
-                                        <div className="text-xs text-slate-500 flex items-center gap-1">
-                                            <MapPin className="h-3 w-3" />
-                                            المحكمة العامة
-                                        </div>
-                                    </div>
-                                </div>
+                                        {selectedDateEvents.map((event) => {
+                                            const eventTime = new Date(event.startDate).toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit', hour12: false })
+                                            const timePeriod = new Date(event.startDate).getHours() < 12 ? 'صباحاً' : 'مساءً'
+                                            const colorClass = getEventColor(event)
 
-                                {/* Event 2 */}
-                                <div className="flex gap-4 relative group">
-                                    <div className="w-14 text-center shrink-0 pt-1">
-                                        <div className="text-sm font-bold text-slate-700 group-hover:text-purple-600 transition-colors">02:00</div>
-                                        <div className="text-[10px] text-slate-400">مساءً</div>
-                                    </div>
-                                    <div className="absolute right-[3.25rem] top-2 w-3 h-3 bg-purple-500 rounded-full border-2 border-white shadow-sm z-10"></div>
-                                    <div className="flex-1 bg-white rounded-xl p-3 border-r-4 border-purple-500 shadow-sm hover:shadow-md transition-all">
-                                        <div className="font-bold text-slate-800 text-sm mb-1">غداء عمل</div>
-                                        <div className="text-xs text-slate-500 flex items-center gap-1">
-                                            <MapPin className="h-3 w-3" />
-                                            مطعم الشرفة
-                                        </div>
-                                    </div>
-                                </div>
-
-                                {/* Event 3 */}
-                                <div className="flex gap-4 relative group">
-                                    <div className="w-14 text-center shrink-0 pt-1">
-                                        <div className="text-sm font-bold text-slate-700 group-hover:text-blue-600 transition-colors">04:30</div>
-                                        <div className="text-[10px] text-slate-400">مساءً</div>
-                                    </div>
-                                    <div className="absolute right-[3.25rem] top-2 w-3 h-3 bg-blue-500 rounded-full border-2 border-white shadow-sm z-10"></div>
-                                    <div className="flex-1 bg-white rounded-xl p-3 border-r-4 border-blue-500 shadow-sm hover:shadow-md transition-all">
-                                        <div className="font-bold text-slate-800 text-sm mb-1">مراجعة العقود</div>
-                                        <div className="text-xs text-slate-500 flex items-center gap-1">
-                                            <Clock className="h-3 w-3" />
-                                            المكتب الرئيسي
-                                        </div>
-                                    </div>
-                                </div>
+                                            return (
+                                                <div key={event.id} className="flex gap-4 relative group">
+                                                    <div className="w-14 text-center shrink-0 pt-1">
+                                                        <div className={cn("text-sm font-bold text-slate-700 transition-colors", `group-hover:text-${colorClass}-600`)}>
+                                                            {eventTime}
+                                                        </div>
+                                                        <div className="text-[10px] text-slate-400">{timePeriod}</div>
+                                                    </div>
+                                                    <div className={cn("absolute right-[3.25rem] top-2 w-3 h-3 rounded-full border-2 border-white shadow-sm z-10", `bg-${colorClass}-500`)}></div>
+                                                    <div className={cn("flex-1 bg-white rounded-xl p-3 shadow-sm hover:shadow-md transition-all", `border-r-4 border-${colorClass}-500`)}>
+                                                        <div className="font-bold text-slate-800 text-sm mb-1">{event.title}</div>
+                                                        {event.location && (
+                                                            <div className="text-xs text-slate-500 flex items-center gap-1">
+                                                                <MapPin className="h-3 w-3" />
+                                                                {event.location}
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            )
+                                        })}
+                                    </>
+                                )}
                             </div>
 
-                            <Button variant="ghost" className="w-full mt-6 text-slate-500 hover:text-emerald-700 hover:bg-emerald-50 group">
-                                <span>عرض الجدول الكامل</span>
-                                <ChevronRight className="w-4 h-4 mr-2 transition-transform group-hover:-translate-x-1" />
+                            <Button asChild variant="ghost" className="w-full mt-6 text-slate-500 hover:text-emerald-700 hover:bg-emerald-50 group cursor-pointer">
+                                <Link to="/dashboard/calendar">
+                                    <span>عرض الجدول الكامل</span>
+                                    <ChevronRight className="w-4 h-4 mr-2 transition-transform group-hover:-translate-x-1" />
+                                </Link>
                             </Button>
                         </div>
                     ) : (
-                        <div className="space-y-3 animate-in fade-in slide-in-from-bottom-2 duration-300">
-                            {[1, 2, 3].map((_, i) => (
-                                <div key={i} className="flex gap-3 p-3 rounded-xl bg-white border border-slate-100 hover:shadow-md transition-all cursor-pointer group">
-                                    <div className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center text-blue-500 shrink-0 group-hover:bg-blue-500 group-hover:text-white transition-colors">
-                                        <Bell className="w-5 h-5" />
-                                    </div>
-                                    <div>
-                                        <p className="text-sm font-bold text-slate-800 group-hover:text-blue-600 transition-colors">تذكير جديد</p>
-                                        <p className="text-xs text-slate-500 mt-1">لديك اجتماع في تمام الساعة 2:00 مساءً</p>
-                                    </div>
+                        <div className="space-y-3 animate-in fade-in slide-in-from-bottom-2 duration-300 min-h-[200px]">
+                            {isRemindersLoading ? (
+                                <div className="flex items-center justify-center h-full py-12">
+                                    <Loader2 className="h-6 w-6 animate-spin text-emerald-600" />
                                 </div>
-                            ))}
-                            <Button variant="ghost" className="w-full text-xs text-slate-400 hover:text-emerald-600 hover:bg-emerald-50">
-                                عرض كل التنبيهات
+                            ) : upcomingReminders.length === 0 ? (
+                                <div className="flex flex-col items-center justify-center py-8 text-slate-400">
+                                    <Bell className="h-10 w-10 mb-2 opacity-20" />
+                                    <p className="text-xs font-medium">لا توجد تنبيهات قادمة</p>
+                                </div>
+                            ) : (
+                                <>
+                                    {upcomingReminders.map((reminder) => {
+                                        const priorityColor = getPriorityColor(reminder.priority)
+                                        const reminderDate = reminder.reminderDateTime || reminder.reminderDate
+                                        const isOverdue = reminderDate && new Date(reminderDate) < new Date()
+
+                                        return (
+                                            <Link
+                                                key={reminder._id}
+                                                to={`/dashboard/tasks/reminders/${reminder._id}`}
+                                                className="flex gap-3 p-3 rounded-xl bg-white border border-slate-100 hover:shadow-md transition-all cursor-pointer group"
+                                            >
+                                                <div className={cn(
+                                                    "w-10 h-10 rounded-full flex items-center justify-center shrink-0 transition-colors",
+                                                    isOverdue
+                                                        ? "bg-red-50 text-red-500 group-hover:bg-red-500 group-hover:text-white"
+                                                        : `bg-${priorityColor}-50 text-${priorityColor}-500 group-hover:bg-${priorityColor}-500 group-hover:text-white`
+                                                )}>
+                                                    {isOverdue ? <AlertCircle className="w-5 h-5" /> : <Bell className="w-5 h-5" />}
+                                                </div>
+                                                <div className="flex-1 min-w-0">
+                                                    <p className={cn(
+                                                        "text-sm font-bold text-slate-800 transition-colors truncate",
+                                                        isOverdue ? "group-hover:text-red-600" : `group-hover:text-${priorityColor}-600`
+                                                    )}>
+                                                        {reminder.title}
+                                                    </p>
+                                                    <div className="flex items-center gap-2 mt-1">
+                                                        {reminderDate && (
+                                                            <p className="text-xs text-slate-500">
+                                                                {format(new Date(reminderDate), 'dd MMM', { locale: arSA })}
+                                                                {' - '}
+                                                                {formatReminderTime(reminderDate)}
+                                                            </p>
+                                                        )}
+                                                        {isOverdue && (
+                                                            <Badge variant="destructive" className="text-[10px] px-1.5 py-0">
+                                                                متأخر
+                                                            </Badge>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            </Link>
+                                        )
+                                    })}
+                                </>
+                            )}
+                            <Button asChild variant="ghost" className="w-full text-xs text-slate-400 hover:text-emerald-600 hover:bg-emerald-50">
+                                <Link to="/dashboard/tasks/reminders">
+                                    عرض كل التنبيهات
+                                </Link>
                             </Button>
                         </div>
                     )}
