@@ -10,8 +10,8 @@ import {
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { StatCard } from '@/components/stat-card'
-import { useDueTodayTasks, useOverdueTasks } from '@/hooks/useTasks'
-import { useUpcomingEvents, useReminderStats } from '@/hooks/useRemindersAndEvents'
+import { useDueTodayTasks, useOverdueTasks, useUpcomingTasks } from '@/hooks/useTasks'
+import { useReminderStats } from '@/hooks/useRemindersAndEvents'
 
 interface StatItem {
     label: string;
@@ -34,13 +34,13 @@ export function ProductivityHero({ badge, title = 'الإنتاجية', type = '
     // Fetch Stats (only if stats prop is not provided)
     const { data: dueTodayTasks } = useDueTodayTasks()
     const { data: overdueTasks } = useOverdueTasks()
-    const { data: upcomingEvents } = useUpcomingEvents(7) // Next 7 days
+    const { data: upcomingTasks } = useUpcomingTasks(7) // Next 7 days
     const { data: reminderStats } = useReminderStats()
 
     // Calculate counts
     const tasksDueTodayCount = Array.isArray(dueTodayTasks) ? dueTodayTasks.length : 0
     const overdueTasksCount = Array.isArray(overdueTasks) ? overdueTasks.length : 0
-    const upcomingEventsCount = Array.isArray(upcomingEvents) ? upcomingEvents.length : 0
+    const upcomingTasksCount = Array.isArray(upcomingTasks) ? upcomingTasks.length : 0
     const pendingRemindersCount = reminderStats?.pending || 0
 
     const buttonConfig: Record<string, { label: string; href: string }> = {
@@ -158,8 +158,8 @@ export function ProductivityHero({ badge, title = 'الإنتاجية', type = '
                                         className="py-3 px-4"
                                     />
                                     <StatCard
-                                        label="أحداث قادمة"
-                                        value={upcomingEventsCount}
+                                        label="مهام قادمة"
+                                        value={upcomingTasksCount}
                                         icon={CalendarRange}
                                         status="normal"
                                         className="py-3 px-4"
