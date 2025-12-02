@@ -23,13 +23,15 @@ export function TasksListView() {
     const [isSelectionMode, setIsSelectionMode] = useState(false)
     const [selectedTaskIds, setSelectedTaskIds] = useState<string[]>([])
 
-    // API Filters
+    // API Filters - Map UI tabs to actual task status values
+    // TaskStatus: 'backlog' | 'todo' | 'in_progress' | 'done' | 'canceled'
     const filters = useMemo(() => {
         const f: any = {}
         if (activeStatusTab === 'active') {
-            f.status = 'active'
+            // Active tasks = not done and not canceled
+            f.status = ['backlog', 'todo', 'in_progress']
         } else if (activeStatusTab === 'completed') {
-            f.status = 'completed'
+            f.status = 'done'
         }
         return f
     }, [activeStatusTab])
