@@ -44,8 +44,7 @@ import type {
 
 const PRIORITY_OPTIONS: { value: ReminderPriority; label: string; color: string }[] = [
     { value: 'critical', label: 'حرج', color: 'bg-red-500' },
-    { value: 'urgent', label: 'عاجل جداً', color: 'bg-orange-500' },
-    { value: 'high', label: 'عالية', color: 'bg-amber-500' },
+    { value: 'high', label: 'عالية', color: 'bg-orange-500' },
     { value: 'medium', label: 'متوسطة', color: 'bg-yellow-500' },
     { value: 'low', label: 'منخفضة', color: 'bg-blue-500' },
 ]
@@ -197,9 +196,15 @@ export function CreateReminderView() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
 
+        // Transform advanceNotifications to the correct format for API
+        const formattedAdvanceNotifications = advanceNotifications.map(minutes => ({
+            beforeMinutes: minutes,
+            channels: notificationChannels,
+        }))
+
         const notificationConfig: NotificationConfig = {
             channels: notificationChannels,
-            advanceNotifications: advanceNotifications,
+            advanceNotifications: formattedAdvanceNotifications,
             escalationEnabled: escalationEnabled,
             escalationDelayMinutes: escalationDelay,
             soundEnabled: true,
