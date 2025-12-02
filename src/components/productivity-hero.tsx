@@ -34,7 +34,7 @@ export function ProductivityHero({ badge, title = 'الإنتاجية', type = '
     // Fetch Stats (only if stats prop is not provided)
     const { data: dueTodayTasks } = useDueTodayTasks()
     const { data: overdueTasks } = useOverdueTasks()
-    const { data: upcomingTasks } = useUpcomingTasks(7) // Next 7 days
+    const { data: upcomingTasks } = useUpcomingTasks(14) // Next 14 days
     const { data: reminderStats } = useReminderStats()
 
     // Calculate counts
