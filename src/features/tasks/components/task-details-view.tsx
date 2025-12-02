@@ -214,8 +214,10 @@ export function TaskDetailsView() {
         const clientInfo = typeof t.clientId === 'string' || !t.clientId
             ? { name: 'غير محدد', type: 'فرد', phone: '', _id: typeof t.clientId === 'string' ? t.clientId : null }
             : {
-                name: t.clientId.name || 'غير محدد',
-                type: 'فرد',
+                name: t.clientId.firstName && t.clientId.lastName
+                    ? `${t.clientId.firstName} ${t.clientId.lastName}`
+                    : t.clientId.name || 'غير محدد',
+                type: t.clientId.type === 'individual' ? 'فرد' : t.clientId.type === 'company' ? 'شركة' : 'فرد',
                 phone: t.clientId.phone || '',
                 _id: (t.clientId as any)._id || null
             }
@@ -885,10 +887,14 @@ export function TaskDetailsView() {
                                                             <span className="font-medium text-slate-900">{task.case.court}</span>
                                                         </div>
                                                         {task.case._id ? (
-                                                            <a href={`/dashboard/cases/${task.case._id}`} className="text-blue-600 text-sm hover:underline inline-flex items-center gap-1">
+                                                            <Link
+                                                                to="/cases/$caseId"
+                                                                params={{ caseId: task.case._id }}
+                                                                className="text-blue-600 text-sm hover:underline inline-flex items-center gap-1"
+                                                            >
                                                                 <LinkIcon className="h-3 w-3" />
                                                                 عرض ملف القضية
-                                                            </a>
+                                                            </Link>
                                                         ) : (
                                                             <span className="text-slate-400 text-sm">لا توجد قضية مرتبطة</span>
                                                         )}
@@ -912,10 +918,14 @@ export function TaskDetailsView() {
                                                             <span className="font-medium text-slate-900">{task.client.type}</span>
                                                         </div>
                                                         {task.client._id ? (
-                                                            <a href={`/dashboard/clients/${task.client._id}`} className="text-blue-600 text-sm hover:underline inline-flex items-center gap-1">
+                                                            <Link
+                                                                to="/clients/$clientId"
+                                                                params={{ clientId: task.client._id }}
+                                                                className="text-blue-600 text-sm hover:underline inline-flex items-center gap-1"
+                                                            >
                                                                 <LinkIcon className="h-3 w-3" />
                                                                 عرض ملف العميل
-                                                            </a>
+                                                            </Link>
                                                         ) : (
                                                             <span className="text-slate-400 text-sm">لا يوجد عميل مرتبط</span>
                                                         )}

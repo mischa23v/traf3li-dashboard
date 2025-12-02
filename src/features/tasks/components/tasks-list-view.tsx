@@ -16,12 +16,27 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { Header } from '@/components/layout/header'
 import { TopNav } from '@/components/layout/top-nav'
 import { DynamicIsland } from '@/components/dynamic-island'
-import { Search, Bell, AlertCircle, Briefcase, Plus, MoreHorizontal, ChevronLeft } from 'lucide-react'
+import { Search, Bell, AlertCircle, Briefcase, Plus, MoreHorizontal, ChevronLeft, Eye, Trash2, CheckCircle, XCircle } from 'lucide-react'
+import { useNavigate } from '@tanstack/react-router'
+import { useDeleteTask, useCompleteTask, useReopenTask } from '@/hooks/useTasks'
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 
 export function TasksListView() {
+    const navigate = useNavigate()
     const [activeStatusTab, setActiveStatusTab] = useState('active')
     const [isSelectionMode, setIsSelectionMode] = useState(false)
     const [selectedTaskIds, setSelectedTaskIds] = useState<string[]>([])
+
+    // Mutations for task actions
+    const deleteTaskMutation = useDeleteTask()
+    const completeTaskMutation = useCompleteTask()
+    const reopenTaskMutation = useReopenTask()
 
     // API Filters - Map UI tabs to actual task status values
     // TaskStatus: 'backlog' | 'todo' | 'in_progress' | 'done' | 'canceled'
@@ -81,6 +96,25 @@ export function TasksListView() {
                 }
             })
         }
+    }
+
+    // Single task actions
+    const handleViewTask = (taskId: string) => {
+        navigate({ to: '/tasks/$taskId', params: { taskId } })
+    }
+
+    const handleDeleteTask = (taskId: string) => {
+        if (confirm('هل أنت متأكد من حذف هذه المهمة؟')) {
+            deleteTaskMutation.mutate(taskId)
+        }
+    }
+
+    const handleCompleteTask = (taskId: string) => {
+        completeTaskMutation.mutate({ id: taskId })
+    }
+
+    const handleReopenTask = (taskId: string) => {
+        reopenTaskMutation.mutate({ id: taskId })
     }
 
     const topNav = [
@@ -231,9 +265,39 @@ export function TasksListView() {
                                                     <p className="text-slate-500 text-sm">العميل: {task.client}</p>
                                                 </div>
                                             </div>
-                                            <Button variant="ghost" size="icon" className="text-slate-400 hover:text-navy">
-                                                <MoreHorizontal className="h-5 w-5" />
-                                            </Button>
+                                            <DropdownMenu>
+                                                <DropdownMenuTrigger asChild>
+                                                    <Button variant="ghost" size="icon" className="text-slate-400 hover:text-navy">
+                                                        <MoreHorizontal className="h-5 w-5" />
+                                                    </Button>
+                                                </DropdownMenuTrigger>
+                                                <DropdownMenuContent align="end" className="w-48">
+                                                    <DropdownMenuItem onClick={() => handleViewTask(task.id)}>
+                                                        <Eye className="h-4 w-4 ml-2" />
+                                                        عرض التفاصيل
+                                                    </DropdownMenuItem>
+                                                    <DropdownMenuSeparator />
+                                                    {task.status !== 'done' ? (
+                                                        <DropdownMenuItem onClick={() => handleCompleteTask(task.id)}>
+                                                            <CheckCircle className="h-4 w-4 ml-2 text-emerald-500" />
+                                                            إكمال المهمة
+                                                        </DropdownMenuItem>
+                                                    ) : (
+                                                        <DropdownMenuItem onClick={() => handleReopenTask(task.id)}>
+                                                            <XCircle className="h-4 w-4 ml-2 text-amber-500" />
+                                                            إعادة فتح المهمة
+                                                        </DropdownMenuItem>
+                                                    )}
+                                                    <DropdownMenuSeparator />
+                                                    <DropdownMenuItem
+                                                        onClick={() => handleDeleteTask(task.id)}
+                                                        className="text-red-600 focus:text-red-600"
+                                                    >
+                                                        <Trash2 className="h-4 w-4 ml-2" />
+                                                        حذف المهمة
+                                                    </DropdownMenuItem>
+                                                </DropdownMenuContent>
+                                            </DropdownMenu>
                                         </div>
 
                                         <div className="flex items-center justify-between pt-4 border-t border-slate-200/50">
