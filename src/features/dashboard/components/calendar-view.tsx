@@ -399,7 +399,7 @@ export function CalendarView() {
                                                             {item.location && (
                                                                 <div className="flex items-center gap-1.5 text-[11px] text-slate-400">
                                                                     <MapPin className="h-3 w-3" />
-                                                                    <span>{item.location}</span>
+                                                                    <span>{typeof item.location === 'string' ? item.location : (item.location?.name || item.location?.address || 'عن بعد')}</span>
                                                                 </div>
                                                             )}
                                                             {item.judge && (

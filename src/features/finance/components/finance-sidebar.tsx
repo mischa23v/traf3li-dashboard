@@ -298,7 +298,7 @@ export function FinanceSidebar({
                                                         {event.location && (
                                                             <div className="text-xs text-slate-500 flex items-center gap-1">
                                                                 <MapPin className="h-3 w-3" />
-                                                                {event.location}
+                                                                {typeof event.location === 'string' ? event.location : (event.location?.name || event.location?.address || 'عن بعد')}
                                                             </div>
                                                         )}
                                                     </div>
