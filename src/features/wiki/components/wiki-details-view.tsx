@@ -69,7 +69,7 @@ import {
   pageTypeLabelsAr,
   pageStatusLabels,
   pageStatusLabelsAr,
-  pageStatusColors,
+  getPageStatusColorClasses,
   confidentialityLabels,
   confidentialityLabelsAr,
   revisionChangeTypeLabels,
@@ -396,7 +396,7 @@ export function WikiDetailsView() {
                   )}
                   <Badge
                     variant="outline"
-                    className={pageStatusColors[page.status as WikiPageStatus] || 'bg-slate-50 text-slate-700 border-slate-200'}
+                    className={`${getPageStatusColorClasses(page.status as WikiPageStatus).bg} ${getPageStatusColorClasses(page.status as WikiPageStatus).text} ${getPageStatusColorClasses(page.status as WikiPageStatus).border}`}
                   >
                     {getStatusLabel(page.status as WikiPageStatus)}
                   </Badge>
