@@ -15,6 +15,13 @@ import { Badge } from '@/components/ui/badge'
 import { Link, useParams } from '@tanstack/react-router'
 import type { WikiPage, WikiCollection } from '@/types/wiki'
 
+// Get activity color classes based on index (full Tailwind class names to avoid purge issues)
+const getActivityColorClasses = (index: number) => {
+  if (index === 0) return { bg: 'bg-blue-50', border: 'border-blue-500' }
+  if (index === 1) return { bg: 'bg-purple-50', border: 'border-purple-500' }
+  return { bg: 'bg-emerald-50', border: 'border-emerald-500' }
+}
+
 interface WikiSidebarProps {
   recentPages?: WikiPage[]
   collections?: WikiCollection[]
@@ -165,29 +172,32 @@ export function WikiSidebar({ recentPages = [], collections = [], isLoading }: W
             <div className="text-center py-4 text-slate-400">
               {isArabic ? 'لا توجد نشاطات حديثة' : 'No recent activity'}
             </div>
-          ) : recentPages.slice(0, 3).map((page, i) => (
-            <div key={page._id} className={`flex gap-4 relative pb-4 ${i < 2 ? 'border-b border-slate-50' : ''}`}>
-              <div className="w-14 text-center shrink-0">
-                <div className="text-sm font-bold text-navy">
-                  {new Date(page.updatedAt).toLocaleDateString(isArabic ? 'ar-SA' : 'en-US', { day: 'numeric' })}
-                </div>
-                <div className="text-xs text-slate-400">
-                  {new Date(page.updatedAt).toLocaleDateString(isArabic ? 'ar-SA' : 'en-US', { month: 'short' })}
-                </div>
-              </div>
-              <div className={`flex-1 bg-${i === 0 ? 'blue' : i === 1 ? 'purple' : 'emerald'}-50 rounded-xl p-3 border-r-4 border-${i === 0 ? 'blue' : i === 1 ? 'purple' : 'emerald'}-500`}>
-                <Link to={`/dashboard/cases/${caseId}/wiki/${page._id}` as any}>
-                  <div className="font-bold text-navy text-sm mb-1 hover:text-emerald-600 transition-colors line-clamp-1">
-                    {isArabic ? page.titleAr || page.title : page.title}
+          ) : recentPages.slice(0, 3).map((page, i) => {
+            const colorClasses = getActivityColorClasses(i)
+            return (
+              <div key={page._id} className={`flex gap-4 relative pb-4 ${i < 2 ? 'border-b border-slate-50' : ''}`}>
+                <div className="w-14 text-center shrink-0">
+                  <div className="text-sm font-bold text-navy">
+                    {new Date(page.updatedAt).toLocaleDateString(isArabic ? 'ar-SA' : 'en-US', { day: 'numeric' })}
                   </div>
-                </Link>
-                <div className="text-xs text-slate-500 flex items-center gap-1">
-                  <Clock className="h-3 w-3" />
-                  v{page.version}
+                  <div className="text-xs text-slate-400">
+                    {new Date(page.updatedAt).toLocaleDateString(isArabic ? 'ar-SA' : 'en-US', { month: 'short' })}
+                  </div>
+                </div>
+                <div className={`flex-1 ${colorClasses.bg} rounded-xl p-3 border-r-4 ${colorClasses.border}`}>
+                  <Link to={`/dashboard/cases/${caseId}/wiki/${page._id}` as any}>
+                    <div className="font-bold text-navy text-sm mb-1 hover:text-emerald-600 transition-colors line-clamp-1">
+                      {isArabic ? page.titleAr || page.title : page.title}
+                    </div>
+                  </Link>
+                  <div className="text-xs text-slate-500 flex items-center gap-1">
+                    <Clock className="h-3 w-3" />
+                    v{page.version}
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            )
+          })}
         </div>
       </div>
 

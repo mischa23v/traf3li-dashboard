@@ -63,7 +63,7 @@ import {
   richDocumentTypeLabelsAr,
   richDocumentStatusLabels,
   richDocumentStatusLabelsAr,
-  richDocumentStatusColors
+  getRichDocumentStatusColorClasses
 } from '@/types/caseRichDocument'
 
 interface RichDocumentsListProps {
@@ -363,7 +363,7 @@ export function RichDocumentsList({
                   </Badge>
                   <Badge
                     variant="outline"
-                    className={`rounded-md px-2 text-xs bg-${richDocumentStatusColors[doc.status]}-50 text-${richDocumentStatusColors[doc.status]}-700 border-${richDocumentStatusColors[doc.status]}-200`}
+                    className={`rounded-md px-2 text-xs ${getRichDocumentStatusColorClasses(doc.status).bg} ${getRichDocumentStatusColorClasses(doc.status).text} ${getRichDocumentStatusColorClasses(doc.status).border}`}
                   >
                     {getStatusLabel(doc.status)}
                   </Badge>

@@ -258,8 +258,16 @@ export function Dashboard() {
                   <div className="divide-y divide-slate-100">
                     {todayEvents.map((event) => {
                       const eventTime = new Date(event.startDate).toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' })
-                      const colorMap = { meeting: 'blue', session: 'green', deadline: 'amber' }
-                      const eventColor = colorMap[event.type] || 'blue'
+                      // Full Tailwind class names to avoid purge issues
+                      const getEventColorClasses = (type: string) => {
+                        switch (type) {
+                          case 'meeting': return { bar: 'bg-blue-500', badgeBg: 'bg-blue-50', badgeText: 'text-blue-700' }
+                          case 'session': return { bar: 'bg-green-500', badgeBg: 'bg-green-50', badgeText: 'text-green-700' }
+                          case 'deadline': return { bar: 'bg-amber-500', badgeBg: 'bg-amber-50', badgeText: 'text-amber-700' }
+                          default: return { bar: 'bg-blue-500', badgeBg: 'bg-blue-50', badgeText: 'text-blue-700' }
+                        }
+                      }
+                      const colorClasses = getEventColorClasses(event.type)
                       return (
                         <Link
                           key={event._id}
@@ -268,12 +276,12 @@ export function Dashboard() {
                           className="flex items-center p-6 hover:bg-slate-50/80 transition-colors group cursor-pointer block"
                         >
                           <div className="w-20 font-bold text-slate-600 text-sm">{eventTime}</div>
-                          <div className={`w-1.5 h-12 rounded-full bg-${eventColor}-500 mr-4 ml-2`}></div>
+                          <div className={`w-1.5 h-12 rounded-full ${colorClasses.bar} mr-4 ml-2`}></div>
                           <div className="flex-1">
                             <h4 className="font-bold text-navy text-lg group-hover:text-brand-blue transition-colors">{event.title}</h4>
                             <div className="flex items-center gap-4 mt-1 text-xs font-medium text-slate-500">
                               <span className="flex items-center gap-1"><MapPinIcon className="h-3 w-3" /> {event.location}</span>
-                              <span className={`bg-${eventColor}-50 text-${eventColor}-700 px-2 py-0.5 rounded-md font-bold`}>
+                              <span className={`${colorClasses.badgeBg} ${colorClasses.badgeText} px-2 py-0.5 rounded-md font-bold`}>
                                 {event.type === 'session' ? 'جلسة' : event.type === 'meeting' ? 'اجتماع' : 'موعد نهائي'}
                               </span>
                             </div>

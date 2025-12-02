@@ -54,7 +54,7 @@ import {
   pageTypeLabelsAr,
   pageStatusLabels,
   pageStatusLabelsAr,
-  pageStatusColors
+  getPageStatusColorClasses
 } from '@/constants/wikiLabels'
 import { WikiSidebar } from './wiki-sidebar'
 
@@ -286,7 +286,7 @@ export function WikiListView() {
                             )}
                           </div>
                           <div className="flex items-center gap-3 text-sm text-slate-500">
-                            <Badge variant="outline" className={`rounded-md px-2 border-${pageStatusColors[page.status]}-200 text-${pageStatusColors[page.status]}-700 bg-${pageStatusColors[page.status]}-50`}>
+                            <Badge variant="outline" className={`rounded-md px-2 ${getPageStatusColorClasses(page.status).border} ${getPageStatusColorClasses(page.status).text} ${getPageStatusColorClasses(page.status).bg}`}>
                               {getStatusLabel(page.status)}
                             </Badge>
                             <span className="flex items-center gap-1">

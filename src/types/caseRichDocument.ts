@@ -184,3 +184,19 @@ export const richDocumentStatusColors: Record<RichDocumentStatus, string> = {
   final: 'emerald',
   archived: 'slate'
 }
+
+// Full Tailwind class names for rich document status colors (to avoid purge issues with dynamic interpolation)
+export const getRichDocumentStatusColorClasses = (status: RichDocumentStatus): { bg: string; text: string; border: string } => {
+  switch (status) {
+    case 'draft':
+      return { bg: 'bg-amber-50', text: 'text-amber-700', border: 'border-amber-200' }
+    case 'review':
+      return { bg: 'bg-blue-50', text: 'text-blue-700', border: 'border-blue-200' }
+    case 'final':
+      return { bg: 'bg-emerald-50', text: 'text-emerald-700', border: 'border-emerald-200' }
+    case 'archived':
+      return { bg: 'bg-slate-50', text: 'text-slate-700', border: 'border-slate-200' }
+    default:
+      return { bg: 'bg-slate-50', text: 'text-slate-700', border: 'border-slate-200' }
+  }
+}

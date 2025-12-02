@@ -51,7 +51,7 @@ import {
   richDocumentTypeLabelsAr,
   richDocumentStatusLabels,
   richDocumentStatusLabelsAr,
-  richDocumentStatusColors
+  getRichDocumentStatusColorClasses
 } from '@/types/caseRichDocument'
 
 interface RichDocumentViewProps {
@@ -271,7 +271,7 @@ export function RichDocumentView({
             <div className="flex items-center gap-2">
               <Badge
                 variant="outline"
-                className={`rounded-md px-3 py-1 bg-${richDocumentStatusColors[document.status]}-50 text-${richDocumentStatusColors[document.status]}-700 border-${richDocumentStatusColors[document.status]}-200`}
+                className={`rounded-md px-3 py-1 ${getRichDocumentStatusColorClasses(document.status).bg} ${getRichDocumentStatusColorClasses(document.status).text} ${getRichDocumentStatusColorClasses(document.status).border}`}
               >
                 {getStatusLabel(document.status)}
               </Badge>

@@ -120,6 +120,24 @@ export const pageStatusColors: Record<WikiPageStatus, string> = {
   archived: 'red'
 }
 
+// Full Tailwind class names for page status colors (to avoid purge issues with dynamic interpolation)
+export const getPageStatusColorClasses = (status: WikiPageStatus): { border: string; text: string; bg: string } => {
+  switch (status) {
+    case 'draft':
+      return { border: 'border-gray-200', text: 'text-gray-700', bg: 'bg-gray-50' }
+    case 'in_review':
+      return { border: 'border-yellow-200', text: 'text-yellow-700', bg: 'bg-yellow-50' }
+    case 'approved':
+      return { border: 'border-blue-200', text: 'text-blue-700', bg: 'bg-blue-50' }
+    case 'published':
+      return { border: 'border-green-200', text: 'text-green-700', bg: 'bg-green-50' }
+    case 'archived':
+      return { border: 'border-red-200', text: 'text-red-700', bg: 'bg-red-50' }
+    default:
+      return { border: 'border-slate-200', text: 'text-slate-700', bg: 'bg-slate-50' }
+  }
+}
+
 // ═══════════════════════════════════════════════════════════════
 // CONFIDENTIALITY LEVEL LABELS
 // ═══════════════════════════════════════════════════════════════
