@@ -58,7 +58,7 @@ const RichTextEditor = lazy(() => import('@/components/rich-text-editor'))
 
 import {
   useWikiCollections,
-  useCreateWikiPage
+  useCreateStandaloneWikiPage
 } from '@/hooks/useWiki'
 import { useCases } from '@/hooks/useCasesAndClients'
 import type {
@@ -124,7 +124,7 @@ export function WikiGlobalCreateView() {
   const { data: collections } = useWikiCollections(selectedCaseId)
 
   // Mutations
-  const createMutation = useCreateWikiPage()
+  const createMutation = useCreateStandaloneWikiPage()
 
   // Form state
   const [formData, setFormData] = useState<CreateWikiPageInput>({
@@ -183,25 +183,23 @@ export function WikiGlobalCreateView() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    if (!selectedCaseId) {
-      alert(isArabic ? 'يرجى اختيار قضية' : 'Please select a case')
-      return
-    }
-
     const data: CreateWikiPageInput = {
       ...formData,
+      caseId: selectedCaseId || undefined,
       collectionId: formData.collectionId || undefined,
       parentPageId: formData.parentPageId || undefined
     }
 
-    createMutation.mutate(
-      { caseId: selectedCaseId, data },
-      {
-        onSuccess: (newPage) => {
+    createMutation.mutate(data, {
+      onSuccess: (newPage) => {
+        // Navigate to case wiki if linked, otherwise standalone wiki
+        if (selectedCaseId) {
           navigate({ to: `/dashboard/cases/${selectedCaseId}/wiki/${newPage._id}` as any })
+        } else {
+          navigate({ to: `/dashboard/wiki/${newPage._id}` as any })
         }
       }
-    )
+    })
   }
 
   const isPending = createMutation.isPending
@@ -248,12 +246,12 @@ export function WikiGlobalCreateView() {
 
           {/* Sidebar Widgets */}
           <div className="space-y-6">
-            {/* Case Selection Card */}
+            {/* Case Selection Card - Optional */}
             <Card className="border border-slate-100 shadow-sm rounded-2xl overflow-hidden">
               <CardHeader className="bg-white border-b border-slate-50 pb-4">
                 <CardTitle className="text-lg font-bold text-navy flex items-center gap-2">
                   <Scale className="h-5 w-5 text-emerald-500" />
-                  {isArabic ? 'ربط بقضية' : 'Link to Case'} <span className="text-red-500">*</span>
+                  {isArabic ? 'ربط بقضية' : 'Link to Case'} <span className="text-slate-400 text-sm font-normal">({isArabic ? 'اختياري' : 'optional'})</span>
                 </CardTitle>
               </CardHeader>
               <CardContent className="p-4">
@@ -315,10 +313,25 @@ export function WikiGlobalCreateView() {
                   </div>
                 </ScrollArea>
 
-                {selectedCase && (
+                {selectedCase ? (
                   <div className="mt-4 p-3 bg-emerald-50 rounded-xl border border-emerald-200">
-                    <div className="text-xs text-emerald-600 mb-1">{isArabic ? 'القضية المختارة' : 'Selected Case'}</div>
+                    <div className="flex items-center justify-between mb-1">
+                      <div className="text-xs text-emerald-600">{isArabic ? 'القضية المختارة' : 'Selected Case'}</div>
+                      <button
+                        type="button"
+                        onClick={() => setSelectedCaseId('')}
+                        className="text-xs text-emerald-600 hover:text-emerald-800 underline"
+                      >
+                        {isArabic ? 'إلغاء الربط' : 'Clear'}
+                      </button>
+                    </div>
                     <div className="text-sm font-bold text-emerald-800">{selectedCase.title || selectedCase.caseNumber}</div>
+                  </div>
+                ) : (
+                  <div className="mt-4 p-3 bg-slate-50 rounded-xl border border-slate-200">
+                    <div className="text-xs text-slate-500">
+                      {isArabic ? 'سيتم إنشاء صفحة مستقلة بدون ربط بقضية' : 'A standalone page will be created without case linking'}
+                    </div>
                   </div>
                 )}
               </CardContent>
@@ -710,7 +723,7 @@ export function WikiGlobalCreateView() {
                   <Button
                     type="submit"
                     className="bg-emerald-500 hover:bg-emerald-600 text-white min-w-[140px] rounded-xl shadow-lg shadow-emerald-500/20"
-                    disabled={isPending || !selectedCaseId}
+                    disabled={isPending}
                   >
                     {isPending ? (
                       <span className="flex items-center gap-2">
