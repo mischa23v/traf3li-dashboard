@@ -1,7 +1,7 @@
 import { useState, useMemo, useRef } from 'react'
 import {
     FileText, Calendar, CheckSquare, Clock, MoreHorizontal, Plus, Upload,
-    User, ArrowLeft, Briefcase, Trash2, Edit3, Loader2,
+    User, ArrowLeft, Briefcase, Trash2, Edit3, Loader2, Mic,
     History, Link as LinkIcon, Flag, Send, Eye, Download, Search, Bell, AlertCircle, X,
     GitBranch, Timer, Target, Play, Pause, TrendingUp, AlertTriangle
 } from 'lucide-react'
@@ -13,7 +13,9 @@ import {
     useAddDependency, useRemoveDependency, useTimeTrackingDetails,
     useStartTimeTracking, useStopTimeTracking, useUpdateOutcome
 } from '@/hooks/useTasks'
-import { OutcomeType } from '@/services/tasksService'
+import { OutcomeType, VOICE_MEMO_TYPES } from '@/services/tasksService'
+import tasksService from '@/services/tasksService'
+import { VoiceMemoRecorder, VoiceMemoPlayer, isVoiceMemo } from './voice-memo-recorder'
 import { useParams, useNavigate } from '@tanstack/react-router'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -243,19 +245,38 @@ export function TaskDetailsView() {
             }) : ''
         }))
 
-        // Map attachments
-        const mappedAttachments = (t.attachments || []).map((a: any) => ({
-            _id: a._id || a.id,
-            name: a.fileName || a.name || 'ملف',
-            type: a.fileType?.includes('pdf') ? 'PDF' :
-                  a.fileType?.includes('word') || a.fileName?.includes('.doc') ? 'DOC' :
-                  a.fileType?.includes('image') ? 'IMG' : 'FILE',
-            size: a.fileSize ? (a.fileSize / 1024 > 1024
-                ? `${(a.fileSize / 1024 / 1024).toFixed(1)} MB`
-                : `${Math.round(a.fileSize / 1024)} KB`) : '',
-            date: a.uploadedAt ? new Date(a.uploadedAt).toLocaleDateString('ar-SA') : '',
-            url: a.fileUrl || a.url
-        }))
+        // Map attachments with voice memo detection and S3 URL handling
+        const mappedAttachments = (t.attachments || []).map((a: any) => {
+            const fileType = a.fileType || ''
+            const isAudioFile = isVoiceMemo(fileType)
+
+            // Determine file type label
+            let typeLabel = 'FILE'
+            if (fileType.includes('pdf')) typeLabel = 'PDF'
+            else if (fileType.includes('word') || a.fileName?.includes('.doc')) typeLabel = 'DOC'
+            else if (fileType.includes('excel') || fileType.includes('spreadsheet')) typeLabel = 'XLS'
+            else if (fileType.includes('image')) typeLabel = 'IMG'
+            else if (isAudioFile) typeLabel = 'AUDIO'
+
+            // Get URL - use downloadUrl for S3, fallback to fileUrl
+            const url = a.storageType === 's3' && a.downloadUrl
+                ? a.downloadUrl
+                : a.fileUrl || a.url
+
+            return {
+                _id: a._id || a.id,
+                name: a.fileName || a.name || 'ملف',
+                type: typeLabel,
+                size: a.fileSize ? (a.fileSize / 1024 > 1024
+                    ? `${(a.fileSize / 1024 / 1024).toFixed(1)} MB`
+                    : `${Math.round(a.fileSize / 1024)} KB`) : '',
+                date: a.uploadedAt ? new Date(a.uploadedAt).toLocaleDateString('ar-SA') : '',
+                url,
+                isVoiceMemo: isAudioFile,
+                storageType: a.storageType || 'local',
+                fileKey: a.fileKey
+            }
+        })
 
         // Map history/timeline with proper action labels
         const actionLabels: Record<string, string> = {
@@ -1073,14 +1094,49 @@ export function TaskDetailsView() {
                                             </Card>
                                         </TabsContent>
 
-                                        <TabsContent value="files" className="mt-0">
+                                        <TabsContent value="files" className="mt-0 space-y-6">
+                                            {/* Voice Memo Recorder Section */}
+                                            <VoiceMemoRecorder
+                                                taskId={taskId}
+                                                onUploadSuccess={() => refetch()}
+                                            />
+
+                                            {/* Voice Memos List */}
+                                            {task.attachments.filter(a => a.isVoiceMemo).length > 0 && (
+                                                <div className="space-y-2">
+                                                    <h4 className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                                                        <Mic className="h-4 w-4" />
+                                                        التسجيلات الصوتية ({task.attachments.filter(a => a.isVoiceMemo).length})
+                                                    </h4>
+                                                    {task.attachments.filter(a => a.isVoiceMemo).map((memo) => (
+                                                        <div key={memo._id} className="flex items-center gap-2">
+                                                            <div className="flex-1">
+                                                                <VoiceMemoPlayer
+                                                                    audioUrl={memo.url}
+                                                                    fileName={memo.name}
+                                                                />
+                                                            </div>
+                                                            <Button
+                                                                variant="ghost"
+                                                                size="icon"
+                                                                onClick={() => handleDeleteAttachment(memo._id)}
+                                                                className="h-8 w-8 text-red-500 hover:bg-red-50"
+                                                            >
+                                                                <Trash2 className="h-4 w-4" />
+                                                            </Button>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            )}
+
+                                            {/* Documents Grid */}
                                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                                                 {/* Hidden file input */}
                                                 <input
                                                     type="file"
                                                     ref={fileInputRef}
                                                     onChange={handleFileUpload}
-                                                    accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+                                                    accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.jpg,.jpeg,.png,.gif,.webp,.zip,.rar,.webm,.mp3,.wav,.ogg,.m4a"
                                                     className="hidden"
                                                 />
 
@@ -1100,13 +1156,13 @@ export function TaskDetailsView() {
                                                                 <Upload className="h-6 w-6" />
                                                             </div>
                                                             <span className="font-bold text-slate-600 group-hover:text-brand-blue">رفع مستند جديد</span>
-                                                            <span className="text-xs text-slate-400 mt-1">PDF, DOCX, JPG</span>
+                                                            <span className="text-xs text-slate-400 mt-1">PDF, DOCX, Excel, صور</span>
                                                         </>
                                                     )}
                                                 </div>
 
-                                                {/* Empty State */}
-                                                {task.attachments.length === 0 && (
+                                                {/* Empty State - Only show if no documents (excluding voice memos) */}
+                                                {task.attachments.filter(a => !a.isVoiceMemo).length === 0 && (
                                                     <div className="col-span-2 flex flex-col items-center justify-center p-8 text-slate-400">
                                                         <FileText className="w-12 h-12 mb-3 opacity-30" />
                                                         <p>لا توجد مرفقات</p>
@@ -1114,13 +1170,14 @@ export function TaskDetailsView() {
                                                     </div>
                                                 )}
 
-                                                {/* Document Cards - from API */}
-                                                {task.attachments.map((doc) => (
+                                                {/* Document Cards - from API (excluding voice memos) */}
+                                                {task.attachments.filter(a => !a.isVoiceMemo).map((doc) => (
                                                     <div key={doc._id} className="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-all group relative h-[180px] flex flex-col justify-between">
                                                         <div className="flex justify-between items-start">
                                                             <div className={`w-10 h-10 rounded-lg flex items-center justify-center font-bold text-xs border ${
                                                                 doc.type === 'PDF' ? 'bg-red-50 text-red-600 border-red-100' :
                                                                 doc.type === 'DOC' ? 'bg-blue-50 text-blue-600 border-blue-100' :
+                                                                doc.type === 'XLS' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' :
                                                                 doc.type === 'IMG' ? 'bg-green-50 text-green-600 border-green-100' :
                                                                 'bg-slate-50 text-slate-500 border-slate-100'
                                                             }`}>

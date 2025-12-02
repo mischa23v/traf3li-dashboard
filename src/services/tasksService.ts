@@ -140,7 +140,38 @@ export interface Attachment {
   uploadedBy: string
   uploadedAt: string
   thumbnailUrl?: string
+  // S3 storage fields
+  fileKey?: string
+  storageType?: 'local' | 's3'
+  downloadUrl?: string // Presigned URL for S3
 }
+
+// Voice memo supported types
+export const VOICE_MEMO_TYPES = [
+  'audio/webm',
+  'audio/mp3',
+  'audio/mpeg',
+  'audio/wav',
+  'audio/ogg',
+  'audio/m4a',
+  'audio/x-m4a'
+] as const
+
+// All supported attachment types
+export const ATTACHMENT_TYPES = {
+  documents: [
+    'application/pdf',
+    'application/msword',
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    'application/vnd.ms-excel',
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    'application/vnd.ms-powerpoint',
+    'application/vnd.openxmlformats-officedocument.presentationml.presentation'
+  ],
+  images: ['image/jpeg', 'image/png', 'image/gif', 'image/webp'],
+  archives: ['application/zip', 'application/x-rar-compressed'],
+  audio: VOICE_MEMO_TYPES
+} as const
 
 export interface Comment {
   _id?: string
@@ -789,14 +820,25 @@ const tasksService = {
   // ==================== Attachments ====================
 
   /**
-   * Upload attachment
+   * Upload attachment (supports S3 and local storage)
+   * Backend automatically detects storage type
    */
-  uploadAttachment: async (taskId: string, file: File): Promise<Attachment> => {
+  uploadAttachment: async (
+    taskId: string,
+    file: File,
+    onProgress?: (percent: number) => void
+  ): Promise<Attachment> => {
     try {
       const formData = new FormData()
       formData.append('file', file)
       const response = await apiClient.post(`/tasks/${taskId}/attachments`, formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
+        headers: { 'Content-Type': 'multipart/form-data' },
+        onUploadProgress: (progressEvent) => {
+          if (onProgress && progressEvent.total) {
+            const percent = Math.round((progressEvent.loaded * 100) / progressEvent.total)
+            onProgress(percent)
+          }
+        }
       })
       return response.data.attachment || response.data.data
     } catch (error: any) {
@@ -806,7 +848,21 @@ const tasksService = {
   },
 
   /**
-   * Delete attachment
+   * Get fresh download URL for S3 attachment (presigned URL)
+   * Use this when the presigned URL expires
+   */
+  getAttachmentDownloadUrl: async (taskId: string, attachmentId: string): Promise<string> => {
+    try {
+      const response = await apiClient.get(`/tasks/${taskId}/attachments/${attachmentId}/download-url`)
+      return response.data.downloadUrl
+    } catch (error: any) {
+      console.error('Get attachment download URL error:', error)
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Delete attachment (handles both S3 and local storage)
    */
   deleteAttachment: async (taskId: string, attachmentId: string): Promise<void> => {
     try {
@@ -815,6 +871,25 @@ const tasksService = {
       console.error('Delete attachment error:', error)
       throw new Error(handleApiError(error))
     }
+  },
+
+  /**
+   * Check if file type is a voice memo
+   */
+  isVoiceMemo: (fileType: string): boolean => {
+    return VOICE_MEMO_TYPES.includes(fileType as any)
+  },
+
+  /**
+   * Get attachment URL (handles S3 presigned URLs and local files)
+   */
+  getAttachmentUrl: (attachment: Attachment): string => {
+    // For S3 storage, use downloadUrl (presigned URL)
+    if (attachment.storageType === 's3' && attachment.downloadUrl) {
+      return attachment.downloadUrl
+    }
+    // For local storage or fallback
+    return attachment.fileUrl
   },
 
   // ==================== Dependencies ====================

@@ -394,8 +394,8 @@ export const useUploadTaskAttachment = () => {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: ({ id, file }: { id: string; file: File }) =>
-      tasksService.uploadAttachment(id, file),
+    mutationFn: ({ id, file, onProgress }: { id: string; file: File; onProgress?: (percent: number) => void }) =>
+      tasksService.uploadAttachment(id, file, onProgress),
     onSuccess: (_, { id }) => {
       queryClient.invalidateQueries({ queryKey: ['tasks', id] })
       toast.success('تم رفع المرفق بنجاح')
@@ -418,6 +418,16 @@ export const useDeleteTaskAttachment = () => {
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل حذف المرفق')
+    },
+  })
+}
+
+export const useGetAttachmentDownloadUrl = () => {
+  return useMutation({
+    mutationFn: ({ taskId, attachmentId }: { taskId: string; attachmentId: string }) =>
+      tasksService.getAttachmentDownloadUrl(taskId, attachmentId),
+    onError: (error: Error) => {
+      toast.error(error.message || 'فشل الحصول على رابط التحميل')
     },
   })
 }
