@@ -3,7 +3,7 @@ import { TasksSidebar } from './tasks-sidebar'
 import {
     Calendar as CalendarIcon, MoreHorizontal, Plus,
     MapPin, Clock, Search, AlertCircle, ChevronLeft, Bell, Users,
-    CalendarCheck, CalendarPlus, CalendarRange
+    CalendarCheck, CalendarPlus, CalendarRange, Eye, Trash2, CheckCircle, XCircle
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -15,8 +15,15 @@ import { LanguageSwitcher } from '@/components/language-switcher'
 import { ThemeSwitch } from '@/components/theme-switch'
 import { ConfigDrawer } from '@/components/config-drawer'
 import { ProfileDropdown } from '@/components/profile-dropdown'
-import { Link } from '@tanstack/react-router'
-import { useEvents, useDeleteEvent, useRSVPEvent, useEventStats } from '@/hooks/useRemindersAndEvents'
+import { Link, useNavigate } from '@tanstack/react-router'
+import { useEvents, useDeleteEvent, useRSVPEvent, useCompleteEvent, useCancelEvent, useEventStats } from '@/hooks/useRemindersAndEvents'
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 import { StatCard } from '@/components/stat-card'
 import { ProductivityHero } from '@/components/productivity-hero'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -25,6 +32,7 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { toast } from 'sonner'
 
 export function EventsView() {
+    const navigate = useNavigate()
     const [activeTab, setActiveTab] = useState('upcoming')
     const [isSelectionMode, setIsSelectionMode] = useState(false)
     const [selectedEventIds, setSelectedEventIds] = useState<string[]>([])
@@ -45,6 +53,8 @@ export function EventsView() {
     const { data: stats } = useEventStats()
     const { mutateAsync: deleteEvent } = useDeleteEvent()
     const { mutate: rsvpEvent } = useRSVPEvent()
+    const completeEventMutation = useCompleteEvent()
+    const cancelEventMutation = useCancelEvent()
 
     // Transform API data
     const events = useMemo(() => {
@@ -63,6 +73,30 @@ export function EventsView() {
         }))
     }, [eventsData])
 
+    // Single event actions
+    const handleViewEvent = (eventId: string) => {
+        navigate({ to: '/dashboard/tasks/events/$eventId', params: { eventId } })
+    }
+
+    const handleDeleteEvent = async (eventId: string) => {
+        if (confirm('هل أنت متأكد من حذف هذا الحدث؟')) {
+            try {
+                await deleteEvent(eventId)
+                toast.success('تم حذف الحدث بنجاح')
+            } catch (error) {
+                toast.error('فشل حذف الحدث')
+            }
+        }
+    }
+
+    const handleCompleteEvent = (eventId: string) => {
+        completeEventMutation.mutate(eventId)
+    }
+
+    const handleCancelEvent = (eventId: string) => {
+        cancelEventMutation.mutate(eventId)
+    }
+
     // Selection Handlers
     const handleToggleSelectionMode = () => {
         setIsSelectionMode(!isSelectionMode)
@@ -79,6 +113,18 @@ export function EventsView() {
 
     const handleDeleteSelected = async () => {
         if (selectedEventIds.length === 0) return
+
+        if (confirm(`هل أنت متأكد من حذف ${selectedEventIds.length} حدث؟`)) {
+            try {
+                await Promise.all(selectedEventIds.map(id => deleteEvent(id)))
+                toast.success(`تم حذف ${selectedEventIds.length} حدث بنجاح`)
+                setIsSelectionMode(false)
+                setSelectedEventIds([])
+            } catch (error) {
+                console.error("Failed to delete events", error)
+                toast.error("حدث خطأ أثناء حذف بعض الأحداث")
+            }
+        }
     }
 
     const handleRSVP = (id: string, status: 'accepted' | 'declined') => {
@@ -247,9 +293,40 @@ export function EventsView() {
                                                     </div>
                                                 </div>
                                             </div>
-                                            <Button variant="ghost" size="icon" className="text-slate-400 hover:text-navy">
-                                                <MoreHorizontal className="h-5 w-5" />
-                                            </Button>
+                                            <DropdownMenu>
+                                                <DropdownMenuTrigger asChild>
+                                                    <Button variant="ghost" size="icon" className="text-slate-400 hover:text-navy">
+                                                        <MoreHorizontal className="h-5 w-5" />
+                                                    </Button>
+                                                </DropdownMenuTrigger>
+                                                <DropdownMenuContent align="end" className="w-48">
+                                                    <DropdownMenuItem onClick={() => handleViewEvent(event.id)}>
+                                                        <Eye className="h-4 w-4 ml-2" />
+                                                        عرض التفاصيل
+                                                    </DropdownMenuItem>
+                                                    <DropdownMenuSeparator />
+                                                    {event.status !== 'completed' && (
+                                                        <DropdownMenuItem onClick={() => handleCompleteEvent(event.id)}>
+                                                            <CheckCircle className="h-4 w-4 ml-2" />
+                                                            إكمال
+                                                        </DropdownMenuItem>
+                                                    )}
+                                                    {event.status !== 'cancelled' && (
+                                                        <DropdownMenuItem onClick={() => handleCancelEvent(event.id)}>
+                                                            <XCircle className="h-4 w-4 ml-2" />
+                                                            إلغاء
+                                                        </DropdownMenuItem>
+                                                    )}
+                                                    <DropdownMenuSeparator />
+                                                    <DropdownMenuItem
+                                                        onClick={() => handleDeleteEvent(event.id)}
+                                                        className="text-red-600 focus:text-red-600"
+                                                    >
+                                                        <Trash2 className="h-4 w-4 ml-2" />
+                                                        حذف
+                                                    </DropdownMenuItem>
+                                                </DropdownMenuContent>
+                                            </DropdownMenu>
                                         </div>
 
                                         <div className="flex items-center justify-between pt-4 border-t border-slate-200/50">
