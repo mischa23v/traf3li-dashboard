@@ -35,7 +35,7 @@ import { useClients, useCases, useTeamMembers } from '@/hooks/useCasesAndClients
 import { cn } from '@/lib/utils'
 import type {
     ReminderPriority,
-    ReminderType,
+    ReminderTypeLegacy,
     RecurrenceFrequency,
     NotificationChannel,
     RecurringConfig,
@@ -49,16 +49,15 @@ const PRIORITY_OPTIONS: { value: ReminderPriority; label: string; color: string 
     { value: 'low', label: 'منخفضة', color: 'bg-blue-500' },
 ]
 
-const TYPE_OPTIONS: { value: ReminderType; label: string }[] = [
+const TYPE_OPTIONS: { value: ReminderTypeLegacy; label: string }[] = [
     { value: 'deadline', label: 'موعد نهائي' },
     { value: 'hearing', label: 'جلسة محكمة' },
-    { value: 'court_date', label: 'موعد قضائي' },
     { value: 'meeting', label: 'اجتماع' },
-    { value: 'task', label: 'مهمة' },
     { value: 'payment', label: 'دفع مالي' },
-    { value: 'document_submission', label: 'تقديم مستند' },
-    { value: 'client_call', label: 'اتصال عميل' },
+    { value: 'task_due', label: 'مهمة' },
     { value: 'follow_up', label: 'متابعة' },
+    { value: 'contract_renewal', label: 'تجديد عقد' },
+    { value: 'statute_limitation', label: 'مدة التقادم' },
     { value: 'general', label: 'عام' },
 ]
 
@@ -119,7 +118,7 @@ export function CreateReminderView() {
         reminderDate: '',
         reminderTime: '',
         priority: 'medium' as ReminderPriority,
-        type: 'general' as ReminderType,
+        type: 'general' as ReminderTypeLegacy,
         assignedTo: '',
         relatedCase: '',
         relatedClient: '',
