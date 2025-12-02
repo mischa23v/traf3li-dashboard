@@ -176,6 +176,24 @@ export const useReopenReminder = () => {
   })
 }
 
+export const useDelegateReminder = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({ id, delegateTo, note }: { id: string; delegateTo: string; note?: string }) =>
+      remindersService.delegateReminder(id, delegateTo, note),
+    onSuccess: (_, { id }) => {
+      queryClient.invalidateQueries({ queryKey: ['reminders'] })
+      queryClient.invalidateQueries({ queryKey: ['reminders', id] })
+      queryClient.invalidateQueries({ queryKey: ['calendar'] })
+      toast.success('تم تفويض التذكير بنجاح')
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'فشل تفويض التذكير')
+    },
+  })
+}
+
 // ==================== EVENTS ====================
 
 export const useEvents = (filters?: EventFilters) => {

@@ -3,7 +3,7 @@ import { TasksSidebar } from './tasks-sidebar'
 import {
     Clock, MoreHorizontal, Plus,
     Calendar as CalendarIcon, Search, AlertCircle, ChevronLeft, Bell,
-    Eye, Trash2, CheckCircle, XCircle
+    Eye, Trash2, CheckCircle, XCircle, UserPlus, Loader2
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -16,20 +16,49 @@ import { ThemeSwitch } from '@/components/theme-switch'
 import { ConfigDrawer } from '@/components/config-drawer'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { Link, useNavigate } from '@tanstack/react-router'
-import { useReminders, useDeleteReminder, useCompleteReminder, useDismissReminder, useReminderStats } from '@/hooks/useRemindersAndEvents'
+import { useReminders, useDeleteReminder, useCompleteReminder, useDismissReminder, useSnoozeReminder, useDelegateReminder, useReminderStats } from '@/hooks/useRemindersAndEvents'
+import { useTeamMembers } from '@/hooks/useCasesAndClients'
 import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuSeparator,
     DropdownMenuTrigger,
+    DropdownMenuSub,
+    DropdownMenuSubContent,
+    DropdownMenuSubTrigger,
 } from '@/components/ui/dropdown-menu'
 import { StatCard } from '@/components/stat-card'
 import { ProductivityHero } from '@/components/productivity-hero'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Checkbox } from '@/components/ui/checkbox'
+import { Textarea } from '@/components/ui/textarea'
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog'
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select'
 import { toast } from 'sonner'
+
+const SNOOZE_OPTIONS = [
+    { value: 15, label: '15 دقيقة' },
+    { value: 30, label: '30 دقيقة' },
+    { value: 60, label: 'ساعة واحدة' },
+    { value: 180, label: '3 ساعات' },
+    { value: 1440, label: 'يوم واحد' },
+    { value: 10080, label: 'أسبوع' },
+]
 
 export function RemindersView() {
     const navigate = useNavigate()
@@ -59,6 +88,16 @@ export function RemindersView() {
     const { mutateAsync: deleteReminder } = useDeleteReminder()
     const completeReminderMutation = useCompleteReminder()
     const dismissReminderMutation = useDismissReminder()
+    const snoozeReminderMutation = useSnoozeReminder()
+    const delegateReminderMutation = useDelegateReminder()
+
+    // Team members for delegation
+    const { data: teamMembers } = useTeamMembers()
+
+    // Delegate dialog state
+    const [delegateReminderId, setDelegateReminderId] = useState<string | null>(null)
+    const [delegateTo, setDelegateTo] = useState('')
+    const [delegateNote, setDelegateNote] = useState('')
 
     // Single reminder actions
     const handleViewReminder = (reminderId: string) => {
@@ -82,6 +121,24 @@ export function RemindersView() {
 
     const handleDismissReminder = (reminderId: string) => {
         dismissReminderMutation.mutate(reminderId)
+    }
+
+    const handleSnoozeReminder = (reminderId: string, duration: number) => {
+        snoozeReminderMutation.mutate({ id: reminderId, duration })
+    }
+
+    const handleDelegateReminder = () => {
+        if (!delegateReminderId || !delegateTo) return
+        delegateReminderMutation.mutate(
+            { id: delegateReminderId, delegateTo, note: delegateNote || undefined },
+            {
+                onSuccess: () => {
+                    setDelegateReminderId(null)
+                    setDelegateTo('')
+                    setDelegateNote('')
+                }
+            }
+        )
     }
 
     // Transform API data
@@ -310,6 +367,30 @@ export function RemindersView() {
                                                             تجاهل
                                                         </DropdownMenuItem>
                                                     )}
+                                                    {reminder.status !== 'completed' && reminder.status !== 'dismissed' && (
+                                                        <DropdownMenuSub>
+                                                            <DropdownMenuSubTrigger>
+                                                                <Clock className="h-4 w-4 ml-2" />
+                                                                تأجيل
+                                                            </DropdownMenuSubTrigger>
+                                                            <DropdownMenuSubContent>
+                                                                {SNOOZE_OPTIONS.map((option) => (
+                                                                    <DropdownMenuItem
+                                                                        key={option.value}
+                                                                        onClick={() => handleSnoozeReminder(reminder.id, option.value)}
+                                                                    >
+                                                                        {option.label}
+                                                                    </DropdownMenuItem>
+                                                                ))}
+                                                            </DropdownMenuSubContent>
+                                                        </DropdownMenuSub>
+                                                    )}
+                                                    {reminder.status !== 'completed' && reminder.status !== 'dismissed' && (
+                                                        <DropdownMenuItem onClick={() => setDelegateReminderId(reminder.id)}>
+                                                            <UserPlus className="h-4 w-4 ml-2" />
+                                                            تفويض
+                                                        </DropdownMenuItem>
+                                                    )}
                                                     <DropdownMenuSeparator />
                                                     <DropdownMenuItem
                                                         onClick={() => handleDeleteReminder(reminder.id)}
@@ -355,6 +436,69 @@ export function RemindersView() {
                     />
                 </div>
             </Main>
+
+            {/* Delegate Reminder Dialog */}
+            <Dialog open={!!delegateReminderId} onOpenChange={(open) => !open && setDelegateReminderId(null)}>
+                <DialogContent className="sm:max-w-[425px]">
+                    <DialogHeader>
+                        <DialogTitle>تفويض التذكير</DialogTitle>
+                        <DialogDescription>
+                            اختر الشخص الذي تريد تفويض التذكير إليه
+                        </DialogDescription>
+                    </DialogHeader>
+                    <div className="grid gap-4 py-4">
+                        <div className="space-y-2">
+                            <label className="text-sm font-medium">تفويض إلى</label>
+                            <Select value={delegateTo} onValueChange={setDelegateTo}>
+                                <SelectTrigger className="rounded-xl">
+                                    <SelectValue placeholder="اختر عضو الفريق" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {teamMembers && teamMembers.length > 0 ? (
+                                        teamMembers.map((member) => (
+                                            <SelectItem key={member._id} value={member._id}>
+                                                {member.firstName} {member.lastName}
+                                            </SelectItem>
+                                        ))
+                                    ) : (
+                                        <div className="text-center py-4 text-slate-500 text-sm">
+                                            لا يوجد أعضاء فريق
+                                        </div>
+                                    )}
+                                </SelectContent>
+                            </Select>
+                        </div>
+                        <div className="space-y-2">
+                            <label className="text-sm font-medium">ملاحظة (اختياري)</label>
+                            <Textarea
+                                placeholder="أضف ملاحظة للتفويض..."
+                                value={delegateNote}
+                                onChange={(e) => setDelegateNote(e.target.value)}
+                                className="rounded-xl"
+                            />
+                        </div>
+                    </div>
+                    <DialogFooter>
+                        <Button variant="outline" onClick={() => setDelegateReminderId(null)}>
+                            إلغاء
+                        </Button>
+                        <Button
+                            onClick={handleDelegateReminder}
+                            disabled={!delegateTo || delegateReminderMutation.isPending}
+                            className="bg-emerald-500 hover:bg-emerald-600"
+                        >
+                            {delegateReminderMutation.isPending ? (
+                                <>
+                                    <Loader2 className="h-4 w-4 ml-2 animate-spin" />
+                                    جاري التفويض...
+                                </>
+                            ) : (
+                                'تفويض'
+                            )}
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </>
     )
 }

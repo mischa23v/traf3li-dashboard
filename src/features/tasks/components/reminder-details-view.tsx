@@ -3,7 +3,7 @@ import { useParams, useNavigate } from '@tanstack/react-router'
 import {
     Clock, AlertCircle, CheckCircle2, Trash2, Edit3, Loader2,
     ArrowLeft, Briefcase, XCircle,
-    History, Flag, Send, Bell, Calendar, Search
+    History, Flag, Send, Bell, Calendar, Search, UserPlus
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -27,11 +27,28 @@ import {
     useCompleteReminder,
     useDismissReminder,
     useSnoozeReminder,
-    useReopenReminder
+    useReopenReminder,
+    useDelegateReminder
 } from '@/hooks/useRemindersAndEvents'
+import { useTeamMembers } from '@/hooks/useCasesAndClients'
 import { Skeleton } from '@/components/ui/skeleton'
 import { ProductivityHero } from '@/components/productivity-hero'
 import { Alert, AlertDescription } from '@/components/ui/alert'
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog'
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select'
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -62,6 +79,15 @@ export function ReminderDetailsView() {
     const dismissReminderMutation = useDismissReminder()
     const snoozeReminderMutation = useSnoozeReminder()
     const reopenReminderMutation = useReopenReminder()
+    const delegateReminderMutation = useDelegateReminder()
+
+    // Team members for delegation
+    const { data: teamMembers } = useTeamMembers()
+
+    // Delegate dialog state
+    const [showDelegateDialog, setShowDelegateDialog] = useState(false)
+    const [delegateTo, setDelegateTo] = useState('')
+    const [delegateNote, setDelegateNote] = useState('')
 
     const handleDelete = () => {
         deleteReminderMutation.mutate(reminderId, {
@@ -85,6 +111,20 @@ export function ReminderDetailsView() {
 
     const handleSnooze = (duration: number) => {
         snoozeReminderMutation.mutate({ id: reminderId, duration })
+    }
+
+    const handleDelegate = () => {
+        if (!delegateTo) return
+        delegateReminderMutation.mutate(
+            { id: reminderId, delegateTo, note: delegateNote || undefined },
+            {
+                onSuccess: () => {
+                    setShowDelegateDialog(false)
+                    setDelegateTo('')
+                    setDelegateNote('')
+                }
+            }
+        )
     }
 
     const reminder = useMemo(() => {
@@ -312,6 +352,18 @@ export function ReminderDetailsView() {
                                             </DropdownMenuContent>
                                         </DropdownMenu>
                                     )}
+
+                                    {/* Delegate Button */}
+                                    {reminder.status !== 'completed' && reminder.status !== 'dismissed' && (
+                                        <Button
+                                            onClick={() => setShowDelegateDialog(true)}
+                                            variant="outline"
+                                            className="border-purple-300 text-purple-700 hover:bg-purple-50 rounded-xl"
+                                        >
+                                            <UserPlus className="h-4 w-4 ml-2" />
+                                            تفويض
+                                        </Button>
+                                    )}
                                 </div>
 
                                 {/* Delete Button */}
@@ -464,6 +516,69 @@ export function ReminderDetailsView() {
                     </>
                 )}
             </Main>
+
+            {/* Delegate Reminder Dialog */}
+            <Dialog open={showDelegateDialog} onOpenChange={setShowDelegateDialog}>
+                <DialogContent className="sm:max-w-[425px]">
+                    <DialogHeader>
+                        <DialogTitle>تفويض التذكير</DialogTitle>
+                        <DialogDescription>
+                            اختر الشخص الذي تريد تفويض التذكير إليه
+                        </DialogDescription>
+                    </DialogHeader>
+                    <div className="grid gap-4 py-4">
+                        <div className="space-y-2">
+                            <label className="text-sm font-medium">تفويض إلى</label>
+                            <Select value={delegateTo} onValueChange={setDelegateTo}>
+                                <SelectTrigger className="rounded-xl">
+                                    <SelectValue placeholder="اختر عضو الفريق" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {teamMembers && teamMembers.length > 0 ? (
+                                        teamMembers.map((member) => (
+                                            <SelectItem key={member._id} value={member._id}>
+                                                {member.firstName} {member.lastName}
+                                            </SelectItem>
+                                        ))
+                                    ) : (
+                                        <div className="text-center py-4 text-slate-500 text-sm">
+                                            لا يوجد أعضاء فريق
+                                        </div>
+                                    )}
+                                </SelectContent>
+                            </Select>
+                        </div>
+                        <div className="space-y-2">
+                            <label className="text-sm font-medium">ملاحظة (اختياري)</label>
+                            <Textarea
+                                placeholder="أضف ملاحظة للتفويض..."
+                                value={delegateNote}
+                                onChange={(e) => setDelegateNote(e.target.value)}
+                                className="rounded-xl"
+                            />
+                        </div>
+                    </div>
+                    <DialogFooter>
+                        <Button variant="outline" onClick={() => setShowDelegateDialog(false)}>
+                            إلغاء
+                        </Button>
+                        <Button
+                            onClick={handleDelegate}
+                            disabled={!delegateTo || delegateReminderMutation.isPending}
+                            className="bg-purple-500 hover:bg-purple-600"
+                        >
+                            {delegateReminderMutation.isPending ? (
+                                <>
+                                    <Loader2 className="h-4 w-4 ml-2 animate-spin" />
+                                    جاري التفويض...
+                                </>
+                            ) : (
+                                'تفويض'
+                            )}
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </>
     )
 }
