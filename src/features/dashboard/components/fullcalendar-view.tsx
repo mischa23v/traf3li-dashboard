@@ -389,7 +389,7 @@ export function FullCalendarView() {
     if (type === 'event') {
       navigate({ to: '/dashboard/tasks/events/$eventId', params: { eventId: id } })
     } else if (type === 'task') {
-      navigate({ to: '/dashboard/tasks/$taskId', params: { taskId: id } })
+      navigate({ to: '/tasks/$taskId', params: { taskId: id } })
     } else if (type === 'reminder') {
       navigate({ to: '/dashboard/tasks/reminders/$reminderId', params: { reminderId: id } })
     }
