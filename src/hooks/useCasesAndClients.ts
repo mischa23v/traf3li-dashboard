@@ -93,7 +93,7 @@ export const useCreateCase = () => {
   return useMutation({
     mutationFn: (data: CreateCaseData) => casesService.createCase(data),
     onSuccess: () => {
-      queryClient.refetchQueries({ queryKey: ['cases'] })
+      queryClient.invalidateQueries({ queryKey: ['cases'] })
       toast.success(t('cases.createSuccess', 'تم إنشاء القضية بنجاح'))
     },
     onError: (error: Error) => {
@@ -113,8 +113,8 @@ export const useUpdateCase = () => {
     mutationFn: ({ id, data }: { id: string; data: UpdateCaseData }) =>
       casesService.updateCase(id, data),
     onSuccess: (_, { id }) => {
-      queryClient.refetchQueries({ queryKey: ['cases'] })
-      queryClient.refetchQueries({ queryKey: ['cases', id] })
+      queryClient.invalidateQueries({ queryKey: ['cases'] })
+      queryClient.invalidateQueries({ queryKey: ['cases', id] })
       toast.success(t('cases.updateSuccess', 'تم تحديث القضية بنجاح'))
     },
     onError: (error: Error) => {
@@ -133,7 +133,7 @@ export const useDeleteCase = () => {
   return useMutation({
     mutationFn: (id: string) => casesService.deleteCase(id),
     onSuccess: () => {
-      queryClient.refetchQueries({ queryKey: ['cases'] })
+      queryClient.invalidateQueries({ queryKey: ['cases'] })
       toast.success(t('cases.deleteSuccess', 'تم حذف القضية بنجاح'))
     },
     onError: (error: Error) => {
@@ -153,7 +153,7 @@ export const useAddCaseNote = () => {
     mutationFn: ({ id, data }: { id: string; data: AddNoteData }) =>
       casesService.addNote(id, data),
     onSuccess: (_, { id }) => {
-      queryClient.refetchQueries({ queryKey: ['cases', id] })
+      queryClient.invalidateQueries({ queryKey: ['cases', id] })
       toast.success(t('cases.noteAddSuccess', 'تمت إضافة الملاحظة بنجاح'))
     },
     onError: (error: Error) => {
@@ -173,7 +173,7 @@ export const useAddCaseDocument = () => {
     mutationFn: ({ id, data }: { id: string; data: AddDocumentData }) =>
       casesService.addDocument(id, data),
     onSuccess: (_, { id }) => {
-      queryClient.refetchQueries({ queryKey: ['cases', id] })
+      queryClient.invalidateQueries({ queryKey: ['cases', id] })
       toast.success(t('cases.documentAddSuccess', 'تمت إضافة المستند بنجاح'))
     },
     onError: (error: Error) => {
@@ -242,11 +242,11 @@ export const useAddCaseHearing = () => {
       return result
     },
     onSuccess: (_, { id }) => {
-      queryClient.refetchQueries({ queryKey: ['cases', id] })
-      queryClient.refetchQueries({ queryKey: ['cases'] })
-      queryClient.refetchQueries({ queryKey: ['calendar'] })
-      queryClient.refetchQueries({ queryKey: ['events'] })
-      queryClient.refetchQueries({ queryKey: ['reminders'] })
+      queryClient.invalidateQueries({ queryKey: ['cases', id] })
+      queryClient.invalidateQueries({ queryKey: ['cases'] })
+      queryClient.invalidateQueries({ queryKey: ['calendar'] })
+      queryClient.invalidateQueries({ queryKey: ['events'] })
+      queryClient.invalidateQueries({ queryKey: ['reminders'] })
       toast.success(t('cases.hearingAddSuccess', 'تمت إضافة الجلسة بنجاح وتم إنشاء حدث في التقويم'))
     },
     onError: (error: Error) => {
@@ -266,7 +266,7 @@ export const useAddCaseClaim = () => {
     mutationFn: ({ id, data }: { id: string; data: AddClaimData }) =>
       casesService.addClaim(id, data),
     onSuccess: (_, { id }) => {
-      queryClient.refetchQueries({ queryKey: ['cases', id] })
+      queryClient.invalidateQueries({ queryKey: ['cases', id] })
       toast.success(t('cases.claimAddSuccess', 'تمت إضافة المطالبة بنجاح'))
     },
     onError: (error: Error) => {
@@ -286,8 +286,8 @@ export const useUpdateCaseStatus = () => {
     mutationFn: ({ id, status }: { id: string; status: CaseStatus }) =>
       casesService.updateStatus(id, status),
     onSuccess: (_, { id }) => {
-      queryClient.refetchQueries({ queryKey: ['cases'] })
-      queryClient.refetchQueries({ queryKey: ['cases', id] })
+      queryClient.invalidateQueries({ queryKey: ['cases'] })
+      queryClient.invalidateQueries({ queryKey: ['cases', id] })
       toast.success(t('cases.statusUpdateSuccess', 'تم تحديث حالة القضية بنجاح'))
     },
     onError: (error: Error) => {
@@ -307,8 +307,8 @@ export const useUpdateCaseOutcome = () => {
     mutationFn: ({ id, outcome }: { id: string; outcome: CaseOutcome }) =>
       casesService.updateOutcome(id, outcome),
     onSuccess: (_, { id }) => {
-      queryClient.refetchQueries({ queryKey: ['cases'] })
-      queryClient.refetchQueries({ queryKey: ['cases', id] })
+      queryClient.invalidateQueries({ queryKey: ['cases'] })
+      queryClient.invalidateQueries({ queryKey: ['cases', id] })
       toast.success(t('cases.outcomeUpdateSuccess', 'تم تحديث نتيجة القضية بنجاح'))
     },
     onError: (error: Error) => {
@@ -342,7 +342,7 @@ export const useCreateClient = () => {
   return useMutation({
     mutationFn: (data: CreateClientData) => clientsService.createClient(data),
     onSuccess: () => {
-      queryClient.refetchQueries({ queryKey: ['clients'] })
+      queryClient.invalidateQueries({ queryKey: ['clients'] })
       toast.success(t('clients.createSuccess', 'تم إنشاء العميل بنجاح'))
     },
     onError: (error: Error) => {
@@ -359,8 +359,8 @@ export const useUpdateClient = () => {
     mutationFn: ({ id, data }: { id: string; data: Partial<CreateClientData> }) =>
       clientsService.updateClient(id, data),
     onSuccess: (_, { id }) => {
-      queryClient.refetchQueries({ queryKey: ['clients'] })
-      queryClient.refetchQueries({ queryKey: ['clients', id] })
+      queryClient.invalidateQueries({ queryKey: ['clients'] })
+      queryClient.invalidateQueries({ queryKey: ['clients', id] })
       toast.success(t('clients.updateSuccess', 'تم تحديث العميل بنجاح'))
     },
     onError: (error: Error) => {
@@ -376,7 +376,7 @@ export const useDeleteClient = () => {
   return useMutation({
     mutationFn: (id: string) => clientsService.deleteClient(id),
     onSuccess: () => {
-      queryClient.refetchQueries({ queryKey: ['clients'] })
+      queryClient.invalidateQueries({ queryKey: ['clients'] })
       toast.success(t('clients.deleteSuccess', 'تم حذف العميل بنجاح'))
     },
     onError: (error: Error) => {
@@ -458,7 +458,7 @@ export const useUpdateCaseNote = () => {
     mutationFn: ({ caseId, noteId, data }: { caseId: string; noteId: string; data: UpdateNoteData }) =>
       casesService.updateNote(caseId, noteId, data),
     onSuccess: (_, { caseId }) => {
-      queryClient.refetchQueries({ queryKey: ['cases', caseId] })
+      queryClient.invalidateQueries({ queryKey: ['cases', caseId] })
       toast.success(t('cases.noteUpdateSuccess', 'تم تحديث الملاحظة بنجاح'))
     },
     onError: (error: Error) => {
@@ -478,7 +478,7 @@ export const useDeleteCaseNote = () => {
     mutationFn: ({ caseId, noteId }: { caseId: string; noteId: string }) =>
       casesService.deleteNote(caseId, noteId),
     onSuccess: (_, { caseId }) => {
-      queryClient.refetchQueries({ queryKey: ['cases', caseId] })
+      queryClient.invalidateQueries({ queryKey: ['cases', caseId] })
       toast.success(t('cases.noteDeleteSuccess', 'تم حذف الملاحظة بنجاح'))
     },
     onError: (error: Error) => {
@@ -501,10 +501,10 @@ export const useUpdateCaseHearing = () => {
     mutationFn: ({ caseId, hearingId, data }: { caseId: string; hearingId: string; data: UpdateHearingData }) =>
       casesService.updateHearing(caseId, hearingId, data),
     onSuccess: (_, { caseId }) => {
-      queryClient.refetchQueries({ queryKey: ['cases', caseId] })
-      queryClient.refetchQueries({ queryKey: ['cases'] })
-      queryClient.refetchQueries({ queryKey: ['calendar'] })
-      queryClient.refetchQueries({ queryKey: ['events'] })
+      queryClient.invalidateQueries({ queryKey: ['cases', caseId] })
+      queryClient.invalidateQueries({ queryKey: ['cases'] })
+      queryClient.invalidateQueries({ queryKey: ['calendar'] })
+      queryClient.invalidateQueries({ queryKey: ['events'] })
       toast.success(t('cases.hearingUpdateSuccess', 'تم تحديث الجلسة بنجاح'))
     },
     onError: (error: Error) => {
@@ -525,10 +525,10 @@ export const useDeleteCaseHearing = () => {
     mutationFn: ({ caseId, hearingId }: { caseId: string; hearingId: string }) =>
       casesService.deleteHearing(caseId, hearingId),
     onSuccess: (_, { caseId }) => {
-      queryClient.refetchQueries({ queryKey: ['cases', caseId] })
-      queryClient.refetchQueries({ queryKey: ['cases'] })
-      queryClient.refetchQueries({ queryKey: ['calendar'] })
-      queryClient.refetchQueries({ queryKey: ['events'] })
+      queryClient.invalidateQueries({ queryKey: ['cases', caseId] })
+      queryClient.invalidateQueries({ queryKey: ['cases'] })
+      queryClient.invalidateQueries({ queryKey: ['calendar'] })
+      queryClient.invalidateQueries({ queryKey: ['events'] })
       toast.success(t('cases.hearingDeleteSuccess', 'تم حذف الجلسة بنجاح'))
     },
     onError: (error: Error) => {
@@ -550,7 +550,7 @@ export const useUpdateCaseClaim = () => {
     mutationFn: ({ caseId, claimId, data }: { caseId: string; claimId: string; data: UpdateClaimData }) =>
       casesService.updateClaim(caseId, claimId, data),
     onSuccess: (_, { caseId }) => {
-      queryClient.refetchQueries({ queryKey: ['cases', caseId] })
+      queryClient.invalidateQueries({ queryKey: ['cases', caseId] })
       toast.success(t('cases.claimUpdateSuccess', 'تم تحديث المطالبة بنجاح'))
     },
     onError: (error: Error) => {
@@ -570,7 +570,7 @@ export const useDeleteCaseClaim = () => {
     mutationFn: ({ caseId, claimId }: { caseId: string; claimId: string }) =>
       casesService.deleteClaim(caseId, claimId),
     onSuccess: (_, { caseId }) => {
-      queryClient.refetchQueries({ queryKey: ['cases', caseId] })
+      queryClient.invalidateQueries({ queryKey: ['cases', caseId] })
       toast.success(t('cases.claimDeleteSuccess', 'تم حذف المطالبة بنجاح'))
     },
     onError: (error: Error) => {
@@ -592,7 +592,7 @@ export const useAddCaseTimelineEvent = () => {
     mutationFn: ({ caseId, data }: { caseId: string; data: AddTimelineEventData }) =>
       casesService.addTimelineEvent(caseId, data),
     onSuccess: (_, { caseId }) => {
-      queryClient.refetchQueries({ queryKey: ['cases', caseId] })
+      queryClient.invalidateQueries({ queryKey: ['cases', caseId] })
       toast.success(t('cases.timelineAddSuccess', 'تمت إضافة الحدث بنجاح'))
     },
     onError: (error: Error) => {
@@ -612,7 +612,7 @@ export const useUpdateCaseTimelineEvent = () => {
     mutationFn: ({ caseId, eventId, data }: { caseId: string; eventId: string; data: UpdateTimelineEventData }) =>
       casesService.updateTimelineEvent(caseId, eventId, data),
     onSuccess: (_, { caseId }) => {
-      queryClient.refetchQueries({ queryKey: ['cases', caseId] })
+      queryClient.invalidateQueries({ queryKey: ['cases', caseId] })
       toast.success(t('cases.timelineUpdateSuccess', 'تم تحديث الحدث بنجاح'))
     },
     onError: (error: Error) => {
@@ -632,7 +632,7 @@ export const useDeleteCaseTimelineEvent = () => {
     mutationFn: ({ caseId, eventId }: { caseId: string; eventId: string }) =>
       casesService.deleteTimelineEvent(caseId, eventId),
     onSuccess: (_, { caseId }) => {
-      queryClient.refetchQueries({ queryKey: ['cases', caseId] })
+      queryClient.invalidateQueries({ queryKey: ['cases', caseId] })
       toast.success(t('cases.timelineDeleteSuccess', 'تم حذف الحدث بنجاح'))
     },
     onError: (error: Error) => {
@@ -684,7 +684,7 @@ export const useUploadCaseDocument = () => {
       })
     },
     onSuccess: (_, { caseId }) => {
-      queryClient.refetchQueries({ queryKey: ['cases', caseId] })
+      queryClient.invalidateQueries({ queryKey: ['cases', caseId] })
       toast.success(t('cases.documentUploadSuccess', 'تم رفع المستند بنجاح'))
     },
     onError: (error: Error) => {
@@ -731,7 +731,7 @@ export const useDeleteCaseDocument = () => {
     mutationFn: ({ caseId, docId }: { caseId: string; docId: string }) =>
       casesService.deleteDocument(caseId, docId),
     onSuccess: (_, { caseId }) => {
-      queryClient.refetchQueries({ queryKey: ['cases', caseId] })
+      queryClient.invalidateQueries({ queryKey: ['cases', caseId] })
       toast.success(t('cases.documentDeleteSuccess', 'تم حذف المستند بنجاح'))
     },
     onError: (error: Error) => {

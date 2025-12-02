@@ -50,7 +50,7 @@ export function useCreateTemplate() {
   return useMutation({
     mutationFn: (data: CreateTemplateData) => invoiceTemplatesService.create(data),
     onSuccess: () => {
-      queryClient.refetchQueries({ queryKey: templateKeys.all })
+      queryClient.invalidateQueries({ queryKey: templateKeys.all })
       toast({
         title: t('common.success'),
         description: t('invoiceTemplates.createSuccess'),
@@ -75,8 +75,8 @@ export function useUpdateTemplate() {
     mutationFn: ({ id, data }: { id: string; data: UpdateTemplateData }) =>
       invoiceTemplatesService.update(id, data),
     onSuccess: (_, { id }) => {
-      queryClient.refetchQueries({ queryKey: templateKeys.all })
-      queryClient.refetchQueries({ queryKey: templateKeys.detail(id) })
+      queryClient.invalidateQueries({ queryKey: templateKeys.all })
+      queryClient.invalidateQueries({ queryKey: templateKeys.detail(id) })
       toast({
         title: t('common.success'),
         description: t('invoiceTemplates.updateSuccess'),
@@ -100,7 +100,7 @@ export function useDeleteTemplate() {
   return useMutation({
     mutationFn: (id: string) => invoiceTemplatesService.delete(id),
     onSuccess: () => {
-      queryClient.refetchQueries({ queryKey: templateKeys.all })
+      queryClient.invalidateQueries({ queryKey: templateKeys.all })
       toast({
         title: t('common.success'),
         description: t('invoiceTemplates.deleteSuccess'),
@@ -125,7 +125,7 @@ export function useDuplicateTemplate() {
     mutationFn: ({ id, name, nameAr }: { id: string; name: string; nameAr: string }) =>
       invoiceTemplatesService.duplicate(id, name, nameAr),
     onSuccess: () => {
-      queryClient.refetchQueries({ queryKey: templateKeys.all })
+      queryClient.invalidateQueries({ queryKey: templateKeys.all })
       toast({
         title: t('common.success'),
         description: t('invoiceTemplates.duplicateSuccess'),
@@ -149,8 +149,8 @@ export function useSetDefaultTemplate() {
   return useMutation({
     mutationFn: (id: string) => invoiceTemplatesService.setDefault(id),
     onSuccess: () => {
-      queryClient.refetchQueries({ queryKey: templateKeys.all })
-      queryClient.refetchQueries({ queryKey: templateKeys.default() })
+      queryClient.invalidateQueries({ queryKey: templateKeys.all })
+      queryClient.invalidateQueries({ queryKey: templateKeys.default() })
       toast({
         title: t('common.success'),
         description: t('invoiceTemplates.setDefaultSuccess'),
@@ -183,7 +183,7 @@ export function useImportTemplate() {
   return useMutation({
     mutationFn: (file: File) => invoiceTemplatesService.import(file),
     onSuccess: () => {
-      queryClient.refetchQueries({ queryKey: templateKeys.all })
+      queryClient.invalidateQueries({ queryKey: templateKeys.all })
       toast({
         title: t('common.success'),
         description: t('invoiceTemplates.importSuccess'),

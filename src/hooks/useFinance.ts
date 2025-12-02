@@ -41,7 +41,7 @@ export const useCreateInvoice = () => {
     mutationFn: (data: CreateInvoiceData) =>
       financeService.createInvoice(data),
     onSuccess: () => {
-      queryClient.refetchQueries({ queryKey: ['invoices'] })
+      queryClient.invalidateQueries({ queryKey: ['invoices'] })
       toast.success('تم إنشاء الفاتورة بنجاح')
     },
     onError: (error: Error) => {
@@ -57,8 +57,8 @@ export const useUpdateInvoice = () => {
     mutationFn: ({ id, data }: { id: string; data: Partial<CreateInvoiceData> }) =>
       financeService.updateInvoice(id, data),
     onSuccess: (_, { id }) => {
-      queryClient.refetchQueries({ queryKey: ['invoices'] })
-      queryClient.refetchQueries({ queryKey: ['invoices', id] })
+      queryClient.invalidateQueries({ queryKey: ['invoices'] })
+      queryClient.invalidateQueries({ queryKey: ['invoices', id] })
       toast.success('تم تحديث الفاتورة بنجاح')
     },
     onError: (error: Error) => {
@@ -73,8 +73,8 @@ export const useSendInvoice = () => {
   return useMutation({
     mutationFn: (id: string) => financeService.sendInvoice(id),
     onSuccess: (_, id) => {
-      queryClient.refetchQueries({ queryKey: ['invoices'] })
-      queryClient.refetchQueries({ queryKey: ['invoices', id] })
+      queryClient.invalidateQueries({ queryKey: ['invoices'] })
+      queryClient.invalidateQueries({ queryKey: ['invoices', id] })
       toast.success('تم إرسال الفاتورة بنجاح')
     },
     onError: (error: Error) => {
@@ -116,7 +116,7 @@ export const useCreateExpense = () => {
     mutationFn: (data: CreateExpenseData) =>
       financeService.createExpense(data),
     onSuccess: () => {
-      queryClient.refetchQueries({ queryKey: ['expenses'] })
+      queryClient.invalidateQueries({ queryKey: ['expenses'] })
       toast.success('تم إنشاء المصروف بنجاح')
     },
     onError: (error: Error) => {
@@ -132,8 +132,8 @@ export const useUpdateExpense = () => {
     mutationFn: ({ id, data }: { id: string; data: Partial<CreateExpenseData> }) =>
       financeService.updateExpense(id, data),
     onSuccess: (_, { id }) => {
-      queryClient.refetchQueries({ queryKey: ['expenses'] })
-      queryClient.refetchQueries({ queryKey: ['expenses', id] })
+      queryClient.invalidateQueries({ queryKey: ['expenses'] })
+      queryClient.invalidateQueries({ queryKey: ['expenses', id] })
       toast.success('تم تحديث المصروف بنجاح')
     },
     onError: (error: Error) => {
@@ -149,7 +149,7 @@ export const useUploadReceipt = () => {
     mutationFn: ({ id, file }: { id: string; file: File }) =>
       financeService.uploadReceipt(id, file),
     onSuccess: (_, { id }) => {
-      queryClient.refetchQueries({ queryKey: ['expenses', id] })
+      queryClient.invalidateQueries({ queryKey: ['expenses', id] })
       toast.success('تم رفع الإيصال بنجاح')
     },
     onError: (error: Error) => {
@@ -192,7 +192,7 @@ export const useStartTimer = () => {
       description: string
     }) => financeService.startTimer(data),
     onSuccess: () => {
-      queryClient.refetchQueries({ queryKey: ['timer'] })
+      queryClient.invalidateQueries({ queryKey: ['timer'] })
       toast.success('تم بدء المؤقت بنجاح')
     },
     onError: (error: Error) => {
@@ -207,7 +207,7 @@ export const usePauseTimer = () => {
   return useMutation({
     mutationFn: () => financeService.pauseTimer(),
     onSuccess: () => {
-      queryClient.refetchQueries({ queryKey: ['timer'] })
+      queryClient.invalidateQueries({ queryKey: ['timer'] })
       toast.success('تم إيقاف المؤقت مؤقتاً')
     },
     onError: (error: Error) => {
@@ -222,7 +222,7 @@ export const useResumeTimer = () => {
   return useMutation({
     mutationFn: () => financeService.resumeTimer(),
     onSuccess: () => {
-      queryClient.refetchQueries({ queryKey: ['timer'] })
+      queryClient.invalidateQueries({ queryKey: ['timer'] })
       toast.success('تم استئناف المؤقت')
     },
     onError: (error: Error) => {
@@ -238,8 +238,8 @@ export const useStopTimer = () => {
     mutationFn: (data: { notes?: string; isBillable?: boolean }) =>
       financeService.stopTimer(data),
     onSuccess: () => {
-      queryClient.refetchQueries({ queryKey: ['timer'] })
-      queryClient.refetchQueries({ queryKey: ['timeEntries'] })
+      queryClient.invalidateQueries({ queryKey: ['timer'] })
+      queryClient.invalidateQueries({ queryKey: ['timeEntries'] })
       toast.success('تم إيقاف المؤقت وإنشاء إدخال الوقت')
     },
     onError: (error: Error) => {
@@ -263,7 +263,7 @@ export const useCreateTimeEntry = () => {
     mutationFn: (data: CreateTimeEntryData) =>
       financeService.createTimeEntry(data),
     onSuccess: () => {
-      queryClient.refetchQueries({ queryKey: ['timeEntries'] })
+      queryClient.invalidateQueries({ queryKey: ['timeEntries'] })
       toast.success('تم إنشاء إدخال الوقت بنجاح')
     },
     onError: (error: Error) => {
@@ -309,8 +309,8 @@ export const useCreatePayment = () => {
     mutationFn: (data: CreatePaymentData) =>
       financeService.createPayment(data),
     onSuccess: () => {
-      queryClient.refetchQueries({ queryKey: ['payments'] })
-      queryClient.refetchQueries({ queryKey: ['invoices'] })
+      queryClient.invalidateQueries({ queryKey: ['payments'] })
+      queryClient.invalidateQueries({ queryKey: ['invoices'] })
       toast.success('تم إنشاء الدفعة بنجاح')
     },
     onError: (error: Error) => {
@@ -333,8 +333,8 @@ export const useCompletePayment = () => {
   return useMutation({
     mutationFn: (id: string) => financeService.completePayment(id),
     onSuccess: () => {
-      queryClient.refetchQueries({ queryKey: ['payments'] })
-      queryClient.refetchQueries({ queryKey: ['invoices'] })
+      queryClient.invalidateQueries({ queryKey: ['payments'] })
+      queryClient.invalidateQueries({ queryKey: ['invoices'] })
       toast.success('تم إكمال الدفعة بنجاح')
     },
     onError: (error: Error) => {
@@ -350,8 +350,8 @@ export const useRecordPaymentForInvoice = () => {
     mutationFn: ({ invoiceId, data }: { invoiceId: string; data: any }) =>
       financeService.recordPaymentForInvoice(invoiceId, data),
     onSuccess: () => {
-      queryClient.refetchQueries({ queryKey: ['payments'] })
-      queryClient.refetchQueries({ queryKey: ['invoices'] })
+      queryClient.invalidateQueries({ queryKey: ['payments'] })
+      queryClient.invalidateQueries({ queryKey: ['invoices'] })
       toast.success('تم تسجيل الدفعة بنجاح')
     },
     onError: (error: Error) => {
@@ -393,7 +393,7 @@ export const useCreateTransaction = () => {
     mutationFn: (data: CreateTransactionData) =>
       financeService.createTransaction(data),
     onSuccess: () => {
-      queryClient.refetchQueries({ queryKey: ['transactions'] })
+      queryClient.invalidateQueries({ queryKey: ['transactions'] })
       toast.success('تم إنشاء المعاملة بنجاح')
     },
     onError: (error: Error) => {
@@ -442,7 +442,7 @@ export const useCreateStatement = () => {
   return useMutation({
     mutationFn: (data: any) => financeService.createStatement(data),
     onSuccess: () => {
-      queryClient.refetchQueries({ queryKey: ['statements'] })
+      queryClient.invalidateQueries({ queryKey: ['statements'] })
       toast.success('تم إنشاء الكشف الحسابي بنجاح')
     },
     onError: (error: Error) => {
@@ -458,8 +458,8 @@ export const useUpdateStatement = () => {
     mutationFn: ({ id, data }: { id: string; data: any }) =>
       financeService.updateStatement(id, data),
     onSuccess: (_, { id }) => {
-      queryClient.refetchQueries({ queryKey: ['statements'] })
-      queryClient.refetchQueries({ queryKey: ['statements', id] })
+      queryClient.invalidateQueries({ queryKey: ['statements'] })
+      queryClient.invalidateQueries({ queryKey: ['statements', id] })
       toast.success('تم تحديث الكشف الحسابي بنجاح')
     },
     onError: (error: Error) => {
@@ -474,7 +474,7 @@ export const useDeleteStatement = () => {
   return useMutation({
     mutationFn: (id: string) => financeService.deleteStatement(id),
     onSuccess: () => {
-      queryClient.refetchQueries({ queryKey: ['statements'] })
+      queryClient.invalidateQueries({ queryKey: ['statements'] })
       toast.success('تم حذف الكشف الحسابي بنجاح')
     },
     onError: (error: Error) => {
@@ -489,8 +489,8 @@ export const useSendStatement = () => {
   return useMutation({
     mutationFn: (id: string) => financeService.sendStatement(id),
     onSuccess: (_, id) => {
-      queryClient.refetchQueries({ queryKey: ['statements'] })
-      queryClient.refetchQueries({ queryKey: ['statements', id] })
+      queryClient.invalidateQueries({ queryKey: ['statements'] })
+      queryClient.invalidateQueries({ queryKey: ['statements', id] })
       toast.success('تم إرسال الكشف الحسابي بنجاح')
     },
     onError: (error: Error) => {
@@ -523,7 +523,7 @@ export const useCreateActivity = () => {
   return useMutation({
     mutationFn: (data: any) => financeService.createActivity(data),
     onSuccess: () => {
-      queryClient.refetchQueries({ queryKey: ['activities'] })
+      queryClient.invalidateQueries({ queryKey: ['activities'] })
       toast.success('تم إنشاء النشاط المالي بنجاح')
     },
     onError: (error: Error) => {
@@ -605,7 +605,7 @@ export const useDeleteInvoice = () => {
   return useMutation({
     mutationFn: (id: string) => financeService.deleteInvoice(id),
     onSuccess: () => {
-      queryClient.refetchQueries({ queryKey: ['invoices'] })
+      queryClient.invalidateQueries({ queryKey: ['invoices'] })
       toast.success('تم حذف الفاتورة بنجاح')
     },
     onError: (error: Error) => {
@@ -620,7 +620,7 @@ export const useDeleteExpense = () => {
   return useMutation({
     mutationFn: (id: string) => financeService.deleteExpense(id),
     onSuccess: () => {
-      queryClient.refetchQueries({ queryKey: ['expenses'] })
+      queryClient.invalidateQueries({ queryKey: ['expenses'] })
       toast.success('تم حذف المصروف بنجاح')
     },
     onError: (error: Error) => {
@@ -636,8 +636,8 @@ export const useUpdateTimeEntry = () => {
     mutationFn: ({ id, data }: { id: string; data: Partial<CreateTimeEntryData> }) =>
       financeService.updateTimeEntry(id, data),
     onSuccess: (_, { id }) => {
-      queryClient.refetchQueries({ queryKey: ['timeEntries'] })
-      queryClient.refetchQueries({ queryKey: ['timeEntries', id] })
+      queryClient.invalidateQueries({ queryKey: ['timeEntries'] })
+      queryClient.invalidateQueries({ queryKey: ['timeEntries', id] })
       toast.success('تم تحديث إدخال الوقت بنجاح')
     },
     onError: (error: Error) => {
@@ -652,7 +652,7 @@ export const useDeleteTimeEntry = () => {
   return useMutation({
     mutationFn: (id: string) => financeService.deleteTimeEntry(id),
     onSuccess: () => {
-      queryClient.refetchQueries({ queryKey: ['timeEntries'] })
+      queryClient.invalidateQueries({ queryKey: ['timeEntries'] })
       toast.success('تم حذف إدخال الوقت بنجاح')
     },
     onError: (error: Error) => {
@@ -668,8 +668,8 @@ export const useUpdateTransaction = () => {
     mutationFn: ({ id, data }: { id: string; data: Partial<CreateTransactionData> }) =>
       financeService.updateTransaction(id, data),
     onSuccess: (_, { id }) => {
-      queryClient.refetchQueries({ queryKey: ['transactions'] })
-      queryClient.refetchQueries({ queryKey: ['transactions', id] })
+      queryClient.invalidateQueries({ queryKey: ['transactions'] })
+      queryClient.invalidateQueries({ queryKey: ['transactions', id] })
       toast.success('تم تحديث المعاملة بنجاح')
     },
     onError: (error: Error) => {
@@ -684,7 +684,7 @@ export const useDeleteTransaction = () => {
   return useMutation({
     mutationFn: (id: string) => financeService.deleteTransaction(id),
     onSuccess: () => {
-      queryClient.refetchQueries({ queryKey: ['transactions'] })
+      queryClient.invalidateQueries({ queryKey: ['transactions'] })
       toast.success('تم حذف المعاملة بنجاح')
     },
     onError: (error: Error) => {
@@ -731,8 +731,8 @@ export const useUpdateAccountActivity = () => {
     mutationFn: ({ id, data }: { id: string; data: any }) =>
       financeService.updateActivity(id, data),
     onSuccess: (_, { id }) => {
-      queryClient.refetchQueries({ queryKey: ['activities'] })
-      queryClient.refetchQueries({ queryKey: ['activities', id] })
+      queryClient.invalidateQueries({ queryKey: ['activities'] })
+      queryClient.invalidateQueries({ queryKey: ['activities', id] })
       toast.success('تم تحديث النشاط بنجاح')
     },
     onError: (error: Error) => {
@@ -747,7 +747,7 @@ export const useDeleteAccountActivity = () => {
   return useMutation({
     mutationFn: (id: string) => financeService.deleteActivity(id),
     onSuccess: () => {
-      queryClient.refetchQueries({ queryKey: ['activities'] })
+      queryClient.invalidateQueries({ queryKey: ['activities'] })
       toast.success('تم حذف النشاط بنجاح')
     },
     onError: (error: Error) => {
