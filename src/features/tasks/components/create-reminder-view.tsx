@@ -196,37 +196,26 @@ export function CreateReminderView() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
 
-        const notificationConfig: NotificationConfig = {
-            channels: notificationChannels,
-            // Convert number[] to AdvanceNotification[] format expected by backend
-            advanceNotifications: advanceNotifications.map(minutes => ({
-                beforeMinutes: minutes,
-                channels: notificationChannels,
-                sent: false
-            })),
-            escalation: escalationEnabled ? {
-                enabled: true,
-                escalateAfterMinutes: escalationDelay,
-                escalated: false,
-                escalationLevel: 0
-            } : undefined,
-            soundEnabled: true,
-            vibrationEnabled: true,
-        }
+        // Combine date and time into ISO 8601 datetime
+        const reminderDateTime = formData.reminderDate && formData.reminderTime
+            ? new Date(`${formData.reminderDate}T${formData.reminderTime}:00`).toISOString()
+            : undefined
 
         const reminderData = {
             title: formData.title,
             description: formData.description,
-            reminderDate: formData.reminderDate,
-            reminderTime: formData.reminderTime,
+            reminderDateTime,
             priority: formData.priority,
             type: formData.type,
             tags: formData.tags,
-            maxSnoozeCount: formData.maxSnoozeCount,
+            notification: {
+                channels: notificationChannels,
+                // API accepts number (minutes) or array
+                advanceNotifications: advanceNotifications[0] || 30,
+            },
             ...(formData.assignedTo && { assignedTo: formData.assignedTo }),
             ...(formData.relatedCase && { relatedCase: formData.relatedCase }),
-            ...(formData.relatedClient && { relatedClient: formData.relatedClient }),
-            notification: notificationConfig,
+            ...(formData.relatedClient && { clientId: formData.relatedClient }),
             ...(isRecurring && {
                 recurring: {
                     ...recurringConfig,
