@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { toast } from 'sonner'
 import {
     ArrowRight, Save, Calendar, Clock,
     MapPin, Users, FileText, Briefcase, Loader2,
@@ -277,59 +278,82 @@ export function CreateEventView() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
 
-        // Combine date and time into ISO 8601 datetime
-        const startDateTime = formData.startDate && formData.startTime
-            ? new Date(`${formData.startDate}T${formData.startTime}:00`).toISOString()
-            : undefined
+        // Combine date and time into ISO 8601 datetime (required by API)
+        let startDateTime: string
+        if (formData.allDay && formData.startDate) {
+            // For all-day events, use start of day
+            startDateTime = new Date(`${formData.startDate}T00:00:00`).toISOString()
+        } else if (formData.startDate && formData.startTime) {
+            startDateTime = new Date(`${formData.startDate}T${formData.startTime}:00`).toISOString()
+        } else {
+            // Should not happen due to form validation, but fallback
+            toast.error('يرجى تحديد تاريخ ووقت البداية')
+            return
+        }
 
-        const endDateTime = (formData.endDate || formData.startDate) && formData.endTime
-            ? new Date(`${formData.endDate || formData.startDate}T${formData.endTime}:00`).toISOString()
-            : undefined
+        let endDateTime: string | undefined
+        if (formData.allDay && formData.startDate) {
+            // For all-day events, end at end of day
+            endDateTime = new Date(`${formData.endDate || formData.startDate}T23:59:59`).toISOString()
+        } else if ((formData.endDate || formData.startDate) && formData.endTime) {
+            endDateTime = new Date(`${formData.endDate || formData.startDate}T${formData.endTime}:00`).toISOString()
+        }
 
-        // Build reminders array per API spec: { type: 'email', beforeMinutes: 60 }
+        // Build reminders array per API spec: { type: 'notification', beforeMinutes: 60 }
         const reminders = selectedReminders.map(minutes => ({
-            type: 'email' as const,
+            type: 'notification' as const,
             beforeMinutes: minutes,
         }))
 
-        // Build attendees array
+        // Build attendees array per API spec
         const attendeesData = attendees.map(a => ({
             name: a.name,
             email: a.email,
             role: a.role,
         }))
 
-        // Build agenda array
-        const agendaData = agendaItems.map((item, index) => ({
-            order: index + 1,
-            title: item.title,
-            duration: item.duration,
-            presenter: item.presenter,
-            notes: item.notes,
-        }))
+        // Build location per API spec: { type: 'physical' | 'virtual', address?, meetingUrl? }
+        let location: { type: 'physical' | 'virtual'; address?: string; meetingUrl?: string } | undefined
+        if (locationType === 'physical' && locationData.address) {
+            location = {
+                type: 'physical',
+                address: locationData.address,
+            }
+        } else if (locationType === 'virtual' && locationData.meetingUrl) {
+            location = {
+                type: 'virtual',
+                meetingUrl: locationData.meetingUrl,
+            }
+        } else if (locationType === 'hybrid') {
+            // Hybrid - prefer virtual format with address in meetingUrl or use physical
+            if (locationData.meetingUrl) {
+                location = {
+                    type: 'virtual',
+                    meetingUrl: locationData.meetingUrl,
+                }
+            } else if (locationData.address) {
+                location = {
+                    type: 'physical',
+                    address: locationData.address,
+                }
+            }
+        }
 
         const eventData = {
             title: formData.title,
-            description: formData.description,
             type: formData.type,
-            priority: formData.priority,
-            color: formData.color,
             startDateTime,
-            endDateTime,
-            location: locationType === 'physical' ? {
-                name: locationData.room || locationData.building || 'Office',
-                address: locationData.address,
-            } : locationType === 'virtual' ? {
-                name: locationData.platform || 'Virtual Meeting',
-                meetingUrl: locationData.meetingUrl,
-            } : {
-                name: locationData.room || 'Hybrid Meeting',
-                address: locationData.address,
-                meetingUrl: locationData.meetingUrl,
-            },
+            ...(endDateTime && { endDateTime }),
+            ...(formData.description && { description: formData.description }),
+            allDay: formData.allDay,
+            timezone: 'Asia/Riyadh',
+            ...(location && { location }),
             ...(formData.caseId && { caseId: formData.caseId }),
             ...(formData.clientId && { clientId: formData.clientId }),
             ...(attendeesData.length > 0 && { attendees: attendeesData }),
+            priority: formData.priority,
+            color: formData.color,
+            ...(formData.tags.length > 0 && { tags: formData.tags }),
             ...(reminders.length > 0 && { reminders }),
             ...(isRecurring && {
                 recurrence: {

@@ -243,30 +243,34 @@ export interface Event {
 }
 
 /**
- * Create Event Data
+ * Create Event Data - matches API spec
+ * POST /api/events
  */
 export interface CreateEventData {
-  title: string
+  title: string                          // required
+  type: EventType                        // required: meeting, hearing, deadline, reminder, task, consultation, other
+  startDateTime: string                  // required (ISO string)
+  endDateTime?: string                   // optional (ISO string)
   description?: string
-  notes?: string
-  type: EventType
-  status?: EventStatus
-  priority?: EventPriority
-  color?: string
-  tags?: string[]
-  startDate: string
-  startTime?: string
-  endDate?: string
-  endTime?: string
   allDay?: boolean
   timezone?: string
+  location?: {
+    type: 'physical' | 'virtual'
+    address?: string                     // for physical
+    meetingUrl?: string                  // for virtual
+  }
+  caseId?: string                        // optional - link to case
+  clientId?: string                      // optional
+  attendees?: { userId?: string; name?: string; email?: string; role: 'organizer' | 'required' | 'optional' }[]
+  priority?: EventPriority               // low, medium, high, critical
+  color?: string
+  tags?: string[]
+  reminders?: { type: 'notification' | 'email' | 'sms'; beforeMinutes: number }[]
+  // Extended fields (may not be in base API)
+  notes?: string
+  status?: EventStatus
   duration?: number
-  location?: string | EventLocation
-  caseId?: string
   taskId?: string
-  clientId?: string
-  attendees?: Omit<EventAttendee, '_id' | 'notificationSent' | 'notificationSentAt'>[]
-  reminders?: Omit<EventReminder, '_id' | 'sent' | 'sentAt'>[]
   recurrence?: RecurrenceConfig
   attachments?: { fileName: string; fileUrl: string; fileType: string }[]
   agenda?: { title: string; duration?: number; presenter?: string; notes?: string }[]
