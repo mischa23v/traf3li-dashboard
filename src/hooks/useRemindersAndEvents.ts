@@ -73,8 +73,8 @@ export const useDeleteReminder = () => {
   return useMutation({
     mutationFn: (id: string) => remindersService.deleteReminder(id),
     onSuccess: () => {
-      queryClient.refetchQueries({ queryKey: ['reminders'] })
-      queryClient.refetchQueries({ queryKey: ['calendar'] })
+      queryClient.invalidateQueries({ queryKey: ['reminders'] })
+      queryClient.invalidateQueries({ queryKey: ['calendar'] })
       toast.success('تم حذف التذكير بنجاح')
     },
     onError: (error: Error) => {
@@ -252,8 +252,8 @@ export const useDeleteEvent = () => {
   return useMutation({
     mutationFn: (id: string) => eventsService.deleteEvent(id),
     onSuccess: () => {
-      queryClient.refetchQueries({ queryKey: ['events'] })
-      queryClient.refetchQueries({ queryKey: ['calendar'] })
+      queryClient.invalidateQueries({ queryKey: ['events'] })
+      queryClient.invalidateQueries({ queryKey: ['calendar'] })
       toast.success('تم حذف الحدث بنجاح')
     },
     onError: (error: Error) => {

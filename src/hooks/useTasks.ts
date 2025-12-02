@@ -142,8 +142,8 @@ export const useDeleteTask = () => {
   return useMutation({
     mutationFn: (id: string) => tasksService.deleteTask(id),
     onSuccess: () => {
-      queryClient.refetchQueries({ queryKey: ['tasks'] })
-      queryClient.refetchQueries({ queryKey: ['calendar'] })
+      queryClient.invalidateQueries({ queryKey: ['tasks'] })
+      queryClient.invalidateQueries({ queryKey: ['calendar'] })
       toast.success('تم حذف المهمة بنجاح')
     },
     onError: (error: Error) => {
