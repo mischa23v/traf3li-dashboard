@@ -26,7 +26,7 @@ export const useConnectApp = () => {
     mutationFn: ({ appId, data }: { appId: string; data?: ConnectAppData }) =>
       appsService.connectApp(appId, data),
     onSuccess: () => {
-      queryClient.refetchQueries({ queryKey: ['apps'] })
+      queryClient.invalidateQueries({ queryKey: ['apps'] })
       toast.success('تم ربط التطبيق بنجاح')
     },
     onError: (error: Error) => {
@@ -41,7 +41,7 @@ export const useDisconnectApp = () => {
   return useMutation({
     mutationFn: (appId: string) => appsService.disconnectApp(appId),
     onSuccess: () => {
-      queryClient.refetchQueries({ queryKey: ['apps'] })
+      queryClient.invalidateQueries({ queryKey: ['apps'] })
       toast.success('تم فصل التطبيق بنجاح')
     },
     onError: (error: Error) => {

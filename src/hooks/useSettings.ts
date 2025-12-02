@@ -22,7 +22,7 @@ export const useUpdateAccountSettings = () => {
     mutationFn: (data: UpdateAccountSettings) =>
       settingsService.updateAccountSettings(data),
     onSuccess: () => {
-      queryClient.refetchQueries({ queryKey: ['settings'] })
+      queryClient.invalidateQueries({ queryKey: ['settings'] })
       toast.success('تم تحديث إعدادات الحساب بنجاح')
     },
     onError: (error: Error) => {
@@ -38,7 +38,7 @@ export const useUpdateAppearanceSettings = () => {
     mutationFn: (data: UpdateAppearanceSettings) =>
       settingsService.updateAppearanceSettings(data),
     onSuccess: () => {
-      queryClient.refetchQueries({ queryKey: ['settings'] })
+      queryClient.invalidateQueries({ queryKey: ['settings'] })
       toast.success('تم تحديث إعدادات المظهر بنجاح')
     },
     onError: (error: Error) => {
@@ -54,7 +54,7 @@ export const useUpdateDisplaySettings = () => {
     mutationFn: (data: UpdateDisplaySettings) =>
       settingsService.updateDisplaySettings(data),
     onSuccess: () => {
-      queryClient.refetchQueries({ queryKey: ['settings'] })
+      queryClient.invalidateQueries({ queryKey: ['settings'] })
       toast.success('تم تحديث إعدادات العرض بنجاح')
     },
     onError: (error: Error) => {
@@ -70,7 +70,7 @@ export const useUpdateNotificationSettings = () => {
     mutationFn: (data: UpdateNotificationSettings) =>
       settingsService.updateNotificationSettings(data),
     onSuccess: () => {
-      queryClient.refetchQueries({ queryKey: ['settings'] })
+      queryClient.invalidateQueries({ queryKey: ['settings'] })
       toast.success('تم تحديث إعدادات الإشعارات بنجاح')
     },
     onError: (error: Error) => {

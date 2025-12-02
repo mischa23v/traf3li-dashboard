@@ -74,8 +74,8 @@ export function useCreateMatterBudget() {
       >
     ) => matterBudgetService.createBudget(data),
     onSuccess: (_, variables) => {
-      queryClient.refetchQueries({ queryKey: matterBudgetKeys.lists() })
-      queryClient.refetchQueries({
+      queryClient.invalidateQueries({ queryKey: matterBudgetKeys.lists() })
+      queryClient.invalidateQueries({
         queryKey: matterBudgetKeys.matter(variables.matterId),
       })
     },
@@ -89,8 +89,8 @@ export function useUpdateMatterBudget() {
     mutationFn: ({ id, data }: { id: string; data: Partial<MatterBudget> }) =>
       matterBudgetService.updateBudget(id, data),
     onSuccess: (_, variables) => {
-      queryClient.refetchQueries({ queryKey: matterBudgetKeys.lists() })
-      queryClient.refetchQueries({ queryKey: matterBudgetKeys.detail(variables.id) })
+      queryClient.invalidateQueries({ queryKey: matterBudgetKeys.lists() })
+      queryClient.invalidateQueries({ queryKey: matterBudgetKeys.detail(variables.id) })
     },
   })
 }
@@ -101,7 +101,7 @@ export function useDeleteMatterBudget() {
   return useMutation({
     mutationFn: (id: string) => matterBudgetService.deleteBudget(id),
     onSuccess: () => {
-      queryClient.refetchQueries({ queryKey: matterBudgetKeys.lists() })
+      queryClient.invalidateQueries({ queryKey: matterBudgetKeys.lists() })
     },
   })
 }
@@ -114,8 +114,8 @@ export function useApproveBudget() {
     mutationFn: ({ id, notes }: { id: string; notes?: string }) =>
       matterBudgetService.approveBudget(id, notes),
     onSuccess: (_, variables) => {
-      queryClient.refetchQueries({ queryKey: matterBudgetKeys.detail(variables.id) })
-      queryClient.refetchQueries({ queryKey: matterBudgetKeys.lists() })
+      queryClient.invalidateQueries({ queryKey: matterBudgetKeys.detail(variables.id) })
+      queryClient.invalidateQueries({ queryKey: matterBudgetKeys.lists() })
     },
   })
 }
@@ -126,8 +126,8 @@ export function useActivateBudget() {
   return useMutation({
     mutationFn: (id: string) => matterBudgetService.activateBudget(id),
     onSuccess: (_, id) => {
-      queryClient.refetchQueries({ queryKey: matterBudgetKeys.detail(id) })
-      queryClient.refetchQueries({ queryKey: matterBudgetKeys.lists() })
+      queryClient.invalidateQueries({ queryKey: matterBudgetKeys.detail(id) })
+      queryClient.invalidateQueries({ queryKey: matterBudgetKeys.lists() })
     },
   })
 }
@@ -138,8 +138,8 @@ export function useCompleteBudget() {
   return useMutation({
     mutationFn: (id: string) => matterBudgetService.completeBudget(id),
     onSuccess: (_, id) => {
-      queryClient.refetchQueries({ queryKey: matterBudgetKeys.detail(id) })
-      queryClient.refetchQueries({ queryKey: matterBudgetKeys.lists() })
+      queryClient.invalidateQueries({ queryKey: matterBudgetKeys.detail(id) })
+      queryClient.invalidateQueries({ queryKey: matterBudgetKeys.lists() })
     },
   })
 }
@@ -151,8 +151,8 @@ export function useCancelBudget() {
     mutationFn: ({ id, reason }: { id: string; reason: string }) =>
       matterBudgetService.cancelBudget(id, reason),
     onSuccess: (_, variables) => {
-      queryClient.refetchQueries({ queryKey: matterBudgetKeys.detail(variables.id) })
-      queryClient.refetchQueries({ queryKey: matterBudgetKeys.lists() })
+      queryClient.invalidateQueries({ queryKey: matterBudgetKeys.detail(variables.id) })
+      queryClient.invalidateQueries({ queryKey: matterBudgetKeys.lists() })
     },
   })
 }
@@ -170,7 +170,7 @@ export function useAddBudgetPhase() {
       phase: Omit<BudgetPhase, '_id' | 'usedAmount' | 'remainingAmount' | 'percentUsed'>
     }) => matterBudgetService.addPhase(budgetId, phase),
     onSuccess: (_, variables) => {
-      queryClient.refetchQueries({
+      queryClient.invalidateQueries({
         queryKey: matterBudgetKeys.detail(variables.budgetId),
       })
     },
@@ -191,7 +191,7 @@ export function useUpdateBudgetPhase() {
       data: Partial<BudgetPhase>
     }) => matterBudgetService.updatePhase(budgetId, phaseId, data),
     onSuccess: (_, variables) => {
-      queryClient.refetchQueries({
+      queryClient.invalidateQueries({
         queryKey: matterBudgetKeys.detail(variables.budgetId),
       })
     },
@@ -205,7 +205,7 @@ export function useDeleteBudgetPhase() {
     mutationFn: ({ budgetId, phaseId }: { budgetId: string; phaseId: string }) =>
       matterBudgetService.deletePhase(budgetId, phaseId),
     onSuccess: (_, variables) => {
-      queryClient.refetchQueries({
+      queryClient.invalidateQueries({
         queryKey: matterBudgetKeys.detail(variables.budgetId),
       })
     },
@@ -225,7 +225,7 @@ export function useAddBudgetCategory() {
       category: Omit<BudgetCategory, '_id' | 'usedAmount' | 'remainingAmount' | 'percentUsed'>
     }) => matterBudgetService.addCategory(budgetId, category),
     onSuccess: (_, variables) => {
-      queryClient.refetchQueries({
+      queryClient.invalidateQueries({
         queryKey: matterBudgetKeys.detail(variables.budgetId),
       })
     },
@@ -246,7 +246,7 @@ export function useUpdateBudgetCategory() {
       data: Partial<BudgetCategory>
     }) => matterBudgetService.updateCategory(budgetId, categoryId, data),
     onSuccess: (_, variables) => {
-      queryClient.refetchQueries({
+      queryClient.invalidateQueries({
         queryKey: matterBudgetKeys.detail(variables.budgetId),
       })
     },
@@ -260,7 +260,7 @@ export function useDeleteBudgetCategory() {
     mutationFn: ({ budgetId, categoryId }: { budgetId: string; categoryId: string }) =>
       matterBudgetService.deleteCategory(budgetId, categoryId),
     onSuccess: (_, variables) => {
-      queryClient.refetchQueries({
+      queryClient.invalidateQueries({
         queryKey: matterBudgetKeys.detail(variables.budgetId),
       })
     },
@@ -282,7 +282,7 @@ export function useAddBudgetTask() {
       task: Omit<BudgetTask, '_id' | 'actualHours' | 'actualAmount'>
     }) => matterBudgetService.addTask(budgetId, phaseId, task),
     onSuccess: (_, variables) => {
-      queryClient.refetchQueries({
+      queryClient.invalidateQueries({
         queryKey: matterBudgetKeys.detail(variables.budgetId),
       })
     },
@@ -305,7 +305,7 @@ export function useUpdateBudgetTask() {
       data: Partial<BudgetTask>
     }) => matterBudgetService.updateTask(budgetId, phaseId, taskId, data),
     onSuccess: (_, variables) => {
-      queryClient.refetchQueries({
+      queryClient.invalidateQueries({
         queryKey: matterBudgetKeys.detail(variables.budgetId),
       })
     },
@@ -326,7 +326,7 @@ export function useDeleteBudgetTask() {
       taskId: string
     }) => matterBudgetService.deleteTask(budgetId, phaseId, taskId),
     onSuccess: (_, variables) => {
-      queryClient.refetchQueries({
+      queryClient.invalidateQueries({
         queryKey: matterBudgetKeys.detail(variables.budgetId),
       })
     },
@@ -361,7 +361,7 @@ export function useAcknowledgeBudgetAlert() {
     mutationFn: ({ budgetId, alertId }: { budgetId: string; alertId: string }) =>
       matterBudgetService.acknowledgeAlert(budgetId, alertId),
     onSuccess: (_, variables) => {
-      queryClient.refetchQueries({
+      queryClient.invalidateQueries({
         queryKey: matterBudgetKeys.detail(variables.budgetId),
       })
     },
@@ -380,7 +380,7 @@ export function useUpdateAlertThresholds() {
       thresholds: { warning: number; critical: number }
     }) => matterBudgetService.updateAlertThresholds(budgetId, thresholds),
     onSuccess: (_, variables) => {
-      queryClient.refetchQueries({
+      queryClient.invalidateQueries({
         queryKey: matterBudgetKeys.detail(variables.budgetId),
       })
     },
@@ -450,8 +450,8 @@ export function useCreateBudgetFromTemplate() {
       totalBudget: number
     }) => matterBudgetService.createFromTemplate(templateId, matterId, totalBudget),
     onSuccess: (_, variables) => {
-      queryClient.refetchQueries({ queryKey: matterBudgetKeys.lists() })
-      queryClient.refetchQueries({
+      queryClient.invalidateQueries({ queryKey: matterBudgetKeys.lists() })
+      queryClient.invalidateQueries({
         queryKey: matterBudgetKeys.matter(variables.matterId),
       })
     },

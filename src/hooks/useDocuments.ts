@@ -119,14 +119,14 @@ export const useUploadDocument = () => {
       onProgress?: (progress: number) => void
     }) => documentsService.uploadDocument(file, metadata, onProgress),
     onSuccess: (_, variables) => {
-      queryClient.refetchQueries({ queryKey: documentsKeys.all })
+      queryClient.invalidateQueries({ queryKey: documentsKeys.all })
       if (variables.metadata.caseId) {
-        queryClient.refetchQueries({
+        queryClient.invalidateQueries({
           queryKey: documentsKeys.byCase(variables.metadata.caseId),
         })
       }
       if (variables.metadata.clientId) {
-        queryClient.refetchQueries({
+        queryClient.invalidateQueries({
           queryKey: documentsKeys.byClient(variables.metadata.clientId),
         })
       }
@@ -154,8 +154,8 @@ export const useUpdateDocument = () => {
     mutationFn: ({ id, data }: { id: string; data: UpdateDocumentData }) =>
       documentsService.updateDocument(id, data),
     onSuccess: (_, variables) => {
-      queryClient.refetchQueries({ queryKey: documentsKeys.all })
-      queryClient.refetchQueries({ queryKey: documentsKeys.detail(variables.id) })
+      queryClient.invalidateQueries({ queryKey: documentsKeys.all })
+      queryClient.invalidateQueries({ queryKey: documentsKeys.detail(variables.id) })
       toast({
         title: t('status.success'),
         description: t('status.updatedSuccessfully'),
@@ -179,7 +179,7 @@ export const useDeleteDocument = () => {
   return useMutation({
     mutationFn: (id: string) => documentsService.deleteDocument(id),
     onSuccess: () => {
-      queryClient.refetchQueries({ queryKey: documentsKeys.all })
+      queryClient.invalidateQueries({ queryKey: documentsKeys.all })
       toast({
         title: t('status.success'),
         description: t('status.deletedSuccessfully'),
@@ -203,7 +203,7 @@ export const useBulkDeleteDocuments = () => {
   return useMutation({
     mutationFn: (ids: string[]) => documentsService.bulkDeleteDocuments(ids),
     onSuccess: () => {
-      queryClient.refetchQueries({ queryKey: documentsKeys.all })
+      queryClient.invalidateQueries({ queryKey: documentsKeys.all })
       toast({
         title: t('status.success'),
         description: t('documents.bulkDeleteSuccess'),
@@ -237,9 +237,9 @@ export const useUploadDocumentVersion = () => {
       onProgress?: (progress: number) => void
     }) => documentsService.uploadDocumentVersion(documentId, file, changeNote, onProgress),
     onSuccess: (_, variables) => {
-      queryClient.refetchQueries({ queryKey: documentsKeys.all })
-      queryClient.refetchQueries({ queryKey: documentsKeys.detail(variables.documentId) })
-      queryClient.refetchQueries({ queryKey: documentsKeys.versions(variables.documentId) })
+      queryClient.invalidateQueries({ queryKey: documentsKeys.all })
+      queryClient.invalidateQueries({ queryKey: documentsKeys.detail(variables.documentId) })
+      queryClient.invalidateQueries({ queryKey: documentsKeys.versions(variables.documentId) })
       toast({
         title: t('status.success'),
         description: t('documents.versionUploadSuccess'),
@@ -269,9 +269,9 @@ export const useRestoreDocumentVersion = () => {
       versionId: string
     }) => documentsService.restoreDocumentVersion(documentId, versionId),
     onSuccess: (_, variables) => {
-      queryClient.refetchQueries({ queryKey: documentsKeys.all })
-      queryClient.refetchQueries({ queryKey: documentsKeys.detail(variables.documentId) })
-      queryClient.refetchQueries({ queryKey: documentsKeys.versions(variables.documentId) })
+      queryClient.invalidateQueries({ queryKey: documentsKeys.all })
+      queryClient.invalidateQueries({ queryKey: documentsKeys.detail(variables.documentId) })
+      queryClient.invalidateQueries({ queryKey: documentsKeys.versions(variables.documentId) })
       toast({
         title: t('status.success'),
         description: t('documents.versionRestoreSuccess'),
@@ -350,7 +350,7 @@ export const useRevokeShareLink = () => {
   return useMutation({
     mutationFn: (id: string) => documentsService.revokeShareLink(id),
     onSuccess: (_, id) => {
-      queryClient.refetchQueries({ queryKey: documentsKeys.detail(id) })
+      queryClient.invalidateQueries({ queryKey: documentsKeys.detail(id) })
       toast({
         title: t('status.success'),
         description: t('documents.shareRevoked'),
@@ -374,8 +374,8 @@ export const useEncryptDocument = () => {
   return useMutation({
     mutationFn: (id: string) => documentsService.encryptDocument(id),
     onSuccess: (_, id) => {
-      queryClient.refetchQueries({ queryKey: documentsKeys.all })
-      queryClient.refetchQueries({ queryKey: documentsKeys.detail(id) })
+      queryClient.invalidateQueries({ queryKey: documentsKeys.all })
+      queryClient.invalidateQueries({ queryKey: documentsKeys.detail(id) })
       toast({
         title: t('status.success'),
         description: t('documents.encryptSuccess'),
@@ -421,9 +421,9 @@ export const useMoveDocumentToCase = () => {
       caseId: string
     }) => documentsService.moveDocumentToCase(documentId, caseId),
     onSuccess: (_, variables) => {
-      queryClient.refetchQueries({ queryKey: documentsKeys.all })
-      queryClient.refetchQueries({ queryKey: documentsKeys.detail(variables.documentId) })
-      queryClient.refetchQueries({ queryKey: documentsKeys.byCase(variables.caseId) })
+      queryClient.invalidateQueries({ queryKey: documentsKeys.all })
+      queryClient.invalidateQueries({ queryKey: documentsKeys.detail(variables.documentId) })
+      queryClient.invalidateQueries({ queryKey: documentsKeys.byCase(variables.caseId) })
       toast({
         title: t('status.success'),
         description: t('documents.moveSuccess'),

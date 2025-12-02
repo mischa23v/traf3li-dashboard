@@ -63,7 +63,7 @@ export const useCreateOrganization = () => {
   return useMutation({
     mutationFn: (data: CreateOrganizationData) => organizationsService.createOrganization(data),
     onSuccess: () => {
-      queryClient.refetchQueries({ queryKey: organizationsKeys.all })
+      queryClient.invalidateQueries({ queryKey: organizationsKeys.all })
       toast({
         title: t('status.success'),
         description: t('status.createdSuccessfully'),
@@ -88,8 +88,8 @@ export const useUpdateOrganization = () => {
     mutationFn: ({ id, data }: { id: string; data: UpdateOrganizationData }) =>
       organizationsService.updateOrganization(id, data),
     onSuccess: (_, variables) => {
-      queryClient.refetchQueries({ queryKey: organizationsKeys.all })
-      queryClient.refetchQueries({ queryKey: organizationsKeys.detail(variables.id) })
+      queryClient.invalidateQueries({ queryKey: organizationsKeys.all })
+      queryClient.invalidateQueries({ queryKey: organizationsKeys.detail(variables.id) })
       toast({
         title: t('status.success'),
         description: t('status.updatedSuccessfully'),
@@ -113,7 +113,7 @@ export const useDeleteOrganization = () => {
   return useMutation({
     mutationFn: (id: string) => organizationsService.deleteOrganization(id),
     onSuccess: () => {
-      queryClient.refetchQueries({ queryKey: organizationsKeys.all })
+      queryClient.invalidateQueries({ queryKey: organizationsKeys.all })
       toast({
         title: t('status.success'),
         description: t('status.deletedSuccessfully'),
@@ -137,7 +137,7 @@ export const useBulkDeleteOrganizations = () => {
   return useMutation({
     mutationFn: (ids: string[]) => organizationsService.bulkDeleteOrganizations(ids),
     onSuccess: () => {
-      queryClient.refetchQueries({ queryKey: organizationsKeys.all })
+      queryClient.invalidateQueries({ queryKey: organizationsKeys.all })
       toast({
         title: t('status.success'),
         description: t('status.deletedSuccessfully'),
