@@ -158,7 +158,7 @@ export function ProductivityHero({ badge, title = 'الإنتاجية', type = '
                                         className="py-3 px-4"
                                     />
                                     <StatCard
-                                        label="مهام قادمة"
+                                        label="أحداث قادمة"
                                         value={upcomingTasksCount}
                                         icon={CalendarRange}
                                         status="normal"
