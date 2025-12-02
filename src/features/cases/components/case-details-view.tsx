@@ -1065,10 +1065,10 @@ export function CaseDetailsView() {
                                   <div className="flex items-center gap-1">
                                     <Clock className="h-4 w-4 text-blue-500" />
                                     <span>
-                                      {new Date(hearing.date).toLocaleTimeString('ar-SA', {
+                                      {hearing.date ? new Date(hearing.date).toLocaleTimeString('ar-SA', {
                                         hour: '2-digit',
                                         minute: '2-digit',
-                                      })}
+                                      }) : 'غير محدد'}
                                     </span>
                                   </div>
                                 </div>

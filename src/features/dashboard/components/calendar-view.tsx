@@ -95,6 +95,7 @@ export function CalendarView() {
 
         // Map events
         calendarData.data.events?.forEach((event: any) => {
+            if (!event.startDate) return
             items.push({
                 id: event.id,
                 type: event.eventType === 'hearing' ? 'court' : event.eventType || 'meeting',
@@ -111,6 +112,7 @@ export function CalendarView() {
 
         // Map tasks
         calendarData.data.tasks?.forEach((task: any) => {
+            if (!task.startDate) return
             items.push({
                 id: task.id,
                 type: 'deadline',
@@ -126,6 +128,7 @@ export function CalendarView() {
 
         // Map reminders
         calendarData.data.reminders?.forEach((reminder: any) => {
+            if (!reminder.startDate) return
             items.push({
                 id: reminder.id,
                 type: 'deadline',
