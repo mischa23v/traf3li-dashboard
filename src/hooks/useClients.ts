@@ -28,7 +28,7 @@ export const useCreateClient = () => {
   return useMutation({
     mutationFn: (data: CreateClientData) => clientsService.createClient(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['clients'] })
+      queryClient.refetchQueries({ queryKey: ['clients'] })
       toast.success('تم إنشاء العميل بنجاح')
     },
     onError: (error: Error) => {
@@ -49,8 +49,8 @@ export const useUpdateClient = () => {
       data: Partial<CreateClientData>
     }) => clientsService.updateClient(clientId, data),
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['clients'] })
-      queryClient.invalidateQueries({ queryKey: ['clients', variables.clientId] })
+      queryClient.refetchQueries({ queryKey: ['clients'] })
+      queryClient.refetchQueries({ queryKey: ['clients', variables.clientId] })
       toast.success('تم تحديث العميل بنجاح')
     },
     onError: (error: Error) => {
@@ -65,7 +65,7 @@ export const useDeleteClient = () => {
   return useMutation({
     mutationFn: (clientId: string) => clientsService.deleteClient(clientId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['clients'] })
+      queryClient.refetchQueries({ queryKey: ['clients'] })
       toast.success('تم حذف العميل بنجاح')
     },
     onError: (error: Error) => {
@@ -105,7 +105,7 @@ export const useBulkDeleteClients = () => {
   return useMutation({
     mutationFn: (clientIds: string[]) => clientsService.bulkDelete(clientIds),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['clients'] })
+      queryClient.refetchQueries({ queryKey: ['clients'] })
       toast.success('تم حذف العملاء بنجاح')
     },
     onError: (error: Error) => {

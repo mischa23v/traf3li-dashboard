@@ -29,7 +29,7 @@ export const useCreateUser = () => {
   return useMutation({
     mutationFn: (data: CreateUserData) => usersService.createUser(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['users'] })
+      queryClient.refetchQueries({ queryKey: ['users'] })
       toast.success('تم إنشاء المستخدم بنجاح')
     },
     onError: (error: Error) => {
@@ -45,8 +45,8 @@ export const useUpdateUser = () => {
     mutationFn: ({ userId, data }: { userId: string; data: UpdateUserData }) =>
       usersService.updateUser(userId, data),
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['users'] })
-      queryClient.invalidateQueries({ queryKey: ['users', variables.userId] })
+      queryClient.refetchQueries({ queryKey: ['users'] })
+      queryClient.refetchQueries({ queryKey: ['users', variables.userId] })
       toast.success('تم تحديث المستخدم بنجاح')
     },
     onError: (error: Error) => {
@@ -61,7 +61,7 @@ export const useDeleteUser = () => {
   return useMutation({
     mutationFn: (userId: string) => usersService.deleteUser(userId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['users'] })
+      queryClient.refetchQueries({ queryKey: ['users'] })
       toast.success('تم حذف المستخدم بنجاح')
     },
     onError: (error: Error) => {
@@ -76,7 +76,7 @@ export const useDeleteMultipleUsers = () => {
   return useMutation({
     mutationFn: (userIds: string[]) => usersService.deleteMultipleUsers(userIds),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['users'] })
+      queryClient.refetchQueries({ queryKey: ['users'] })
       toast.success('تم حذف المستخدمين بنجاح')
     },
     onError: (error: Error) => {
@@ -92,7 +92,7 @@ export const useInviteUser = () => {
     mutationFn: ({ email, role }: { email: string; role: string }) =>
       usersService.inviteUser(email, role),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['users'] })
+      queryClient.refetchQueries({ queryKey: ['users'] })
       toast.success('تم إرسال الدعوة بنجاح')
     },
     onError: (error: Error) => {

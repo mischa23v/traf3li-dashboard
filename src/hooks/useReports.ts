@@ -54,7 +54,7 @@ export function useCreateSavedReport() {
     mutationFn: (data: Omit<SavedReport, '_id' | 'createdAt' | 'updatedAt'>) =>
       reportsService.createSavedReport(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: reportKeys.lists() })
+      queryClient.refetchQueries({ queryKey: reportKeys.lists() })
     },
   })
 }
@@ -66,8 +66,8 @@ export function useUpdateSavedReport() {
     mutationFn: ({ id, data }: { id: string; data: Partial<SavedReport> }) =>
       reportsService.updateSavedReport(id, data),
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: reportKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: reportKeys.detail(variables.id) })
+      queryClient.refetchQueries({ queryKey: reportKeys.lists() })
+      queryClient.refetchQueries({ queryKey: reportKeys.detail(variables.id) })
     },
   })
 }
@@ -78,7 +78,7 @@ export function useDeleteSavedReport() {
   return useMutation({
     mutationFn: (id: string) => reportsService.deleteSavedReport(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: reportKeys.lists() })
+      queryClient.refetchQueries({ queryKey: reportKeys.lists() })
     },
   })
 }
@@ -185,7 +185,7 @@ export function useScheduleReport() {
       format: 'pdf' | 'xlsx'
     }) => reportsService.scheduleReport(data),
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: reportKeys.detail(variables.reportId) })
+      queryClient.refetchQueries({ queryKey: reportKeys.detail(variables.reportId) })
     },
   })
 }
@@ -204,7 +204,7 @@ export function useUpdateDashboardWidgets() {
   return useMutation({
     mutationFn: (widgets: DashboardWidget[]) => reportsService.updateDashboardWidgets(widgets),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: reportKeys.widgets() })
+      queryClient.refetchQueries({ queryKey: reportKeys.widgets() })
     },
   })
 }

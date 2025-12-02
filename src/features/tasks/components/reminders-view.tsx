@@ -320,10 +320,10 @@ export function RemindersView() {
                                                 )}
                                                 <div className="w-16 h-16 rounded-2xl bg-white flex flex-col items-center justify-center shadow-sm border border-slate-100 text-center overflow-hidden">
                                                     <div className="bg-emerald-500 text-white text-[10px] w-full py-0.5 font-bold">
-                                                        {new Date(reminder.date).toLocaleDateString('ar-SA', { month: 'short' })}
+                                                        {reminder.date && reminder.date !== 'غير محدد' ? new Date(reminder.date).toLocaleDateString('ar-SA', { month: 'short' }) : 'غير محدد'}
                                                     </div>
                                                     <div className="text-xl font-bold text-navy pt-1">
-                                                        {new Date(reminder.date).toLocaleDateString('en-US', { day: 'numeric' })}
+                                                        {reminder.date && reminder.date !== 'غير محدد' ? new Date(reminder.date).toLocaleDateString('en-US', { day: 'numeric' }) : '-'}
                                                     </div>
                                                 </div>
                                                 <div>

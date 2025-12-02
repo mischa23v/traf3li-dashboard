@@ -76,7 +76,7 @@ export const useCreateTag = () => {
   return useMutation({
     mutationFn: (data: CreateTagData) => tagsService.createTag(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: tagsKeys.all })
+      queryClient.refetchQueries({ queryKey: tagsKeys.all })
       toast({
         title: t('status.success'),
         description: t('status.createdSuccessfully'),
@@ -101,8 +101,8 @@ export const useUpdateTag = () => {
     mutationFn: ({ id, data }: { id: string; data: UpdateTagData }) =>
       tagsService.updateTag(id, data),
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: tagsKeys.all })
-      queryClient.invalidateQueries({ queryKey: tagsKeys.detail(variables.id) })
+      queryClient.refetchQueries({ queryKey: tagsKeys.all })
+      queryClient.refetchQueries({ queryKey: tagsKeys.detail(variables.id) })
       toast({
         title: t('status.success'),
         description: t('status.updatedSuccessfully'),
@@ -126,7 +126,7 @@ export const useDeleteTag = () => {
   return useMutation({
     mutationFn: (id: string) => tagsService.deleteTag(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: tagsKeys.all })
+      queryClient.refetchQueries({ queryKey: tagsKeys.all })
       toast({
         title: t('status.success'),
         description: t('status.deletedSuccessfully'),
@@ -158,10 +158,10 @@ export const useAddTagToEntity = () => {
       entityId: string
     }) => tagsService.addTagToEntity(tagId, entityType, entityId),
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({
+      queryClient.refetchQueries({
         queryKey: tagsKeys.entity(variables.entityType, variables.entityId),
       })
-      queryClient.invalidateQueries({ queryKey: tagsKeys.all })
+      queryClient.refetchQueries({ queryKey: tagsKeys.all })
     },
     onError: (error: any) => {
       toast({
@@ -189,10 +189,10 @@ export const useRemoveTagFromEntity = () => {
       entityId: string
     }) => tagsService.removeTagFromEntity(tagId, entityType, entityId),
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({
+      queryClient.refetchQueries({
         queryKey: tagsKeys.entity(variables.entityType, variables.entityId),
       })
-      queryClient.invalidateQueries({ queryKey: tagsKeys.all })
+      queryClient.refetchQueries({ queryKey: tagsKeys.all })
     },
     onError: (error: any) => {
       toast({

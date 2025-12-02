@@ -260,8 +260,9 @@ export function ReputationSidebar({
                                         <div className="absolute top-2 bottom-2 right-[3.5rem] w-[2px] bg-slate-200"></div>
 
                                         {selectedDateEvents.map((event) => {
-                                            const eventTime = new Date(event.startDate).toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit', hour12: false })
-                                            const timePeriod = new Date(event.startDate).getHours() < 12 ? 'صباحاً' : 'مساءً'
+                                            const eventDate = event.startDate ? new Date(event.startDate) : null
+                                            const eventTime = eventDate ? eventDate.toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit', hour12: false }) : 'غير محدد'
+                                            const timePeriod = eventDate ? (eventDate.getHours() < 12 ? 'صباحاً' : 'مساءً') : ''
                                             const colorClass = getEventColor(event)
 
                                             return (

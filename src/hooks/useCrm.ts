@@ -118,7 +118,7 @@ export const useCreateLead = () => {
   return useMutation({
     mutationFn: (data: CreateLeadData) => leadService.createLead(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['leads'] })
+      queryClient.refetchQueries({ queryKey: ['leads'] })
       toast.success('تم إنشاء العميل المحتمل بنجاح')
     },
     onError: (error: Error) => {
@@ -137,8 +137,8 @@ export const useUpdateLead = () => {
     mutationFn: ({ leadId, data }: { leadId: string; data: Partial<Lead> }) =>
       leadService.updateLead(leadId, data),
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['leads'] })
-      queryClient.invalidateQueries({ queryKey: ['leads', variables.leadId] })
+      queryClient.refetchQueries({ queryKey: ['leads'] })
+      queryClient.refetchQueries({ queryKey: ['leads', variables.leadId] })
       toast.success('تم تحديث العميل المحتمل بنجاح')
     },
     onError: (error: Error) => {
@@ -156,7 +156,7 @@ export const useDeleteLead = () => {
   return useMutation({
     mutationFn: (leadId: string) => leadService.deleteLead(leadId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['leads'] })
+      queryClient.refetchQueries({ queryKey: ['leads'] })
       toast.success('تم حذف العميل المحتمل بنجاح')
     },
     onError: (error: Error) => {
@@ -184,8 +184,8 @@ export const useUpdateLeadStatus = () => {
       lostReason?: string
     }) => leadService.updateLeadStatus(leadId, { status, notes, lostReason }),
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['leads'] })
-      queryClient.invalidateQueries({ queryKey: ['leads', variables.leadId] })
+      queryClient.refetchQueries({ queryKey: ['leads'] })
+      queryClient.refetchQueries({ queryKey: ['leads', variables.leadId] })
       toast.success('تم تحديث حالة العميل المحتمل')
     },
     onError: (error: Error) => {
@@ -211,8 +211,8 @@ export const useMoveLeadToStage = () => {
       notes?: string
     }) => leadService.moveLeadToStage(leadId, { stageId, notes }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['leads'] })
-      queryClient.invalidateQueries({ queryKey: ['leads', 'pipeline'] })
+      queryClient.refetchQueries({ queryKey: ['leads'] })
+      queryClient.refetchQueries({ queryKey: ['leads', 'pipeline'] })
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل نقل العميل المحتمل')
@@ -229,8 +229,8 @@ export const useConvertLead = () => {
   return useMutation({
     mutationFn: (leadId: string) => leadService.convertToClient(leadId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['leads'] })
-      queryClient.invalidateQueries({ queryKey: ['clients'] })
+      queryClient.refetchQueries({ queryKey: ['leads'] })
+      queryClient.refetchQueries({ queryKey: ['clients'] })
       toast.success('تم تحويل العميل المحتمل إلى عميل بنجاح')
     },
     onError: (error: Error) => {
@@ -256,8 +256,8 @@ export const useScheduleFollowUp = () => {
       note?: string
     }) => leadService.scheduleFollowUp(leadId, { date, note }),
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['leads', variables.leadId] })
-      queryClient.invalidateQueries({ queryKey: ['leads', 'follow-up'] })
+      queryClient.refetchQueries({ queryKey: ['leads', variables.leadId] })
+      queryClient.refetchQueries({ queryKey: ['leads', 'follow-up'] })
       toast.success('تم جدولة المتابعة بنجاح')
     },
     onError: (error: Error) => {
@@ -281,8 +281,8 @@ export const useLogLeadActivity = () => {
       data: CreateActivityData
     }) => leadService.logActivity(leadId, data),
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['leads', variables.leadId] })
-      queryClient.invalidateQueries({ queryKey: ['activity-timeline'] })
+      queryClient.refetchQueries({ queryKey: ['leads', variables.leadId] })
+      queryClient.refetchQueries({ queryKey: ['activity-timeline'] })
       toast.success('تم تسجيل النشاط بنجاح')
     },
     onError: (error: Error) => {
@@ -340,7 +340,7 @@ export const useCreatePipeline = () => {
     mutationFn: (data: CreatePipelineData) =>
       pipelineService.createPipeline(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['pipelines'] })
+      queryClient.refetchQueries({ queryKey: ['pipelines'] })
       toast.success('تم إنشاء مسار المبيعات بنجاح')
     },
     onError: (error: Error) => {
@@ -364,8 +364,8 @@ export const useUpdatePipeline = () => {
       data: Partial<Pipeline>
     }) => pipelineService.updatePipeline(pipelineId, data),
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['pipelines'] })
-      queryClient.invalidateQueries({
+      queryClient.refetchQueries({ queryKey: ['pipelines'] })
+      queryClient.refetchQueries({
         queryKey: ['pipelines', variables.pipelineId],
       })
       toast.success('تم تحديث مسار المبيعات بنجاح')
@@ -386,7 +386,7 @@ export const useDeletePipeline = () => {
     mutationFn: (pipelineId: string) =>
       pipelineService.deletePipeline(pipelineId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['pipelines'] })
+      queryClient.refetchQueries({ queryKey: ['pipelines'] })
       toast.success('تم حذف مسار المبيعات بنجاح')
     },
     onError: (error: Error) => {
@@ -410,7 +410,7 @@ export const useAddPipelineStage = () => {
       data: CreateStageData
     }) => pipelineService.addStage(pipelineId, data),
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({
+      queryClient.refetchQueries({
         queryKey: ['pipelines', variables.pipelineId],
       })
       toast.success('تم إضافة المرحلة بنجاح')
@@ -438,7 +438,7 @@ export const useUpdatePipelineStage = () => {
       data: Partial<PipelineStage>
     }) => pipelineService.updateStage(pipelineId, stageId, data),
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({
+      queryClient.refetchQueries({
         queryKey: ['pipelines', variables.pipelineId],
       })
       toast.success('تم تحديث المرحلة بنجاح')
@@ -464,7 +464,7 @@ export const useRemovePipelineStage = () => {
       stageId: string
     }) => pipelineService.removeStage(pipelineId, stageId),
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({
+      queryClient.refetchQueries({
         queryKey: ['pipelines', variables.pipelineId],
       })
       toast.success('تم حذف المرحلة بنجاح')
@@ -490,7 +490,7 @@ export const useReorderPipelineStages = () => {
       stageOrders: { stageId: string; order: number }[]
     }) => pipelineService.reorderStages(pipelineId, stageOrders),
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({
+      queryClient.refetchQueries({
         queryKey: ['pipelines', variables.pipelineId],
       })
     },
@@ -510,7 +510,7 @@ export const useSetDefaultPipeline = () => {
     mutationFn: (pipelineId: string) =>
       pipelineService.setDefault(pipelineId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['pipelines'] })
+      queryClient.refetchQueries({ queryKey: ['pipelines'] })
       toast.success('تم تعيين مسار المبيعات الافتراضي')
     },
     onError: (error: Error) => {
@@ -534,7 +534,7 @@ export const useDuplicatePipeline = () => {
       data?: { name?: string; nameAr?: string }
     }) => pipelineService.duplicate(pipelineId, data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['pipelines'] })
+      queryClient.refetchQueries({ queryKey: ['pipelines'] })
       toast.success('تم نسخ مسار المبيعات بنجاح')
     },
     onError: (error: Error) => {
@@ -605,7 +605,7 @@ export const useCreateReferral = () => {
     mutationFn: (data: CreateReferralData) =>
       referralService.createReferral(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['referrals'] })
+      queryClient.refetchQueries({ queryKey: ['referrals'] })
       toast.success('تم إنشاء مصدر الإحالة بنجاح')
     },
     onError: (error: Error) => {
@@ -629,8 +629,8 @@ export const useUpdateReferral = () => {
       data: Partial<Referral>
     }) => referralService.updateReferral(referralId, data),
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['referrals'] })
-      queryClient.invalidateQueries({
+      queryClient.refetchQueries({ queryKey: ['referrals'] })
+      queryClient.refetchQueries({
         queryKey: ['referrals', variables.referralId],
       })
       toast.success('تم تحديث مصدر الإحالة بنجاح')
@@ -651,7 +651,7 @@ export const useDeleteReferral = () => {
     mutationFn: (referralId: string) =>
       referralService.deleteReferral(referralId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['referrals'] })
+      queryClient.refetchQueries({ queryKey: ['referrals'] })
       toast.success('تم حذف مصدر الإحالة بنجاح')
     },
     onError: (error: Error) => {
@@ -675,8 +675,8 @@ export const useUpdateReferralStatus = () => {
       status: string
     }) => referralService.updateReferral(referralId, { status }),
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['referrals'] })
-      queryClient.invalidateQueries({
+      queryClient.refetchQueries({ queryKey: ['referrals'] })
+      queryClient.refetchQueries({
         queryKey: ['referrals', variables.referralId],
       })
       toast.success('تم تحديث حالة الإحالة بنجاح')
@@ -700,8 +700,8 @@ export const useMarkReferralPaid = () => {
         rewardPaidAt: new Date().toISOString()
       }),
     onSuccess: (_, referralId) => {
-      queryClient.invalidateQueries({ queryKey: ['referrals'] })
-      queryClient.invalidateQueries({
+      queryClient.refetchQueries({ queryKey: ['referrals'] })
+      queryClient.refetchQueries({
         queryKey: ['referrals', referralId],
       })
       toast.success('تم تأكيد دفع المكافأة بنجاح')
@@ -729,7 +729,7 @@ export const useAddLeadReferral = () => {
       caseValue?: number
     }) => referralService.addLeadReferral(referralId, { leadId, caseValue }),
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({
+      queryClient.refetchQueries({
         queryKey: ['referrals', variables.referralId],
       })
       toast.success('تم ربط العميل المحتمل بمصدر الإحالة')
@@ -757,10 +757,10 @@ export const useMarkReferralConverted = () => {
       clientId: string
     }) => referralService.markConverted(referralId, leadId, clientId),
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({
+      queryClient.refetchQueries({
         queryKey: ['referrals', variables.referralId],
       })
-      queryClient.invalidateQueries({ queryKey: ['referrals', 'stats'] })
+      queryClient.refetchQueries({ queryKey: ['referrals', 'stats'] })
       toast.success('تم تسجيل تحويل الإحالة')
     },
     onError: (error: Error) => {
@@ -784,10 +784,10 @@ export const useRecordReferralPayment = () => {
       data: FeePaymentData
     }) => referralService.recordPayment(referralId, data),
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({
+      queryClient.refetchQueries({
         queryKey: ['referrals', variables.referralId],
       })
-      queryClient.invalidateQueries({ queryKey: ['referrals', 'stats'] })
+      queryClient.refetchQueries({ queryKey: ['referrals', 'stats'] })
       toast.success('تم تسجيل الدفعة بنجاح')
     },
     onError: (error: Error) => {
@@ -909,8 +909,8 @@ export const useCreateActivity = () => {
     mutationFn: (data: CreateActivityData) =>
       crmActivityService.createActivity(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['activities'] })
-      queryClient.invalidateQueries({ queryKey: ['activity-timeline'] })
+      queryClient.refetchQueries({ queryKey: ['activities'] })
+      queryClient.refetchQueries({ queryKey: ['activity-timeline'] })
       toast.success('تم إنشاء النشاط بنجاح')
     },
     onError: (error: Error) => {
@@ -934,11 +934,11 @@ export const useUpdateActivity = () => {
       data: Partial<CrmActivity>
     }) => crmActivityService.updateActivity(activityId, data),
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['activities'] })
-      queryClient.invalidateQueries({
+      queryClient.refetchQueries({ queryKey: ['activities'] })
+      queryClient.refetchQueries({
         queryKey: ['activities', variables.activityId],
       })
-      queryClient.invalidateQueries({ queryKey: ['activity-timeline'] })
+      queryClient.refetchQueries({ queryKey: ['activity-timeline'] })
       toast.success('تم تحديث النشاط بنجاح')
     },
     onError: (error: Error) => {
@@ -957,8 +957,8 @@ export const useDeleteActivity = () => {
     mutationFn: (activityId: string) =>
       crmActivityService.deleteActivity(activityId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['activities'] })
-      queryClient.invalidateQueries({ queryKey: ['activity-timeline'] })
+      queryClient.refetchQueries({ queryKey: ['activities'] })
+      queryClient.refetchQueries({ queryKey: ['activity-timeline'] })
       toast.success('تم حذف النشاط بنجاح')
     },
     onError: (error: Error) => {
@@ -982,9 +982,9 @@ export const useUpdateActivityStatus = () => {
       status: string
     }) => crmActivityService.updateActivity(activityId, { status }),
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['activities'] })
-      queryClient.invalidateQueries({ queryKey: ['activity-timeline'] })
-      queryClient.invalidateQueries({
+      queryClient.refetchQueries({ queryKey: ['activities'] })
+      queryClient.refetchQueries({ queryKey: ['activity-timeline'] })
+      queryClient.refetchQueries({
         queryKey: ['activities', variables.activityId],
       })
       toast.success('تم تحديث حالة النشاط بنجاح')
@@ -1010,8 +1010,8 @@ export const useCompleteTask = () => {
       outcomeNotes?: string
     }) => crmActivityService.completeTask(activityId, outcomeNotes),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['activities'] })
-      queryClient.invalidateQueries({ queryKey: ['activity-timeline'] })
+      queryClient.refetchQueries({ queryKey: ['activities'] })
+      queryClient.refetchQueries({ queryKey: ['activity-timeline'] })
       toast.success('تم إكمال المهمة بنجاح')
     },
     onError: (error: Error) => {
@@ -1029,8 +1029,8 @@ export const useLogCall = () => {
   return useMutation({
     mutationFn: (data: LogCallData) => crmActivityService.logCall(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['activities'] })
-      queryClient.invalidateQueries({ queryKey: ['activity-timeline'] })
+      queryClient.refetchQueries({ queryKey: ['activities'] })
+      queryClient.refetchQueries({ queryKey: ['activity-timeline'] })
       toast.success('تم تسجيل المكالمة بنجاح')
     },
     onError: (error: Error) => {
@@ -1048,8 +1048,8 @@ export const useLogEmail = () => {
   return useMutation({
     mutationFn: (data: LogEmailData) => crmActivityService.logEmail(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['activities'] })
-      queryClient.invalidateQueries({ queryKey: ['activity-timeline'] })
+      queryClient.refetchQueries({ queryKey: ['activities'] })
+      queryClient.refetchQueries({ queryKey: ['activity-timeline'] })
       toast.success('تم تسجيل البريد الإلكتروني بنجاح')
     },
     onError: (error: Error) => {
@@ -1067,8 +1067,8 @@ export const useLogMeeting = () => {
   return useMutation({
     mutationFn: (data: LogMeetingData) => crmActivityService.logMeeting(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['activities'] })
-      queryClient.invalidateQueries({ queryKey: ['activity-timeline'] })
+      queryClient.refetchQueries({ queryKey: ['activities'] })
+      queryClient.refetchQueries({ queryKey: ['activity-timeline'] })
       toast.success('تم تسجيل الاجتماع بنجاح')
     },
     onError: (error: Error) => {
@@ -1086,8 +1086,8 @@ export const useAddNote = () => {
   return useMutation({
     mutationFn: (data: AddNoteData) => crmActivityService.addNote(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['activities'] })
-      queryClient.invalidateQueries({ queryKey: ['activity-timeline'] })
+      queryClient.refetchQueries({ queryKey: ['activities'] })
+      queryClient.refetchQueries({ queryKey: ['activity-timeline'] })
       toast.success('تم إضافة الملاحظة بنجاح')
     },
     onError: (error: Error) => {

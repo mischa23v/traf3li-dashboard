@@ -257,7 +257,7 @@ export function Dashboard() {
                 ) : (
                   <div className="divide-y divide-slate-100">
                     {todayEvents.map((event) => {
-                      const eventTime = new Date(event.startDate).toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' })
+                      const eventTime = event.startDate ? new Date(event.startDate).toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' }) : 'غير محدد'
                       const colorMap = { meeting: 'blue', session: 'green', deadline: 'amber' }
                       const eventColor = colorMap[event.type] || 'blue'
                       return (

@@ -312,10 +312,10 @@ export function EventsView() {
                                                 )}
                                                 <div className="w-16 h-16 rounded-2xl bg-white flex flex-col items-center justify-center shadow-sm border border-slate-100 text-center overflow-hidden">
                                                     <div className="bg-blue-500 text-white text-[10px] w-full py-0.5 font-bold">
-                                                        {new Date(event.date).toLocaleDateString('ar-SA', { month: 'short' })}
+                                                        {event.date && !isNaN(new Date(event.date).getTime()) ? new Date(event.date).toLocaleDateString('ar-SA', { month: 'short' }) : 'غير محدد'}
                                                     </div>
                                                     <div className="text-xl font-bold text-navy pt-1">
-                                                        {new Date(event.date).toLocaleDateString('en-US', { day: 'numeric' })}
+                                                        {event.date && !isNaN(new Date(event.date).getTime()) ? new Date(event.date).toLocaleDateString('en-US', { day: 'numeric' }) : '-'}
                                                     </div>
                                                 </div>
                                                 <div>
