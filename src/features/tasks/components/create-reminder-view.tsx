@@ -252,12 +252,12 @@ export function CreateReminderView() {
             </Header>
 
             <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-r border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
+                {/* HERO CARD - Full width */}
+                <ProductivityHero badge="التذكيرات" title="إنشاء تذكير جديد" type="reminders" hideButtons={true} />
+
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     {/* Main Form Content */}
                     <div className="lg:col-span-2 space-y-8">
-
-                        {/* HERO CARD */}
-                        <ProductivityHero badge="التذكيرات" title="إنشاء تذكير جديد" type="reminders" hideButtons={true} />
 
                         {/* Form Card */}
                         <div className="bg-white rounded-3xl p-8 shadow-sm border border-slate-100">
