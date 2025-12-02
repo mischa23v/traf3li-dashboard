@@ -221,7 +221,7 @@ export function AttendanceDetail() {
                                                     <p className="text-sm text-slate-500 mb-2">الموقع</p>
                                                     <div className="bg-slate-50 rounded-xl p-4 flex items-center gap-2">
                                                         <MapPin className="w-4 h-4 text-slate-400" />
-                                                        <p className="text-slate-700">{record.location}</p>
+                                                        <p className="text-slate-700">{typeof record.location === 'string' ? record.location : (record.location?.name || record.location?.address || 'عن بعد')}</p>
                                                     </div>
                                                 </div>
                                             )}
