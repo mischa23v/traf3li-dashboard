@@ -1284,6 +1284,151 @@ const tasksService = {
       throw new Error(handleApiError(error))
     }
   },
+
+  // ==================== Documents (TipTap Editor) ====================
+
+  /**
+   * Create a new document with TipTap content
+   */
+  createDocument: async (
+    taskId: string,
+    title: string,
+    content: string,
+    contentJson?: any
+  ): Promise<{ document: TaskDocument }> => {
+    try {
+      const response = await apiClient.post(`/tasks/${taskId}/documents`, {
+        title,
+        content,
+        contentJson,
+        contentFormat: 'tiptap-json'
+      })
+      return response.data
+    } catch (error: any) {
+      console.error('Create document error:', error)
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Get a document
+   */
+  getDocument: async (taskId: string, documentId: string): Promise<{ document: TaskDocument }> => {
+    try {
+      const response = await apiClient.get(`/tasks/${taskId}/documents/${documentId}`)
+      return response.data
+    } catch (error: any) {
+      console.error('Get document error:', error)
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Update a document
+   */
+  updateDocument: async (
+    taskId: string,
+    documentId: string,
+    data: { title?: string; content?: string; contentJson?: any }
+  ): Promise<{ document: TaskDocument }> => {
+    try {
+      const response = await apiClient.patch(`/tasks/${taskId}/documents/${documentId}`, {
+        ...data,
+        contentFormat: 'tiptap-json'
+      })
+      return response.data
+    } catch (error: any) {
+      console.error('Update document error:', error)
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Delete a document
+   */
+  deleteDocument: async (taskId: string, documentId: string): Promise<void> => {
+    try {
+      await apiClient.delete(`/tasks/${taskId}/documents/${documentId}`)
+    } catch (error: any) {
+      console.error('Delete document error:', error)
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Get all documents for a task
+   */
+  getDocuments: async (taskId: string): Promise<{ documents: TaskDocument[] }> => {
+    try {
+      const response = await apiClient.get(`/tasks/${taskId}/documents`)
+      return response.data
+    } catch (error: any) {
+      console.error('Get documents error:', error)
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  // ==================== Voice Memos ====================
+
+  /**
+   * Upload voice memo
+   */
+  uploadVoiceMemo: async (
+    taskId: string,
+    file: Blob,
+    duration: number
+  ): Promise<{ voiceMemo: any }> => {
+    try {
+      const formData = new FormData()
+      formData.append('file', file, `voice-memo-${Date.now()}.webm`)
+      formData.append('duration', String(duration))
+
+      const response = await apiClient.post(`/tasks/${taskId}/voice-memos`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      })
+      return response.data
+    } catch (error: any) {
+      console.error('Upload voice memo error:', error)
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Update voice memo transcription
+   */
+  updateVoiceMemoTranscription: async (
+    taskId: string,
+    memoId: string,
+    transcription: string
+  ): Promise<{ voiceMemo: any }> => {
+    try {
+      const response = await apiClient.patch(`/tasks/${taskId}/voice-memos/${memoId}/transcription`, {
+        transcription
+      })
+      return response.data
+    } catch (error: any) {
+      console.error('Update voice memo transcription error:', error)
+      throw new Error(handleApiError(error))
+    }
+  },
+}
+
+// Task Document interface
+export interface TaskDocument {
+  _id: string
+  fileName: string
+  title?: string
+  content?: string
+  contentJson?: any
+  contentFormat?: 'html' | 'tiptap-json' | 'markdown'
+  fileUrl?: string
+  fileType?: string
+  fileSize?: number
+  createdBy?: string
+  createdAt: string
+  updatedAt?: string
 }
 
 export default tasksService
