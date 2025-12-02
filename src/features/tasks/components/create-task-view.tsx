@@ -291,12 +291,12 @@ export function CreateTaskView() {
             </Header>
 
             <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-r border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
+                {/* HERO CARD - Full width */}
+                <ProductivityHero badge="إدارة المهام" title="إنشاء مهمة جديدة" type="tasks" hideButtons={true} />
+
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     {/* RIGHT COLUMN (Main Content) */}
                     <div className="lg:col-span-2 space-y-8">
-
-                        {/* HERO CARD */}
-                        <ProductivityHero badge="إدارة المهام" title="إنشاء مهمة جديدة" type="tasks" hideButtons={true} />
 
                         {/* Templates Section */}
                         {templates && templates.length > 0 && (
