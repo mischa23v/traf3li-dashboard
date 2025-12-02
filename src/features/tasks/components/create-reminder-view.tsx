@@ -198,9 +198,18 @@ export function CreateReminderView() {
 
         const notificationConfig: NotificationConfig = {
             channels: notificationChannels,
-            advanceNotifications: advanceNotifications, // Backend accepts number[] and converts
-            escalationEnabled: escalationEnabled,
-            escalationDelayMinutes: escalationDelay,
+            // Convert number[] to AdvanceNotification[] format expected by backend
+            advanceNotifications: advanceNotifications.map(minutes => ({
+                beforeMinutes: minutes,
+                channels: notificationChannels,
+                sent: false
+            })),
+            escalation: escalationEnabled ? {
+                enabled: true,
+                escalateAfterMinutes: escalationDelay,
+                escalated: false,
+                escalationLevel: 0
+            } : undefined,
             soundEnabled: true,
             vibrationEnabled: true,
         }
