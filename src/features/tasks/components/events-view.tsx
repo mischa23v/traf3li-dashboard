@@ -95,11 +95,11 @@ export function EventsView() {
     }
 
     const handleCompleteEvent = (eventId: string) => {
-        completeEventMutation.mutate(eventId)
+        completeEventMutation.mutate({ id: eventId })
     }
 
     const handleCancelEvent = (eventId: string) => {
-        cancelEventMutation.mutate(eventId)
+        cancelEventMutation.mutate({ id: eventId })
     }
 
     // Selection Handlers

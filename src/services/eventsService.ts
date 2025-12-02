@@ -443,9 +443,9 @@ const eventsService = {
   /**
    * Mark event as completed
    */
-  completeEvent: async (id: string, meetingNotes?: string, actionItems?: any[]): Promise<Event> => {
+  completeEvent: async (id: string, minutesNotes?: string): Promise<Event> => {
     try {
-      const response = await apiClient.post(`/events/${id}/complete`, { meetingNotes, actionItems })
+      const response = await apiClient.post(`/events/${id}/complete`, { minutesNotes })
       return response.data.event || response.data.data || response.data
     } catch (error: any) {
       console.error('Complete event error:', error)
@@ -456,12 +456,25 @@ const eventsService = {
   /**
    * Cancel event
    */
-  cancelEvent: async (id: string, reason?: string, notifyAttendees: boolean = true): Promise<Event> => {
+  cancelEvent: async (id: string, reason?: string): Promise<Event> => {
     try {
-      const response = await apiClient.post(`/events/${id}/cancel`, { reason, notifyAttendees })
+      const response = await apiClient.post(`/events/${id}/cancel`, { reason })
       return response.data.event || response.data.data || response.data
     } catch (error: any) {
       console.error('Cancel event error:', error)
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Postpone event to a new date/time
+   */
+  postponeEvent: async (id: string, newDateTime: string, reason?: string): Promise<Event> => {
+    try {
+      const response = await apiClient.post(`/events/${id}/postpone`, { newDateTime, reason })
+      return response.data.event || response.data.data || response.data
+    } catch (error: any) {
+      console.error('Postpone event error:', error)
       throw new Error(handleApiError(error))
     }
   },
