@@ -82,11 +82,6 @@ export const sidebarData: SidebarData = {
               title: 'sidebar.allCases',
               url: '/dashboard/cases',
             },
-            {
-              title: 'wiki.title',
-              url: '/dashboard/cases',
-              icon: BookOpen,
-            },
           ],
         },
         {

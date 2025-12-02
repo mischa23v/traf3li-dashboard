@@ -47,7 +47,6 @@ export function ProductivityHero({ badge, title = 'الإنتاجية', type = '
         tasks: { label: 'مهمة جديدة', href: '/dashboard/tasks/new' },
         reminders: { label: 'تذكير جديد', href: '/dashboard/tasks/reminders/new' },
         events: { label: 'حدث جديد', href: '/dashboard/tasks/events/new' },
-        wiki: { label: 'صفحة جديدة', href: '/dashboard/wiki/new' },
         clients: { label: 'عميل جديد', href: '/dashboard/clients/new' },
         contacts: { label: 'جهة اتصال جديدة', href: '/dashboard/contacts/new' },
         organizations: { label: 'منظمة جديدة', href: '/dashboard/organizations/new' },
