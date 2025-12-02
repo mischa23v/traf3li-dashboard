@@ -108,8 +108,8 @@ export const useCreateTask = () => {
   return useMutation({
     mutationFn: (data: CreateTaskData) => tasksService.createTask(data),
     onSuccess: () => {
-      queryClient.refetchQueries({ queryKey: ['tasks'] })
-      queryClient.refetchQueries({ queryKey: ['calendar'] })
+      queryClient.invalidateQueries({ queryKey: ['tasks'] })
+      queryClient.invalidateQueries({ queryKey: ['calendar'] })
       toast.success('تم إنشاء المهمة بنجاح')
     },
     onError: (error: Error) => {
@@ -125,9 +125,9 @@ export const useUpdateTask = () => {
     mutationFn: ({ id, data }: { id: string; data: Partial<CreateTaskData> }) =>
       tasksService.updateTask(id, data),
     onSuccess: (_, { id }) => {
-      queryClient.refetchQueries({ queryKey: ['tasks'] })
-      queryClient.refetchQueries({ queryKey: ['tasks', id] })
-      queryClient.refetchQueries({ queryKey: ['calendar'] })
+      queryClient.invalidateQueries({ queryKey: ['tasks'] })
+      queryClient.invalidateQueries({ queryKey: ['tasks', id] })
+      queryClient.invalidateQueries({ queryKey: ['calendar'] })
       toast.success('تم تحديث المهمة بنجاح')
     },
     onError: (error: Error) => {
@@ -142,8 +142,8 @@ export const useDeleteTask = () => {
   return useMutation({
     mutationFn: (id: string) => tasksService.deleteTask(id),
     onSuccess: () => {
-      queryClient.refetchQueries({ queryKey: ['tasks'] })
-      queryClient.refetchQueries({ queryKey: ['calendar'] })
+      queryClient.invalidateQueries({ queryKey: ['tasks'] })
+      queryClient.invalidateQueries({ queryKey: ['calendar'] })
       toast.success('تم حذف المهمة بنجاح')
     },
     onError: (error: Error) => {
@@ -161,9 +161,9 @@ export const useUpdateTaskStatus = () => {
     mutationFn: ({ id, status }: { id: string; status: TaskStatus }) =>
       tasksService.updateStatus(id, status),
     onSuccess: (_, { id }) => {
-      queryClient.refetchQueries({ queryKey: ['tasks'] })
-      queryClient.refetchQueries({ queryKey: ['tasks', id] })
-      queryClient.refetchQueries({ queryKey: ['calendar'] })
+      queryClient.invalidateQueries({ queryKey: ['tasks'] })
+      queryClient.invalidateQueries({ queryKey: ['tasks', id] })
+      queryClient.invalidateQueries({ queryKey: ['calendar'] })
       toast.success('تم تحديث حالة المهمة')
     },
     onError: (error: Error) => {
@@ -179,9 +179,9 @@ export const useCompleteTask = () => {
     mutationFn: ({ id, completionNotes }: { id: string; completionNotes?: string }) =>
       tasksService.completeTask(id, completionNotes),
     onSuccess: (_, { id }) => {
-      queryClient.refetchQueries({ queryKey: ['tasks'] })
-      queryClient.refetchQueries({ queryKey: ['tasks', id] })
-      queryClient.refetchQueries({ queryKey: ['calendar'] })
+      queryClient.invalidateQueries({ queryKey: ['tasks'] })
+      queryClient.invalidateQueries({ queryKey: ['tasks', id] })
+      queryClient.invalidateQueries({ queryKey: ['calendar'] })
       toast.success('تم إكمال المهمة بنجاح')
     },
     onError: (error: Error) => {
@@ -196,9 +196,9 @@ export const useReopenTask = () => {
   return useMutation({
     mutationFn: (id: string) => tasksService.reopenTask(id),
     onSuccess: (_, id) => {
-      queryClient.refetchQueries({ queryKey: ['tasks'] })
-      queryClient.refetchQueries({ queryKey: ['tasks', id] })
-      queryClient.refetchQueries({ queryKey: ['calendar'] })
+      queryClient.invalidateQueries({ queryKey: ['tasks'] })
+      queryClient.invalidateQueries({ queryKey: ['tasks', id] })
+      queryClient.invalidateQueries({ queryKey: ['calendar'] })
       toast.success('تم إعادة فتح المهمة')
     },
     onError: (error: Error) => {
@@ -214,9 +214,9 @@ export const useUpdateTaskProgress = () => {
     mutationFn: ({ id, progress, autoCalculate }: { id: string; progress?: number; autoCalculate?: boolean }) =>
       tasksService.updateProgress(id, progress, autoCalculate),
     onSuccess: (_, { id }) => {
-      queryClient.refetchQueries({ queryKey: ['tasks'] })
-      queryClient.refetchQueries({ queryKey: ['tasks', id] })
-      queryClient.refetchQueries({ queryKey: ['calendar'] })
+      queryClient.invalidateQueries({ queryKey: ['tasks'] })
+      queryClient.invalidateQueries({ queryKey: ['tasks', id] })
+      queryClient.invalidateQueries({ queryKey: ['calendar'] })
       toast.success('تم تحديث تقدم المهمة')
     },
     onError: (error: Error) => {
@@ -234,7 +234,7 @@ export const useAddSubtask = () => {
     mutationFn: ({ taskId, subtask }: { taskId: string; subtask: Omit<Subtask, '_id' | 'order'> }) =>
       tasksService.addSubtask(taskId, subtask),
     onSuccess: (_, { taskId }) => {
-      queryClient.refetchQueries({ queryKey: ['tasks', taskId] })
+      queryClient.invalidateQueries({ queryKey: ['tasks', taskId] })
       toast.success('تم إضافة المهمة الفرعية')
     },
     onError: (error: Error) => {
@@ -250,7 +250,7 @@ export const useUpdateSubtask = () => {
     mutationFn: ({ taskId, subtaskId, data }: { taskId: string; subtaskId: string; data: Partial<Subtask> }) =>
       tasksService.updateSubtask(taskId, subtaskId, data),
     onSuccess: (_, { taskId }) => {
-      queryClient.refetchQueries({ queryKey: ['tasks', taskId] })
+      queryClient.invalidateQueries({ queryKey: ['tasks', taskId] })
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل تحديث المهمة الفرعية')
@@ -265,7 +265,7 @@ export const useToggleSubtask = () => {
     mutationFn: ({ taskId, subtaskId }: { taskId: string; subtaskId: string }) =>
       tasksService.toggleSubtask(taskId, subtaskId),
     onSuccess: (_, { taskId }) => {
-      queryClient.refetchQueries({ queryKey: ['tasks', taskId] })
+      queryClient.invalidateQueries({ queryKey: ['tasks', taskId] })
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل تحديث المهمة الفرعية')
@@ -280,7 +280,7 @@ export const useDeleteSubtask = () => {
     mutationFn: ({ taskId, subtaskId }: { taskId: string; subtaskId: string }) =>
       tasksService.deleteSubtask(taskId, subtaskId),
     onSuccess: (_, { taskId }) => {
-      queryClient.refetchQueries({ queryKey: ['tasks', taskId] })
+      queryClient.invalidateQueries({ queryKey: ['tasks', taskId] })
       toast.success('تم حذف المهمة الفرعية')
     },
     onError: (error: Error) => {
@@ -296,7 +296,7 @@ export const useReorderSubtasks = () => {
     mutationFn: ({ taskId, subtaskIds }: { taskId: string; subtaskIds: string[] }) =>
       tasksService.reorderSubtasks(taskId, subtaskIds),
     onSuccess: (_, { taskId }) => {
-      queryClient.refetchQueries({ queryKey: ['tasks', taskId] })
+      queryClient.invalidateQueries({ queryKey: ['tasks', taskId] })
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل إعادة ترتيب المهام الفرعية')
@@ -312,8 +312,8 @@ export const useStartTimeTracking = () => {
   return useMutation({
     mutationFn: (taskId: string) => tasksService.startTimeTracking(taskId),
     onSuccess: (_, taskId) => {
-      queryClient.refetchQueries({ queryKey: ['tasks', taskId] })
-      queryClient.refetchQueries({ queryKey: ['tasks', taskId, 'time-tracking'] })
+      queryClient.invalidateQueries({ queryKey: ['tasks', taskId] })
+      queryClient.invalidateQueries({ queryKey: ['tasks', taskId, 'time-tracking'] })
       toast.success('تم بدء تتبع الوقت')
     },
     onError: (error: Error) => {
@@ -329,8 +329,8 @@ export const useStopTimeTracking = () => {
     mutationFn: ({ taskId, notes }: { taskId: string; notes?: string }) =>
       tasksService.stopTimeTracking(taskId, notes),
     onSuccess: (_, { taskId }) => {
-      queryClient.refetchQueries({ queryKey: ['tasks', taskId] })
-      queryClient.refetchQueries({ queryKey: ['tasks', taskId, 'time-tracking'] })
+      queryClient.invalidateQueries({ queryKey: ['tasks', taskId] })
+      queryClient.invalidateQueries({ queryKey: ['tasks', taskId, 'time-tracking'] })
       toast.success('تم إيقاف تتبع الوقت')
     },
     onError: (error: Error) => {
@@ -346,8 +346,8 @@ export const useAddTimeEntry = () => {
     mutationFn: ({ taskId, data }: { taskId: string; data: { minutes: number; date: string; notes?: string } }) =>
       tasksService.addTimeEntry(taskId, data),
     onSuccess: (_, { taskId }) => {
-      queryClient.refetchQueries({ queryKey: ['tasks', taskId] })
-      queryClient.refetchQueries({ queryKey: ['tasks', taskId, 'time-tracking'] })
+      queryClient.invalidateQueries({ queryKey: ['tasks', taskId] })
+      queryClient.invalidateQueries({ queryKey: ['tasks', taskId, 'time-tracking'] })
       toast.success('تم إضافة وقت يدوي')
     },
     onError: (error: Error) => {
@@ -365,7 +365,7 @@ export const useAddComment = () => {
     mutationFn: ({ taskId, text, mentions }: { taskId: string; text: string; mentions?: string[] }) =>
       tasksService.addComment(taskId, text, mentions),
     onSuccess: (_, { taskId }) => {
-      queryClient.refetchQueries({ queryKey: ['tasks', taskId] })
+      queryClient.invalidateQueries({ queryKey: ['tasks', taskId] })
       toast.success('تم إضافة التعليق')
     },
     onError: (error: Error) => {
@@ -381,7 +381,7 @@ export const useUpdateComment = () => {
     mutationFn: ({ taskId, commentId, text }: { taskId: string; commentId: string; text: string }) =>
       tasksService.updateComment(taskId, commentId, text),
     onSuccess: (_, { taskId }) => {
-      queryClient.refetchQueries({ queryKey: ['tasks', taskId] })
+      queryClient.invalidateQueries({ queryKey: ['tasks', taskId] })
       toast.success('تم تحديث التعليق')
     },
     onError: (error: Error) => {
@@ -397,7 +397,7 @@ export const useDeleteComment = () => {
     mutationFn: ({ taskId, commentId }: { taskId: string; commentId: string }) =>
       tasksService.deleteComment(taskId, commentId),
     onSuccess: (_, { taskId }) => {
-      queryClient.refetchQueries({ queryKey: ['tasks', taskId] })
+      queryClient.invalidateQueries({ queryKey: ['tasks', taskId] })
       toast.success('تم حذف التعليق')
     },
     onError: (error: Error) => {
@@ -415,7 +415,7 @@ export const useUploadTaskAttachment = () => {
     mutationFn: ({ id, file, onProgress }: { id: string; file: File; onProgress?: (percent: number) => void }) =>
       tasksService.uploadAttachment(id, file, onProgress),
     onSuccess: (_, { id }) => {
-      queryClient.refetchQueries({ queryKey: ['tasks', id] })
+      queryClient.invalidateQueries({ queryKey: ['tasks', id] })
       toast.success('تم رفع المرفق بنجاح')
     },
     onError: (error: Error) => {
@@ -431,7 +431,7 @@ export const useDeleteTaskAttachment = () => {
     mutationFn: ({ taskId, attachmentId }: { taskId: string; attachmentId: string }) =>
       tasksService.deleteAttachment(taskId, attachmentId),
     onSuccess: (_, { taskId }) => {
-      queryClient.refetchQueries({ queryKey: ['tasks', taskId] })
+      queryClient.invalidateQueries({ queryKey: ['tasks', taskId] })
       toast.success('تم حذف المرفق')
     },
     onError: (error: Error) => {
@@ -459,7 +459,7 @@ export const useCreateFromTemplate = () => {
     mutationFn: ({ templateId, overrides }: { templateId: string; overrides?: Partial<CreateTaskData> }) =>
       tasksService.createFromTemplate(templateId, overrides),
     onSuccess: () => {
-      queryClient.refetchQueries({ queryKey: ['tasks'] })
+      queryClient.invalidateQueries({ queryKey: ['tasks'] })
       toast.success('تم إنشاء المهمة من القالب')
     },
     onError: (error: Error) => {
@@ -475,7 +475,7 @@ export const useSaveAsTemplate = () => {
     mutationFn: ({ taskId, templateName }: { taskId: string; templateName: string }) =>
       tasksService.saveAsTemplate(taskId, templateName),
     onSuccess: () => {
-      queryClient.refetchQueries({ queryKey: ['tasks', 'templates'] })
+      queryClient.invalidateQueries({ queryKey: ['tasks', 'templates'] })
       toast.success('تم حفظ المهمة كقالب')
     },
     onError: (error: Error) => {
@@ -492,7 +492,7 @@ export const useBulkUpdateTasks = () => {
   return useMutation<BulkOperationResult, Error, { taskIds: string[]; data: Partial<CreateTaskData> }>({
     mutationFn: ({ taskIds, data }) => tasksService.bulkUpdate(taskIds, data),
     onSuccess: (result) => {
-      queryClient.refetchQueries({ queryKey: ['tasks'] })
+      queryClient.invalidateQueries({ queryKey: ['tasks'] })
       toast.success(`تم تحديث ${result.success} مهمة`)
       if (result.failed > 0) {
         toast.warning(`فشل تحديث ${result.failed} مهمة`)
@@ -510,7 +510,7 @@ export const useBulkDeleteTasks = () => {
   return useMutation<BulkOperationResult, Error, string[]>({
     mutationFn: (taskIds) => tasksService.bulkDelete(taskIds),
     onSuccess: (result) => {
-      queryClient.refetchQueries({ queryKey: ['tasks'] })
+      queryClient.invalidateQueries({ queryKey: ['tasks'] })
       toast.success(`تم حذف ${result.success} مهمة`)
       if (result.failed > 0) {
         toast.warning(`فشل حذف ${result.failed} مهمة`)
@@ -528,7 +528,7 @@ export const useBulkCompleteTasks = () => {
   return useMutation<BulkOperationResult, Error, string[]>({
     mutationFn: (taskIds) => tasksService.bulkComplete(taskIds),
     onSuccess: (result) => {
-      queryClient.refetchQueries({ queryKey: ['tasks'] })
+      queryClient.invalidateQueries({ queryKey: ['tasks'] })
       toast.success(`تم إكمال ${result.success} مهمة`)
       if (result.failed > 0) {
         toast.warning(`فشل إكمال ${result.failed} مهمة`)
@@ -546,7 +546,7 @@ export const useBulkAssignTasks = () => {
   return useMutation<BulkOperationResult, Error, { taskIds: string[]; assignedTo: string }>({
     mutationFn: ({ taskIds, assignedTo }) => tasksService.bulkAssign(taskIds, assignedTo),
     onSuccess: (result) => {
-      queryClient.refetchQueries({ queryKey: ['tasks'] })
+      queryClient.invalidateQueries({ queryKey: ['tasks'] })
       toast.success(`تم تعيين ${result.success} مهمة`)
       if (result.failed > 0) {
         toast.warning(`فشل تعيين ${result.failed} مهمة`)
@@ -566,7 +566,7 @@ export const useImportTasks = () => {
   return useMutation({
     mutationFn: (file: File) => tasksService.importTasks(file),
     onSuccess: (result) => {
-      queryClient.refetchQueries({ queryKey: ['tasks'] })
+      queryClient.invalidateQueries({ queryKey: ['tasks'] })
       toast.success(`تم استيراد ${result.imported} مهمة بنجاح`)
       if (result.failed > 0) {
         toast.warning(`فشل استيراد ${result.failed} مهمة`)
@@ -607,8 +607,8 @@ export const useSkipRecurrence = () => {
   return useMutation({
     mutationFn: (taskId: string) => tasksService.skipRecurrence(taskId),
     onSuccess: (_, taskId) => {
-      queryClient.refetchQueries({ queryKey: ['tasks', taskId] })
-      queryClient.refetchQueries({ queryKey: ['tasks'] })
+      queryClient.invalidateQueries({ queryKey: ['tasks', taskId] })
+      queryClient.invalidateQueries({ queryKey: ['tasks'] })
       toast.success('تم تخطي الموعد التالي')
     },
     onError: (error: Error) => {
@@ -623,8 +623,8 @@ export const useStopRecurrence = () => {
   return useMutation({
     mutationFn: (taskId: string) => tasksService.stopRecurrence(taskId),
     onSuccess: (_, taskId) => {
-      queryClient.refetchQueries({ queryKey: ['tasks', taskId] })
-      queryClient.refetchQueries({ queryKey: ['tasks'] })
+      queryClient.invalidateQueries({ queryKey: ['tasks', taskId] })
+      queryClient.invalidateQueries({ queryKey: ['tasks'] })
       toast.success('تم إيقاف التكرار')
     },
     onError: (error: Error) => {
@@ -650,8 +650,8 @@ export const useAddDependency = () => {
     mutationFn: ({ taskId, dependencyTaskId, type }: { taskId: string; dependencyTaskId: string; type: 'blocks' | 'blocked_by' }) =>
       tasksService.addDependency(taskId, dependencyTaskId, type),
     onSuccess: (_, { taskId }) => {
-      queryClient.refetchQueries({ queryKey: ['tasks', taskId] })
-      queryClient.refetchQueries({ queryKey: ['tasks'] })
+      queryClient.invalidateQueries({ queryKey: ['tasks', taskId] })
+      queryClient.invalidateQueries({ queryKey: ['tasks'] })
       toast.success('تم إضافة التبعية بنجاح')
     },
     onError: (error: Error) => {
@@ -667,8 +667,8 @@ export const useRemoveDependency = () => {
     mutationFn: ({ taskId, dependencyTaskId }: { taskId: string; dependencyTaskId: string }) =>
       tasksService.removeDependency(taskId, dependencyTaskId),
     onSuccess: (_, { taskId }) => {
-      queryClient.refetchQueries({ queryKey: ['tasks', taskId] })
-      queryClient.refetchQueries({ queryKey: ['tasks'] })
+      queryClient.invalidateQueries({ queryKey: ['tasks', taskId] })
+      queryClient.invalidateQueries({ queryKey: ['tasks'] })
       toast.success('تم إزالة التبعية')
     },
     onError: (error: Error) => {
@@ -686,7 +686,7 @@ export const useAddWorkflowRule = () => {
     mutationFn: ({ taskId, rule }: { taskId: string; rule: Omit<WorkflowRule, '_id' | 'createdAt' | 'createdBy'> }) =>
       tasksService.addWorkflowRule(taskId, rule),
     onSuccess: (_, { taskId }) => {
-      queryClient.refetchQueries({ queryKey: ['tasks', taskId] })
+      queryClient.invalidateQueries({ queryKey: ['tasks', taskId] })
       toast.success('تم إضافة قاعدة العمل بنجاح')
     },
     onError: (error: Error) => {
@@ -702,7 +702,7 @@ export const useUpdateWorkflowRule = () => {
     mutationFn: ({ taskId, ruleId, rule }: { taskId: string; ruleId: string; rule: Partial<WorkflowRule> }) =>
       tasksService.updateWorkflowRule(taskId, ruleId, rule),
     onSuccess: (_, { taskId }) => {
-      queryClient.refetchQueries({ queryKey: ['tasks', taskId] })
+      queryClient.invalidateQueries({ queryKey: ['tasks', taskId] })
       toast.success('تم تحديث قاعدة العمل')
     },
     onError: (error: Error) => {
@@ -718,7 +718,7 @@ export const useDeleteWorkflowRule = () => {
     mutationFn: ({ taskId, ruleId }: { taskId: string; ruleId: string }) =>
       tasksService.deleteWorkflowRule(taskId, ruleId),
     onSuccess: (_, { taskId }) => {
-      queryClient.refetchQueries({ queryKey: ['tasks', taskId] })
+      queryClient.invalidateQueries({ queryKey: ['tasks', taskId] })
       toast.success('تم حذف قاعدة العمل')
     },
     onError: (error: Error) => {
@@ -734,7 +734,7 @@ export const useToggleWorkflowRule = () => {
     mutationFn: ({ taskId, ruleId }: { taskId: string; ruleId: string }) =>
       tasksService.toggleWorkflowRule(taskId, ruleId),
     onSuccess: (_, { taskId }) => {
-      queryClient.refetchQueries({ queryKey: ['tasks', taskId] })
+      queryClient.invalidateQueries({ queryKey: ['tasks', taskId] })
       toast.success('تم تغيير حالة قاعدة العمل')
     },
     onError: (error: Error) => {
@@ -752,8 +752,8 @@ export const useUpdateOutcome = () => {
     mutationFn: ({ taskId, outcome }: { taskId: string; outcome: TaskOutcome }) =>
       tasksService.updateOutcome(taskId, outcome),
     onSuccess: (_, { taskId }) => {
-      queryClient.refetchQueries({ queryKey: ['tasks', taskId] })
-      queryClient.refetchQueries({ queryKey: ['tasks'] })
+      queryClient.invalidateQueries({ queryKey: ['tasks', taskId] })
+      queryClient.invalidateQueries({ queryKey: ['tasks'] })
       toast.success('تم تحديث نتيجة المهمة')
     },
     onError: (error: Error) => {
@@ -771,8 +771,8 @@ export const useUpdateEstimate = () => {
     mutationFn: ({ taskId, estimate }: { taskId: string; estimate: TimeBudget }) =>
       tasksService.updateEstimate(taskId, estimate),
     onSuccess: (_, { taskId }) => {
-      queryClient.refetchQueries({ queryKey: ['tasks', taskId] })
-      queryClient.refetchQueries({ queryKey: ['tasks', taskId, 'time-tracking'] })
+      queryClient.invalidateQueries({ queryKey: ['tasks', taskId] })
+      queryClient.invalidateQueries({ queryKey: ['tasks', taskId, 'time-tracking'] })
       toast.success('تم تحديث التقدير')
     },
     onError: (error: Error) => {
@@ -818,8 +818,8 @@ export const useCreateDocument = () => {
       contentJson?: any
     }) => tasksService.createDocument(taskId, title, content, contentJson),
     onSuccess: (_, { taskId }) => {
-      queryClient.refetchQueries({ queryKey: ['tasks', taskId] })
-      queryClient.refetchQueries({ queryKey: ['tasks', taskId, 'documents'] })
+      queryClient.invalidateQueries({ queryKey: ['tasks', taskId] })
+      queryClient.invalidateQueries({ queryKey: ['tasks', taskId, 'documents'] })
       toast.success('تم إنشاء المستند')
     },
     onError: (error: Error) => {
@@ -838,9 +838,9 @@ export const useUpdateDocument = () => {
       data: { title?: string; content?: string; contentJson?: any }
     }) => tasksService.updateDocument(taskId, documentId, data),
     onSuccess: (_, { taskId, documentId }) => {
-      queryClient.refetchQueries({ queryKey: ['tasks', taskId] })
-      queryClient.refetchQueries({ queryKey: ['tasks', taskId, 'documents'] })
-      queryClient.refetchQueries({ queryKey: ['tasks', taskId, 'documents', documentId] })
+      queryClient.invalidateQueries({ queryKey: ['tasks', taskId] })
+      queryClient.invalidateQueries({ queryKey: ['tasks', taskId, 'documents'] })
+      queryClient.invalidateQueries({ queryKey: ['tasks', taskId, 'documents', documentId] })
       toast.success('تم حفظ المستند')
     },
     onError: (error: Error) => {
@@ -856,8 +856,8 @@ export const useDeleteDocument = () => {
     mutationFn: ({ taskId, documentId }: { taskId: string; documentId: string }) =>
       tasksService.deleteDocument(taskId, documentId),
     onSuccess: (_, { taskId }) => {
-      queryClient.refetchQueries({ queryKey: ['tasks', taskId] })
-      queryClient.refetchQueries({ queryKey: ['tasks', taskId, 'documents'] })
+      queryClient.invalidateQueries({ queryKey: ['tasks', taskId] })
+      queryClient.invalidateQueries({ queryKey: ['tasks', taskId, 'documents'] })
       toast.success('تم حذف المستند')
     },
     onError: (error: Error) => {
@@ -875,7 +875,7 @@ export const useUploadVoiceMemo = () => {
     mutationFn: ({ taskId, file, duration }: { taskId: string; file: Blob; duration: number }) =>
       tasksService.uploadVoiceMemo(taskId, file, duration),
     onSuccess: (_, { taskId }) => {
-      queryClient.refetchQueries({ queryKey: ['tasks', taskId] })
+      queryClient.invalidateQueries({ queryKey: ['tasks', taskId] })
       toast.success('تم رفع المذكرة الصوتية')
     },
     onError: (error: Error) => {
@@ -894,11 +894,27 @@ export const useUpdateVoiceMemoTranscription = () => {
       transcription: string
     }) => tasksService.updateVoiceMemoTranscription(taskId, memoId, transcription),
     onSuccess: (_, { taskId }) => {
-      queryClient.refetchQueries({ queryKey: ['tasks', taskId] })
+      queryClient.invalidateQueries({ queryKey: ['tasks', taskId] })
       toast.success('تم تحديث النص')
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل تحديث النص')
+    },
+  })
+}
+
+export const useDeleteVoiceMemo = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({ taskId, memoId }: { taskId: string; memoId: string }) =>
+      tasksService.deleteVoiceMemo(taskId, memoId),
+    onSuccess: (_, { taskId }) => {
+      queryClient.invalidateQueries({ queryKey: ['tasks', taskId] })
+      toast.success('تم حذف المذكرة الصوتية')
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'فشل حذف المذكرة الصوتية')
     },
   })
 }
