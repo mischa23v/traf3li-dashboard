@@ -299,7 +299,7 @@ export function CasesView() {
                                                         </div>
                                                         <div className="text-xs text-slate-400">{event.date}</div>
                                                         <div className="text-xs text-slate-500 bg-slate-50 p-2 rounded-lg inline-block">
-                                                            {event.location}
+                                                            {typeof event.location === 'string' ? event.location : (event.location?.name || event.location?.address || 'عن بعد')}
                                                         </div>
                                                     </div>
                                                 </div>
@@ -613,7 +613,7 @@ export function CasesView() {
                                                                     </div>
                                                                     <div className="flex items-center gap-1">
                                                                         <MapPin className="h-4 w-4" />
-                                                                        {hearing.location}
+                                                                        {typeof hearing.location === 'string' ? hearing.location : (hearing.location?.name || hearing.location?.address || 'عن بعد')}
                                                                     </div>
                                                                 </div>
                                                             </div>

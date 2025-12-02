@@ -245,7 +245,7 @@ export default function CasesDashboard() {
                                             <MapPin className="h-4 w-4 text-slate-400" />
                                             الموقع
                                         </span>
-                                        <span className="font-bold text-slate-800 text-xs bg-slate-50 px-2 py-1 rounded-lg">{caseItem.location}</span>
+                                        <span className="font-bold text-slate-800 text-xs bg-slate-50 px-2 py-1 rounded-lg">{typeof caseItem.location === 'string' ? caseItem.location : (caseItem.location?.name || caseItem.location?.address || 'عن بعد')}</span>
                                     </div>
 
                                     {/* Time */}

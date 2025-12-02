@@ -1056,7 +1056,7 @@ export function CaseDetailsView() {
                                         : t('cases.missed', 'فائتة')}
                                   </Badge>
                                 </div>
-                                <h4 className="text-lg font-bold text-navy mb-1">{hearing.location}</h4>
+                                <h4 className="text-lg font-bold text-navy mb-1">{typeof hearing.location === 'string' ? hearing.location : (hearing.location?.name || hearing.location?.address || 'عن بعد')}</h4>
                                 <div className="flex items-center gap-4 text-sm text-slate-600">
                                   <div className="flex items-center gap-1">
                                     <Calendar className="h-4 w-4 text-blue-500" />

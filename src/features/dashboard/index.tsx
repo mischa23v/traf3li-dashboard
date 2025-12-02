@@ -272,7 +272,7 @@ export function Dashboard() {
                           <div className="flex-1">
                             <h4 className="font-bold text-navy text-lg group-hover:text-brand-blue transition-colors">{event.title}</h4>
                             <div className="flex items-center gap-4 mt-1 text-xs font-medium text-slate-500">
-                              <span className="flex items-center gap-1"><MapPinIcon className="h-3 w-3" /> {event.location}</span>
+                              <span className="flex items-center gap-1"><MapPinIcon className="h-3 w-3" /> {typeof event.location === 'string' ? event.location : (event.location?.name || event.location?.address || 'عن بعد')}</span>
                               <span className={`bg-${eventColor}-50 text-${eventColor}-700 px-2 py-0.5 rounded-md font-bold`}>
                                 {event.type === 'session' ? 'جلسة' : event.type === 'meeting' ? 'اجتماع' : 'موعد نهائي'}
                               </span>
