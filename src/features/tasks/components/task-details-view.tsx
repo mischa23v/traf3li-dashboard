@@ -1,11 +1,12 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useRef } from 'react'
 import {
     FileText, Calendar, CheckSquare, Clock, MoreHorizontal, Plus, Upload,
     User, ArrowLeft, Briefcase, Trash2, Edit3, Loader2,
-    History, Link as LinkIcon, Flag, Send, Eye, Download, Search, Bell, AlertCircle
+    History, Link as LinkIcon, Flag, Send, Eye, Download, Search, Bell, AlertCircle, X
 } from 'lucide-react'
 import { Skeleton } from '@/components/ui/skeleton'
-import { useTask, useDeleteTask, useCompleteTask, useReopenTask } from '@/hooks/useTasks'
+import { Input } from '@/components/ui/input'
+import { useTask, useDeleteTask, useCompleteTask, useReopenTask, useAddSubtask, useToggleSubtask, useAddComment, useUploadTaskAttachment, useDeleteTaskAttachment } from '@/hooks/useTasks'
 import { useParams, useNavigate } from '@tanstack/react-router'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -37,6 +38,16 @@ export function TaskDetailsView() {
     const [activeTab, setActiveTab] = useState('overview')
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
 
+    // Subtask state
+    const [isAddingSubtask, setIsAddingSubtask] = useState(false)
+    const [newSubtaskTitle, setNewSubtaskTitle] = useState('')
+
+    // Comment state
+    const [newComment, setNewComment] = useState('')
+
+    // File upload ref
+    const fileInputRef = useRef<HTMLInputElement>(null)
+
     // Fetch task data
     const { data: taskData, isLoading, isError, error, refetch } = useTask(taskId)
 
@@ -44,6 +55,11 @@ export function TaskDetailsView() {
     const deleteTaskMutation = useDeleteTask()
     const completeTaskMutation = useCompleteTask()
     const reopenTaskMutation = useReopenTask()
+    const addSubtaskMutation = useAddSubtask()
+    const toggleSubtaskMutation = useToggleSubtask()
+    const addCommentMutation = useAddComment()
+    const uploadAttachmentMutation = useUploadTaskAttachment()
+    const deleteAttachmentMutation = useDeleteTaskAttachment()
 
     const handleDelete = () => {
         deleteTaskMutation.mutate(taskId, {
@@ -57,7 +73,60 @@ export function TaskDetailsView() {
         if (taskData?.status === 'done') {
             reopenTaskMutation.mutate(taskId)
         } else {
-            completeTaskMutation.mutate(taskId)
+            completeTaskMutation.mutate({ id: taskId })
+        }
+    }
+
+    // Subtask handlers
+    const handleAddSubtask = () => {
+        if (!newSubtaskTitle.trim()) return
+        addSubtaskMutation.mutate(
+            { taskId, subtask: { title: newSubtaskTitle.trim(), completed: false } },
+            {
+                onSuccess: () => {
+                    setNewSubtaskTitle('')
+                    setIsAddingSubtask(false)
+                }
+            }
+        )
+    }
+
+    const handleToggleSubtask = (subtaskId: string) => {
+        toggleSubtaskMutation.mutate({ taskId, subtaskId })
+    }
+
+    // Comment handler
+    const handleAddComment = () => {
+        if (!newComment.trim()) return
+        addCommentMutation.mutate(
+            { taskId, text: newComment.trim() },
+            {
+                onSuccess: () => {
+                    setNewComment('')
+                }
+            }
+        )
+    }
+
+    // File upload handler
+    const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0]
+        if (!file) return
+        uploadAttachmentMutation.mutate(
+            { id: taskId, file },
+            {
+                onSuccess: () => {
+                    if (fileInputRef.current) {
+                        fileInputRef.current.value = ''
+                    }
+                }
+            }
+        )
+    }
+
+    const handleDeleteAttachment = (attachmentId: string) => {
+        if (confirm('هل أنت متأكد من حذف هذا المرفق؟')) {
+            deleteAttachmentMutation.mutate({ taskId, attachmentId })
         }
     }
 
@@ -103,6 +172,68 @@ export function TaskDetailsView() {
         // Type narrow assignedTo for linking
         const assigneeId = typeof t.assignedTo === 'string' ? t.assignedTo : (t.assignedTo as any)?._id || null
 
+        // Map subtasks with proper IDs
+        const mappedSubtasks = subtasks.map((st: any, idx: number) => ({
+            _id: st._id || `subtask-${idx}`,
+            id: idx + 1,
+            title: st.title || st.description || 'مهمة فرعية',
+            completed: st.completed || st.status === 'completed'
+        }))
+
+        // Map comments to display format
+        const mappedComments = (t.comments || []).map((c: any) => ({
+            id: c._id || c.id,
+            user: c.userName || c.user || 'مستخدم',
+            avatar: c.userAvatar?.charAt(0) || c.userName?.charAt(0) || 'م',
+            text: c.text || c.content || '',
+            time: c.createdAt ? new Date(c.createdAt).toLocaleDateString('ar-SA', {
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            }) : ''
+        }))
+
+        // Map attachments
+        const mappedAttachments = (t.attachments || []).map((a: any) => ({
+            _id: a._id || a.id,
+            name: a.fileName || a.name || 'ملف',
+            type: a.fileType?.includes('pdf') ? 'PDF' :
+                  a.fileType?.includes('word') || a.fileName?.includes('.doc') ? 'DOC' :
+                  a.fileType?.includes('image') ? 'IMG' : 'FILE',
+            size: a.fileSize ? (a.fileSize / 1024 > 1024
+                ? `${(a.fileSize / 1024 / 1024).toFixed(1)} MB`
+                : `${Math.round(a.fileSize / 1024)} KB`) : '',
+            date: a.uploadedAt ? new Date(a.uploadedAt).toLocaleDateString('ar-SA') : '',
+            url: a.fileUrl || a.url
+        }))
+
+        // Map history/timeline with proper action labels
+        const actionLabels: Record<string, string> = {
+            'created': 'تم إنشاء المهمة',
+            'updated': 'تم تحديث المهمة',
+            'status_changed': 'تم تغيير الحالة',
+            'assigned': 'تم تعيين المهمة',
+            'completed': 'تم إكمال المهمة',
+            'reopened': 'تم إعادة فتح المهمة',
+            'commented': 'تم إضافة تعليق',
+            'attachment_added': 'تم إضافة مرفق'
+        }
+
+        const mappedTimeline = (t.history || []).map((h: any, idx: number) => ({
+            id: h._id || `history-${idx}`,
+            title: h.details || actionLabels[h.action] || h.action || 'نشاط',
+            date: h.timestamp ? new Date(h.timestamp).toLocaleDateString('ar-SA', {
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            }) : '',
+            status: h.action === 'completed' ? 'completed' :
+                    h.action === 'created' ? 'completed' : 'upcoming',
+            user: h.userName || ''
+        }))
+
         return {
             id: t._id,
             title: t.title || t.description || 'مهمة غير محددة',
@@ -115,13 +246,10 @@ export function TaskDetailsView() {
             assigneeId,
             client: clientInfo,
             case: caseInfo,
-            subtasks: subtasks.map((st: any, idx: number) => ({
-                id: idx + 1,
-                title: st.title || st.description,
-                completed: st.completed || st.status === 'completed'
-            })),
-            comments: t.comments || [],
-            timeline: t.history || []
+            subtasks: mappedSubtasks,
+            comments: mappedComments,
+            attachments: mappedAttachments,
+            timeline: mappedTimeline
         }
     }, [taskData])
 
@@ -360,24 +488,37 @@ export function TaskDetailsView() {
                                 <CardContent className="p-0">
                                     <ScrollArea className="h-[300px]">
                                         <div className="relative p-6">
-                                            {/* Vertical Line */}
-                                            <div className="absolute top-6 bottom-6 right-[29px] w-0.5 bg-slate-100"></div>
+                                            {task.timeline.length === 0 ? (
+                                                <div className="text-center py-8 text-slate-400">
+                                                    <History className="w-10 h-10 mx-auto mb-3 opacity-30" />
+                                                    <p className="text-sm">لا يوجد سجل نشاطات</p>
+                                                    <p className="text-xs mt-1">سيظهر السجل هنا عند إجراء تغييرات</p>
+                                                </div>
+                                            ) : (
+                                                <>
+                                                    {/* Vertical Line */}
+                                                    <div className="absolute top-6 bottom-6 right-[29px] w-0.5 bg-slate-100"></div>
 
-                                            <div className="space-y-8 relative">
-                                                {task.timeline.map((event, i) => (
-                                                    <div key={i} className="flex gap-4 relative">
-                                                        <div className={`
-                                                            w-3 h-3 rounded-full mt-1.5 z-10 ring-4 ring-white
-                                                            ${event.status === 'completed' ? 'bg-emerald-500' :
-                                                                event.status === 'upcoming' ? 'bg-amber-500' : 'bg-slate-300'}
-                                                        `}></div>
-                                                        <div className="flex-1">
-                                                            <div className="text-sm font-bold text-navy">{event.title}</div>
-                                                            <div className="text-xs text-slate-500 mb-1">{event.date}</div>
-                                                        </div>
+                                                    <div className="space-y-8 relative">
+                                                        {task.timeline.map((event, i) => (
+                                                            <div key={event.id || i} className="flex gap-4 relative">
+                                                                <div className={`
+                                                                    w-3 h-3 rounded-full mt-1.5 z-10 ring-4 ring-white
+                                                                    ${event.status === 'completed' ? 'bg-emerald-500' :
+                                                                        event.status === 'upcoming' ? 'bg-amber-500' : 'bg-slate-300'}
+                                                                `}></div>
+                                                                <div className="flex-1">
+                                                                    <div className="text-sm font-bold text-navy">{event.title}</div>
+                                                                    <div className="text-xs text-slate-500 mb-1">
+                                                                        {event.date}
+                                                                        {event.user && <span className="mr-2">• {event.user}</span>}
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        ))}
                                                     </div>
-                                                ))}
-                                            </div>
+                                                </>
+                                            )}
                                         </div>
                                     </ScrollArea>
                                 </CardContent>
@@ -501,42 +642,129 @@ export function TaskDetailsView() {
                                         <TabsContent value="subtasks" className="mt-0">
                                             <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
                                                 <CardContent className="p-6 space-y-4">
+                                                    {task.subtasks.length === 0 && !isAddingSubtask && (
+                                                        <div className="text-center py-8 text-slate-400">
+                                                            <CheckSquare className="w-12 h-12 mx-auto mb-3 opacity-30" />
+                                                            <p>لا توجد مهام فرعية</p>
+                                                        </div>
+                                                    )}
                                                     {task.subtasks.map((subtask) => (
-                                                        <div key={subtask.id} className="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 border border-transparent hover:border-slate-100 transition-all">
-                                                            <div className={`w-5 h-5 rounded-md border flex items-center justify-center cursor-pointer ${subtask.completed ? 'bg-brand-blue border-brand-blue text-white' : 'border-slate-300'}`}>
+                                                        <div key={subtask._id} className="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 border border-transparent hover:border-slate-100 transition-all">
+                                                            <div
+                                                                onClick={() => handleToggleSubtask(subtask._id)}
+                                                                className={`w-5 h-5 rounded-md border flex items-center justify-center cursor-pointer transition-colors ${subtask.completed ? 'bg-brand-blue border-brand-blue text-white' : 'border-slate-300 hover:border-brand-blue'}`}
+                                                            >
                                                                 {subtask.completed && <CheckSquare className="w-3 h-3" />}
+                                                                {toggleSubtaskMutation.isPending && <Loader2 className="w-3 h-3 animate-spin" />}
                                                             </div>
                                                             <span className={`flex-1 font-medium ${subtask.completed ? 'text-slate-400 line-through' : 'text-navy'}`}>
                                                                 {subtask.title}
                                                             </span>
                                                         </div>
                                                     ))}
-                                                    <Button variant="ghost" className="w-full justify-start text-slate-500 hover:text-brand-blue hover:bg-blue-50 rounded-xl">
-                                                        <Plus className="w-5 h-5 ml-2" /> إضافة مهمة فرعية
-                                                    </Button>
+
+                                                    {/* Add Subtask Form */}
+                                                    {isAddingSubtask ? (
+                                                        <div className="flex items-center gap-3 p-3 rounded-xl bg-blue-50 border border-blue-100">
+                                                            <div className="w-5 h-5 rounded-md border border-slate-300"></div>
+                                                            <Input
+                                                                autoFocus
+                                                                value={newSubtaskTitle}
+                                                                onChange={(e) => setNewSubtaskTitle(e.target.value)}
+                                                                onKeyDown={(e) => {
+                                                                    if (e.key === 'Enter') handleAddSubtask()
+                                                                    if (e.key === 'Escape') {
+                                                                        setIsAddingSubtask(false)
+                                                                        setNewSubtaskTitle('')
+                                                                    }
+                                                                }}
+                                                                placeholder="عنوان المهمة الفرعية..."
+                                                                className="flex-1 h-8 border-0 bg-transparent focus-visible:ring-0 text-navy"
+                                                            />
+                                                            <Button
+                                                                size="sm"
+                                                                onClick={handleAddSubtask}
+                                                                disabled={!newSubtaskTitle.trim() || addSubtaskMutation.isPending}
+                                                                className="h-8 bg-brand-blue hover:bg-blue-600"
+                                                            >
+                                                                {addSubtaskMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : 'إضافة'}
+                                                            </Button>
+                                                            <Button
+                                                                size="sm"
+                                                                variant="ghost"
+                                                                onClick={() => {
+                                                                    setIsAddingSubtask(false)
+                                                                    setNewSubtaskTitle('')
+                                                                }}
+                                                                className="h-8 w-8 p-0"
+                                                            >
+                                                                <X className="w-4 h-4" />
+                                                            </Button>
+                                                        </div>
+                                                    ) : (
+                                                        <Button
+                                                            variant="ghost"
+                                                            onClick={() => setIsAddingSubtask(true)}
+                                                            className="w-full justify-start text-slate-500 hover:text-brand-blue hover:bg-blue-50 rounded-xl"
+                                                        >
+                                                            <Plus className="w-5 h-5 ml-2" /> إضافة مهمة فرعية
+                                                        </Button>
+                                                    )}
                                                 </CardContent>
                                             </Card>
                                         </TabsContent>
 
                                         <TabsContent value="files" className="mt-0">
                                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                                {/* Hidden file input */}
+                                                <input
+                                                    type="file"
+                                                    ref={fileInputRef}
+                                                    onChange={handleFileUpload}
+                                                    accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+                                                    className="hidden"
+                                                />
+
                                                 {/* Upload New Card */}
-                                                <div className="border-2 border-dashed border-slate-200 rounded-2xl flex flex-col items-center justify-center p-6 cursor-pointer hover:border-brand-blue hover:bg-blue-50 transition-all group h-[180px]">
-                                                    <div className="w-12 h-12 rounded-full bg-slate-100 group-hover:bg-blue-100 flex items-center justify-center text-slate-400 group-hover:text-brand-blue mb-3 transition-colors">
-                                                        <Upload className="h-6 w-6" />
-                                                    </div>
-                                                    <span className="font-bold text-slate-600 group-hover:text-brand-blue">رفع مستند جديد</span>
-                                                    <span className="text-xs text-slate-400 mt-1">PDF, DOCX, JPG</span>
+                                                <div
+                                                    onClick={() => fileInputRef.current?.click()}
+                                                    className="border-2 border-dashed border-slate-200 rounded-2xl flex flex-col items-center justify-center p-6 cursor-pointer hover:border-brand-blue hover:bg-blue-50 transition-all group h-[180px]"
+                                                >
+                                                    {uploadAttachmentMutation.isPending ? (
+                                                        <>
+                                                            <Loader2 className="h-8 w-8 animate-spin text-brand-blue mb-3" />
+                                                            <span className="font-bold text-brand-blue">جاري الرفع...</span>
+                                                        </>
+                                                    ) : (
+                                                        <>
+                                                            <div className="w-12 h-12 rounded-full bg-slate-100 group-hover:bg-blue-100 flex items-center justify-center text-slate-400 group-hover:text-brand-blue mb-3 transition-colors">
+                                                                <Upload className="h-6 w-6" />
+                                                            </div>
+                                                            <span className="font-bold text-slate-600 group-hover:text-brand-blue">رفع مستند جديد</span>
+                                                            <span className="text-xs text-slate-400 mt-1">PDF, DOCX, JPG</span>
+                                                        </>
+                                                    )}
                                                 </div>
 
-                                                {/* Document Cards */}
-                                                {[
-                                                    { name: 'مسودة الرد.docx', type: 'DOC', size: '850 KB', date: '20/11/2025' },
-                                                    { name: 'المستندات الداعمة.pdf', type: 'PDF', size: '2.4 MB', date: '19/11/2025' },
-                                                ].map((doc, i) => (
-                                                    <div key={i} className="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-all group relative h-[180px] flex flex-col justify-between">
+                                                {/* Empty State */}
+                                                {task.attachments.length === 0 && (
+                                                    <div className="col-span-2 flex flex-col items-center justify-center p-8 text-slate-400">
+                                                        <FileText className="w-12 h-12 mb-3 opacity-30" />
+                                                        <p>لا توجد مرفقات</p>
+                                                        <p className="text-xs mt-1">اضغط على رفع مستند لإضافة ملفات</p>
+                                                    </div>
+                                                )}
+
+                                                {/* Document Cards - from API */}
+                                                {task.attachments.map((doc) => (
+                                                    <div key={doc._id} className="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-all group relative h-[180px] flex flex-col justify-between">
                                                         <div className="flex justify-between items-start">
-                                                            <div className="w-10 h-10 rounded-lg bg-slate-50 flex items-center justify-center text-slate-500 font-bold text-xs border border-slate-100">
+                                                            <div className={`w-10 h-10 rounded-lg flex items-center justify-center font-bold text-xs border ${
+                                                                doc.type === 'PDF' ? 'bg-red-50 text-red-600 border-red-100' :
+                                                                doc.type === 'DOC' ? 'bg-blue-50 text-blue-600 border-blue-100' :
+                                                                doc.type === 'IMG' ? 'bg-green-50 text-green-600 border-green-100' :
+                                                                'bg-slate-50 text-slate-500 border-slate-100'
+                                                            }`}>
                                                                 {doc.type}
                                                             </div>
                                                             <DropdownMenu>
@@ -546,11 +774,26 @@ export function TaskDetailsView() {
                                                                     </Button>
                                                                 </DropdownMenuTrigger>
                                                                 <DropdownMenuContent align="end">
-                                                                    <DropdownMenuItem>
-                                                                        <Eye className="h-4 w-4 ml-2" /> معاينة
-                                                                    </DropdownMenuItem>
-                                                                    <DropdownMenuItem>
-                                                                        <Download className="h-4 w-4 ml-2" /> تحميل
+                                                                    {doc.url && (
+                                                                        <DropdownMenuItem onClick={() => window.open(doc.url, '_blank')}>
+                                                                            <Eye className="h-4 w-4 ml-2" /> معاينة
+                                                                        </DropdownMenuItem>
+                                                                    )}
+                                                                    {doc.url && (
+                                                                        <DropdownMenuItem onClick={() => {
+                                                                            const a = document.createElement('a')
+                                                                            a.href = doc.url
+                                                                            a.download = doc.name
+                                                                            a.click()
+                                                                        }}>
+                                                                            <Download className="h-4 w-4 ml-2" /> تحميل
+                                                                        </DropdownMenuItem>
+                                                                    )}
+                                                                    <DropdownMenuItem
+                                                                        onClick={() => handleDeleteAttachment(doc._id)}
+                                                                        className="text-red-600 focus:text-red-600"
+                                                                    >
+                                                                        <Trash2 className="h-4 w-4 ml-2" /> حذف
                                                                     </DropdownMenuItem>
                                                                 </DropdownMenuContent>
                                                             </DropdownMenu>
@@ -558,16 +801,37 @@ export function TaskDetailsView() {
                                                         <div>
                                                             <h4 className="font-bold text-navy text-sm mb-1 line-clamp-1" title={doc.name}>{doc.name}</h4>
                                                             <div className="flex items-center gap-2 text-xs text-slate-400">
-                                                                <span>{doc.size}</span>
-                                                                <span>•</span>
-                                                                <span>{doc.date}</span>
+                                                                {doc.size && <span>{doc.size}</span>}
+                                                                {doc.size && doc.date && <span>•</span>}
+                                                                {doc.date && <span>{doc.date}</span>}
                                                             </div>
                                                         </div>
                                                         <div className="pt-3 border-t border-slate-50 flex gap-2">
-                                                            <Button variant="outline" size="sm" className="flex-1 h-8 text-xs">معاينة</Button>
-                                                            <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-brand-blue">
-                                                                <Download className="h-4 w-4" />
-                                                            </Button>
+                                                            {doc.url && (
+                                                                <Button
+                                                                    variant="outline"
+                                                                    size="sm"
+                                                                    className="flex-1 h-8 text-xs"
+                                                                    onClick={() => window.open(doc.url, '_blank')}
+                                                                >
+                                                                    معاينة
+                                                                </Button>
+                                                            )}
+                                                            {doc.url && (
+                                                                <Button
+                                                                    variant="ghost"
+                                                                    size="icon"
+                                                                    className="h-8 w-8 text-slate-400 hover:text-brand-blue"
+                                                                    onClick={() => {
+                                                                        const a = document.createElement('a')
+                                                                        a.href = doc.url
+                                                                        a.download = doc.name
+                                                                        a.click()
+                                                                    }}
+                                                                >
+                                                                    <Download className="h-4 w-4" />
+                                                                </Button>
+                                                            )}
                                                         </div>
                                                     </div>
                                                 ))}
@@ -578,6 +842,13 @@ export function TaskDetailsView() {
                                             <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
                                                 <CardContent className="p-6">
                                                     <div className="space-y-6 mb-6">
+                                                        {task.comments.length === 0 && (
+                                                            <div className="text-center py-8 text-slate-400">
+                                                                <Send className="w-12 h-12 mx-auto mb-3 opacity-30" />
+                                                                <p>لا توجد تعليقات</p>
+                                                                <p className="text-xs mt-1">كن أول من يعلق على هذه المهمة</p>
+                                                            </div>
+                                                        )}
                                                         {task.comments.map((comment) => (
                                                             <div key={comment.id} className="flex gap-4">
                                                                 <Avatar className="w-10 h-10 border-2 border-white shadow-sm">
@@ -598,9 +869,29 @@ export function TaskDetailsView() {
                                                             <AvatarFallback className="bg-navy text-white">أنا</AvatarFallback>
                                                         </Avatar>
                                                         <div className="flex-1 relative">
-                                                            <Textarea placeholder="اكتب تعليقاً..." className="min-h-[80px] rounded-xl resize-none pr-12 bg-slate-50 border-slate-200 focus:border-brand-blue" />
-                                                            <Button size="icon" className="absolute bottom-2 left-2 w-8 h-8 rounded-lg bg-brand-blue hover:bg-blue-600">
-                                                                <Send className="w-4 h-4" />
+                                                            <Textarea
+                                                                value={newComment}
+                                                                onChange={(e) => setNewComment(e.target.value)}
+                                                                onKeyDown={(e) => {
+                                                                    if (e.key === 'Enter' && !e.shiftKey) {
+                                                                        e.preventDefault()
+                                                                        handleAddComment()
+                                                                    }
+                                                                }}
+                                                                placeholder="اكتب تعليقاً..."
+                                                                className="min-h-[80px] rounded-xl resize-none pr-12 bg-slate-50 border-slate-200 focus:border-brand-blue"
+                                                            />
+                                                            <Button
+                                                                size="icon"
+                                                                onClick={handleAddComment}
+                                                                disabled={!newComment.trim() || addCommentMutation.isPending}
+                                                                className="absolute bottom-2 left-2 w-8 h-8 rounded-lg bg-brand-blue hover:bg-blue-600 disabled:opacity-50"
+                                                            >
+                                                                {addCommentMutation.isPending ? (
+                                                                    <Loader2 className="w-4 h-4 animate-spin" />
+                                                                ) : (
+                                                                    <Send className="w-4 h-4" />
+                                                                )}
                                                             </Button>
                                                         </div>
                                                     </div>
