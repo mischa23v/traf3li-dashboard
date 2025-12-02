@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react'
-import { Link } from '@tanstack/react-router'
+import { Link, useNavigate } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 import {
   FileText,
@@ -13,7 +13,11 @@ import {
   Shield,
   Plus,
   ChevronLeft,
-  Settings
+  Settings,
+  MoreHorizontal,
+  Eye,
+  Trash2,
+  Edit3
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -28,8 +32,17 @@ import { ProfileDropdown } from '@/components/profile-dropdown'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { WikiSidebar } from './wiki-sidebar'
-import { useRecentWikiPages, useWikiGlobalSearch } from '@/hooks/useWiki'
+import { useRecentWikiPages, useWikiGlobalSearch, useWikiGlobalStats, useToggleWikiPagePin, useDeleteWikiPage } from '@/hooks/useWiki'
 import { ProductivityHero } from '@/components/productivity-hero'
+import { StatCard } from '@/components/stat-card'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+import { toast } from 'sonner'
 import type { WikiPageType, WikiPageStatus } from '@/types/wiki'
 import {
   pageTypeLabels,
@@ -42,6 +55,7 @@ import {
 export function WikiGlobalView() {
   const { t, i18n } = useTranslation()
   const isArabic = i18n.language === 'ar'
+  const navigate = useNavigate()
 
   const [searchQuery, setSearchQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState<string>('all')
@@ -51,6 +65,34 @@ export function WikiGlobalView() {
 
   // Global search
   const { data: searchResults, isLoading: isSearching } = useWikiGlobalSearch(searchQuery, 20)
+
+  // Stats
+  const { data: stats } = useWikiGlobalStats()
+
+  // Mutations
+  const togglePinMutation = useToggleWikiPagePin()
+  const deleteMutation = useDeleteWikiPage()
+
+  // Handlers
+  const handleViewPage = (caseId: string, pageId: string) => {
+    navigate({ to: `/dashboard/cases/${caseId}/wiki/${pageId}` as any })
+  }
+
+  const handleTogglePin = (pageId: string) => {
+    togglePinMutation.mutate(pageId, {
+      onSuccess: () => toast.success(isArabic ? 'تم تحديث التثبيت' : 'Pin updated'),
+      onError: () => toast.error(isArabic ? 'فشل في تحديث التثبيت' : 'Failed to update pin')
+    })
+  }
+
+  const handleDelete = (pageId: string) => {
+    if (confirm(isArabic ? 'هل أنت متأكد من حذف هذه الصفحة؟' : 'Are you sure you want to delete this page?')) {
+      deleteMutation.mutate({ pageId }, {
+        onSuccess: () => toast.success(isArabic ? 'تم حذف الصفحة' : 'Page deleted'),
+        onError: () => toast.error(isArabic ? 'فشل في حذف الصفحة' : 'Failed to delete page')
+      })
+    }
+  }
 
   // Filter by status
   const filteredPages = useMemo(() => {
@@ -108,8 +150,36 @@ export function WikiGlobalView() {
 
       <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-r border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
 
-        {/* HERO CARD & STATS */}
-        <ProductivityHero badge="المراجع والملاحظات" type="wiki" />
+        {/* HERO CARD */}
+        <ProductivityHero badge="المراجع والملاحظات" title={isArabic ? 'المراجع والملاحظات' : 'References & Notes'} type="wiki" />
+
+        {/* STATS CARDS */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <StatCard
+            title={isArabic ? 'إجمالي الصفحات' : 'Total Pages'}
+            value={stats?.totalPages || 0}
+            icon={<FileText className="h-5 w-5 text-emerald-500" />}
+            variant="default"
+          />
+          <StatCard
+            title={isArabic ? 'منشورة' : 'Published'}
+            value={stats?.publishedPages || 0}
+            icon={<BookOpen className="h-5 w-5 text-blue-500" />}
+            variant="success"
+          />
+          <StatCard
+            title={isArabic ? 'مسودات' : 'Drafts'}
+            value={stats?.draftPages || 0}
+            icon={<Edit3 className="h-5 w-5 text-amber-500" />}
+            variant="warning"
+          />
+          <StatCard
+            title={isArabic ? 'مثبتة' : 'Pinned'}
+            value={stats?.pinnedPages || 0}
+            icon={<Pin className="h-5 w-5 text-purple-500" />}
+            variant="info"
+          />
+        </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
@@ -247,7 +317,7 @@ export function WikiGlobalView() {
                               </h4>
                             </Link>
                             {page.isPinned && (
-                              <Pin className="h-4 w-4 text-amber-500" />
+                              <Pin className="h-4 w-4 text-amber-500 fill-amber-500" />
                             )}
                             {page.isSealed && (
                               <Lock className="h-4 w-4 text-red-500" />
@@ -267,6 +337,32 @@ export function WikiGlobalView() {
                           </div>
                         </div>
                       </div>
+                      {/* 3-dots Menu */}
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="icon" className="text-slate-400 hover:text-navy">
+                            <MoreHorizontal className="h-5 w-5" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="w-48">
+                          <DropdownMenuItem onClick={() => handleViewPage(page.caseId, page._id)}>
+                            <Eye className="h-4 w-4 ml-2" />
+                            {isArabic ? 'عرض التفاصيل' : 'View Details'}
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleTogglePin(page._id)}>
+                            <Pin className={`h-4 w-4 ml-2 ${page.isPinned ? 'fill-amber-500 text-amber-500' : ''}`} />
+                            {page.isPinned ? (isArabic ? 'إلغاء التثبيت' : 'Unpin') : (isArabic ? 'تثبيت' : 'Pin')}
+                          </DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem
+                            onClick={() => handleDelete(page._id)}
+                            className="text-red-600 focus:text-red-600"
+                          >
+                            <Trash2 className="h-4 w-4 ml-2" />
+                            {isArabic ? 'حذف' : 'Delete'}
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </div>
 
                     {page.summary && (
