@@ -2,11 +2,18 @@ import { useState, useMemo, useRef } from 'react'
 import {
     FileText, Calendar, CheckSquare, Clock, MoreHorizontal, Plus, Upload,
     User, ArrowLeft, Briefcase, Trash2, Edit3, Loader2,
-    History, Link as LinkIcon, Flag, Send, Eye, Download, Search, Bell, AlertCircle, X
+    History, Link as LinkIcon, Flag, Send, Eye, Download, Search, Bell, AlertCircle, X,
+    GitBranch, Timer, Target, Play, Pause, TrendingUp, AlertTriangle
 } from 'lucide-react'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Input } from '@/components/ui/input'
-import { useTask, useDeleteTask, useCompleteTask, useReopenTask, useAddSubtask, useToggleSubtask, useAddComment, useUploadTaskAttachment, useDeleteTaskAttachment } from '@/hooks/useTasks'
+import {
+    useTask, useDeleteTask, useCompleteTask, useReopenTask, useAddSubtask, useToggleSubtask,
+    useAddComment, useUploadTaskAttachment, useDeleteTaskAttachment,
+    useAddDependency, useRemoveDependency, useTimeTrackingDetails,
+    useStartTimeTracking, useStopTimeTracking, useUpdateOutcome
+} from '@/hooks/useTasks'
+import { OutcomeType } from '@/services/tasksService'
 import { useParams, useNavigate } from '@tanstack/react-router'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -60,6 +67,14 @@ export function TaskDetailsView() {
     const addCommentMutation = useAddComment()
     const uploadAttachmentMutation = useUploadTaskAttachment()
     const deleteAttachmentMutation = useDeleteTaskAttachment()
+    const addDependencyMutation = useAddDependency()
+    const removeDependencyMutation = useRemoveDependency()
+    const startTimeTrackingMutation = useStartTimeTracking()
+    const stopTimeTrackingMutation = useStopTimeTracking()
+    const updateOutcomeMutation = useUpdateOutcome()
+
+    // Time tracking details
+    const { data: timeTrackingData } = useTimeTrackingDetails(taskId)
 
     const handleDelete = () => {
         deleteTaskMutation.mutate(taskId, {
@@ -129,6 +144,40 @@ export function TaskDetailsView() {
             deleteAttachmentMutation.mutate({ taskId, attachmentId })
         }
     }
+
+    // Time tracking handlers
+    const handleStartTimeTracking = () => {
+        startTimeTrackingMutation.mutate(taskId)
+    }
+
+    const handleStopTimeTracking = () => {
+        stopTimeTrackingMutation.mutate({ taskId })
+    }
+
+    // Dependency handler
+    const handleRemoveDependency = (dependencyTaskId: string) => {
+        if (confirm('هل أنت متأكد من إزالة هذه التبعية؟')) {
+            removeDependencyMutation.mutate({ taskId, dependencyTaskId })
+        }
+    }
+
+    // Outcome handler
+    const handleUpdateOutcome = (outcome: OutcomeType) => {
+        updateOutcomeMutation.mutate({
+            taskId,
+            outcome: {
+                outcome,
+                outcomeDate: new Date().toISOString()
+            }
+        })
+    }
+
+    // Check if time tracking is active
+    const isTimeTrackingActive = useMemo(() => {
+        if (!taskData?.timeTracking?.sessions) return false
+        const sessions = taskData.timeTracking.sessions
+        return sessions.some((s: any) => s.startedAt && !s.endedAt)
+    }, [taskData])
 
     // Transform API data
     const task = useMemo(() => {
@@ -234,12 +283,57 @@ export function TaskDetailsView() {
             user: h.userName || ''
         }))
 
+        // Map dependencies
+        const dependencies = t.dependencies || { blockedBy: [], blocks: [] }
+        const mappedDependencies = {
+            blockedBy: (dependencies.blockedBy || []).map((d: any) => ({
+                taskId: d.taskId,
+                taskTitle: d.taskTitle || 'مهمة',
+                status: d.status || 'todo'
+            })),
+            blocks: (dependencies.blocks || []).map((d: any) => ({
+                taskId: d.taskId,
+                taskTitle: d.taskTitle || 'مهمة',
+                status: d.status || 'todo'
+            }))
+        }
+
+        // Map outcome
+        const outcomeLabels: Record<string, string> = {
+            'won': 'فوز',
+            'lost': 'خسارة',
+            'settled': 'تسوية',
+            'dismissed': 'رفض',
+            'withdrawn': 'سحب',
+            'ongoing': 'جارية',
+            'not_applicable': 'غير قابل للتطبيق'
+        }
+        const mappedOutcome = t.outcome ? {
+            outcome: t.outcome.outcome,
+            outcomeLabel: outcomeLabels[t.outcome.outcome] || t.outcome.outcome,
+            outcomeDate: t.outcome.outcomeDate ? new Date(t.outcome.outcomeDate).toLocaleDateString('ar-SA') : undefined,
+            outcomeNotes: t.outcome.outcomeNotes,
+            settlementAmount: t.outcome.settlementAmount
+        } : null
+
+        // Time tracking info
+        const timeTrackingInfo = t.timeTracking ? {
+            estimatedMinutes: t.timeTracking.estimatedMinutes || t.estimatedMinutes || 0,
+            actualMinutes: t.timeTracking.actualMinutes || t.actualMinutes || 0,
+            sessions: t.timeTracking.sessions || []
+        } : {
+            estimatedMinutes: t.estimatedMinutes || 0,
+            actualMinutes: t.actualMinutes || 0,
+            sessions: []
+        }
+
         return {
             id: t._id,
             title: t.title || t.description || 'مهمة غير محددة',
             description: t.description || 'لا يوجد وصف',
             status: t.status || 'pending',
             priority: t.priority || 'medium',
+            taskType: t.taskType || 'other',
             dueDate: t.dueDate ? new Date(t.dueDate).toLocaleDateString('ar-SA') : 'غير محدد',
             completion,
             assignee,
@@ -249,7 +343,10 @@ export function TaskDetailsView() {
             subtasks: mappedSubtasks,
             comments: mappedComments,
             attachments: mappedAttachments,
-            timeline: mappedTimeline
+            timeline: mappedTimeline,
+            dependencies: mappedDependencies,
+            outcome: mappedOutcome,
+            timeTracking: timeTrackingInfo
         }
     }, [taskData])
 
@@ -542,6 +639,173 @@ export function TaskDetailsView() {
                                     </div>
                                 </CardContent>
                             </Card>
+
+                            {/* Time Tracking Card */}
+                            <Card className="border border-slate-100 shadow-sm rounded-2xl">
+                                <CardHeader className="pb-3">
+                                    <CardTitle className="text-base font-bold text-navy flex items-center gap-2">
+                                        <Timer className="h-4 w-4 text-emerald-600" />
+                                        تتبع الوقت
+                                    </CardTitle>
+                                </CardHeader>
+                                <CardContent className="space-y-4">
+                                    {/* Time Progress */}
+                                    <div className="space-y-2">
+                                        <div className="flex justify-between text-sm">
+                                            <span className="text-slate-500">الوقت المقدر</span>
+                                            <span className="font-medium text-slate-900">
+                                                {task.timeTracking.estimatedMinutes > 0
+                                                    ? `${Math.floor(task.timeTracking.estimatedMinutes / 60)} ساعة ${task.timeTracking.estimatedMinutes % 60} دقيقة`
+                                                    : 'غير محدد'}
+                                            </span>
+                                        </div>
+                                        <div className="flex justify-between text-sm">
+                                            <span className="text-slate-500">الوقت الفعلي</span>
+                                            <span className={`font-medium ${
+                                                task.timeTracking.estimatedMinutes > 0 && task.timeTracking.actualMinutes > task.timeTracking.estimatedMinutes
+                                                    ? 'text-red-600'
+                                                    : 'text-emerald-600'
+                                            }`}>
+                                                {task.timeTracking.actualMinutes > 0
+                                                    ? `${Math.floor(task.timeTracking.actualMinutes / 60)} ساعة ${task.timeTracking.actualMinutes % 60} دقيقة`
+                                                    : '0 دقيقة'}
+                                            </span>
+                                        </div>
+                                        {task.timeTracking.estimatedMinutes > 0 && (
+                                            <Progress
+                                                value={Math.min((task.timeTracking.actualMinutes / task.timeTracking.estimatedMinutes) * 100, 100)}
+                                                className="h-2 bg-slate-100"
+                                                indicatorClassName={
+                                                    task.timeTracking.actualMinutes > task.timeTracking.estimatedMinutes
+                                                        ? 'bg-red-500'
+                                                        : 'bg-emerald-500'
+                                                }
+                                            />
+                                        )}
+                                        {task.timeTracking.estimatedMinutes > 0 && task.timeTracking.actualMinutes > task.timeTracking.estimatedMinutes && (
+                                            <div className="flex items-center gap-1 text-xs text-red-600">
+                                                <AlertTriangle className="h-3 w-3" />
+                                                <span>تجاوز الوقت المقدر!</span>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {/* Time Tracking Button */}
+                                    {task.status !== 'done' && task.status !== 'canceled' && (
+                                        <Button
+                                            onClick={isTimeTrackingActive ? handleStopTimeTracking : handleStartTimeTracking}
+                                            disabled={startTimeTrackingMutation.isPending || stopTimeTrackingMutation.isPending}
+                                            className={`w-full ${isTimeTrackingActive ? 'bg-red-500 hover:bg-red-600' : 'bg-emerald-500 hover:bg-emerald-600'}`}
+                                        >
+                                            {(startTimeTrackingMutation.isPending || stopTimeTrackingMutation.isPending) ? (
+                                                <Loader2 className="h-4 w-4 animate-spin ml-2" />
+                                            ) : isTimeTrackingActive ? (
+                                                <Pause className="h-4 w-4 ml-2" />
+                                            ) : (
+                                                <Play className="h-4 w-4 ml-2" />
+                                            )}
+                                            {isTimeTrackingActive ? 'إيقاف التتبع' : 'بدء التتبع'}
+                                        </Button>
+                                    )}
+
+                                    {/* Budget info if available */}
+                                    {timeTrackingData && timeTrackingData.budgetAmount && (
+                                        <div className="pt-3 border-t border-slate-100">
+                                            <div className="flex justify-between text-sm">
+                                                <span className="text-slate-500">الميزانية</span>
+                                                <span className="font-medium text-slate-900">
+                                                    {timeTrackingData.budgetAmount.toLocaleString('ar-SA')} ر.س
+                                                </span>
+                                            </div>
+                                            {timeTrackingData.budgetUsed !== undefined && (
+                                                <div className="flex justify-between text-sm mt-1">
+                                                    <span className="text-slate-500">المستخدم</span>
+                                                    <span className={`font-medium ${timeTrackingData.isOverBudget ? 'text-red-600' : 'text-emerald-600'}`}>
+                                                        {timeTrackingData.budgetUsed.toLocaleString('ar-SA')} ر.س
+                                                    </span>
+                                                </div>
+                                            )}
+                                        </div>
+                                    )}
+                                </CardContent>
+                            </Card>
+
+                            {/* Dependencies Card */}
+                            {(task.dependencies.blockedBy.length > 0 || task.dependencies.blocks.length > 0) && (
+                                <Card className="border border-slate-100 shadow-sm rounded-2xl">
+                                    <CardHeader className="pb-3">
+                                        <CardTitle className="text-base font-bold text-navy flex items-center gap-2">
+                                            <GitBranch className="h-4 w-4 text-purple-600" />
+                                            التبعيات
+                                        </CardTitle>
+                                    </CardHeader>
+                                    <CardContent className="space-y-4">
+                                        {/* Blocked By */}
+                                        {task.dependencies.blockedBy.length > 0 && (
+                                            <div>
+                                                <div className="text-xs font-medium text-slate-500 mb-2 flex items-center gap-1">
+                                                    <AlertTriangle className="h-3 w-3 text-amber-500" />
+                                                    محظور بواسطة
+                                                </div>
+                                                <div className="space-y-2">
+                                                    {task.dependencies.blockedBy.map((dep) => (
+                                                        <div key={dep.taskId} className="flex items-center justify-between p-2 bg-amber-50 rounded-lg border border-amber-100">
+                                                            <Link
+                                                                to="/tasks/$taskId"
+                                                                params={{ taskId: dep.taskId }}
+                                                                className="text-sm text-amber-800 hover:text-amber-900 font-medium truncate flex-1"
+                                                            >
+                                                                {dep.taskTitle}
+                                                            </Link>
+                                                            <Badge variant="outline" className={`text-xs mr-2 ${
+                                                                dep.status === 'done' ? 'border-emerald-300 text-emerald-700 bg-emerald-50' :
+                                                                dep.status === 'in_progress' ? 'border-blue-300 text-blue-700 bg-blue-50' :
+                                                                'border-slate-300 text-slate-600'
+                                                            }`}>
+                                                                {dep.status === 'done' ? 'مكتمل' :
+                                                                 dep.status === 'in_progress' ? 'قيد التنفيذ' :
+                                                                 dep.status === 'todo' ? 'للتنفيذ' : dep.status}
+                                                            </Badge>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        {/* Blocks */}
+                                        {task.dependencies.blocks.length > 0 && (
+                                            <div>
+                                                <div className="text-xs font-medium text-slate-500 mb-2 flex items-center gap-1">
+                                                    <Target className="h-3 w-3 text-blue-500" />
+                                                    يحظر
+                                                </div>
+                                                <div className="space-y-2">
+                                                    {task.dependencies.blocks.map((dep) => (
+                                                        <div key={dep.taskId} className="flex items-center justify-between p-2 bg-blue-50 rounded-lg border border-blue-100">
+                                                            <Link
+                                                                to="/tasks/$taskId"
+                                                                params={{ taskId: dep.taskId }}
+                                                                className="text-sm text-blue-800 hover:text-blue-900 font-medium truncate flex-1"
+                                                            >
+                                                                {dep.taskTitle}
+                                                            </Link>
+                                                            <Badge variant="outline" className={`text-xs mr-2 ${
+                                                                dep.status === 'done' ? 'border-emerald-300 text-emerald-700 bg-emerald-50' :
+                                                                dep.status === 'in_progress' ? 'border-blue-300 text-blue-700 bg-blue-50' :
+                                                                'border-slate-300 text-slate-600'
+                                                            }`}>
+                                                                {dep.status === 'done' ? 'مكتمل' :
+                                                                 dep.status === 'in_progress' ? 'قيد التنفيذ' :
+                                                                 dep.status === 'todo' ? 'للتنفيذ' : dep.status}
+                                                            </Badge>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        )}
+                                    </CardContent>
+                                </Card>
+                            )}
                         </div>
 
                         {/* CENTER CONTENT (Tabs & Details) */}
@@ -637,6 +901,101 @@ export function TaskDetailsView() {
                                                     </CardContent>
                                                 </Card>
                                             </div>
+
+                                            {/* Outcome Section - For court cases */}
+                                            {(task.taskType === 'court_hearing' || task.taskType === 'appeal_deadline' || task.taskType === 'filing_deadline') && (
+                                                <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
+                                                    <CardHeader className="pb-3">
+                                                        <CardTitle className="text-base font-bold text-navy flex items-center gap-2">
+                                                            <Target className="w-4 h-4 text-purple-600" />
+                                                            نتيجة المهمة
+                                                        </CardTitle>
+                                                    </CardHeader>
+                                                    <CardContent>
+                                                        {task.outcome ? (
+                                                            <div className="space-y-3">
+                                                                <div className="flex justify-between items-center">
+                                                                    <span className="text-slate-500 text-sm">النتيجة</span>
+                                                                    <Badge className={`${
+                                                                        task.outcome.outcome === 'won' ? 'bg-emerald-100 text-emerald-800 border-emerald-200' :
+                                                                        task.outcome.outcome === 'lost' ? 'bg-red-100 text-red-800 border-red-200' :
+                                                                        task.outcome.outcome === 'settled' ? 'bg-blue-100 text-blue-800 border-blue-200' :
+                                                                        task.outcome.outcome === 'ongoing' ? 'bg-amber-100 text-amber-800 border-amber-200' :
+                                                                        'bg-slate-100 text-slate-800 border-slate-200'
+                                                                    }`}>
+                                                                        {task.outcome.outcomeLabel}
+                                                                    </Badge>
+                                                                </div>
+                                                                {task.outcome.outcomeDate && (
+                                                                    <div className="flex justify-between text-sm">
+                                                                        <span className="text-slate-500">تاريخ النتيجة</span>
+                                                                        <span className="font-medium text-slate-900">{task.outcome.outcomeDate}</span>
+                                                                    </div>
+                                                                )}
+                                                                {task.outcome.settlementAmount && (
+                                                                    <div className="flex justify-between text-sm">
+                                                                        <span className="text-slate-500">مبلغ التسوية</span>
+                                                                        <span className="font-medium text-emerald-600">
+                                                                            {task.outcome.settlementAmount.toLocaleString('ar-SA')} ر.س
+                                                                        </span>
+                                                                    </div>
+                                                                )}
+                                                                {task.outcome.outcomeNotes && (
+                                                                    <div className="mt-3 pt-3 border-t border-slate-100">
+                                                                        <span className="text-slate-500 text-xs block mb-1">ملاحظات</span>
+                                                                        <p className="text-sm text-slate-700">{task.outcome.outcomeNotes}</p>
+                                                                    </div>
+                                                                )}
+                                                            </div>
+                                                        ) : (
+                                                            <div className="space-y-4">
+                                                                <p className="text-slate-500 text-sm">لم يتم تحديد نتيجة بعد</p>
+                                                                {task.status === 'done' && (
+                                                                    <div className="flex flex-wrap gap-2">
+                                                                        <Button
+                                                                            size="sm"
+                                                                            variant="outline"
+                                                                            onClick={() => handleUpdateOutcome('won')}
+                                                                            disabled={updateOutcomeMutation.isPending}
+                                                                            className="border-emerald-200 text-emerald-700 hover:bg-emerald-50"
+                                                                        >
+                                                                            <TrendingUp className="h-3 w-3 ml-1" />
+                                                                            فوز
+                                                                        </Button>
+                                                                        <Button
+                                                                            size="sm"
+                                                                            variant="outline"
+                                                                            onClick={() => handleUpdateOutcome('lost')}
+                                                                            disabled={updateOutcomeMutation.isPending}
+                                                                            className="border-red-200 text-red-700 hover:bg-red-50"
+                                                                        >
+                                                                            خسارة
+                                                                        </Button>
+                                                                        <Button
+                                                                            size="sm"
+                                                                            variant="outline"
+                                                                            onClick={() => handleUpdateOutcome('settled')}
+                                                                            disabled={updateOutcomeMutation.isPending}
+                                                                            className="border-blue-200 text-blue-700 hover:bg-blue-50"
+                                                                        >
+                                                                            تسوية
+                                                                        </Button>
+                                                                        <Button
+                                                                            size="sm"
+                                                                            variant="outline"
+                                                                            onClick={() => handleUpdateOutcome('dismissed')}
+                                                                            disabled={updateOutcomeMutation.isPending}
+                                                                            className="border-slate-200 text-slate-700 hover:bg-slate-50"
+                                                                        >
+                                                                            رفض
+                                                                        </Button>
+                                                                    </div>
+                                                                )}
+                                                            </div>
+                                                        )}
+                                                    </CardContent>
+                                                </Card>
+                                            )}
                                         </TabsContent>
 
                                         <TabsContent value="subtasks" className="mt-0">

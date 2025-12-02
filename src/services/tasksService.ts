@@ -217,6 +217,63 @@ export interface KnowledgeLinks {
   researchNotes?: string
 }
 
+// Task Dependencies
+export interface TaskDependency {
+  taskId: string
+  taskTitle?: string
+  type: 'blocks' | 'blocked_by'
+  status?: TaskStatus
+  createdAt?: string
+}
+
+// Workflow Rule Types
+export type WorkflowTrigger = 'status_change' | 'due_date_approaching' | 'priority_change' | 'assignment_change' | 'completion'
+export type WorkflowConditionOperator = 'equals' | 'not_equals' | 'in' | 'not_in' | 'greater_than' | 'less_than'
+export type WorkflowActionType = 'update_status' | 'update_priority' | 'assign_to' | 'send_notification' | 'create_subtask' | 'add_comment'
+
+export interface WorkflowCondition {
+  field: string
+  operator: WorkflowConditionOperator
+  value: any
+}
+
+export interface WorkflowAction {
+  type: WorkflowActionType
+  params: Record<string, any>
+}
+
+export interface WorkflowRule {
+  _id?: string
+  name: string
+  description?: string
+  trigger: WorkflowTrigger
+  conditions: WorkflowCondition[]
+  actions: WorkflowAction[]
+  isActive: boolean
+  priority?: number
+  createdAt?: string
+  createdBy?: string
+}
+
+// Task Outcome
+export type OutcomeType = 'won' | 'lost' | 'settled' | 'dismissed' | 'withdrawn' | 'ongoing' | 'not_applicable'
+
+export interface TaskOutcome {
+  outcome: OutcomeType
+  outcomeDate?: string
+  outcomeNotes?: string
+  settlementAmount?: number
+  currency?: string
+}
+
+// Time Budget/Estimate
+export interface TimeBudget {
+  estimatedMinutes: number
+  budgetAmount?: number
+  currency?: string
+  hourlyRate?: number
+}
+
 // Marketplace Tracking
 export interface MarketplaceTracking {
   originSource: MarketplaceOrigin
@@ -302,6 +359,15 @@ export interface Task {
   knowledgeLinks?: KnowledgeLinks
   // Marketplace Tracking
   marketplaceTracking?: MarketplaceTracking
+  // Task Dependencies
+  dependencies?: {
+    blockedBy: TaskDependency[]
+    blocks: TaskDependency[]
+  }
+  // Workflow Rules
+  workflowRules?: WorkflowRule[]
+  // Task Outcome (for court cases)
+  outcome?: TaskOutcome
   // Template
   isTemplate?: boolean
   templateId?: string
@@ -747,6 +813,158 @@ const tasksService = {
       await apiClient.delete(`/tasks/${taskId}/attachments/${attachmentId}`)
     } catch (error: any) {
       console.error('Delete attachment error:', error)
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  // ==================== Dependencies ====================
+
+  /**
+   * Add task dependency
+   */
+  addDependency: async (taskId: string, dependencyTaskId: string, type: 'blocks' | 'blocked_by'): Promise<Task> => {
+    try {
+      const response = await apiClient.post(`/tasks/${taskId}/dependencies`, {
+        dependencyTaskId,
+        type
+      })
+      return response.data.task || response.data.data
+    } catch (error: any) {
+      console.error('Add dependency error:', error)
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Remove task dependency
+   */
+  removeDependency: async (taskId: string, dependencyTaskId: string): Promise<Task> => {
+    try {
+      const response = await apiClient.delete(`/tasks/${taskId}/dependencies/${dependencyTaskId}`)
+      return response.data.task || response.data.data
+    } catch (error: any) {
+      console.error('Remove dependency error:', error)
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Get tasks that can be dependencies (not creating circular refs)
+   */
+  getAvailableDependencies: async (taskId: string): Promise<Task[]> => {
+    try {
+      const response = await apiClient.get(`/tasks/${taskId}/available-dependencies`)
+      return response.data.tasks || response.data.data || []
+    } catch (error: any) {
+      console.error('Get available dependencies error:', error)
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  // ==================== Workflow Rules ====================
+
+  /**
+   * Add workflow rule to task
+   */
+  addWorkflowRule: async (taskId: string, rule: Omit<WorkflowRule, '_id' | 'createdAt' | 'createdBy'>): Promise<Task> => {
+    try {
+      const response = await apiClient.post(`/tasks/${taskId}/workflow-rules`, rule)
+      return response.data.task || response.data.data
+    } catch (error: any) {
+      console.error('Add workflow rule error:', error)
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Update workflow rule
+   */
+  updateWorkflowRule: async (taskId: string, ruleId: string, rule: Partial<WorkflowRule>): Promise<Task> => {
+    try {
+      const response = await apiClient.patch(`/tasks/${taskId}/workflow-rules/${ruleId}`, rule)
+      return response.data.task || response.data.data
+    } catch (error: any) {
+      console.error('Update workflow rule error:', error)
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Delete workflow rule
+   */
+  deleteWorkflowRule: async (taskId: string, ruleId: string): Promise<Task> => {
+    try {
+      const response = await apiClient.delete(`/tasks/${taskId}/workflow-rules/${ruleId}`)
+      return response.data.task || response.data.data
+    } catch (error: any) {
+      console.error('Delete workflow rule error:', error)
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Toggle workflow rule active status
+   */
+  toggleWorkflowRule: async (taskId: string, ruleId: string): Promise<Task> => {
+    try {
+      const response = await apiClient.post(`/tasks/${taskId}/workflow-rules/${ruleId}/toggle`)
+      return response.data.task || response.data.data
+    } catch (error: any) {
+      console.error('Toggle workflow rule error:', error)
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  // ==================== Outcome ====================
+
+  /**
+   * Update task outcome (for court cases, deadlines, etc.)
+   */
+  updateOutcome: async (taskId: string, outcome: TaskOutcome): Promise<Task> => {
+    try {
+      const response = await apiClient.patch(`/tasks/${taskId}/outcome`, outcome)
+      return response.data.task || response.data.data
+    } catch (error: any) {
+      console.error('Update outcome error:', error)
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  // ==================== Time Estimate & Budget ====================
+
+  /**
+   * Update time/budget estimate
+   */
+  updateEstimate: async (taskId: string, estimate: TimeBudget): Promise<Task> => {
+    try {
+      const response = await apiClient.patch(`/tasks/${taskId}/estimate`, estimate)
+      return response.data.task || response.data.data
+    } catch (error: any) {
+      console.error('Update estimate error:', error)
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Get detailed time tracking summary with budget comparison
+   */
+  getTimeTrackingDetails: async (taskId: string): Promise<{
+    estimated: number
+    actual: number
+    remaining: number
+    percentUsed: number
+    budgetAmount?: number
+    budgetUsed?: number
+    budgetRemaining?: number
+    sessions: TimeSession[]
+    isOverBudget: boolean
+    isOverTime: boolean
+  }> => {
+    try {
+      const response = await apiClient.get(`/tasks/${taskId}/time-tracking/summary`)
+      return response.data
+    } catch (error: any) {
+      console.error('Get time tracking details error:', error)
       throw new Error(handleApiError(error))
     }
   },
