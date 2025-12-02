@@ -13,6 +13,9 @@ import tasksService, {
   Task,
   TaskStats,
   BulkOperationResult,
+  WorkflowRule,
+  TaskOutcome,
+  TimeBudget,
 } from '@/services/tasksService'
 
 // ==================== Query Hooks ====================
@@ -391,8 +394,8 @@ export const useUploadTaskAttachment = () => {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: ({ id, file }: { id: string; file: File }) =>
-      tasksService.uploadAttachment(id, file),
+    mutationFn: ({ id, file, onProgress }: { id: string; file: File; onProgress?: (percent: number) => void }) =>
+      tasksService.uploadAttachment(id, file, onProgress),
     onSuccess: (_, { id }) => {
       queryClient.invalidateQueries({ queryKey: ['tasks', id] })
       toast.success('تم رفع المرفق بنجاح')
@@ -415,6 +418,16 @@ export const useDeleteTaskAttachment = () => {
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل حذف المرفق')
+    },
+  })
+}
+
+export const useGetAttachmentDownloadUrl = () => {
+  return useMutation({
+    mutationFn: ({ taskId, attachmentId }: { taskId: string; attachmentId: string }) =>
+      tasksService.getAttachmentDownloadUrl(taskId, attachmentId),
+    onError: (error: Error) => {
+      toast.error(error.message || 'فشل الحصول على رابط التحميل')
     },
   })
 }
@@ -599,5 +612,161 @@ export const useStopRecurrence = () => {
     onError: (error: Error) => {
       toast.error(error.message || 'فشل إيقاف التكرار')
     },
+  })
+}
+
+// ==================== Dependency Hooks ====================
+
+export const useAvailableDependencies = (taskId: string) => {
+  return useQuery({
+    queryKey: ['tasks', taskId, 'available-dependencies'],
+    queryFn: () => tasksService.getAvailableDependencies(taskId),
+    enabled: !!taskId,
+  })
+}
+
+export const useAddDependency = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({ taskId, dependencyTaskId, type }: { taskId: string; dependencyTaskId: string; type: 'blocks' | 'blocked_by' }) =>
+      tasksService.addDependency(taskId, dependencyTaskId, type),
+    onSuccess: (_, { taskId }) => {
+      queryClient.invalidateQueries({ queryKey: ['tasks', taskId] })
+      queryClient.invalidateQueries({ queryKey: ['tasks'] })
+      toast.success('تم إضافة التبعية بنجاح')
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'فشل إضافة التبعية')
+    },
+  })
+}
+
+export const useRemoveDependency = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({ taskId, dependencyTaskId }: { taskId: string; dependencyTaskId: string }) =>
+      tasksService.removeDependency(taskId, dependencyTaskId),
+    onSuccess: (_, { taskId }) => {
+      queryClient.invalidateQueries({ queryKey: ['tasks', taskId] })
+      queryClient.invalidateQueries({ queryKey: ['tasks'] })
+      toast.success('تم إزالة التبعية')
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'فشل إزالة التبعية')
+    },
+  })
+}
+
+// ==================== Workflow Rule Hooks ====================
+
+export const useAddWorkflowRule = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({ taskId, rule }: { taskId: string; rule: Omit<WorkflowRule, '_id' | 'createdAt' | 'createdBy'> }) =>
+      tasksService.addWorkflowRule(taskId, rule),
+    onSuccess: (_, { taskId }) => {
+      queryClient.invalidateQueries({ queryKey: ['tasks', taskId] })
+      toast.success('تم إضافة قاعدة العمل بنجاح')
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'فشل إضافة قاعدة العمل')
+    },
+  })
+}
+
+export const useUpdateWorkflowRule = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({ taskId, ruleId, rule }: { taskId: string; ruleId: string; rule: Partial<WorkflowRule> }) =>
+      tasksService.updateWorkflowRule(taskId, ruleId, rule),
+    onSuccess: (_, { taskId }) => {
+      queryClient.invalidateQueries({ queryKey: ['tasks', taskId] })
+      toast.success('تم تحديث قاعدة العمل')
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'فشل تحديث قاعدة العمل')
+    },
+  })
+}
+
+export const useDeleteWorkflowRule = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({ taskId, ruleId }: { taskId: string; ruleId: string }) =>
+      tasksService.deleteWorkflowRule(taskId, ruleId),
+    onSuccess: (_, { taskId }) => {
+      queryClient.invalidateQueries({ queryKey: ['tasks', taskId] })
+      toast.success('تم حذف قاعدة العمل')
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'فشل حذف قاعدة العمل')
+    },
+  })
+}
+
+export const useToggleWorkflowRule = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({ taskId, ruleId }: { taskId: string; ruleId: string }) =>
+      tasksService.toggleWorkflowRule(taskId, ruleId),
+    onSuccess: (_, { taskId }) => {
+      queryClient.invalidateQueries({ queryKey: ['tasks', taskId] })
+      toast.success('تم تغيير حالة قاعدة العمل')
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'فشل تغيير حالة قاعدة العمل')
+    },
+  })
+}
+
+// ==================== Outcome Hooks ====================
+
+export const useUpdateOutcome = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({ taskId, outcome }: { taskId: string; outcome: TaskOutcome }) =>
+      tasksService.updateOutcome(taskId, outcome),
+    onSuccess: (_, { taskId }) => {
+      queryClient.invalidateQueries({ queryKey: ['tasks', taskId] })
+      queryClient.invalidateQueries({ queryKey: ['tasks'] })
+      toast.success('تم تحديث نتيجة المهمة')
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'فشل تحديث النتيجة')
+    },
+  })
+}
+
+// ==================== Estimate & Budget Hooks ====================
+
+export const useUpdateEstimate = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({ taskId, estimate }: { taskId: string; estimate: TimeBudget }) =>
+      tasksService.updateEstimate(taskId, estimate),
+    onSuccess: (_, { taskId }) => {
+      queryClient.invalidateQueries({ queryKey: ['tasks', taskId] })
+      queryClient.invalidateQueries({ queryKey: ['tasks', taskId, 'time-tracking'] })
+      toast.success('تم تحديث التقدير')
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'فشل تحديث التقدير')
+    },
+  })
+}
+
+export const useTimeTrackingDetails = (taskId: string) => {
+  return useQuery({
+    queryKey: ['tasks', taskId, 'time-tracking-details'],
+    queryFn: () => tasksService.getTimeTrackingDetails(taskId),
+    enabled: !!taskId,
   })
 }

@@ -140,7 +140,38 @@ export interface Attachment {
   uploadedBy: string
   uploadedAt: string
   thumbnailUrl?: string
+  // S3 storage fields
+  fileKey?: string
+  storageType?: 'local' | 's3'
+  downloadUrl?: string // Presigned URL for S3
 }
+
+// Voice memo supported types
+export const VOICE_MEMO_TYPES = [
+  'audio/webm',
+  'audio/mp3',
+  'audio/mpeg',
+  'audio/wav',
+  'audio/ogg',
+  'audio/m4a',
+  'audio/x-m4a'
+] as const
+
+// All supported attachment types
+export const ATTACHMENT_TYPES = {
+  documents: [
+    'application/pdf',
+    'application/msword',
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    'application/vnd.ms-excel',
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    'application/vnd.ms-powerpoint',
+    'application/vnd.openxmlformats-officedocument.presentationml.presentation'
+  ],
+  images: ['image/jpeg', 'image/png', 'image/gif', 'image/webp'],
+  archives: ['application/zip', 'application/x-rar-compressed'],
+  audio: VOICE_MEMO_TYPES
+} as const
 
 export interface Comment {
   _id?: string
@@ -215,6 +246,63 @@ export interface KnowledgeLinks {
     articleNumber: string
   }[]
   researchNotes?: string
+}
+
+// Task Dependencies
+export interface TaskDependency {
+  taskId: string
+  taskTitle?: string
+  type: 'blocks' | 'blocked_by'
+  status?: TaskStatus
+  createdAt?: string
+}
+
+// Workflow Rule Types
+export type WorkflowTrigger = 'status_change' | 'due_date_approaching' | 'priority_change' | 'assignment_change' | 'completion'
+export type WorkflowConditionOperator = 'equals' | 'not_equals' | 'in' | 'not_in' | 'greater_than' | 'less_than'
+export type WorkflowActionType = 'update_status' | 'update_priority' | 'assign_to' | 'send_notification' | 'create_subtask' | 'add_comment'
+
+export interface WorkflowCondition {
+  field: string
+  operator: WorkflowConditionOperator
+  value: any
+}
+
+export interface WorkflowAction {
+  type: WorkflowActionType
+  params: Record<string, any>
+}
+
+export interface WorkflowRule {
+  _id?: string
+  name: string
+  description?: string
+  trigger: WorkflowTrigger
+  conditions: WorkflowCondition[]
+  actions: WorkflowAction[]
+  isActive: boolean
+  priority?: number
+  createdAt?: string
+  createdBy?: string
+}
+
+// Task Outcome
+export type OutcomeType = 'won' | 'lost' | 'settled' | 'dismissed' | 'withdrawn' | 'ongoing' | 'not_applicable'
+
+export interface TaskOutcome {
+  outcome: OutcomeType
+  outcomeDate?: string
+  outcomeNotes?: string
+  settlementAmount?: number
+  currency?: string
+}
+
+// Time Budget/Estimate
+export interface TimeBudget {
+  estimatedMinutes: number
+  budgetAmount?: number
+  currency?: string
+  hourlyRate?: number
 }
 
 // Marketplace Tracking
@@ -302,6 +390,15 @@ export interface Task {
   knowledgeLinks?: KnowledgeLinks
   // Marketplace Tracking
   marketplaceTracking?: MarketplaceTracking
+  // Task Dependencies
+  dependencies?: {
+    blockedBy: TaskDependency[]
+    blocks: TaskDependency[]
+  }
+  // Workflow Rules
+  workflowRules?: WorkflowRule[]
+  // Task Outcome (for court cases)
+  outcome?: TaskOutcome
   // Template
   isTemplate?: boolean
   templateId?: string
@@ -723,14 +820,25 @@ const tasksService = {
   // ==================== Attachments ====================
 
   /**
-   * Upload attachment
+   * Upload attachment (supports S3 and local storage)
+   * Backend automatically detects storage type
    */
-  uploadAttachment: async (taskId: string, file: File): Promise<Attachment> => {
+  uploadAttachment: async (
+    taskId: string,
+    file: File,
+    onProgress?: (percent: number) => void
+  ): Promise<Attachment> => {
     try {
       const formData = new FormData()
       formData.append('file', file)
       const response = await apiClient.post(`/tasks/${taskId}/attachments`, formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
+        headers: { 'Content-Type': 'multipart/form-data' },
+        onUploadProgress: (progressEvent) => {
+          if (onProgress && progressEvent.total) {
+            const percent = Math.round((progressEvent.loaded * 100) / progressEvent.total)
+            onProgress(percent)
+          }
+        }
       })
       return response.data.attachment || response.data.data
     } catch (error: any) {
@@ -740,13 +848,198 @@ const tasksService = {
   },
 
   /**
-   * Delete attachment
+   * Get fresh download URL for S3 attachment (presigned URL)
+   * Use this when the presigned URL expires
+   */
+  getAttachmentDownloadUrl: async (taskId: string, attachmentId: string): Promise<string> => {
+    try {
+      const response = await apiClient.get(`/tasks/${taskId}/attachments/${attachmentId}/download-url`)
+      return response.data.downloadUrl
+    } catch (error: any) {
+      console.error('Get attachment download URL error:', error)
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Delete attachment (handles both S3 and local storage)
    */
   deleteAttachment: async (taskId: string, attachmentId: string): Promise<void> => {
     try {
       await apiClient.delete(`/tasks/${taskId}/attachments/${attachmentId}`)
     } catch (error: any) {
       console.error('Delete attachment error:', error)
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Check if file type is a voice memo
+   */
+  isVoiceMemo: (fileType: string): boolean => {
+    return VOICE_MEMO_TYPES.includes(fileType as any)
+  },
+
+  /**
+   * Get attachment URL (handles S3 presigned URLs and local files)
+   */
+  getAttachmentUrl: (attachment: Attachment): string => {
+    // For S3 storage, use downloadUrl (presigned URL)
+    if (attachment.storageType === 's3' && attachment.downloadUrl) {
+      return attachment.downloadUrl
+    }
+    // For local storage or fallback
+    return attachment.fileUrl
+  },
+
+  // ==================== Dependencies ====================
+
+  /**
+   * Add task dependency
+   */
+  addDependency: async (taskId: string, dependencyTaskId: string, type: 'blocks' | 'blocked_by'): Promise<Task> => {
+    try {
+      const response = await apiClient.post(`/tasks/${taskId}/dependencies`, {
+        dependencyTaskId,
+        type
+      })
+      return response.data.task || response.data.data
+    } catch (error: any) {
+      console.error('Add dependency error:', error)
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Remove task dependency
+   */
+  removeDependency: async (taskId: string, dependencyTaskId: string): Promise<Task> => {
+    try {
+      const response = await apiClient.delete(`/tasks/${taskId}/dependencies/${dependencyTaskId}`)
+      return response.data.task || response.data.data
+    } catch (error: any) {
+      console.error('Remove dependency error:', error)
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Get tasks that can be dependencies (not creating circular refs)
+   */
+  getAvailableDependencies: async (taskId: string): Promise<Task[]> => {
+    try {
+      const response = await apiClient.get(`/tasks/${taskId}/available-dependencies`)
+      return response.data.tasks || response.data.data || []
+    } catch (error: any) {
+      console.error('Get available dependencies error:', error)
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  // ==================== Workflow Rules ====================
+
+  /**
+   * Add workflow rule to task
+   */
+  addWorkflowRule: async (taskId: string, rule: Omit<WorkflowRule, '_id' | 'createdAt' | 'createdBy'>): Promise<Task> => {
+    try {
+      const response = await apiClient.post(`/tasks/${taskId}/workflow-rules`, rule)
+      return response.data.task || response.data.data
+    } catch (error: any) {
+      console.error('Add workflow rule error:', error)
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Update workflow rule
+   */
+  updateWorkflowRule: async (taskId: string, ruleId: string, rule: Partial<WorkflowRule>): Promise<Task> => {
+    try {
+      const response = await apiClient.patch(`/tasks/${taskId}/workflow-rules/${ruleId}`, rule)
+      return response.data.task || response.data.data
+    } catch (error: any) {
+      console.error('Update workflow rule error:', error)
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Delete workflow rule
+   */
+  deleteWorkflowRule: async (taskId: string, ruleId: string): Promise<Task> => {
+    try {
+      const response = await apiClient.delete(`/tasks/${taskId}/workflow-rules/${ruleId}`)
+      return response.data.task || response.data.data
+    } catch (error: any) {
+      console.error('Delete workflow rule error:', error)
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Toggle workflow rule active status
+   */
+  toggleWorkflowRule: async (taskId: string, ruleId: string): Promise<Task> => {
+    try {
+      const response = await apiClient.post(`/tasks/${taskId}/workflow-rules/${ruleId}/toggle`)
+      return response.data.task || response.data.data
+    } catch (error: any) {
+      console.error('Toggle workflow rule error:', error)
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  // ==================== Outcome ====================
+
+  /**
+   * Update task outcome (for court cases, deadlines, etc.)
+   */
+  updateOutcome: async (taskId: string, outcome: TaskOutcome): Promise<Task> => {
+    try {
+      const response = await apiClient.patch(`/tasks/${taskId}/outcome`, outcome)
+      return response.data.task || response.data.data
+    } catch (error: any) {
+      console.error('Update outcome error:', error)
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  // ==================== Time Estimate & Budget ====================
+
+  /**
+   * Update time/budget estimate
+   */
+  updateEstimate: async (taskId: string, estimate: TimeBudget): Promise<Task> => {
+    try {
+      const response = await apiClient.patch(`/tasks/${taskId}/estimate`, estimate)
+      return response.data.task || response.data.data
+    } catch (error: any) {
+      console.error('Update estimate error:', error)
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Get detailed time tracking summary with budget comparison
+   */
+  getTimeTrackingDetails: async (taskId: string): Promise<{
+    estimated: number
+    actual: number
+    remaining: number
+    percentUsed: number
+    budgetAmount?: number
+    budgetUsed?: number
+    budgetRemaining?: number
+    sessions: TimeSession[]
+    isOverBudget: boolean
+    isOverTime: boolean
+  }> => {
+    try {
+      const response = await apiClient.get(`/tasks/${taskId}/time-tracking/summary`)
+      return response.data
+    } catch (error: any) {
+      console.error('Get time tracking details error:', error)
       throw new Error(handleApiError(error))
     }
   },
