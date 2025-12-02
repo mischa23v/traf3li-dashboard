@@ -207,6 +207,24 @@ export const useReopenTask = () => {
   })
 }
 
+export const useUpdateTaskProgress = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({ id, progress, autoCalculate }: { id: string; progress?: number; autoCalculate?: boolean }) =>
+      tasksService.updateProgress(id, progress, autoCalculate),
+    onSuccess: (_, { id }) => {
+      queryClient.invalidateQueries({ queryKey: ['tasks'] })
+      queryClient.invalidateQueries({ queryKey: ['tasks', id] })
+      queryClient.invalidateQueries({ queryKey: ['calendar'] })
+      toast.success('تم تحديث تقدم المهمة')
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'فشل تحديث التقدم')
+    },
+  })
+}
+
 // ==================== Subtask Mutation Hooks ====================
 
 export const useAddSubtask = () => {

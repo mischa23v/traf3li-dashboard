@@ -62,7 +62,7 @@ export function EventDetailsView() {
     }
 
     const handleComplete = () => {
-        completeEventMutation.mutate(eventId)
+        completeEventMutation.mutate({ id: eventId })
     }
 
     const handleCancel = () => {

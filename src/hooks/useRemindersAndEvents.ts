@@ -248,8 +248,9 @@ export const useCompleteEvent = () => {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: (id: string) => eventsService.completeEvent(id),
-    onSuccess: (_, id) => {
+    mutationFn: ({ id, minutesNotes }: { id: string; minutesNotes?: string }) =>
+      eventsService.completeEvent(id, minutesNotes),
+    onSuccess: (_, { id }) => {
       queryClient.invalidateQueries({ queryKey: ['events'] })
       queryClient.invalidateQueries({ queryKey: ['events', id] })
       queryClient.invalidateQueries({ queryKey: ['calendar'] })
@@ -275,6 +276,24 @@ export const useCancelEvent = () => {
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل إلغاء الحدث')
+    },
+  })
+}
+
+export const usePostponeEvent = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({ id, newDateTime, reason }: { id: string; newDateTime: string; reason?: string }) =>
+      eventsService.postponeEvent(id, newDateTime, reason),
+    onSuccess: (_, { id }) => {
+      queryClient.invalidateQueries({ queryKey: ['events'] })
+      queryClient.invalidateQueries({ queryKey: ['events', id] })
+      queryClient.invalidateQueries({ queryKey: ['calendar'] })
+      toast.success('تم تأجيل الحدث بنجاح')
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'فشل تأجيل الحدث')
     },
   })
 }

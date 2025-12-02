@@ -277,29 +277,18 @@ export function CreateEventView() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
 
-        // Build location object
-        const location: string | EventLocation = locationType === 'physical' ? {
-            type: 'physical',
-            address: locationData.address,
-            room: locationData.room,
-            building: locationData.building,
-        } : locationType === 'virtual' ? {
-            type: 'virtual',
-            platform: locationData.platform as any,
-            meetingUrl: locationData.meetingUrl,
-            meetingId: locationData.meetingId,
-            password: locationData.password,
-        } : {
-            type: 'hybrid',
-            address: locationData.address,
-            room: locationData.room,
-            platform: locationData.platform as any,
-            meetingUrl: locationData.meetingUrl,
-        }
+        // Combine date and time into ISO 8601 datetime
+        const startDateTime = formData.startDate && formData.startTime
+            ? new Date(`${formData.startDate}T${formData.startTime}:00`).toISOString()
+            : undefined
 
-        // Build reminders array
-        const reminders: Omit<EventReminder, '_id' | 'sent' | 'sentAt'>[] = selectedReminders.map(minutes => ({
-            type: 'notification' as const,
+        const endDateTime = (formData.endDate || formData.startDate) && formData.endTime
+            ? new Date(`${formData.endDate || formData.startDate}T${formData.endTime}:00`).toISOString()
+            : undefined
+
+        // Build reminders array per API spec: { type: 'email', beforeMinutes: 60 }
+        const reminders = selectedReminders.map(minutes => ({
+            type: 'email' as const,
             beforeMinutes: minutes,
         }))
 
@@ -308,7 +297,6 @@ export function CreateEventView() {
             name: a.name,
             email: a.email,
             role: a.role,
-            rsvpStatus: 'pending' as const,
         }))
 
         // Build agenda array
@@ -324,30 +312,31 @@ export function CreateEventView() {
             title: formData.title,
             description: formData.description,
             type: formData.type,
-            status: formData.status,
             priority: formData.priority,
             color: formData.color,
-            tags: formData.tags,
-            startDate: formData.startDate,
-            startTime: formData.startTime,
-            endDate: formData.endDate || formData.startDate,
-            endTime: formData.endTime,
-            allDay: formData.allDay,
-            duration: formData.duration,
-            location,
+            startDateTime,
+            endDateTime,
+            location: locationType === 'physical' ? {
+                name: locationData.room || locationData.building || 'Office',
+                address: locationData.address,
+            } : locationType === 'virtual' ? {
+                name: locationData.platform || 'Virtual Meeting',
+                meetingUrl: locationData.meetingUrl,
+            } : {
+                name: locationData.room || 'Hybrid Meeting',
+                address: locationData.address,
+                meetingUrl: locationData.meetingUrl,
+            },
             ...(formData.caseId && { caseId: formData.caseId }),
             ...(formData.clientId && { clientId: formData.clientId }),
             ...(attendeesData.length > 0 && { attendees: attendeesData }),
             ...(reminders.length > 0 && { reminders }),
-            ...(agendaData.length > 0 && { agenda: agendaData }),
             ...(isRecurring && {
                 recurrence: {
                     ...recurringConfig,
                     enabled: true,
                 }
             }),
-            billable: formData.billable,
-            ...(formData.billable && formData.billingRate > 0 && { billingRate: formData.billingRate }),
         }
 
         createEventMutation.mutate(eventData, {

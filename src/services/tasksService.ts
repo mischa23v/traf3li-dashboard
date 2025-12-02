@@ -630,6 +630,22 @@ const tasksService = {
   },
 
   /**
+   * Update task progress (0-100)
+   * Setting progress to 100 auto-completes the task
+   * Use autoCalculate: true to switch back to automatic calculation from subtasks
+   */
+  updateProgress: async (id: string, progress?: number, autoCalculate?: boolean): Promise<Task> => {
+    try {
+      const payload = autoCalculate ? { autoCalculate: true } : { progress }
+      const response = await apiClient.patch(`/tasks/${id}/progress`, payload)
+      return response.data.task || response.data.data
+    } catch (error: any) {
+      console.error('Update task progress error:', error)
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
    * Mark task as complete
    */
   completeTask: async (id: string, completionNotes?: string): Promise<Task> => {

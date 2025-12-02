@@ -37,15 +37,20 @@ export function EventsView() {
     const [isSelectionMode, setIsSelectionMode] = useState(false)
     const [selectedEventIds, setSelectedEventIds] = useState<string[]>([])
 
-    // API filters
+    // API filters - use date-based filters that backend supports
     const filters = useMemo(() => {
-        const f: any = {}
+        const today = new Date()
+        today.setHours(0, 0, 0, 0)
+        const todayStr = today.toISOString().split('T')[0]
+
         if (activeTab === 'upcoming') {
-            f.upcoming = true
+            // Get events from today onwards
+            return { startDate: todayStr }
         } else if (activeTab === 'past') {
-            f.past = true
+            // Get events before today
+            return { endDate: todayStr }
         }
-        return f
+        return {}
     }, [activeTab])
 
     // Fetch events
@@ -90,11 +95,11 @@ export function EventsView() {
     }
 
     const handleCompleteEvent = (eventId: string) => {
-        completeEventMutation.mutate(eventId)
+        completeEventMutation.mutate({ id: eventId })
     }
 
     const handleCancelEvent = (eventId: string) => {
-        cancelEventMutation.mutate(eventId)
+        cancelEventMutation.mutate({ id: eventId })
     }
 
     // Selection Handlers
