@@ -86,21 +86,51 @@ export function TasksSidebar({
         })
     }, [])
 
-    // Get color based on event type
-    const getEventColor = (event: { type?: string; isOverdue?: boolean }) => {
-        if (event.isOverdue) return 'red'
-        if (event.type === 'event') return 'blue'
-        if (event.type === 'task') return 'amber'
-        return 'emerald'
+    // Get color classes based on event type (full Tailwind class names to avoid purge issues)
+    const getEventColorClasses = (event: { type?: string; isOverdue?: boolean }) => {
+        if (event.isOverdue) return {
+            dot: 'bg-red-500',
+            border: 'border-red-500',
+            hoverText: 'group-hover:text-red-600'
+        }
+        if (event.type === 'event') return {
+            dot: 'bg-blue-500',
+            border: 'border-blue-500',
+            hoverText: 'group-hover:text-blue-600'
+        }
+        if (event.type === 'task') return {
+            dot: 'bg-amber-500',
+            border: 'border-amber-500',
+            hoverText: 'group-hover:text-amber-600'
+        }
+        return {
+            dot: 'bg-emerald-500',
+            border: 'border-emerald-500',
+            hoverText: 'group-hover:text-emerald-600'
+        }
     }
 
-    // Get priority color for reminders
-    const getPriorityColor = (priority?: string) => {
+    // Get priority color classes for reminders (full Tailwind class names)
+    const getPriorityColorClasses = (priority?: string) => {
         switch (priority) {
-            case 'critical': return 'red'
-            case 'high': return 'orange'
-            case 'medium': return 'blue'
-            default: return 'blue'
+            case 'critical': return {
+                bg: 'bg-red-50',
+                text: 'text-red-500',
+                hoverBg: 'group-hover:bg-red-500',
+                hoverText: 'group-hover:text-red-600'
+            }
+            case 'high': return {
+                bg: 'bg-orange-50',
+                text: 'text-orange-500',
+                hoverBg: 'group-hover:bg-orange-500',
+                hoverText: 'group-hover:text-orange-600'
+            }
+            default: return {
+                bg: 'bg-blue-50',
+                text: 'text-blue-500',
+                hoverBg: 'group-hover:bg-blue-500',
+                hoverText: 'group-hover:text-blue-600'
+            }
         }
     }
 
@@ -266,18 +296,18 @@ export function TasksSidebar({
                                         {selectedDateEvents.map((event) => {
                                             const eventTime = new Date(event.startDate).toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit', hour12: false })
                                             const timePeriod = new Date(event.startDate).getHours() < 12 ? 'صباحاً' : 'مساءً'
-                                            const colorClass = getEventColor(event)
+                                            const colorClasses = getEventColorClasses(event)
 
                                             return (
                                                 <div key={event.id} className="flex gap-4 relative group">
                                                     <div className="w-14 text-center shrink-0 pt-1">
-                                                        <div className={cn("text-sm font-bold text-slate-700 transition-colors", `group-hover:text-${colorClass}-600`)}>
+                                                        <div className={cn("text-sm font-bold text-slate-700 transition-colors", colorClasses.hoverText)}>
                                                             {eventTime}
                                                         </div>
                                                         <div className="text-[10px] text-slate-400">{timePeriod}</div>
                                                     </div>
-                                                    <div className={cn("absolute right-[3.25rem] top-2 w-3 h-3 rounded-full border-2 border-white shadow-sm z-10", `bg-${colorClass}-500`)}></div>
-                                                    <div className={cn("flex-1 bg-white rounded-xl p-3 shadow-sm hover:shadow-md transition-all", `border-r-4 border-${colorClass}-500`)}>
+                                                    <div className={cn("absolute right-[3.25rem] top-2 w-3 h-3 rounded-full border-2 border-white shadow-sm z-10", colorClasses.dot)}></div>
+                                                    <div className={cn("flex-1 bg-white rounded-xl p-3 shadow-sm hover:shadow-md transition-all border-r-4", colorClasses.border)}>
                                                         <div className="font-bold text-slate-800 text-sm mb-1">{event.title}</div>
                                                         {event.location && (
                                                             <div className="text-xs text-slate-500 flex items-center gap-1">
@@ -314,7 +344,7 @@ export function TasksSidebar({
                             ) : (
                                 <>
                                     {upcomingReminders.map((reminder) => {
-                                        const priorityColor = getPriorityColor(reminder.priority)
+                                        const priorityClasses = getPriorityColorClasses(reminder.priority)
                                         const reminderDate = reminder.reminderDateTime || reminder.reminderDate
                                         const isOverdue = reminderDate && new Date(reminderDate) < new Date()
 
@@ -325,17 +355,17 @@ export function TasksSidebar({
                                                 className="flex gap-3 p-3 rounded-xl bg-white border border-slate-100 hover:shadow-md transition-all cursor-pointer group"
                                             >
                                                 <div className={cn(
-                                                    "w-10 h-10 rounded-full flex items-center justify-center shrink-0 transition-colors",
+                                                    "w-10 h-10 rounded-full flex items-center justify-center shrink-0 transition-colors group-hover:text-white",
                                                     isOverdue
-                                                        ? "bg-red-50 text-red-500 group-hover:bg-red-500 group-hover:text-white"
-                                                        : `bg-${priorityColor}-50 text-${priorityColor}-500 group-hover:bg-${priorityColor}-500 group-hover:text-white`
+                                                        ? "bg-red-50 text-red-500 group-hover:bg-red-500"
+                                                        : cn(priorityClasses.bg, priorityClasses.text, priorityClasses.hoverBg)
                                                 )}>
                                                     {isOverdue ? <AlertCircle className="w-5 h-5" /> : <Bell className="w-5 h-5" />}
                                                 </div>
                                                 <div className="flex-1 min-w-0">
                                                     <p className={cn(
                                                         "text-sm font-bold text-slate-800 transition-colors truncate",
-                                                        isOverdue ? "group-hover:text-red-600" : `group-hover:text-${priorityColor}-600`
+                                                        isOverdue ? "group-hover:text-red-600" : priorityClasses.hoverText
                                                     )}>
                                                         {reminder.title}
                                                     </p>
