@@ -10,6 +10,10 @@ import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios'
 const API_BASE_URL =
   import.meta.env.VITE_API_URL || 'https://api.traf3li.com/api'
 
+// Export the base URL for use in other components (e.g., file downloads)
+export const API_URL = API_BASE_URL
+export const API_DOMAIN = API_BASE_URL.replace('/api', '')
+
 // Cache for GET requests (simple in-memory cache)
 const requestCache = new Map<string, { data: any; timestamp: number }>()
 const CACHE_DURATION = 2 * 60 * 1000 // 2 minutes

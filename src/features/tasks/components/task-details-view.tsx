@@ -15,6 +15,7 @@ import {
 } from '@/hooks/useTasks'
 import { OutcomeType, VOICE_MEMO_TYPES } from '@/services/tasksService'
 import tasksService from '@/services/tasksService'
+import { API_DOMAIN, API_URL } from '@/lib/api'
 import { VoiceMemoRecorder, VoiceMemoPlayer, isVoiceMemo } from './voice-memo-recorder'
 import { useParams, useNavigate } from '@tanstack/react-router'
 import { Button } from '@/components/ui/button'
@@ -145,6 +146,21 @@ export function TaskDetailsView() {
         if (confirm('هل أنت متأكد من حذف هذا المرفق؟')) {
             deleteAttachmentMutation.mutate({ taskId, attachmentId })
         }
+    }
+
+    // Helper to get full document URL (handles relative paths)
+    const getFullDocumentUrl = (url: string | undefined): string => {
+        if (!url) return ''
+        // If already a full URL, return as is
+        if (url.startsWith('http://') || url.startsWith('https://')) {
+            return url
+        }
+        // If relative path starting with /, prepend API domain
+        if (url.startsWith('/')) {
+            return `${API_DOMAIN}${url}`
+        }
+        // Otherwise assume it needs full API URL
+        return `${API_URL}/${url}`
     }
 
     // Time tracking handlers
@@ -1122,7 +1138,7 @@ export function TaskDetailsView() {
                                                         <div key={memo._id} className="flex items-center gap-2">
                                                             <div className="flex-1">
                                                                 <VoiceMemoPlayer
-                                                                    audioUrl={memo.url}
+                                                                    audioUrl={getFullDocumentUrl(memo.url)}
                                                                     fileName={memo.name}
                                                                 />
                                                             </div>
@@ -1201,14 +1217,14 @@ export function TaskDetailsView() {
                                                                 </DropdownMenuTrigger>
                                                                 <DropdownMenuContent align="end">
                                                                     {doc.url && (
-                                                                        <DropdownMenuItem onClick={() => window.open(doc.url, '_blank')}>
+                                                                        <DropdownMenuItem onClick={() => window.open(getFullDocumentUrl(doc.url), '_blank')}>
                                                                             <Eye className="h-4 w-4 ml-2" /> معاينة
                                                                         </DropdownMenuItem>
                                                                     )}
                                                                     {doc.url && (
                                                                         <DropdownMenuItem onClick={() => {
                                                                             const a = document.createElement('a')
-                                                                            a.href = doc.url
+                                                                            a.href = getFullDocumentUrl(doc.url)
                                                                             a.download = doc.name
                                                                             a.click()
                                                                         }}>
@@ -1238,7 +1254,7 @@ export function TaskDetailsView() {
                                                                     variant="outline"
                                                                     size="sm"
                                                                     className="flex-1 h-8 text-xs"
-                                                                    onClick={() => window.open(doc.url, '_blank')}
+                                                                    onClick={() => window.open(getFullDocumentUrl(doc.url), '_blank')}
                                                                 >
                                                                     معاينة
                                                                 </Button>
@@ -1250,7 +1266,7 @@ export function TaskDetailsView() {
                                                                     className="h-8 w-8 text-slate-400 hover:text-brand-blue"
                                                                     onClick={() => {
                                                                         const a = document.createElement('a')
-                                                                        a.href = doc.url
+                                                                        a.href = getFullDocumentUrl(doc.url)
                                                                         a.download = doc.name
                                                                         a.click()
                                                                     }}
