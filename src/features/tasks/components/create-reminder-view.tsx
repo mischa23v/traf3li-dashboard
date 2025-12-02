@@ -44,8 +44,7 @@ import type {
 
 const PRIORITY_OPTIONS: { value: ReminderPriority; label: string; color: string }[] = [
     { value: 'critical', label: 'حرج', color: 'bg-red-500' },
-    { value: 'urgent', label: 'عاجل جداً', color: 'bg-orange-500' },
-    { value: 'high', label: 'عالية', color: 'bg-amber-500' },
+    { value: 'high', label: 'عالية', color: 'bg-orange-500' },
     { value: 'medium', label: 'متوسطة', color: 'bg-yellow-500' },
     { value: 'low', label: 'منخفضة', color: 'bg-blue-500' },
 ]
@@ -199,7 +198,7 @@ export function CreateReminderView() {
 
         const notificationConfig: NotificationConfig = {
             channels: notificationChannels,
-            advanceNotifications: advanceNotifications,
+            advanceNotifications: advanceNotifications, // Backend accepts number[] and converts
             escalationEnabled: escalationEnabled,
             escalationDelayMinutes: escalationDelay,
             soundEnabled: true,

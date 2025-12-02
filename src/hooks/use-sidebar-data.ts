@@ -105,10 +105,6 @@ export function useSidebarData(): SidebarData {
                 title: 'الأحداث',
                 url: '/dashboard/tasks/events',
               },
-              {
-                title: 'الملاحظات',
-                url: '/dashboard/wiki',
-              },
             ],
           },
         ],
