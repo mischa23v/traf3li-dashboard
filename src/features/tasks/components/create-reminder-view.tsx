@@ -196,15 +196,9 @@ export function CreateReminderView() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
 
-        // Transform advanceNotifications to the correct format for API
-        const formattedAdvanceNotifications = advanceNotifications.map(minutes => ({
-            beforeMinutes: minutes,
-            channels: notificationChannels,
-        }))
-
         const notificationConfig: NotificationConfig = {
             channels: notificationChannels,
-            advanceNotifications: formattedAdvanceNotifications,
+            advanceNotifications: advanceNotifications, // Backend accepts number[] and converts
             escalationEnabled: escalationEnabled,
             escalationDelayMinutes: escalationDelay,
             soundEnabled: true,
