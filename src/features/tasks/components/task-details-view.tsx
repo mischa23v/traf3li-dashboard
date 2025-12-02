@@ -15,7 +15,9 @@ import {
 } from '@/hooks/useTasks'
 import { OutcomeType, VOICE_MEMO_TYPES } from '@/services/tasksService'
 import tasksService from '@/services/tasksService'
+import { API_DOMAIN, API_URL } from '@/lib/api'
 import { VoiceMemoRecorder, VoiceMemoPlayer, isVoiceMemo } from './voice-memo-recorder'
+import { DocumentEditorDialog } from './document-editor-dialog'
 import { useParams, useNavigate } from '@tanstack/react-router'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -56,6 +58,10 @@ export function TaskDetailsView() {
 
     // File upload ref
     const fileInputRef = useRef<HTMLInputElement>(null)
+
+    // Document editor state
+    const [isDocumentEditorOpen, setIsDocumentEditorOpen] = useState(false)
+    const [editingDocumentId, setEditingDocumentId] = useState<string | undefined>(undefined)
 
     // Fetch task data
     const { data: taskData, isLoading, isError, error, refetch } = useTask(taskId)
@@ -145,6 +151,32 @@ export function TaskDetailsView() {
         if (confirm('هل أنت متأكد من حذف هذا المرفق؟')) {
             deleteAttachmentMutation.mutate({ taskId, attachmentId })
         }
+    }
+
+    // Helper to get full document URL (handles relative paths)
+    const getFullDocumentUrl = (url: string | undefined): string => {
+        if (!url) return ''
+        // If already a full URL, return as is
+        if (url.startsWith('http://') || url.startsWith('https://')) {
+            return url
+        }
+        // If relative path starting with /, prepend API domain
+        if (url.startsWith('/')) {
+            return `${API_DOMAIN}${url}`
+        }
+        // Otherwise assume it needs full API URL
+        return `${API_URL}/${url}`
+    }
+
+    // Document editor handlers
+    const handleOpenDocumentEditor = (documentId?: string) => {
+        setEditingDocumentId(documentId)
+        setIsDocumentEditorOpen(true)
+    }
+
+    const handleCloseDocumentEditor = () => {
+        setIsDocumentEditorOpen(false)
+        setEditingDocumentId(undefined)
     }
 
     // Time tracking handlers
@@ -1122,7 +1154,7 @@ export function TaskDetailsView() {
                                                         <div key={memo._id} className="flex items-center gap-2">
                                                             <div className="flex-1">
                                                                 <VoiceMemoPlayer
-                                                                    audioUrl={memo.url}
+                                                                    audioUrl={getFullDocumentUrl(memo.url)}
                                                                     fileName={memo.name}
                                                                 />
                                                             </div>
@@ -1171,6 +1203,18 @@ export function TaskDetailsView() {
                                                     )}
                                                 </div>
 
+                                                {/* Create Document Card (Text Editor) */}
+                                                <div
+                                                    onClick={() => handleOpenDocumentEditor()}
+                                                    className="border-2 border-dashed border-emerald-200 rounded-2xl flex flex-col items-center justify-center p-6 cursor-pointer hover:border-emerald-500 hover:bg-emerald-50 transition-all group h-[180px]"
+                                                >
+                                                    <div className="w-12 h-12 rounded-full bg-emerald-100 group-hover:bg-emerald-200 flex items-center justify-center text-emerald-500 group-hover:text-emerald-600 mb-3 transition-colors">
+                                                        <Edit3 className="h-6 w-6" />
+                                                    </div>
+                                                    <span className="font-bold text-slate-600 group-hover:text-emerald-600">إنشاء مستند</span>
+                                                    <span className="text-xs text-slate-400 mt-1">محرر نصوص متقدم</span>
+                                                </div>
+
                                                 {/* Empty State - Only show if no documents (excluding voice memos) */}
                                                 {task.attachments.filter(a => !a.isVoiceMemo).length === 0 && (
                                                     <div className="col-span-2 flex flex-col items-center justify-center p-8 text-slate-400">
@@ -1201,14 +1245,14 @@ export function TaskDetailsView() {
                                                                 </DropdownMenuTrigger>
                                                                 <DropdownMenuContent align="end">
                                                                     {doc.url && (
-                                                                        <DropdownMenuItem onClick={() => window.open(doc.url, '_blank')}>
+                                                                        <DropdownMenuItem onClick={() => window.open(getFullDocumentUrl(doc.url), '_blank')}>
                                                                             <Eye className="h-4 w-4 ml-2" /> معاينة
                                                                         </DropdownMenuItem>
                                                                     )}
                                                                     {doc.url && (
                                                                         <DropdownMenuItem onClick={() => {
                                                                             const a = document.createElement('a')
-                                                                            a.href = doc.url
+                                                                            a.href = getFullDocumentUrl(doc.url)
                                                                             a.download = doc.name
                                                                             a.click()
                                                                         }}>
@@ -1238,7 +1282,7 @@ export function TaskDetailsView() {
                                                                     variant="outline"
                                                                     size="sm"
                                                                     className="flex-1 h-8 text-xs"
-                                                                    onClick={() => window.open(doc.url, '_blank')}
+                                                                    onClick={() => window.open(getFullDocumentUrl(doc.url), '_blank')}
                                                                 >
                                                                     معاينة
                                                                 </Button>
@@ -1250,7 +1294,7 @@ export function TaskDetailsView() {
                                                                     className="h-8 w-8 text-slate-400 hover:text-brand-blue"
                                                                     onClick={() => {
                                                                         const a = document.createElement('a')
-                                                                        a.href = doc.url
+                                                                        a.href = getFullDocumentUrl(doc.url)
                                                                         a.download = doc.name
                                                                         a.click()
                                                                     }}
@@ -1333,6 +1377,15 @@ export function TaskDetailsView() {
                     </>
                 )}
             </Main>
+
+            {/* Document Editor Dialog */}
+            <DocumentEditorDialog
+                open={isDocumentEditorOpen}
+                onOpenChange={handleCloseDocumentEditor}
+                taskId={taskId}
+                documentId={editingDocumentId}
+                onSuccess={() => refetch()}
+            />
         </>
     )
 }

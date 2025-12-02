@@ -770,3 +770,117 @@ export const useTimeTrackingDetails = (taskId: string) => {
     enabled: !!taskId,
   })
 }
+
+// ==================== Document Hooks (TipTap Editor) ====================
+
+export const useDocuments = (taskId: string) => {
+  return useQuery({
+    queryKey: ['tasks', taskId, 'documents'],
+    queryFn: () => tasksService.getDocuments(taskId),
+    enabled: !!taskId,
+  })
+}
+
+export const useDocument = (taskId: string, documentId: string) => {
+  return useQuery({
+    queryKey: ['tasks', taskId, 'documents', documentId],
+    queryFn: () => tasksService.getDocument(taskId, documentId),
+    enabled: !!taskId && !!documentId,
+  })
+}
+
+export const useCreateDocument = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({ taskId, title, content, contentJson }: {
+      taskId: string
+      title: string
+      content: string
+      contentJson?: any
+    }) => tasksService.createDocument(taskId, title, content, contentJson),
+    onSuccess: (_, { taskId }) => {
+      queryClient.invalidateQueries({ queryKey: ['tasks', taskId] })
+      queryClient.invalidateQueries({ queryKey: ['tasks', taskId, 'documents'] })
+      toast.success('تم إنشاء المستند')
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'فشل إنشاء المستند')
+    },
+  })
+}
+
+export const useUpdateDocument = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({ taskId, documentId, data }: {
+      taskId: string
+      documentId: string
+      data: { title?: string; content?: string; contentJson?: any }
+    }) => tasksService.updateDocument(taskId, documentId, data),
+    onSuccess: (_, { taskId, documentId }) => {
+      queryClient.invalidateQueries({ queryKey: ['tasks', taskId] })
+      queryClient.invalidateQueries({ queryKey: ['tasks', taskId, 'documents'] })
+      queryClient.invalidateQueries({ queryKey: ['tasks', taskId, 'documents', documentId] })
+      toast.success('تم حفظ المستند')
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'فشل حفظ المستند')
+    },
+  })
+}
+
+export const useDeleteDocument = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({ taskId, documentId }: { taskId: string; documentId: string }) =>
+      tasksService.deleteDocument(taskId, documentId),
+    onSuccess: (_, { taskId }) => {
+      queryClient.invalidateQueries({ queryKey: ['tasks', taskId] })
+      queryClient.invalidateQueries({ queryKey: ['tasks', taskId, 'documents'] })
+      toast.success('تم حذف المستند')
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'فشل حذف المستند')
+    },
+  })
+}
+
+// ==================== Voice Memo Hooks ====================
+
+export const useUploadVoiceMemo = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({ taskId, file, duration }: { taskId: string; file: Blob; duration: number }) =>
+      tasksService.uploadVoiceMemo(taskId, file, duration),
+    onSuccess: (_, { taskId }) => {
+      queryClient.invalidateQueries({ queryKey: ['tasks', taskId] })
+      toast.success('تم رفع المذكرة الصوتية')
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'فشل رفع المذكرة الصوتية')
+    },
+  })
+}
+
+export const useUpdateVoiceMemoTranscription = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({ taskId, memoId, transcription }: {
+      taskId: string
+      memoId: string
+      transcription: string
+    }) => tasksService.updateVoiceMemoTranscription(taskId, memoId, transcription),
+    onSuccess: (_, { taskId }) => {
+      queryClient.invalidateQueries({ queryKey: ['tasks', taskId] })
+      toast.success('تم تحديث النص')
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'فشل تحديث النص')
+    },
+  })
+}
