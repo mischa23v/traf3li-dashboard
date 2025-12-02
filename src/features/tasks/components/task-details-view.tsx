@@ -11,7 +11,8 @@ import {
     useTask, useDeleteTask, useCompleteTask, useReopenTask, useAddSubtask, useToggleSubtask,
     useAddComment, useUploadTaskAttachment, useDeleteTaskAttachment,
     useAddDependency, useRemoveDependency, useTimeTrackingDetails,
-    useStartTimeTracking, useStopTimeTracking, useUpdateOutcome
+    useStartTimeTracking, useStopTimeTracking, useUpdateOutcome,
+    useDocuments, useDeleteDocument
 } from '@/hooks/useTasks'
 import { OutcomeType, VOICE_MEMO_TYPES } from '@/services/tasksService'
 import tasksService from '@/services/tasksService'
@@ -84,6 +85,10 @@ export function TaskDetailsView() {
     // Time tracking details
     const { data: timeTrackingData } = useTimeTrackingDetails(taskId)
 
+    // Documents (text documents created via TipTap editor)
+    const { data: documentsData } = useDocuments(taskId)
+    const deleteDocumentMutation = useDeleteDocument()
+
     const handleDelete = () => {
         deleteTaskMutation.mutate(taskId, {
             onSuccess: () => {
@@ -150,6 +155,12 @@ export function TaskDetailsView() {
     const handleDeleteAttachment = (attachmentId: string) => {
         if (confirm('هل أنت متأكد من حذف هذا المرفق؟')) {
             deleteAttachmentMutation.mutate({ taskId, attachmentId })
+        }
+    }
+
+    const handleDeleteDocument = (documentId: string) => {
+        if (confirm('هل أنت متأكد من حذف هذا المستند؟')) {
+            deleteDocumentMutation.mutate({ taskId, documentId })
         }
     }
 
@@ -1215,8 +1226,8 @@ export function TaskDetailsView() {
                                                     <span className="text-xs text-slate-400 mt-1">محرر نصوص متقدم</span>
                                                 </div>
 
-                                                {/* Empty State - Only show if no documents (excluding voice memos) */}
-                                                {task.attachments.filter(a => !a.isVoiceMemo).length === 0 && (
+                                                {/* Empty State - Only show if no attachments AND no documents */}
+                                                {task.attachments.filter(a => !a.isVoiceMemo).length === 0 && (!documentsData?.documents || documentsData.documents.length === 0) && (
                                                     <div className="col-span-2 flex flex-col items-center justify-center p-8 text-slate-400">
                                                         <FileText className="w-12 h-12 mb-3 opacity-30" />
                                                         <p>لا توجد مرفقات</p>
@@ -1302,6 +1313,56 @@ export function TaskDetailsView() {
                                                                     <Download className="h-4 w-4" />
                                                                 </Button>
                                                             )}
+                                                        </div>
+                                                    </div>
+                                                ))}
+
+                                                {/* Text Documents - Created via TipTap Editor */}
+                                                {documentsData?.documents?.map((doc) => (
+                                                    <div key={doc._id} className="bg-white p-4 rounded-2xl border border-emerald-100 shadow-sm hover:shadow-md transition-all group relative h-[180px] flex flex-col justify-between">
+                                                        <div className="flex justify-between items-start">
+                                                            <div className="w-10 h-10 rounded-lg flex items-center justify-center font-bold text-xs border bg-emerald-50 text-emerald-600 border-emerald-100">
+                                                                TXT
+                                                            </div>
+                                                            <DropdownMenu>
+                                                                <DropdownMenuTrigger asChild>
+                                                                    <Button variant="ghost" size="icon" className="h-8 w-8 -ml-2 text-slate-400 hover:text-navy">
+                                                                        <MoreHorizontal className="h-4 w-4" />
+                                                                    </Button>
+                                                                </DropdownMenuTrigger>
+                                                                <DropdownMenuContent align="end">
+                                                                    <DropdownMenuItem onClick={() => handleOpenDocumentEditor(doc._id)}>
+                                                                        <Eye className="h-4 w-4 ml-2" /> عرض وتحرير
+                                                                    </DropdownMenuItem>
+                                                                    <DropdownMenuItem
+                                                                        onClick={() => handleDeleteDocument(doc._id)}
+                                                                        className="text-red-600 focus:text-red-600"
+                                                                    >
+                                                                        <Trash2 className="h-4 w-4 ml-2" /> حذف
+                                                                    </DropdownMenuItem>
+                                                                </DropdownMenuContent>
+                                                            </DropdownMenu>
+                                                        </div>
+                                                        <div>
+                                                            <h4 className="font-bold text-navy text-sm mb-1 line-clamp-1" title={doc.title || doc.fileName}>
+                                                                {doc.title || doc.fileName?.replace('.html', '') || 'مستند بدون عنوان'}
+                                                            </h4>
+                                                            <div className="flex items-center gap-2 text-xs text-slate-400">
+                                                                <span>مستند نصي</span>
+                                                                <span>•</span>
+                                                                <span>{new Date(doc.createdAt).toLocaleDateString('ar-SA')}</span>
+                                                            </div>
+                                                        </div>
+                                                        <div className="pt-3 border-t border-emerald-50 flex gap-2">
+                                                            <Button
+                                                                variant="outline"
+                                                                size="sm"
+                                                                className="flex-1 h-8 text-xs border-emerald-200 text-emerald-700 hover:bg-emerald-50"
+                                                                onClick={() => handleOpenDocumentEditor(doc._id)}
+                                                            >
+                                                                <Edit3 className="h-3 w-3 ml-1" />
+                                                                عرض وتحرير
+                                                            </Button>
                                                         </div>
                                                     </div>
                                                 ))}
