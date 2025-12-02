@@ -1,10 +1,11 @@
 import {
-    MoreHorizontal, Plus,
-    Briefcase, Smartphone, Shield,
+    MoreHorizontal,
+    Briefcase,
     ChevronLeft
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
+import { ProductivityHero } from '@/components/productivity-hero'
 
 export default function ExecutiveTasksDashboard() {
     // Mock Data
@@ -23,35 +24,12 @@ export default function ExecutiveTasksDashboard() {
                 {/* Main Content */}
                 <div className="space-y-8">
 
-                    {/* HERO CARD (Matches "App Promo" style) */}
-                    <div className="bg-emerald-950 rounded-3xl p-8 relative overflow-hidden text-white shadow-xl shadow-emerald-900/20 flex flex-col md:flex-row items-center justify-between gap-8">
-                        <div className="relative z-10 max-w-lg">
-                            <h2 className="text-3xl font-bold mb-4 leading-tight">المساعد الذكي للمهام القانونية بين يديك</h2>
-                            <p className="text-emerald-200 text-lg mb-8 leading-relaxed">
-                                قم بإدارة قضاياك، تابع المواعيد النهائية، واحصل على تحليلات ذكية لأدائك المهني في مكان واحد.
-                            </p>
-                            <div className="flex gap-3">
-                                <Button className="bg-emerald-500 hover:bg-emerald-600 text-white h-12 px-8 rounded-xl font-bold shadow-lg shadow-emerald-500/20 border-0">
-                                    <Plus className="ml-2 h-5 w-5" />
-                                    مهمة جديدة
-                                </Button>
-                                <Button className="bg-white text-slate-900 hover:bg-slate-100 h-12 px-8 rounded-xl font-bold shadow-lg border-0 transition-all hover:scale-105">
-                                    <Smartphone className="ml-2 h-5 w-5" />
-                                    تحميل التطبيق
-                                </Button>
-                            </div>
-                        </div>
-                        {/* Abstract Visual Decoration */}
-                        <div className="hidden md:block relative w-64 h-64">
-                            <div className="absolute inset-0 bg-gradient-to-tr from-emerald-500 to-teal-500 rounded-full opacity-20 blur-3xl animate-pulse"></div>
-                            <div className="absolute inset-4 bg-emerald-950 rounded-2xl border border-white/10 flex items-center justify-center transform rotate-6 shadow-2xl">
-                                <Shield className="h-24 w-24 text-emerald-400" />
-                            </div>
-                            <div className="absolute inset-4 bg-emerald-950/80 rounded-2xl border border-white/10 flex items-center justify-center transform -rotate-6 backdrop-blur-sm">
-                                <Briefcase className="h-24 w-24 text-teal-400" />
-                            </div>
-                        </div>
-                    </div>
+                    {/* HERO CARD with Real API Data */}
+                    <ProductivityHero
+                        badge="لوحة المهام"
+                        title="المهام"
+                        type="tasks"
+                    />
 
                     {/* MAIN TASKS LIST (Matches "Current Subscriptions" style) */}
                     <div className="bg-white rounded-3xl p-1 shadow-sm border border-slate-100">
