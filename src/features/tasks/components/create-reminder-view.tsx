@@ -205,12 +205,16 @@ export function CreateReminderView() {
             description: formData.description,
             reminderDateTime,
             priority: formData.priority,
-            type: formData.type,
+            reminderType: formData.type, // Use reminderType for Saudi Legal API
             tags: formData.tags,
             notification: {
                 channels: notificationChannels,
-                // API accepts number (minutes) or array
-                advanceNotifications: advanceNotifications[0] || 30,
+                // API expects array of AdvanceNotification objects
+                advanceNotifications: advanceNotifications.map(minutes => ({
+                    beforeMinutes: minutes,
+                    channels: notificationChannels,
+                    sent: false
+                })),
             },
             ...(formData.assignedTo && { assignedTo: formData.assignedTo }),
             ...(formData.relatedCase && { relatedCase: formData.relatedCase }),

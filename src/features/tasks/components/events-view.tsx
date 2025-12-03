@@ -3,7 +3,8 @@ import { TasksSidebar } from './tasks-sidebar'
 import {
     Calendar as CalendarIcon, MoreHorizontal, Plus,
     MapPin, Clock, Search, AlertCircle, ChevronLeft, Bell, Users,
-    CalendarCheck, CalendarPlus, CalendarRange, Eye, Trash2, CheckCircle, XCircle, CalendarClock
+    CalendarCheck, CalendarPlus, CalendarRange, Eye, Trash2, CheckCircle, XCircle, CalendarClock,
+    SortAsc, X
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -24,6 +25,13 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select'
 import { StatCard } from '@/components/stat-card'
 import { ProductivityHero } from '@/components/productivity-hero'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -40,6 +48,8 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog'
 import { toast } from 'sonner'
+import { format } from 'date-fns'
+import { arSA } from 'date-fns/locale'
 
 export function EventsView() {
     const navigate = useNavigate()
@@ -47,21 +57,59 @@ export function EventsView() {
     const [isSelectionMode, setIsSelectionMode] = useState(false)
     const [selectedEventIds, setSelectedEventIds] = useState<string[]>([])
 
+    // Filter states
+    const [searchQuery, setSearchQuery] = useState('')
+    const [typeFilter, setTypeFilter] = useState<string>('all')
+    const [sortBy, setSortBy] = useState<string>('startDate')
+
     // API filters - use date-based filters that backend supports
     const filters = useMemo(() => {
         const today = new Date()
         today.setHours(0, 0, 0, 0)
         const todayStr = today.toISOString().split('T')[0]
+        const f: any = {}
 
         if (activeTab === 'upcoming') {
-            // Get events from today onwards
-            return { startDate: todayStr }
+            f.startDate = todayStr
         } else if (activeTab === 'past') {
-            // Get events before today
-            return { endDate: todayStr }
+            f.endDate = todayStr
         }
-        return {}
-    }, [activeTab])
+
+        if (searchQuery.trim()) {
+            f.search = searchQuery.trim()
+        }
+
+        if (typeFilter !== 'all') {
+            f.type = typeFilter
+        }
+
+        if (sortBy) {
+            f.sortBy = sortBy
+            f.sortOrder = 'asc'
+        }
+
+        return f
+    }, [activeTab, searchQuery, typeFilter, sortBy])
+
+    // Check if any filter is active
+    const hasActiveFilters = searchQuery || typeFilter !== 'all'
+
+    // Clear all filters
+    const clearFilters = () => {
+        setSearchQuery('')
+        setTypeFilter('all')
+    }
+
+    // Helper function to format dates in both languages
+    const formatDualDate = (dateString: string | null | undefined) => {
+        if (!dateString) return { arabic: 'غير محدد', english: 'Not set' }
+        const date = new Date(dateString)
+        if (isNaN(date.getTime())) return { arabic: 'غير محدد', english: 'Not set' }
+        return {
+            arabic: format(date, 'd MMMM', { locale: arSA }),
+            english: format(date, 'MMM d, yyyy')
+        }
+    }
 
     // Fetch events
     const { data: eventsData, isLoading, isError, error, refetch } = useEvents(filters)
@@ -96,6 +144,10 @@ export function EventsView() {
                 type: event.type || 'meeting',
                 status: event.status || 'scheduled',
                 attendees: event.attendees?.length || 0,
+                startDateTime: eventDate,
+                createdAt: event.createdAt,
+                eventDateFormatted: formatDualDate(eventDate),
+                createdAtFormatted: formatDualDate(event.createdAt),
                 _id: event._id,
             }
         })
@@ -223,28 +275,86 @@ export function EventsView() {
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
                     {/* RIGHT COLUMN (Main Content) */}
-                    <div className="lg:col-span-2 space-y-8">
+                    <div className="lg:col-span-2 space-y-6">
+
+                        {/* FILTERS BAR */}
+                        <div className="bg-white rounded-2xl p-4 shadow-sm border border-slate-100">
+                            <div className="flex flex-wrap items-center gap-3">
+                                {/* Search Input */}
+                                <div className="relative flex-1 min-w-[200px] max-w-md">
+                                    <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                                    <Input
+                                        type="text"
+                                        placeholder="بحث في الأحداث..."
+                                        value={searchQuery}
+                                        onChange={(e) => setSearchQuery(e.target.value)}
+                                        className="pr-10 h-10 rounded-xl border-slate-200 focus:border-blue-500 focus:ring-blue-500/20"
+                                    />
+                                </div>
+
+                                {/* Status Filter */}
+                                <Select value={activeTab} onValueChange={setActiveTab}>
+                                    <SelectTrigger className="w-[130px] h-10 rounded-xl border-slate-200">
+                                        <SelectValue placeholder="الحالة" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="upcoming">القادمة</SelectItem>
+                                        <SelectItem value="past">السابقة</SelectItem>
+                                    </SelectContent>
+                                </Select>
+
+                                {/* Type Filter */}
+                                <Select value={typeFilter} onValueChange={setTypeFilter}>
+                                    <SelectTrigger className="w-[150px] h-10 rounded-xl border-slate-200">
+                                        <SelectValue placeholder="النوع" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="all">كل الأنواع</SelectItem>
+                                        <SelectItem value="meeting">اجتماع</SelectItem>
+                                        <SelectItem value="court_hearing">جلسة محكمة</SelectItem>
+                                        <SelectItem value="conference">مؤتمر</SelectItem>
+                                        <SelectItem value="webinar">ندوة إلكترونية</SelectItem>
+                                        <SelectItem value="workshop">ورشة عمل</SelectItem>
+                                    </SelectContent>
+                                </Select>
+
+                                {/* Sort By */}
+                                <Select value={sortBy} onValueChange={setSortBy}>
+                                    <SelectTrigger className="w-[160px] h-10 rounded-xl border-slate-200">
+                                        <SortAsc className="h-4 w-4 ml-2 text-slate-400" />
+                                        <SelectValue placeholder="ترتيب حسب" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="startDate">تاريخ الحدث</SelectItem>
+                                        <SelectItem value="createdAt">تاريخ الإنشاء</SelectItem>
+                                        <SelectItem value="title">الاسم</SelectItem>
+                                    </SelectContent>
+                                </Select>
+
+                                {/* Clear Filters Button */}
+                                {hasActiveFilters && (
+                                    <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={clearFilters}
+                                        className="h-10 px-4 text-red-500 hover:text-red-600 hover:bg-red-50 rounded-xl"
+                                    >
+                                        <X className="h-4 w-4 ml-2" />
+                                        مسح الفلاتر
+                                    </Button>
+                                )}
+                            </div>
+                        </div>
 
                         {/* MAIN EVENTS LIST */}
                         <div className="bg-white rounded-3xl p-1 shadow-sm border border-slate-100">
                             <div className="p-6 pb-2 flex justify-between items-center">
-                                <h3 className="font-bold text-navy text-xl">قائمة الفعاليات</h3>
-                                <div className="flex gap-2">
-                                    <Button
-                                        size="sm"
-                                        onClick={() => setActiveTab('upcoming')}
-                                        className={activeTab === 'upcoming' ? "bg-blue-500 hover:bg-blue-600 text-white rounded-full px-4" : "bg-slate-100 text-slate-600 hover:bg-slate-200 rounded-full px-4"}
-                                    >
-                                        القادمة
-                                    </Button>
-                                    <Button
-                                        size="sm"
-                                        onClick={() => setActiveTab('past')}
-                                        className={activeTab === 'past' ? "bg-blue-500 hover:bg-blue-600 text-white rounded-full px-4" : "bg-slate-100 text-slate-600 hover:bg-slate-200 rounded-full px-4"}
-                                    >
-                                        السابقة
-                                    </Button>
-                                </div>
+                                <h3 className="font-bold text-navy text-xl">
+                                    {activeTab === 'upcoming' ? 'الأحداث القادمة' : 'الأحداث السابقة'}
+                                </h3>
+                                <Badge className="bg-slate-100 text-slate-600 border-0 rounded-full px-4 py-1">
+                                    {events.length} حدث
+                                </Badge>
                             </div>
 
                             <div className="p-4 space-y-4">
@@ -380,18 +490,33 @@ export function EventsView() {
                                         </div>
 
                                         <div className="flex items-center justify-between pt-4 border-t border-slate-200/50">
-                                            <div className="flex items-center gap-2">
-                                                <div className="flex -space-x-2 space-x-reverse">
-                                                    {[...Array(Math.min(3, event.attendees))].map((_, i) => (
-                                                        <div key={i} className="w-8 h-8 rounded-full bg-slate-200 border-2 border-white flex items-center justify-center text-xs font-bold text-slate-500">
-                                                            <Users className="w-4 h-4" />
-                                                        </div>
-                                                    ))}
-                                                    {event.attendees > 3 && (
-                                                        <div className="w-8 h-8 rounded-full bg-slate-100 border-2 border-white flex items-center justify-center text-xs font-bold text-slate-500">
-                                                            +{event.attendees - 3}
-                                                        </div>
-                                                    )}
+                                            <div className="flex items-center gap-4">
+                                                {/* Attendees */}
+                                                <div className="flex items-center gap-2">
+                                                    <div className="flex -space-x-2 space-x-reverse">
+                                                        {[...Array(Math.min(3, event.attendees))].map((_, i) => (
+                                                            <div key={i} className="w-8 h-8 rounded-full bg-slate-200 border-2 border-white flex items-center justify-center text-xs font-bold text-slate-500">
+                                                                <Users className="w-4 h-4" />
+                                                            </div>
+                                                        ))}
+                                                        {event.attendees > 3 && (
+                                                            <div className="w-8 h-8 rounded-full bg-slate-100 border-2 border-white flex items-center justify-center text-xs font-bold text-slate-500">
+                                                                +{event.attendees - 3}
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                                {/* Event Date - Dual Language */}
+                                                <div className="text-center">
+                                                    <div className="text-xs text-slate-400 mb-1">موعد الحدث</div>
+                                                    <div className="font-bold text-navy text-sm">{event.eventDateFormatted.arabic}</div>
+                                                    <div className="text-xs text-slate-400">{event.eventDateFormatted.english}</div>
+                                                </div>
+                                                {/* Creation Date - Dual Language */}
+                                                <div className="text-center">
+                                                    <div className="text-xs text-slate-400 mb-1">تاريخ الإنشاء</div>
+                                                    <div className="font-bold text-slate-600 text-sm">{event.createdAtFormatted.arabic}</div>
+                                                    <div className="text-xs text-slate-400">{event.createdAtFormatted.english}</div>
                                                 </div>
                                             </div>
                                             <div className="flex gap-2">
@@ -402,8 +527,8 @@ export function EventsView() {
                                                     تأكيد الحضور
                                                 </Button>
                                                 <Link to={`/dashboard/tasks/events/${event.id}` as any}>
-                                                    <Button variant="ghost" size="sm">
-                                                        التفاصيل
+                                                    <Button className="bg-blue-500 hover:bg-blue-600 text-white rounded-lg px-6 shadow-lg shadow-blue-500/20">
+                                                        عرض التفاصيل
                                                     </Button>
                                                 </Link>
                                             </div>
