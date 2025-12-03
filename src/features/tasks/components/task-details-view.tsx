@@ -21,6 +21,8 @@ import { API_DOMAIN, API_URL } from '@/lib/api'
 import { toast } from 'sonner'
 import { VoiceMemoRecorder, VoiceMemoPlayer, isVoiceMemo } from './voice-memo-recorder'
 import { DocumentEditorDialog } from './document-editor-dialog'
+import { AttachmentVersionsDialog } from './attachment-versions-dialog'
+import type { Attachment } from '@/services/tasksService'
 import { useParams, useNavigate } from '@tanstack/react-router'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -66,6 +68,9 @@ export function TaskDetailsView() {
     // Document editor state
     const [isDocumentEditorOpen, setIsDocumentEditorOpen] = useState(false)
     const [editingDocumentId, setEditingDocumentId] = useState<string | undefined>(undefined)
+
+    // Attachment versions dialog state
+    const [versionsAttachment, setVersionsAttachment] = useState<Attachment | null>(null)
 
     // Fetch task data
     const { data: taskData, isLoading, isError, error, refetch } = useTask(taskId)
@@ -1423,6 +1428,19 @@ export function TaskDetailsView() {
                                                                     <DropdownMenuItem onClick={() => handleDownloadAttachment(doc._id, doc.name, doc.url, doc.storageType)}>
                                                                         <Download className="h-4 w-4 ml-2" /> تحميل
                                                                     </DropdownMenuItem>
+                                                                    {doc.storageType === 's3' && (
+                                                                        <DropdownMenuItem
+                                                                            onClick={() => {
+                                                                                // Find the original attachment from taskData
+                                                                                const attachment = taskData?.attachments?.find((a: Attachment) => a._id === doc._id)
+                                                                                if (attachment) {
+                                                                                    setVersionsAttachment(attachment)
+                                                                                }
+                                                                            }}
+                                                                        >
+                                                                            <History className="h-4 w-4 ml-2" /> سجل النسخ
+                                                                        </DropdownMenuItem>
+                                                                    )}
                                                                     <DropdownMenuItem
                                                                         onClick={() => handleDeleteAttachment(doc._id)}
                                                                         className="text-red-600 focus:text-red-600"
@@ -1599,6 +1617,16 @@ export function TaskDetailsView() {
                     await forceRefreshTask()
                 }}
             />
+
+            {/* Attachment Versions Dialog */}
+            {versionsAttachment && (
+                <AttachmentVersionsDialog
+                    open={!!versionsAttachment}
+                    onOpenChange={(open) => !open && setVersionsAttachment(null)}
+                    taskId={taskId}
+                    attachment={versionsAttachment}
+                />
+            )}
         </>
     )
 }

@@ -450,6 +450,56 @@ export const useGetAttachmentDownloadUrl = () => {
   })
 }
 
+// ==================== Attachment Versioning Hooks ====================
+
+export const useAttachmentVersions = (taskId: string, attachmentId: string) => {
+  return useQuery({
+    queryKey: ['task-attachment-versions', taskId, attachmentId],
+    queryFn: () => tasksService.getAttachmentVersions(taskId, attachmentId),
+    enabled: !!taskId && !!attachmentId,
+  })
+}
+
+export const useAttachmentVersionDownload = () => {
+  return useMutation({
+    mutationFn: async ({
+      taskId,
+      attachmentId,
+      versionId,
+      disposition = 'attachment',
+      fileName,
+    }: {
+      taskId: string
+      attachmentId: string
+      versionId?: string
+      disposition?: 'inline' | 'attachment'
+      fileName?: string
+    }) => {
+      const { downloadUrl } = await tasksService.getAttachmentVersionDownloadUrl(
+        taskId,
+        attachmentId,
+        { versionId, disposition }
+      )
+
+      if (disposition === 'inline') {
+        window.open(downloadUrl, '_blank')
+      } else {
+        const link = document.createElement('a')
+        link.href = downloadUrl
+        if (fileName) link.download = fileName
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+      }
+
+      return { downloadUrl }
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'فشل تحميل النسخة')
+    },
+  })
+}
+
 // ==================== Template Hooks ====================
 
 export const useCreateFromTemplate = () => {

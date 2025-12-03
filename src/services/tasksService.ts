@@ -146,6 +146,26 @@ export interface Attachment {
   downloadUrl?: string // Presigned URL for S3
 }
 
+// Attachment Version (S3 Versioning)
+export interface AttachmentVersion {
+  versionId: string
+  lastModified: string
+  size: number
+  isLatest: boolean
+  etag: string
+}
+
+export interface AttachmentVersionsResponse {
+  success: boolean
+  attachment: {
+    _id: string
+    fileName: string
+    fileKey: string
+  }
+  versions: AttachmentVersion[]
+  message?: string
+}
+
 // Voice memo supported types
 export const VOICE_MEMO_TYPES = [
   'audio/webm',
@@ -910,6 +930,53 @@ const tasksService = {
       await apiClient.delete(`/tasks/${taskId}/attachments/${attachmentId}`)
     } catch (error: any) {
       console.error('Delete attachment error:', error)
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  // ==================== Attachment Versioning ====================
+
+  /**
+   * Get all versions of an attachment (S3 versioning)
+   */
+  getAttachmentVersions: async (
+    taskId: string,
+    attachmentId: string
+  ): Promise<AttachmentVersionsResponse> => {
+    try {
+      const response = await apiClient.get(
+        `/tasks/${taskId}/attachments/${attachmentId}/versions`
+      )
+      return response.data
+    } catch (error: any) {
+      console.error('Get attachment versions error:', error)
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Get download URL for a specific version of an attachment
+   */
+  getAttachmentVersionDownloadUrl: async (
+    taskId: string,
+    attachmentId: string,
+    options?: {
+      versionId?: string
+      disposition?: 'inline' | 'attachment'
+    }
+  ): Promise<{ downloadUrl: string; versionId: string | null; disposition: string }> => {
+    try {
+      const params: Record<string, string> = {}
+      if (options?.versionId) params.versionId = options.versionId
+      if (options?.disposition) params.disposition = options.disposition
+
+      const response = await apiClient.get(
+        `/tasks/${taskId}/attachments/${attachmentId}/download-url`,
+        { params }
+      )
+      return response.data
+    } catch (error: any) {
+      console.error('Get attachment version download URL error:', error)
       throw new Error(handleApiError(error))
     }
   },
