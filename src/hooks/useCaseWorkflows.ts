@@ -107,8 +107,8 @@ export function useCreateWorkflow() {
   return useMutation({
     mutationFn: (data: CreateWorkflowData) => caseWorkflowsService.createWorkflow(data),
     onSuccess: () => {
-      queryClient.refetchQueries({ queryKey: caseWorkflowKeys.lists() })
-      queryClient.refetchQueries({ queryKey: caseWorkflowKeys.statistics() })
+      queryClient.invalidateQueries({ queryKey: caseWorkflowKeys.lists() })
+      queryClient.invalidateQueries({ queryKey: caseWorkflowKeys.statistics() })
     },
   })
 }
@@ -124,7 +124,7 @@ export function useUpdateWorkflow() {
       caseWorkflowsService.updateWorkflow(id, data),
     onSuccess: (workflow) => {
       queryClient.setQueryData(caseWorkflowKeys.detail(workflow._id), workflow)
-      queryClient.refetchQueries({ queryKey: caseWorkflowKeys.lists() })
+      queryClient.invalidateQueries({ queryKey: caseWorkflowKeys.lists() })
     },
   })
 }
@@ -138,8 +138,8 @@ export function useDeleteWorkflow() {
   return useMutation({
     mutationFn: (id: string) => caseWorkflowsService.deleteWorkflow(id),
     onSuccess: () => {
-      queryClient.refetchQueries({ queryKey: caseWorkflowKeys.lists() })
-      queryClient.refetchQueries({ queryKey: caseWorkflowKeys.statistics() })
+      queryClient.invalidateQueries({ queryKey: caseWorkflowKeys.lists() })
+      queryClient.invalidateQueries({ queryKey: caseWorkflowKeys.statistics() })
     },
   })
 }
@@ -154,8 +154,8 @@ export function useDuplicateWorkflow() {
     mutationFn: ({ id, name, nameAr }: { id: string; name: string; nameAr: string }) =>
       caseWorkflowsService.duplicateWorkflow(id, name, nameAr),
     onSuccess: () => {
-      queryClient.refetchQueries({ queryKey: caseWorkflowKeys.lists() })
-      queryClient.refetchQueries({ queryKey: caseWorkflowKeys.statistics() })
+      queryClient.invalidateQueries({ queryKey: caseWorkflowKeys.lists() })
+      queryClient.invalidateQueries({ queryKey: caseWorkflowKeys.statistics() })
     },
   })
 }
@@ -173,7 +173,7 @@ export function useAddStage() {
       caseWorkflowsService.addStage(workflowId, data),
     onSuccess: (workflow) => {
       queryClient.setQueryData(caseWorkflowKeys.detail(workflow._id), workflow)
-      queryClient.refetchQueries({ queryKey: caseWorkflowKeys.lists() })
+      queryClient.invalidateQueries({ queryKey: caseWorkflowKeys.lists() })
     },
   })
 }
@@ -189,7 +189,7 @@ export function useUpdateStage() {
       caseWorkflowsService.updateStage(workflowId, stageId, data),
     onSuccess: (workflow) => {
       queryClient.setQueryData(caseWorkflowKeys.detail(workflow._id), workflow)
-      queryClient.refetchQueries({ queryKey: caseWorkflowKeys.lists() })
+      queryClient.invalidateQueries({ queryKey: caseWorkflowKeys.lists() })
     },
   })
 }
@@ -205,7 +205,7 @@ export function useDeleteStage() {
       caseWorkflowsService.deleteStage(workflowId, stageId),
     onSuccess: (workflow) => {
       queryClient.setQueryData(caseWorkflowKeys.detail(workflow._id), workflow)
-      queryClient.refetchQueries({ queryKey: caseWorkflowKeys.lists() })
+      queryClient.invalidateQueries({ queryKey: caseWorkflowKeys.lists() })
     },
   })
 }
@@ -221,7 +221,7 @@ export function useReorderStages() {
       caseWorkflowsService.reorderStages(workflowId, stageIds),
     onSuccess: (workflow) => {
       queryClient.setQueryData(caseWorkflowKeys.detail(workflow._id), workflow)
-      queryClient.refetchQueries({ queryKey: caseWorkflowKeys.lists() })
+      queryClient.invalidateQueries({ queryKey: caseWorkflowKeys.lists() })
     },
   })
 }
@@ -246,7 +246,7 @@ export function useAddRequirement() {
     }) => caseWorkflowsService.addRequirement(workflowId, stageId, requirement),
     onSuccess: (workflow) => {
       queryClient.setQueryData(caseWorkflowKeys.detail(workflow._id), workflow)
-      queryClient.refetchQueries({ queryKey: caseWorkflowKeys.lists() })
+      queryClient.invalidateQueries({ queryKey: caseWorkflowKeys.lists() })
     },
   })
 }
@@ -271,7 +271,7 @@ export function useUpdateRequirement() {
     }) => caseWorkflowsService.updateRequirement(workflowId, stageId, reqId, data),
     onSuccess: (workflow) => {
       queryClient.setQueryData(caseWorkflowKeys.detail(workflow._id), workflow)
-      queryClient.refetchQueries({ queryKey: caseWorkflowKeys.lists() })
+      queryClient.invalidateQueries({ queryKey: caseWorkflowKeys.lists() })
     },
   })
 }
@@ -287,7 +287,7 @@ export function useDeleteRequirement() {
       caseWorkflowsService.deleteRequirement(workflowId, stageId, reqId),
     onSuccess: (workflow) => {
       queryClient.setQueryData(caseWorkflowKeys.detail(workflow._id), workflow)
-      queryClient.refetchQueries({ queryKey: caseWorkflowKeys.lists() })
+      queryClient.invalidateQueries({ queryKey: caseWorkflowKeys.lists() })
     },
   })
 }
@@ -305,7 +305,7 @@ export function useAddTransition() {
       caseWorkflowsService.addTransition(workflowId, data),
     onSuccess: (workflow) => {
       queryClient.setQueryData(caseWorkflowKeys.detail(workflow._id), workflow)
-      queryClient.refetchQueries({ queryKey: caseWorkflowKeys.lists() })
+      queryClient.invalidateQueries({ queryKey: caseWorkflowKeys.lists() })
     },
   })
 }
@@ -328,7 +328,7 @@ export function useUpdateTransition() {
     }) => caseWorkflowsService.updateTransition(workflowId, transitionId, data),
     onSuccess: (workflow) => {
       queryClient.setQueryData(caseWorkflowKeys.detail(workflow._id), workflow)
-      queryClient.refetchQueries({ queryKey: caseWorkflowKeys.lists() })
+      queryClient.invalidateQueries({ queryKey: caseWorkflowKeys.lists() })
     },
   })
 }
@@ -344,7 +344,7 @@ export function useDeleteTransition() {
       caseWorkflowsService.deleteTransition(workflowId, transitionId),
     onSuccess: (workflow) => {
       queryClient.setQueryData(caseWorkflowKeys.detail(workflow._id), workflow)
-      queryClient.refetchQueries({ queryKey: caseWorkflowKeys.lists() })
+      queryClient.invalidateQueries({ queryKey: caseWorkflowKeys.lists() })
     },
   })
 }
@@ -405,8 +405,8 @@ export function useImportPresetTemplate() {
   return useMutation({
     mutationFn: (presetId: string) => caseWorkflowsService.importPresetTemplate(presetId),
     onSuccess: () => {
-      queryClient.refetchQueries({ queryKey: caseWorkflowKeys.lists() })
-      queryClient.refetchQueries({ queryKey: caseWorkflowKeys.statistics() })
+      queryClient.invalidateQueries({ queryKey: caseWorkflowKeys.lists() })
+      queryClient.invalidateQueries({ queryKey: caseWorkflowKeys.statistics() })
     },
   })
 }
