@@ -1,4 +1,4 @@
-import { useState, useMemo, useRef } from 'react'
+import { useState, useMemo, useRef, useCallback } from 'react'
 import {
     FileText, Calendar, CheckSquare, Clock, MoreHorizontal, Plus, Upload,
     User, ArrowLeft, Briefcase, Trash2, Edit3, Loader2, Mic,
@@ -7,6 +7,7 @@ import {
 } from 'lucide-react'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Input } from '@/components/ui/input'
+import { useQueryClient } from '@tanstack/react-query'
 import {
     useTask, useDeleteTask, useCompleteTask, useReopenTask, useAddSubtask, useToggleSubtask,
     useAddComment, useUploadTaskAttachment, useDeleteTaskAttachment,
@@ -47,6 +48,7 @@ import { ProfileDropdown } from '@/components/profile-dropdown'
 export function TaskDetailsView() {
     const { taskId } = useParams({ strict: false }) as { taskId: string }
     const navigate = useNavigate()
+    const queryClient = useQueryClient()
     const [activeTab, setActiveTab] = useState('overview')
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
 
@@ -66,6 +68,14 @@ export function TaskDetailsView() {
 
     // Fetch task data
     const { data: taskData, isLoading, isError, error, refetch } = useTask(taskId)
+
+    // Force refresh task data - removes stale cache and refetches
+    const forceRefreshTask = useCallback(async () => {
+        // Remove the query from cache to ensure fresh data
+        await queryClient.removeQueries({ queryKey: ['tasks', taskId] })
+        // Refetch the task data
+        await queryClient.refetchQueries({ queryKey: ['tasks', taskId] })
+    }, [queryClient, taskId])
 
     // Mutations
     const deleteTaskMutation = useDeleteTask()
@@ -102,23 +112,30 @@ export function TaskDetailsView() {
     }
 
     // Subtask handlers
-    const handleAddSubtask = () => {
+    const handleAddSubtask = async () => {
         if (!newSubtaskTitle.trim()) return
         addSubtaskMutation.mutate(
             { taskId, subtask: { title: newSubtaskTitle.trim(), completed: false } },
             {
-                onSuccess: () => {
+                onSuccess: async () => {
                     setNewSubtaskTitle('')
                     setIsAddingSubtask(false)
-                    // Explicitly refetch to update UI immediately
-                    refetch()
+                    // Force refresh to update UI immediately
+                    await forceRefreshTask()
                 }
             }
         )
     }
 
     const handleToggleSubtask = (subtaskId: string) => {
-        toggleSubtaskMutation.mutate({ taskId, subtaskId })
+        toggleSubtaskMutation.mutate(
+            { taskId, subtaskId },
+            {
+                onSuccess: async () => {
+                    await forceRefreshTask()
+                }
+            }
+        )
     }
 
     // Comment handler
@@ -127,8 +144,9 @@ export function TaskDetailsView() {
         addCommentMutation.mutate(
             { taskId, text: newComment.trim() },
             {
-                onSuccess: () => {
+                onSuccess: async () => {
                     setNewComment('')
+                    await forceRefreshTask()
                 }
             }
         )
@@ -141,12 +159,12 @@ export function TaskDetailsView() {
         uploadAttachmentMutation.mutate(
             { id: taskId, file },
             {
-                onSuccess: () => {
+                onSuccess: async () => {
                     if (fileInputRef.current) {
                         fileInputRef.current.value = ''
                     }
-                    // Explicitly refetch to update UI immediately
-                    refetch()
+                    // Force refresh to update UI immediately
+                    await forceRefreshTask()
                 }
             }
         )
@@ -157,9 +175,9 @@ export function TaskDetailsView() {
             deleteAttachmentMutation.mutate(
                 { taskId, attachmentId },
                 {
-                    onSuccess: () => {
-                        // Explicitly refetch to update UI immediately
-                        refetch()
+                    onSuccess: async () => {
+                        // Force refresh to update UI immediately
+                        await forceRefreshTask()
                     }
                 }
             )
@@ -1194,7 +1212,7 @@ export function TaskDetailsView() {
                                             {/* Voice Memo Recorder Section */}
                                             <VoiceMemoRecorder
                                                 taskId={taskId}
-                                                onUploadSuccess={() => refetch()}
+                                                onUploadSuccess={() => forceRefreshTask()}
                                             />
 
                                             {/* Voice Memos List */}
@@ -1420,7 +1438,7 @@ export function TaskDetailsView() {
                 onOpenChange={handleCloseDocumentEditor}
                 taskId={taskId}
                 documentId={editingDocumentId}
-                onSuccess={() => refetch()}
+                onSuccess={() => forceRefreshTask()}
             />
         </>
     )
