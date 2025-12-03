@@ -32,11 +32,13 @@ export const useCreateQuote = () => {
   return useMutation({
     mutationFn: (data: CreateQuoteData) => quoteService.createQuote(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['quotes'] })
       toast.success('تم إنشاء عرض السعر بنجاح')
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل إنشاء عرض السعر')
+    },
+    onSettled: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['quotes'] })
     },
   })
 }
@@ -48,13 +50,15 @@ export const useUpdateQuote = () => {
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: Partial<CreateQuoteData> }) =>
       quoteService.updateQuote(id, data),
-    onSuccess: (_, { id }) => {
-      queryClient.invalidateQueries({ queryKey: ['quotes'] })
-      queryClient.invalidateQueries({ queryKey: ['quotes', id] })
+    onSuccess: () => {
       toast.success('تم تحديث عرض السعر بنجاح')
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل تحديث عرض السعر')
+    },
+    onSettled: async (_, __, { id }) => {
+      await queryClient.invalidateQueries({ queryKey: ['quotes'] })
+      await queryClient.invalidateQueries({ queryKey: ['quotes', id] })
     },
   })
 }
@@ -66,11 +70,13 @@ export const useDeleteQuote = () => {
   return useMutation({
     mutationFn: (id: string) => quoteService.deleteQuote(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['quotes'] })
       toast.success('تم حذف عرض السعر بنجاح')
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل حذف عرض السعر')
+    },
+    onSettled: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['quotes'] })
     },
   })
 }
@@ -81,13 +87,15 @@ export const useSendQuote = () => {
 
   return useMutation({
     mutationFn: (id: string) => quoteService.sendQuote(id),
-    onSuccess: (_, id) => {
-      queryClient.invalidateQueries({ queryKey: ['quotes'] })
-      queryClient.invalidateQueries({ queryKey: ['quotes', id] })
+    onSuccess: () => {
       toast.success('تم إرسال عرض السعر بنجاح')
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل إرسال عرض السعر')
+    },
+    onSettled: async (_, __, id) => {
+      await queryClient.invalidateQueries({ queryKey: ['quotes'] })
+      await queryClient.invalidateQueries({ queryKey: ['quotes', id] })
     },
   })
 }
@@ -99,13 +107,15 @@ export const useUpdateQuoteStatus = () => {
   return useMutation({
     mutationFn: ({ id, status }: { id: string; status: QuoteStatus }) =>
       quoteService.updateQuoteStatus(id, status),
-    onSuccess: (_, { id }) => {
-      queryClient.invalidateQueries({ queryKey: ['quotes'] })
-      queryClient.invalidateQueries({ queryKey: ['quotes', id] })
+    onSuccess: () => {
       toast.success('تم تحديث حالة عرض السعر بنجاح')
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل تحديث حالة عرض السعر')
+    },
+    onSettled: async (_, __, { id }) => {
+      await queryClient.invalidateQueries({ queryKey: ['quotes'] })
+      await queryClient.invalidateQueries({ queryKey: ['quotes', id] })
     },
   })
 }
@@ -116,14 +126,16 @@ export const useConvertQuoteToInvoice = () => {
 
   return useMutation({
     mutationFn: (id: string) => quoteService.convertToInvoice(id),
-    onSuccess: (_, id) => {
-      queryClient.invalidateQueries({ queryKey: ['quotes'] })
-      queryClient.invalidateQueries({ queryKey: ['quotes', id] })
-      queryClient.invalidateQueries({ queryKey: ['invoices'] })
+    onSuccess: () => {
       toast.success('تم تحويل عرض السعر إلى فاتورة بنجاح')
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل تحويل عرض السعر إلى فاتورة')
+    },
+    onSettled: async (_, __, id) => {
+      await queryClient.invalidateQueries({ queryKey: ['quotes'] })
+      await queryClient.invalidateQueries({ queryKey: ['quotes', id] })
+      await queryClient.invalidateQueries({ queryKey: ['invoices'] })
     },
   })
 }
@@ -144,11 +156,13 @@ export const useDuplicateQuote = () => {
   return useMutation({
     mutationFn: (id: string) => quoteService.duplicateQuote(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['quotes'] })
       toast.success('تم نسخ عرض السعر بنجاح')
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل نسخ عرض السعر')
+    },
+    onSettled: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['quotes'] })
     },
   })
 }

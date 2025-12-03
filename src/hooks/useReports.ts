@@ -53,8 +53,8 @@ export function useCreateSavedReport() {
   return useMutation({
     mutationFn: (data: Omit<SavedReport, '_id' | 'createdAt' | 'updatedAt'>) =>
       reportsService.createSavedReport(data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: reportKeys.lists() })
+    onSettled: async () => {
+      await queryClient.invalidateQueries({ queryKey: reportKeys.lists() })
     },
   })
 }
@@ -65,9 +65,9 @@ export function useUpdateSavedReport() {
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: Partial<SavedReport> }) =>
       reportsService.updateSavedReport(id, data),
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: reportKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: reportKeys.detail(variables.id) })
+    onSettled: async (_, __, variables) => {
+      await queryClient.invalidateQueries({ queryKey: reportKeys.lists() })
+      await queryClient.invalidateQueries({ queryKey: reportKeys.detail(variables.id) })
     },
   })
 }
@@ -77,8 +77,8 @@ export function useDeleteSavedReport() {
 
   return useMutation({
     mutationFn: (id: string) => reportsService.deleteSavedReport(id),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: reportKeys.lists() })
+    onSettled: async () => {
+      await queryClient.invalidateQueries({ queryKey: reportKeys.lists() })
     },
   })
 }
@@ -184,8 +184,8 @@ export function useScheduleReport() {
       recipients: string[]
       format: 'pdf' | 'xlsx'
     }) => reportsService.scheduleReport(data),
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: reportKeys.detail(variables.reportId) })
+    onSettled: async (_, __, variables) => {
+      await queryClient.invalidateQueries({ queryKey: reportKeys.detail(variables.reportId) })
     },
   })
 }
@@ -203,8 +203,8 @@ export function useUpdateDashboardWidgets() {
 
   return useMutation({
     mutationFn: (widgets: DashboardWidget[]) => reportsService.updateDashboardWidgets(widgets),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: reportKeys.widgets() })
+    onSettled: async () => {
+      await queryClient.invalidateQueries({ queryKey: reportKeys.widgets() })
     },
   })
 }

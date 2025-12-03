@@ -73,9 +73,9 @@ export function useCreateMatterBudget() {
         | 'updatedAt'
       >
     ) => matterBudgetService.createBudget(data),
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: matterBudgetKeys.lists() })
-      queryClient.invalidateQueries({
+    onSettled: async (_, __, variables) => {
+      await queryClient.invalidateQueries({ queryKey: matterBudgetKeys.lists() })
+      return await queryClient.invalidateQueries({
         queryKey: matterBudgetKeys.matter(variables.matterId),
       })
     },
@@ -88,9 +88,9 @@ export function useUpdateMatterBudget() {
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: Partial<MatterBudget> }) =>
       matterBudgetService.updateBudget(id, data),
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: matterBudgetKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: matterBudgetKeys.detail(variables.id) })
+    onSettled: async (_, __, variables) => {
+      await queryClient.invalidateQueries({ queryKey: matterBudgetKeys.lists() })
+      return await queryClient.invalidateQueries({ queryKey: matterBudgetKeys.detail(variables.id) })
     },
   })
 }
@@ -100,8 +100,8 @@ export function useDeleteMatterBudget() {
 
   return useMutation({
     mutationFn: (id: string) => matterBudgetService.deleteBudget(id),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: matterBudgetKeys.lists() })
+    onSettled: async () => {
+      return await queryClient.invalidateQueries({ queryKey: matterBudgetKeys.lists() })
     },
   })
 }
@@ -113,9 +113,9 @@ export function useApproveBudget() {
   return useMutation({
     mutationFn: ({ id, notes }: { id: string; notes?: string }) =>
       matterBudgetService.approveBudget(id, notes),
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: matterBudgetKeys.detail(variables.id) })
-      queryClient.invalidateQueries({ queryKey: matterBudgetKeys.lists() })
+    onSettled: async (_, __, variables) => {
+      await queryClient.invalidateQueries({ queryKey: matterBudgetKeys.detail(variables.id) })
+      return await queryClient.invalidateQueries({ queryKey: matterBudgetKeys.lists() })
     },
   })
 }
@@ -125,9 +125,9 @@ export function useActivateBudget() {
 
   return useMutation({
     mutationFn: (id: string) => matterBudgetService.activateBudget(id),
-    onSuccess: (_, id) => {
-      queryClient.invalidateQueries({ queryKey: matterBudgetKeys.detail(id) })
-      queryClient.invalidateQueries({ queryKey: matterBudgetKeys.lists() })
+    onSettled: async (_, __, id) => {
+      await queryClient.invalidateQueries({ queryKey: matterBudgetKeys.detail(id) })
+      return await queryClient.invalidateQueries({ queryKey: matterBudgetKeys.lists() })
     },
   })
 }
@@ -137,9 +137,9 @@ export function useCompleteBudget() {
 
   return useMutation({
     mutationFn: (id: string) => matterBudgetService.completeBudget(id),
-    onSuccess: (_, id) => {
-      queryClient.invalidateQueries({ queryKey: matterBudgetKeys.detail(id) })
-      queryClient.invalidateQueries({ queryKey: matterBudgetKeys.lists() })
+    onSettled: async (_, __, id) => {
+      await queryClient.invalidateQueries({ queryKey: matterBudgetKeys.detail(id) })
+      return await queryClient.invalidateQueries({ queryKey: matterBudgetKeys.lists() })
     },
   })
 }
@@ -150,9 +150,9 @@ export function useCancelBudget() {
   return useMutation({
     mutationFn: ({ id, reason }: { id: string; reason: string }) =>
       matterBudgetService.cancelBudget(id, reason),
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: matterBudgetKeys.detail(variables.id) })
-      queryClient.invalidateQueries({ queryKey: matterBudgetKeys.lists() })
+    onSettled: async (_, __, variables) => {
+      await queryClient.invalidateQueries({ queryKey: matterBudgetKeys.detail(variables.id) })
+      return await queryClient.invalidateQueries({ queryKey: matterBudgetKeys.lists() })
     },
   })
 }
@@ -169,8 +169,8 @@ export function useAddBudgetPhase() {
       budgetId: string
       phase: Omit<BudgetPhase, '_id' | 'usedAmount' | 'remainingAmount' | 'percentUsed'>
     }) => matterBudgetService.addPhase(budgetId, phase),
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({
+    onSettled: async (_, __, variables) => {
+      return await queryClient.invalidateQueries({
         queryKey: matterBudgetKeys.detail(variables.budgetId),
       })
     },
@@ -190,8 +190,8 @@ export function useUpdateBudgetPhase() {
       phaseId: string
       data: Partial<BudgetPhase>
     }) => matterBudgetService.updatePhase(budgetId, phaseId, data),
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({
+    onSettled: async (_, __, variables) => {
+      return await queryClient.invalidateQueries({
         queryKey: matterBudgetKeys.detail(variables.budgetId),
       })
     },
@@ -204,8 +204,8 @@ export function useDeleteBudgetPhase() {
   return useMutation({
     mutationFn: ({ budgetId, phaseId }: { budgetId: string; phaseId: string }) =>
       matterBudgetService.deletePhase(budgetId, phaseId),
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({
+    onSettled: async (_, __, variables) => {
+      return await queryClient.invalidateQueries({
         queryKey: matterBudgetKeys.detail(variables.budgetId),
       })
     },
@@ -224,8 +224,8 @@ export function useAddBudgetCategory() {
       budgetId: string
       category: Omit<BudgetCategory, '_id' | 'usedAmount' | 'remainingAmount' | 'percentUsed'>
     }) => matterBudgetService.addCategory(budgetId, category),
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({
+    onSettled: async (_, __, variables) => {
+      return await queryClient.invalidateQueries({
         queryKey: matterBudgetKeys.detail(variables.budgetId),
       })
     },
@@ -245,8 +245,8 @@ export function useUpdateBudgetCategory() {
       categoryId: string
       data: Partial<BudgetCategory>
     }) => matterBudgetService.updateCategory(budgetId, categoryId, data),
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({
+    onSettled: async (_, __, variables) => {
+      return await queryClient.invalidateQueries({
         queryKey: matterBudgetKeys.detail(variables.budgetId),
       })
     },
@@ -259,8 +259,8 @@ export function useDeleteBudgetCategory() {
   return useMutation({
     mutationFn: ({ budgetId, categoryId }: { budgetId: string; categoryId: string }) =>
       matterBudgetService.deleteCategory(budgetId, categoryId),
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({
+    onSettled: async (_, __, variables) => {
+      return await queryClient.invalidateQueries({
         queryKey: matterBudgetKeys.detail(variables.budgetId),
       })
     },
@@ -281,8 +281,8 @@ export function useAddBudgetTask() {
       phaseId: string
       task: Omit<BudgetTask, '_id' | 'actualHours' | 'actualAmount'>
     }) => matterBudgetService.addTask(budgetId, phaseId, task),
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({
+    onSettled: async (_, __, variables) => {
+      return await queryClient.invalidateQueries({
         queryKey: matterBudgetKeys.detail(variables.budgetId),
       })
     },
@@ -304,8 +304,8 @@ export function useUpdateBudgetTask() {
       taskId: string
       data: Partial<BudgetTask>
     }) => matterBudgetService.updateTask(budgetId, phaseId, taskId, data),
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({
+    onSettled: async (_, __, variables) => {
+      return await queryClient.invalidateQueries({
         queryKey: matterBudgetKeys.detail(variables.budgetId),
       })
     },
@@ -325,8 +325,8 @@ export function useDeleteBudgetTask() {
       phaseId: string
       taskId: string
     }) => matterBudgetService.deleteTask(budgetId, phaseId, taskId),
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({
+    onSettled: async (_, __, variables) => {
+      return await queryClient.invalidateQueries({
         queryKey: matterBudgetKeys.detail(variables.budgetId),
       })
     },
@@ -360,8 +360,8 @@ export function useAcknowledgeBudgetAlert() {
   return useMutation({
     mutationFn: ({ budgetId, alertId }: { budgetId: string; alertId: string }) =>
       matterBudgetService.acknowledgeAlert(budgetId, alertId),
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({
+    onSettled: async (_, __, variables) => {
+      return await queryClient.invalidateQueries({
         queryKey: matterBudgetKeys.detail(variables.budgetId),
       })
     },
@@ -379,8 +379,8 @@ export function useUpdateAlertThresholds() {
       budgetId: string
       thresholds: { warning: number; critical: number }
     }) => matterBudgetService.updateAlertThresholds(budgetId, thresholds),
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({
+    onSettled: async (_, __, variables) => {
+      return await queryClient.invalidateQueries({
         queryKey: matterBudgetKeys.detail(variables.budgetId),
       })
     },
@@ -449,9 +449,9 @@ export function useCreateBudgetFromTemplate() {
       matterId: string
       totalBudget: number
     }) => matterBudgetService.createFromTemplate(templateId, matterId, totalBudget),
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: matterBudgetKeys.lists() })
-      queryClient.invalidateQueries({
+    onSettled: async (_, __, variables) => {
+      await queryClient.invalidateQueries({ queryKey: matterBudgetKeys.lists() })
+      return await queryClient.invalidateQueries({
         queryKey: matterBudgetKeys.matter(variables.matterId),
       })
     },

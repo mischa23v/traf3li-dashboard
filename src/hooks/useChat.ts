@@ -90,8 +90,8 @@ export const useCreateConversation = () => {
             const response = await apiClient.post('/conversations', data)
             return response.data as Conversation
         },
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['conversations'] })
+        onSettled: async () => {
+            await queryClient.invalidateQueries({ queryKey: ['conversations'] })
         },
     })
 }
@@ -124,9 +124,9 @@ export const useSendMessage = () => {
             })
             return response.data as Message
         },
-        onSuccess: (_, variables) => {
-            queryClient.invalidateQueries({ queryKey: ['messages', variables.conversationID] })
-            queryClient.invalidateQueries({ queryKey: ['conversations'] })
+        onSettled: async (_, __, variables) => {
+            await queryClient.invalidateQueries({ queryKey: ['messages', variables.conversationID] })
+            await queryClient.invalidateQueries({ queryKey: ['conversations'] })
         },
     })
 }
@@ -140,9 +140,9 @@ export const useMarkAsRead = () => {
             const response = await apiClient.patch(`/messages/${conversationID}/read`)
             return response.data
         },
-        onSuccess: (_, conversationID) => {
-            queryClient.invalidateQueries({ queryKey: ['messages', conversationID] })
-            queryClient.invalidateQueries({ queryKey: ['conversations'] })
+        onSettled: async (_, __, conversationID) => {
+            await queryClient.invalidateQueries({ queryKey: ['messages', conversationID] })
+            await queryClient.invalidateQueries({ queryKey: ['conversations'] })
         },
     })
 }
@@ -156,8 +156,8 @@ export const useUpdateConversation = () => {
             const response = await apiClient.patch(`/conversations/${conversationID}`)
             return response.data as Conversation
         },
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['conversations'] })
+        onSettled: async () => {
+            await queryClient.invalidateQueries({ queryKey: ['conversations'] })
         },
     })
 }

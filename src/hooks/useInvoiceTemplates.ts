@@ -50,11 +50,13 @@ export function useCreateTemplate() {
   return useMutation({
     mutationFn: (data: CreateTemplateData) => invoiceTemplatesService.create(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: templateKeys.all })
       toast({
         title: t('common.success'),
         description: t('invoiceTemplates.createSuccess'),
       })
+    },
+    onSettled: async () => {
+      await queryClient.invalidateQueries({ queryKey: templateKeys.all })
     },
     onError: (error: Error) => {
       toast({
@@ -74,13 +76,15 @@ export function useUpdateTemplate() {
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: UpdateTemplateData }) =>
       invoiceTemplatesService.update(id, data),
-    onSuccess: (_, { id }) => {
-      queryClient.invalidateQueries({ queryKey: templateKeys.all })
-      queryClient.invalidateQueries({ queryKey: templateKeys.detail(id) })
+    onSuccess: () => {
       toast({
         title: t('common.success'),
         description: t('invoiceTemplates.updateSuccess'),
       })
+    },
+    onSettled: async (_, __, { id }) => {
+      await queryClient.invalidateQueries({ queryKey: templateKeys.all })
+      await queryClient.invalidateQueries({ queryKey: templateKeys.detail(id) })
     },
     onError: (error: Error) => {
       toast({
@@ -100,11 +104,13 @@ export function useDeleteTemplate() {
   return useMutation({
     mutationFn: (id: string) => invoiceTemplatesService.delete(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: templateKeys.all })
       toast({
         title: t('common.success'),
         description: t('invoiceTemplates.deleteSuccess'),
       })
+    },
+    onSettled: async () => {
+      await queryClient.invalidateQueries({ queryKey: templateKeys.all })
     },
     onError: (error: Error) => {
       toast({
@@ -125,11 +131,13 @@ export function useDuplicateTemplate() {
     mutationFn: ({ id, name, nameAr }: { id: string; name: string; nameAr: string }) =>
       invoiceTemplatesService.duplicate(id, name, nameAr),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: templateKeys.all })
       toast({
         title: t('common.success'),
         description: t('invoiceTemplates.duplicateSuccess'),
       })
+    },
+    onSettled: async () => {
+      await queryClient.invalidateQueries({ queryKey: templateKeys.all })
     },
     onError: (error: Error) => {
       toast({
@@ -149,12 +157,14 @@ export function useSetDefaultTemplate() {
   return useMutation({
     mutationFn: (id: string) => invoiceTemplatesService.setDefault(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: templateKeys.all })
-      queryClient.invalidateQueries({ queryKey: templateKeys.default() })
       toast({
         title: t('common.success'),
         description: t('invoiceTemplates.setDefaultSuccess'),
       })
+    },
+    onSettled: async () => {
+      await queryClient.invalidateQueries({ queryKey: templateKeys.all })
+      await queryClient.invalidateQueries({ queryKey: templateKeys.default() })
     },
     onError: (error: Error) => {
       toast({
@@ -183,11 +193,13 @@ export function useImportTemplate() {
   return useMutation({
     mutationFn: (file: File) => invoiceTemplatesService.import(file),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: templateKeys.all })
       toast({
         title: t('common.success'),
         description: t('invoiceTemplates.importSuccess'),
       })
+    },
+    onSettled: async () => {
+      await queryClient.invalidateQueries({ queryKey: templateKeys.all })
     },
     onError: (error: Error) => {
       toast({

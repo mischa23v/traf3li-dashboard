@@ -72,11 +72,13 @@ export const useCreateEmployee = () => {
   return useMutation({
     mutationFn: (data: CreateEmployeeData) => employeeService.createEmployee(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['employees'] })
       toast({
         title: 'نجاح',
         description: 'تم إضافة الموظف بنجاح',
       })
+    },
+    onSettled: async () => {
+      return await queryClient.invalidateQueries({ queryKey: ['employees'] })
     },
     onError: (error: Error) => {
       toast({
@@ -94,13 +96,15 @@ export const useUpdateEmployee = () => {
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: UpdateEmployeeData }) =>
       employeeService.updateEmployee(id, data),
-    onSuccess: (_, { id }) => {
-      queryClient.invalidateQueries({ queryKey: ['employees'] })
-      queryClient.invalidateQueries({ queryKey: ['employees', id] })
+    onSuccess: () => {
       toast({
         title: 'نجاح',
         description: 'تم تحديث بيانات الموظف بنجاح',
       })
+    },
+    onSettled: async (_, __, { id }) => {
+      await queryClient.invalidateQueries({ queryKey: ['employees'] })
+      return await queryClient.invalidateQueries({ queryKey: ['employees', id] })
     },
     onError: (error: Error) => {
       toast({
@@ -118,11 +122,13 @@ export const useDeleteEmployee = () => {
   return useMutation({
     mutationFn: (id: string) => employeeService.deleteEmployee(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['employees'] })
       toast({
         title: 'نجاح',
         description: 'تم حذف الموظف بنجاح',
       })
+    },
+    onSettled: async () => {
+      return await queryClient.invalidateQueries({ queryKey: ['employees'] })
     },
     onError: (error: Error) => {
       toast({
@@ -140,13 +146,15 @@ export const useUpdateEmployeeStatus = () => {
   return useMutation({
     mutationFn: ({ id, status }: { id: string; status: Employee['status'] }) =>
       employeeService.updateStatus(id, status),
-    onSuccess: (_, { id }) => {
-      queryClient.invalidateQueries({ queryKey: ['employees'] })
-      queryClient.invalidateQueries({ queryKey: ['employees', id] })
+    onSuccess: () => {
       toast({
         title: 'نجاح',
         description: 'تم تحديث حالة الموظف',
       })
+    },
+    onSettled: async (_, __, { id }) => {
+      await queryClient.invalidateQueries({ queryKey: ['employees'] })
+      return await queryClient.invalidateQueries({ queryKey: ['employees', id] })
     },
     onError: (error: Error) => {
       toast({
@@ -173,11 +181,13 @@ export const useBulkDeleteEmployees = () => {
       return results
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['employees'] })
       toast({
         title: 'نجاح',
         description: 'تم حذف الموظفين المحددين بنجاح',
       })
+    },
+    onSettled: async () => {
+      return await queryClient.invalidateQueries({ queryKey: ['employees'] })
     },
     onError: (error: Error) => {
       toast({
@@ -229,11 +239,13 @@ export const useCreateLeave = () => {
   return useMutation({
     mutationFn: (data: CreateLeaveRequestData) => leaveService.createLeave(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['leaves'] })
       toast({
         title: 'نجاح',
         description: 'تم تقديم طلب الإجازة بنجاح',
       })
+    },
+    onSettled: async () => {
+      return await queryClient.invalidateQueries({ queryKey: ['leaves'] })
     },
     onError: (error: Error) => {
       toast({
@@ -251,13 +263,15 @@ export const useUpdateLeave = () => {
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: UpdateLeaveRequestData }) =>
       leaveService.updateLeave(id, data),
-    onSuccess: (_, { id }) => {
-      queryClient.invalidateQueries({ queryKey: ['leaves'] })
-      queryClient.invalidateQueries({ queryKey: ['leaves', id] })
+    onSuccess: () => {
       toast({
         title: 'نجاح',
         description: 'تم تحديث طلب الإجازة بنجاح',
       })
+    },
+    onSettled: async (_, __, { id }) => {
+      await queryClient.invalidateQueries({ queryKey: ['leaves'] })
+      return await queryClient.invalidateQueries({ queryKey: ['leaves', id] })
     },
     onError: (error: Error) => {
       toast({
@@ -275,11 +289,13 @@ export const useDeleteLeave = () => {
   return useMutation({
     mutationFn: (id: string) => leaveService.deleteLeave(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['leaves'] })
       toast({
         title: 'نجاح',
         description: 'تم حذف طلب الإجازة بنجاح',
       })
+    },
+    onSettled: async () => {
+      return await queryClient.invalidateQueries({ queryKey: ['leaves'] })
     },
     onError: (error: Error) => {
       toast({
@@ -296,13 +312,15 @@ export const useApproveLeave = () => {
 
   return useMutation({
     mutationFn: (id: string) => leaveService.approveLeave(id),
-    onSuccess: (_, id) => {
-      queryClient.invalidateQueries({ queryKey: ['leaves'] })
-      queryClient.invalidateQueries({ queryKey: ['leaves', id] })
+    onSuccess: () => {
       toast({
         title: 'نجاح',
         description: 'تمت الموافقة على الإجازة',
       })
+    },
+    onSettled: async (_, __, id) => {
+      await queryClient.invalidateQueries({ queryKey: ['leaves'] })
+      return await queryClient.invalidateQueries({ queryKey: ['leaves', id] })
     },
     onError: (error: Error) => {
       toast({
@@ -320,13 +338,15 @@ export const useRejectLeave = () => {
   return useMutation({
     mutationFn: ({ id, reason }: { id: string; reason: string }) =>
       leaveService.rejectLeave(id, reason),
-    onSuccess: (_, { id }) => {
-      queryClient.invalidateQueries({ queryKey: ['leaves'] })
-      queryClient.invalidateQueries({ queryKey: ['leaves', id] })
+    onSuccess: () => {
       toast({
         title: 'نجاح',
         description: 'تم رفض طلب الإجازة',
       })
+    },
+    onSettled: async (_, __, { id }) => {
+      await queryClient.invalidateQueries({ queryKey: ['leaves'] })
+      return await queryClient.invalidateQueries({ queryKey: ['leaves', id] })
     },
     onError: (error: Error) => {
       toast({
@@ -353,11 +373,13 @@ export const useBulkDeleteLeaves = () => {
       return results
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['leaves'] })
       toast({
         title: 'نجاح',
         description: 'تم حذف الطلبات المحددة بنجاح',
       })
+    },
+    onSettled: async () => {
+      return await queryClient.invalidateQueries({ queryKey: ['leaves'] })
     },
     onError: (error: Error) => {
       toast({
@@ -409,11 +431,13 @@ export const useCreateAttendance = () => {
   return useMutation({
     mutationFn: (data: CreateAttendanceData) => attendanceService.createRecord(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['attendance'] })
       toast({
         title: 'نجاح',
         description: 'تم تسجيل الحضور بنجاح',
       })
+    },
+    onSettled: async () => {
+      return await queryClient.invalidateQueries({ queryKey: ['attendance'] })
     },
     onError: (error: Error) => {
       toast({
@@ -431,13 +455,15 @@ export const useUpdateAttendance = () => {
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: UpdateAttendanceData }) =>
       attendanceService.updateRecord(id, data),
-    onSuccess: (_, { id }) => {
-      queryClient.invalidateQueries({ queryKey: ['attendance'] })
-      queryClient.invalidateQueries({ queryKey: ['attendance', id] })
+    onSuccess: () => {
       toast({
         title: 'نجاح',
         description: 'تم تحديث سجل الحضور بنجاح',
       })
+    },
+    onSettled: async (_, __, { id }) => {
+      await queryClient.invalidateQueries({ queryKey: ['attendance'] })
+      return await queryClient.invalidateQueries({ queryKey: ['attendance', id] })
     },
     onError: (error: Error) => {
       toast({
@@ -455,11 +481,13 @@ export const useDeleteAttendance = () => {
   return useMutation({
     mutationFn: (id: string) => attendanceService.deleteRecord(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['attendance'] })
       toast({
         title: 'نجاح',
         description: 'تم حذف سجل الحضور بنجاح',
       })
+    },
+    onSettled: async () => {
+      return await queryClient.invalidateQueries({ queryKey: ['attendance'] })
     },
     onError: (error: Error) => {
       toast({
@@ -478,11 +506,13 @@ export const useClockIn = () => {
     mutationFn: ({ employeeId, location }: { employeeId: string; location?: string }) =>
       attendanceService.clockIn(employeeId, location),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['attendance'] })
       toast({
         title: 'نجاح',
         description: 'تم تسجيل الدخول بنجاح',
       })
+    },
+    onSettled: async () => {
+      return await queryClient.invalidateQueries({ queryKey: ['attendance'] })
     },
     onError: (error: Error) => {
       toast({
@@ -501,11 +531,13 @@ export const useClockOut = () => {
     mutationFn: ({ employeeId, location }: { employeeId: string; location?: string }) =>
       attendanceService.clockOut(employeeId, location),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['attendance'] })
       toast({
         title: 'نجاح',
         description: 'تم تسجيل الخروج بنجاح',
       })
+    },
+    onSettled: async () => {
+      return await queryClient.invalidateQueries({ queryKey: ['attendance'] })
     },
     onError: (error: Error) => {
       toast({
@@ -532,11 +564,13 @@ export const useBulkDeleteAttendance = () => {
       return results
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['attendance'] })
       toast({
         title: 'نجاح',
         description: 'تم حذف السجلات المحددة بنجاح',
       })
+    },
+    onSettled: async () => {
+      return await queryClient.invalidateQueries({ queryKey: ['attendance'] })
     },
     onError: (error: Error) => {
       toast({
@@ -572,11 +606,13 @@ export const useCreateSalary = () => {
   return useMutation({
     mutationFn: (data: CreateSalaryData) => salaryService.createSalary(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['salaries'] })
       toast({
         title: 'نجاح',
         description: 'تم إنشاء سجل الراتب بنجاح',
       })
+    },
+    onSettled: async () => {
+      return await queryClient.invalidateQueries({ queryKey: ['salaries'] })
     },
     onError: (error: Error) => {
       toast({
@@ -594,13 +630,15 @@ export const useUpdateSalary = () => {
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: UpdateSalaryData }) =>
       salaryService.updateSalary(id, data),
-    onSuccess: (_, { id }) => {
-      queryClient.invalidateQueries({ queryKey: ['salaries'] })
-      queryClient.invalidateQueries({ queryKey: ['salaries', id] })
+    onSuccess: () => {
       toast({
         title: 'نجاح',
         description: 'تم تحديث سجل الراتب بنجاح',
       })
+    },
+    onSettled: async (_, __, { id }) => {
+      await queryClient.invalidateQueries({ queryKey: ['salaries'] })
+      return await queryClient.invalidateQueries({ queryKey: ['salaries', id] })
     },
     onError: (error: Error) => {
       toast({
@@ -618,11 +656,13 @@ export const useDeleteSalary = () => {
   return useMutation({
     mutationFn: (id: string) => salaryService.deleteSalary(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['salaries'] })
       toast({
         title: 'نجاح',
         description: 'تم حذف سجل الراتب بنجاح',
       })
+    },
+    onSettled: async () => {
+      return await queryClient.invalidateQueries({ queryKey: ['salaries'] })
     },
     onError: (error: Error) => {
       toast({
@@ -639,13 +679,15 @@ export const useApproveSalary = () => {
 
   return useMutation({
     mutationFn: (id: string) => salaryService.approveSalary(id),
-    onSuccess: (_, id) => {
-      queryClient.invalidateQueries({ queryKey: ['salaries'] })
-      queryClient.invalidateQueries({ queryKey: ['salaries', id] })
+    onSuccess: () => {
       toast({
         title: 'نجاح',
         description: 'تمت الموافقة على الراتب',
       })
+    },
+    onSettled: async (_, __, id) => {
+      await queryClient.invalidateQueries({ queryKey: ['salaries'] })
+      return await queryClient.invalidateQueries({ queryKey: ['salaries', id] })
     },
     onError: (error: Error) => {
       toast({
@@ -663,13 +705,15 @@ export const useMarkSalaryPaid = () => {
   return useMutation({
     mutationFn: ({ id, paymentDetails }: { id: string; paymentDetails: { paymentDate: string; paymentMethod: string; paymentReference?: string } }) =>
       salaryService.markAsPaid(id, paymentDetails),
-    onSuccess: (_, { id }) => {
-      queryClient.invalidateQueries({ queryKey: ['salaries'] })
-      queryClient.invalidateQueries({ queryKey: ['salaries', id] })
+    onSuccess: () => {
       toast({
         title: 'نجاح',
         description: 'تم تسجيل الدفع بنجاح',
       })
+    },
+    onSettled: async (_, __, { id }) => {
+      await queryClient.invalidateQueries({ queryKey: ['salaries'] })
+      return await queryClient.invalidateQueries({ queryKey: ['salaries', id] })
     },
     onError: (error: Error) => {
       toast({
@@ -696,11 +740,13 @@ export const useBulkDeleteSalaries = () => {
       return results
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['salaries'] })
       toast({
         title: 'نجاح',
         description: 'تم حذف السجلات المحددة بنجاح',
       })
+    },
+    onSettled: async () => {
+      return await queryClient.invalidateQueries({ queryKey: ['salaries'] })
     },
     onError: (error: Error) => {
       toast({
@@ -744,11 +790,13 @@ export const useCreatePayroll = () => {
   return useMutation({
     mutationFn: (data: CreatePayrollData) => payrollService.createPayroll(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['payroll'] })
       toast({
         title: 'نجاح',
         description: 'تم إنشاء مسير الرواتب بنجاح',
       })
+    },
+    onSettled: async () => {
+      return await queryClient.invalidateQueries({ queryKey: ['payroll'] })
     },
     onError: (error: Error) => {
       toast({
@@ -766,13 +814,15 @@ export const useUpdatePayroll = () => {
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: UpdatePayrollData }) =>
       payrollService.updatePayroll(id, data),
-    onSuccess: (_, { id }) => {
-      queryClient.invalidateQueries({ queryKey: ['payroll'] })
-      queryClient.invalidateQueries({ queryKey: ['payroll', id] })
+    onSuccess: () => {
       toast({
         title: 'نجاح',
         description: 'تم تحديث مسير الرواتب بنجاح',
       })
+    },
+    onSettled: async (_, __, { id }) => {
+      await queryClient.invalidateQueries({ queryKey: ['payroll'] })
+      return await queryClient.invalidateQueries({ queryKey: ['payroll', id] })
     },
     onError: (error: Error) => {
       toast({
@@ -790,11 +840,13 @@ export const useDeletePayroll = () => {
   return useMutation({
     mutationFn: (id: string) => payrollService.deletePayroll(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['payroll'] })
       toast({
         title: 'نجاح',
         description: 'تم حذف مسير الرواتب بنجاح',
       })
+    },
+    onSettled: async () => {
+      return await queryClient.invalidateQueries({ queryKey: ['payroll'] })
     },
     onError: (error: Error) => {
       toast({
@@ -811,14 +863,16 @@ export const useProcessPayroll = () => {
 
   return useMutation({
     mutationFn: (id: string) => payrollService.processPayroll(id),
-    onSuccess: (_, id) => {
-      queryClient.invalidateQueries({ queryKey: ['payroll'] })
-      queryClient.invalidateQueries({ queryKey: ['payroll', id] })
-      queryClient.invalidateQueries({ queryKey: ['salaries'] })
+    onSuccess: () => {
       toast({
         title: 'نجاح',
         description: 'تتم معالجة مسير الرواتب',
       })
+    },
+    onSettled: async (_, __, id) => {
+      await queryClient.invalidateQueries({ queryKey: ['payroll'] })
+      await queryClient.invalidateQueries({ queryKey: ['payroll', id] })
+      return await queryClient.invalidateQueries({ queryKey: ['salaries'] })
     },
     onError: (error: Error) => {
       toast({
@@ -835,13 +889,15 @@ export const useCompletePayroll = () => {
 
   return useMutation({
     mutationFn: (id: string) => payrollService.completePayroll(id),
-    onSuccess: (_, id) => {
-      queryClient.invalidateQueries({ queryKey: ['payroll'] })
-      queryClient.invalidateQueries({ queryKey: ['payroll', id] })
+    onSuccess: () => {
       toast({
         title: 'نجاح',
         description: 'تم اكتمال مسير الرواتب',
       })
+    },
+    onSettled: async (_, __, id) => {
+      await queryClient.invalidateQueries({ queryKey: ['payroll'] })
+      return await queryClient.invalidateQueries({ queryKey: ['payroll', id] })
     },
     onError: (error: Error) => {
       toast({
@@ -868,11 +924,13 @@ export const useBulkDeletePayrolls = () => {
       return results
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['payroll'] })
       toast({
         title: 'نجاح',
         description: 'تم حذف المسيرات المحددة بنجاح',
       })
+    },
+    onSettled: async () => {
+      return await queryClient.invalidateQueries({ queryKey: ['payroll'] })
     },
     onError: (error: Error) => {
       toast({
@@ -908,11 +966,13 @@ export const useCreateEvaluation = () => {
   return useMutation({
     mutationFn: (data: CreateEvaluationData) => evaluationService.createEvaluation(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['evaluations'] })
       toast({
         title: 'نجاح',
         description: 'تم إنشاء التقييم بنجاح',
       })
+    },
+    onSettled: async () => {
+      return await queryClient.invalidateQueries({ queryKey: ['evaluations'] })
     },
     onError: (error: Error) => {
       toast({
@@ -930,13 +990,15 @@ export const useUpdateEvaluation = () => {
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: UpdateEvaluationData }) =>
       evaluationService.updateEvaluation(id, data),
-    onSuccess: (_, { id }) => {
-      queryClient.invalidateQueries({ queryKey: ['evaluations'] })
-      queryClient.invalidateQueries({ queryKey: ['evaluations', id] })
+    onSuccess: () => {
       toast({
         title: 'نجاح',
         description: 'تم تحديث التقييم بنجاح',
       })
+    },
+    onSettled: async (_, __, { id }) => {
+      await queryClient.invalidateQueries({ queryKey: ['evaluations'] })
+      return await queryClient.invalidateQueries({ queryKey: ['evaluations', id] })
     },
     onError: (error: Error) => {
       toast({
@@ -954,11 +1016,13 @@ export const useDeleteEvaluation = () => {
   return useMutation({
     mutationFn: (id: string) => evaluationService.deleteEvaluation(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['evaluations'] })
       toast({
         title: 'نجاح',
         description: 'تم حذف التقييم بنجاح',
       })
+    },
+    onSettled: async () => {
+      return await queryClient.invalidateQueries({ queryKey: ['evaluations'] })
     },
     onError: (error: Error) => {
       toast({
@@ -975,13 +1039,15 @@ export const useCompleteEvaluation = () => {
 
   return useMutation({
     mutationFn: (id: string) => evaluationService.completeEvaluation(id),
-    onSuccess: (_, id) => {
-      queryClient.invalidateQueries({ queryKey: ['evaluations'] })
-      queryClient.invalidateQueries({ queryKey: ['evaluations', id] })
+    onSuccess: () => {
       toast({
         title: 'نجاح',
         description: 'تم اكتمال التقييم',
       })
+    },
+    onSettled: async (_, __, id) => {
+      await queryClient.invalidateQueries({ queryKey: ['evaluations'] })
+      return await queryClient.invalidateQueries({ queryKey: ['evaluations', id] })
     },
     onError: (error: Error) => {
       toast({
@@ -1008,11 +1074,13 @@ export const useBulkDeleteEvaluations = () => {
       return results
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['evaluations'] })
       toast({
         title: 'نجاح',
         description: 'تم حذف التقييمات المحددة بنجاح',
       })
+    },
+    onSettled: async () => {
+      return await queryClient.invalidateQueries({ queryKey: ['evaluations'] })
     },
     onError: (error: Error) => {
       toast({
@@ -1041,9 +1109,9 @@ export const useUpdateLeaveRequestStatus = () => {
         return leaveService.rejectLeave(id, '')
       }
     },
-    onSuccess: (_, { id }) => {
-      queryClient.invalidateQueries({ queryKey: ['leaves'] })
-      queryClient.invalidateQueries({ queryKey: ['leaves', id] })
+    onSettled: async (_, __, { id }) => {
+      await queryClient.invalidateQueries({ queryKey: ['leaves'] })
+      return await queryClient.invalidateQueries({ queryKey: ['leaves', id] })
     },
     onError: (error: Error) => {
       toast({

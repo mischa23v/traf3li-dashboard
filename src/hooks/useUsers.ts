@@ -29,11 +29,13 @@ export const useCreateUser = () => {
   return useMutation({
     mutationFn: (data: CreateUserData) => usersService.createUser(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['users'] })
       toast.success('تم إنشاء المستخدم بنجاح')
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل إنشاء المستخدم')
+    },
+    onSettled: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['users'] })
     },
   })
 }
@@ -44,13 +46,15 @@ export const useUpdateUser = () => {
   return useMutation({
     mutationFn: ({ userId, data }: { userId: string; data: UpdateUserData }) =>
       usersService.updateUser(userId, data),
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['users'] })
-      queryClient.invalidateQueries({ queryKey: ['users', variables.userId] })
+    onSuccess: () => {
       toast.success('تم تحديث المستخدم بنجاح')
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل تحديث المستخدم')
+    },
+    onSettled: async (_, __, variables) => {
+      await queryClient.invalidateQueries({ queryKey: ['users'] })
+      await queryClient.invalidateQueries({ queryKey: ['users', variables.userId] })
     },
   })
 }
@@ -61,11 +65,13 @@ export const useDeleteUser = () => {
   return useMutation({
     mutationFn: (userId: string) => usersService.deleteUser(userId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['users'] })
       toast.success('تم حذف المستخدم بنجاح')
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل حذف المستخدم')
+    },
+    onSettled: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['users'] })
     },
   })
 }
@@ -76,11 +82,13 @@ export const useDeleteMultipleUsers = () => {
   return useMutation({
     mutationFn: (userIds: string[]) => usersService.deleteMultipleUsers(userIds),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['users'] })
       toast.success('تم حذف المستخدمين بنجاح')
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل حذف المستخدمين')
+    },
+    onSettled: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['users'] })
     },
   })
 }
@@ -92,11 +100,13 @@ export const useInviteUser = () => {
     mutationFn: ({ email, role }: { email: string; role: string }) =>
       usersService.inviteUser(email, role),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['users'] })
       toast.success('تم إرسال الدعوة بنجاح')
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل إرسال الدعوة')
+    },
+    onSettled: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['users'] })
     },
   })
 }

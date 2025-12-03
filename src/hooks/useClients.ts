@@ -28,11 +28,13 @@ export const useCreateClient = () => {
   return useMutation({
     mutationFn: (data: CreateClientData) => clientsService.createClient(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['clients'] })
       toast.success('تم إنشاء العميل بنجاح')
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل إنشاء العميل')
+    },
+    onSettled: async () => {
+      return await queryClient.invalidateQueries({ queryKey: ['clients'] })
     },
   })
 }
@@ -48,13 +50,15 @@ export const useUpdateClient = () => {
       clientId: string
       data: Partial<CreateClientData>
     }) => clientsService.updateClient(clientId, data),
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['clients'] })
-      queryClient.invalidateQueries({ queryKey: ['clients', variables.clientId] })
+    onSuccess: () => {
       toast.success('تم تحديث العميل بنجاح')
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل تحديث العميل')
+    },
+    onSettled: async (_, __, { clientId }) => {
+      await queryClient.invalidateQueries({ queryKey: ['clients'] })
+      return await queryClient.invalidateQueries({ queryKey: ['clients', clientId] })
     },
   })
 }
@@ -65,11 +69,13 @@ export const useDeleteClient = () => {
   return useMutation({
     mutationFn: (clientId: string) => clientsService.deleteClient(clientId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['clients'] })
       toast.success('تم حذف العميل بنجاح')
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل حذف العميل')
+    },
+    onSettled: async () => {
+      return await queryClient.invalidateQueries({ queryKey: ['clients'] })
     },
   })
 }
@@ -105,11 +111,13 @@ export const useBulkDeleteClients = () => {
   return useMutation({
     mutationFn: (clientIds: string[]) => clientsService.bulkDelete(clientIds),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['clients'] })
       toast.success('تم حذف العملاء بنجاح')
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل حذف العملاء')
+    },
+    onSettled: async () => {
+      return await queryClient.invalidateQueries({ queryKey: ['clients'] })
     },
   })
 }

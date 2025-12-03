@@ -118,18 +118,7 @@ export const useUploadDocument = () => {
       metadata: CreateDocumentData
       onProgress?: (progress: number) => void
     }) => documentsService.uploadDocument(file, metadata, onProgress),
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: documentsKeys.all })
-      if (variables.metadata.caseId) {
-        queryClient.invalidateQueries({
-          queryKey: documentsKeys.byCase(variables.metadata.caseId),
-        })
-      }
-      if (variables.metadata.clientId) {
-        queryClient.invalidateQueries({
-          queryKey: documentsKeys.byClient(variables.metadata.clientId),
-        })
-      }
+    onSuccess: () => {
       toast({
         title: t('status.success'),
         description: t('documents.uploadSuccess'),
@@ -142,6 +131,19 @@ export const useUploadDocument = () => {
         description: error.response?.data?.message || t('documents.uploadError'),
       })
     },
+    onSettled: async (_, __, variables) => {
+      await queryClient.invalidateQueries({ queryKey: documentsKeys.all })
+      if (variables.metadata.caseId) {
+        await queryClient.invalidateQueries({
+          queryKey: documentsKeys.byCase(variables.metadata.caseId),
+        })
+      }
+      if (variables.metadata.clientId) {
+        return await queryClient.invalidateQueries({
+          queryKey: documentsKeys.byClient(variables.metadata.clientId),
+        })
+      }
+    },
   })
 }
 
@@ -153,9 +155,7 @@ export const useUpdateDocument = () => {
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: UpdateDocumentData }) =>
       documentsService.updateDocument(id, data),
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: documentsKeys.all })
-      queryClient.invalidateQueries({ queryKey: documentsKeys.detail(variables.id) })
+    onSuccess: () => {
       toast({
         title: t('status.success'),
         description: t('status.updatedSuccessfully'),
@@ -168,6 +168,10 @@ export const useUpdateDocument = () => {
         description: error.response?.data?.message || t('common.unknownError'),
       })
     },
+    onSettled: async (_, __, { id }) => {
+      await queryClient.invalidateQueries({ queryKey: documentsKeys.all })
+      return await queryClient.invalidateQueries({ queryKey: documentsKeys.detail(id) })
+    },
   })
 }
 
@@ -179,7 +183,6 @@ export const useDeleteDocument = () => {
   return useMutation({
     mutationFn: (id: string) => documentsService.deleteDocument(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: documentsKeys.all })
       toast({
         title: t('status.success'),
         description: t('status.deletedSuccessfully'),
@@ -192,6 +195,9 @@ export const useDeleteDocument = () => {
         description: error.response?.data?.message || t('common.unknownError'),
       })
     },
+    onSettled: async () => {
+      return await queryClient.invalidateQueries({ queryKey: documentsKeys.all })
+    },
   })
 }
 
@@ -203,7 +209,6 @@ export const useBulkDeleteDocuments = () => {
   return useMutation({
     mutationFn: (ids: string[]) => documentsService.bulkDeleteDocuments(ids),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: documentsKeys.all })
       toast({
         title: t('status.success'),
         description: t('documents.bulkDeleteSuccess'),
@@ -215,6 +220,9 @@ export const useBulkDeleteDocuments = () => {
         title: t('status.error'),
         description: error.response?.data?.message || t('common.unknownError'),
       })
+    },
+    onSettled: async () => {
+      return await queryClient.invalidateQueries({ queryKey: documentsKeys.all })
     },
   })
 }
@@ -236,10 +244,7 @@ export const useUploadDocumentVersion = () => {
       changeNote?: string
       onProgress?: (progress: number) => void
     }) => documentsService.uploadDocumentVersion(documentId, file, changeNote, onProgress),
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: documentsKeys.all })
-      queryClient.invalidateQueries({ queryKey: documentsKeys.detail(variables.documentId) })
-      queryClient.invalidateQueries({ queryKey: documentsKeys.versions(variables.documentId) })
+    onSuccess: () => {
       toast({
         title: t('status.success'),
         description: t('documents.versionUploadSuccess'),
@@ -251,6 +256,11 @@ export const useUploadDocumentVersion = () => {
         title: t('status.error'),
         description: error.response?.data?.message || t('documents.uploadError'),
       })
+    },
+    onSettled: async (_, __, { documentId }) => {
+      await queryClient.invalidateQueries({ queryKey: documentsKeys.all })
+      await queryClient.invalidateQueries({ queryKey: documentsKeys.detail(documentId) })
+      return await queryClient.invalidateQueries({ queryKey: documentsKeys.versions(documentId) })
     },
   })
 }
@@ -268,10 +278,7 @@ export const useRestoreDocumentVersion = () => {
       documentId: string
       versionId: string
     }) => documentsService.restoreDocumentVersion(documentId, versionId),
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: documentsKeys.all })
-      queryClient.invalidateQueries({ queryKey: documentsKeys.detail(variables.documentId) })
-      queryClient.invalidateQueries({ queryKey: documentsKeys.versions(variables.documentId) })
+    onSuccess: () => {
       toast({
         title: t('status.success'),
         description: t('documents.versionRestoreSuccess'),
@@ -283,6 +290,11 @@ export const useRestoreDocumentVersion = () => {
         title: t('status.error'),
         description: error.response?.data?.message || t('common.unknownError'),
       })
+    },
+    onSettled: async (_, __, { documentId }) => {
+      await queryClient.invalidateQueries({ queryKey: documentsKeys.all })
+      await queryClient.invalidateQueries({ queryKey: documentsKeys.detail(documentId) })
+      return await queryClient.invalidateQueries({ queryKey: documentsKeys.versions(documentId) })
     },
   })
 }
@@ -385,8 +397,7 @@ export const useRevokeShareLink = () => {
 
   return useMutation({
     mutationFn: (id: string) => documentsService.revokeShareLink(id),
-    onSuccess: (_, id) => {
-      queryClient.invalidateQueries({ queryKey: documentsKeys.detail(id) })
+    onSuccess: () => {
       toast({
         title: t('status.success'),
         description: t('documents.shareRevoked'),
@@ -399,6 +410,9 @@ export const useRevokeShareLink = () => {
         description: error.response?.data?.message || t('common.unknownError'),
       })
     },
+    onSettled: async (_, __, id) => {
+      return await queryClient.invalidateQueries({ queryKey: documentsKeys.detail(id) })
+    },
   })
 }
 
@@ -409,9 +423,7 @@ export const useEncryptDocument = () => {
 
   return useMutation({
     mutationFn: (id: string) => documentsService.encryptDocument(id),
-    onSuccess: (_, id) => {
-      queryClient.invalidateQueries({ queryKey: documentsKeys.all })
-      queryClient.invalidateQueries({ queryKey: documentsKeys.detail(id) })
+    onSuccess: () => {
       toast({
         title: t('status.success'),
         description: t('documents.encryptSuccess'),
@@ -423,6 +435,10 @@ export const useEncryptDocument = () => {
         title: t('status.error'),
         description: error.response?.data?.message || t('common.unknownError'),
       })
+    },
+    onSettled: async (_, __, id) => {
+      await queryClient.invalidateQueries({ queryKey: documentsKeys.all })
+      return await queryClient.invalidateQueries({ queryKey: documentsKeys.detail(id) })
     },
   })
 }
@@ -456,10 +472,7 @@ export const useMoveDocumentToCase = () => {
       documentId: string
       caseId: string
     }) => documentsService.moveDocumentToCase(documentId, caseId),
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: documentsKeys.all })
-      queryClient.invalidateQueries({ queryKey: documentsKeys.detail(variables.documentId) })
-      queryClient.invalidateQueries({ queryKey: documentsKeys.byCase(variables.caseId) })
+    onSuccess: () => {
       toast({
         title: t('status.success'),
         description: t('documents.moveSuccess'),
@@ -471,6 +484,11 @@ export const useMoveDocumentToCase = () => {
         title: t('status.error'),
         description: error.response?.data?.message || t('common.unknownError'),
       })
+    },
+    onSettled: async (_, __, { documentId, caseId }) => {
+      await queryClient.invalidateQueries({ queryKey: documentsKeys.all })
+      await queryClient.invalidateQueries({ queryKey: documentsKeys.detail(documentId) })
+      return await queryClient.invalidateQueries({ queryKey: documentsKeys.byCase(caseId) })
     },
   })
 }

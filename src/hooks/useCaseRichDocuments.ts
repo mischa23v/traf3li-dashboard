@@ -75,9 +75,9 @@ export const useCreateCaseRichDocument = () => {
       caseId: string
       data: CreateRichDocumentInput
     }) => caseRichDocumentService.create(caseId, data),
-    onSuccess: (_, { caseId }) => {
-      queryClient.invalidateQueries({ queryKey: richDocumentKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: richDocumentKeys.list(caseId) })
+    onSettled: async (_, __, { caseId }) => {
+      await queryClient.invalidateQueries({ queryKey: richDocumentKeys.lists() })
+      await queryClient.invalidateQueries({ queryKey: richDocumentKeys.list(caseId) })
     }
   })
 }
@@ -98,12 +98,12 @@ export const useUpdateCaseRichDocument = () => {
       docId: string
       data: UpdateRichDocumentInput
     }) => caseRichDocumentService.update(caseId, docId, data),
-    onSuccess: (document, { caseId, docId }) => {
-      queryClient.invalidateQueries({ queryKey: richDocumentKeys.list(caseId) })
-      queryClient.invalidateQueries({
+    onSettled: async (_, __, { caseId, docId }) => {
+      await queryClient.invalidateQueries({ queryKey: richDocumentKeys.list(caseId) })
+      await queryClient.invalidateQueries({
         queryKey: richDocumentKeys.detail(caseId, docId)
       })
-      queryClient.invalidateQueries({
+      await queryClient.invalidateQueries({
         queryKey: richDocumentKeys.versions(caseId, docId)
       })
     }
@@ -119,9 +119,9 @@ export const useDeleteCaseRichDocument = () => {
   return useMutation({
     mutationFn: ({ caseId, docId }: { caseId: string; docId: string }) =>
       caseRichDocumentService.delete(caseId, docId),
-    onSuccess: (_, { caseId }) => {
-      queryClient.invalidateQueries({ queryKey: richDocumentKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: richDocumentKeys.list(caseId) })
+    onSettled: async (_, __, { caseId }) => {
+      await queryClient.invalidateQueries({ queryKey: richDocumentKeys.lists() })
+      await queryClient.invalidateQueries({ queryKey: richDocumentKeys.list(caseId) })
     }
   })
 }
@@ -161,12 +161,12 @@ export const useRestoreCaseRichDocumentVersion = () => {
       docId: string
       versionNumber: number
     }) => caseRichDocumentService.restoreVersion(caseId, docId, versionNumber),
-    onSuccess: (_, { caseId, docId }) => {
-      queryClient.invalidateQueries({ queryKey: richDocumentKeys.list(caseId) })
-      queryClient.invalidateQueries({
+    onSettled: async (_, __, { caseId, docId }) => {
+      await queryClient.invalidateQueries({ queryKey: richDocumentKeys.list(caseId) })
+      await queryClient.invalidateQueries({
         queryKey: richDocumentKeys.detail(caseId, docId)
       })
-      queryClient.invalidateQueries({
+      await queryClient.invalidateQueries({
         queryKey: richDocumentKeys.versions(caseId, docId)
       })
     }

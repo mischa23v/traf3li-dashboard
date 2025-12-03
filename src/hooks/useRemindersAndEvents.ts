@@ -39,12 +39,14 @@ export const useCreateReminder = () => {
     mutationFn: (data: CreateReminderData) =>
       remindersService.createReminder(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['reminders'] })
-      queryClient.invalidateQueries({ queryKey: ['calendar'] })
       toast.success('تم إنشاء التذكير بنجاح')
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل إنشاء التذكير')
+    },
+    onSettled: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['reminders'] })
+      return await queryClient.invalidateQueries({ queryKey: ['calendar'] })
     },
   })
 }
@@ -55,14 +57,16 @@ export const useUpdateReminder = () => {
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: Partial<CreateReminderData> }) =>
       remindersService.updateReminder(id, data),
-    onSuccess: (_, { id }) => {
-      queryClient.invalidateQueries({ queryKey: ['reminders'] })
-      queryClient.invalidateQueries({ queryKey: ['reminders', id] })
-      queryClient.invalidateQueries({ queryKey: ['calendar'] })
+    onSuccess: () => {
       toast.success('تم تحديث التذكير بنجاح')
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل تحديث التذكير')
+    },
+    onSettled: async (_, __, { id }) => {
+      await queryClient.invalidateQueries({ queryKey: ['reminders'] })
+      await queryClient.invalidateQueries({ queryKey: ['reminders', id] })
+      return await queryClient.invalidateQueries({ queryKey: ['calendar'] })
     },
   })
 }
@@ -73,12 +77,14 @@ export const useDeleteReminder = () => {
   return useMutation({
     mutationFn: (id: string) => remindersService.deleteReminder(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['reminders'] })
-      queryClient.invalidateQueries({ queryKey: ['calendar'] })
       toast.success('تم حذف التذكير بنجاح')
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل حذف التذكير')
+    },
+    onSettled: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['reminders'] })
+      return await queryClient.invalidateQueries({ queryKey: ['calendar'] })
     },
   })
 }
@@ -112,14 +118,16 @@ export const useCompleteReminder = () => {
 
   return useMutation({
     mutationFn: (id: string) => remindersService.completeReminder(id),
-    onSuccess: (_, id) => {
-      queryClient.invalidateQueries({ queryKey: ['reminders'] })
-      queryClient.invalidateQueries({ queryKey: ['reminders', id] })
-      queryClient.invalidateQueries({ queryKey: ['calendar'] })
+    onSuccess: () => {
       toast.success('تم إكمال التذكير بنجاح')
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل إكمال التذكير')
+    },
+    onSettled: async (_, __, id) => {
+      await queryClient.invalidateQueries({ queryKey: ['reminders'] })
+      await queryClient.invalidateQueries({ queryKey: ['reminders', id] })
+      return await queryClient.invalidateQueries({ queryKey: ['calendar'] })
     },
   })
 }
@@ -129,14 +137,16 @@ export const useDismissReminder = () => {
 
   return useMutation({
     mutationFn: (id: string) => remindersService.dismissReminder(id),
-    onSuccess: (_, id) => {
-      queryClient.invalidateQueries({ queryKey: ['reminders'] })
-      queryClient.invalidateQueries({ queryKey: ['reminders', id] })
-      queryClient.invalidateQueries({ queryKey: ['calendar'] })
+    onSuccess: () => {
       toast.success('تم تجاهل التذكير')
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل تجاهل التذكير')
+    },
+    onSettled: async (_, __, id) => {
+      await queryClient.invalidateQueries({ queryKey: ['reminders'] })
+      await queryClient.invalidateQueries({ queryKey: ['reminders', id] })
+      return await queryClient.invalidateQueries({ queryKey: ['calendar'] })
     },
   })
 }
@@ -147,14 +157,16 @@ export const useSnoozeReminder = () => {
   return useMutation({
     mutationFn: ({ id, duration }: { id: string; duration: number }) =>
       remindersService.snoozeReminder(id, { minutes: duration }),
-    onSuccess: (_, { id }) => {
-      queryClient.invalidateQueries({ queryKey: ['reminders'] })
-      queryClient.invalidateQueries({ queryKey: ['reminders', id] })
-      queryClient.invalidateQueries({ queryKey: ['calendar'] })
+    onSuccess: () => {
       toast.success('تم تأجيل التذكير بنجاح')
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل تأجيل التذكير')
+    },
+    onSettled: async (_, __, { id }) => {
+      await queryClient.invalidateQueries({ queryKey: ['reminders'] })
+      await queryClient.invalidateQueries({ queryKey: ['reminders', id] })
+      return await queryClient.invalidateQueries({ queryKey: ['calendar'] })
     },
   })
 }
@@ -164,14 +176,16 @@ export const useReopenReminder = () => {
 
   return useMutation({
     mutationFn: (id: string) => remindersService.reopenReminder(id),
-    onSuccess: (_, id) => {
-      queryClient.invalidateQueries({ queryKey: ['reminders'] })
-      queryClient.invalidateQueries({ queryKey: ['reminders', id] })
-      queryClient.invalidateQueries({ queryKey: ['calendar'] })
+    onSuccess: () => {
       toast.success('تم إعادة فتح التذكير')
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل إعادة فتح التذكير')
+    },
+    onSettled: async (_, __, id) => {
+      await queryClient.invalidateQueries({ queryKey: ['reminders'] })
+      await queryClient.invalidateQueries({ queryKey: ['reminders', id] })
+      return await queryClient.invalidateQueries({ queryKey: ['calendar'] })
     },
   })
 }
@@ -182,14 +196,16 @@ export const useDelegateReminder = () => {
   return useMutation({
     mutationFn: ({ id, delegateTo, note }: { id: string; delegateTo: string; note?: string }) =>
       remindersService.delegateReminder(id, delegateTo, note),
-    onSuccess: (_, { id }) => {
-      queryClient.invalidateQueries({ queryKey: ['reminders'] })
-      queryClient.invalidateQueries({ queryKey: ['reminders', id] })
-      queryClient.invalidateQueries({ queryKey: ['calendar'] })
+    onSuccess: () => {
       toast.success('تم تفويض التذكير بنجاح')
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل تفويض التذكير')
+    },
+    onSettled: async (_, __, { id }) => {
+      await queryClient.invalidateQueries({ queryKey: ['reminders'] })
+      await queryClient.invalidateQueries({ queryKey: ['reminders', id] })
+      return await queryClient.invalidateQueries({ queryKey: ['calendar'] })
     },
   })
 }
@@ -218,12 +234,14 @@ export const useCreateEvent = () => {
   return useMutation({
     mutationFn: (data: CreateEventData) => eventsService.createEvent(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['events'] })
-      queryClient.invalidateQueries({ queryKey: ['calendar'] })
       toast.success('تم إنشاء الحدث بنجاح')
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل إنشاء الحدث')
+    },
+    onSettled: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['events'] })
+      return await queryClient.invalidateQueries({ queryKey: ['calendar'] })
     },
   })
 }
@@ -234,14 +252,16 @@ export const useUpdateEvent = () => {
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: Partial<CreateEventData> }) =>
       eventsService.updateEvent(id, data),
-    onSuccess: (_, { id }) => {
-      queryClient.invalidateQueries({ queryKey: ['events'] })
-      queryClient.invalidateQueries({ queryKey: ['events', id] })
-      queryClient.invalidateQueries({ queryKey: ['calendar'] })
+    onSuccess: () => {
       toast.success('تم تحديث الحدث بنجاح')
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل تحديث الحدث')
+    },
+    onSettled: async (_, __, { id }) => {
+      await queryClient.invalidateQueries({ queryKey: ['events'] })
+      await queryClient.invalidateQueries({ queryKey: ['events', id] })
+      return await queryClient.invalidateQueries({ queryKey: ['calendar'] })
     },
   })
 }
@@ -252,12 +272,14 @@ export const useDeleteEvent = () => {
   return useMutation({
     mutationFn: (id: string) => eventsService.deleteEvent(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['events'] })
-      queryClient.invalidateQueries({ queryKey: ['calendar'] })
       toast.success('تم حذف الحدث بنجاح')
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل حذف الحدث')
+    },
+    onSettled: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['events'] })
+      return await queryClient.invalidateQueries({ queryKey: ['calendar'] })
     },
   })
 }
@@ -268,14 +290,16 @@ export const useCompleteEvent = () => {
   return useMutation({
     mutationFn: ({ id, minutesNotes }: { id: string; minutesNotes?: string }) =>
       eventsService.completeEvent(id, minutesNotes),
-    onSuccess: (_, { id }) => {
-      queryClient.invalidateQueries({ queryKey: ['events'] })
-      queryClient.invalidateQueries({ queryKey: ['events', id] })
-      queryClient.invalidateQueries({ queryKey: ['calendar'] })
+    onSuccess: () => {
       toast.success('تم إكمال الحدث بنجاح')
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل إكمال الحدث')
+    },
+    onSettled: async (_, __, { id }) => {
+      await queryClient.invalidateQueries({ queryKey: ['events'] })
+      await queryClient.invalidateQueries({ queryKey: ['events', id] })
+      return await queryClient.invalidateQueries({ queryKey: ['calendar'] })
     },
   })
 }
@@ -286,14 +310,16 @@ export const useCancelEvent = () => {
   return useMutation({
     mutationFn: ({ id, reason }: { id: string; reason?: string }) =>
       eventsService.cancelEvent(id, reason),
-    onSuccess: (_, { id }) => {
-      queryClient.invalidateQueries({ queryKey: ['events'] })
-      queryClient.invalidateQueries({ queryKey: ['events', id] })
-      queryClient.invalidateQueries({ queryKey: ['calendar'] })
+    onSuccess: () => {
       toast.success('تم إلغاء الحدث بنجاح')
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل إلغاء الحدث')
+    },
+    onSettled: async (_, __, { id }) => {
+      await queryClient.invalidateQueries({ queryKey: ['events'] })
+      await queryClient.invalidateQueries({ queryKey: ['events', id] })
+      return await queryClient.invalidateQueries({ queryKey: ['calendar'] })
     },
   })
 }
@@ -304,14 +330,16 @@ export const usePostponeEvent = () => {
   return useMutation({
     mutationFn: ({ id, newDateTime, reason }: { id: string; newDateTime: string; reason?: string }) =>
       eventsService.postponeEvent(id, newDateTime, reason),
-    onSuccess: (_, { id }) => {
-      queryClient.invalidateQueries({ queryKey: ['events'] })
-      queryClient.invalidateQueries({ queryKey: ['events', id] })
-      queryClient.invalidateQueries({ queryKey: ['calendar'] })
+    onSuccess: () => {
       toast.success('تم تأجيل الحدث بنجاح')
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل تأجيل الحدث')
+    },
+    onSettled: async (_, __, { id }) => {
+      await queryClient.invalidateQueries({ queryKey: ['events'] })
+      await queryClient.invalidateQueries({ queryKey: ['events', id] })
+      return await queryClient.invalidateQueries({ queryKey: ['calendar'] })
     },
   })
 }
@@ -322,14 +350,16 @@ export const useRSVPEvent = () => {
   return useMutation({
     mutationFn: ({ id, status, notes }: { id: string; status: 'accepted' | 'declined' | 'tentative'; notes?: string }) =>
       eventsService.rsvpToEvent(id, { status, note: notes }),
-    onSuccess: (_, { id }) => {
-      queryClient.invalidateQueries({ queryKey: ['events'] })
-      queryClient.invalidateQueries({ queryKey: ['events', id] })
-      queryClient.invalidateQueries({ queryKey: ['calendar'] })
+    onSuccess: () => {
       toast.success('تم تسجيل الحضور بنجاح')
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل تسجيل الحضور')
+    },
+    onSettled: async (_, __, { id }) => {
+      await queryClient.invalidateQueries({ queryKey: ['events'] })
+      await queryClient.invalidateQueries({ queryKey: ['events', id] })
+      return await queryClient.invalidateQueries({ queryKey: ['calendar'] })
     },
   })
 }

@@ -35,11 +35,13 @@ export const useCreateConversation = () => {
     mutationFn: (data: CreateConversationData) =>
       conversationsService.createConversation(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['conversations'] })
       toast.success('تم إنشاء المحادثة بنجاح')
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل إنشاء المحادثة')
+    },
+    onSettled: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['conversations'] })
     },
   })
 }
@@ -69,14 +71,14 @@ export const useSendMessage = () => {
       conversationId: string
       data: SendMessageData
     }) => conversationsService.sendMessage(conversationId, data),
-    onSuccess: (_, { conversationId }) => {
-      queryClient.invalidateQueries({
-        queryKey: ['conversations', conversationId, 'messages'],
-      })
-      queryClient.invalidateQueries({ queryKey: ['conversations'] })
-    },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل إرسال الرسالة')
+    },
+    onSettled: async (_, __, { conversationId }) => {
+      await queryClient.invalidateQueries({
+        queryKey: ['conversations', conversationId, 'messages'],
+      })
+      await queryClient.invalidateQueries({ queryKey: ['conversations'] })
     },
   })
 }
@@ -87,11 +89,11 @@ export const useMarkAsRead = () => {
   return useMutation({
     mutationFn: (conversationId: string) =>
       conversationsService.markAsRead(conversationId),
-    onSuccess: (_, conversationId) => {
-      queryClient.invalidateQueries({
+    onSettled: async (_, __, conversationId) => {
+      await queryClient.invalidateQueries({
         queryKey: ['conversations', conversationId],
       })
-      queryClient.invalidateQueries({ queryKey: ['conversations'] })
+      await queryClient.invalidateQueries({ queryKey: ['conversations'] })
     },
   })
 }
@@ -102,11 +104,13 @@ export const useDeleteConversation = () => {
   return useMutation({
     mutationFn: (id: string) => conversationsService.deleteConversation(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['conversations'] })
       toast.success('تم حذف المحادثة بنجاح')
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل حذف المحادثة')
+    },
+    onSettled: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['conversations'] })
     },
   })
 }

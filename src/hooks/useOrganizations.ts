@@ -63,7 +63,6 @@ export const useCreateOrganization = () => {
   return useMutation({
     mutationFn: (data: CreateOrganizationData) => organizationsService.createOrganization(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: organizationsKeys.all })
       toast({
         title: t('status.success'),
         description: t('status.createdSuccessfully'),
@@ -76,6 +75,9 @@ export const useCreateOrganization = () => {
         description: error.response?.data?.message || t('common.unknownError'),
       })
     },
+    onSettled: async () => {
+      return await queryClient.invalidateQueries({ queryKey: organizationsKeys.all })
+    },
   })
 }
 
@@ -87,9 +89,7 @@ export const useUpdateOrganization = () => {
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: UpdateOrganizationData }) =>
       organizationsService.updateOrganization(id, data),
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: organizationsKeys.all })
-      queryClient.invalidateQueries({ queryKey: organizationsKeys.detail(variables.id) })
+    onSuccess: () => {
       toast({
         title: t('status.success'),
         description: t('status.updatedSuccessfully'),
@@ -102,6 +102,10 @@ export const useUpdateOrganization = () => {
         description: error.response?.data?.message || t('common.unknownError'),
       })
     },
+    onSettled: async (_, __, { id }) => {
+      await queryClient.invalidateQueries({ queryKey: organizationsKeys.all })
+      return await queryClient.invalidateQueries({ queryKey: organizationsKeys.detail(id) })
+    },
   })
 }
 
@@ -113,7 +117,6 @@ export const useDeleteOrganization = () => {
   return useMutation({
     mutationFn: (id: string) => organizationsService.deleteOrganization(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: organizationsKeys.all })
       toast({
         title: t('status.success'),
         description: t('status.deletedSuccessfully'),
@@ -125,6 +128,9 @@ export const useDeleteOrganization = () => {
         title: t('status.error'),
         description: error.response?.data?.message || t('common.unknownError'),
       })
+    },
+    onSettled: async () => {
+      return await queryClient.invalidateQueries({ queryKey: organizationsKeys.all })
     },
   })
 }
@@ -137,7 +143,6 @@ export const useBulkDeleteOrganizations = () => {
   return useMutation({
     mutationFn: (ids: string[]) => organizationsService.bulkDeleteOrganizations(ids),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: organizationsKeys.all })
       toast({
         title: t('status.success'),
         description: t('status.deletedSuccessfully'),
@@ -149,6 +154,9 @@ export const useBulkDeleteOrganizations = () => {
         title: t('status.error'),
         description: error.response?.data?.message || t('common.unknownError'),
       })
+    },
+    onSettled: async () => {
+      return await queryClient.invalidateQueries({ queryKey: organizationsKeys.all })
     },
   })
 }

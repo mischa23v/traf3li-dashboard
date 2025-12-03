@@ -92,13 +92,15 @@ export function useCreateActivity() {
 
   return useMutation({
     mutationFn: (input: CreateActivityInput) => activityService.create(input),
-    onSuccess: (newActivity) => {
+    onSettled: async (newActivity) => {
       // Invalidate relevant queries
-      queryClient.invalidateQueries({ queryKey: activityKeys.lists() })
-      queryClient.invalidateQueries({
-        queryKey: activityKeys.entity(newActivity.entityType, newActivity.entityId),
-      })
-      queryClient.invalidateQueries({ queryKey: activityKeys.recent() })
+      if (newActivity) {
+        await queryClient.invalidateQueries({ queryKey: activityKeys.lists() })
+        await queryClient.invalidateQueries({
+          queryKey: activityKeys.entity(newActivity.entityType, newActivity.entityId),
+        })
+        return await queryClient.invalidateQueries({ queryKey: activityKeys.recent() })
+      }
     },
   })
 }
@@ -126,12 +128,12 @@ export function useLogTaskActivity() {
       newValue?: any
     }) =>
       activityService.logTaskActivity(taskId, type, taskTitle, metadata, oldValue, newValue),
-    onSuccess: (newActivity, variables) => {
+    onSettled: async (newActivity, _, variables) => {
       if (newActivity) {
-        queryClient.invalidateQueries({
+        await queryClient.invalidateQueries({
           queryKey: activityKeys.entity('task', variables.taskId),
         })
-        queryClient.invalidateQueries({ queryKey: activityKeys.recent() })
+        return await queryClient.invalidateQueries({ queryKey: activityKeys.recent() })
       }
     },
   })
@@ -155,12 +157,12 @@ export function useLogEventActivity() {
       eventTitle?: string
       metadata?: Record<string, any>
     }) => activityService.logEventActivity(eventId, type, eventTitle, metadata),
-    onSuccess: (newActivity, variables) => {
+    onSettled: async (newActivity, _, variables) => {
       if (newActivity) {
-        queryClient.invalidateQueries({
+        await queryClient.invalidateQueries({
           queryKey: activityKeys.entity('event', variables.eventId),
         })
-        queryClient.invalidateQueries({ queryKey: activityKeys.recent() })
+        return await queryClient.invalidateQueries({ queryKey: activityKeys.recent() })
       }
     },
   })
@@ -184,12 +186,12 @@ export function useLogReminderActivity() {
       reminderTitle?: string
       metadata?: Record<string, any>
     }) => activityService.logReminderActivity(reminderId, type, reminderTitle, metadata),
-    onSuccess: (newActivity, variables) => {
+    onSettled: async (newActivity, _, variables) => {
       if (newActivity) {
-        queryClient.invalidateQueries({
+        await queryClient.invalidateQueries({
           queryKey: activityKeys.entity('reminder', variables.reminderId),
         })
-        queryClient.invalidateQueries({ queryKey: activityKeys.recent() })
+        return await queryClient.invalidateQueries({ queryKey: activityKeys.recent() })
       }
     },
   })
