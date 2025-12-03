@@ -18,6 +18,7 @@ import {
   useUploadDocumentVersion,
   useRestoreDocumentVersion,
   useDownloadDocument,
+  useDocumentPreviewUrl,
 } from '@/hooks/useDocuments'
 import { type Document, type DocumentVersion } from '../data/schema'
 import { formatFileSize, MAX_FILE_SIZE, acceptedFileTypes } from '../data/data'
@@ -35,7 +36,10 @@ import {
   History,
   CheckCircle2,
   GitBranch,
+  Eye,
+  Loader2,
 } from 'lucide-react'
+import { openSmartPreview } from '@/lib/file-viewer'
 import {
   Tooltip,
   TooltipContent,
@@ -65,6 +69,28 @@ export function DocumentsVersionsDialog({
   const uploadVersion = useUploadDocumentVersion()
   const restoreVersion = useRestoreDocumentVersion()
   const downloadDocument = useDownloadDocument()
+  const previewUrlMutation = useDocumentPreviewUrl()
+  const [isPreviewLoading, setIsPreviewLoading] = useState(false)
+
+  // Smart preview handler
+  const handlePreview = async () => {
+    setIsPreviewLoading(true)
+    try {
+      let url = currentRow.url
+      try {
+        url = await previewUrlMutation.mutateAsync(currentRow._id)
+      } catch {
+        console.warn('Failed to get preview URL, using existing URL')
+      }
+      openSmartPreview({
+        url,
+        fileName: currentRow.originalName,
+        isArabic,
+      })
+    } finally {
+      setIsPreviewLoading(false)
+    }
+  }
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
     if (acceptedFiles.length > 0) {
@@ -260,26 +286,48 @@ export function DocumentsVersionsDialog({
                                 </span>
                               </div>
                             </div>
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <Button
-                                  variant='outline'
-                                  size='sm'
-                                  className='hover:bg-primary hover:text-primary-foreground'
-                                  onClick={() =>
-                                    downloadDocument.mutate({
-                                      id: currentRow._id,
-                                      fileName: currentRow.originalName,
-                                    })
-                                  }
-                                >
-                                  <Download className='h-4 w-4' />
-                                </Button>
-                              </TooltipTrigger>
-                              <TooltipContent>
-                                {t('common.download')}
-                              </TooltipContent>
-                            </Tooltip>
+                            <div className='flex gap-2'>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <Button
+                                    variant='ghost'
+                                    size='sm'
+                                    className='hover:bg-primary/10'
+                                    onClick={handlePreview}
+                                    disabled={isPreviewLoading}
+                                  >
+                                    {isPreviewLoading ? (
+                                      <Loader2 className='h-4 w-4 animate-spin' />
+                                    ) : (
+                                      <Eye className='h-4 w-4' />
+                                    )}
+                                  </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  {t('common.preview', 'Preview')}
+                                </TooltipContent>
+                              </Tooltip>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <Button
+                                    variant='outline'
+                                    size='sm'
+                                    className='hover:bg-primary hover:text-primary-foreground'
+                                    onClick={() =>
+                                      downloadDocument.mutate({
+                                        id: currentRow._id,
+                                        fileName: currentRow.originalName,
+                                      })
+                                    }
+                                  >
+                                    <Download className='h-4 w-4' />
+                                  </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  {t('common.download')}
+                                </TooltipContent>
+                              </Tooltip>
+                            </div>
                           </div>
                         </div>
                       </div>
@@ -341,6 +389,27 @@ export function DocumentsVersionsDialog({
                                   )}
                                 </div>
                                 <div className='flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity'>
+                                  <Tooltip>
+                                    <TooltipTrigger asChild>
+                                      <Button
+                                        variant='ghost'
+                                        size='sm'
+                                        className='hover:bg-primary/10'
+                                        onClick={() => {
+                                          openSmartPreview({
+                                            url: version.url,
+                                            fileName: version.originalName,
+                                            isArabic,
+                                          })
+                                        }}
+                                      >
+                                        <Eye className='h-4 w-4' />
+                                      </Button>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                      {t('common.preview', 'Preview')}
+                                    </TooltipContent>
+                                  </Tooltip>
                                   <Tooltip>
                                     <TooltipTrigger asChild>
                                       <Button

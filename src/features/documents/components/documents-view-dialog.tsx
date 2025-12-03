@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import {
   Dialog,
   DialogContent,
@@ -10,10 +11,11 @@ import { Button } from '@/components/ui/button'
 import { type Document } from '../data/schema'
 import { getCategoryInfo, formatFileSize, getFileIcon } from '../data/data'
 import { useTranslation } from 'react-i18next'
-import { useDownloadDocument } from '@/hooks/useDocuments'
+import { useDownloadDocument, useDocumentPreviewUrl } from '@/hooks/useDocuments'
 import { format } from 'date-fns'
 import { ar, enUS } from 'date-fns/locale'
-import { Download, ExternalLink, Lock, History, Link as LinkIcon } from 'lucide-react'
+import { Download, ExternalLink, Lock, History, Link as LinkIcon, Loader2 } from 'lucide-react'
+import { openSmartPreview } from '@/lib/file-viewer'
 
 interface DocumentsViewDialogProps {
   open: boolean
@@ -30,6 +32,8 @@ export function DocumentsViewDialog({
   const isArabic = i18n.language === 'ar'
   const categoryInfo = getCategoryInfo(currentRow.category)
   const downloadDocument = useDownloadDocument()
+  const previewUrlMutation = useDocumentPreviewUrl()
+  const [isPreviewLoading, setIsPreviewLoading] = useState(false)
 
   const formatDate = (dateString: string) => {
     try {
@@ -48,8 +52,27 @@ export function DocumentsViewDialog({
     })
   }
 
-  const handlePreview = () => {
-    window.open(currentRow.url, '_blank')
+  // Smart preview - uses Microsoft Office Online for Office files, native browser for others
+  const handlePreview = async () => {
+    setIsPreviewLoading(true)
+    try {
+      // Try to get fresh presigned URL with inline disposition
+      let url = currentRow.url
+      try {
+        url = await previewUrlMutation.mutateAsync(currentRow._id)
+      } catch {
+        // Fall back to existing URL if API fails
+        console.warn('Failed to get preview URL, using existing URL')
+      }
+
+      openSmartPreview({
+        url,
+        fileName: currentRow.originalName,
+        isArabic,
+      })
+    } finally {
+      setIsPreviewLoading(false)
+    }
   }
 
   return (
@@ -184,12 +207,20 @@ export function DocumentsViewDialog({
 
           {/* Actions */}
           <div className='flex gap-2 pt-4'>
-            <Button onClick={handleDownload} className='flex-1'>
-              <Download className='me-2 h-4 w-4' />
+            <Button onClick={handleDownload} className='flex-1' disabled={downloadDocument.isPending}>
+              {downloadDocument.isPending ? (
+                <Loader2 className='me-2 h-4 w-4 animate-spin' />
+              ) : (
+                <Download className='me-2 h-4 w-4' />
+              )}
               {t('common.download')}
             </Button>
-            <Button variant='outline' onClick={handlePreview}>
-              <ExternalLink className='me-2 h-4 w-4' />
+            <Button variant='outline' onClick={handlePreview} disabled={isPreviewLoading}>
+              {isPreviewLoading ? (
+                <Loader2 className='me-2 h-4 w-4 animate-spin' />
+              ) : (
+                <ExternalLink className='me-2 h-4 w-4' />
+              )}
               {t('common.preview')}
             </Button>
           </div>
