@@ -18,6 +18,7 @@ import tasksService, {
   TimeBudget,
   Comment,
   TaskDocument,
+  Attachment,
 } from '@/services/tasksService'
 
 // ==================== Query Hooks ====================
@@ -562,12 +563,42 @@ export const useUploadTaskAttachment = () => {
   return useMutation({
     mutationFn: ({ id, file, onProgress }: { id: string; file: File; onProgress?: (percent: number) => void }) =>
       tasksService.uploadAttachment(id, file, onProgress),
-    onSuccess: (_, { id }) => {
-      queryClient.invalidateQueries({ queryKey: ['tasks', id] })
+    // Optimistic update - show file immediately with "uploading" state
+    onMutate: async ({ id, file }) => {
+      await queryClient.cancelQueries({ queryKey: ['tasks', id] })
+      const previousTask = queryClient.getQueryData<Task>(['tasks', id])
+
+      if (previousTask) {
+        const tempAttachment: Attachment = {
+          _id: `temp-${Date.now()}`,
+          fileName: file.name,
+          fileUrl: URL.createObjectURL(file), // Temporary local URL
+          fileType: file.type,
+          fileSize: file.size,
+          uploadedBy: 'current-user',
+          uploadedAt: new Date().toISOString(),
+          storageType: 'local'
+        }
+        queryClient.setQueryData<Task>(['tasks', id], {
+          ...previousTask,
+          attachments: [...(previousTask.attachments || []), tempAttachment]
+        })
+      }
+
+      return { previousTask }
+    },
+    onError: (error: Error, { id }, context) => {
+      if (context?.previousTask) {
+        queryClient.setQueryData(['tasks', id], context.previousTask)
+      }
+      toast.error(error.message || 'فشل رفع المرفق')
+    },
+    onSuccess: () => {
       toast.success('تم رفع المرفق بنجاح')
     },
-    onError: (error: Error) => {
-      toast.error(error.message || 'فشل رفع المرفق')
+    // Use onSettled with await to replace temp file with real one from server
+    onSettled: async (_, __, { id }) => {
+      return await queryClient.invalidateQueries({ queryKey: ['tasks', id] })
     },
   })
 }
@@ -1041,13 +1072,39 @@ export const useCreateDocument = () => {
       content: string
       contentJson?: any
     }) => tasksService.createDocument(taskId, title, content, contentJson),
+    // Optimistic update - show document immediately
+    onMutate: async ({ taskId, title, content, contentJson }) => {
+      await queryClient.cancelQueries({ queryKey: ['tasks', taskId, 'documents'] })
+      const previousDocs = queryClient.getQueryData<{ documents: TaskDocument[] }>(['tasks', taskId, 'documents'])
+
+      if (previousDocs) {
+        const tempDoc: TaskDocument = {
+          _id: `temp-${Date.now()}`,
+          fileName: `${title}.html`,
+          title,
+          content,
+          contentJson,
+          contentFormat: 'tiptap-json',
+          fileType: 'text/html',
+          createdAt: new Date().toISOString()
+        }
+        queryClient.setQueryData<{ documents: TaskDocument[] }>(['tasks', taskId, 'documents'], {
+          documents: [...(previousDocs.documents || []), tempDoc]
+        })
+      }
+
+      return { previousDocs }
+    },
     onSuccess: () => {
       toast.success('تم إنشاء المستند')
     },
-    onError: (error: Error) => {
+    onError: (error: Error, { taskId }, context) => {
+      if (context?.previousDocs) {
+        queryClient.setQueryData(['tasks', taskId, 'documents'], context.previousDocs)
+      }
       toast.error(error.message || 'فشل إنشاء المستند')
     },
-    // Use onSettled with await to ensure mutation stays pending until refetch completes
+    // Use onSettled with await to replace temp doc with real one from server
     onSettled: async (_, __, { taskId }) => {
       await queryClient.invalidateQueries({ queryKey: ['tasks', taskId] })
       return await queryClient.invalidateQueries({ queryKey: ['tasks', taskId, 'documents'] })
