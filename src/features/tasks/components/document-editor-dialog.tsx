@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { Loader2, Save, X } from 'lucide-react'
 import {
     Dialog,
@@ -10,7 +10,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { TipTapEditor } from '@/components/tiptap-editor'
 import { useCreateDocument, useUpdateDocument, useDocument } from '@/hooks/useTasks'
-import { TaskDocument } from '@/services/tasksService'
+import { toast } from 'sonner'
 
 interface DocumentEditorDialogProps {
     open: boolean
@@ -30,46 +30,63 @@ export function DocumentEditorDialog({
     const [title, setTitle] = useState('')
     const [contentHtml, setContentHtml] = useState('')
     const [contentJson, setContentJson] = useState<any>(null)
+    const [isInitialized, setIsInitialized] = useState(false)
 
     const isEditMode = !!documentId
     const createMutation = useCreateDocument()
     const updateMutation = useUpdateDocument()
 
     // Fetch document if in edit mode
-    const { data: documentData, isLoading: isLoadingDocument } = useDocument(
+    const { data: documentData, isLoading: isLoadingDocument, isSuccess: isDocumentLoaded } = useDocument(
         taskId,
         documentId || ''
     )
 
-    // Load document data when available
+    // Load document data when available (for edit mode)
     useEffect(() => {
-        if (documentData?.document) {
+        if (isEditMode && documentData?.document && !isInitialized) {
             const doc = documentData.document
             setTitle(doc.title || doc.fileName?.replace('.html', '') || '')
             setContentHtml(doc.content || '')
             setContentJson(doc.contentJson || null)
+            setIsInitialized(true)
         }
-    }, [documentData])
+    }, [documentData, isEditMode, isInitialized])
 
-    // Reset form when dialog closes
+    // Reset form when dialog opens/closes
     useEffect(() => {
-        if (!open) {
+        if (open) {
+            // Reset initialization flag when opening
             if (!isEditMode) {
                 setTitle('')
                 setContentHtml('')
                 setContentJson(null)
+                setIsInitialized(true) // Mark as initialized for create mode
+            } else {
+                setIsInitialized(false) // Will be set to true when document loads
             }
+        } else {
+            // Reset everything when closing
+            setTitle('')
+            setContentHtml('')
+            setContentJson(null)
+            setIsInitialized(false)
         }
     }, [open, isEditMode])
 
-    const handleEditorChange = (html: string, json: any) => {
+    const handleEditorChange = useCallback((html: string, json: any) => {
         setContentHtml(html)
         setContentJson(json)
-    }
+    }, [])
 
     const handleSave = async () => {
         if (!title.trim()) {
-            alert('يرجى إدخال عنوان المستند')
+            toast.error('يرجى إدخال عنوان المستند')
+            return
+        }
+
+        if (!contentHtml.trim() || contentHtml === '<p></p>') {
+            toast.error('يرجى إدخال محتوى المستند')
             return
         }
 
@@ -84,6 +101,7 @@ export function DocumentEditorDialog({
                         contentJson
                     }
                 })
+                toast.success('تم تحديث المستند بنجاح')
             } else {
                 await createMutation.mutateAsync({
                     taskId,
@@ -91,28 +109,32 @@ export function DocumentEditorDialog({
                     content: contentHtml,
                     contentJson
                 })
+                toast.success('تم إنشاء المستند بنجاح')
             }
             onOpenChange(false)
             onSuccess?.()
-        } catch (error) {
+        } catch (error: any) {
             console.error('Failed to save document:', error)
+            toast.error(error.message || 'فشل في حفظ المستند')
         }
     }
 
     const isSaving = createMutation.isPending || updateMutation.isPending
+    const isLoading = isEditMode && isLoadingDocument && !isInitialized
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="max-w-4xl max-h-[90vh] flex flex-col" dir="rtl">
+            <DialogContent className="max-w-5xl max-h-[90vh] flex flex-col" dir="rtl">
                 <DialogHeader className="flex-shrink-0">
                     <DialogTitle className="text-right">
                         {isEditMode ? 'تحرير المستند' : 'إنشاء مستند جديد'}
                     </DialogTitle>
                 </DialogHeader>
 
-                {isEditMode && isLoadingDocument ? (
+                {isLoading ? (
                     <div className="flex items-center justify-center py-12">
                         <Loader2 className="h-8 w-8 animate-spin text-slate-400" />
+                        <span className="mr-3 text-slate-500">جاري تحميل المستند...</span>
                     </div>
                 ) : (
                     <div className="flex-1 overflow-auto space-y-4">
@@ -136,6 +158,7 @@ export function DocumentEditorDialog({
                                 placeholder="ابدأ الكتابة هنا..."
                                 dir="rtl"
                                 minHeight="350px"
+                                showCharacterCount={true}
                             />
                         </div>
                     </div>
@@ -153,7 +176,7 @@ export function DocumentEditorDialog({
                     </Button>
                     <Button
                         onClick={handleSave}
-                        disabled={isSaving || !title.trim()}
+                        disabled={isSaving || !title.trim() || isLoading}
                         className="bg-blue-600 hover:bg-blue-700"
                     >
                         {isSaving ? (
@@ -164,7 +187,7 @@ export function DocumentEditorDialog({
                         ) : (
                             <>
                                 <Save className="h-4 w-4 ml-2" />
-                                حفظ المستند
+                                {isEditMode ? 'حفظ التغييرات' : 'حفظ المستند'}
                             </>
                         )}
                     </Button>
