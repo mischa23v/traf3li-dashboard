@@ -22,11 +22,13 @@ export const useUpdateAccountSettings = () => {
     mutationFn: (data: UpdateAccountSettings) =>
       settingsService.updateAccountSettings(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['settings'] })
       toast.success('تم تحديث إعدادات الحساب بنجاح')
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل تحديث إعدادات الحساب')
+    },
+    onSettled: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['settings'] })
     },
   })
 }
@@ -38,11 +40,13 @@ export const useUpdateAppearanceSettings = () => {
     mutationFn: (data: UpdateAppearanceSettings) =>
       settingsService.updateAppearanceSettings(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['settings'] })
       toast.success('تم تحديث إعدادات المظهر بنجاح')
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل تحديث إعدادات المظهر')
+    },
+    onSettled: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['settings'] })
     },
   })
 }
@@ -54,11 +58,13 @@ export const useUpdateDisplaySettings = () => {
     mutationFn: (data: UpdateDisplaySettings) =>
       settingsService.updateDisplaySettings(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['settings'] })
       toast.success('تم تحديث إعدادات العرض بنجاح')
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل تحديث إعدادات العرض')
+    },
+    onSettled: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['settings'] })
     },
   })
 }
@@ -70,11 +76,13 @@ export const useUpdateNotificationSettings = () => {
     mutationFn: (data: UpdateNotificationSettings) =>
       settingsService.updateNotificationSettings(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['settings'] })
       toast.success('تم تحديث إعدادات الإشعارات بنجاح')
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل تحديث إعدادات الإشعارات')
+    },
+    onSettled: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['settings'] })
     },
   })
 }

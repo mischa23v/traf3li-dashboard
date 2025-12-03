@@ -32,7 +32,6 @@ export function useStartExport() {
   return useMutation({
     mutationFn: (options: ExportOptions) => dataExportService.startExport(options),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: exportKeys.exports() })
       toast({
         title: t('common.success'),
         description: t('dataExport.exportStarted'),
@@ -44,6 +43,9 @@ export function useStartExport() {
         title: t('common.error'),
         description: error.message,
       })
+    },
+    onSettled: async () => {
+      await queryClient.invalidateQueries({ queryKey: exportKeys.exports() })
     },
   })
 }
@@ -107,7 +109,6 @@ export function useCancelExport() {
   return useMutation({
     mutationFn: (jobId: string) => dataExportService.cancelExport(jobId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: exportKeys.exports() })
       toast({
         title: t('common.success'),
         description: t('dataExport.exportCancelled'),
@@ -119,6 +120,9 @@ export function useCancelExport() {
         title: t('common.error'),
         description: error.message,
       })
+    },
+    onSettled: async () => {
+      await queryClient.invalidateQueries({ queryKey: exportKeys.exports() })
     },
   })
 }
@@ -150,7 +154,6 @@ export function useStartImport() {
   return useMutation({
     mutationFn: (options: ImportOptions) => dataExportService.startImport(options),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: exportKeys.imports() })
       toast({
         title: t('common.success'),
         description: t('dataExport.importStarted'),
@@ -162,6 +165,9 @@ export function useStartImport() {
         title: t('common.error'),
         description: error.message,
       })
+    },
+    onSettled: async () => {
+      await queryClient.invalidateQueries({ queryKey: exportKeys.imports() })
     },
   })
 }
@@ -198,7 +204,6 @@ export function useCancelImport() {
   return useMutation({
     mutationFn: (jobId: string) => dataExportService.cancelImport(jobId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: exportKeys.imports() })
       toast({
         title: t('common.success'),
         description: t('dataExport.importCancelled'),
@@ -210,6 +215,9 @@ export function useCancelImport() {
         title: t('common.error'),
         description: error.message,
       })
+    },
+    onSettled: async () => {
+      await queryClient.invalidateQueries({ queryKey: exportKeys.imports() })
     },
   })
 }
@@ -259,7 +267,6 @@ export function useCreateExportTemplate() {
   return useMutation({
     mutationFn: dataExportService.createTemplate,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: exportKeys.templates() })
       toast({
         title: t('common.success'),
         description: t('dataExport.templateCreated'),
@@ -272,6 +279,9 @@ export function useCreateExportTemplate() {
         description: error.message,
       })
     },
+    onSettled: async () => {
+      await queryClient.invalidateQueries({ queryKey: exportKeys.templates() })
+    },
   })
 }
 
@@ -283,7 +293,6 @@ export function useDeleteExportTemplate() {
   return useMutation({
     mutationFn: (id: string) => dataExportService.deleteTemplate(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: exportKeys.templates() })
       toast({
         title: t('common.success'),
         description: t('dataExport.templateDeleted'),
@@ -295,6 +304,9 @@ export function useDeleteExportTemplate() {
         title: t('common.error'),
         description: error.message,
       })
+    },
+    onSettled: async () => {
+      await queryClient.invalidateQueries({ queryKey: exportKeys.templates() })
     },
   })
 }

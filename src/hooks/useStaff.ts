@@ -91,11 +91,13 @@ export const useCreateStaff = () => {
   return useMutation({
     mutationFn: (data: CreateStaffData) => staffService.createStaff(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['staff'] })
       toast.success('تم إضافة عضو الفريق بنجاح')
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل إضافة عضو الفريق')
+    },
+    onSettled: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['staff'] })
     },
   })
 }
@@ -111,13 +113,15 @@ export const useUpdateStaff = () => {
       staffId: string
       data: UpdateStaffData
     }) => staffService.updateStaff(staffId, data),
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['staff'] })
-      queryClient.invalidateQueries({ queryKey: ['staff', variables.staffId] })
+    onSuccess: () => {
       toast.success('تم تحديث بيانات عضو الفريق بنجاح')
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل تحديث بيانات عضو الفريق')
+    },
+    onSettled: async (_, __, variables) => {
+      await queryClient.invalidateQueries({ queryKey: ['staff'] })
+      await queryClient.invalidateQueries({ queryKey: ['staff', variables.staffId] })
     },
   })
 }
@@ -128,11 +132,13 @@ export const useDeleteStaff = () => {
   return useMutation({
     mutationFn: (staffId: string) => staffService.deleteStaff(staffId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['staff'] })
       toast.success('تم حذف عضو الفريق بنجاح')
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل حذف عضو الفريق')
+    },
+    onSettled: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['staff'] })
     },
   })
 }
@@ -143,11 +149,13 @@ export const useBulkDeleteStaff = () => {
   return useMutation({
     mutationFn: (staffIds: string[]) => staffService.bulkDeleteStaff(staffIds),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['staff'] })
       toast.success('تم حذف أعضاء الفريق بنجاح')
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل حذف أعضاء الفريق')
+    },
+    onSettled: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['staff'] })
     },
   })
 }

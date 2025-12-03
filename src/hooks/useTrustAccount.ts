@@ -61,8 +61,8 @@ export function useCreateTrustAccount() {
         '_id' | 'balance' | 'availableBalance' | 'pendingBalance' | 'createdAt' | 'updatedAt'
       >
     ) => trustAccountService.createTrustAccount(data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: trustAccountKeys.lists() })
+    onSettled: async () => {
+      await queryClient.invalidateQueries({ queryKey: trustAccountKeys.lists() })
     },
   })
 }
@@ -73,9 +73,9 @@ export function useUpdateTrustAccount() {
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: Partial<TrustAccount> }) =>
       trustAccountService.updateTrustAccount(id, data),
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: trustAccountKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: trustAccountKeys.detail(variables.id) })
+    onSettled: async (_, __, variables) => {
+      await queryClient.invalidateQueries({ queryKey: trustAccountKeys.lists() })
+      await queryClient.invalidateQueries({ queryKey: trustAccountKeys.detail(variables.id) })
     },
   })
 }
@@ -86,9 +86,9 @@ export function useCloseTrustAccount() {
   return useMutation({
     mutationFn: ({ id, reason }: { id: string; reason: string }) =>
       trustAccountService.closeTrustAccount(id, reason),
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: trustAccountKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: trustAccountKeys.detail(variables.id) })
+    onSettled: async (_, __, variables) => {
+      await queryClient.invalidateQueries({ queryKey: trustAccountKeys.lists() })
+      await queryClient.invalidateQueries({ queryKey: trustAccountKeys.detail(variables.id) })
     },
   })
 }
@@ -156,10 +156,10 @@ export function useCreateTrustDeposit() {
       payor: string
       notes?: string
     }) => trustAccountService.createTrustDeposit(data),
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: trustAccountKeys.transactions() })
-      queryClient.invalidateQueries({ queryKey: trustAccountKeys.clientBalances() })
-      queryClient.invalidateQueries({ queryKey: trustAccountKeys.detail(variables.accountId) })
+    onSettled: async (_, __, variables) => {
+      await queryClient.invalidateQueries({ queryKey: trustAccountKeys.transactions() })
+      await queryClient.invalidateQueries({ queryKey: trustAccountKeys.clientBalances() })
+      await queryClient.invalidateQueries({ queryKey: trustAccountKeys.detail(variables.accountId) })
     },
   })
 }
@@ -182,10 +182,10 @@ export function useCreateTrustWithdrawal() {
       relatedExpenseId?: string
       notes?: string
     }) => trustAccountService.createTrustWithdrawal(data),
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: trustAccountKeys.transactions() })
-      queryClient.invalidateQueries({ queryKey: trustAccountKeys.clientBalances() })
-      queryClient.invalidateQueries({ queryKey: trustAccountKeys.detail(variables.accountId) })
+    onSettled: async (_, __, variables) => {
+      await queryClient.invalidateQueries({ queryKey: trustAccountKeys.transactions() })
+      await queryClient.invalidateQueries({ queryKey: trustAccountKeys.clientBalances() })
+      await queryClient.invalidateQueries({ queryKey: trustAccountKeys.detail(variables.accountId) })
     },
   })
 }
@@ -205,10 +205,10 @@ export function useCreateTrustTransfer() {
       description: string
       notes?: string
     }) => trustAccountService.createTrustTransfer(data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: trustAccountKeys.transactions() })
-      queryClient.invalidateQueries({ queryKey: trustAccountKeys.clientBalances() })
-      queryClient.invalidateQueries({ queryKey: trustAccountKeys.lists() })
+    onSettled: async () => {
+      await queryClient.invalidateQueries({ queryKey: trustAccountKeys.transactions() })
+      await queryClient.invalidateQueries({ queryKey: trustAccountKeys.clientBalances() })
+      await queryClient.invalidateQueries({ queryKey: trustAccountKeys.lists() })
     },
   })
 }
@@ -219,10 +219,10 @@ export function useVoidTransaction() {
   return useMutation({
     mutationFn: ({ id, reason }: { id: string; reason: string }) =>
       trustAccountService.voidTransaction(id, reason),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: trustAccountKeys.transactions() })
-      queryClient.invalidateQueries({ queryKey: trustAccountKeys.clientBalances() })
-      queryClient.invalidateQueries({ queryKey: trustAccountKeys.lists() })
+    onSettled: async () => {
+      await queryClient.invalidateQueries({ queryKey: trustAccountKeys.transactions() })
+      await queryClient.invalidateQueries({ queryKey: trustAccountKeys.clientBalances() })
+      await queryClient.invalidateQueries({ queryKey: trustAccountKeys.lists() })
     },
   })
 }
@@ -233,8 +233,8 @@ export function useMarkTransactionCleared() {
   return useMutation({
     mutationFn: ({ id, clearedDate }: { id: string; clearedDate: string }) =>
       trustAccountService.markTransactionCleared(id, clearedDate),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: trustAccountKeys.transactions() })
+    onSettled: async () => {
+      await queryClient.invalidateQueries({ queryKey: trustAccountKeys.transactions() })
     },
   })
 }
@@ -272,8 +272,8 @@ export function useStartReconciliation() {
       periodEnd: string
       bankStatementBalance: number
     }) => trustAccountService.startReconciliation(data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: trustAccountKeys.reconciliations() })
+    onSettled: async () => {
+      await queryClient.invalidateQueries({ queryKey: trustAccountKeys.reconciliations() })
     },
   })
 }
@@ -289,8 +289,8 @@ export function useUpdateReconciliation() {
       id: string
       data: Parameters<typeof trustAccountService.updateReconciliation>[1]
     }) => trustAccountService.updateReconciliation(id, data),
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({
+    onSettled: async (_, __, variables) => {
+      await queryClient.invalidateQueries({
         queryKey: trustAccountKeys.reconciliation(variables.id),
       })
     },
@@ -303,9 +303,9 @@ export function useCompleteReconciliation() {
   return useMutation({
     mutationFn: ({ id, notes }: { id: string; notes?: string }) =>
       trustAccountService.completeReconciliation(id, notes),
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: trustAccountKeys.reconciliations() })
-      queryClient.invalidateQueries({
+    onSettled: async (_, __, variables) => {
+      await queryClient.invalidateQueries({ queryKey: trustAccountKeys.reconciliations() })
+      await queryClient.invalidateQueries({
         queryKey: trustAccountKeys.reconciliation(variables.id),
       })
     },
@@ -323,8 +323,8 @@ export function useAddReconciliationAdjustment() {
       id: string
       adjustment: ReconciliationAdjustment
     }) => trustAccountService.addReconciliationAdjustment(id, adjustment),
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({
+    onSettled: async (_, __, variables) => {
+      await queryClient.invalidateQueries({
         queryKey: trustAccountKeys.reconciliation(variables.id),
       })
     },
@@ -346,8 +346,8 @@ export function useRunThreeWayReconciliation() {
   return useMutation({
     mutationFn: (accountId: string) =>
       trustAccountService.runThreeWayReconciliation(accountId),
-    onSuccess: (_, accountId) => {
-      queryClient.invalidateQueries({
+    onSettled: async (_, __, accountId) => {
+      await queryClient.invalidateQueries({
         queryKey: trustAccountKeys.threeWay(accountId),
       })
     },

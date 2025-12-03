@@ -29,11 +29,13 @@ export const useUpdateCompanySettings = () => {
     mutationFn: (data: UpdateCompanySettingsData) =>
       billingSettingsService.updateCompanySettings(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['company-settings'] })
       toast.success('تم تحديث إعدادات الشركة بنجاح')
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل تحديث إعدادات الشركة')
+    },
+    onSettled: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['company-settings'] })
     },
   })
 }
@@ -44,11 +46,13 @@ export const useUpdateCompanyLogo = () => {
   return useMutation({
     mutationFn: (file: File) => billingSettingsService.updateCompanyLogo(file),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['company-settings'] })
       toast.success('تم تحديث شعار الشركة بنجاح')
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل تحديث شعار الشركة')
+    },
+    onSettled: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['company-settings'] })
     },
   })
 }
@@ -69,11 +73,13 @@ export const useCreateTax = () => {
   return useMutation({
     mutationFn: (data: CreateTaxData) => billingSettingsService.createTax(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['taxes'] })
       toast.success('تم إنشاء الضريبة بنجاح')
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل إنشاء الضريبة')
+    },
+    onSettled: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['taxes'] })
     },
   })
 }
@@ -85,11 +91,13 @@ export const useUpdateTax = () => {
     mutationFn: ({ id, data }: { id: string; data: Partial<CreateTaxData> }) =>
       billingSettingsService.updateTax(id, data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['taxes'] })
       toast.success('تم تحديث الضريبة بنجاح')
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل تحديث الضريبة')
+    },
+    onSettled: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['taxes'] })
     },
   })
 }
@@ -100,11 +108,13 @@ export const useDeleteTax = () => {
   return useMutation({
     mutationFn: (id: string) => billingSettingsService.deleteTax(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['taxes'] })
       toast.success('تم حذف الضريبة بنجاح')
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل حذف الضريبة')
+    },
+    onSettled: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['taxes'] })
     },
   })
 }
@@ -115,11 +125,13 @@ export const useSetDefaultTax = () => {
   return useMutation({
     mutationFn: (id: string) => billingSettingsService.setDefaultTax(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['taxes'] })
       toast.success('تم تعيين الضريبة الافتراضية بنجاح')
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل تعيين الضريبة الافتراضية')
+    },
+    onSettled: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['taxes'] })
     },
   })
 }
@@ -141,11 +153,13 @@ export const useCreatePaymentMode = () => {
     mutationFn: (data: CreatePaymentModeData) =>
       billingSettingsService.createPaymentMode(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['payment-modes'] })
       toast.success('تم إنشاء طريقة الدفع بنجاح')
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل إنشاء طريقة الدفع')
+    },
+    onSettled: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['payment-modes'] })
     },
   })
 }
@@ -157,11 +171,13 @@ export const useUpdatePaymentMode = () => {
     mutationFn: ({ id, data }: { id: string; data: Partial<CreatePaymentModeData> }) =>
       billingSettingsService.updatePaymentMode(id, data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['payment-modes'] })
       toast.success('تم تحديث طريقة الدفع بنجاح')
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل تحديث طريقة الدفع')
+    },
+    onSettled: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['payment-modes'] })
     },
   })
 }
@@ -172,11 +188,13 @@ export const useDeletePaymentMode = () => {
   return useMutation({
     mutationFn: (id: string) => billingSettingsService.deletePaymentMode(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['payment-modes'] })
       toast.success('تم حذف طريقة الدفع بنجاح')
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل حذف طريقة الدفع')
+    },
+    onSettled: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['payment-modes'] })
     },
   })
 }
@@ -187,11 +205,13 @@ export const useSetDefaultPaymentMode = () => {
   return useMutation({
     mutationFn: (id: string) => billingSettingsService.setDefaultPaymentMode(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['payment-modes'] })
       toast.success('تم تعيين طريقة الدفع الافتراضية بنجاح')
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل تعيين طريقة الدفع الافتراضية')
+    },
+    onSettled: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['payment-modes'] })
     },
   })
 }
@@ -213,11 +233,13 @@ export const useUpdateFinanceSettings = () => {
     mutationFn: (data: UpdateFinanceSettingsData) =>
       billingSettingsService.updateFinanceSettings(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['finance-settings'] })
       toast.success('تم تحديث الإعدادات المالية بنجاح')
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل تحديث الإعدادات المالية')
+    },
+    onSettled: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['finance-settings'] })
     },
   })
 }

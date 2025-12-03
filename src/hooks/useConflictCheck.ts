@@ -26,10 +26,10 @@ export function useRunConflictCheck() {
   return useMutation({
     mutationFn: (request: ConflictCheckRequest) =>
       conflictCheckService.runConflictCheck(request),
-    onSuccess: (data, variables) => {
-      queryClient.invalidateQueries({ queryKey: conflictCheckKeys.lists() })
+    onSettled: async (data, error, variables) => {
+      await queryClient.invalidateQueries({ queryKey: conflictCheckKeys.lists() })
       if (variables.entityId) {
-        queryClient.invalidateQueries({
+        await queryClient.invalidateQueries({
           queryKey: conflictCheckKeys.entity(variables.entityType, variables.entityId),
         })
       }
@@ -101,8 +101,8 @@ export function useResolveConflictMatch() {
       matchId: string
       resolution: { status: 'cleared' | 'flagged' | 'waived'; notes: string }
     }) => conflictCheckService.resolveConflictMatch(checkId, matchId, resolution),
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({
+    onSettled: async (data, error, variables) => {
+      await queryClient.invalidateQueries({
         queryKey: conflictCheckKeys.detail(variables.checkId),
       })
     },
@@ -121,11 +121,11 @@ export function useAddConflictWaiver() {
       checkId: string
       waiver: Omit<ConflictWaiver, 'waivedBy' | 'waivedAt'>
     }) => conflictCheckService.addConflictWaiver(checkId, waiver),
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({
+    onSettled: async (data, error, variables) => {
+      await queryClient.invalidateQueries({
         queryKey: conflictCheckKeys.detail(variables.checkId),
       })
-      queryClient.invalidateQueries({ queryKey: conflictCheckKeys.lists() })
+      await queryClient.invalidateQueries({ queryKey: conflictCheckKeys.lists() })
     },
   })
 }
@@ -137,11 +137,11 @@ export function useClearConflictCheck() {
   return useMutation({
     mutationFn: ({ checkId, notes }: { checkId: string; notes: string }) =>
       conflictCheckService.clearConflictCheck(checkId, notes),
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({
+    onSettled: async (data, error, variables) => {
+      await queryClient.invalidateQueries({
         queryKey: conflictCheckKeys.detail(variables.checkId),
       })
-      queryClient.invalidateQueries({ queryKey: conflictCheckKeys.lists() })
+      await queryClient.invalidateQueries({ queryKey: conflictCheckKeys.lists() })
     },
   })
 }

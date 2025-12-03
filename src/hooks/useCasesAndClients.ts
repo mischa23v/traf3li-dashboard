@@ -93,11 +93,13 @@ export const useCreateCase = () => {
   return useMutation({
     mutationFn: (data: CreateCaseData) => casesService.createCase(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['cases'] })
       toast.success(t('cases.createSuccess', 'تم إنشاء القضية بنجاح'))
     },
     onError: (error: Error) => {
       toast.error(error.message || t('cases.createError', 'فشل إنشاء القضية'))
+    },
+    onSettled: async () => {
+      return await queryClient.invalidateQueries({ queryKey: ['cases'] })
     },
   })
 }
@@ -112,13 +114,15 @@ export const useUpdateCase = () => {
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: UpdateCaseData }) =>
       casesService.updateCase(id, data),
-    onSuccess: (_, { id }) => {
-      queryClient.invalidateQueries({ queryKey: ['cases'] })
-      queryClient.invalidateQueries({ queryKey: ['cases', id] })
+    onSuccess: () => {
       toast.success(t('cases.updateSuccess', 'تم تحديث القضية بنجاح'))
     },
     onError: (error: Error) => {
       toast.error(error.message || t('cases.updateError', 'فشل تحديث القضية'))
+    },
+    onSettled: async (_, __, { id }) => {
+      await queryClient.invalidateQueries({ queryKey: ['cases'] })
+      return await queryClient.invalidateQueries({ queryKey: ['cases', id] })
     },
   })
 }
@@ -133,11 +137,13 @@ export const useDeleteCase = () => {
   return useMutation({
     mutationFn: (id: string) => casesService.deleteCase(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['cases'] })
       toast.success(t('cases.deleteSuccess', 'تم حذف القضية بنجاح'))
     },
     onError: (error: Error) => {
       toast.error(error.message || t('cases.deleteError', 'فشل حذف القضية'))
+    },
+    onSettled: async () => {
+      return await queryClient.invalidateQueries({ queryKey: ['cases'] })
     },
   })
 }
@@ -152,12 +158,14 @@ export const useAddCaseNote = () => {
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: AddNoteData }) =>
       casesService.addNote(id, data),
-    onSuccess: (_, { id }) => {
-      queryClient.invalidateQueries({ queryKey: ['cases', id] })
+    onSuccess: () => {
       toast.success(t('cases.noteAddSuccess', 'تمت إضافة الملاحظة بنجاح'))
     },
     onError: (error: Error) => {
       toast.error(error.message || t('cases.noteAddError', 'فشل إضافة الملاحظة'))
+    },
+    onSettled: async (_, __, { id }) => {
+      return await queryClient.invalidateQueries({ queryKey: ['cases', id] })
     },
   })
 }
@@ -172,12 +180,14 @@ export const useAddCaseDocument = () => {
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: AddDocumentData }) =>
       casesService.addDocument(id, data),
-    onSuccess: (_, { id }) => {
-      queryClient.invalidateQueries({ queryKey: ['cases', id] })
+    onSuccess: () => {
       toast.success(t('cases.documentAddSuccess', 'تمت إضافة المستند بنجاح'))
     },
     onError: (error: Error) => {
       toast.error(error.message || t('cases.documentAddError', 'فشل إضافة المستند'))
+    },
+    onSettled: async (_, __, { id }) => {
+      return await queryClient.invalidateQueries({ queryKey: ['cases', id] })
     },
   })
 }
@@ -241,16 +251,18 @@ export const useAddCaseHearing = () => {
 
       return result
     },
-    onSuccess: (_, { id }) => {
-      queryClient.invalidateQueries({ queryKey: ['cases', id] })
-      queryClient.invalidateQueries({ queryKey: ['cases'] })
-      queryClient.invalidateQueries({ queryKey: ['calendar'] })
-      queryClient.invalidateQueries({ queryKey: ['events'] })
-      queryClient.invalidateQueries({ queryKey: ['reminders'] })
+    onSuccess: () => {
       toast.success(t('cases.hearingAddSuccess', 'تمت إضافة الجلسة بنجاح وتم إنشاء حدث في التقويم'))
     },
     onError: (error: Error) => {
       toast.error(error.message || t('cases.hearingAddError', 'فشل إضافة الجلسة'))
+    },
+    onSettled: async (_, __, { id }) => {
+      await queryClient.invalidateQueries({ queryKey: ['cases', id] })
+      await queryClient.invalidateQueries({ queryKey: ['cases'] })
+      await queryClient.invalidateQueries({ queryKey: ['calendar'] })
+      await queryClient.invalidateQueries({ queryKey: ['events'] })
+      return await queryClient.invalidateQueries({ queryKey: ['reminders'] })
     },
   })
 }
@@ -265,12 +277,14 @@ export const useAddCaseClaim = () => {
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: AddClaimData }) =>
       casesService.addClaim(id, data),
-    onSuccess: (_, { id }) => {
-      queryClient.invalidateQueries({ queryKey: ['cases', id] })
+    onSuccess: () => {
       toast.success(t('cases.claimAddSuccess', 'تمت إضافة المطالبة بنجاح'))
     },
     onError: (error: Error) => {
       toast.error(error.message || t('cases.claimAddError', 'فشل إضافة المطالبة'))
+    },
+    onSettled: async (_, __, { id }) => {
+      return await queryClient.invalidateQueries({ queryKey: ['cases', id] })
     },
   })
 }
@@ -285,13 +299,15 @@ export const useUpdateCaseStatus = () => {
   return useMutation({
     mutationFn: ({ id, status }: { id: string; status: CaseStatus }) =>
       casesService.updateStatus(id, status),
-    onSuccess: (_, { id }) => {
-      queryClient.invalidateQueries({ queryKey: ['cases'] })
-      queryClient.invalidateQueries({ queryKey: ['cases', id] })
+    onSuccess: () => {
       toast.success(t('cases.statusUpdateSuccess', 'تم تحديث حالة القضية بنجاح'))
     },
     onError: (error: Error) => {
       toast.error(error.message || t('cases.statusUpdateError', 'فشل تحديث حالة القضية'))
+    },
+    onSettled: async (_, __, { id }) => {
+      await queryClient.invalidateQueries({ queryKey: ['cases'] })
+      return await queryClient.invalidateQueries({ queryKey: ['cases', id] })
     },
   })
 }
@@ -306,13 +322,15 @@ export const useUpdateCaseOutcome = () => {
   return useMutation({
     mutationFn: ({ id, outcome }: { id: string; outcome: CaseOutcome }) =>
       casesService.updateOutcome(id, outcome),
-    onSuccess: (_, { id }) => {
-      queryClient.invalidateQueries({ queryKey: ['cases'] })
-      queryClient.invalidateQueries({ queryKey: ['cases', id] })
+    onSuccess: () => {
       toast.success(t('cases.outcomeUpdateSuccess', 'تم تحديث نتيجة القضية بنجاح'))
     },
     onError: (error: Error) => {
       toast.error(error.message || t('cases.outcomeUpdateError', 'فشل تحديث نتيجة القضية'))
+    },
+    onSettled: async (_, __, { id }) => {
+      await queryClient.invalidateQueries({ queryKey: ['cases'] })
+      return await queryClient.invalidateQueries({ queryKey: ['cases', id] })
     },
   })
 }
@@ -342,11 +360,13 @@ export const useCreateClient = () => {
   return useMutation({
     mutationFn: (data: CreateClientData) => clientsService.createClient(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['clients'] })
       toast.success(t('clients.createSuccess', 'تم إنشاء العميل بنجاح'))
     },
     onError: (error: Error) => {
       toast.error(error.message || t('clients.createError', 'فشل إنشاء العميل'))
+    },
+    onSettled: async () => {
+      return await queryClient.invalidateQueries({ queryKey: ['clients'] })
     },
   })
 }
@@ -358,13 +378,15 @@ export const useUpdateClient = () => {
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: Partial<CreateClientData> }) =>
       clientsService.updateClient(id, data),
-    onSuccess: (_, { id }) => {
-      queryClient.invalidateQueries({ queryKey: ['clients'] })
-      queryClient.invalidateQueries({ queryKey: ['clients', id] })
+    onSuccess: () => {
       toast.success(t('clients.updateSuccess', 'تم تحديث العميل بنجاح'))
     },
     onError: (error: Error) => {
       toast.error(error.message || t('clients.updateError', 'فشل تحديث العميل'))
+    },
+    onSettled: async (_, __, { id }) => {
+      await queryClient.invalidateQueries({ queryKey: ['clients'] })
+      return await queryClient.invalidateQueries({ queryKey: ['clients', id] })
     },
   })
 }
@@ -376,11 +398,13 @@ export const useDeleteClient = () => {
   return useMutation({
     mutationFn: (id: string) => clientsService.deleteClient(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['clients'] })
       toast.success(t('clients.deleteSuccess', 'تم حذف العميل بنجاح'))
     },
     onError: (error: Error) => {
       toast.error(error.message || t('clients.deleteError', 'فشل حذف العميل'))
+    },
+    onSettled: async () => {
+      return await queryClient.invalidateQueries({ queryKey: ['clients'] })
     },
   })
 }
@@ -457,12 +481,14 @@ export const useUpdateCaseNote = () => {
   return useMutation({
     mutationFn: ({ caseId, noteId, data }: { caseId: string; noteId: string; data: UpdateNoteData }) =>
       casesService.updateNote(caseId, noteId, data),
-    onSuccess: (_, { caseId }) => {
-      queryClient.invalidateQueries({ queryKey: ['cases', caseId] })
+    onSuccess: () => {
       toast.success(t('cases.noteUpdateSuccess', 'تم تحديث الملاحظة بنجاح'))
     },
     onError: (error: Error) => {
       toast.error(error.message || t('cases.noteUpdateError', 'فشل تحديث الملاحظة'))
+    },
+    onSettled: async (_, __, { caseId }) => {
+      return await queryClient.invalidateQueries({ queryKey: ['cases', caseId] })
     },
   })
 }
@@ -477,12 +503,14 @@ export const useDeleteCaseNote = () => {
   return useMutation({
     mutationFn: ({ caseId, noteId }: { caseId: string; noteId: string }) =>
       casesService.deleteNote(caseId, noteId),
-    onSuccess: (_, { caseId }) => {
-      queryClient.invalidateQueries({ queryKey: ['cases', caseId] })
+    onSuccess: () => {
       toast.success(t('cases.noteDeleteSuccess', 'تم حذف الملاحظة بنجاح'))
     },
     onError: (error: Error) => {
       toast.error(error.message || t('cases.noteDeleteError', 'فشل حذف الملاحظة'))
+    },
+    onSettled: async (_, __, { caseId }) => {
+      return await queryClient.invalidateQueries({ queryKey: ['cases', caseId] })
     },
   })
 }
@@ -500,15 +528,17 @@ export const useUpdateCaseHearing = () => {
   return useMutation({
     mutationFn: ({ caseId, hearingId, data }: { caseId: string; hearingId: string; data: UpdateHearingData }) =>
       casesService.updateHearing(caseId, hearingId, data),
-    onSuccess: (_, { caseId }) => {
-      queryClient.invalidateQueries({ queryKey: ['cases', caseId] })
-      queryClient.invalidateQueries({ queryKey: ['cases'] })
-      queryClient.invalidateQueries({ queryKey: ['calendar'] })
-      queryClient.invalidateQueries({ queryKey: ['events'] })
+    onSuccess: () => {
       toast.success(t('cases.hearingUpdateSuccess', 'تم تحديث الجلسة بنجاح'))
     },
     onError: (error: Error) => {
       toast.error(error.message || t('cases.hearingUpdateError', 'فشل تحديث الجلسة'))
+    },
+    onSettled: async (_, __, { caseId }) => {
+      await queryClient.invalidateQueries({ queryKey: ['cases', caseId] })
+      await queryClient.invalidateQueries({ queryKey: ['cases'] })
+      await queryClient.invalidateQueries({ queryKey: ['calendar'] })
+      return await queryClient.invalidateQueries({ queryKey: ['events'] })
     },
   })
 }
@@ -524,15 +554,17 @@ export const useDeleteCaseHearing = () => {
   return useMutation({
     mutationFn: ({ caseId, hearingId }: { caseId: string; hearingId: string }) =>
       casesService.deleteHearing(caseId, hearingId),
-    onSuccess: (_, { caseId }) => {
-      queryClient.invalidateQueries({ queryKey: ['cases', caseId] })
-      queryClient.invalidateQueries({ queryKey: ['cases'] })
-      queryClient.invalidateQueries({ queryKey: ['calendar'] })
-      queryClient.invalidateQueries({ queryKey: ['events'] })
+    onSuccess: () => {
       toast.success(t('cases.hearingDeleteSuccess', 'تم حذف الجلسة بنجاح'))
     },
     onError: (error: Error) => {
       toast.error(error.message || t('cases.hearingDeleteError', 'فشل حذف الجلسة'))
+    },
+    onSettled: async (_, __, { caseId }) => {
+      await queryClient.invalidateQueries({ queryKey: ['cases', caseId] })
+      await queryClient.invalidateQueries({ queryKey: ['cases'] })
+      await queryClient.invalidateQueries({ queryKey: ['calendar'] })
+      return await queryClient.invalidateQueries({ queryKey: ['events'] })
     },
   })
 }
@@ -549,12 +581,14 @@ export const useUpdateCaseClaim = () => {
   return useMutation({
     mutationFn: ({ caseId, claimId, data }: { caseId: string; claimId: string; data: UpdateClaimData }) =>
       casesService.updateClaim(caseId, claimId, data),
-    onSuccess: (_, { caseId }) => {
-      queryClient.invalidateQueries({ queryKey: ['cases', caseId] })
+    onSuccess: () => {
       toast.success(t('cases.claimUpdateSuccess', 'تم تحديث المطالبة بنجاح'))
     },
     onError: (error: Error) => {
       toast.error(error.message || t('cases.claimUpdateError', 'فشل تحديث المطالبة'))
+    },
+    onSettled: async (_, __, { caseId }) => {
+      return await queryClient.invalidateQueries({ queryKey: ['cases', caseId] })
     },
   })
 }
@@ -569,12 +603,14 @@ export const useDeleteCaseClaim = () => {
   return useMutation({
     mutationFn: ({ caseId, claimId }: { caseId: string; claimId: string }) =>
       casesService.deleteClaim(caseId, claimId),
-    onSuccess: (_, { caseId }) => {
-      queryClient.invalidateQueries({ queryKey: ['cases', caseId] })
+    onSuccess: () => {
       toast.success(t('cases.claimDeleteSuccess', 'تم حذف المطالبة بنجاح'))
     },
     onError: (error: Error) => {
       toast.error(error.message || t('cases.claimDeleteError', 'فشل حذف المطالبة'))
+    },
+    onSettled: async (_, __, { caseId }) => {
+      return await queryClient.invalidateQueries({ queryKey: ['cases', caseId] })
     },
   })
 }
@@ -591,12 +627,14 @@ export const useAddCaseTimelineEvent = () => {
   return useMutation({
     mutationFn: ({ caseId, data }: { caseId: string; data: AddTimelineEventData }) =>
       casesService.addTimelineEvent(caseId, data),
-    onSuccess: (_, { caseId }) => {
-      queryClient.invalidateQueries({ queryKey: ['cases', caseId] })
+    onSuccess: () => {
       toast.success(t('cases.timelineAddSuccess', 'تمت إضافة الحدث بنجاح'))
     },
     onError: (error: Error) => {
       toast.error(error.message || t('cases.timelineAddError', 'فشل إضافة الحدث'))
+    },
+    onSettled: async (_, __, { caseId }) => {
+      return await queryClient.invalidateQueries({ queryKey: ['cases', caseId] })
     },
   })
 }
@@ -611,12 +649,14 @@ export const useUpdateCaseTimelineEvent = () => {
   return useMutation({
     mutationFn: ({ caseId, eventId, data }: { caseId: string; eventId: string; data: UpdateTimelineEventData }) =>
       casesService.updateTimelineEvent(caseId, eventId, data),
-    onSuccess: (_, { caseId }) => {
-      queryClient.invalidateQueries({ queryKey: ['cases', caseId] })
+    onSuccess: () => {
       toast.success(t('cases.timelineUpdateSuccess', 'تم تحديث الحدث بنجاح'))
     },
     onError: (error: Error) => {
       toast.error(error.message || t('cases.timelineUpdateError', 'فشل تحديث الحدث'))
+    },
+    onSettled: async (_, __, { caseId }) => {
+      return await queryClient.invalidateQueries({ queryKey: ['cases', caseId] })
     },
   })
 }
@@ -631,12 +671,14 @@ export const useDeleteCaseTimelineEvent = () => {
   return useMutation({
     mutationFn: ({ caseId, eventId }: { caseId: string; eventId: string }) =>
       casesService.deleteTimelineEvent(caseId, eventId),
-    onSuccess: (_, { caseId }) => {
-      queryClient.invalidateQueries({ queryKey: ['cases', caseId] })
+    onSuccess: () => {
       toast.success(t('cases.timelineDeleteSuccess', 'تم حذف الحدث بنجاح'))
     },
     onError: (error: Error) => {
       toast.error(error.message || t('cases.timelineDeleteError', 'فشل حذف الحدث'))
+    },
+    onSettled: async (_, __, { caseId }) => {
+      return await queryClient.invalidateQueries({ queryKey: ['cases', caseId] })
     },
   })
 }
@@ -683,12 +725,14 @@ export const useUploadCaseDocument = () => {
         description,
       })
     },
-    onSuccess: (_, { caseId }) => {
-      queryClient.invalidateQueries({ queryKey: ['cases', caseId] })
+    onSuccess: () => {
       toast.success(t('cases.documentUploadSuccess', 'تم رفع المستند بنجاح'))
     },
     onError: (error: Error) => {
       toast.error(error.message || t('cases.documentUploadError', 'فشل رفع المستند'))
+    },
+    onSettled: async (_, __, { caseId }) => {
+      return await queryClient.invalidateQueries({ queryKey: ['cases', caseId] })
     },
   })
 }
@@ -730,12 +774,14 @@ export const useDeleteCaseDocument = () => {
   return useMutation({
     mutationFn: ({ caseId, docId }: { caseId: string; docId: string }) =>
       casesService.deleteDocument(caseId, docId),
-    onSuccess: (_, { caseId }) => {
-      queryClient.invalidateQueries({ queryKey: ['cases', caseId] })
+    onSuccess: () => {
       toast.success(t('cases.documentDeleteSuccess', 'تم حذف المستند بنجاح'))
     },
     onError: (error: Error) => {
       toast.error(error.message || t('cases.documentDeleteError', 'فشل حذف المستند'))
+    },
+    onSettled: async (_, __, { caseId }) => {
+      return await queryClient.invalidateQueries({ queryKey: ['cases', caseId] })
     },
   })
 }
