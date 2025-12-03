@@ -16,12 +16,16 @@ import { Table } from '@tiptap/extension-table'
 import { TableRow } from '@tiptap/extension-table-row'
 import { TableCell } from '@tiptap/extension-table-cell'
 import { TableHeader } from '@tiptap/extension-table-header'
+import TaskList from '@tiptap/extension-task-list'
+import TaskItem from '@tiptap/extension-task-item'
+import Subscript from '@tiptap/extension-subscript'
+import Superscript from '@tiptap/extension-superscript'
 import { Button } from '@/components/ui/button'
 import {
     Bold, Italic, Strikethrough, Underline as UnderlineIcon, AlignRight, AlignCenter, AlignLeft, AlignJustify,
     Heading1, Heading2, Heading3, List, ListOrdered, Quote, Image as ImageIcon,
     Link as LinkIcon, Unlink, Undo, Redo, Highlighter, Palette, Table as TableIcon,
-    Plus, Trash2, Code, Minus, Rows3, Columns3, Type
+    Plus, Trash2, Code, Minus, Rows3, Columns3, ListTodo, Subscript as SubscriptIcon, Superscript as SuperscriptIcon
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import {
@@ -124,6 +128,12 @@ export const TipTapEditor = ({
             TableRow,
             TableHeader,
             TableCell,
+            TaskList,
+            TaskItem.configure({
+                nested: true,
+            }),
+            Subscript,
+            Superscript,
         ],
         content: contentJson || content,
         editable,
@@ -271,6 +281,20 @@ export const TipTapEditor = ({
                     >
                         <Code className="h-4 w-4" />
                     </ToolbarButton>
+                    <ToolbarButton
+                        onClick={() => editor.chain().focus().toggleSubscript().run()}
+                        isActive={editor.isActive('subscript')}
+                        title="نص سفلي"
+                    >
+                        <SubscriptIcon className="h-4 w-4" />
+                    </ToolbarButton>
+                    <ToolbarButton
+                        onClick={() => editor.chain().focus().toggleSuperscript().run()}
+                        isActive={editor.isActive('superscript')}
+                        title="نص علوي"
+                    >
+                        <SuperscriptIcon className="h-4 w-4" />
+                    </ToolbarButton>
 
                     <ToolbarDivider />
 
@@ -397,6 +421,13 @@ export const TipTapEditor = ({
                         title="قائمة مرقمة"
                     >
                         <ListOrdered className="h-4 w-4" />
+                    </ToolbarButton>
+                    <ToolbarButton
+                        onClick={() => editor.chain().focus().toggleTaskList().run()}
+                        isActive={editor.isActive('taskList')}
+                        title="قائمة مهام"
+                    >
+                        <ListTodo className="h-4 w-4" />
                     </ToolbarButton>
                     <ToolbarButton
                         onClick={() => editor.chain().focus().toggleBlockquote().run()}
@@ -641,6 +672,16 @@ export const TipTapEditor = ({
                         type="button"
                         variant="ghost"
                         size="icon"
+                        onClick={() => editor.chain().focus().toggleTaskList().run()}
+                        className={cn('h-8 w-8', editor.isActive('taskList') && 'bg-slate-200')}
+                        title="قائمة مهام"
+                    >
+                        <ListTodo className="h-4 w-4" />
+                    </Button>
+                    <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
                         onClick={() => editor.chain().focus().toggleBlockquote().run()}
                         className={cn('h-8 w-8', editor.isActive('blockquote') && 'bg-slate-200')}
                         title="اقتباس"
@@ -829,6 +870,52 @@ export const TipTapEditor = ({
                 .tiptap-editor .ProseMirror mark {
                     border-radius: 0.125rem;
                     padding: 0.125rem 0;
+                }
+
+                /* Task List Styles */
+                .tiptap-editor .ProseMirror ul[data-type="taskList"] {
+                    list-style: none;
+                    padding-${dir === 'rtl' ? 'right' : 'left'}: 0.5rem;
+                }
+
+                .tiptap-editor .ProseMirror ul[data-type="taskList"] li {
+                    display: flex;
+                    align-items: flex-start;
+                    gap: 0.5rem;
+                    margin-bottom: 0.25rem;
+                }
+
+                .tiptap-editor .ProseMirror ul[data-type="taskList"] li > label {
+                    flex-shrink: 0;
+                    margin-top: 0.25rem;
+                }
+
+                .tiptap-editor .ProseMirror ul[data-type="taskList"] li > div {
+                    flex: 1;
+                }
+
+                .tiptap-editor .ProseMirror ul[data-type="taskList"] input[type="checkbox"] {
+                    width: 1rem;
+                    height: 1rem;
+                    cursor: pointer;
+                    accent-color: #3b82f6;
+                    border-radius: 0.25rem;
+                }
+
+                .tiptap-editor .ProseMirror ul[data-type="taskList"] li[data-checked="true"] > div {
+                    text-decoration: line-through;
+                    color: #9ca3af;
+                }
+
+                /* Subscript and Superscript */
+                .tiptap-editor .ProseMirror sub {
+                    font-size: 0.75em;
+                    vertical-align: sub;
+                }
+
+                .tiptap-editor .ProseMirror sup {
+                    font-size: 0.75em;
+                    vertical-align: super;
                 }
             `}</style>
         </div>
