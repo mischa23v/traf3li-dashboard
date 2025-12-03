@@ -118,11 +118,13 @@ export const useCreateLead = () => {
   return useMutation({
     mutationFn: (data: CreateLeadData) => leadService.createLead(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['leads'] })
       toast.success('تم إنشاء العميل المحتمل بنجاح')
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل إنشاء العميل المحتمل')
+    },
+    onSettled: async () => {
+      return await queryClient.invalidateQueries({ queryKey: ['leads'] })
     },
   })
 }
@@ -136,13 +138,15 @@ export const useUpdateLead = () => {
   return useMutation({
     mutationFn: ({ leadId, data }: { leadId: string; data: Partial<Lead> }) =>
       leadService.updateLead(leadId, data),
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['leads'] })
-      queryClient.invalidateQueries({ queryKey: ['leads', variables.leadId] })
+    onSuccess: () => {
       toast.success('تم تحديث العميل المحتمل بنجاح')
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل تحديث العميل المحتمل')
+    },
+    onSettled: async (_, __, { leadId }) => {
+      await queryClient.invalidateQueries({ queryKey: ['leads'] })
+      return await queryClient.invalidateQueries({ queryKey: ['leads', leadId] })
     },
   })
 }
@@ -156,11 +160,13 @@ export const useDeleteLead = () => {
   return useMutation({
     mutationFn: (leadId: string) => leadService.deleteLead(leadId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['leads'] })
       toast.success('تم حذف العميل المحتمل بنجاح')
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل حذف العميل المحتمل')
+    },
+    onSettled: async () => {
+      return await queryClient.invalidateQueries({ queryKey: ['leads'] })
     },
   })
 }
@@ -183,13 +189,15 @@ export const useUpdateLeadStatus = () => {
       notes?: string
       lostReason?: string
     }) => leadService.updateLeadStatus(leadId, { status, notes, lostReason }),
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['leads'] })
-      queryClient.invalidateQueries({ queryKey: ['leads', variables.leadId] })
+    onSuccess: () => {
       toast.success('تم تحديث حالة العميل المحتمل')
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل تحديث الحالة')
+    },
+    onSettled: async (_, __, { leadId }) => {
+      await queryClient.invalidateQueries({ queryKey: ['leads'] })
+      return await queryClient.invalidateQueries({ queryKey: ['leads', leadId] })
     },
   })
 }
@@ -210,12 +218,12 @@ export const useMoveLeadToStage = () => {
       stageId: string
       notes?: string
     }) => leadService.moveLeadToStage(leadId, { stageId, notes }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['leads'] })
-      queryClient.invalidateQueries({ queryKey: ['leads', 'pipeline'] })
-    },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل نقل العميل المحتمل')
+    },
+    onSettled: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['leads'] })
+      return await queryClient.invalidateQueries({ queryKey: ['leads', 'pipeline'] })
     },
   })
 }
@@ -229,12 +237,14 @@ export const useConvertLead = () => {
   return useMutation({
     mutationFn: (leadId: string) => leadService.convertToClient(leadId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['leads'] })
-      queryClient.invalidateQueries({ queryKey: ['clients'] })
       toast.success('تم تحويل العميل المحتمل إلى عميل بنجاح')
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل تحويل العميل المحتمل')
+    },
+    onSettled: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['leads'] })
+      return await queryClient.invalidateQueries({ queryKey: ['clients'] })
     },
   })
 }
@@ -255,13 +265,15 @@ export const useScheduleFollowUp = () => {
       date: string
       note?: string
     }) => leadService.scheduleFollowUp(leadId, { date, note }),
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['leads', variables.leadId] })
-      queryClient.invalidateQueries({ queryKey: ['leads', 'follow-up'] })
+    onSuccess: () => {
       toast.success('تم جدولة المتابعة بنجاح')
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل جدولة المتابعة')
+    },
+    onSettled: async (_, __, { leadId }) => {
+      await queryClient.invalidateQueries({ queryKey: ['leads', leadId] })
+      return await queryClient.invalidateQueries({ queryKey: ['leads', 'follow-up'] })
     },
   })
 }
@@ -280,13 +292,15 @@ export const useLogLeadActivity = () => {
       leadId: string
       data: CreateActivityData
     }) => leadService.logActivity(leadId, data),
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['leads', variables.leadId] })
-      queryClient.invalidateQueries({ queryKey: ['activity-timeline'] })
+    onSuccess: () => {
       toast.success('تم تسجيل النشاط بنجاح')
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل تسجيل النشاط')
+    },
+    onSettled: async (_, __, { leadId }) => {
+      await queryClient.invalidateQueries({ queryKey: ['leads', leadId] })
+      return await queryClient.invalidateQueries({ queryKey: ['activity-timeline'] })
     },
   })
 }
@@ -340,11 +354,13 @@ export const useCreatePipeline = () => {
     mutationFn: (data: CreatePipelineData) =>
       pipelineService.createPipeline(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['pipelines'] })
       toast.success('تم إنشاء مسار المبيعات بنجاح')
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل إنشاء مسار المبيعات')
+    },
+    onSettled: async () => {
+      return await queryClient.invalidateQueries({ queryKey: ['pipelines'] })
     },
   })
 }
@@ -363,15 +379,17 @@ export const useUpdatePipeline = () => {
       pipelineId: string
       data: Partial<Pipeline>
     }) => pipelineService.updatePipeline(pipelineId, data),
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['pipelines'] })
-      queryClient.invalidateQueries({
-        queryKey: ['pipelines', variables.pipelineId],
-      })
+    onSuccess: () => {
       toast.success('تم تحديث مسار المبيعات بنجاح')
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل تحديث مسار المبيعات')
+    },
+    onSettled: async (_, __, { pipelineId }) => {
+      await queryClient.invalidateQueries({ queryKey: ['pipelines'] })
+      return await queryClient.invalidateQueries({
+        queryKey: ['pipelines', pipelineId],
+      })
     },
   })
 }
@@ -386,11 +404,13 @@ export const useDeletePipeline = () => {
     mutationFn: (pipelineId: string) =>
       pipelineService.deletePipeline(pipelineId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['pipelines'] })
       toast.success('تم حذف مسار المبيعات بنجاح')
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل حذف مسار المبيعات')
+    },
+    onSettled: async () => {
+      return await queryClient.invalidateQueries({ queryKey: ['pipelines'] })
     },
   })
 }
@@ -409,14 +429,16 @@ export const useAddPipelineStage = () => {
       pipelineId: string
       data: CreateStageData
     }) => pipelineService.addStage(pipelineId, data),
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({
-        queryKey: ['pipelines', variables.pipelineId],
-      })
+    onSuccess: () => {
       toast.success('تم إضافة المرحلة بنجاح')
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل إضافة المرحلة')
+    },
+    onSettled: async (_, __, { pipelineId }) => {
+      return await queryClient.invalidateQueries({
+        queryKey: ['pipelines', pipelineId],
+      })
     },
   })
 }
@@ -437,14 +459,16 @@ export const useUpdatePipelineStage = () => {
       stageId: string
       data: Partial<PipelineStage>
     }) => pipelineService.updateStage(pipelineId, stageId, data),
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({
-        queryKey: ['pipelines', variables.pipelineId],
-      })
+    onSuccess: () => {
       toast.success('تم تحديث المرحلة بنجاح')
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل تحديث المرحلة')
+    },
+    onSettled: async (_, __, { pipelineId }) => {
+      return await queryClient.invalidateQueries({
+        queryKey: ['pipelines', pipelineId],
+      })
     },
   })
 }
@@ -463,14 +487,16 @@ export const useRemovePipelineStage = () => {
       pipelineId: string
       stageId: string
     }) => pipelineService.removeStage(pipelineId, stageId),
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({
-        queryKey: ['pipelines', variables.pipelineId],
-      })
+    onSuccess: () => {
       toast.success('تم حذف المرحلة بنجاح')
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل حذف المرحلة')
+    },
+    onSettled: async (_, __, { pipelineId }) => {
+      return await queryClient.invalidateQueries({
+        queryKey: ['pipelines', pipelineId],
+      })
     },
   })
 }
@@ -489,13 +515,13 @@ export const useReorderPipelineStages = () => {
       pipelineId: string
       stageOrders: { stageId: string; order: number }[]
     }) => pipelineService.reorderStages(pipelineId, stageOrders),
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({
-        queryKey: ['pipelines', variables.pipelineId],
-      })
-    },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل إعادة ترتيب المراحل')
+    },
+    onSettled: async (_, __, { pipelineId }) => {
+      return await queryClient.invalidateQueries({
+        queryKey: ['pipelines', pipelineId],
+      })
     },
   })
 }
@@ -510,11 +536,13 @@ export const useSetDefaultPipeline = () => {
     mutationFn: (pipelineId: string) =>
       pipelineService.setDefault(pipelineId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['pipelines'] })
       toast.success('تم تعيين مسار المبيعات الافتراضي')
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل تعيين مسار المبيعات الافتراضي')
+    },
+    onSettled: async () => {
+      return await queryClient.invalidateQueries({ queryKey: ['pipelines'] })
     },
   })
 }
@@ -534,11 +562,13 @@ export const useDuplicatePipeline = () => {
       data?: { name?: string; nameAr?: string }
     }) => pipelineService.duplicate(pipelineId, data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['pipelines'] })
       toast.success('تم نسخ مسار المبيعات بنجاح')
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل نسخ مسار المبيعات')
+    },
+    onSettled: async () => {
+      return await queryClient.invalidateQueries({ queryKey: ['pipelines'] })
     },
   })
 }
@@ -605,11 +635,13 @@ export const useCreateReferral = () => {
     mutationFn: (data: CreateReferralData) =>
       referralService.createReferral(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['referrals'] })
       toast.success('تم إنشاء مصدر الإحالة بنجاح')
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل إنشاء مصدر الإحالة')
+    },
+    onSettled: async () => {
+      return await queryClient.invalidateQueries({ queryKey: ['referrals'] })
     },
   })
 }
@@ -628,15 +660,17 @@ export const useUpdateReferral = () => {
       referralId: string
       data: Partial<Referral>
     }) => referralService.updateReferral(referralId, data),
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['referrals'] })
-      queryClient.invalidateQueries({
-        queryKey: ['referrals', variables.referralId],
-      })
+    onSuccess: () => {
       toast.success('تم تحديث مصدر الإحالة بنجاح')
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل تحديث مصدر الإحالة')
+    },
+    onSettled: async (_, __, { referralId }) => {
+      await queryClient.invalidateQueries({ queryKey: ['referrals'] })
+      return await queryClient.invalidateQueries({
+        queryKey: ['referrals', referralId],
+      })
     },
   })
 }
@@ -651,11 +685,13 @@ export const useDeleteReferral = () => {
     mutationFn: (referralId: string) =>
       referralService.deleteReferral(referralId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['referrals'] })
       toast.success('تم حذف مصدر الإحالة بنجاح')
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل حذف مصدر الإحالة')
+    },
+    onSettled: async () => {
+      return await queryClient.invalidateQueries({ queryKey: ['referrals'] })
     },
   })
 }
@@ -674,15 +710,17 @@ export const useUpdateReferralStatus = () => {
       referralId: string
       status: string
     }) => referralService.updateReferral(referralId, { status }),
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['referrals'] })
-      queryClient.invalidateQueries({
-        queryKey: ['referrals', variables.referralId],
-      })
+    onSuccess: () => {
       toast.success('تم تحديث حالة الإحالة بنجاح')
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل تحديث حالة الإحالة')
+    },
+    onSettled: async (_, __, { referralId }) => {
+      await queryClient.invalidateQueries({ queryKey: ['referrals'] })
+      return await queryClient.invalidateQueries({
+        queryKey: ['referrals', referralId],
+      })
     },
   })
 }
@@ -699,15 +737,17 @@ export const useMarkReferralPaid = () => {
         rewardPaid: true,
         rewardPaidAt: new Date().toISOString()
       }),
-    onSuccess: (_, referralId) => {
-      queryClient.invalidateQueries({ queryKey: ['referrals'] })
-      queryClient.invalidateQueries({
-        queryKey: ['referrals', referralId],
-      })
+    onSuccess: () => {
       toast.success('تم تأكيد دفع المكافأة بنجاح')
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل تأكيد الدفع')
+    },
+    onSettled: async (_, __, referralId) => {
+      await queryClient.invalidateQueries({ queryKey: ['referrals'] })
+      return await queryClient.invalidateQueries({
+        queryKey: ['referrals', referralId],
+      })
     },
   })
 }
@@ -728,14 +768,16 @@ export const useAddLeadReferral = () => {
       leadId: string
       caseValue?: number
     }) => referralService.addLeadReferral(referralId, { leadId, caseValue }),
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({
-        queryKey: ['referrals', variables.referralId],
-      })
+    onSuccess: () => {
       toast.success('تم ربط العميل المحتمل بمصدر الإحالة')
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل ربط العميل المحتمل')
+    },
+    onSettled: async (_, __, { referralId }) => {
+      return await queryClient.invalidateQueries({
+        queryKey: ['referrals', referralId],
+      })
     },
   })
 }
@@ -756,15 +798,17 @@ export const useMarkReferralConverted = () => {
       leadId: string
       clientId: string
     }) => referralService.markConverted(referralId, leadId, clientId),
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({
-        queryKey: ['referrals', variables.referralId],
-      })
-      queryClient.invalidateQueries({ queryKey: ['referrals', 'stats'] })
+    onSuccess: () => {
       toast.success('تم تسجيل تحويل الإحالة')
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل تسجيل التحويل')
+    },
+    onSettled: async (_, __, { referralId }) => {
+      await queryClient.invalidateQueries({
+        queryKey: ['referrals', referralId],
+      })
+      return await queryClient.invalidateQueries({ queryKey: ['referrals', 'stats'] })
     },
   })
 }
@@ -783,15 +827,17 @@ export const useRecordReferralPayment = () => {
       referralId: string
       data: FeePaymentData
     }) => referralService.recordPayment(referralId, data),
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({
-        queryKey: ['referrals', variables.referralId],
-      })
-      queryClient.invalidateQueries({ queryKey: ['referrals', 'stats'] })
+    onSuccess: () => {
       toast.success('تم تسجيل الدفعة بنجاح')
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل تسجيل الدفعة')
+    },
+    onSettled: async (_, __, { referralId }) => {
+      await queryClient.invalidateQueries({
+        queryKey: ['referrals', referralId],
+      })
+      return await queryClient.invalidateQueries({ queryKey: ['referrals', 'stats'] })
     },
   })
 }
@@ -909,12 +955,14 @@ export const useCreateActivity = () => {
     mutationFn: (data: CreateActivityData) =>
       crmActivityService.createActivity(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['activities'] })
-      queryClient.invalidateQueries({ queryKey: ['activity-timeline'] })
       toast.success('تم إنشاء النشاط بنجاح')
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل إنشاء النشاط')
+    },
+    onSettled: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['activities'] })
+      return await queryClient.invalidateQueries({ queryKey: ['activity-timeline'] })
     },
   })
 }
@@ -933,16 +981,18 @@ export const useUpdateActivity = () => {
       activityId: string
       data: Partial<CrmActivity>
     }) => crmActivityService.updateActivity(activityId, data),
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['activities'] })
-      queryClient.invalidateQueries({
-        queryKey: ['activities', variables.activityId],
-      })
-      queryClient.invalidateQueries({ queryKey: ['activity-timeline'] })
+    onSuccess: () => {
       toast.success('تم تحديث النشاط بنجاح')
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل تحديث النشاط')
+    },
+    onSettled: async (_, __, { activityId }) => {
+      await queryClient.invalidateQueries({ queryKey: ['activities'] })
+      await queryClient.invalidateQueries({
+        queryKey: ['activities', activityId],
+      })
+      return await queryClient.invalidateQueries({ queryKey: ['activity-timeline'] })
     },
   })
 }
@@ -957,12 +1007,14 @@ export const useDeleteActivity = () => {
     mutationFn: (activityId: string) =>
       crmActivityService.deleteActivity(activityId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['activities'] })
-      queryClient.invalidateQueries({ queryKey: ['activity-timeline'] })
       toast.success('تم حذف النشاط بنجاح')
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل حذف النشاط')
+    },
+    onSettled: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['activities'] })
+      return await queryClient.invalidateQueries({ queryKey: ['activity-timeline'] })
     },
   })
 }
@@ -981,16 +1033,18 @@ export const useUpdateActivityStatus = () => {
       activityId: string
       status: string
     }) => crmActivityService.updateActivity(activityId, { status }),
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['activities'] })
-      queryClient.invalidateQueries({ queryKey: ['activity-timeline'] })
-      queryClient.invalidateQueries({
-        queryKey: ['activities', variables.activityId],
-      })
+    onSuccess: () => {
       toast.success('تم تحديث حالة النشاط بنجاح')
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل تحديث حالة النشاط')
+    },
+    onSettled: async (_, __, { activityId }) => {
+      await queryClient.invalidateQueries({ queryKey: ['activities'] })
+      await queryClient.invalidateQueries({ queryKey: ['activity-timeline'] })
+      return await queryClient.invalidateQueries({
+        queryKey: ['activities', activityId],
+      })
     },
   })
 }
@@ -1010,12 +1064,14 @@ export const useCompleteTask = () => {
       outcomeNotes?: string
     }) => crmActivityService.completeTask(activityId, outcomeNotes),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['activities'] })
-      queryClient.invalidateQueries({ queryKey: ['activity-timeline'] })
       toast.success('تم إكمال المهمة بنجاح')
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل إكمال المهمة')
+    },
+    onSettled: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['activities'] })
+      return await queryClient.invalidateQueries({ queryKey: ['activity-timeline'] })
     },
   })
 }
@@ -1029,12 +1085,14 @@ export const useLogCall = () => {
   return useMutation({
     mutationFn: (data: LogCallData) => crmActivityService.logCall(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['activities'] })
-      queryClient.invalidateQueries({ queryKey: ['activity-timeline'] })
       toast.success('تم تسجيل المكالمة بنجاح')
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل تسجيل المكالمة')
+    },
+    onSettled: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['activities'] })
+      return await queryClient.invalidateQueries({ queryKey: ['activity-timeline'] })
     },
   })
 }
@@ -1048,12 +1106,14 @@ export const useLogEmail = () => {
   return useMutation({
     mutationFn: (data: LogEmailData) => crmActivityService.logEmail(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['activities'] })
-      queryClient.invalidateQueries({ queryKey: ['activity-timeline'] })
       toast.success('تم تسجيل البريد الإلكتروني بنجاح')
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل تسجيل البريد الإلكتروني')
+    },
+    onSettled: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['activities'] })
+      return await queryClient.invalidateQueries({ queryKey: ['activity-timeline'] })
     },
   })
 }
@@ -1067,12 +1127,14 @@ export const useLogMeeting = () => {
   return useMutation({
     mutationFn: (data: LogMeetingData) => crmActivityService.logMeeting(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['activities'] })
-      queryClient.invalidateQueries({ queryKey: ['activity-timeline'] })
       toast.success('تم تسجيل الاجتماع بنجاح')
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل تسجيل الاجتماع')
+    },
+    onSettled: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['activities'] })
+      return await queryClient.invalidateQueries({ queryKey: ['activity-timeline'] })
     },
   })
 }
@@ -1086,12 +1148,14 @@ export const useAddNote = () => {
   return useMutation({
     mutationFn: (data: AddNoteData) => crmActivityService.addNote(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['activities'] })
-      queryClient.invalidateQueries({ queryKey: ['activity-timeline'] })
       toast.success('تم إضافة الملاحظة بنجاح')
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل إضافة الملاحظة')
+    },
+    onSettled: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['activities'] })
+      return await queryClient.invalidateQueries({ queryKey: ['activity-timeline'] })
     },
   })
 }
