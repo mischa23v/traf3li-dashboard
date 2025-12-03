@@ -18,7 +18,9 @@ import { TopNav } from '@/components/layout/top-nav'
 import { DynamicIsland } from '@/components/dynamic-island'
 import { Search, Bell, AlertCircle, Briefcase, Plus, MoreHorizontal, ChevronLeft, Eye, Trash2, CheckCircle, XCircle, Edit3, Calendar, SortAsc, Filter, X, List, Grid } from 'lucide-react'
 import { useNavigate } from '@tanstack/react-router'
-import { useDeleteTask, useCompleteTask, useReopenTask } from '@/hooks/useTasks'
+import { useDeleteTask, useCompleteTask, useReopenTask, useUpdateTask } from '@/hooks/useTasks'
+import { format } from 'date-fns'
+import { arSA } from 'date-fns/locale'
 import { Input } from '@/components/ui/input'
 import {
     Select,
@@ -60,6 +62,7 @@ export function TasksListView() {
     const deleteTaskMutation = useDeleteTask()
     const completeTaskMutation = useCompleteTask()
     const reopenTaskMutation = useReopenTask()
+    const updateTaskMutation = useUpdateTask()
 
     // API Filters - Map UI tabs to actual task status values
     // TaskStatus: 'backlog' | 'todo' | 'in_progress' | 'done' | 'canceled'
@@ -153,6 +156,16 @@ export function TasksListView() {
     const { data: stats } = useTaskStats()
     const { mutate: bulkDeleteTasks } = useBulkDeleteTasks()
 
+    // Helper function to format dates in both languages
+    const formatDualDate = (dateString: string | null | undefined) => {
+        if (!dateString) return { arabic: 'غير محدد', english: 'Not set' }
+        const date = new Date(dateString)
+        return {
+            arabic: format(date, 'd MMMM', { locale: arSA }),
+            english: format(date, 'MMM d, yyyy')
+        }
+    }
+
     // Transform API data
     const tasks = useMemo(() => {
         if (!tasksData?.tasks) return []
@@ -161,7 +174,10 @@ export function TasksListView() {
             id: task._id,
             title: task.title || task.description || 'مهمة غير محددة',
             client: task.caseId?.clientId?.name || task.clientId?.name || 'غير محدد',
-            deadline: task.dueDate ? new Date(task.dueDate).toLocaleDateString('ar-SA', { month: 'long', day: 'numeric' }) : 'غير محدد',
+            dueDate: task.dueDate,
+            createdAt: task.createdAt,
+            dueDateFormatted: formatDualDate(task.dueDate),
+            createdAtFormatted: formatDualDate(task.createdAt),
             priority: task.priority || 'medium',
             status: task.status || 'pending',
             _id: task._id,
@@ -216,6 +232,10 @@ export function TasksListView() {
 
     const handleReopenTask = (taskId: string) => {
         reopenTaskMutation.mutate({ id: taskId })
+    }
+
+    const handlePriorityChange = (taskId: string, priority: string) => {
+        updateTaskMutation.mutate({ id: taskId, data: { priority: priority as 'low' | 'medium' | 'high' | 'urgent' } })
     }
 
     const topNav = [
@@ -539,16 +559,41 @@ export function TasksListView() {
                                         </div>
 
                                         <div className="flex items-center justify-between pt-4 border-t border-slate-200/50">
-                                            <div className="flex items-center gap-6">
-                                                <div className="text-center">
+                                            <div className="flex items-center gap-4">
+                                                {/* Priority Dropdown */}
+                                                <div>
                                                     <div className="text-xs text-slate-400 mb-1">الأولوية</div>
-                                                    <div className={`font-bold ${task.priority === 'high' ? 'text-red-500' : 'text-orange-500'}`}>
-                                                        {task.priority === 'high' ? 'عالية' : 'متوسطة'}
-                                                    </div>
+                                                    <Select
+                                                        value={task.priority}
+                                                        onValueChange={(value) => handlePriorityChange(task.id, value)}
+                                                    >
+                                                        <SelectTrigger className={`w-[100px] h-8 text-xs font-bold rounded-lg border-0 ${
+                                                            task.priority === 'urgent' ? 'bg-red-100 text-red-700' :
+                                                            task.priority === 'high' ? 'bg-orange-100 text-orange-700' :
+                                                            task.priority === 'medium' ? 'bg-amber-100 text-amber-700' :
+                                                            'bg-green-100 text-green-700'
+                                                        }`}>
+                                                            <SelectValue />
+                                                        </SelectTrigger>
+                                                        <SelectContent>
+                                                            <SelectItem value="urgent">عاجلة</SelectItem>
+                                                            <SelectItem value="high">عالية</SelectItem>
+                                                            <SelectItem value="medium">متوسطة</SelectItem>
+                                                            <SelectItem value="low">منخفضة</SelectItem>
+                                                        </SelectContent>
+                                                    </Select>
                                                 </div>
+                                                {/* Due Date - Dual Language */}
                                                 <div className="text-center">
-                                                    <div className="text-xs text-slate-400 mb-1">الموعد</div>
-                                                    <div className="font-bold text-navy">{task.deadline}</div>
+                                                    <div className="text-xs text-slate-400 mb-1">تاريخ الاستحقاق</div>
+                                                    <div className="font-bold text-navy text-sm">{task.dueDateFormatted.arabic}</div>
+                                                    <div className="text-xs text-slate-400">{task.dueDateFormatted.english}</div>
+                                                </div>
+                                                {/* Creation Date - Dual Language */}
+                                                <div className="text-center">
+                                                    <div className="text-xs text-slate-400 mb-1">تاريخ الإنشاء</div>
+                                                    <div className="font-bold text-slate-600 text-sm">{task.createdAtFormatted.arabic}</div>
+                                                    <div className="text-xs text-slate-400">{task.createdAtFormatted.english}</div>
                                                 </div>
                                             </div>
                                             <Link to={`/dashboard/tasks/${task.id}` as any}>
