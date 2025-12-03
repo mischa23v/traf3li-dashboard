@@ -195,34 +195,22 @@ export function CreateReminderView() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
 
-        // Combine date and time into ISO 8601 datetime
-        const reminderDateTime = formData.reminderDate && formData.reminderTime
-            ? new Date(`${formData.reminderDate}T${formData.reminderTime}:00`).toISOString()
-            : undefined
-
         const reminderData = {
             title: formData.title,
             description: formData.description,
-            reminderDateTime,
+            // Backend expects separate date/time fields
+            reminderDate: formData.reminderDate,
+            reminderTime: formData.reminderTime,
             priority: formData.priority,
-            reminderType: formData.type, // Use reminderType for Saudi Legal API
-            tags: formData.tags,
-            notification: {
-                channels: notificationChannels,
-                // API expects array of AdvanceNotification objects
-                advanceNotifications: advanceNotifications.map(minutes => ({
-                    beforeMinutes: minutes,
-                    channels: notificationChannels,
-                    sent: false
-                })),
-            },
+            type: formData.type, // Backend expects 'type' not 'reminderType'
+            notes: formData.description, // Also send as notes
             ...(formData.assignedTo && { assignedTo: formData.assignedTo }),
             ...(formData.relatedCase && { relatedCase: formData.relatedCase }),
-            ...(formData.relatedClient && { clientId: formData.relatedClient }),
             ...(isRecurring && {
                 recurring: {
-                    ...recurringConfig,
                     enabled: true,
+                    frequency: recurringConfig.frequency,
+                    endDate: recurringConfig.endDate,
                 }
             }),
         }
