@@ -110,13 +110,46 @@ export const useCreateTask = () => {
 
   return useMutation({
     mutationFn: (data: CreateTaskData) => tasksService.createTask(data),
+    // Optimistic update - add task to list immediately
+    onMutate: async (data) => {
+      await queryClient.cancelQueries({ queryKey: ['tasks'] })
+      const previousTasks = queryClient.getQueryData<{ tasks: Task[]; total: number }>(['tasks'])
+
+      if (previousTasks) {
+        const tempTask: Task = {
+          _id: `temp-${Date.now()}`,
+          title: data.title,
+          description: data.description,
+          taskType: data.taskType || 'other',
+          status: data.status || 'todo',
+          priority: data.priority || 'medium',
+          deadlineType: data.deadlineType || 'none',
+          warningDaysBefore: data.warningDaysBefore || 3,
+          dueDate: data.dueDate,
+          createdBy: 'current-user',
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        }
+        queryClient.setQueryData<{ tasks: Task[]; total: number }>(['tasks'], {
+          tasks: [tempTask, ...(previousTasks.tasks || [])],
+          total: (previousTasks.total || 0) + 1
+        })
+      }
+
+      return { previousTasks }
+    },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['tasks'] })
-      queryClient.invalidateQueries({ queryKey: ['calendar'] })
       toast.success('تم إنشاء المهمة بنجاح')
     },
-    onError: (error: Error) => {
+    onError: (error: Error, _, context) => {
+      if (context?.previousTasks) {
+        queryClient.setQueryData(['tasks'], context.previousTasks)
+      }
       toast.error(error.message || 'فشل إنشاء المهمة')
+    },
+    onSettled: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['tasks'] })
+      return await queryClient.invalidateQueries({ queryKey: ['calendar'] })
     },
   })
 }
@@ -127,14 +160,42 @@ export const useUpdateTask = () => {
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: Partial<CreateTaskData> }) =>
       tasksService.updateTask(id, data),
-    onSuccess: (_, { id }) => {
-      queryClient.invalidateQueries({ queryKey: ['tasks'] })
-      queryClient.invalidateQueries({ queryKey: ['tasks', id] })
-      queryClient.invalidateQueries({ queryKey: ['calendar'] })
+    // Optimistic update
+    onMutate: async ({ id, data }) => {
+      await queryClient.cancelQueries({ queryKey: ['tasks'] })
+      await queryClient.cancelQueries({ queryKey: ['tasks', id] })
+
+      const previousTasks = queryClient.getQueryData<{ tasks: Task[]; total: number }>(['tasks'])
+      const previousTask = queryClient.getQueryData<Task>(['tasks', id])
+
+      if (previousTasks) {
+        queryClient.setQueryData<{ tasks: Task[]; total: number }>(['tasks'], {
+          ...previousTasks,
+          tasks: previousTasks.tasks?.map(t => t._id === id ? { ...t, ...data } : t) || []
+        })
+      }
+      if (previousTask) {
+        queryClient.setQueryData<Task>(['tasks', id], { ...previousTask, ...data })
+      }
+
+      return { previousTasks, previousTask }
+    },
+    onSuccess: () => {
       toast.success('تم تحديث المهمة بنجاح')
     },
-    onError: (error: Error) => {
+    onError: (error: Error, { id }, context) => {
+      if (context?.previousTasks) {
+        queryClient.setQueryData(['tasks'], context.previousTasks)
+      }
+      if (context?.previousTask) {
+        queryClient.setQueryData(['tasks', id], context.previousTask)
+      }
       toast.error(error.message || 'فشل تحديث المهمة')
+    },
+    onSettled: async (_, __, { id }) => {
+      await queryClient.invalidateQueries({ queryKey: ['tasks'] })
+      await queryClient.invalidateQueries({ queryKey: ['tasks', id] })
+      return await queryClient.invalidateQueries({ queryKey: ['calendar'] })
     },
   })
 }
@@ -144,13 +205,32 @@ export const useDeleteTask = () => {
 
   return useMutation({
     mutationFn: (id: string) => tasksService.deleteTask(id),
+    // Optimistic update - remove task from list immediately
+    onMutate: async (id) => {
+      await queryClient.cancelQueries({ queryKey: ['tasks'] })
+      const previousTasks = queryClient.getQueryData<{ tasks: Task[]; total: number }>(['tasks'])
+
+      if (previousTasks) {
+        queryClient.setQueryData<{ tasks: Task[]; total: number }>(['tasks'], {
+          tasks: previousTasks.tasks?.filter(t => t._id !== id) || [],
+          total: Math.max(0, (previousTasks.total || 0) - 1)
+        })
+      }
+
+      return { previousTasks }
+    },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['tasks'] })
-      queryClient.invalidateQueries({ queryKey: ['calendar'] })
       toast.success('تم حذف المهمة بنجاح')
     },
-    onError: (error: Error) => {
+    onError: (error: Error, _, context) => {
+      if (context?.previousTasks) {
+        queryClient.setQueryData(['tasks'], context.previousTasks)
+      }
       toast.error(error.message || 'فشل حذف المهمة')
+    },
+    onSettled: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['tasks'] })
+      return await queryClient.invalidateQueries({ queryKey: ['calendar'] })
     },
   })
 }

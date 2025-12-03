@@ -96,11 +96,7 @@ export const useCreateFollowup = () => {
 
   return useMutation({
     mutationFn: (data: CreateFollowupData) => followupsService.createFollowup(data),
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: followupsKeys.all })
-      queryClient.invalidateQueries({
-        queryKey: followupsKeys.entity(variables.entityType, variables.entityId),
-      })
+    onSuccess: () => {
       toast({
         title: t('status.success'),
         description: t('followups.createSuccess'),
@@ -111,6 +107,12 @@ export const useCreateFollowup = () => {
         variant: 'destructive',
         title: t('status.error'),
         description: error.response?.data?.message || t('common.unknownError'),
+      })
+    },
+    onSettled: async (_, __, variables) => {
+      await queryClient.invalidateQueries({ queryKey: followupsKeys.all })
+      return await queryClient.invalidateQueries({
+        queryKey: followupsKeys.entity(variables.entityType, variables.entityId),
       })
     },
   })
@@ -124,9 +126,7 @@ export const useUpdateFollowup = () => {
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: UpdateFollowupData }) =>
       followupsService.updateFollowup(id, data),
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: followupsKeys.all })
-      queryClient.invalidateQueries({ queryKey: followupsKeys.detail(variables.id) })
+    onSuccess: () => {
       toast({
         title: t('status.success'),
         description: t('status.updatedSuccessfully'),
@@ -139,6 +139,10 @@ export const useUpdateFollowup = () => {
         description: error.response?.data?.message || t('common.unknownError'),
       })
     },
+    onSettled: async (_, __, { id }) => {
+      await queryClient.invalidateQueries({ queryKey: followupsKeys.all })
+      return await queryClient.invalidateQueries({ queryKey: followupsKeys.detail(id) })
+    },
   })
 }
 
@@ -150,7 +154,6 @@ export const useDeleteFollowup = () => {
   return useMutation({
     mutationFn: (id: string) => followupsService.deleteFollowup(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: followupsKeys.all })
       toast({
         title: t('status.success'),
         description: t('status.deletedSuccessfully'),
@@ -163,6 +166,9 @@ export const useDeleteFollowup = () => {
         description: error.response?.data?.message || t('common.unknownError'),
       })
     },
+    onSettled: async () => {
+      return await queryClient.invalidateQueries({ queryKey: followupsKeys.all })
+    },
   })
 }
 
@@ -174,9 +180,7 @@ export const useCompleteFollowup = () => {
   return useMutation({
     mutationFn: ({ id, notes }: { id: string; notes?: string }) =>
       followupsService.completeFollowup(id, notes),
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: followupsKeys.all })
-      queryClient.invalidateQueries({ queryKey: followupsKeys.detail(variables.id) })
+    onSuccess: () => {
       toast({
         title: t('status.success'),
         description: t('followups.completeSuccess'),
@@ -189,6 +193,10 @@ export const useCompleteFollowup = () => {
         description: error.response?.data?.message || t('common.unknownError'),
       })
     },
+    onSettled: async (_, __, { id }) => {
+      await queryClient.invalidateQueries({ queryKey: followupsKeys.all })
+      return await queryClient.invalidateQueries({ queryKey: followupsKeys.detail(id) })
+    },
   })
 }
 
@@ -200,9 +208,7 @@ export const useCancelFollowup = () => {
   return useMutation({
     mutationFn: ({ id, reason }: { id: string; reason?: string }) =>
       followupsService.cancelFollowup(id, reason),
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: followupsKeys.all })
-      queryClient.invalidateQueries({ queryKey: followupsKeys.detail(variables.id) })
+    onSuccess: () => {
       toast({
         title: t('status.success'),
         description: t('followups.cancelSuccess'),
@@ -214,6 +220,10 @@ export const useCancelFollowup = () => {
         title: t('status.error'),
         description: error.response?.data?.message || t('common.unknownError'),
       })
+    },
+    onSettled: async (_, __, { id }) => {
+      await queryClient.invalidateQueries({ queryKey: followupsKeys.all })
+      return await queryClient.invalidateQueries({ queryKey: followupsKeys.detail(id) })
     },
   })
 }
@@ -235,9 +245,7 @@ export const useRescheduleFollowup = () => {
       newDueTime?: string
       reason?: string
     }) => followupsService.rescheduleFollowup(id, newDueDate, newDueTime, reason),
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: followupsKeys.all })
-      queryClient.invalidateQueries({ queryKey: followupsKeys.detail(variables.id) })
+    onSuccess: () => {
       toast({
         title: t('status.success'),
         description: t('followups.rescheduleSuccess'),
@@ -250,6 +258,10 @@ export const useRescheduleFollowup = () => {
         description: error.response?.data?.message || t('common.unknownError'),
       })
     },
+    onSettled: async (_, __, { id }) => {
+      await queryClient.invalidateQueries({ queryKey: followupsKeys.all })
+      return await queryClient.invalidateQueries({ queryKey: followupsKeys.detail(id) })
+    },
   })
 }
 
@@ -261,8 +273,7 @@ export const useAddFollowupNote = () => {
   return useMutation({
     mutationFn: ({ id, note }: { id: string; note: string }) =>
       followupsService.addFollowupNote(id, note),
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: followupsKeys.detail(variables.id) })
+    onSuccess: () => {
       toast({
         title: t('status.success'),
         description: t('followups.noteAdded'),
@@ -275,6 +286,9 @@ export const useAddFollowupNote = () => {
         description: error.response?.data?.message || t('common.unknownError'),
       })
     },
+    onSettled: async (_, __, { id }) => {
+      return await queryClient.invalidateQueries({ queryKey: followupsKeys.detail(id) })
+    },
   })
 }
 
@@ -286,7 +300,6 @@ export const useBulkCompleteFollowups = () => {
   return useMutation({
     mutationFn: (ids: string[]) => followupsService.bulkCompleteFollowups(ids),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: followupsKeys.all })
       toast({
         title: t('status.success'),
         description: t('followups.bulkCompleteSuccess'),
@@ -299,6 +312,9 @@ export const useBulkCompleteFollowups = () => {
         description: error.response?.data?.message || t('common.unknownError'),
       })
     },
+    onSettled: async () => {
+      return await queryClient.invalidateQueries({ queryKey: followupsKeys.all })
+    },
   })
 }
 
@@ -310,7 +326,6 @@ export const useBulkDeleteFollowups = () => {
   return useMutation({
     mutationFn: (ids: string[]) => followupsService.bulkDeleteFollowups(ids),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: followupsKeys.all })
       toast({
         title: t('status.success'),
         description: t('followups.bulkDeleteSuccess'),
@@ -322,6 +337,9 @@ export const useBulkDeleteFollowups = () => {
         title: t('status.error'),
         description: error.response?.data?.message || t('common.unknownError'),
       })
+    },
+    onSettled: async () => {
+      return await queryClient.invalidateQueries({ queryKey: followupsKeys.all })
     },
   })
 }

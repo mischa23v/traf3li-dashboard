@@ -41,11 +41,13 @@ export const useCreateInvoice = () => {
     mutationFn: (data: CreateInvoiceData) =>
       financeService.createInvoice(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['invoices'] })
       toast.success('تم إنشاء الفاتورة بنجاح')
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل إنشاء الفاتورة')
+    },
+    onSettled: async () => {
+      return await queryClient.invalidateQueries({ queryKey: ['invoices'] })
     },
   })
 }
@@ -56,13 +58,15 @@ export const useUpdateInvoice = () => {
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: Partial<CreateInvoiceData> }) =>
       financeService.updateInvoice(id, data),
-    onSuccess: (_, { id }) => {
-      queryClient.invalidateQueries({ queryKey: ['invoices'] })
-      queryClient.invalidateQueries({ queryKey: ['invoices', id] })
+    onSuccess: () => {
       toast.success('تم تحديث الفاتورة بنجاح')
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل تحديث الفاتورة')
+    },
+    onSettled: async (_, __, { id }) => {
+      await queryClient.invalidateQueries({ queryKey: ['invoices'] })
+      return await queryClient.invalidateQueries({ queryKey: ['invoices', id] })
     },
   })
 }
@@ -72,13 +76,15 @@ export const useSendInvoice = () => {
 
   return useMutation({
     mutationFn: (id: string) => financeService.sendInvoice(id),
-    onSuccess: (_, id) => {
-      queryClient.invalidateQueries({ queryKey: ['invoices'] })
-      queryClient.invalidateQueries({ queryKey: ['invoices', id] })
+    onSuccess: () => {
       toast.success('تم إرسال الفاتورة بنجاح')
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل إرسال الفاتورة')
+    },
+    onSettled: async (_, __, id) => {
+      await queryClient.invalidateQueries({ queryKey: ['invoices'] })
+      return await queryClient.invalidateQueries({ queryKey: ['invoices', id] })
     },
   })
 }
@@ -116,11 +122,13 @@ export const useCreateExpense = () => {
     mutationFn: (data: CreateExpenseData) =>
       financeService.createExpense(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['expenses'] })
       toast.success('تم إنشاء المصروف بنجاح')
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل إنشاء المصروف')
+    },
+    onSettled: async () => {
+      return await queryClient.invalidateQueries({ queryKey: ['expenses'] })
     },
   })
 }
@@ -131,13 +139,15 @@ export const useUpdateExpense = () => {
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: Partial<CreateExpenseData> }) =>
       financeService.updateExpense(id, data),
-    onSuccess: (_, { id }) => {
-      queryClient.invalidateQueries({ queryKey: ['expenses'] })
-      queryClient.invalidateQueries({ queryKey: ['expenses', id] })
+    onSuccess: () => {
       toast.success('تم تحديث المصروف بنجاح')
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل تحديث المصروف')
+    },
+    onSettled: async (_, __, { id }) => {
+      await queryClient.invalidateQueries({ queryKey: ['expenses'] })
+      return await queryClient.invalidateQueries({ queryKey: ['expenses', id] })
     },
   })
 }
@@ -148,12 +158,14 @@ export const useUploadReceipt = () => {
   return useMutation({
     mutationFn: ({ id, file }: { id: string; file: File }) =>
       financeService.uploadReceipt(id, file),
-    onSuccess: (_, { id }) => {
-      queryClient.invalidateQueries({ queryKey: ['expenses', id] })
+    onSuccess: () => {
       toast.success('تم رفع الإيصال بنجاح')
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل رفع الإيصال')
+    },
+    onSettled: async (_, __, { id }) => {
+      return await queryClient.invalidateQueries({ queryKey: ['expenses', id] })
     },
   })
 }
@@ -192,11 +204,13 @@ export const useStartTimer = () => {
       description: string
     }) => financeService.startTimer(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['timer'] })
       toast.success('تم بدء المؤقت بنجاح')
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل بدء المؤقت')
+    },
+    onSettled: async () => {
+      return await queryClient.invalidateQueries({ queryKey: ['timer'] })
     },
   })
 }
@@ -207,11 +221,13 @@ export const usePauseTimer = () => {
   return useMutation({
     mutationFn: () => financeService.pauseTimer(),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['timer'] })
       toast.success('تم إيقاف المؤقت مؤقتاً')
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل إيقاف المؤقت')
+    },
+    onSettled: async () => {
+      return await queryClient.invalidateQueries({ queryKey: ['timer'] })
     },
   })
 }
@@ -222,11 +238,13 @@ export const useResumeTimer = () => {
   return useMutation({
     mutationFn: () => financeService.resumeTimer(),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['timer'] })
       toast.success('تم استئناف المؤقت')
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل استئناف المؤقت')
+    },
+    onSettled: async () => {
+      return await queryClient.invalidateQueries({ queryKey: ['timer'] })
     },
   })
 }
@@ -238,12 +256,14 @@ export const useStopTimer = () => {
     mutationFn: (data: { notes?: string; isBillable?: boolean }) =>
       financeService.stopTimer(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['timer'] })
-      queryClient.invalidateQueries({ queryKey: ['timeEntries'] })
       toast.success('تم إيقاف المؤقت وإنشاء إدخال الوقت')
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل إيقاف المؤقت')
+    },
+    onSettled: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['timer'] })
+      return await queryClient.invalidateQueries({ queryKey: ['timeEntries'] })
     },
   })
 }
@@ -263,11 +283,13 @@ export const useCreateTimeEntry = () => {
     mutationFn: (data: CreateTimeEntryData) =>
       financeService.createTimeEntry(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['timeEntries'] })
       toast.success('تم إنشاء إدخال الوقت بنجاح')
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل إنشاء إدخال الوقت')
+    },
+    onSettled: async () => {
+      return await queryClient.invalidateQueries({ queryKey: ['timeEntries'] })
     },
   })
 }
@@ -309,12 +331,14 @@ export const useCreatePayment = () => {
     mutationFn: (data: CreatePaymentData) =>
       financeService.createPayment(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['payments'] })
-      queryClient.invalidateQueries({ queryKey: ['invoices'] })
       toast.success('تم إنشاء الدفعة بنجاح')
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل إنشاء الدفعة')
+    },
+    onSettled: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['payments'] })
+      return await queryClient.invalidateQueries({ queryKey: ['invoices'] })
     },
   })
 }
@@ -333,12 +357,14 @@ export const useCompletePayment = () => {
   return useMutation({
     mutationFn: (id: string) => financeService.completePayment(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['payments'] })
-      queryClient.invalidateQueries({ queryKey: ['invoices'] })
       toast.success('تم إكمال الدفعة بنجاح')
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل إكمال الدفعة')
+    },
+    onSettled: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['payments'] })
+      return await queryClient.invalidateQueries({ queryKey: ['invoices'] })
     },
   })
 }
@@ -350,12 +376,14 @@ export const useRecordPaymentForInvoice = () => {
     mutationFn: ({ invoiceId, data }: { invoiceId: string; data: any }) =>
       financeService.recordPaymentForInvoice(invoiceId, data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['payments'] })
-      queryClient.invalidateQueries({ queryKey: ['invoices'] })
       toast.success('تم تسجيل الدفعة بنجاح')
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل تسجيل الدفعة')
+    },
+    onSettled: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['payments'] })
+      return await queryClient.invalidateQueries({ queryKey: ['invoices'] })
     },
   })
 }
@@ -393,11 +421,13 @@ export const useCreateTransaction = () => {
     mutationFn: (data: CreateTransactionData) =>
       financeService.createTransaction(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['transactions'] })
       toast.success('تم إنشاء المعاملة بنجاح')
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل إنشاء المعاملة')
+    },
+    onSettled: async () => {
+      return await queryClient.invalidateQueries({ queryKey: ['transactions'] })
     },
   })
 }
@@ -442,11 +472,13 @@ export const useCreateStatement = () => {
   return useMutation({
     mutationFn: (data: any) => financeService.createStatement(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['statements'] })
       toast.success('تم إنشاء الكشف الحسابي بنجاح')
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل إنشاء الكشف الحسابي')
+    },
+    onSettled: async () => {
+      return await queryClient.invalidateQueries({ queryKey: ['statements'] })
     },
   })
 }
@@ -457,13 +489,15 @@ export const useUpdateStatement = () => {
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: any }) =>
       financeService.updateStatement(id, data),
-    onSuccess: (_, { id }) => {
-      queryClient.invalidateQueries({ queryKey: ['statements'] })
-      queryClient.invalidateQueries({ queryKey: ['statements', id] })
+    onSuccess: () => {
       toast.success('تم تحديث الكشف الحسابي بنجاح')
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل تحديث الكشف الحسابي')
+    },
+    onSettled: async (_, __, { id }) => {
+      await queryClient.invalidateQueries({ queryKey: ['statements'] })
+      return await queryClient.invalidateQueries({ queryKey: ['statements', id] })
     },
   })
 }
@@ -474,11 +508,13 @@ export const useDeleteStatement = () => {
   return useMutation({
     mutationFn: (id: string) => financeService.deleteStatement(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['statements'] })
       toast.success('تم حذف الكشف الحسابي بنجاح')
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل حذف الكشف الحسابي')
+    },
+    onSettled: async () => {
+      return await queryClient.invalidateQueries({ queryKey: ['statements'] })
     },
   })
 }
@@ -488,13 +524,15 @@ export const useSendStatement = () => {
 
   return useMutation({
     mutationFn: (id: string) => financeService.sendStatement(id),
-    onSuccess: (_, id) => {
-      queryClient.invalidateQueries({ queryKey: ['statements'] })
-      queryClient.invalidateQueries({ queryKey: ['statements', id] })
+    onSuccess: () => {
       toast.success('تم إرسال الكشف الحسابي بنجاح')
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل إرسال الكشف الحسابي')
+    },
+    onSettled: async (_, __, id) => {
+      await queryClient.invalidateQueries({ queryKey: ['statements'] })
+      return await queryClient.invalidateQueries({ queryKey: ['statements', id] })
     },
   })
 }
@@ -523,11 +561,13 @@ export const useCreateActivity = () => {
   return useMutation({
     mutationFn: (data: any) => financeService.createActivity(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['activities'] })
       toast.success('تم إنشاء النشاط المالي بنجاح')
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل إنشاء النشاط المالي')
+    },
+    onSettled: async () => {
+      return await queryClient.invalidateQueries({ queryKey: ['activities'] })
     },
   })
 }
@@ -605,11 +645,13 @@ export const useDeleteInvoice = () => {
   return useMutation({
     mutationFn: (id: string) => financeService.deleteInvoice(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['invoices'] })
       toast.success('تم حذف الفاتورة بنجاح')
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل حذف الفاتورة')
+    },
+    onSettled: async () => {
+      return await queryClient.invalidateQueries({ queryKey: ['invoices'] })
     },
   })
 }
@@ -620,11 +662,13 @@ export const useDeleteExpense = () => {
   return useMutation({
     mutationFn: (id: string) => financeService.deleteExpense(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['expenses'] })
       toast.success('تم حذف المصروف بنجاح')
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل حذف المصروف')
+    },
+    onSettled: async () => {
+      return await queryClient.invalidateQueries({ queryKey: ['expenses'] })
     },
   })
 }
@@ -635,13 +679,15 @@ export const useUpdateTimeEntry = () => {
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: Partial<CreateTimeEntryData> }) =>
       financeService.updateTimeEntry(id, data),
-    onSuccess: (_, { id }) => {
-      queryClient.invalidateQueries({ queryKey: ['timeEntries'] })
-      queryClient.invalidateQueries({ queryKey: ['timeEntries', id] })
+    onSuccess: () => {
       toast.success('تم تحديث إدخال الوقت بنجاح')
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل تحديث إدخال الوقت')
+    },
+    onSettled: async (_, __, { id }) => {
+      await queryClient.invalidateQueries({ queryKey: ['timeEntries'] })
+      return await queryClient.invalidateQueries({ queryKey: ['timeEntries', id] })
     },
   })
 }
@@ -652,11 +698,13 @@ export const useDeleteTimeEntry = () => {
   return useMutation({
     mutationFn: (id: string) => financeService.deleteTimeEntry(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['timeEntries'] })
       toast.success('تم حذف إدخال الوقت بنجاح')
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل حذف إدخال الوقت')
+    },
+    onSettled: async () => {
+      return await queryClient.invalidateQueries({ queryKey: ['timeEntries'] })
     },
   })
 }
@@ -667,13 +715,15 @@ export const useUpdateTransaction = () => {
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: Partial<CreateTransactionData> }) =>
       financeService.updateTransaction(id, data),
-    onSuccess: (_, { id }) => {
-      queryClient.invalidateQueries({ queryKey: ['transactions'] })
-      queryClient.invalidateQueries({ queryKey: ['transactions', id] })
+    onSuccess: () => {
       toast.success('تم تحديث المعاملة بنجاح')
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل تحديث المعاملة')
+    },
+    onSettled: async (_, __, { id }) => {
+      await queryClient.invalidateQueries({ queryKey: ['transactions'] })
+      return await queryClient.invalidateQueries({ queryKey: ['transactions', id] })
     },
   })
 }
@@ -684,11 +734,13 @@ export const useDeleteTransaction = () => {
   return useMutation({
     mutationFn: (id: string) => financeService.deleteTransaction(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['transactions'] })
       toast.success('تم حذف المعاملة بنجاح')
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل حذف المعاملة')
+    },
+    onSettled: async () => {
+      return await queryClient.invalidateQueries({ queryKey: ['transactions'] })
     },
   })
 }
@@ -730,13 +782,15 @@ export const useUpdateAccountActivity = () => {
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: any }) =>
       financeService.updateActivity(id, data),
-    onSuccess: (_, { id }) => {
-      queryClient.invalidateQueries({ queryKey: ['activities'] })
-      queryClient.invalidateQueries({ queryKey: ['activities', id] })
+    onSuccess: () => {
       toast.success('تم تحديث النشاط بنجاح')
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل تحديث النشاط')
+    },
+    onSettled: async (_, __, { id }) => {
+      await queryClient.invalidateQueries({ queryKey: ['activities'] })
+      return await queryClient.invalidateQueries({ queryKey: ['activities', id] })
     },
   })
 }
@@ -747,11 +801,13 @@ export const useDeleteAccountActivity = () => {
   return useMutation({
     mutationFn: (id: string) => financeService.deleteActivity(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['activities'] })
       toast.success('تم حذف النشاط بنجاح')
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل حذف النشاط')
+    },
+    onSettled: async () => {
+      return await queryClient.invalidateQueries({ queryKey: ['activities'] })
     },
   })
 }

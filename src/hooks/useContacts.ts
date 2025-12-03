@@ -73,7 +73,6 @@ export const useCreateContact = () => {
   return useMutation({
     mutationFn: (data: CreateContactData) => contactsService.createContact(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: contactsKeys.all })
       toast({
         title: t('status.success'),
         description: t('status.createdSuccessfully'),
@@ -86,6 +85,9 @@ export const useCreateContact = () => {
         description: error.response?.data?.message || t('common.unknownError'),
       })
     },
+    onSettled: async () => {
+      return await queryClient.invalidateQueries({ queryKey: contactsKeys.all })
+    },
   })
 }
 
@@ -97,9 +99,7 @@ export const useUpdateContact = () => {
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: UpdateContactData }) =>
       contactsService.updateContact(id, data),
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: contactsKeys.all })
-      queryClient.invalidateQueries({ queryKey: contactsKeys.detail(variables.id) })
+    onSuccess: () => {
       toast({
         title: t('status.success'),
         description: t('status.updatedSuccessfully'),
@@ -111,6 +111,10 @@ export const useUpdateContact = () => {
         title: t('status.error'),
         description: error.response?.data?.message || t('common.unknownError'),
       })
+    },
+    onSettled: async (_, __, { id }) => {
+      await queryClient.invalidateQueries({ queryKey: contactsKeys.all })
+      return await queryClient.invalidateQueries({ queryKey: contactsKeys.detail(id) })
     },
   })
 }
@@ -123,7 +127,6 @@ export const useDeleteContact = () => {
   return useMutation({
     mutationFn: (id: string) => contactsService.deleteContact(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: contactsKeys.all })
       toast({
         title: t('status.success'),
         description: t('status.deletedSuccessfully'),
@@ -135,6 +138,9 @@ export const useDeleteContact = () => {
         title: t('status.error'),
         description: error.response?.data?.message || t('common.unknownError'),
       })
+    },
+    onSettled: async () => {
+      return await queryClient.invalidateQueries({ queryKey: contactsKeys.all })
     },
   })
 }
@@ -147,7 +153,6 @@ export const useBulkDeleteContacts = () => {
   return useMutation({
     mutationFn: (ids: string[]) => contactsService.bulkDeleteContacts(ids),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: contactsKeys.all })
       toast({
         title: t('status.success'),
         description: t('status.deletedSuccessfully'),
@@ -160,6 +165,9 @@ export const useBulkDeleteContacts = () => {
         description: error.response?.data?.message || t('common.unknownError'),
       })
     },
+    onSettled: async () => {
+      return await queryClient.invalidateQueries({ queryKey: contactsKeys.all })
+    },
   })
 }
 
@@ -171,9 +179,7 @@ export const useLinkContactToCase = () => {
   return useMutation({
     mutationFn: ({ contactId, caseId }: { contactId: string; caseId: string }) =>
       contactsService.linkToCase(contactId, caseId),
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: contactsKeys.detail(variables.contactId) })
-      queryClient.invalidateQueries({ queryKey: contactsKeys.byCase(variables.caseId) })
+    onSuccess: () => {
       toast({
         title: t('status.success'),
         description: t('status.updatedSuccessfully'),
@@ -185,6 +191,10 @@ export const useLinkContactToCase = () => {
         title: t('status.error'),
         description: error.response?.data?.message || t('common.unknownError'),
       })
+    },
+    onSettled: async (_, __, { contactId, caseId }) => {
+      await queryClient.invalidateQueries({ queryKey: contactsKeys.detail(contactId) })
+      return await queryClient.invalidateQueries({ queryKey: contactsKeys.byCase(caseId) })
     },
   })
 }
@@ -197,9 +207,7 @@ export const useUnlinkContactFromCase = () => {
   return useMutation({
     mutationFn: ({ contactId, caseId }: { contactId: string; caseId: string }) =>
       contactsService.unlinkFromCase(contactId, caseId),
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: contactsKeys.detail(variables.contactId) })
-      queryClient.invalidateQueries({ queryKey: contactsKeys.byCase(variables.caseId) })
+    onSuccess: () => {
       toast({
         title: t('status.success'),
         description: t('status.updatedSuccessfully'),
@@ -211,6 +219,10 @@ export const useUnlinkContactFromCase = () => {
         title: t('status.error'),
         description: error.response?.data?.message || t('common.unknownError'),
       })
+    },
+    onSettled: async (_, __, { contactId, caseId }) => {
+      await queryClient.invalidateQueries({ queryKey: contactsKeys.detail(contactId) })
+      return await queryClient.invalidateQueries({ queryKey: contactsKeys.byCase(caseId) })
     },
   })
 }
