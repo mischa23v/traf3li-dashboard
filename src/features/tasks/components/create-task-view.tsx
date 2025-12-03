@@ -77,7 +77,7 @@ export function CreateTaskView() {
     const [formData, setFormData] = useState({
         title: '',
         description: '',
-        status: 'todo' as TaskStatus,
+        status: 'backlog' as TaskStatus,
         priority: 'medium' as TaskPriority,
         label: '' as TaskLabel | '',
         tags: [] as string[],
@@ -353,7 +353,7 @@ export function CreateTaskView() {
                                             </label>
                                             <Select value={formData.label} onValueChange={(value) => handleChange('label', value)}>
                                                 <SelectTrigger className="rounded-xl border-slate-200 focus:ring-emerald-500">
-                                                    <SelectValue placeholder="اختر التصنيف (اختياري)" />
+                                                    <SelectValue placeholder="اختر التصنيف" />
                                                 </SelectTrigger>
                                                 <SelectContent>
                                                     {CATEGORY_OPTIONS.map(option => (
@@ -458,7 +458,7 @@ export function CreateTaskView() {
                                             </label>
                                             <Select value={formData.clientId} onValueChange={(value) => handleChange('clientId', value)}>
                                                 <SelectTrigger className="rounded-xl border-slate-200 focus:ring-emerald-500">
-                                                    <SelectValue placeholder={t('tasks.selectClient', 'اختر العميل (اختياري)')} />
+                                                    <SelectValue placeholder={t('tasks.selectClient', 'اختر العميل')} />
                                                 </SelectTrigger>
                                                 <SelectContent>
                                                     {clientsLoading ? (
@@ -488,7 +488,7 @@ export function CreateTaskView() {
                                             </label>
                                             <Select value={formData.caseId} onValueChange={(value) => handleChange('caseId', value)}>
                                                 <SelectTrigger className="rounded-xl border-slate-200 focus:ring-emerald-500">
-                                                    <SelectValue placeholder={t('tasks.selectCase', 'اختر القضية (اختياري)')} />
+                                                    <SelectValue placeholder={t('tasks.selectCase', 'اختر القضية')} />
                                                 </SelectTrigger>
                                                 <SelectContent>
                                                     {casesLoading ? (

@@ -153,7 +153,7 @@ export function ReminderDetailsView() {
                 ? { type: 'case' as const, id: r.caseId, title: 'قضية' }
                 : {
                     type: 'case' as const,
-                    id: r.caseId.caseNumber || 'N/A',
+                    id: r.caseId.caseNumber || 'غير محدد',
                     title: r.caseId.title || 'قضية غير محددة'
                 }
 

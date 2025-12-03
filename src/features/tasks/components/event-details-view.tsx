@@ -131,7 +131,7 @@ export function EventDetailsView() {
             })),
             relatedTo: e.caseId ? {
                 type: 'case',
-                id: typeof e.caseId === 'string' ? e.caseId : (e.caseId.caseNumber || 'N/A'),
+                id: typeof e.caseId === 'string' ? e.caseId : (e.caseId.caseNumber || 'غير محدد'),
                 title: typeof e.caseId === 'string' ? 'قضية' : (e.caseId.title || 'قضية غير محددة')
             } : null,
             timeline: (e.history || []).map((h: any) => ({

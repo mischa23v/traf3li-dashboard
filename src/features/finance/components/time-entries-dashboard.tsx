@@ -90,7 +90,7 @@ export default function TimeEntriesDashboard() {
             id: entry._id,
             date: new Date(entry.date).toLocaleDateString('ar-SA'),
             client: entry.clientId?.name || entry.clientId?.firstName + ' ' + entry.clientId?.lastName || 'عميل غير محدد',
-            caseNumber: entry.caseId?.caseNumber || 'N/A',
+            caseNumber: entry.caseId?.caseNumber || 'غير محدد',
             task: entry.description || 'مهمة غير محددة',
             hours: entry.hours || 0,
             rate: entry.hourlyRate || 0,

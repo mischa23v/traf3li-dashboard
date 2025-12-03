@@ -16,6 +16,7 @@ import {
 import { OutcomeType, VOICE_MEMO_TYPES } from '@/services/tasksService'
 import tasksService from '@/services/tasksService'
 import { API_DOMAIN, API_URL } from '@/lib/api'
+import { toast } from 'sonner'
 import { VoiceMemoRecorder, VoiceMemoPlayer, isVoiceMemo } from './voice-memo-recorder'
 import { DocumentEditorDialog } from './document-editor-dialog'
 import { useParams, useNavigate } from '@tanstack/react-router'
@@ -109,6 +110,8 @@ export function TaskDetailsView() {
                 onSuccess: () => {
                     setNewSubtaskTitle('')
                     setIsAddingSubtask(false)
+                    // Explicitly refetch to update UI immediately
+                    refetch()
                 }
             }
         )
@@ -142,6 +145,8 @@ export function TaskDetailsView() {
                     if (fileInputRef.current) {
                         fileInputRef.current.value = ''
                     }
+                    // Explicitly refetch to update UI immediately
+                    refetch()
                 }
             }
         )
@@ -149,7 +154,56 @@ export function TaskDetailsView() {
 
     const handleDeleteAttachment = (attachmentId: string) => {
         if (confirm('هل أنت متأكد من حذف هذا المرفق؟')) {
-            deleteAttachmentMutation.mutate({ taskId, attachmentId })
+            deleteAttachmentMutation.mutate(
+                { taskId, attachmentId },
+                {
+                    onSuccess: () => {
+                        // Explicitly refetch to update UI immediately
+                        refetch()
+                    }
+                }
+            )
+        }
+    }
+
+    // Preview attachment handler - fetches URL on demand for S3 files
+    const handlePreviewAttachment = async (attachmentId: string, existingUrl?: string, storageType?: string) => {
+        try {
+            let url = existingUrl
+            // If no URL or S3 storage, fetch fresh signed URL
+            if (!url || storageType === 's3') {
+                url = await tasksService.getAttachmentDownloadUrl(taskId, attachmentId)
+            }
+            if (url) {
+                window.open(getFullDocumentUrl(url), '_blank')
+            } else {
+                toast.error('لا يمكن معاينة الملف')
+            }
+        } catch (error) {
+            console.error('Preview attachment error:', error)
+            toast.error('فشل في معاينة الملف')
+        }
+    }
+
+    // Download attachment handler - fetches URL on demand for S3 files
+    const handleDownloadAttachment = async (attachmentId: string, fileName: string, existingUrl?: string, storageType?: string) => {
+        try {
+            let url = existingUrl
+            // If no URL or S3 storage, fetch fresh signed URL
+            if (!url || storageType === 's3') {
+                url = await tasksService.getAttachmentDownloadUrl(taskId, attachmentId)
+            }
+            if (url) {
+                const a = document.createElement('a')
+                a.href = getFullDocumentUrl(url)
+                a.download = fileName
+                a.click()
+            } else {
+                toast.error('لا يمكن تحميل الملف')
+            }
+        } catch (error) {
+            console.error('Download attachment error:', error)
+            toast.error('فشل في تحميل الملف')
         }
     }
 
@@ -234,9 +288,9 @@ export function TaskDetailsView() {
 
         // Type narrow caseId
         const caseInfo = typeof t.caseId === 'string' || !t.caseId
-            ? { id: 'N/A', title: 'غير محدد', court: 'غير محدد', _id: typeof t.caseId === 'string' ? t.caseId : null }
+            ? { id: 'غير محدد', title: 'غير محدد', court: 'غير محدد', _id: typeof t.caseId === 'string' ? t.caseId : null }
             : {
-                id: t.caseId.caseNumber || 'N/A',
+                id: t.caseId.caseNumber || 'غير محدد',
                 title: t.caseId.title || 'غير محدد',
                 court: t.caseId.court || 'غير محدد',
                 _id: (t.caseId as any)._id || null
@@ -1244,21 +1298,12 @@ export function TaskDetailsView() {
                                                                     </Button>
                                                                 </DropdownMenuTrigger>
                                                                 <DropdownMenuContent align="end">
-                                                                    {doc.url && (
-                                                                        <DropdownMenuItem onClick={() => window.open(getFullDocumentUrl(doc.url), '_blank')}>
-                                                                            <Eye className="h-4 w-4 ml-2" /> معاينة
-                                                                        </DropdownMenuItem>
-                                                                    )}
-                                                                    {doc.url && (
-                                                                        <DropdownMenuItem onClick={() => {
-                                                                            const a = document.createElement('a')
-                                                                            a.href = getFullDocumentUrl(doc.url)
-                                                                            a.download = doc.name
-                                                                            a.click()
-                                                                        }}>
-                                                                            <Download className="h-4 w-4 ml-2" /> تحميل
-                                                                        </DropdownMenuItem>
-                                                                    )}
+                                                                    <DropdownMenuItem onClick={() => handlePreviewAttachment(doc._id, doc.url, doc.storageType)}>
+                                                                        <Eye className="h-4 w-4 ml-2" /> معاينة
+                                                                    </DropdownMenuItem>
+                                                                    <DropdownMenuItem onClick={() => handleDownloadAttachment(doc._id, doc.name, doc.url, doc.storageType)}>
+                                                                        <Download className="h-4 w-4 ml-2" /> تحميل
+                                                                    </DropdownMenuItem>
                                                                     <DropdownMenuItem
                                                                         onClick={() => handleDeleteAttachment(doc._id)}
                                                                         className="text-red-600 focus:text-red-600"
@@ -1277,31 +1322,22 @@ export function TaskDetailsView() {
                                                             </div>
                                                         </div>
                                                         <div className="pt-3 border-t border-slate-50 flex gap-2">
-                                                            {doc.url && (
-                                                                <Button
-                                                                    variant="outline"
-                                                                    size="sm"
-                                                                    className="flex-1 h-8 text-xs"
-                                                                    onClick={() => window.open(getFullDocumentUrl(doc.url), '_blank')}
-                                                                >
-                                                                    معاينة
-                                                                </Button>
-                                                            )}
-                                                            {doc.url && (
-                                                                <Button
-                                                                    variant="ghost"
-                                                                    size="icon"
-                                                                    className="h-8 w-8 text-slate-400 hover:text-brand-blue"
-                                                                    onClick={() => {
-                                                                        const a = document.createElement('a')
-                                                                        a.href = getFullDocumentUrl(doc.url)
-                                                                        a.download = doc.name
-                                                                        a.click()
-                                                                    }}
-                                                                >
-                                                                    <Download className="h-4 w-4" />
-                                                                </Button>
-                                                            )}
+                                                            <Button
+                                                                variant="outline"
+                                                                size="sm"
+                                                                className="flex-1 h-8 text-xs"
+                                                                onClick={() => handlePreviewAttachment(doc._id, doc.url, doc.storageType)}
+                                                            >
+                                                                معاينة
+                                                            </Button>
+                                                            <Button
+                                                                variant="ghost"
+                                                                size="icon"
+                                                                className="h-8 w-8 text-slate-400 hover:text-brand-blue"
+                                                                onClick={() => handleDownloadAttachment(doc._id, doc.name, doc.url, doc.storageType)}
+                                                            >
+                                                                <Download className="h-4 w-4" />
+                                                            </Button>
                                                         </div>
                                                     </div>
                                                 ))}
