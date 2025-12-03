@@ -8,70 +8,100 @@ import {
   Timer,
   HelpCircle,
   CircleOff,
+  Flame,
 } from 'lucide-react'
 
 export const labels = [
   {
     value: 'bug',
-    label: 'Bug',
+    label: 'تقني',
   },
   {
     value: 'feature',
-    label: 'Feature',
+    label: 'ميزة',
   },
   {
     value: 'documentation',
-    label: 'Documentation',
+    label: 'توثيق',
+  },
+  {
+    value: 'urgent',
+    label: 'عاجل',
+  },
+  {
+    value: 'legal',
+    label: 'قانوني',
+  },
+  {
+    value: 'administrative',
+    label: 'إداري',
+  },
+  {
+    value: 'enhancement',
+    label: 'تحسين',
+  },
+  {
+    value: 'question',
+    label: 'استفسار',
   },
 ]
 
 export const statuses = [
   {
-    label: 'Backlog',
+    label: 'جديدة',
     value: 'backlog' as const,
     icon: HelpCircle,
+    tooltip: 'المهمة لم تبدأ بعد وفي انتظار البدء بالعمل عليها',
   },
   {
-    label: 'Todo',
+    label: 'معلقة',
     value: 'todo' as const,
     icon: Circle,
+    tooltip: 'المهمة متوقفة مؤقتاً في انتظار إجراء أو موافقة',
   },
   {
-    label: 'In Progress',
-    value: 'in progress' as const,
+    label: 'قيد التنفيذ',
+    value: 'in_progress' as const,
     icon: Timer,
+    tooltip: 'المهمة قيد العمل حالياً ويتم تنفيذها',
   },
   {
-    label: 'Done',
+    label: 'مكتملة',
     value: 'done' as const,
     icon: CheckCircle,
+    tooltip: 'تم الانتهاء من تنفيذ المهمة بنجاح',
   },
   {
-    label: 'Canceled',
+    label: 'منتهية',
     value: 'canceled' as const,
     icon: CircleOff,
+    tooltip: 'المهمة مغلقة نهائياً ولا تحتاج لأي إجراء آخر',
   },
 ]
 
 export const priorities = [
   {
-    label: 'Low',
-    value: 'low' as const,
-    icon: ArrowDown,
+    label: 'عاجل جداً',
+    value: 'critical' as const,
+    icon: Flame,
+    tooltip: 'مهمة عاجلة جداً تتطلب إجراءً فورياً ولا تحتمل أي تأخير',
   },
   {
-    label: 'Medium',
+    label: 'عاجل',
+    value: 'high' as const,
+    icon: AlertCircle,
+    tooltip: 'مهمة عاجلة يجب إنجازها في أقرب وقت ممكن',
+  },
+  {
+    label: 'متوسطة',
     value: 'medium' as const,
     icon: ArrowRight,
+    tooltip: 'مهمة ذات أهمية متوسطة ضمن الجدول الزمني المعتاد',
   },
   {
-    label: 'High',
-    value: 'high' as const,
-    icon: ArrowUp,
-  },
-  {
-    label: 'Critical',
-    value: 'critical' as const,
-    icon: AlertCircle,
+    label: 'عادية',
+    value: 'low' as const,
+    icon: ArrowDown,
+    tooltip: 'مهمة عادية يمكن إنجازها ضمن المواعيد الاعتيادية',
   },
 ]
