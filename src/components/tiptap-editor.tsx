@@ -1,7 +1,7 @@
 import { useEditor, EditorContent } from '@tiptap/react'
 import { BubbleMenu } from '@tiptap/extension-bubble-menu'
 import { FloatingMenu } from '@tiptap/extension-floating-menu'
-import { useEffect, useCallback } from 'react'
+import { useEffect, useCallback, useMemo } from 'react'
 import StarterKit from '@tiptap/starter-kit'
 import TextAlign from '@tiptap/extension-text-align'
 import Image from '@tiptap/extension-image'
@@ -82,59 +82,62 @@ export const TipTapEditor = ({
     maxCharacters,
     showCharacterCount = false
 }: TipTapEditorProps) => {
+    // Memoize extensions to prevent duplicate registration on re-renders
+    const extensions = useMemo(() => [
+        StarterKit.configure({
+            heading: {
+                levels: [1, 2, 3]
+            }
+        }),
+        TextAlign.configure({
+            types: ['heading', 'paragraph'],
+            alignments: ['left', 'center', 'right', 'justify'],
+            defaultAlignment: dir === 'rtl' ? 'right' : 'left',
+        }),
+        Image.configure({
+            inline: true,
+            allowBase64: true,
+        }),
+        Link.configure({
+            openOnClick: false,
+            HTMLAttributes: {
+                target: '_blank',
+                rel: 'noopener noreferrer',
+            },
+        }),
+        Placeholder.configure({
+            placeholder,
+            emptyEditorClass: 'is-editor-empty',
+        }),
+        Underline.configure({}),
+        TextStyle.configure({}),
+        Color.configure({}),
+        Highlight.configure({
+            multicolor: true,
+        }),
+        CharacterCount.configure({
+            limit: maxCharacters,
+        }),
+        Table.configure({
+            resizable: true,
+            HTMLAttributes: {
+                class: 'tiptap-table',
+            },
+        }),
+        TableRow.configure({}),
+        TableHeader.configure({}),
+        TableCell.configure({}),
+        TaskList.configure({}),
+        TaskItem.configure({
+            nested: true,
+        }),
+        Subscript.configure({}),
+        Superscript.configure({}),
+    ], [dir, placeholder, maxCharacters])
+
     const editor = useEditor({
         immediatelyRender: false, // Required for SSR safety
-        extensions: [
-            StarterKit.configure({
-                heading: {
-                    levels: [1, 2, 3]
-                }
-            }),
-            TextAlign.configure({
-                types: ['heading', 'paragraph'],
-                alignments: ['left', 'center', 'right', 'justify'],
-                defaultAlignment: dir === 'rtl' ? 'right' : 'left',
-            }),
-            Image.configure({
-                inline: true,
-                allowBase64: true,
-            }),
-            Link.configure({
-                openOnClick: false,
-                HTMLAttributes: {
-                    target: '_blank',
-                    rel: 'noopener noreferrer',
-                },
-            }),
-            Placeholder.configure({
-                placeholder,
-                emptyEditorClass: 'is-editor-empty',
-            }),
-            Underline,
-            TextStyle,
-            Color,
-            Highlight.configure({
-                multicolor: true,
-            }),
-            CharacterCount.configure({
-                limit: maxCharacters,
-            }),
-            Table.configure({
-                resizable: true,
-                HTMLAttributes: {
-                    class: 'tiptap-table',
-                },
-            }),
-            TableRow,
-            TableHeader,
-            TableCell,
-            TaskList,
-            TaskItem.configure({
-                nested: true,
-            }),
-            Subscript,
-            Superscript,
-        ],
+        extensions,
         content: contentJson || content,
         editable,
         onUpdate: ({ editor }) => {
