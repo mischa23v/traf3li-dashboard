@@ -54,7 +54,6 @@ import { Route as AuthenticatedAppsIndexRouteImport } from './routes/_authentica
 import { Route as ClerkAuthenticatedUserManagementRouteImport } from './routes/clerk/_authenticated/user-management'
 import { Route as ClerkauthSignUpRouteImport } from './routes/clerk/(auth)/sign-up'
 import { Route as ClerkauthSignInRouteImport } from './routes/clerk/(auth)/sign-in'
-import { Route as AuthenticatedTasksTaskIdRouteImport } from './routes/_authenticated/tasks.$taskId'
 import { Route as AuthenticatedSettingsNotificationsRouteImport } from './routes/_authenticated/settings/notifications'
 import { Route as AuthenticatedSettingsDisplayRouteImport } from './routes/_authenticated/settings/display'
 import { Route as AuthenticatedSettingsAppearanceRouteImport } from './routes/_authenticated/settings/appearance'
@@ -78,6 +77,7 @@ import { Route as AuthenticatedDashboardBillingRatesIndexRouteImport } from './r
 import { Route as AuthenticatedDashboardAppsIndexRouteImport } from './routes/_authenticated/dashboard.apps.index'
 import { Route as AuthenticatedDashboardTasksNewRouteImport } from './routes/_authenticated/dashboard.tasks.new'
 import { Route as AuthenticatedDashboardTasksListRouteImport } from './routes/_authenticated/dashboard.tasks.list'
+import { Route as AuthenticatedDashboardTasksTaskIdRouteImport } from './routes/_authenticated/dashboard.tasks.$taskId'
 import { Route as AuthenticatedDashboardStaffNewRouteImport } from './routes/_authenticated/dashboard.staff.new'
 import { Route as AuthenticatedDashboardSettingsTaxesRouteImport } from './routes/_authenticated/dashboard.settings.taxes'
 import { Route as AuthenticatedDashboardSettingsSecurityRouteImport } from './routes/_authenticated/dashboard.settings.security'
@@ -398,12 +398,6 @@ const ClerkauthSignInRoute = ClerkauthSignInRouteImport.update({
   path: '/sign-in',
   getParentRoute: () => ClerkauthRouteRoute,
 } as any)
-const AuthenticatedTasksTaskIdRoute =
-  AuthenticatedTasksTaskIdRouteImport.update({
-    id: '/tasks/$taskId',
-    path: '/tasks/$taskId',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
 const AuthenticatedSettingsNotificationsRoute =
   AuthenticatedSettingsNotificationsRouteImport.update({
     id: '/notifications',
@@ -540,6 +534,12 @@ const AuthenticatedDashboardTasksListRoute =
   AuthenticatedDashboardTasksListRouteImport.update({
     id: '/dashboard/tasks/list',
     path: '/dashboard/tasks/list',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedDashboardTasksTaskIdRoute =
+  AuthenticatedDashboardTasksTaskIdRouteImport.update({
+    id: '/dashboard/tasks/$taskId',
+    path: '/dashboard/tasks/$taskId',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedDashboardStaffNewRoute =
@@ -1145,7 +1145,6 @@ export interface FileRoutesByFullPath {
   '/settings/appearance': typeof AuthenticatedSettingsAppearanceRoute
   '/settings/display': typeof AuthenticatedSettingsDisplayRoute
   '/settings/notifications': typeof AuthenticatedSettingsNotificationsRoute
-  '/tasks/$taskId': typeof AuthenticatedTasksTaskIdRoute
   '/clerk/sign-in': typeof ClerkauthSignInRoute
   '/clerk/sign-up': typeof ClerkauthSignUpRoute
   '/clerk/user-management': typeof ClerkAuthenticatedUserManagementRoute
@@ -1179,6 +1178,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/settings/security': typeof AuthenticatedDashboardSettingsSecurityRoute
   '/dashboard/settings/taxes': typeof AuthenticatedDashboardSettingsTaxesRoute
   '/dashboard/staff/new': typeof AuthenticatedDashboardStaffNewRoute
+  '/dashboard/tasks/$taskId': typeof AuthenticatedDashboardTasksTaskIdRoute
   '/dashboard/tasks/list': typeof AuthenticatedDashboardTasksListRoute
   '/dashboard/tasks/new': typeof AuthenticatedDashboardTasksNewRoute
   '/dashboard/apps': typeof AuthenticatedDashboardAppsIndexRoute
@@ -1305,7 +1305,6 @@ export interface FileRoutesByTo {
   '/settings/appearance': typeof AuthenticatedSettingsAppearanceRoute
   '/settings/display': typeof AuthenticatedSettingsDisplayRoute
   '/settings/notifications': typeof AuthenticatedSettingsNotificationsRoute
-  '/tasks/$taskId': typeof AuthenticatedTasksTaskIdRoute
   '/clerk/sign-in': typeof ClerkauthSignInRoute
   '/clerk/sign-up': typeof ClerkauthSignUpRoute
   '/clerk/user-management': typeof ClerkAuthenticatedUserManagementRoute
@@ -1339,6 +1338,7 @@ export interface FileRoutesByTo {
   '/dashboard/settings/security': typeof AuthenticatedDashboardSettingsSecurityRoute
   '/dashboard/settings/taxes': typeof AuthenticatedDashboardSettingsTaxesRoute
   '/dashboard/staff/new': typeof AuthenticatedDashboardStaffNewRoute
+  '/dashboard/tasks/$taskId': typeof AuthenticatedDashboardTasksTaskIdRoute
   '/dashboard/tasks/list': typeof AuthenticatedDashboardTasksListRoute
   '/dashboard/tasks/new': typeof AuthenticatedDashboardTasksNewRoute
   '/dashboard/apps': typeof AuthenticatedDashboardAppsIndexRoute
@@ -1470,7 +1470,6 @@ export interface FileRoutesById {
   '/_authenticated/settings/appearance': typeof AuthenticatedSettingsAppearanceRoute
   '/_authenticated/settings/display': typeof AuthenticatedSettingsDisplayRoute
   '/_authenticated/settings/notifications': typeof AuthenticatedSettingsNotificationsRoute
-  '/_authenticated/tasks/$taskId': typeof AuthenticatedTasksTaskIdRoute
   '/clerk/(auth)/sign-in': typeof ClerkauthSignInRoute
   '/clerk/(auth)/sign-up': typeof ClerkauthSignUpRoute
   '/clerk/_authenticated/user-management': typeof ClerkAuthenticatedUserManagementRoute
@@ -1504,6 +1503,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/settings/security': typeof AuthenticatedDashboardSettingsSecurityRoute
   '/_authenticated/dashboard/settings/taxes': typeof AuthenticatedDashboardSettingsTaxesRoute
   '/_authenticated/dashboard/staff/new': typeof AuthenticatedDashboardStaffNewRoute
+  '/_authenticated/dashboard/tasks/$taskId': typeof AuthenticatedDashboardTasksTaskIdRoute
   '/_authenticated/dashboard/tasks/list': typeof AuthenticatedDashboardTasksListRoute
   '/_authenticated/dashboard/tasks/new': typeof AuthenticatedDashboardTasksNewRoute
   '/_authenticated/dashboard/apps/': typeof AuthenticatedDashboardAppsIndexRoute
@@ -1633,7 +1633,6 @@ export interface FileRouteTypes {
     | '/settings/appearance'
     | '/settings/display'
     | '/settings/notifications'
-    | '/tasks/$taskId'
     | '/clerk/sign-in'
     | '/clerk/sign-up'
     | '/clerk/user-management'
@@ -1667,6 +1666,7 @@ export interface FileRouteTypes {
     | '/dashboard/settings/security'
     | '/dashboard/settings/taxes'
     | '/dashboard/staff/new'
+    | '/dashboard/tasks/$taskId'
     | '/dashboard/tasks/list'
     | '/dashboard/tasks/new'
     | '/dashboard/apps'
@@ -1793,7 +1793,6 @@ export interface FileRouteTypes {
     | '/settings/appearance'
     | '/settings/display'
     | '/settings/notifications'
-    | '/tasks/$taskId'
     | '/clerk/sign-in'
     | '/clerk/sign-up'
     | '/clerk/user-management'
@@ -1827,6 +1826,7 @@ export interface FileRouteTypes {
     | '/dashboard/settings/security'
     | '/dashboard/settings/taxes'
     | '/dashboard/staff/new'
+    | '/dashboard/tasks/$taskId'
     | '/dashboard/tasks/list'
     | '/dashboard/tasks/new'
     | '/dashboard/apps'
@@ -1957,7 +1957,6 @@ export interface FileRouteTypes {
     | '/_authenticated/settings/appearance'
     | '/_authenticated/settings/display'
     | '/_authenticated/settings/notifications'
-    | '/_authenticated/tasks/$taskId'
     | '/clerk/(auth)/sign-in'
     | '/clerk/(auth)/sign-up'
     | '/clerk/_authenticated/user-management'
@@ -1991,6 +1990,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/settings/security'
     | '/_authenticated/dashboard/settings/taxes'
     | '/_authenticated/dashboard/staff/new'
+    | '/_authenticated/dashboard/tasks/$taskId'
     | '/_authenticated/dashboard/tasks/list'
     | '/_authenticated/dashboard/tasks/new'
     | '/_authenticated/dashboard/apps/'
@@ -2430,13 +2430,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ClerkauthSignInRouteImport
       parentRoute: typeof ClerkauthRouteRoute
     }
-    '/_authenticated/tasks/$taskId': {
-      id: '/_authenticated/tasks/$taskId'
-      path: '/tasks/$taskId'
-      fullPath: '/tasks/$taskId'
-      preLoaderRoute: typeof AuthenticatedTasksTaskIdRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
     '/_authenticated/settings/notifications': {
       id: '/_authenticated/settings/notifications'
       path: '/notifications'
@@ -2596,6 +2589,13 @@ declare module '@tanstack/react-router' {
       path: '/dashboard/tasks/list'
       fullPath: '/dashboard/tasks/list'
       preLoaderRoute: typeof AuthenticatedDashboardTasksListRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dashboard/tasks/$taskId': {
+      id: '/_authenticated/dashboard/tasks/$taskId'
+      path: '/dashboard/tasks/$taskId'
+      fullPath: '/dashboard/tasks/$taskId'
+      preLoaderRoute: typeof AuthenticatedDashboardTasksTaskIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/dashboard/staff/new': {
@@ -3389,7 +3389,6 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardCalendarRoute: typeof AuthenticatedDashboardCalendarRoute
   AuthenticatedDashboardHelpRoute: typeof AuthenticatedDashboardHelpRoute
   AuthenticatedErrorsErrorRoute: typeof AuthenticatedErrorsErrorRoute
-  AuthenticatedTasksTaskIdRoute: typeof AuthenticatedTasksTaskIdRoute
   AuthenticatedAppsIndexRoute: typeof AuthenticatedAppsIndexRoute
   AuthenticatedChatsIndexRoute: typeof AuthenticatedChatsIndexRoute
   AuthenticatedHelpCenterIndexRoute: typeof AuthenticatedHelpCenterIndexRoute
@@ -3419,6 +3418,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardSettingsSecurityRoute: typeof AuthenticatedDashboardSettingsSecurityRoute
   AuthenticatedDashboardSettingsTaxesRoute: typeof AuthenticatedDashboardSettingsTaxesRoute
   AuthenticatedDashboardStaffNewRoute: typeof AuthenticatedDashboardStaffNewRoute
+  AuthenticatedDashboardTasksTaskIdRoute: typeof AuthenticatedDashboardTasksTaskIdRoute
   AuthenticatedDashboardTasksListRoute: typeof AuthenticatedDashboardTasksListRoute
   AuthenticatedDashboardTasksNewRoute: typeof AuthenticatedDashboardTasksNewRoute
   AuthenticatedDashboardAppsIndexRoute: typeof AuthenticatedDashboardAppsIndexRoute
@@ -3503,7 +3503,6 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDashboardCalendarRoute: AuthenticatedDashboardCalendarRoute,
   AuthenticatedDashboardHelpRoute: AuthenticatedDashboardHelpRoute,
   AuthenticatedErrorsErrorRoute: AuthenticatedErrorsErrorRoute,
-  AuthenticatedTasksTaskIdRoute: AuthenticatedTasksTaskIdRoute,
   AuthenticatedAppsIndexRoute: AuthenticatedAppsIndexRoute,
   AuthenticatedChatsIndexRoute: AuthenticatedChatsIndexRoute,
   AuthenticatedHelpCenterIndexRoute: AuthenticatedHelpCenterIndexRoute,
@@ -3555,6 +3554,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDashboardSettingsTaxesRoute:
     AuthenticatedDashboardSettingsTaxesRoute,
   AuthenticatedDashboardStaffNewRoute: AuthenticatedDashboardStaffNewRoute,
+  AuthenticatedDashboardTasksTaskIdRoute:
+    AuthenticatedDashboardTasksTaskIdRoute,
   AuthenticatedDashboardTasksListRoute: AuthenticatedDashboardTasksListRoute,
   AuthenticatedDashboardTasksNewRoute: AuthenticatedDashboardTasksNewRoute,
   AuthenticatedDashboardAppsIndexRoute: AuthenticatedDashboardAppsIndexRoute,

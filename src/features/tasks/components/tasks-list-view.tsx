@@ -197,7 +197,7 @@ export function TasksListView() {
 
     // Single task actions
     const handleViewTask = (taskId: string) => {
-        navigate({ to: '/tasks/$taskId', params: { taskId } })
+        navigate({ to: '/dashboard/tasks/$taskId', params: { taskId } })
     }
 
     const handleEditTask = (taskId: string) => {
@@ -551,7 +551,7 @@ export function TasksListView() {
                                                     <div className="font-bold text-navy">{task.deadline}</div>
                                                 </div>
                                             </div>
-                                            <Link to={`/tasks/${task.id}` as any}>
+                                            <Link to={`/dashboard/tasks/${task.id}` as any}>
                                                 <Button className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg px-6 shadow-lg shadow-emerald-500/20">
                                                     عرض التفاصيل
                                                 </Button>
