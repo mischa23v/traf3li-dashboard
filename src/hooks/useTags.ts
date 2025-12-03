@@ -75,14 +75,21 @@ export const useCreateTag = () => {
 
   return useMutation({
     mutationFn: (data: CreateTagData) => tagsService.createTag(data),
-    onSuccess: () => {
+    onSuccess: (data) => {
       toast({
         title: t('status.success'),
         description: t('status.createdSuccessfully'),
       })
+      // Optimistically update the cache
+      queryClient.setQueriesData({ queryKey: tagsKeys.all }, (old: any) => {
+        if (!old) return old
+        if (Array.isArray(old)) return [data, ...old]
+        return old
+      })
     },
     onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey: tagsKeys.all })
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      await queryClient.invalidateQueries({ queryKey: tagsKeys.all, refetchType: 'all' })
     },
     onError: (error: any) => {
       toast({
@@ -102,15 +109,26 @@ export const useUpdateTag = () => {
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: UpdateTagData }) =>
       tagsService.updateTag(id, data),
-    onSuccess: () => {
+    onSuccess: (data) => {
       toast({
         title: t('status.success'),
         description: t('status.updatedSuccessfully'),
       })
+      // Update specific tag in cache
+      queryClient.setQueryData(tagsKeys.detail(data.id), data)
+      // Update list cache
+      queryClient.setQueriesData({ queryKey: tagsKeys.all }, (old: any) => {
+        if (!old) return old
+        if (Array.isArray(old)) {
+          return old.map((item: any) => (item.id === data.id ? data : item))
+        }
+        return old
+      })
     },
     onSettled: async (_, __, variables) => {
-      await queryClient.invalidateQueries({ queryKey: tagsKeys.all })
-      await queryClient.invalidateQueries({ queryKey: tagsKeys.detail(variables.id) })
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      await queryClient.invalidateQueries({ queryKey: tagsKeys.all, refetchType: 'all' })
+      await queryClient.invalidateQueries({ queryKey: tagsKeys.detail(variables.id), refetchType: 'all' })
     },
     onError: (error: any) => {
       toast({
@@ -129,14 +147,23 @@ export const useDeleteTag = () => {
 
   return useMutation({
     mutationFn: (id: string) => tagsService.deleteTag(id),
-    onSuccess: () => {
+    onSuccess: (_, id) => {
       toast({
         title: t('status.success'),
         description: t('status.deletedSuccessfully'),
       })
+      // Remove from cache
+      queryClient.setQueriesData({ queryKey: tagsKeys.all }, (old: any) => {
+        if (!old) return old
+        if (Array.isArray(old)) {
+          return old.filter((item: any) => item.id !== id)
+        }
+        return old
+      })
     },
     onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey: tagsKeys.all })
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      await queryClient.invalidateQueries({ queryKey: tagsKeys.all, refetchType: 'all' })
     },
     onError: (error: any) => {
       toast({
@@ -163,11 +190,19 @@ export const useAddTagToEntity = () => {
       entityType: 'case' | 'client' | 'contact' | 'document'
       entityId: string
     }) => tagsService.addTagToEntity(tagId, entityType, entityId),
+    onSuccess: () => {
+      toast({
+        title: t('status.success'),
+        description: t('status.createdSuccessfully'),
+      })
+    },
     onSettled: async (_, __, variables) => {
+      await new Promise(resolve => setTimeout(resolve, 1000))
       await queryClient.invalidateQueries({
         queryKey: tagsKeys.entity(variables.entityType, variables.entityId),
+        refetchType: 'all'
       })
-      await queryClient.invalidateQueries({ queryKey: tagsKeys.all })
+      await queryClient.invalidateQueries({ queryKey: tagsKeys.all, refetchType: 'all' })
     },
     onError: (error: any) => {
       toast({
@@ -194,11 +229,19 @@ export const useRemoveTagFromEntity = () => {
       entityType: 'case' | 'client' | 'contact' | 'document'
       entityId: string
     }) => tagsService.removeTagFromEntity(tagId, entityType, entityId),
+    onSuccess: () => {
+      toast({
+        title: t('status.success'),
+        description: t('status.deletedSuccessfully'),
+      })
+    },
     onSettled: async (_, __, variables) => {
+      await new Promise(resolve => setTimeout(resolve, 1000))
       await queryClient.invalidateQueries({
         queryKey: tagsKeys.entity(variables.entityType, variables.entityId),
+        refetchType: 'all'
       })
-      await queryClient.invalidateQueries({ queryKey: tagsKeys.all })
+      await queryClient.invalidateQueries({ queryKey: tagsKeys.all, refetchType: 'all' })
     },
     onError: (error: any) => {
       toast({

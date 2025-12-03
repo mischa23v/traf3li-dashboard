@@ -101,6 +101,7 @@ apiClient.interceptors.response.use(
         url: originalRequest?.url,
         status: error.response?.status,
         message: error.response?.data?.message || error.message,
+        data: error.response?.data // Log full data to see validation errors
       })
     }
 

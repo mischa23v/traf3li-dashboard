@@ -26,11 +26,31 @@ export function useRunConflictCheck() {
   return useMutation({
     mutationFn: (request: ConflictCheckRequest) =>
       conflictCheckService.runConflictCheck(request),
+    // Update cache on success (Stable & Correct)
+    onSuccess: (data) => {
+      // Manually update the cache for lists
+      queryClient.setQueriesData({ queryKey: conflictCheckKeys.lists() }, (old: any) => {
+        if (!old) return old
+        // Handle { checks: [...] } structure
+        if (old.checks && Array.isArray(old.checks)) {
+          return {
+            ...old,
+            checks: [data, ...old.checks]
+          }
+        }
+        if (Array.isArray(old)) return [data, ...old]
+        return old
+      })
+    },
     onSettled: async (data, error, variables) => {
-      await queryClient.invalidateQueries({ queryKey: conflictCheckKeys.lists() })
+      // Delay to allow DB propagation
+      await new Promise(resolve => setTimeout(resolve, 1000))
+
+      await queryClient.invalidateQueries({ queryKey: conflictCheckKeys.lists(), refetchType: 'all' })
       if (variables.entityId) {
         await queryClient.invalidateQueries({
           queryKey: conflictCheckKeys.entity(variables.entityType, variables.entityId),
+          refetchType: 'all'
         })
       }
     },
@@ -102,8 +122,11 @@ export function useResolveConflictMatch() {
       resolution: { status: 'cleared' | 'flagged' | 'waived'; notes: string }
     }) => conflictCheckService.resolveConflictMatch(checkId, matchId, resolution),
     onSettled: async (data, error, variables) => {
+      // Delay to allow DB propagation
+      await new Promise(resolve => setTimeout(resolve, 1000))
       await queryClient.invalidateQueries({
         queryKey: conflictCheckKeys.detail(variables.checkId),
+        refetchType: 'all'
       })
     },
   })
@@ -122,10 +145,13 @@ export function useAddConflictWaiver() {
       waiver: Omit<ConflictWaiver, 'waivedBy' | 'waivedAt'>
     }) => conflictCheckService.addConflictWaiver(checkId, waiver),
     onSettled: async (data, error, variables) => {
+      // Delay to allow DB propagation
+      await new Promise(resolve => setTimeout(resolve, 1000))
       await queryClient.invalidateQueries({
         queryKey: conflictCheckKeys.detail(variables.checkId),
+        refetchType: 'all'
       })
-      await queryClient.invalidateQueries({ queryKey: conflictCheckKeys.lists() })
+      await queryClient.invalidateQueries({ queryKey: conflictCheckKeys.lists(), refetchType: 'all' })
     },
   })
 }
@@ -138,10 +164,13 @@ export function useClearConflictCheck() {
     mutationFn: ({ checkId, notes }: { checkId: string; notes: string }) =>
       conflictCheckService.clearConflictCheck(checkId, notes),
     onSettled: async (data, error, variables) => {
+      // Delay to allow DB propagation
+      await new Promise(resolve => setTimeout(resolve, 1000))
       await queryClient.invalidateQueries({
         queryKey: conflictCheckKeys.detail(variables.checkId),
+        refetchType: 'all'
       })
-      await queryClient.invalidateQueries({ queryKey: conflictCheckKeys.lists() })
+      await queryClient.invalidateQueries({ queryKey: conflictCheckKeys.lists(), refetchType: 'all' })
     },
   })
 }

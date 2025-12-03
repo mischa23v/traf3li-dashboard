@@ -31,14 +31,22 @@ export const useCreateQuote = () => {
 
   return useMutation({
     mutationFn: (data: CreateQuoteData) => quoteService.createQuote(data),
-    onSuccess: () => {
+    onSuccess: (data) => {
       toast.success('تم إنشاء عرض السعر بنجاح')
+      // Optimistically update the cache
+      queryClient.setQueriesData({ queryKey: ['quotes'] }, (old: any) => {
+        if (!old) return old
+        if (Array.isArray(old)) return [data, ...old]
+        // Handle paginated response if applicable, otherwise just return old
+        return old
+      })
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل إنشاء عرض السعر')
     },
     onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['quotes'] })
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      await queryClient.invalidateQueries({ queryKey: ['quotes'], refetchType: 'all' })
     },
   })
 }
@@ -50,15 +58,26 @@ export const useUpdateQuote = () => {
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: Partial<CreateQuoteData> }) =>
       quoteService.updateQuote(id, data),
-    onSuccess: () => {
+    onSuccess: (data) => {
       toast.success('تم تحديث عرض السعر بنجاح')
+      // Update specific quote in cache
+      queryClient.setQueryData(['quotes', data.id], data)
+      // Update list cache
+      queryClient.setQueriesData({ queryKey: ['quotes'] }, (old: any) => {
+        if (!old) return old
+        if (Array.isArray(old)) {
+          return old.map((item: any) => (item.id === data.id ? data : item))
+        }
+        return old
+      })
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل تحديث عرض السعر')
     },
     onSettled: async (_, __, { id }) => {
-      await queryClient.invalidateQueries({ queryKey: ['quotes'] })
-      await queryClient.invalidateQueries({ queryKey: ['quotes', id] })
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      await queryClient.invalidateQueries({ queryKey: ['quotes'], refetchType: 'all' })
+      await queryClient.invalidateQueries({ queryKey: ['quotes', id], refetchType: 'all' })
     },
   })
 }
@@ -69,14 +88,23 @@ export const useDeleteQuote = () => {
 
   return useMutation({
     mutationFn: (id: string) => quoteService.deleteQuote(id),
-    onSuccess: () => {
+    onSuccess: (_, id) => {
       toast.success('تم حذف عرض السعر بنجاح')
+      // Remove from cache
+      queryClient.setQueriesData({ queryKey: ['quotes'] }, (old: any) => {
+        if (!old) return old
+        if (Array.isArray(old)) {
+          return old.filter((item: any) => item.id !== id)
+        }
+        return old
+      })
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل حذف عرض السعر')
     },
     onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['quotes'] })
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      await queryClient.invalidateQueries({ queryKey: ['quotes'], refetchType: 'all' })
     },
   })
 }
@@ -94,8 +122,9 @@ export const useSendQuote = () => {
       toast.error(error.message || 'فشل إرسال عرض السعر')
     },
     onSettled: async (_, __, id) => {
-      await queryClient.invalidateQueries({ queryKey: ['quotes'] })
-      await queryClient.invalidateQueries({ queryKey: ['quotes', id] })
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      await queryClient.invalidateQueries({ queryKey: ['quotes'], refetchType: 'all' })
+      await queryClient.invalidateQueries({ queryKey: ['quotes', id], refetchType: 'all' })
     },
   })
 }
@@ -114,8 +143,9 @@ export const useUpdateQuoteStatus = () => {
       toast.error(error.message || 'فشل تحديث حالة عرض السعر')
     },
     onSettled: async (_, __, { id }) => {
-      await queryClient.invalidateQueries({ queryKey: ['quotes'] })
-      await queryClient.invalidateQueries({ queryKey: ['quotes', id] })
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      await queryClient.invalidateQueries({ queryKey: ['quotes'], refetchType: 'all' })
+      await queryClient.invalidateQueries({ queryKey: ['quotes', id], refetchType: 'all' })
     },
   })
 }
@@ -133,9 +163,10 @@ export const useConvertQuoteToInvoice = () => {
       toast.error(error.message || 'فشل تحويل عرض السعر إلى فاتورة')
     },
     onSettled: async (_, __, id) => {
-      await queryClient.invalidateQueries({ queryKey: ['quotes'] })
-      await queryClient.invalidateQueries({ queryKey: ['quotes', id] })
-      await queryClient.invalidateQueries({ queryKey: ['invoices'] })
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      await queryClient.invalidateQueries({ queryKey: ['quotes'], refetchType: 'all' })
+      await queryClient.invalidateQueries({ queryKey: ['quotes', id], refetchType: 'all' })
+      await queryClient.invalidateQueries({ queryKey: ['invoices'], refetchType: 'all' })
     },
   })
 }
@@ -155,14 +186,21 @@ export const useDuplicateQuote = () => {
 
   return useMutation({
     mutationFn: (id: string) => quoteService.duplicateQuote(id),
-    onSuccess: () => {
+    onSuccess: (data) => {
       toast.success('تم نسخ عرض السعر بنجاح')
+      // Add to cache
+      queryClient.setQueriesData({ queryKey: ['quotes'] }, (old: any) => {
+        if (!old) return old
+        if (Array.isArray(old)) return [data, ...old]
+        return old
+      })
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل نسخ عرض السعر')
     },
     onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['quotes'] })
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      await queryClient.invalidateQueries({ queryKey: ['quotes'], refetchType: 'all' })
     },
   })
 }

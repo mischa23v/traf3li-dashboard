@@ -1,6 +1,6 @@
 import { useEditor, EditorContent } from '@tiptap/react'
-import { BubbleMenu } from '@tiptap/extension-bubble-menu'
-import { FloatingMenu } from '@tiptap/extension-floating-menu'
+import BubbleMenuExtension from '@tiptap/extension-bubble-menu'
+import FloatingMenuExtension from '@tiptap/extension-floating-menu'
 import { useEffect, useCallback } from 'react'
 import StarterKit from '@tiptap/starter-kit'
 import TextAlign from '@tiptap/extension-text-align'
@@ -90,6 +90,8 @@ export const TipTapEditor = ({
                     levels: [1, 2, 3]
                 }
             }),
+            BubbleMenuExtension,
+            FloatingMenuExtension,
             TextAlign.configure({
                 types: ['heading', 'paragraph'],
                 alignments: ['left', 'center', 'right', 'justify'],
@@ -162,7 +164,7 @@ export const TipTapEditor = ({
                 // Use setTimeout to avoid update during render
                 setTimeout(() => {
                     if (editor && !editor.isDestroyed) {
-                        editor.commands.setContent(newContent, false)
+                        editor.commands.setContent(newContent, { emitUpdate: false })
                     }
                 }, 0)
             }
@@ -546,7 +548,7 @@ export const TipTapEditor = ({
             )}
 
             {/* Bubble Menu - appears when selecting text */}
-            {editor && editable && (
+            {/* {editor && editable && (
                 <BubbleMenu
                     editor={editor}
                     tippyOptions={{ duration: 100 }}
@@ -619,10 +621,10 @@ export const TipTapEditor = ({
                         </Button>
                     )}
                 </BubbleMenu>
-            )}
+            )} */}
 
             {/* Floating Menu - appears on empty lines */}
-            {editor && editable && (
+            {/* {editor && editable && (
                 <FloatingMenu
                     editor={editor}
                     tippyOptions={{ duration: 100 }}
@@ -709,7 +711,7 @@ export const TipTapEditor = ({
                         <ImageIcon className="h-4 w-4" />
                     </Button>
                 </FloatingMenu>
-            )}
+            )} */}
 
             {/* Editor Content */}
             <EditorContent

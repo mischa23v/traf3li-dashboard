@@ -49,14 +49,31 @@ export function useCreateTemplate() {
 
   return useMutation({
     mutationFn: (data: CreateTemplateData) => invoiceTemplatesService.create(data),
-    onSuccess: () => {
+    // Update cache on success (Stable & Correct)
+    onSuccess: (data) => {
       toast({
         title: t('common.success'),
         description: t('invoiceTemplates.createSuccess'),
       })
+
+      // Manually update the cache
+      queryClient.setQueriesData({ queryKey: templateKeys.lists() }, (old: any) => {
+        if (!old) return old
+        // Handle { templates: [...] } structure
+        if (old.templates && Array.isArray(old.templates)) {
+          return {
+            ...old,
+            templates: [data, ...old.templates]
+          }
+        }
+        if (Array.isArray(old)) return [data, ...old]
+        return old
+      })
     },
     onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey: templateKeys.all })
+      // Delay to allow DB propagation
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      await queryClient.invalidateQueries({ queryKey: templateKeys.all, refetchType: 'all' })
     },
     onError: (error: Error) => {
       toast({
@@ -103,14 +120,31 @@ export function useDeleteTemplate() {
 
   return useMutation({
     mutationFn: (id: string) => invoiceTemplatesService.delete(id),
-    onSuccess: () => {
+    // Update cache on success (Stable & Correct)
+    onSuccess: (_, id) => {
       toast({
         title: t('common.success'),
         description: t('invoiceTemplates.deleteSuccess'),
       })
+
+      // Manually update the cache
+      queryClient.setQueriesData({ queryKey: templateKeys.lists() }, (old: any) => {
+        if (!old) return old
+        // Handle { templates: [...] } structure
+        if (old.templates && Array.isArray(old.templates)) {
+          return {
+            ...old,
+            templates: old.templates.filter((t: any) => t._id !== id)
+          }
+        }
+        if (Array.isArray(old)) return old.filter((t: any) => t._id !== id)
+        return old
+      })
     },
     onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey: templateKeys.all })
+      // Delay to allow DB propagation
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      await queryClient.invalidateQueries({ queryKey: templateKeys.all, refetchType: 'all' })
     },
     onError: (error: Error) => {
       toast({
@@ -130,14 +164,31 @@ export function useDuplicateTemplate() {
   return useMutation({
     mutationFn: ({ id, name, nameAr }: { id: string; name: string; nameAr: string }) =>
       invoiceTemplatesService.duplicate(id, name, nameAr),
-    onSuccess: () => {
+    // Update cache on success (Stable & Correct)
+    onSuccess: (data) => {
       toast({
         title: t('common.success'),
         description: t('invoiceTemplates.duplicateSuccess'),
       })
+
+      // Manually update the cache
+      queryClient.setQueriesData({ queryKey: templateKeys.lists() }, (old: any) => {
+        if (!old) return old
+        // Handle { templates: [...] } structure
+        if (old.templates && Array.isArray(old.templates)) {
+          return {
+            ...old,
+            templates: [data, ...old.templates]
+          }
+        }
+        if (Array.isArray(old)) return [data, ...old]
+        return old
+      })
     },
     onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey: templateKeys.all })
+      // Delay to allow DB propagation
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      await queryClient.invalidateQueries({ queryKey: templateKeys.all, refetchType: 'all' })
     },
     onError: (error: Error) => {
       toast({
@@ -192,14 +243,31 @@ export function useImportTemplate() {
 
   return useMutation({
     mutationFn: (file: File) => invoiceTemplatesService.import(file),
-    onSuccess: () => {
+    // Update cache on success (Stable & Correct)
+    onSuccess: (data) => {
       toast({
         title: t('common.success'),
         description: t('invoiceTemplates.importSuccess'),
       })
+
+      // Manually update the cache
+      queryClient.setQueriesData({ queryKey: templateKeys.lists() }, (old: any) => {
+        if (!old) return old
+        // Handle { templates: [...] } structure
+        if (old.templates && Array.isArray(old.templates)) {
+          return {
+            ...old,
+            templates: [data, ...old.templates]
+          }
+        }
+        if (Array.isArray(old)) return [data, ...old]
+        return old
+      })
     },
     onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey: templateKeys.all })
+      // Delay to allow DB propagation
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      await queryClient.invalidateQueries({ queryKey: templateKeys.all, refetchType: 'all' })
     },
     onError: (error: Error) => {
       toast({

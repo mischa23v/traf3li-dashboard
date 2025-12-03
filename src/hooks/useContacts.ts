@@ -72,10 +72,25 @@ export const useCreateContact = () => {
 
   return useMutation({
     mutationFn: (data: CreateContactData) => contactsService.createContact(data),
-    onSuccess: () => {
+    // Update cache on success (Stable & Correct)
+    onSuccess: (data) => {
       toast({
         title: t('status.success'),
         description: t('status.createdSuccessfully'),
+      })
+
+      // Manually update the cache
+      queryClient.setQueriesData({ queryKey: contactsKeys.lists() }, (old: any) => {
+        if (!old) return old
+        // Handle { contacts: [...] } structure
+        if (old.contacts && Array.isArray(old.contacts)) {
+          return {
+            ...old,
+            contacts: [data, ...old.contacts]
+          }
+        }
+        if (Array.isArray(old)) return [data, ...old]
+        return old
       })
     },
     onError: (error: any) => {
@@ -86,7 +101,9 @@ export const useCreateContact = () => {
       })
     },
     onSettled: async () => {
-      return await queryClient.invalidateQueries({ queryKey: contactsKeys.all })
+      // Delay to allow DB propagation
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      return await queryClient.invalidateQueries({ queryKey: contactsKeys.all, refetchType: 'all' })
     },
   })
 }
@@ -126,10 +143,25 @@ export const useDeleteContact = () => {
 
   return useMutation({
     mutationFn: (id: string) => contactsService.deleteContact(id),
-    onSuccess: () => {
+    // Update cache on success (Stable & Correct)
+    onSuccess: (_, id) => {
       toast({
         title: t('status.success'),
         description: t('status.deletedSuccessfully'),
+      })
+
+      // Manually update the cache
+      queryClient.setQueriesData({ queryKey: contactsKeys.lists() }, (old: any) => {
+        if (!old) return old
+        // Handle { contacts: [...] } structure
+        if (old.contacts && Array.isArray(old.contacts)) {
+          return {
+            ...old,
+            contacts: old.contacts.filter((c: any) => c._id !== id)
+          }
+        }
+        if (Array.isArray(old)) return old.filter((c: any) => c._id !== id)
+        return old
       })
     },
     onError: (error: any) => {
@@ -140,7 +172,9 @@ export const useDeleteContact = () => {
       })
     },
     onSettled: async () => {
-      return await queryClient.invalidateQueries({ queryKey: contactsKeys.all })
+      // Delay to allow DB propagation
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      return await queryClient.invalidateQueries({ queryKey: contactsKeys.all, refetchType: 'all' })
     },
   })
 }
@@ -152,10 +186,25 @@ export const useBulkDeleteContacts = () => {
 
   return useMutation({
     mutationFn: (ids: string[]) => contactsService.bulkDeleteContacts(ids),
-    onSuccess: () => {
+    // Update cache on success (Stable & Correct)
+    onSuccess: (_, ids) => {
       toast({
         title: t('status.success'),
         description: t('status.deletedSuccessfully'),
+      })
+
+      // Manually update the cache
+      queryClient.setQueriesData({ queryKey: contactsKeys.lists() }, (old: any) => {
+        if (!old) return old
+        // Handle { contacts: [...] } structure
+        if (old.contacts && Array.isArray(old.contacts)) {
+          return {
+            ...old,
+            contacts: old.contacts.filter((c: any) => !ids.includes(c._id))
+          }
+        }
+        if (Array.isArray(old)) return old.filter((c: any) => !ids.includes(c._id))
+        return old
       })
     },
     onError: (error: any) => {
@@ -166,7 +215,9 @@ export const useBulkDeleteContacts = () => {
       })
     },
     onSettled: async () => {
-      return await queryClient.invalidateQueries({ queryKey: contactsKeys.all })
+      // Delay to allow DB propagation
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      return await queryClient.invalidateQueries({ queryKey: contactsKeys.all, refetchType: 'all' })
     },
   })
 }

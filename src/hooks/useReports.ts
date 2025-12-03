@@ -53,8 +53,26 @@ export function useCreateSavedReport() {
   return useMutation({
     mutationFn: (data: Omit<SavedReport, '_id' | 'createdAt' | 'updatedAt'>) =>
       reportsService.createSavedReport(data),
+    // Update cache on success (Stable & Correct)
+    onSuccess: (data) => {
+      // Manually update the cache
+      queryClient.setQueriesData({ queryKey: reportKeys.lists() }, (old: any) => {
+        if (!old) return old
+        // Handle { reports: [...] } structure
+        if (old.reports && Array.isArray(old.reports)) {
+          return {
+            ...old,
+            reports: [data, ...old.reports]
+          }
+        }
+        if (Array.isArray(old)) return [data, ...old]
+        return old
+      })
+    },
     onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey: reportKeys.lists() })
+      // Delay to allow DB propagation
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      await queryClient.invalidateQueries({ queryKey: reportKeys.lists(), refetchType: 'all' })
     },
   })
 }
@@ -77,8 +95,26 @@ export function useDeleteSavedReport() {
 
   return useMutation({
     mutationFn: (id: string) => reportsService.deleteSavedReport(id),
+    // Update cache on success (Stable & Correct)
+    onSuccess: (_, id) => {
+      // Manually update the cache
+      queryClient.setQueriesData({ queryKey: reportKeys.lists() }, (old: any) => {
+        if (!old) return old
+        // Handle { reports: [...] } structure
+        if (old.reports && Array.isArray(old.reports)) {
+          return {
+            ...old,
+            reports: old.reports.filter((r: any) => r._id !== id)
+          }
+        }
+        if (Array.isArray(old)) return old.filter((r: any) => r._id !== id)
+        return old
+      })
+    },
     onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey: reportKeys.lists() })
+      // Delay to allow DB propagation
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      await queryClient.invalidateQueries({ queryKey: reportKeys.lists(), refetchType: 'all' })
     },
   })
 }

@@ -110,46 +110,37 @@ export const useCreateTask = () => {
 
   return useMutation({
     mutationFn: (data: CreateTaskData) => tasksService.createTask(data),
-    // Optimistic update - add task to list immediately
-    onMutate: async (data) => {
-      await queryClient.cancelQueries({ queryKey: ['tasks'] })
-      const previousTasks = queryClient.getQueryData<{ tasks: Task[]; total: number }>(['tasks'])
-
-      if (previousTasks) {
-        const tempTask: Task = {
-          _id: `temp-${Date.now()}`,
-          title: data.title,
-          description: data.description,
-          taskType: data.taskType || 'other',
-          status: data.status || 'todo',
-          priority: data.priority || 'medium',
-          deadlineType: data.deadlineType || 'none',
-          warningDaysBefore: data.warningDaysBefore || 3,
-          dueDate: data.dueDate,
-          createdBy: 'current-user',
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        }
-        queryClient.setQueryData<{ tasks: Task[]; total: number }>(['tasks'], {
-          tasks: [tempTask, ...(previousTasks.tasks || [])],
-          total: (previousTasks.total || 0) + 1
-        })
-      }
-
-      return { previousTasks }
-    },
-    onSuccess: () => {
+    // Update cache with real server data on success (Stable & Correct)
+    onSuccess: (data) => {
+      console.log('✅ Task Created Successfully:', data)
       toast.success('تم إنشاء المهمة بنجاح')
+
+      // Manually update the cache with the REAL task from server
+      // This avoids "flickering" and "missing fields" issues
+      queryClient.setQueriesData({ queryKey: ['tasks'] }, (old: any) => {
+        console.log('🔄 Updating Cache for Query:', old)
+        if (!old) return old
+
+        // Handle { tasks: [...] } structure
+        if (old.tasks && Array.isArray(old.tasks)) {
+          return {
+            ...old,
+            tasks: [data, ...old.tasks],
+            total: (old.total || old.tasks.length) + 1
+          }
+        }
+
+        // Handle Array structure
+        if (Array.isArray(old)) {
+          return [data, ...old]
+        }
+
+        return old
+      })
     },
-    onError: (error: Error, _, context) => {
-      if (context?.previousTasks) {
-        queryClient.setQueryData(['tasks'], context.previousTasks)
-      }
+    onError: (error: Error) => {
+      console.error('❌ Task Creation Failed:', error)
       toast.error(error.message || 'فشل إنشاء المهمة')
-    },
-    onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['tasks'] })
-      return await queryClient.invalidateQueries({ queryKey: ['calendar'] })
     },
   })
 }
@@ -163,29 +154,137 @@ export const useUpdateTask = () => {
     // Optimistic update
     onMutate: async ({ id, data }) => {
       await queryClient.cancelQueries({ queryKey: ['tasks'] })
-      await queryClient.cancelQueries({ queryKey: ['tasks', id] })
 
-      const previousTasks = queryClient.getQueryData<{ tasks: Task[]; total: number }>(['tasks'])
+      const previousQueries = queryClient.getQueriesData<{ tasks: Task[]; total: number }>({ queryKey: ['tasks'] })
       const previousTask = queryClient.getQueryData<Task>(['tasks', id])
 
-      if (previousTasks) {
-        queryClient.setQueryData<{ tasks: Task[]; total: number }>(['tasks'], {
-          ...previousTasks,
-          tasks: previousTasks.tasks?.map(t => t._id === id ? { ...t, ...data } : t) || []
-        })
-      }
-      if (previousTask) {
-        queryClient.setQueryData<Task>(['tasks', id], { ...previousTask, ...data })
+      // Helper to check if task matches filters
+      const matchesFilters = (task: Task, filters?: TaskFilters) => {
+        if (!filters) return true
+
+        // Status filter
+        if (filters.status) {
+          const statuses = Array.isArray(filters.status) ? filters.status : [filters.status]
+          if (!statuses.includes(task.status)) return false
+        }
+
+        // Priority filter
+        if (filters.priority) {
+          const priorities = Array.isArray(filters.priority) ? filters.priority : [filters.priority]
+          if (!priorities.includes(task.priority)) return false
+        }
+
+        // Task Type filter
+        if (filters.taskType) {
+          const types = Array.isArray(filters.taskType) ? filters.taskType : [filters.taskType]
+          if (!types.includes(task.taskType)) return false
+        }
+
+        // Search filter
+        if (filters.search && typeof filters.search === 'string') {
+          const searchLower = filters.search.toLowerCase()
+          if (!task.title.toLowerCase().includes(searchLower) &&
+            !task.description?.toLowerCase().includes(searchLower)) {
+            return false
+          }
+        }
+
+        return true
       }
 
-      return { previousTasks, previousTask }
+      // Update all matching queries manually
+      previousQueries.forEach(([queryKey, oldData]) => {
+        const filters = queryKey[1] as TaskFilters | undefined
+
+        queryClient.setQueryData(queryKey, (old: any) => {
+          if (!old) return old
+
+          // Handle array vs object structure
+          const list = Array.isArray(old) ? old : (old.tasks || old.data || [])
+
+          // Find the task in this list
+          const taskIndex = list.findIndex((t: Task) => t._id === id)
+
+          // If task is not in this list, check if it SHOULD be after update
+          if (taskIndex === -1) {
+            // We need the full task object to check filters. 
+            // If we have previousTask, we can merge with data.
+            if (previousTask) {
+              const updatedTask = { ...previousTask, ...data } as Task
+              if (matchesFilters(updatedTask, filters)) {
+                // Add to list
+                if (Array.isArray(old)) {
+                  return [updatedTask, ...old]
+                }
+                return {
+                  ...old,
+                  tasks: [updatedTask, ...list],
+                  total: (old.total || list.length) + 1
+                }
+              }
+            }
+            return old
+          }
+
+          // Task IS in the list. Update it.
+          const currentTask = list[taskIndex]
+          const updatedTask = { ...currentTask, ...data } as Task
+
+          // Check if it still matches filters
+          if (!matchesFilters(updatedTask, filters)) {
+            // Remove from list if it no longer matches
+            const newList = list.filter((t: Task) => t._id !== id)
+            if (Array.isArray(old)) {
+              return newList
+            }
+            return {
+              ...old,
+              tasks: newList,
+              total: Math.max(0, (old.total || list.length) - 1)
+            }
+          }
+
+          // Update in place
+          const newList = [...list]
+          newList[taskIndex] = updatedTask
+
+          if (Array.isArray(old)) {
+            return newList
+          }
+          return {
+            ...old,
+            tasks: newList
+          }
+        })
+      })
+
+      // Update single task
+      if (previousTask) {
+        const updatedTask = { ...previousTask, ...data }
+        if (data.billing) {
+          updatedTask.billing = {
+            ...previousTask.billing,
+            ...data.billing,
+            isBillable: data.billing.isBillable ?? previousTask.billing?.isBillable ?? true,
+            billingType: data.billing.billingType || previousTask.billing?.billingType || 'hourly',
+            currency: data.billing.currency || previousTask.billing?.currency || 'SAR',
+            invoiceStatus: data.billing.invoiceStatus || previousTask.billing?.invoiceStatus || 'not_invoiced',
+          }
+        }
+        queryClient.setQueryData<Task>(['tasks', id], updatedTask as Task)
+      }
+
+      return { previousQueries, previousTask }
     },
     onSuccess: () => {
       toast.success('تم تحديث المهمة بنجاح')
+      queryClient.invalidateQueries({ queryKey: ['tasks'] })
     },
     onError: (error: Error, { id }, context) => {
-      if (context?.previousTasks) {
-        queryClient.setQueryData(['tasks'], context.previousTasks)
+      if (context?.previousQueries) {
+        context.previousQueries.forEach(([queryKey, data]) => {
+          queryClient.setQueryData(queryKey, data)
+        })
       }
       if (context?.previousTask) {
         queryClient.setQueryData(['tasks', id], context.previousTask)
@@ -206,31 +305,36 @@ export const useDeleteTask = () => {
   return useMutation({
     mutationFn: (id: string) => tasksService.deleteTask(id),
     // Optimistic update - remove task from list immediately
-    onMutate: async (id) => {
-      await queryClient.cancelQueries({ queryKey: ['tasks'] })
-      const previousTasks = queryClient.getQueryData<{ tasks: Task[]; total: number }>(['tasks'])
-
-      if (previousTasks) {
-        queryClient.setQueryData<{ tasks: Task[]; total: number }>(['tasks'], {
-          tasks: previousTasks.tasks?.filter(t => t._id !== id) || [],
-          total: Math.max(0, (previousTasks.total || 0) - 1)
-        })
-      }
-
-      return { previousTasks }
-    },
-    onSuccess: () => {
+    // Update cache on success (Stable & Correct)
+    onSuccess: (_, id) => {
+      console.log('✅ Task Deleted Successfully:', id)
       toast.success('تم حذف المهمة بنجاح')
+
+      // Optimistically remove task from all lists
+      queryClient.setQueriesData({ queryKey: ['tasks'] }, (old: any) => {
+        console.log('🔄 Updating Cache (Delete) for Query:', old)
+        if (!old) return old
+
+        // Handle { tasks: [...] } structure (Paginated response)
+        if (old.tasks && Array.isArray(old.tasks)) {
+          return {
+            ...old,
+            tasks: old.tasks.filter((t: Task) => t._id !== id),
+            total: Math.max(0, (old.total || old.tasks.length) - 1)
+          }
+        }
+
+        // Handle Array structure (Simple list)
+        if (Array.isArray(old)) {
+          return old.filter((t: Task) => t._id !== id)
+        }
+
+        return old
+      })
     },
-    onError: (error: Error, _, context) => {
-      if (context?.previousTasks) {
-        queryClient.setQueryData(['tasks'], context.previousTasks)
-      }
+    onError: (error: Error) => {
+      console.error('❌ Task Deletion Failed:', error)
       toast.error(error.message || 'فشل حذف المهمة')
-    },
-    onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['tasks'] })
-      return await queryClient.invalidateQueries({ queryKey: ['calendar'] })
     },
   })
 }
@@ -643,42 +747,30 @@ export const useUploadTaskAttachment = () => {
   return useMutation({
     mutationFn: ({ id, file, onProgress }: { id: string; file: File; onProgress?: (percent: number) => void }) =>
       tasksService.uploadAttachment(id, file, onProgress),
-    // Optimistic update - show file immediately with "uploading" state
-    onMutate: async ({ id, file }) => {
-      await queryClient.cancelQueries({ queryKey: ['tasks', id] })
-      const previousTask = queryClient.getQueryData<Task>(['tasks', id])
+    // Update cache on success (Stable & Correct)
+    onSuccess: (data, { id: taskId }) => {
+      toast.success('تم رفع المرفق بنجاح')
 
-      if (previousTask) {
-        const tempAttachment: Attachment = {
-          _id: `temp-${Date.now()}`,
-          fileName: file.name,
-          fileUrl: URL.createObjectURL(file), // Temporary local URL
-          fileType: file.type,
-          fileSize: file.size,
-          uploadedBy: 'current-user',
-          uploadedAt: new Date().toISOString(),
-          storageType: 'local'
+      // Manually update the cache
+      queryClient.setQueryData(['tasks', taskId], (old: any) => {
+        if (!old) return old
+
+        const newAttachment = data
+        const currentAttachments = old.attachments || []
+
+        return {
+          ...old,
+          attachments: [...currentAttachments, newAttachment]
         }
-        queryClient.setQueryData<Task>(['tasks', id], {
-          ...previousTask,
-          attachments: [...(previousTask.attachments || []), tempAttachment]
-        })
-      }
-
-      return { previousTask }
+      })
     },
-    onError: (error: Error, { id }, context) => {
-      if (context?.previousTask) {
-        queryClient.setQueryData(['tasks', id], context.previousTask)
-      }
+    onError: (error: Error) => {
       toast.error(error.message || 'فشل رفع المرفق')
     },
-    onSuccess: () => {
-      toast.success('تم رفع المرفق بنجاح')
-    },
-    // Use onSettled with await to replace temp file with real one from server
     onSettled: async (_, __, { id }) => {
-      return await queryClient.invalidateQueries({ queryKey: ['tasks', id] })
+      // Removed invalidation to prevent flickering (race condition)
+      // The manual cache update in onSuccess is sufficient
+      console.log(`[${new Date().toISOString()}] 🛑 Upload Attachment Settled. Skipping invalidation.`)
     },
   })
 }
@@ -687,40 +779,42 @@ export const useDeleteTaskAttachment = () => {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: ({ taskId, attachmentId }: { taskId: string; attachmentId: string }) =>
-      tasksService.deleteAttachment(taskId, attachmentId),
-    // Optimistic update - immediately remove from UI
-    onMutate: async ({ taskId, attachmentId }) => {
-      // Cancel any outgoing refetches so they don't overwrite our optimistic update
-      await queryClient.cancelQueries({ queryKey: ['tasks', taskId] })
-
-      // Snapshot the previous value
-      const previousTask = queryClient.getQueryData<Task>(['tasks', taskId])
-
-      // Optimistically update the cache - remove the attachment immediately
-      if (previousTask) {
-        queryClient.setQueryData<Task>(['tasks', taskId], {
-          ...previousTask,
-          attachments: previousTask.attachments?.filter(a => a._id !== attachmentId) || []
-        })
+    mutationFn: async ({ taskId, attachmentId }: { taskId: string; attachmentId: string }) => {
+      try {
+        return await tasksService.deleteAttachment(taskId, attachmentId)
+      } catch (error: any) {
+        // If 404, treat as success (already deleted)
+        if (error?.response?.status === 404 || error?.status === 404) {
+          console.warn('⚠️ Attachment not found (404), treating as deleted')
+          return { success: true }
+        }
+        throw error
       }
-
-      // Return context with the previous value for rollback
-      return { previousTask }
     },
-    onError: (error: Error, { taskId }, context) => {
-      // Roll back to the previous value on error
-      if (context?.previousTask) {
-        queryClient.setQueryData(['tasks', taskId], context.previousTask)
-      }
+    // Update cache on success (Stable & Correct)
+    onSuccess: (_, { taskId, attachmentId }) => {
+      toast.success('تم حذف المرفق')
+
+      // Manually update the cache
+      queryClient.setQueryData(['tasks', taskId], (old: any) => {
+        if (!old) return old
+
+        if (old.attachments && Array.isArray(old.attachments)) {
+          return {
+            ...old,
+            attachments: old.attachments.filter((a: any) => a._id !== attachmentId)
+          }
+        }
+        return old
+      })
+    },
+    onError: (error: Error) => {
       toast.error(error.message || 'فشل حذف المرفق')
     },
-    onSuccess: () => {
-      toast.success('تم حذف المرفق')
-    },
-    onSettled: (_, __, { taskId }) => {
-      // Always refetch after error or success to ensure we have correct server state
-      queryClient.invalidateQueries({ queryKey: ['tasks', taskId] })
+    onSettled: async (_, __, { taskId }) => {
+      // Removed invalidation to prevent flickering (race condition)
+      // The manual cache update in onSuccess is sufficient
+      console.log(`[${new Date().toISOString()}] 🛑 Delete Attachment Settled. Skipping invalidation.`)
     },
   })
 }
@@ -1129,7 +1223,12 @@ export const useTimeTrackingDetails = (taskId: string) => {
 export const useDocuments = (taskId: string) => {
   return useQuery({
     queryKey: ['tasks', taskId, 'documents'],
-    queryFn: () => tasksService.getDocuments(taskId),
+    queryFn: async () => {
+      console.log(`[${new Date().toISOString()}] 📥 Fetching documents for task ${taskId}`)
+      const res = await tasksService.getDocuments(taskId)
+      console.log(`[${new Date().toISOString()}] ✅ Fetched documents:`, res.documents.length)
+      return res
+    },
     enabled: !!taskId,
   })
 }
@@ -1152,42 +1251,48 @@ export const useCreateDocument = () => {
       content: string
       contentJson?: any
     }) => tasksService.createDocument(taskId, title, content, contentJson),
-    // Optimistic update - show document immediately
-    onMutate: async ({ taskId, title, content, contentJson }) => {
-      await queryClient.cancelQueries({ queryKey: ['tasks', taskId, 'documents'] })
-      const previousDocs = queryClient.getQueryData<{ documents: TaskDocument[] }>(['tasks', taskId, 'documents'])
-
-      if (previousDocs) {
-        const tempDoc: TaskDocument = {
-          _id: `temp-${Date.now()}`,
-          fileName: `${title}.html`,
-          title,
-          content,
-          contentJson,
-          contentFormat: 'tiptap-json',
-          fileType: 'text/html',
-          createdAt: new Date().toISOString()
-        }
-        queryClient.setQueryData<{ documents: TaskDocument[] }>(['tasks', taskId, 'documents'], {
-          documents: [...(previousDocs.documents || []), tempDoc]
-        })
-      }
-
-      return { previousDocs }
-    },
-    onSuccess: () => {
+    // Update cache on success (Stable & Correct)
+    onSuccess: (data, { taskId }) => {
+      console.log(`[${new Date().toISOString()}] 🟢 Create Document Success. Updating cache...`)
       toast.success('تم إنشاء المستند')
+
+      // Manually update the cache
+      queryClient.setQueryData(['tasks', taskId, 'documents'], (old: any) => {
+        let newState
+        if (!old) {
+          newState = { documents: [data.document] }
+        } else if (old.documents && Array.isArray(old.documents)) {
+          // Check for duplicates
+          const exists = old.documents.some((d: any) => d._id === data.document._id)
+          if (exists) {
+            console.warn(`[${new Date().toISOString()}] ⚠️ Document already in cache, skipping append`)
+            newState = old
+          } else {
+            // Ensure dates exist
+            const newDoc = {
+              ...data.document,
+              createdAt: data.document.createdAt || new Date().toISOString(),
+              updatedAt: data.document.updatedAt || new Date().toISOString()
+            }
+            newState = {
+              ...old,
+              documents: [...old.documents, newDoc]
+            }
+          }
+        } else {
+          newState = old
+        }
+        console.log(`[${new Date().toISOString()}] 💾 Cache updated manually. New count:`, newState.documents?.length)
+        return newState
+      })
     },
-    onError: (error: Error, { taskId }, context) => {
-      if (context?.previousDocs) {
-        queryClient.setQueryData(['tasks', taskId, 'documents'], context.previousDocs)
-      }
+    onError: (error: Error) => {
       toast.error(error.message || 'فشل إنشاء المستند')
     },
-    // Use onSettled with await to replace temp doc with real one from server
-    onSettled: async (_, __, { taskId }) => {
-      await queryClient.invalidateQueries({ queryKey: ['tasks', taskId] })
-      return await queryClient.invalidateQueries({ queryKey: ['tasks', taskId, 'documents'] })
+    onSettled: (_, __, { taskId }) => {
+      // Removed invalidation to prevent flickering (race condition)
+      // The manual cache update in onSuccess is sufficient
+      console.log(`[${new Date().toISOString()}] 🛑 Create Document Settled. Skipping invalidation.`)
     },
   })
 }
@@ -1201,14 +1306,36 @@ export const useUpdateDocument = () => {
       documentId: string
       data: { title?: string; content?: string; contentJson?: any }
     }) => tasksService.updateDocument(taskId, documentId, data),
-    onSuccess: () => {
+    onSuccess: (data, { taskId, documentId }) => {
       toast.success('تم حفظ المستند')
+
+      // Manually update the list cache
+      queryClient.setQueryData(['tasks', taskId, 'documents'], (old: any) => {
+        if (!old) return old
+
+        if (old.documents && Array.isArray(old.documents)) {
+          const newState = {
+            ...old,
+            documents: old.documents.map((d: any) => d._id === documentId ? data.document : d)
+          }
+          return newState
+        }
+        return old
+      })
+
+      // Manually update the detail cache
+      queryClient.setQueryData(['tasks', taskId, 'documents', documentId], (old: any) => {
+        const newState = { ...old, document: data.document }
+        return newState
+      })
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل حفظ المستند')
     },
     // Use onSettled with await to ensure mutation stays pending until refetch completes
     onSettled: async (_, __, { taskId, documentId }) => {
+      // Delay to allow DB propagation
+      await new Promise(resolve => setTimeout(resolve, 1000))
       await queryClient.invalidateQueries({ queryKey: ['tasks', taskId] })
       await queryClient.invalidateQueries({ queryKey: ['tasks', taskId, 'documents'] })
       return await queryClient.invalidateQueries({ queryKey: ['tasks', taskId, 'documents', documentId] })
@@ -1220,35 +1347,47 @@ export const useDeleteDocument = () => {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: ({ taskId, documentId }: { taskId: string; documentId: string }) =>
-      tasksService.deleteDocument(taskId, documentId),
-    // Optimistic update - remove document immediately from UI
-    onMutate: async ({ taskId, documentId }) => {
-      await queryClient.cancelQueries({ queryKey: ['tasks', taskId, 'documents'] })
-      const previousDocs = queryClient.getQueryData<{ documents: TaskDocument[] }>(['tasks', taskId, 'documents'])
-
-      if (previousDocs) {
-        queryClient.setQueryData<{ documents: TaskDocument[] }>(['tasks', taskId, 'documents'], {
-          documents: previousDocs.documents?.filter(d => d._id !== documentId) || []
-        })
+    mutationFn: async ({ taskId, documentId }: { taskId: string; documentId: string }) => {
+      try {
+        return await tasksService.deleteDocument(taskId, documentId)
+      } catch (error: any) {
+        // If 404, treat as success (already deleted)
+        if (error?.response?.status === 404 || error?.status === 404) {
+          console.warn('⚠️ Document not found (404), treating as deleted')
+          return { success: true }
+        }
+        throw error
       }
-
-      return { previousDocs }
     },
-    onSuccess: () => {
+    // Update cache on success (Stable & Correct)
+    onSuccess: (_, { taskId, documentId }) => {
+      console.log(`[${new Date().toISOString()}] 🔴 Delete Document Success. Removing ${documentId} from cache...`)
       toast.success('تم حذف المستند')
+
+      // Manually update the cache
+      queryClient.setQueryData(['tasks', taskId, 'documents'], (old: any) => {
+        if (!old) {
+          return old
+        }
+
+        if (old.documents && Array.isArray(old.documents)) {
+          const newState = {
+            ...old,
+            documents: old.documents.filter((d: any) => d._id !== documentId)
+          }
+          console.log(`[${new Date().toISOString()}] 💾 Cache updated manually. New count:`, newState.documents.length)
+          return newState
+        }
+        return old
+      })
     },
-    onError: (error: Error, { taskId }, context) => {
-      // Rollback on error
-      if (context?.previousDocs) {
-        queryClient.setQueryData(['tasks', taskId, 'documents'], context.previousDocs)
-      }
+    onError: (error: Error) => {
       toast.error(error.message || 'فشل حذف المستند')
     },
-    // Use onSettled with await to ensure mutation stays pending until refetch completes
-    onSettled: async (_, __, { taskId }) => {
-      await queryClient.invalidateQueries({ queryKey: ['tasks', taskId] })
-      return await queryClient.invalidateQueries({ queryKey: ['tasks', taskId, 'documents'] })
+    onSettled: (_, __, { taskId }) => {
+      // Removed invalidation to prevent flickering (race condition)
+      // The manual cache update in onSuccess is sufficient
+      console.log(`[${new Date().toISOString()}] 🛑 Delete Document Settled. Skipping invalidation.`)
     },
   })
 }
@@ -1262,11 +1401,15 @@ export const useUploadVoiceMemo = () => {
     mutationFn: ({ taskId, file, duration }: { taskId: string; file: Blob; duration: number }) =>
       tasksService.uploadVoiceMemo(taskId, file, duration),
     onSuccess: (_, { taskId }) => {
-      queryClient.invalidateQueries({ queryKey: ['tasks', taskId] })
       toast.success('تم رفع المذكرة الصوتية')
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل رفع المذكرة الصوتية')
+    },
+    onSettled: async (_, __, { taskId }) => {
+      // Delay to allow DB propagation
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      return await queryClient.invalidateQueries({ queryKey: ['tasks', taskId], refetchType: 'all' })
     },
   })
 }
@@ -1297,11 +1440,15 @@ export const useDeleteVoiceMemo = () => {
     mutationFn: ({ taskId, memoId }: { taskId: string; memoId: string }) =>
       tasksService.deleteVoiceMemo(taskId, memoId),
     onSuccess: (_, { taskId }) => {
-      queryClient.invalidateQueries({ queryKey: ['tasks', taskId] })
       toast.success('تم حذف المذكرة الصوتية')
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل حذف المذكرة الصوتية')
+    },
+    onSettled: async (_, __, { taskId }) => {
+      // Delay to allow DB propagation
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      return await queryClient.invalidateQueries({ queryKey: ['tasks', taskId], refetchType: 'all' })
     },
   })
 }

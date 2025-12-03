@@ -118,10 +118,32 @@ export const useUploadDocument = () => {
       metadata: CreateDocumentData
       onProgress?: (progress: number) => void
     }) => documentsService.uploadDocument(file, metadata, onProgress),
-    onSuccess: () => {
+    // Update cache on success (Stable & Correct)
+    onSuccess: (data) => {
       toast({
         title: t('status.success'),
         description: t('documents.uploadSuccess'),
+      })
+
+      // Manually update the cache with the REAL document from server
+      queryClient.setQueriesData({ queryKey: documentsKeys.all }, (old: any) => {
+        if (!old) return old
+
+        // Handle { documents: [...] } structure
+        if (old.documents && Array.isArray(old.documents)) {
+          return {
+            ...old,
+            documents: [data, ...old.documents],
+            total: (old.total || old.documents.length) + 1
+          }
+        }
+
+        // Handle Array structure
+        if (Array.isArray(old)) {
+          return [data, ...old]
+        }
+
+        return old
       })
     },
     onError: (error: any) => {
@@ -132,15 +154,19 @@ export const useUploadDocument = () => {
       })
     },
     onSettled: async (_, __, variables) => {
-      await queryClient.invalidateQueries({ queryKey: documentsKeys.all })
+      // Delay to allow DB propagation
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      await queryClient.invalidateQueries({ queryKey: documentsKeys.all, refetchType: 'all' })
       if (variables.metadata.caseId) {
         await queryClient.invalidateQueries({
           queryKey: documentsKeys.byCase(variables.metadata.caseId),
+          refetchType: 'all'
         })
       }
       if (variables.metadata.clientId) {
         return await queryClient.invalidateQueries({
           queryKey: documentsKeys.byClient(variables.metadata.clientId),
+          refetchType: 'all'
         })
       }
     },
@@ -155,13 +181,50 @@ export const useUpdateDocument = () => {
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: UpdateDocumentData }) =>
       documentsService.updateDocument(id, data),
+    // Optimistic update
+    onMutate: async ({ id, data }) => {
+      await queryClient.cancelQueries({ queryKey: documentsKeys.all })
+
+      const previousQueries = queryClient.getQueriesData({ queryKey: documentsKeys.all })
+      const previousDoc = queryClient.getQueryData(documentsKeys.detail(id))
+
+      queryClient.setQueriesData({ queryKey: documentsKeys.all }, (old: any) => {
+        if (!old) return old
+
+        const list = Array.isArray(old) ? old : (old.documents || old.data || [])
+        const updatedList = list.map((item: any) => item._id === id ? { ...item, ...data } : item)
+
+        if (Array.isArray(old)) {
+          return updatedList
+        }
+
+        return {
+          ...old,
+          documents: updatedList
+        }
+      })
+
+      if (previousDoc) {
+        queryClient.setQueryData(documentsKeys.detail(id), { ...previousDoc, ...data })
+      }
+
+      return { previousQueries, previousDoc }
+    },
     onSuccess: () => {
       toast({
         title: t('status.success'),
         description: t('status.updatedSuccessfully'),
       })
     },
-    onError: (error: any) => {
+    onError: (error: any, { id }, context) => {
+      if (context?.previousQueries) {
+        context.previousQueries.forEach(([queryKey, data]: [any, any]) => {
+          queryClient.setQueryData(queryKey, data)
+        })
+      }
+      if (context?.previousDoc) {
+        queryClient.setQueryData(documentsKeys.detail(id), context.previousDoc)
+      }
       toast({
         variant: 'destructive',
         title: t('status.error'),
@@ -182,10 +245,32 @@ export const useDeleteDocument = () => {
 
   return useMutation({
     mutationFn: (id: string) => documentsService.deleteDocument(id),
-    onSuccess: () => {
+    // Update cache on success (Stable & Correct)
+    onSuccess: (_, id) => {
       toast({
         title: t('status.success'),
         description: t('status.deletedSuccessfully'),
+      })
+
+      // Optimistically remove document from all lists
+      queryClient.setQueriesData({ queryKey: documentsKeys.all }, (old: any) => {
+        if (!old) return old
+
+        // Handle { documents: [...] } structure
+        if (old.documents && Array.isArray(old.documents)) {
+          return {
+            ...old,
+            documents: old.documents.filter((item: any) => item._id !== id),
+            total: Math.max(0, (old.total || old.documents.length) - 1)
+          }
+        }
+
+        // Handle Array structure
+        if (Array.isArray(old)) {
+          return old.filter((item: any) => item._id !== id)
+        }
+
+        return old
       })
     },
     onError: (error: any) => {
@@ -196,7 +281,9 @@ export const useDeleteDocument = () => {
       })
     },
     onSettled: async () => {
-      return await queryClient.invalidateQueries({ queryKey: documentsKeys.all })
+      // Delay to allow DB propagation
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      return await queryClient.invalidateQueries({ queryKey: documentsKeys.all, refetchType: 'all' })
     },
   })
 }

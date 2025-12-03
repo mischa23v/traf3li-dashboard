@@ -14,7 +14,7 @@ export interface CreateStaffData {
   status?: 'active' | 'inactive'
 }
 
-export interface UpdateStaffData extends Partial<CreateStaffData> {}
+export interface UpdateStaffData extends Partial<CreateStaffData> { }
 
 // Staff service extensions (for CRUD operations)
 const staffService = {
@@ -90,14 +90,21 @@ export const useCreateStaff = () => {
 
   return useMutation({
     mutationFn: (data: CreateStaffData) => staffService.createStaff(data),
-    onSuccess: () => {
+    onSuccess: (data) => {
       toast.success('تم إضافة عضو الفريق بنجاح')
+      // Optimistically update the cache
+      queryClient.setQueriesData({ queryKey: ['staff'] }, (old: any) => {
+        if (!old) return old
+        if (Array.isArray(old)) return [data, ...old]
+        return old
+      })
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل إضافة عضو الفريق')
     },
     onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['staff'] })
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      await queryClient.invalidateQueries({ queryKey: ['staff'], refetchType: 'all' })
     },
   })
 }
@@ -113,15 +120,26 @@ export const useUpdateStaff = () => {
       staffId: string
       data: UpdateStaffData
     }) => staffService.updateStaff(staffId, data),
-    onSuccess: () => {
+    onSuccess: (data) => {
       toast.success('تم تحديث بيانات عضو الفريق بنجاح')
+      // Update specific staff member in cache
+      queryClient.setQueryData(['staff', data.id], data)
+      // Update list cache
+      queryClient.setQueriesData({ queryKey: ['staff'] }, (old: any) => {
+        if (!old) return old
+        if (Array.isArray(old)) {
+          return old.map((item: any) => (item.id === data.id ? data : item))
+        }
+        return old
+      })
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل تحديث بيانات عضو الفريق')
     },
     onSettled: async (_, __, variables) => {
-      await queryClient.invalidateQueries({ queryKey: ['staff'] })
-      await queryClient.invalidateQueries({ queryKey: ['staff', variables.staffId] })
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      await queryClient.invalidateQueries({ queryKey: ['staff'], refetchType: 'all' })
+      await queryClient.invalidateQueries({ queryKey: ['staff', variables.staffId], refetchType: 'all' })
     },
   })
 }
@@ -131,14 +149,23 @@ export const useDeleteStaff = () => {
 
   return useMutation({
     mutationFn: (staffId: string) => staffService.deleteStaff(staffId),
-    onSuccess: () => {
+    onSuccess: (_, staffId) => {
       toast.success('تم حذف عضو الفريق بنجاح')
+      // Remove from cache
+      queryClient.setQueriesData({ queryKey: ['staff'] }, (old: any) => {
+        if (!old) return old
+        if (Array.isArray(old)) {
+          return old.filter((item: any) => item.id !== staffId)
+        }
+        return old
+      })
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل حذف عضو الفريق')
     },
     onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['staff'] })
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      await queryClient.invalidateQueries({ queryKey: ['staff'], refetchType: 'all' })
     },
   })
 }
@@ -148,14 +175,23 @@ export const useBulkDeleteStaff = () => {
 
   return useMutation({
     mutationFn: (staffIds: string[]) => staffService.bulkDeleteStaff(staffIds),
-    onSuccess: () => {
+    onSuccess: (_, staffIds) => {
       toast.success('تم حذف أعضاء الفريق بنجاح')
+      // Remove from cache
+      queryClient.setQueriesData({ queryKey: ['staff'] }, (old: any) => {
+        if (!old) return old
+        if (Array.isArray(old)) {
+          return old.filter((item: any) => !staffIds.includes(item.id))
+        }
+        return old
+      })
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل حذف أعضاء الفريق')
     },
     onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['staff'] })
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      await queryClient.invalidateQueries({ queryKey: ['staff'], refetchType: 'all' })
     },
   })
 }

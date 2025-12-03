@@ -79,9 +79,27 @@ export function useCreateRate() {
 
   return useMutation({
     mutationFn: (data: CreateRateData) => billingRatesService.createRate(data),
+    // Update cache on success (Stable & Correct)
+    onSuccess: (data) => {
+      // Manually update the cache
+      queryClient.setQueriesData({ queryKey: billingKeys.rates() }, (old: any) => {
+        if (!old) return old
+        // Handle { rates: [...] } structure
+        if (old.rates && Array.isArray(old.rates)) {
+          return {
+            ...old,
+            rates: [data, ...old.rates]
+          }
+        }
+        if (Array.isArray(old)) return [data, ...old]
+        return old
+      })
+    },
     onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey: billingKeys.rates() })
-      return await queryClient.invalidateQueries({ queryKey: billingKeys.statistics() })
+      // Delay to allow DB propagation
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      await queryClient.invalidateQueries({ queryKey: billingKeys.rates(), refetchType: 'all' })
+      return await queryClient.invalidateQueries({ queryKey: billingKeys.statistics(), refetchType: 'all' })
     },
   })
 }
@@ -112,9 +130,27 @@ export function useDeleteRate() {
 
   return useMutation({
     mutationFn: (id: string) => billingRatesService.deleteRate(id),
+    // Update cache on success (Stable & Correct)
+    onSuccess: (_, id) => {
+      // Manually update the cache
+      queryClient.setQueriesData({ queryKey: billingKeys.rates() }, (old: any) => {
+        if (!old) return old
+        // Handle { rates: [...] } structure
+        if (old.rates && Array.isArray(old.rates)) {
+          return {
+            ...old,
+            rates: old.rates.filter((item: any) => item._id !== id)
+          }
+        }
+        if (Array.isArray(old)) return old.filter((item: any) => item._id !== id)
+        return old
+      })
+    },
     onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey: billingKeys.rates() })
-      return await queryClient.invalidateQueries({ queryKey: billingKeys.statistics() })
+      // Delay to allow DB propagation
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      await queryClient.invalidateQueries({ queryKey: billingKeys.rates(), refetchType: 'all' })
+      return await queryClient.invalidateQueries({ queryKey: billingKeys.statistics(), refetchType: 'all' })
     },
   })
 }
@@ -152,9 +188,27 @@ export function useCreateRateGroup() {
 
   return useMutation({
     mutationFn: (data: CreateRateGroupData) => billingRatesService.createRateGroup(data),
+    // Update cache on success (Stable & Correct)
+    onSuccess: (data) => {
+      // Manually update the cache
+      queryClient.setQueriesData({ queryKey: billingKeys.groups() }, (old: any) => {
+        if (!old) return old
+        // Handle { groups: [...] } structure
+        if (old.groups && Array.isArray(old.groups)) {
+          return {
+            ...old,
+            groups: [data, ...old.groups]
+          }
+        }
+        if (Array.isArray(old)) return [data, ...old]
+        return old
+      })
+    },
     onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey: billingKeys.groups() })
-      return await queryClient.invalidateQueries({ queryKey: billingKeys.statistics() })
+      // Delay to allow DB propagation
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      await queryClient.invalidateQueries({ queryKey: billingKeys.groups(), refetchType: 'all' })
+      return await queryClient.invalidateQueries({ queryKey: billingKeys.statistics(), refetchType: 'all' })
     },
   })
 }
@@ -185,9 +239,27 @@ export function useDeleteRateGroup() {
 
   return useMutation({
     mutationFn: (id: string) => billingRatesService.deleteRateGroup(id),
+    // Update cache on success (Stable & Correct)
+    onSuccess: (_, id) => {
+      // Manually update the cache
+      queryClient.setQueriesData({ queryKey: billingKeys.groups() }, (old: any) => {
+        if (!old) return old
+        // Handle { groups: [...] } structure
+        if (old.groups && Array.isArray(old.groups)) {
+          return {
+            ...old,
+            groups: old.groups.filter((item: any) => item._id !== id)
+          }
+        }
+        if (Array.isArray(old)) return old.filter((item: any) => item._id !== id)
+        return old
+      })
+    },
     onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey: billingKeys.groups() })
-      return await queryClient.invalidateQueries({ queryKey: billingKeys.statistics() })
+      // Delay to allow DB propagation
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      await queryClient.invalidateQueries({ queryKey: billingKeys.groups(), refetchType: 'all' })
+      return await queryClient.invalidateQueries({ queryKey: billingKeys.statistics(), refetchType: 'all' })
     },
   })
 }
@@ -261,9 +333,27 @@ export function useCreateRateCard() {
 
   return useMutation({
     mutationFn: (data: CreateRateCardData) => billingRatesService.createRateCard(data),
+    // Update cache on success (Stable & Correct)
+    onSuccess: (data) => {
+      // Manually update the cache
+      queryClient.setQueriesData({ queryKey: billingKeys.rateCards() }, (old: any) => {
+        if (!old) return old
+        // Handle { rateCards: [...] } structure
+        if (old.rateCards && Array.isArray(old.rateCards)) {
+          return {
+            ...old,
+            rateCards: [data, ...old.rateCards]
+          }
+        }
+        if (Array.isArray(old)) return [data, ...old]
+        return old
+      })
+    },
     onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey: billingKeys.rateCards() })
-      return await queryClient.invalidateQueries({ queryKey: billingKeys.statistics() })
+      // Delay to allow DB propagation
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      await queryClient.invalidateQueries({ queryKey: billingKeys.rateCards(), refetchType: 'all' })
+      return await queryClient.invalidateQueries({ queryKey: billingKeys.statistics(), refetchType: 'all' })
     },
   })
 }
@@ -291,9 +381,27 @@ export function useDeleteRateCard() {
 
   return useMutation({
     mutationFn: (id: string) => billingRatesService.deleteRateCard(id),
+    // Update cache on success (Stable & Correct)
+    onSuccess: (_, id) => {
+      // Manually update the cache
+      queryClient.setQueriesData({ queryKey: billingKeys.rateCards() }, (old: any) => {
+        if (!old) return old
+        // Handle { rateCards: [...] } structure
+        if (old.rateCards && Array.isArray(old.rateCards)) {
+          return {
+            ...old,
+            rateCards: old.rateCards.filter((item: any) => item._id !== id)
+          }
+        }
+        if (Array.isArray(old)) return old.filter((item: any) => item._id !== id)
+        return old
+      })
+    },
     onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey: billingKeys.rateCards() })
-      return await queryClient.invalidateQueries({ queryKey: billingKeys.statistics() })
+      // Delay to allow DB propagation
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      await queryClient.invalidateQueries({ queryKey: billingKeys.rateCards(), refetchType: 'all' })
+      return await queryClient.invalidateQueries({ queryKey: billingKeys.statistics(), refetchType: 'all' })
     },
   })
 }
@@ -320,9 +428,27 @@ export function useCreateTimeEntry() {
 
   return useMutation({
     mutationFn: (data: CreateTimeEntryData) => billingRatesService.createTimeEntry(data),
+    // Update cache on success (Stable & Correct)
+    onSuccess: (data) => {
+      // Manually update the cache
+      queryClient.setQueriesData({ queryKey: billingKeys.timeEntries() }, (old: any) => {
+        if (!old) return old
+        // Handle { timeEntries: [...] } structure
+        if (old.timeEntries && Array.isArray(old.timeEntries)) {
+          return {
+            ...old,
+            timeEntries: [data, ...old.timeEntries]
+          }
+        }
+        if (Array.isArray(old)) return [data, ...old]
+        return old
+      })
+    },
     onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey: billingKeys.timeEntries() })
-      return await queryClient.invalidateQueries({ queryKey: billingKeys.statistics() })
+      // Delay to allow DB propagation
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      await queryClient.invalidateQueries({ queryKey: billingKeys.timeEntries(), refetchType: 'all' })
+      return await queryClient.invalidateQueries({ queryKey: billingKeys.statistics(), refetchType: 'all' })
     },
   })
 }
@@ -350,9 +476,27 @@ export function useDeleteTimeEntry() {
 
   return useMutation({
     mutationFn: (id: string) => billingRatesService.deleteTimeEntry(id),
+    // Update cache on success (Stable & Correct)
+    onSuccess: (_, id) => {
+      // Manually update the cache
+      queryClient.setQueriesData({ queryKey: billingKeys.timeEntries() }, (old: any) => {
+        if (!old) return old
+        // Handle { timeEntries: [...] } structure
+        if (old.timeEntries && Array.isArray(old.timeEntries)) {
+          return {
+            ...old,
+            timeEntries: old.timeEntries.filter((item: any) => item._id !== id)
+          }
+        }
+        if (Array.isArray(old)) return old.filter((item: any) => item._id !== id)
+        return old
+      })
+    },
     onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey: billingKeys.timeEntries() })
-      return await queryClient.invalidateQueries({ queryKey: billingKeys.statistics() })
+      // Delay to allow DB propagation
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      await queryClient.invalidateQueries({ queryKey: billingKeys.timeEntries(), refetchType: 'all' })
+      return await queryClient.invalidateQueries({ queryKey: billingKeys.statistics(), refetchType: 'all' })
     },
   })
 }

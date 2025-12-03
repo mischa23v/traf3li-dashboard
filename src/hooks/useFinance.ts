@@ -40,14 +40,34 @@ export const useCreateInvoice = () => {
   return useMutation({
     mutationFn: (data: CreateInvoiceData) =>
       financeService.createInvoice(data),
-    onSuccess: () => {
+    // Update cache on success (Stable & Correct)
+    onSuccess: (data) => {
       toast.success('تم إنشاء الفاتورة بنجاح')
+
+      // Manually update the cache
+      queryClient.setQueriesData({ queryKey: ['invoices'] }, (old: any) => {
+        if (!old) return old
+
+        // Handle { invoices: [...] } structure
+        if (old.invoices && Array.isArray(old.invoices)) {
+          return {
+            ...old,
+            invoices: [data, ...old.invoices],
+            total: (old.total || old.invoices.length) + 1
+          }
+        }
+
+        if (Array.isArray(old)) return [data, ...old]
+        return old
+      })
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل إنشاء الفاتورة')
     },
     onSettled: async () => {
-      return await queryClient.invalidateQueries({ queryKey: ['invoices'] })
+      // Delay to allow DB propagation
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      return await queryClient.invalidateQueries({ queryKey: ['invoices'], refetchType: 'all' })
     },
   })
 }
@@ -121,14 +141,34 @@ export const useCreateExpense = () => {
   return useMutation({
     mutationFn: (data: CreateExpenseData) =>
       financeService.createExpense(data),
-    onSuccess: () => {
+    // Update cache on success (Stable & Correct)
+    onSuccess: (data) => {
       toast.success('تم إنشاء المصروف بنجاح')
+
+      // Manually update the cache
+      queryClient.setQueriesData({ queryKey: ['expenses'] }, (old: any) => {
+        if (!old) return old
+
+        // Handle { expenses: [...] } structure
+        if (old.expenses && Array.isArray(old.expenses)) {
+          return {
+            ...old,
+            expenses: [data, ...old.expenses],
+            total: (old.total || old.expenses.length) + 1
+          }
+        }
+
+        if (Array.isArray(old)) return [data, ...old]
+        return old
+      })
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل إنشاء المصروف')
     },
     onSettled: async () => {
-      return await queryClient.invalidateQueries({ queryKey: ['expenses'] })
+      // Delay to allow DB propagation
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      return await queryClient.invalidateQueries({ queryKey: ['expenses'], refetchType: 'all' })
     },
   })
 }
@@ -282,14 +322,34 @@ export const useCreateTimeEntry = () => {
   return useMutation({
     mutationFn: (data: CreateTimeEntryData) =>
       financeService.createTimeEntry(data),
-    onSuccess: () => {
+    // Update cache on success (Stable & Correct)
+    onSuccess: (data) => {
       toast.success('تم إنشاء إدخال الوقت بنجاح')
+
+      // Manually update the cache
+      queryClient.setQueriesData({ queryKey: ['timeEntries'] }, (old: any) => {
+        if (!old) return old
+
+        // Handle { timeEntries: [...] } structure
+        if (old.timeEntries && Array.isArray(old.timeEntries)) {
+          return {
+            ...old,
+            timeEntries: [data, ...old.timeEntries],
+            total: (old.total || old.timeEntries.length) + 1
+          }
+        }
+
+        if (Array.isArray(old)) return [data, ...old]
+        return old
+      })
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل إنشاء إدخال الوقت')
     },
     onSettled: async () => {
-      return await queryClient.invalidateQueries({ queryKey: ['timeEntries'] })
+      // Delay to allow DB propagation
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      return await queryClient.invalidateQueries({ queryKey: ['timeEntries'], refetchType: 'all' })
     },
   })
 }
@@ -420,14 +480,34 @@ export const useCreateTransaction = () => {
   return useMutation({
     mutationFn: (data: CreateTransactionData) =>
       financeService.createTransaction(data),
-    onSuccess: () => {
+    // Update cache on success (Stable & Correct)
+    onSuccess: (data) => {
       toast.success('تم إنشاء المعاملة بنجاح')
+
+      // Manually update the cache
+      queryClient.setQueriesData({ queryKey: ['transactions'] }, (old: any) => {
+        if (!old) return old
+
+        // Handle { transactions: [...] } structure
+        if (old.transactions && Array.isArray(old.transactions)) {
+          return {
+            ...old,
+            transactions: [data, ...old.transactions],
+            total: (old.total || old.transactions.length) + 1
+          }
+        }
+
+        if (Array.isArray(old)) return [data, ...old]
+        return old
+      })
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل إنشاء المعاملة')
     },
     onSettled: async () => {
-      return await queryClient.invalidateQueries({ queryKey: ['transactions'] })
+      // Delay to allow DB propagation
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      return await queryClient.invalidateQueries({ queryKey: ['transactions'], refetchType: 'all' })
     },
   })
 }
@@ -644,14 +724,34 @@ export const useDeleteInvoice = () => {
 
   return useMutation({
     mutationFn: (id: string) => financeService.deleteInvoice(id),
-    onSuccess: () => {
+    // Update cache on success (Stable & Correct)
+    onSuccess: (_, id) => {
       toast.success('تم حذف الفاتورة بنجاح')
+
+      // Manually update the cache
+      queryClient.setQueriesData({ queryKey: ['invoices'] }, (old: any) => {
+        if (!old) return old
+
+        // Handle { invoices: [...] } structure
+        if (old.invoices && Array.isArray(old.invoices)) {
+          return {
+            ...old,
+            invoices: old.invoices.filter((item: any) => item._id !== id),
+            total: Math.max(0, (old.total || old.invoices.length) - 1)
+          }
+        }
+
+        if (Array.isArray(old)) return old.filter((item: any) => item._id !== id)
+        return old
+      })
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل حذف الفاتورة')
     },
     onSettled: async () => {
-      return await queryClient.invalidateQueries({ queryKey: ['invoices'] })
+      // Delay to allow DB propagation
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      return await queryClient.invalidateQueries({ queryKey: ['invoices'], refetchType: 'all' })
     },
   })
 }
@@ -661,14 +761,34 @@ export const useDeleteExpense = () => {
 
   return useMutation({
     mutationFn: (id: string) => financeService.deleteExpense(id),
-    onSuccess: () => {
+    // Update cache on success (Stable & Correct)
+    onSuccess: (_, id) => {
       toast.success('تم حذف المصروف بنجاح')
+
+      // Manually update the cache
+      queryClient.setQueriesData({ queryKey: ['expenses'] }, (old: any) => {
+        if (!old) return old
+
+        // Handle { expenses: [...] } structure
+        if (old.expenses && Array.isArray(old.expenses)) {
+          return {
+            ...old,
+            expenses: old.expenses.filter((item: any) => item._id !== id),
+            total: Math.max(0, (old.total || old.expenses.length) - 1)
+          }
+        }
+
+        if (Array.isArray(old)) return old.filter((item: any) => item._id !== id)
+        return old
+      })
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل حذف المصروف')
     },
     onSettled: async () => {
-      return await queryClient.invalidateQueries({ queryKey: ['expenses'] })
+      // Delay to allow DB propagation
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      return await queryClient.invalidateQueries({ queryKey: ['expenses'], refetchType: 'all' })
     },
   })
 }
@@ -697,14 +817,34 @@ export const useDeleteTimeEntry = () => {
 
   return useMutation({
     mutationFn: (id: string) => financeService.deleteTimeEntry(id),
-    onSuccess: () => {
+    // Update cache on success (Stable & Correct)
+    onSuccess: (_, id) => {
       toast.success('تم حذف إدخال الوقت بنجاح')
+
+      // Manually update the cache
+      queryClient.setQueriesData({ queryKey: ['timeEntries'] }, (old: any) => {
+        if (!old) return old
+
+        // Handle { timeEntries: [...] } structure
+        if (old.timeEntries && Array.isArray(old.timeEntries)) {
+          return {
+            ...old,
+            timeEntries: old.timeEntries.filter((item: any) => item._id !== id),
+            total: Math.max(0, (old.total || old.timeEntries.length) - 1)
+          }
+        }
+
+        if (Array.isArray(old)) return old.filter((item: any) => item._id !== id)
+        return old
+      })
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل حذف إدخال الوقت')
     },
     onSettled: async () => {
-      return await queryClient.invalidateQueries({ queryKey: ['timeEntries'] })
+      // Delay to allow DB propagation
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      return await queryClient.invalidateQueries({ queryKey: ['timeEntries'], refetchType: 'all' })
     },
   })
 }
@@ -733,14 +873,34 @@ export const useDeleteTransaction = () => {
 
   return useMutation({
     mutationFn: (id: string) => financeService.deleteTransaction(id),
-    onSuccess: () => {
+    // Update cache on success (Stable & Correct)
+    onSuccess: (_, id) => {
       toast.success('تم حذف المعاملة بنجاح')
+
+      // Manually update the cache
+      queryClient.setQueriesData({ queryKey: ['transactions'] }, (old: any) => {
+        if (!old) return old
+
+        // Handle { transactions: [...] } structure
+        if (old.transactions && Array.isArray(old.transactions)) {
+          return {
+            ...old,
+            transactions: old.transactions.filter((item: any) => item._id !== id),
+            total: Math.max(0, (old.total || old.transactions.length) - 1)
+          }
+        }
+
+        if (Array.isArray(old)) return old.filter((item: any) => item._id !== id)
+        return old
+      })
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل حذف المعاملة')
     },
     onSettled: async () => {
-      return await queryClient.invalidateQueries({ queryKey: ['transactions'] })
+      // Delay to allow DB propagation
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      return await queryClient.invalidateQueries({ queryKey: ['transactions'], refetchType: 'all' })
     },
   })
 }

@@ -73,10 +73,29 @@ export function useCreateMatterBudget() {
         | 'updatedAt'
       >
     ) => matterBudgetService.createBudget(data),
+    // Update cache on success (Stable & Correct)
+    onSuccess: (data) => {
+      // Manually update the cache
+      queryClient.setQueriesData({ queryKey: matterBudgetKeys.lists() }, (old: any) => {
+        if (!old) return old
+        // Handle { budgets: [...] } structure
+        if (old.budgets && Array.isArray(old.budgets)) {
+          return {
+            ...old,
+            budgets: [data, ...old.budgets]
+          }
+        }
+        if (Array.isArray(old)) return [data, ...old]
+        return old
+      })
+    },
     onSettled: async (_, __, variables) => {
-      await queryClient.invalidateQueries({ queryKey: matterBudgetKeys.lists() })
+      // Delay to allow DB propagation
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      await queryClient.invalidateQueries({ queryKey: matterBudgetKeys.lists(), refetchType: 'all' })
       return await queryClient.invalidateQueries({
         queryKey: matterBudgetKeys.matter(variables.matterId),
+        refetchType: 'all'
       })
     },
   })
@@ -100,8 +119,26 @@ export function useDeleteMatterBudget() {
 
   return useMutation({
     mutationFn: (id: string) => matterBudgetService.deleteBudget(id),
+    // Update cache on success (Stable & Correct)
+    onSuccess: (_, id) => {
+      // Manually update the cache
+      queryClient.setQueriesData({ queryKey: matterBudgetKeys.lists() }, (old: any) => {
+        if (!old) return old
+        // Handle { budgets: [...] } structure
+        if (old.budgets && Array.isArray(old.budgets)) {
+          return {
+            ...old,
+            budgets: old.budgets.filter((b: any) => b._id !== id)
+          }
+        }
+        if (Array.isArray(old)) return old.filter((b: any) => b._id !== id)
+        return old
+      })
+    },
     onSettled: async () => {
-      return await queryClient.invalidateQueries({ queryKey: matterBudgetKeys.lists() })
+      // Delay to allow DB propagation
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      return await queryClient.invalidateQueries({ queryKey: matterBudgetKeys.lists(), refetchType: 'all' })
     },
   })
 }
@@ -170,8 +207,11 @@ export function useAddBudgetPhase() {
       phase: Omit<BudgetPhase, '_id' | 'usedAmount' | 'remainingAmount' | 'percentUsed'>
     }) => matterBudgetService.addPhase(budgetId, phase),
     onSettled: async (_, __, variables) => {
+      // Delay to allow DB propagation
+      await new Promise(resolve => setTimeout(resolve, 1000))
       return await queryClient.invalidateQueries({
         queryKey: matterBudgetKeys.detail(variables.budgetId),
+        refetchType: 'all'
       })
     },
   })
@@ -205,8 +245,11 @@ export function useDeleteBudgetPhase() {
     mutationFn: ({ budgetId, phaseId }: { budgetId: string; phaseId: string }) =>
       matterBudgetService.deletePhase(budgetId, phaseId),
     onSettled: async (_, __, variables) => {
+      // Delay to allow DB propagation
+      await new Promise(resolve => setTimeout(resolve, 1000))
       return await queryClient.invalidateQueries({
         queryKey: matterBudgetKeys.detail(variables.budgetId),
+        refetchType: 'all'
       })
     },
   })
@@ -225,8 +268,11 @@ export function useAddBudgetCategory() {
       category: Omit<BudgetCategory, '_id' | 'usedAmount' | 'remainingAmount' | 'percentUsed'>
     }) => matterBudgetService.addCategory(budgetId, category),
     onSettled: async (_, __, variables) => {
+      // Delay to allow DB propagation
+      await new Promise(resolve => setTimeout(resolve, 1000))
       return await queryClient.invalidateQueries({
         queryKey: matterBudgetKeys.detail(variables.budgetId),
+        refetchType: 'all'
       })
     },
   })
@@ -260,8 +306,11 @@ export function useDeleteBudgetCategory() {
     mutationFn: ({ budgetId, categoryId }: { budgetId: string; categoryId: string }) =>
       matterBudgetService.deleteCategory(budgetId, categoryId),
     onSettled: async (_, __, variables) => {
+      // Delay to allow DB propagation
+      await new Promise(resolve => setTimeout(resolve, 1000))
       return await queryClient.invalidateQueries({
         queryKey: matterBudgetKeys.detail(variables.budgetId),
+        refetchType: 'all'
       })
     },
   })
@@ -282,8 +331,11 @@ export function useAddBudgetTask() {
       task: Omit<BudgetTask, '_id' | 'actualHours' | 'actualAmount'>
     }) => matterBudgetService.addTask(budgetId, phaseId, task),
     onSettled: async (_, __, variables) => {
+      // Delay to allow DB propagation
+      await new Promise(resolve => setTimeout(resolve, 1000))
       return await queryClient.invalidateQueries({
         queryKey: matterBudgetKeys.detail(variables.budgetId),
+        refetchType: 'all'
       })
     },
   })
@@ -326,8 +378,11 @@ export function useDeleteBudgetTask() {
       taskId: string
     }) => matterBudgetService.deleteTask(budgetId, phaseId, taskId),
     onSettled: async (_, __, variables) => {
+      // Delay to allow DB propagation
+      await new Promise(resolve => setTimeout(resolve, 1000))
       return await queryClient.invalidateQueries({
         queryKey: matterBudgetKeys.detail(variables.budgetId),
+        refetchType: 'all'
       })
     },
   })
@@ -449,10 +504,29 @@ export function useCreateBudgetFromTemplate() {
       matterId: string
       totalBudget: number
     }) => matterBudgetService.createFromTemplate(templateId, matterId, totalBudget),
+    // Update cache on success (Stable & Correct)
+    onSuccess: (data) => {
+      // Manually update the cache
+      queryClient.setQueriesData({ queryKey: matterBudgetKeys.lists() }, (old: any) => {
+        if (!old) return old
+        // Handle { budgets: [...] } structure
+        if (old.budgets && Array.isArray(old.budgets)) {
+          return {
+            ...old,
+            budgets: [data, ...old.budgets]
+          }
+        }
+        if (Array.isArray(old)) return [data, ...old]
+        return old
+      })
+    },
     onSettled: async (_, __, variables) => {
-      await queryClient.invalidateQueries({ queryKey: matterBudgetKeys.lists() })
+      // Delay to allow DB propagation
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      await queryClient.invalidateQueries({ queryKey: matterBudgetKeys.lists(), refetchType: 'all' })
       return await queryClient.invalidateQueries({
         queryKey: matterBudgetKeys.matter(variables.matterId),
+        refetchType: 'all'
       })
     },
   })

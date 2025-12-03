@@ -92,14 +92,34 @@ export const useCreateCase = () => {
 
   return useMutation({
     mutationFn: (data: CreateCaseData) => casesService.createCase(data),
-    onSuccess: () => {
+    // Update cache on success (Stable & Correct)
+    onSuccess: (data) => {
       toast.success(t('cases.createSuccess', 'تم إنشاء القضية بنجاح'))
+
+      // Manually update the cache
+      queryClient.setQueriesData({ queryKey: ['cases'] }, (old: any) => {
+        if (!old) return old
+
+        // Handle { cases: [...] } structure
+        if (old.cases && Array.isArray(old.cases)) {
+          return {
+            ...old,
+            cases: [data, ...old.cases],
+            total: (old.total || old.cases.length) + 1
+          }
+        }
+
+        if (Array.isArray(old)) return [data, ...old]
+        return old
+      })
     },
     onError: (error: Error) => {
       toast.error(error.message || t('cases.createError', 'فشل إنشاء القضية'))
     },
     onSettled: async () => {
-      return await queryClient.invalidateQueries({ queryKey: ['cases'] })
+      // Delay to allow DB propagation
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      return await queryClient.invalidateQueries({ queryKey: ['cases'], refetchType: 'all' })
     },
   })
 }
@@ -136,14 +156,34 @@ export const useDeleteCase = () => {
 
   return useMutation({
     mutationFn: (id: string) => casesService.deleteCase(id),
-    onSuccess: () => {
+    // Update cache on success (Stable & Correct)
+    onSuccess: (_, id) => {
       toast.success(t('cases.deleteSuccess', 'تم حذف القضية بنجاح'))
+
+      // Manually update the cache
+      queryClient.setQueriesData({ queryKey: ['cases'] }, (old: any) => {
+        if (!old) return old
+
+        // Handle { cases: [...] } structure
+        if (old.cases && Array.isArray(old.cases)) {
+          return {
+            ...old,
+            cases: old.cases.filter((item: any) => item._id !== id),
+            total: Math.max(0, (old.total || old.cases.length) - 1)
+          }
+        }
+
+        if (Array.isArray(old)) return old.filter((item: any) => item._id !== id)
+        return old
+      })
     },
     onError: (error: Error) => {
       toast.error(error.message || t('cases.deleteError', 'فشل حذف القضية'))
     },
     onSettled: async () => {
-      return await queryClient.invalidateQueries({ queryKey: ['cases'] })
+      // Delay to allow DB propagation
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      return await queryClient.invalidateQueries({ queryKey: ['cases'], refetchType: 'all' })
     },
   })
 }
@@ -359,14 +399,34 @@ export const useCreateClient = () => {
 
   return useMutation({
     mutationFn: (data: CreateClientData) => clientsService.createClient(data),
-    onSuccess: () => {
+    // Update cache on success (Stable & Correct)
+    onSuccess: (data) => {
       toast.success(t('clients.createSuccess', 'تم إنشاء العميل بنجاح'))
+
+      // Manually update the cache
+      queryClient.setQueriesData({ queryKey: ['clients'] }, (old: any) => {
+        if (!old) return old
+
+        // Handle { clients: [...] } structure
+        if (old.clients && Array.isArray(old.clients)) {
+          return {
+            ...old,
+            clients: [data, ...old.clients],
+            total: (old.total || old.clients.length) + 1
+          }
+        }
+
+        if (Array.isArray(old)) return [data, ...old]
+        return old
+      })
     },
     onError: (error: Error) => {
       toast.error(error.message || t('clients.createError', 'فشل إنشاء العميل'))
     },
     onSettled: async () => {
-      return await queryClient.invalidateQueries({ queryKey: ['clients'] })
+      // Delay to allow DB propagation
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      return await queryClient.invalidateQueries({ queryKey: ['clients'], refetchType: 'all' })
     },
   })
 }
@@ -397,14 +457,34 @@ export const useDeleteClient = () => {
 
   return useMutation({
     mutationFn: (id: string) => clientsService.deleteClient(id),
-    onSuccess: () => {
+    // Update cache on success (Stable & Correct)
+    onSuccess: (_, id) => {
       toast.success(t('clients.deleteSuccess', 'تم حذف العميل بنجاح'))
+
+      // Manually update the cache
+      queryClient.setQueriesData({ queryKey: ['clients'] }, (old: any) => {
+        if (!old) return old
+
+        // Handle { clients: [...] } structure
+        if (old.clients && Array.isArray(old.clients)) {
+          return {
+            ...old,
+            clients: old.clients.filter((item: any) => item._id !== id),
+            total: Math.max(0, (old.total || old.clients.length) - 1)
+          }
+        }
+
+        if (Array.isArray(old)) return old.filter((item: any) => item._id !== id)
+        return old
+      })
     },
     onError: (error: Error) => {
       toast.error(error.message || t('clients.deleteError', 'فشل حذف العميل'))
     },
     onSettled: async () => {
-      return await queryClient.invalidateQueries({ queryKey: ['clients'] })
+      // Delay to allow DB propagation
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      return await queryClient.invalidateQueries({ queryKey: ['clients'], refetchType: 'all' })
     },
   })
 }

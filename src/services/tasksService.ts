@@ -1462,8 +1462,13 @@ const tasksService = {
    */
   deleteDocument: async (taskId: string, documentId: string): Promise<void> => {
     try {
-      await apiClient.delete(`/tasks/${taskId}/documents/${documentId}`)
+      // Documents are stored as attachments in the backend, so we use the attachments endpoint
+      await apiClient.delete(`/tasks/${taskId}/attachments/${documentId}`)
     } catch (error: any) {
+      // If 404, it's already deleted, so we can treat it as success
+      if (error?.response?.status === 404 || error?.status === 404 || error?.status === '404') {
+        return
+      }
       console.error('Delete document error:', error)
       throw new Error(handleApiError(error))
     }

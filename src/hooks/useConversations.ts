@@ -34,14 +34,24 @@ export const useCreateConversation = () => {
   return useMutation({
     mutationFn: (data: CreateConversationData) =>
       conversationsService.createConversation(data),
-    onSuccess: () => {
+    // Update cache on success (Stable & Correct)
+    onSuccess: (data) => {
       toast.success('تم إنشاء المحادثة بنجاح')
+
+      // Manually update the cache
+      queryClient.setQueriesData({ queryKey: ['conversations'] }, (old: any) => {
+        if (!old) return old
+        if (Array.isArray(old)) return [data, ...old]
+        return old
+      })
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل إنشاء المحادثة')
     },
     onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['conversations'] })
+      // Delay to allow DB propagation
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      await queryClient.invalidateQueries({ queryKey: ['conversations'], refetchType: 'all' })
     },
   })
 }
@@ -71,14 +81,26 @@ export const useSendMessage = () => {
       conversationId: string
       data: SendMessageData
     }) => conversationsService.sendMessage(conversationId, data),
+    // Update cache on success (Stable & Correct)
+    onSuccess: (data, { conversationId }) => {
+      // Manually update the cache for messages
+      queryClient.setQueriesData({ queryKey: ['conversations', conversationId, 'messages'] }, (old: any) => {
+        if (!old) return old
+        if (Array.isArray(old)) return [...old, data]
+        return old
+      })
+    },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل إرسال الرسالة')
     },
     onSettled: async (_, __, { conversationId }) => {
+      // Delay to allow DB propagation
+      await new Promise(resolve => setTimeout(resolve, 1000))
       await queryClient.invalidateQueries({
         queryKey: ['conversations', conversationId, 'messages'],
+        refetchType: 'all'
       })
-      await queryClient.invalidateQueries({ queryKey: ['conversations'] })
+      await queryClient.invalidateQueries({ queryKey: ['conversations'], refetchType: 'all' })
     },
   })
 }
@@ -90,10 +112,13 @@ export const useMarkAsRead = () => {
     mutationFn: (conversationId: string) =>
       conversationsService.markAsRead(conversationId),
     onSettled: async (_, __, conversationId) => {
+      // Delay to allow DB propagation
+      await new Promise(resolve => setTimeout(resolve, 1000))
       await queryClient.invalidateQueries({
         queryKey: ['conversations', conversationId],
+        refetchType: 'all'
       })
-      await queryClient.invalidateQueries({ queryKey: ['conversations'] })
+      await queryClient.invalidateQueries({ queryKey: ['conversations'], refetchType: 'all' })
     },
   })
 }
@@ -103,14 +128,24 @@ export const useDeleteConversation = () => {
 
   return useMutation({
     mutationFn: (id: string) => conversationsService.deleteConversation(id),
-    onSuccess: () => {
+    // Update cache on success (Stable & Correct)
+    onSuccess: (_, id) => {
       toast.success('تم حذف المحادثة بنجاح')
+
+      // Manually update the cache
+      queryClient.setQueriesData({ queryKey: ['conversations'] }, (old: any) => {
+        if (!old) return old
+        if (Array.isArray(old)) return old.filter((c: any) => c._id !== id)
+        return old
+      })
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل حذف المحادثة')
     },
     onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['conversations'] })
+      // Delay to allow DB propagation
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      await queryClient.invalidateQueries({ queryKey: ['conversations'], refetchType: 'all' })
     },
   })
 }

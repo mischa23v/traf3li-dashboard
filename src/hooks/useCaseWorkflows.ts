@@ -106,9 +106,27 @@ export function useCreateWorkflow() {
 
   return useMutation({
     mutationFn: (data: CreateWorkflowData) => caseWorkflowsService.createWorkflow(data),
+    // Update cache on success (Stable & Correct)
+    onSuccess: (data) => {
+      // Manually update the cache
+      queryClient.setQueriesData({ queryKey: caseWorkflowKeys.lists() }, (old: any) => {
+        if (!old) return old
+        // Handle { workflows: [...] } structure
+        if (old.workflows && Array.isArray(old.workflows)) {
+          return {
+            ...old,
+            workflows: [data, ...old.workflows]
+          }
+        }
+        if (Array.isArray(old)) return [data, ...old]
+        return old
+      })
+    },
     onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey: caseWorkflowKeys.lists() })
-      await queryClient.invalidateQueries({ queryKey: caseWorkflowKeys.statistics() })
+      // Delay to allow DB propagation
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      await queryClient.invalidateQueries({ queryKey: caseWorkflowKeys.lists(), refetchType: 'all' })
+      await queryClient.invalidateQueries({ queryKey: caseWorkflowKeys.statistics(), refetchType: 'all' })
     },
   })
 }
@@ -139,9 +157,27 @@ export function useDeleteWorkflow() {
 
   return useMutation({
     mutationFn: (id: string) => caseWorkflowsService.deleteWorkflow(id),
+    // Update cache on success (Stable & Correct)
+    onSuccess: (_, id) => {
+      // Manually update the cache
+      queryClient.setQueriesData({ queryKey: caseWorkflowKeys.lists() }, (old: any) => {
+        if (!old) return old
+        // Handle { workflows: [...] } structure
+        if (old.workflows && Array.isArray(old.workflows)) {
+          return {
+            ...old,
+            workflows: old.workflows.filter((w: any) => w._id !== id)
+          }
+        }
+        if (Array.isArray(old)) return old.filter((w: any) => w._id !== id)
+        return old
+      })
+    },
     onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey: caseWorkflowKeys.lists() })
-      await queryClient.invalidateQueries({ queryKey: caseWorkflowKeys.statistics() })
+      // Delay to allow DB propagation
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      await queryClient.invalidateQueries({ queryKey: caseWorkflowKeys.lists(), refetchType: 'all' })
+      await queryClient.invalidateQueries({ queryKey: caseWorkflowKeys.statistics(), refetchType: 'all' })
     },
   })
 }
@@ -177,7 +213,9 @@ export function useAddStage() {
       queryClient.setQueryData(caseWorkflowKeys.detail(workflow._id), workflow)
     },
     onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey: caseWorkflowKeys.lists() })
+      // Delay to allow DB propagation
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      await queryClient.invalidateQueries({ queryKey: caseWorkflowKeys.lists(), refetchType: 'all' })
     },
   })
 }
@@ -213,7 +251,9 @@ export function useDeleteStage() {
       queryClient.setQueryData(caseWorkflowKeys.detail(workflow._id), workflow)
     },
     onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey: caseWorkflowKeys.lists() })
+      // Delay to allow DB propagation
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      await queryClient.invalidateQueries({ queryKey: caseWorkflowKeys.lists(), refetchType: 'all' })
     },
   })
 }
@@ -258,7 +298,9 @@ export function useAddRequirement() {
       queryClient.setQueryData(caseWorkflowKeys.detail(workflow._id), workflow)
     },
     onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey: caseWorkflowKeys.lists() })
+      // Delay to allow DB propagation
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      await queryClient.invalidateQueries({ queryKey: caseWorkflowKeys.lists(), refetchType: 'all' })
     },
   })
 }
@@ -303,7 +345,9 @@ export function useDeleteRequirement() {
       queryClient.setQueryData(caseWorkflowKeys.detail(workflow._id), workflow)
     },
     onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey: caseWorkflowKeys.lists() })
+      // Delay to allow DB propagation
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      await queryClient.invalidateQueries({ queryKey: caseWorkflowKeys.lists(), refetchType: 'all' })
     },
   })
 }
@@ -323,7 +367,9 @@ export function useAddTransition() {
       queryClient.setQueryData(caseWorkflowKeys.detail(workflow._id), workflow)
     },
     onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey: caseWorkflowKeys.lists() })
+      // Delay to allow DB propagation
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      await queryClient.invalidateQueries({ queryKey: caseWorkflowKeys.lists(), refetchType: 'all' })
     },
   })
 }
@@ -366,7 +412,9 @@ export function useDeleteTransition() {
       queryClient.setQueryData(caseWorkflowKeys.detail(workflow._id), workflow)
     },
     onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey: caseWorkflowKeys.lists() })
+      // Delay to allow DB propagation
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      await queryClient.invalidateQueries({ queryKey: caseWorkflowKeys.lists(), refetchType: 'all' })
     },
   })
 }

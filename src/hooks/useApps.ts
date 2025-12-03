@@ -25,14 +25,31 @@ export const useConnectApp = () => {
   return useMutation({
     mutationFn: ({ appId, data }: { appId: string; data?: ConnectAppData }) =>
       appsService.connectApp(appId, data),
-    onSuccess: () => {
+    // Update cache on success (Stable & Correct)
+    onSuccess: (data) => {
       toast.success('تم ربط التطبيق بنجاح')
+
+      // Manually update the cache
+      queryClient.setQueriesData({ queryKey: ['apps'] }, (old: any) => {
+        if (!old) return old
+        // Handle { apps: [...] } structure
+        if (old.apps && Array.isArray(old.apps)) {
+          return {
+            ...old,
+            apps: old.apps.map((app: any) => app._id === data._id ? data : app)
+          }
+        }
+        if (Array.isArray(old)) return old.map((app: any) => app._id === data._id ? data : app)
+        return old
+      })
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل ربط التطبيق')
     },
     onSettled: async () => {
-      return await queryClient.invalidateQueries({ queryKey: ['apps'] })
+      // Delay to allow DB propagation
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      return await queryClient.invalidateQueries({ queryKey: ['apps'], refetchType: 'all' })
     },
   })
 }
@@ -42,14 +59,31 @@ export const useDisconnectApp = () => {
 
   return useMutation({
     mutationFn: (appId: string) => appsService.disconnectApp(appId),
-    onSuccess: () => {
+    // Update cache on success (Stable & Correct)
+    onSuccess: (data) => {
       toast.success('تم فصل التطبيق بنجاح')
+
+      // Manually update the cache
+      queryClient.setQueriesData({ queryKey: ['apps'] }, (old: any) => {
+        if (!old) return old
+        // Handle { apps: [...] } structure
+        if (old.apps && Array.isArray(old.apps)) {
+          return {
+            ...old,
+            apps: old.apps.map((app: any) => app._id === data._id ? data : app)
+          }
+        }
+        if (Array.isArray(old)) return old.map((app: any) => app._id === data._id ? data : app)
+        return old
+      })
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل فصل التطبيق')
     },
     onSettled: async () => {
-      return await queryClient.invalidateQueries({ queryKey: ['apps'] })
+      // Delay to allow DB propagation
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      return await queryClient.invalidateQueries({ queryKey: ['apps'], refetchType: 'all' })
     },
   })
 }

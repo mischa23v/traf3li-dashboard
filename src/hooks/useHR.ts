@@ -71,14 +71,34 @@ export const useCreateEmployee = () => {
 
   return useMutation({
     mutationFn: (data: CreateEmployeeData) => employeeService.createEmployee(data),
-    onSuccess: () => {
+    // Update cache on success (Stable & Correct)
+    onSuccess: (data) => {
       toast({
         title: 'نجاح',
         description: 'تم إضافة الموظف بنجاح',
       })
+
+      // Manually update the cache
+      queryClient.setQueriesData({ queryKey: ['employees'] }, (old: any) => {
+        if (!old) return old
+
+        // Handle { employees: [...] } structure
+        if (old.employees && Array.isArray(old.employees)) {
+          return {
+            ...old,
+            employees: [data, ...old.employees],
+            total: (old.total || old.employees.length) + 1
+          }
+        }
+
+        if (Array.isArray(old)) return [data, ...old]
+        return old
+      })
     },
     onSettled: async () => {
-      return await queryClient.invalidateQueries({ queryKey: ['employees'] })
+      // Delay to allow DB propagation
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      return await queryClient.invalidateQueries({ queryKey: ['employees'], refetchType: 'all' })
     },
     onError: (error: Error) => {
       toast({
@@ -121,14 +141,34 @@ export const useDeleteEmployee = () => {
 
   return useMutation({
     mutationFn: (id: string) => employeeService.deleteEmployee(id),
-    onSuccess: () => {
+    // Update cache on success (Stable & Correct)
+    onSuccess: (_, id) => {
       toast({
         title: 'نجاح',
         description: 'تم حذف الموظف بنجاح',
       })
+
+      // Manually update the cache
+      queryClient.setQueriesData({ queryKey: ['employees'] }, (old: any) => {
+        if (!old) return old
+
+        // Handle { employees: [...] } structure
+        if (old.employees && Array.isArray(old.employees)) {
+          return {
+            ...old,
+            employees: old.employees.filter((item: any) => item._id !== id),
+            total: Math.max(0, (old.total || old.employees.length) - 1)
+          }
+        }
+
+        if (Array.isArray(old)) return old.filter((item: any) => item._id !== id)
+        return old
+      })
     },
     onSettled: async () => {
-      return await queryClient.invalidateQueries({ queryKey: ['employees'] })
+      // Delay to allow DB propagation
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      return await queryClient.invalidateQueries({ queryKey: ['employees'], refetchType: 'all' })
     },
     onError: (error: Error) => {
       toast({
@@ -238,14 +278,34 @@ export const useCreateLeave = () => {
 
   return useMutation({
     mutationFn: (data: CreateLeaveRequestData) => leaveService.createLeave(data),
-    onSuccess: () => {
+    // Update cache on success (Stable & Correct)
+    onSuccess: (data) => {
       toast({
         title: 'نجاح',
         description: 'تم تقديم طلب الإجازة بنجاح',
       })
+
+      // Manually update the cache
+      queryClient.setQueriesData({ queryKey: ['leaves'] }, (old: any) => {
+        if (!old) return old
+
+        // Handle { leaves: [...] } structure
+        if (old.leaves && Array.isArray(old.leaves)) {
+          return {
+            ...old,
+            leaves: [data, ...old.leaves],
+            total: (old.total || old.leaves.length) + 1
+          }
+        }
+
+        if (Array.isArray(old)) return [data, ...old]
+        return old
+      })
     },
     onSettled: async () => {
-      return await queryClient.invalidateQueries({ queryKey: ['leaves'] })
+      // Delay to allow DB propagation
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      return await queryClient.invalidateQueries({ queryKey: ['leaves'], refetchType: 'all' })
     },
     onError: (error: Error) => {
       toast({
@@ -288,14 +348,34 @@ export const useDeleteLeave = () => {
 
   return useMutation({
     mutationFn: (id: string) => leaveService.deleteLeave(id),
-    onSuccess: () => {
+    // Update cache on success (Stable & Correct)
+    onSuccess: (_, id) => {
       toast({
         title: 'نجاح',
         description: 'تم حذف طلب الإجازة بنجاح',
       })
+
+      // Manually update the cache
+      queryClient.setQueriesData({ queryKey: ['leaves'] }, (old: any) => {
+        if (!old) return old
+
+        // Handle { leaves: [...] } structure
+        if (old.leaves && Array.isArray(old.leaves)) {
+          return {
+            ...old,
+            leaves: old.leaves.filter((item: any) => item._id !== id),
+            total: Math.max(0, (old.total || old.leaves.length) - 1)
+          }
+        }
+
+        if (Array.isArray(old)) return old.filter((item: any) => item._id !== id)
+        return old
+      })
     },
     onSettled: async () => {
-      return await queryClient.invalidateQueries({ queryKey: ['leaves'] })
+      // Delay to allow DB propagation
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      return await queryClient.invalidateQueries({ queryKey: ['leaves'], refetchType: 'all' })
     },
     onError: (error: Error) => {
       toast({
@@ -430,14 +510,34 @@ export const useCreateAttendance = () => {
 
   return useMutation({
     mutationFn: (data: CreateAttendanceData) => attendanceService.createRecord(data),
-    onSuccess: () => {
+    // Update cache on success (Stable & Correct)
+    onSuccess: (data) => {
       toast({
         title: 'نجاح',
         description: 'تم تسجيل الحضور بنجاح',
       })
+
+      // Manually update the cache
+      queryClient.setQueriesData({ queryKey: ['attendance'] }, (old: any) => {
+        if (!old) return old
+
+        // Handle { attendance: [...] } structure
+        if (old.attendance && Array.isArray(old.attendance)) {
+          return {
+            ...old,
+            attendance: [data, ...old.attendance],
+            total: (old.total || old.attendance.length) + 1
+          }
+        }
+
+        if (Array.isArray(old)) return [data, ...old]
+        return old
+      })
     },
     onSettled: async () => {
-      return await queryClient.invalidateQueries({ queryKey: ['attendance'] })
+      // Delay to allow DB propagation
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      return await queryClient.invalidateQueries({ queryKey: ['attendance'], refetchType: 'all' })
     },
     onError: (error: Error) => {
       toast({
@@ -480,14 +580,34 @@ export const useDeleteAttendance = () => {
 
   return useMutation({
     mutationFn: (id: string) => attendanceService.deleteRecord(id),
-    onSuccess: () => {
+    // Update cache on success (Stable & Correct)
+    onSuccess: (_, id) => {
       toast({
         title: 'نجاح',
         description: 'تم حذف سجل الحضور بنجاح',
       })
+
+      // Manually update the cache
+      queryClient.setQueriesData({ queryKey: ['attendance'] }, (old: any) => {
+        if (!old) return old
+
+        // Handle { attendance: [...] } structure
+        if (old.attendance && Array.isArray(old.attendance)) {
+          return {
+            ...old,
+            attendance: old.attendance.filter((item: any) => item._id !== id),
+            total: Math.max(0, (old.total || old.attendance.length) - 1)
+          }
+        }
+
+        if (Array.isArray(old)) return old.filter((item: any) => item._id !== id)
+        return old
+      })
     },
     onSettled: async () => {
-      return await queryClient.invalidateQueries({ queryKey: ['attendance'] })
+      // Delay to allow DB propagation
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      return await queryClient.invalidateQueries({ queryKey: ['attendance'], refetchType: 'all' })
     },
     onError: (error: Error) => {
       toast({
@@ -605,14 +725,34 @@ export const useCreateSalary = () => {
 
   return useMutation({
     mutationFn: (data: CreateSalaryData) => salaryService.createSalary(data),
-    onSuccess: () => {
+    // Update cache on success (Stable & Correct)
+    onSuccess: (data) => {
       toast({
         title: 'نجاح',
         description: 'تم إنشاء سجل الراتب بنجاح',
       })
+
+      // Manually update the cache
+      queryClient.setQueriesData({ queryKey: ['salaries'] }, (old: any) => {
+        if (!old) return old
+
+        // Handle { salaries: [...] } structure
+        if (old.salaries && Array.isArray(old.salaries)) {
+          return {
+            ...old,
+            salaries: [data, ...old.salaries],
+            total: (old.total || old.salaries.length) + 1
+          }
+        }
+
+        if (Array.isArray(old)) return [data, ...old]
+        return old
+      })
     },
     onSettled: async () => {
-      return await queryClient.invalidateQueries({ queryKey: ['salaries'] })
+      // Delay to allow DB propagation
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      return await queryClient.invalidateQueries({ queryKey: ['salaries'], refetchType: 'all' })
     },
     onError: (error: Error) => {
       toast({
@@ -655,14 +795,34 @@ export const useDeleteSalary = () => {
 
   return useMutation({
     mutationFn: (id: string) => salaryService.deleteSalary(id),
-    onSuccess: () => {
+    // Update cache on success (Stable & Correct)
+    onSuccess: (_, id) => {
       toast({
         title: 'نجاح',
         description: 'تم حذف سجل الراتب بنجاح',
       })
+
+      // Manually update the cache
+      queryClient.setQueriesData({ queryKey: ['salaries'] }, (old: any) => {
+        if (!old) return old
+
+        // Handle { salaries: [...] } structure
+        if (old.salaries && Array.isArray(old.salaries)) {
+          return {
+            ...old,
+            salaries: old.salaries.filter((item: any) => item._id !== id),
+            total: Math.max(0, (old.total || old.salaries.length) - 1)
+          }
+        }
+
+        if (Array.isArray(old)) return old.filter((item: any) => item._id !== id)
+        return old
+      })
     },
     onSettled: async () => {
-      return await queryClient.invalidateQueries({ queryKey: ['salaries'] })
+      // Delay to allow DB propagation
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      return await queryClient.invalidateQueries({ queryKey: ['salaries'], refetchType: 'all' })
     },
     onError: (error: Error) => {
       toast({
@@ -789,14 +949,34 @@ export const useCreatePayroll = () => {
 
   return useMutation({
     mutationFn: (data: CreatePayrollData) => payrollService.createPayroll(data),
-    onSuccess: () => {
+    // Update cache on success (Stable & Correct)
+    onSuccess: (data) => {
       toast({
         title: 'نجاح',
         description: 'تم إنشاء مسير الرواتب بنجاح',
       })
+
+      // Manually update the cache
+      queryClient.setQueriesData({ queryKey: ['payroll'] }, (old: any) => {
+        if (!old) return old
+
+        // Handle { payroll: [...] } structure
+        if (old.payroll && Array.isArray(old.payroll)) {
+          return {
+            ...old,
+            payroll: [data, ...old.payroll],
+            total: (old.total || old.payroll.length) + 1
+          }
+        }
+
+        if (Array.isArray(old)) return [data, ...old]
+        return old
+      })
     },
     onSettled: async () => {
-      return await queryClient.invalidateQueries({ queryKey: ['payroll'] })
+      // Delay to allow DB propagation
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      return await queryClient.invalidateQueries({ queryKey: ['payroll'], refetchType: 'all' })
     },
     onError: (error: Error) => {
       toast({
@@ -839,14 +1019,34 @@ export const useDeletePayroll = () => {
 
   return useMutation({
     mutationFn: (id: string) => payrollService.deletePayroll(id),
-    onSuccess: () => {
+    // Update cache on success (Stable & Correct)
+    onSuccess: (_, id) => {
       toast({
         title: 'نجاح',
         description: 'تم حذف مسير الرواتب بنجاح',
       })
+
+      // Manually update the cache
+      queryClient.setQueriesData({ queryKey: ['payroll'] }, (old: any) => {
+        if (!old) return old
+
+        // Handle { payroll: [...] } structure
+        if (old.payroll && Array.isArray(old.payroll)) {
+          return {
+            ...old,
+            payroll: old.payroll.filter((item: any) => item._id !== id),
+            total: Math.max(0, (old.total || old.payroll.length) - 1)
+          }
+        }
+
+        if (Array.isArray(old)) return old.filter((item: any) => item._id !== id)
+        return old
+      })
     },
     onSettled: async () => {
-      return await queryClient.invalidateQueries({ queryKey: ['payroll'] })
+      // Delay to allow DB propagation
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      return await queryClient.invalidateQueries({ queryKey: ['payroll'], refetchType: 'all' })
     },
     onError: (error: Error) => {
       toast({
@@ -965,14 +1165,34 @@ export const useCreateEvaluation = () => {
 
   return useMutation({
     mutationFn: (data: CreateEvaluationData) => evaluationService.createEvaluation(data),
-    onSuccess: () => {
+    // Update cache on success (Stable & Correct)
+    onSuccess: (data) => {
       toast({
         title: 'نجاح',
         description: 'تم إنشاء التقييم بنجاح',
       })
+
+      // Manually update the cache
+      queryClient.setQueriesData({ queryKey: ['evaluations'] }, (old: any) => {
+        if (!old) return old
+
+        // Handle { evaluations: [...] } structure
+        if (old.evaluations && Array.isArray(old.evaluations)) {
+          return {
+            ...old,
+            evaluations: [data, ...old.evaluations],
+            total: (old.total || old.evaluations.length) + 1
+          }
+        }
+
+        if (Array.isArray(old)) return [data, ...old]
+        return old
+      })
     },
     onSettled: async () => {
-      return await queryClient.invalidateQueries({ queryKey: ['evaluations'] })
+      // Delay to allow DB propagation
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      return await queryClient.invalidateQueries({ queryKey: ['evaluations'], refetchType: 'all' })
     },
     onError: (error: Error) => {
       toast({
@@ -1015,14 +1235,34 @@ export const useDeleteEvaluation = () => {
 
   return useMutation({
     mutationFn: (id: string) => evaluationService.deleteEvaluation(id),
-    onSuccess: () => {
+    // Update cache on success (Stable & Correct)
+    onSuccess: (_, id) => {
       toast({
         title: 'نجاح',
         description: 'تم حذف التقييم بنجاح',
       })
+
+      // Manually update the cache
+      queryClient.setQueriesData({ queryKey: ['evaluations'] }, (old: any) => {
+        if (!old) return old
+
+        // Handle { evaluations: [...] } structure
+        if (old.evaluations && Array.isArray(old.evaluations)) {
+          return {
+            ...old,
+            evaluations: old.evaluations.filter((item: any) => item._id !== id),
+            total: Math.max(0, (old.total || old.evaluations.length) - 1)
+          }
+        }
+
+        if (Array.isArray(old)) return old.filter((item: any) => item._id !== id)
+        return old
+      })
     },
     onSettled: async () => {
-      return await queryClient.invalidateQueries({ queryKey: ['evaluations'] })
+      // Delay to allow DB propagation
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      return await queryClient.invalidateQueries({ queryKey: ['evaluations'], refetchType: 'all' })
     },
     onError: (error: Error) => {
       toast({

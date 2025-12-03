@@ -153,10 +153,16 @@ export function useStartImport() {
 
   return useMutation({
     mutationFn: (options: ImportOptions) => dataExportService.startImport(options),
-    onSuccess: () => {
+    onSuccess: (data) => {
       toast({
         title: t('common.success'),
         description: t('dataExport.importStarted'),
+      })
+      // Optimistically update the cache
+      queryClient.setQueriesData({ queryKey: exportKeys.imports() }, (old: any) => {
+        if (!old) return old
+        if (Array.isArray(old)) return [data, ...old]
+        return old
       })
     },
     onError: (error: Error) => {
@@ -167,7 +173,8 @@ export function useStartImport() {
       })
     },
     onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey: exportKeys.imports() })
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      await queryClient.invalidateQueries({ queryKey: exportKeys.imports(), refetchType: 'all' })
     },
   })
 }
@@ -203,10 +210,20 @@ export function useCancelImport() {
 
   return useMutation({
     mutationFn: (jobId: string) => dataExportService.cancelImport(jobId),
-    onSuccess: () => {
+    onSuccess: (data) => {
       toast({
         title: t('common.success'),
         description: t('dataExport.importCancelled'),
+      })
+      // Update specific import in cache
+      queryClient.setQueryData(exportKeys.importDetail(data.id), data)
+      // Update list cache
+      queryClient.setQueriesData({ queryKey: exportKeys.imports() }, (old: any) => {
+        if (!old) return old
+        if (Array.isArray(old)) {
+          return old.map((item: any) => (item.id === data.id ? data : item))
+        }
+        return old
       })
     },
     onError: (error: Error) => {
@@ -217,7 +234,8 @@ export function useCancelImport() {
       })
     },
     onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey: exportKeys.imports() })
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      await queryClient.invalidateQueries({ queryKey: exportKeys.imports(), refetchType: 'all' })
     },
   })
 }
@@ -266,10 +284,16 @@ export function useCreateExportTemplate() {
 
   return useMutation({
     mutationFn: dataExportService.createTemplate,
-    onSuccess: () => {
+    onSuccess: (data) => {
       toast({
         title: t('common.success'),
         description: t('dataExport.templateCreated'),
+      })
+      // Optimistically update the cache
+      queryClient.setQueriesData({ queryKey: exportKeys.templates() }, (old: any) => {
+        if (!old) return old
+        if (Array.isArray(old)) return [data, ...old]
+        return old
       })
     },
     onError: (error: Error) => {
@@ -280,7 +304,8 @@ export function useCreateExportTemplate() {
       })
     },
     onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey: exportKeys.templates() })
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      await queryClient.invalidateQueries({ queryKey: exportKeys.templates(), refetchType: 'all' })
     },
   })
 }
@@ -292,10 +317,18 @@ export function useDeleteExportTemplate() {
 
   return useMutation({
     mutationFn: (id: string) => dataExportService.deleteTemplate(id),
-    onSuccess: () => {
+    onSuccess: (_, id) => {
       toast({
         title: t('common.success'),
         description: t('dataExport.templateDeleted'),
+      })
+      // Remove from cache
+      queryClient.setQueriesData({ queryKey: exportKeys.templates() }, (old: any) => {
+        if (!old) return old
+        if (Array.isArray(old)) {
+          return old.filter((item: any) => item.id !== id)
+        }
+        return old
       })
     },
     onError: (error: Error) => {
@@ -306,7 +339,8 @@ export function useDeleteExportTemplate() {
       })
     },
     onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey: exportKeys.templates() })
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      await queryClient.invalidateQueries({ queryKey: exportKeys.templates(), refetchType: 'all' })
     },
   })
 }

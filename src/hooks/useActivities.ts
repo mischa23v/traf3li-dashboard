@@ -92,14 +92,34 @@ export function useCreateActivity() {
 
   return useMutation({
     mutationFn: (input: CreateActivityInput) => activityService.create(input),
+    // Update cache on success (Stable & Correct)
+    onSuccess: (newActivity) => {
+      // Manually update the cache for lists
+      queryClient.setQueriesData({ queryKey: activityKeys.lists() }, (old: any) => {
+        if (!old) return old
+        // Handle { activities: [...] } structure
+        if (old.activities && Array.isArray(old.activities)) {
+          return {
+            ...old,
+            activities: [newActivity, ...old.activities]
+          }
+        }
+        if (Array.isArray(old)) return [newActivity, ...old]
+        return old
+      })
+    },
     onSettled: async (newActivity) => {
+      // Delay to allow DB propagation
+      await new Promise(resolve => setTimeout(resolve, 1000))
+
       // Invalidate relevant queries
       if (newActivity) {
-        await queryClient.invalidateQueries({ queryKey: activityKeys.lists() })
+        await queryClient.invalidateQueries({ queryKey: activityKeys.lists(), refetchType: 'all' })
         await queryClient.invalidateQueries({
           queryKey: activityKeys.entity(newActivity.entityType, newActivity.entityId),
+          refetchType: 'all'
         })
-        return await queryClient.invalidateQueries({ queryKey: activityKeys.recent() })
+        return await queryClient.invalidateQueries({ queryKey: activityKeys.recent(), refetchType: 'all' })
       }
     },
   })
@@ -129,11 +149,15 @@ export function useLogTaskActivity() {
     }) =>
       activityService.logTaskActivity(taskId, type, taskTitle, metadata, oldValue, newValue),
     onSettled: async (newActivity, _, variables) => {
+      // Delay to allow DB propagation
+      await new Promise(resolve => setTimeout(resolve, 1000))
+
       if (newActivity) {
         await queryClient.invalidateQueries({
           queryKey: activityKeys.entity('task', variables.taskId),
+          refetchType: 'all'
         })
-        return await queryClient.invalidateQueries({ queryKey: activityKeys.recent() })
+        return await queryClient.invalidateQueries({ queryKey: activityKeys.recent(), refetchType: 'all' })
       }
     },
   })
@@ -158,11 +182,15 @@ export function useLogEventActivity() {
       metadata?: Record<string, any>
     }) => activityService.logEventActivity(eventId, type, eventTitle, metadata),
     onSettled: async (newActivity, _, variables) => {
+      // Delay to allow DB propagation
+      await new Promise(resolve => setTimeout(resolve, 1000))
+
       if (newActivity) {
         await queryClient.invalidateQueries({
           queryKey: activityKeys.entity('event', variables.eventId),
+          refetchType: 'all'
         })
-        return await queryClient.invalidateQueries({ queryKey: activityKeys.recent() })
+        return await queryClient.invalidateQueries({ queryKey: activityKeys.recent(), refetchType: 'all' })
       }
     },
   })
@@ -187,11 +215,15 @@ export function useLogReminderActivity() {
       metadata?: Record<string, any>
     }) => activityService.logReminderActivity(reminderId, type, reminderTitle, metadata),
     onSettled: async (newActivity, _, variables) => {
+      // Delay to allow DB propagation
+      await new Promise(resolve => setTimeout(resolve, 1000))
+
       if (newActivity) {
         await queryClient.invalidateQueries({
           queryKey: activityKeys.entity('reminder', variables.reminderId),
+          refetchType: 'all'
         })
-        return await queryClient.invalidateQueries({ queryKey: activityKeys.recent() })
+        return await queryClient.invalidateQueries({ queryKey: activityKeys.recent(), refetchType: 'all' })
       }
     },
   })

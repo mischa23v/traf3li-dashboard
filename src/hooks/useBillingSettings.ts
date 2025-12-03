@@ -72,14 +72,31 @@ export const useCreateTax = () => {
 
   return useMutation({
     mutationFn: (data: CreateTaxData) => billingSettingsService.createTax(data),
-    onSuccess: () => {
+    // Update cache on success (Stable & Correct)
+    onSuccess: (data) => {
       toast.success('تم إنشاء الضريبة بنجاح')
+
+      // Manually update the cache
+      queryClient.setQueriesData({ queryKey: ['taxes'] }, (old: any) => {
+        if (!old) return old
+        // Handle { taxes: [...] } structure
+        if (old.taxes && Array.isArray(old.taxes)) {
+          return {
+            ...old,
+            taxes: [data, ...old.taxes]
+          }
+        }
+        if (Array.isArray(old)) return [data, ...old]
+        return old
+      })
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل إنشاء الضريبة')
     },
     onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['taxes'] })
+      // Delay to allow DB propagation
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      await queryClient.invalidateQueries({ queryKey: ['taxes'], refetchType: 'all' })
     },
   })
 }
@@ -107,14 +124,31 @@ export const useDeleteTax = () => {
 
   return useMutation({
     mutationFn: (id: string) => billingSettingsService.deleteTax(id),
-    onSuccess: () => {
+    // Update cache on success (Stable & Correct)
+    onSuccess: (_, id) => {
       toast.success('تم حذف الضريبة بنجاح')
+
+      // Manually update the cache
+      queryClient.setQueriesData({ queryKey: ['taxes'] }, (old: any) => {
+        if (!old) return old
+        // Handle { taxes: [...] } structure
+        if (old.taxes && Array.isArray(old.taxes)) {
+          return {
+            ...old,
+            taxes: old.taxes.filter((item: any) => item._id !== id)
+          }
+        }
+        if (Array.isArray(old)) return old.filter((item: any) => item._id !== id)
+        return old
+      })
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل حذف الضريبة')
     },
     onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['taxes'] })
+      // Delay to allow DB propagation
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      await queryClient.invalidateQueries({ queryKey: ['taxes'], refetchType: 'all' })
     },
   })
 }
@@ -152,14 +186,31 @@ export const useCreatePaymentMode = () => {
   return useMutation({
     mutationFn: (data: CreatePaymentModeData) =>
       billingSettingsService.createPaymentMode(data),
-    onSuccess: () => {
+    // Update cache on success (Stable & Correct)
+    onSuccess: (data) => {
       toast.success('تم إنشاء طريقة الدفع بنجاح')
+
+      // Manually update the cache
+      queryClient.setQueriesData({ queryKey: ['payment-modes'] }, (old: any) => {
+        if (!old) return old
+        // Handle { paymentModes: [...] } structure
+        if (old.paymentModes && Array.isArray(old.paymentModes)) {
+          return {
+            ...old,
+            paymentModes: [data, ...old.paymentModes]
+          }
+        }
+        if (Array.isArray(old)) return [data, ...old]
+        return old
+      })
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل إنشاء طريقة الدفع')
     },
     onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['payment-modes'] })
+      // Delay to allow DB propagation
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      await queryClient.invalidateQueries({ queryKey: ['payment-modes'], refetchType: 'all' })
     },
   })
 }
@@ -187,14 +238,31 @@ export const useDeletePaymentMode = () => {
 
   return useMutation({
     mutationFn: (id: string) => billingSettingsService.deletePaymentMode(id),
-    onSuccess: () => {
+    // Update cache on success (Stable & Correct)
+    onSuccess: (_, id) => {
       toast.success('تم حذف طريقة الدفع بنجاح')
+
+      // Manually update the cache
+      queryClient.setQueriesData({ queryKey: ['payment-modes'] }, (old: any) => {
+        if (!old) return old
+        // Handle { paymentModes: [...] } structure
+        if (old.paymentModes && Array.isArray(old.paymentModes)) {
+          return {
+            ...old,
+            paymentModes: old.paymentModes.filter((item: any) => item._id !== id)
+          }
+        }
+        if (Array.isArray(old)) return old.filter((item: any) => item._id !== id)
+        return old
+      })
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل حذف طريقة الدفع')
     },
     onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['payment-modes'] })
+      // Delay to allow DB propagation
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      await queryClient.invalidateQueries({ queryKey: ['payment-modes'], refetchType: 'all' })
     },
   })
 }

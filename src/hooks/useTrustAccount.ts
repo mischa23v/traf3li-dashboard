@@ -61,8 +61,17 @@ export function useCreateTrustAccount() {
         '_id' | 'balance' | 'availableBalance' | 'pendingBalance' | 'createdAt' | 'updatedAt'
       >
     ) => trustAccountService.createTrustAccount(data),
+    onSuccess: (data) => {
+      // Optimistically update the cache
+      queryClient.setQueriesData({ queryKey: trustAccountKeys.lists() }, (old: any) => {
+        if (!old) return old
+        if (Array.isArray(old)) return [data, ...old]
+        return old
+      })
+    },
     onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey: trustAccountKeys.lists() })
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      await queryClient.invalidateQueries({ queryKey: trustAccountKeys.lists(), refetchType: 'all' })
     },
   })
 }
@@ -73,9 +82,22 @@ export function useUpdateTrustAccount() {
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: Partial<TrustAccount> }) =>
       trustAccountService.updateTrustAccount(id, data),
+    onSuccess: (data) => {
+      // Update specific account in cache
+      queryClient.setQueryData(trustAccountKeys.detail(data._id), data)
+      // Update list cache
+      queryClient.setQueriesData({ queryKey: trustAccountKeys.lists() }, (old: any) => {
+        if (!old) return old
+        if (Array.isArray(old)) {
+          return old.map((item: any) => (item._id === data._id ? data : item))
+        }
+        return old
+      })
+    },
     onSettled: async (_, __, variables) => {
-      await queryClient.invalidateQueries({ queryKey: trustAccountKeys.lists() })
-      await queryClient.invalidateQueries({ queryKey: trustAccountKeys.detail(variables.id) })
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      await queryClient.invalidateQueries({ queryKey: trustAccountKeys.lists(), refetchType: 'all' })
+      await queryClient.invalidateQueries({ queryKey: trustAccountKeys.detail(variables.id), refetchType: 'all' })
     },
   })
 }
@@ -86,9 +108,22 @@ export function useCloseTrustAccount() {
   return useMutation({
     mutationFn: ({ id, reason }: { id: string; reason: string }) =>
       trustAccountService.closeTrustAccount(id, reason),
+    onSuccess: (data) => {
+      // Update specific account in cache
+      queryClient.setQueryData(trustAccountKeys.detail(data._id), data)
+      // Update list cache
+      queryClient.setQueriesData({ queryKey: trustAccountKeys.lists() }, (old: any) => {
+        if (!old) return old
+        if (Array.isArray(old)) {
+          return old.map((item: any) => (item._id === data._id ? data : item))
+        }
+        return old
+      })
+    },
     onSettled: async (_, __, variables) => {
-      await queryClient.invalidateQueries({ queryKey: trustAccountKeys.lists() })
-      await queryClient.invalidateQueries({ queryKey: trustAccountKeys.detail(variables.id) })
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      await queryClient.invalidateQueries({ queryKey: trustAccountKeys.lists(), refetchType: 'all' })
+      await queryClient.invalidateQueries({ queryKey: trustAccountKeys.detail(variables.id), refetchType: 'all' })
     },
   })
 }
@@ -156,10 +191,19 @@ export function useCreateTrustDeposit() {
       payor: string
       notes?: string
     }) => trustAccountService.createTrustDeposit(data),
+    onSuccess: (data) => {
+      // Optimistically update the cache
+      queryClient.setQueriesData({ queryKey: trustAccountKeys.transactions() }, (old: any) => {
+        if (!old) return old
+        if (Array.isArray(old)) return [data, ...old]
+        return old
+      })
+    },
     onSettled: async (_, __, variables) => {
-      await queryClient.invalidateQueries({ queryKey: trustAccountKeys.transactions() })
-      await queryClient.invalidateQueries({ queryKey: trustAccountKeys.clientBalances() })
-      await queryClient.invalidateQueries({ queryKey: trustAccountKeys.detail(variables.accountId) })
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      await queryClient.invalidateQueries({ queryKey: trustAccountKeys.transactions(), refetchType: 'all' })
+      await queryClient.invalidateQueries({ queryKey: trustAccountKeys.clientBalances(), refetchType: 'all' })
+      await queryClient.invalidateQueries({ queryKey: trustAccountKeys.detail(variables.accountId), refetchType: 'all' })
     },
   })
 }
@@ -182,10 +226,19 @@ export function useCreateTrustWithdrawal() {
       relatedExpenseId?: string
       notes?: string
     }) => trustAccountService.createTrustWithdrawal(data),
+    onSuccess: (data) => {
+      // Optimistically update the cache
+      queryClient.setQueriesData({ queryKey: trustAccountKeys.transactions() }, (old: any) => {
+        if (!old) return old
+        if (Array.isArray(old)) return [data, ...old]
+        return old
+      })
+    },
     onSettled: async (_, __, variables) => {
-      await queryClient.invalidateQueries({ queryKey: trustAccountKeys.transactions() })
-      await queryClient.invalidateQueries({ queryKey: trustAccountKeys.clientBalances() })
-      await queryClient.invalidateQueries({ queryKey: trustAccountKeys.detail(variables.accountId) })
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      await queryClient.invalidateQueries({ queryKey: trustAccountKeys.transactions(), refetchType: 'all' })
+      await queryClient.invalidateQueries({ queryKey: trustAccountKeys.clientBalances(), refetchType: 'all' })
+      await queryClient.invalidateQueries({ queryKey: trustAccountKeys.detail(variables.accountId), refetchType: 'all' })
     },
   })
 }
@@ -205,10 +258,19 @@ export function useCreateTrustTransfer() {
       description: string
       notes?: string
     }) => trustAccountService.createTrustTransfer(data),
+    onSuccess: (data) => {
+      // Optimistically update the cache
+      queryClient.setQueriesData({ queryKey: trustAccountKeys.transactions() }, (old: any) => {
+        if (!old) return old
+        if (Array.isArray(old)) return [data, ...old]
+        return old
+      })
+    },
     onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey: trustAccountKeys.transactions() })
-      await queryClient.invalidateQueries({ queryKey: trustAccountKeys.clientBalances() })
-      await queryClient.invalidateQueries({ queryKey: trustAccountKeys.lists() })
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      await queryClient.invalidateQueries({ queryKey: trustAccountKeys.transactions(), refetchType: 'all' })
+      await queryClient.invalidateQueries({ queryKey: trustAccountKeys.clientBalances(), refetchType: 'all' })
+      await queryClient.invalidateQueries({ queryKey: trustAccountKeys.lists(), refetchType: 'all' })
     },
   })
 }
@@ -219,10 +281,23 @@ export function useVoidTransaction() {
   return useMutation({
     mutationFn: ({ id, reason }: { id: string; reason: string }) =>
       trustAccountService.voidTransaction(id, reason),
+    onSuccess: (data) => {
+      // Update specific transaction in cache
+      queryClient.setQueryData(trustAccountKeys.transaction(data._id), data)
+      // Update list cache
+      queryClient.setQueriesData({ queryKey: trustAccountKeys.transactions() }, (old: any) => {
+        if (!old) return old
+        if (Array.isArray(old)) {
+          return old.map((item: any) => (item._id === data._id ? data : item))
+        }
+        return old
+      })
+    },
     onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey: trustAccountKeys.transactions() })
-      await queryClient.invalidateQueries({ queryKey: trustAccountKeys.clientBalances() })
-      await queryClient.invalidateQueries({ queryKey: trustAccountKeys.lists() })
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      await queryClient.invalidateQueries({ queryKey: trustAccountKeys.transactions(), refetchType: 'all' })
+      await queryClient.invalidateQueries({ queryKey: trustAccountKeys.clientBalances(), refetchType: 'all' })
+      await queryClient.invalidateQueries({ queryKey: trustAccountKeys.lists(), refetchType: 'all' })
     },
   })
 }
@@ -233,8 +308,21 @@ export function useMarkTransactionCleared() {
   return useMutation({
     mutationFn: ({ id, clearedDate }: { id: string; clearedDate: string }) =>
       trustAccountService.markTransactionCleared(id, clearedDate),
+    onSuccess: (data) => {
+      // Update specific transaction in cache
+      queryClient.setQueryData(trustAccountKeys.transaction(data._id), data)
+      // Update list cache
+      queryClient.setQueriesData({ queryKey: trustAccountKeys.transactions() }, (old: any) => {
+        if (!old) return old
+        if (Array.isArray(old)) {
+          return old.map((item: any) => (item._id === data._id ? data : item))
+        }
+        return old
+      })
+    },
     onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey: trustAccountKeys.transactions() })
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      await queryClient.invalidateQueries({ queryKey: trustAccountKeys.transactions(), refetchType: 'all' })
     },
   })
 }
@@ -272,8 +360,17 @@ export function useStartReconciliation() {
       periodEnd: string
       bankStatementBalance: number
     }) => trustAccountService.startReconciliation(data),
+    onSuccess: (data) => {
+      // Optimistically update the cache
+      queryClient.setQueriesData({ queryKey: trustAccountKeys.reconciliations() }, (old: any) => {
+        if (!old) return old
+        if (Array.isArray(old)) return [data, ...old]
+        return old
+      })
+    },
     onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey: trustAccountKeys.reconciliations() })
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      await queryClient.invalidateQueries({ queryKey: trustAccountKeys.reconciliations(), refetchType: 'all' })
     },
   })
 }
@@ -289,9 +386,15 @@ export function useUpdateReconciliation() {
       id: string
       data: Parameters<typeof trustAccountService.updateReconciliation>[1]
     }) => trustAccountService.updateReconciliation(id, data),
+    onSuccess: (data) => {
+      // Update specific reconciliation in cache
+      queryClient.setQueryData(trustAccountKeys.reconciliation(data._id), data)
+    },
     onSettled: async (_, __, variables) => {
+      await new Promise(resolve => setTimeout(resolve, 1000))
       await queryClient.invalidateQueries({
         queryKey: trustAccountKeys.reconciliation(variables.id),
+        refetchType: 'all'
       })
     },
   })
@@ -303,10 +406,16 @@ export function useCompleteReconciliation() {
   return useMutation({
     mutationFn: ({ id, notes }: { id: string; notes?: string }) =>
       trustAccountService.completeReconciliation(id, notes),
+    onSuccess: (data) => {
+      // Update specific reconciliation in cache
+      queryClient.setQueryData(trustAccountKeys.reconciliation(data._id), data)
+    },
     onSettled: async (_, __, variables) => {
-      await queryClient.invalidateQueries({ queryKey: trustAccountKeys.reconciliations() })
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      await queryClient.invalidateQueries({ queryKey: trustAccountKeys.reconciliations(), refetchType: 'all' })
       await queryClient.invalidateQueries({
         queryKey: trustAccountKeys.reconciliation(variables.id),
+        refetchType: 'all'
       })
     },
   })
@@ -323,9 +432,15 @@ export function useAddReconciliationAdjustment() {
       id: string
       adjustment: ReconciliationAdjustment
     }) => trustAccountService.addReconciliationAdjustment(id, adjustment),
+    onSuccess: (data) => {
+      // Update specific reconciliation in cache
+      queryClient.setQueryData(trustAccountKeys.reconciliation(data._id), data)
+    },
     onSettled: async (_, __, variables) => {
+      await new Promise(resolve => setTimeout(resolve, 1000))
       await queryClient.invalidateQueries({
         queryKey: trustAccountKeys.reconciliation(variables.id),
+        refetchType: 'all'
       })
     },
   })
@@ -346,9 +461,19 @@ export function useRunThreeWayReconciliation() {
   return useMutation({
     mutationFn: (accountId: string) =>
       trustAccountService.runThreeWayReconciliation(accountId),
+    onSuccess: (data, accountId) => {
+      // Optimistically update the cache
+      queryClient.setQueriesData({ queryKey: trustAccountKeys.threeWay(accountId) }, (old: any) => {
+        if (!old) return old
+        if (Array.isArray(old)) return [data, ...old]
+        return old
+      })
+    },
     onSettled: async (_, __, accountId) => {
+      await new Promise(resolve => setTimeout(resolve, 1000))
       await queryClient.invalidateQueries({
         queryKey: trustAccountKeys.threeWay(accountId),
+        refetchType: 'all'
       })
     },
   })

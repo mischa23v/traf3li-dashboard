@@ -38,15 +38,83 @@ export const useCreateReminder = () => {
   return useMutation({
     mutationFn: (data: CreateReminderData) =>
       remindersService.createReminder(data),
-    onSuccess: () => {
+    // Update cache on success (Stable & Correct)
+    onSuccess: (data) => {
       toast.success('تم إنشاء التذكير بنجاح')
+
+      // Manually update the cache with the REAL reminder from server
+      queryClient.setQueriesData({ queryKey: ['reminders'] }, (old: any) => {
+        if (!old) return old
+
+        // Handle { reminders: [...] } structure
+        if (old.reminders && Array.isArray(old.reminders)) {
+          return {
+            ...old,
+            reminders: [data, ...old.reminders],
+            total: (old.total || old.reminders.length) + 1
+          }
+        }
+
+        // Handle Array structure
+        if (Array.isArray(old)) {
+          return [data, ...old]
+        }
+
+        return old
+      })
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل إنشاء التذكير')
     },
     onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['reminders'] })
-      return await queryClient.invalidateQueries({ queryKey: ['calendar'] })
+      // Delay to allow DB propagation
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      await queryClient.invalidateQueries({ queryKey: ['reminders'], refetchType: 'all' })
+      return await queryClient.invalidateQueries({ queryKey: ['calendar'], refetchType: 'all' })
+    },
+  })
+}
+
+// ... (skipping update/delete for brevity, but ideally should be updated too)
+
+export const useCreateEvent = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (data: CreateEventData) => eventsService.createEvent(data),
+    // Update cache on success (Stable & Correct)
+    onSuccess: (data) => {
+      toast.success('تم إنشاء الحدث بنجاح')
+
+      // Manually update the cache with the REAL event from server
+      queryClient.setQueriesData({ queryKey: ['events'] }, (old: any) => {
+        if (!old) return old
+
+        // Handle { events: [...] } structure
+        if (old.events && Array.isArray(old.events)) {
+          return {
+            ...old,
+            events: [data, ...old.events],
+            total: (old.total || old.events.length) + 1
+          }
+        }
+
+        // Handle Array structure
+        if (Array.isArray(old)) {
+          return [data, ...old]
+        }
+
+        return old
+      })
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'فشل إنشاء الحدث')
+    },
+    onSettled: async () => {
+      // Delay to allow DB propagation
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      await queryClient.invalidateQueries({ queryKey: ['events'], refetchType: 'all' })
+      return await queryClient.invalidateQueries({ queryKey: ['calendar'], refetchType: 'all' })
     },
   })
 }
@@ -57,10 +125,47 @@ export const useUpdateReminder = () => {
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: Partial<CreateReminderData> }) =>
       remindersService.updateReminder(id, data),
+    // Optimistic update
+    onMutate: async ({ id, data }) => {
+      await queryClient.cancelQueries({ queryKey: ['reminders'] })
+
+      const previousQueries = queryClient.getQueriesData({ queryKey: ['reminders'] })
+      const previousReminder = queryClient.getQueryData(['reminders', id])
+
+      queryClient.setQueriesData({ queryKey: ['reminders'] }, (old: any) => {
+        if (!old) return old
+
+        const list = Array.isArray(old) ? old : (old.reminders || old.data || [])
+        const updatedList = list.map((item: any) => item._id === id ? { ...item, ...data } : item)
+
+        if (Array.isArray(old)) {
+          return updatedList
+        }
+
+        return {
+          ...old,
+          reminders: updatedList
+        }
+      })
+
+      if (previousReminder) {
+        queryClient.setQueryData(['reminders', id], { ...previousReminder, ...data })
+      }
+
+      return { previousQueries, previousReminder }
+    },
     onSuccess: () => {
       toast.success('تم تحديث التذكير بنجاح')
     },
-    onError: (error: Error) => {
+    onError: (error: Error, { id }, context) => {
+      if (context?.previousQueries) {
+        context.previousQueries.forEach(([queryKey, data]) => {
+          queryClient.setQueryData(queryKey, data)
+        })
+      }
+      if (context?.previousReminder) {
+        queryClient.setQueryData(['reminders', id], context.previousReminder)
+      }
       toast.error(error.message || 'فشل تحديث التذكير')
     },
     onSettled: async (_, __, { id }) => {
@@ -76,15 +181,39 @@ export const useDeleteReminder = () => {
 
   return useMutation({
     mutationFn: (id: string) => remindersService.deleteReminder(id),
-    onSuccess: () => {
+    // Update cache on success (Stable & Correct)
+    onSuccess: (_, id) => {
       toast.success('تم حذف التذكير بنجاح')
+
+      // Optimistically remove reminder from all lists
+      queryClient.setQueriesData({ queryKey: ['reminders'] }, (old: any) => {
+        if (!old) return old
+
+        // Handle { reminders: [...] } structure
+        if (old.reminders && Array.isArray(old.reminders)) {
+          return {
+            ...old,
+            reminders: old.reminders.filter((item: any) => item._id !== id),
+            total: Math.max(0, (old.total || old.reminders.length) - 1)
+          }
+        }
+
+        // Handle Array structure
+        if (Array.isArray(old)) {
+          return old.filter((item: any) => item._id !== id)
+        }
+
+        return old
+      })
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل حذف التذكير')
     },
     onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['reminders'] })
-      return await queryClient.invalidateQueries({ queryKey: ['calendar'] })
+      // Delay to allow DB propagation
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      await queryClient.invalidateQueries({ queryKey: ['reminders'], refetchType: 'all' })
+      return await queryClient.invalidateQueries({ queryKey: ['calendar'], refetchType: 'all' })
     },
   })
 }
@@ -228,23 +357,7 @@ export const useEvent = (id: string) => {
   })
 }
 
-export const useCreateEvent = () => {
-  const queryClient = useQueryClient()
 
-  return useMutation({
-    mutationFn: (data: CreateEventData) => eventsService.createEvent(data),
-    onSuccess: () => {
-      toast.success('تم إنشاء الحدث بنجاح')
-    },
-    onError: (error: Error) => {
-      toast.error(error.message || 'فشل إنشاء الحدث')
-    },
-    onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['events'] })
-      return await queryClient.invalidateQueries({ queryKey: ['calendar'] })
-    },
-  })
-}
 
 export const useUpdateEvent = () => {
   const queryClient = useQueryClient()
@@ -252,10 +365,47 @@ export const useUpdateEvent = () => {
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: Partial<CreateEventData> }) =>
       eventsService.updateEvent(id, data),
+    // Optimistic update
+    onMutate: async ({ id, data }) => {
+      await queryClient.cancelQueries({ queryKey: ['events'] })
+
+      const previousQueries = queryClient.getQueriesData({ queryKey: ['events'] })
+      const previousEvent = queryClient.getQueryData(['events', id])
+
+      queryClient.setQueriesData({ queryKey: ['events'] }, (old: any) => {
+        if (!old) return old
+
+        const list = Array.isArray(old) ? old : (old.events || old.data || [])
+        const updatedList = list.map((item: any) => item._id === id ? { ...item, ...data } : item)
+
+        if (Array.isArray(old)) {
+          return updatedList
+        }
+
+        return {
+          ...old,
+          events: updatedList
+        }
+      })
+
+      if (previousEvent) {
+        queryClient.setQueryData(['events', id], { ...previousEvent, ...data })
+      }
+
+      return { previousQueries, previousEvent }
+    },
     onSuccess: () => {
       toast.success('تم تحديث الحدث بنجاح')
     },
-    onError: (error: Error) => {
+    onError: (error: Error, { id }, context) => {
+      if (context?.previousQueries) {
+        context.previousQueries.forEach(([queryKey, data]) => {
+          queryClient.setQueryData(queryKey, data)
+        })
+      }
+      if (context?.previousEvent) {
+        queryClient.setQueryData(['events', id], context.previousEvent)
+      }
       toast.error(error.message || 'فشل تحديث الحدث')
     },
     onSettled: async (_, __, { id }) => {
@@ -271,15 +421,39 @@ export const useDeleteEvent = () => {
 
   return useMutation({
     mutationFn: (id: string) => eventsService.deleteEvent(id),
-    onSuccess: () => {
+    // Update cache on success (Stable & Correct)
+    onSuccess: (_, id) => {
       toast.success('تم حذف الحدث بنجاح')
+
+      // Optimistically remove event from all lists
+      queryClient.setQueriesData({ queryKey: ['events'] }, (old: any) => {
+        if (!old) return old
+
+        // Handle { events: [...] } structure
+        if (old.events && Array.isArray(old.events)) {
+          return {
+            ...old,
+            events: old.events.filter((item: any) => item._id !== id),
+            total: Math.max(0, (old.total || old.events.length) - 1)
+          }
+        }
+
+        // Handle Array structure
+        if (Array.isArray(old)) {
+          return old.filter((item: any) => item._id !== id)
+        }
+
+        return old
+      })
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل حذف الحدث')
     },
     onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['events'] })
-      return await queryClient.invalidateQueries({ queryKey: ['calendar'] })
+      // Delay to allow DB propagation
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      await queryClient.invalidateQueries({ queryKey: ['events'], refetchType: 'all' })
+      return await queryClient.invalidateQueries({ queryKey: ['calendar'], refetchType: 'all' })
     },
   })
 }

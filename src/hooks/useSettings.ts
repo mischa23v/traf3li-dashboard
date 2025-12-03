@@ -28,7 +28,9 @@ export const useUpdateAccountSettings = () => {
       toast.error(error.message || 'فشل تحديث إعدادات الحساب')
     },
     onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['settings'] })
+      // Delay to allow DB propagation
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      await queryClient.invalidateQueries({ queryKey: ['settings'], refetchType: 'all' })
     },
   })
 }
@@ -46,7 +48,9 @@ export const useUpdateAppearanceSettings = () => {
       toast.error(error.message || 'فشل تحديث إعدادات المظهر')
     },
     onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['settings'] })
+      // Delay to allow DB propagation
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      await queryClient.invalidateQueries({ queryKey: ['settings'], refetchType: 'all' })
     },
   })
 }
@@ -64,7 +68,9 @@ export const useUpdateDisplaySettings = () => {
       toast.error(error.message || 'فشل تحديث إعدادات العرض')
     },
     onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['settings'] })
+      // Delay to allow DB propagation
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      await queryClient.invalidateQueries({ queryKey: ['settings'], refetchType: 'all' })
     },
   })
 }
@@ -82,7 +88,9 @@ export const useUpdateNotificationSettings = () => {
       toast.error(error.message || 'فشل تحديث إعدادات الإشعارات')
     },
     onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['settings'] })
+      // Delay to allow DB propagation
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      await queryClient.invalidateQueries({ queryKey: ['settings'], refetchType: 'all' })
     },
   })
 }

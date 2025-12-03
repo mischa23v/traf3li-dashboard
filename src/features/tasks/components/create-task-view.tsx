@@ -183,12 +183,13 @@ export function CreateTaskView() {
             description: formData.description,
             status: formData.status,
             priority: formData.priority,
-            ...(formData.label && { label: formData.label as TaskLabel }),
+            taskType: 'other', // Default task type
+            ...(typeof formData.label === 'string' && formData.label.trim().length > 0 ? { label: formData.label as TaskLabel } : {}),
             tags: formData.tags,
-            dueDate: formData.dueDate,
+            ...(formData.dueDate && { dueDate: formData.dueDate }),
             ...(formData.dueTime && { dueTime: formData.dueTime }),
             ...(formData.startDate && { startDate: formData.startDate }),
-            assignedTo: formData.assignedTo,
+            ...(formData.assignedTo && { assignedTo: formData.assignedTo }),
             ...(formData.clientId && { clientId: formData.clientId }),
             ...(formData.caseId && { caseId: formData.caseId }),
             ...(formData.estimatedMinutes > 0 && { estimatedMinutes: formData.estimatedMinutes }),
@@ -216,6 +217,8 @@ export function CreateTaskView() {
                 }))
             }),
         }
+
+        console.log('Submitting Task Data:', taskData)
 
         createTaskMutation.mutate(taskData, {
             onSuccess: () => {
@@ -613,16 +616,24 @@ export function CreateTaskView() {
                                 {/* Recurring Section */}
                                 <Collapsible open={showRecurring} onOpenChange={setShowRecurring}>
                                     <div className="border-t border-slate-100 pt-6">
-                                        <CollapsibleTrigger asChild>
-                                            <Button variant="ghost" className="w-full justify-between p-0 h-auto hover:bg-transparent">
-                                                <h3 className="text-lg font-semibold text-slate-800 flex items-center gap-2">
-                                                    <Repeat className="w-5 h-5 text-emerald-500" />
-                                                    مهمة متكررة
-                                                    <FieldTooltip content={FIELD_TOOLTIPS.recurring} />
-                                                </h3>
-                                                {showRecurring ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
-                                            </Button>
-                                        </CollapsibleTrigger>
+                                        <div className="flex items-center justify-between w-full">
+                                            <CollapsibleTrigger asChild>
+                                                <Button variant="ghost" className="flex-1 justify-start p-0 h-auto hover:bg-transparent">
+                                                    <h3 className="text-lg font-semibold text-slate-800 flex items-center gap-2">
+                                                        <Repeat className="w-5 h-5 text-emerald-500" />
+                                                        مهمة متكررة
+                                                    </h3>
+                                                </Button>
+                                            </CollapsibleTrigger>
+                                            <div className="flex items-center gap-2">
+                                                <FieldTooltip content={FIELD_TOOLTIPS.recurring} />
+                                                <CollapsibleTrigger asChild>
+                                                    <Button variant="ghost" size="sm" className="p-0 h-auto hover:bg-transparent">
+                                                        {showRecurring ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
+                                                    </Button>
+                                                </CollapsibleTrigger>
+                                            </div>
+                                        </div>
                                         <CollapsibleContent className="mt-4">
                                             <div className="space-y-4 p-4 bg-slate-50 rounded-xl">
                                                 <div className="flex items-center gap-3">
@@ -761,16 +772,24 @@ export function CreateTaskView() {
                                 {/* Reminders Section */}
                                 <Collapsible open={showAdvanced} onOpenChange={setShowAdvanced}>
                                     <div className="border-t border-slate-100 pt-6">
-                                        <CollapsibleTrigger asChild>
-                                            <Button variant="ghost" className="w-full justify-between p-0 h-auto hover:bg-transparent">
-                                                <h3 className="text-lg font-semibold text-slate-800 flex items-center gap-2">
-                                                    <Clock className="w-5 h-5 text-emerald-500" />
-                                                    التذكيرات
-                                                    <FieldTooltip content={FIELD_TOOLTIPS.reminders} />
-                                                </h3>
-                                                {showAdvanced ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
-                                            </Button>
-                                        </CollapsibleTrigger>
+                                        <div className="flex items-center justify-between w-full">
+                                            <CollapsibleTrigger asChild>
+                                                <Button variant="ghost" className="flex-1 justify-start p-0 h-auto hover:bg-transparent">
+                                                    <h3 className="text-lg font-semibold text-slate-800 flex items-center gap-2">
+                                                        <Clock className="w-5 h-5 text-emerald-500" />
+                                                        التذكيرات
+                                                    </h3>
+                                                </Button>
+                                            </CollapsibleTrigger>
+                                            <div className="flex items-center gap-2">
+                                                <FieldTooltip content={FIELD_TOOLTIPS.reminders} />
+                                                <CollapsibleTrigger asChild>
+                                                    <Button variant="ghost" size="sm" className="p-0 h-auto hover:bg-transparent">
+                                                        {showAdvanced ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
+                                                    </Button>
+                                                </CollapsibleTrigger>
+                                            </div>
+                                        </div>
                                         <CollapsibleContent className="mt-4">
                                             <div className="space-y-3 p-4 bg-slate-50 rounded-xl">
                                                 {reminders.map((reminder, index) => (

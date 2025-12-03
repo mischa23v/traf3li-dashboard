@@ -96,10 +96,25 @@ export const useCreateFollowup = () => {
 
   return useMutation({
     mutationFn: (data: CreateFollowupData) => followupsService.createFollowup(data),
-    onSuccess: () => {
+    // Update cache on success (Stable & Correct)
+    onSuccess: (data) => {
       toast({
         title: t('status.success'),
         description: t('followups.createSuccess'),
+      })
+
+      // Manually update the cache
+      queryClient.setQueriesData({ queryKey: followupsKeys.lists() }, (old: any) => {
+        if (!old) return old
+        // Handle { followups: [...] } structure
+        if (old.followups && Array.isArray(old.followups)) {
+          return {
+            ...old,
+            followups: [data, ...old.followups]
+          }
+        }
+        if (Array.isArray(old)) return [data, ...old]
+        return old
       })
     },
     onError: (error: any) => {
@@ -110,9 +125,12 @@ export const useCreateFollowup = () => {
       })
     },
     onSettled: async (_, __, variables) => {
-      await queryClient.invalidateQueries({ queryKey: followupsKeys.all })
+      // Delay to allow DB propagation
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      await queryClient.invalidateQueries({ queryKey: followupsKeys.all, refetchType: 'all' })
       return await queryClient.invalidateQueries({
         queryKey: followupsKeys.entity(variables.entityType, variables.entityId),
+        refetchType: 'all'
       })
     },
   })
@@ -153,10 +171,25 @@ export const useDeleteFollowup = () => {
 
   return useMutation({
     mutationFn: (id: string) => followupsService.deleteFollowup(id),
-    onSuccess: () => {
+    // Update cache on success (Stable & Correct)
+    onSuccess: (_, id) => {
       toast({
         title: t('status.success'),
         description: t('status.deletedSuccessfully'),
+      })
+
+      // Manually update the cache
+      queryClient.setQueriesData({ queryKey: followupsKeys.lists() }, (old: any) => {
+        if (!old) return old
+        // Handle { followups: [...] } structure
+        if (old.followups && Array.isArray(old.followups)) {
+          return {
+            ...old,
+            followups: old.followups.filter((f: any) => f._id !== id)
+          }
+        }
+        if (Array.isArray(old)) return old.filter((f: any) => f._id !== id)
+        return old
       })
     },
     onError: (error: any) => {
@@ -167,7 +200,9 @@ export const useDeleteFollowup = () => {
       })
     },
     onSettled: async () => {
-      return await queryClient.invalidateQueries({ queryKey: followupsKeys.all })
+      // Delay to allow DB propagation
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      return await queryClient.invalidateQueries({ queryKey: followupsKeys.all, refetchType: 'all' })
     },
   })
 }
@@ -313,7 +348,9 @@ export const useBulkCompleteFollowups = () => {
       })
     },
     onSettled: async () => {
-      return await queryClient.invalidateQueries({ queryKey: followupsKeys.all })
+      // Delay to allow DB propagation
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      return await queryClient.invalidateQueries({ queryKey: followupsKeys.all, refetchType: 'all' })
     },
   })
 }
@@ -325,10 +362,25 @@ export const useBulkDeleteFollowups = () => {
 
   return useMutation({
     mutationFn: (ids: string[]) => followupsService.bulkDeleteFollowups(ids),
-    onSuccess: () => {
+    // Update cache on success (Stable & Correct)
+    onSuccess: (_, ids) => {
       toast({
         title: t('status.success'),
         description: t('followups.bulkDeleteSuccess'),
+      })
+
+      // Manually update the cache
+      queryClient.setQueriesData({ queryKey: followupsKeys.lists() }, (old: any) => {
+        if (!old) return old
+        // Handle { followups: [...] } structure
+        if (old.followups && Array.isArray(old.followups)) {
+          return {
+            ...old,
+            followups: old.followups.filter((f: any) => !ids.includes(f._id))
+          }
+        }
+        if (Array.isArray(old)) return old.filter((f: any) => !ids.includes(f._id))
+        return old
       })
     },
     onError: (error: any) => {
@@ -339,7 +391,9 @@ export const useBulkDeleteFollowups = () => {
       })
     },
     onSettled: async () => {
-      return await queryClient.invalidateQueries({ queryKey: followupsKeys.all })
+      // Delay to allow DB propagation
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      return await queryClient.invalidateQueries({ queryKey: followupsKeys.all, refetchType: 'all' })
     },
   })
 }

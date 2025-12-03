@@ -75,9 +75,27 @@ export const useCreateCaseRichDocument = () => {
       caseId: string
       data: CreateRichDocumentInput
     }) => caseRichDocumentService.create(caseId, data),
+    // Update cache on success (Stable & Correct)
+    onSuccess: (data, { caseId }) => {
+      // Manually update the cache for list
+      queryClient.setQueriesData({ queryKey: richDocumentKeys.list(caseId) }, (old: any) => {
+        if (!old) return old
+        // Handle { documents: [...] } structure
+        if (old.documents && Array.isArray(old.documents)) {
+          return {
+            ...old,
+            documents: [data, ...old.documents]
+          }
+        }
+        if (Array.isArray(old)) return [data, ...old]
+        return old
+      })
+    },
     onSettled: async (_, __, { caseId }) => {
-      await queryClient.invalidateQueries({ queryKey: richDocumentKeys.lists() })
-      await queryClient.invalidateQueries({ queryKey: richDocumentKeys.list(caseId) })
+      // Delay to allow DB propagation
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      await queryClient.invalidateQueries({ queryKey: richDocumentKeys.lists(), refetchType: 'all' })
+      await queryClient.invalidateQueries({ queryKey: richDocumentKeys.list(caseId), refetchType: 'all' })
     }
   })
 }
@@ -119,9 +137,27 @@ export const useDeleteCaseRichDocument = () => {
   return useMutation({
     mutationFn: ({ caseId, docId }: { caseId: string; docId: string }) =>
       caseRichDocumentService.delete(caseId, docId),
+    // Update cache on success (Stable & Correct)
+    onSuccess: (_, { caseId, docId }) => {
+      // Manually update the cache for list
+      queryClient.setQueriesData({ queryKey: richDocumentKeys.list(caseId) }, (old: any) => {
+        if (!old) return old
+        // Handle { documents: [...] } structure
+        if (old.documents && Array.isArray(old.documents)) {
+          return {
+            ...old,
+            documents: old.documents.filter((d: any) => d._id !== docId)
+          }
+        }
+        if (Array.isArray(old)) return old.filter((d: any) => d._id !== docId)
+        return old
+      })
+    },
     onSettled: async (_, __, { caseId }) => {
-      await queryClient.invalidateQueries({ queryKey: richDocumentKeys.lists() })
-      await queryClient.invalidateQueries({ queryKey: richDocumentKeys.list(caseId) })
+      // Delay to allow DB propagation
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      await queryClient.invalidateQueries({ queryKey: richDocumentKeys.lists(), refetchType: 'all' })
+      await queryClient.invalidateQueries({ queryKey: richDocumentKeys.list(caseId), refetchType: 'all' })
     }
   })
 }

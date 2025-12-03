@@ -90,8 +90,19 @@ export const useCreateConversation = () => {
             const response = await apiClient.post('/conversations', data)
             return response.data as Conversation
         },
+        // Update cache on success (Stable & Correct)
+        onSuccess: (newConversation) => {
+            // Manually update the cache
+            queryClient.setQueriesData({ queryKey: ['conversations'] }, (old: any) => {
+                if (!old) return old
+                if (Array.isArray(old)) return [newConversation, ...old]
+                return old
+            })
+        },
         onSettled: async () => {
-            await queryClient.invalidateQueries({ queryKey: ['conversations'] })
+            // Delay to allow DB propagation
+            await new Promise(resolve => setTimeout(resolve, 1000))
+            await queryClient.invalidateQueries({ queryKey: ['conversations'], refetchType: 'all' })
         },
     })
 }
@@ -124,9 +135,20 @@ export const useSendMessage = () => {
             })
             return response.data as Message
         },
+        // Update cache on success (Stable & Correct)
+        onSuccess: (newMessage, variables) => {
+            // Manually update the cache for messages
+            queryClient.setQueriesData({ queryKey: ['messages', variables.conversationID] }, (old: any) => {
+                if (!old) return old
+                if (Array.isArray(old)) return [...old, newMessage]
+                return old
+            })
+        },
         onSettled: async (_, __, variables) => {
-            await queryClient.invalidateQueries({ queryKey: ['messages', variables.conversationID] })
-            await queryClient.invalidateQueries({ queryKey: ['conversations'] })
+            // Delay to allow DB propagation
+            await new Promise(resolve => setTimeout(resolve, 1000))
+            await queryClient.invalidateQueries({ queryKey: ['messages', variables.conversationID], refetchType: 'all' })
+            await queryClient.invalidateQueries({ queryKey: ['conversations'], refetchType: 'all' })
         },
     })
 }
@@ -141,8 +163,10 @@ export const useMarkAsRead = () => {
             return response.data
         },
         onSettled: async (_, __, conversationID) => {
-            await queryClient.invalidateQueries({ queryKey: ['messages', conversationID] })
-            await queryClient.invalidateQueries({ queryKey: ['conversations'] })
+            // Delay to allow DB propagation
+            await new Promise(resolve => setTimeout(resolve, 1000))
+            await queryClient.invalidateQueries({ queryKey: ['messages', conversationID], refetchType: 'all' })
+            await queryClient.invalidateQueries({ queryKey: ['conversations'], refetchType: 'all' })
         },
     })
 }
@@ -157,7 +181,9 @@ export const useUpdateConversation = () => {
             return response.data as Conversation
         },
         onSettled: async () => {
-            await queryClient.invalidateQueries({ queryKey: ['conversations'] })
+            // Delay to allow DB propagation
+            await new Promise(resolve => setTimeout(resolve, 1000))
+            await queryClient.invalidateQueries({ queryKey: ['conversations'], refetchType: 'all' })
         },
     })
 }

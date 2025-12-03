@@ -117,14 +117,38 @@ export const useCreateLead = () => {
 
   return useMutation({
     mutationFn: (data: CreateLeadData) => leadService.createLead(data),
-    onSuccess: () => {
+    // Update cache on success (Stable & Correct)
+    onSuccess: (data) => {
       toast.success('تم إنشاء العميل المحتمل بنجاح')
+
+      // Manually update the cache with the REAL lead from server
+      queryClient.setQueriesData({ queryKey: ['leads'] }, (old: any) => {
+        if (!old) return old
+
+        // Handle { leads: [...] } structure
+        if (old.leads && Array.isArray(old.leads)) {
+          return {
+            ...old,
+            leads: [data, ...old.leads],
+            total: (old.total || old.leads.length) + 1
+          }
+        }
+
+        // Handle Array structure
+        if (Array.isArray(old)) {
+          return [data, ...old]
+        }
+
+        return old
+      })
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل إنشاء العميل المحتمل')
     },
     onSettled: async () => {
-      return await queryClient.invalidateQueries({ queryKey: ['leads'] })
+      // Delay to allow DB propagation
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      return await queryClient.invalidateQueries({ queryKey: ['leads'], refetchType: 'all' })
     },
   })
 }
@@ -159,14 +183,38 @@ export const useDeleteLead = () => {
 
   return useMutation({
     mutationFn: (leadId: string) => leadService.deleteLead(leadId),
-    onSuccess: () => {
+    // Update cache on success (Stable & Correct)
+    onSuccess: (_, leadId) => {
       toast.success('تم حذف العميل المحتمل بنجاح')
+
+      // Optimistically remove lead from all lists
+      queryClient.setQueriesData({ queryKey: ['leads'] }, (old: any) => {
+        if (!old) return old
+
+        // Handle { leads: [...] } structure
+        if (old.leads && Array.isArray(old.leads)) {
+          return {
+            ...old,
+            leads: old.leads.filter((item: any) => item._id !== leadId),
+            total: Math.max(0, (old.total || old.leads.length) - 1)
+          }
+        }
+
+        // Handle Array structure
+        if (Array.isArray(old)) {
+          return old.filter((item: any) => item._id !== leadId)
+        }
+
+        return old
+      })
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل حذف العميل المحتمل')
     },
     onSettled: async () => {
-      return await queryClient.invalidateQueries({ queryKey: ['leads'] })
+      // Delay to allow DB propagation
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      return await queryClient.invalidateQueries({ queryKey: ['leads'], refetchType: 'all' })
     },
   })
 }
@@ -353,14 +401,24 @@ export const useCreatePipeline = () => {
   return useMutation({
     mutationFn: (data: CreatePipelineData) =>
       pipelineService.createPipeline(data),
-    onSuccess: () => {
+    // Update cache on success (Stable & Correct)
+    onSuccess: (data) => {
       toast.success('تم إنشاء مسار المبيعات بنجاح')
+
+      // Manually update the cache
+      queryClient.setQueriesData({ queryKey: ['pipelines'] }, (old: any) => {
+        if (!old) return old
+        if (Array.isArray(old)) return [data, ...old]
+        return old
+      })
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل إنشاء مسار المبيعات')
     },
     onSettled: async () => {
-      return await queryClient.invalidateQueries({ queryKey: ['pipelines'] })
+      // Delay to allow DB propagation
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      return await queryClient.invalidateQueries({ queryKey: ['pipelines'], refetchType: 'all' })
     },
   })
 }
@@ -403,14 +461,24 @@ export const useDeletePipeline = () => {
   return useMutation({
     mutationFn: (pipelineId: string) =>
       pipelineService.deletePipeline(pipelineId),
-    onSuccess: () => {
+    // Update cache on success (Stable & Correct)
+    onSuccess: (_, pipelineId) => {
       toast.success('تم حذف مسار المبيعات بنجاح')
+
+      // Manually update the cache
+      queryClient.setQueriesData({ queryKey: ['pipelines'] }, (old: any) => {
+        if (!old) return old
+        if (Array.isArray(old)) return old.filter((item: any) => item._id !== pipelineId)
+        return old
+      })
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل حذف مسار المبيعات')
     },
     onSettled: async () => {
-      return await queryClient.invalidateQueries({ queryKey: ['pipelines'] })
+      // Delay to allow DB propagation
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      return await queryClient.invalidateQueries({ queryKey: ['pipelines'], refetchType: 'all' })
     },
   })
 }
@@ -634,14 +702,34 @@ export const useCreateReferral = () => {
   return useMutation({
     mutationFn: (data: CreateReferralData) =>
       referralService.createReferral(data),
-    onSuccess: () => {
+    // Update cache on success (Stable & Correct)
+    onSuccess: (data) => {
       toast.success('تم إنشاء مصدر الإحالة بنجاح')
+
+      // Manually update the cache
+      queryClient.setQueriesData({ queryKey: ['referrals'] }, (old: any) => {
+        if (!old) return old
+
+        // Handle { referrals: [...] } structure
+        if (old.referrals && Array.isArray(old.referrals)) {
+          return {
+            ...old,
+            referrals: [data, ...old.referrals],
+            total: (old.total || old.referrals.length) + 1
+          }
+        }
+
+        if (Array.isArray(old)) return [data, ...old]
+        return old
+      })
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل إنشاء مصدر الإحالة')
     },
     onSettled: async () => {
-      return await queryClient.invalidateQueries({ queryKey: ['referrals'] })
+      // Delay to allow DB propagation
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      return await queryClient.invalidateQueries({ queryKey: ['referrals'], refetchType: 'all' })
     },
   })
 }
@@ -684,14 +772,34 @@ export const useDeleteReferral = () => {
   return useMutation({
     mutationFn: (referralId: string) =>
       referralService.deleteReferral(referralId),
-    onSuccess: () => {
+    // Update cache on success (Stable & Correct)
+    onSuccess: (_, referralId) => {
       toast.success('تم حذف مصدر الإحالة بنجاح')
+
+      // Manually update the cache
+      queryClient.setQueriesData({ queryKey: ['referrals'] }, (old: any) => {
+        if (!old) return old
+
+        // Handle { referrals: [...] } structure
+        if (old.referrals && Array.isArray(old.referrals)) {
+          return {
+            ...old,
+            referrals: old.referrals.filter((item: any) => item._id !== referralId),
+            total: Math.max(0, (old.total || old.referrals.length) - 1)
+          }
+        }
+
+        if (Array.isArray(old)) return old.filter((item: any) => item._id !== referralId)
+        return old
+      })
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل حذف مصدر الإحالة')
     },
     onSettled: async () => {
-      return await queryClient.invalidateQueries({ queryKey: ['referrals'] })
+      // Delay to allow DB propagation
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      return await queryClient.invalidateQueries({ queryKey: ['referrals'], refetchType: 'all' })
     },
   })
 }

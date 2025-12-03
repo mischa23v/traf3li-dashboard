@@ -62,10 +62,25 @@ export const useCreateOrganization = () => {
 
   return useMutation({
     mutationFn: (data: CreateOrganizationData) => organizationsService.createOrganization(data),
-    onSuccess: () => {
+    // Update cache on success (Stable & Correct)
+    onSuccess: (data) => {
       toast({
         title: t('status.success'),
         description: t('status.createdSuccessfully'),
+      })
+
+      // Manually update the cache
+      queryClient.setQueriesData({ queryKey: organizationsKeys.lists() }, (old: any) => {
+        if (!old) return old
+        // Handle { organizations: [...] } structure
+        if (old.organizations && Array.isArray(old.organizations)) {
+          return {
+            ...old,
+            organizations: [data, ...old.organizations]
+          }
+        }
+        if (Array.isArray(old)) return [data, ...old]
+        return old
       })
     },
     onError: (error: any) => {
@@ -76,7 +91,9 @@ export const useCreateOrganization = () => {
       })
     },
     onSettled: async () => {
-      return await queryClient.invalidateQueries({ queryKey: organizationsKeys.all })
+      // Delay to allow DB propagation
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      return await queryClient.invalidateQueries({ queryKey: organizationsKeys.all, refetchType: 'all' })
     },
   })
 }
@@ -116,10 +133,25 @@ export const useDeleteOrganization = () => {
 
   return useMutation({
     mutationFn: (id: string) => organizationsService.deleteOrganization(id),
-    onSuccess: () => {
+    // Update cache on success (Stable & Correct)
+    onSuccess: (_, id) => {
       toast({
         title: t('status.success'),
         description: t('status.deletedSuccessfully'),
+      })
+
+      // Manually update the cache
+      queryClient.setQueriesData({ queryKey: organizationsKeys.lists() }, (old: any) => {
+        if (!old) return old
+        // Handle { organizations: [...] } structure
+        if (old.organizations && Array.isArray(old.organizations)) {
+          return {
+            ...old,
+            organizations: old.organizations.filter((o: any) => o._id !== id)
+          }
+        }
+        if (Array.isArray(old)) return old.filter((o: any) => o._id !== id)
+        return old
       })
     },
     onError: (error: any) => {
@@ -130,7 +162,9 @@ export const useDeleteOrganization = () => {
       })
     },
     onSettled: async () => {
-      return await queryClient.invalidateQueries({ queryKey: organizationsKeys.all })
+      // Delay to allow DB propagation
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      return await queryClient.invalidateQueries({ queryKey: organizationsKeys.all, refetchType: 'all' })
     },
   })
 }
@@ -142,10 +176,25 @@ export const useBulkDeleteOrganizations = () => {
 
   return useMutation({
     mutationFn: (ids: string[]) => organizationsService.bulkDeleteOrganizations(ids),
-    onSuccess: () => {
+    // Update cache on success (Stable & Correct)
+    onSuccess: (_, ids) => {
       toast({
         title: t('status.success'),
         description: t('status.deletedSuccessfully'),
+      })
+
+      // Manually update the cache
+      queryClient.setQueriesData({ queryKey: organizationsKeys.lists() }, (old: any) => {
+        if (!old) return old
+        // Handle { organizations: [...] } structure
+        if (old.organizations && Array.isArray(old.organizations)) {
+          return {
+            ...old,
+            organizations: old.organizations.filter((o: any) => !ids.includes(o._id))
+          }
+        }
+        if (Array.isArray(old)) return old.filter((o: any) => !ids.includes(o._id))
+        return old
       })
     },
     onError: (error: any) => {
@@ -156,7 +205,9 @@ export const useBulkDeleteOrganizations = () => {
       })
     },
     onSettled: async () => {
-      return await queryClient.invalidateQueries({ queryKey: organizationsKeys.all })
+      // Delay to allow DB propagation
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      return await queryClient.invalidateQueries({ queryKey: organizationsKeys.all, refetchType: 'all' })
     },
   })
 }
