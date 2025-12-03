@@ -1,7 +1,8 @@
 import { useState, useMemo } from 'react'
 import {
     Clock, Bell, MapPin, Calendar as CalendarIcon,
-    Plus, CheckSquare, Trash2, List, X, ChevronRight, Loader2, AlertCircle
+    Plus, CheckSquare, Trash2, List, X, ChevronRight, Loader2, AlertCircle,
+    Edit3, Eye
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -18,6 +19,13 @@ interface TasksSidebarProps {
     onToggleSelectionMode?: () => void
     selectedCount?: number
     onDeleteSelected?: () => void
+    // Task details specific props
+    taskId?: string
+    isTaskCompleted?: boolean
+    onCompleteTask?: () => void
+    onDeleteTask?: () => void
+    isCompletePending?: boolean
+    isDeletePending?: boolean
 }
 
 export function TasksSidebar({
@@ -25,7 +33,14 @@ export function TasksSidebar({
     isSelectionMode = false,
     onToggleSelectionMode,
     selectedCount = 0,
-    onDeleteSelected
+    onDeleteSelected,
+    // Task details props
+    taskId,
+    isTaskCompleted = false,
+    onCompleteTask,
+    onDeleteTask,
+    isCompletePending = false,
+    isDeletePending = false
 }: TasksSidebarProps) {
     const [activeTab, setActiveTab] = useState<'calendar' | 'notifications'>('calendar')
     const [selectedDate, setSelectedDate] = useState(new Date())
@@ -127,49 +142,110 @@ export function TasksSidebar({
 
                 {/* Content */}
                 <div className="relative z-10 grid grid-cols-2 gap-4 animate-in fade-in slide-in-from-bottom-2 duration-300">
-                    {/* Create Button - White + Green Text + Glow */}
-                    <Button asChild className="bg-white hover:bg-emerald-50 text-emerald-600 h-auto py-6 flex flex-col items-center justify-center gap-2 rounded-3xl shadow-lg shadow-white/10 transition-all duration-300 hover:scale-[1.02] border-0">
-                        <Link to={currentLinks.create}>
-                            <Plus className="h-7 w-7" />
-                            <span className="text-sm font-bold">إنشاء</span>
-                        </Link>
-                    </Button>
+                    {taskId ? (
+                        // Task Details View - Show Complete, Edit, Delete, View All
+                        <>
+                            {/* Complete/Reopen Button */}
+                            <Button
+                                variant="ghost"
+                                className={cn(
+                                    "h-auto py-6 flex flex-col items-center justify-center gap-2 rounded-3xl transition-all duration-300 hover:scale-[1.02] shadow-lg disabled:opacity-50",
+                                    isTaskCompleted
+                                        ? "bg-amber-50 hover:bg-amber-100 text-amber-600 shadow-amber-500/10"
+                                        : "bg-white hover:bg-emerald-50 text-emerald-600 shadow-white/10"
+                                )}
+                                onClick={onCompleteTask}
+                                disabled={isCompletePending}
+                            >
+                                {isCompletePending ? (
+                                    <Loader2 className="h-7 w-7 animate-spin" />
+                                ) : (
+                                    <CheckSquare className="h-7 w-7" />
+                                )}
+                                <span className="text-sm font-bold">
+                                    {isTaskCompleted ? 'إعادة فتح' : 'إكمال'}
+                                </span>
+                            </Button>
 
-                    {/* Select Button - White + Dark Text + Glow */}
-                    <Button
-                        variant="ghost"
-                        className={cn(
-                            "h-auto py-6 flex flex-col items-center justify-center gap-2 rounded-3xl transition-all duration-300 hover:scale-[1.02] shadow-lg",
-                            isSelectionMode
-                                ? "bg-emerald-100 text-emerald-800 ring-2 ring-emerald-400 shadow-emerald-500/20"
-                                : "bg-white hover:bg-slate-50 text-emerald-950 shadow-white/10"
-                        )}
-                        onClick={onToggleSelectionMode}
-                    >
-                        {isSelectionMode ? <X className="h-6 w-6" /> : <CheckSquare className="h-6 w-6" />}
-                        <span className="text-sm font-bold">{isSelectionMode ? 'إلغاء' : 'تحديد'}</span>
-                    </Button>
+                            {/* Edit Button */}
+                            <Button asChild className="bg-white hover:bg-blue-50 text-blue-600 h-auto py-6 flex flex-col items-center justify-center gap-2 rounded-3xl shadow-lg shadow-white/10 transition-all duration-300 hover:scale-[1.02] border-0">
+                                <Link to="/dashboard/tasks/create" search={{ editId: taskId }}>
+                                    <Edit3 className="h-7 w-7" />
+                                    <span className="text-sm font-bold">تعديل</span>
+                                </Link>
+                            </Button>
 
-                    {/* Delete Button - White + Red Text + Glow */}
-                    <Button
-                        variant="ghost"
-                        className="bg-white hover:bg-red-50 text-red-500 hover:text-red-600 h-auto py-6 flex flex-col items-center justify-center gap-2 rounded-3xl disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 hover:scale-[1.02] shadow-lg shadow-white/10"
-                        onClick={onDeleteSelected}
-                        disabled={!isSelectionMode || selectedCount === 0}
-                    >
-                        <Trash2 className="h-6 w-6" />
-                        <span className="text-sm font-bold">
-                            {selectedCount > 0 ? `حذف (${selectedCount})` : 'حذف'}
-                        </span>
-                    </Button>
+                            {/* Delete Button */}
+                            <Button
+                                variant="ghost"
+                                className="bg-white hover:bg-red-50 text-red-500 hover:text-red-600 h-auto py-6 flex flex-col items-center justify-center gap-2 rounded-3xl disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 hover:scale-[1.02] shadow-lg shadow-white/10"
+                                onClick={onDeleteTask}
+                                disabled={isDeletePending}
+                            >
+                                {isDeletePending ? (
+                                    <Loader2 className="h-6 w-6 animate-spin" />
+                                ) : (
+                                    <Trash2 className="h-6 w-6" />
+                                )}
+                                <span className="text-sm font-bold">حذف</span>
+                            </Button>
 
-                    {/* View All Button - White + Dark Text + Glow */}
-                    <Button asChild variant="ghost" className="bg-white hover:bg-slate-50 text-emerald-950 h-auto py-6 flex flex-col items-center justify-center gap-2 rounded-3xl transition-all duration-300 hover:scale-[1.02] shadow-lg shadow-white/10">
-                        <Link to={currentLinks.viewAll}>
-                            <List className="h-6 w-6" />
-                            <span className="text-sm font-bold">عرض جميع</span>
-                        </Link>
-                    </Button>
+                            {/* View All Button */}
+                            <Button asChild variant="ghost" className="bg-white hover:bg-slate-50 text-emerald-950 h-auto py-6 flex flex-col items-center justify-center gap-2 rounded-3xl transition-all duration-300 hover:scale-[1.02] shadow-lg shadow-white/10">
+                                <Link to={currentLinks.viewAll}>
+                                    <List className="h-6 w-6" />
+                                    <span className="text-sm font-bold">عرض جميع</span>
+                                </Link>
+                            </Button>
+                        </>
+                    ) : (
+                        // List View - Show Create, Select, Delete, View All
+                        <>
+                            {/* Create Button - White + Green Text + Glow */}
+                            <Button asChild className="bg-white hover:bg-emerald-50 text-emerald-600 h-auto py-6 flex flex-col items-center justify-center gap-2 rounded-3xl shadow-lg shadow-white/10 transition-all duration-300 hover:scale-[1.02] border-0">
+                                <Link to={currentLinks.create}>
+                                    <Plus className="h-7 w-7" />
+                                    <span className="text-sm font-bold">إنشاء</span>
+                                </Link>
+                            </Button>
+
+                            {/* Select Button - White + Dark Text + Glow */}
+                            <Button
+                                variant="ghost"
+                                className={cn(
+                                    "h-auto py-6 flex flex-col items-center justify-center gap-2 rounded-3xl transition-all duration-300 hover:scale-[1.02] shadow-lg",
+                                    isSelectionMode
+                                        ? "bg-emerald-100 text-emerald-800 ring-2 ring-emerald-400 shadow-emerald-500/20"
+                                        : "bg-white hover:bg-slate-50 text-emerald-950 shadow-white/10"
+                                )}
+                                onClick={onToggleSelectionMode}
+                            >
+                                {isSelectionMode ? <X className="h-6 w-6" /> : <CheckSquare className="h-6 w-6" />}
+                                <span className="text-sm font-bold">{isSelectionMode ? 'إلغاء' : 'تحديد'}</span>
+                            </Button>
+
+                            {/* Delete Button - White + Red Text + Glow */}
+                            <Button
+                                variant="ghost"
+                                className="bg-white hover:bg-red-50 text-red-500 hover:text-red-600 h-auto py-6 flex flex-col items-center justify-center gap-2 rounded-3xl disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 hover:scale-[1.02] shadow-lg shadow-white/10"
+                                onClick={onDeleteSelected}
+                                disabled={!isSelectionMode || selectedCount === 0}
+                            >
+                                <Trash2 className="h-6 w-6" />
+                                <span className="text-sm font-bold">
+                                    {selectedCount > 0 ? `حذف (${selectedCount})` : 'حذف'}
+                                </span>
+                            </Button>
+
+                            {/* View All Button - White + Dark Text + Glow */}
+                            <Button asChild variant="ghost" className="bg-white hover:bg-slate-50 text-emerald-950 h-auto py-6 flex flex-col items-center justify-center gap-2 rounded-3xl transition-all duration-300 hover:scale-[1.02] shadow-lg shadow-white/10">
+                                <Link to={currentLinks.viewAll}>
+                                    <List className="h-6 w-6" />
+                                    <span className="text-sm font-bold">عرض جميع</span>
+                                </Link>
+                            </Button>
+                        </>
+                    )}
                 </div>
             </div>
 
