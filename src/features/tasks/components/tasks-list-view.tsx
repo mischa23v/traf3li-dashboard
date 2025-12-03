@@ -259,155 +259,155 @@ export function TasksListView() {
                 {/* HERO CARD & STATS */}
                 <ProductivityHero badge="إدارة المهام" title="المهام" type="tasks" />
 
-                {/* FILTERS BAR */}
-                <div className="bg-white rounded-2xl p-4 shadow-sm border border-slate-100">
-                    <div className="flex flex-col gap-4">
-                        {/* Row 1: Search and primary filters */}
-                        <div className="flex flex-wrap items-center gap-3">
-                            {/* Search Input */}
-                            <div className="relative flex-1 min-w-[200px] max-w-md">
-                                <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                                <Input
-                                    type="text"
-                                    placeholder="بحث في المهام..."
-                                    value={searchQuery}
-                                    onChange={(e) => setSearchQuery(e.target.value)}
-                                    className="pr-10 h-10 rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500/20"
-                                />
-                            </div>
-
-                            {/* Status Filter (already exists as tabs, keep it simple) */}
-                            <Select value={activeStatusTab} onValueChange={setActiveStatusTab}>
-                                <SelectTrigger className="w-[130px] h-10 rounded-xl border-slate-200">
-                                    <SelectValue placeholder="الحالة" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="active">النشطة</SelectItem>
-                                    <SelectItem value="completed">المكتملة</SelectItem>
-                                </SelectContent>
-                            </Select>
-
-                            {/* Priority Filter */}
-                            <Select value={priorityFilter} onValueChange={setPriorityFilter}>
-                                <SelectTrigger className="w-[130px] h-10 rounded-xl border-slate-200">
-                                    <SelectValue placeholder="الأولوية" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="all">كل الأولويات</SelectItem>
-                                    <SelectItem value="urgent">عاجلة</SelectItem>
-                                    <SelectItem value="high">عالية</SelectItem>
-                                    <SelectItem value="medium">متوسطة</SelectItem>
-                                    <SelectItem value="low">منخفضة</SelectItem>
-                                </SelectContent>
-                            </Select>
-
-                            {/* Assigned To Filter */}
-                            <Select value={assignedFilter} onValueChange={setAssignedFilter}>
-                                <SelectTrigger className="w-[150px] h-10 rounded-xl border-slate-200">
-                                    <SelectValue placeholder="المسؤول" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="all">الكل</SelectItem>
-                                    <SelectItem value="me">مهامي</SelectItem>
-                                    <SelectItem value="unassigned">غير معينة</SelectItem>
-                                    {teamMembers?.map((member: any) => (
-                                        <SelectItem key={member._id} value={member._id}>
-                                            {member.name || member.email}
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-                        </div>
-
-                        {/* Row 2: Secondary filters */}
-                        <div className="flex flex-wrap items-center gap-3">
-                            {/* Due Date Filter */}
-                            <Select value={dueDateFilter} onValueChange={setDueDateFilter}>
-                                <SelectTrigger className="w-[150px] h-10 rounded-xl border-slate-200">
-                                    <Calendar className="h-4 w-4 ml-2 text-slate-400" />
-                                    <SelectValue placeholder="تاريخ الاستحقاق" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="all">كل التواريخ</SelectItem>
-                                    <SelectItem value="today">اليوم</SelectItem>
-                                    <SelectItem value="thisWeek">هذا الأسبوع</SelectItem>
-                                    <SelectItem value="thisMonth">هذا الشهر</SelectItem>
-                                    <SelectItem value="overdue">متأخرة</SelectItem>
-                                    <SelectItem value="noDueDate">بدون موعد</SelectItem>
-                                </SelectContent>
-                            </Select>
-
-                            {/* Case Filter */}
-                            <Select value={caseFilter} onValueChange={setCaseFilter}>
-                                <SelectTrigger className="w-[180px] h-10 rounded-xl border-slate-200">
-                                    <Briefcase className="h-4 w-4 ml-2 text-slate-400" />
-                                    <SelectValue placeholder="القضية" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="all">كل القضايا</SelectItem>
-                                    {casesData?.cases?.map((caseItem: any) => (
-                                        <SelectItem key={caseItem._id} value={caseItem._id}>
-                                            {caseItem.title || caseItem.caseNumber}
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-
-                            {/* Sort By */}
-                            <Select value={sortBy} onValueChange={setSortBy}>
-                                <SelectTrigger className="w-[160px] h-10 rounded-xl border-slate-200">
-                                    <SortAsc className="h-4 w-4 ml-2 text-slate-400" />
-                                    <SelectValue placeholder="ترتيب حسب" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="dueDate">تاريخ الاستحقاق</SelectItem>
-                                    <SelectItem value="priority">الأولوية</SelectItem>
-                                    <SelectItem value="createdAt">تاريخ الإنشاء</SelectItem>
-                                    <SelectItem value="title">الاسم</SelectItem>
-                                </SelectContent>
-                            </Select>
-
-                            {/* View Toggle */}
-                            <div className="flex items-center gap-1 bg-slate-100 rounded-xl p-1">
-                                <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={() => setViewMode('list')}
-                                    className={`h-8 px-3 rounded-lg ${viewMode === 'list' ? 'bg-white shadow-sm' : ''}`}
-                                >
-                                    <List className="h-4 w-4" />
-                                </Button>
-                                <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={() => setViewMode('grid')}
-                                    className={`h-8 px-3 rounded-lg ${viewMode === 'grid' ? 'bg-white shadow-sm' : ''}`}
-                                >
-                                    <Grid className="h-4 w-4" />
-                                </Button>
-                            </div>
-
-                            {/* Clear Filters Button (shows only when filters are active) */}
-                            {hasActiveFilters && (
-                                <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={clearFilters}
-                                    className="h-10 px-4 text-red-500 hover:text-red-600 hover:bg-red-50 rounded-xl"
-                                >
-                                    <X className="h-4 w-4 ml-2" />
-                                    مسح الفلاتر
-                                </Button>
-                            )}
-                        </div>
-                    </div>
-                </div>
-
                 {/* MAIN GRID LAYOUT */}
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
                     {/* RIGHT COLUMN (Main Content) */}
-                    <div className="lg:col-span-2 space-y-8">
+                    <div className="lg:col-span-2 space-y-6">
+
+                        {/* FILTERS BAR */}
+                        <div className="bg-white rounded-2xl p-4 shadow-sm border border-slate-100">
+                            <div className="flex flex-col gap-4">
+                                {/* Row 1: Search and primary filters */}
+                                <div className="flex flex-wrap items-center gap-3">
+                                    {/* Search Input */}
+                                    <div className="relative flex-1 min-w-[200px] max-w-md">
+                                        <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                                        <Input
+                                            type="text"
+                                            placeholder="بحث في المهام..."
+                                            value={searchQuery}
+                                            onChange={(e) => setSearchQuery(e.target.value)}
+                                            className="pr-10 h-10 rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500/20"
+                                        />
+                                    </div>
+
+                                    {/* Status Filter (already exists as tabs, keep it simple) */}
+                                    <Select value={activeStatusTab} onValueChange={setActiveStatusTab}>
+                                        <SelectTrigger className="w-[130px] h-10 rounded-xl border-slate-200">
+                                            <SelectValue placeholder="الحالة" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="active">النشطة</SelectItem>
+                                            <SelectItem value="completed">المكتملة</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+
+                                    {/* Priority Filter */}
+                                    <Select value={priorityFilter} onValueChange={setPriorityFilter}>
+                                        <SelectTrigger className="w-[130px] h-10 rounded-xl border-slate-200">
+                                            <SelectValue placeholder="الأولوية" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="all">كل الأولويات</SelectItem>
+                                            <SelectItem value="urgent">عاجلة</SelectItem>
+                                            <SelectItem value="high">عالية</SelectItem>
+                                            <SelectItem value="medium">متوسطة</SelectItem>
+                                            <SelectItem value="low">منخفضة</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+
+                                    {/* Assigned To Filter */}
+                                    <Select value={assignedFilter} onValueChange={setAssignedFilter}>
+                                        <SelectTrigger className="w-[150px] h-10 rounded-xl border-slate-200">
+                                            <SelectValue placeholder="المسؤول" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="all">الكل</SelectItem>
+                                            <SelectItem value="me">مهامي</SelectItem>
+                                            <SelectItem value="unassigned">غير معينة</SelectItem>
+                                            {teamMembers?.map((member: any) => (
+                                                <SelectItem key={member._id} value={member._id}>
+                                                    {member.name || member.email}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+
+                                {/* Row 2: Secondary filters */}
+                                <div className="flex flex-wrap items-center gap-3">
+                                    {/* Due Date Filter */}
+                                    <Select value={dueDateFilter} onValueChange={setDueDateFilter}>
+                                        <SelectTrigger className="w-[150px] h-10 rounded-xl border-slate-200">
+                                            <Calendar className="h-4 w-4 ml-2 text-slate-400" />
+                                            <SelectValue placeholder="تاريخ الاستحقاق" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="all">كل التواريخ</SelectItem>
+                                            <SelectItem value="today">اليوم</SelectItem>
+                                            <SelectItem value="thisWeek">هذا الأسبوع</SelectItem>
+                                            <SelectItem value="thisMonth">هذا الشهر</SelectItem>
+                                            <SelectItem value="overdue">متأخرة</SelectItem>
+                                            <SelectItem value="noDueDate">بدون موعد</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+
+                                    {/* Case Filter */}
+                                    <Select value={caseFilter} onValueChange={setCaseFilter}>
+                                        <SelectTrigger className="w-[180px] h-10 rounded-xl border-slate-200">
+                                            <Briefcase className="h-4 w-4 ml-2 text-slate-400" />
+                                            <SelectValue placeholder="القضية" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="all">كل القضايا</SelectItem>
+                                            {casesData?.cases?.map((caseItem: any) => (
+                                                <SelectItem key={caseItem._id} value={caseItem._id}>
+                                                    {caseItem.title || caseItem.caseNumber}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+
+                                    {/* Sort By */}
+                                    <Select value={sortBy} onValueChange={setSortBy}>
+                                        <SelectTrigger className="w-[160px] h-10 rounded-xl border-slate-200">
+                                            <SortAsc className="h-4 w-4 ml-2 text-slate-400" />
+                                            <SelectValue placeholder="ترتيب حسب" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="dueDate">تاريخ الاستحقاق</SelectItem>
+                                            <SelectItem value="priority">الأولوية</SelectItem>
+                                            <SelectItem value="createdAt">تاريخ الإنشاء</SelectItem>
+                                            <SelectItem value="title">الاسم</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+
+                                    {/* View Toggle */}
+                                    <div className="flex items-center gap-1 bg-slate-100 rounded-xl p-1">
+                                        <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            onClick={() => setViewMode('list')}
+                                            className={`h-8 px-3 rounded-lg ${viewMode === 'list' ? 'bg-white shadow-sm' : ''}`}
+                                        >
+                                            <List className="h-4 w-4" />
+                                        </Button>
+                                        <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            onClick={() => setViewMode('grid')}
+                                            className={`h-8 px-3 rounded-lg ${viewMode === 'grid' ? 'bg-white shadow-sm' : ''}`}
+                                        >
+                                            <Grid className="h-4 w-4" />
+                                        </Button>
+                                    </div>
+
+                                    {/* Clear Filters Button (shows only when filters are active) */}
+                                    {hasActiveFilters && (
+                                        <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            onClick={clearFilters}
+                                            className="h-10 px-4 text-red-500 hover:text-red-600 hover:bg-red-50 rounded-xl"
+                                        >
+                                            <X className="h-4 w-4 ml-2" />
+                                            مسح الفلاتر
+                                        </Button>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
 
                         {/* MAIN TASKS LIST (Matches "Current Subscriptions" style) */}
                         <div className="bg-white rounded-3xl p-1 shadow-sm border border-slate-100">
