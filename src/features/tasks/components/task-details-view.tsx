@@ -1,9 +1,9 @@
 import { useState, useMemo, useRef, useCallback } from 'react'
 import {
     FileText, Calendar, CheckSquare, Clock, MoreHorizontal, Plus, Upload,
-    User, ArrowLeft, Briefcase, Trash2, Edit3, Loader2, Mic,
-    History, Link as LinkIcon, Flag, Send, Eye, Download, Search, Bell, AlertCircle, X,
-    GitBranch, Timer, Target, Play, Pause, TrendingUp, AlertTriangle
+    User, Briefcase, Trash2, Edit3, Loader2, Mic,
+    History, Link as LinkIcon, Send, Eye, Download, Search, Bell, AlertCircle, X,
+    Timer, Play, Pause, AlertTriangle
 } from 'lucide-react'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Input } from '@/components/ui/input'
@@ -47,6 +47,8 @@ import { LanguageSwitcher } from '@/components/language-switcher'
 import { ThemeSwitch } from '@/components/theme-switch'
 import { ConfigDrawer } from '@/components/config-drawer'
 import { ProfileDropdown } from '@/components/profile-dropdown'
+import { ProductivityHero } from '@/components/productivity-hero'
+import { TasksSidebar } from './tasks-sidebar'
 
 export function TaskDetailsView() {
     const { taskId } = useParams({ strict: false }) as { taskId: string }
@@ -494,25 +496,17 @@ export function TaskDetailsView() {
                 <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-emerald-500/50 to-transparent"></div>
             </Header>
 
-            <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-4 sm:p-6 lg:p-8 space-y-6 sm:space-y-8 rounded-tr-3xl shadow-inner border-r border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
-
-                {/* Breadcrumb / Back Link */}
-                <div className="max-w-[1600px] mx-auto mb-6">
-                    <Link to="/dashboard/tasks/list" className="inline-flex items-center text-slate-500 hover:text-navy transition-colors">
-                        <ArrowLeft className="h-4 w-4 ml-2" />
-                        العودة إلى قائمة المهام
-                    </Link>
-                </div>
+            <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-r border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
 
                 {/* Loading State */}
                 {isLoading && (
-                    <div className="max-w-[1600px] mx-auto space-y-6">
+                    <div className="space-y-6">
                         <Skeleton className="h-48 w-full rounded-3xl" />
-                        <div className="grid grid-cols-12 gap-6">
-                            <div className="col-span-12 lg:col-span-8">
+                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                            <div className="lg:col-span-2">
                                 <Skeleton className="h-96 w-full rounded-2xl" />
                             </div>
-                            <div className="col-span-12 lg:col-span-4">
+                            <div>
                                 <Skeleton className="h-96 w-full rounded-2xl" />
                             </div>
                         </div>
@@ -521,401 +515,68 @@ export function TaskDetailsView() {
 
                 {/* Error State */}
                 {isError && (
-                    <div className="max-w-[1600px] mx-auto">
-                        <div className="bg-white rounded-2xl p-12 border border-slate-100 text-center">
-                            <div className="flex justify-center mb-4">
-                                <div className="w-16 h-16 rounded-full bg-red-50 flex items-center justify-center">
-                                    <AlertCircle className="w-8 h-8 text-red-500" />
-                                </div>
+                    <div className="bg-white rounded-2xl p-12 border border-slate-100 text-center">
+                        <div className="flex justify-center mb-4">
+                            <div className="w-16 h-16 rounded-full bg-red-50 flex items-center justify-center">
+                                <AlertCircle className="w-8 h-8 text-red-500" />
                             </div>
-                            <h3 className="text-lg font-bold text-slate-900 mb-2">حدث خطأ أثناء تحميل المهمة</h3>
-                            <p className="text-slate-500 mb-4">{error?.message || 'تعذر الاتصال بالخادم'}</p>
-                            <Button onClick={() => refetch()} className="bg-emerald-500 hover:bg-emerald-600">
-                                إعادة المحاولة
-                            </Button>
                         </div>
+                        <h3 className="text-lg font-bold text-slate-900 mb-2">حدث خطأ أثناء تحميل المهمة</h3>
+                        <p className="text-slate-500 mb-4">{error?.message || 'تعذر الاتصال بالخادم'}</p>
+                        <Button onClick={() => refetch()} className="bg-emerald-500 hover:bg-emerald-600">
+                            إعادة المحاولة
+                        </Button>
                     </div>
                 )}
 
                 {/* Empty State */}
                 {!isLoading && !isError && !task && (
-                    <div className="max-w-[1600px] mx-auto">
-                        <div className="bg-white rounded-2xl p-12 border border-slate-100 text-center">
-                            <div className="flex justify-center mb-4">
-                                <div className="w-16 h-16 rounded-full bg-emerald-50 flex items-center justify-center">
-                                    <Briefcase className="w-8 h-8 text-emerald-500" />
-                                </div>
+                    <div className="bg-white rounded-2xl p-12 border border-slate-100 text-center">
+                        <div className="flex justify-center mb-4">
+                            <div className="w-16 h-16 rounded-full bg-emerald-50 flex items-center justify-center">
+                                <Briefcase className="w-8 h-8 text-emerald-500" />
                             </div>
-                            <h3 className="text-lg font-bold text-slate-900 mb-2">المهمة غير موجودة</h3>
-                            <p className="text-slate-500 mb-4">لم يتم العثور على المهمة المطلوبة</p>
-                            <Button asChild className="bg-emerald-500 hover:bg-emerald-600">
-                                <Link to="/dashboard/tasks/list">
-                                    العودة إلى القائمة
-                                </Link>
-                            </Button>
                         </div>
+                        <h3 className="text-lg font-bold text-slate-900 mb-2">المهمة غير موجودة</h3>
+                        <p className="text-slate-500 mb-4">لم يتم العثور على المهمة المطلوبة</p>
+                        <Button asChild className="bg-emerald-500 hover:bg-emerald-600">
+                            <Link to="/dashboard/tasks/list">
+                                العودة إلى القائمة
+                            </Link>
+                        </Button>
                     </div>
                 )}
 
                 {/* Success State */}
                 {!isLoading && !isError && task && (
                     <>
-                        {/* Task Hero Content */}
-                        <div className="max-w-[1600px] mx-auto bg-emerald-950 rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8 shadow-xl shadow-emerald-900/20 mb-6 sm:mb-8 relative overflow-hidden">
-                            {/* Background Decoration */}
-                            <div className="absolute top-0 left-0 w-full h-full overflow-hidden z-0 pointer-events-none">
-                                <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-emerald-500/10 rounded-full blur-[100px]"></div>
-                                <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-blue-500/10 rounded-full blur-[100px]"></div>
-                                {/* Abstract Shapes */}
-                                <div className="absolute right-0 top-0 w-64 h-64 bg-gradient-to-br from-emerald-500/10 to-transparent rounded-full blur-3xl"></div>
-                            </div>
+                        {/* HERO CARD - Same as task list/create */}
+                        <ProductivityHero badge="إدارة المهام" title={task.title} type="tasks">
+                            <Link to="/dashboard/tasks/create" search={{ editId: taskId }}>
+                                <Button variant="outline" className="h-10 px-5 rounded-xl font-bold border-white/10 text-white hover:bg-white/10 hover:text-white bg-transparent text-sm">
+                                    <Edit3 className="ml-2 h-4 w-4" />
+                                    تعديل
+                                </Button>
+                            </Link>
+                            <Button
+                                onClick={handleComplete}
+                                disabled={completeTaskMutation.isPending || reopenTaskMutation.isPending}
+                                className={`h-10 px-5 rounded-xl font-bold shadow-lg text-sm ${task.status === 'done' ? 'bg-amber-500 hover:bg-amber-600 shadow-amber-500/20' : 'bg-emerald-500 hover:bg-emerald-600 shadow-emerald-500/20'} text-white border-0`}
+                            >
+                                {(completeTaskMutation.isPending || reopenTaskMutation.isPending) ? (
+                                    <Loader2 className="h-4 w-4 animate-spin ml-2" />
+                                ) : (
+                                    <CheckSquare className="ml-2 h-4 w-4" />
+                                )}
+                                {task.status === 'done' ? 'إعادة فتح' : 'إكمال المهمة'}
+                            </Button>
+                        </ProductivityHero>
 
-                            <div className="relative z-10 flex flex-col lg:flex-row gap-4 sm:gap-6 lg:gap-8 items-start justify-between text-white">
-                                {/* Main Info */}
-                                <div className="flex-1 w-full">
-                                    <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
-                                        <div className="bg-white/10 p-2 rounded-xl backdrop-blur-md border border-white/10 text-emerald-400">
-                                            <Briefcase className="h-6 w-6" />
-                                        </div>
-                                        <span className="text-emerald-100 font-medium">{task.case.title}</span>
-                                        <span className="text-white/20">•</span>
-                                        <span className="text-slate-300">{task.case.id}</span>
-                                        <Badge variant="outline" className="mr-2 border-emerald-500/30 text-emerald-300 bg-emerald-500/10">
-                                            {task.id}
-                                        </Badge>
-                                    </div>
-                                    <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold mb-3 sm:mb-4 leading-tight text-white">
-                                        {task.title}
-                                    </h1>
-                                    <div className="flex flex-wrap gap-3 sm:gap-6 text-xs sm:text-sm text-slate-300">
-                                        <div className="flex items-center gap-2">
-                                            <User className="h-4 w-4 text-emerald-400" />
-                                            <span>العميل: <span className="text-white font-medium">{task.client.name}</span></span>
-                                        </div>
-                                        <div className="flex items-center gap-2">
-                                            <Calendar className="h-4 w-4 text-emerald-400" />
-                                            <span>تاريخ الاستحقاق: <span className="text-white font-medium">{task.dueDate}</span></span>
-                                        </div>
-                                        <div className="flex items-center gap-2">
-                                            <Flag className="h-4 w-4 text-rose-400" />
-                                            <span className="text-rose-200 font-bold">الأولوية: {task.priority === 'high' ? 'عالية جداً' : 'عادية'}</span>
-                                        </div>
-                                    </div>
-                                </div>
+                        {/* MAIN GRID LAYOUT - Same as task list/create */}
+                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
-                                {/* Actions & Status */}
-                                <div className="flex flex-col gap-3 sm:gap-4 w-full lg:w-auto lg:min-w-[250px]">
-                                    <div className="flex gap-3">
-                                        <Link to="/dashboard/tasks/create" search={{ editId: taskId }}>
-                                            <Button variant="outline" className="border-white/10 text-white hover:bg-white/10 hover:text-white backdrop-blur-sm">
-                                                <Edit3 className="h-4 w-4 ml-2" />
-                                                تعديل
-                                            </Button>
-                                        </Link>
-                                        <Button
-                                            onClick={handleComplete}
-                                            disabled={completeTaskMutation.isPending || reopenTaskMutation.isPending}
-                                            className={`flex-1 ${task.status === 'done' ? 'bg-amber-500 hover:bg-amber-600' : 'bg-emerald-500 hover:bg-emerald-600'} text-white shadow-lg border-0`}
-                                        >
-                                            {(completeTaskMutation.isPending || reopenTaskMutation.isPending) ? (
-                                                <Loader2 className="h-4 w-4 animate-spin ml-2" />
-                                            ) : (
-                                                <CheckSquare className="h-4 w-4 ml-2" />
-                                            )}
-                                            {task.status === 'done' ? 'إعادة فتح' : 'إكمال المهمة'}
-                                        </Button>
-                                    </div>
-                                    <div className="flex gap-3">
-                                        <Button variant="outline" className="flex-1 border-white/10 text-white hover:bg-white/10 hover:text-white backdrop-blur-sm">
-                                            <LinkIcon className="h-4 w-4 ml-2" />
-                                            نسخ الرابط
-                                        </Button>
-                                        {!showDeleteConfirm ? (
-                                            <Button
-                                                variant="outline"
-                                                onClick={() => setShowDeleteConfirm(true)}
-                                                className="border-red-500/30 text-red-300 hover:bg-red-500/20 hover:text-red-200 backdrop-blur-sm"
-                                            >
-                                                <Trash2 className="h-4 w-4 ml-2" />
-                                                حذف
-                                            </Button>
-                                        ) : (
-                                            <div className="flex gap-2">
-                                                <Button
-                                                    variant="outline"
-                                                    size="sm"
-                                                    onClick={() => setShowDeleteConfirm(false)}
-                                                    className="border-white/10 text-white hover:bg-white/10"
-                                                >
-                                                    إلغاء
-                                                </Button>
-                                                <Button
-                                                    variant="destructive"
-                                                    size="sm"
-                                                    onClick={handleDelete}
-                                                    disabled={deleteTaskMutation.isPending}
-                                                    className="bg-red-500 hover:bg-red-600"
-                                                >
-                                                    {deleteTaskMutation.isPending ? (
-                                                        <Loader2 className="h-4 w-4 animate-spin" />
-                                                    ) : (
-                                                        'تأكيد الحذف'
-                                                    )}
-                                                </Button>
-                                            </div>
-                                        )}
-                                    </div>
-
-                                    <div className="bg-white/5 rounded-2xl p-4 border border-white/10 backdrop-blur-sm">
-                                        <div className="flex justify-between items-center mb-2">
-                                            <span className="text-sm text-slate-300">نسبة الإنجاز</span>
-                                            <span className="text-lg font-bold text-emerald-400">{task.completion}%</span>
-                                        </div>
-                                        <Progress value={task.completion} className="h-2 bg-white/10" indicatorClassName="bg-emerald-500" />
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* MAIN CONTENT GRID */}
-                        <div className="max-w-[1600px] mx-auto pb-8 sm:pb-12">
-                            <div className="grid grid-cols-12 gap-4 sm:gap-6">
-
-                                {/* LEFT SIDEBAR (Timeline & Quick Actions) - Shows after main content on mobile */}
-                                <div className="col-span-12 lg:col-span-3 space-y-4 sm:space-y-6 order-2 lg:order-1">
-                                    {/* Timeline Card */}
-                                    <Card className="border border-slate-100 shadow-sm rounded-2xl overflow-hidden">
-                                        <CardHeader className="bg-white border-b border-slate-50 pb-4">
-                                            <CardTitle className="text-lg font-bold text-navy flex items-center gap-2">
-                                                <History className="h-5 w-5 text-brand-blue" />
-                                                الجدول الزمني
-                                            </CardTitle>
-                                        </CardHeader>
-                                        <CardContent className="p-0">
-                                            <ScrollArea className="h-[300px]">
-                                                <div className="relative p-6">
-                                                    {task.timeline.length === 0 ? (
-                                                        <div className="text-center py-8 text-slate-400">
-                                                            <History className="w-10 h-10 mx-auto mb-3 opacity-30" />
-                                                            <p className="text-sm">لا يوجد سجل نشاطات</p>
-                                                            <p className="text-xs mt-1">سيظهر السجل هنا عند إجراء تغييرات</p>
-                                                        </div>
-                                                    ) : (
-                                                        <>
-                                                            {/* Vertical Line */}
-                                                            <div className="absolute top-6 bottom-6 right-[29px] w-0.5 bg-slate-100"></div>
-
-                                                            <div className="space-y-8 relative">
-                                                                {task.timeline.map((event, i) => (
-                                                                    <div key={event.id || i} className="flex gap-4 relative">
-                                                                        <div className={`
-                                                                    w-3 h-3 rounded-full mt-1.5 z-10 ring-4 ring-white
-                                                                    ${event.status === 'completed' ? 'bg-emerald-500' :
-                                                                                event.status === 'upcoming' ? 'bg-amber-500' : 'bg-slate-300'}
-                                                                `}></div>
-                                                                        <div className="flex-1">
-                                                                            <div className="text-sm font-bold text-navy">{event.title}</div>
-                                                                            <div className="text-xs text-slate-500 mb-1">
-                                                                                {event.date}
-                                                                                {event.user && <span className="mr-2">• {event.user}</span>}
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
-                                                                ))}
-                                                            </div>
-                                                        </>
-                                                    )}
-                                                </div>
-                                            </ScrollArea>
-                                        </CardContent>
-                                    </Card>
-
-                                    {/* Assignee Card */}
-                                    <Card className="border border-slate-100 shadow-sm rounded-2xl">
-                                        <CardHeader className="pb-3">
-                                            <CardTitle className="text-base font-bold text-navy">فريق العمل</CardTitle>
-                                        </CardHeader>
-                                        <CardContent className="space-y-4">
-                                            <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-xl border border-slate-100">
-                                                <Avatar className="h-10 w-10 border border-slate-200">
-                                                    <AvatarImage src={task.assignee.avatar} />
-                                                    <AvatarFallback className="bg-brand-blue text-white">AS</AvatarFallback>
-                                                </Avatar>
-                                                <div>
-                                                    <div className="text-sm font-bold text-navy">{task.assignee.name}</div>
-                                                    <div className="text-xs text-slate-500 font-medium">{task.assignee.role}</div>
-                                                </div>
-                                            </div>
-                                        </CardContent>
-                                    </Card>
-
-                                    {/* Time Tracking Card */}
-                                    <Card className="border border-slate-100 shadow-sm rounded-2xl">
-                                        <CardHeader className="pb-3">
-                                            <CardTitle className="text-base font-bold text-navy flex items-center gap-2">
-                                                <Timer className="h-4 w-4 text-emerald-600" />
-                                                تتبع الوقت
-                                            </CardTitle>
-                                        </CardHeader>
-                                        <CardContent className="space-y-4">
-                                            {/* Time Progress */}
-                                            <div className="space-y-2">
-                                                <div className="flex justify-between text-sm">
-                                                    <span className="text-slate-500">الوقت المقدر</span>
-                                                    <span className="font-medium text-slate-900">
-                                                        {task.timeTracking.estimatedMinutes > 0
-                                                            ? `${Math.floor(task.timeTracking.estimatedMinutes / 60)} ساعة ${task.timeTracking.estimatedMinutes % 60} دقيقة`
-                                                            : 'غير محدد'}
-                                                    </span>
-                                                </div>
-                                                <div className="flex justify-between text-sm">
-                                                    <span className="text-slate-500">الوقت الفعلي</span>
-                                                    <span className={`font-medium ${task.timeTracking.estimatedMinutes > 0 && task.timeTracking.actualMinutes > task.timeTracking.estimatedMinutes
-                                                        ? 'text-red-600'
-                                                        : 'text-emerald-600'
-                                                        }`}>
-                                                        {task.timeTracking.actualMinutes > 0
-                                                            ? `${Math.floor(task.timeTracking.actualMinutes / 60)} ساعة ${task.timeTracking.actualMinutes % 60} دقيقة`
-                                                            : '0 دقيقة'}
-                                                    </span>
-                                                </div>
-                                                {task.timeTracking.estimatedMinutes > 0 && (
-                                                    <Progress
-                                                        value={Math.min((task.timeTracking.actualMinutes / task.timeTracking.estimatedMinutes) * 100, 100)}
-                                                        className="h-2 bg-slate-100"
-                                                        indicatorClassName={
-                                                            task.timeTracking.actualMinutes > task.timeTracking.estimatedMinutes
-                                                                ? 'bg-red-500'
-                                                                : 'bg-emerald-500'
-                                                        }
-                                                    />
-                                                )}
-                                                {task.timeTracking.estimatedMinutes > 0 && task.timeTracking.actualMinutes > task.timeTracking.estimatedMinutes && (
-                                                    <div className="flex items-center gap-1 text-xs text-red-600">
-                                                        <AlertTriangle className="h-3 w-3" />
-                                                        <span>تجاوز الوقت المقدر!</span>
-                                                    </div>
-                                                )}
-                                            </div>
-
-                                            {/* Time Tracking Button */}
-                                            {task.status !== 'done' && task.status !== 'canceled' && (
-                                                <Button
-                                                    onClick={isTimeTrackingActive ? handleStopTimeTracking : handleStartTimeTracking}
-                                                    disabled={startTimeTrackingMutation.isPending || stopTimeTrackingMutation.isPending}
-                                                    className={`w-full ${isTimeTrackingActive ? 'bg-red-500 hover:bg-red-600' : 'bg-emerald-500 hover:bg-emerald-600'}`}
-                                                >
-                                                    {(startTimeTrackingMutation.isPending || stopTimeTrackingMutation.isPending) ? (
-                                                        <Loader2 className="h-4 w-4 animate-spin ml-2" />
-                                                    ) : isTimeTrackingActive ? (
-                                                        <Pause className="h-4 w-4 ml-2" />
-                                                    ) : (
-                                                        <Play className="h-4 w-4 ml-2" />
-                                                    )}
-                                                    {isTimeTrackingActive ? 'إيقاف التتبع' : 'بدء التتبع'}
-                                                </Button>
-                                            )}
-
-                                            {/* Budget info if available */}
-                                            {timeTrackingData && timeTrackingData.budgetAmount && (
-                                                <div className="pt-3 border-t border-slate-100">
-                                                    <div className="flex justify-between text-sm">
-                                                        <span className="text-slate-500">الميزانية</span>
-                                                        <span className="font-medium text-slate-900">
-                                                            {timeTrackingData.budgetAmount.toLocaleString('ar-SA')} ر.س
-                                                        </span>
-                                                    </div>
-                                                    {timeTrackingData.budgetUsed !== undefined && (
-                                                        <div className="flex justify-between text-sm mt-1">
-                                                            <span className="text-slate-500">المستخدم</span>
-                                                            <span className={`font-medium ${timeTrackingData.isOverBudget ? 'text-red-600' : 'text-emerald-600'}`}>
-                                                                {timeTrackingData.budgetUsed.toLocaleString('ar-SA')} ر.س
-                                                            </span>
-                                                        </div>
-                                                    )}
-                                                </div>
-                                            )}
-                                        </CardContent>
-                                    </Card>
-
-                                    {/* Dependencies Card */}
-                                    {(task.dependencies.blockedBy.length > 0 || task.dependencies.blocks.length > 0) && (
-                                        <Card className="border border-slate-100 shadow-sm rounded-2xl">
-                                            <CardHeader className="pb-3">
-                                                <CardTitle className="text-base font-bold text-navy flex items-center gap-2">
-                                                    <GitBranch className="h-4 w-4 text-purple-600" />
-                                                    التبعيات
-                                                </CardTitle>
-                                            </CardHeader>
-                                            <CardContent className="space-y-4">
-                                                {/* Blocked By */}
-                                                {task.dependencies.blockedBy.length > 0 && (
-                                                    <div>
-                                                        <div className="text-xs font-medium text-slate-500 mb-2 flex items-center gap-1">
-                                                            <AlertTriangle className="h-3 w-3 text-amber-500" />
-                                                            محظور بواسطة
-                                                        </div>
-                                                        <div className="space-y-2">
-                                                            {task.dependencies.blockedBy.map((dep) => (
-                                                                <div key={dep.taskId} className="flex items-center justify-between p-2 bg-amber-50 rounded-lg border border-amber-100">
-                                                                    <Link
-                                                                        to="/tasks/$taskId"
-                                                                        params={{ taskId: dep.taskId }}
-                                                                        className="text-sm text-amber-800 hover:text-amber-900 font-medium truncate flex-1"
-                                                                    >
-                                                                        {dep.taskTitle}
-                                                                    </Link>
-                                                                    <Badge variant="outline" className={`text-xs mr-2 ${dep.status === 'done' ? 'border-emerald-300 text-emerald-700 bg-emerald-50' :
-                                                                        dep.status === 'in_progress' ? 'border-blue-300 text-blue-700 bg-blue-50' :
-                                                                            'border-slate-300 text-slate-600'
-                                                                        }`}>
-                                                                        {dep.status === 'done' ? 'مكتمل' :
-                                                                            dep.status === 'in_progress' ? 'قيد التنفيذ' :
-                                                                                dep.status === 'todo' ? 'للتنفيذ' : dep.status}
-                                                                    </Badge>
-                                                                </div>
-                                                            ))}
-                                                        </div>
-                                                    </div>
-                                                )}
-
-                                                {/* Blocks */}
-                                                {task.dependencies.blocks.length > 0 && (
-                                                    <div>
-                                                        <div className="text-xs font-medium text-slate-500 mb-2 flex items-center gap-1">
-                                                            <Target className="h-3 w-3 text-blue-500" />
-                                                            يحظر
-                                                        </div>
-                                                        <div className="space-y-2">
-                                                            {task.dependencies.blocks.map((dep) => (
-                                                                <div key={dep.taskId} className="flex items-center justify-between p-2 bg-blue-50 rounded-lg border border-blue-100">
-                                                                    <Link
-                                                                        to="/tasks/$taskId"
-                                                                        params={{ taskId: dep.taskId }}
-                                                                        className="text-sm text-blue-800 hover:text-blue-900 font-medium truncate flex-1"
-                                                                    >
-                                                                        {dep.taskTitle}
-                                                                    </Link>
-                                                                    <Badge variant="outline" className={`text-xs mr-2 ${dep.status === 'done' ? 'border-emerald-300 text-emerald-700 bg-emerald-50' :
-                                                                        dep.status === 'in_progress' ? 'border-blue-300 text-blue-700 bg-blue-50' :
-                                                                            'border-slate-300 text-slate-600'
-                                                                        }`}>
-                                                                        {dep.status === 'done' ? 'مكتمل' :
-                                                                            dep.status === 'in_progress' ? 'قيد التنفيذ' :
-                                                                                dep.status === 'todo' ? 'للتنفيذ' : dep.status}
-                                                                    </Badge>
-                                                                </div>
-                                                            ))}
-                                                        </div>
-                                                    </div>
-                                                )}
-                                            </CardContent>
-                                        </Card>
-                                    )}
-                                </div>
-
-                                {/* CENTER CONTENT (Tabs & Details) */}
-                                <div className="col-span-12 lg:col-span-9 order-1 lg:order-2">
+                            {/* RIGHT COLUMN (Main Content) */}
+                            <div className="lg:col-span-2 space-y-8">
                                     <Card className="border border-slate-100 shadow-sm rounded-2xl overflow-hidden min-h-[600px]">
                                         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
                                             <div className="border-b border-slate-100 px-4 sm:px-6 py-4">
@@ -1483,8 +1144,10 @@ export function TaskDetailsView() {
                                             </div>
                                         </Tabs>
                                     </Card>
-                                </div>
                             </div>
+
+                            {/* LEFT SIDEBAR - Quick Actions & Calendar */}
+                            <TasksSidebar context="tasks" />
                         </div>
                     </>
                 )}
