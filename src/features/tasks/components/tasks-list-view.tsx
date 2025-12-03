@@ -16,7 +16,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { Header } from '@/components/layout/header'
 import { TopNav } from '@/components/layout/top-nav'
 import { DynamicIsland } from '@/components/dynamic-island'
-import { Search, Bell, AlertCircle, Briefcase, Plus, MoreHorizontal, ChevronLeft, Eye, Trash2, CheckCircle, XCircle, Edit3, Calendar, SortAsc, Filter, X, List, Grid } from 'lucide-react'
+import { Search, Bell, AlertCircle, Briefcase, Plus, MoreHorizontal, ChevronLeft, Eye, Trash2, CheckCircle, XCircle, Edit3, Calendar, SortAsc, Filter, X } from 'lucide-react'
 import { useNavigate } from '@tanstack/react-router'
 import { useDeleteTask, useCompleteTask, useReopenTask, useUpdateTask } from '@/hooks/useTasks'
 import { format } from 'date-fns'
@@ -52,7 +52,6 @@ export function TasksListView() {
     const [dueDateFilter, setDueDateFilter] = useState<string>('all')
     const [caseFilter, setCaseFilter] = useState<string>('all')
     const [sortBy, setSortBy] = useState<string>('dueDate')
-    const [viewMode, setViewMode] = useState<'list' | 'grid'>('list')
 
     // Fetch team members and cases for filter dropdowns
     const { data: teamMembers } = useTeamMembers()
@@ -392,26 +391,6 @@ export function TasksListView() {
                                             <SelectItem value="title">الاسم</SelectItem>
                                         </SelectContent>
                                     </Select>
-
-                                    {/* View Toggle */}
-                                    <div className="flex items-center gap-1 bg-slate-100 rounded-xl p-1">
-                                        <Button
-                                            variant="ghost"
-                                            size="sm"
-                                            onClick={() => setViewMode('list')}
-                                            className={`h-8 px-3 rounded-lg ${viewMode === 'list' ? 'bg-white shadow-sm' : ''}`}
-                                        >
-                                            <List className="h-4 w-4" />
-                                        </Button>
-                                        <Button
-                                            variant="ghost"
-                                            size="sm"
-                                            onClick={() => setViewMode('grid')}
-                                            className={`h-8 px-3 rounded-lg ${viewMode === 'grid' ? 'bg-white shadow-sm' : ''}`}
-                                        >
-                                            <Grid className="h-4 w-4" />
-                                        </Button>
-                                    </div>
 
                                     {/* Clear Filters Button (shows only when filters are active) */}
                                     {hasActiveFilters && (
