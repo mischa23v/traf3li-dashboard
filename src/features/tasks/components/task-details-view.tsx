@@ -3,7 +3,7 @@ import {
     FileText, Calendar, CheckSquare, Clock, MoreHorizontal, Plus, Upload,
     User, Briefcase, Trash2, Edit3, Loader2, Mic,
     History, Link as LinkIcon, Send, Eye, Download, Search, Bell, AlertCircle, X,
-    Timer, Play, Pause, AlertTriangle
+    Timer, Play, Pause, AlertTriangle, Target, TrendingUp
 } from 'lucide-react'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Input } from '@/components/ui/input'
@@ -570,7 +570,58 @@ export function TaskDetailsView() {
                                 )}
                                 {task.status === 'done' ? 'إعادة فتح' : 'إكمال المهمة'}
                             </Button>
+                            <Button
+                                onClick={() => setShowDeleteConfirm(true)}
+                                variant="outline"
+                                className="h-10 px-5 rounded-xl font-bold border-red-500/30 text-red-400 hover:bg-red-500/20 hover:text-red-300 bg-transparent text-sm"
+                            >
+                                <Trash2 className="ml-2 h-4 w-4" />
+                                حذف
+                            </Button>
                         </ProductivityHero>
+
+                        {/* Delete Confirmation Dialog */}
+                        {showDeleteConfirm && (
+                            <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+                                <div className="bg-white rounded-2xl p-6 max-w-md w-full shadow-xl">
+                                    <div className="flex justify-center mb-4">
+                                        <div className="w-16 h-16 rounded-full bg-red-50 flex items-center justify-center">
+                                            <AlertTriangle className="w-8 h-8 text-red-500" />
+                                        </div>
+                                    </div>
+                                    <h3 className="text-lg font-bold text-slate-900 text-center mb-2">
+                                        هل أنت متأكد من حذف هذه المهمة؟
+                                    </h3>
+                                    <p className="text-slate-500 text-center mb-6">
+                                        سيتم حذف المهمة "{task.title}" نهائياً ولا يمكن استرجاعها.
+                                    </p>
+                                    <div className="flex gap-3 justify-center">
+                                        <Button
+                                            variant="outline"
+                                            onClick={() => setShowDeleteConfirm(false)}
+                                            className="px-6 rounded-xl"
+                                        >
+                                            إلغاء
+                                        </Button>
+                                        <Button
+                                            onClick={() => {
+                                                setShowDeleteConfirm(false)
+                                                handleDelete()
+                                            }}
+                                            disabled={deleteTaskMutation.isPending}
+                                            className="px-6 rounded-xl bg-red-500 hover:bg-red-600 text-white"
+                                        >
+                                            {deleteTaskMutation.isPending ? (
+                                                <Loader2 className="h-4 w-4 animate-spin ml-2" />
+                                            ) : (
+                                                <Trash2 className="h-4 w-4 ml-2" />
+                                            )}
+                                            حذف المهمة
+                                        </Button>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
 
                         {/* MAIN GRID LAYOUT - Same as task list/create */}
                         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">

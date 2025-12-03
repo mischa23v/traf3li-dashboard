@@ -16,9 +16,17 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { Header } from '@/components/layout/header'
 import { TopNav } from '@/components/layout/top-nav'
 import { DynamicIsland } from '@/components/dynamic-island'
-import { Search, Bell, AlertCircle, Briefcase, Plus, MoreHorizontal, ChevronLeft, Eye, Trash2, CheckCircle, XCircle } from 'lucide-react'
+import { Search, Bell, AlertCircle, Briefcase, Plus, MoreHorizontal, ChevronLeft, Eye, Trash2, CheckCircle, XCircle, Edit3, Calendar, SortAsc, Filter, X, List, Grid } from 'lucide-react'
 import { useNavigate } from '@tanstack/react-router'
 import { useDeleteTask, useCompleteTask, useReopenTask } from '@/hooks/useTasks'
+import { Input } from '@/components/ui/input'
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select'
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -26,12 +34,27 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import { useCases } from '@/hooks/useCasesAndClients'
+import { useTeamMembers } from '@/hooks/useStaff'
 
 export function TasksListView() {
     const navigate = useNavigate()
     const [activeStatusTab, setActiveStatusTab] = useState('active')
     const [isSelectionMode, setIsSelectionMode] = useState(false)
     const [selectedTaskIds, setSelectedTaskIds] = useState<string[]>([])
+
+    // Filter states
+    const [searchQuery, setSearchQuery] = useState('')
+    const [priorityFilter, setPriorityFilter] = useState<string>('all')
+    const [assignedFilter, setAssignedFilter] = useState<string>('all')
+    const [dueDateFilter, setDueDateFilter] = useState<string>('all')
+    const [caseFilter, setCaseFilter] = useState<string>('all')
+    const [sortBy, setSortBy] = useState<string>('dueDate')
+    const [viewMode, setViewMode] = useState<'list' | 'grid'>('list')
+
+    // Fetch team members and cases for filter dropdowns
+    const { data: teamMembers } = useTeamMembers()
+    const { data: casesData } = useCases()
 
     // Mutations for task actions
     const deleteTaskMutation = useDeleteTask()
@@ -42,14 +65,88 @@ export function TasksListView() {
     // TaskStatus: 'backlog' | 'todo' | 'in_progress' | 'done' | 'canceled'
     const filters = useMemo(() => {
         const f: any = {}
+
+        // Status filter
         if (activeStatusTab === 'active') {
-            // Active tasks = not done and not canceled
             f.status = ['backlog', 'todo', 'in_progress']
         } else if (activeStatusTab === 'completed') {
             f.status = 'done'
         }
+
+        // Search
+        if (searchQuery.trim()) {
+            f.search = searchQuery.trim()
+        }
+
+        // Priority
+        if (priorityFilter !== 'all') {
+            f.priority = priorityFilter
+        }
+
+        // Assigned To
+        if (assignedFilter === 'me') {
+            // This would need current user ID - for now we'll pass 'me' and let the API handle it
+            f.assignedTo = 'me'
+        } else if (assignedFilter === 'unassigned') {
+            f.assignedTo = 'unassigned'
+        } else if (assignedFilter !== 'all') {
+            f.assignedTo = assignedFilter
+        }
+
+        // Case
+        if (caseFilter !== 'all') {
+            f.caseId = caseFilter
+        }
+
+        // Due Date
+        if (dueDateFilter === 'today') {
+            const today = new Date()
+            f.dueDateFrom = today.toISOString().split('T')[0]
+            f.dueDateTo = today.toISOString().split('T')[0]
+        } else if (dueDateFilter === 'thisWeek') {
+            const today = new Date()
+            const endOfWeek = new Date(today)
+            endOfWeek.setDate(today.getDate() + (7 - today.getDay()))
+            f.dueDateFrom = today.toISOString().split('T')[0]
+            f.dueDateTo = endOfWeek.toISOString().split('T')[0]
+        } else if (dueDateFilter === 'thisMonth') {
+            const today = new Date()
+            const endOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0)
+            f.dueDateFrom = today.toISOString().split('T')[0]
+            f.dueDateTo = endOfMonth.toISOString().split('T')[0]
+        } else if (dueDateFilter === 'overdue') {
+            f.overdue = true
+        }
+
+        // Sort
+        if (sortBy === 'dueDate') {
+            f.sortBy = 'dueDate'
+            f.sortOrder = 'asc'
+        } else if (sortBy === 'priority') {
+            f.sortBy = 'priority'
+            f.sortOrder = 'desc'
+        } else if (sortBy === 'createdAt') {
+            f.sortBy = 'createdAt'
+            f.sortOrder = 'desc'
+        } else if (sortBy === 'title') {
+            f.sortBy = 'title'
+            f.sortOrder = 'asc'
+        }
+
         return f
-    }, [activeStatusTab])
+    }, [activeStatusTab, searchQuery, priorityFilter, assignedFilter, dueDateFilter, caseFilter, sortBy])
+
+    // Check if any filter is active
+    const hasActiveFilters = searchQuery || priorityFilter !== 'all' || assignedFilter !== 'all' || dueDateFilter !== 'all' || caseFilter !== 'all'
+
+    // Clear all filters
+    const clearFilters = () => {
+        setSearchQuery('')
+        setPriorityFilter('all')
+        setAssignedFilter('all')
+        setDueDateFilter('all')
+        setCaseFilter('all')
+    }
 
     // Fetch tasks
     const { data: tasksData, isLoading, isError, error, refetch } = useTasks(filters)
@@ -101,6 +198,10 @@ export function TasksListView() {
     // Single task actions
     const handleViewTask = (taskId: string) => {
         navigate({ to: '/tasks/$taskId', params: { taskId } })
+    }
+
+    const handleEditTask = (taskId: string) => {
+        navigate({ to: '/dashboard/tasks/create', search: { editId: taskId } })
     }
 
     const handleDeleteTask = (taskId: string) => {
@@ -158,6 +259,150 @@ export function TasksListView() {
                 {/* HERO CARD & STATS */}
                 <ProductivityHero badge="إدارة المهام" title="المهام" type="tasks" />
 
+                {/* FILTERS BAR */}
+                <div className="bg-white rounded-2xl p-4 shadow-sm border border-slate-100">
+                    <div className="flex flex-col gap-4">
+                        {/* Row 1: Search and primary filters */}
+                        <div className="flex flex-wrap items-center gap-3">
+                            {/* Search Input */}
+                            <div className="relative flex-1 min-w-[200px] max-w-md">
+                                <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                                <Input
+                                    type="text"
+                                    placeholder="بحث في المهام..."
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                    className="pr-10 h-10 rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500/20"
+                                />
+                            </div>
+
+                            {/* Status Filter (already exists as tabs, keep it simple) */}
+                            <Select value={activeStatusTab} onValueChange={setActiveStatusTab}>
+                                <SelectTrigger className="w-[130px] h-10 rounded-xl border-slate-200">
+                                    <SelectValue placeholder="الحالة" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="active">النشطة</SelectItem>
+                                    <SelectItem value="completed">المكتملة</SelectItem>
+                                </SelectContent>
+                            </Select>
+
+                            {/* Priority Filter */}
+                            <Select value={priorityFilter} onValueChange={setPriorityFilter}>
+                                <SelectTrigger className="w-[130px] h-10 rounded-xl border-slate-200">
+                                    <SelectValue placeholder="الأولوية" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="all">كل الأولويات</SelectItem>
+                                    <SelectItem value="urgent">عاجلة</SelectItem>
+                                    <SelectItem value="high">عالية</SelectItem>
+                                    <SelectItem value="medium">متوسطة</SelectItem>
+                                    <SelectItem value="low">منخفضة</SelectItem>
+                                </SelectContent>
+                            </Select>
+
+                            {/* Assigned To Filter */}
+                            <Select value={assignedFilter} onValueChange={setAssignedFilter}>
+                                <SelectTrigger className="w-[150px] h-10 rounded-xl border-slate-200">
+                                    <SelectValue placeholder="المسؤول" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="all">الكل</SelectItem>
+                                    <SelectItem value="me">مهامي</SelectItem>
+                                    <SelectItem value="unassigned">غير معينة</SelectItem>
+                                    {teamMembers?.map((member: any) => (
+                                        <SelectItem key={member._id} value={member._id}>
+                                            {member.name || member.email}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
+
+                        {/* Row 2: Secondary filters */}
+                        <div className="flex flex-wrap items-center gap-3">
+                            {/* Due Date Filter */}
+                            <Select value={dueDateFilter} onValueChange={setDueDateFilter}>
+                                <SelectTrigger className="w-[150px] h-10 rounded-xl border-slate-200">
+                                    <Calendar className="h-4 w-4 ml-2 text-slate-400" />
+                                    <SelectValue placeholder="تاريخ الاستحقاق" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="all">كل التواريخ</SelectItem>
+                                    <SelectItem value="today">اليوم</SelectItem>
+                                    <SelectItem value="thisWeek">هذا الأسبوع</SelectItem>
+                                    <SelectItem value="thisMonth">هذا الشهر</SelectItem>
+                                    <SelectItem value="overdue">متأخرة</SelectItem>
+                                    <SelectItem value="noDueDate">بدون موعد</SelectItem>
+                                </SelectContent>
+                            </Select>
+
+                            {/* Case Filter */}
+                            <Select value={caseFilter} onValueChange={setCaseFilter}>
+                                <SelectTrigger className="w-[180px] h-10 rounded-xl border-slate-200">
+                                    <Briefcase className="h-4 w-4 ml-2 text-slate-400" />
+                                    <SelectValue placeholder="القضية" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="all">كل القضايا</SelectItem>
+                                    {casesData?.cases?.map((caseItem: any) => (
+                                        <SelectItem key={caseItem._id} value={caseItem._id}>
+                                            {caseItem.title || caseItem.caseNumber}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+
+                            {/* Sort By */}
+                            <Select value={sortBy} onValueChange={setSortBy}>
+                                <SelectTrigger className="w-[160px] h-10 rounded-xl border-slate-200">
+                                    <SortAsc className="h-4 w-4 ml-2 text-slate-400" />
+                                    <SelectValue placeholder="ترتيب حسب" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="dueDate">تاريخ الاستحقاق</SelectItem>
+                                    <SelectItem value="priority">الأولوية</SelectItem>
+                                    <SelectItem value="createdAt">تاريخ الإنشاء</SelectItem>
+                                    <SelectItem value="title">الاسم</SelectItem>
+                                </SelectContent>
+                            </Select>
+
+                            {/* View Toggle */}
+                            <div className="flex items-center gap-1 bg-slate-100 rounded-xl p-1">
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => setViewMode('list')}
+                                    className={`h-8 px-3 rounded-lg ${viewMode === 'list' ? 'bg-white shadow-sm' : ''}`}
+                                >
+                                    <List className="h-4 w-4" />
+                                </Button>
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => setViewMode('grid')}
+                                    className={`h-8 px-3 rounded-lg ${viewMode === 'grid' ? 'bg-white shadow-sm' : ''}`}
+                                >
+                                    <Grid className="h-4 w-4" />
+                                </Button>
+                            </div>
+
+                            {/* Clear Filters Button (shows only when filters are active) */}
+                            {hasActiveFilters && (
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={clearFilters}
+                                    className="h-10 px-4 text-red-500 hover:text-red-600 hover:bg-red-50 rounded-xl"
+                                >
+                                    <X className="h-4 w-4 ml-2" />
+                                    مسح الفلاتر
+                                </Button>
+                            )}
+                        </div>
+                    </div>
+                </div>
+
                 {/* MAIN GRID LAYOUT */}
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
@@ -167,23 +412,12 @@ export function TasksListView() {
                         {/* MAIN TASKS LIST (Matches "Current Subscriptions" style) */}
                         <div className="bg-white rounded-3xl p-1 shadow-sm border border-slate-100">
                             <div className="p-6 pb-2 flex justify-between items-center">
-                                <h3 className="font-bold text-navy text-xl">المهام الحالية</h3>
-                                <div className="flex gap-2">
-                                    <Button
-                                        size="sm"
-                                        onClick={() => setActiveStatusTab('active')}
-                                        className={activeStatusTab === 'active' ? "bg-emerald-500 hover:bg-emerald-600 text-white rounded-full px-4" : "bg-slate-100 text-slate-600 hover:bg-slate-200 rounded-full px-4"}
-                                    >
-                                        النشطة
-                                    </Button>
-                                    <Button
-                                        size="sm"
-                                        onClick={() => setActiveStatusTab('completed')}
-                                        className={activeStatusTab === 'completed' ? "bg-emerald-500 hover:bg-emerald-600 text-white rounded-full px-4" : "bg-slate-100 text-slate-600 hover:bg-slate-200 rounded-full px-4"}
-                                    >
-                                        المكتملة
-                                    </Button>
-                                </div>
+                                <h3 className="font-bold text-navy text-xl">
+                                    {activeStatusTab === 'active' ? 'المهام النشطة' : 'المهام المكتملة'}
+                                </h3>
+                                <Badge className="bg-slate-100 text-slate-600 border-0 rounded-full px-4 py-1">
+                                    {tasks.length} مهمة
+                                </Badge>
                             </div>
 
                             <div className="p-4 space-y-4">
@@ -272,6 +506,10 @@ export function TasksListView() {
                                                     </Button>
                                                 </DropdownMenuTrigger>
                                                 <DropdownMenuContent align="end" className="w-48">
+                                                    <DropdownMenuItem onClick={() => handleEditTask(task.id)}>
+                                                        <Edit3 className="h-4 w-4 ml-2 text-blue-500" />
+                                                        تعديل المهمة
+                                                    </DropdownMenuItem>
                                                     <DropdownMenuItem onClick={() => handleViewTask(task.id)}>
                                                         <Eye className="h-4 w-4 ml-2" />
                                                         عرض التفاصيل
