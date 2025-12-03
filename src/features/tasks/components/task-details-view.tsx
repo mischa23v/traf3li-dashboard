@@ -551,77 +551,7 @@ export function TaskDetailsView() {
                 {!isLoading && !isError && task && (
                     <>
                         {/* HERO CARD - Same as task list/create */}
-                        <ProductivityHero badge="إدارة المهام" title={task.title} type="tasks">
-                            <Link to="/dashboard/tasks/create" search={{ editId: taskId }}>
-                                <Button variant="outline" className="h-10 px-5 rounded-xl font-bold border-white/10 text-white hover:bg-white/10 hover:text-white bg-transparent text-sm">
-                                    <Edit3 className="ml-2 h-4 w-4" />
-                                    تعديل
-                                </Button>
-                            </Link>
-                            <Button
-                                onClick={handleComplete}
-                                disabled={completeTaskMutation.isPending || reopenTaskMutation.isPending}
-                                className={`h-10 px-5 rounded-xl font-bold shadow-lg text-sm ${task.status === 'done' ? 'bg-amber-500 hover:bg-amber-600 shadow-amber-500/20' : 'bg-emerald-500 hover:bg-emerald-600 shadow-emerald-500/20'} text-white border-0`}
-                            >
-                                {(completeTaskMutation.isPending || reopenTaskMutation.isPending) ? (
-                                    <Loader2 className="h-4 w-4 animate-spin ml-2" />
-                                ) : (
-                                    <CheckSquare className="ml-2 h-4 w-4" />
-                                )}
-                                {task.status === 'done' ? 'إعادة فتح' : 'إكمال المهمة'}
-                            </Button>
-                            <Button
-                                onClick={() => setShowDeleteConfirm(true)}
-                                variant="outline"
-                                className="h-10 px-5 rounded-xl font-bold border-red-500/30 text-red-400 hover:bg-red-500/20 hover:text-red-300 bg-transparent text-sm"
-                            >
-                                <Trash2 className="ml-2 h-4 w-4" />
-                                حذف
-                            </Button>
-                        </ProductivityHero>
-
-                        {/* Delete Confirmation Dialog */}
-                        {showDeleteConfirm && (
-                            <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-                                <div className="bg-white rounded-2xl p-6 max-w-md w-full shadow-xl">
-                                    <div className="flex justify-center mb-4">
-                                        <div className="w-16 h-16 rounded-full bg-red-50 flex items-center justify-center">
-                                            <AlertTriangle className="w-8 h-8 text-red-500" />
-                                        </div>
-                                    </div>
-                                    <h3 className="text-lg font-bold text-slate-900 text-center mb-2">
-                                        هل أنت متأكد من حذف هذه المهمة؟
-                                    </h3>
-                                    <p className="text-slate-500 text-center mb-6">
-                                        سيتم حذف المهمة "{task.title}" نهائياً ولا يمكن استرجاعها.
-                                    </p>
-                                    <div className="flex gap-3 justify-center">
-                                        <Button
-                                            variant="outline"
-                                            onClick={() => setShowDeleteConfirm(false)}
-                                            className="px-6 rounded-xl"
-                                        >
-                                            إلغاء
-                                        </Button>
-                                        <Button
-                                            onClick={() => {
-                                                setShowDeleteConfirm(false)
-                                                handleDelete()
-                                            }}
-                                            disabled={deleteTaskMutation.isPending}
-                                            className="px-6 rounded-xl bg-red-500 hover:bg-red-600 text-white"
-                                        >
-                                            {deleteTaskMutation.isPending ? (
-                                                <Loader2 className="h-4 w-4 animate-spin ml-2" />
-                                            ) : (
-                                                <Trash2 className="h-4 w-4 ml-2" />
-                                            )}
-                                            حذف المهمة
-                                        </Button>
-                                    </div>
-                                </div>
-                            </div>
-                        )}
+                        <ProductivityHero badge="إدارة المهام" title={task.title} type="tasks" />
 
                         {/* MAIN GRID LAYOUT - Same as task list/create */}
                         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -1198,11 +1128,62 @@ export function TaskDetailsView() {
                             </div>
 
                             {/* LEFT SIDEBAR - Quick Actions & Calendar */}
-                            <TasksSidebar context="tasks" />
+                            <TasksSidebar
+                                context="tasks"
+                                taskId={taskId}
+                                isTaskCompleted={task.status === 'done'}
+                                onCompleteTask={handleComplete}
+                                onDeleteTask={() => setShowDeleteConfirm(true)}
+                                isCompletePending={completeTaskMutation.isPending || reopenTaskMutation.isPending}
+                                isDeletePending={deleteTaskMutation.isPending}
+                            />
                         </div>
                     </>
                 )}
             </Main>
+
+            {/* Delete Confirmation Dialog */}
+            {showDeleteConfirm && task && (
+                <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+                    <div className="bg-white rounded-2xl p-6 max-w-md w-full shadow-xl">
+                        <div className="flex justify-center mb-4">
+                            <div className="w-16 h-16 rounded-full bg-red-50 flex items-center justify-center">
+                                <AlertTriangle className="w-8 h-8 text-red-500" />
+                            </div>
+                        </div>
+                        <h3 className="text-lg font-bold text-slate-900 text-center mb-2">
+                            هل أنت متأكد من حذف هذه المهمة؟
+                        </h3>
+                        <p className="text-slate-500 text-center mb-6">
+                            سيتم حذف المهمة "{task.title}" نهائياً ولا يمكن استرجاعها.
+                        </p>
+                        <div className="flex gap-3 justify-center">
+                            <Button
+                                variant="outline"
+                                onClick={() => setShowDeleteConfirm(false)}
+                                className="px-6 rounded-xl"
+                            >
+                                إلغاء
+                            </Button>
+                            <Button
+                                onClick={() => {
+                                    setShowDeleteConfirm(false)
+                                    handleDelete()
+                                }}
+                                disabled={deleteTaskMutation.isPending}
+                                className="px-6 rounded-xl bg-red-500 hover:bg-red-600 text-white"
+                            >
+                                {deleteTaskMutation.isPending ? (
+                                    <Loader2 className="h-4 w-4 animate-spin ml-2" />
+                                ) : (
+                                    <Trash2 className="h-4 w-4 ml-2" />
+                                )}
+                                حذف المهمة
+                            </Button>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {/* Document Editor Dialog */}
             <DocumentEditorDialog
