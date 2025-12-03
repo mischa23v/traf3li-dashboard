@@ -494,7 +494,7 @@ export function TaskDetailsView() {
                 <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-emerald-500/50 to-transparent"></div>
             </Header>
 
-            <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-r border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
+            <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-4 sm:p-6 lg:p-8 space-y-6 sm:space-y-8 rounded-tr-3xl shadow-inner border-r border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
 
                 {/* Breadcrumb / Back Link */}
                 <div className="max-w-[1600px] mx-auto mb-6">
@@ -561,7 +561,7 @@ export function TaskDetailsView() {
                 {!isLoading && !isError && task && (
                     <>
                         {/* Task Hero Content */}
-                        <div className="max-w-[1600px] mx-auto bg-emerald-950 rounded-3xl p-8 shadow-xl shadow-emerald-900/20 mb-8 relative overflow-hidden">
+                        <div className="max-w-[1600px] mx-auto bg-emerald-950 rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8 shadow-xl shadow-emerald-900/20 mb-6 sm:mb-8 relative overflow-hidden">
                             {/* Background Decoration */}
                             <div className="absolute top-0 left-0 w-full h-full overflow-hidden z-0 pointer-events-none">
                                 <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-emerald-500/10 rounded-full blur-[100px]"></div>
@@ -570,10 +570,10 @@ export function TaskDetailsView() {
                                 <div className="absolute right-0 top-0 w-64 h-64 bg-gradient-to-br from-emerald-500/10 to-transparent rounded-full blur-3xl"></div>
                             </div>
 
-                            <div className="relative z-10 flex flex-col lg:flex-row gap-8 items-start justify-between text-white">
+                            <div className="relative z-10 flex flex-col lg:flex-row gap-4 sm:gap-6 lg:gap-8 items-start justify-between text-white">
                                 {/* Main Info */}
-                                <div className="flex-1">
-                                    <div className="flex items-center gap-3 mb-4">
+                                <div className="flex-1 w-full">
+                                    <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
                                         <div className="bg-white/10 p-2 rounded-xl backdrop-blur-md border border-white/10 text-emerald-400">
                                             <Briefcase className="h-6 w-6" />
                                         </div>
@@ -584,10 +584,10 @@ export function TaskDetailsView() {
                                             {task.id}
                                         </Badge>
                                     </div>
-                                    <h1 className="text-3xl font-bold mb-4 leading-tight text-white">
+                                    <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold mb-3 sm:mb-4 leading-tight text-white">
                                         {task.title}
                                     </h1>
-                                    <div className="flex flex-wrap gap-6 text-sm text-slate-300">
+                                    <div className="flex flex-wrap gap-3 sm:gap-6 text-xs sm:text-sm text-slate-300">
                                         <div className="flex items-center gap-2">
                                             <User className="h-4 w-4 text-emerald-400" />
                                             <span>العميل: <span className="text-white font-medium">{task.client.name}</span></span>
@@ -604,7 +604,7 @@ export function TaskDetailsView() {
                                 </div>
 
                                 {/* Actions & Status */}
-                                <div className="flex flex-col gap-4 min-w-[250px]">
+                                <div className="flex flex-col gap-3 sm:gap-4 w-full lg:w-auto lg:min-w-[250px]">
                                     <div className="flex gap-3">
                                         <Link to="/dashboard/tasks/create" search={{ editId: taskId }}>
                                             <Button variant="outline" className="border-white/10 text-white hover:bg-white/10 hover:text-white backdrop-blur-sm">
@@ -678,11 +678,11 @@ export function TaskDetailsView() {
                         </div>
 
                         {/* MAIN CONTENT GRID */}
-                        <div className="max-w-[1600px] mx-auto pb-12">
-                            <div className="grid grid-cols-12 gap-6">
+                        <div className="max-w-[1600px] mx-auto pb-8 sm:pb-12">
+                            <div className="grid grid-cols-12 gap-4 sm:gap-6">
 
-                                {/* LEFT SIDEBAR (Timeline & Quick Actions) */}
-                                <div className="col-span-12 lg:col-span-3 space-y-6">
+                                {/* LEFT SIDEBAR (Timeline & Quick Actions) - Shows after main content on mobile */}
+                                <div className="col-span-12 lg:col-span-3 space-y-4 sm:space-y-6 order-2 lg:order-1">
                                     {/* Timeline Card */}
                                     <Card className="border border-slate-100 shadow-sm rounded-2xl overflow-hidden">
                                         <CardHeader className="bg-white border-b border-slate-50 pb-4">
@@ -915,31 +915,32 @@ export function TaskDetailsView() {
                                 </div>
 
                                 {/* CENTER CONTENT (Tabs & Details) */}
-                                <div className="col-span-12 lg:col-span-9">
+                                <div className="col-span-12 lg:col-span-9 order-1 lg:order-2">
                                     <Card className="border border-slate-100 shadow-sm rounded-2xl overflow-hidden min-h-[600px]">
                                         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-                                            <div className="border-b border-slate-100 px-6 pt-4">
-                                                <TabsList className="bg-transparent h-auto p-0 gap-6">
-                                                    {['overview', 'subtasks', 'files', 'comments'].map((tab) => (
+                                            <div className="border-b border-slate-100 px-4 sm:px-6 py-4">
+                                                <TabsList className="inline-flex h-10 items-center justify-center rounded-lg bg-slate-100 p-1 text-slate-500 w-full sm:w-auto">
+                                                    {['overview', 'files', 'comments'].map((tab) => (
                                                         <TabsTrigger
                                                             key={tab}
                                                             value={tab}
                                                             className="
-                                                        data-[state=active]:bg-transparent data-[state=active]:shadow-none 
-                                                        data-[state=active]:border-b-2 data-[state=active]:border-brand-blue 
-                                                        data-[state=active]:text-brand-blue
-                                                        text-slate-500 font-medium text-base pb-4 rounded-none px-2
-                                                    "
+                                                                inline-flex items-center justify-center whitespace-nowrap rounded-md px-3 sm:px-4 py-2 text-sm font-medium ring-offset-white transition-all
+                                                                focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2
+                                                                disabled:pointer-events-none disabled:opacity-50
+                                                                data-[state=active]:bg-emerald-950 data-[state=active]:text-white data-[state=active]:shadow-sm
+                                                                data-[state=inactive]:hover:bg-slate-200
+                                                                flex-1 sm:flex-initial
+                                                            "
                                                         >
                                                             {tab === 'overview' ? 'نظرة عامة' :
-                                                                tab === 'subtasks' ? 'المهام الفرعية' :
-                                                                    tab === 'files' ? 'المرفقات' : 'التعليقات'}
+                                                                tab === 'files' ? 'المرفقات' : 'التعليقات'}
                                                         </TabsTrigger>
                                                     ))}
                                                 </TabsList>
                                             </div>
 
-                                            <div className="p-6 bg-slate-50/50 min-h-[500px]">
+                                            <div className="p-4 sm:p-6 bg-slate-50/50 min-h-[400px] sm:min-h-[500px]">
                                                 <TabsContent value="overview" className="mt-0 space-y-6">
                                                     <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
                                                         <CardHeader>
@@ -949,6 +950,91 @@ export function TaskDetailsView() {
                                                             <p className="text-slate-600 leading-relaxed">
                                                                 {task.description}
                                                             </p>
+                                                        </CardContent>
+                                                    </Card>
+
+                                                    {/* Subtasks Section - Moved from separate tab */}
+                                                    <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
+                                                        <CardHeader className="pb-3">
+                                                            <CardTitle className="text-base font-bold text-navy flex items-center gap-2">
+                                                                <CheckSquare className="w-4 h-4 text-emerald-600" />
+                                                                المهام الفرعية
+                                                                {task.subtasks.length > 0 && (
+                                                                    <Badge variant="secondary" className="mr-2 bg-slate-100 text-slate-600">
+                                                                        {task.subtasks.filter(s => s.completed).length}/{task.subtasks.length}
+                                                                    </Badge>
+                                                                )}
+                                                            </CardTitle>
+                                                        </CardHeader>
+                                                        <CardContent className="space-y-3">
+                                                            {task.subtasks.length === 0 && !isAddingSubtask && (
+                                                                <div className="text-center py-6 text-slate-400">
+                                                                    <CheckSquare className="w-10 h-10 mx-auto mb-2 opacity-30" />
+                                                                    <p className="text-sm">لا توجد مهام فرعية</p>
+                                                                </div>
+                                                            )}
+                                                            {task.subtasks.map((subtask) => (
+                                                                <div key={subtask._id} className="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 border border-transparent hover:border-slate-100 transition-all">
+                                                                    <div
+                                                                        onClick={() => handleToggleSubtask(subtask._id)}
+                                                                        className={`w-5 h-5 rounded-md border flex items-center justify-center cursor-pointer transition-colors ${subtask.completed ? 'bg-emerald-600 border-emerald-600 text-white' : 'border-slate-300 hover:border-emerald-500'}`}
+                                                                    >
+                                                                        {subtask.completed && <CheckSquare className="w-3 h-3" />}
+                                                                        {toggleSubtaskMutation.isPending && <Loader2 className="w-3 h-3 animate-spin" />}
+                                                                    </div>
+                                                                    <span className={`flex-1 font-medium ${subtask.completed ? 'text-slate-400 line-through' : 'text-navy'}`}>
+                                                                        {subtask.title}
+                                                                    </span>
+                                                                </div>
+                                                            ))}
+
+                                                            {/* Add Subtask Form */}
+                                                            {isAddingSubtask ? (
+                                                                <div className="flex items-center gap-3 p-3 rounded-xl bg-emerald-50 border border-emerald-100">
+                                                                    <div className="w-5 h-5 rounded-md border border-slate-300"></div>
+                                                                    <Input
+                                                                        autoFocus
+                                                                        value={newSubtaskTitle}
+                                                                        onChange={(e) => setNewSubtaskTitle(e.target.value)}
+                                                                        onKeyDown={(e) => {
+                                                                            if (e.key === 'Enter') handleAddSubtask()
+                                                                            if (e.key === 'Escape') {
+                                                                                setIsAddingSubtask(false)
+                                                                                setNewSubtaskTitle('')
+                                                                            }
+                                                                        }}
+                                                                        placeholder="عنوان المهمة الفرعية..."
+                                                                        className="flex-1 h-8 border-0 bg-transparent focus-visible:ring-0 text-navy"
+                                                                    />
+                                                                    <Button
+                                                                        size="sm"
+                                                                        onClick={handleAddSubtask}
+                                                                        disabled={!newSubtaskTitle.trim() || addSubtaskMutation.isPending}
+                                                                        className="h-8 bg-emerald-600 hover:bg-emerald-700"
+                                                                    >
+                                                                        {addSubtaskMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : 'إضافة'}
+                                                                    </Button>
+                                                                    <Button
+                                                                        size="sm"
+                                                                        variant="ghost"
+                                                                        onClick={() => {
+                                                                            setIsAddingSubtask(false)
+                                                                            setNewSubtaskTitle('')
+                                                                        }}
+                                                                        className="h-8 w-8 p-0"
+                                                                    >
+                                                                        <X className="w-4 h-4" />
+                                                                    </Button>
+                                                                </div>
+                                                            ) : (
+                                                                <Button
+                                                                    variant="ghost"
+                                                                    onClick={() => setIsAddingSubtask(true)}
+                                                                    className="w-full justify-start text-slate-500 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl"
+                                                                >
+                                                                    <Plus className="w-5 h-5 ml-2" /> إضافة مهمة فرعية
+                                                                </Button>
+                                                            )}
                                                         </CardContent>
                                                     </Card>
 
@@ -1109,81 +1195,6 @@ export function TaskDetailsView() {
                                                             </CardContent>
                                                         </Card>
                                                     )}
-                                                </TabsContent>
-
-                                                <TabsContent value="subtasks" className="mt-0">
-                                                    <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
-                                                        <CardContent className="p-6 space-y-4">
-                                                            {task.subtasks.length === 0 && !isAddingSubtask && (
-                                                                <div className="text-center py-8 text-slate-400">
-                                                                    <CheckSquare className="w-12 h-12 mx-auto mb-3 opacity-30" />
-                                                                    <p>لا توجد مهام فرعية</p>
-                                                                </div>
-                                                            )}
-                                                            {task.subtasks.map((subtask) => (
-                                                                <div key={subtask._id} className="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 border border-transparent hover:border-slate-100 transition-all">
-                                                                    <div
-                                                                        onClick={() => handleToggleSubtask(subtask._id)}
-                                                                        className={`w-5 h-5 rounded-md border flex items-center justify-center cursor-pointer transition-colors ${subtask.completed ? 'bg-brand-blue border-brand-blue text-white' : 'border-slate-300 hover:border-brand-blue'}`}
-                                                                    >
-                                                                        {subtask.completed && <CheckSquare className="w-3 h-3" />}
-                                                                        {toggleSubtaskMutation.isPending && <Loader2 className="w-3 h-3 animate-spin" />}
-                                                                    </div>
-                                                                    <span className={`flex-1 font-medium ${subtask.completed ? 'text-slate-400 line-through' : 'text-navy'}`}>
-                                                                        {subtask.title}
-                                                                    </span>
-                                                                </div>
-                                                            ))}
-
-                                                            {/* Add Subtask Form */}
-                                                            {isAddingSubtask ? (
-                                                                <div className="flex items-center gap-3 p-3 rounded-xl bg-blue-50 border border-blue-100">
-                                                                    <div className="w-5 h-5 rounded-md border border-slate-300"></div>
-                                                                    <Input
-                                                                        autoFocus
-                                                                        value={newSubtaskTitle}
-                                                                        onChange={(e) => setNewSubtaskTitle(e.target.value)}
-                                                                        onKeyDown={(e) => {
-                                                                            if (e.key === 'Enter') handleAddSubtask()
-                                                                            if (e.key === 'Escape') {
-                                                                                setIsAddingSubtask(false)
-                                                                                setNewSubtaskTitle('')
-                                                                            }
-                                                                        }}
-                                                                        placeholder="عنوان المهمة الفرعية..."
-                                                                        className="flex-1 h-8 border-0 bg-transparent focus-visible:ring-0 text-navy"
-                                                                    />
-                                                                    <Button
-                                                                        size="sm"
-                                                                        onClick={handleAddSubtask}
-                                                                        disabled={!newSubtaskTitle.trim() || addSubtaskMutation.isPending}
-                                                                        className="h-8 bg-brand-blue hover:bg-blue-600"
-                                                                    >
-                                                                        {addSubtaskMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : 'إضافة'}
-                                                                    </Button>
-                                                                    <Button
-                                                                        size="sm"
-                                                                        variant="ghost"
-                                                                        onClick={() => {
-                                                                            setIsAddingSubtask(false)
-                                                                            setNewSubtaskTitle('')
-                                                                        }}
-                                                                        className="h-8 w-8 p-0"
-                                                                    >
-                                                                        <X className="w-4 h-4" />
-                                                                    </Button>
-                                                                </div>
-                                                            ) : (
-                                                                <Button
-                                                                    variant="ghost"
-                                                                    onClick={() => setIsAddingSubtask(true)}
-                                                                    className="w-full justify-start text-slate-500 hover:text-brand-blue hover:bg-blue-50 rounded-xl"
-                                                                >
-                                                                    <Plus className="w-5 h-5 ml-2" /> إضافة مهمة فرعية
-                                                                </Button>
-                                                            )}
-                                                        </CardContent>
-                                                    </Card>
                                                 </TabsContent>
 
                                                 <TabsContent value="files" className="mt-0 space-y-6">
