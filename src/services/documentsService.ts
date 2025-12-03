@@ -204,6 +204,25 @@ const documentsService = {
     return response.data
   },
 
+  // Get download URL with disposition (for S3 presigned URLs)
+  getDownloadUrl: async (
+    id: string,
+    disposition: 'inline' | 'attachment' = 'attachment'
+  ): Promise<string> => {
+    const response = await api.get(`/documents/${id}/download-url`, {
+      params: { disposition },
+    })
+    return response.data.downloadUrl
+  },
+
+  // Get preview URL (inline disposition)
+  getPreviewUrl: async (id: string): Promise<string> => {
+    const response = await api.get(`/documents/${id}/download-url`, {
+      params: { disposition: 'inline' },
+    })
+    return response.data.downloadUrl
+  },
+
   // Generate shareable link
   shareDocument: async (
     id: string,

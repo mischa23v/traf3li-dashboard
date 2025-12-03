@@ -319,6 +319,42 @@ export const useDownloadDocument = () => {
   })
 }
 
+// Get document preview URL (with inline disposition for browser viewing)
+export const useDocumentPreviewUrl = () => {
+  const { t } = useTranslation()
+
+  return useMutation({
+    mutationFn: async (id: string) => {
+      return documentsService.getPreviewUrl(id)
+    },
+    onError: (error: any) => {
+      toast({
+        variant: 'destructive',
+        title: t('status.error'),
+        description: error.response?.data?.message || t('documents.previewError', 'Failed to get preview URL'),
+      })
+    },
+  })
+}
+
+// Get document download URL (with attachment disposition for download)
+export const useDocumentDownloadUrl = () => {
+  const { t } = useTranslation()
+
+  return useMutation({
+    mutationFn: async (id: string) => {
+      return documentsService.getDownloadUrl(id, 'attachment')
+    },
+    onError: (error: any) => {
+      toast({
+        variant: 'destructive',
+        title: t('status.error'),
+        description: error.response?.data?.message || t('documents.downloadError'),
+      })
+    },
+  })
+}
+
 // Share document
 export const useShareDocument = () => {
   const { t } = useTranslation()
