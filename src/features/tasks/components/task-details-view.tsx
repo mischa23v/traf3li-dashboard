@@ -12,7 +12,8 @@ import {
     useTask, useDeleteTask, useCompleteTask, useReopenTask, useAddSubtask, useToggleSubtask,
     useAddComment, useUploadTaskAttachment, useDeleteTaskAttachment,
     useAddDependency, useRemoveDependency, useTimeTrackingDetails,
-    useStartTimeTracking, useStopTimeTracking, useUpdateOutcome
+    useStartTimeTracking, useStopTimeTracking, useUpdateOutcome,
+    useDocuments, useDeleteDocument
 } from '@/hooks/useTasks'
 import { OutcomeType, VOICE_MEMO_TYPES } from '@/services/tasksService'
 import tasksService from '@/services/tasksService'
@@ -94,6 +95,10 @@ export function TaskDetailsView() {
 
     // Time tracking details
     const { data: timeTrackingData } = useTimeTrackingDetails(taskId)
+
+    // TipTap Documents
+    const { data: documentsData, refetch: refetchDocuments } = useDocuments(taskId)
+    const deleteDocumentMutation = useDeleteDocument()
 
     const handleDelete = () => {
         deleteTaskMutation.mutate(taskId, {
@@ -188,14 +193,30 @@ export function TaskDetailsView() {
     const handlePreviewAttachment = async (attachmentId: string, existingUrl?: string, storageType?: string) => {
         try {
             let url = existingUrl
-            // If no URL or S3 storage, fetch fresh signed URL
-            if (!url || storageType === 's3') {
-                url = await tasksService.getAttachmentDownloadUrl(taskId, attachmentId)
+
+            // For S3 storage, always fetch fresh signed URL
+            if (storageType === 's3') {
+                try {
+                    url = await tasksService.getAttachmentDownloadUrl(taskId, attachmentId)
+                } catch (e) {
+                    console.error('Failed to get S3 URL, trying existing URL:', e)
+                    // Fall back to existing URL if API fails
+                }
             }
+
+            // If still no URL and no existing URL, try fetching anyway
+            if (!url) {
+                try {
+                    url = await tasksService.getAttachmentDownloadUrl(taskId, attachmentId)
+                } catch (e) {
+                    console.error('Failed to get download URL:', e)
+                }
+            }
+
             if (url) {
                 window.open(getFullDocumentUrl(url), '_blank')
             } else {
-                toast.error('لا يمكن معاينة الملف')
+                toast.error('لا يمكن معاينة الملف - الرابط غير متوفر')
             }
         } catch (error) {
             console.error('Preview attachment error:', error)
@@ -207,17 +228,32 @@ export function TaskDetailsView() {
     const handleDownloadAttachment = async (attachmentId: string, fileName: string, existingUrl?: string, storageType?: string) => {
         try {
             let url = existingUrl
-            // If no URL or S3 storage, fetch fresh signed URL
-            if (!url || storageType === 's3') {
-                url = await tasksService.getAttachmentDownloadUrl(taskId, attachmentId)
+
+            // For S3 storage, always fetch fresh signed URL
+            if (storageType === 's3') {
+                try {
+                    url = await tasksService.getAttachmentDownloadUrl(taskId, attachmentId)
+                } catch (e) {
+                    console.error('Failed to get S3 URL, trying existing URL:', e)
+                }
             }
+
+            // If still no URL, try fetching anyway
+            if (!url) {
+                try {
+                    url = await tasksService.getAttachmentDownloadUrl(taskId, attachmentId)
+                } catch (e) {
+                    console.error('Failed to get download URL:', e)
+                }
+            }
+
             if (url) {
                 const a = document.createElement('a')
                 a.href = getFullDocumentUrl(url)
                 a.download = fileName
                 a.click()
             } else {
-                toast.error('لا يمكن تحميل الملف')
+                toast.error('لا يمكن تحميل الملف - الرابط غير متوفر')
             }
         } catch (error) {
             console.error('Download attachment error:', error)
@@ -249,6 +285,20 @@ export function TaskDetailsView() {
     const handleCloseDocumentEditor = () => {
         setIsDocumentEditorOpen(false)
         setEditingDocumentId(undefined)
+    }
+
+    // Delete TipTap document handler
+    const handleDeleteDocument = (documentId: string) => {
+        if (confirm('هل أنت متأكد من حذف هذا المستند؟')) {
+            deleteDocumentMutation.mutate(
+                { taskId, documentId },
+                {
+                    onSuccess: async () => {
+                        await refetchDocuments()
+                    }
+                }
+            )
+        }
     }
 
     // Time tracking handlers
@@ -1359,6 +1409,61 @@ export function TaskDetailsView() {
                                                         </div>
                                                     </div>
                                                 ))}
+
+                                                {/* TipTap Documents Section */}
+                                                {documentsData?.documents && documentsData.documents.length > 0 && (
+                                                    <>
+                                                        <div className="col-span-full mt-4 mb-2">
+                                                            <h4 className="text-sm font-semibold text-slate-600">المستندات النصية</h4>
+                                                        </div>
+                                                        {documentsData.documents.map((doc) => (
+                                                            <div key={doc._id} className="bg-white p-4 rounded-2xl border border-emerald-100 shadow-sm hover:shadow-md transition-all group relative h-[180px] flex flex-col justify-between">
+                                                                <div className="flex justify-between items-start">
+                                                                    <div className="w-10 h-10 rounded-lg flex items-center justify-center font-bold text-xs border bg-emerald-50 text-emerald-600 border-emerald-100">
+                                                                        TXT
+                                                                    </div>
+                                                                    <DropdownMenu>
+                                                                        <DropdownMenuTrigger asChild>
+                                                                            <Button variant="ghost" size="icon" className="h-8 w-8 -ml-2 text-slate-400 hover:text-navy">
+                                                                                <MoreHorizontal className="h-4 w-4" />
+                                                                            </Button>
+                                                                        </DropdownMenuTrigger>
+                                                                        <DropdownMenuContent align="end">
+                                                                            <DropdownMenuItem onClick={() => handleOpenDocumentEditor(doc._id)}>
+                                                                                <Edit3 className="h-4 w-4 ml-2" /> تحرير
+                                                                            </DropdownMenuItem>
+                                                                            <DropdownMenuItem
+                                                                                onClick={() => handleDeleteDocument(doc._id)}
+                                                                                className="text-red-600 focus:text-red-600"
+                                                                            >
+                                                                                <Trash2 className="h-4 w-4 ml-2" /> حذف
+                                                                            </DropdownMenuItem>
+                                                                        </DropdownMenuContent>
+                                                                    </DropdownMenu>
+                                                                </div>
+                                                                <div>
+                                                                    <h4 className="font-bold text-navy text-sm mb-1 line-clamp-1" title={doc.title || doc.fileName}>
+                                                                        {doc.title || doc.fileName?.replace('.html', '') || 'مستند'}
+                                                                    </h4>
+                                                                    <div className="flex items-center gap-2 text-xs text-slate-400">
+                                                                        <span>{new Date(doc.createdAt).toLocaleDateString('ar-SA')}</span>
+                                                                    </div>
+                                                                </div>
+                                                                <div className="pt-3 border-t border-emerald-50 flex gap-2">
+                                                                    <Button
+                                                                        variant="outline"
+                                                                        size="sm"
+                                                                        className="flex-1 h-8 text-xs border-emerald-200 text-emerald-700 hover:bg-emerald-50"
+                                                                        onClick={() => handleOpenDocumentEditor(doc._id)}
+                                                                    >
+                                                                        <Edit3 className="h-3 w-3 ml-1" />
+                                                                        تحرير
+                                                                    </Button>
+                                                                </div>
+                                                            </div>
+                                                        ))}
+                                                    </>
+                                                )}
                                             </div>
                                         </TabsContent>
 
@@ -1438,7 +1543,10 @@ export function TaskDetailsView() {
                 onOpenChange={handleCloseDocumentEditor}
                 taskId={taskId}
                 documentId={editingDocumentId}
-                onSuccess={() => forceRefreshTask()}
+                onSuccess={async () => {
+                    await refetchDocuments()
+                    await forceRefreshTask()
+                }}
             />
         </>
     )
