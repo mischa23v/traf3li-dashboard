@@ -190,7 +190,8 @@ export function TaskDetailsView() {
     }
 
     // Preview attachment handler - fetches URL on demand for S3 files
-    const handlePreviewAttachment = async (attachmentId: string, existingUrl?: string, storageType?: string) => {
+    // Smart viewer: uses Microsoft Office Online for Office files, native browser for others
+    const handlePreviewAttachment = async (attachmentId: string, fileName: string, existingUrl?: string, storageType?: string) => {
         try {
             let url = existingUrl
 
@@ -213,11 +214,44 @@ export function TaskDetailsView() {
                 }
             }
 
-            if (url) {
-                window.open(getFullDocumentUrl(url), '_blank')
-            } else {
+            if (!url) {
                 toast.error('لا يمكن معاينة الملف - الرابط غير متوفر')
+                return
             }
+
+            const fullUrl = getFullDocumentUrl(url)
+            const ext = fileName?.split('.').pop()?.toLowerCase() || ''
+
+            // File type sets for smart viewer selection
+            const officeExts = new Set(['doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx'])
+            const nativeExts = new Set(['pdf', 'png', 'jpg', 'jpeg', 'gif', 'webp', 'txt', 'csv', 'mp3', 'wav', 'mp4', 'webm'])
+
+            // Use Microsoft Office Online Viewer for Office files
+            if (officeExts.has(ext)) {
+                // Office Online Viewer works best with URLs under 2000 characters
+                // For longer signed URLs, it may fail - fall back to download
+                if (fullUrl.length < 2000) {
+                    const officeViewerUrl = `https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(fullUrl)}`
+                    window.open(officeViewerUrl, '_blank')
+                } else {
+                    // Long URL - try download instead with a warning
+                    toast.info('جاري تحميل الملف... (الرابط طويل جداً للمعاينة)')
+                    const a = document.createElement('a')
+                    a.href = fullUrl
+                    a.download = fileName
+                    a.click()
+                }
+                return
+            }
+
+            // Native browser viewing for PDF, images, text, audio, video
+            if (nativeExts.has(ext) || ext === 'pdf') {
+                window.open(fullUrl, '_blank')
+                return
+            }
+
+            // Unknown file type - attempt to open, browser will handle or download
+            window.open(fullUrl, '_blank')
         } catch (error) {
             console.error('Preview attachment error:', error)
             toast.error('فشل في معاينة الملف')
@@ -1366,7 +1400,7 @@ export function TaskDetailsView() {
                                                                     </Button>
                                                                 </DropdownMenuTrigger>
                                                                 <DropdownMenuContent align="end">
-                                                                    <DropdownMenuItem onClick={() => handlePreviewAttachment(doc._id, doc.url, doc.storageType)}>
+                                                                    <DropdownMenuItem onClick={() => handlePreviewAttachment(doc._id, doc.name, doc.url, doc.storageType)}>
                                                                         <Eye className="h-4 w-4 ml-2" /> معاينة
                                                                     </DropdownMenuItem>
                                                                     <DropdownMenuItem onClick={() => handleDownloadAttachment(doc._id, doc.name, doc.url, doc.storageType)}>
@@ -1394,7 +1428,7 @@ export function TaskDetailsView() {
                                                                 variant="outline"
                                                                 size="sm"
                                                                 className="flex-1 h-8 text-xs"
-                                                                onClick={() => handlePreviewAttachment(doc._id, doc.url, doc.storageType)}
+                                                                onClick={() => handlePreviewAttachment(doc._id, doc.name, doc.url, doc.storageType)}
                                                             >
                                                                 معاينة
                                                             </Button>
