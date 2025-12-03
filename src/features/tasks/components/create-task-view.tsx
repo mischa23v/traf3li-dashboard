@@ -116,6 +116,47 @@ export function CreateTaskView() {
     // Tags input
     const [tagInput, setTagInput] = useState('')
 
+    // Form validation state
+    const [errors, setErrors] = useState<Record<string, string>>({})
+    const [touched, setTouched] = useState<Record<string, boolean>>({})
+
+    // Validate a single field
+    const validateField = (field: string, value: any): string => {
+        switch (field) {
+            case 'title':
+                if (!value || !value.trim()) return 'عنوان المهمة مطلوب'
+                if (value.length < 3) return 'يجب أن يكون العنوان 3 أحرف على الأقل'
+                return ''
+            case 'dueDate':
+                if (!value) return 'تاريخ الاستحقاق مطلوب'
+                return ''
+            default:
+                return ''
+        }
+    }
+
+    // Handle field blur for validation
+    const handleBlur = (field: string) => {
+        setTouched(prev => ({ ...prev, [field]: true }))
+        const error = validateField(field, formData[field as keyof typeof formData])
+        setErrors(prev => ({ ...prev, [field]: error }))
+    }
+
+    // Validate all required fields
+    const validateForm = (): boolean => {
+        const newErrors: Record<string, string> = {}
+        const requiredFields = ['title', 'dueDate']
+
+        requiredFields.forEach(field => {
+            const error = validateField(field, formData[field as keyof typeof formData])
+            if (error) newErrors[field] = error
+        })
+
+        setErrors(newErrors)
+        setTouched(requiredFields.reduce((acc, field) => ({ ...acc, [field]: true }), {}))
+        return Object.keys(newErrors).length === 0
+    }
+
     const handleChange = (field: string, value: any) => {
         setFormData(prev => ({ ...prev, [field]: value }))
     }
@@ -177,6 +218,11 @@ export function CreateTaskView() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
+
+        // Validate form before submission
+        if (!validateForm()) {
+            return
+        }
 
         const taskData = {
             title: formData.title,
@@ -295,11 +341,17 @@ export function CreateTaskView() {
                                             </label>
                                             <Input
                                                 placeholder="مثال: مراجعة العقد النهائي"
-                                                className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500"
-                                                required
+                                                className={cn(
+                                                    "rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500",
+                                                    touched.title && errors.title && "border-red-500 focus:border-red-500 focus:ring-red-500/20"
+                                                )}
                                                 value={formData.title}
                                                 onChange={(e) => handleChange('title', e.target.value)}
+                                                onBlur={() => handleBlur('title')}
                                             />
+                                            {touched.title && errors.title && (
+                                                <p className="text-sm text-red-500 mt-1">{errors.title}</p>
+                                            )}
                                         </div>
                                         <div className="space-y-2">
                                             <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
@@ -416,11 +468,17 @@ export function CreateTaskView() {
                                             </label>
                                             <Input
                                                 type="date"
-                                                className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500"
-                                                required
+                                                className={cn(
+                                                    "rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500",
+                                                    touched.dueDate && errors.dueDate && "border-red-500 focus:border-red-500 focus:ring-red-500/20"
+                                                )}
                                                 value={formData.dueDate}
                                                 onChange={(e) => handleChange('dueDate', e.target.value)}
+                                                onBlur={() => handleBlur('dueDate')}
                                             />
+                                            {touched.dueDate && errors.dueDate && (
+                                                <p className="text-sm text-red-500 mt-1">{errors.dueDate}</p>
+                                            )}
                                         </div>
                                         <div className="space-y-2">
                                             <label className="text-sm font-medium text-slate-700 flex items-center gap-2">

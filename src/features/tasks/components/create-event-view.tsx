@@ -214,6 +214,51 @@ export function CreateEventView() {
     const [showReminders, setShowReminders] = useState(false)
     const [showBilling, setShowBilling] = useState(false)
 
+    // Form validation state
+    const [errors, setErrors] = useState<Record<string, string>>({})
+    const [touched, setTouched] = useState<Record<string, boolean>>({})
+
+    // Validate a single field
+    const validateField = (field: string, value: any): string => {
+        switch (field) {
+            case 'title':
+                if (!value || !value.trim()) return 'عنوان الحدث مطلوب'
+                if (value.length < 3) return 'يجب أن يكون العنوان 3 أحرف على الأقل'
+                return ''
+            case 'startDate':
+                if (!value) return 'تاريخ البداية مطلوب'
+                return ''
+            case 'startTime':
+                if (!formData.allDay && !value) return 'وقت البداية مطلوب'
+                return ''
+            default:
+                return ''
+        }
+    }
+
+    // Handle field blur for validation
+    const handleBlur = (field: string) => {
+        setTouched(prev => ({ ...prev, [field]: true }))
+        const error = validateField(field, formData[field as keyof typeof formData])
+        setErrors(prev => ({ ...prev, [field]: error }))
+    }
+
+    // Validate all required fields
+    const validateForm = (): boolean => {
+        const newErrors: Record<string, string> = {}
+        const requiredFields = ['title', 'startDate']
+        if (!formData.allDay) requiredFields.push('startTime')
+
+        requiredFields.forEach(field => {
+            const error = validateField(field, formData[field as keyof typeof formData])
+            if (error) newErrors[field] = error
+        })
+
+        setErrors(newErrors)
+        setTouched(requiredFields.reduce((acc, field) => ({ ...acc, [field]: true }), {}))
+        return Object.keys(newErrors).length === 0
+    }
+
     const handleChange = (field: string, value: any) => {
         setFormData(prev => ({ ...prev, [field]: value }))
     }
@@ -276,6 +321,11 @@ export function CreateEventView() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
+
+        // Validate form before submission
+        if (!validateForm()) {
+            return
+        }
 
         // Combine date and time into ISO 8601 datetime
         const startDateTime = formData.startDate && formData.startTime
@@ -383,11 +433,17 @@ export function CreateEventView() {
                                         </label>
                                         <Input
                                             placeholder="مثال: اجتماع مراجعة العقد"
-                                            className="rounded-xl border-slate-200 focus:border-blue-500 focus:ring-blue-500"
-                                            required
+                                            className={cn(
+                                                "rounded-xl border-slate-200 focus:border-blue-500 focus:ring-blue-500",
+                                                touched.title && errors.title && "border-red-500 focus:border-red-500 focus:ring-red-500/20"
+                                            )}
                                             value={formData.title}
                                             onChange={(e) => handleChange('title', e.target.value)}
+                                            onBlur={() => handleBlur('title')}
                                         />
+                                        {touched.title && errors.title && (
+                                            <p className="text-sm text-red-500 mt-1">{errors.title}</p>
+                                        )}
                                     </div>
 
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -428,25 +484,41 @@ export function CreateEventView() {
 
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                         <div className="space-y-2">
-                                            <label className="text-sm font-medium text-slate-700">تاريخ البداية</label>
+                                            <label className="text-sm font-medium text-slate-700">
+                                                تاريخ البداية <span className="text-red-500">*</span>
+                                            </label>
                                             <Input
                                                 type="date"
-                                                className="rounded-xl"
-                                                required
+                                                className={cn(
+                                                    "rounded-xl",
+                                                    touched.startDate && errors.startDate && "border-red-500 focus:border-red-500 focus:ring-red-500/20"
+                                                )}
                                                 value={formData.startDate}
                                                 onChange={(e) => handleChange('startDate', e.target.value)}
+                                                onBlur={() => handleBlur('startDate')}
                                             />
+                                            {touched.startDate && errors.startDate && (
+                                                <p className="text-sm text-red-500 mt-1">{errors.startDate}</p>
+                                            )}
                                         </div>
                                         <div className="space-y-2">
-                                            <label className="text-sm font-medium text-slate-700">وقت البداية</label>
+                                            <label className="text-sm font-medium text-slate-700">
+                                                وقت البداية {!formData.allDay && <span className="text-red-500">*</span>}
+                                            </label>
                                             <Input
                                                 type="time"
-                                                className="rounded-xl"
-                                                required={!formData.allDay}
+                                                className={cn(
+                                                    "rounded-xl",
+                                                    touched.startTime && errors.startTime && "border-red-500 focus:border-red-500 focus:ring-red-500/20"
+                                                )}
                                                 disabled={formData.allDay}
                                                 value={formData.startTime}
                                                 onChange={(e) => handleChange('startTime', e.target.value)}
+                                                onBlur={() => handleBlur('startTime')}
                                             />
+                                            {touched.startTime && errors.startTime && (
+                                                <p className="text-sm text-red-500 mt-1">{errors.startTime}</p>
+                                            )}
                                         </div>
                                     </div>
 
