@@ -16,6 +16,8 @@ import tasksService, {
   WorkflowRule,
   TaskOutcome,
   TimeBudget,
+  Comment,
+  TaskDocument,
 } from '@/services/tasksService'
 
 // ==================== Query Hooks ====================
@@ -233,12 +235,37 @@ export const useAddSubtask = () => {
   return useMutation({
     mutationFn: ({ taskId, subtask }: { taskId: string; subtask: Omit<Subtask, '_id' | 'order'> }) =>
       tasksService.addSubtask(taskId, subtask),
-    onSuccess: (_, { taskId }) => {
-      queryClient.invalidateQueries({ queryKey: ['tasks', taskId] })
+    // Optimistic update - add subtask to UI immediately
+    onMutate: async ({ taskId, subtask }) => {
+      await queryClient.cancelQueries({ queryKey: ['tasks', taskId] })
+      const previousTask = queryClient.getQueryData<Task>(['tasks', taskId])
+
+      if (previousTask) {
+        const tempId = `temp-${Date.now()}`
+        const newSubtask: Subtask = {
+          _id: tempId,
+          ...subtask,
+          order: (previousTask.subtasks?.length || 0) + 1
+        }
+        queryClient.setQueryData<Task>(['tasks', taskId], {
+          ...previousTask,
+          subtasks: [...(previousTask.subtasks || []), newSubtask]
+        })
+      }
+
+      return { previousTask }
+    },
+    onError: (error: Error, { taskId }, context) => {
+      if (context?.previousTask) {
+        queryClient.setQueryData(['tasks', taskId], context.previousTask)
+      }
+      toast.error(error.message || 'فشل إضافة المهمة الفرعية')
+    },
+    onSuccess: () => {
       toast.success('تم إضافة المهمة الفرعية')
     },
-    onError: (error: Error) => {
-      toast.error(error.message || 'فشل إضافة المهمة الفرعية')
+    onSettled: (_, __, { taskId }) => {
+      queryClient.invalidateQueries({ queryKey: ['tasks', taskId] })
     },
   })
 }
@@ -249,11 +276,29 @@ export const useUpdateSubtask = () => {
   return useMutation({
     mutationFn: ({ taskId, subtaskId, data }: { taskId: string; subtaskId: string; data: Partial<Subtask> }) =>
       tasksService.updateSubtask(taskId, subtaskId, data),
-    onSuccess: (_, { taskId }) => {
-      queryClient.invalidateQueries({ queryKey: ['tasks', taskId] })
+    onMutate: async ({ taskId, subtaskId, data }) => {
+      await queryClient.cancelQueries({ queryKey: ['tasks', taskId] })
+      const previousTask = queryClient.getQueryData<Task>(['tasks', taskId])
+
+      if (previousTask) {
+        queryClient.setQueryData<Task>(['tasks', taskId], {
+          ...previousTask,
+          subtasks: previousTask.subtasks?.map(s =>
+            s._id === subtaskId ? { ...s, ...data } : s
+          ) || []
+        })
+      }
+
+      return { previousTask }
     },
-    onError: (error: Error) => {
+    onError: (error: Error, { taskId }, context) => {
+      if (context?.previousTask) {
+        queryClient.setQueryData(['tasks', taskId], context.previousTask)
+      }
       toast.error(error.message || 'فشل تحديث المهمة الفرعية')
+    },
+    onSettled: (_, __, { taskId }) => {
+      queryClient.invalidateQueries({ queryKey: ['tasks', taskId] })
     },
   })
 }
@@ -264,11 +309,30 @@ export const useToggleSubtask = () => {
   return useMutation({
     mutationFn: ({ taskId, subtaskId }: { taskId: string; subtaskId: string }) =>
       tasksService.toggleSubtask(taskId, subtaskId),
-    onSuccess: (_, { taskId }) => {
-      queryClient.invalidateQueries({ queryKey: ['tasks', taskId] })
+    // Optimistic update - toggle immediately
+    onMutate: async ({ taskId, subtaskId }) => {
+      await queryClient.cancelQueries({ queryKey: ['tasks', taskId] })
+      const previousTask = queryClient.getQueryData<Task>(['tasks', taskId])
+
+      if (previousTask) {
+        queryClient.setQueryData<Task>(['tasks', taskId], {
+          ...previousTask,
+          subtasks: previousTask.subtasks?.map(s =>
+            s._id === subtaskId ? { ...s, completed: !s.completed } : s
+          ) || []
+        })
+      }
+
+      return { previousTask }
     },
-    onError: (error: Error) => {
+    onError: (error: Error, { taskId }, context) => {
+      if (context?.previousTask) {
+        queryClient.setQueryData(['tasks', taskId], context.previousTask)
+      }
       toast.error(error.message || 'فشل تحديث المهمة الفرعية')
+    },
+    onSettled: (_, __, { taskId }) => {
+      queryClient.invalidateQueries({ queryKey: ['tasks', taskId] })
     },
   })
 }
@@ -279,12 +343,31 @@ export const useDeleteSubtask = () => {
   return useMutation({
     mutationFn: ({ taskId, subtaskId }: { taskId: string; subtaskId: string }) =>
       tasksService.deleteSubtask(taskId, subtaskId),
-    onSuccess: (_, { taskId }) => {
-      queryClient.invalidateQueries({ queryKey: ['tasks', taskId] })
+    // Optimistic update - remove immediately
+    onMutate: async ({ taskId, subtaskId }) => {
+      await queryClient.cancelQueries({ queryKey: ['tasks', taskId] })
+      const previousTask = queryClient.getQueryData<Task>(['tasks', taskId])
+
+      if (previousTask) {
+        queryClient.setQueryData<Task>(['tasks', taskId], {
+          ...previousTask,
+          subtasks: previousTask.subtasks?.filter(s => s._id !== subtaskId) || []
+        })
+      }
+
+      return { previousTask }
+    },
+    onError: (error: Error, { taskId }, context) => {
+      if (context?.previousTask) {
+        queryClient.setQueryData(['tasks', taskId], context.previousTask)
+      }
+      toast.error(error.message || 'فشل حذف المهمة الفرعية')
+    },
+    onSuccess: () => {
       toast.success('تم حذف المهمة الفرعية')
     },
-    onError: (error: Error) => {
-      toast.error(error.message || 'فشل حذف المهمة الفرعية')
+    onSettled: (_, __, { taskId }) => {
+      queryClient.invalidateQueries({ queryKey: ['tasks', taskId] })
     },
   })
 }
@@ -364,12 +447,38 @@ export const useAddComment = () => {
   return useMutation({
     mutationFn: ({ taskId, text, mentions }: { taskId: string; text: string; mentions?: string[] }) =>
       tasksService.addComment(taskId, text, mentions),
-    onSuccess: (_, { taskId }) => {
-      queryClient.invalidateQueries({ queryKey: ['tasks', taskId] })
+    // Optimistic update - add comment immediately
+    onMutate: async ({ taskId, text, mentions }) => {
+      await queryClient.cancelQueries({ queryKey: ['tasks', taskId] })
+      const previousTask = queryClient.getQueryData<Task>(['tasks', taskId])
+
+      if (previousTask) {
+        const newComment: Comment = {
+          _id: `temp-${Date.now()}`,
+          userId: 'current-user',
+          text,
+          mentions,
+          createdAt: new Date().toISOString()
+        }
+        queryClient.setQueryData<Task>(['tasks', taskId], {
+          ...previousTask,
+          comments: [...(previousTask.comments || []), newComment]
+        })
+      }
+
+      return { previousTask }
+    },
+    onError: (error: Error, { taskId }, context) => {
+      if (context?.previousTask) {
+        queryClient.setQueryData(['tasks', taskId], context.previousTask)
+      }
+      toast.error(error.message || 'فشل إضافة التعليق')
+    },
+    onSuccess: () => {
       toast.success('تم إضافة التعليق')
     },
-    onError: (error: Error) => {
-      toast.error(error.message || 'فشل إضافة التعليق')
+    onSettled: (_, __, { taskId }) => {
+      queryClient.invalidateQueries({ queryKey: ['tasks', taskId] })
     },
   })
 }
@@ -380,12 +489,32 @@ export const useUpdateComment = () => {
   return useMutation({
     mutationFn: ({ taskId, commentId, text }: { taskId: string; commentId: string; text: string }) =>
       tasksService.updateComment(taskId, commentId, text),
-    onSuccess: (_, { taskId }) => {
-      queryClient.invalidateQueries({ queryKey: ['tasks', taskId] })
+    onMutate: async ({ taskId, commentId, text }) => {
+      await queryClient.cancelQueries({ queryKey: ['tasks', taskId] })
+      const previousTask = queryClient.getQueryData<Task>(['tasks', taskId])
+
+      if (previousTask) {
+        queryClient.setQueryData<Task>(['tasks', taskId], {
+          ...previousTask,
+          comments: previousTask.comments?.map(c =>
+            c._id === commentId ? { ...c, text, isEdited: true, updatedAt: new Date().toISOString() } : c
+          ) || []
+        })
+      }
+
+      return { previousTask }
+    },
+    onError: (error: Error, { taskId }, context) => {
+      if (context?.previousTask) {
+        queryClient.setQueryData(['tasks', taskId], context.previousTask)
+      }
+      toast.error(error.message || 'فشل تحديث التعليق')
+    },
+    onSuccess: () => {
       toast.success('تم تحديث التعليق')
     },
-    onError: (error: Error) => {
-      toast.error(error.message || 'فشل تحديث التعليق')
+    onSettled: (_, __, { taskId }) => {
+      queryClient.invalidateQueries({ queryKey: ['tasks', taskId] })
     },
   })
 }
@@ -396,12 +525,31 @@ export const useDeleteComment = () => {
   return useMutation({
     mutationFn: ({ taskId, commentId }: { taskId: string; commentId: string }) =>
       tasksService.deleteComment(taskId, commentId),
-    onSuccess: (_, { taskId }) => {
-      queryClient.invalidateQueries({ queryKey: ['tasks', taskId] })
+    // Optimistic update - remove comment immediately
+    onMutate: async ({ taskId, commentId }) => {
+      await queryClient.cancelQueries({ queryKey: ['tasks', taskId] })
+      const previousTask = queryClient.getQueryData<Task>(['tasks', taskId])
+
+      if (previousTask) {
+        queryClient.setQueryData<Task>(['tasks', taskId], {
+          ...previousTask,
+          comments: previousTask.comments?.filter(c => c._id !== commentId) || []
+        })
+      }
+
+      return { previousTask }
+    },
+    onError: (error: Error, { taskId }, context) => {
+      if (context?.previousTask) {
+        queryClient.setQueryData(['tasks', taskId], context.previousTask)
+      }
+      toast.error(error.message || 'فشل حذف التعليق')
+    },
+    onSuccess: () => {
       toast.success('تم حذف التعليق')
     },
-    onError: (error: Error) => {
-      toast.error(error.message || 'فشل حذف التعليق')
+    onSettled: (_, __, { taskId }) => {
+      queryClient.invalidateQueries({ queryKey: ['tasks', taskId] })
     },
   })
 }
@@ -430,12 +578,38 @@ export const useDeleteTaskAttachment = () => {
   return useMutation({
     mutationFn: ({ taskId, attachmentId }: { taskId: string; attachmentId: string }) =>
       tasksService.deleteAttachment(taskId, attachmentId),
-    onSuccess: (_, { taskId }) => {
-      queryClient.invalidateQueries({ queryKey: ['tasks', taskId] })
+    // Optimistic update - immediately remove from UI
+    onMutate: async ({ taskId, attachmentId }) => {
+      // Cancel any outgoing refetches so they don't overwrite our optimistic update
+      await queryClient.cancelQueries({ queryKey: ['tasks', taskId] })
+
+      // Snapshot the previous value
+      const previousTask = queryClient.getQueryData<Task>(['tasks', taskId])
+
+      // Optimistically update the cache - remove the attachment immediately
+      if (previousTask) {
+        queryClient.setQueryData<Task>(['tasks', taskId], {
+          ...previousTask,
+          attachments: previousTask.attachments?.filter(a => a._id !== attachmentId) || []
+        })
+      }
+
+      // Return context with the previous value for rollback
+      return { previousTask }
+    },
+    onError: (error: Error, { taskId }, context) => {
+      // Roll back to the previous value on error
+      if (context?.previousTask) {
+        queryClient.setQueryData(['tasks', taskId], context.previousTask)
+      }
+      toast.error(error.message || 'فشل حذف المرفق')
+    },
+    onSuccess: () => {
       toast.success('تم حذف المرفق')
     },
-    onError: (error: Error) => {
-      toast.error(error.message || 'فشل حذف المرفق')
+    onSettled: (_, __, { taskId }) => {
+      // Always refetch after error or success to ensure we have correct server state
+      queryClient.invalidateQueries({ queryKey: ['tasks', taskId] })
     },
   })
 }
@@ -867,13 +1041,16 @@ export const useCreateDocument = () => {
       content: string
       contentJson?: any
     }) => tasksService.createDocument(taskId, title, content, contentJson),
-    onSuccess: (_, { taskId }) => {
-      queryClient.invalidateQueries({ queryKey: ['tasks', taskId] })
-      queryClient.invalidateQueries({ queryKey: ['tasks', taskId, 'documents'] })
+    onSuccess: () => {
       toast.success('تم إنشاء المستند')
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل إنشاء المستند')
+    },
+    // Use onSettled with await to ensure mutation stays pending until refetch completes
+    onSettled: async (_, __, { taskId }) => {
+      await queryClient.invalidateQueries({ queryKey: ['tasks', taskId] })
+      return await queryClient.invalidateQueries({ queryKey: ['tasks', taskId, 'documents'] })
     },
   })
 }
@@ -887,14 +1064,17 @@ export const useUpdateDocument = () => {
       documentId: string
       data: { title?: string; content?: string; contentJson?: any }
     }) => tasksService.updateDocument(taskId, documentId, data),
-    onSuccess: (_, { taskId, documentId }) => {
-      queryClient.invalidateQueries({ queryKey: ['tasks', taskId] })
-      queryClient.invalidateQueries({ queryKey: ['tasks', taskId, 'documents'] })
-      queryClient.invalidateQueries({ queryKey: ['tasks', taskId, 'documents', documentId] })
+    onSuccess: () => {
       toast.success('تم حفظ المستند')
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل حفظ المستند')
+    },
+    // Use onSettled with await to ensure mutation stays pending until refetch completes
+    onSettled: async (_, __, { taskId, documentId }) => {
+      await queryClient.invalidateQueries({ queryKey: ['tasks', taskId] })
+      await queryClient.invalidateQueries({ queryKey: ['tasks', taskId, 'documents'] })
+      return await queryClient.invalidateQueries({ queryKey: ['tasks', taskId, 'documents', documentId] })
     },
   })
 }
@@ -905,13 +1085,33 @@ export const useDeleteDocument = () => {
   return useMutation({
     mutationFn: ({ taskId, documentId }: { taskId: string; documentId: string }) =>
       tasksService.deleteDocument(taskId, documentId),
-    onSuccess: (_, { taskId }) => {
-      queryClient.invalidateQueries({ queryKey: ['tasks', taskId] })
-      queryClient.invalidateQueries({ queryKey: ['tasks', taskId, 'documents'] })
+    // Optimistic update - remove document immediately from UI
+    onMutate: async ({ taskId, documentId }) => {
+      await queryClient.cancelQueries({ queryKey: ['tasks', taskId, 'documents'] })
+      const previousDocs = queryClient.getQueryData<{ documents: TaskDocument[] }>(['tasks', taskId, 'documents'])
+
+      if (previousDocs) {
+        queryClient.setQueryData<{ documents: TaskDocument[] }>(['tasks', taskId, 'documents'], {
+          documents: previousDocs.documents?.filter(d => d._id !== documentId) || []
+        })
+      }
+
+      return { previousDocs }
+    },
+    onSuccess: () => {
       toast.success('تم حذف المستند')
     },
-    onError: (error: Error) => {
+    onError: (error: Error, { taskId }, context) => {
+      // Rollback on error
+      if (context?.previousDocs) {
+        queryClient.setQueryData(['tasks', taskId, 'documents'], context.previousDocs)
+      }
       toast.error(error.message || 'فشل حذف المستند')
+    },
+    // Use onSettled with await to ensure mutation stays pending until refetch completes
+    onSettled: async (_, __, { taskId }) => {
+      await queryClient.invalidateQueries({ queryKey: ['tasks', taskId] })
+      return await queryClient.invalidateQueries({ queryKey: ['tasks', taskId, 'documents'] })
     },
   })
 }
