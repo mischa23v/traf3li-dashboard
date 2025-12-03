@@ -16,6 +16,8 @@ import tasksService, {
   WorkflowRule,
   TaskOutcome,
   TimeBudget,
+  Comment,
+  TaskDocument,
 } from '@/services/tasksService'
 
 // ==================== Query Hooks ====================
@@ -1039,13 +1041,16 @@ export const useCreateDocument = () => {
       content: string
       contentJson?: any
     }) => tasksService.createDocument(taskId, title, content, contentJson),
-    onSuccess: (_, { taskId }) => {
-      queryClient.invalidateQueries({ queryKey: ['tasks', taskId] })
-      queryClient.invalidateQueries({ queryKey: ['tasks', taskId, 'documents'] })
+    onSuccess: () => {
       toast.success('تم إنشاء المستند')
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل إنشاء المستند')
+    },
+    // Use onSettled with await to ensure mutation stays pending until refetch completes
+    onSettled: async (_, __, { taskId }) => {
+      await queryClient.invalidateQueries({ queryKey: ['tasks', taskId] })
+      return await queryClient.invalidateQueries({ queryKey: ['tasks', taskId, 'documents'] })
     },
   })
 }
@@ -1059,14 +1064,17 @@ export const useUpdateDocument = () => {
       documentId: string
       data: { title?: string; content?: string; contentJson?: any }
     }) => tasksService.updateDocument(taskId, documentId, data),
-    onSuccess: (_, { taskId, documentId }) => {
-      queryClient.invalidateQueries({ queryKey: ['tasks', taskId] })
-      queryClient.invalidateQueries({ queryKey: ['tasks', taskId, 'documents'] })
-      queryClient.invalidateQueries({ queryKey: ['tasks', taskId, 'documents', documentId] })
+    onSuccess: () => {
       toast.success('تم حفظ المستند')
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل حفظ المستند')
+    },
+    // Use onSettled with await to ensure mutation stays pending until refetch completes
+    onSettled: async (_, __, { taskId, documentId }) => {
+      await queryClient.invalidateQueries({ queryKey: ['tasks', taskId] })
+      await queryClient.invalidateQueries({ queryKey: ['tasks', taskId, 'documents'] })
+      return await queryClient.invalidateQueries({ queryKey: ['tasks', taskId, 'documents', documentId] })
     },
   })
 }
@@ -1077,13 +1085,33 @@ export const useDeleteDocument = () => {
   return useMutation({
     mutationFn: ({ taskId, documentId }: { taskId: string; documentId: string }) =>
       tasksService.deleteDocument(taskId, documentId),
-    onSuccess: (_, { taskId }) => {
-      queryClient.invalidateQueries({ queryKey: ['tasks', taskId] })
-      queryClient.invalidateQueries({ queryKey: ['tasks', taskId, 'documents'] })
+    // Optimistic update - remove document immediately from UI
+    onMutate: async ({ taskId, documentId }) => {
+      await queryClient.cancelQueries({ queryKey: ['tasks', taskId, 'documents'] })
+      const previousDocs = queryClient.getQueryData<{ documents: TaskDocument[] }>(['tasks', taskId, 'documents'])
+
+      if (previousDocs) {
+        queryClient.setQueryData<{ documents: TaskDocument[] }>(['tasks', taskId, 'documents'], {
+          documents: previousDocs.documents?.filter(d => d._id !== documentId) || []
+        })
+      }
+
+      return { previousDocs }
+    },
+    onSuccess: () => {
       toast.success('تم حذف المستند')
     },
-    onError: (error: Error) => {
+    onError: (error: Error, { taskId }, context) => {
+      // Rollback on error
+      if (context?.previousDocs) {
+        queryClient.setQueryData(['tasks', taskId, 'documents'], context.previousDocs)
+      }
       toast.error(error.message || 'فشل حذف المستند')
+    },
+    // Use onSettled with await to ensure mutation stays pending until refetch completes
+    onSettled: async (_, __, { taskId }) => {
+      await queryClient.invalidateQueries({ queryKey: ['tasks', taskId] })
+      return await queryClient.invalidateQueries({ queryKey: ['tasks', taskId, 'documents'] })
     },
   })
 }
