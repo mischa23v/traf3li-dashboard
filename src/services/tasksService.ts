@@ -1420,12 +1420,18 @@ const tasksService = {
 
   /**
    * Get a document
+   * Returns null document if not found (404)
    */
-  getDocument: async (taskId: string, documentId: string): Promise<{ document: TaskDocument }> => {
+  getDocument: async (taskId: string, documentId: string): Promise<{ document: TaskDocument | null }> => {
     try {
       const response = await apiClient.get(`/tasks/${taskId}/documents/${documentId}`)
       return response.data
     } catch (error: any) {
+      // Handle 404 gracefully
+      if (error?.response?.status === 404) {
+        console.warn('Document not found:', documentId)
+        return { document: null }
+      }
       console.error('Get document error:', error)
       throw new Error(handleApiError(error))
     }
@@ -1465,12 +1471,18 @@ const tasksService = {
 
   /**
    * Get all documents for a task
+   * Returns empty array if endpoint not implemented (404)
    */
   getDocuments: async (taskId: string): Promise<{ documents: TaskDocument[] }> => {
     try {
       const response = await apiClient.get(`/tasks/${taskId}/documents`)
       return response.data
     } catch (error: any) {
+      // Handle 404 gracefully - endpoint may not be implemented yet
+      if (error?.response?.status === 404) {
+        console.warn('Documents endpoint not available for task:', taskId)
+        return { documents: [] }
+      }
       console.error('Get documents error:', error)
       throw new Error(handleApiError(error))
     }
