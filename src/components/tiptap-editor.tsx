@@ -1,4 +1,6 @@
 import { useEditor, EditorContent } from '@tiptap/react'
+import { BubbleMenu } from '@tiptap/extension-bubble-menu'
+import { FloatingMenu } from '@tiptap/extension-floating-menu'
 import { useEffect, useCallback } from 'react'
 import StarterKit from '@tiptap/starter-kit'
 import TextAlign from '@tiptap/extension-text-align'
@@ -19,7 +21,7 @@ import {
     Bold, Italic, Strikethrough, Underline as UnderlineIcon, AlignRight, AlignCenter, AlignLeft, AlignJustify,
     Heading1, Heading2, Heading3, List, ListOrdered, Quote, Image as ImageIcon,
     Link as LinkIcon, Unlink, Undo, Redo, Highlighter, Palette, Table as TableIcon,
-    Plus, Trash2, Code, Minus, Rows3, Columns3
+    Plus, Trash2, Code, Minus, Rows3, Columns3, Type
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import {
@@ -510,6 +512,162 @@ export const TipTapEditor = ({
                         <Redo className="h-4 w-4" />
                     </ToolbarButton>
                 </div>
+            )}
+
+            {/* Bubble Menu - appears when selecting text */}
+            {editor && editable && (
+                <BubbleMenu
+                    editor={editor}
+                    tippyOptions={{ duration: 100 }}
+                    className="bg-white shadow-lg border rounded-lg p-1 flex gap-1"
+                >
+                    <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => editor.chain().focus().toggleBold().run()}
+                        className={cn('h-8 w-8', editor.isActive('bold') && 'bg-slate-200')}
+                    >
+                        <Bold className="h-4 w-4" />
+                    </Button>
+                    <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => editor.chain().focus().toggleItalic().run()}
+                        className={cn('h-8 w-8', editor.isActive('italic') && 'bg-slate-200')}
+                    >
+                        <Italic className="h-4 w-4" />
+                    </Button>
+                    <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => editor.chain().focus().toggleUnderline().run()}
+                        className={cn('h-8 w-8', editor.isActive('underline') && 'bg-slate-200')}
+                    >
+                        <UnderlineIcon className="h-4 w-4" />
+                    </Button>
+                    <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => editor.chain().focus().toggleStrike().run()}
+                        className={cn('h-8 w-8', editor.isActive('strike') && 'bg-slate-200')}
+                    >
+                        <Strikethrough className="h-4 w-4" />
+                    </Button>
+                    <div className="w-px h-6 bg-slate-200 self-center mx-1" />
+                    <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => editor.chain().focus().toggleHighlight({ color: '#fef08a' }).run()}
+                        className={cn('h-8 w-8', editor.isActive('highlight') && 'bg-slate-200')}
+                    >
+                        <Highlighter className="h-4 w-4" />
+                    </Button>
+                    <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        onClick={addLink}
+                        className={cn('h-8 w-8', editor.isActive('link') && 'bg-slate-200')}
+                    >
+                        <LinkIcon className="h-4 w-4" />
+                    </Button>
+                    {editor.isActive('link') && (
+                        <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            onClick={removeLink}
+                            className="h-8 w-8"
+                        >
+                            <Unlink className="h-4 w-4" />
+                        </Button>
+                    )}
+                </BubbleMenu>
+            )}
+
+            {/* Floating Menu - appears on empty lines */}
+            {editor && editable && (
+                <FloatingMenu
+                    editor={editor}
+                    tippyOptions={{ duration: 100 }}
+                    className="bg-white shadow-lg border rounded-lg p-1 flex gap-1"
+                >
+                    <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
+                        className={cn('h-8 w-8', editor.isActive('heading', { level: 1 }) && 'bg-slate-200')}
+                        title="عنوان 1"
+                    >
+                        <Heading1 className="h-4 w-4" />
+                    </Button>
+                    <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
+                        className={cn('h-8 w-8', editor.isActive('heading', { level: 2 }) && 'bg-slate-200')}
+                        title="عنوان 2"
+                    >
+                        <Heading2 className="h-4 w-4" />
+                    </Button>
+                    <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => editor.chain().focus().toggleBulletList().run()}
+                        className={cn('h-8 w-8', editor.isActive('bulletList') && 'bg-slate-200')}
+                        title="قائمة نقطية"
+                    >
+                        <List className="h-4 w-4" />
+                    </Button>
+                    <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => editor.chain().focus().toggleOrderedList().run()}
+                        className={cn('h-8 w-8', editor.isActive('orderedList') && 'bg-slate-200')}
+                        title="قائمة مرقمة"
+                    >
+                        <ListOrdered className="h-4 w-4" />
+                    </Button>
+                    <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => editor.chain().focus().toggleBlockquote().run()}
+                        className={cn('h-8 w-8', editor.isActive('blockquote') && 'bg-slate-200')}
+                        title="اقتباس"
+                    >
+                        <Quote className="h-4 w-4" />
+                    </Button>
+                    <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => editor.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run()}
+                        className="h-8 w-8"
+                        title="إدراج جدول"
+                    >
+                        <TableIcon className="h-4 w-4" />
+                    </Button>
+                    <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        onClick={addImage}
+                        className="h-8 w-8"
+                        title="إدراج صورة"
+                    >
+                        <ImageIcon className="h-4 w-4" />
+                    </Button>
+                </FloatingMenu>
             )}
 
             {/* Editor Content */}
