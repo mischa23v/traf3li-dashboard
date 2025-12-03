@@ -22,6 +22,7 @@ import {
     CollapsibleContent,
     CollapsibleTrigger,
 } from "@/components/ui/collapsible"
+import { FieldTooltip } from '@/components/ui/field-tooltip'
 import { Header } from '@/components/layout/header'
 import { TopNav } from '@/components/layout/top-nav'
 import { DynamicIsland } from '@/components/dynamic-island'
@@ -32,6 +33,16 @@ import { ProductivityHero } from '@/components/productivity-hero'
 import { useCreateTask, useTaskTemplates, useCreateFromTemplate } from '@/hooks/useTasks'
 import { useClients, useCases, useTeamMembers } from '@/hooks/useCasesAndClients'
 import { cn } from '@/lib/utils'
+import {
+    ACTIVE_STATUS_OPTIONS,
+    MAIN_PRIORITY_OPTIONS,
+    CATEGORY_OPTIONS,
+    FREQUENCY_OPTIONS,
+    DAYS_OF_WEEK,
+    ASSIGNEE_STRATEGY_OPTIONS,
+    REMINDER_TYPE_OPTIONS,
+    FIELD_TOOLTIPS,
+} from '../constants/task-options'
 import type {
     TaskPriority,
     TaskStatus,
@@ -49,58 +60,6 @@ interface SubtaskInput {
     title: string
     autoReset?: boolean
 }
-
-const PRIORITY_OPTIONS: { value: TaskPriority; label: string; color: string }[] = [
-    { value: 'critical', label: 'حرج', color: 'bg-red-500' },
-    { value: 'high', label: 'عالية', color: 'bg-orange-500' },
-    { value: 'medium', label: 'متوسطة', color: 'bg-yellow-500' },
-    { value: 'low', label: 'منخفضة', color: 'bg-blue-500' },
-    { value: 'none', label: 'بدون', color: 'bg-slate-300' },
-]
-
-const STATUS_OPTIONS: { value: TaskStatus; label: string }[] = [
-    { value: 'backlog', label: 'قائمة الانتظار' },
-    { value: 'todo', label: 'للعمل' },
-    { value: 'in_progress', label: 'قيد التنفيذ' },
-]
-
-const LABEL_OPTIONS: { value: TaskLabel; label: string; color: string }[] = [
-    { value: 'urgent', label: 'عاجل', color: 'bg-red-100 text-red-800' },
-    { value: 'legal', label: 'قانوني', color: 'bg-purple-100 text-purple-800' },
-    { value: 'administrative', label: 'إداري', color: 'bg-blue-100 text-blue-800' },
-    { value: 'bug', label: 'خطأ', color: 'bg-red-100 text-red-800' },
-    { value: 'feature', label: 'ميزة', color: 'bg-green-100 text-green-800' },
-    { value: 'documentation', label: 'توثيق', color: 'bg-yellow-100 text-yellow-800' },
-    { value: 'enhancement', label: 'تحسين', color: 'bg-indigo-100 text-indigo-800' },
-    { value: 'question', label: 'استفسار', color: 'bg-cyan-100 text-cyan-800' },
-]
-
-const FREQUENCY_OPTIONS: { value: RecurrenceFrequency; label: string }[] = [
-    { value: 'daily', label: 'يومياً' },
-    { value: 'weekly', label: 'أسبوعياً' },
-    { value: 'biweekly', label: 'كل أسبوعين' },
-    { value: 'monthly', label: 'شهرياً' },
-    { value: 'quarterly', label: 'ربع سنوي' },
-    { value: 'yearly', label: 'سنوياً' },
-    { value: 'custom', label: 'مخصص' },
-]
-
-const DAYS_OF_WEEK = [
-    { value: 0, label: 'أحد' },
-    { value: 1, label: 'إثنين' },
-    { value: 2, label: 'ثلاثاء' },
-    { value: 3, label: 'أربعاء' },
-    { value: 4, label: 'خميس' },
-    { value: 5, label: 'جمعة' },
-    { value: 6, label: 'سبت' },
-]
-
-const ASSIGNEE_STRATEGY_OPTIONS: { value: AssigneeStrategy; label: string; description: string }[] = [
-    { value: 'fixed', label: 'ثابت', description: 'نفس الشخص دائماً' },
-    { value: 'round_robin', label: 'بالتناوب', description: 'توزيع تناوبي على الفريق' },
-    { value: 'random', label: 'عشوائي', description: 'اختيار عشوائي' },
-    { value: 'least_assigned', label: 'الأقل مهام', description: 'للشخص الأقل انشغالاً' },
-]
 
 export function CreateTaskView() {
     const { t } = useTranslation()
@@ -329,6 +288,7 @@ export function CreateTaskView() {
                                             <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
                                                 <FileText className="w-4 h-4 text-emerald-500" />
                                                 عنوان المهمة <span className="text-red-500">*</span>
+                                                <FieldTooltip content={FIELD_TOOLTIPS.title} />
                                             </label>
                                             <Input
                                                 placeholder="مثال: مراجعة العقد النهائي"
@@ -342,15 +302,19 @@ export function CreateTaskView() {
                                             <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
                                                 <ListTodo className="w-4 h-4 text-emerald-500" />
                                                 الحالة
+                                                <FieldTooltip content={FIELD_TOOLTIPS.status} />
                                             </label>
                                             <Select value={formData.status} onValueChange={(value) => handleChange('status', value)}>
                                                 <SelectTrigger className="rounded-xl border-slate-200 focus:ring-emerald-500">
                                                     <SelectValue placeholder="اختر الحالة" />
                                                 </SelectTrigger>
                                                 <SelectContent>
-                                                    {STATUS_OPTIONS.map(option => (
+                                                    {ACTIVE_STATUS_OPTIONS.map(option => (
                                                         <SelectItem key={option.value} value={option.value}>
-                                                            {option.label}
+                                                            <div className="flex items-center gap-2">
+                                                                <span className={cn("w-2 h-2 rounded-full", option.bgColor)} />
+                                                                {option.label}
+                                                            </div>
                                                         </SelectItem>
                                                     ))}
                                                 </SelectContent>
@@ -363,16 +327,17 @@ export function CreateTaskView() {
                                             <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
                                                 <Flag className="w-4 h-4 text-emerald-500" />
                                                 الأولوية
+                                                <FieldTooltip content={FIELD_TOOLTIPS.priority} />
                                             </label>
                                             <Select value={formData.priority} onValueChange={(value) => handleChange('priority', value)}>
                                                 <SelectTrigger className="rounded-xl border-slate-200 focus:ring-emerald-500">
                                                     <SelectValue placeholder="اختر الأولوية" />
                                                 </SelectTrigger>
                                                 <SelectContent>
-                                                    {PRIORITY_OPTIONS.map(option => (
+                                                    {MAIN_PRIORITY_OPTIONS.map(option => (
                                                         <SelectItem key={option.value} value={option.value}>
                                                             <div className="flex items-center gap-2">
-                                                                <span className={cn("w-2 h-2 rounded-full", option.color)} />
+                                                                <span className={cn("w-2 h-2 rounded-full", option.dotColor)} />
                                                                 {option.label}
                                                             </div>
                                                         </SelectItem>
@@ -384,15 +349,16 @@ export function CreateTaskView() {
                                             <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
                                                 <Tag className="w-4 h-4 text-emerald-500" />
                                                 التصنيف
+                                                <FieldTooltip content={FIELD_TOOLTIPS.category} />
                                             </label>
                                             <Select value={formData.label} onValueChange={(value) => handleChange('label', value)}>
                                                 <SelectTrigger className="rounded-xl border-slate-200 focus:ring-emerald-500">
                                                     <SelectValue placeholder="اختر التصنيف (اختياري)" />
                                                 </SelectTrigger>
                                                 <SelectContent>
-                                                    {LABEL_OPTIONS.map(option => (
+                                                    {CATEGORY_OPTIONS.map(option => (
                                                         <SelectItem key={option.value} value={option.value}>
-                                                            <Badge variant="secondary" className={cn("text-xs", option.color)}>
+                                                            <Badge variant="secondary" className={cn("text-xs", option.bgColor, option.color)}>
                                                                 {option.label}
                                                             </Badge>
                                                         </SelectItem>
@@ -407,6 +373,7 @@ export function CreateTaskView() {
                                         <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
                                             <Tag className="w-4 h-4 text-emerald-500" />
                                             الوسوم
+                                            <FieldTooltip content={FIELD_TOOLTIPS.tags} />
                                         </label>
                                         <div className="flex flex-wrap gap-2 mb-2">
                                             {formData.tags.map(tag => (
@@ -442,6 +409,7 @@ export function CreateTaskView() {
                                             <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
                                                 <Calendar className="w-4 h-4 text-emerald-500" />
                                                 تاريخ الاستحقاق <span className="text-red-500">*</span>
+                                                <FieldTooltip content={FIELD_TOOLTIPS.dueDate} />
                                             </label>
                                             <Input
                                                 type="date"
@@ -455,6 +423,7 @@ export function CreateTaskView() {
                                             <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
                                                 <Clock className="w-4 h-4 text-emerald-500" />
                                                 الوقت
+                                                <FieldTooltip content={FIELD_TOOLTIPS.dueTime} />
                                             </label>
                                             <Input
                                                 type="time"
@@ -467,6 +436,7 @@ export function CreateTaskView() {
                                             <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
                                                 <Clock className="w-4 h-4 text-emerald-500" />
                                                 الوقت المقدر (دقائق)
+                                                <FieldTooltip content={FIELD_TOOLTIPS.estimatedMinutes} />
                                             </label>
                                             <Input
                                                 type="number"
@@ -484,6 +454,7 @@ export function CreateTaskView() {
                                             <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
                                                 <User className="w-4 h-4 text-emerald-500" />
                                                 {t('tasks.client', 'العميل')}
+                                                <FieldTooltip content={FIELD_TOOLTIPS.client} />
                                             </label>
                                             <Select value={formData.clientId} onValueChange={(value) => handleChange('clientId', value)}>
                                                 <SelectTrigger className="rounded-xl border-slate-200 focus:ring-emerald-500">
@@ -513,6 +484,7 @@ export function CreateTaskView() {
                                             <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
                                                 <Scale className="w-4 h-4 text-emerald-500" />
                                                 {t('tasks.linkedCase', 'القضية المرتبطة')}
+                                                <FieldTooltip content={FIELD_TOOLTIPS.case} />
                                             </label>
                                             <Select value={formData.caseId} onValueChange={(value) => handleChange('caseId', value)}>
                                                 <SelectTrigger className="rounded-xl border-slate-200 focus:ring-emerald-500">
@@ -544,6 +516,7 @@ export function CreateTaskView() {
                                         <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
                                             <Users className="w-4 h-4 text-emerald-500" />
                                             {t('tasks.assignedTo', 'تعيين إلى')}
+                                            <FieldTooltip content={FIELD_TOOLTIPS.assignedTo} />
                                         </label>
                                         <Select value={formData.assignedTo} onValueChange={(value) => handleChange('assignedTo', value)}>
                                             <SelectTrigger className="rounded-xl border-slate-200 focus:ring-emerald-500">
@@ -574,6 +547,7 @@ export function CreateTaskView() {
                                         <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
                                             <FileText className="w-4 h-4 text-emerald-500" />
                                             وصف المهمة
+                                            <FieldTooltip content={FIELD_TOOLTIPS.description} />
                                         </label>
                                         <Textarea
                                             placeholder="أدخل تفاصيل إضافية عن المهمة..."
@@ -589,6 +563,7 @@ export function CreateTaskView() {
                                     <h3 className="text-lg font-semibold text-slate-800 mb-4 flex items-center gap-2">
                                         <ListTodo className="w-5 h-5 text-emerald-500" />
                                         المهام الفرعية
+                                        <FieldTooltip content={FIELD_TOOLTIPS.subtasks} />
                                     </h3>
                                     <div className="space-y-3">
                                         {subtasks.map((subtask) => (
@@ -643,6 +618,7 @@ export function CreateTaskView() {
                                                 <h3 className="text-lg font-semibold text-slate-800 flex items-center gap-2">
                                                     <Repeat className="w-5 h-5 text-emerald-500" />
                                                     مهمة متكررة
+                                                    <FieldTooltip content={FIELD_TOOLTIPS.recurring} />
                                                 </h3>
                                                 {showRecurring ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
                                             </Button>
@@ -790,6 +766,7 @@ export function CreateTaskView() {
                                                 <h3 className="text-lg font-semibold text-slate-800 flex items-center gap-2">
                                                     <Clock className="w-5 h-5 text-emerald-500" />
                                                     التذكيرات
+                                                    <FieldTooltip content={FIELD_TOOLTIPS.reminders} />
                                                 </h3>
                                                 {showAdvanced ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
                                             </Button>
@@ -806,9 +783,11 @@ export function CreateTaskView() {
                                                                 <SelectValue />
                                                             </SelectTrigger>
                                                             <SelectContent>
-                                                                <SelectItem value="notification">إشعار</SelectItem>
-                                                                <SelectItem value="email">بريد إلكتروني</SelectItem>
-                                                                <SelectItem value="sms">رسالة نصية</SelectItem>
+                                                                {REMINDER_TYPE_OPTIONS.map(option => (
+                                                                    <SelectItem key={option.value} value={option.value}>
+                                                                        {option.label}
+                                                                    </SelectItem>
+                                                                ))}
                                                             </SelectContent>
                                                         </Select>
                                                         <span className="text-slate-500">قبل</span>

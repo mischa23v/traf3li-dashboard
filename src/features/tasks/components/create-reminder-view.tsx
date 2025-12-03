@@ -42,11 +42,11 @@ import type {
     NotificationConfig
 } from '@/services/remindersService'
 
-const PRIORITY_OPTIONS: { value: ReminderPriority; label: string; color: string }[] = [
-    { value: 'critical', label: 'حرج', color: 'bg-red-500' },
-    { value: 'high', label: 'عالية', color: 'bg-orange-500' },
-    { value: 'medium', label: 'متوسطة', color: 'bg-yellow-500' },
-    { value: 'low', label: 'منخفضة', color: 'bg-blue-500' },
+const PRIORITY_OPTIONS: { value: ReminderPriority; label: string; color: string; tooltip: string }[] = [
+    { value: 'critical', label: 'عاجل جداً', color: 'bg-red-500', tooltip: 'تذكير عاجل جداً يتطلب إجراءً فورياً ولا يحتمل أي تأخير' },
+    { value: 'high', label: 'عاجل', color: 'bg-orange-500', tooltip: 'تذكير عاجل يجب الانتباه له في أقرب وقت ممكن' },
+    { value: 'medium', label: 'متوسطة', color: 'bg-yellow-500', tooltip: 'تذكير ذو أهمية متوسطة ضمن الجدول الزمني المعتاد' },
+    { value: 'low', label: 'عادية', color: 'bg-emerald-500', tooltip: 'تذكير عادي يمكن التعامل معه ضمن المواعيد الاعتيادية' },
 ]
 
 const TYPE_OPTIONS: { value: ReminderTypeLegacy; label: string }[] = [

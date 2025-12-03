@@ -56,11 +56,11 @@ const EVENT_TYPES: { value: EventType; label: string; color: string }[] = [
     { value: 'other', label: 'أخرى', color: 'bg-gray-100 text-gray-700' },
 ]
 
-const PRIORITY_OPTIONS: { value: EventPriority; label: string; color: string }[] = [
-    { value: 'critical', label: 'حرج', color: 'bg-red-500' },
-    { value: 'high', label: 'عالية', color: 'bg-orange-500' },
-    { value: 'medium', label: 'متوسطة', color: 'bg-yellow-500' },
-    { value: 'low', label: 'منخفضة', color: 'bg-blue-500' },
+const PRIORITY_OPTIONS: { value: EventPriority; label: string; color: string; tooltip: string }[] = [
+    { value: 'critical', label: 'عاجل جداً', color: 'bg-red-500', tooltip: 'حدث عاجل جداً يتطلب حضوراً فورياً ولا يحتمل أي تأخير' },
+    { value: 'high', label: 'عاجل', color: 'bg-orange-500', tooltip: 'حدث عاجل يجب الانتباه له في أقرب وقت ممكن' },
+    { value: 'medium', label: 'متوسطة', color: 'bg-yellow-500', tooltip: 'حدث ذو أهمية متوسطة ضمن الجدول الزمني المعتاد' },
+    { value: 'low', label: 'عادية', color: 'bg-emerald-500', tooltip: 'حدث عادي يمكن جدولته ضمن المواعيد الاعتيادية' },
 ]
 
 const STATUS_OPTIONS: { value: EventStatus; label: string }[] = [
