@@ -866,13 +866,38 @@ const tasksService = {
   /**
    * Get fresh download URL for S3 attachment (presigned URL)
    * Use this when the presigned URL expires
+   * @param disposition - 'inline' for preview (Content-Disposition: inline), 'attachment' for download
    */
-  getAttachmentDownloadUrl: async (taskId: string, attachmentId: string): Promise<string> => {
+  getAttachmentDownloadUrl: async (
+    taskId: string,
+    attachmentId: string,
+    disposition: 'inline' | 'attachment' = 'attachment'
+  ): Promise<string> => {
     try {
-      const response = await apiClient.get(`/tasks/${taskId}/attachments/${attachmentId}/download-url`)
+      const response = await apiClient.get(
+        `/tasks/${taskId}/attachments/${attachmentId}/download-url`,
+        { params: { disposition } }
+      )
       return response.data.downloadUrl
     } catch (error: any) {
       console.error('Get attachment download URL error:', error)
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Get preview URL for S3 attachment with inline disposition
+   * Best practice: Use this for previewing files in browser
+   */
+  getAttachmentPreviewUrl: async (taskId: string, attachmentId: string): Promise<string> => {
+    try {
+      const response = await apiClient.get(
+        `/tasks/${taskId}/attachments/${attachmentId}/download-url`,
+        { params: { disposition: 'inline' } }
+      )
+      return response.data.downloadUrl
+    } catch (error: any) {
+      console.error('Get attachment preview URL error:', error)
       throw new Error(handleApiError(error))
     }
   },

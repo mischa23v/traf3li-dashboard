@@ -191,16 +191,19 @@ export function TaskDetailsView() {
 
     // Preview attachment handler - fetches URL on demand for S3 files
     // Smart viewer: uses Microsoft Office Online for Office files, native browser for others
+    // Best Practice: Uses Content-Disposition: inline for proper browser preview
     const handlePreviewAttachment = async (attachmentId: string, fileName: string, existingUrl?: string, storageType?: string) => {
         try {
             let url = existingUrl
 
-            // For S3 storage, always fetch fresh signed URL
+            // For S3 storage, always fetch fresh signed URL with inline disposition
+            // Best Practice: Request inline disposition for preview (not attachment)
             if (storageType === 's3') {
                 try {
-                    url = await tasksService.getAttachmentDownloadUrl(taskId, attachmentId)
+                    // Use preview URL with Content-Disposition: inline
+                    url = await tasksService.getAttachmentPreviewUrl(taskId, attachmentId)
                 } catch (e) {
-                    console.error('Failed to get S3 URL, trying existing URL:', e)
+                    console.error('Failed to get S3 preview URL, trying existing URL:', e)
                     // Fall back to existing URL if API fails
                 }
             }
@@ -208,9 +211,9 @@ export function TaskDetailsView() {
             // If still no URL and no existing URL, try fetching anyway
             if (!url) {
                 try {
-                    url = await tasksService.getAttachmentDownloadUrl(taskId, attachmentId)
+                    url = await tasksService.getAttachmentPreviewUrl(taskId, attachmentId)
                 } catch (e) {
-                    console.error('Failed to get download URL:', e)
+                    console.error('Failed to get preview URL:', e)
                 }
             }
 
@@ -232,7 +235,11 @@ export function TaskDetailsView() {
                 // For longer signed URLs, it may fail - fall back to download
                 if (fullUrl.length < 2000) {
                     const officeViewerUrl = `https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(fullUrl)}`
-                    window.open(officeViewerUrl, '_blank')
+                    const newWindow = window.open(officeViewerUrl, '_blank')
+                    // Best Practice: Handle popup blocker
+                    if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') {
+                        toast.warning('يرجى السماح بالنوافذ المنبثقة لمعاينة الملفات')
+                    }
                 } else {
                     // Long URL - try download instead with a warning
                     toast.info('جاري تحميل الملف... (الرابط طويل جداً للمعاينة)')
@@ -245,13 +252,21 @@ export function TaskDetailsView() {
             }
 
             // Native browser viewing for PDF, images, text, audio, video
+            // Best Practice: Browser handles these natively with Content-Disposition: inline
             if (nativeExts.has(ext) || ext === 'pdf') {
-                window.open(fullUrl, '_blank')
+                const newWindow = window.open(fullUrl, '_blank')
+                // Best Practice: Handle popup blocker
+                if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') {
+                    toast.warning('يرجى السماح بالنوافذ المنبثقة لمعاينة الملفات')
+                }
                 return
             }
 
             // Unknown file type - attempt to open, browser will handle or download
-            window.open(fullUrl, '_blank')
+            const newWindow = window.open(fullUrl, '_blank')
+            if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') {
+                toast.warning('يرجى السماح بالنوافذ المنبثقة لمعاينة الملفات')
+            }
         } catch (error) {
             console.error('Preview attachment error:', error)
             toast.error('فشل في معاينة الملف')
@@ -259,14 +274,16 @@ export function TaskDetailsView() {
     }
 
     // Download attachment handler - fetches URL on demand for S3 files
+    // Best Practice: Uses Content-Disposition: attachment for proper download
     const handleDownloadAttachment = async (attachmentId: string, fileName: string, existingUrl?: string, storageType?: string) => {
         try {
             let url = existingUrl
 
-            // For S3 storage, always fetch fresh signed URL
+            // For S3 storage, always fetch fresh signed URL with attachment disposition
+            // Best Practice: Request attachment disposition for download (not inline)
             if (storageType === 's3') {
                 try {
-                    url = await tasksService.getAttachmentDownloadUrl(taskId, attachmentId)
+                    url = await tasksService.getAttachmentDownloadUrl(taskId, attachmentId, 'attachment')
                 } catch (e) {
                     console.error('Failed to get S3 URL, trying existing URL:', e)
                 }
@@ -275,7 +292,7 @@ export function TaskDetailsView() {
             // If still no URL, try fetching anyway
             if (!url) {
                 try {
-                    url = await tasksService.getAttachmentDownloadUrl(taskId, attachmentId)
+                    url = await tasksService.getAttachmentDownloadUrl(taskId, attachmentId, 'attachment')
                 } catch (e) {
                     console.error('Failed to get download URL:', e)
                 }
