@@ -38,13 +38,22 @@ export const useCreateReminder = () => {
   return useMutation({
     mutationFn: (data: CreateReminderData) =>
       remindersService.createReminder(data),
-    // Update cache on success (Stable & Correct)
+    // Update cache on success - instant appearance in list
     onSuccess: (data) => {
       toast.success('تم إنشاء التذكير بنجاح')
 
       // Manually update the cache with the REAL reminder from server
       queryClient.setQueriesData({ queryKey: ['reminders'] }, (old: any) => {
         if (!old) return old
+
+        // Handle { data: [...] } structure (API response format)
+        if (old.data && Array.isArray(old.data)) {
+          return {
+            ...old,
+            data: [data, ...old.data],
+            total: (old.total || old.data.length) + 1
+          }
+        }
 
         // Handle { reminders: [...] } structure
         if (old.reminders && Array.isArray(old.reminders)) {
@@ -66,12 +75,6 @@ export const useCreateReminder = () => {
     onError: (error: Error) => {
       toast.error(error.message || 'فشل إنشاء التذكير')
     },
-    onSettled: async () => {
-      // Delay to allow DB propagation
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      await queryClient.invalidateQueries({ queryKey: ['reminders'], refetchType: 'all' })
-      return await queryClient.invalidateQueries({ queryKey: ['calendar'], refetchType: 'all' })
-    },
   })
 }
 
@@ -82,7 +85,7 @@ export const useCreateEvent = () => {
 
   return useMutation({
     mutationFn: (data: CreateEventData) => eventsService.createEvent(data),
-    // Update cache on success (Stable & Correct)
+    // Update cache on success - instant appearance in list
     onSuccess: (data) => {
       toast.success('تم إنشاء الحدث بنجاح')
 
@@ -99,6 +102,15 @@ export const useCreateEvent = () => {
           }
         }
 
+        // Handle { data: [...] } structure (API response format)
+        if (old.data && Array.isArray(old.data)) {
+          return {
+            ...old,
+            data: [data, ...old.data],
+            total: (old.total || old.data.length) + 1
+          }
+        }
+
         // Handle Array structure
         if (Array.isArray(old)) {
           return [data, ...old]
@@ -109,12 +121,6 @@ export const useCreateEvent = () => {
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل إنشاء الحدث')
-    },
-    onSettled: async () => {
-      // Delay to allow DB propagation
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      await queryClient.invalidateQueries({ queryKey: ['events'], refetchType: 'all' })
-      return await queryClient.invalidateQueries({ queryKey: ['calendar'], refetchType: 'all' })
     },
   })
 }
@@ -181,13 +187,22 @@ export const useDeleteReminder = () => {
 
   return useMutation({
     mutationFn: (id: string) => remindersService.deleteReminder(id),
-    // Update cache on success (Stable & Correct)
+    // Update cache on success - instant removal from list
     onSuccess: (_, id) => {
       toast.success('تم حذف التذكير بنجاح')
 
       // Optimistically remove reminder from all lists
       queryClient.setQueriesData({ queryKey: ['reminders'] }, (old: any) => {
         if (!old) return old
+
+        // Handle { data: [...] } structure (API response format)
+        if (old.data && Array.isArray(old.data)) {
+          return {
+            ...old,
+            data: old.data.filter((item: any) => item._id !== id),
+            total: Math.max(0, (old.total || old.data.length) - 1)
+          }
+        }
 
         // Handle { reminders: [...] } structure
         if (old.reminders && Array.isArray(old.reminders)) {
@@ -208,12 +223,6 @@ export const useDeleteReminder = () => {
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل حذف التذكير')
-    },
-    onSettled: async () => {
-      // Delay to allow DB propagation
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      await queryClient.invalidateQueries({ queryKey: ['reminders'], refetchType: 'all' })
-      return await queryClient.invalidateQueries({ queryKey: ['calendar'], refetchType: 'all' })
     },
   })
 }
@@ -421,7 +430,7 @@ export const useDeleteEvent = () => {
 
   return useMutation({
     mutationFn: (id: string) => eventsService.deleteEvent(id),
-    // Update cache on success (Stable & Correct)
+    // Update cache on success - instant removal from list
     onSuccess: (_, id) => {
       toast.success('تم حذف الحدث بنجاح')
 
@@ -438,6 +447,15 @@ export const useDeleteEvent = () => {
           }
         }
 
+        // Handle { data: [...] } structure (API response format)
+        if (old.data && Array.isArray(old.data)) {
+          return {
+            ...old,
+            data: old.data.filter((item: any) => item._id !== id),
+            total: Math.max(0, (old.total || old.data.length) - 1)
+          }
+        }
+
         // Handle Array structure
         if (Array.isArray(old)) {
           return old.filter((item: any) => item._id !== id)
@@ -448,12 +466,6 @@ export const useDeleteEvent = () => {
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل حذف الحدث')
-    },
-    onSettled: async () => {
-      // Delay to allow DB propagation
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      await queryClient.invalidateQueries({ queryKey: ['events'], refetchType: 'all' })
-      return await queryClient.invalidateQueries({ queryKey: ['calendar'], refetchType: 'all' })
     },
   })
 }
