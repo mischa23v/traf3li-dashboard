@@ -218,16 +218,16 @@ export function ImportDialog({
                         <TableCell className="font-mono text-sm">{column}</TableCell>
                         <TableCell>
                           <Select
-                            value={mapping[column] || ''}
+                            value={mapping[column] === '' ? '__skip__' : (mapping[column] || '')}
                             onValueChange={(v) =>
-                              setMapping({ ...mapping, [column]: v })
+                              setMapping({ ...mapping, [column]: v === '__skip__' ? '' : v })
                             }
                           >
                             <SelectTrigger className="w-full">
                               <SelectValue placeholder={t('dataExport.selectField')} />
                             </SelectTrigger>
                             <SelectContent>
-                              <SelectItem value="">{t('dataExport.skip')}</SelectItem>
+                              <SelectItem value="__skip__">{t('dataExport.skip')}</SelectItem>
                               {columns.map((col) => (
                                 <SelectItem key={col.field} value={col.field}>
                                   {isRTL ? col.labelAr : col.label}
