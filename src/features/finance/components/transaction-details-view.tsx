@@ -208,38 +208,29 @@ export function TransactionDetailsView() {
                 <ProductivityHero
                     badge={`المرجع: ${transaction.reference}`}
                     title={transaction.description}
-                    type="finance"
-                    hideButtons={true}
+                    type="transactions"
+                    listMode={true}
                     stats={[
                         {
                             label: "المبلغ",
                             value: `${transaction.type === 'income' ? '+' : '-'}${transaction.amount} ${transaction.currency}`,
-                            icon: <DollarSign className="w-4 h-4 text-emerald-400" />,
+                            icon: DollarSign,
                             status: transaction.type === 'income' ? 'normal' : 'attention'
                         },
                         {
                             label: "التاريخ",
                             value: `${transaction.date} - ${transaction.time}`,
-                            icon: <Calendar className="w-4 h-4 text-emerald-400" />,
+                            icon: Calendar,
                             status: 'normal'
                         },
                         {
                             label: "الحالة",
                             value: transaction.status === 'completed' ? 'مكتملة' : 'قيد المعالجة',
-                            icon: <CheckCircle2 className="w-4 h-4 text-emerald-400" />,
+                            icon: CheckCircle2,
                             status: 'normal'
                         }
                     ]}
-                >
-                    <div className="flex gap-3">
-                        <Button asChild variant="ghost" className="bg-white/10 text-white hover:bg-white/20 h-10 px-5 rounded-xl font-bold border-0 backdrop-blur-sm">
-                            <Link to="/dashboard/finance/transactions">
-                                <ArrowLeft className="h-4 w-4 ml-2" />
-                                العودة إلى المعاملات
-                            </Link>
-                        </Button>
-                    </div>
-                </ProductivityHero>
+                />
 
                 <div className="max-w-[1600px] mx-auto pb-12">
                     <div className="grid grid-cols-12 gap-6">
