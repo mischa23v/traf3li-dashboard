@@ -106,20 +106,27 @@ import { Route as AuthenticatedDashboardClientsClientIdRouteImport } from './rou
 import { Route as AuthenticatedDashboardCasesCaseIdRouteImport } from './routes/_authenticated/dashboard.cases.$caseId'
 import { Route as AuthenticatedDashboardTasksRemindersIndexRouteImport } from './routes/_authenticated/dashboard.tasks.reminders.index'
 import { Route as AuthenticatedDashboardTasksEventsIndexRouteImport } from './routes/_authenticated/dashboard.tasks.events.index'
+import { Route as AuthenticatedDashboardSalesLeadsIndexRouteImport } from './routes/_authenticated/dashboard.sales.leads.index'
 import { Route as AuthenticatedDashboardHrSalariesIndexRouteImport } from './routes/_authenticated/dashboard.hr.salaries.index'
 import { Route as AuthenticatedDashboardHrPayrollIndexRouteImport } from './routes/_authenticated/dashboard.hr.payroll.index'
 import { Route as AuthenticatedDashboardHrLeavesIndexRouteImport } from './routes/_authenticated/dashboard.hr.leaves.index'
 import { Route as AuthenticatedDashboardHrEvaluationsIndexRouteImport } from './routes/_authenticated/dashboard.hr.evaluations.index'
 import { Route as AuthenticatedDashboardHrEmployeesIndexRouteImport } from './routes/_authenticated/dashboard.hr.employees.index'
 import { Route as AuthenticatedDashboardHrAttendanceIndexRouteImport } from './routes/_authenticated/dashboard.hr.attendance.index'
+import { Route as AuthenticatedDashboardFinanceVendorsIndexRouteImport } from './routes/_authenticated/dashboard.finance.vendors.index'
 import { Route as AuthenticatedDashboardFinanceTransactionsIndexRouteImport } from './routes/_authenticated/dashboard.finance.transactions.index'
+import { Route as AuthenticatedDashboardFinanceTransactionsHistoryIndexRouteImport } from './routes/_authenticated/dashboard.finance.transactions-history.index'
 import { Route as AuthenticatedDashboardFinanceTimeTrackingIndexRouteImport } from './routes/_authenticated/dashboard.finance.time-tracking.index'
 import { Route as AuthenticatedDashboardFinanceStatementsIndexRouteImport } from './routes/_authenticated/dashboard.finance.statements.index'
+import { Route as AuthenticatedDashboardFinanceRetainersIndexRouteImport } from './routes/_authenticated/dashboard.finance.retainers.index'
 import { Route as AuthenticatedDashboardFinanceReportsIndexRouteImport } from './routes/_authenticated/dashboard.finance.reports.index'
+import { Route as AuthenticatedDashboardFinanceRecurringIndexRouteImport } from './routes/_authenticated/dashboard.finance.recurring.index'
 import { Route as AuthenticatedDashboardFinanceQuotesIndexRouteImport } from './routes/_authenticated/dashboard.finance.quotes.index'
 import { Route as AuthenticatedDashboardFinancePaymentsIndexRouteImport } from './routes/_authenticated/dashboard.finance.payments.index'
 import { Route as AuthenticatedDashboardFinanceInvoicesIndexRouteImport } from './routes/_authenticated/dashboard.finance.invoices.index'
+import { Route as AuthenticatedDashboardFinanceFiscalPeriodsIndexRouteImport } from './routes/_authenticated/dashboard.finance.fiscal-periods.index'
 import { Route as AuthenticatedDashboardFinanceExpensesIndexRouteImport } from './routes/_authenticated/dashboard.finance.expenses.index'
+import { Route as AuthenticatedDashboardFinanceBillsIndexRouteImport } from './routes/_authenticated/dashboard.finance.bills.index'
 import { Route as AuthenticatedDashboardFinanceActivityIndexRouteImport } from './routes/_authenticated/dashboard.finance.activity.index'
 import { Route as AuthenticatedDashboardCrmReferralsIndexRouteImport } from './routes/_authenticated/dashboard.crm.referrals.index'
 import { Route as AuthenticatedDashboardCrmLeadsIndexRouteImport } from './routes/_authenticated/dashboard.crm.leads.index'
@@ -150,6 +157,7 @@ import { Route as AuthenticatedDashboardFinanceStatementsStatementIdRouteImport 
 import { Route as AuthenticatedDashboardFinanceReportsTimeEntriesRouteImport } from './routes/_authenticated/dashboard.finance.reports.time-entries'
 import { Route as AuthenticatedDashboardFinanceReportsRevenueByClientRouteImport } from './routes/_authenticated/dashboard.finance.reports.revenue-by-client'
 import { Route as AuthenticatedDashboardFinanceReportsOutstandingInvoicesRouteImport } from './routes/_authenticated/dashboard.finance.reports.outstanding-invoices'
+import { Route as AuthenticatedDashboardFinanceReportsFinancialRouteImport } from './routes/_authenticated/dashboard.finance.reports.financial'
 import { Route as AuthenticatedDashboardFinanceReportsAccountsAgingRouteImport } from './routes/_authenticated/dashboard.finance.reports.accounts-aging'
 import { Route as AuthenticatedDashboardFinanceQuotesNewRouteImport } from './routes/_authenticated/dashboard.finance.quotes.new'
 import { Route as AuthenticatedDashboardFinanceQuotesQuoteIdRouteImport } from './routes/_authenticated/dashboard.finance.quotes.$quoteId'
@@ -710,6 +718,12 @@ const AuthenticatedDashboardTasksEventsIndexRoute =
     path: '/dashboard/tasks/events/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedDashboardSalesLeadsIndexRoute =
+  AuthenticatedDashboardSalesLeadsIndexRouteImport.update({
+    id: '/dashboard/sales/leads/',
+    path: '/dashboard/sales/leads/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedDashboardHrSalariesIndexRoute =
   AuthenticatedDashboardHrSalariesIndexRouteImport.update({
     id: '/dashboard/hr/salaries/',
@@ -746,10 +760,22 @@ const AuthenticatedDashboardHrAttendanceIndexRoute =
     path: '/dashboard/hr/attendance/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedDashboardFinanceVendorsIndexRoute =
+  AuthenticatedDashboardFinanceVendorsIndexRouteImport.update({
+    id: '/dashboard/finance/vendors/',
+    path: '/dashboard/finance/vendors/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedDashboardFinanceTransactionsIndexRoute =
   AuthenticatedDashboardFinanceTransactionsIndexRouteImport.update({
     id: '/dashboard/finance/transactions/',
     path: '/dashboard/finance/transactions/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedDashboardFinanceTransactionsHistoryIndexRoute =
+  AuthenticatedDashboardFinanceTransactionsHistoryIndexRouteImport.update({
+    id: '/dashboard/finance/transactions-history/',
+    path: '/dashboard/finance/transactions-history/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedDashboardFinanceTimeTrackingIndexRoute =
@@ -764,10 +790,22 @@ const AuthenticatedDashboardFinanceStatementsIndexRoute =
     path: '/dashboard/finance/statements/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedDashboardFinanceRetainersIndexRoute =
+  AuthenticatedDashboardFinanceRetainersIndexRouteImport.update({
+    id: '/dashboard/finance/retainers/',
+    path: '/dashboard/finance/retainers/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedDashboardFinanceReportsIndexRoute =
   AuthenticatedDashboardFinanceReportsIndexRouteImport.update({
     id: '/dashboard/finance/reports/',
     path: '/dashboard/finance/reports/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedDashboardFinanceRecurringIndexRoute =
+  AuthenticatedDashboardFinanceRecurringIndexRouteImport.update({
+    id: '/dashboard/finance/recurring/',
+    path: '/dashboard/finance/recurring/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedDashboardFinanceQuotesIndexRoute =
@@ -788,10 +826,22 @@ const AuthenticatedDashboardFinanceInvoicesIndexRoute =
     path: '/dashboard/finance/invoices/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedDashboardFinanceFiscalPeriodsIndexRoute =
+  AuthenticatedDashboardFinanceFiscalPeriodsIndexRouteImport.update({
+    id: '/dashboard/finance/fiscal-periods/',
+    path: '/dashboard/finance/fiscal-periods/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedDashboardFinanceExpensesIndexRoute =
   AuthenticatedDashboardFinanceExpensesIndexRouteImport.update({
     id: '/dashboard/finance/expenses/',
     path: '/dashboard/finance/expenses/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedDashboardFinanceBillsIndexRoute =
+  AuthenticatedDashboardFinanceBillsIndexRouteImport.update({
+    id: '/dashboard/finance/bills/',
+    path: '/dashboard/finance/bills/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedDashboardFinanceActivityIndexRoute =
@@ -972,6 +1022,12 @@ const AuthenticatedDashboardFinanceReportsOutstandingInvoicesRoute =
   AuthenticatedDashboardFinanceReportsOutstandingInvoicesRouteImport.update({
     id: '/dashboard/finance/reports/outstanding-invoices',
     path: '/dashboard/finance/reports/outstanding-invoices',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedDashboardFinanceReportsFinancialRoute =
+  AuthenticatedDashboardFinanceReportsFinancialRouteImport.update({
+    id: '/dashboard/finance/reports/financial',
+    path: '/dashboard/finance/reports/financial',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedDashboardFinanceReportsAccountsAgingRoute =
@@ -1218,6 +1274,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/finance/quotes/$quoteId': typeof AuthenticatedDashboardFinanceQuotesQuoteIdRoute
   '/dashboard/finance/quotes/new': typeof AuthenticatedDashboardFinanceQuotesNewRoute
   '/dashboard/finance/reports/accounts-aging': typeof AuthenticatedDashboardFinanceReportsAccountsAgingRoute
+  '/dashboard/finance/reports/financial': typeof AuthenticatedDashboardFinanceReportsFinancialRoute
   '/dashboard/finance/reports/outstanding-invoices': typeof AuthenticatedDashboardFinanceReportsOutstandingInvoicesRoute
   '/dashboard/finance/reports/revenue-by-client': typeof AuthenticatedDashboardFinanceReportsRevenueByClientRoute
   '/dashboard/finance/reports/time-entries': typeof AuthenticatedDashboardFinanceReportsTimeEntriesRoute
@@ -1248,20 +1305,27 @@ export interface FileRoutesByFullPath {
   '/dashboard/crm/leads': typeof AuthenticatedDashboardCrmLeadsIndexRoute
   '/dashboard/crm/referrals': typeof AuthenticatedDashboardCrmReferralsIndexRoute
   '/dashboard/finance/activity': typeof AuthenticatedDashboardFinanceActivityIndexRoute
+  '/dashboard/finance/bills': typeof AuthenticatedDashboardFinanceBillsIndexRoute
   '/dashboard/finance/expenses': typeof AuthenticatedDashboardFinanceExpensesIndexRoute
+  '/dashboard/finance/fiscal-periods': typeof AuthenticatedDashboardFinanceFiscalPeriodsIndexRoute
   '/dashboard/finance/invoices': typeof AuthenticatedDashboardFinanceInvoicesIndexRoute
   '/dashboard/finance/payments': typeof AuthenticatedDashboardFinancePaymentsIndexRoute
   '/dashboard/finance/quotes': typeof AuthenticatedDashboardFinanceQuotesIndexRoute
+  '/dashboard/finance/recurring': typeof AuthenticatedDashboardFinanceRecurringIndexRoute
   '/dashboard/finance/reports': typeof AuthenticatedDashboardFinanceReportsIndexRoute
+  '/dashboard/finance/retainers': typeof AuthenticatedDashboardFinanceRetainersIndexRoute
   '/dashboard/finance/statements': typeof AuthenticatedDashboardFinanceStatementsIndexRoute
   '/dashboard/finance/time-tracking': typeof AuthenticatedDashboardFinanceTimeTrackingIndexRoute
+  '/dashboard/finance/transactions-history': typeof AuthenticatedDashboardFinanceTransactionsHistoryIndexRoute
   '/dashboard/finance/transactions': typeof AuthenticatedDashboardFinanceTransactionsIndexRoute
+  '/dashboard/finance/vendors': typeof AuthenticatedDashboardFinanceVendorsIndexRoute
   '/dashboard/hr/attendance': typeof AuthenticatedDashboardHrAttendanceIndexRoute
   '/dashboard/hr/employees': typeof AuthenticatedDashboardHrEmployeesIndexRoute
   '/dashboard/hr/evaluations': typeof AuthenticatedDashboardHrEvaluationsIndexRoute
   '/dashboard/hr/leaves': typeof AuthenticatedDashboardHrLeavesIndexRoute
   '/dashboard/hr/payroll': typeof AuthenticatedDashboardHrPayrollIndexRoute
   '/dashboard/hr/salaries': typeof AuthenticatedDashboardHrSalariesIndexRoute
+  '/dashboard/sales/leads': typeof AuthenticatedDashboardSalesLeadsIndexRoute
   '/dashboard/tasks/events': typeof AuthenticatedDashboardTasksEventsIndexRoute
   '/dashboard/tasks/reminders': typeof AuthenticatedDashboardTasksRemindersIndexRoute
   '/dashboard/finance/activity/$activityId/edit': typeof AuthenticatedDashboardFinanceActivityActivityIdEditRoute
@@ -1379,6 +1443,7 @@ export interface FileRoutesByTo {
   '/dashboard/finance/quotes/$quoteId': typeof AuthenticatedDashboardFinanceQuotesQuoteIdRoute
   '/dashboard/finance/quotes/new': typeof AuthenticatedDashboardFinanceQuotesNewRoute
   '/dashboard/finance/reports/accounts-aging': typeof AuthenticatedDashboardFinanceReportsAccountsAgingRoute
+  '/dashboard/finance/reports/financial': typeof AuthenticatedDashboardFinanceReportsFinancialRoute
   '/dashboard/finance/reports/outstanding-invoices': typeof AuthenticatedDashboardFinanceReportsOutstandingInvoicesRoute
   '/dashboard/finance/reports/revenue-by-client': typeof AuthenticatedDashboardFinanceReportsRevenueByClientRoute
   '/dashboard/finance/reports/time-entries': typeof AuthenticatedDashboardFinanceReportsTimeEntriesRoute
@@ -1409,20 +1474,27 @@ export interface FileRoutesByTo {
   '/dashboard/crm/leads': typeof AuthenticatedDashboardCrmLeadsIndexRoute
   '/dashboard/crm/referrals': typeof AuthenticatedDashboardCrmReferralsIndexRoute
   '/dashboard/finance/activity': typeof AuthenticatedDashboardFinanceActivityIndexRoute
+  '/dashboard/finance/bills': typeof AuthenticatedDashboardFinanceBillsIndexRoute
   '/dashboard/finance/expenses': typeof AuthenticatedDashboardFinanceExpensesIndexRoute
+  '/dashboard/finance/fiscal-periods': typeof AuthenticatedDashboardFinanceFiscalPeriodsIndexRoute
   '/dashboard/finance/invoices': typeof AuthenticatedDashboardFinanceInvoicesIndexRoute
   '/dashboard/finance/payments': typeof AuthenticatedDashboardFinancePaymentsIndexRoute
   '/dashboard/finance/quotes': typeof AuthenticatedDashboardFinanceQuotesIndexRoute
+  '/dashboard/finance/recurring': typeof AuthenticatedDashboardFinanceRecurringIndexRoute
   '/dashboard/finance/reports': typeof AuthenticatedDashboardFinanceReportsIndexRoute
+  '/dashboard/finance/retainers': typeof AuthenticatedDashboardFinanceRetainersIndexRoute
   '/dashboard/finance/statements': typeof AuthenticatedDashboardFinanceStatementsIndexRoute
   '/dashboard/finance/time-tracking': typeof AuthenticatedDashboardFinanceTimeTrackingIndexRoute
+  '/dashboard/finance/transactions-history': typeof AuthenticatedDashboardFinanceTransactionsHistoryIndexRoute
   '/dashboard/finance/transactions': typeof AuthenticatedDashboardFinanceTransactionsIndexRoute
+  '/dashboard/finance/vendors': typeof AuthenticatedDashboardFinanceVendorsIndexRoute
   '/dashboard/hr/attendance': typeof AuthenticatedDashboardHrAttendanceIndexRoute
   '/dashboard/hr/employees': typeof AuthenticatedDashboardHrEmployeesIndexRoute
   '/dashboard/hr/evaluations': typeof AuthenticatedDashboardHrEvaluationsIndexRoute
   '/dashboard/hr/leaves': typeof AuthenticatedDashboardHrLeavesIndexRoute
   '/dashboard/hr/payroll': typeof AuthenticatedDashboardHrPayrollIndexRoute
   '/dashboard/hr/salaries': typeof AuthenticatedDashboardHrSalariesIndexRoute
+  '/dashboard/sales/leads': typeof AuthenticatedDashboardSalesLeadsIndexRoute
   '/dashboard/tasks/events': typeof AuthenticatedDashboardTasksEventsIndexRoute
   '/dashboard/tasks/reminders': typeof AuthenticatedDashboardTasksRemindersIndexRoute
   '/dashboard/finance/activity/$activityId/edit': typeof AuthenticatedDashboardFinanceActivityActivityIdEditRoute
@@ -1545,6 +1617,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/finance/quotes/$quoteId': typeof AuthenticatedDashboardFinanceQuotesQuoteIdRoute
   '/_authenticated/dashboard/finance/quotes/new': typeof AuthenticatedDashboardFinanceQuotesNewRoute
   '/_authenticated/dashboard/finance/reports/accounts-aging': typeof AuthenticatedDashboardFinanceReportsAccountsAgingRoute
+  '/_authenticated/dashboard/finance/reports/financial': typeof AuthenticatedDashboardFinanceReportsFinancialRoute
   '/_authenticated/dashboard/finance/reports/outstanding-invoices': typeof AuthenticatedDashboardFinanceReportsOutstandingInvoicesRoute
   '/_authenticated/dashboard/finance/reports/revenue-by-client': typeof AuthenticatedDashboardFinanceReportsRevenueByClientRoute
   '/_authenticated/dashboard/finance/reports/time-entries': typeof AuthenticatedDashboardFinanceReportsTimeEntriesRoute
@@ -1575,20 +1648,27 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/crm/leads/': typeof AuthenticatedDashboardCrmLeadsIndexRoute
   '/_authenticated/dashboard/crm/referrals/': typeof AuthenticatedDashboardCrmReferralsIndexRoute
   '/_authenticated/dashboard/finance/activity/': typeof AuthenticatedDashboardFinanceActivityIndexRoute
+  '/_authenticated/dashboard/finance/bills/': typeof AuthenticatedDashboardFinanceBillsIndexRoute
   '/_authenticated/dashboard/finance/expenses/': typeof AuthenticatedDashboardFinanceExpensesIndexRoute
+  '/_authenticated/dashboard/finance/fiscal-periods/': typeof AuthenticatedDashboardFinanceFiscalPeriodsIndexRoute
   '/_authenticated/dashboard/finance/invoices/': typeof AuthenticatedDashboardFinanceInvoicesIndexRoute
   '/_authenticated/dashboard/finance/payments/': typeof AuthenticatedDashboardFinancePaymentsIndexRoute
   '/_authenticated/dashboard/finance/quotes/': typeof AuthenticatedDashboardFinanceQuotesIndexRoute
+  '/_authenticated/dashboard/finance/recurring/': typeof AuthenticatedDashboardFinanceRecurringIndexRoute
   '/_authenticated/dashboard/finance/reports/': typeof AuthenticatedDashboardFinanceReportsIndexRoute
+  '/_authenticated/dashboard/finance/retainers/': typeof AuthenticatedDashboardFinanceRetainersIndexRoute
   '/_authenticated/dashboard/finance/statements/': typeof AuthenticatedDashboardFinanceStatementsIndexRoute
   '/_authenticated/dashboard/finance/time-tracking/': typeof AuthenticatedDashboardFinanceTimeTrackingIndexRoute
+  '/_authenticated/dashboard/finance/transactions-history/': typeof AuthenticatedDashboardFinanceTransactionsHistoryIndexRoute
   '/_authenticated/dashboard/finance/transactions/': typeof AuthenticatedDashboardFinanceTransactionsIndexRoute
+  '/_authenticated/dashboard/finance/vendors/': typeof AuthenticatedDashboardFinanceVendorsIndexRoute
   '/_authenticated/dashboard/hr/attendance/': typeof AuthenticatedDashboardHrAttendanceIndexRoute
   '/_authenticated/dashboard/hr/employees/': typeof AuthenticatedDashboardHrEmployeesIndexRoute
   '/_authenticated/dashboard/hr/evaluations/': typeof AuthenticatedDashboardHrEvaluationsIndexRoute
   '/_authenticated/dashboard/hr/leaves/': typeof AuthenticatedDashboardHrLeavesIndexRoute
   '/_authenticated/dashboard/hr/payroll/': typeof AuthenticatedDashboardHrPayrollIndexRoute
   '/_authenticated/dashboard/hr/salaries/': typeof AuthenticatedDashboardHrSalariesIndexRoute
+  '/_authenticated/dashboard/sales/leads/': typeof AuthenticatedDashboardSalesLeadsIndexRoute
   '/_authenticated/dashboard/tasks/events/': typeof AuthenticatedDashboardTasksEventsIndexRoute
   '/_authenticated/dashboard/tasks/reminders/': typeof AuthenticatedDashboardTasksRemindersIndexRoute
   '/_authenticated/dashboard/finance/activity/$activityId/edit': typeof AuthenticatedDashboardFinanceActivityActivityIdEditRoute
@@ -1709,6 +1789,7 @@ export interface FileRouteTypes {
     | '/dashboard/finance/quotes/$quoteId'
     | '/dashboard/finance/quotes/new'
     | '/dashboard/finance/reports/accounts-aging'
+    | '/dashboard/finance/reports/financial'
     | '/dashboard/finance/reports/outstanding-invoices'
     | '/dashboard/finance/reports/revenue-by-client'
     | '/dashboard/finance/reports/time-entries'
@@ -1739,20 +1820,27 @@ export interface FileRouteTypes {
     | '/dashboard/crm/leads'
     | '/dashboard/crm/referrals'
     | '/dashboard/finance/activity'
+    | '/dashboard/finance/bills'
     | '/dashboard/finance/expenses'
+    | '/dashboard/finance/fiscal-periods'
     | '/dashboard/finance/invoices'
     | '/dashboard/finance/payments'
     | '/dashboard/finance/quotes'
+    | '/dashboard/finance/recurring'
     | '/dashboard/finance/reports'
+    | '/dashboard/finance/retainers'
     | '/dashboard/finance/statements'
     | '/dashboard/finance/time-tracking'
+    | '/dashboard/finance/transactions-history'
     | '/dashboard/finance/transactions'
+    | '/dashboard/finance/vendors'
     | '/dashboard/hr/attendance'
     | '/dashboard/hr/employees'
     | '/dashboard/hr/evaluations'
     | '/dashboard/hr/leaves'
     | '/dashboard/hr/payroll'
     | '/dashboard/hr/salaries'
+    | '/dashboard/sales/leads'
     | '/dashboard/tasks/events'
     | '/dashboard/tasks/reminders'
     | '/dashboard/finance/activity/$activityId/edit'
@@ -1870,6 +1958,7 @@ export interface FileRouteTypes {
     | '/dashboard/finance/quotes/$quoteId'
     | '/dashboard/finance/quotes/new'
     | '/dashboard/finance/reports/accounts-aging'
+    | '/dashboard/finance/reports/financial'
     | '/dashboard/finance/reports/outstanding-invoices'
     | '/dashboard/finance/reports/revenue-by-client'
     | '/dashboard/finance/reports/time-entries'
@@ -1900,20 +1989,27 @@ export interface FileRouteTypes {
     | '/dashboard/crm/leads'
     | '/dashboard/crm/referrals'
     | '/dashboard/finance/activity'
+    | '/dashboard/finance/bills'
     | '/dashboard/finance/expenses'
+    | '/dashboard/finance/fiscal-periods'
     | '/dashboard/finance/invoices'
     | '/dashboard/finance/payments'
     | '/dashboard/finance/quotes'
+    | '/dashboard/finance/recurring'
     | '/dashboard/finance/reports'
+    | '/dashboard/finance/retainers'
     | '/dashboard/finance/statements'
     | '/dashboard/finance/time-tracking'
+    | '/dashboard/finance/transactions-history'
     | '/dashboard/finance/transactions'
+    | '/dashboard/finance/vendors'
     | '/dashboard/hr/attendance'
     | '/dashboard/hr/employees'
     | '/dashboard/hr/evaluations'
     | '/dashboard/hr/leaves'
     | '/dashboard/hr/payroll'
     | '/dashboard/hr/salaries'
+    | '/dashboard/sales/leads'
     | '/dashboard/tasks/events'
     | '/dashboard/tasks/reminders'
     | '/dashboard/finance/activity/$activityId/edit'
@@ -2035,6 +2131,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/finance/quotes/$quoteId'
     | '/_authenticated/dashboard/finance/quotes/new'
     | '/_authenticated/dashboard/finance/reports/accounts-aging'
+    | '/_authenticated/dashboard/finance/reports/financial'
     | '/_authenticated/dashboard/finance/reports/outstanding-invoices'
     | '/_authenticated/dashboard/finance/reports/revenue-by-client'
     | '/_authenticated/dashboard/finance/reports/time-entries'
@@ -2065,20 +2162,27 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/crm/leads/'
     | '/_authenticated/dashboard/crm/referrals/'
     | '/_authenticated/dashboard/finance/activity/'
+    | '/_authenticated/dashboard/finance/bills/'
     | '/_authenticated/dashboard/finance/expenses/'
+    | '/_authenticated/dashboard/finance/fiscal-periods/'
     | '/_authenticated/dashboard/finance/invoices/'
     | '/_authenticated/dashboard/finance/payments/'
     | '/_authenticated/dashboard/finance/quotes/'
+    | '/_authenticated/dashboard/finance/recurring/'
     | '/_authenticated/dashboard/finance/reports/'
+    | '/_authenticated/dashboard/finance/retainers/'
     | '/_authenticated/dashboard/finance/statements/'
     | '/_authenticated/dashboard/finance/time-tracking/'
+    | '/_authenticated/dashboard/finance/transactions-history/'
     | '/_authenticated/dashboard/finance/transactions/'
+    | '/_authenticated/dashboard/finance/vendors/'
     | '/_authenticated/dashboard/hr/attendance/'
     | '/_authenticated/dashboard/hr/employees/'
     | '/_authenticated/dashboard/hr/evaluations/'
     | '/_authenticated/dashboard/hr/leaves/'
     | '/_authenticated/dashboard/hr/payroll/'
     | '/_authenticated/dashboard/hr/salaries/'
+    | '/_authenticated/dashboard/sales/leads/'
     | '/_authenticated/dashboard/tasks/events/'
     | '/_authenticated/dashboard/tasks/reminders/'
     | '/_authenticated/dashboard/finance/activity/$activityId/edit'
@@ -2807,6 +2911,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardTasksEventsIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/dashboard/sales/leads/': {
+      id: '/_authenticated/dashboard/sales/leads/'
+      path: '/dashboard/sales/leads'
+      fullPath: '/dashboard/sales/leads'
+      preLoaderRoute: typeof AuthenticatedDashboardSalesLeadsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/dashboard/hr/salaries/': {
       id: '/_authenticated/dashboard/hr/salaries/'
       path: '/dashboard/hr/salaries'
@@ -2849,11 +2960,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardHrAttendanceIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/dashboard/finance/vendors/': {
+      id: '/_authenticated/dashboard/finance/vendors/'
+      path: '/dashboard/finance/vendors'
+      fullPath: '/dashboard/finance/vendors'
+      preLoaderRoute: typeof AuthenticatedDashboardFinanceVendorsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/dashboard/finance/transactions/': {
       id: '/_authenticated/dashboard/finance/transactions/'
       path: '/dashboard/finance/transactions'
       fullPath: '/dashboard/finance/transactions'
       preLoaderRoute: typeof AuthenticatedDashboardFinanceTransactionsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dashboard/finance/transactions-history/': {
+      id: '/_authenticated/dashboard/finance/transactions-history/'
+      path: '/dashboard/finance/transactions-history'
+      fullPath: '/dashboard/finance/transactions-history'
+      preLoaderRoute: typeof AuthenticatedDashboardFinanceTransactionsHistoryIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/dashboard/finance/time-tracking/': {
@@ -2870,11 +2995,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardFinanceStatementsIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/dashboard/finance/retainers/': {
+      id: '/_authenticated/dashboard/finance/retainers/'
+      path: '/dashboard/finance/retainers'
+      fullPath: '/dashboard/finance/retainers'
+      preLoaderRoute: typeof AuthenticatedDashboardFinanceRetainersIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/dashboard/finance/reports/': {
       id: '/_authenticated/dashboard/finance/reports/'
       path: '/dashboard/finance/reports'
       fullPath: '/dashboard/finance/reports'
       preLoaderRoute: typeof AuthenticatedDashboardFinanceReportsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dashboard/finance/recurring/': {
+      id: '/_authenticated/dashboard/finance/recurring/'
+      path: '/dashboard/finance/recurring'
+      fullPath: '/dashboard/finance/recurring'
+      preLoaderRoute: typeof AuthenticatedDashboardFinanceRecurringIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/dashboard/finance/quotes/': {
@@ -2898,11 +3037,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardFinanceInvoicesIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/dashboard/finance/fiscal-periods/': {
+      id: '/_authenticated/dashboard/finance/fiscal-periods/'
+      path: '/dashboard/finance/fiscal-periods'
+      fullPath: '/dashboard/finance/fiscal-periods'
+      preLoaderRoute: typeof AuthenticatedDashboardFinanceFiscalPeriodsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/dashboard/finance/expenses/': {
       id: '/_authenticated/dashboard/finance/expenses/'
       path: '/dashboard/finance/expenses'
       fullPath: '/dashboard/finance/expenses'
       preLoaderRoute: typeof AuthenticatedDashboardFinanceExpensesIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dashboard/finance/bills/': {
+      id: '/_authenticated/dashboard/finance/bills/'
+      path: '/dashboard/finance/bills'
+      fullPath: '/dashboard/finance/bills'
+      preLoaderRoute: typeof AuthenticatedDashboardFinanceBillsIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/dashboard/finance/activity/': {
@@ -3113,6 +3266,13 @@ declare module '@tanstack/react-router' {
       path: '/dashboard/finance/reports/outstanding-invoices'
       fullPath: '/dashboard/finance/reports/outstanding-invoices'
       preLoaderRoute: typeof AuthenticatedDashboardFinanceReportsOutstandingInvoicesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dashboard/finance/reports/financial': {
+      id: '/_authenticated/dashboard/finance/reports/financial'
+      path: '/dashboard/finance/reports/financial'
+      fullPath: '/dashboard/finance/reports/financial'
+      preLoaderRoute: typeof AuthenticatedDashboardFinanceReportsFinancialRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/dashboard/finance/reports/accounts-aging': {
@@ -3469,6 +3629,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardFinanceQuotesQuoteIdRoute: typeof AuthenticatedDashboardFinanceQuotesQuoteIdRoute
   AuthenticatedDashboardFinanceQuotesNewRoute: typeof AuthenticatedDashboardFinanceQuotesNewRoute
   AuthenticatedDashboardFinanceReportsAccountsAgingRoute: typeof AuthenticatedDashboardFinanceReportsAccountsAgingRoute
+  AuthenticatedDashboardFinanceReportsFinancialRoute: typeof AuthenticatedDashboardFinanceReportsFinancialRoute
   AuthenticatedDashboardFinanceReportsOutstandingInvoicesRoute: typeof AuthenticatedDashboardFinanceReportsOutstandingInvoicesRoute
   AuthenticatedDashboardFinanceReportsRevenueByClientRoute: typeof AuthenticatedDashboardFinanceReportsRevenueByClientRoute
   AuthenticatedDashboardFinanceReportsTimeEntriesRoute: typeof AuthenticatedDashboardFinanceReportsTimeEntriesRoute
@@ -3499,20 +3660,27 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardCrmLeadsIndexRoute: typeof AuthenticatedDashboardCrmLeadsIndexRoute
   AuthenticatedDashboardCrmReferralsIndexRoute: typeof AuthenticatedDashboardCrmReferralsIndexRoute
   AuthenticatedDashboardFinanceActivityIndexRoute: typeof AuthenticatedDashboardFinanceActivityIndexRoute
+  AuthenticatedDashboardFinanceBillsIndexRoute: typeof AuthenticatedDashboardFinanceBillsIndexRoute
   AuthenticatedDashboardFinanceExpensesIndexRoute: typeof AuthenticatedDashboardFinanceExpensesIndexRoute
+  AuthenticatedDashboardFinanceFiscalPeriodsIndexRoute: typeof AuthenticatedDashboardFinanceFiscalPeriodsIndexRoute
   AuthenticatedDashboardFinanceInvoicesIndexRoute: typeof AuthenticatedDashboardFinanceInvoicesIndexRoute
   AuthenticatedDashboardFinancePaymentsIndexRoute: typeof AuthenticatedDashboardFinancePaymentsIndexRoute
   AuthenticatedDashboardFinanceQuotesIndexRoute: typeof AuthenticatedDashboardFinanceQuotesIndexRoute
+  AuthenticatedDashboardFinanceRecurringIndexRoute: typeof AuthenticatedDashboardFinanceRecurringIndexRoute
   AuthenticatedDashboardFinanceReportsIndexRoute: typeof AuthenticatedDashboardFinanceReportsIndexRoute
+  AuthenticatedDashboardFinanceRetainersIndexRoute: typeof AuthenticatedDashboardFinanceRetainersIndexRoute
   AuthenticatedDashboardFinanceStatementsIndexRoute: typeof AuthenticatedDashboardFinanceStatementsIndexRoute
   AuthenticatedDashboardFinanceTimeTrackingIndexRoute: typeof AuthenticatedDashboardFinanceTimeTrackingIndexRoute
+  AuthenticatedDashboardFinanceTransactionsHistoryIndexRoute: typeof AuthenticatedDashboardFinanceTransactionsHistoryIndexRoute
   AuthenticatedDashboardFinanceTransactionsIndexRoute: typeof AuthenticatedDashboardFinanceTransactionsIndexRoute
+  AuthenticatedDashboardFinanceVendorsIndexRoute: typeof AuthenticatedDashboardFinanceVendorsIndexRoute
   AuthenticatedDashboardHrAttendanceIndexRoute: typeof AuthenticatedDashboardHrAttendanceIndexRoute
   AuthenticatedDashboardHrEmployeesIndexRoute: typeof AuthenticatedDashboardHrEmployeesIndexRoute
   AuthenticatedDashboardHrEvaluationsIndexRoute: typeof AuthenticatedDashboardHrEvaluationsIndexRoute
   AuthenticatedDashboardHrLeavesIndexRoute: typeof AuthenticatedDashboardHrLeavesIndexRoute
   AuthenticatedDashboardHrPayrollIndexRoute: typeof AuthenticatedDashboardHrPayrollIndexRoute
   AuthenticatedDashboardHrSalariesIndexRoute: typeof AuthenticatedDashboardHrSalariesIndexRoute
+  AuthenticatedDashboardSalesLeadsIndexRoute: typeof AuthenticatedDashboardSalesLeadsIndexRoute
   AuthenticatedDashboardTasksEventsIndexRoute: typeof AuthenticatedDashboardTasksEventsIndexRoute
   AuthenticatedDashboardTasksRemindersIndexRoute: typeof AuthenticatedDashboardTasksRemindersIndexRoute
 }
@@ -3630,6 +3798,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
     AuthenticatedDashboardFinanceQuotesNewRoute,
   AuthenticatedDashboardFinanceReportsAccountsAgingRoute:
     AuthenticatedDashboardFinanceReportsAccountsAgingRoute,
+  AuthenticatedDashboardFinanceReportsFinancialRoute:
+    AuthenticatedDashboardFinanceReportsFinancialRoute,
   AuthenticatedDashboardFinanceReportsOutstandingInvoicesRoute:
     AuthenticatedDashboardFinanceReportsOutstandingInvoicesRoute,
   AuthenticatedDashboardFinanceReportsRevenueByClientRoute:
@@ -3690,22 +3860,34 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
     AuthenticatedDashboardCrmReferralsIndexRoute,
   AuthenticatedDashboardFinanceActivityIndexRoute:
     AuthenticatedDashboardFinanceActivityIndexRoute,
+  AuthenticatedDashboardFinanceBillsIndexRoute:
+    AuthenticatedDashboardFinanceBillsIndexRoute,
   AuthenticatedDashboardFinanceExpensesIndexRoute:
     AuthenticatedDashboardFinanceExpensesIndexRoute,
+  AuthenticatedDashboardFinanceFiscalPeriodsIndexRoute:
+    AuthenticatedDashboardFinanceFiscalPeriodsIndexRoute,
   AuthenticatedDashboardFinanceInvoicesIndexRoute:
     AuthenticatedDashboardFinanceInvoicesIndexRoute,
   AuthenticatedDashboardFinancePaymentsIndexRoute:
     AuthenticatedDashboardFinancePaymentsIndexRoute,
   AuthenticatedDashboardFinanceQuotesIndexRoute:
     AuthenticatedDashboardFinanceQuotesIndexRoute,
+  AuthenticatedDashboardFinanceRecurringIndexRoute:
+    AuthenticatedDashboardFinanceRecurringIndexRoute,
   AuthenticatedDashboardFinanceReportsIndexRoute:
     AuthenticatedDashboardFinanceReportsIndexRoute,
+  AuthenticatedDashboardFinanceRetainersIndexRoute:
+    AuthenticatedDashboardFinanceRetainersIndexRoute,
   AuthenticatedDashboardFinanceStatementsIndexRoute:
     AuthenticatedDashboardFinanceStatementsIndexRoute,
   AuthenticatedDashboardFinanceTimeTrackingIndexRoute:
     AuthenticatedDashboardFinanceTimeTrackingIndexRoute,
+  AuthenticatedDashboardFinanceTransactionsHistoryIndexRoute:
+    AuthenticatedDashboardFinanceTransactionsHistoryIndexRoute,
   AuthenticatedDashboardFinanceTransactionsIndexRoute:
     AuthenticatedDashboardFinanceTransactionsIndexRoute,
+  AuthenticatedDashboardFinanceVendorsIndexRoute:
+    AuthenticatedDashboardFinanceVendorsIndexRoute,
   AuthenticatedDashboardHrAttendanceIndexRoute:
     AuthenticatedDashboardHrAttendanceIndexRoute,
   AuthenticatedDashboardHrEmployeesIndexRoute:
@@ -3718,6 +3900,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
     AuthenticatedDashboardHrPayrollIndexRoute,
   AuthenticatedDashboardHrSalariesIndexRoute:
     AuthenticatedDashboardHrSalariesIndexRoute,
+  AuthenticatedDashboardSalesLeadsIndexRoute:
+    AuthenticatedDashboardSalesLeadsIndexRoute,
   AuthenticatedDashboardTasksEventsIndexRoute:
     AuthenticatedDashboardTasksEventsIndexRoute,
   AuthenticatedDashboardTasksRemindersIndexRoute:

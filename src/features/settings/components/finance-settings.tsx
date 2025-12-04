@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react'
 import {
     FileText, Save, Hash, Calendar, Loader2,
-    DollarSign, Receipt, ClipboardList, Globe
+    DollarSign, Receipt, ClipboardList, Globe,
+    Building2, Wallet, TrendingUp, TrendingDown,
+    ChevronDown, Plus, Pencil, Trash2, Settings2
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -16,13 +18,51 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select"
+import {
+    Accordion,
+    AccordionContent,
+    AccordionItem,
+    AccordionTrigger,
+} from "@/components/ui/accordion"
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from "@/components/ui/dialog"
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from "@/components/ui/table"
+import { Badge } from '@/components/ui/badge'
 import { Header } from '@/components/layout/header'
 import { Main } from '@/components/layout/main'
 import { LanguageSwitcher } from '@/components/language-switcher'
 import { ThemeSwitch } from '@/components/theme-switch'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { useFinanceSettings, useUpdateFinanceSettings } from '@/hooks/useBillingSettings'
+import {
+    useAccounts,
+    useAccountTypes,
+    useCreateAccount,
+    useUpdateAccount,
+    useDeleteAccount,
+    usePriceLevels,
+    useCreatePriceLevel,
+    useUpdatePriceLevel,
+    useDeletePriceLevel,
+    useSetDefaultPriceLevel,
+} from '@/hooks/useAccounting'
+import { Account, AccountType, AccountSubType, PriceLevel } from '@/services/accountingService'
 import { Skeleton } from '@/components/ui/skeleton'
+import { formatSAR } from '@/lib/currency'
 
 const currencies = [
     { value: 'SAR', label: 'ريال سعودي (SAR)' },
@@ -444,8 +484,696 @@ export default function FinanceSettings() {
                             </Button>
                         </div>
                     </form>
+
+                    {/* Advanced Settings (Hidden Accounting) */}
+                    <Card className="border-0 shadow-sm rounded-3xl mt-6">
+                        <CardHeader>
+                            <CardTitle className="flex items-center gap-2">
+                                <Settings2 className="h-5 w-5 text-brand-blue" />
+                                الإعدادات المتقدمة
+                            </CardTitle>
+                            <CardDescription>
+                                إعدادات دفتر الحسابات ومستويات الأسعار (للمحاسبين)
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            <AdvancedAccountingSettings />
+                        </CardContent>
+                    </Card>
                 </div>
             </Main>
         </>
+    )
+}
+
+// ==================== ADVANCED ACCOUNTING SETTINGS ====================
+
+function AdvancedAccountingSettings() {
+    const { data: accountTypesData } = useAccountTypes()
+    const { data: bankAccounts, isLoading: loadingBanks } = useAccounts({ type: 'asset', subType: 'bank' })
+    const { data: incomeAccounts, isLoading: loadingIncome } = useAccounts({ type: 'income' })
+    const { data: expenseAccounts, isLoading: loadingExpenses } = useAccounts({ type: 'expense' })
+    const { data: priceLevels, isLoading: loadingPriceLevels } = usePriceLevels()
+
+    const typeLabels: Record<AccountType, string> = {
+        asset: 'أصول',
+        liability: 'خصوم',
+        equity: 'حقوق ملكية',
+        income: 'إيرادات',
+        expense: 'مصروفات',
+    }
+
+    const subTypeLabels: Record<AccountSubType, string> = {
+        current_asset: 'أصول متداولة',
+        fixed_asset: 'أصول ثابتة',
+        bank: 'حسابات بنكية',
+        cash: 'نقدية',
+        receivable: 'مدينون',
+        current_liability: 'خصوم متداولة',
+        long_term_liability: 'خصوم طويلة الأجل',
+        payable: 'دائنون',
+        operating_income: 'إيرادات تشغيلية',
+        other_income: 'إيرادات أخرى',
+        operating_expense: 'مصروفات تشغيلية',
+        administrative: 'مصروفات إدارية',
+        cost_of_sales: 'تكلفة المبيعات',
+    }
+
+    return (
+        <Accordion type="multiple" className="w-full">
+            {/* Bank Accounts */}
+            <AccordionItem value="banks">
+                <AccordionTrigger className="hover:no-underline">
+                    <div className="flex items-center gap-2">
+                        <Building2 className="h-4 w-4 text-blue-600" />
+                        <span>البنوك</span>
+                        <Badge variant="secondary" className="mr-2">
+                            {bankAccounts?.accounts?.length || 0}
+                        </Badge>
+                    </div>
+                </AccordionTrigger>
+                <AccordionContent>
+                    <AccountsList
+                        accounts={bankAccounts?.accounts || []}
+                        isLoading={loadingBanks}
+                        accountType="asset"
+                        defaultSubType="bank"
+                        typeLabels={typeLabels}
+                        subTypeLabels={subTypeLabels}
+                    />
+                </AccordionContent>
+            </AccordionItem>
+
+            {/* Income Types */}
+            <AccordionItem value="income-types">
+                <AccordionTrigger className="hover:no-underline">
+                    <div className="flex items-center gap-2">
+                        <TrendingUp className="h-4 w-4 text-green-600" />
+                        <span>أنواع الدخل</span>
+                        <Badge variant="secondary" className="mr-2">
+                            {incomeAccounts?.accounts?.length || 0}
+                        </Badge>
+                    </div>
+                </AccordionTrigger>
+                <AccordionContent>
+                    <AccountsList
+                        accounts={incomeAccounts?.accounts || []}
+                        isLoading={loadingIncome}
+                        accountType="income"
+                        defaultSubType="operating_income"
+                        typeLabels={typeLabels}
+                        subTypeLabels={subTypeLabels}
+                    />
+                </AccordionContent>
+            </AccordionItem>
+
+            {/* Expense Types */}
+            <AccordionItem value="expense-types">
+                <AccordionTrigger className="hover:no-underline">
+                    <div className="flex items-center gap-2">
+                        <TrendingDown className="h-4 w-4 text-red-600" />
+                        <span>أنواع المصروفات</span>
+                        <Badge variant="secondary" className="mr-2">
+                            {expenseAccounts?.accounts?.length || 0}
+                        </Badge>
+                    </div>
+                </AccordionTrigger>
+                <AccordionContent>
+                    <AccountsList
+                        accounts={expenseAccounts?.accounts || []}
+                        isLoading={loadingExpenses}
+                        accountType="expense"
+                        defaultSubType="operating_expense"
+                        typeLabels={typeLabels}
+                        subTypeLabels={subTypeLabels}
+                    />
+                </AccordionContent>
+            </AccordionItem>
+
+            {/* Price Levels */}
+            <AccordionItem value="price-levels">
+                <AccordionTrigger className="hover:no-underline">
+                    <div className="flex items-center gap-2">
+                        <Wallet className="h-4 w-4 text-purple-600" />
+                        <span>مستويات الأسعار</span>
+                        <Badge variant="secondary" className="mr-2">
+                            {priceLevels?.length || 0}
+                        </Badge>
+                    </div>
+                </AccordionTrigger>
+                <AccordionContent>
+                    <PriceLevelsList
+                        priceLevels={priceLevels || []}
+                        isLoading={loadingPriceLevels}
+                    />
+                </AccordionContent>
+            </AccordionItem>
+        </Accordion>
+    )
+}
+
+// ==================== ACCOUNTS LIST COMPONENT ====================
+
+interface AccountsListProps {
+    accounts: Account[]
+    isLoading: boolean
+    accountType: AccountType
+    defaultSubType: AccountSubType
+    typeLabels: Record<AccountType, string>
+    subTypeLabels: Record<AccountSubType, string>
+}
+
+function AccountsList({ accounts, isLoading, accountType, defaultSubType, typeLabels, subTypeLabels }: AccountsListProps) {
+    const [isDialogOpen, setIsDialogOpen] = useState(false)
+    const [editingAccount, setEditingAccount] = useState<Account | null>(null)
+    const [formData, setFormData] = useState({
+        code: '',
+        name: '',
+        nameAr: '',
+        type: accountType,
+        subType: defaultSubType,
+        description: '',
+        isActive: true,
+    })
+
+    const createAccountMutation = useCreateAccount()
+    const updateAccountMutation = useUpdateAccount()
+    const deleteAccountMutation = useDeleteAccount()
+
+    const handleOpenDialog = (account?: Account) => {
+        if (account) {
+            setEditingAccount(account)
+            setFormData({
+                code: account.code,
+                name: account.name,
+                nameAr: account.nameAr,
+                type: account.type,
+                subType: account.subType,
+                description: account.description || '',
+                isActive: account.isActive,
+            })
+        } else {
+            setEditingAccount(null)
+            setFormData({
+                code: '',
+                name: '',
+                nameAr: '',
+                type: accountType,
+                subType: defaultSubType,
+                description: '',
+                isActive: true,
+            })
+        }
+        setIsDialogOpen(true)
+    }
+
+    const handleSubmit = async () => {
+        if (editingAccount) {
+            await updateAccountMutation.mutateAsync({
+                id: editingAccount._id,
+                data: formData,
+            })
+        } else {
+            await createAccountMutation.mutateAsync(formData)
+        }
+        setIsDialogOpen(false)
+    }
+
+    const handleDelete = async (id: string) => {
+        if (confirm('هل أنت متأكد من حذف هذا الحساب؟')) {
+            await deleteAccountMutation.mutateAsync(id)
+        }
+    }
+
+    if (isLoading) {
+        return <Skeleton className="h-32 w-full" />
+    }
+
+    return (
+        <div className="space-y-4">
+            <div className="flex justify-end">
+                <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                    <DialogTrigger asChild>
+                        <Button size="sm" onClick={() => handleOpenDialog()}>
+                            <Plus className="h-4 w-4 ml-1" />
+                            إضافة حساب
+                        </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                        <DialogHeader>
+                            <DialogTitle>
+                                {editingAccount ? 'تعديل الحساب' : 'إضافة حساب جديد'}
+                            </DialogTitle>
+                            <DialogDescription>
+                                أدخل بيانات الحساب
+                            </DialogDescription>
+                        </DialogHeader>
+                        <div className="space-y-4 py-4">
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="space-y-2">
+                                    <Label>رقم الحساب</Label>
+                                    <Input
+                                        value={formData.code}
+                                        onChange={(e) => setFormData({ ...formData, code: e.target.value })}
+                                        placeholder="1102"
+                                        dir="ltr"
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label>النوع الفرعي</Label>
+                                    <Select
+                                        value={formData.subType}
+                                        onValueChange={(value) => setFormData({ ...formData, subType: value as AccountSubType })}
+                                    >
+                                        <SelectTrigger>
+                                            <SelectValue />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {Object.entries(subTypeLabels).map(([key, label]) => (
+                                                <SelectItem key={key} value={key}>{label}</SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                            </div>
+                            <div className="space-y-2">
+                                <Label>الاسم (عربي)</Label>
+                                <Input
+                                    value={formData.nameAr}
+                                    onChange={(e) => setFormData({ ...formData, nameAr: e.target.value })}
+                                    placeholder="الحساب البنكي الرئيسي"
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <Label>الاسم (إنجليزي)</Label>
+                                <Input
+                                    value={formData.name}
+                                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                                    placeholder="Main Bank Account"
+                                    dir="ltr"
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <Label>الوصف</Label>
+                                <Textarea
+                                    value={formData.description}
+                                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                                    placeholder="وصف الحساب..."
+                                />
+                            </div>
+                            <div className="flex items-center justify-between">
+                                <Label>حساب نشط</Label>
+                                <Switch
+                                    checked={formData.isActive}
+                                    onCheckedChange={(checked) => setFormData({ ...formData, isActive: checked })}
+                                />
+                            </div>
+                        </div>
+                        <DialogFooter>
+                            <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
+                                إلغاء
+                            </Button>
+                            <Button
+                                onClick={handleSubmit}
+                                disabled={createAccountMutation.isPending || updateAccountMutation.isPending}
+                            >
+                                {(createAccountMutation.isPending || updateAccountMutation.isPending) && (
+                                    <Loader2 className="h-4 w-4 ml-1 animate-spin" />
+                                )}
+                                {editingAccount ? 'تحديث' : 'إضافة'}
+                            </Button>
+                        </DialogFooter>
+                    </DialogContent>
+                </Dialog>
+            </div>
+
+            {accounts.length === 0 ? (
+                <div className="text-center py-8 text-slate-500">
+                    لا توجد حسابات
+                </div>
+            ) : (
+                <Table>
+                    <TableHeader>
+                        <TableRow>
+                            <TableHead className="text-right">الرقم</TableHead>
+                            <TableHead className="text-right">الاسم</TableHead>
+                            <TableHead className="text-right">النوع</TableHead>
+                            <TableHead className="text-right">الحالة</TableHead>
+                            <TableHead className="text-right">الإجراءات</TableHead>
+                        </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                        {accounts.map((account) => (
+                            <TableRow key={account._id}>
+                                <TableCell className="font-mono" dir="ltr">{account.code}</TableCell>
+                                <TableCell>{account.nameAr || account.name}</TableCell>
+                                <TableCell>
+                                    <Badge variant="outline">
+                                        {subTypeLabels[account.subType] || account.subType}
+                                    </Badge>
+                                </TableCell>
+                                <TableCell>
+                                    {account.isActive ? (
+                                        <Badge className="bg-green-100 text-green-700">نشط</Badge>
+                                    ) : (
+                                        <Badge variant="secondary">غير نشط</Badge>
+                                    )}
+                                </TableCell>
+                                <TableCell>
+                                    <div className="flex gap-1">
+                                        <Button
+                                            variant="ghost"
+                                            size="icon"
+                                            onClick={() => handleOpenDialog(account)}
+                                            disabled={account.isSystemAccount}
+                                        >
+                                            <Pencil className="h-4 w-4" />
+                                        </Button>
+                                        <Button
+                                            variant="ghost"
+                                            size="icon"
+                                            onClick={() => handleDelete(account._id)}
+                                            disabled={account.isSystemAccount}
+                                            className="text-red-600 hover:text-red-700"
+                                        >
+                                            <Trash2 className="h-4 w-4" />
+                                        </Button>
+                                    </div>
+                                </TableCell>
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                </Table>
+            )}
+        </div>
+    )
+}
+
+// ==================== PRICE LEVELS LIST COMPONENT ====================
+
+interface PriceLevelsListProps {
+    priceLevels: PriceLevel[]
+    isLoading: boolean
+}
+
+function PriceLevelsList({ priceLevels, isLoading }: PriceLevelsListProps) {
+    const [isDialogOpen, setIsDialogOpen] = useState(false)
+    const [editingLevel, setEditingLevel] = useState<PriceLevel | null>(null)
+    const [formData, setFormData] = useState({
+        code: '',
+        name: '',
+        nameAr: '',
+        pricingType: 'percentage' as 'percentage' | 'fixed',
+        percentageAdjustment: 0,
+        fixedAdjustment: 0,
+        minimumRevenue: 0,
+        minimumCases: 0,
+        priority: 1,
+    })
+
+    const createMutation = useCreatePriceLevel()
+    const updateMutation = useUpdatePriceLevel()
+    const deleteMutation = useDeletePriceLevel()
+    const setDefaultMutation = useSetDefaultPriceLevel()
+
+    const handleOpenDialog = (level?: PriceLevel) => {
+        if (level) {
+            setEditingLevel(level)
+            setFormData({
+                code: level.code,
+                name: level.name,
+                nameAr: level.nameAr,
+                pricingType: level.pricingType === 'rate_table' ? 'percentage' : level.pricingType,
+                percentageAdjustment: level.percentageAdjustment || 0,
+                fixedAdjustment: level.fixedAdjustment || 0,
+                minimumRevenue: level.minimumRevenue || 0,
+                minimumCases: level.minimumCases || 0,
+                priority: level.priority,
+            })
+        } else {
+            setEditingLevel(null)
+            setFormData({
+                code: '',
+                name: '',
+                nameAr: '',
+                pricingType: 'percentage',
+                percentageAdjustment: 0,
+                fixedAdjustment: 0,
+                minimumRevenue: 0,
+                minimumCases: 0,
+                priority: 1,
+            })
+        }
+        setIsDialogOpen(true)
+    }
+
+    const handleSubmit = async () => {
+        const data = {
+            code: formData.code,
+            name: formData.name,
+            nameAr: formData.nameAr,
+            pricingType: formData.pricingType,
+            percentageAdjustment: formData.pricingType === 'percentage' ? formData.percentageAdjustment : undefined,
+            fixedAdjustment: formData.pricingType === 'fixed' ? formData.fixedAdjustment : undefined,
+            minimumRevenue: formData.minimumRevenue || undefined,
+            minimumCases: formData.minimumCases || undefined,
+            priority: formData.priority,
+        }
+
+        if (editingLevel) {
+            await updateMutation.mutateAsync({ id: editingLevel._id, data })
+        } else {
+            await createMutation.mutateAsync(data)
+        }
+        setIsDialogOpen(false)
+    }
+
+    const handleDelete = async (id: string) => {
+        if (confirm('هل أنت متأكد من حذف هذا المستوى؟')) {
+            await deleteMutation.mutateAsync(id)
+        }
+    }
+
+    const handleSetDefault = async (id: string) => {
+        await setDefaultMutation.mutateAsync(id)
+    }
+
+    if (isLoading) {
+        return <Skeleton className="h-32 w-full" />
+    }
+
+    return (
+        <div className="space-y-4">
+            <div className="flex justify-end">
+                <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                    <DialogTrigger asChild>
+                        <Button size="sm" onClick={() => handleOpenDialog()}>
+                            <Plus className="h-4 w-4 ml-1" />
+                            إضافة مستوى
+                        </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                        <DialogHeader>
+                            <DialogTitle>
+                                {editingLevel ? 'تعديل مستوى السعر' : 'إضافة مستوى سعر جديد'}
+                            </DialogTitle>
+                            <DialogDescription>
+                                تحديد مستويات الأسعار للعملاء المميزين
+                            </DialogDescription>
+                        </DialogHeader>
+                        <div className="space-y-4 py-4">
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="space-y-2">
+                                    <Label>الرمز</Label>
+                                    <Input
+                                        value={formData.code}
+                                        onChange={(e) => setFormData({ ...formData, code: e.target.value.toUpperCase() })}
+                                        placeholder="PREMIUM"
+                                        dir="ltr"
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label>الأولوية</Label>
+                                    <Input
+                                        type="number"
+                                        value={formData.priority}
+                                        onChange={(e) => setFormData({ ...formData, priority: parseInt(e.target.value) || 1 })}
+                                        min="1"
+                                    />
+                                </div>
+                            </div>
+                            <div className="space-y-2">
+                                <Label>الاسم (عربي)</Label>
+                                <Input
+                                    value={formData.nameAr}
+                                    onChange={(e) => setFormData({ ...formData, nameAr: e.target.value })}
+                                    placeholder="العملاء المميزين"
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <Label>الاسم (إنجليزي)</Label>
+                                <Input
+                                    value={formData.name}
+                                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                                    placeholder="Premium Clients"
+                                    dir="ltr"
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <Label>نوع التعديل</Label>
+                                <Select
+                                    value={formData.pricingType}
+                                    onValueChange={(value) => setFormData({ ...formData, pricingType: value as 'percentage' | 'fixed' })}
+                                >
+                                    <SelectTrigger>
+                                        <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="percentage">نسبة مئوية</SelectItem>
+                                        <SelectItem value="fixed">مبلغ ثابت</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                            {formData.pricingType === 'percentage' ? (
+                                <div className="space-y-2">
+                                    <Label>نسبة التعديل (%)</Label>
+                                    <Input
+                                        type="number"
+                                        value={formData.percentageAdjustment}
+                                        onChange={(e) => setFormData({ ...formData, percentageAdjustment: parseFloat(e.target.value) || 0 })}
+                                        placeholder="-10 للخصم، 10 للزيادة"
+                                    />
+                                    <p className="text-xs text-slate-500">
+                                        قيمة سالبة للخصم، موجبة للزيادة
+                                    </p>
+                                </div>
+                            ) : (
+                                <div className="space-y-2">
+                                    <Label>مبلغ التعديل (ر.س)</Label>
+                                    <Input
+                                        type="number"
+                                        value={formData.fixedAdjustment}
+                                        onChange={(e) => setFormData({ ...formData, fixedAdjustment: parseFloat(e.target.value) || 0 })}
+                                        placeholder="-50 للخصم، 50 للزيادة"
+                                    />
+                                </div>
+                            )}
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="space-y-2">
+                                    <Label>الحد الأدنى للإيرادات (ر.س)</Label>
+                                    <Input
+                                        type="number"
+                                        value={formData.minimumRevenue}
+                                        onChange={(e) => setFormData({ ...formData, minimumRevenue: parseFloat(e.target.value) || 0 })}
+                                        placeholder="100000"
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label>الحد الأدنى للقضايا</Label>
+                                    <Input
+                                        type="number"
+                                        value={formData.minimumCases}
+                                        onChange={(e) => setFormData({ ...formData, minimumCases: parseInt(e.target.value) || 0 })}
+                                        placeholder="3"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                        <DialogFooter>
+                            <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
+                                إلغاء
+                            </Button>
+                            <Button
+                                onClick={handleSubmit}
+                                disabled={createMutation.isPending || updateMutation.isPending}
+                            >
+                                {(createMutation.isPending || updateMutation.isPending) && (
+                                    <Loader2 className="h-4 w-4 ml-1 animate-spin" />
+                                )}
+                                {editingLevel ? 'تحديث' : 'إضافة'}
+                            </Button>
+                        </DialogFooter>
+                    </DialogContent>
+                </Dialog>
+            </div>
+
+            {priceLevels.length === 0 ? (
+                <div className="text-center py-8 text-slate-500">
+                    لا توجد مستويات أسعار
+                </div>
+            ) : (
+                <Table>
+                    <TableHeader>
+                        <TableRow>
+                            <TableHead className="text-right">الرمز</TableHead>
+                            <TableHead className="text-right">الاسم</TableHead>
+                            <TableHead className="text-right">التعديل</TableHead>
+                            <TableHead className="text-right">الشروط</TableHead>
+                            <TableHead className="text-right">الإجراءات</TableHead>
+                        </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                        {priceLevels.map((level) => (
+                            <TableRow key={level._id}>
+                                <TableCell className="font-mono" dir="ltr">
+                                    {level.code}
+                                    {level.isDefault && (
+                                        <Badge className="mr-2 bg-brand-blue">افتراضي</Badge>
+                                    )}
+                                </TableCell>
+                                <TableCell>{level.nameAr || level.name}</TableCell>
+                                <TableCell>
+                                    {level.pricingType === 'percentage' ? (
+                                        <span className={level.percentageAdjustment && level.percentageAdjustment < 0 ? 'text-green-600' : 'text-red-600'}>
+                                            {level.percentageAdjustment}%
+                                        </span>
+                                    ) : (
+                                        <span className={level.fixedAdjustment && level.fixedAdjustment < 0 ? 'text-green-600' : 'text-red-600'}>
+                                            {formatSAR(level.fixedAdjustment || 0)}
+                                        </span>
+                                    )}
+                                </TableCell>
+                                <TableCell>
+                                    <div className="text-sm text-slate-500">
+                                        {level.minimumRevenue && `إيرادات: ${formatSAR(level.minimumRevenue)}`}
+                                        {level.minimumRevenue && level.minimumCases && ' | '}
+                                        {level.minimumCases && `قضايا: ${level.minimumCases}`}
+                                        {!level.minimumRevenue && !level.minimumCases && '-'}
+                                    </div>
+                                </TableCell>
+                                <TableCell>
+                                    <div className="flex gap-1">
+                                        {!level.isDefault && (
+                                            <Button
+                                                variant="ghost"
+                                                size="sm"
+                                                onClick={() => handleSetDefault(level._id)}
+                                            >
+                                                تعيين افتراضي
+                                            </Button>
+                                        )}
+                                        <Button
+                                            variant="ghost"
+                                            size="icon"
+                                            onClick={() => handleOpenDialog(level)}
+                                        >
+                                            <Pencil className="h-4 w-4" />
+                                        </Button>
+                                        <Button
+                                            variant="ghost"
+                                            size="icon"
+                                            onClick={() => handleDelete(level._id)}
+                                            className="text-red-600 hover:text-red-700"
+                                        >
+                                            <Trash2 className="h-4 w-4" />
+                                        </Button>
+                                    </div>
+                                </TableCell>
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                </Table>
+            )}
+        </div>
     )
 }
