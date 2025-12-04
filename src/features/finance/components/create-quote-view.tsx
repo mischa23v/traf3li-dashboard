@@ -225,7 +225,7 @@ export default function CreateQuoteView() {
                                                     <SelectValue placeholder={loadingCases ? "جاري التحميل..." : "اختر القضية"} />
                                                 </SelectTrigger>
                                                 <SelectContent>
-                                                    <SelectItem value="">بدون قضية</SelectItem>
+                                                    <SelectItem value="none">بدون قضية</SelectItem>
                                                     {casesData?.data?.map((caseItem: any) => (
                                                         <SelectItem key={caseItem._id} value={caseItem._id}>
                                                             {caseItem.caseNumber} - {caseItem.title}

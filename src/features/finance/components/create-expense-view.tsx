@@ -337,7 +337,7 @@ export function CreateExpenseView() {
                                                     <SelectValue placeholder={loadingClients ? "جاري التحميل..." : "اختر العميل"} />
                                                 </SelectTrigger>
                                                 <SelectContent>
-                                                    <SelectItem value="">بدون عميل (مصروف عام)</SelectItem>
+                                                    <SelectItem value="none">بدون عميل (مصروف عام)</SelectItem>
                                                     {clientsData?.data?.map((client: any) => (
                                                         <SelectItem key={client._id} value={client._id}>
                                                             {client.name || client.fullName}
@@ -365,7 +365,7 @@ export function CreateExpenseView() {
                                                     <SelectValue placeholder={loadingCases ? "جاري التحميل..." : "اختر القضية"} />
                                                 </SelectTrigger>
                                                 <SelectContent>
-                                                    <SelectItem value="">بدون قضية</SelectItem>
+                                                    <SelectItem value="none">بدون قضية</SelectItem>
                                                     {casesData?.data?.map((caseItem: any) => (
                                                         <SelectItem key={caseItem._id} value={caseItem._id}>
                                                             {caseItem.caseNumber} - {caseItem.title}

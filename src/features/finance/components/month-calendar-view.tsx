@@ -255,7 +255,7 @@ export function MonthCalendarView() {
               <SelectValue placeholder="جميع العملاء" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">جميع العملاء</SelectItem>
+              <SelectItem value="all">جميع العملاء</SelectItem>
               {casesAndClients?.clients?.map((client: { id: string; name: string }) => (
                 <SelectItem key={client.id} value={client.id}>
                   {client.name}
