@@ -2,14 +2,15 @@ import { useState, useMemo } from 'react'
 import {
     Clock, Bell, MapPin, Calendar as CalendarIcon,
     Plus, CheckSquare, Trash2, List, X, ChevronRight, Loader2, AlertCircle,
-    Edit3, Eye
+    Edit3, Eye, ListTodo, CalendarClock
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Link } from '@tanstack/react-router'
 import { cn } from '@/lib/utils'
 import { useCalendar } from '@/hooks/useCalendar'
-import { useUpcomingReminders } from '@/hooks/useRemindersAndEvents'
+import { useUpcomingReminders, useOverdueReminders, useUpcomingEvents } from '@/hooks/useRemindersAndEvents'
+import { useDueTodayTasks, useOverdueTasks } from '@/hooks/useTasks'
 import { format, addDays, startOfDay, endOfDay, isSameDay } from 'date-fns'
 import { arSA } from 'date-fns/locale'
 
@@ -57,6 +58,10 @@ export function TasksSidebar({
 
     // Fetch upcoming reminders for the notifications tab
     const { data: upcomingRemindersData, isLoading: isRemindersLoading } = useUpcomingReminders(7)
+    const { data: overdueRemindersData } = useOverdueReminders()
+    const { data: upcomingEventsData, isLoading: isEventsLoading } = useUpcomingEvents(7)
+    const { data: dueTodayTasksData, isLoading: isTasksLoading } = useDueTodayTasks()
+    const { data: overdueTasksData } = useOverdueTasks()
 
     // Filter events for the selected date
     const selectedDateEvents = useMemo(() => {
@@ -66,11 +71,112 @@ export function TasksSidebar({
         ).sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime())
     }, [calendarData, selectedDate])
 
-    // Get upcoming reminders (limit to 5)
-    const upcomingReminders = useMemo(() => {
-        if (!upcomingRemindersData?.data) return []
-        return upcomingRemindersData.data.slice(0, 5)
-    }, [upcomingRemindersData])
+    // Combine all alerts: reminders, events, tasks (limit to 8)
+    const allAlerts = useMemo(() => {
+        const alerts: Array<{
+            id: string
+            type: 'reminder' | 'event' | 'task'
+            title: string
+            dateTime: string
+            priority?: string
+            isOverdue: boolean
+            link: string
+        }> = []
+
+        // Add upcoming reminders
+        if (upcomingRemindersData?.data) {
+            upcomingRemindersData.data.forEach((r: any) => {
+                alerts.push({
+                    id: r._id,
+                    type: 'reminder',
+                    title: r.title,
+                    dateTime: r.reminderDateTime || r.reminderDate,
+                    priority: r.priority,
+                    isOverdue: false,
+                    link: `/dashboard/tasks/reminders/${r._id}`
+                })
+            })
+        }
+
+        // Add overdue reminders
+        if (overdueRemindersData?.data) {
+            overdueRemindersData.data.forEach((r: any) => {
+                alerts.push({
+                    id: r._id,
+                    type: 'reminder',
+                    title: r.title,
+                    dateTime: r.reminderDateTime || r.reminderDate,
+                    priority: r.priority || 'high',
+                    isOverdue: true,
+                    link: `/dashboard/tasks/reminders/${r._id}`
+                })
+            })
+        }
+
+        // Add upcoming events
+        if (upcomingEventsData?.data) {
+            upcomingEventsData.data.forEach((e: any) => {
+                alerts.push({
+                    id: e._id,
+                    type: 'event',
+                    title: e.title,
+                    dateTime: e.startDateTime || e.date,
+                    priority: e.priority,
+                    isOverdue: false,
+                    link: `/dashboard/tasks/events/${e._id}`
+                })
+            })
+        }
+
+        // Add due today tasks
+        if (dueTodayTasksData) {
+            const tasks = Array.isArray(dueTodayTasksData) ? dueTodayTasksData : dueTodayTasksData?.data || []
+            tasks.forEach((t: any) => {
+                alerts.push({
+                    id: t._id,
+                    type: 'task',
+                    title: t.title,
+                    dateTime: t.dueDate,
+                    priority: t.priority,
+                    isOverdue: false,
+                    link: `/dashboard/tasks/${t._id}`
+                })
+            })
+        }
+
+        // Add overdue tasks
+        if (overdueTasksData) {
+            const tasks = Array.isArray(overdueTasksData) ? overdueTasksData : overdueTasksData?.data || []
+            tasks.forEach((t: any) => {
+                alerts.push({
+                    id: t._id,
+                    type: 'task',
+                    title: t.title,
+                    dateTime: t.dueDate,
+                    priority: t.priority || 'high',
+                    isOverdue: true,
+                    link: `/dashboard/tasks/${t._id}`
+                })
+            })
+        }
+
+        // Sort: overdue first, then by date
+        alerts.sort((a, b) => {
+            if (a.isOverdue && !b.isOverdue) return -1
+            if (!a.isOverdue && b.isOverdue) return 1
+            return new Date(a.dateTime).getTime() - new Date(b.dateTime).getTime()
+        })
+
+        // Remove duplicates by id
+        const seen = new Set<string>()
+        return alerts.filter(a => {
+            if (seen.has(a.id)) return false
+            seen.add(a.id)
+            return true
+        }).slice(0, 8)
+    }, [upcomingRemindersData, overdueRemindersData, upcomingEventsData, dueTodayTasksData, overdueTasksData])
+
+    const isAlertsLoading = isRemindersLoading || isEventsLoading || isTasksLoading
 
     const links = {
         tasks: {
@@ -109,13 +215,39 @@ export function TasksSidebar({
         return 'emerald'
     }
 
-    // Get priority color for reminders
-    const getPriorityColor = (priority?: string) => {
-        switch (priority) {
-            case 'critical': return 'red'
-            case 'high': return 'orange'
-            case 'medium': return 'blue'
-            default: return 'blue'
+    // Get alert styling based on type
+    const getAlertStyle = (alert: { type: 'reminder' | 'event' | 'task'; isOverdue: boolean; priority?: string }) => {
+        if (alert.isOverdue) {
+            return { bgColor: 'bg-red-50', textColor: 'text-red-500', hoverBg: 'group-hover:bg-red-500' }
+        }
+        switch (alert.type) {
+            case 'event':
+                return { bgColor: 'bg-blue-50', textColor: 'text-blue-500', hoverBg: 'group-hover:bg-blue-500' }
+            case 'task':
+                return { bgColor: 'bg-amber-50', textColor: 'text-amber-500', hoverBg: 'group-hover:bg-amber-500' }
+            case 'reminder':
+            default:
+                return { bgColor: 'bg-emerald-50', textColor: 'text-emerald-500', hoverBg: 'group-hover:bg-emerald-500' }
+        }
+    }
+
+    // Get icon based on alert type
+    const getAlertIcon = (type: 'reminder' | 'event' | 'task', isOverdue: boolean) => {
+        if (isOverdue) return AlertCircle
+        switch (type) {
+            case 'event': return CalendarClock
+            case 'task': return ListTodo
+            case 'reminder':
+            default: return Bell
+        }
+    }
+
+    // Get type label
+    const getTypeLabel = (type: 'reminder' | 'event' | 'task') => {
+        switch (type) {
+            case 'event': return 'حدث'
+            case 'task': return 'مهمة'
+            case 'reminder': return 'تذكير'
         }
     }
 
@@ -289,9 +421,14 @@ export function TasksSidebar({
                             {format(new Date(), 'MMMM', { locale: arSA })}
                         </Badge>
                     )}
-                    {activeTab === 'notifications' && upcomingReminders.length > 0 && (
-                        <Badge className="bg-emerald-500/20 text-emerald-100 border-0 rounded-full px-3 hover:bg-emerald-500/30">
-                            {upcomingReminders.length}
+                    {activeTab === 'notifications' && allAlerts.length > 0 && (
+                        <Badge className={cn(
+                            "border-0 rounded-full px-3 hover:opacity-80",
+                            allAlerts.some(a => a.isOverdue)
+                                ? "bg-red-500/20 text-red-100"
+                                : "bg-emerald-500/20 text-emerald-100"
+                        )}>
+                            {allAlerts.length}
                         </Badge>
                     )}
                 </div>
@@ -379,52 +516,49 @@ export function TasksSidebar({
                         </div>
                     ) : (
                         <div className="space-y-3 animate-in fade-in slide-in-from-bottom-2 duration-300 min-h-[200px]">
-                            {isRemindersLoading ? (
+                            {isAlertsLoading ? (
                                 <div className="flex items-center justify-center h-full py-12">
                                     <Loader2 className="h-6 w-6 animate-spin text-emerald-600" />
                                 </div>
-                            ) : upcomingReminders.length === 0 ? (
+                            ) : allAlerts.length === 0 ? (
                                 <div className="flex flex-col items-center justify-center py-8 text-slate-400">
                                     <Bell className="h-10 w-10 mb-2 opacity-20" />
                                     <p className="text-xs font-medium">لا توجد تنبيهات قادمة</p>
                                 </div>
                             ) : (
                                 <>
-                                    {upcomingReminders.map((reminder) => {
-                                        const priorityColor = getPriorityColor(reminder.priority)
-                                        const reminderDate = reminder.reminderDateTime || reminder.reminderDate
-                                        const isOverdue = reminderDate && new Date(reminderDate) < new Date()
+                                    {allAlerts.map((alert) => {
+                                        const style = getAlertStyle(alert)
+                                        const Icon = getAlertIcon(alert.type, alert.isOverdue)
 
                                         return (
                                             <Link
-                                                key={reminder._id}
-                                                to={`/dashboard/tasks/reminders/${reminder._id}`}
+                                                key={`${alert.type}-${alert.id}`}
+                                                to={alert.link}
                                                 className="flex gap-3 p-3 rounded-xl bg-white border border-slate-100 hover:shadow-md transition-all cursor-pointer group"
                                             >
                                                 <div className={cn(
                                                     "w-10 h-10 rounded-full flex items-center justify-center shrink-0 transition-colors",
-                                                    isOverdue
-                                                        ? "bg-red-50 text-red-500 group-hover:bg-red-500 group-hover:text-white"
-                                                        : `bg-${priorityColor}-50 text-${priorityColor}-500 group-hover:bg-${priorityColor}-500 group-hover:text-white`
+                                                    style.bgColor, style.textColor, style.hoverBg, "group-hover:text-white"
                                                 )}>
-                                                    {isOverdue ? <AlertCircle className="w-5 h-5" /> : <Bell className="w-5 h-5" />}
+                                                    <Icon className="w-5 h-5" />
                                                 </div>
                                                 <div className="flex-1 min-w-0">
-                                                    <p className={cn(
-                                                        "text-sm font-bold text-slate-800 transition-colors truncate",
-                                                        isOverdue ? "group-hover:text-red-600" : `group-hover:text-${priorityColor}-600`
-                                                    )}>
-                                                        {reminder.title}
+                                                    <p className="text-sm font-bold text-slate-800 transition-colors truncate group-hover:text-slate-900">
+                                                        {alert.title}
                                                     </p>
-                                                    <div className="flex items-center gap-2 mt-1">
-                                                        {reminderDate && (
+                                                    <div className="flex items-center gap-2 mt-1 flex-wrap">
+                                                        <Badge variant="outline" className="text-[10px] px-1.5 py-0 border-slate-200">
+                                                            {getTypeLabel(alert.type)}
+                                                        </Badge>
+                                                        {alert.dateTime && (
                                                             <p className="text-xs text-slate-500">
-                                                                {format(new Date(reminderDate), 'dd MMM', { locale: arSA })}
+                                                                {format(new Date(alert.dateTime), 'dd MMM', { locale: arSA })}
                                                                 {' - '}
-                                                                {formatReminderTime(reminderDate)}
+                                                                {formatReminderTime(alert.dateTime)}
                                                             </p>
                                                         )}
-                                                        {isOverdue && (
+                                                        {alert.isOverdue && (
                                                             <Badge variant="destructive" className="text-[10px] px-1.5 py-0">
                                                                 متأخر
                                                             </Badge>
@@ -437,8 +571,8 @@ export function TasksSidebar({
                                 </>
                             )}
                             <Button asChild variant="ghost" className="w-full text-xs text-slate-400 hover:text-emerald-600 hover:bg-emerald-50">
-                                <Link to="/dashboard/tasks/reminders">
-                                    عرض كل التنبيهات
+                                <Link to="/dashboard/calendar">
+                                    عرض التقويم الكامل
                                 </Link>
                             </Button>
                         </div>
