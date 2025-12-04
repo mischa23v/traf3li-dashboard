@@ -252,32 +252,6 @@ export function InvoiceDetailsView() {
                     title={invoice.id}
                     type="invoices"
                     listMode={true}
-                    stats={[
-                        {
-                            label: "العميل",
-                            value: invoice.client,
-                            icon: User,
-                            status: 'normal'
-                        },
-                        {
-                            label: "تاريخ الإصدار",
-                            value: invoice.issueDate,
-                            icon: Calendar,
-                            status: 'normal'
-                        },
-                        {
-                            label: "تاريخ الاستحقاق",
-                            value: invoice.dueDate,
-                            icon: Clock,
-                            status: 'normal'
-                        },
-                        {
-                            label: "الإجمالي المستحق",
-                            value: `${invoice.amount} ${invoice.currency}`,
-                            icon: DollarSign,
-                            status: 'attention'
-                        }
-                    ]}
                 />
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">

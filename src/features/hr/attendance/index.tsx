@@ -284,9 +284,7 @@ export function AttendancePage() {
                 <ProductivityHero
                     badge="الموارد البشرية"
                     title="الحضور والانصراف"
-                    type="hr"
-                    stats={stats}
-                    hideButtons={true}
+                    type="attendance"
                 >
                         <div className="flex flex-col gap-4 w-full">
                             <div className="flex items-center gap-4 mb-4">

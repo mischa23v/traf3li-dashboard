@@ -175,36 +175,8 @@ export default function QuoteDetailsView() {
                     <ProductivityHero
                         badge="عرض سعر"
                         title={`عرض سعر #${quote.quoteNumber}`}
-                        type="invoices"
+                        type="quotes"
                         listMode={true}
-                        stats={[
-                            {
-                                label: "العميل",
-                                value: typeof quote.clientId === 'object'
-                                    ? `${quote.clientId.firstName || ''} ${quote.clientId.lastName || ''}`.trim() || quote.clientId.name
-                                    : 'غير محدد',
-                                icon: User,
-                                status: 'normal'
-                            },
-                            {
-                                label: "تاريخ الإصدار",
-                                value: formatDate(quote.date),
-                                icon: Calendar,
-                                status: 'normal'
-                            },
-                            {
-                                label: "تاريخ الانتهاء",
-                                value: formatDate(quote.expiredDate),
-                                icon: Clock,
-                                status: isExpired ? 'attention' : 'normal'
-                            },
-                            {
-                                label: "الإجمالي",
-                                value: formatCurrency(quote.total, quote.currency),
-                                icon: DollarSign,
-                                status: 'normal'
-                            }
-                        ]}
                     >
                         <div className="flex gap-2 flex-wrap">
                             {quote.status === 'draft' && (

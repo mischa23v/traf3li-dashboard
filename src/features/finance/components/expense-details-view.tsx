@@ -210,32 +210,6 @@ export function ExpenseDetailsView() {
                     title={expense.description}
                     type="expenses"
                     listMode={true}
-                    stats={[
-                        {
-                            label: "الفئة",
-                            value: expense.category,
-                            icon: Receipt,
-                            status: 'normal'
-                        },
-                        {
-                            label: "التاريخ",
-                            value: expense.date,
-                            icon: Calendar,
-                            status: 'normal'
-                        },
-                        {
-                            label: "دفع بواسطة",
-                            value: expense.paidBy,
-                            icon: User,
-                            status: 'normal'
-                        },
-                        {
-                            label: "المبلغ",
-                            value: `${expense.amount} ${expense.currency}`,
-                            icon: DollarSign,
-                            status: 'attention'
-                        }
-                    ]}
                 />
 
                 <div className="max-w-[1600px] mx-auto pb-12">

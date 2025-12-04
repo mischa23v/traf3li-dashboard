@@ -168,30 +168,6 @@ export default function AccountsDashboard({ }: AccountsDashboardProps) {
                             badge="السنة المالية 2025"
                             title="لوحة الحسابات"
                             type="finance"
-                            hideButtons={true}
-                            stats={[
-                                {
-                                    label: "إجمالي الرصيد",
-                                    value: formatCurrency(financialSummary.totalBalance),
-                                    icon: Landmark,
-                                    trend: `${financialSummary.growth}%`,
-                                },
-                                {
-                                    label: "الإيرادات (هذا الشهر)",
-                                    value: formatCurrency(financialSummary.monthlyRevenue),
-                                    icon: TrendingUp
-                                },
-                                {
-                                    label: "المصروفات (هذا الشهر)",
-                                    value: formatCurrency(financialSummary.monthlyExpenses),
-                                    icon: TrendingDown
-                                },
-                                {
-                                    label: "صافي الربح",
-                                    value: formatCurrency(financialSummary.netProfit),
-                                    icon: PieChart
-                                }
-                            ]}
                         >
                             <div className="flex gap-3">
                                 <Button variant="outline" className="bg-white/5 border-white/10 text-white hover:bg-white/10 rounded-xl h-10 px-5 backdrop-blur-sm">

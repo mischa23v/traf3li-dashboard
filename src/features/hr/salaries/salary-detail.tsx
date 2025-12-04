@@ -120,35 +120,8 @@ export function SalaryDetail() {
                         <ProductivityHero
                             badge="الموارد البشرية"
                             title={`كشف راتب - ${salary.month}/${salary.year}`}
-                            type="hr"
+                            type="payslips"
                             listMode={true}
-                            hideButtons={true}
-                            stats={[
-                                {
-                                    label: "الراتب الأساسي",
-                                    value: formatCurrency(salary.basicSalary),
-                                    icon: DollarSign,
-                                    status: 'normal'
-                                },
-                                {
-                                    label: "إجمالي البدلات",
-                                    value: formatCurrency(salary.totalAllowances || 0),
-                                    icon: TrendingUp,
-                                    status: 'normal'
-                                },
-                                {
-                                    label: "إجمالي الخصومات",
-                                    value: formatCurrency(salary.totalDeductions || 0),
-                                    icon: TrendingDown,
-                                    status: 'normal'
-                                },
-                                {
-                                    label: "صافي الراتب",
-                                    value: formatCurrency(salary.netSalary),
-                                    icon: CreditCard,
-                                    status: 'normal'
-                                }
-                            ]}
                         >
                                 <div className="flex flex-col gap-4 w-full">
                                     <div className="flex items-center gap-4 mb-6">

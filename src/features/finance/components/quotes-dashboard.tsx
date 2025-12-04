@@ -264,34 +264,7 @@ export default function QuotesDashboard() {
                     <ProductivityHero
                         badge="عروض الأسعار"
                         title="إدارة عروض الأسعار"
-                        type="finance"
-                        hideButtons={true}
-                        stats={[
-                            {
-                                label: "قيد المراجعة",
-                                value: formatCurrency(stats.totalPending),
-                                icon: Clock,
-                                status: stats.totalPending > 0 ? 'attention' : 'normal'
-                            },
-                            {
-                                label: "تم القبول",
-                                value: formatCurrency(stats.totalAccepted),
-                                icon: CheckCircle,
-                                status: 'normal'
-                            },
-                            {
-                                label: "تم الرفض",
-                                value: formatCurrency(stats.totalDeclined),
-                                icon: XCircle,
-                                status: 'normal'
-                            },
-                            {
-                                label: "إجمالي هذا الشهر",
-                                value: formatCurrency(stats.totalThisMonth),
-                                icon: FileText,
-                                status: 'normal'
-                            }
-                        ]}
+                        type="quotes"
                     >
                         <div className="flex gap-3">
                             <Button asChild className="bg-emerald-500 hover:bg-emerald-600 text-white h-10 px-5 rounded-xl font-bold shadow-lg shadow-emerald-500/20 border-0">

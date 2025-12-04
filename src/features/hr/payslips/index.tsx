@@ -224,34 +224,7 @@ export function PayslipsPage() {
                 <ProductivityHero
                     badge="الموارد البشرية"
                     title="قسائم الرواتب"
-                    type="hr"
-                    hideButtons={true}
-                    stats={[
-                        {
-                            label: "إجمالي الرواتب",
-                            value: formatCurrency(stats.totalNet),
-                            icon: Wallet,
-                            status: 'normal'
-                        },
-                        {
-                            label: "قسائم مدفوعة",
-                            value: stats.totalPaid,
-                            icon: CheckCircle,
-                            status: 'normal'
-                        },
-                        {
-                            label: "قيد المراجعة",
-                            value: stats.totalPending,
-                            icon: Clock,
-                            status: 'normal'
-                        },
-                        {
-                            label: "إجمالي القسائم",
-                            value: stats.total,
-                            icon: FileText,
-                            status: 'normal'
-                        }
-                    ]}
+                    type="payslips"
                 >
                         <div className="flex flex-col gap-4 w-full">
                             <div className="flex flex-wrap items-center gap-3">

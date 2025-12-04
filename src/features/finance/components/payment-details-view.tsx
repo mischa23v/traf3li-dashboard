@@ -166,26 +166,6 @@ export default function PaymentDetailsView() {
                         title={formatCurrency(payment.amount, payment.currency)}
                         type="payments"
                         listMode={true}
-                        stats={[
-                            {
-                                label: "تاريخ الدفع",
-                                value: formatDate(payment.paymentDate),
-                                icon: Calendar,
-                                status: 'normal'
-                            },
-                            {
-                                label: "طريقة الدفع",
-                                value: payment.paymentMethod || 'تحويل بنكي',
-                                icon: CreditCard,
-                                status: 'normal'
-                            },
-                            {
-                                label: "الحالة",
-                                value: status.label,
-                                icon: StatusIcon,
-                                status: 'normal'
-                            }
-                        ]}
                     />
 
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

@@ -142,35 +142,8 @@ export function LeaveDetail() {
                             <ProductivityHero
                                 badge="الموارد البشرية"
                                 title={`طلب إجازة ${leaveTypeConfig[leave.leaveType]?.label}`}
-                                type="hr"
+                                type="leaves"
                                 listMode={true}
-                                hideButtons={true}
-                                stats={[
-                                    {
-                                        label: "تاريخ البداية",
-                                        value: format(parseISO(leave.startDate), 'd MMM yyyy', { locale: ar }),
-                                        icon: Calendar,
-                                        status: 'normal'
-                                    },
-                                    {
-                                        label: "تاريخ النهاية",
-                                        value: format(parseISO(leave.endDate), 'd MMM yyyy', { locale: ar }),
-                                        icon: Calendar,
-                                        status: 'normal'
-                                    },
-                                    {
-                                        label: "عدد الأيام",
-                                        value: `${differenceInDays(parseISO(leave.endDate), parseISO(leave.startDate)) + 1} يوم`,
-                                        icon: Clock,
-                                        status: 'normal'
-                                    },
-                                    {
-                                        label: "نوع الإجازة",
-                                        value: leaveTypeConfig[leave.leaveType]?.label,
-                                        icon: FileText,
-                                        status: 'normal'
-                                    }
-                                ]}
                             >
                                 <div className="flex flex-col gap-4 w-full">
                                     <div className="flex items-center gap-4 mb-6">

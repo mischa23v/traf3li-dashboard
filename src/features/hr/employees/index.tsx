@@ -271,33 +271,7 @@ export function EmployeesPage() {
                 <ProductivityHero
                     badge="الموارد البشرية"
                     title="الموظفين"
-                    type="hr"
-                    stats={[
-                        {
-                            label: "إجمالي الموظفين",
-                            value: stats?.total || defaultStats.total,
-                            icon: Users,
-                            status: 'normal'
-                        },
-                        {
-                            label: "موظف نشط",
-                            value: stats?.active || defaultStats.active,
-                            icon: Briefcase,
-                            status: 'normal'
-                        },
-                        {
-                            label: "في إجازة",
-                            value: stats?.onLeave || defaultStats.onLeave,
-                            icon: Building2,
-                            status: 'normal'
-                        },
-                        {
-                            label: "جديد هذا الشهر",
-                            value: stats?.newThisMonth || defaultStats.newThisMonth,
-                            icon: UserPlus,
-                            status: 'normal'
-                        }
-                    ]}
+                    type="employees"
                 />
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">

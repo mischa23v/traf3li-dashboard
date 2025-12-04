@@ -149,35 +149,8 @@ export function EmployeeDetail() {
                             <ProductivityHero
                                 badge="الموارد البشرية"
                                 title={`${employee.firstName} ${employee.lastName}`}
-                                type="hr"
+                                type="employees"
                                 listMode={true}
-                                hideButtons={true}
-                                stats={[
-                                    {
-                                        label: "القسم",
-                                        value: employee.department,
-                                        icon: Building2,
-                                        status: 'normal'
-                                    },
-                                    {
-                                        label: "تاريخ التعيين",
-                                        value: employee.hireDate ? format(parseISO(employee.hireDate), 'd MMM yyyy', { locale: ar }) : '-',
-                                        icon: Calendar,
-                                        status: 'normal'
-                                    },
-                                    {
-                                        label: "الراتب الأساسي",
-                                        value: formatCurrency(employee.baseSalary || 0),
-                                        icon: DollarSign,
-                                        status: 'normal'
-                                    },
-                                    {
-                                        label: "رصيد الإجازات",
-                                        value: `${employee.annualLeaveBalance || 0} يوم`,
-                                        icon: Clock,
-                                        status: 'normal'
-                                    }
-                                ]}
                             >
                                 <div className="flex flex-col gap-4 w-full">
                                     <div className="flex items-center gap-4 mb-6">
