@@ -210,112 +210,15 @@ export default function TransactionsDashboard() {
             </Header>
 
             <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-r border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
-                <div className="max-w-7xl mx-auto space-y-6">
 
-                    <ProductivityHero
-                        badge="المالية"
-                        title="سجل المعاملات المالية"
-                        type="finance"
-                        hideButtons={true}
-                        stats={[
-                            {
-                                label: "صافي الربح",
-                                value: formatCurrency(netProfit),
-                                icon: <TrendingUp className="w-4 h-4 text-emerald-400" />,
-                                status: 'normal'
-                            },
-                            {
-                                label: "إجمالي الدخل",
-                                value: formatCurrency(totalIncome),
-                                icon: <ArrowUpRight className="w-4 h-4 text-blue-400" />,
-                                status: 'normal'
-                            },
-                            {
-                                label: "إجمالي المصروفات",
-                                value: formatCurrency(totalExpenses),
-                                icon: <ArrowDownRight className="w-4 h-4 text-red-400" />,
-                                status: 'normal'
-                            }
-                        ]}
-                    >
-                        <div className="flex gap-3">
-                            <Button asChild className="bg-emerald-500 hover:bg-emerald-600 text-white h-10 px-5 rounded-xl font-bold shadow-lg shadow-emerald-500/20 border-0">
-                                <Link to="/dashboard/finance/transactions/new">
-                                    <Plus className="ml-2 h-4 w-4" />
-                                    معاملة جديدة
-                                </Link>
-                            </Button>
-                            <Button variant="ghost" className="bg-white/10 text-white hover:bg-white/20 h-10 px-5 rounded-xl font-bold border-0 backdrop-blur-sm">
-                                <Download className="ml-2 h-4 w-4" />
-                                تصدير الكشف
-                            </Button>
-                        </div>
-                    </ProductivityHero>
+                {/* HERO CARD & STATS */}
+                <ProductivityHero badge="المعاملات" title="المعاملات" type="transactions" />
 
-                    {/* Stats Grid - Remaining Metrics */}
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        {/* Net Profit Card */}
-                        <Card className="border-none shadow-sm bg-white rounded-3xl overflow-hidden group hover:shadow-md transition-all duration-300">
-                            <CardContent className="p-6">
-                                <div className="flex justify-between items-start mb-4">
-                                    <div className="w-12 h-12 rounded-2xl bg-emerald-50 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                                        <TrendingUp className="w-6 h-6 text-emerald-600" />
-                                    </div>
-                                    <Badge variant="outline" className="bg-emerald-50 text-emerald-700 border-emerald-100">
-                                        صافي
-                                    </Badge>
-                                </div>
-                                <div className="space-y-1">
-                                    <h3 className="text-slate-500 text-sm">صافي الربح</h3>
-                                    <div className="text-2xl font-bold text-[#022c22]">{formatCurrency(netProfit)}</div>
-                                </div>
-                                <Progress value={(netProfit / totalIncome) * 100} className="h-1.5 mt-4 bg-slate-100" indicatorClassName="bg-emerald-500" />
-                            </CardContent>
-                        </Card>
+                {/* MAIN GRID LAYOUT */}
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
-                        {/* Total Income Card */}
-                        <Card className="border-none shadow-sm bg-white rounded-3xl overflow-hidden group hover:shadow-md transition-all duration-300">
-                            <CardContent className="p-6">
-                                <div className="flex justify-between items-start mb-4">
-                                    <div className="w-12 h-12 rounded-2xl bg-blue-50 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                                        <ArrowUpRight className="w-6 h-6 text-blue-600" />
-                                    </div>
-                                    <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-100">
-                                        دخل
-                                    </Badge>
-                                </div>
-                                <div className="space-y-1">
-                                    <h3 className="text-slate-500 text-sm">إجمالي الدخل</h3>
-                                    <div className="text-2xl font-bold text-[#022c22]">{formatCurrency(totalIncome)}</div>
-                                </div>
-                                <Progress value={(totalIncome / (totalIncome + totalExpenses)) * 100} className="h-1.5 mt-4 bg-slate-100" indicatorClassName="bg-blue-500" />
-                            </CardContent>
-                        </Card>
-
-                        {/* Total Expenses Card */}
-                        <Card className="border-none shadow-sm bg-white rounded-3xl overflow-hidden group hover:shadow-md transition-all duration-300">
-                            <CardContent className="p-6">
-                                <div className="flex justify-between items-start mb-4">
-                                    <div className="w-12 h-12 rounded-2xl bg-red-50 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                                        <ArrowDownRight className="w-6 h-6 text-red-600" />
-                                    </div>
-                                    <Badge variant="outline" className="bg-red-50 text-red-700 border-red-100">
-                                        مصروف
-                                    </Badge>
-                                </div>
-                                <div className="space-y-1">
-                                    <h3 className="text-slate-500 text-sm">إجمالي المصروفات</h3>
-                                    <div className="text-2xl font-bold text-[#022c22]">{formatCurrency(totalExpenses)}</div>
-                                </div>
-                                <Progress value={(totalExpenses / (totalIncome + totalExpenses)) * 100} className="h-1.5 mt-4 bg-slate-100" indicatorClassName="bg-red-500" />
-                            </CardContent>
-                        </Card>
-                    </div>
-
-                    {/* Main Content Area */}
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                        {/* Transactions List */}
-                        <div className="lg:col-span-2 space-y-6">
+                    {/* RIGHT COLUMN (Main Content) */}
+                    <div className="lg:col-span-2 space-y-6">
                             {filteredTransactions.length === 0 && !searchQuery && activeTab === 'all' ? (
                                 <div className="bg-white rounded-3xl p-12 text-center border border-slate-100 shadow-sm">
                                     <div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -437,11 +340,10 @@ export default function TransactionsDashboard() {
                             )}
                         </div>
 
-                        {/* Sidebar - Analytics */}
-                        <FinanceSidebar context="transactions" />
-                    </div>
+                    {/* LEFT COLUMN (Widgets) */}
+                    <FinanceSidebar context="transactions" />
                 </div>
-            </Main >
+            </Main>
         </>
     )
 }

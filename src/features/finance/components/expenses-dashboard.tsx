@@ -231,112 +231,15 @@ export default function ExpensesDashboard() {
             </Header>
 
             <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-r border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
-                <div className="max-w-7xl mx-auto space-y-6">
 
-                    <ProductivityHero
-                        badge="المصروفات"
-                        title="إدارة المصروفات والميزانية"
-                        type="expenses"
-                        hideButtons={true}
-                        stats={[
-                            {
-                                label: "مصروفات معلقة",
-                                value: formatCurrency(pendingExpenses),
-                                icon: <Clock className="w-4 h-4 text-amber-400" />,
-                                status: pendingExpenses > 0 ? 'attention' : 'normal'
-                            },
-                            {
-                                label: "المتبقي من الميزانية",
-                                value: "45%",
-                                icon: <PieChart className="w-4 h-4 text-blue-400" />,
-                                status: 'normal'
-                            },
-                            {
-                                label: "متوسط الصرف اليومي",
-                                value: formatCurrency(totalExpenses / 30),
-                                icon: <TrendingUp className="w-4 h-4 text-purple-400" />,
-                                status: 'normal'
-                            }
-                        ]}
-                    >
-                        <div className="flex gap-3">
-                            <Button asChild className="bg-emerald-500 hover:bg-emerald-600 text-white h-10 px-5 rounded-xl font-bold shadow-lg shadow-emerald-500/20 border-0">
-                                <Link to="/dashboard/finance/expenses/new">
-                                    <Plus className="ml-2 h-4 w-4" />
-                                    مصروف جديد
-                                </Link>
-                            </Button>
-                            <Button variant="ghost" className="bg-white/10 text-white hover:bg-white/20 h-10 px-5 rounded-xl font-bold border-0 backdrop-blur-sm">
-                                <Download className="ml-2 h-4 w-4" />
-                                تصدير التقرير
-                            </Button>
-                        </div>
-                    </ProductivityHero>
+                {/* HERO CARD & STATS */}
+                <ProductivityHero badge="المصروفات" title="المصروفات" type="expenses" />
 
-                    {/* Stats Grid - Remaining Metrics */}
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        {/* Pending Expenses */}
-                        <Card className="border-none shadow-sm bg-white rounded-3xl overflow-hidden group hover:shadow-md transition-all duration-300">
-                            <CardContent className="p-6">
-                                <div className="flex justify-between items-start mb-4">
-                                    <div className="w-12 h-12 rounded-2xl bg-amber-50 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                                        <Clock className="w-6 h-6 text-amber-600" />
-                                    </div>
-                                    <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-100">
-                                        معلق
-                                    </Badge>
-                                </div>
-                                <div className="space-y-1">
-                                    <h3 className="text-slate-500 text-sm">مصروفات معلقة</h3>
-                                    <div className="text-2xl font-bold text-[#022c22]">{formatCurrency(pendingExpenses)}</div>
-                                </div>
-                                <Progress value={(pendingExpenses / totalExpenses) * 100} className="h-1.5 mt-4 bg-slate-100" indicatorClassName="bg-amber-500" />
-                            </CardContent>
-                        </Card>
+                {/* MAIN GRID LAYOUT */}
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
-                        {/* Budget Status (Mock) */}
-                        <Card className="border-none shadow-sm bg-white rounded-3xl overflow-hidden group hover:shadow-md transition-all duration-300">
-                            <CardContent className="p-6">
-                                <div className="flex justify-between items-start mb-4">
-                                    <div className="w-12 h-12 rounded-2xl bg-blue-50 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                                        <PieChart className="w-6 h-6 text-blue-600" />
-                                    </div>
-                                    <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-100">
-                                        الميزانية
-                                    </Badge>
-                                </div>
-                                <div className="space-y-1">
-                                    <h3 className="text-slate-500 text-sm">المتبقي من الميزانية</h3>
-                                    <div className="text-2xl font-bold text-[#022c22]">45%</div>
-                                </div>
-                                <Progress value={55} className="h-1.5 mt-4 bg-slate-100" indicatorClassName="bg-blue-500" />
-                            </CardContent>
-                        </Card>
-
-                        {/* Average Daily (Mock) */}
-                        <Card className="border-none shadow-sm bg-white rounded-3xl overflow-hidden group hover:shadow-md transition-all duration-300">
-                            <CardContent className="p-6">
-                                <div className="flex justify-between items-start mb-4">
-                                    <div className="w-12 h-12 rounded-2xl bg-purple-50 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                                        <TrendingUp className="w-6 h-6 text-purple-600" />
-                                    </div>
-                                    <Badge variant="outline" className="bg-purple-50 text-purple-700 border-purple-100">
-                                        يومي
-                                    </Badge>
-                                </div>
-                                <div className="space-y-1">
-                                    <h3 className="text-slate-500 text-sm">متوسط الصرف اليومي</h3>
-                                    <div className="text-2xl font-bold text-[#022c22]">{formatCurrency(totalExpenses / 30)}</div>
-                                </div>
-                                <Progress value={30} className="h-1.5 mt-4 bg-slate-100" indicatorClassName="bg-purple-500" />
-                            </CardContent>
-                        </Card>
-                    </div>
-
-                    {/* Main Content Area */}
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                        {/* Expenses List */}
-                        <div className="lg:col-span-2 space-y-6">
+                    {/* RIGHT COLUMN (Main Content) */}
+                    <div className="lg:col-span-2 space-y-6">
                             {filteredExpenses.length === 0 && !searchQuery && activeTab === 'all' ? (
                                 <div className="bg-white rounded-3xl p-12 text-center border border-slate-100 shadow-sm">
                                     <div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -464,11 +367,10 @@ export default function ExpensesDashboard() {
                                     </div>
                                 </>
                             )}
-                        </div>
-
-                        {/* Sidebar - Analytics */}
-                        <FinanceSidebar context="expenses" />
                     </div>
+
+                    {/* LEFT COLUMN (Widgets) */}
+                    <FinanceSidebar context="expenses" />
                 </div>
             </Main>
         </>
