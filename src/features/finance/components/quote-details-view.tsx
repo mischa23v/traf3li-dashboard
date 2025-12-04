@@ -175,33 +175,33 @@ export default function QuoteDetailsView() {
                     <ProductivityHero
                         badge="عرض سعر"
                         title={`عرض سعر #${quote.quoteNumber}`}
-                        type="finance"
-                        hideButtons={true}
+                        type="invoices"
+                        listMode={true}
                         stats={[
                             {
                                 label: "العميل",
                                 value: typeof quote.clientId === 'object'
                                     ? `${quote.clientId.firstName || ''} ${quote.clientId.lastName || ''}`.trim() || quote.clientId.name
                                     : 'غير محدد',
-                                icon: <User className="w-4 h-4 text-emerald-400" />,
+                                icon: User,
                                 status: 'normal'
                             },
                             {
                                 label: "تاريخ الإصدار",
                                 value: formatDate(quote.date),
-                                icon: <Calendar className="w-4 h-4 text-emerald-400" />,
+                                icon: Calendar,
                                 status: 'normal'
                             },
                             {
                                 label: "تاريخ الانتهاء",
                                 value: formatDate(quote.expiredDate),
-                                icon: <Clock className="w-4 h-4 text-emerald-400" />,
+                                icon: Clock,
                                 status: isExpired ? 'attention' : 'normal'
                             },
                             {
                                 label: "الإجمالي",
                                 value: formatCurrency(quote.total, quote.currency),
-                                icon: <DollarSign className="w-4 h-4 text-emerald-400" />,
+                                icon: DollarSign,
                                 status: 'normal'
                             }
                         ]}

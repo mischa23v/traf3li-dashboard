@@ -25,6 +25,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { useInvoice } from '@/hooks/useFinance'
 import { useParams } from '@tanstack/react-router'
 import { ProductivityHero } from '@/components/productivity-hero'
+import { FinanceSidebar } from './finance-sidebar'
 
 export function InvoiceDetailsView() {
     const { invoiceId } = useParams({ strict: false }) as { invoiceId: string }
@@ -250,47 +251,37 @@ export function InvoiceDetailsView() {
                     badge="فاتورة ضريبية"
                     title={invoice.id}
                     type="invoices"
-                    hideButtons={true}
+                    listMode={true}
                     stats={[
                         {
                             label: "العميل",
                             value: invoice.client,
-                            icon: <User className="w-4 h-4 text-emerald-400" />,
+                            icon: User,
                             status: 'normal'
                         },
                         {
                             label: "تاريخ الإصدار",
                             value: invoice.issueDate,
-                            icon: <Calendar className="w-4 h-4 text-emerald-400" />,
+                            icon: Calendar,
                             status: 'normal'
                         },
                         {
                             label: "تاريخ الاستحقاق",
                             value: invoice.dueDate,
-                            icon: <Clock className="w-4 h-4 text-emerald-400" />,
+                            icon: Clock,
                             status: 'normal'
                         },
                         {
                             label: "الإجمالي المستحق",
                             value: `${invoice.amount} ${invoice.currency}`,
-                            icon: <DollarSign className="w-4 h-4 text-emerald-400" />,
+                            icon: DollarSign,
                             status: 'attention'
                         }
                     ]}
-                >
-                    <Button variant="outline" className="flex-1 border-white/10 text-white hover:bg-white/10 hover:text-white backdrop-blur-sm">
-                        <Download className="h-4 w-4 ml-2" />
-                        تحميل PDF
-                    </Button>
-                    <Button className="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white shadow-lg shadow-emerald-500/20 border-0">
-                        <Send className="h-4 w-4 ml-2" />
-                        إرسال
-                    </Button>
-                </ProductivityHero>
+                />
 
-                <div className="max-w-[1600px] mx-auto pb-12">
-                    <div className="grid grid-cols-12 gap-6">
-                        <div className="col-span-12 lg:col-span-8 space-y-6">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <div className="lg:col-span-2 space-y-6">
                             <Card className="border border-slate-100 shadow-sm rounded-2xl overflow-hidden">
                                 <CardHeader className="bg-white border-b border-slate-50 pb-4">
                                     <CardTitle className="text-lg font-bold text-navy">بنود الفاتورة</CardTitle>
@@ -328,35 +319,8 @@ export function InvoiceDetailsView() {
                             </Card>
                         </div>
 
-                        <div className="col-span-12 lg:col-span-4 space-y-6">
-                            <Card className="border border-slate-100 shadow-sm rounded-2xl overflow-hidden">
-                                <CardHeader className="bg-white border-b border-slate-50 pb-4">
-                                    <CardTitle className="text-lg font-bold text-navy flex items-center gap-2">
-                                        <History className="h-5 w-5 text-brand-blue" />
-                                        سجل النشاط
-                                    </CardTitle>
-                                </CardHeader>
-                                <CardContent className="p-0">
-                                    <ScrollArea className="h-[300px]">
-                                        <div className="relative p-6">
-                                            <div className="absolute top-6 bottom-6 right-[29px] w-0.5 bg-slate-100"></div>
-                                            <div className="space-y-8 relative">
-                                                {invoice.history.map((event, i) => (
-                                                    <div key={i} className="flex gap-4 relative">
-                                                        <div className="w-3 h-3 rounded-full mt-1.5 z-10 ring-4 ring-white bg-blue-500"></div>
-                                                        <div className="flex-1">
-                                                            <div className="text-sm font-bold text-navy">{event.action}</div>
-                                                            <div className="text-xs text-slate-500 mb-1">{event.date} • {event.user}</div>
-                                                        </div>
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        </div>
-                                    </ScrollArea>
-                                </CardContent>
-                            </Card>
-                        </div>
-                    </div>
+                    {/* LEFT COLUMN (Sidebar) */}
+                    <FinanceSidebar context="invoices" />
                 </div>
             </Main>
         </>

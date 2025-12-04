@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react'
 import {
-    ArrowRight, Save, Calendar, Clock,
+    Save, Calendar, Clock,
     FileText, Briefcase, DollarSign, Loader2, CheckSquare,
     User, Tag, Timer
 } from 'lucide-react'
@@ -22,6 +22,7 @@ import { Link, useNavigate } from '@tanstack/react-router'
 import { FinanceSidebar } from './finance-sidebar'
 import { useCreateTimeEntry } from '@/hooks/useFinance'
 import { useCases, useClients, useTeamMembers } from '@/hooks/useCasesAndClients'
+import { ProductivityHero } from '@/components/productivity-hero'
 
 // Task types matching miru-web / legal work types
 const taskTypes = [
@@ -168,40 +169,12 @@ export function CreateTimeEntryView() {
             </Header>
 
             <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-r border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
-                    {/* Sidebar Widgets */}
-                    <FinanceSidebar />
+                {/* HERO CARD - Full width */}
+                <ProductivityHero badge="تتبع الوقت" title="تسجيل وقت جديد" type="time-tracking" listMode={true} />
 
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     {/* RIGHT COLUMN (Main Content) */}
                     <div className="lg:col-span-2 space-y-8">
-
-                        {/* HERO CARD */}
-                        <div className="bg-emerald-950 rounded-3xl p-8 relative overflow-hidden text-white shadow-xl shadow-emerald-900/20 flex flex-col md:flex-row items-center justify-between gap-8">
-                            <div className="relative z-10 max-w-lg">
-                                <div className="flex items-center gap-4 mb-4">
-                                    <Link to="/dashboard/finance/time-tracking">
-                                        <Button variant="ghost" size="icon" className="rounded-full bg-white/10 hover:bg-white/20 text-white">
-                                            <ArrowRight className="w-5 h-5" />
-                                        </Button>
-                                    </Link>
-                                    <h2 className="text-3xl font-bold leading-tight">تسجيل وقت جديد</h2>
-                                </div>
-                                <p className="text-emerald-200 text-lg mb-8 leading-relaxed">
-                                    قم بتسجيل ساعات العمل على القضايا والمشاريع لفوترتها لاحقاً.
-                                </p>
-                            </div>
-                            {/* Abstract Visual Decoration */}
-                            <div className="hidden md:block relative w-64 h-64">
-                                <div className="absolute inset-0 bg-gradient-to-tr from-emerald-500 to-teal-500 rounded-full opacity-20 blur-3xl animate-pulse"></div>
-                                <div className="absolute inset-4 bg-emerald-950 rounded-2xl border border-white/10 flex items-center justify-center transform rotate-6 shadow-2xl">
-                                    <Clock className="h-24 w-24 text-emerald-400" />
-                                </div>
-                                <div className="absolute inset-4 bg-emerald-950/80 rounded-2xl border border-white/10 flex items-center justify-center transform -rotate-6 backdrop-blur-sm">
-                                    <Briefcase className="h-24 w-24 text-teal-400" />
-                                </div>
-                            </div>
-                        </div>
-
                         {/* Form Card */}
                         <div className="bg-white rounded-3xl p-8 shadow-sm border border-slate-100">
                             <form onSubmit={handleSubmit} className="space-y-8">
@@ -548,6 +521,9 @@ export function CreateTimeEntryView() {
                             </form>
                         </div>
                     </div>
+
+                    {/* LEFT COLUMN (Sidebar) */}
+                    <FinanceSidebar context="time-tracking" />
                 </div>
             </Main>
         </>

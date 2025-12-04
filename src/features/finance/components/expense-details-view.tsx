@@ -209,39 +209,34 @@ export function ExpenseDetailsView() {
                     badge="تفاصيل المصروف"
                     title={expense.description}
                     type="expenses"
-                    hideButtons={true}
+                    listMode={true}
                     stats={[
                         {
                             label: "الفئة",
                             value: expense.category,
-                            icon: <Receipt className="w-4 h-4 text-emerald-400" />,
+                            icon: Receipt,
                             status: 'normal'
                         },
                         {
                             label: "التاريخ",
                             value: expense.date,
-                            icon: <Calendar className="w-4 h-4 text-emerald-400" />,
+                            icon: Calendar,
                             status: 'normal'
                         },
                         {
                             label: "دفع بواسطة",
                             value: expense.paidBy,
-                            icon: <User className="w-4 h-4 text-emerald-400" />,
+                            icon: User,
                             status: 'normal'
                         },
                         {
                             label: "المبلغ",
                             value: `${expense.amount} ${expense.currency}`,
-                            icon: <DollarSign className="w-4 h-4 text-emerald-400" />,
+                            icon: DollarSign,
                             status: 'attention'
                         }
                     ]}
-                >
-                    <Button variant="outline" className="flex-1 border-white/10 text-white hover:bg-white/10 hover:text-white backdrop-blur-sm">
-                        <Download className="h-4 w-4 ml-2" />
-                        الإيصال
-                    </Button>
-                </ProductivityHero>
+                />
 
                 <div className="max-w-[1600px] mx-auto pb-12">
                     <div className="grid grid-cols-12 gap-6">

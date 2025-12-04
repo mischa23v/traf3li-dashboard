@@ -165,41 +165,28 @@ export default function PaymentDetailsView() {
                         badge={`إيصال دفع #${payment.paymentNumber}`}
                         title={formatCurrency(payment.amount, payment.currency)}
                         type="payments"
-                        hideButtons={true}
+                        listMode={true}
                         stats={[
                             {
                                 label: "تاريخ الدفع",
                                 value: formatDate(payment.paymentDate),
-                                icon: <Calendar className="w-4 h-4 text-emerald-400" />,
+                                icon: Calendar,
                                 status: 'normal'
                             },
                             {
                                 label: "طريقة الدفع",
                                 value: payment.paymentMethod || 'تحويل بنكي',
-                                icon: <CreditCard className="w-4 h-4 text-emerald-400" />,
+                                icon: CreditCard,
                                 status: 'normal'
                             },
                             {
                                 label: "الحالة",
                                 value: status.label,
-                                icon: <StatusIcon className="w-4 h-4 text-emerald-400" />,
+                                icon: StatusIcon,
                                 status: 'normal'
                             }
                         ]}
-                    >
-                        <div className="flex gap-3">
-                            <Button asChild variant="ghost" className="bg-white/10 text-white hover:bg-white/20 h-10 px-5 rounded-xl font-bold border-0 backdrop-blur-sm">
-                                <Link to="/dashboard/finance/payments">
-                                    <ArrowRight className="h-4 w-4 ml-2" />
-                                    العودة للمدفوعات
-                                </Link>
-                            </Button>
-                            <Button variant="outline" className="bg-white/10 text-white hover:bg-white/20 h-10 px-5 rounded-xl font-bold border-0 backdrop-blur-sm">
-                                <Download className="h-4 w-4 ml-2" />
-                                تحميل الإيصال
-                            </Button>
-                        </div>
-                    </ProductivityHero>
+                    />
 
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                         {/* Main Content */}
