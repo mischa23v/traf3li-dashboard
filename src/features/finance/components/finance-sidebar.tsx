@@ -13,7 +13,7 @@ import { format, addDays, startOfDay, endOfDay, isSameDay } from 'date-fns'
 import { arSA } from 'date-fns/locale'
 
 interface FinanceSidebarProps {
-    context?: 'invoices' | 'quotes' | 'payments' | 'expenses' | 'statements' | 'transactions' | 'activity'
+    context?: 'invoices' | 'quotes' | 'payments' | 'expenses' | 'statements' | 'transactions' | 'activity' | 'time-tracking'
     isSelectionMode?: boolean
     onToggleSelectionMode?: () => void
     selectedCount?: number
@@ -85,6 +85,10 @@ export function FinanceSidebar({
         activity: {
             create: '/dashboard/finance/activity/new',
             viewAll: '/dashboard/finance/activity'
+        },
+        'time-tracking': {
+            create: '/dashboard/finance/time-tracking/new',
+            viewAll: '/dashboard/finance/time-tracking'
         }
     }
 

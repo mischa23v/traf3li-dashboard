@@ -27,6 +27,8 @@ import { LanguageSwitcher } from '@/components/language-switcher'
 import { ThemeSwitch } from '@/components/theme-switch'
 import { ConfigDrawer } from '@/components/config-drawer'
 import { ProfileDropdown } from '@/components/profile-dropdown'
+import { ProductivityHero } from '@/components/productivity-hero'
+import { FinanceSidebar } from './finance-sidebar'
 
 export default function TimeEntriesDashboard() {
     const [activeTab, setActiveTab] = useState('all')
@@ -201,87 +203,15 @@ export default function TimeEntriesDashboard() {
             </Header>
 
             <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-r border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
-                <div className="max-w-7xl mx-auto space-y-6">
 
-                    {/* Hero Section - Contained Navy Card */}
-                    <div className="bg-[#022c22] rounded-3xl p-8 relative overflow-hidden text-white shadow-xl shadow-[#022c22]/20 mb-8">
-                        {/* Background Effects */}
-                        <div className="absolute top-0 left-0 w-full h-full overflow-hidden z-0 pointer-events-none">
-                            <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-brand-blue/20 rounded-full blur-[100px]"></div>
-                            <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-purple-500/10 rounded-full blur-[100px]"></div>
-                        </div>
+                {/* HERO CARD & STATS */}
+                <ProductivityHero badge="تتبع الوقت" title="تتبع الوقت" type="time-tracking" />
 
-                        <div className="relative z-10">
-                            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-8">
-                                <div>
-                                    <div className="flex items-center gap-3 mb-3">
-                                        <Badge className="bg-white/10 hover:bg-white/20 text-white border-0 backdrop-blur-sm">
-                                            <Clock className="w-3 h-3 ml-2" />
-                                            إدارة الوقت
-                                        </Badge>
-                                        <span className="text-blue-200 text-sm">نوفمبر 2025</span>
-                                    </div>
-                                    <h1 className="text-3xl md:text-4xl font-bold leading-tight mb-2">
-                                        سجل الساعات
-                                    </h1>
-                                    <p className="text-blue-200/80">تتبع الوقت، الفوترة، وإدارة إنتاجية الفريق</p>
-                                </div>
-                                <div className="flex gap-3">
-                                    <Button asChild variant="outline" className="bg-white/5 border-white/10 text-white hover:bg-white/10 rounded-xl">
-                                        <Link to="/dashboard/finance/time-tracking/weekly">
-                                            <Clock className="w-4 h-4 ml-2" />
-                                            العرض الأسبوعي
-                                        </Link>
-                                    </Button>
-                                    <Button variant="outline" className="bg-white/5 border-white/10 text-white hover:bg-white/10 rounded-xl">
-                                        <Download className="w-4 h-4 ml-2" />
-                                        تصدير التقرير
-                                    </Button>
-                                    <Button asChild className="bg-brand-blue hover:bg-blue-600 text-white border-0 shadow-lg shadow-blue-500/20 rounded-xl">
-                                        <Link to="/dashboard/finance/time-tracking/new">
-                                            <Plus className="w-4 h-4 ml-2" />
-                                            تسجيل يدوي
-                                        </Link>
-                                    </Button>
-                                </div>
-                            </div>
+                {/* MAIN GRID LAYOUT */}
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 p-6 bg-white/5 rounded-2xl border border-white/10 backdrop-blur-sm">
-                                <div className="space-y-2">
-                                    <div className="flex justify-between text-sm mb-2">
-                                        <span className="text-blue-200">ساعات هذا الأسبوع</span>
-                                        <span className="font-bold text-white">{thisWeekHours} ساعة</span>
-                                    </div>
-                                    <div className="text-3xl font-bold text-white">{totalBillableHours}</div>
-                                    <div className="text-xs text-blue-200">إجمالي الساعات القابلة للفوترة</div>
-                                    <Progress value={75} className="h-1.5 bg-white/10 mt-2" indicatorClassName="bg-brand-blue" />
-                                </div>
-                                <div className="flex justify-between items-center border-r border-white/10 pr-6">
-                                    <div>
-                                        <div className="text-blue-200 text-sm mb-1">قيمة غير مفوترة</div>
-                                        <div className="text-2xl font-bold text-amber-400">{formatCurrency(totalUnbilledValue)}</div>
-                                    </div>
-                                    <div className="w-10 h-10 rounded-full bg-amber-500/20 flex items-center justify-center">
-                                        <DollarSign className="w-5 h-5 text-amber-400" />
-                                    </div>
-                                </div>
-                                <div className="flex justify-between items-center border-r border-white/10 pr-6">
-                                    <div>
-                                        <div className="text-blue-200 text-sm mb-1">معدل الإنجاز</div>
-                                        <div className="text-2xl font-bold text-emerald-400">94%</div>
-                                    </div>
-                                    <div className="w-10 h-10 rounded-full bg-emerald-500/20 flex items-center justify-center">
-                                        <Check className="w-5 h-5 text-emerald-400" />
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Main Content Area */}
-                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-                        {/* Time Entries List */}
-                        <div className="lg:col-span-8 space-y-6">
+                    {/* RIGHT COLUMN (Main Content) */}
+                    <div className="lg:col-span-2 space-y-6">
                             {/* Filters Bar */}
                             <div className="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex flex-wrap items-center justify-between gap-4">
                                 <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full md:w-auto">
@@ -454,101 +384,8 @@ export default function TimeEntriesDashboard() {
                             </div>
                         </div>
 
-                        {/* Sidebar - Timer & Analytics */}
-                        <div className="lg:col-span-4 space-y-6">
-                            {/* Quick Timer Card */}
-                            <Card className="border-none shadow-sm bg-[#022c22] text-white rounded-3xl overflow-hidden relative">
-                                <div className="absolute top-0 right-0 w-32 h-32 bg-brand-blue/20 rounded-full blur-3xl -mr-16 -mt-16"></div>
-                                <CardHeader className="pb-2 relative z-10">
-                                    <CardTitle className="text-lg font-bold flex items-center gap-2">
-                                        <Timer className="w-5 h-5 text-brand-blue" />
-                                        المؤقت السريع
-                                    </CardTitle>
-                                </CardHeader>
-                                <CardContent className="p-6 relative z-10">
-                                    <div className="text-center mb-6">
-                                        <div className="text-5xl font-mono font-bold tracking-wider mb-2">
-                                            {formatTime(currentTime)}
-                                        </div>
-                                        <div className="text-blue-200 text-sm">جاري التسجيل...</div>
-                                    </div>
-
-                                    <div className="flex gap-3 mb-6">
-                                        {!timerData?.isRunning ? (
-                                            <Button
-                                                onClick={handleStartTimer}
-                                                disabled={startTimerMutation.isPending}
-                                                className="flex-1 bg-brand-blue hover:bg-blue-600 text-white h-12 rounded-xl text-lg"
-                                            >
-                                                <Play className="w-5 h-5 ml-2" />
-                                                بدء
-                                            </Button>
-                                        ) : timerData?.timer?.isPaused ? (
-                                            <Button
-                                                onClick={handleResumeTimer}
-                                                disabled={resumeTimerMutation.isPending}
-                                                className="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white h-12 rounded-xl text-lg"
-                                            >
-                                                <Play className="w-5 h-5 ml-2" />
-                                                استئناف
-                                            </Button>
-                                        ) : (
-                                            <Button
-                                                onClick={handlePauseTimer}
-                                                disabled={pauseTimerMutation.isPending}
-                                                className="flex-1 bg-amber-500 hover:bg-amber-600 text-white h-12 rounded-xl text-lg"
-                                            >
-                                                <Pause className="w-5 h-5 ml-2" />
-                                                إيقاف مؤقت
-                                            </Button>
-                                        )}
-                                        <Button
-                                            onClick={handleStopTimer}
-                                            disabled={stopTimerMutation.isPending || !timerData?.isRunning}
-                                            variant="outline"
-                                            className="bg-white/10 border-white/20 text-white hover:bg-white/20 h-12 w-12 rounded-xl p-0"
-                                        >
-                                            <Square className="w-5 h-5 fill-current" />
-                                        </Button>
-                                    </div>
-
-                                    <div className="space-y-3">
-                                        <Input
-                                            placeholder="بماذا تعمل الآن؟"
-                                            value={timerDescription}
-                                            onChange={(e) => setTimerDescription(e.target.value)}
-                                            className="bg-white/10 border-white/10 text-white placeholder:text-blue-200/50 rounded-xl"
-                                        />
-                                    </div>
-                                </CardContent>
-                            </Card>
-
-                            {/* Hours by Lawyer */}
-                            <Card className="border-none shadow-sm bg-white rounded-3xl overflow-hidden hover:shadow-md transition-all duration-300">
-                                <CardHeader className="border-b border-slate-100 pb-4">
-                                    <CardTitle className="text-lg font-bold text-[#022c22] flex items-center gap-2">
-                                        <User className="w-5 h-5 text-purple-500" />
-                                        ساعات الفريق
-                                    </CardTitle>
-                                </CardHeader>
-                                <CardContent className="p-6 space-y-4">
-                                    {[
-                                        { name: 'أحمد السالم', hours: 42.5, color: 'bg-blue-500' },
-                                        { name: 'فاطمة الغامدي', hours: 38.0, color: 'bg-emerald-500' },
-                                        { name: 'خالد المري', hours: 31.5, color: 'bg-amber-500' }
-                                    ].map((lawyer, idx) => (
-                                        <div key={idx} className="space-y-2">
-                                            <div className="flex justify-between text-sm">
-                                                <span className="font-medium text-slate-700">{lawyer.name}</span>
-                                                <span className="text-slate-500">{lawyer.hours} ساعة</span>
-                                            </div>
-                                            <Progress value={(lawyer.hours / 50) * 100} className="h-2 bg-slate-100" indicatorClassName={lawyer.color} />
-                                        </div>
-                                    ))}
-                                </CardContent>
-                            </Card>
-                        </div>
-                    </div>
+                    {/* LEFT COLUMN (Widgets) */}
+                    <FinanceSidebar context="time-tracking" />
                 </div>
             </Main>
         </>

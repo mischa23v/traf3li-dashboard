@@ -304,50 +304,12 @@ export default function PaymentsDashboard() {
             </Header>
 
             <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-r border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
-                <div className="max-w-7xl mx-auto space-y-6">
 
-                    <ProductivityHero
-                        badge="المدفوعات"
-                        title="إدارة المدفوعات والتحصيل"
-                        type="payments"
-                        hideButtons={true}
-                        stats={[
-                            {
-                                label: "مدفوعات مكتملة",
-                                value: formatCurrency(stats.totalCompleted),
-                                icon: <CheckCircle className="w-4 h-4 text-emerald-400" />,
-                                status: 'normal'
-                            },
-                            {
-                                label: "مدفوعات معلقة",
-                                value: formatCurrency(stats.totalPending),
-                                icon: <Clock className="w-4 h-4 text-amber-400" />,
-                                status: stats.totalPending > 0 ? 'attention' : 'normal'
-                            },
-                            {
-                                label: "مدفوعات هذا الشهر",
-                                value: formatCurrency(stats.totalThisMonth),
-                                icon: <Calendar className="w-4 h-4 text-blue-400" />,
-                                status: 'normal'
-                            }
-                        ]}
-                    >
-                        <div className="flex gap-3">
-                            <Button asChild className="bg-emerald-500 hover:bg-emerald-600 text-white h-10 px-5 rounded-xl font-bold shadow-lg shadow-emerald-500/20 border-0">
-                                <Link to="/dashboard/finance/payments/new">
-                                    <Plus className="ml-2 h-4 w-4" />
-                                    سجل دفعة جديدة
-                                </Link>
-                            </Button>
-                            <Button variant="ghost" className="bg-white/10 text-white hover:bg-white/20 h-10 px-5 rounded-xl font-bold border-0 backdrop-blur-sm">
-                                <Download className="ml-2 h-4 w-4" />
-                                تصدير التقرير
-                            </Button>
-                        </div>
-                    </ProductivityHero>
+                {/* HERO CARD & STATS */}
+                <ProductivityHero badge="المدفوعات" title="المدفوعات" type="payments" />
 
-                    {/* Main Content */}
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                {/* MAIN GRID LAYOUT */}
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
                         {/* Payments List */}
                         <div className="lg:col-span-2 space-y-6">
@@ -663,10 +625,8 @@ export default function PaymentsDashboard() {
                             )}
                         </div>
 
-                        {/* Sidebar */}
-                        <FinanceSidebar context="payments" />
-
-                    </div>
+                    {/* LEFT COLUMN (Widgets) */}
+                    <FinanceSidebar context="payments" />
                 </div>
             </Main>
         </>

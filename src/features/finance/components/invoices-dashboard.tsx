@@ -280,51 +280,12 @@ export default function InvoicesDashboard() {
             </Header>
 
             <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-r border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
-                <div className="max-w-7xl mx-auto space-y-6">
 
-                    {/* Hero Section - New Design */}
-                    <ProductivityHero
-                        badge="الفواتير"
-                        title="إدارة الفواتير والمدفوعات"
-                        type="invoices"
-                        hideButtons={true}
-                        stats={[
-                            {
-                                label: "إجمالي المعلق",
-                                value: formatCurrency(stats.totalPending),
-                                icon: <AlertCircle className="w-4 h-4 text-amber-400" />,
-                                status: stats.totalPending > 0 ? 'attention' : 'normal'
-                            },
-                            {
-                                label: "إجمالي المتأخر",
-                                value: formatCurrency(stats.totalOverdue),
-                                icon: <AlertCircle className="w-4 h-4 text-rose-400" />,
-                                status: stats.totalOverdue > 0 ? 'attention' : 'normal'
-                            },
-                            {
-                                label: "مدفوعات هذا الشهر",
-                                value: formatCurrency(stats.totalPaidThisMonth),
-                                icon: <CheckCircle className="w-4 h-4 text-emerald-400" />,
-                                status: 'normal'
-                            }
-                        ]}
-                    >
-                        <div className="flex gap-3">
-                            <Button asChild className="bg-emerald-500 hover:bg-emerald-600 text-white h-10 px-5 rounded-xl font-bold shadow-lg shadow-emerald-500/20 border-0">
-                                <Link to="/dashboard/finance/invoices/new">
-                                    <Plus className="ml-2 h-4 w-4" />
-                                    فاتورة جديدة
-                                </Link>
-                            </Button>
-                            <Button variant="ghost" className="bg-white/10 text-white hover:bg-white/20 h-10 px-5 rounded-xl font-bold border-0 backdrop-blur-sm">
-                                <Download className="ml-2 h-4 w-4" />
-                                تصدير التقرير
-                            </Button>
-                        </div>
-                    </ProductivityHero>
+                {/* HERO CARD & STATS */}
+                <ProductivityHero badge="الفواتير" title="الفواتير" type="invoices" />
 
-                    {/* Main Content */}
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                {/* MAIN GRID LAYOUT */}
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
                         {/* Invoices List */}
                         <div className="lg:col-span-2 space-y-6">
@@ -641,10 +602,8 @@ export default function InvoicesDashboard() {
                             )}
                         </div>
 
-                        {/* Sidebar */}
-                        <FinanceSidebar context="invoices" />
-
-                    </div>
+                    {/* LEFT COLUMN (Widgets) */}
+                    <FinanceSidebar context="invoices" />
                 </div>
             </Main>
         </>

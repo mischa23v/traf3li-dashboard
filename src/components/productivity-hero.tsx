@@ -74,6 +74,7 @@ export function ProductivityHero({ badge, title = 'الإنتاجية', type = '
         payments: { label: 'دفعة جديدة', href: '/dashboard/finance/payments/new' },
         transactions: { label: 'معاملة جديدة', href: '/dashboard/finance/transactions/new' },
         'time-entries': { label: 'سجل وقت جديد', href: '/dashboard/finance/time-entries/new' },
+        'time-tracking': { label: 'سجل وقت جديد', href: '/dashboard/finance/time-tracking/new' },
         employees: { label: 'موظف جديد', href: '/dashboard/hr/employees/new' },
         laws: { label: 'قانون جديد', href: '/dashboard/knowledge/laws/new' },
         judgments: { label: 'حكم جديد', href: '/dashboard/knowledge/judgments/new' },
