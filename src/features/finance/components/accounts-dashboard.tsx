@@ -21,6 +21,7 @@ import { ThemeSwitch } from '@/components/theme-switch'
 import { ConfigDrawer } from '@/components/config-drawer'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { ProductivityHero } from '@/components/productivity-hero'
+import { FinanceSidebar } from './finance-sidebar'
 
 interface AccountsDashboardProps {
     defaultTab?: string
@@ -172,23 +173,23 @@ export default function AccountsDashboard({ }: AccountsDashboardProps) {
                                 {
                                     label: "إجمالي الرصيد",
                                     value: formatCurrency(financialSummary.totalBalance),
-                                    icon: <Landmark className="w-4 h-4 text-brand-blue" />,
+                                    icon: Landmark,
                                     trend: `${financialSummary.growth}%`,
                                 },
                                 {
                                     label: "الإيرادات (هذا الشهر)",
                                     value: formatCurrency(financialSummary.monthlyRevenue),
-                                    icon: <TrendingUp className="w-4 h-4 text-emerald-400" />
+                                    icon: TrendingUp
                                 },
                                 {
                                     label: "المصروفات (هذا الشهر)",
                                     value: formatCurrency(financialSummary.monthlyExpenses),
-                                    icon: <TrendingDown className="w-4 h-4 text-rose-400" />
+                                    icon: TrendingDown
                                 },
                                 {
                                     label: "صافي الربح",
                                     value: formatCurrency(financialSummary.netProfit),
-                                    icon: <PieChart className="w-4 h-4 text-white" />
+                                    icon: PieChart
                                 }
                             ]}
                         >
@@ -205,10 +206,10 @@ export default function AccountsDashboard({ }: AccountsDashboardProps) {
                         </ProductivityHero>
 
                         {/* MAIN CONTENT GRID */}
-                        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
                             {/* LEFT COLUMN (Main Content) */}
-                            <div className="lg:col-span-8 space-y-8">
+                            <div className="lg:col-span-2 space-y-8">
 
                                 {/* Cash Flow Chart Card */}
                                 <Card className="border-0 shadow-sm rounded-[32px] overflow-hidden">
@@ -292,104 +293,8 @@ export default function AccountsDashboard({ }: AccountsDashboardProps) {
                                 </div>
                             </div>
 
-                            {/* RIGHT COLUMN (Sidebar) */}
-                            <div className="lg:col-span-4 space-y-6">
-
-                                {/* Quick Actions */}
-                                <Card className="border-0 shadow-sm rounded-[32px] bg-white">
-                                    <CardHeader>
-                                        <CardTitle className="text-lg font-bold text-navy">إجراءات سريعة</CardTitle>
-                                    </CardHeader>
-                                    <CardContent className="grid grid-cols-2 gap-3">
-                                        <Button variant="outline" className="h-28 flex flex-col gap-3 border-slate-100 bg-slate-50/50 hover:bg-white hover:border-brand-blue/20 hover:shadow-md text-navy rounded-2xl transition-all group">
-                                            <div className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center group-hover:scale-110 transition-transform">
-                                                <FileText className="w-5 h-5 text-brand-blue" />
-                                            </div>
-                                            <span className="font-bold text-sm">إنشاء فاتورة</span>
-                                        </Button>
-                                        <Button variant="outline" className="h-28 flex flex-col gap-3 border-slate-100 bg-slate-50/50 hover:bg-white hover:border-emerald-500/20 hover:shadow-md text-navy rounded-2xl transition-all group">
-                                            <div className="w-10 h-10 rounded-full bg-emerald-50 flex items-center justify-center group-hover:scale-110 transition-transform">
-                                                <Receipt className="w-5 h-5 text-emerald-500" />
-                                            </div>
-                                            <span className="font-bold text-sm">تسجيل مصروف</span>
-                                        </Button>
-                                        <Button variant="outline" className="h-28 flex flex-col gap-3 border-slate-100 bg-slate-50/50 hover:bg-white hover:border-purple-500/20 hover:shadow-md text-navy rounded-2xl transition-all group">
-                                            <div className="w-10 h-10 rounded-full bg-purple-50 flex items-center justify-center group-hover:scale-110 transition-transform">
-                                                <CreditCard className="w-5 h-5 text-purple-500" />
-                                            </div>
-                                            <span className="font-bold text-sm">سداد مستحقات</span>
-                                        </Button>
-                                        <Button variant="outline" className="h-28 flex flex-col gap-3 border-slate-100 bg-slate-50/50 hover:bg-white hover:border-amber-500/20 hover:shadow-md text-navy rounded-2xl transition-all group">
-                                            <div className="w-10 h-10 rounded-full bg-amber-50 flex items-center justify-center group-hover:scale-110 transition-transform">
-                                                <ArrowLeftRight className="w-5 h-5 text-amber-500" />
-                                            </div>
-                                            <span className="font-bold text-sm">تحويل رصيد</span>
-                                        </Button>
-                                    </CardContent>
-                                </Card>
-
-                                {/* Financial Health */}
-                                <Card className="border-0 shadow-sm rounded-[32px] bg-white">
-                                    <CardHeader className="border-b border-slate-100 pb-4">
-                                        <CardTitle className="text-lg font-bold text-navy flex items-center gap-2">
-                                            <PieChart className="w-5 h-5 text-brand-blue" />
-                                            الصحة المالية
-                                        </CardTitle>
-                                    </CardHeader>
-                                    <CardContent className="p-6 space-y-6">
-                                        <div className="space-y-2">
-                                            <div className="flex justify-between text-sm">
-                                                <span className="font-bold text-navy">معدل التحصيل</span>
-                                                <span className="text-emerald-600 font-bold">72.5%</span>
-                                            </div>
-                                            <Progress value={72.5} className="h-2.5 bg-slate-100" indicatorClassName="bg-emerald-500" />
-                                            <p className="text-xs text-slate-400">أعلى بنسبة 5% من الشهر الماضي</p>
-                                        </div>
-                                        <div className="space-y-2">
-                                            <div className="flex justify-between text-sm">
-                                                <span className="font-bold text-navy">هامش الربح</span>
-                                                <span className="text-brand-blue font-bold">38.5%</span>
-                                            </div>
-                                            <Progress value={38.5} className="h-2.5 bg-slate-100" indicatorClassName="bg-brand-blue" />
-                                        </div>
-                                        <div className="space-y-2">
-                                            <div className="flex justify-between text-sm">
-                                                <span className="font-bold text-navy">الميزانية المستهلكة</span>
-                                                <span className="text-amber-500 font-bold">65%</span>
-                                            </div>
-                                            <Progress value={65} className="h-2.5 bg-slate-100" indicatorClassName="bg-amber-500" />
-                                        </div>
-                                    </CardContent>
-                                </Card>
-
-                                {/* Outstanding Alerts */}
-                                <Card className="border-0 shadow-sm rounded-[32px] bg-rose-50/50 border-rose-100">
-                                    <CardHeader className="pb-2">
-                                        <CardTitle className="text-lg font-bold text-rose-700 flex items-center gap-2">
-                                            <AlertCircle className="w-5 h-5" />
-                                            تنبيهات هامة
-                                        </CardTitle>
-                                    </CardHeader>
-                                    <CardContent className="p-6 pt-2 space-y-3">
-                                        <div className="bg-white p-4 rounded-2xl border border-rose-100 shadow-sm flex items-start gap-3">
-                                            <div className="w-2 h-2 rounded-full bg-rose-500 mt-2 shrink-0"></div>
-                                            <div>
-                                                <h4 className="font-bold text-navy text-sm">فاتورة متأخرة - محمد الدوسري</h4>
-                                                <p className="text-xs text-slate-500 mt-1">مستحقة منذ 5 أيام • 42,000 ر.س</p>
-                                                <Button variant="link" className="text-rose-600 p-0 h-auto text-xs mt-2">إرسال تذكير</Button>
-                                            </div>
-                                        </div>
-                                        <div className="bg-white p-4 rounded-2xl border border-rose-100 shadow-sm flex items-start gap-3">
-                                            <div className="w-2 h-2 rounded-full bg-amber-500 mt-2 shrink-0"></div>
-                                            <div>
-                                                <h4 className="font-bold text-navy text-sm">تجديد اشتراك المكتبة</h4>
-                                                <p className="text-xs text-slate-500 mt-1">يستحق خلال 3 أيام • 2,500 ر.س</p>
-                                            </div>
-                                        </div>
-                                    </CardContent>
-                                </Card>
-
-                            </div>
+                            {/* Sidebar */}
+                            <FinanceSidebar context="overview" />
                         </div>
                     </div>
                 )}
