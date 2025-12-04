@@ -415,7 +415,7 @@ export function CreateEventView() {
 
             <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-r border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
                 {/* HERO CARD - Full width */}
-                <ProductivityHero badge="الأحداث" title="إضافة حدث جديد" type="events" hideButtons={true} />
+                <ProductivityHero badge="الأحداث" title="إضافة حدث" type="events" hideButtons={true} backUrl="/dashboard/tasks/events" />
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     {/* RIGHT COLUMN (Main Content) */}

@@ -283,7 +283,7 @@ export function ReminderDetailsView() {
                 {/* Success State - Hero Content */}
                 {!isLoading && !isError && reminder && (
                     <>
-                        <ProductivityHero badge="التذكيرات" title={reminder.title} type="reminders" hideButtons={false} />
+                        <ProductivityHero badge="التذكيرات" title={reminder.title} type="reminders" hideButtons={false} backUrl="/dashboard/tasks/reminders" />
 
                         {/* ACTION BUTTONS */}
                         <div className="max-w-[1600px] mx-auto">
