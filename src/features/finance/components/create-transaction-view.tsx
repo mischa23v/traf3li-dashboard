@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import {
-    ArrowRight, Save, Calendar, ArrowRightLeft,
-    FileText, DollarSign, CreditCard, TrendingUp, Tag, Loader2
+    Save, Calendar, ArrowRightLeft,
+    FileText, DollarSign, CreditCard, Tag, Loader2
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -109,27 +109,12 @@ export function CreateTransactionView() {
             </Header>
 
             <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-r border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
-                    {/* Sidebar Widgets */}
-                    <FinanceSidebar />
+                {/* HERO CARD - Full width */}
+                <ProductivityHero badge="المعاملات" title="تسجيل معاملة جديدة" type="transactions" listMode={true} />
 
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     {/* RIGHT COLUMN (Main Content) */}
                     <div className="lg:col-span-2 space-y-8">
-
-                        {/* HERO CARD */}
-                        <ProductivityHero
-                            badge="المالية"
-                            title="تسجيل معاملة جديدة"
-                            type="finance"
-                            hideButtons={true}
-                        >
-                            <Link to="/dashboard/finance/transactions">
-                                <Button variant="ghost" size="icon" className="rounded-full bg-white/10 hover:bg-white/20 text-white">
-                                    <ArrowRight className="w-5 h-5" />
-                                </Button>
-                            </Link>
-                        </ProductivityHero>
-
                         {/* Form Card */}
                         <div className="bg-white rounded-3xl p-8 shadow-sm border border-slate-100">
                             <form onSubmit={handleSubmit} className="space-y-8">
@@ -283,6 +268,9 @@ export function CreateTransactionView() {
                             </form>
                         </div>
                     </div>
+
+                    {/* LEFT COLUMN (Sidebar) */}
+                    <FinanceSidebar context="transactions" />
                 </div>
             </Main>
         </>

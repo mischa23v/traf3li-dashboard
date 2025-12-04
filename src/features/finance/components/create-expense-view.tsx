@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react'
 import {
-    ArrowRight, Save, Calendar, Tag,
+    Save, Calendar, Tag,
     FileText, DollarSign, CreditCard, Upload, Briefcase, Building, Loader2, CheckSquare,
     User, RotateCcw, Receipt
 } from 'lucide-react'
@@ -127,27 +127,12 @@ export function CreateExpenseView() {
             </Header>
 
             <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-r border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
-                    {/* Sidebar Widgets */}
-                    <FinanceSidebar />
+                {/* HERO CARD - Full width */}
+                <ProductivityHero badge="المصروفات" title="تسجيل مصروف جديد" type="expenses" listMode={true} />
 
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     {/* RIGHT COLUMN (Main Content) */}
                     <div className="lg:col-span-2 space-y-8">
-
-                        {/* HERO CARD */}
-                        <ProductivityHero
-                            badge="المصروفات"
-                            title="تسجيل مصروف جديد"
-                            type="expenses"
-                            hideButtons={true}
-                        >
-                            <Link to="/dashboard/finance/expenses">
-                                <Button variant="ghost" size="icon" className="rounded-full bg-white/10 hover:bg-white/20 text-white">
-                                    <ArrowRight className="w-5 h-5" />
-                                </Button>
-                            </Link>
-                        </ProductivityHero>
-
                         {/* Form Card */}
                         <div className="bg-white rounded-3xl p-8 shadow-sm border border-slate-100">
                             <form onSubmit={handleSubmit} className="space-y-8">
@@ -465,6 +450,9 @@ export function CreateExpenseView() {
                             </form>
                         </div>
                     </div>
+
+                    {/* LEFT COLUMN (Sidebar) */}
+                    <FinanceSidebar context="expenses" />
                 </div>
             </Main>
         </>
