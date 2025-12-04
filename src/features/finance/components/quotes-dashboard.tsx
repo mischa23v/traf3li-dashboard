@@ -270,25 +270,25 @@ export default function QuotesDashboard() {
                             {
                                 label: "قيد المراجعة",
                                 value: formatCurrency(stats.totalPending),
-                                icon: <Clock className="w-4 h-4 text-amber-400" />,
+                                icon: Clock,
                                 status: stats.totalPending > 0 ? 'attention' : 'normal'
                             },
                             {
                                 label: "تم القبول",
                                 value: formatCurrency(stats.totalAccepted),
-                                icon: <CheckCircle className="w-4 h-4 text-emerald-400" />,
+                                icon: CheckCircle,
                                 status: 'normal'
                             },
                             {
                                 label: "تم الرفض",
                                 value: formatCurrency(stats.totalDeclined),
-                                icon: <XCircle className="w-4 h-4 text-rose-400" />,
+                                icon: XCircle,
                                 status: 'normal'
                             },
                             {
                                 label: "إجمالي هذا الشهر",
                                 value: formatCurrency(stats.totalThisMonth),
-                                icon: <FileText className="w-4 h-4 text-blue-400" />,
+                                icon: FileText,
                                 status: 'normal'
                             }
                         ]}
