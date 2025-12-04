@@ -219,41 +219,40 @@ export function PayslipsPage() {
                 </div>
             </DynamicIsland>
 
-            <Main className="bg-[#f8f9fa] min-h-screen">
-                <div className="bg-[#022c22] rounded-tr-3xl min-h-screen -mt-4 -mr-4 -ml-4 p-6">
-                    {/* Hero Card */}
-                    <ProductivityHero
-                        badge="الموارد البشرية"
-                        title="قسائم الرواتب"
-                        type="hr"
-                        hideButtons={true}
-                        stats={[
-                            {
-                                label: "إجمالي الرواتب",
-                                value: formatCurrency(stats.totalNet),
-                                icon: <Wallet className="w-4 h-4 text-emerald-400" />,
-                                status: 'normal'
-                            },
-                            {
-                                label: "قسائم مدفوعة",
-                                value: stats.totalPaid,
-                                icon: <CheckCircle className="w-4 h-4 text-blue-400" />,
-                                status: 'normal'
-                            },
-                            {
-                                label: "قيد المراجعة",
-                                value: stats.totalPending,
-                                icon: <Clock className="w-4 h-4 text-amber-400" />,
-                                status: 'normal'
-                            },
-                            {
-                                label: "إجمالي القسائم",
-                                value: stats.total,
-                                icon: <FileText className="w-4 h-4 text-purple-400" />,
-                                status: 'normal'
-                            }
-                        ]}
-                    >
+            <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-r border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
+                {/* Hero Card */}
+                <ProductivityHero
+                    badge="الموارد البشرية"
+                    title="قسائم الرواتب"
+                    type="hr"
+                    hideButtons={true}
+                    stats={[
+                        {
+                            label: "إجمالي الرواتب",
+                            value: formatCurrency(stats.totalNet),
+                            icon: Wallet,
+                            status: 'normal'
+                        },
+                        {
+                            label: "قسائم مدفوعة",
+                            value: stats.totalPaid,
+                            icon: CheckCircle,
+                            status: 'normal'
+                        },
+                        {
+                            label: "قيد المراجعة",
+                            value: stats.totalPending,
+                            icon: Clock,
+                            status: 'normal'
+                        },
+                        {
+                            label: "إجمالي القسائم",
+                            value: stats.total,
+                            icon: FileText,
+                            status: 'normal'
+                        }
+                    ]}
+                >
                         <div className="flex flex-col gap-4 w-full">
                             <div className="flex flex-wrap items-center gap-3">
                                 <div className="relative flex-1 min-w-[200px] max-w-md">
@@ -289,10 +288,10 @@ export function PayslipsPage() {
                         </div>
                     </ProductivityHero>
 
-                    {/* Main content grid */}
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
-                        {/* Payslip list - 2/3 width */}
-                        <div className="lg:col-span-2 space-y-4">
+                {/* Main content grid */}
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    {/* Payslip list - 2/3 width */}
+                    <div className="lg:col-span-2 space-y-4">
                             {isLoading ? (
                                 <PayslipListSkeleton />
                             ) : error ? (
@@ -324,19 +323,16 @@ export function PayslipsPage() {
                             )}
                         </div>
 
-                        {/* Sidebar - 1/3 width */}
-                        <div className="lg:col-span-1">
-                            <HRSidebar
-                                context="payslips"
-                                isSelectionMode={isSelectionMode}
-                                onToggleSelectionMode={() => {
-                                    setIsSelectionMode(!isSelectionMode)
-                                    if (isSelectionMode) setSelectedRecords(new Set())
-                                }}
-                                selectedCount={selectedRecords.size}
-                            />
-                        </div>
-                    </div>
+                    {/* Sidebar - 1/3 width */}
+                    <HRSidebar
+                        context="payslips"
+                        isSelectionMode={isSelectionMode}
+                        onToggleSelectionMode={() => {
+                            setIsSelectionMode(!isSelectionMode)
+                            if (isSelectionMode) setSelectedRecords(new Set())
+                        }}
+                        selectedCount={selectedRecords.size}
+                    />
                 </div>
             </Main>
         </>

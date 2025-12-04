@@ -102,54 +102,54 @@ export function SalaryDetail() {
                 </div>
             </DynamicIsland>
 
-            <Main className="bg-[#f8f9fa] min-h-screen">
-                <div className="bg-[#022c22] rounded-tr-3xl min-h-screen -mt-4 -mr-4 -ml-4 p-6">
-                    {isLoading ? (
-                        <SalaryDetailSkeleton />
-                    ) : error || !salary ? (
-                        <div className="bg-red-50 border border-red-200 rounded-2xl p-6 text-center">
-                            <AlertCircle className="w-12 h-12 text-red-400 mx-auto mb-3" />
-                            <h3 className="text-lg font-semibold text-red-800">خطأ في تحميل البيانات</h3>
-                            <p className="text-red-600 mt-1">لم يتم العثور على سجل الراتب</p>
-                            <Link to="/dashboard/hr/salaries">
-                                <Button className="mt-4">العودة للقائمة</Button>
-                            </Link>
-                        </div>
-                    ) : (
-                        <>
-                            {/* Hero Card */}
-                            <ProductivityHero
-                                badge="الموارد البشرية"
-                                title={`كشف راتب - ${salary.month}/${salary.year}`}
-                                type="hr"
-                                hideButtons={true}
-                                stats={[
-                                    {
-                                        label: "الراتب الأساسي",
-                                        value: formatCurrency(salary.basicSalary),
-                                        icon: <DollarSign className="w-4 h-4 text-blue-400" />,
-                                        status: 'normal'
-                                    },
-                                    {
-                                        label: "إجمالي البدلات",
-                                        value: formatCurrency(salary.totalAllowances || 0),
-                                        icon: <TrendingUp className="w-4 h-4 text-emerald-400" />,
-                                        status: 'normal'
-                                    },
-                                    {
-                                        label: "إجمالي الخصومات",
-                                        value: formatCurrency(salary.totalDeductions || 0),
-                                        icon: <TrendingDown className="w-4 h-4 text-red-400" />,
-                                        status: 'normal'
-                                    },
-                                    {
-                                        label: "صافي الراتب",
-                                        value: formatCurrency(salary.netSalary),
-                                        icon: <CreditCard className="w-4 h-4 text-amber-400" />,
-                                        status: 'normal'
-                                    }
-                                ]}
-                            >
+            <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-r border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
+                {isLoading ? (
+                    <SalaryDetailSkeleton />
+                ) : error || !salary ? (
+                    <div className="bg-red-50 border border-red-200 rounded-2xl p-6 text-center">
+                        <AlertCircle className="w-12 h-12 text-red-400 mx-auto mb-3" />
+                        <h3 className="text-lg font-semibold text-red-800">خطأ في تحميل البيانات</h3>
+                        <p className="text-red-600 mt-1">لم يتم العثور على سجل الراتب</p>
+                        <Link to="/dashboard/hr/salaries">
+                            <Button className="mt-4">العودة للقائمة</Button>
+                        </Link>
+                    </div>
+                ) : (
+                    <>
+                        {/* Hero Card */}
+                        <ProductivityHero
+                            badge="الموارد البشرية"
+                            title={`كشف راتب - ${salary.month}/${salary.year}`}
+                            type="hr"
+                            listMode={true}
+                            hideButtons={true}
+                            stats={[
+                                {
+                                    label: "الراتب الأساسي",
+                                    value: formatCurrency(salary.basicSalary),
+                                    icon: DollarSign,
+                                    status: 'normal'
+                                },
+                                {
+                                    label: "إجمالي البدلات",
+                                    value: formatCurrency(salary.totalAllowances || 0),
+                                    icon: TrendingUp,
+                                    status: 'normal'
+                                },
+                                {
+                                    label: "إجمالي الخصومات",
+                                    value: formatCurrency(salary.totalDeductions || 0),
+                                    icon: TrendingDown,
+                                    status: 'normal'
+                                },
+                                {
+                                    label: "صافي الراتب",
+                                    value: formatCurrency(salary.netSalary),
+                                    icon: CreditCard,
+                                    status: 'normal'
+                                }
+                            ]}
+                        >
                                 <div className="flex flex-col gap-4 w-full">
                                     <div className="flex items-center gap-4 mb-6">
                                         <Link to="/dashboard/hr/salaries">
@@ -189,9 +189,9 @@ export function SalaryDetail() {
                                 </div>
                             </ProductivityHero>
 
-                            {/* Main content grid */}
-                            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
-                                <div className="lg:col-span-2 space-y-6">
+                        {/* Main content grid */}
+                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                            <div className="lg:col-span-2 space-y-6">
                                     {/* Earnings */}
                                     <Card className="bg-white rounded-2xl border-0 shadow-lg">
                                         <CardHeader>
@@ -295,13 +295,10 @@ export function SalaryDetail() {
                                     </Card>
                                 </div>
 
-                                <div className="lg:col-span-1">
-                                    <HRSidebar context="salaries" />
-                                </div>
-                            </div>
-                        </>
-                    )}
-                </div>
+                            <HRSidebar context="salaries" />
+                        </div>
+                    </>
+                )}
             </Main>
 
             <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>

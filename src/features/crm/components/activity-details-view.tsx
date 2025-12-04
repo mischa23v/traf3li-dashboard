@@ -38,6 +38,7 @@ import { Link } from '@tanstack/react-router'
 import { Header } from '@/components/layout/header'
 import { TopNav } from '@/components/layout/top-nav'
 import { DynamicIsland } from '@/components/dynamic-island'
+import { ProductivityHero } from '@/components/productivity-hero'
 import { Main } from '@/components/layout/main'
 import { LanguageSwitcher } from '@/components/language-switcher'
 import { ThemeSwitch } from '@/components/theme-switch'
@@ -271,120 +272,66 @@ export function ActivityDetailsView() {
         {!isLoading && !isError && activity && (
           <>
             {/* Activity Hero Content */}
-            <div className="max-w-[1600px] mx-auto bg-blue-950 rounded-3xl p-8 shadow-xl shadow-blue-900/20 mb-8 relative overflow-hidden">
-              {/* Background Decoration */}
-              <div className="absolute top-0 left-0 w-full h-full overflow-hidden z-0 pointer-events-none">
-                <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-blue-500/10 rounded-full blur-[100px]"></div>
-                <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-cyan-500/10 rounded-full blur-[100px]"></div>
+            <ProductivityHero badge="إدارة النشاطات" title={activity.titleAr || activity.title} type="crm" listMode={true} hideButtons={true}>
+              <div className="flex flex-wrap gap-3">
+                <Select
+                  value={activity.status}
+                  onValueChange={(value) =>
+                    handleStatusChange(value as ActivityStatus)
+                  }
+                >
+                  <SelectTrigger className="w-[180px] border-white/10 bg-white/5 text-white">
+                    <SelectValue placeholder="تغيير الحالة" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {Object.entries(statusLabels).map(([value, label]) => (
+                      <SelectItem key={value} value={value}>
+                        {label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {!showDeleteConfirm ? (
+                  <Button
+                    variant="outline"
+                    onClick={() => setShowDeleteConfirm(true)}
+                    className="border-red-500/30 text-red-300 hover:bg-red-500/20 hover:text-red-200 backdrop-blur-sm"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                ) : (
+                  <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setShowDeleteConfirm(false)}
+                      className="border-white/10 text-white hover:bg-white/10"
+                    >
+                      إلغاء
+                    </Button>
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      onClick={handleDelete}
+                      disabled={deleteActivityMutation.isPending}
+                      className="bg-red-500 hover:bg-red-600"
+                    >
+                      {deleteActivityMutation.isPending ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        'تأكيد'
+                      )}
+                    </Button>
+                  </div>
+                )}
               </div>
-
-              <div className="relative z-10 flex flex-col lg:flex-row gap-8 items-start justify-between text-white">
-                {/* Main Info */}
-                <div className="flex-1">
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className={`p-2 rounded-xl backdrop-blur-md border border-white/10 ${typeColors[activity.type]}`}>
-                      <TypeIcon className="h-6 w-6" />
-                    </div>
-                    <Badge
-                      className={`${typeColors[activity.type]} border-0 rounded-lg px-3 py-1`}
-                    >
-                      {typeLabels[activity.type]}
-                    </Badge>
-                    <Badge
-                      className={`${statusColors[activity.status]} border-0 rounded-lg px-3 py-1`}
-                    >
-                      <StatusIcon className="h-3 w-3 ml-1" />
-                      {statusLabels[activity.status]}
-                    </Badge>
-                  </div>
-                  <h1 className="text-3xl font-bold mb-4 leading-tight text-white">
-                    {activity.titleAr || activity.title}
-                  </h1>
-                  <div className="flex flex-wrap gap-6 text-sm text-slate-300">
-                    {activity.entityName && (
-                      <div className="flex items-center gap-2">
-                        <User className="h-4 w-4 text-blue-400" />
-                        <span>{activity.entityName}</span>
-                      </div>
-                    )}
-                    <div className="flex items-center gap-2">
-                      <Calendar className="h-4 w-4 text-blue-400" />
-                      <span>
-                        {format(new Date(activity.createdAt), 'dd MMMM yyyy', { locale: ar })}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Clock className="h-4 w-4 text-blue-400" />
-                      <span>
-                        {format(new Date(activity.createdAt), 'HH:mm', { locale: ar })}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Actions */}
-                <div className="flex flex-col gap-4 min-w-[280px]">
-                  <div className="flex gap-3">
-                    <Select
-                      value={activity.status}
-                      onValueChange={(value) =>
-                        handleStatusChange(value as ActivityStatus)
-                      }
-                    >
-                      <SelectTrigger className="flex-1 border-white/10 bg-white/5 text-white">
-                        <SelectValue placeholder="تغيير الحالة" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {Object.entries(statusLabels).map(([value, label]) => (
-                          <SelectItem key={value} value={value}>
-                            {label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    {!showDeleteConfirm ? (
-                      <Button
-                        variant="outline"
-                        onClick={() => setShowDeleteConfirm(true)}
-                        className="border-red-500/30 text-red-300 hover:bg-red-500/20 hover:text-red-200 backdrop-blur-sm"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    ) : (
-                      <div className="flex gap-2">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => setShowDeleteConfirm(false)}
-                          className="border-white/10 text-white hover:bg-white/10"
-                        >
-                          إلغاء
-                        </Button>
-                        <Button
-                          variant="destructive"
-                          size="sm"
-                          onClick={handleDelete}
-                          disabled={deleteActivityMutation.isPending}
-                          className="bg-red-500 hover:bg-red-600"
-                        >
-                          {deleteActivityMutation.isPending ? (
-                            <Loader2 className="h-4 w-4 animate-spin" />
-                          ) : (
-                            'تأكيد'
-                          )}
-                        </Button>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-            </div>
+            </ProductivityHero>
 
             {/* MAIN CONTENT */}
             <div className="max-w-[1600px] mx-auto pb-12">
-              <div className="grid grid-cols-12 gap-6">
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 {/* MAIN CONTENT */}
-                <div className="col-span-12 lg:col-span-8 space-y-6">
+                <div className="lg:col-span-2 space-y-6">
                   {/* Description Card */}
                   {activity.description && (
                     <Card className="border border-slate-100 shadow-sm rounded-2xl">
@@ -542,7 +489,7 @@ export function ActivityDetailsView() {
                 </div>
 
                 {/* SIDEBAR */}
-                <div className="col-span-12 lg:col-span-4 space-y-6">
+                <div className="space-y-6">
                   {/* Info Card */}
                   <Card className="border border-slate-100 shadow-sm rounded-2xl">
                     <CardHeader className="bg-white border-b border-slate-50 pb-4">

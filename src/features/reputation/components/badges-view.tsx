@@ -1,8 +1,8 @@
 import { useTranslation } from 'react-i18next'
 import {
   Star, Award, Trophy, Shield, Zap, Crown, Medal,
-  Target, Users, Clock, CheckCircle, TrendingUp,
-  Lock, Unlock, Search, Bell, Scale
+  Target, Users, CheckCircle,
+  Lock, Unlock, Search, Bell
 } from 'lucide-react'
 import { Progress } from '@/components/ui/progress'
 import {
@@ -23,6 +23,7 @@ import { LanguageSwitcher } from '@/components/language-switcher'
 import { DynamicIsland } from '@/components/dynamic-island'
 import { Button } from '@/components/ui/button'
 import { ReputationSidebar } from './reputation-sidebar'
+import { ProductivityHero } from '@/components/productivity-hero'
 
 // Mock badges data
 const earnedBadges = [
@@ -193,61 +194,22 @@ export function BadgesView() {
         fluid={true}
         className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-r border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']"
       >
-        {/* HERO BANNER */}
-        <div className="bg-navy rounded-3xl p-8 relative overflow-hidden text-white shadow-xl shadow-navy/20 group">
-          <div className="absolute -bottom-32 -left-32 w-96 h-96 bg-brand-blue rounded-full blur-[120px] opacity-40 group-hover:opacity-50 transition-opacity duration-700"></div>
-          <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
-            <div>
-              <div className="flex items-center gap-2 mb-2">
-                <Badge className="bg-blue-500/20 text-blue-100 hover:bg-blue-500/30 border-0 px-3 py-1">
-                  <Award className="w-3 h-3 ml-2" />
-                  {t('reputation.badges', 'الشارات والإنجازات')}
-                </Badge>
-                <span className="text-slate-400 text-sm">
-                  {new Date().toLocaleDateString('ar-SA', { month: 'long', year: 'numeric' })}
-                </span>
-              </div>
-              <h1 className="text-4xl font-bold leading-tight mb-2">
-                {isRTL ? 'شاراتي' : 'My Badges'}
-              </h1>
-              <p className="text-slate-300 text-lg max-w-xl">
-                {isRTL ? 'عرض الشارات المكتسبة والتقدم نحو شارات جديدة' : 'View earned badges and progress towards new ones'}
-              </p>
-            </div>
-          </div>
-        </div>
+        {/* HERO CARD & STATS */}
+        <ProductivityHero
+          badge={isRTL ? 'السمعة' : 'Reputation'}
+          title={isRTL ? 'الشارات' : 'Badges'}
+          type="reputation"
+          stats={[
+            { label: isRTL ? 'شارات مكتسبة' : 'Badges Earned', value: earnedBadges.length, icon: Award, status: 'normal' },
+            { label: isRTL ? 'أسطوري' : 'Legendary', value: 2, icon: Crown, status: 'normal' },
+            { label: isRTL ? 'ملحمي' : 'Epic', value: 2, icon: Trophy, status: 'normal' },
+            { label: isRTL ? 'قيد الفتح' : 'In Progress', value: lockedBadges.length, icon: Lock, status: 'normal' },
+          ]}
+        />
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* --- Main Content --- */}
           <div className="lg:col-span-2 flex flex-col gap-6">
-
-            {/* Stats Summary */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <Card className="border-slate-100 shadow-sm">
-                <CardContent className="p-4 text-center">
-                  <div className="text-3xl font-bold text-navy">{earnedBadges.length}</div>
-                  <div className="text-sm text-slate-500">{isRTL ? 'شارات مكتسبة' : 'Badges Earned'}</div>
-                </CardContent>
-              </Card>
-              <Card className="border-slate-100 shadow-sm">
-                <CardContent className="p-4 text-center">
-                  <div className="text-3xl font-bold text-amber-500">2</div>
-                  <div className="text-sm text-slate-500">{isRTL ? 'أسطوري' : 'Legendary'}</div>
-                </CardContent>
-              </Card>
-              <Card className="border-slate-100 shadow-sm">
-                <CardContent className="p-4 text-center">
-                  <div className="text-3xl font-bold text-purple-500">2</div>
-                  <div className="text-sm text-slate-500">{isRTL ? 'ملحمي' : 'Epic'}</div>
-                </CardContent>
-              </Card>
-              <Card className="border-slate-100 shadow-sm">
-                <CardContent className="p-4 text-center">
-                  <div className="text-3xl font-bold text-slate-500">{lockedBadges.length}</div>
-                  <div className="text-sm text-slate-500">{isRTL ? 'قيد الفتح' : 'In Progress'}</div>
-                </CardContent>
-              </Card>
-            </div>
 
             {/* Earned Badges */}
             <div>

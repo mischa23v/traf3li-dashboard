@@ -139,50 +139,50 @@ export function EvaluationDetail() {
                 </div>
             </DynamicIsland>
 
-            <Main className="bg-[#f8f9fa] min-h-screen">
-                <div className="bg-[#022c22] rounded-tr-3xl min-h-screen -mt-4 -mr-4 -ml-4 p-6">
-                    {isLoading ? (
-                        <EvaluationDetailSkeleton />
-                    ) : error || !evaluation ? (
-                        <div className="bg-red-50 border border-red-200 rounded-2xl p-6 text-center">
-                            <AlertCircle className="w-12 h-12 text-red-400 mx-auto mb-3" />
-                            <h3 className="text-lg font-semibold text-red-800">خطأ في تحميل البيانات</h3>
-                            <p className="text-red-600 mt-1">لم يتم العثور على التقييم</p>
-                            <Link to="/dashboard/hr/evaluations">
-                                <Button className="mt-4">العودة للقائمة</Button>
-                            </Link>
-                        </div>
-                    ) : (
-                        <>
-                            {/* Hero Card */}
-                            <ProductivityHero
-                                badge="الموارد البشرية"
-                                title={`تقييم أداء - ${evaluation.period}`}
-                                type="hr"
-                                hideButtons={true}
+            <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-r border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
+                {isLoading ? (
+                    <EvaluationDetailSkeleton />
+                ) : error || !evaluation ? (
+                    <div className="bg-red-50 border border-red-200 rounded-2xl p-6 text-center">
+                        <AlertCircle className="w-12 h-12 text-red-400 mx-auto mb-3" />
+                        <h3 className="text-lg font-semibold text-red-800">خطأ في تحميل البيانات</h3>
+                        <p className="text-red-600 mt-1">لم يتم العثور على التقييم</p>
+                        <Link to="/dashboard/hr/evaluations">
+                            <Button className="mt-4">العودة للقائمة</Button>
+                        </Link>
+                    </div>
+                ) : (
+                    <>
+                        {/* Hero Card */}
+                        <ProductivityHero
+                            badge="الموارد البشرية"
+                            title={`تقييم أداء - ${evaluation.period}`}
+                            type="hr"
+                            listMode={true}
+                            hideButtons={true}
                                 stats={[
                                     {
                                         label: "التقييم العام",
                                         value: `${evaluation.overallRating?.toFixed(1)} / 5`,
-                                        icon: <Star className="w-4 h-4 text-amber-400" />,
+                                        icon: Star,
                                         status: 'normal'
                                     },
                                     {
                                         label: "فترة التقييم",
                                         value: evaluation.period,
-                                        icon: <Calendar className="w-4 h-4 text-blue-400" />,
+                                        icon: Calendar,
                                         status: 'normal'
                                     },
                                     {
                                         label: "المُقيّم",
                                         value: evaluation.reviewerName || 'المدير المباشر',
-                                        icon: <User className="w-4 h-4 text-purple-400" />,
+                                        icon: User,
                                         status: 'normal'
                                     },
                                     {
                                         label: "التصنيف",
                                         value: getRatingLabel(evaluation.overallRating || 0),
-                                        icon: <Target className="w-4 h-4 text-emerald-400" />,
+                                        icon: Target,
                                         status: 'normal'
                                     }
                                 ]}
@@ -225,9 +225,9 @@ export function EvaluationDetail() {
                                 </div>
                             </ProductivityHero>
 
-                            {/* Main content grid */}
-                            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
-                                <div className="lg:col-span-2 space-y-6">
+                        {/* Main content grid */}
+                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                            <div className="lg:col-span-2 space-y-6">
                                     {/* Criteria Breakdown */}
                                     <Card className="bg-white rounded-2xl border-0 shadow-lg">
                                         <CardHeader>
@@ -315,13 +315,12 @@ export function EvaluationDetail() {
                                     )}
                                 </div>
 
-                                <div className="lg:col-span-1">
-                                    <HRSidebar context="evaluations" />
-                                </div>
+                            <div className="lg:col-span-1">
+                                <HRSidebar context="evaluations" />
                             </div>
-                        </>
-                    )}
-                </div>
+                        </div>
+                    </>
+                )}
             </Main>
 
             <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>

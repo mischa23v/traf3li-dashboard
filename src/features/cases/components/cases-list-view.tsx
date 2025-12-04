@@ -249,7 +249,7 @@ export function CasesListView() {
         className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-r border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']"
       >
         {/* HERO BANNER */}
-        <ProductivityHero badge={t('cases.management', 'إدارة القضايا')} title={t('cases.title', 'ملفات القضايا والمرافعات')} type="cases" hideButtons={true}>
+        <ProductivityHero badge="القضايا" title="القضايا" type="cases" hideButtons={true}>
           <div className="flex gap-3">
             <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
               <DialogTrigger asChild>

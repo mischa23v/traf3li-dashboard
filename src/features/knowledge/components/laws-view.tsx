@@ -1,9 +1,9 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
-  Scale, Search, Filter, BookOpen, Download, ExternalLink,
-  Calendar, ChevronRight, ChevronLeft, FileText, Bookmark,
-  Eye, Clock, Building2, Bell
+  Scale, Search, Download, ExternalLink,
+  Calendar, FileText, Bookmark,
+  Eye, Clock, Bell
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -11,9 +11,6 @@ import { Badge } from '@/components/ui/badge'
 import {
   Card,
   CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
 } from '@/components/ui/card'
 import {
   Select,
@@ -31,6 +28,7 @@ import { ProfileDropdown } from '@/components/profile-dropdown'
 import { LanguageSwitcher } from '@/components/language-switcher'
 import { DynamicIsland } from '@/components/dynamic-island'
 import { KnowledgeSidebar } from './knowledge-sidebar'
+import { ProductivityHero } from '@/components/productivity-hero'
 
 // Mock laws data
 const mockLaws = [
@@ -182,29 +180,18 @@ export function LawsView() {
         fluid={true}
         className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-r border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']"
       >
-        {/* HERO BANNER */}
-        <div className="bg-navy rounded-3xl p-8 relative overflow-hidden text-white shadow-xl shadow-navy/20 group">
-          <div className="absolute -bottom-32 -left-32 w-96 h-96 bg-brand-blue rounded-full blur-[120px] opacity-40 group-hover:opacity-50 transition-opacity duration-700"></div>
-          <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
-            <div>
-              <div className="flex items-center gap-2 mb-2">
-                <Badge className="bg-blue-500/20 text-blue-100 hover:bg-blue-500/30 border-0 px-3 py-1">
-                  <Scale className="w-3 h-3 ml-2" />
-                  {isRTL ? 'المكتبة القانونية' : 'Legal Library'}
-                </Badge>
-                <span className="text-slate-400 text-sm">
-                  {new Date().toLocaleDateString('ar-SA', { month: 'long', year: 'numeric' })}
-                </span>
-              </div>
-              <h1 className="text-4xl font-bold leading-tight mb-2">
-                {isRTL ? 'الأنظمة واللوائح' : 'Laws & Regulations'}
-              </h1>
-              <p className="text-slate-300 text-lg max-w-xl">
-                {isRTL ? 'مكتبة شاملة للأنظمة واللوائح السعودية' : 'Comprehensive library of Saudi laws and regulations'}
-              </p>
-            </div>
-          </div>
-        </div>
+        {/* HERO CARD & STATS */}
+        <ProductivityHero
+          badge={isRTL ? 'قاعدة المعرفة' : 'Knowledge Base'}
+          title={isRTL ? 'الأنظمة' : 'Laws'}
+          type="knowledge"
+          stats={[
+            { label: isRTL ? 'نظام متاح' : 'Available Laws', value: mockLaws.length, icon: Scale, status: 'normal' },
+            { label: isRTL ? 'إجمالي المواد' : 'Total Articles', value: 873, icon: FileText, status: 'normal' },
+            { label: isRTL ? 'إجمالي المشاهدات' : 'Total Views', value: '46.4K', icon: Eye, status: 'normal' },
+            { label: isRTL ? 'إجمالي التحميلات' : 'Total Downloads', value: '12.6K', icon: Download, status: 'normal' },
+          ]}
+        />
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* --- Main Content --- */}
@@ -238,46 +225,6 @@ export function LawsView() {
                 </div>
               </CardContent>
             </Card>
-
-            {/* Stats */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <Card className="border-slate-100 shadow-sm">
-                <CardContent className="p-4 text-center">
-                  <div className="h-12 w-12 bg-navy/5 rounded-full flex items-center justify-center mx-auto mb-3">
-                    <Scale className="h-6 w-6 text-navy" />
-                  </div>
-                  <div className="text-2xl font-bold text-navy">{mockLaws.length}</div>
-                  <div className="text-xs text-slate-500 mt-1">{isRTL ? 'نظام متاح' : 'Available Laws'}</div>
-                </CardContent>
-              </Card>
-              <Card className="border-slate-100 shadow-sm">
-                <CardContent className="p-4 text-center">
-                  <div className="h-12 w-12 bg-emerald-50 rounded-full flex items-center justify-center mx-auto mb-3">
-                    <FileText className="h-6 w-6 text-emerald-600" />
-                  </div>
-                  <div className="text-2xl font-bold text-navy">873</div>
-                  <div className="text-xs text-slate-500 mt-1">{isRTL ? 'إجمالي المواد' : 'Total Articles'}</div>
-                </CardContent>
-              </Card>
-              <Card className="border-slate-100 shadow-sm">
-                <CardContent className="p-4 text-center">
-                  <div className="h-12 w-12 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-3">
-                    <Eye className="h-6 w-6 text-blue-600" />
-                  </div>
-                  <div className="text-2xl font-bold text-navy">46.4K</div>
-                  <div className="text-xs text-slate-500 mt-1">{isRTL ? 'إجمالي المشاهدات' : 'Total Views'}</div>
-                </CardContent>
-              </Card>
-              <Card className="border-slate-100 shadow-sm">
-                <CardContent className="p-4 text-center">
-                  <div className="h-12 w-12 bg-purple-50 rounded-full flex items-center justify-center mx-auto mb-3">
-                    <Download className="h-6 w-6 text-purple-600" />
-                  </div>
-                  <div className="text-2xl font-bold text-navy">12.6K</div>
-                  <div className="text-xs text-slate-500 mt-1">{isRTL ? 'إجمالي التحميلات' : 'Total Downloads'}</div>
-                </CardContent>
-              </Card>
-            </div>
 
             {/* Laws List */}
             <div className="space-y-4">

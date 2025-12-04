@@ -158,15 +158,15 @@ export function SalaryCreate() {
                 </div>
             </DynamicIsland>
 
-            <Main className="bg-[#f8f9fa] min-h-screen">
-                <div className="bg-[#022c22] rounded-tr-3xl min-h-screen -mt-4 -mr-4 -ml-4 p-6">
-                    {/* Hero Card */}
-                    <ProductivityHero
-                        badge="الموارد البشرية"
-                        title="إنشاء سجل راتب"
-                        type="hr"
-                        hideButtons={true}
-                    >
+            <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-r border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
+                {/* Hero Card */}
+                <ProductivityHero
+                    badge="الموارد البشرية"
+                    title="إنشاء سجل راتب"
+                    type="hr"
+                    listMode={true}
+                    hideButtons={true}
+                >
                         <Link to="/dashboard/hr/salaries">
                             <Button variant="ghost" size="icon" className="rounded-full bg-white/10 hover:bg-white/20 text-white">
                                 <ArrowRight className="w-5 h-5" />
@@ -174,9 +174,9 @@ export function SalaryCreate() {
                         </Link>
                     </ProductivityHero>
 
-                    {/* Main content grid */}
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
-                        <div className="lg:col-span-2">
+                {/* Main content grid */}
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <div className="lg:col-span-2">
                             <form onSubmit={handleSubmit} className="space-y-6">
                                 {/* Employee & Period */}
                                 <div className="bg-white rounded-2xl p-6 shadow-lg">
@@ -390,10 +390,7 @@ export function SalaryCreate() {
                             </form>
                         </div>
 
-                        <div className="lg:col-span-1">
-                            <HRSidebar context="salaries" />
-                        </div>
-                    </div>
+                    <HRSidebar context="salaries" />
                 </div>
             </Main>
         </>

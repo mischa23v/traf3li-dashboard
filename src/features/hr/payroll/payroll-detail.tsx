@@ -115,54 +115,54 @@ export function PayrollDetail() {
                 </div>
             </DynamicIsland>
 
-            <Main className="bg-[#f8f9fa] min-h-screen">
-                <div className="bg-[#022c22] rounded-tr-3xl min-h-screen -mt-4 -mr-4 -ml-4 p-6">
-                    {isLoading ? (
-                        <PayrollDetailSkeleton />
-                    ) : error || !payroll ? (
-                        <div className="bg-red-50 border border-red-200 rounded-2xl p-6 text-center">
-                            <AlertCircle className="w-12 h-12 text-red-400 mx-auto mb-3" />
-                            <h3 className="text-lg font-semibold text-red-800">خطأ في تحميل البيانات</h3>
-                            <p className="text-red-600 mt-1">لم يتم العثور على مسير الرواتب</p>
-                            <Link to="/dashboard/hr/payroll">
-                                <Button className="mt-4">العودة للقائمة</Button>
-                            </Link>
-                        </div>
-                    ) : (
-                        <>
-                            {/* Hero Card */}
-                            <ProductivityHero
-                                badge="الموارد البشرية"
-                                title={payroll.name || `مسير رواتب ${payroll.month}/${payroll.year}`}
-                                type="hr"
-                                hideButtons={true}
-                                stats={[
-                                    {
-                                        label: "الفترة",
-                                        value: `${payroll.month}/${payroll.year}`,
-                                        icon: <Calendar className="w-4 h-4 text-blue-400" />,
-                                        status: 'normal'
-                                    },
-                                    {
-                                        label: "عدد الموظفين",
-                                        value: payroll.employeeCount || 0,
-                                        icon: <Users className="w-4 h-4 text-purple-400" />,
-                                        status: 'normal'
-                                    },
-                                    {
-                                        label: "إجمالي الرواتب",
-                                        value: formatCurrency(payroll.totalGross || 0),
-                                        icon: <DollarSign className="w-4 h-4 text-emerald-400" />,
-                                        status: 'normal'
-                                    },
-                                    {
-                                        label: "صافي المستحق",
-                                        value: formatCurrency(payroll.totalNet || 0),
-                                        icon: <DollarSign className="w-4 h-4 text-amber-400" />,
-                                        status: 'normal'
-                                    }
-                                ]}
-                            >
+            <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-r border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
+                {isLoading ? (
+                    <PayrollDetailSkeleton />
+                ) : error || !payroll ? (
+                    <div className="bg-red-50 border border-red-200 rounded-2xl p-6 text-center">
+                        <AlertCircle className="w-12 h-12 text-red-400 mx-auto mb-3" />
+                        <h3 className="text-lg font-semibold text-red-800">خطأ في تحميل البيانات</h3>
+                        <p className="text-red-600 mt-1">لم يتم العثور على مسير الرواتب</p>
+                        <Link to="/dashboard/hr/payroll">
+                            <Button className="mt-4">العودة للقائمة</Button>
+                        </Link>
+                    </div>
+                ) : (
+                    <>
+                        {/* Hero Card */}
+                        <ProductivityHero
+                            badge="الموارد البشرية"
+                            title={payroll.name || `مسير رواتب ${payroll.month}/${payroll.year}`}
+                            type="hr"
+                            listMode={true}
+                            hideButtons={true}
+                            stats={[
+                                {
+                                    label: "الفترة",
+                                    value: `${payroll.month}/${payroll.year}`,
+                                    icon: Calendar,
+                                    status: 'normal'
+                                },
+                                {
+                                    label: "عدد الموظفين",
+                                    value: payroll.employeeCount || 0,
+                                    icon: Users,
+                                    status: 'normal'
+                                },
+                                {
+                                    label: "إجمالي الرواتب",
+                                    value: formatCurrency(payroll.totalGross || 0),
+                                    icon: DollarSign,
+                                    status: 'normal'
+                                },
+                                {
+                                    label: "صافي المستحق",
+                                    value: formatCurrency(payroll.totalNet || 0),
+                                    icon: DollarSign,
+                                    status: 'normal'
+                                }
+                            ]}
+                        >
                                 <div className="flex flex-col gap-4 w-full">
                                     <div className="flex items-center gap-4 mb-6">
                                         <Link to="/dashboard/hr/payroll">
@@ -219,9 +219,9 @@ export function PayrollDetail() {
                                 </div>
                             </ProductivityHero>
 
-                            {/* Main content grid */}
-                            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
-                                <div className="lg:col-span-2 space-y-6">
+                        {/* Main content grid */}
+                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                            <div className="lg:col-span-2 space-y-6">
                                     {/* Summary */}
                                     <Card className="bg-white rounded-2xl border-0 shadow-lg">
                                         <CardHeader>
@@ -287,13 +287,10 @@ export function PayrollDetail() {
                                     )}
                                 </div>
 
-                                <div className="lg:col-span-1">
-                                    <HRSidebar context="payroll" />
-                                </div>
-                            </div>
-                        </>
-                    )}
-                </div>
+                            <HRSidebar context="payroll" />
+                        </div>
+                    </>
+                )}
             </Main>
 
             <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>

@@ -107,8 +107,7 @@ export function AttendanceDetail() {
                 </div>
             </DynamicIsland>
 
-            <Main className="bg-[#f8f9fa] min-h-screen">
-                <div className="bg-[#022c22] rounded-tr-3xl min-h-screen -mt-4 -mr-4 -ml-4 p-6">
+            <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-r border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
                     {isLoading ? (
                         <AttendanceDetailSkeleton />
                     ) : error || !record ? (
@@ -121,40 +120,41 @@ export function AttendanceDetail() {
                             </Link>
                         </div>
                     ) : (
-                        <>
-                            {/* Hero Card */}
-                            <ProductivityHero
-                                badge="الموارد البشرية"
-                                title="سجل حضور"
-                                type="hr"
-                                hideButtons={true}
-                                stats={[
-                                    {
-                                        label: "وقت الحضور",
-                                        value: record.checkIn || '-',
-                                        icon: <LogIn className="w-4 h-4 text-emerald-400" />,
-                                        status: 'normal'
-                                    },
-                                    {
-                                        label: "وقت الانصراف",
-                                        value: record.checkOut || '-',
-                                        icon: <LogOut className="w-4 h-4 text-red-400" />,
-                                        status: 'normal'
-                                    },
-                                    {
-                                        label: "ساعات العمل",
-                                        value: record.workHours ? `${record.workHours} ساعة` : calculateWorkHours(),
-                                        icon: <Clock className="w-4 h-4 text-blue-400" />,
-                                        status: 'normal'
-                                    },
-                                    {
-                                        label: "العمل الإضافي",
-                                        value: record.overtime ? `${record.overtime} ساعة` : '-',
-                                        icon: <Clock className="w-4 h-4 text-amber-400" />,
-                                        status: 'normal'
-                                    }
-                                ]}
-                            >
+                    <>
+                        {/* Hero Card */}
+                        <ProductivityHero
+                            badge="الموارد البشرية"
+                            title="سجل حضور"
+                            type="hr"
+                            listMode={true}
+                            hideButtons={true}
+                            stats={[
+                                {
+                                    label: "وقت الحضور",
+                                    value: record.checkIn || '-',
+                                    icon: LogIn,
+                                    status: 'normal'
+                                },
+                                {
+                                    label: "وقت الانصراف",
+                                    value: record.checkOut || '-',
+                                    icon: LogOut,
+                                    status: 'normal'
+                                },
+                                {
+                                    label: "ساعات العمل",
+                                    value: record.workHours ? `${record.workHours} ساعة` : calculateWorkHours(),
+                                    icon: Clock,
+                                    status: 'normal'
+                                },
+                                {
+                                    label: "العمل الإضافي",
+                                    value: record.overtime ? `${record.overtime} ساعة` : '-',
+                                    icon: Clock,
+                                    status: 'normal'
+                                }
+                            ]}
+                        >
                                 <div className="flex flex-col gap-4 w-full">
                                     <div className="flex items-center gap-4 mb-6">
                                         <Link to="/dashboard/hr/attendance">
@@ -190,10 +190,10 @@ export function AttendanceDetail() {
                                         </Button>
                                     </div>
                                 </div>
-                            </ProductivityHero>
+                        </ProductivityHero>
 
-                            {/* Main content grid */}
-                            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
+                        {/* Main content grid */}
+                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                                 <div className="lg:col-span-2 space-y-6">
                                     <Card className="bg-white rounded-2xl border-0 shadow-lg">
                                         <CardHeader>
@@ -239,11 +239,10 @@ export function AttendanceDetail() {
 
                                 <div className="lg:col-span-1">
                                     <HRSidebar context="attendance" />
-                                </div>
                             </div>
-                        </>
-                    )}
-                </div>
+                        </div>
+                    </>
+                )}
             </Main>
 
             <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>

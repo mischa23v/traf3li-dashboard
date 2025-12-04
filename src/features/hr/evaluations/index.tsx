@@ -188,25 +188,25 @@ export function EvaluationsPage() {
             {
                 label: "متوسط التقييم",
                 value: avgRating.toFixed(1),
-                icon: <Star className="w-4 h-4 text-amber-400" />,
+                icon: Star,
                 status: 'normal'
             },
             {
                 label: "مكتمل",
                 value: completed,
-                icon: <CheckCircle className="w-4 h-4 text-emerald-400" />,
+                icon: CheckCircle,
                 status: 'normal'
             },
             {
                 label: "قيد المراجعة",
                 value: pending,
-                icon: <Clock className="w-4 h-4 text-blue-400" />,
+                icon: Clock,
                 status: 'attention'
             },
             {
                 label: "مسودة",
                 value: draft,
-                icon: <FileText className="w-4 h-4 text-slate-400" />,
+                icon: FileText,
                 status: 'normal'
             }
         ]
@@ -283,16 +283,15 @@ export function EvaluationsPage() {
                 </div>
             </DynamicIsland>
 
-            <Main className="bg-[#f8f9fa] min-h-screen">
-                <div className="bg-[#022c22] rounded-tr-3xl min-h-screen -mt-4 -mr-4 -ml-4 p-6">
-                    {/* Hero Card */}
-                    <ProductivityHero
-                        badge="الموارد البشرية"
-                        title="تقييم الأداء"
-                        type="hr"
-                        stats={stats}
-                        hideButtons={true}
-                    >
+            <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-r border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
+                {/* Hero Card */}
+                <ProductivityHero
+                    badge="الموارد البشرية"
+                    title="تقييمات الأداء"
+                    type="hr"
+                    stats={stats}
+                    hideButtons={true}
+                >
                         <div className="flex flex-col gap-4 w-full">
                             <div className="flex items-center gap-4 mb-4">
                                 <Link to="/dashboard">
@@ -348,10 +347,10 @@ export function EvaluationsPage() {
                         </div>
                     </ProductivityHero>
 
-                    {/* Main content grid */}
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
-                        {/* Evaluation list - 2/3 width */}
-                        <div className="lg:col-span-2 space-y-4">
+                {/* Main content grid */}
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    {/* Evaluation list - 2/3 width */}
+                    <div className="lg:col-span-2 space-y-4">
                             {isLoading ? (
                                 <EvaluationListSkeleton />
                             ) : error ? (
@@ -389,19 +388,18 @@ export function EvaluationsPage() {
                             )}
                         </div>
 
-                        {/* Sidebar - 1/3 width */}
-                        <div className="lg:col-span-1">
-                            <HRSidebar
-                                context="evaluations"
-                                isSelectionMode={isSelectionMode}
-                                onToggleSelectionMode={() => {
-                                    setIsSelectionMode(!isSelectionMode)
-                                    if (isSelectionMode) setSelectedRecords(new Set())
-                                }}
-                                selectedCount={selectedRecords.size}
-                                onDeleteSelected={handleDeleteSelected}
-                            />
-                        </div>
+                    {/* Sidebar - 1/3 width */}
+                    <div className="lg:col-span-1">
+                        <HRSidebar
+                            context="evaluations"
+                            isSelectionMode={isSelectionMode}
+                            onToggleSelectionMode={() => {
+                                setIsSelectionMode(!isSelectionMode)
+                                if (isSelectionMode) setSelectedRecords(new Set())
+                            }}
+                            selectedCount={selectedRecords.size}
+                            onDeleteSelected={handleDeleteSelected}
+                        />
                     </div>
                 </div>
             </Main>
