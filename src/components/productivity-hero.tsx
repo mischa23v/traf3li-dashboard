@@ -7,7 +7,8 @@ import {
     CalendarRange,
     Bell,
     CheckSquare,
-    ArrowRight
+    ArrowRight,
+    List
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { StatCard } from '@/components/stat-card'
@@ -30,9 +31,11 @@ interface ProductivityHeroProps {
     children?: React.ReactNode;
     stats?: StatItem[];
     backUrl?: string;
+    /** When true, shows "Go to List" button instead of "Create New" button */
+    listMode?: boolean;
 }
 
-export function ProductivityHero({ badge, title = 'الإنتاجية', type = 'tasks', hideButtons = false, children, stats, backUrl }: ProductivityHeroProps) {
+export function ProductivityHero({ badge, title = 'الإنتاجية', type = 'tasks', hideButtons = false, children, stats, backUrl, listMode = false }: ProductivityHeroProps) {
     // Fetch Stats (only if stats prop is not provided)
     const { data: dueTodayTasks } = useDueTodayTasks()
     const { data: overdueTasks } = useOverdueTasks()
@@ -44,6 +47,13 @@ export function ProductivityHero({ badge, title = 'الإنتاجية', type = '
     const overdueTasksCount = Array.isArray(overdueTasks) ? overdueTasks.length : 0
     const upcomingTasksCount = Array.isArray(upcomingTasks) ? upcomingTasks.length : 0
     const pendingRemindersCount = reminderStats?.pending || 0
+
+    // Button config for "Go to List" mode (used in detail/create pages)
+    const listButtonConfig: Record<string, { label: string; href: string }> = {
+        tasks: { label: 'المهام', href: '/dashboard/tasks/list' },
+        reminders: { label: 'التذكيرات', href: '/dashboard/tasks/reminders' },
+        events: { label: 'الأحداث', href: '/dashboard/tasks/events' },
+    }
 
     const buttonConfig: Record<string, { label: string; href: string }> = {
         tasks: { label: 'مهمة جديدة', href: '/dashboard/tasks/new' },
@@ -114,14 +124,25 @@ export function ProductivityHero({ badge, title = 'الإنتاجية', type = '
                             <div className="flex gap-3">
                                 {children}
                             </div>
-                        ) : !hideButtons && currentButtonConfig && (
+                        ) : !hideButtons && (listMode ? listButtonConfig[type] : currentButtonConfig) && (
                             <div className="flex gap-3">
-                                <Button asChild className="bg-emerald-500 hover:bg-emerald-600 text-white h-10 px-5 rounded-xl font-bold shadow-lg shadow-emerald-500/20 border-0 text-sm">
-                                    <Link to={currentButtonConfig.href}>
-                                        <Plus className="ml-2 h-4 w-4" />
-                                        {currentButtonConfig.label}
-                                    </Link>
-                                </Button>
+                                {listMode ? (
+                                    // List mode: Show "Go to List" button
+                                    <Button asChild className="bg-emerald-500 hover:bg-emerald-600 text-white h-10 px-5 rounded-xl font-bold shadow-lg shadow-emerald-500/20 border-0 text-sm">
+                                        <Link to={listButtonConfig[type]?.href || '/dashboard/tasks/list'}>
+                                            <List className="ml-2 h-4 w-4" />
+                                            {listButtonConfig[type]?.label || 'القائمة'}
+                                        </Link>
+                                    </Button>
+                                ) : (
+                                    // Default mode: Show "Create New" button
+                                    <Button asChild className="bg-emerald-500 hover:bg-emerald-600 text-white h-10 px-5 rounded-xl font-bold shadow-lg shadow-emerald-500/20 border-0 text-sm">
+                                        <Link to={currentButtonConfig.href}>
+                                            <Plus className="ml-2 h-4 w-4" />
+                                            {currentButtonConfig.label}
+                                        </Link>
+                                    </Button>
+                                )}
                                 <Button asChild variant="outline" className="h-10 px-5 rounded-xl font-bold border-white/10 text-white hover:bg-white/10 hover:text-white bg-transparent text-sm">
                                     <Link to="/dashboard/tasks/events">
                                         <CalendarIcon className="ml-2 h-4 w-4" />
