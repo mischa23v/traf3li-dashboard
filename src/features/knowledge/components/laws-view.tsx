@@ -184,13 +184,7 @@ export function LawsView() {
         <ProductivityHero
           badge={isRTL ? 'قاعدة المعرفة' : 'Knowledge Base'}
           title={isRTL ? 'الأنظمة' : 'Laws'}
-          type="knowledge"
-          stats={[
-            { label: isRTL ? 'نظام متاح' : 'Available Laws', value: mockLaws.length, icon: Scale, status: 'normal' },
-            { label: isRTL ? 'إجمالي المواد' : 'Total Articles', value: 873, icon: FileText, status: 'normal' },
-            { label: isRTL ? 'إجمالي المشاهدات' : 'Total Views', value: '46.4K', icon: Eye, status: 'normal' },
-            { label: isRTL ? 'إجمالي التحميلات' : 'Total Downloads', value: '12.6K', icon: Download, status: 'normal' },
-          ]}
+          type="laws"
         />
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">

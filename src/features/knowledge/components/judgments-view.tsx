@@ -196,13 +196,7 @@ export function JudgmentsView() {
         <ProductivityHero
           badge={isRTL ? 'قاعدة المعرفة' : 'Knowledge Base'}
           title={isRTL ? 'الأحكام' : 'Judgments'}
-          type="knowledge"
-          stats={[
-            { label: isRTL ? 'حكم متاح' : 'Available Judgments', value: mockJudgments.length, icon: Gavel, status: 'normal' },
-            { label: isRTL ? 'محكمة' : 'Courts', value: 5, icon: Building2, status: 'normal' },
-            { label: isRTL ? 'إجمالي المشاهدات' : 'Total Views', value: '7.8K', icon: Eye, status: 'normal' },
-            { label: isRTL ? 'إجمالي التحميلات' : 'Total Downloads', value: '1.9K', icon: Download, status: 'normal' },
-          ]}
+          type="judgments"
         />
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">

@@ -125,35 +125,8 @@ export function AttendanceDetail() {
                         <ProductivityHero
                             badge="الموارد البشرية"
                             title="سجل حضور"
-                            type="hr"
+                            type="attendance"
                             listMode={true}
-                            hideButtons={true}
-                            stats={[
-                                {
-                                    label: "وقت الحضور",
-                                    value: record.checkIn || '-',
-                                    icon: LogIn,
-                                    status: 'normal'
-                                },
-                                {
-                                    label: "وقت الانصراف",
-                                    value: record.checkOut || '-',
-                                    icon: LogOut,
-                                    status: 'normal'
-                                },
-                                {
-                                    label: "ساعات العمل",
-                                    value: record.workHours ? `${record.workHours} ساعة` : calculateWorkHours(),
-                                    icon: Clock,
-                                    status: 'normal'
-                                },
-                                {
-                                    label: "العمل الإضافي",
-                                    value: record.overtime ? `${record.overtime} ساعة` : '-',
-                                    icon: Clock,
-                                    status: 'normal'
-                                }
-                            ]}
                         >
                                 <div className="flex flex-col gap-4 w-full">
                                     <div className="flex items-center gap-4 mb-6">

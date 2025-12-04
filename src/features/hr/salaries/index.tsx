@@ -302,77 +302,8 @@ export function SalariesPage() {
                 <ProductivityHero
                     badge="الموارد البشرية"
                     title="الرواتب"
-                    type="hr"
-                    hideButtons={true}
-                    stats={[
-                        {
-                            label: "إجمالي الرواتب",
-                            value: formatCurrency(stats.totalGross),
-                            icon: Wallet,
-                            status: 'normal'
-                        },
-                        {
-                            label: "صافي الرواتب",
-                            value: formatCurrency(stats.totalNet),
-                            icon: CreditCard,
-                            status: 'normal'
-                        },
-                        {
-                            label: "إجمالي الخصومات",
-                            value: formatCurrency(stats.totalDeductions),
-                            icon: DollarSign,
-                            status: 'normal'
-                        },
-                        {
-                            label: "مدفوع",
-                            value: `${stats.paid}/${stats.total}`,
-                            icon: CheckCircle,
-                            status: 'normal'
-                        }
-                    ]}
-                >
-                        <div className="flex flex-col gap-4 w-full">
-                            <div className="flex flex-wrap items-center gap-3">
-                                <div className="relative flex-1 min-w-[200px] max-w-md">
-                                    <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-white/40" />
-                                    <input
-                                        type="text"
-                                        placeholder="البحث عن موظف..."
-                                        value={searchQuery}
-                                        onChange={(e) => setSearchQuery(e.target.value)}
-                                        className="w-full bg-white/10 border border-white/20 rounded-xl py-2.5 pr-10 pl-4 text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
-                                    />
-                                </div>
-
-                                <div className="flex items-center gap-2">
-                                    {['all', 'draft', 'approved', 'paid'].map((status) => (
-                                        <Button
-                                            key={status}
-                                            variant="ghost"
-                                            size="sm"
-                                            onClick={() => setStatusFilter(status)}
-                                            className={cn(
-                                                "rounded-xl text-white/70 hover:text-white hover:bg-white/10",
-                                                statusFilter === status && "bg-white/20 text-white"
-                                            )}
-                                        >
-                                            {status === 'all' && 'الكل'}
-                                            {status === 'draft' && 'مسودة'}
-                                            {status === 'approved' && 'معتمد'}
-                                            {status === 'paid' && 'مدفوع'}
-                                        </Button>
-                                    ))}
-                                </div>
-
-                                <Link to="/dashboard/hr/salaries/new">
-                                    <Button className="bg-white text-emerald-900 hover:bg-white/90 rounded-xl gap-2 font-medium">
-                                        <Plus className="w-4 h-4" />
-                                        إنشاء راتب
-                                    </Button>
-                                </Link>
-                            </div>
-                        </div>
-                    </ProductivityHero>
+                    type="salaries"
+                />
 
                 {/* Main content grid */}
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">

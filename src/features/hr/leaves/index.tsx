@@ -277,28 +277,7 @@ export function LeavesPage() {
                     <ProductivityHero
                         badge="الموارد البشرية"
                         title="الإجازات"
-                        type="hr"
-                        hideButtons={true}
-                        stats={[
-                            {
-                                label: "قيد الانتظار",
-                                value: stats?.pending || defaultStats.pending,
-                                icon: Clock,
-                                status: 'normal'
-                            },
-                            {
-                                label: "موافق عليها",
-                                value: stats?.approved || defaultStats.approved,
-                                icon: CheckCircle,
-                                status: 'normal'
-                            },
-                            {
-                                label: "مرفوضة",
-                                value: stats?.rejected || defaultStats.rejected,
-                                icon: XCircle,
-                                status: 'normal'
-                            }
-                        ]}
+                        type="leaves"
                     >
                         <div className="flex flex-col gap-4 w-full">
                             <div className="flex flex-wrap items-center gap-3">

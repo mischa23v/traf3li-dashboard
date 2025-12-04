@@ -199,12 +199,6 @@ export function BadgesView() {
           badge={isRTL ? 'السمعة' : 'Reputation'}
           title={isRTL ? 'الشارات' : 'Badges'}
           type="reputation"
-          stats={[
-            { label: isRTL ? 'شارات مكتسبة' : 'Badges Earned', value: earnedBadges.length, icon: Award, status: 'normal' },
-            { label: isRTL ? 'أسطوري' : 'Legendary', value: 2, icon: Crown, status: 'normal' },
-            { label: isRTL ? 'ملحمي' : 'Epic', value: 2, icon: Trophy, status: 'normal' },
-            { label: isRTL ? 'قيد الفتح' : 'In Progress', value: lockedBadges.length, icon: Lock, status: 'normal' },
-          ]}
         />
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">

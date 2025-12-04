@@ -210,26 +210,6 @@ export function TransactionDetailsView() {
                     title={transaction.description}
                     type="transactions"
                     listMode={true}
-                    stats={[
-                        {
-                            label: "المبلغ",
-                            value: `${transaction.type === 'income' ? '+' : '-'}${transaction.amount} ${transaction.currency}`,
-                            icon: DollarSign,
-                            status: transaction.type === 'income' ? 'normal' : 'attention'
-                        },
-                        {
-                            label: "التاريخ",
-                            value: `${transaction.date} - ${transaction.time}`,
-                            icon: Calendar,
-                            status: 'normal'
-                        },
-                        {
-                            label: "الحالة",
-                            value: transaction.status === 'completed' ? 'مكتملة' : 'قيد المعالجة',
-                            icon: CheckCircle2,
-                            status: 'normal'
-                        }
-                    ]}
                 />
 
                 <div className="max-w-[1600px] mx-auto pb-12">

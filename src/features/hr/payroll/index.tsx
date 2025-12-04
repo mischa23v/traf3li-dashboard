@@ -314,34 +314,7 @@ export function PayrollPage() {
                 <ProductivityHero
                     badge="الموارد البشرية"
                     title="الرواتب"
-                    type="hr"
-                    hideButtons={true}
-                    stats={[
-                        {
-                            label: "إجمالي المسيرات",
-                            value: formatCurrency(stats.totalNet),
-                            icon: Wallet,
-                            status: 'normal'
-                        },
-                        {
-                            label: "موظف",
-                            value: stats.totalEmployees,
-                            icon: Users,
-                            status: 'normal'
-                        },
-                        {
-                            label: "قيد المعالجة",
-                            value: stats.processing,
-                            icon: Clock,
-                            status: 'normal'
-                        },
-                        {
-                            label: "مكتمل",
-                            value: stats.completed,
-                            icon: CheckCircle,
-                            status: 'normal'
-                        }
-                    ]}
+                    type="payroll"
                 >
                         <div className="flex flex-col gap-4 w-full">
                             <div className="flex flex-wrap items-center gap-3">

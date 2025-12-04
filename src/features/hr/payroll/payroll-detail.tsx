@@ -133,35 +133,8 @@ export function PayrollDetail() {
                         <ProductivityHero
                             badge="الموارد البشرية"
                             title={payroll.name || `مسير رواتب ${payroll.month}/${payroll.year}`}
-                            type="hr"
+                            type="payroll"
                             listMode={true}
-                            hideButtons={true}
-                            stats={[
-                                {
-                                    label: "الفترة",
-                                    value: `${payroll.month}/${payroll.year}`,
-                                    icon: Calendar,
-                                    status: 'normal'
-                                },
-                                {
-                                    label: "عدد الموظفين",
-                                    value: payroll.employeeCount || 0,
-                                    icon: Users,
-                                    status: 'normal'
-                                },
-                                {
-                                    label: "إجمالي الرواتب",
-                                    value: formatCurrency(payroll.totalGross || 0),
-                                    icon: DollarSign,
-                                    status: 'normal'
-                                },
-                                {
-                                    label: "صافي المستحق",
-                                    value: formatCurrency(payroll.totalNet || 0),
-                                    icon: DollarSign,
-                                    status: 'normal'
-                                }
-                            ]}
                         >
                                 <div className="flex flex-col gap-4 w-full">
                                     <div className="flex items-center gap-4 mb-6">

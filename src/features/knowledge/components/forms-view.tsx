@@ -243,13 +243,7 @@ export function FormsView() {
         <ProductivityHero
           badge={isRTL ? 'قاعدة المعرفة' : 'Knowledge Base'}
           title={isRTL ? 'النماذج' : 'Forms'}
-          type="knowledge"
-          stats={[
-            { label: isRTL ? 'نموذج متاح' : 'Available Forms', value: mockForms.length, icon: FolderOpen, status: 'normal' },
-            { label: isRTL ? 'إجمالي التحميلات' : 'Total Downloads', value: '20K', icon: Download, status: 'normal' },
-            { label: isRTL ? 'إجمالي المشاهدات' : 'Total Views', value: '45K', icon: Eye, status: 'normal' },
-            { label: isRTL ? 'المحفوظة' : 'Bookmarked', value: bookmarkedForms.length, icon: Bookmark, status: 'normal' },
-          ]}
+          type="forms"
         />
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">

@@ -157,36 +157,9 @@ export function EvaluationDetail() {
                         <ProductivityHero
                             badge="الموارد البشرية"
                             title={`تقييم أداء - ${evaluation.period}`}
-                            type="hr"
+                            type="evaluations"
                             listMode={true}
-                            hideButtons={true}
-                                stats={[
-                                    {
-                                        label: "التقييم العام",
-                                        value: `${evaluation.overallRating?.toFixed(1)} / 5`,
-                                        icon: Star,
-                                        status: 'normal'
-                                    },
-                                    {
-                                        label: "فترة التقييم",
-                                        value: evaluation.period,
-                                        icon: Calendar,
-                                        status: 'normal'
-                                    },
-                                    {
-                                        label: "المُقيّم",
-                                        value: evaluation.reviewerName || 'المدير المباشر',
-                                        icon: User,
-                                        status: 'normal'
-                                    },
-                                    {
-                                        label: "التصنيف",
-                                        value: getRatingLabel(evaluation.overallRating || 0),
-                                        icon: Target,
-                                        status: 'normal'
-                                    }
-                                ]}
-                            >
+                        >
                                 <div className="flex flex-col gap-4 w-full">
                                     <div className="flex items-center gap-4 mb-6">
                                         <Link to="/dashboard/hr/evaluations">
