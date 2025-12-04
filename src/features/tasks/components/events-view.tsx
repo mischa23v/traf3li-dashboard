@@ -48,6 +48,7 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog'
 import { toast } from 'sonner'
+import { ConfirmDialog } from '@/components/confirm-dialog'
 import { format } from 'date-fns'
 import { arSA } from 'date-fns/locale'
 
@@ -120,6 +121,11 @@ export function EventsView() {
     const cancelEventMutation = useCancelEvent()
     const postponeEventMutation = usePostponeEvent()
 
+    // Confirm dialog states
+    const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+    const [showBulkDeleteConfirm, setShowBulkDeleteConfirm] = useState(false)
+    const [eventToDelete, setEventToDelete] = useState<string | null>(null)
+
     // Postpone dialog state
     const [postponeEventId, setPostponeEventId] = useState<string | null>(null)
     const [postponeDate, setPostponeDate] = useState('')
@@ -158,11 +164,18 @@ export function EventsView() {
         navigate({ to: '/dashboard/tasks/events/$eventId', params: { eventId } })
     }
 
-    const handleDeleteEvent = async (eventId: string) => {
-        if (confirm('هل أنت متأكد من حذف هذا الحدث؟')) {
+    const handleDeleteEvent = (eventId: string) => {
+        setEventToDelete(eventId)
+        setShowDeleteConfirm(true)
+    }
+
+    const confirmDeleteEvent = async () => {
+        if (eventToDelete) {
             try {
-                await deleteEvent(eventId)
+                await deleteEvent(eventToDelete)
                 toast.success('تم حذف الحدث بنجاح')
+                setShowDeleteConfirm(false)
+                setEventToDelete(null)
             } catch (error) {
                 toast.error('فشل حذف الحدث')
             }
@@ -207,19 +220,21 @@ export function EventsView() {
         }
     }
 
-    const handleDeleteSelected = async () => {
+    const handleDeleteSelected = () => {
         if (selectedEventIds.length === 0) return
+        setShowBulkDeleteConfirm(true)
+    }
 
-        if (confirm(`هل أنت متأكد من حذف ${selectedEventIds.length} حدث؟`)) {
-            try {
-                await Promise.all(selectedEventIds.map(id => deleteEvent(id)))
-                toast.success(`تم حذف ${selectedEventIds.length} حدث بنجاح`)
-                setIsSelectionMode(false)
-                setSelectedEventIds([])
-            } catch (error) {
-                console.error("Failed to delete events", error)
-                toast.error("حدث خطأ أثناء حذف بعض الأحداث")
-            }
+    const confirmBulkDelete = async () => {
+        try {
+            await Promise.all(selectedEventIds.map(id => deleteEvent(id)))
+            toast.success(`تم حذف ${selectedEventIds.length} حدث بنجاح`)
+            setIsSelectionMode(false)
+            setSelectedEventIds([])
+            setShowBulkDeleteConfirm(false)
+        } catch (error) {
+            console.error("Failed to delete events", error)
+            toast.error("حدث خطأ أثناء حذف بعض الأحداث")
         }
     }
 
@@ -248,14 +263,14 @@ export function EventsView() {
                     <DynamicIsland />
                 </div>
 
-                <div className='ms-auto flex items-center space-x-4'>
+                <div className='ms-auto flex items-center gap-4'>
                     <div className="relative hidden md:block">
-                        <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                        <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pr-9 pl-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
+                        <Search className="absolute end-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
+                        <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
                     </div>
-                    <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white">
+                    <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white" aria-label="الإشعارات">
                         <Bell className="h-5 w-5" />
-                        <span className="absolute top-2 right-2 h-2 w-2 bg-red-500 rounded-full border border-navy"></span>
+                        <span className="absolute top-2 end-2 h-2 w-2 bg-red-500 rounded-full border border-navy" aria-hidden="true"></span>
                     </Button>
                     <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white" />
                     <ThemeSwitch className="text-slate-300 hover:bg-white/10 hover:text-white" />
@@ -282,13 +297,13 @@ export function EventsView() {
                             <div className="flex flex-wrap items-center gap-3">
                                 {/* Search Input */}
                                 <div className="relative flex-1 min-w-[200px] max-w-md">
-                                    <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                                    <Search className="absolute end-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
                                     <Input
                                         type="text"
                                         placeholder="بحث في الأحداث..."
                                         value={searchQuery}
                                         onChange={(e) => setSearchQuery(e.target.value)}
-                                        className="pr-10 h-10 rounded-xl border-slate-200 focus:border-blue-500 focus:ring-blue-500/20"
+                                        className="pe-10 h-10 rounded-xl border-slate-200 focus:border-blue-500 focus:ring-blue-500/20"
                                     />
                                 </div>
 
@@ -449,7 +464,7 @@ export function EventsView() {
                                             </div>
                                             <DropdownMenu>
                                                 <DropdownMenuTrigger asChild>
-                                                    <Button variant="ghost" size="icon" className="text-slate-400 hover:text-navy">
+                                                    <Button variant="ghost" size="icon" className="text-slate-500 hover:text-navy" aria-label="خيارات الحدث">
                                                         <MoreHorizontal className="h-5 w-5" />
                                                     </Button>
                                                 </DropdownMenuTrigger>
@@ -508,15 +523,15 @@ export function EventsView() {
                                                 </div>
                                                 {/* Event Date - Dual Language */}
                                                 <div className="text-center">
-                                                    <div className="text-xs text-slate-400 mb-1">موعد الحدث</div>
+                                                    <div className="text-xs text-slate-500 mb-1">موعد الحدث</div>
                                                     <div className="font-bold text-navy text-sm">{event.eventDateFormatted.arabic}</div>
-                                                    <div className="text-xs text-slate-400">{event.eventDateFormatted.english}</div>
+                                                    <div className="text-xs text-slate-500">{event.eventDateFormatted.english}</div>
                                                 </div>
                                                 {/* Creation Date - Dual Language */}
                                                 <div className="text-center">
-                                                    <div className="text-xs text-slate-400 mb-1">تاريخ الإنشاء</div>
+                                                    <div className="text-xs text-slate-500 mb-1">تاريخ الإنشاء</div>
                                                     <div className="font-bold text-slate-600 text-sm">{event.createdAtFormatted.arabic}</div>
-                                                    <div className="text-xs text-slate-400">{event.createdAtFormatted.english}</div>
+                                                    <div className="text-xs text-slate-500">{event.createdAtFormatted.english}</div>
                                                 </div>
                                             </div>
                                             <div className="flex gap-2">
@@ -611,6 +626,30 @@ export function EventsView() {
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
+
+            {/* Delete Single Event Confirmation Dialog */}
+            <ConfirmDialog
+                open={showDeleteConfirm}
+                onOpenChange={setShowDeleteConfirm}
+                title="حذف الحدث"
+                desc="هل أنت متأكد من حذف هذا الحدث؟ لا يمكن التراجع عن هذا الإجراء."
+                confirmText="حذف"
+                cancelBtnText="إلغاء"
+                destructive
+                handleConfirm={confirmDeleteEvent}
+            />
+
+            {/* Bulk Delete Confirmation Dialog */}
+            <ConfirmDialog
+                open={showBulkDeleteConfirm}
+                onOpenChange={setShowBulkDeleteConfirm}
+                title="حذف الأحداث المحددة"
+                desc={`هل أنت متأكد من حذف ${selectedEventIds.length} حدث؟ لا يمكن التراجع عن هذا الإجراء.`}
+                confirmText="حذف الكل"
+                cancelBtnText="إلغاء"
+                destructive
+                handleConfirm={confirmBulkDelete}
+            />
         </>
     )
 }

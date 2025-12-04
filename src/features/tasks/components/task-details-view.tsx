@@ -19,6 +19,7 @@ import { OutcomeType, VOICE_MEMO_TYPES } from '@/services/tasksService'
 import tasksService from '@/services/tasksService'
 import { API_DOMAIN, API_URL } from '@/lib/api'
 import { toast } from 'sonner'
+import { ConfirmDialog } from '@/components/confirm-dialog'
 import { VoiceMemoRecorder, VoiceMemoPlayer, isVoiceMemo } from './voice-memo-recorder'
 import { DocumentEditorDialog } from './document-editor-dialog'
 import { AttachmentVersionsDialog } from './attachment-versions-dialog'
@@ -56,6 +57,12 @@ export function TaskDetailsView() {
     const queryClient = useQueryClient()
     const [activeTab, setActiveTab] = useState('overview')
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+    const [showRemoveDependencyConfirm, setShowRemoveDependencyConfirm] = useState(false)
+    const [showDeleteDocumentConfirm, setShowDeleteDocumentConfirm] = useState(false)
+    const [showDeleteAttachmentConfirm, setShowDeleteAttachmentConfirm] = useState(false)
+    const [dependencyToRemove, setDependencyToRemove] = useState<string | null>(null)
+    const [documentToDelete, setDocumentToDelete] = useState<string | null>(null)
+    const [attachmentToDelete, setAttachmentToDelete] = useState<string | null>(null)
 
     // Subtask state
     const [isAddingSubtask, setIsAddingSubtask] = useState(false)
@@ -189,8 +196,18 @@ export function TaskDetailsView() {
 
     // Dependency handler
     const handleRemoveDependency = (dependencyTaskId: string) => {
-        if (confirm('هل أنت متأكد من إزالة هذه التبعية؟')) {
-            removeDependencyMutation.mutate({ taskId, dependencyTaskId })
+        setDependencyToRemove(dependencyTaskId)
+        setShowRemoveDependencyConfirm(true)
+    }
+
+    const confirmRemoveDependency = () => {
+        if (dependencyToRemove) {
+            removeDependencyMutation.mutate({ taskId, dependencyTaskId: dependencyToRemove }, {
+                onSuccess: () => {
+                    setShowRemoveDependencyConfirm(false)
+                    setDependencyToRemove(null)
+                }
+            })
         }
     }
 
@@ -221,12 +238,18 @@ export function TaskDetailsView() {
     }
 
     const handleDeleteDocument = (documentId: string) => {
-        if (confirm('هل أنت متأكد من حذف هذا المستند؟')) {
+        setDocumentToDelete(documentId)
+        setShowDeleteDocumentConfirm(true)
+    }
+
+    const confirmDeleteDocument = () => {
+        if (documentToDelete) {
             deleteDocumentMutation.mutate(
-                { taskId, documentId },
+                { taskId, documentId: documentToDelete },
                 {
-                    onSuccess: async () => {
-                        // Cache update handled by hook
+                    onSuccess: () => {
+                        setShowDeleteDocumentConfirm(false)
+                        setDocumentToDelete(null)
                     }
                 }
             )
@@ -249,12 +272,18 @@ export function TaskDetailsView() {
     }
 
     const handleDeleteAttachment = (attachmentId: string) => {
-        if (confirm('هل أنت متأكد من حذف هذا المرفق؟')) {
+        setAttachmentToDelete(attachmentId)
+        setShowDeleteAttachmentConfirm(true)
+    }
+
+    const confirmDeleteAttachment = () => {
+        if (attachmentToDelete) {
             deleteAttachmentMutation.mutate(
-                { taskId, attachmentId },
+                { taskId, attachmentId: attachmentToDelete },
                 {
-                    onSuccess: async () => {
-                        // Cache update handled by hook
+                    onSuccess: () => {
+                        setShowDeleteAttachmentConfirm(false)
+                        setAttachmentToDelete(null)
                     }
                 }
             )
@@ -478,14 +507,14 @@ export function TaskDetailsView() {
                     <DynamicIsland />
                 </div>
 
-                <div className='ms-auto flex items-center space-x-4'>
+                <div className='ms-auto flex items-center gap-4'>
                     <div className="relative hidden md:block">
-                        <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                        <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pr-9 pl-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
+                        <Search className="absolute end-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
+                        <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
                     </div>
-                    <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white">
+                    <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white" aria-label="الإشعارات">
                         <Bell className="h-5 w-5" />
-                        <span className="absolute top-2 right-2 h-2 w-2 bg-red-500 rounded-full border border-navy"></span>
+                        <span className="absolute top-2 end-2 h-2 w-2 bg-red-500 rounded-full border border-navy" aria-hidden="true"></span>
                     </Button>
                     <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white" />
                     <ThemeSwitch className="text-slate-300 hover:bg-white/10 hover:text-white" />
@@ -1205,6 +1234,45 @@ export function TaskDetailsView() {
                     attachment={versionsAttachment}
                 />
             )}
+
+            {/* Remove Dependency Confirmation Dialog */}
+            <ConfirmDialog
+                open={showRemoveDependencyConfirm}
+                onOpenChange={setShowRemoveDependencyConfirm}
+                title="إزالة التبعية"
+                desc="هل أنت متأكد من إزالة هذه التبعية؟"
+                confirmText="إزالة"
+                cancelBtnText="إلغاء"
+                destructive
+                handleConfirm={confirmRemoveDependency}
+                isLoading={removeDependencyMutation.isPending}
+            />
+
+            {/* Delete Document Confirmation Dialog */}
+            <ConfirmDialog
+                open={showDeleteDocumentConfirm}
+                onOpenChange={setShowDeleteDocumentConfirm}
+                title="حذف المستند"
+                desc="هل أنت متأكد من حذف هذا المستند؟ لا يمكن التراجع عن هذا الإجراء."
+                confirmText="حذف"
+                cancelBtnText="إلغاء"
+                destructive
+                handleConfirm={confirmDeleteDocument}
+                isLoading={deleteDocumentMutation.isPending}
+            />
+
+            {/* Delete Attachment Confirmation Dialog */}
+            <ConfirmDialog
+                open={showDeleteAttachmentConfirm}
+                onOpenChange={setShowDeleteAttachmentConfirm}
+                title="حذف المرفق"
+                desc="هل أنت متأكد من حذف هذا المرفق؟ لا يمكن التراجع عن هذا الإجراء."
+                confirmText="حذف"
+                cancelBtnText="إلغاء"
+                destructive
+                handleConfirm={confirmDeleteAttachment}
+                isLoading={deleteAttachmentMutation.isPending}
+            />
         </>
     )
 }

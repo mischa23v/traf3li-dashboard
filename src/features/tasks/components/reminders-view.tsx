@@ -51,6 +51,7 @@ import {
     SelectValue,
 } from '@/components/ui/select'
 import { toast } from 'sonner'
+import { ConfirmDialog } from '@/components/confirm-dialog'
 import { format } from 'date-fns'
 import { arSA } from 'date-fns/locale'
 
@@ -142,6 +143,11 @@ export function RemindersView() {
     // Team members for delegation
     const { data: teamMembers } = useTeamMembers()
 
+    // Confirm dialog states
+    const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+    const [showBulkDeleteConfirm, setShowBulkDeleteConfirm] = useState(false)
+    const [reminderToDelete, setReminderToDelete] = useState<string | null>(null)
+
     // Delegate dialog state
     const [delegateReminderId, setDelegateReminderId] = useState<string | null>(null)
     const [delegateTo, setDelegateTo] = useState('')
@@ -152,11 +158,18 @@ export function RemindersView() {
         navigate({ to: '/dashboard/tasks/reminders/$reminderId', params: { reminderId } })
     }
 
-    const handleDeleteReminder = async (reminderId: string) => {
-        if (confirm('هل أنت متأكد من حذف هذا التذكير؟')) {
+    const handleDeleteReminder = (reminderId: string) => {
+        setReminderToDelete(reminderId)
+        setShowDeleteConfirm(true)
+    }
+
+    const confirmDeleteReminder = async () => {
+        if (reminderToDelete) {
             try {
-                await deleteReminder(reminderId)
+                await deleteReminder(reminderToDelete)
                 toast.success('تم حذف التذكير بنجاح')
+                setShowDeleteConfirm(false)
+                setReminderToDelete(null)
             } catch (error) {
                 toast.error('فشل حذف التذكير')
             }
@@ -230,20 +243,21 @@ export function RemindersView() {
         }
     }
 
-    const handleDeleteSelected = async () => {
+    const handleDeleteSelected = () => {
         if (selectedReminderIds.length === 0) return
+        setShowBulkDeleteConfirm(true)
+    }
 
-        if (confirm(`هل أنت متأكد من حذف ${selectedReminderIds.length} تذكير؟`)) {
-            try {
-                // Loop delete since no bulk API yet
-                await Promise.all(selectedReminderIds.map(id => deleteReminder(id)))
-                toast.success(`تم حذف ${selectedReminderIds.length} تذكير بنجاح`)
-                setIsSelectionMode(false)
-                setSelectedReminderIds([])
-            } catch (error) {
-                console.error("Failed to delete reminders", error)
-                toast.error("حدث خطأ أثناء حذف بعض التذكيرات")
-            }
+    const confirmBulkDelete = async () => {
+        try {
+            await Promise.all(selectedReminderIds.map(id => deleteReminder(id)))
+            toast.success(`تم حذف ${selectedReminderIds.length} تذكير بنجاح`)
+            setIsSelectionMode(false)
+            setSelectedReminderIds([])
+            setShowBulkDeleteConfirm(false)
+        } catch (error) {
+            console.error("Failed to delete reminders", error)
+            toast.error("حدث خطأ أثناء حذف بعض التذكيرات")
         }
     }
 
@@ -264,14 +278,14 @@ export function RemindersView() {
                     <DynamicIsland />
                 </div>
 
-                <div className='ms-auto flex items-center space-x-4'>
+                <div className='ms-auto flex items-center gap-4'>
                     <div className="relative hidden md:block">
-                        <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                        <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pr-9 pl-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
+                        <Search className="absolute end-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
+                        <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
                     </div>
-                    <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white">
+                    <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white" aria-label="الإشعارات">
                         <Bell className="h-5 w-5" />
-                        <span className="absolute top-2 right-2 h-2 w-2 bg-red-500 rounded-full border border-navy"></span>
+                        <span className="absolute top-2 end-2 h-2 w-2 bg-red-500 rounded-full border border-navy" aria-hidden="true"></span>
                     </Button>
                     <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white" />
                     <ThemeSwitch className="text-slate-300 hover:bg-white/10 hover:text-white" />
@@ -298,13 +312,13 @@ export function RemindersView() {
                             <div className="flex flex-wrap items-center gap-3">
                                 {/* Search Input */}
                                 <div className="relative flex-1 min-w-[200px] max-w-md">
-                                    <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                                    <Search className="absolute end-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
                                     <Input
                                         type="text"
                                         placeholder="بحث في التذكيرات..."
                                         value={searchQuery}
                                         onChange={(e) => setSearchQuery(e.target.value)}
-                                        className="pr-10 h-10 rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500/20"
+                                        className="pe-10 h-10 rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500/20"
                                     />
                                 </div>
 
@@ -465,7 +479,7 @@ export function RemindersView() {
                                             </div>
                                             <DropdownMenu>
                                                 <DropdownMenuTrigger asChild>
-                                                    <Button variant="ghost" size="icon" className="text-slate-400 hover:text-navy">
+                                                    <Button variant="ghost" size="icon" className="text-slate-500 hover:text-navy" aria-label="خيارات التذكير">
                                                         <MoreHorizontal className="h-5 w-5" />
                                                     </Button>
                                                 </DropdownMenuTrigger>
@@ -527,7 +541,7 @@ export function RemindersView() {
                                             <div className="flex items-center gap-4">
                                                 {/* Priority Dropdown */}
                                                 <div>
-                                                    <div className="text-xs text-slate-400 mb-1">الأولوية</div>
+                                                    <div className="text-xs text-slate-500 mb-1">الأولوية</div>
                                                     <Select
                                                         value={reminder.priority}
                                                         onValueChange={(value) => handlePriorityChange(reminder.id, value)}
@@ -550,15 +564,15 @@ export function RemindersView() {
                                                 </div>
                                                 {/* Reminder Date - Dual Language */}
                                                 <div className="text-center">
-                                                    <div className="text-xs text-slate-400 mb-1">موعد التذكير</div>
+                                                    <div className="text-xs text-slate-500 mb-1">موعد التذكير</div>
                                                     <div className="font-bold text-navy text-sm">{reminder.reminderDateFormatted.arabic}</div>
-                                                    <div className="text-xs text-slate-400">{reminder.reminderDateFormatted.english}</div>
+                                                    <div className="text-xs text-slate-500">{reminder.reminderDateFormatted.english}</div>
                                                 </div>
                                                 {/* Creation Date - Dual Language */}
                                                 <div className="text-center">
-                                                    <div className="text-xs text-slate-400 mb-1">تاريخ الإنشاء</div>
+                                                    <div className="text-xs text-slate-500 mb-1">تاريخ الإنشاء</div>
                                                     <div className="font-bold text-slate-600 text-sm">{reminder.createdAtFormatted.arabic}</div>
-                                                    <div className="text-xs text-slate-400">{reminder.createdAtFormatted.english}</div>
+                                                    <div className="text-xs text-slate-500">{reminder.createdAtFormatted.english}</div>
                                                 </div>
                                             </div>
                                             <Link to={`/dashboard/tasks/reminders/${reminder.id}` as any}>
@@ -653,6 +667,30 @@ export function RemindersView() {
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
+
+            {/* Delete Single Reminder Confirmation Dialog */}
+            <ConfirmDialog
+                open={showDeleteConfirm}
+                onOpenChange={setShowDeleteConfirm}
+                title="حذف التذكير"
+                desc="هل أنت متأكد من حذف هذا التذكير؟ لا يمكن التراجع عن هذا الإجراء."
+                confirmText="حذف"
+                cancelBtnText="إلغاء"
+                destructive
+                handleConfirm={confirmDeleteReminder}
+            />
+
+            {/* Bulk Delete Confirmation Dialog */}
+            <ConfirmDialog
+                open={showBulkDeleteConfirm}
+                onOpenChange={setShowBulkDeleteConfirm}
+                title="حذف التذكيرات المحددة"
+                desc={`هل أنت متأكد من حذف ${selectedReminderIds.length} تذكير؟ لا يمكن التراجع عن هذا الإجراء.`}
+                confirmText="حذف الكل"
+                cancelBtnText="إلغاء"
+                destructive
+                handleConfirm={confirmBulkDelete}
+            />
         </>
     )
 }
