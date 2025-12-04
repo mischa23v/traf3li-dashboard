@@ -29,7 +29,7 @@ import { Link } from '@tanstack/react-router'
 import type { CrmActivity, ActivityType } from '@/types/crm'
 import { formatDistanceToNow, format } from 'date-fns'
 import { ar } from 'date-fns/locale'
-import { CrmSidebar } from './crm-sidebar'
+import { SalesSidebar } from './sales-sidebar'
 import { ProductivityHero } from '@/components/productivity-hero'
 
 const activityIcons: Record<ActivityType, React.ReactNode> = {
@@ -404,7 +404,7 @@ export function ActivitiesView() {
           </div>
 
           {/* LEFT COLUMN (Widgets) */}
-          <CrmSidebar context="activities" />
+          <SalesSidebar context="activities" />
         </div>
       </Main>
     </>

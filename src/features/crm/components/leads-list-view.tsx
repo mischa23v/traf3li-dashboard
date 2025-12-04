@@ -35,7 +35,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import type { Lead, LeadStatus } from '@/types/crm'
-import { CrmSidebar } from './crm-sidebar'
+import { SalesSidebar } from './sales-sidebar'
 import { ProductivityHero } from '@/components/productivity-hero'
 
 const statusLabels: Record<LeadStatus, string> = {
@@ -418,13 +418,7 @@ export function LeadsListView() {
           </div>
 
           {/* LEFT COLUMN (Widgets) */}
-          <CrmSidebar
-            context="leads"
-            isSelectionMode={isSelectionMode}
-            onToggleSelectionMode={handleToggleSelectionMode}
-            selectedCount={selectedLeadIds.length}
-            onDeleteSelected={handleDeleteSelected}
-          />
+          <SalesSidebar context="leads" />
         </div>
       </Main>
     </>

@@ -66,6 +66,7 @@ import { ProfileDropdown } from '@/components/profile-dropdown'
 import type { LeadStatus, CrmActivity } from '@/types/crm'
 import { formatDistanceToNow, format } from 'date-fns'
 import { ar } from 'date-fns/locale'
+import { SalesSidebar } from './sales-sidebar'
 
 const statusLabels: Record<LeadStatus, string> = {
   new: 'جديد',
@@ -213,7 +214,7 @@ export function LeadDetailsView() {
         className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-r border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']"
       >
         {/* Breadcrumb / Back Link */}
-        <div className="max-w-[1600px] mx-auto mb-6">
+        <div className="mb-6">
           <Link
             to="/dashboard/crm/leads"
             className="inline-flex items-center text-slate-500 hover:text-navy transition-colors"
@@ -225,7 +226,7 @@ export function LeadDetailsView() {
 
         {/* Loading State */}
         {isLoading && (
-          <div className="max-w-[1600px] mx-auto space-y-6">
+          <div className="space-y-6">
             <Skeleton className="h-48 w-full rounded-3xl" />
             <div className="grid grid-cols-12 gap-6">
               <div className="col-span-12 lg:col-span-8">
@@ -240,7 +241,7 @@ export function LeadDetailsView() {
 
         {/* Error State */}
         {isError && (
-          <div className="max-w-[1600px] mx-auto">
+          <div>
             <div className="bg-white rounded-2xl p-12 border border-slate-100 text-center">
               <div className="flex justify-center mb-4">
                 <div className="w-16 h-16 rounded-full bg-red-50 flex items-center justify-center">
@@ -265,7 +266,7 @@ export function LeadDetailsView() {
 
         {/* Empty State */}
         {!isLoading && !isError && !lead && (
-          <div className="max-w-[1600px] mx-auto">
+          <div>
             <div className="bg-white rounded-2xl p-12 border border-slate-100 text-center">
               <div className="flex justify-center mb-4">
                 <div className="w-16 h-16 rounded-full bg-emerald-50 flex items-center justify-center">
@@ -368,8 +369,7 @@ export function LeadDetailsView() {
             </ProductivityHero>
 
             {/* MAIN CONTENT GRID */}
-            <div className="max-w-[1600px] mx-auto pb-12">
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 {/* CENTER CONTENT (Tabs & Details) */}
                 <div className="lg:col-span-2">
                   <Card className="border border-slate-100 shadow-sm rounded-2xl overflow-hidden min-h-[600px]">
@@ -741,93 +741,9 @@ export function LeadDetailsView() {
                   </Card>
                 </div>
 
-                {/* SIDEBAR (Timeline & Quick Actions) */}
-                <div className="space-y-6">
-                  {/* Schedule Follow-up */}
-                  <Card className="border border-slate-100 shadow-sm rounded-2xl overflow-hidden">
-                    <CardHeader className="bg-white border-b border-slate-50 pb-4">
-                      <CardTitle className="text-lg font-bold text-navy flex items-center gap-2">
-                        <Calendar className="h-5 w-5 text-emerald-500" />
-                        جدولة متابعة
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="p-4 space-y-3">
-                      <Input
-                        type="date"
-                        value={followUpDate}
-                        onChange={(e) => setFollowUpDate(e.target.value)}
-                        className="rounded-xl"
-                      />
-                      <Textarea
-                        placeholder="ملاحظة المتابعة..."
-                        value={followUpNote}
-                        onChange={(e) => setFollowUpNote(e.target.value)}
-                        className="rounded-xl min-h-[80px]"
-                      />
-                      <Button
-                        onClick={handleScheduleFollowUp}
-                        disabled={
-                          !followUpDate || scheduleFollowUpMutation.isPending
-                        }
-                        className="w-full bg-emerald-500 hover:bg-emerald-600 rounded-xl"
-                      >
-                        {scheduleFollowUpMutation.isPending ? (
-                          <Loader2 className="h-4 w-4 animate-spin ml-2" />
-                        ) : (
-                          <Calendar className="h-4 w-4 ml-2" />
-                        )}
-                        جدولة المتابعة
-                      </Button>
-                    </CardContent>
-                  </Card>
-
-                  {/* Activity Timeline */}
-                  <Card className="border border-slate-100 shadow-sm rounded-2xl overflow-hidden">
-                    <CardHeader className="bg-white border-b border-slate-50 pb-4">
-                      <CardTitle className="text-lg font-bold text-navy flex items-center gap-2">
-                        <History className="h-5 w-5 text-blue-500" />
-                        سجل الأنشطة
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="p-0">
-                      <ScrollArea className="h-[300px]">
-                        <div className="relative p-6">
-                          <div className="absolute top-6 bottom-6 right-[29px] w-0.5 bg-slate-100"></div>
-                          <div className="space-y-6 relative">
-                            {activities.length > 0 ? (
-                              activities.slice(0, 10).map((activity: CrmActivity, i: number) => (
-                                <div key={activity._id || i} className="flex gap-4 relative">
-                                  <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center z-10 ring-4 ring-white">
-                                    {activityIcons[activity.type] || (
-                                      <Clock className="h-4 w-4 text-slate-400" />
-                                    )}
-                                  </div>
-                                  <div className="flex-1">
-                                    <div className="text-sm font-bold text-navy">
-                                      {activity.title}
-                                    </div>
-                                    <div className="text-xs text-slate-500">
-                                      {formatDistanceToNow(
-                                        new Date(activity.createdAt),
-                                        { addSuffix: true, locale: ar }
-                                      )}
-                                    </div>
-                                  </div>
-                                </div>
-                              ))
-                            ) : (
-                              <p className="text-slate-400 text-sm text-center py-4">
-                                لا توجد أنشطة بعد
-                              </p>
-                            )}
-                          </div>
-                        </div>
-                      </ScrollArea>
-                    </CardContent>
-                  </Card>
-                </div>
+                {/* SIDEBAR */}
+                <SalesSidebar context="leads" />
               </div>
-            </div>
           </>
         )}
       </Main>

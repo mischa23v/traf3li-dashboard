@@ -59,11 +59,11 @@ export function ReputationSidebar({
 
     const links = {
         overview: {
-            create: '/dashboard/reputation/overview/new',
-            viewAll: '/dashboard/reputation/overview'
+            create: '/dashboard/reputation',
+            viewAll: '/dashboard/reputation'
         },
         badges: {
-            create: '/dashboard/reputation/badges/new',
+            create: '/dashboard/reputation/badges',
             viewAll: '/dashboard/reputation/badges'
         }
     }

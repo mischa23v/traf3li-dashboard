@@ -19,7 +19,7 @@ import { TopNav } from '@/components/layout/top-nav'
 import { DynamicIsland } from '@/components/dynamic-island'
 import { Main } from '@/components/layout/main'
 import { Link, useNavigate } from '@tanstack/react-router'
-import { CrmSidebar } from '@/components/crm-sidebar'
+import { ClientsSidebar } from '@/features/clients/components/clients-sidebar'
 import { ProductivityHero } from '@/components/productivity-hero'
 import { useCreateContact } from '@/hooks/useContacts'
 import { createContactSchema, type CreateContactInput } from '../data/schema'
@@ -357,7 +357,7 @@ export function CreateContactView() {
                     </div>
 
                     {/* Sidebar Widgets */}
-                    <CrmSidebar context="contacts" />
+                    <ClientsSidebar context="contacts" />
                 </div>
             </Main>
         </>

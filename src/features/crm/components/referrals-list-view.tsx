@@ -34,7 +34,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import type { Referral, ReferralType, ReferralStatus } from '@/types/crm'
-import { CrmSidebar } from './crm-sidebar'
+import { SalesSidebar } from './sales-sidebar'
 import { ProductivityHero } from '@/components/productivity-hero'
 
 const typeLabels: Record<ReferralType, string> = {
@@ -445,13 +445,7 @@ export function ReferralsListView() {
           </div>
 
           {/* LEFT COLUMN (Widgets) */}
-          <CrmSidebar
-            context="referrals"
-            isSelectionMode={isSelectionMode}
-            onToggleSelectionMode={handleToggleSelectionMode}
-            selectedCount={selectedReferralIds.length}
-            onDeleteSelected={handleDeleteSelected}
-          />
+          <SalesSidebar context="referrals" />
         </div>
       </Main>
     </>

@@ -12,7 +12,7 @@ import { ClientsProvider, useClientsContext } from './components/clients-provide
 import { ClientsTable } from './components/clients-table'
 import { useClients } from '@/hooks/useClients'
 import { useTranslation } from 'react-i18next'
-import { PracticeSidebar } from '@/features/cases/components/practice-sidebar'
+import { ClientsSidebar } from '@/features/clients/components/clients-sidebar'
 import { Button } from '@/components/ui/button'
 import { Plus, Users, Search as SearchIcon, Bell } from 'lucide-react'
 import { TopNav } from '@/components/layout/top-nav'
@@ -77,14 +77,13 @@ function ClientsContent() {
         <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-emerald-500/50 to-transparent"></div>
       </Header>
 
-      <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8">
-        <div className="max-w-7xl mx-auto space-y-6">
-          {/* Hero Card */}
-          <ProductivityHero badge="إدارة العملاء" title={t('clients.title')} type="clients" hideButtons={true}>
-            <ClientsPrimaryButtons />
-          </ProductivityHero>
+      <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-r border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
+        {/* Hero Card */}
+        <ProductivityHero badge="إدارة العملاء" title={t('clients.title')} type="clients" hideButtons={true}>
+          <ClientsPrimaryButtons />
+        </ProductivityHero>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <div className="lg:col-span-2 space-y-6">
               {isLoading ? (
                 <div className='space-y-4'>
@@ -111,8 +110,7 @@ function ClientsContent() {
                 />
               )}
             </div>
-            <PracticeSidebar context="clients" />
-          </div>
+          <ClientsSidebar context="clients" />
         </div>
       </Main>
     </>

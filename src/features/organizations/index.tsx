@@ -12,7 +12,7 @@ import { OrganizationsProvider, useOrganizationsContext } from './components/org
 import { OrganizationsTable } from './components/organizations-table'
 import { useOrganizations } from '@/hooks/useOrganizations'
 import { useTranslation } from 'react-i18next'
-import { PracticeSidebar } from '@/features/cases/components/practice-sidebar'
+import { ClientsSidebar } from '@/features/clients/components/clients-sidebar'
 import { Button } from '@/components/ui/button'
 import { Plus, Building2, Search as SearchIcon, Bell } from 'lucide-react'
 import { TopNav } from '@/components/layout/top-nav'
@@ -76,14 +76,13 @@ function OrganizationsContent() {
         <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-emerald-500/50 to-transparent"></div>
       </Header>
 
-      <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8">
-        <div className="max-w-7xl mx-auto space-y-6">
-          {/* Hero Card */}
-          <ProductivityHero badge="إدارة المنظمات" title={t('organizations.title')} type="organizations" hideButtons={true}>
-            <OrganizationsPrimaryButtons />
-          </ProductivityHero>
+      <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-r border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
+        {/* Hero Card */}
+        <ProductivityHero badge="إدارة المنظمات" title={t('organizations.title')} type="organizations" hideButtons={true}>
+          <OrganizationsPrimaryButtons />
+        </ProductivityHero>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <div className="lg:col-span-2 space-y-6">
               {isLoading ? (
                 <div className='space-y-4'>
@@ -110,8 +109,7 @@ function OrganizationsContent() {
                 />
               )}
             </div>
-            <PracticeSidebar context="organizations" />
-          </div>
+          <ClientsSidebar context="organizations" />
         </div>
       </Main>
     </>

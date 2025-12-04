@@ -51,6 +51,7 @@ import { ProfileDropdown } from '@/components/profile-dropdown'
 import type { ReferralStatus, ReferralType, ReferredLead } from '@/types/crm'
 import { formatDistanceToNow, format } from 'date-fns'
 import { ar } from 'date-fns/locale'
+import { SalesSidebar } from './sales-sidebar'
 
 const statusLabels: Record<ReferralStatus, string> = {
   active: 'نشط',
@@ -165,7 +166,7 @@ export function ReferralDetailsView() {
         className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-r border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']"
       >
         {/* Breadcrumb / Back Link */}
-        <div className="max-w-[1600px] mx-auto mb-6">
+        <div className="mb-6">
           <Link
             to="/dashboard/crm/referrals"
             className="inline-flex items-center text-slate-500 hover:text-navy transition-colors"
@@ -177,7 +178,7 @@ export function ReferralDetailsView() {
 
         {/* Loading State */}
         {isLoading && (
-          <div className="max-w-[1600px] mx-auto space-y-6">
+          <div className="space-y-6">
             <Skeleton className="h-48 w-full rounded-3xl" />
             <div className="grid grid-cols-12 gap-6">
               <div className="col-span-12 lg:col-span-8">
@@ -192,7 +193,7 @@ export function ReferralDetailsView() {
 
         {/* Error State */}
         {isError && (
-          <div className="max-w-[1600px] mx-auto">
+          <div>
             <div className="bg-white rounded-2xl p-12 border border-slate-100 text-center">
               <div className="flex justify-center mb-4">
                 <div className="w-16 h-16 rounded-full bg-red-50 flex items-center justify-center">
@@ -217,7 +218,7 @@ export function ReferralDetailsView() {
 
         {/* Empty State */}
         {!isLoading && !isError && !referral && (
-          <div className="max-w-[1600px] mx-auto">
+          <div>
             <div className="bg-white rounded-2xl p-12 border border-slate-100 text-center">
               <div className="flex justify-center mb-4">
                 <div className="w-16 h-16 rounded-full bg-emerald-50 flex items-center justify-center">
@@ -306,8 +307,7 @@ export function ReferralDetailsView() {
             </ProductivityHero>
 
             {/* MAIN CONTENT GRID */}
-            <div className="max-w-[1600px] mx-auto pb-12">
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 {/* CENTER CONTENT (Tabs & Details) */}
                 <div className="lg:col-span-2">
                   <Card className="border border-slate-100 shadow-sm rounded-2xl overflow-hidden min-h-[500px]">
@@ -551,77 +551,8 @@ export function ReferralDetailsView() {
                 </div>
 
                 {/* SIDEBAR */}
-                <div className="space-y-6">
-                  {/* Stats Card */}
-                  <Card className="border border-slate-100 shadow-sm rounded-2xl overflow-hidden">
-                    <CardHeader className="bg-white border-b border-slate-50 pb-4">
-                      <CardTitle className="text-lg font-bold text-navy flex items-center gap-2">
-                        <TrendingUp className="h-5 w-5 text-purple-500" />
-                        الإحصائيات
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="p-4 space-y-3">
-                      <div className="p-3 bg-slate-50 rounded-xl flex justify-between items-center">
-                        <span className="text-slate-600">إجمالي الإحالات</span>
-                        <span className="font-bold text-navy text-lg">{referral.totalReferrals}</span>
-                      </div>
-                      <div className="p-3 bg-slate-50 rounded-xl flex justify-between items-center">
-                        <span className="text-slate-600">إحالات ناجحة</span>
-                        <span className="font-bold text-emerald-600 text-lg">{referral.successfulReferrals}</span>
-                      </div>
-                      <div className="p-3 bg-slate-50 rounded-xl flex justify-between items-center">
-                        <span className="text-slate-600">معدل التحويل</span>
-                        <span className="font-bold text-blue-600 text-lg">{referral.conversionRate}%</span>
-                      </div>
-                    </CardContent>
-                  </Card>
-
-                  {/* Fee Info Card */}
-                  {referral.hasFeeAgreement && (
-                    <Card className="border border-slate-100 shadow-sm rounded-2xl overflow-hidden">
-                      <CardHeader className="bg-white border-b border-slate-50 pb-4">
-                        <CardTitle className="text-lg font-bold text-navy flex items-center gap-2">
-                          <DollarSign className="h-5 w-5 text-green-500" />
-                          اتفاقية العمولة
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent className="p-4 space-y-3">
-                        <div className="p-3 bg-slate-50 rounded-xl">
-                          <p className="text-xs text-slate-500 mb-1">نوع العمولة</p>
-                          <p className="font-medium text-navy">{feeTypeLabels[referral.feeType]}</p>
-                        </div>
-                        {referral.feeType === 'percentage' && referral.feePercentage && (
-                          <div className="p-3 bg-slate-50 rounded-xl flex items-center gap-2">
-                            <Percent className="h-4 w-4 text-blue-500" />
-                            <span className="font-bold text-blue-600">{referral.feePercentage}%</span>
-                          </div>
-                        )}
-                        {referral.feeType === 'fixed' && referral.feeFixedAmount && (
-                          <div className="p-3 bg-slate-50 rounded-xl flex items-center gap-2">
-                            <DollarSign className="h-4 w-4 text-green-500" />
-                            <span className="font-bold text-green-600">
-                              {referral.feeFixedAmount.toLocaleString('ar-SA')} ر.س
-                            </span>
-                          </div>
-                        )}
-                        <div className="p-3 bg-orange-50 rounded-xl flex justify-between items-center">
-                          <span className="text-orange-700">مستحق</span>
-                          <span className="font-bold text-orange-600">
-                            {referral.outstandingFees?.toLocaleString('ar-SA') || 0} ر.س
-                          </span>
-                        </div>
-                        <div className="p-3 bg-green-50 rounded-xl flex justify-between items-center">
-                          <span className="text-green-700">مدفوع</span>
-                          <span className="font-bold text-green-600">
-                            {referral.totalFeesPaid?.toLocaleString('ar-SA') || 0} ر.س
-                          </span>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  )}
-                </div>
+                <SalesSidebar context="referrals" />
               </div>
-            </div>
           </>
         )}
       </Main>
