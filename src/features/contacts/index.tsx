@@ -16,7 +16,7 @@ import { DynamicIsland } from '@/components/dynamic-island'
 import { LanguageSwitcher } from '@/components/language-switcher'
 import { Button } from '@/components/ui/button'
 import { Search, Bell, Users, Plus } from 'lucide-react'
-import { PracticeSidebar } from '@/features/cases/components/practice-sidebar'
+import { ClientsSidebar } from '@/features/clients/components/clients-sidebar'
 import { Badge } from '@/components/ui/badge'
 import { ProductivityHero } from '@/components/productivity-hero'
 
@@ -105,7 +105,7 @@ export function Contacts() {
           </div>
 
           {/* Sidebar */}
-          <PracticeSidebar context="contacts" />
+          <ClientsSidebar context="contacts" />
         </div>
       </Main>
 

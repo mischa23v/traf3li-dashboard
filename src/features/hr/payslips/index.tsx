@@ -195,7 +195,7 @@ export function PayslipsPage() {
 
     return (
         <>
-            <Header>
+            <Header className="bg-navy">
                 <TopNav links={topLinks} />
                 <div className="flex items-center gap-4">
                     <LanguageSwitcher />

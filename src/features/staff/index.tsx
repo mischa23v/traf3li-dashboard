@@ -13,7 +13,7 @@ import { StaffTable } from './components/staff-table'
 import { useStaff } from '@/hooks/useStaff'
 import { useTranslation } from 'react-i18next'
 import { ProductivityHero } from '@/components/productivity-hero'
-import { CrmSidebar } from '@/components/crm-sidebar'
+import { ClientsSidebar } from '@/features/clients/components/clients-sidebar'
 
 const route = getRouteApi('/_authenticated/dashboard/staff/')
 
@@ -61,7 +61,7 @@ export function Staff() {
             )}
           </div>
 
-          <CrmSidebar context="staff" />
+          <ClientsSidebar context="staff" />
         </div>
       </Main>
 

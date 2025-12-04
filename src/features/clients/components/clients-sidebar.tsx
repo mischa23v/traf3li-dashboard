@@ -12,21 +12,21 @@ import { useUpcomingReminders } from '@/hooks/useRemindersAndEvents'
 import { format, addDays, startOfDay, endOfDay, isSameDay } from 'date-fns'
 import { arSA } from 'date-fns/locale'
 
-interface HRSidebarProps {
-    context?: 'employees' | 'attendance' | 'leaves' | 'evaluations' | 'payroll' | 'salaries' | 'payslips'
+interface ClientsSidebarProps {
+    context?: 'clients' | 'contacts' | 'organizations' | 'staff'
     isSelectionMode?: boolean
     onToggleSelectionMode?: () => void
     selectedCount?: number
     onDeleteSelected?: () => void
 }
 
-export function HRSidebar({
-    context = 'employees',
+export function ClientsSidebar({
+    context = 'clients',
     isSelectionMode = false,
     onToggleSelectionMode,
     selectedCount = 0,
     onDeleteSelected
-}: HRSidebarProps) {
+}: ClientsSidebarProps) {
     const [activeTab, setActiveTab] = useState<'calendar' | 'notifications'>('calendar')
     const [selectedDate, setSelectedDate] = useState(new Date())
 
@@ -58,37 +58,25 @@ export function HRSidebar({
     }, [upcomingRemindersData])
 
     const links = {
-        employees: {
-            create: '/dashboard/hr/employees/new',
-            viewAll: '/dashboard/hr/employees'
+        clients: {
+            create: '/dashboard/clients/new',
+            viewAll: '/dashboard/clients'
         },
-        attendance: {
-            create: '/dashboard/hr/attendance/new',
-            viewAll: '/dashboard/hr/attendance'
+        contacts: {
+            create: '/dashboard/contacts/new',
+            viewAll: '/dashboard/contacts'
         },
-        leaves: {
-            create: '/dashboard/hr/leaves/new',
-            viewAll: '/dashboard/hr/leaves'
+        organizations: {
+            create: '/dashboard/organizations/new',
+            viewAll: '/dashboard/organizations'
         },
-        evaluations: {
-            create: '/dashboard/hr/evaluations/new',
-            viewAll: '/dashboard/hr/evaluations'
-        },
-        payroll: {
-            create: '/dashboard/hr/payroll/new',
-            viewAll: '/dashboard/hr/payroll'
-        },
-        salaries: {
-            create: '/dashboard/hr/salaries/new',
-            viewAll: '/dashboard/hr/salaries'
-        },
-        payslips: {
-            create: '/dashboard/hr/payslips/new',
-            viewAll: '/dashboard/hr/payslips'
+        staff: {
+            create: '/dashboard/staff/new',
+            viewAll: '/dashboard/staff'
         }
     }
 
-    const currentLinks = links[context] || links.employees
+    const currentLinks = links[context] || links.clients
 
     // Generate 5 days for the strip
     const calendarStripDays = useMemo(() => {

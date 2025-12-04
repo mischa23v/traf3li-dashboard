@@ -47,6 +47,7 @@ import {
 import type { Lead, Pipeline, PipelineStage } from '@/types/crm'
 import { formatDistanceToNow } from 'date-fns'
 import { ar } from 'date-fns/locale'
+import { SalesSidebar } from './sales-sidebar'
 
 export function PipelineView() {
   const [selectedPipelineId, setSelectedPipelineId] = useState<string>('')
@@ -363,7 +364,7 @@ export function PipelineView() {
           </div>
 
           {/* SIDEBAR */}
-          <CrmSidebar />
+          <SalesSidebar context="pipeline" />
         </div>
       </Main>
     </>

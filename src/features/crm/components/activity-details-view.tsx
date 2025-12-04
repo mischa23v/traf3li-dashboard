@@ -47,6 +47,7 @@ import { ProfileDropdown } from '@/components/profile-dropdown'
 import type { ActivityType, ActivityStatus } from '@/types/crm'
 import { format } from 'date-fns'
 import { ar } from 'date-fns/locale'
+import { SalesSidebar } from './sales-sidebar'
 
 const typeLabels: Record<ActivityType, string> = {
   call: 'مكالمة',
@@ -196,7 +197,7 @@ export function ActivityDetailsView() {
         className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-r border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']"
       >
         {/* Breadcrumb / Back Link */}
-        <div className="max-w-[1600px] mx-auto mb-6">
+        <div className="mb-6">
           <Link
             to="/dashboard/crm/activities"
             className="inline-flex items-center text-slate-500 hover:text-navy transition-colors"
@@ -208,7 +209,7 @@ export function ActivityDetailsView() {
 
         {/* Loading State */}
         {isLoading && (
-          <div className="max-w-[1600px] mx-auto space-y-6">
+          <div className="space-y-6">
             <Skeleton className="h-48 w-full rounded-3xl" />
             <div className="grid grid-cols-12 gap-6">
               <div className="col-span-12 lg:col-span-8">
@@ -223,7 +224,7 @@ export function ActivityDetailsView() {
 
         {/* Error State */}
         {isError && (
-          <div className="max-w-[1600px] mx-auto">
+          <div>
             <div className="bg-white rounded-2xl p-12 border border-slate-100 text-center">
               <div className="flex justify-center mb-4">
                 <div className="w-16 h-16 rounded-full bg-red-50 flex items-center justify-center">
@@ -248,7 +249,7 @@ export function ActivityDetailsView() {
 
         {/* Empty State */}
         {!isLoading && !isError && !activity && (
-          <div className="max-w-[1600px] mx-auto">
+          <div>
             <div className="bg-white rounded-2xl p-12 border border-slate-100 text-center">
               <div className="flex justify-center mb-4">
                 <div className="w-16 h-16 rounded-full bg-blue-50 flex items-center justify-center">
@@ -328,8 +329,7 @@ export function ActivityDetailsView() {
             </ProductivityHero>
 
             {/* MAIN CONTENT */}
-            <div className="max-w-[1600px] mx-auto pb-12">
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 {/* MAIN CONTENT */}
                 <div className="lg:col-span-2 space-y-6">
                   {/* Description Card */}
@@ -489,71 +489,8 @@ export function ActivityDetailsView() {
                 </div>
 
                 {/* SIDEBAR */}
-                <div className="space-y-6">
-                  {/* Info Card */}
-                  <Card className="border border-slate-100 shadow-sm rounded-2xl">
-                    <CardHeader className="bg-white border-b border-slate-50 pb-4">
-                      <CardTitle className="text-lg font-bold text-navy flex items-center gap-2">
-                        <Calendar className="h-5 w-5 text-blue-500" />
-                        معلومات النشاط
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="p-4 space-y-3">
-                      <div className="p-3 bg-slate-50 rounded-xl">
-                        <p className="text-xs text-slate-500 mb-1">تاريخ الإنشاء</p>
-                        <p className="font-medium text-navy">
-                          {format(new Date(activity.createdAt), 'dd MMMM yyyy - HH:mm', { locale: ar })}
-                        </p>
-                      </div>
-                      {activity.completedAt && (
-                        <div className="p-3 bg-green-50 rounded-xl">
-                          <p className="text-xs text-green-600 mb-1">تاريخ الإكمال</p>
-                          <p className="font-medium text-green-700">
-                            {format(new Date(activity.completedAt), 'dd MMMM yyyy - HH:mm', { locale: ar })}
-                          </p>
-                        </div>
-                      )}
-                      <div className="p-3 bg-slate-50 rounded-xl">
-                        <p className="text-xs text-slate-500 mb-1">معرف النشاط</p>
-                        <p className="font-mono text-sm text-navy">{activity.activityId}</p>
-                      </div>
-                    </CardContent>
-                  </Card>
-
-                  {/* Linked Entity Card */}
-                  {activity.entityId && (
-                    <Card className="border border-slate-100 shadow-sm rounded-2xl">
-                      <CardHeader className="bg-white border-b border-slate-50 pb-4">
-                        <CardTitle className="text-lg font-bold text-navy flex items-center gap-2">
-                          <Users className="h-5 w-5 text-purple-500" />
-                          مرتبط بـ
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent className="p-4">
-                        <div className="p-4 bg-purple-50 rounded-xl">
-                          <p className="text-xs text-purple-600 mb-2">
-                            {activity.entityType === 'lead' ? 'عميل محتمل' :
-                              activity.entityType === 'client' ? 'عميل' :
-                                activity.entityType === 'contact' ? 'جهة اتصال' : 'قضية'}
-                          </p>
-                          <p className="font-bold text-purple-700">
-                            {activity.entityName || 'غير محدد'}
-                          </p>
-                        </div>
-                        {activity.entityType === 'lead' && (
-                          <Button variant="outline" asChild className="w-full mt-4 rounded-xl">
-                            <Link to={`/dashboard/crm/leads/${activity.entityId}`}>
-                              <User className="h-4 w-4 ml-2" />
-                              عرض العميل المحتمل
-                            </Link>
-                          </Button>
-                        )}
-                      </CardContent>
-                    </Card>
-                  )}
-                </div>
+                <SalesSidebar context="activities" />
               </div>
-            </div>
           </>
         )}
       </Main>

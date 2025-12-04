@@ -26,7 +26,7 @@ import { TopNav } from '@/components/layout/top-nav'
 import { DynamicIsland } from '@/components/dynamic-island'
 import { Main } from '@/components/layout/main'
 import { Link, useNavigate } from '@tanstack/react-router'
-import { CrmSidebar } from './crm-sidebar'
+import { SalesSidebar } from './sales-sidebar'
 import { ProductivityHero } from '@/components/productivity-hero'
 import { useCreateLead, usePipelines } from '@/hooks/useCrm'
 import { cn } from '@/lib/utils'
@@ -245,7 +245,7 @@ export function CreateLeadView() {
           </Link>
         </ProductivityHero>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* RIGHT COLUMN (Main Content) */}
           <div className="lg:col-span-2 space-y-8">
 
@@ -713,7 +713,7 @@ export function CreateLeadView() {
           </div>
 
           {/* Sidebar Widgets */}
-          <CrmSidebar />
+          <SalesSidebar context="leads" />
         </div>
       </Main>
     </>

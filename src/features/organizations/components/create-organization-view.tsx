@@ -19,7 +19,7 @@ import { TopNav } from '@/components/layout/top-nav'
 import { DynamicIsland } from '@/components/dynamic-island'
 import { Main } from '@/components/layout/main'
 import { Link, useNavigate } from '@tanstack/react-router'
-import { CrmSidebar } from '@/components/crm-sidebar'
+import { ClientsSidebar } from '@/features/clients/components/clients-sidebar'
 import { ProductivityHero } from '@/components/productivity-hero'
 import { useCreateOrganization } from '@/hooks/useOrganizations'
 import { createOrganizationSchema, type CreateOrganizationInput } from '../data/schema'
@@ -381,7 +381,7 @@ export function CreateOrganizationView() {
                     </div>
 
                     {/* Sidebar Widgets */}
-                    <CrmSidebar context="organizations" />
+                    <ClientsSidebar context="organizations" />
                 </div>
             </Main>
         </>

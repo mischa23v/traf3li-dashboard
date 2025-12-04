@@ -153,7 +153,7 @@ export function BadgesView() {
 
   return (
     <>
-      <Header className="bg-navy shadow-none relative">
+      <Header className="bg-navy">
         <TopNav
           links={topNav}
           className="[&>a]:text-slate-300 [&>a:hover]:text-white [&>a[aria-current='page']]:text-white"

@@ -19,7 +19,7 @@ import { TopNav } from '@/components/layout/top-nav'
 import { DynamicIsland } from '@/components/dynamic-island'
 import { Main } from '@/components/layout/main'
 import { Link, useNavigate } from '@tanstack/react-router'
-import { CrmSidebar } from '@/components/crm-sidebar'
+import { ClientsSidebar } from '@/features/clients/components/clients-sidebar'
 import { ProductivityHero } from '@/components/productivity-hero'
 import { useCreateStaff } from '@/hooks/useStaff'
 import { staffStatuses, staffRoles, specializations } from '../data/data'
@@ -271,7 +271,7 @@ export function CreateStaffView() {
                     </div>
 
                     {/* Sidebar Widgets */}
-                    <CrmSidebar context="staff" />
+                    <ClientsSidebar context="staff" />
                 </div>
             </Main>
         </>

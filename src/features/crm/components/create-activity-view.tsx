@@ -26,7 +26,7 @@ import { DynamicIsland } from '@/components/dynamic-island'
 import { Main } from '@/components/layout/main'
 import { ProductivityHero } from '@/components/productivity-hero'
 import { Link, useNavigate } from '@tanstack/react-router'
-import { CrmSidebar } from './crm-sidebar'
+import { SalesSidebar } from './sales-sidebar'
 import { useCreateActivity, useLeads } from '@/hooks/useCrm'
 import type { ActivityType, ActivityEntityType } from '@/types/crm'
 
@@ -178,7 +178,7 @@ export function CreateActivityView() {
           </Link>
         </ProductivityHero>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* RIGHT COLUMN (Main Content) */}
           <div className="lg:col-span-2 space-y-8">
 
@@ -510,7 +510,7 @@ export function CreateActivityView() {
           </div>
 
           {/* Sidebar Widgets */}
-          <CrmSidebar />
+          <SalesSidebar context="activities" />
         </div>
       </Main>
     </>
