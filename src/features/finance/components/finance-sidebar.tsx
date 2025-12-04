@@ -1,7 +1,8 @@
 import { useState, useMemo } from 'react'
 import {
     Clock, Bell, MapPin, Calendar as CalendarIcon,
-    Plus, CheckSquare, Trash2, List, X, ChevronRight, Loader2, AlertCircle
+    Plus, CheckSquare, Trash2, List, X, ChevronRight, Loader2, AlertCircle,
+    Edit3, Eye, RefreshCw, RotateCcw
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -13,11 +14,17 @@ import { format, addDays, startOfDay, endOfDay, isSameDay } from 'date-fns'
 import { arSA } from 'date-fns/locale'
 
 interface FinanceSidebarProps {
-    context?: 'invoices' | 'quotes' | 'payments' | 'expenses' | 'statements' | 'transactions' | 'activity'
+    context?: 'invoices' | 'quotes' | 'payments' | 'expenses' | 'statements' | 'transactions' | 'activity' | 'time-tracking'
     isSelectionMode?: boolean
     onToggleSelectionMode?: () => void
     selectedCount?: number
     onDeleteSelected?: () => void
+    // Detail page props (similar to TasksSidebar)
+    itemId?: string
+    isItemCompleted?: boolean
+    onCompleteItem?: () => void
+    onDeleteItem?: () => void
+    onEditItem?: () => void
 }
 
 export function FinanceSidebar({
@@ -25,10 +32,19 @@ export function FinanceSidebar({
     isSelectionMode = false,
     onToggleSelectionMode,
     selectedCount = 0,
-    onDeleteSelected
+    onDeleteSelected,
+    // Detail page props
+    itemId,
+    isItemCompleted = false,
+    onCompleteItem,
+    onDeleteItem,
+    onEditItem
 }: FinanceSidebarProps) {
     const [activeTab, setActiveTab] = useState<'calendar' | 'notifications'>('calendar')
     const [selectedDate, setSelectedDate] = useState(new Date())
+
+    // Determine if we're in detail view
+    const isDetailView = !!itemId
 
     // Calculate date range for the strip (Today + 4 days)
     const startDate = useMemo(() => startOfDay(new Date()).toISOString(), [])
@@ -85,6 +101,10 @@ export function FinanceSidebar({
         activity: {
             create: '/dashboard/finance/activity/new',
             viewAll: '/dashboard/finance/activity'
+        },
+        'time-tracking': {
+            create: '/dashboard/finance/time-tracking/new',
+            viewAll: '/dashboard/finance/time-tracking'
         }
     }
 
@@ -141,51 +161,129 @@ export function FinanceSidebar({
                     <h3 className="font-bold text-lg text-white">إجراءات سريعة</h3>
                 </div>
 
-                {/* Content */}
+                {/* Content - Different based on view mode */}
                 <div className="relative z-10 grid grid-cols-2 gap-4 animate-in fade-in slide-in-from-bottom-2 duration-300">
-                    {/* Create Button - White + Green Text + Glow */}
-                    <Button asChild className="bg-white hover:bg-emerald-50 text-emerald-600 h-auto py-6 flex flex-col items-center justify-center gap-2 rounded-3xl shadow-lg shadow-white/10 transition-all duration-300 hover:scale-[1.02] border-0">
-                        <Link to={currentLinks.create}>
-                            <Plus className="h-7 w-7" />
-                            <span className="text-sm font-bold">إنشاء</span>
-                        </Link>
-                    </Button>
+                    {isDetailView ? (
+                        // Detail View Mode - Shows Complete/Reopen, Edit, Delete, View All
+                        <>
+                            {/* Complete/Reopen Button */}
+                            {onCompleteItem && (
+                                <Button
+                                    variant="ghost"
+                                    className={cn(
+                                        "h-auto py-6 flex flex-col items-center justify-center gap-2 rounded-3xl transition-all duration-300 hover:scale-[1.02] shadow-lg",
+                                        isItemCompleted
+                                            ? "bg-amber-100 text-amber-800 ring-2 ring-amber-400 shadow-amber-500/20"
+                                            : "bg-white hover:bg-emerald-50 text-emerald-600 shadow-white/10"
+                                    )}
+                                    onClick={onCompleteItem}
+                                >
+                                    {isItemCompleted ? <RotateCcw className="h-6 w-6" /> : <RefreshCw className="h-6 w-6" />}
+                                    <span className="text-sm font-bold">{isItemCompleted ? 'إعادة فتح' : 'إكمال'}</span>
+                                </Button>
+                            )}
 
-                    {/* Select Button - White + Dark Text + Glow */}
-                    <Button
-                        variant="ghost"
-                        className={cn(
-                            "h-auto py-6 flex flex-col items-center justify-center gap-2 rounded-3xl transition-all duration-300 hover:scale-[1.02] shadow-lg",
-                            isSelectionMode
-                                ? "bg-emerald-100 text-emerald-800 ring-2 ring-emerald-400 shadow-emerald-500/20"
-                                : "bg-white hover:bg-slate-50 text-emerald-950 shadow-white/10"
-                        )}
-                        onClick={onToggleSelectionMode}
-                    >
-                        {isSelectionMode ? <X className="h-6 w-6" /> : <CheckSquare className="h-6 w-6" />}
-                        <span className="text-sm font-bold">{isSelectionMode ? 'إلغاء' : 'تحديد'}</span>
-                    </Button>
+                            {/* Edit Button */}
+                            {onEditItem && (
+                                <Button
+                                    variant="ghost"
+                                    className="bg-white hover:bg-blue-50 text-blue-600 h-auto py-6 flex flex-col items-center justify-center gap-2 rounded-3xl transition-all duration-300 hover:scale-[1.02] shadow-lg shadow-white/10"
+                                    onClick={onEditItem}
+                                >
+                                    <Edit3 className="h-6 w-6" />
+                                    <span className="text-sm font-bold">تعديل</span>
+                                </Button>
+                            )}
 
-                    {/* Delete Button - White + Red Text + Glow */}
-                    <Button
-                        variant="ghost"
-                        className="bg-white hover:bg-red-50 text-red-500 hover:text-red-600 h-auto py-6 flex flex-col items-center justify-center gap-2 rounded-3xl disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 hover:scale-[1.02] shadow-lg shadow-white/10"
-                        onClick={onDeleteSelected}
-                        disabled={!isSelectionMode || selectedCount === 0}
-                    >
-                        <Trash2 className="h-6 w-6" />
-                        <span className="text-sm font-bold">
-                            {selectedCount > 0 ? `حذف (${selectedCount})` : 'حذف'}
-                        </span>
-                    </Button>
+                            {/* Delete Button */}
+                            {onDeleteItem && (
+                                <Button
+                                    variant="ghost"
+                                    className="bg-white hover:bg-red-50 text-red-500 hover:text-red-600 h-auto py-6 flex flex-col items-center justify-center gap-2 rounded-3xl transition-all duration-300 hover:scale-[1.02] shadow-lg shadow-white/10"
+                                    onClick={onDeleteItem}
+                                >
+                                    <Trash2 className="h-6 w-6" />
+                                    <span className="text-sm font-bold">حذف</span>
+                                </Button>
+                            )}
 
-                    {/* View All Button - White + Dark Text + Glow */}
-                    <Button asChild variant="ghost" className="bg-white hover:bg-slate-50 text-emerald-950 h-auto py-6 flex flex-col items-center justify-center gap-2 rounded-3xl transition-all duration-300 hover:scale-[1.02] shadow-lg shadow-white/10">
-                        <Link to={currentLinks.viewAll}>
-                            <List className="h-6 w-6" />
-                            <span className="text-sm font-bold">عرض جميع</span>
-                        </Link>
-                    </Button>
+                            {/* View All Button */}
+                            <Button asChild variant="ghost" className="bg-white hover:bg-slate-50 text-emerald-950 h-auto py-6 flex flex-col items-center justify-center gap-2 rounded-3xl transition-all duration-300 hover:scale-[1.02] shadow-lg shadow-white/10">
+                                <Link to={currentLinks.viewAll}>
+                                    <List className="h-6 w-6" />
+                                    <span className="text-sm font-bold">عرض جميع</span>
+                                </Link>
+                            </Button>
+                        </>
+                    ) : isSelectionMode ? (
+                        // Selection Mode - Shows Cancel, Delete Selected
+                        <>
+                            {/* Cancel Selection Button */}
+                            <Button
+                                variant="ghost"
+                                className="bg-emerald-100 text-emerald-800 ring-2 ring-emerald-400 shadow-emerald-500/20 h-auto py-6 flex flex-col items-center justify-center gap-2 rounded-3xl transition-all duration-300 hover:scale-[1.02] shadow-lg"
+                                onClick={onToggleSelectionMode}
+                            >
+                                <X className="h-6 w-6" />
+                                <span className="text-sm font-bold">إلغاء التحديد</span>
+                            </Button>
+
+                            {/* Delete Selected Button */}
+                            <Button
+                                variant="ghost"
+                                className="bg-white hover:bg-red-50 text-red-500 hover:text-red-600 h-auto py-6 flex flex-col items-center justify-center gap-2 rounded-3xl disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 hover:scale-[1.02] shadow-lg shadow-white/10"
+                                onClick={onDeleteSelected}
+                                disabled={selectedCount === 0}
+                            >
+                                <Trash2 className="h-6 w-6" />
+                                <span className="text-sm font-bold">
+                                    {selectedCount > 0 ? `حذف (${selectedCount})` : 'حذف المحدد'}
+                                </span>
+                            </Button>
+                        </>
+                    ) : (
+                        // Default List View Mode - Shows Create, Select, Delete, View All
+                        <>
+                            {/* Create Button */}
+                            <Button asChild className="bg-white hover:bg-emerald-50 text-emerald-600 h-auto py-6 flex flex-col items-center justify-center gap-2 rounded-3xl shadow-lg shadow-white/10 transition-all duration-300 hover:scale-[1.02] border-0">
+                                <Link to={currentLinks.create}>
+                                    <Plus className="h-7 w-7" />
+                                    <span className="text-sm font-bold">إنشاء</span>
+                                </Link>
+                            </Button>
+
+                            {/* Select Button */}
+                            <Button
+                                variant="ghost"
+                                className="bg-white hover:bg-slate-50 text-emerald-950 h-auto py-6 flex flex-col items-center justify-center gap-2 rounded-3xl transition-all duration-300 hover:scale-[1.02] shadow-lg shadow-white/10"
+                                onClick={onToggleSelectionMode}
+                            >
+                                <CheckSquare className="h-6 w-6" />
+                                <span className="text-sm font-bold">تحديد</span>
+                            </Button>
+
+                            {/* Delete Button - Disabled when no selection */}
+                            <Button
+                                variant="ghost"
+                                className="bg-white hover:bg-red-50 text-red-500 hover:text-red-600 h-auto py-6 flex flex-col items-center justify-center gap-2 rounded-3xl disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 hover:scale-[1.02] shadow-lg shadow-white/10"
+                                onClick={onDeleteSelected}
+                                disabled={!isSelectionMode || selectedCount === 0}
+                            >
+                                <Trash2 className="h-6 w-6" />
+                                <span className="text-sm font-bold">
+                                    {selectedCount > 0 ? `حذف (${selectedCount})` : 'حذف'}
+                                </span>
+                            </Button>
+
+                            {/* View All Button */}
+                            <Button asChild variant="ghost" className="bg-white hover:bg-slate-50 text-emerald-950 h-auto py-6 flex flex-col items-center justify-center gap-2 rounded-3xl transition-all duration-300 hover:scale-[1.02] shadow-lg shadow-white/10">
+                                <Link to={currentLinks.viewAll}>
+                                    <List className="h-6 w-6" />
+                                    <span className="text-sm font-bold">عرض جميع</span>
+                                </Link>
+                            </Button>
+                        </>
+                    )}
                 </div>
             </div>
 

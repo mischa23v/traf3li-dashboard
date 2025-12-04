@@ -1,17 +1,18 @@
 import { useState, useMemo } from 'react'
 import {
-    Search, Filter, Plus, MoreHorizontal,
+    Search, Plus, MoreHorizontal,
     FileText, AlertCircle, CheckCircle, Bell, Loader2,
-    Calendar, ChevronLeft, ChevronRight, Download, X
+    Calendar, ChevronLeft, ChevronRight, X, Eye, Edit3, Trash2, Download
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
+import { Checkbox } from '@/components/ui/checkbox'
 import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
+    DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import {
@@ -21,13 +22,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select"
-import {
-    Popover,
-    PopoverContent,
-    PopoverTrigger,
-} from "@/components/ui/popover"
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Link } from '@tanstack/react-router'
+import { Link, useNavigate } from '@tanstack/react-router'
 import { Header } from '@/components/layout/header'
 import { TopNav } from '@/components/layout/top-nav'
 import { DynamicIsland } from '@/components/dynamic-island'
@@ -37,73 +32,95 @@ import { ThemeSwitch } from '@/components/theme-switch'
 import { ConfigDrawer } from '@/components/config-drawer'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { Skeleton } from '@/components/ui/skeleton'
-import { useInvoices, useOverdueInvoices, useExportReport } from '@/hooks/useFinance'
+import { useInvoices, useDeleteInvoice } from '@/hooks/useFinance'
 import { useClients } from '@/hooks/useCasesAndClients'
 import { FinanceSidebar } from './finance-sidebar'
 import { ProductivityHero } from '@/components/productivity-hero'
+import { format } from 'date-fns'
+import { arSA } from 'date-fns/locale'
 
 export default function InvoicesDashboard() {
-    const [activeTab, setActiveTab] = useState('all')
-    const [searchQuery, setSearchQuery] = useState('')
-    const [currentPage, setCurrentPage] = useState(1)
-    const [itemsPerPage, setItemsPerPage] = useState(10)
-    const [startDate, setStartDate] = useState('')
-    const [endDate, setEndDate] = useState('')
-    const [selectedClient, setSelectedClient] = useState('')
-    const [showFilters, setShowFilters] = useState(false)
+    const navigate = useNavigate()
+    const [activeStatusTab, setActiveStatusTab] = useState('all')
+    const [isSelectionMode, setIsSelectionMode] = useState(false)
+    const [selectedIds, setSelectedIds] = useState<string[]>([])
 
-    // Fetch clients for filter
+    // Filter states
+    const [searchQuery, setSearchQuery] = useState('')
+    const [clientFilter, setClientFilter] = useState<string>('all')
+    const [sortBy, setSortBy] = useState<string>('dueDate')
+    const [currentPage, setCurrentPage] = useState(1)
+    const [itemsPerPage] = useState(10)
+
+    // Fetch clients for filter dropdowns
     const { data: clientsData } = useClients()
-    const { mutate: exportReport, isPending: isExporting } = useExportReport()
+
+    // Mutations
+    const deleteInvoiceMutation = useDeleteInvoice()
 
     // API Filters
     const filters = useMemo(() => {
         const f: any = { page: currentPage, limit: itemsPerPage }
-        if (activeTab !== 'all') {
-            f.status = activeTab
-        }
-        if (startDate) f.startDate = startDate
-        if (endDate) f.endDate = endDate
-        if (selectedClient && selectedClient !== 'all') f.clientId = selectedClient
-        return f
-    }, [activeTab, currentPage, itemsPerPage, startDate, endDate, selectedClient])
 
-    // Active filter count
-    const activeFilterCount = useMemo(() => {
-        let count = 0
-        if (startDate) count++
-        if (endDate) count++
-        if (selectedClient && selectedClient !== 'all') count++
-        return count
-    }, [startDate, endDate, selectedClient])
+        // Status filter
+        if (activeStatusTab !== 'all') {
+            f.status = activeStatusTab
+        }
+
+        // Search
+        if (searchQuery.trim()) {
+            f.search = searchQuery.trim()
+        }
+
+        // Client
+        if (clientFilter !== 'all') {
+            f.clientId = clientFilter
+        }
+
+        // Sort
+        f.sortBy = sortBy
+        f.sortOrder = sortBy === 'dueDate' ? 'asc' : 'desc'
+
+        return f
+    }, [activeStatusTab, searchQuery, clientFilter, sortBy, currentPage, itemsPerPage])
+
+    // Check if any filter is active
+    const hasActiveFilters = searchQuery || clientFilter !== 'all'
 
     // Clear all filters
     const clearFilters = () => {
-        setStartDate('')
-        setEndDate('')
-        setSelectedClient('')
+        setSearchQuery('')
+        setClientFilter('all')
         setCurrentPage(1)
-    }
-
-    // Handle export
-    const handleExport = (format: 'csv' | 'pdf') => {
-        exportReport({ reportType: 'invoices', format, filters })
     }
 
     // Fetch data
     const { data: invoicesData, isLoading, isError, error, refetch } = useInvoices(filters)
-    const { data: overdueData } = useOverdueInvoices()
 
-    // Transform API data to component format
+    // Helper function to format dates in both languages
+    const formatDualDate = (dateString: string | null | undefined) => {
+        if (!dateString) return { arabic: 'غير محدد', english: 'Not set' }
+        const date = new Date(dateString)
+        return {
+            arabic: format(date, 'd MMMM', { locale: arSA }),
+            english: format(date, 'MMM d, yyyy')
+        }
+    }
+
+    // Transform API data
     const invoices = useMemo(() => {
         if (!invoicesData?.invoices) return []
+
         return invoicesData.invoices.map((inv: any) => ({
-            id: inv.invoiceNumber || inv._id,
+            id: inv._id,
+            invoiceNumber: inv.invoiceNumber || inv._id,
             client: inv.clientId?.name || inv.clientId?.firstName + ' ' + inv.clientId?.lastName || 'عميل غير محدد',
             amount: inv.totalAmount || 0,
-            date: new Date(inv.issueDate).toLocaleDateString('ar-SA'),
-            status: inv.status,
-            dueDate: new Date(inv.dueDate).toLocaleDateString('ar-SA'),
+            issueDate: inv.issueDate,
+            dueDate: inv.dueDate,
+            issueDateFormatted: formatDualDate(inv.issueDate),
+            dueDateFormatted: formatDualDate(inv.dueDate),
+            status: inv.status || 'pending',
             _id: inv._id,
         }))
     }, [invoicesData])
@@ -111,37 +128,50 @@ export default function InvoicesDashboard() {
     // Filter Logic (client-side search)
     const filteredInvoices = useMemo(() => {
         return invoices.filter(inv => {
-            if (searchQuery && !inv.client.includes(searchQuery) && !inv.id.includes(searchQuery)) {
+            if (searchQuery && !inv.client.includes(searchQuery) && !inv.invoiceNumber.includes(searchQuery)) {
                 return false
             }
             return true
         })
     }, [invoices, searchQuery])
 
-    // Calculate statistics
-    const stats = useMemo(() => {
-        if (!invoicesData?.invoices) return { totalPending: 0, totalOverdue: 0, totalPaidThisMonth: 0 }
+    // Selection Handlers
+    const handleToggleSelectionMode = () => {
+        setIsSelectionMode(!isSelectionMode)
+        setSelectedIds([])
+    }
 
-        const allInvoices = invoicesData.invoices
-        const totalPending = allInvoices
-            .filter((inv: any) => inv.status === 'pending' || inv.status === 'sent')
-            .reduce((sum: number, inv: any) => sum + (inv.balanceDue || inv.totalAmount || 0), 0)
+    const handleSelectItem = (id: string) => {
+        if (selectedIds.includes(id)) {
+            setSelectedIds(selectedIds.filter(i => i !== id))
+        } else {
+            setSelectedIds([...selectedIds, id])
+        }
+    }
 
-        const totalOverdue = overdueData
-            ? overdueData.reduce((sum: number, inv: any) => sum + (inv.balanceDue || inv.totalAmount || 0), 0)
-            : 0
+    const handleDeleteSelected = () => {
+        if (selectedIds.length === 0) return
+        if (confirm(`هل أنت متأكد من حذف ${selectedIds.length} فاتورة؟`)) {
+            selectedIds.forEach(id => deleteInvoiceMutation.mutate(id))
+            setIsSelectionMode(false)
+            setSelectedIds([])
+        }
+    }
 
-        const thisMonth = new Date()
-        const totalPaidThisMonth = allInvoices
-            .filter((inv: any) => {
-                if (inv.status !== 'paid' || !inv.paidDate) return false
-                const paidDate = new Date(inv.paidDate)
-                return paidDate.getMonth() === thisMonth.getMonth() && paidDate.getFullYear() === thisMonth.getFullYear()
-            })
-            .reduce((sum: number, inv: any) => sum + (inv.totalAmount || 0), 0)
+    // Single invoice actions
+    const handleViewInvoice = (id: string) => {
+        navigate({ to: '/dashboard/finance/invoices/$invoiceId', params: { invoiceId: id } })
+    }
 
-        return { totalPending, totalOverdue, totalPaidThisMonth }
-    }, [invoicesData, overdueData])
+    const handleEditInvoice = (id: string) => {
+        navigate({ to: '/dashboard/finance/invoices/$invoiceId/edit', params: { invoiceId: id } })
+    }
+
+    const handleDeleteInvoice = (id: string) => {
+        if (confirm('هل أنت متأكد من حذف هذه الفاتورة؟')) {
+            deleteInvoiceMutation.mutate(id)
+        }
+    }
 
     const formatCurrency = (amount: number) => {
         return new Intl.NumberFormat('ar-SA', {
@@ -151,106 +181,34 @@ export default function InvoicesDashboard() {
         }).format(amount)
     }
 
+    const getStatusConfig = (status: string) => {
+        switch (status) {
+            case 'paid':
+                return { label: 'مدفوعة', bg: 'bg-emerald-100', text: 'text-emerald-700' }
+            case 'overdue':
+                return { label: 'متأخرة', bg: 'bg-rose-100', text: 'text-rose-700' }
+            case 'cancelled':
+                return { label: 'ملغاة', bg: 'bg-slate-100', text: 'text-slate-700' }
+            case 'draft':
+                return { label: 'مسودة', bg: 'bg-slate-100', text: 'text-slate-600' }
+            case 'partial':
+                return { label: 'مدفوعة جزئياً', bg: 'bg-blue-100', text: 'text-blue-700' }
+            case 'sent':
+                return { label: 'مرسلة', bg: 'bg-blue-100', text: 'text-blue-700' }
+            default:
+                return { label: 'معلقة', bg: 'bg-amber-100', text: 'text-amber-700' }
+        }
+    }
+
     const topNav = [
         { title: 'نظرة عامة', href: '/dashboard/finance/overview', isActive: false },
         { title: 'الفواتير', href: '/dashboard/finance/invoices', isActive: true },
+        { title: 'المدفوعات', href: '/dashboard/finance/payments', isActive: false },
         { title: 'المصروفات', href: '/dashboard/finance/expenses', isActive: false },
-        { title: 'كشف الحساب', href: '/dashboard/finance/statements', isActive: false },
         { title: 'المعاملات', href: '/dashboard/finance/transactions', isActive: false },
         { title: 'تتبع الوقت', href: '/dashboard/finance/time-tracking', isActive: false },
-        { title: 'نشاط الحساب', href: '/dashboard/finance/activity', isActive: false },
     ]
 
-    // LOADING STATE
-    if (isLoading) {
-        return (
-            <>
-                <Header className="bg-navy shadow-none relative">
-                    <TopNav links={topNav} className="[&>a]:text-slate-300 [&>a:hover]:text-white [&>a[aria-current='page']]:text-white" />
-                    <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
-                        <DynamicIsland />
-                    </div>
-                    <div className='ms-auto flex items-center space-x-4'>
-                        <div className="relative hidden md:block">
-                            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                            <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pr-9 pl-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
-                        </div>
-                        <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white">
-                            <Bell className="h-5 w-5" />
-                            <span className="absolute top-2 right-2 h-2 w-2 bg-red-500 rounded-full border border-navy"></span>
-                        </Button>
-                        <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white" />
-                        <ThemeSwitch className="text-slate-300 hover:bg-white/10 hover:text-white" />
-                        <ConfigDrawer className="text-slate-300 hover:bg-white/10 hover:text-white" />
-                        <ProfileDropdown className="text-slate-300 hover:bg-white/10 hover:text-white" />
-                    </div>
-                    <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-emerald-500/50 to-transparent"></div>
-                </Header>
-                <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8">
-                    <Skeleton className="h-32 w-full rounded-3xl" />
-                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-                        <div className="lg:col-span-8 space-y-6">
-                            <Skeleton className="h-16 w-full rounded-2xl" />
-                            <Skeleton className="h-32 w-full rounded-3xl" />
-                            <Skeleton className="h-32 w-full rounded-3xl" />
-                            <Skeleton className="h-32 w-full rounded-3xl" />
-                        </div>
-                        <div className="lg:col-span-4 space-y-6">
-                            <Skeleton className="h-32 w-full rounded-2xl" />
-                            <Skeleton className="h-32 w-full rounded-2xl" />
-                            <Skeleton className="h-32 w-full rounded-2xl" />
-                        </div>
-                    </div>
-                </Main>
-            </>
-        )
-    }
-
-    // ERROR STATE
-    if (isError) {
-        return (
-            <>
-                <Header className="bg-navy shadow-none relative">
-                    <TopNav links={topNav} className="[&>a]:text-slate-300 [&>a:hover]:text-white [&>a[aria-current='page']]:text-white" />
-                    <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
-                        <DynamicIsland />
-                    </div>
-                    <div className='ms-auto flex items-center space-x-4'>
-                        <div className="relative hidden md:block">
-                            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                            <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pr-9 pl-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
-                        </div>
-                        <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white">
-                            <Bell className="h-5 w-5" />
-                            <span className="absolute top-2 right-2 h-2 w-2 bg-red-500 rounded-full border border-navy"></span>
-                        </Button>
-                        <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white" />
-                        <ThemeSwitch className="text-slate-300 hover:bg-white/10 hover:text-white" />
-                        <ConfigDrawer className="text-slate-300 hover:bg-white/10 hover:text-white" />
-                        <ProfileDropdown className="text-slate-300 hover:bg-white/10 hover:text-white" />
-                    </div>
-                    <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-emerald-500/50 to-transparent"></div>
-                </Header>
-                <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8">
-                    <div className="bg-white rounded-3xl p-12 text-center border border-slate-100 shadow-sm">
-                        <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <AlertCircle className="h-8 w-8 text-red-500" />
-                        </div>
-                        <h3 className="text-xl font-bold text-slate-900 mb-2">فشل تحميل الفواتير</h3>
-                        <p className="text-slate-500 mb-6">{error?.message || 'حدث خطأ أثناء تحميل البيانات'}</p>
-                        <Button onClick={() => refetch()} className="bg-emerald-500 hover:bg-emerald-600 text-white px-8">
-                            <Loader2 className="ml-2 h-4 w-4" />
-                            إعادة المحاولة
-                        </Button>
-                    </div>
-                </Main>
-            </>
-        )
-    }
-
-
-
-    // SUCCESS STATE
     return (
         <>
             <Header className="bg-navy shadow-none relative">
@@ -280,371 +238,288 @@ export default function InvoicesDashboard() {
             </Header>
 
             <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-r border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
-                <div className="max-w-7xl mx-auto space-y-6">
 
-                    {/* Hero Section - New Design */}
-                    <ProductivityHero
-                        badge="الفواتير"
-                        title="إدارة الفواتير والمدفوعات"
-                        type="invoices"
-                        hideButtons={true}
-                        stats={[
-                            {
-                                label: "إجمالي المعلق",
-                                value: formatCurrency(stats.totalPending),
-                                icon: <AlertCircle className="w-4 h-4 text-amber-400" />,
-                                status: stats.totalPending > 0 ? 'attention' : 'normal'
-                            },
-                            {
-                                label: "إجمالي المتأخر",
-                                value: formatCurrency(stats.totalOverdue),
-                                icon: <AlertCircle className="w-4 h-4 text-rose-400" />,
-                                status: stats.totalOverdue > 0 ? 'attention' : 'normal'
-                            },
-                            {
-                                label: "مدفوعات هذا الشهر",
-                                value: formatCurrency(stats.totalPaidThisMonth),
-                                icon: <CheckCircle className="w-4 h-4 text-emerald-400" />,
-                                status: 'normal'
-                            }
-                        ]}
-                    >
-                        <div className="flex gap-3">
-                            <Button asChild className="bg-emerald-500 hover:bg-emerald-600 text-white h-10 px-5 rounded-xl font-bold shadow-lg shadow-emerald-500/20 border-0">
-                                <Link to="/dashboard/finance/invoices/new">
-                                    <Plus className="ml-2 h-4 w-4" />
-                                    فاتورة جديدة
-                                </Link>
-                            </Button>
-                            <Button variant="ghost" className="bg-white/10 text-white hover:bg-white/20 h-10 px-5 rounded-xl font-bold border-0 backdrop-blur-sm">
-                                <Download className="ml-2 h-4 w-4" />
-                                تصدير التقرير
-                            </Button>
-                        </div>
-                    </ProductivityHero>
+                {/* HERO CARD & STATS */}
+                <ProductivityHero badge="إدارة المالية" title="الفواتير" type="invoices" />
 
-                    {/* Main Content */}
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                {/* MAIN GRID LAYOUT */}
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
-                        {/* Invoices List */}
-                        <div className="lg:col-span-2 space-y-6">
-                            {filteredInvoices.length === 0 && !searchQuery && activeTab === 'all' ? (
-                                <div className="bg-white rounded-3xl p-12 text-center border border-slate-100 shadow-sm">
-                                    <div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                                        <FileText className="h-8 w-8 text-brand-blue" />
+                    {/* RIGHT COLUMN (Main Content) */}
+                    <div className="lg:col-span-2 space-y-6">
+
+                        {/* FILTERS BAR */}
+                        <div className="bg-white rounded-2xl p-4 shadow-sm border border-slate-100">
+                            <div className="flex flex-col gap-4">
+                                {/* Row 1: Search and primary filters */}
+                                <div className="flex flex-wrap items-center gap-3">
+                                    {/* Search Input */}
+                                    <div className="relative flex-1 min-w-[200px] max-w-md">
+                                        <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                                        <Input
+                                            type="text"
+                                            placeholder="بحث في الفواتير..."
+                                            value={searchQuery}
+                                            onChange={(e) => setSearchQuery(e.target.value)}
+                                            className="pr-10 h-10 rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500/20"
+                                        />
                                     </div>
-                                    <h3 className="text-xl font-bold text-slate-900 mb-2">لا توجد فواتير بعد</h3>
-                                    <p className="text-slate-500 mb-6">ابدأ بإنشاء أول فاتورة لعملائك</p>
-                                    <Button asChild className="bg-brand-blue hover:bg-blue-600 text-white px-8">
-                                        <Link to="/dashboard/finance/invoices/new">
-                                            <Plus className="ml-2 h-4 w-4" />
-                                            إنشاء فاتورة جديدة
-                                        </Link>
-                                    </Button>
-                                </div>
-                            ) : (
-                                <>
-                                    {/* Filters Bar */}
-                                    <div className="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 space-y-4">
-                                        <div className="flex flex-wrap items-center justify-between gap-4">
-                                            <Tabs value={activeTab} onValueChange={(v) => { setActiveTab(v); setCurrentPage(1); }} className="w-full md:w-auto">
-                                                <TabsList className="justify-start bg-slate-50 p-1 rounded-xl border border-slate-200 h-auto">
-                                                    <TabsTrigger
-                                                        value="all"
-                                                        className="rounded-lg px-4 py-2 data-[state=active]:bg-[#022c22] data-[state=active]:text-white transition-all duration-300"
-                                                    >
-                                                        الكل
-                                                    </TabsTrigger>
-                                                    <TabsTrigger
-                                                        value="pending"
-                                                        className="rounded-lg px-4 py-2 data-[state=active]:bg-amber-500 data-[state=active]:text-white transition-all duration-300"
-                                                    >
-                                                        معلقة
-                                                    </TabsTrigger>
-                                                    <TabsTrigger
-                                                        value="paid"
-                                                        className="rounded-lg px-4 py-2 data-[state=active]:bg-emerald-600 data-[state=active]:text-white transition-all duration-300"
-                                                    >
-                                                        مدفوعة
-                                                    </TabsTrigger>
-                                                    <TabsTrigger
-                                                        value="overdue"
-                                                        className="rounded-lg px-4 py-2 data-[state=active]:bg-red-500 data-[state=active]:text-white transition-all duration-300"
-                                                    >
-                                                        متأخرة
-                                                    </TabsTrigger>
-                                                </TabsList>
-                                            </Tabs>
 
-                                            <div className="flex items-center gap-3">
-                                                <div className="relative w-full max-w-xs">
-                                                    <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                                                    <Input
-                                                        placeholder="بحث في الفواتير..."
-                                                        className="pr-10 rounded-xl border-slate-200 focus:ring-[#022c22] focus:border-[#022c22]"
-                                                        value={searchQuery}
-                                                        onChange={(e) => setSearchQuery(e.target.value)}
-                                                    />
+                                    {/* Status Filter */}
+                                    <Select value={activeStatusTab} onValueChange={setActiveStatusTab}>
+                                        <SelectTrigger className="w-[130px] h-10 rounded-xl border-slate-200">
+                                            <SelectValue placeholder="الحالة" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="all">الكل</SelectItem>
+                                            <SelectItem value="pending">معلقة</SelectItem>
+                                            <SelectItem value="paid">مدفوعة</SelectItem>
+                                            <SelectItem value="overdue">متأخرة</SelectItem>
+                                            <SelectItem value="draft">مسودة</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+
+                                    {/* Client Filter */}
+                                    <Select value={clientFilter} onValueChange={setClientFilter}>
+                                        <SelectTrigger className="w-[150px] h-10 rounded-xl border-slate-200">
+                                            <SelectValue placeholder="العميل" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="all">كل العملاء</SelectItem>
+                                            {clientsData?.data?.map((client: any) => (
+                                                <SelectItem key={client._id} value={client._id}>
+                                                    {client.fullName || client.name}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+
+                                    {/* Sort By */}
+                                    <Select value={sortBy} onValueChange={setSortBy}>
+                                        <SelectTrigger className="w-[160px] h-10 rounded-xl border-slate-200">
+                                            <SelectValue placeholder="ترتيب حسب" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="dueDate">تاريخ الاستحقاق</SelectItem>
+                                            <SelectItem value="issueDate">تاريخ الإصدار</SelectItem>
+                                            <SelectItem value="amount">المبلغ</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+
+                                    {/* Clear Filters Button */}
+                                    {hasActiveFilters && (
+                                        <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            onClick={clearFilters}
+                                            className="h-10 px-4 text-red-500 hover:text-red-600 hover:bg-red-50 rounded-xl"
+                                        >
+                                            <X className="h-4 w-4 ml-2" />
+                                            مسح الفلاتر
+                                        </Button>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* MAIN INVOICES LIST */}
+                        <div className="bg-white rounded-3xl p-1 shadow-sm border border-slate-100">
+                            <div className="p-6 pb-2 flex justify-between items-center">
+                                <h3 className="font-bold text-navy text-xl">
+                                    {activeStatusTab === 'all' ? 'جميع الفواتير' :
+                                        activeStatusTab === 'paid' ? 'الفواتير المدفوعة' :
+                                            activeStatusTab === 'overdue' ? 'الفواتير المتأخرة' :
+                                                activeStatusTab === 'pending' ? 'الفواتير المعلقة' : 'الفواتير'}
+                                </h3>
+                                <Badge className="bg-slate-100 text-slate-600 border-0 rounded-full px-4 py-1">
+                                    {filteredInvoices.length} فاتورة
+                                </Badge>
+                            </div>
+
+                            <div className="p-4 space-y-4">
+                                {/* Loading State */}
+                                {isLoading && (
+                                    <>
+                                        {[1, 2, 3].map((i) => (
+                                            <div key={i} className="bg-[#F8F9FA] rounded-2xl p-6 border border-slate-100">
+                                                <div className="flex gap-4 mb-4">
+                                                    <Skeleton className="w-12 h-12 rounded-xl" />
+                                                    <div className="flex-1 space-y-2">
+                                                        <Skeleton className="h-6 w-3/4" />
+                                                        <Skeleton className="h-4 w-1/2" />
+                                                    </div>
                                                 </div>
-                                                <Popover open={showFilters} onOpenChange={setShowFilters}>
-                                                    <PopoverTrigger asChild>
-                                                        <Button variant="outline" className="rounded-xl border-slate-200 relative">
-                                                            <Filter className="w-4 h-4 ml-2" />
-                                                            تصفية متقدمة
-                                                            {activeFilterCount > 0 && (
-                                                                <Badge className="absolute -top-2 -left-2 h-5 w-5 p-0 flex items-center justify-center bg-brand-blue text-white text-xs">
-                                                                    {activeFilterCount}
-                                                                </Badge>
-                                                            )}
-                                                        </Button>
-                                                    </PopoverTrigger>
-                                                    <PopoverContent className="w-80" align="end">
-                                                        <div className="space-y-4">
-                                                            <div className="flex items-center justify-between">
-                                                                <h4 className="font-bold text-navy">تصفية متقدمة</h4>
-                                                                {activeFilterCount > 0 && (
-                                                                    <Button variant="ghost" size="sm" onClick={clearFilters} className="text-slate-500 hover:text-red-500">
-                                                                        <X className="w-4 h-4 ml-1" />
-                                                                        مسح
-                                                                    </Button>
-                                                                )}
-                                                            </div>
-                                                            <div className="space-y-2">
-                                                                <label className="text-sm font-medium text-slate-700">العميل</label>
-                                                                <Select value={selectedClient} onValueChange={setSelectedClient}>
-                                                                    <SelectTrigger className="rounded-xl">
-                                                                        <SelectValue placeholder="جميع العملاء" />
-                                                                    </SelectTrigger>
-                                                                    <SelectContent>
-                                                                        <SelectItem value="all">جميع العملاء</SelectItem>
-                                                                        {clientsData?.data?.map((client: any) => (
-                                                                            <SelectItem key={client._id} value={client._id}>
-                                                                                {client.fullName || client.name}
-                                                                            </SelectItem>
-                                                                        ))}
-                                                                    </SelectContent>
-                                                                </Select>
-                                                            </div>
-                                                            <div className="grid grid-cols-2 gap-3">
-                                                                <div className="space-y-2">
-                                                                    <label className="text-sm font-medium text-slate-700 flex items-center gap-1">
-                                                                        <Calendar className="w-3 h-3" />
-                                                                        من تاريخ
-                                                                    </label>
-                                                                    <Input
-                                                                        type="date"
-                                                                        value={startDate}
-                                                                        onChange={(e) => setStartDate(e.target.value)}
-                                                                        className="rounded-xl"
-                                                                    />
-                                                                </div>
-                                                                <div className="space-y-2">
-                                                                    <label className="text-sm font-medium text-slate-700 flex items-center gap-1">
-                                                                        <Calendar className="w-3 h-3" />
-                                                                        إلى تاريخ
-                                                                    </label>
-                                                                    <Input
-                                                                        type="date"
-                                                                        value={endDate}
-                                                                        onChange={(e) => setEndDate(e.target.value)}
-                                                                        className="rounded-xl"
-                                                                    />
-                                                                </div>
-                                                            </div>
-                                                            <div className="pt-2 border-t border-slate-100 flex gap-2">
-                                                                <Button
-                                                                    variant="outline"
-                                                                    size="sm"
-                                                                    onClick={() => handleExport('csv')}
-                                                                    disabled={isExporting}
-                                                                    className="flex-1 rounded-xl"
-                                                                >
-                                                                    <Download className="w-4 h-4 ml-1" />
-                                                                    CSV
-                                                                </Button>
-                                                                <Button
-                                                                    variant="outline"
-                                                                    size="sm"
-                                                                    onClick={() => handleExport('pdf')}
-                                                                    disabled={isExporting}
-                                                                    className="flex-1 rounded-xl"
-                                                                >
-                                                                    <Download className="w-4 h-4 ml-1" />
-                                                                    PDF
-                                                                </Button>
-                                                            </div>
-                                                        </div>
-                                                    </PopoverContent>
-                                                </Popover>
+                                                <Skeleton className="h-20 w-full" />
+                                            </div>
+                                        ))}
+                                    </>
+                                )}
+
+                                {/* Error State */}
+                                {isError && (
+                                    <div className="bg-white rounded-2xl p-12 border border-slate-100 text-center">
+                                        <div className="flex justify-center mb-4">
+                                            <div className="w-16 h-16 rounded-full bg-red-50 flex items-center justify-center">
+                                                <AlertCircle className="w-8 h-8 text-red-500" />
                                             </div>
                                         </div>
-
-                                        {/* Active Filters Display */}
-                                        {activeFilterCount > 0 && (
-                                            <div className="flex items-center gap-2 flex-wrap">
-                                                <span className="text-sm text-slate-500">الفلاتر النشطة:</span>
-                                                {selectedClient && selectedClient !== 'all' && (
-                                                    <Badge variant="outline" className="bg-blue-50 border-blue-200 text-blue-700 gap-1">
-                                                        العميل
-                                                        <X className="w-3 h-3 cursor-pointer" onClick={() => setSelectedClient('')} />
-                                                    </Badge>
-                                                )}
-                                                {startDate && (
-                                                    <Badge variant="outline" className="bg-purple-50 border-purple-200 text-purple-700 gap-1">
-                                                        من: {new Date(startDate).toLocaleDateString('ar-SA')}
-                                                        <X className="w-3 h-3 cursor-pointer" onClick={() => setStartDate('')} />
-                                                    </Badge>
-                                                )}
-                                                {endDate && (
-                                                    <Badge variant="outline" className="bg-purple-50 border-purple-200 text-purple-700 gap-1">
-                                                        إلى: {new Date(endDate).toLocaleDateString('ar-SA')}
-                                                        <X className="w-3 h-3 cursor-pointer" onClick={() => setEndDate('')} />
-                                                    </Badge>
-                                                )}
-                                            </div>
-                                        )}
+                                        <h3 className="text-lg font-bold text-slate-900 mb-2">حدث خطأ أثناء تحميل الفواتير</h3>
+                                        <p className="text-slate-500 mb-4">{error?.message || 'تعذر الاتصال بالخادم'}</p>
+                                        <Button onClick={() => refetch()} className="bg-emerald-500 hover:bg-emerald-600">
+                                            إعادة المحاولة
+                                        </Button>
                                     </div>
+                                )}
 
-                                    {/* List Items */}
-                                    <div className="space-y-4">
-                                        {filteredInvoices.length === 0 ? (
-                                            <div className="bg-white p-12 rounded-3xl text-center border border-slate-100">
-                                                <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                                                    <Search className="h-8 w-8 text-slate-400" />
-                                                </div>
-                                                <h3 className="text-lg font-bold text-slate-900 mb-2">لا توجد نتائج</h3>
-                                                <p className="text-slate-500 mb-4">لم نجد فواتير تطابق البحث أو الفلاتر المحددة</p>
-                                                <Button
-                                                    variant="outline"
-                                                    onClick={() => {
-                                                        setSearchQuery('')
-                                                        setActiveTab('all')
-                                                    }}
-                                                    className="border-slate-200 hover:bg-slate-50"
-                                                >
-                                                    مسح الفلاتر
-                                                </Button>
+                                {/* Empty State */}
+                                {!isLoading && !isError && filteredInvoices.length === 0 && (
+                                    <div className="bg-white rounded-2xl p-12 border border-slate-100 text-center">
+                                        <div className="flex justify-center mb-4">
+                                            <div className="w-16 h-16 rounded-full bg-emerald-50 flex items-center justify-center">
+                                                <FileText className="w-8 h-8 text-emerald-500" />
                                             </div>
-                                        ) : filteredInvoices.map((inv) => (
-                                            <div key={inv.id} className="bg-white p-6 rounded-[24px] border border-slate-100 shadow-sm hover:shadow-md transition-all flex flex-col md:flex-row md:items-center justify-between gap-4">
-                                                <div className="flex items-center gap-4">
-                                                    <div className="w-14 h-14 rounded-2xl bg-blue-50 flex items-center justify-center text-brand-blue">
-                                                        <FileText className="w-7 h-7" />
+                                        </div>
+                                        <h3 className="text-lg font-bold text-slate-900 mb-2">لا توجد فواتير</h3>
+                                        <p className="text-slate-500 mb-4">ابدأ بإنشاء فاتورة جديدة</p>
+                                        <Button asChild className="bg-emerald-500 hover:bg-emerald-600">
+                                            <Link to="/dashboard/finance/invoices/new">
+                                                <Plus className="w-4 h-4 ml-2" />
+                                                فاتورة جديدة
+                                            </Link>
+                                        </Button>
+                                    </div>
+                                )}
+
+                                {/* Success State - Invoices List */}
+                                {!isLoading && !isError && filteredInvoices.map((invoice) => {
+                                    const statusConfig = getStatusConfig(invoice.status)
+                                    return (
+                                        <div key={invoice.id} className={`bg-[#F8F9FA] rounded-2xl p-6 border transition-all group ${selectedIds.includes(invoice.id) ? 'border-emerald-500 bg-emerald-50/30' : 'border-slate-100 hover:border-emerald-200'}`}>
+                                            <div className="flex justify-between items-start mb-4">
+                                                <div className="flex gap-4 items-center">
+                                                    {isSelectionMode && (
+                                                        <Checkbox
+                                                            checked={selectedIds.includes(invoice.id)}
+                                                            onCheckedChange={() => handleSelectItem(invoice.id)}
+                                                            className="h-6 w-6 rounded-md border-slate-300 data-[state=checked]:bg-emerald-500 data-[state=checked]:border-emerald-500"
+                                                        />
+                                                    )}
+                                                    <div className="w-12 h-12 rounded-xl bg-white flex items-center justify-center shadow-sm text-emerald-600">
+                                                        <FileText className="h-6 w-6" />
                                                     </div>
                                                     <div>
                                                         <div className="flex items-center gap-2 mb-1">
-                                                            <h4 className="font-bold text-navy text-lg">{inv.id}</h4>
-                                                            <Badge className={`
-                                                        ${inv.status === 'paid' ? 'bg-emerald-100 text-emerald-700' :
-                                                                    inv.status === 'overdue' ? 'bg-rose-100 text-rose-700' :
-                                                                        inv.status === 'cancelled' ? 'bg-slate-100 text-slate-700' :
-                                                                            inv.status === 'draft' ? 'bg-slate-100 text-slate-600' :
-                                                                                inv.status === 'partial' ? 'bg-blue-100 text-blue-700' :
-                                                                                    'bg-amber-100 text-amber-700'}
-                                                        border-0 px-2 py-0.5
-                                                    `}>
-                                                                {inv.status === 'paid' ? 'مدفوعة' :
-                                                                    inv.status === 'overdue' ? 'متأخرة' :
-                                                                        inv.status === 'cancelled' ? 'ملغاة' :
-                                                                            inv.status === 'draft' ? 'مسودة' :
-                                                                                inv.status === 'partial' ? 'مدفوعة جزئياً' :
-                                                                                    inv.status === 'sent' ? 'مرسلة' : 'معلقة'}
+                                                            <h4 className="font-bold text-navy text-lg">{invoice.invoiceNumber}</h4>
+                                                            <Badge className={`${statusConfig.bg} ${statusConfig.text} border-0 rounded-md px-2`}>
+                                                                {statusConfig.label}
                                                             </Badge>
                                                         </div>
-                                                        <p className="text-slate-500 font-medium">{inv.client}</p>
+                                                        <p className="text-slate-500 text-sm">العميل: {invoice.client}</p>
                                                     </div>
                                                 </div>
-                                                <div className="flex items-center gap-8 border-t md:border-t-0 border-slate-100 pt-4 md:pt-0">
-                                                    <div className="text-center md:text-right">
-                                                        <div className="text-xs text-slate-400 mb-1">تاريخ الاستحقاق</div>
-                                                        <div className="font-bold text-navy">{inv.dueDate}</div>
-                                                    </div>
-                                                    <div className="text-center md:text-right">
-                                                        <div className="text-xs text-slate-400 mb-1">المبلغ</div>
-                                                        <div className="font-bold text-xl text-navy">{formatCurrency(inv.amount)}</div>
-                                                    </div>
-                                                    <DropdownMenu>
-                                                        <DropdownMenuTrigger asChild>
-                                                            <Button variant="ghost" size="icon" className="rounded-full hover:bg-slate-50">
-                                                                <MoreHorizontal className="w-5 h-5 text-slate-400" />
-                                                            </Button>
-                                                        </DropdownMenuTrigger>
-                                                        <DropdownMenuContent align="end">
-                                                            <DropdownMenuItem asChild>
-                                                                <Link to="/dashboard/finance/invoices/$invoiceId" params={{ invoiceId: inv._id }}>
-                                                                    عرض الفاتورة
-                                                                </Link>
-                                                            </DropdownMenuItem>
-                                                            <DropdownMenuItem>تحميل PDF</DropdownMenuItem>
-                                                            <DropdownMenuItem>إرسال تذكير</DropdownMenuItem>
-                                                        </DropdownMenuContent>
-                                                    </DropdownMenu>
-                                                </div>
-                                            </div>
-                                        ))}
-                                    </div>
-
-                                    {/* Pagination */}
-                                    {filteredInvoices.length > 0 && (
-                                        <div className="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex flex-wrap items-center justify-between gap-4">
-                                            <div className="flex items-center gap-2">
-                                                <span className="text-sm text-slate-500">عرض</span>
-                                                <Select value={itemsPerPage.toString()} onValueChange={(v) => { setItemsPerPage(parseInt(v)); setCurrentPage(1); }}>
-                                                    <SelectTrigger className="w-[70px] h-9 rounded-lg">
-                                                        <SelectValue />
-                                                    </SelectTrigger>
-                                                    <SelectContent>
-                                                        <SelectItem value="5">5</SelectItem>
-                                                        <SelectItem value="10">10</SelectItem>
-                                                        <SelectItem value="20">20</SelectItem>
-                                                        <SelectItem value="50">50</SelectItem>
-                                                    </SelectContent>
-                                                </Select>
-                                                <span className="text-sm text-slate-500">من {invoicesData?.total || filteredInvoices.length} فاتورة</span>
-                                            </div>
-                                            <div className="flex items-center gap-2">
-                                                <Button
-                                                    variant="outline"
-                                                    size="icon"
-                                                    onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-                                                    disabled={currentPage === 1}
-                                                    className="rounded-lg h-9 w-9"
-                                                >
-                                                    <ChevronRight className="w-4 h-4" />
-                                                </Button>
-                                                <div className="flex items-center gap-1">
-                                                    {Array.from({ length: Math.min(5, Math.ceil((invoicesData?.total || filteredInvoices.length) / itemsPerPage)) }, (_, i) => i + 1).map((page) => (
-                                                        <Button
-                                                            key={page}
-                                                            variant={currentPage === page ? "default" : "outline"}
-                                                            size="icon"
-                                                            onClick={() => setCurrentPage(page)}
-                                                            className={`rounded-lg h-9 w-9 ${currentPage === page ? 'bg-brand-blue text-white' : ''}`}
-                                                        >
-                                                            {page}
+                                                <DropdownMenu>
+                                                    <DropdownMenuTrigger asChild>
+                                                        <Button variant="ghost" size="icon" className="text-slate-400 hover:text-navy">
+                                                            <MoreHorizontal className="h-5 w-5" />
                                                         </Button>
-                                                    ))}
+                                                    </DropdownMenuTrigger>
+                                                    <DropdownMenuContent align="end" className="w-48">
+                                                        <DropdownMenuItem onClick={() => handleEditInvoice(invoice.id)}>
+                                                            <Edit3 className="h-4 w-4 ml-2 text-blue-500" />
+                                                            تعديل الفاتورة
+                                                        </DropdownMenuItem>
+                                                        <DropdownMenuItem onClick={() => handleViewInvoice(invoice.id)}>
+                                                            <Eye className="h-4 w-4 ml-2" />
+                                                            عرض التفاصيل
+                                                        </DropdownMenuItem>
+                                                        <DropdownMenuItem>
+                                                            <Download className="h-4 w-4 ml-2" />
+                                                            تحميل PDF
+                                                        </DropdownMenuItem>
+                                                        <DropdownMenuSeparator />
+                                                        <DropdownMenuItem
+                                                            onClick={() => handleDeleteInvoice(invoice.id)}
+                                                            className="text-red-600 focus:text-red-600"
+                                                        >
+                                                            <Trash2 className="h-4 w-4 ml-2" />
+                                                            حذف الفاتورة
+                                                        </DropdownMenuItem>
+                                                    </DropdownMenuContent>
+                                                </DropdownMenu>
+                                            </div>
+
+                                            <div className="flex items-center justify-between pt-4 border-t border-slate-200/50">
+                                                <div className="flex items-center gap-4">
+                                                    {/* Amount */}
+                                                    <div className="text-center">
+                                                        <div className="text-xs text-slate-400 mb-1">المبلغ</div>
+                                                        <div className="font-bold text-navy text-lg">{formatCurrency(invoice.amount)}</div>
+                                                    </div>
+                                                    {/* Due Date - Dual Language */}
+                                                    <div className="text-center">
+                                                        <div className="text-xs text-slate-400 mb-1">تاريخ الاستحقاق</div>
+                                                        <div className="font-bold text-navy text-sm">{invoice.dueDateFormatted.arabic}</div>
+                                                        <div className="text-xs text-slate-400">{invoice.dueDateFormatted.english}</div>
+                                                    </div>
+                                                    {/* Issue Date - Dual Language */}
+                                                    <div className="text-center">
+                                                        <div className="text-xs text-slate-400 mb-1">تاريخ الإصدار</div>
+                                                        <div className="font-bold text-slate-600 text-sm">{invoice.issueDateFormatted.arabic}</div>
+                                                        <div className="text-xs text-slate-400">{invoice.issueDateFormatted.english}</div>
+                                                    </div>
                                                 </div>
                                                 <Button
-                                                    variant="outline"
-                                                    size="icon"
-                                                    onClick={() => setCurrentPage(p => p + 1)}
-                                                    disabled={currentPage >= Math.ceil((invoicesData?.total || filteredInvoices.length) / itemsPerPage)}
-                                                    className="rounded-lg h-9 w-9"
+                                                    onClick={() => handleViewInvoice(invoice.id)}
+                                                    className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg px-6 shadow-lg shadow-emerald-500/20"
                                                 >
-                                                    <ChevronLeft className="w-4 h-4" />
+                                                    عرض التفاصيل
                                                 </Button>
                                             </div>
                                         </div>
-                                    )}
-                                </>
+                                    )
+                                })}
+                            </div>
+
+                            {/* Pagination */}
+                            {filteredInvoices.length > 0 && (
+                                <div className="p-4 pt-0 flex items-center justify-between">
+                                    <span className="text-sm text-slate-500">
+                                        عرض {filteredInvoices.length} من {invoicesData?.total || filteredInvoices.length} فاتورة
+                                    </span>
+                                    <div className="flex items-center gap-2">
+                                        <Button
+                                            variant="outline"
+                                            size="icon"
+                                            onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                                            disabled={currentPage === 1}
+                                            className="rounded-lg h-9 w-9"
+                                        >
+                                            <ChevronRight className="w-4 h-4" />
+                                        </Button>
+                                        <span className="text-sm text-slate-600 px-2">{currentPage}</span>
+                                        <Button
+                                            variant="outline"
+                                            size="icon"
+                                            onClick={() => setCurrentPage(p => p + 1)}
+                                            disabled={currentPage >= Math.ceil((invoicesData?.total || filteredInvoices.length) / itemsPerPage)}
+                                            className="rounded-lg h-9 w-9"
+                                        >
+                                            <ChevronLeft className="w-4 h-4" />
+                                        </Button>
+                                    </div>
+                                </div>
                             )}
                         </div>
-
-                        {/* Sidebar */}
-                        <FinanceSidebar context="invoices" />
-
                     </div>
+
+                    {/* LEFT COLUMN (Widgets) */}
+                    <FinanceSidebar
+                        context="invoices"
+                        isSelectionMode={isSelectionMode}
+                        onToggleSelectionMode={handleToggleSelectionMode}
+                        selectedCount={selectedIds.length}
+                        onDeleteSelected={handleDeleteSelected}
+                    />
                 </div>
             </Main>
         </>
