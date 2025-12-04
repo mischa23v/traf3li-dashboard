@@ -124,8 +124,7 @@ export function LeaveDetail() {
                 </div>
             </DynamicIsland>
 
-            <Main className="bg-[#f8f9fa] min-h-screen">
-                <div className="bg-[#022c22] rounded-tr-3xl min-h-screen -mt-4 -mr-4 -ml-4 p-6">
+            <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-r border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
                     {isLoading ? (
                         <LeaveDetailSkeleton />
                     ) : error || !leave ? (
@@ -144,30 +143,31 @@ export function LeaveDetail() {
                                 badge="الموارد البشرية"
                                 title={`طلب إجازة ${leaveTypeConfig[leave.leaveType]?.label}`}
                                 type="hr"
+                                listMode={true}
                                 hideButtons={true}
                                 stats={[
                                     {
                                         label: "تاريخ البداية",
                                         value: format(parseISO(leave.startDate), 'd MMM yyyy', { locale: ar }),
-                                        icon: <Calendar className="w-4 h-4 text-blue-400" />,
+                                        icon: Calendar,
                                         status: 'normal'
                                     },
                                     {
                                         label: "تاريخ النهاية",
                                         value: format(parseISO(leave.endDate), 'd MMM yyyy', { locale: ar }),
-                                        icon: <Calendar className="w-4 h-4 text-purple-400" />,
+                                        icon: Calendar,
                                         status: 'normal'
                                     },
                                     {
                                         label: "عدد الأيام",
                                         value: `${differenceInDays(parseISO(leave.endDate), parseISO(leave.startDate)) + 1} يوم`,
-                                        icon: <Clock className="w-4 h-4 text-amber-400" />,
+                                        icon: Clock,
                                         status: 'normal'
                                     },
                                     {
                                         label: "نوع الإجازة",
                                         value: leaveTypeConfig[leave.leaveType]?.label,
-                                        icon: <FileText className="w-4 h-4 text-emerald-400" />,
+                                        icon: FileText,
                                         status: 'normal'
                                     }
                                 ]}
@@ -221,7 +221,7 @@ export function LeaveDetail() {
                             </ProductivityHero>
 
                             {/* Main content grid */}
-                            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
+                            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                                 <div className="lg:col-span-2 space-y-6">
                                     <Card className="bg-white rounded-2xl border-0 shadow-lg">
                                         <CardHeader>
@@ -280,7 +280,6 @@ export function LeaveDetail() {
                             </div>
                         </>
                     )}
-                </div>
             </Main>
 
             <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>

@@ -181,8 +181,12 @@ export function PipelineView() {
           </div>
         </ProductivityHero>
 
-        {/* Pipeline Board */}
-        {isLoading ? (
+        {/* MAIN GRID LAYOUT */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* MAIN CONTENT */}
+          <div className="lg:col-span-2">
+            {/* Pipeline Board */}
+            {isLoading ? (
           <div className="flex gap-4 overflow-x-auto pb-4">
             {[1, 2, 3, 4, 5].map((i) => (
               <div key={i} className="flex-shrink-0 w-80">
@@ -354,8 +358,13 @@ export function PipelineView() {
                 </div>
               )
             })}
+            </div>
+          )}
           </div>
-        )}
+
+          {/* SIDEBAR */}
+          <CrmSidebar />
+        </div>
       </Main>
     </>
   )

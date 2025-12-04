@@ -80,7 +80,7 @@ export function CreateOrganizationView() {
 
             <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-r border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
                 {/* HERO CARD - Full width */}
-                <ProductivityHero badge="العملاء والتواصل" title="إضافة منظمة جديدة" type="organizations" hideButtons={true} />
+                <ProductivityHero badge="المنظمات" title="إنشاء منظمة" type="organizations" listMode={true} />
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     {/* Main Form Content */}

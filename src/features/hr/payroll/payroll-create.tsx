@@ -105,15 +105,15 @@ export function PayrollCreate() {
                 </div>
             </DynamicIsland>
 
-            <Main className="bg-[#f8f9fa] min-h-screen">
-                <div className="bg-[#022c22] rounded-tr-3xl min-h-screen -mt-4 -mr-4 -ml-4 p-6">
-                    {/* Hero Card */}
-                    <ProductivityHero
-                        badge="الموارد البشرية"
-                        title="إنشاء مسير رواتب"
-                        type="hr"
-                        hideButtons={true}
-                    >
+            <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-r border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
+                {/* Hero Card */}
+                <ProductivityHero
+                    badge="الموارد البشرية"
+                    title="إنشاء مسير رواتب"
+                    type="hr"
+                    listMode={true}
+                    hideButtons={true}
+                >
                         <Link to="/dashboard/hr/payroll">
                             <Button variant="ghost" size="icon" className="rounded-full bg-white/10 hover:bg-white/20 text-white">
                                 <ArrowRight className="w-5 h-5" />
@@ -121,9 +121,9 @@ export function PayrollCreate() {
                         </Link>
                     </ProductivityHero>
 
-                    {/* Main content grid */}
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
-                        <div className="lg:col-span-2">
+                {/* Main content grid */}
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <div className="lg:col-span-2">
                             <form onSubmit={handleSubmit} className="space-y-6">
                                 <div className="bg-white rounded-2xl p-6 shadow-lg">
                                     <h3 className="text-lg font-semibold flex items-center gap-2 mb-6">
@@ -240,10 +240,7 @@ export function PayrollCreate() {
                             </form>
                         </div>
 
-                        <div className="lg:col-span-1">
-                            <HRSidebar context="payroll" />
-                        </div>
-                    </div>
+                    <HRSidebar context="payroll" />
                 </div>
             </Main>
         </>

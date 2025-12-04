@@ -236,18 +236,18 @@ export function CreateLeadView() {
       </Header>
 
       <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-r border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
+        {/* HERO CARD */}
+        <ProductivityHero badge="إدارة العملاء المحتملين" title="إضافة عميل محتمل جديد" type="leads" listMode={true} hideButtons={true}>
+          <Link to="/dashboard/crm/leads">
+            <Button variant="ghost" size="icon" className="rounded-full bg-white/10 hover:bg-white/20 text-white">
+              <ArrowRight className="w-5 h-5" />
+            </Button>
+          </Link>
+        </ProductivityHero>
+
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
           {/* RIGHT COLUMN (Main Content) */}
           <div className="lg:col-span-2 space-y-8">
-
-            {/* HERO CARD */}
-            <ProductivityHero badge="إدارة العملاء المحتملين" title="إضافة عميل محتمل جديد" type="leads" hideButtons={true}>
-              <Link to="/dashboard/crm/leads">
-                <Button variant="ghost" size="icon" className="rounded-full bg-white/10 hover:bg-white/20 text-white">
-                  <ArrowRight className="w-5 h-5" />
-                </Button>
-              </Link>
-            </ProductivityHero>
 
             {/* Form Card */}
             <div className="bg-white rounded-3xl p-8 shadow-sm border border-slate-100">

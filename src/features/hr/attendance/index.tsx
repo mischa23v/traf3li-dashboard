@@ -184,25 +184,25 @@ export function AttendancePage() {
             {
                 label: "حاضر اليوم",
                 value: presentToday,
-                icon: <CheckCircle className="w-4 h-4 text-emerald-400" />,
+                icon: CheckCircle,
                 status: 'normal'
             },
             {
                 label: "غائب اليوم",
                 value: absentToday,
-                icon: <XCircle className="w-4 h-4 text-red-400" />,
+                icon: XCircle,
                 status: 'attention'
             },
             {
                 label: "متأخر اليوم",
                 value: lateToday,
-                icon: <Clock className="w-4 h-4 text-amber-400" />,
+                icon: Clock,
                 status: 'normal'
             },
             {
                 label: "إجمالي السجلات",
                 value: records.length,
-                icon: <Calendar className="w-4 h-4 text-blue-400" />,
+                icon: Calendar,
                 status: 'normal'
             }
         ]
@@ -279,16 +279,15 @@ export function AttendancePage() {
                 </div>
             </DynamicIsland>
 
-            <Main className="bg-[#f8f9fa] min-h-screen">
-                <div className="bg-[#022c22] rounded-tr-3xl min-h-screen -mt-4 -mr-4 -ml-4 p-6">
-                    {/* Hero Card */}
-                    <ProductivityHero
-                        badge="الموارد البشرية"
-                        title="الحضور والانصراف"
-                        type="hr"
-                        stats={stats}
-                        hideButtons={true}
-                    >
+            <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-r border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
+                {/* Hero Card */}
+                <ProductivityHero
+                    badge="الموارد البشرية"
+                    title="الحضور والانصراف"
+                    type="hr"
+                    stats={stats}
+                    hideButtons={true}
+                >
                         <div className="flex flex-col gap-4 w-full">
                             <div className="flex items-center gap-4 mb-4">
                                 <Link to="/dashboard">
@@ -343,10 +342,10 @@ export function AttendancePage() {
                                 </Link>
                             </div>
                         </div>
-                    </ProductivityHero>
+                </ProductivityHero>
 
-                    {/* Main content grid */}
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
+                {/* Main content grid */}
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                         {/* Attendance list - 2/3 width */}
                         <div className="lg:col-span-2 space-y-4">
                             {isLoading ? (
@@ -398,7 +397,6 @@ export function AttendancePage() {
                                 selectedCount={selectedRecords.size}
                                 onDeleteSelected={handleDeleteSelected}
                             />
-                        </div>
                     </div>
                 </div>
             </Main>

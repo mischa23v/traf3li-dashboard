@@ -131,8 +131,7 @@ export function EmployeeDetail() {
                 </div>
             </DynamicIsland>
 
-            <Main className="bg-[#f8f9fa] min-h-screen">
-                <div className="bg-[#022c22] rounded-tr-3xl min-h-screen -mt-4 -mr-4 -ml-4 p-6">
+            <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-r border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
                     {isLoading ? (
                         <EmployeeDetailSkeleton />
                     ) : error || !employee ? (
@@ -151,30 +150,31 @@ export function EmployeeDetail() {
                                 badge="الموارد البشرية"
                                 title={`${employee.firstName} ${employee.lastName}`}
                                 type="hr"
+                                listMode={true}
                                 hideButtons={true}
                                 stats={[
                                     {
                                         label: "القسم",
                                         value: employee.department,
-                                        icon: <Building2 className="w-4 h-4 text-emerald-400" />,
+                                        icon: Building2,
                                         status: 'normal'
                                     },
                                     {
                                         label: "تاريخ التعيين",
                                         value: employee.hireDate ? format(parseISO(employee.hireDate), 'd MMM yyyy', { locale: ar }) : '-',
-                                        icon: <Calendar className="w-4 h-4 text-blue-400" />,
+                                        icon: Calendar,
                                         status: 'normal'
                                     },
                                     {
                                         label: "الراتب الأساسي",
                                         value: formatCurrency(employee.baseSalary || 0),
-                                        icon: <DollarSign className="w-4 h-4 text-amber-400" />,
+                                        icon: DollarSign,
                                         status: 'normal'
                                     },
                                     {
                                         label: "رصيد الإجازات",
                                         value: `${employee.annualLeaveBalance || 0} يوم`,
-                                        icon: <Clock className="w-4 h-4 text-purple-400" />,
+                                        icon: Clock,
                                         status: 'normal'
                                     }
                                 ]}
@@ -244,7 +244,7 @@ export function EmployeeDetail() {
                             </ProductivityHero>
 
                             {/* Main content grid */}
-                            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
+                            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                                 <div className="lg:col-span-2">
                                     <Tabs defaultValue="info" className="w-full">
                                         <TabsList className="bg-white/10 rounded-xl p-1 mb-4">
@@ -394,13 +394,12 @@ export function EmployeeDetail() {
                                     </Tabs>
                                 </div>
 
-                                <div className="lg:col-span-1">
+                                <div>
                                     <HRSidebar context="employees" />
                                 </div>
                             </div>
                         </>
                     )}
-                </div>
             </Main>
 
             <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>

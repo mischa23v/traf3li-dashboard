@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import {
   FileText, Search, Download, ExternalLink, Calendar,
   Bookmark, Eye, FolderOpen, File, FileSpreadsheet,
-  FileImage, Plus, Bell
+  Bell
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -11,9 +11,6 @@ import { Badge } from '@/components/ui/badge'
 import {
   Card,
   CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
 } from '@/components/ui/card'
 import {
   Select,
@@ -31,6 +28,7 @@ import { ProfileDropdown } from '@/components/profile-dropdown'
 import { LanguageSwitcher } from '@/components/language-switcher'
 import { DynamicIsland } from '@/components/dynamic-island'
 import { KnowledgeSidebar } from './knowledge-sidebar'
+import { ProductivityHero } from '@/components/productivity-hero'
 
 // Mock forms data
 const mockForms = [
@@ -241,33 +239,18 @@ export function FormsView() {
         fluid={true}
         className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-r border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']"
       >
-        {/* HERO BANNER */}
-        <div className="bg-navy rounded-3xl p-8 relative overflow-hidden text-white shadow-xl shadow-navy/20 group">
-          <div className="absolute -bottom-32 -left-32 w-96 h-96 bg-brand-blue rounded-full blur-[120px] opacity-40 group-hover:opacity-50 transition-opacity duration-700"></div>
-          <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
-            <div>
-              <div className="flex items-center gap-2 mb-2">
-                <Badge className="bg-blue-500/20 text-blue-100 hover:bg-blue-500/30 border-0 px-3 py-1">
-                  <FileText className="w-3 h-3 ml-2" />
-                  {isRTL ? 'المكتبة القانونية' : 'Legal Library'}
-                </Badge>
-                <span className="text-slate-400 text-sm">
-                  {new Date().toLocaleDateString('ar-SA', { month: 'long', year: 'numeric' })}
-                </span>
-              </div>
-              <h1 className="text-4xl font-bold leading-tight mb-2">
-                {isRTL ? 'النماذج والمستندات' : 'Forms & Documents'}
-              </h1>
-              <p className="text-slate-300 text-lg max-w-xl">
-                {isRTL ? 'مكتبة شاملة للنماذج والمستندات القانونية' : 'Comprehensive library of legal forms and documents'}
-              </p>
-            </div>
-            <Button className="bg-emerald-500 hover:bg-emerald-600 text-white h-12 px-6 rounded-xl shadow-lg shadow-emerald-500/20 border-0">
-              <Plus className="me-2 h-5 w-5" />
-              {isRTL ? 'رفع نموذج' : 'Upload Form'}
-            </Button>
-          </div>
-        </div>
+        {/* HERO CARD & STATS */}
+        <ProductivityHero
+          badge={isRTL ? 'قاعدة المعرفة' : 'Knowledge Base'}
+          title={isRTL ? 'النماذج' : 'Forms'}
+          type="knowledge"
+          stats={[
+            { label: isRTL ? 'نموذج متاح' : 'Available Forms', value: mockForms.length, icon: FolderOpen, status: 'normal' },
+            { label: isRTL ? 'إجمالي التحميلات' : 'Total Downloads', value: '20K', icon: Download, status: 'normal' },
+            { label: isRTL ? 'إجمالي المشاهدات' : 'Total Views', value: '45K', icon: Eye, status: 'normal' },
+            { label: isRTL ? 'المحفوظة' : 'Bookmarked', value: bookmarkedForms.length, icon: Bookmark, status: 'normal' },
+          ]}
+        />
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* --- Main Content --- */}
@@ -315,46 +298,6 @@ export function FormsView() {
                 </div>
               </CardContent>
             </Card>
-
-            {/* Stats */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <Card className="border-slate-100 shadow-sm">
-                <CardContent className="p-4 text-center">
-                  <div className="h-12 w-12 bg-navy/5 rounded-full flex items-center justify-center mx-auto mb-3">
-                    <FolderOpen className="h-6 w-6 text-navy" />
-                  </div>
-                  <div className="text-2xl font-bold text-navy">{mockForms.length}</div>
-                  <div className="text-xs text-slate-500 mt-1">{isRTL ? 'نموذج متاح' : 'Available Forms'}</div>
-                </CardContent>
-              </Card>
-              <Card className="border-slate-100 shadow-sm">
-                <CardContent className="p-4 text-center">
-                  <div className="h-12 w-12 bg-emerald-50 rounded-full flex items-center justify-center mx-auto mb-3">
-                    <Download className="h-6 w-6 text-emerald-600" />
-                  </div>
-                  <div className="text-2xl font-bold text-navy">20K</div>
-                  <div className="text-xs text-slate-500 mt-1">{isRTL ? 'إجمالي التحميلات' : 'Total Downloads'}</div>
-                </CardContent>
-              </Card>
-              <Card className="border-slate-100 shadow-sm">
-                <CardContent className="p-4 text-center">
-                  <div className="h-12 w-12 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-3">
-                    <Eye className="h-6 w-6 text-blue-600" />
-                  </div>
-                  <div className="text-2xl font-bold text-navy">45K</div>
-                  <div className="text-xs text-slate-500 mt-1">{isRTL ? 'إجمالي المشاهدات' : 'Total Views'}</div>
-                </CardContent>
-              </Card>
-              <Card className="border-slate-100 shadow-sm">
-                <CardContent className="p-4 text-center">
-                  <div className="h-12 w-12 bg-amber-50 rounded-full flex items-center justify-center mx-auto mb-3">
-                    <Bookmark className="h-6 w-6 text-amber-600" />
-                  </div>
-                  <div className="text-2xl font-bold text-navy">{bookmarkedForms.length}</div>
-                  <div className="text-xs text-slate-500 mt-1">{isRTL ? 'المحفوظة' : 'Bookmarked'}</div>
-                </CardContent>
-              </Card>
-            </div>
 
             {/* Forms Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

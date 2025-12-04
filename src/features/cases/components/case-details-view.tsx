@@ -651,7 +651,7 @@ export function CaseDetailsView() {
         {!isLoading && !isError && caseData && (
           <>
             {/* HERO BANNER */}
-            <ProductivityHero badge={getCategoryLabel(caseData.category)} title={caseData.title} type="cases" hideButtons={true}>
+            <ProductivityHero badge={getCategoryLabel(caseData.category)} title={caseData.title} type="cases" listMode={true} hideButtons={true}>
               <div className="flex gap-3">
                 <Link to="/dashboard/cases">
                   <Button
@@ -666,9 +666,9 @@ export function CaseDetailsView() {
             </ProductivityHero>
 
             {/* MAIN CONTENT GRID */}
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-              {/* LEFT SIDEBAR */}
-              <div className="lg:col-span-3 flex flex-col gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+              {/* SIDEBAR */}
+              <div className="flex flex-col gap-6">
                 {/* Timeline Card */}
                 <Card className="rounded-3xl border-0 shadow-lg bg-white overflow-hidden flex flex-col">
                   <div className="bg-navy p-6 text-white relative overflow-hidden">
@@ -854,8 +854,8 @@ export function CaseDetailsView() {
                 </Card>
               </div>
 
-              {/* CENTER CONTENT (Tabs & Details) */}
-              <div className="lg:col-span-9 flex flex-col gap-6">
+              {/* MAIN CONTENT (Tabs & Details) */}
+              <div className="lg:col-span-2 flex flex-col gap-6">
                 {/* Tabs Toolbar */}
                 <div className="bg-white p-2 rounded-[20px] border border-slate-100 shadow-sm overflow-x-auto">
                   <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">

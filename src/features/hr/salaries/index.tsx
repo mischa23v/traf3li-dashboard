@@ -297,41 +297,40 @@ export function SalariesPage() {
                 </div>
             </DynamicIsland>
 
-            <Main className="bg-[#f8f9fa] min-h-screen">
-                <div className="bg-[#022c22] rounded-tr-3xl min-h-screen -mt-4 -mr-4 -ml-4 p-6">
-                    {/* Hero Card */}
-                    <ProductivityHero
-                        badge="الموارد البشرية"
-                        title="الرواتب"
-                        type="hr"
-                        hideButtons={true}
-                        stats={[
-                            {
-                                label: "إجمالي الرواتب",
-                                value: formatCurrency(stats.totalGross),
-                                icon: <Wallet className="w-4 h-4 text-emerald-400" />,
-                                status: 'normal'
-                            },
-                            {
-                                label: "صافي الرواتب",
-                                value: formatCurrency(stats.totalNet),
-                                icon: <CreditCard className="w-4 h-4 text-blue-400" />,
-                                status: 'normal'
-                            },
-                            {
-                                label: "إجمالي الخصومات",
-                                value: formatCurrency(stats.totalDeductions),
-                                icon: <DollarSign className="w-4 h-4 text-red-400" />,
-                                status: 'normal'
-                            },
-                            {
-                                label: "مدفوع",
-                                value: `${stats.paid}/${stats.total}`,
-                                icon: <CheckCircle className="w-4 h-4 text-amber-400" />,
-                                status: 'normal'
-                            }
-                        ]}
-                    >
+            <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-r border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
+                {/* Hero Card */}
+                <ProductivityHero
+                    badge="الموارد البشرية"
+                    title="الرواتب"
+                    type="hr"
+                    hideButtons={true}
+                    stats={[
+                        {
+                            label: "إجمالي الرواتب",
+                            value: formatCurrency(stats.totalGross),
+                            icon: Wallet,
+                            status: 'normal'
+                        },
+                        {
+                            label: "صافي الرواتب",
+                            value: formatCurrency(stats.totalNet),
+                            icon: CreditCard,
+                            status: 'normal'
+                        },
+                        {
+                            label: "إجمالي الخصومات",
+                            value: formatCurrency(stats.totalDeductions),
+                            icon: DollarSign,
+                            status: 'normal'
+                        },
+                        {
+                            label: "مدفوع",
+                            value: `${stats.paid}/${stats.total}`,
+                            icon: CheckCircle,
+                            status: 'normal'
+                        }
+                    ]}
+                >
                         <div className="flex flex-col gap-4 w-full">
                             <div className="flex flex-wrap items-center gap-3">
                                 <div className="relative flex-1 min-w-[200px] max-w-md">
@@ -375,10 +374,10 @@ export function SalariesPage() {
                         </div>
                     </ProductivityHero>
 
-                    {/* Main content grid */}
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
-                        {/* Salary list - 2/3 width */}
-                        <div className="lg:col-span-2 space-y-4">
+                {/* Main content grid */}
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    {/* Salary list - 2/3 width */}
+                    <div className="lg:col-span-2 space-y-4">
                             {isLoading ? (
                                 <SalaryListSkeleton />
                             ) : error ? (
@@ -416,20 +415,17 @@ export function SalariesPage() {
                             )}
                         </div>
 
-                        {/* Sidebar - 1/3 width */}
-                        <div className="lg:col-span-1">
-                            <HRSidebar
-                                context="salaries"
-                                isSelectionMode={isSelectionMode}
-                                onToggleSelectionMode={() => {
-                                    setIsSelectionMode(!isSelectionMode)
-                                    if (isSelectionMode) setSelectedRecords(new Set())
-                                }}
-                                selectedCount={selectedRecords.size}
-                                onDeleteSelected={handleDeleteSelected}
-                            />
-                        </div>
-                    </div>
+                    {/* Sidebar - 1/3 width */}
+                    <HRSidebar
+                        context="salaries"
+                        isSelectionMode={isSelectionMode}
+                        onToggleSelectionMode={() => {
+                            setIsSelectionMode(!isSelectionMode)
+                            if (isSelectionMode) setSelectedRecords(new Set())
+                        }}
+                        selectedCount={selectedRecords.size}
+                        onDeleteSelected={handleDeleteSelected}
+                    />
                 </div>
             </Main>
         </>

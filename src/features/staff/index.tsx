@@ -13,6 +13,7 @@ import { StaffTable } from './components/staff-table'
 import { useStaff } from '@/hooks/useStaff'
 import { useTranslation } from 'react-i18next'
 import { ProductivityHero } from '@/components/productivity-hero'
+import { CrmSidebar } from '@/components/crm-sidebar'
 
 const route = getRouteApi('/_authenticated/dashboard/staff/')
 
@@ -39,22 +40,29 @@ export function Staff() {
         </div>
       </Header>
 
-      <Main className='flex flex-1 flex-col gap-4 sm:gap-6'>
+      <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-r border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
         <ProductivityHero badge="فريق العمل" title={t('staff.title')} type="staff" hideButtons={true}>
           <StaffPrimaryButtons />
         </ProductivityHero>
-        {isLoading ? (
-          <div className='space-y-4'>
-            <Skeleton className='h-12 w-full' />
-            <Skeleton className='h-96 w-full' />
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="lg:col-span-2 space-y-6">
+            {isLoading ? (
+              <div className='space-y-4'>
+                <Skeleton className='h-12 w-full' />
+                <Skeleton className='h-96 w-full' />
+              </div>
+            ) : (
+              <StaffTable
+                data={(data || []) as any}
+                search={search}
+                navigate={navigate}
+              />
+            )}
           </div>
-        ) : (
-          <StaffTable
-            data={(data || []) as any}
-            search={search}
-            navigate={navigate}
-          />
-        )}
+
+          <CrmSidebar context="staff" />
+        </div>
       </Main>
 
       <StaffDialogs />

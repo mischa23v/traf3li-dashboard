@@ -267,140 +267,135 @@ export function EmployeesPage() {
                 </div>
             </DynamicIsland>
 
-            <Main className="bg-[#f8f9fa] min-h-screen">
-                <div className="bg-[#022c22] rounded-tr-3xl min-h-screen -mt-4 -mr-4 -ml-4 p-6">
-                    {/* Hero Card */}
-                    <ProductivityHero
-                        badge="الموارد البشرية"
-                        title="الموظفين"
-                        type="hr"
-                        hideButtons={true}
-                        stats={[
-                            {
-                                label: "إجمالي الموظفين",
-                                value: stats?.total || defaultStats.total,
-                                icon: <Users className="w-4 h-4 text-emerald-400" />,
-                                status: 'normal'
-                            },
-                            {
-                                label: "موظف نشط",
-                                value: stats?.active || defaultStats.active,
-                                icon: <Briefcase className="w-4 h-4 text-blue-400" />,
-                                status: 'normal'
-                            },
-                            {
-                                label: "في إجازة",
-                                value: stats?.onLeave || defaultStats.onLeave,
-                                icon: <Building2 className="w-4 h-4 text-amber-400" />,
-                                status: 'normal'
-                            },
-                            {
-                                label: "جديد هذا الشهر",
-                                value: stats?.newThisMonth || defaultStats.newThisMonth,
-                                icon: <UserPlus className="w-4 h-4 text-purple-400" />,
-                                status: 'normal'
-                            }
-                        ]}
-                    >
-                        <div className="flex flex-col gap-4 w-full">
-                            <div className="flex flex-wrap items-center gap-3">
-                                <div className="relative flex-1 min-w-[200px] max-w-md">
-                                    <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-white/40" />
-                                    <input
-                                        type="text"
-                                        placeholder="البحث عن موظف..."
-                                        value={searchQuery}
-                                        onChange={(e) => setSearchQuery(e.target.value)}
-                                        className="w-full bg-white/10 border border-white/20 rounded-xl py-2.5 pr-10 pl-4 text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
-                                    />
-                                </div>
+            <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-r border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
+                <ProductivityHero
+                    badge="الموارد البشرية"
+                    title="الموظفين"
+                    type="hr"
+                    stats={[
+                        {
+                            label: "إجمالي الموظفين",
+                            value: stats?.total || defaultStats.total,
+                            icon: Users,
+                            status: 'normal'
+                        },
+                        {
+                            label: "موظف نشط",
+                            value: stats?.active || defaultStats.active,
+                            icon: Briefcase,
+                            status: 'normal'
+                        },
+                        {
+                            label: "في إجازة",
+                            value: stats?.onLeave || defaultStats.onLeave,
+                            icon: Building2,
+                            status: 'normal'
+                        },
+                        {
+                            label: "جديد هذا الشهر",
+                            value: stats?.newThisMonth || defaultStats.newThisMonth,
+                            icon: UserPlus,
+                            status: 'normal'
+                        }
+                    ]}
+                />
 
-                                <div className="flex items-center gap-2">
-                                    {['all', 'active', 'inactive', 'on_leave', 'probation'].map((status) => (
-                                        <Button
-                                            key={status}
-                                            variant="ghost"
-                                            size="sm"
-                                            onClick={() => setStatusFilter(status)}
-                                            className={cn(
-                                                "rounded-xl text-white/70 hover:text-white hover:bg-white/10",
-                                                statusFilter === status && "bg-white/20 text-white"
-                                            )}
-                                        >
-                                            {status === 'all' && 'الكل'}
-                                            {status === 'active' && 'نشط'}
-                                            {status === 'inactive' && 'غير نشط'}
-                                            {status === 'on_leave' && 'إجازة'}
-                                            {status === 'probation' && 'تجربة'}
-                                        </Button>
-                                    ))}
-                                </div>
-
-                                <Link to="/dashboard/hr/employees/new">
-                                    <Button className="bg-white text-emerald-900 hover:bg-white/90 rounded-xl gap-2 font-medium">
-                                        <Plus className="w-4 h-4" />
-                                        إضافة موظف
-                                    </Button>
-                                </Link>
-                            </div>
-                        </div>
-                    </ProductivityHero>
-
-                    {/* Main content grid */}
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
-                        {/* Employee list - 2/3 width */}
-                        <div className="lg:col-span-2 space-y-4">
-                            {isLoading ? (
-                                <EmployeeListSkeleton />
-                            ) : error ? (
-                                <div className="bg-red-50 border border-red-200 rounded-2xl p-6 text-center">
-                                    <AlertCircle className="w-12 h-12 text-red-400 mx-auto mb-3" />
-                                    <h3 className="text-lg font-semibold text-red-800">خطأ في تحميل البيانات</h3>
-                                    <p className="text-red-600 mt-1">حدث خطأ أثناء تحميل قائمة الموظفين</p>
-                                </div>
-                            ) : filteredEmployees.length === 0 ? (
-                                <div className="bg-white rounded-2xl border border-slate-200/60 p-12 text-center">
-                                    <div className="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center mx-auto mb-4">
-                                        <Users className="w-8 h-8 text-slate-400" />
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <div className="lg:col-span-2 space-y-6">
+                        {/* Filters Section */}
+                        <div className="bg-white rounded-2xl p-4 shadow-sm border border-slate-100">
+                            <div className="flex flex-col gap-4">
+                                <div className="flex flex-wrap items-center gap-3">
+                                    <div className="relative flex-1 min-w-[200px] max-w-md">
+                                        <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                                        <input
+                                            type="text"
+                                            placeholder="البحث عن موظف..."
+                                            value={searchQuery}
+                                            onChange={(e) => setSearchQuery(e.target.value)}
+                                            className="w-full bg-white border border-slate-200 rounded-xl py-2.5 pr-10 pl-4 text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500"
+                                        />
                                     </div>
-                                    <h3 className="text-lg font-semibold text-slate-700">لا يوجد موظفين</h3>
-                                    <p className="text-slate-500 mt-1 mb-4">لم يتم العثور على موظفين</p>
+
+                                    <div className="flex items-center gap-2">
+                                        {['all', 'active', 'inactive', 'on_leave', 'probation'].map((status) => (
+                                            <Button
+                                                key={status}
+                                                variant="ghost"
+                                                size="sm"
+                                                onClick={() => setStatusFilter(status)}
+                                                className={cn(
+                                                    "rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100",
+                                                    statusFilter === status && "bg-emerald-100 text-emerald-700 hover:bg-emerald-100 hover:text-emerald-700"
+                                                )}
+                                            >
+                                                {status === 'all' && 'الكل'}
+                                                {status === 'active' && 'نشط'}
+                                                {status === 'inactive' && 'غير نشط'}
+                                                {status === 'on_leave' && 'إجازة'}
+                                                {status === 'probation' && 'تجربة'}
+                                            </Button>
+                                        ))}
+                                    </div>
+
                                     <Link to="/dashboard/hr/employees/new">
-                                        <Button className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl gap-2">
+                                        <Button className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl gap-2 font-medium">
                                             <Plus className="w-4 h-4" />
-                                            إضافة موظف جديد
+                                            إضافة موظف
                                         </Button>
                                     </Link>
                                 </div>
-                            ) : (
-                                <div className="space-y-4">
-                                    {filteredEmployees.map((employee) => (
-                                        <EmployeeCard
-                                            key={employee.id}
-                                            employee={employee}
-                                            isSelected={selectedEmployees.has(employee.id)}
-                                            onToggleSelect={() => handleToggleSelect(employee.id)}
-                                            isSelectionMode={isSelectionMode}
-                                        />
-                                    ))}
-                                </div>
-                            )}
+                            </div>
                         </div>
 
-                        {/* Sidebar - 1/3 width */}
-                        <div className="lg:col-span-1">
-                            <HRSidebar
-                                context="employees"
-                                isSelectionMode={isSelectionMode}
-                                onToggleSelectionMode={() => {
-                                    setIsSelectionMode(!isSelectionMode)
-                                    if (isSelectionMode) setSelectedEmployees(new Set())
-                                }}
-                                selectedCount={selectedEmployees.size}
-                                onDeleteSelected={handleDeleteSelected}
-                            />
-                        </div>
+                        {/* Employee List */}
+                        {isLoading ? (
+                            <EmployeeListSkeleton />
+                        ) : error ? (
+                            <div className="bg-red-50 border border-red-200 rounded-2xl p-6 text-center">
+                                <AlertCircle className="w-12 h-12 text-red-400 mx-auto mb-3" />
+                                <h3 className="text-lg font-semibold text-red-800">خطأ في تحميل البيانات</h3>
+                                <p className="text-red-600 mt-1">حدث خطأ أثناء تحميل قائمة الموظفين</p>
+                            </div>
+                        ) : filteredEmployees.length === 0 ? (
+                            <div className="bg-white rounded-2xl border border-slate-200/60 p-12 text-center">
+                                <div className="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center mx-auto mb-4">
+                                    <Users className="w-8 h-8 text-slate-400" />
+                                </div>
+                                <h3 className="text-lg font-semibold text-slate-700">لا يوجد موظفين</h3>
+                                <p className="text-slate-500 mt-1 mb-4">لم يتم العثور على موظفين</p>
+                                <Link to="/dashboard/hr/employees/new">
+                                    <Button className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl gap-2">
+                                        <Plus className="w-4 h-4" />
+                                        إضافة موظف جديد
+                                    </Button>
+                                </Link>
+                            </div>
+                        ) : (
+                            <div className="space-y-4">
+                                {filteredEmployees.map((employee) => (
+                                    <EmployeeCard
+                                        key={employee.id}
+                                        employee={employee}
+                                        isSelected={selectedEmployees.has(employee.id)}
+                                        onToggleSelect={() => handleToggleSelect(employee.id)}
+                                        isSelectionMode={isSelectionMode}
+                                    />
+                                ))}
+                            </div>
+                        )}
                     </div>
+
+                    <HRSidebar
+                        context="employees"
+                        isSelectionMode={isSelectionMode}
+                        onToggleSelectionMode={() => {
+                            setIsSelectionMode(!isSelectionMode)
+                            if (isSelectionMode) setSelectedEmployees(new Set())
+                        }}
+                        selectedCount={selectedEmployees.size}
+                        onDeleteSelected={handleDeleteSelected}
+                    />
                 </div>
             </Main>
         </>
