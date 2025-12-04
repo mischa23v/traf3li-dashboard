@@ -222,8 +222,8 @@ export default function PaymentDetailsView() {
                                         <div>
                                             <p className="text-sm text-slate-500 mb-1">اسم العميل</p>
                                             <p className="font-medium text-navy">
-                                                {typeof payment.clientId === 'object'
-                                                    ? `${payment.clientId.firstName || ''} ${payment.clientId.lastName || ''}`.trim()
+                                                {payment.clientId && typeof payment.clientId === 'object'
+                                                    ? `${payment.clientId.firstName || ''} ${payment.clientId.lastName || ''}`.trim() || 'غير محدد'
                                                     : 'غير محدد'}
                                             </p>
                                         </div>
