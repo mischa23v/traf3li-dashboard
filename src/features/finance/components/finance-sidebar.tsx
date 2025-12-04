@@ -13,7 +13,7 @@ import { format, addDays, startOfDay, endOfDay, isSameDay } from 'date-fns'
 import { arSA } from 'date-fns/locale'
 
 interface FinanceSidebarProps {
-    context?: 'invoices' | 'quotes' | 'payments' | 'expenses' | 'statements' | 'transactions' | 'activity' | 'time-tracking'
+    context?: 'invoices' | 'quotes' | 'payments' | 'expenses' | 'statements' | 'transactions' | 'activity' | 'time-tracking' | 'bills' | 'vendors' | 'retainers' | 'recurring' | 'reports' | 'fiscal-periods'
     isSelectionMode?: boolean
     onToggleSelectionMode?: () => void
     selectedCount?: number
@@ -89,6 +89,30 @@ export function FinanceSidebar({
         'time-tracking': {
             create: '/dashboard/finance/time-tracking/new',
             viewAll: '/dashboard/finance/time-tracking'
+        },
+        bills: {
+            create: '/dashboard/finance/bills/new',
+            viewAll: '/dashboard/finance/bills'
+        },
+        vendors: {
+            create: '/dashboard/finance/vendors/new',
+            viewAll: '/dashboard/finance/vendors'
+        },
+        retainers: {
+            create: '/dashboard/finance/retainers/new',
+            viewAll: '/dashboard/finance/retainers'
+        },
+        recurring: {
+            create: '/dashboard/finance/recurring/new',
+            viewAll: '/dashboard/finance/recurring'
+        },
+        reports: {
+            create: '',
+            viewAll: '/dashboard/finance/reports'
+        },
+        'fiscal-periods': {
+            create: '',
+            viewAll: '/dashboard/finance/fiscal-periods'
         }
     }
 
