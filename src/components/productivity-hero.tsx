@@ -6,7 +6,8 @@ import {
     AlertCircle,
     CalendarRange,
     Bell,
-    CheckSquare
+    CheckSquare,
+    ArrowRight
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { StatCard } from '@/components/stat-card'
@@ -28,9 +29,10 @@ interface ProductivityHeroProps {
     hideButtons?: boolean;
     children?: React.ReactNode;
     stats?: StatItem[];
+    backUrl?: string;
 }
 
-export function ProductivityHero({ badge, title = 'الإنتاجية', type = 'tasks', hideButtons = false, children, stats }: ProductivityHeroProps) {
+export function ProductivityHero({ badge, title = 'الإنتاجية', type = 'tasks', hideButtons = false, children, stats, backUrl }: ProductivityHeroProps) {
     // Fetch Stats (only if stats prop is not provided)
     const { data: dueTodayTasks } = useDueTodayTasks()
     const { data: overdueTasks } = useOverdueTasks()
@@ -94,6 +96,11 @@ export function ProductivityHero({ badge, title = 'الإنتاجية', type = '
                                 <span className="text-white">{badge}</span>
                             </div>
                             <div className="flex items-center gap-3">
+                                {backUrl && (
+                                    <Link to={backUrl} className="p-2 bg-white/10 hover:bg-white/20 rounded-xl transition-colors">
+                                        <ArrowRight className="w-6 h-6 text-white" />
+                                    </Link>
+                                )}
                                 <div className="p-2 bg-white/10 rounded-xl">
                                     <CheckSquare className="w-6 h-6 text-emerald-400 fill-emerald-400/20" />
                                 </div>

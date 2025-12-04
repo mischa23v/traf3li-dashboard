@@ -249,7 +249,7 @@ export function EventDetailsView() {
                 {/* Success State - Hero Content */}
                 {!isLoading && !isError && event && (
                     <>
-                        <ProductivityHero badge="الأحداث" title={event.title} type="events" hideButtons={false} />
+                        <ProductivityHero badge="الأحداث" title={event.title} type="events" hideButtons={false} backUrl="/dashboard/tasks/events" />
 
                         {/* ACTION BUTTONS */}
                         <div className="max-w-[1600px] mx-auto">

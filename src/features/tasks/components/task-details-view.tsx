@@ -551,7 +551,7 @@ export function TaskDetailsView() {
                 {!isLoading && !isError && task && (
                     <>
                         {/* HERO CARD - Same as task list/create */}
-                        <ProductivityHero badge="إدارة المهام" title={task.title} type="tasks" />
+                        <ProductivityHero badge="إدارة المهام" title={task.title} type="tasks" backUrl="/dashboard/tasks/list" />
 
                         {/* MAIN GRID LAYOUT - Same as task list/create */}
                         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
