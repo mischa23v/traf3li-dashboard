@@ -248,7 +248,7 @@ export function CreateTimeEntryView() {
                                                     <SelectValue placeholder={loadingClients ? "جاري التحميل..." : "اختر العميل (اختياري)"} />
                                                 </SelectTrigger>
                                                 <SelectContent>
-                                                    <SelectItem value="">بدون عميل محدد</SelectItem>
+                                                    <SelectItem value="none">بدون عميل محدد</SelectItem>
                                                     {clientsData?.data?.map((client: any) => (
                                                         <SelectItem key={client._id} value={client._id}>
                                                             {client.fullName || client.name}
@@ -300,7 +300,7 @@ export function CreateTimeEntryView() {
                                                     <SelectValue placeholder={loadingTeam ? "جاري التحميل..." : "اختر عضو الفريق"} />
                                                 </SelectTrigger>
                                                 <SelectContent>
-                                                    <SelectItem value="">المستخدم الحالي</SelectItem>
+                                                    <SelectItem value="current">المستخدم الحالي</SelectItem>
                                                     {teamData?.data?.map((member: any) => (
                                                         <SelectItem key={member._id} value={member._id}>
                                                             {member.fullName || member.name || member.email}

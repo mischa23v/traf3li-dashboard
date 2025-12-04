@@ -331,7 +331,7 @@ export function EditInvoiceView() {
                                                     <SelectValue placeholder={loadingCases ? "جاري التحميل..." : "اختر القضية"} />
                                                 </SelectTrigger>
                                                 <SelectContent>
-                                                    <SelectItem value="">بدون قضية</SelectItem>
+                                                    <SelectItem value="none">بدون قضية</SelectItem>
                                                     {casesData?.data?.map((c: any) => (
                                                         <SelectItem key={c._id} value={c._id}>
                                                             {c.caseNumber} - {c.title}

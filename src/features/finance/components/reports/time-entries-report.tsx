@@ -135,7 +135,7 @@ export function TimeEntriesReport() {
                     <SelectValue placeholder="جميع العملاء" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">جميع العملاء</SelectItem>
+                    <SelectItem value="all">جميع العملاء</SelectItem>
                     {casesAndClients?.clients?.map((client: { id: string; name: string }) => (
                       <SelectItem key={client.id} value={client.id}>
                         {client.name}
@@ -170,7 +170,7 @@ export function TimeEntriesReport() {
                     <SelectValue placeholder="الكل" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">الكل</SelectItem>
+                    <SelectItem value="all">الكل</SelectItem>
                     <SelectItem value="true">قابل للفوترة</SelectItem>
                     <SelectItem value="false">غير قابل للفوترة</SelectItem>
                   </SelectContent>
