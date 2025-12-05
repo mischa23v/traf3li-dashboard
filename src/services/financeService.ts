@@ -137,24 +137,56 @@ export interface TimeEntry {
   _id: string
   entryId: string
   description: string
+
+  // Assignment
   lawyerId: string | { firstName: string; lastName: string; _id: string }
-  clientId: string
-  caseId: string
+  assigneeId?: string | { firstName: string; lastName: string; _id: string }
+  userId?: string | { firstName: string; lastName: string }
+
+  // Related entities
+  clientId: string | { firstName: string; lastName: string; _id: string }
+  caseId?: string | { caseNumber: string; title: string; _id: string }
+
+  // Time data
   date: string
   startTime?: string
   endTime?: string
-  duration: number
-  hours?: number
-  hourlyRate: number
-  totalAmount: number
+  breakMinutes?: number
+  duration: number // in minutes
+  hours?: number // computed (duration / 60)
+
+  // Activity & Classification
+  activityCode?: string // UTBMS code
+  timeType?: 'billable' | 'non_billable' | 'pro_bono' | 'internal'
+
+  // Billing
+  hourlyRate: number // in halalas
+  totalAmount: number // in halalas
   isBillable: boolean
   isBilled: boolean
-  activityCode?: string
-  status: string
+  billStatus?: 'draft' | 'unbilled' | 'billed' | 'written_off'
   invoiceId?: string
+
+  // Write-off / Write-down
+  writeOff?: boolean
+  writeOffReason?: string
+  writeDown?: boolean
+  writeDownAmount?: number
+  writeDownReason?: string
+
+  // Organization
+  departmentId?: string | { name: string; _id: string }
+  locationId?: string | { name: string; _id: string }
+  practiceArea?: string
+  phase?: string
+  taskId?: string | { title: string; _id: string }
+
+  // Timer
   wasTimerBased: boolean
   timerStartedAt?: string
-  userId?: string | { firstName: string; lastName: string }
+
+  // Status & Audit
+  status: string
   notes?: string
   history?: any[]
   createdAt: string
@@ -162,14 +194,43 @@ export interface TimeEntry {
 }
 
 export interface CreateTimeEntryData {
-  caseId: string
+  // Required fields
+  caseId?: string
   clientId: string
   date: string
   description: string
-  duration: number
-  hourlyRate: number
-  activityCode?: string
+  duration: number // in minutes
+  hourlyRate: number // in halalas
+
+  // Activity & Classification
+  activityCode?: string // UTBMS code e.g., 'L110'
+  timeType?: 'billable' | 'non_billable' | 'pro_bono' | 'internal'
   isBillable?: boolean
+
+  // Billing adjustments
+  billStatus?: 'draft' | 'unbilled' | 'billed' | 'written_off'
+  writeOff?: boolean
+  writeOffReason?: string
+  writeDown?: boolean
+  writeDownAmount?: number // in halalas
+  writeDownReason?: string
+
+  // Time tracking
+  startTime?: string // HH:mm format
+  endTime?: string // HH:mm format
+  breakMinutes?: number
+
+  // Assignment
+  assigneeId?: string // Attorney/User ID
+
+  // Organization
+  departmentId?: string
+  locationId?: string
+  practiceArea?: string
+  phase?: string
+  taskId?: string
+
+  // Notes
   notes?: string
 }
 
