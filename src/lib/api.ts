@@ -137,6 +137,23 @@ apiClient.interceptors.response.use(
       }
     }
 
+    // Handle 403 Forbidden - Permission denied (including departed users)
+    if (error.response?.status === 403) {
+      const message = error.response?.data?.message
+
+      // Check for Arabic permission messages from departed user blocking
+      // These messages indicate the user doesn't have permission to access a resource
+      if (message?.includes('ليس لديك صلاحية')) {
+        // Import toast dynamically to avoid circular dependencies
+        import('sonner').then(({ toast }) => {
+          toast.error(message, {
+            description: 'قد تكون صلاحياتك محدودة. تواصل مع إدارة المكتب للمزيد من المعلومات.',
+            duration: 5000,
+          })
+        })
+      }
+    }
+
     // Handle CORS errors specifically
     if (error.message === 'Network Error' || error.code === 'ERR_NETWORK') {
       return Promise.reject({

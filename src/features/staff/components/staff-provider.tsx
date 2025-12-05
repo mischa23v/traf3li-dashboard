@@ -2,13 +2,15 @@ import React, { useState } from 'react'
 import useDialogState from '@/hooks/use-dialog-state'
 import { type Staff } from '../data/schema'
 
-type StaffDialogType = 'add' | 'edit' | 'delete' | 'view'
+type StaffDialogType = 'add' | 'edit' | 'delete' | 'view' | 'depart' | 'reinstate' | 'changeRole'
 
 type StaffContextType = {
   open: StaffDialogType | null
   setOpen: (str: StaffDialogType | null) => void
   currentRow: Staff | null
   setCurrentRow: React.Dispatch<React.SetStateAction<Staff | null>>
+  showDeparted: boolean
+  setShowDeparted: React.Dispatch<React.SetStateAction<boolean>>
 }
 
 const StaffContext = React.createContext<StaffContextType | null>(null)
@@ -16,9 +18,10 @@ const StaffContext = React.createContext<StaffContextType | null>(null)
 export function StaffProvider({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = useDialogState<StaffDialogType>(null)
   const [currentRow, setCurrentRow] = useState<Staff | null>(null)
+  const [showDeparted, setShowDeparted] = useState(false)
 
   return (
-    <StaffContext value={{ open, setOpen, currentRow, setCurrentRow }}>
+    <StaffContext value={{ open, setOpen, currentRow, setCurrentRow, showDeparted, setShowDeparted }}>
       {children}
     </StaffContext>
   )

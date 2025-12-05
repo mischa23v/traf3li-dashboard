@@ -20,6 +20,10 @@ export interface User {
   phone: string
   description?: string
   isSeller: boolean
+  // Firm-related fields for RBAC
+  firmId?: string
+  firmRole?: 'owner' | 'admin' | 'partner' | 'lawyer' | 'paralegal' | 'secretary' | 'accountant' | 'departed'
+  firmStatus?: 'active' | 'departed' | 'suspended' | 'pending' | null
   lawyerProfile?: {
     specialization: string[]
     licenseNumber?: string

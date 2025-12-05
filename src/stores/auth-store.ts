@@ -6,6 +6,7 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import authService, { User, LoginCredentials } from '@/services/authService'
+import { usePermissionsStore } from './permissions-store'
 
 interface AuthState {
   // State
@@ -45,6 +46,17 @@ export const useAuthStore = create<AuthState>()(
             isLoading: false,
             error: null,
           })
+
+          // Fetch user permissions after successful login
+          // Only fetch if user has a firm (lawyer/firm member)
+          if (user.firmId || user.role === 'lawyer') {
+            try {
+              await usePermissionsStore.getState().fetchPermissions()
+            } catch (permError) {
+              console.warn('Could not fetch permissions:', permError)
+              // Don't fail login if permissions fetch fails
+            }
+          }
         } catch (error: any) {
           set({
             user: null,
@@ -69,6 +81,8 @@ export const useAuthStore = create<AuthState>()(
             isLoading: false,
             error: null,
           })
+          // Clear permissions on logout
+          usePermissionsStore.getState().clearPermissions()
         } catch (error: any) {
           console.error('Logout error:', error)
           // Even if API fails, clear state
@@ -78,6 +92,8 @@ export const useAuthStore = create<AuthState>()(
             isLoading: false,
             error: null,
           })
+          // Also clear permissions
+          usePermissionsStore.getState().clearPermissions()
         }
       },
 
@@ -113,6 +129,16 @@ export const useAuthStore = create<AuthState>()(
             isLoading: false,
             error: null,
           })
+
+          // Fetch permissions if user is authenticated and has a firm
+          if (user && (user.firmId || user.role === 'lawyer')) {
+            try {
+              await usePermissionsStore.getState().fetchPermissions()
+            } catch (permError) {
+              console.warn('Could not fetch permissions:', permError)
+              // Don't fail auth check if permissions fetch fails
+            }
+          }
         } catch (error: any) {
           set({
             user: null,
@@ -120,6 +146,8 @@ export const useAuthStore = create<AuthState>()(
             isLoading: false,
             error: null, // Don't show error on initial auth check
           })
+          // Clear permissions if auth failed
+          usePermissionsStore.getState().clearPermissions()
         }
       },
     }),
@@ -151,3 +179,16 @@ export const selectIsLawyer = (state: AuthState) =>
   state.user?.role === 'lawyer'
 export const selectIsClient = (state: AuthState) =>
   state.user?.role === 'client'
+
+/**
+ * Firm-related selectors
+ */
+export const selectFirmId = (state: AuthState) => state.user?.firmId
+export const selectFirmRole = (state: AuthState) => state.user?.firmRole
+export const selectFirmStatus = (state: AuthState) => state.user?.firmStatus
+export const selectIsDeparted = (state: AuthState) =>
+  state.user?.firmRole === 'departed' || state.user?.firmStatus === 'departed'
+export const selectIsFirmOwner = (state: AuthState) =>
+  state.user?.firmRole === 'owner'
+export const selectIsFirmAdmin = (state: AuthState) =>
+  state.user?.firmRole === 'admin' || state.user?.firmRole === 'owner'
