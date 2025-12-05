@@ -16,6 +16,10 @@ This document provides comprehensive backend implementation details for the Traf
 6. [Services](#services)
 7. [Environment Variables](#environment-variables)
 8. [ZATCA Integration](#zatca-integration)
+9. [Unified Data Architecture](#unified-data-architecture)
+10. [Saudi Government API Integration](#saudi-government-api-integration)
+11. [Lead Management & Conversion](#lead-management--conversion)
+12. [Complete Unified Data Flow](#complete-unified-data-flow)
 
 ---
 
@@ -30,6 +34,7 @@ backend/
 │   │   └── zatca.js             # ZATCA configuration
 │   ├── models/
 │   │   ├── User.js
+│   │   ├── Lead.js              # Lead management
 │   │   ├── Client.js
 │   │   ├── Case.js
 │   │   ├── Invoice.js
@@ -46,6 +51,7 @@ backend/
 │   ├── routes/
 │   │   ├── auth.js
 │   │   ├── users.js
+│   │   ├── leads.js             # Lead CRUD + conversion
 │   │   ├── clients.js
 │   │   ├── cases.js
 │   │   ├── invoices.js
@@ -55,7 +61,8 @@ backend/
 │   │   ├── tasks.js
 │   │   ├── reminders.js
 │   │   ├── events.js
-│   │   └── documents.js
+│   │   ├── documents.js
+│   │   └── verify.js            # Saudi API verification
 │   ├── controllers/
 │   │   └── [corresponding controllers]
 │   ├── middleware/
@@ -65,6 +72,9 @@ backend/
 │   │   └── upload.js            # File uploads
 │   ├── services/
 │   │   ├── zatcaService.js      # ZATCA e-invoicing
+│   │   ├── yakeenService.js     # National ID verification
+│   │   ├── wathqService.js      # Commercial Registry verification
+│   │   ├── mojService.js        # Attorney/POA verification
 │   │   ├── emailService.js      # Email notifications
 │   │   ├── pdfService.js        # PDF generation
 │   │   └── storageService.js    # File storage
@@ -2049,6 +2059,664 @@ MOJ_API_KEY=your-moj-api-key
 2. After payment application, update Invoice.amountPaid and Invoice.balanceDue
 3. Check Client.creditBalance for available credit
 4. Update Client.creditBalance if payment creates credit
+
+---
+
+## Lead Management & Conversion
+
+### Lead Schema
+
+```javascript
+// models/Lead.js
+const mongoose = require('mongoose');
+
+const leadSchema = new mongoose.Schema({
+  // Basic Info
+  leadNumber: { type: String, unique: true, required: true },
+  leadType: { type: String, enum: ['individual', 'corporate', 'government'], required: true },
+  source: {
+    type: String,
+    enum: ['website', 'referral', 'social_media', 'advertising', 'cold_call', 'event', 'other'],
+    default: 'website'
+  },
+  referredBy: String,
+
+  // Individual fields
+  firstName: String,
+  lastName: String,
+  nationalId: String,
+  birthDate: Date,
+
+  // Corporate fields
+  companyName: String,
+  companyNameEn: String,
+  commercialRegistration: String,
+  unifiedNumber: String,
+  vatNumber: String,
+  capital: Number,
+  mainActivity: String,
+
+  // Contact
+  email: { type: String, required: true },
+  phone: { type: String, required: true },
+  mobile: String,
+  website: String,
+  ecommerceLink: String,
+
+  // Address
+  address: {
+    street: String,
+    city: String,
+    district: String,
+    postalCode: String,
+    country: { type: String, default: 'SA' },
+    buildingNumber: String,
+    additionalNumber: String
+  },
+
+  // Legal Matter Interest
+  interestedServices: [{
+    type: String,
+    enum: ['litigation', 'consultation', 'contract', 'corporate', 'real_estate', 'labor', 'criminal', 'family', 'arbitration', 'other']
+  }],
+  caseDescription: String,
+  estimatedBudget: Number,
+  urgency: { type: String, enum: ['low', 'medium', 'high', 'urgent'], default: 'medium' },
+
+  // Verification Status (from Saudi APIs)
+  verification: {
+    nationalIdVerified: { type: Boolean, default: false },
+    nationalIdVerifiedAt: Date,
+    crVerified: { type: Boolean, default: false },
+    crVerifiedAt: Date,
+    verificationData: mongoose.Schema.Types.Mixed  // Store full API response
+  },
+
+  // Lead Status
+  status: {
+    type: String,
+    enum: ['new', 'contacted', 'qualified', 'proposal_sent', 'negotiating', 'converted', 'lost', 'archived'],
+    default: 'new'
+  },
+  lostReason: String,
+
+  // Assignment
+  assignedTo: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+
+  // Follow-up
+  nextFollowUp: Date,
+  followUpHistory: [{
+    date: Date,
+    type: { type: String, enum: ['call', 'email', 'meeting', 'note'] },
+    notes: String,
+    createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
+  }],
+
+  // Conversion
+  convertedToClientId: { type: mongoose.Schema.Types.ObjectId, ref: 'Client' },
+  convertedAt: Date,
+  convertedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+
+  // Notes
+  notes: String,
+  tags: [String],
+
+  // Metadata
+  createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
+}, { timestamps: true });
+
+// Generate lead number
+leadSchema.pre('save', async function(next) {
+  if (this.isNew && !this.leadNumber) {
+    const count = await this.constructor.countDocuments() + 1;
+    this.leadNumber = `LEAD-${String(count).padStart(5, '0')}`;
+  }
+  next();
+});
+
+// Virtual for display name
+leadSchema.virtual('displayName').get(function() {
+  if (this.leadType === 'individual') {
+    return `${this.firstName} ${this.lastName}`;
+  }
+  return this.companyName;
+});
+
+module.exports = mongoose.model('Lead', leadSchema);
+```
+
+### Lead Routes
+
+```javascript
+// routes/leads.js
+const router = require('express').Router();
+const Lead = require('../models/Lead');
+const Client = require('../models/Client');
+const Case = require('../models/Case');
+const { authenticate, authorize } = require('../middleware/auth');
+
+router.use(authenticate);
+
+// CRUD
+router.get('/', authorize('leads:read'), async (req, res) => {
+  try {
+    const { status, source, assignedTo, page = 1, limit = 20 } = req.query;
+    const query = {};
+
+    if (status) query.status = status;
+    if (source) query.source = source;
+    if (assignedTo) query.assignedTo = assignedTo;
+
+    const leads = await Lead.find(query)
+      .populate('assignedTo', 'firstName lastName')
+      .sort({ createdAt: -1 })
+      .skip((page - 1) * limit)
+      .limit(parseInt(limit))
+      .lean();
+
+    const total = await Lead.countDocuments(query);
+
+    res.json({ leads, total, page: parseInt(page), pages: Math.ceil(total / limit) });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+router.get('/:id', authorize('leads:read'), async (req, res) => {
+  try {
+    const lead = await Lead.findById(req.params.id)
+      .populate('assignedTo', 'firstName lastName')
+      .populate('convertedToClientId', 'clientNumber firstName lastName companyName')
+      .lean();
+
+    if (!lead) {
+      return res.status(404).json({ error: 'Lead not found' });
+    }
+
+    res.json(lead);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+router.post('/', authorize('leads:create'), async (req, res) => {
+  try {
+    const lead = new Lead({
+      ...req.body,
+      createdBy: req.user._id
+    });
+
+    await lead.save();
+    res.status(201).json(lead);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
+router.put('/:id', authorize('leads:update'), async (req, res) => {
+  try {
+    const lead = await Lead.findByIdAndUpdate(
+      req.params.id,
+      { ...req.body, updatedBy: req.user._id },
+      { new: true, runValidators: true }
+    );
+
+    if (!lead) {
+      return res.status(404).json({ error: 'Lead not found' });
+    }
+
+    res.json(lead);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
+// ============================================
+// LEAD → CLIENT CONVERSION
+// ============================================
+router.post('/:id/convert', authorize('leads:convert'), async (req, res) => {
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
+  try {
+    const { createCase, caseDetails } = req.body;
+
+    // 1. Get the lead
+    const lead = await Lead.findById(req.params.id).session(session);
+    if (!lead) {
+      throw new Error('Lead not found');
+    }
+
+    if (lead.status === 'converted') {
+      throw new Error('Lead already converted');
+    }
+
+    // 2. Create Client with ALL lead data (unified data transfer)
+    const clientData = {
+      // Transfer client type
+      clientType: lead.leadType,
+
+      // Individual fields (auto-transferred)
+      firstName: lead.firstName,
+      lastName: lead.lastName,
+      nationalId: lead.nationalId,
+
+      // Corporate fields (auto-transferred)
+      companyName: lead.companyName,
+      companyNameEn: lead.companyNameEn,
+      commercialRegistration: lead.commercialRegistration,
+      vatNumber: lead.vatNumber,
+
+      // Contact (auto-transferred)
+      email: lead.email,
+      phone: lead.phone,
+      mobile: lead.mobile,
+      website: lead.website,
+
+      // Address (auto-transferred completely)
+      address: lead.address,
+
+      // Source tracking
+      source: lead.source,
+      referredBy: lead.referredBy,
+
+      // Notes (auto-transferred)
+      notes: lead.notes,
+      tags: lead.tags,
+
+      // Initial status
+      status: 'active',
+
+      // Metadata
+      createdBy: req.user._id,
+
+      // Store verification data from lead
+      verificationData: lead.verification?.verificationData
+    };
+
+    const client = new Client(clientData);
+    await client.save({ session });
+
+    // 3. Optionally create initial case
+    let newCase = null;
+    if (createCase && caseDetails) {
+      newCase = new Case({
+        title: caseDetails.title || `قضية ${lead.displayName}`,
+        description: lead.caseDescription,
+        caseType: lead.interestedServices?.[0] || caseDetails.caseType || 'consultation',
+        clientId: client._id,
+        responsibleAttorneyId: lead.assignedTo || caseDetails.responsibleAttorneyId,
+        teamMembers: caseDetails.teamMembers || [],
+        budget: lead.estimatedBudget || caseDetails.budget,
+        priority: lead.urgency,
+        status: 'active',
+        createdBy: req.user._id
+      });
+      await newCase.save({ session });
+    }
+
+    // 4. Update lead status
+    lead.status = 'converted';
+    lead.convertedToClientId = client._id;
+    lead.convertedAt = new Date();
+    lead.convertedBy = req.user._id;
+    await lead.save({ session });
+
+    await session.commitTransaction();
+
+    res.json({
+      success: true,
+      message: 'Lead converted successfully',
+      client: {
+        id: client._id,
+        clientNumber: client.clientNumber,
+        displayName: client.clientType === 'individual'
+          ? `${client.firstName} ${client.lastName}`
+          : client.companyName
+      },
+      case: newCase ? {
+        id: newCase._id,
+        caseNumber: newCase.caseNumber,
+        title: newCase.title
+      } : null
+    });
+
+  } catch (error) {
+    await session.abortTransaction();
+    res.status(400).json({ error: error.message });
+  } finally {
+    session.endSession();
+  }
+});
+
+// Get conversion preview (shows what data will be transferred)
+router.get('/:id/conversion-preview', authorize('leads:read'), async (req, res) => {
+  try {
+    const lead = await Lead.findById(req.params.id).lean();
+
+    if (!lead) {
+      return res.status(404).json({ error: 'Lead not found' });
+    }
+
+    // Show user exactly what fields will transfer
+    const preview = {
+      lead: {
+        leadNumber: lead.leadNumber,
+        displayName: lead.leadType === 'individual'
+          ? `${lead.firstName} ${lead.lastName}`
+          : lead.companyName
+      },
+      willTransfer: {
+        basicInfo: {
+          clientType: lead.leadType,
+          firstName: lead.firstName,
+          lastName: lead.lastName,
+          companyName: lead.companyName,
+          companyNameEn: lead.companyNameEn
+        },
+        identification: {
+          nationalId: lead.nationalId,
+          commercialRegistration: lead.commercialRegistration,
+          vatNumber: lead.vatNumber,
+          verified: lead.verification?.nationalIdVerified || lead.verification?.crVerified
+        },
+        contact: {
+          email: lead.email,
+          phone: lead.phone,
+          mobile: lead.mobile,
+          website: lead.website
+        },
+        address: lead.address,
+        metadata: {
+          source: lead.source,
+          referredBy: lead.referredBy,
+          notes: lead.notes,
+          tags: lead.tags
+        }
+      },
+      suggestedCase: lead.interestedServices?.length ? {
+        caseType: lead.interestedServices[0],
+        description: lead.caseDescription,
+        budget: lead.estimatedBudget,
+        priority: lead.urgency
+      } : null
+    };
+
+    res.json(preview);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+module.exports = router;
+```
+
+---
+
+## Complete Unified Data Flow
+
+### Overview
+
+The system ensures **NO duplicate data entry**. Data entered once flows automatically throughout all sections.
+
+### Flow Diagram
+
+```
+┌──────────────────────────────────────────────────────────────────────────────┐
+│                           DATA ENTRY POINTS                                   │
+├──────────────────────────────────────────────────────────────────────────────┤
+│                                                                               │
+│   ┌─────────┐    ┌─────────┐    ┌─────────┐    ┌─────────┐    ┌─────────┐   │
+│   │  Lead   │───▶│ Client  │───▶│  Case   │───▶│ Task/   │───▶│ Invoice │   │
+│   │  Form   │    │  Form   │    │  Form   │    │ Time    │    │  Form   │   │
+│   └─────────┘    └─────────┘    └─────────┘    └─────────┘    └─────────┘   │
+│        │              │              │              │              │         │
+│        │              │              │              │              │         │
+│        ▼              ▼              ▼              ▼              ▼         │
+│   ┌─────────────────────────────────────────────────────────────────────┐   │
+│   │                     UNIFIED DATABASE                                 │   │
+│   │                                                                      │   │
+│   │  ┌──────┐    ┌────────┐    ┌──────┐    ┌──────────┐    ┌─────────┐  │   │
+│   │  │ Lead │───▶│ Client │◀───│ Case │───▶│TimeEntry │───▶│ Invoice │  │   │
+│   │  └──────┘    └────────┘    └──────┘    │  Task    │    │ Payment │  │   │
+│   │                  │              │       └──────────┘    └─────────┘  │   │
+│   │                  │              │              │              │       │   │
+│   │                  └──────────────┴──────────────┴──────────────┘      │   │
+│   │                            Entity Linking                            │   │
+│   └─────────────────────────────────────────────────────────────────────┘   │
+│                                                                               │
+└──────────────────────────────────────────────────────────────────────────────┘
+```
+
+### 1. Lead → Client Conversion (Full Data Transfer)
+
+When converting a lead to client, ALL matching fields transfer automatically:
+
+```javascript
+// Field mapping: Lead → Client
+const fieldMapping = {
+  // Lead Field         → Client Field
+  'leadType':           'clientType',
+  'firstName':          'firstName',
+  'lastName':           'lastName',
+  'nationalId':         'nationalId',
+  'companyName':        'companyName',
+  'companyNameEn':      'companyNameEn',
+  'commercialRegistration': 'commercialRegistration',
+  'vatNumber':          'vatNumber',
+  'email':              'email',
+  'phone':              'phone',
+  'mobile':             'mobile',
+  'website':            'website',
+  'address':            'address',        // Full nested object
+  'source':             'source',
+  'referredBy':         'referredBy',
+  'notes':              'notes',
+  'tags':               'tags',
+  'verification':       'verificationData'
+};
+```
+
+### 2. Client → Invoice Auto-Fill
+
+When selecting client in invoice form, these fields auto-populate:
+
+```javascript
+// Auto-fill from Client to Invoice
+const invoiceAutoFill = {
+  clientId: client._id,
+  clientType: client.clientType,
+
+  // For ZATCA compliance
+  clientVATNumber: client.vatNumber,
+  clientCR: client.commercialRegistration,
+
+  // Billing settings
+  paymentTerms: client.paymentTerms,
+  billingArrangement: client.billingArrangement,
+
+  // For display
+  clientName: client.clientType === 'individual'
+    ? `${client.firstName} ${client.lastName}`
+    : client.companyName,
+  clientAddress: client.address,
+  clientEmail: client.email,
+  clientPhone: client.phone
+};
+```
+
+### 3. Case → Invoice Auto-Fill
+
+When selecting case in invoice form:
+
+```javascript
+// Auto-fill from Case to Invoice
+const caseAutoFill = {
+  caseId: case._id,
+
+  // Inherit from case
+  responsibleAttorneyId: case.responsibleAttorneyId,
+  billingArrangement: case.billingArrangement,
+  departmentId: case.departmentId,
+  locationId: case.locationId,
+
+  // Reference
+  matterNumber: case.caseNumber
+};
+```
+
+### 4. Time Entry → Invoice Line Item
+
+Billable time entries automatically appear in invoice form:
+
+```javascript
+// Time Entry to Invoice Line Item transformation
+const timeToLineItem = (timeEntry) => ({
+  type: 'time',
+  date: timeEntry.date,
+  description: timeEntry.description,
+  quantity: timeEntry.duration,          // Hours
+  unitPrice: timeEntry.hourlyRate,
+  lineTotal: timeEntry.amount,
+  taxable: true,
+  attorneyId: timeEntry.userId,
+  activityCode: timeEntry.activityCode,
+  timeEntryId: timeEntry._id            // Link back to source
+});
+```
+
+### 5. Payment → Invoice Update
+
+When payment is applied to invoice:
+
+```javascript
+// After payment application
+const updateInvoice = async (invoiceId, paymentAmount, paymentId) => {
+  const invoice = await Invoice.findById(invoiceId);
+
+  // Add to payment history
+  invoice.paymentHistory.push({
+    paymentId,
+    amount: paymentAmount,
+    date: new Date(),
+    method: payment.paymentMethod
+  });
+
+  // Update amounts
+  invoice.amountPaid += paymentAmount;
+  invoice.balanceDue = invoice.totalAmount - invoice.amountPaid;
+
+  // Auto-update status
+  if (invoice.balanceDue <= 0) {
+    invoice.status = 'paid';
+    invoice.paidAt = new Date();
+  } else if (invoice.amountPaid > 0) {
+    invoice.status = 'partial';
+  }
+
+  await invoice.save();
+};
+```
+
+### 6. Complete Example: Lead to Payment Flow
+
+```javascript
+// 1. Create Lead (user enters data ONCE)
+const lead = await Lead.create({
+  leadType: 'corporate',
+  companyName: 'شركة مجموعة ماس الاهلية',
+  companyNameEn: 'Mas Al Ahliya Group',
+  commercialRegistration: '2050012516',
+  vatNumber: '300000000000003',
+  email: 'info@masgroup.sa',
+  phone: '0138174055',
+  address: { city: 'الدمام', district: 'حي الفيصلية' },
+  interestedServices: ['corporate', 'contract']
+});
+
+// 2. Convert Lead to Client (data transfers automatically)
+const { client, case: newCase } = await convertLeadToClient(lead._id, {
+  createCase: true,
+  caseDetails: { title: 'استشارة تجارية' }
+});
+// Client now has: companyName, CR, VAT, email, phone, address - ALL auto-filled
+
+// 3. Create Time Entry (links to client & case)
+const timeEntry = await TimeEntry.create({
+  clientId: client._id,           // Already linked
+  caseId: newCase._id,            // Already linked
+  userId: attorneyId,
+  date: new Date(),
+  duration: 2,
+  description: 'مراجعة العقود',
+  billable: true,
+  hourlyRate: attorney.hourlyRate  // Auto-filled from attorney
+});
+
+// 4. Create Invoice (everything auto-populates)
+const invoice = await Invoice.create({
+  clientId: client._id,
+  caseId: newCase._id,
+  // These auto-fill from client:
+  clientType: client.clientType,
+  clientVATNumber: client.vatNumber,
+  clientCR: client.commercialRegistration,
+  paymentTerms: client.paymentTerms,
+  // Line items auto-populate from billable time:
+  items: [timeToLineItem(timeEntry)]
+});
+
+// 5. Receive Payment (auto-applies to invoice)
+const payment = await Payment.create({
+  customerId: client._id,
+  amount: invoice.totalAmount,
+  paymentMethod: 'bank_transfer',
+  invoiceApplications: [{
+    invoiceId: invoice._id,
+    amount: invoice.totalAmount
+  }]
+});
+// Invoice status automatically updates to 'paid'
+```
+
+### Frontend Auto-Fill Implementation
+
+```typescript
+// React hook for unified data loading
+const useUnifiedData = () => {
+  const [clientData, setClientData] = useState(null);
+  const [caseData, setCaseData] = useState(null);
+  const [billableItems, setBillableItems] = useState([]);
+
+  // When client is selected anywhere
+  const selectClient = async (clientId: string) => {
+    const res = await fetch(`/api/clients/${clientId}/billing-info`);
+    const data = await res.json();
+    setClientData(data);
+
+    // Auto-load cases for this client
+    const casesRes = await fetch(`/api/cases?clientId=${clientId}`);
+    const cases = await casesRes.json();
+    return { client: data, cases };
+  };
+
+  // When case is selected
+  const selectCase = async (caseId: string) => {
+    const res = await fetch(`/api/cases/${caseId}`);
+    const data = await res.json();
+    setCaseData(data);
+
+    // Auto-load billable items
+    const billableRes = await fetch(`/api/invoices/billable-items?caseId=${caseId}`);
+    const billable = await billableRes.json();
+    setBillableItems(billable);
+
+    return { case: data, billableItems: billable };
+  };
+
+  return { clientData, caseData, billableItems, selectClient, selectCase };
+};
+```
 
 ---
 
