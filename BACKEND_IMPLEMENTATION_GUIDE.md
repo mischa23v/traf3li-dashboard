@@ -1,0 +1,1222 @@
+# Traf3li Dashboard - Backend Implementation Guide
+
+## Overview
+
+This document provides comprehensive backend implementation details for the Traf3li Legal ERP Dashboard. The frontend is built with React 19, TypeScript, and TanStack Router. The backend should be built with Node.js, Express, and MongoDB.
+
+---
+
+## Table of Contents
+
+1. [Project Structure](#project-structure)
+2. [Database Schemas](#database-schemas)
+3. [API Routes](#api-routes)
+4. [Controllers](#controllers)
+5. [Middleware](#middleware)
+6. [Services](#services)
+7. [Environment Variables](#environment-variables)
+8. [ZATCA Integration](#zatca-integration)
+
+---
+
+## Project Structure
+
+```
+backend/
+├── src/
+│   ├── config/
+│   │   ├── database.js          # MongoDB connection
+│   │   ├── redis.js             # Redis for caching
+│   │   └── zatca.js             # ZATCA configuration
+│   ├── models/
+│   │   ├── User.js
+│   │   ├── Client.js
+│   │   ├── Case.js
+│   │   ├── Invoice.js
+│   │   ├── Payment.js
+│   │   ├── Expense.js
+│   │   ├── TimeEntry.js
+│   │   ├── Task.js
+│   │   ├── Reminder.js
+│   │   ├── Event.js
+│   │   ├── Document.js
+│   │   ├── Employee.js
+│   │   ├── Vendor.js
+│   │   └── BankAccount.js
+│   ├── routes/
+│   │   ├── auth.js
+│   │   ├── users.js
+│   │   ├── clients.js
+│   │   ├── cases.js
+│   │   ├── invoices.js
+│   │   ├── payments.js
+│   │   ├── expenses.js
+│   │   ├── timeEntries.js
+│   │   ├── tasks.js
+│   │   ├── reminders.js
+│   │   ├── events.js
+│   │   └── documents.js
+│   ├── controllers/
+│   │   └── [corresponding controllers]
+│   ├── middleware/
+│   │   ├── auth.js              # JWT authentication
+│   │   ├── validation.js        # Request validation
+│   │   ├── rateLimiter.js       # Rate limiting
+│   │   └── upload.js            # File uploads
+│   ├── services/
+│   │   ├── zatcaService.js      # ZATCA e-invoicing
+│   │   ├── emailService.js      # Email notifications
+│   │   ├── pdfService.js        # PDF generation
+│   │   └── storageService.js    # File storage
+│   ├── utils/
+│   │   ├── helpers.js
+│   │   ├── validators.js
+│   │   └── constants.js
+│   └── app.js                   # Express app setup
+├── .env
+├── .env.example
+└── package.json
+```
+
+---
+
+## Database Schemas
+
+### 1. User Schema
+
+```javascript
+// models/User.js
+const mongoose = require('mongoose');
+const bcrypt = require('bcryptjs');
+
+const userSchema = new mongoose.Schema({
+  // Basic Info
+  firstName: { type: String, required: true },
+  lastName: { type: String, required: true },
+  email: { type: String, required: true, unique: true, lowercase: true },
+  phone: String,
+  password: { type: String, required: true, select: false },
+  avatar: String,
+
+  // Role & Permissions
+  role: {
+    type: String,
+    enum: ['admin', 'lawyer', 'paralegal', 'assistant', 'accountant', 'hr'],
+    default: 'lawyer'
+  },
+  permissions: [String],
+
+  // Organization
+  departmentId: String,
+  locationId: String,
+  specialization: String,
+  barNumber: String,
+
+  // Billing
+  hourlyRate: { type: Number, default: 0 },
+  billingTarget: { type: Number, default: 0 },
+
+  // Status
+  status: { type: String, enum: ['active', 'inactive', 'suspended'], default: 'active' },
+  lastLogin: Date,
+
+  // Settings
+  language: { type: String, default: 'ar' },
+  timezone: { type: String, default: 'Asia/Riyadh' },
+  notifications: {
+    email: { type: Boolean, default: true },
+    push: { type: Boolean, default: true },
+    sms: { type: Boolean, default: false }
+  }
+}, { timestamps: true });
+
+// Password hashing
+userSchema.pre('save', async function(next) {
+  if (!this.isModified('password')) return next();
+  this.password = await bcrypt.hash(this.password, 12);
+  next();
+});
+
+// Password comparison
+userSchema.methods.comparePassword = async function(candidatePassword) {
+  return await bcrypt.compare(candidatePassword, this.password);
+};
+
+// Full name virtual
+userSchema.virtual('fullName').get(function() {
+  return `${this.firstName} ${this.lastName}`;
+});
+
+module.exports = mongoose.model('User', userSchema);
+```
+
+### 2. Client Schema
+
+```javascript
+// models/Client.js
+const mongoose = require('mongoose');
+
+const clientSchema = new mongoose.Schema({
+  // Basic Info
+  clientNumber: { type: String, unique: true, required: true },
+  clientType: { type: String, enum: ['individual', 'corporate', 'government'], required: true },
+
+  // Individual fields
+  firstName: String,
+  lastName: String,
+  nationalId: String,
+
+  // Corporate fields
+  companyName: String,
+  companyNameEn: String,
+  commercialRegistration: String,
+  vatNumber: String,
+
+  // Contact
+  email: { type: String, required: true },
+  phone: { type: String, required: true },
+  mobile: String,
+  fax: String,
+  website: String,
+
+  // Address
+  address: {
+    street: String,
+    city: String,
+    district: String,
+    postalCode: String,
+    country: { type: String, default: 'SA' },
+    buildingNumber: String,
+    additionalNumber: String
+  },
+
+  // Billing
+  billingArrangement: {
+    type: String,
+    enum: ['hourly', 'flat_fee', 'contingency', 'blended', 'monthly_retainer'],
+    default: 'hourly'
+  },
+  defaultHourlyRate: Number,
+  paymentTerms: { type: String, default: 'net_30' },
+  creditLimit: { type: Number, default: 0 },
+  creditBalance: { type: Number, default: 0 },
+
+  // Relationships
+  responsibleAttorneyId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  originatingAttorneyId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+
+  // Status
+  status: { type: String, enum: ['active', 'inactive', 'prospect', 'archived'], default: 'active' },
+  source: String,
+  referredBy: { type: mongoose.Schema.Types.ObjectId, ref: 'Client' },
+
+  // Notes
+  notes: String,
+  tags: [String],
+
+  // Metadata
+  createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
+}, { timestamps: true });
+
+// Generate client number
+clientSchema.pre('save', async function(next) {
+  if (this.isNew && !this.clientNumber) {
+    const count = await this.constructor.countDocuments() + 1;
+    this.clientNumber = `CLT-${String(count).padStart(5, '0')}`;
+  }
+  next();
+});
+
+// Virtual for full name
+clientSchema.virtual('fullName').get(function() {
+  if (this.clientType === 'individual') {
+    return `${this.firstName} ${this.lastName}`;
+  }
+  return this.companyName;
+});
+
+module.exports = mongoose.model('Client', clientSchema);
+```
+
+### 3. Case Schema
+
+```javascript
+// models/Case.js
+const mongoose = require('mongoose');
+
+const caseSchema = new mongoose.Schema({
+  // Basic Info
+  caseNumber: { type: String, unique: true, required: true },
+  title: { type: String, required: true },
+  description: String,
+
+  // Classification
+  caseType: {
+    type: String,
+    enum: ['litigation', 'consultation', 'contract', 'corporate', 'real_estate', 'labor', 'criminal', 'family', 'arbitration', 'other'],
+    required: true
+  },
+  practiceArea: String,
+  subCategory: String,
+
+  // Court Info (for litigation)
+  courtName: String,
+  courtCaseNumber: String,
+  courtBranch: String,
+  judge: String,
+
+  // Relationships
+  clientId: { type: mongoose.Schema.Types.ObjectId, ref: 'Client', required: true },
+  opposingParty: String,
+  opposingCounsel: String,
+
+  // Team
+  responsibleAttorneyId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  teamMembers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+
+  // Dates
+  openDate: { type: Date, default: Date.now },
+  closeDate: Date,
+  statuteOfLimitations: Date,
+  nextHearingDate: Date,
+
+  // Status
+  status: {
+    type: String,
+    enum: ['active', 'pending', 'on_hold', 'closed', 'won', 'lost', 'settled', 'dismissed'],
+    default: 'active'
+  },
+  priority: { type: String, enum: ['low', 'medium', 'high', 'urgent'], default: 'medium' },
+
+  // Billing
+  billingArrangement: {
+    type: String,
+    enum: ['hourly', 'flat_fee', 'contingency', 'blended', 'monthly_retainer'],
+    default: 'hourly'
+  },
+  budget: { type: Number, default: 0 },
+  estimatedValue: Number,
+
+  // Organization
+  departmentId: String,
+  locationId: String,
+
+  // Notes
+  notes: String,
+  tags: [String],
+
+  // Metadata
+  createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
+}, { timestamps: true });
+
+// Generate case number
+caseSchema.pre('save', async function(next) {
+  if (this.isNew && !this.caseNumber) {
+    const year = new Date().getFullYear();
+    const count = await this.constructor.countDocuments() + 1;
+    this.caseNumber = `CASE-${year}-${String(count).padStart(5, '0')}`;
+  }
+  next();
+});
+
+module.exports = mongoose.model('Case', caseSchema);
+```
+
+### 4. Invoice Schema
+
+```javascript
+// models/Invoice.js
+const mongoose = require('mongoose');
+
+const lineItemSchema = new mongoose.Schema({
+  type: { type: String, enum: ['time', 'expense', 'flat_fee', 'product', 'discount', 'subtotal', 'comment'] },
+  date: Date,
+  description: { type: String, required: true },
+  quantity: { type: Number, default: 1 },
+  unitPrice: { type: Number, default: 0 },
+  discountType: { type: String, enum: ['percentage', 'fixed'] },
+  discountValue: { type: Number, default: 0 },
+  lineTotal: { type: Number, default: 0 },
+  taxable: { type: Boolean, default: true },
+  attorneyId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  activityCode: String,
+  timeEntryId: { type: mongoose.Schema.Types.ObjectId, ref: 'TimeEntry' },
+  expenseId: { type: mongoose.Schema.Types.ObjectId, ref: 'Expense' }
+});
+
+const invoiceSchema = new mongoose.Schema({
+  // Basic Info
+  invoiceNumber: { type: String, unique: true, required: true },
+  status: {
+    type: String,
+    enum: ['draft', 'sent', 'viewed', 'partial', 'paid', 'overdue', 'void', 'written_off'],
+    default: 'draft'
+  },
+
+  // Client & Case
+  clientId: { type: mongoose.Schema.Types.ObjectId, ref: 'Client', required: true },
+  clientType: { type: String, enum: ['individual', 'corporate', 'government'] },
+  caseId: { type: mongoose.Schema.Types.ObjectId, ref: 'Case' },
+
+  // Dates
+  issueDate: { type: Date, required: true },
+  dueDate: { type: Date, required: true },
+  paidAt: Date,
+  sentAt: Date,
+  viewedAt: Date,
+
+  // Payment Terms
+  paymentTerms: {
+    type: String,
+    enum: ['due_on_receipt', 'net_7', 'net_15', 'net_30', 'net_45', 'net_60', 'net_90', 'eom', 'custom'],
+    default: 'net_30'
+  },
+
+  // Currency
+  currency: { type: String, default: 'SAR' },
+  exchangeRate: { type: Number, default: 1 },
+
+  // Organization (for firms)
+  departmentId: String,
+  locationId: String,
+  responsibleAttorneyId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  billingArrangement: String,
+  customerPONumber: String,
+  matterNumber: String,
+
+  // Line Items
+  items: [lineItemSchema],
+
+  // Totals
+  subtotal: { type: Number, default: 0 },
+  discountType: { type: String, enum: ['percentage', 'fixed'] },
+  discountValue: { type: Number, default: 0 },
+  discountAmount: { type: Number, default: 0 },
+  taxableAmount: { type: Number, default: 0 },
+  vatRate: { type: Number, default: 0.15 },
+  vatAmount: { type: Number, default: 0 },
+  totalAmount: { type: Number, default: 0 },
+
+  // Payments
+  amountPaid: { type: Number, default: 0 },
+  balanceDue: { type: Number, default: 0 },
+  paymentHistory: [{
+    paymentId: { type: mongoose.Schema.Types.ObjectId, ref: 'Payment' },
+    amount: Number,
+    date: Date,
+    method: String
+  }],
+
+  // Retainer
+  applyFromRetainer: { type: Number, default: 0 },
+
+  // Payment Plan
+  enablePaymentPlan: { type: Boolean, default: false },
+  installments: Number,
+  installmentFrequency: { type: String, enum: ['weekly', 'biweekly', 'monthly'] },
+  installmentSchedule: [{
+    dueDate: Date,
+    amount: Number,
+    status: { type: String, enum: ['pending', 'paid', 'overdue'], default: 'pending' }
+  }],
+
+  // Bank Info
+  bankAccountId: { type: mongoose.Schema.Types.ObjectId, ref: 'BankAccount' },
+  paymentInstructions: String,
+  enableOnlinePayment: { type: Boolean, default: false },
+  onlinePaymentUrl: String,
+
+  // ZATCA
+  zatcaCompliant: { type: Boolean, default: false },
+  invoiceSubtype: { type: String, enum: ['0100000', '0200000'], default: '0200000' },
+  zatcaHash: String,
+  zatcaQRCode: String,
+  zatcaSubmissionId: String,
+  zatcaStatus: { type: String, enum: ['pending', 'submitted', 'accepted', 'rejected'] },
+  clientVATNumber: String,
+  clientCR: String,
+
+  // WIP (for firms)
+  wipAmount: { type: Number, default: 0 },
+  writeOffAmount: { type: Number, default: 0 },
+  writeDownAmount: { type: Number, default: 0 },
+  adjustmentReason: String,
+
+  // Approval (for large firms)
+  requiresApproval: { type: Boolean, default: false },
+  approvalStatus: { type: String, enum: ['pending', 'approved', 'rejected'] },
+  approvedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  approvedAt: Date,
+
+  // Notes
+  customerNotes: String,
+  internalNotes: String,
+  termsAndConditions: String,
+
+  // Email
+  emailTemplate: String,
+  emailSubject: String,
+  lastSentAt: Date,
+  emailHistory: [{
+    sentAt: Date,
+    to: String,
+    subject: String,
+    status: String
+  }],
+
+  // Attachments
+  attachments: [{
+    filename: String,
+    originalName: String,
+    mimeType: String,
+    size: Number,
+    url: String
+  }],
+
+  // Metadata
+  createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  updatedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
+}, { timestamps: true });
+
+// Indexes
+invoiceSchema.index({ clientId: 1, status: 1 });
+invoiceSchema.index({ dueDate: 1, status: 1 });
+invoiceSchema.index({ caseId: 1 });
+
+// Pre-save calculations
+invoiceSchema.pre('save', function(next) {
+  // Calculate line totals
+  this.subtotal = this.items.reduce((sum, item) => {
+    let lineTotal = item.quantity * item.unitPrice;
+    if (item.discountValue) {
+      if (item.discountType === 'percentage') {
+        lineTotal -= lineTotal * (item.discountValue / 100);
+      } else {
+        lineTotal -= item.discountValue;
+      }
+    }
+    item.lineTotal = lineTotal;
+    return sum + lineTotal;
+  }, 0);
+
+  // Calculate invoice discount
+  if (this.discountType === 'percentage') {
+    this.discountAmount = this.subtotal * (this.discountValue / 100);
+  } else {
+    this.discountAmount = this.discountValue || 0;
+  }
+
+  // Calculate VAT
+  this.taxableAmount = this.subtotal - this.discountAmount;
+  this.vatAmount = this.taxableAmount * this.vatRate;
+
+  // Calculate total
+  this.totalAmount = this.taxableAmount + this.vatAmount;
+
+  // Calculate balance due
+  this.balanceDue = this.totalAmount - this.amountPaid - this.applyFromRetainer;
+
+  // Update status based on payments
+  if (this.balanceDue <= 0 && this.amountPaid > 0) {
+    this.status = 'paid';
+    if (!this.paidAt) this.paidAt = new Date();
+  } else if (this.amountPaid > 0) {
+    this.status = 'partial';
+  } else if (this.dueDate < new Date() && this.status !== 'void' && this.status !== 'draft') {
+    this.status = 'overdue';
+  }
+
+  next();
+});
+
+module.exports = mongoose.model('Invoice', invoiceSchema);
+```
+
+### 5. Payment Schema
+
+```javascript
+// models/Payment.js
+const mongoose = require('mongoose');
+
+const paymentSchema = new mongoose.Schema({
+  // Basic Info
+  paymentNumber: { type: String, required: true, unique: true, index: true },
+  paymentType: {
+    type: String,
+    enum: ['customer_payment', 'vendor_payment', 'refund', 'transfer', 'advance', 'retainer'],
+    required: true
+  },
+  status: {
+    type: String,
+    enum: ['pending', 'completed', 'failed', 'cancelled', 'refunded', 'reconciled'],
+    default: 'pending'
+  },
+  paymentDate: { type: Date, required: true },
+  referenceNumber: String,
+
+  // Amount
+  amount: { type: Number, required: true, min: 0 },
+  currency: { type: String, default: 'SAR' },
+  exchangeRate: { type: Number, default: 1 },
+  amountInBaseCurrency: Number,
+
+  // Customer/Vendor Reference
+  customerId: { type: mongoose.Schema.Types.ObjectId, ref: 'Client', index: true },
+  vendorId: { type: mongoose.Schema.Types.ObjectId, ref: 'Vendor', index: true },
+
+  // Payment Method
+  paymentMethod: {
+    type: String,
+    enum: ['cash', 'bank_transfer', 'sarie', 'check', 'credit_card', 'mada', 'tabby', 'tamara', 'stc_pay', 'apple_pay'],
+    required: true
+  },
+  bankAccountId: { type: mongoose.Schema.Types.ObjectId, ref: 'BankAccount' },
+
+  // Check Details
+  checkDetails: {
+    checkNumber: String,
+    checkDate: Date,
+    checkBank: String,
+    checkBranch: String,
+    checkStatus: {
+      type: String,
+      enum: ['received', 'deposited', 'cleared', 'bounced', 'cancelled'],
+      default: 'received'
+    },
+    checkDepositDate: Date,
+    bouncedDate: Date,
+    bouncedReason: String
+  },
+
+  // Card Details
+  cardDetails: {
+    lastFour: String,
+    cardType: { type: String, enum: ['visa', 'mastercard', 'amex', 'mada'] },
+    authCode: String,
+    transactionId: String,
+    terminalId: String
+  },
+
+  // Invoice Applications
+  invoiceApplications: [{
+    invoiceId: { type: mongoose.Schema.Types.ObjectId, ref: 'Invoice', required: true },
+    amount: { type: Number, required: true, min: 0 },
+    appliedAt: { type: Date, default: Date.now }
+  }],
+
+  // Fees
+  fees: {
+    bankFees: { type: Number, default: 0 },
+    processingFees: { type: Number, default: 0 },
+    otherFees: { type: Number, default: 0 },
+    totalFees: { type: Number, default: 0 },
+    paidBy: { type: String, enum: ['office', 'client'], default: 'office' }
+  },
+
+  // Overpayment/Underpayment
+  overpaymentAction: { type: String, enum: ['credit', 'refund', 'hold'] },
+  underpaymentAction: { type: String, enum: ['write_off', 'leave_open', 'credit'] },
+  writeOffReason: String,
+  unappliedAmount: { type: Number, default: 0 },
+
+  // Refund Details
+  refundDetails: {
+    originalPaymentId: { type: mongoose.Schema.Types.ObjectId, ref: 'Payment' },
+    reason: String,
+    method: { type: String, enum: ['original', 'cash', 'bank_transfer'] }
+  },
+
+  // Reconciliation
+  reconciliation: {
+    isReconciled: { type: Boolean, default: false },
+    reconciledDate: Date,
+    reconciledBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+    bankStatementRef: String
+  },
+
+  // Organization
+  departmentId: String,
+  locationId: String,
+  receivedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+
+  // Notes
+  customerNotes: String,
+  internalNotes: String,
+  memo: String,
+
+  // Attachments
+  attachments: [{
+    filename: String,
+    originalName: String,
+    mimeType: String,
+    size: Number,
+    url: String,
+    uploadedAt: { type: Date, default: Date.now }
+  }],
+
+  // Metadata
+  createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  updatedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
+}, { timestamps: true });
+
+// Indexes
+paymentSchema.index({ customerId: 1, paymentDate: -1 });
+paymentSchema.index({ vendorId: 1, paymentDate: -1 });
+paymentSchema.index({ status: 1, paymentDate: -1 });
+paymentSchema.index({ 'checkDetails.checkStatus': 1 });
+paymentSchema.index({ 'reconciliation.isReconciled': 1 });
+
+// Pre-save hook
+paymentSchema.pre('save', async function(next) {
+  // Generate payment number
+  if (this.isNew && !this.paymentNumber) {
+    const date = new Date();
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const count = await this.constructor.countDocuments() + 1;
+    this.paymentNumber = `PAY-${year}${month}-${String(count).padStart(4, '0')}`;
+  }
+
+  // Calculate amount in base currency
+  this.amountInBaseCurrency = this.amount * (this.exchangeRate || 1);
+
+  // Calculate total fees
+  if (this.fees) {
+    this.fees.totalFees = (this.fees.bankFees || 0) + (this.fees.processingFees || 0) + (this.fees.otherFees || 0);
+  }
+
+  // Calculate unapplied amount
+  const appliedTotal = this.invoiceApplications.reduce((sum, app) => sum + app.amount, 0);
+  this.unappliedAmount = this.amount - appliedTotal;
+
+  next();
+});
+
+module.exports = mongoose.model('Payment', paymentSchema);
+```
+
+### 6. TimeEntry Schema
+
+```javascript
+// models/TimeEntry.js
+const mongoose = require('mongoose');
+
+const timeEntrySchema = new mongoose.Schema({
+  // References
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  clientId: { type: mongoose.Schema.Types.ObjectId, ref: 'Client', required: true },
+  caseId: { type: mongoose.Schema.Types.ObjectId, ref: 'Case' },
+  taskId: { type: mongoose.Schema.Types.ObjectId, ref: 'Task' },
+
+  // Time
+  date: { type: Date, required: true },
+  startTime: Date,
+  endTime: Date,
+  duration: { type: Number, required: true, min: 0 }, // in hours
+
+  // Description
+  description: { type: String, required: true },
+  activityCode: String, // UTBMS codes (L110, L120, etc.)
+
+  // Billing
+  billable: { type: Boolean, default: true },
+  billed: { type: Boolean, default: false },
+  hourlyRate: { type: Number, required: true },
+  amount: { type: Number, default: 0 },
+
+  // Invoice Reference
+  invoiceId: { type: mongoose.Schema.Types.ObjectId, ref: 'Invoice' },
+  invoicedAt: Date,
+
+  // Status
+  status: {
+    type: String,
+    enum: ['draft', 'submitted', 'approved', 'rejected', 'billed'],
+    default: 'draft'
+  },
+  approvedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  approvedAt: Date,
+
+  // Notes
+  internalNotes: String,
+
+  // Metadata
+  createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
+}, { timestamps: true });
+
+// Calculate amount
+timeEntrySchema.pre('save', function(next) {
+  this.amount = this.duration * this.hourlyRate;
+  next();
+});
+
+module.exports = mongoose.model('TimeEntry', timeEntrySchema);
+```
+
+---
+
+## API Routes
+
+### Authentication Routes
+
+```javascript
+// routes/auth.js
+const router = require('express').Router();
+const authController = require('../controllers/authController');
+const { validateLogin, validateRegister } = require('../middleware/validation');
+
+router.post('/register', validateRegister, authController.register);
+router.post('/login', validateLogin, authController.login);
+router.post('/refresh-token', authController.refreshToken);
+router.post('/logout', authController.logout);
+router.post('/forgot-password', authController.forgotPassword);
+router.post('/reset-password/:token', authController.resetPassword);
+
+module.exports = router;
+```
+
+### Invoice Routes
+
+```javascript
+// routes/invoices.js
+const router = require('express').Router();
+const invoicesController = require('../controllers/invoicesController');
+const { authenticate, authorize } = require('../middleware/auth');
+const { validateInvoice } = require('../middleware/validation');
+
+router.use(authenticate);
+
+// CRUD
+router.get('/', authorize('invoices:read'), invoicesController.getInvoices);
+router.get('/stats', authorize('invoices:read'), invoicesController.getInvoiceStats);
+router.get('/:id', authorize('invoices:read'), invoicesController.getInvoice);
+router.post('/', authorize('invoices:create'), validateInvoice, invoicesController.createInvoice);
+router.put('/:id', authorize('invoices:update'), validateInvoice, invoicesController.updateInvoice);
+router.delete('/:id', authorize('invoices:delete'), invoicesController.deleteInvoice);
+
+// Actions
+router.post('/:id/send', authorize('invoices:send'), invoicesController.sendInvoice);
+router.post('/:id/remind', authorize('invoices:send'), invoicesController.sendReminder);
+router.post('/:id/void', authorize('invoices:void'), invoicesController.voidInvoice);
+router.post('/:id/duplicate', authorize('invoices:create'), invoicesController.duplicateInvoice);
+
+// PDF
+router.get('/:id/pdf', authorize('invoices:read'), invoicesController.generatePDF);
+
+// ZATCA
+router.post('/:id/zatca/submit', authorize('invoices:zatca'), invoicesController.submitToZATCA);
+router.get('/:id/zatca/status', authorize('invoices:read'), invoicesController.getZATCAStatus);
+
+module.exports = router;
+```
+
+### Payment Routes
+
+```javascript
+// routes/payments.js
+const router = require('express').Router();
+const paymentsController = require('../controllers/paymentsController');
+const { authenticate, authorize } = require('../middleware/auth');
+const { validatePayment } = require('../middleware/validation');
+const upload = require('../middleware/upload');
+
+router.use(authenticate);
+
+// CRUD
+router.get('/', authorize('payments:read'), paymentsController.getPayments);
+router.get('/stats', authorize('payments:read'), paymentsController.getPaymentStats);
+router.get('/pending-checks', authorize('payments:read'), paymentsController.getPendingChecks);
+router.get('/unreconciled', authorize('payments:read'), paymentsController.getUnreconciledPayments);
+router.get('/:id', authorize('payments:read'), paymentsController.getPayment);
+router.post('/', authorize('payments:create'), validatePayment, paymentsController.createPayment);
+router.put('/:id', authorize('payments:update'), validatePayment, paymentsController.updatePayment);
+router.delete('/:id', authorize('payments:delete'), paymentsController.deletePayment);
+
+// Invoice Application
+router.post('/:id/apply', authorize('payments:update'), paymentsController.applyToInvoices);
+router.delete('/:id/apply/:applicationId', authorize('payments:update'), paymentsController.removeApplication);
+
+// Check Management
+router.patch('/:id/check/status', authorize('payments:update'), paymentsController.updateCheckStatus);
+router.post('/:id/check/deposit', authorize('payments:update'), paymentsController.depositCheck);
+
+// Reconciliation
+router.post('/:id/reconcile', authorize('payments:reconcile'), paymentsController.reconcilePayment);
+router.delete('/:id/reconcile', authorize('payments:reconcile'), paymentsController.unreconcilePayment);
+
+// Refunds
+router.post('/:id/refund', authorize('payments:refund'), paymentsController.createRefund);
+
+// Attachments
+router.post('/:id/attachments', authorize('payments:update'), upload.array('files', 10), paymentsController.uploadAttachments);
+router.delete('/:id/attachments/:attachmentId', authorize('payments:update'), paymentsController.deleteAttachment);
+
+// Receipt
+router.get('/:id/receipt', authorize('payments:read'), paymentsController.generateReceipt);
+router.post('/:id/receipt/send', authorize('payments:update'), paymentsController.sendReceipt);
+
+module.exports = router;
+```
+
+---
+
+## Middleware
+
+### Authentication Middleware
+
+```javascript
+// middleware/auth.js
+const jwt = require('jsonwebtoken');
+const User = require('../models/User');
+
+const authenticate = async (req, res, next) => {
+  try {
+    const token = req.header('Authorization')?.replace('Bearer ', '');
+
+    if (!token) {
+      return res.status(401).json({ error: 'Authentication required' });
+    }
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const user = await User.findById(decoded.userId);
+
+    if (!user || user.status !== 'active') {
+      return res.status(401).json({ error: 'Invalid or expired token' });
+    }
+
+    req.user = user;
+    req.token = token;
+    next();
+  } catch (error) {
+    res.status(401).json({ error: 'Invalid token' });
+  }
+};
+
+const authorize = (...permissions) => {
+  return (req, res, next) => {
+    if (req.user.role === 'admin') {
+      return next();
+    }
+
+    const hasPermission = permissions.some(permission =>
+      req.user.permissions.includes(permission)
+    );
+
+    if (!hasPermission) {
+      return res.status(403).json({ error: 'Access denied' });
+    }
+
+    next();
+  };
+};
+
+module.exports = { authenticate, authorize };
+```
+
+### Validation Middleware
+
+```javascript
+// middleware/validation.js
+const Joi = require('joi');
+
+const validateInvoice = (req, res, next) => {
+  const schema = Joi.object({
+    clientId: Joi.string().required(),
+    caseId: Joi.string().optional(),
+    issueDate: Joi.date().required(),
+    dueDate: Joi.date().min(Joi.ref('issueDate')).required(),
+    paymentTerms: Joi.string().valid('due_on_receipt', 'net_7', 'net_15', 'net_30', 'net_45', 'net_60', 'net_90', 'eom', 'custom'),
+    items: Joi.array().items(
+      Joi.object({
+        type: Joi.string().valid('time', 'expense', 'flat_fee', 'product', 'discount', 'subtotal', 'comment'),
+        description: Joi.string().required(),
+        quantity: Joi.number().min(0).default(1),
+        unitPrice: Joi.number().min(0).default(0),
+        taxable: Joi.boolean().default(true)
+      })
+    ).min(1).required(),
+    discountType: Joi.string().valid('percentage', 'fixed'),
+    discountValue: Joi.number().min(0).default(0),
+    customerNotes: Joi.string().optional(),
+    internalNotes: Joi.string().optional()
+  });
+
+  const { error } = schema.validate(req.body, { abortEarly: false });
+
+  if (error) {
+    return res.status(400).json({
+      error: 'Validation failed',
+      details: error.details.map(d => d.message)
+    });
+  }
+
+  next();
+};
+
+const validatePayment = (req, res, next) => {
+  const schema = Joi.object({
+    paymentType: Joi.string().valid('customer_payment', 'vendor_payment', 'refund', 'transfer', 'advance', 'retainer').required(),
+    paymentDate: Joi.date().required(),
+    amount: Joi.number().positive().required(),
+    currency: Joi.string().default('SAR'),
+    paymentMethod: Joi.string().valid('cash', 'bank_transfer', 'sarie', 'check', 'credit_card', 'mada', 'tabby', 'tamara', 'stc_pay', 'apple_pay').required(),
+    customerId: Joi.when('paymentType', {
+      is: 'customer_payment',
+      then: Joi.string().required(),
+      otherwise: Joi.string().optional()
+    }),
+    checkDetails: Joi.when('paymentMethod', {
+      is: 'check',
+      then: Joi.object({
+        checkNumber: Joi.string().required(),
+        checkDate: Joi.date().required(),
+        checkBank: Joi.string().required()
+      }),
+      otherwise: Joi.object().optional()
+    }),
+    invoiceApplications: Joi.array().items(
+      Joi.object({
+        invoiceId: Joi.string().required(),
+        amount: Joi.number().positive().required()
+      })
+    ).optional()
+  });
+
+  const { error } = schema.validate(req.body, { abortEarly: false });
+
+  if (error) {
+    return res.status(400).json({
+      error: 'Validation failed',
+      details: error.details.map(d => d.message)
+    });
+  }
+
+  next();
+};
+
+module.exports = { validateInvoice, validatePayment };
+```
+
+---
+
+## Environment Variables
+
+```bash
+# .env.example
+
+# Server
+NODE_ENV=development
+PORT=5000
+API_URL=http://localhost:5000
+
+# Database
+MONGODB_URI=mongodb://localhost:27017/traf3li
+
+# JWT
+JWT_SECRET=your-super-secret-jwt-key-change-this
+JWT_EXPIRES_IN=7d
+JWT_REFRESH_SECRET=your-refresh-token-secret
+JWT_REFRESH_EXPIRES_IN=30d
+
+# Redis (for caching)
+REDIS_URL=redis://localhost:6379
+
+# Email (SendGrid / SMTP)
+EMAIL_FROM=noreply@traf3li.com
+SENDGRID_API_KEY=your-sendgrid-api-key
+
+# File Storage (S3 / Local)
+STORAGE_TYPE=local
+AWS_ACCESS_KEY_ID=your-aws-key
+AWS_SECRET_ACCESS_KEY=your-aws-secret
+AWS_BUCKET_NAME=traf3li-uploads
+AWS_REGION=me-south-1
+
+# ZATCA E-Invoice
+ZATCA_ENV=sandbox
+ZATCA_CLIENT_ID=your-zatca-client-id
+ZATCA_CLIENT_SECRET=your-zatca-client-secret
+ZATCA_CERT_PATH=./certs/zatca.pem
+ZATCA_PRIVATE_KEY_PATH=./certs/zatca-key.pem
+
+# Office Info (for invoices)
+OFFICE_NAME=مكتب ترافيلي للمحاماة
+OFFICE_NAME_EN=Traf3li Law Firm
+OFFICE_VAT_NUMBER=300000000000003
+OFFICE_CR_NUMBER=1010000000
+OFFICE_ADDRESS=الرياض، المملكة العربية السعودية
+OFFICE_PHONE=+966 11 000 0000
+OFFICE_EMAIL=info@traf3li.com
+
+# Rate Limiting
+RATE_LIMIT_WINDOW_MS=900000
+RATE_LIMIT_MAX=100
+```
+
+---
+
+## ZATCA Integration
+
+```javascript
+// services/zatcaService.js
+const crypto = require('crypto');
+const axios = require('axios');
+const { XMLBuilder, XMLParser } = require('fast-xml-parser');
+
+class ZATCAService {
+  constructor() {
+    this.baseUrl = process.env.ZATCA_ENV === 'production'
+      ? 'https://fatoora.zatca.gov.sa'
+      : 'https://gw-fatoora.zatca.gov.sa';
+    this.clientId = process.env.ZATCA_CLIENT_ID;
+    this.clientSecret = process.env.ZATCA_CLIENT_SECRET;
+  }
+
+  // Generate invoice hash
+  generateHash(invoiceXml) {
+    return crypto.createHash('sha256').update(invoiceXml).digest('base64');
+  }
+
+  // Generate QR code data
+  generateQRCode(invoice) {
+    const data = [
+      { tag: 1, value: process.env.OFFICE_NAME },
+      { tag: 2, value: process.env.OFFICE_VAT_NUMBER },
+      { tag: 3, value: invoice.issueDate.toISOString() },
+      { tag: 4, value: invoice.totalAmount.toFixed(2) },
+      { tag: 5, value: invoice.vatAmount.toFixed(2) }
+    ];
+
+    let tlvBuffer = Buffer.alloc(0);
+    for (const item of data) {
+      const tagBuffer = Buffer.from([item.tag]);
+      const valueBuffer = Buffer.from(item.value, 'utf8');
+      const lengthBuffer = Buffer.from([valueBuffer.length]);
+      tlvBuffer = Buffer.concat([tlvBuffer, tagBuffer, lengthBuffer, valueBuffer]);
+    }
+
+    return tlvBuffer.toString('base64');
+  }
+
+  // Build UBL 2.1 XML
+  buildInvoiceXML(invoice, client) {
+    const builder = new XMLBuilder({
+      ignoreAttributes: false,
+      format: true,
+      suppressEmptyNode: true
+    });
+
+    const invoiceData = {
+      Invoice: {
+        '@_xmlns': 'urn:oasis:names:specification:ubl:schema:xsd:Invoice-2',
+        '@_xmlns:cac': 'urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2',
+        '@_xmlns:cbc': 'urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2',
+        'cbc:ProfileID': 'reporting:1.0',
+        'cbc:ID': invoice.invoiceNumber,
+        'cbc:UUID': invoice._id.toString(),
+        'cbc:IssueDate': invoice.issueDate.toISOString().split('T')[0],
+        'cbc:IssueTime': invoice.issueDate.toISOString().split('T')[1].split('.')[0] + 'Z',
+        'cbc:InvoiceTypeCode': {
+          '@_name': invoice.invoiceSubtype,
+          '#text': '388' // Standard invoice
+        },
+        'cbc:DocumentCurrencyCode': invoice.currency,
+        'cbc:TaxCurrencyCode': 'SAR',
+        // ... more fields
+      }
+    };
+
+    return builder.build(invoiceData);
+  }
+
+  // Submit to ZATCA
+  async submitInvoice(invoice, client) {
+    try {
+      const xml = this.buildInvoiceXML(invoice, client);
+      const hash = this.generateHash(xml);
+      const qrCode = this.generateQRCode(invoice);
+
+      const response = await axios.post(
+        `${this.baseUrl}/invoices/reporting/single`,
+        {
+          invoiceHash: hash,
+          uuid: invoice._id.toString(),
+          invoice: Buffer.from(xml).toString('base64')
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept-Language': 'ar',
+            'Accept-Version': 'V2',
+            'Authorization': `Basic ${Buffer.from(`${this.clientId}:${this.clientSecret}`).toString('base64')}`
+          }
+        }
+      );
+
+      return {
+        success: true,
+        submissionId: response.data.submissionId,
+        status: response.data.status,
+        hash,
+        qrCode
+      };
+    } catch (error) {
+      console.error('ZATCA submission error:', error.response?.data || error.message);
+      return {
+        success: false,
+        error: error.response?.data?.message || error.message
+      };
+    }
+  }
+}
+
+module.exports = new ZATCAService();
+```
+
+---
+
+## Quick Start
+
+1. **Install dependencies:**
+```bash
+npm install express mongoose bcryptjs jsonwebtoken joi axios multer nodemailer fast-xml-parser
+npm install -D nodemon
+```
+
+2. **Create .env file** from .env.example
+
+3. **Start MongoDB:**
+```bash
+mongod --dbpath /path/to/data
+```
+
+4. **Run the server:**
+```bash
+npm run dev
+```
+
+5. **Test the API:**
+```bash
+# Login
+curl -X POST http://localhost:5000/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email": "admin@traf3li.com", "password": "password123"}'
+
+# Create Invoice
+curl -X POST http://localhost:5000/api/invoices \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{...}'
+```
+
+---
+
+## Notes
+
+- All monetary amounts are stored as Numbers (not Decimal128) for simplicity
+- Dates are stored in UTC and converted to Saudi timezone (Asia/Riyadh) on display
+- Arabic text is fully supported with proper UTF-8 encoding
+- All API responses are in JSON format
+- Rate limiting is applied to prevent abuse
+- File uploads are limited to 10MB per file
+- ZATCA integration requires sandbox testing before production
