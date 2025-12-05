@@ -1,6 +1,8 @@
 import { StaffActionDialog } from './staff-action-dialog'
 import { StaffDeleteDialog } from './staff-delete-dialog'
 import { StaffViewDialog } from './staff-view-dialog'
+import { StaffDepartureDialog } from './staff-departure-dialog'
+import { StaffReinstateDialog } from './staff-reinstate-dialog'
 import { useStaffContext } from './staff-provider'
 
 export function StaffDialogs() {
@@ -13,6 +15,10 @@ export function StaffDialogs() {
         open={open === 'add'}
         onOpenChange={() => setOpen('add')}
       />
+
+      {/* Departure and Reinstate dialogs */}
+      <StaffDepartureDialog />
+      <StaffReinstateDialog />
 
       {currentRow && (
         <>
