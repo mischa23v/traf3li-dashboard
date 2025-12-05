@@ -118,6 +118,9 @@ export function FinanceSidebar({
 
     const currentLinks = links[context] || links.invoices
 
+    // Transactions are read-only - no create action
+    const isReadOnlyContext = context === 'transactions'
+
     // Generate 5 days for the strip
     const calendarStripDays = useMemo(() => {
         return Array.from({ length: 5 }).map((_, i) => {
@@ -170,42 +173,61 @@ export function FinanceSidebar({
                 </div>
 
                 {/* Content */}
-                <div className="relative z-10 grid grid-cols-2 gap-4 animate-in fade-in slide-in-from-bottom-2 duration-300">
-                    {/* Create Button - White + Green Text + Glow */}
-                    <Button asChild className="bg-white hover:bg-emerald-50 text-emerald-600 h-auto py-6 flex flex-col items-center justify-center gap-2 rounded-3xl shadow-lg shadow-white/10 transition-all duration-300 hover:scale-[1.02] border-0">
-                        <Link to={currentLinks.create}>
-                            <Plus className="h-7 w-7" />
-                            <span className="text-sm font-bold">إنشاء</span>
-                        </Link>
-                    </Button>
+                <div className={cn(
+                    "relative z-10 animate-in fade-in slide-in-from-bottom-2 duration-300",
+                    isReadOnlyContext ? "grid grid-cols-1 gap-4" : "grid grid-cols-2 gap-4"
+                )}>
+                    {/* Create Button - Only show for non-read-only contexts */}
+                    {!isReadOnlyContext && (
+                        <Button asChild className="bg-white hover:bg-emerald-50 text-emerald-600 h-auto py-6 flex flex-col items-center justify-center gap-2 rounded-3xl shadow-lg shadow-white/10 transition-all duration-300 hover:scale-[1.02] border-0">
+                            <Link to={currentLinks.create}>
+                                <Plus className="h-7 w-7" />
+                                <span className="text-sm font-bold">إنشاء</span>
+                            </Link>
+                        </Button>
+                    )}
 
-                    {/* Select Button - White + Dark Text + Glow */}
-                    <Button
-                        variant="ghost"
-                        className={cn(
-                            "h-auto py-6 flex flex-col items-center justify-center gap-2 rounded-3xl transition-all duration-300 hover:scale-[1.02] shadow-lg",
-                            isSelectionMode
-                                ? "bg-emerald-100 text-emerald-800 ring-2 ring-emerald-400 shadow-emerald-500/20"
-                                : "bg-white hover:bg-slate-50 text-emerald-950 shadow-white/10"
-                        )}
-                        onClick={onToggleSelectionMode}
-                    >
-                        {isSelectionMode ? <X className="h-6 w-6" /> : <CheckSquare className="h-6 w-6" />}
-                        <span className="text-sm font-bold">{isSelectionMode ? 'إلغاء' : 'تحديد'}</span>
-                    </Button>
+                    {/* Select Button - Only show for non-read-only contexts */}
+                    {!isReadOnlyContext && (
+                        <Button
+                            variant="ghost"
+                            className={cn(
+                                "h-auto py-6 flex flex-col items-center justify-center gap-2 rounded-3xl transition-all duration-300 hover:scale-[1.02] shadow-lg",
+                                isSelectionMode
+                                    ? "bg-emerald-100 text-emerald-800 ring-2 ring-emerald-400 shadow-emerald-500/20"
+                                    : "bg-white hover:bg-slate-50 text-emerald-950 shadow-white/10"
+                            )}
+                            onClick={onToggleSelectionMode}
+                        >
+                            {isSelectionMode ? <X className="h-6 w-6" /> : <CheckSquare className="h-6 w-6" />}
+                            <span className="text-sm font-bold">{isSelectionMode ? 'إلغاء' : 'تحديد'}</span>
+                        </Button>
+                    )}
 
-                    {/* Delete Button - White + Red Text + Glow */}
-                    <Button
-                        variant="ghost"
-                        className="bg-white hover:bg-red-50 text-red-500 hover:text-red-600 h-auto py-6 flex flex-col items-center justify-center gap-2 rounded-3xl disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 hover:scale-[1.02] shadow-lg shadow-white/10"
-                        onClick={onDeleteSelected}
-                        disabled={!isSelectionMode || selectedCount === 0}
-                    >
-                        <Trash2 className="h-6 w-6" />
-                        <span className="text-sm font-bold">
-                            {selectedCount > 0 ? `حذف (${selectedCount})` : 'حذف'}
-                        </span>
-                    </Button>
+                    {/* Delete Button - Only show for non-read-only contexts */}
+                    {!isReadOnlyContext && (
+                        <Button
+                            variant="ghost"
+                            className="bg-white hover:bg-red-50 text-red-500 hover:text-red-600 h-auto py-6 flex flex-col items-center justify-center gap-2 rounded-3xl disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 hover:scale-[1.02] shadow-lg shadow-white/10"
+                            onClick={onDeleteSelected}
+                            disabled={!isSelectionMode || selectedCount === 0}
+                        >
+                            <Trash2 className="h-6 w-6" />
+                            <span className="text-sm font-bold">
+                                {selectedCount > 0 ? `حذف (${selectedCount})` : 'حذف'}
+                            </span>
+                        </Button>
+                    )}
+
+                    {/* Read-Only Notice - Only show for transactions */}
+                    {isReadOnlyContext && (
+                        <div className="bg-blue-50 border border-blue-200 rounded-2xl p-4 text-center">
+                            <div className="text-blue-600 text-sm font-bold mb-1">سجل للقراءة فقط</div>
+                            <div className="text-blue-500 text-xs">
+                                يتم إنشاء القيود تلقائياً عند ترحيل المستندات
+                            </div>
+                        </div>
+                    )}
 
                     {/* View All Button - White + Dark Text + Glow */}
                     <Button asChild variant="ghost" className="bg-white hover:bg-slate-50 text-emerald-950 h-auto py-6 flex flex-col items-center justify-center gap-2 rounded-3xl transition-all duration-300 hover:scale-[1.02] shadow-lg shadow-white/10">
