@@ -20,6 +20,9 @@ This document provides comprehensive backend implementation details for the Traf
 10. [Saudi Government API Integration](#saudi-government-api-integration)
 11. [Lead Management & Conversion](#lead-management--conversion)
 12. [Complete Unified Data Flow](#complete-unified-data-flow)
+13. [Complete System Integration](#complete-system-integration)
+14. [Additional Schemas](#additional-schemas)
+15. [API Endpoints Summary](#api-endpoints-summary)
 
 ---
 
@@ -36,6 +39,8 @@ backend/
 │   │   ├── User.js
 │   │   ├── Lead.js              # Lead management
 │   │   ├── Client.js
+│   │   ├── Contact.js           # Client contacts
+│   │   ├── Organization.js      # External organizations
 │   │   ├── Case.js
 │   │   ├── Invoice.js
 │   │   ├── Payment.js
@@ -44,8 +49,17 @@ backend/
 │   │   ├── Task.js
 │   │   ├── Reminder.js
 │   │   ├── Event.js
+│   │   ├── Message.js           # Internal/External messages
 │   │   ├── Document.js
+│   │   ├── Service.js           # Legal services catalog
+│   │   ├── Referral.js          # Referral tracking
+│   │   ├── ActivityLog.js       # Activity history
+│   │   ├── Transaction.js       # Financial transactions
 │   │   ├── Employee.js
+│   │   ├── Payroll.js           # Monthly payroll
+│   │   ├── Leave.js             # Leave requests
+│   │   ├── Attendance.js        # Daily attendance
+│   │   ├── Evaluation.js        # Employee evaluations
 │   │   ├── Vendor.js
 │   │   └── BankAccount.js
 │   ├── routes/
@@ -53,15 +67,27 @@ backend/
 │   │   ├── users.js
 │   │   ├── leads.js             # Lead CRUD + conversion
 │   │   ├── clients.js
+│   │   ├── contacts.js          # Client contacts
+│   │   ├── organizations.js     # External organizations
 │   │   ├── cases.js
 │   │   ├── invoices.js
 │   │   ├── payments.js
 │   │   ├── expenses.js
+│   │   ├── transactions.js      # Financial transactions
 │   │   ├── timeEntries.js
 │   │   ├── tasks.js
 │   │   ├── reminders.js
 │   │   ├── events.js
+│   │   ├── messages.js          # Internal/External messages
 │   │   ├── documents.js
+│   │   ├── services.js          # Legal services catalog
+│   │   ├── referrals.js         # Referral tracking
+│   │   ├── activityLog.js       # Activity history
+│   │   ├── employees.js         # HR - Employees
+│   │   ├── payroll.js           # HR - Payroll
+│   │   ├── leaves.js            # HR - Leave requests
+│   │   ├── attendance.js        # HR - Attendance
+│   │   ├── evaluations.js       # HR - Evaluations
 │   │   └── verify.js            # Saudi API verification
 │   ├── controllers/
 │   │   └── [corresponding controllers]
@@ -2716,6 +2742,700 @@ const useUnifiedData = () => {
 
   return { clientData, caseData, billableItems, selectClient, selectCase };
 };
+```
+
+---
+
+## Complete System Integration
+
+### Full Entity Relationship Map
+
+```
+┌─────────────────────────────────────────────────────────────────────────────────────────────┐
+│                                    TRAF3LI UNIFIED SYSTEM                                    │
+├─────────────────────────────────────────────────────────────────────────────────────────────┤
+│                                                                                              │
+│  ┌─────────────────────────────────────────────────────────────────────────────────────────┐│
+│  │                              المبيعات (SALES)                                           ││
+│  │  ┌──────────┐    ┌──────────┐    ┌──────────┐    ┌──────────┐                          ││
+│  │  │  Lead    │───▶│ Pipeline │───▶│ Referral │    │ Activity │                          ││
+│  │  │ المحتمل  │    │  المسار  │    │ الإحالة  │    │  السجل   │                          ││
+│  │  └────┬─────┘    └──────────┘    └────┬─────┘    └──────────┘                          ││
+│  └───────┼───────────────────────────────┼─────────────────────────────────────────────────┘│
+│          │ Convert                       │ Source                                            │
+│          ▼                               ▼                                                   │
+│  ┌─────────────────────────────────────────────────────────────────────────────────────────┐│
+│  │                         العملاء والتواصل (CLIENTS & COMMUNICATION)                      ││
+│  │  ┌──────────┐    ┌──────────┐    ┌──────────┐    ┌──────────┐                          ││
+│  │  │  Client  │◀──▶│ Contact  │◀──▶│   Org    │    │   Team   │                          ││
+│  │  │  العميل  │    │جهة الاتصال│    │ المنظمة  │    │  الفريق  │                          ││
+│  │  └────┬─────┘    └──────────┘    └────┬─────┘    └────┬─────┘                          ││
+│  └───────┼───────────────────────────────┼───────────────┼─────────────────────────────────┘│
+│          │                               │               │                                   │
+│          ▼                               ▼               ▼                                   │
+│  ┌─────────────────────────────────────────────────────────────────────────────────────────┐│
+│  │                              الأعمال (BUSINESS)                                         ││
+│  │  ┌──────────┐    ┌──────────┐    ┌──────────┐    ┌──────────┐                          ││
+│  │  │   Case   │───▶│ Document │    │ Service  │    │   Job    │                          ││
+│  │  │  القضية  │    │ المستند  │    │  الخدمة  │    │ الوظيفة  │                          ││
+│  │  └────┬─────┘    └──────────┘    └──────────┘    └──────────┘                          ││
+│  └───────┼─────────────────────────────────────────────────────────────────────────────────┘│
+│          │                                                                                   │
+│          ▼                                                                                   │
+│  ┌─────────────────────────────────────────────────────────────────────────────────────────┐│
+│  │                             الإنتاجية (PRODUCTIVITY)                                    ││
+│  │  ┌──────────┐    ┌──────────┐    ┌──────────┐    ┌──────────┐                          ││
+│  │  │   Task   │    │ Reminder │    │  Event   │    │ Message  │                          ││
+│  │  │  المهمة  │    │ التذكير  │    │  الحدث   │    │ الرسالة  │                          ││
+│  │  └────┬─────┘    └──────────┘    └────┬─────┘    └──────────┘                          ││
+│  └───────┼───────────────────────────────┼─────────────────────────────────────────────────┘│
+│          │ Billable                      │ Billable                                          │
+│          ▼                               ▼                                                   │
+│  ┌─────────────────────────────────────────────────────────────────────────────────────────┐│
+│  │                               المالية (FINANCE)                                         ││
+│  │  ┌──────────┐    ┌──────────┐    ┌──────────┐    ┌──────────┐    ┌──────────┐         ││
+│  │  │TimeEntry │───▶│ Invoice  │◀───│ Payment  │    │ Expense  │    │Transaction│         ││
+│  │  │تتبع الوقت│    │ الفاتورة │    │ الدفعة   │    │ المصروف  │    │ المعاملة  │         ││
+│  │  └──────────┘    └────┬─────┘    └──────────┘    └──────────┘    └──────────┘         ││
+│  └────────────────────────┼────────────────────────────────────────────────────────────────┘│
+│                           │ Salary Payment                                                   │
+│                           ▼                                                                  │
+│  ┌─────────────────────────────────────────────────────────────────────────────────────────┐│
+│  │                           الموارد البشرية (HR)                                          ││
+│  │  ┌──────────┐    ┌──────────┐    ┌──────────┐    ┌──────────┐    ┌──────────┐         ││
+│  │  │ Employee │───▶│  Salary  │───▶│ Payroll  │    │  Leave   │    │Attendance│         ││
+│  │  │ الموظف   │    │  الراتب  │    │ المسير   │    │ الإجازة  │    │ الحضور   │         ││
+│  │  └────┬─────┘    └──────────┘    └──────────┘    └──────────┘    └──────────┘         ││
+│  │       │          ┌──────────┐                                                           ││
+│  │       └─────────▶│Evaluation│                                                           ││
+│  │                  │ التقييم  │                                                           ││
+│  │                  └──────────┘                                                           ││
+│  └─────────────────────────────────────────────────────────────────────────────────────────┘│
+│                                                                                              │
+└─────────────────────────────────────────────────────────────────────────────────────────────┘
+```
+
+### Cross-Section Data Flows
+
+#### 1. Sales → Clients Flow
+```javascript
+// When Lead converts to Client
+Lead (المحتمل) → Client (العميل)
+├── All contact info transfers
+├── Verification data transfers
+├── Source/Referral tracking maintained
+└── Optional: Create initial Case
+
+// Referral tracking
+Referral (الإحالة) → Client.referredBy
+                   → Lead.source = 'referral'
+```
+
+#### 2. Clients → Business Flow
+```javascript
+// Client creates Case
+Client → Case (القضية)
+├── Client info auto-fills
+├── Contact persons available
+├── Organization links if corporate
+└── Team assignment from Client.responsibleAttorney
+
+// Case creates Documents
+Case → Document (المستند)
+├── Case reference auto-links
+├── Client info available
+└── Access permissions from Case.teamMembers
+```
+
+#### 3. Business → Productivity Flow
+```javascript
+// Case creates Tasks
+Case → Task (المهمة)
+├── Case.clientId auto-links
+├── Case.teamMembers available for assignment
+├── Due dates link to Case deadlines
+└── Billable flag for finance
+
+// Case creates Events (hearings, meetings)
+Case → Event (الحدث)
+├── Client auto-linked
+├── Shows in Calendar
+├── Reminder auto-created
+└── Billable if client meeting
+
+// Task creates Reminders
+Task → Reminder (التذكير)
+├── Due date based reminder
+├── Assignee notification
+└── Escalation rules
+```
+
+#### 4. Productivity → Finance Flow
+```javascript
+// Billable Task → Invoice
+Task (billable: true) → Invoice Line Item
+├── Task.description → lineItem.description
+├── Task.billableAmount → lineItem.amount
+├── Task.caseId → invoice.caseId
+└── Task.billed = true after invoicing
+
+// Billable Event → Invoice
+Event (billable: true) → Invoice Line Item
+├── Event.title → lineItem.description
+├── Event.billableAmount → lineItem.amount
+└── Event.billed = true after invoicing
+
+// Time Entry → Invoice
+TimeEntry → Invoice Line Item
+├── TimeEntry.description → lineItem.description
+├── TimeEntry.duration × hourlyRate → lineItem.amount
+├── TimeEntry.userId → lineItem.attorneyId
+└── TimeEntry.billed = true after invoicing
+```
+
+#### 5. HR → Finance Flow
+```javascript
+// Employee Salary → Payroll → Transaction
+Employee → Salary (الراتب)
+├── Employee.basicSalary
+├── Employee.allowances
+├── Employee.deductions
+└── Employee.bankAccount
+
+Salary → Payroll (مسير الرواتب)
+├── Monthly aggregation
+├── Attendance adjustments
+├── Leave deductions
+└── Generates Transactions
+
+Payroll → Transaction (المعاملة)
+├── Type: 'salary_payment'
+├── Amount: netSalary
+├── employeeId reference
+└── Updates BankAccount balance
+
+// Leave affects Salary
+Leave (الإجازة) → Salary Calculation
+├── Unpaid leave deduction
+├── Sick leave rules
+└── Annual leave tracking
+
+// Attendance affects Salary
+Attendance (الحضور) → Salary Calculation
+├── Overtime calculation
+├── Late deductions
+├── Absence tracking
+```
+
+#### 6. Team/Employee Integration
+```javascript
+// Employee is also a User (Team member)
+Employee ←→ User (فريق العمل)
+├── Same person, different contexts
+├── User: login, permissions, case assignment
+├── Employee: HR data, salary, attendance
+
+// Team assignment flows
+User → Case.teamMembers
+User → Task.assignedTo
+User → TimeEntry.userId
+User → Event.attendees
+```
+
+---
+
+## Additional Schemas
+
+### Contact Schema
+```javascript
+// models/Contact.js
+const contactSchema = new mongoose.Schema({
+  firstName: { type: String, required: true },
+  lastName: { type: String, required: true },
+  email: String,
+  phone: String,
+  mobile: String,
+  jobTitle: String,
+  department: String,
+  clientId: { type: mongoose.Schema.Types.ObjectId, ref: 'Client' },
+  organizationId: { type: mongoose.Schema.Types.ObjectId, ref: 'Organization' },
+  contactType: { type: String, enum: ['primary', 'billing', 'legal', 'technical', 'other'], default: 'primary' },
+  isPrimary: { type: Boolean, default: false },
+  address: { street: String, city: String, district: String, postalCode: String, country: { type: String, default: 'SA' } },
+  notes: String,
+  tags: [String],
+  createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
+}, { timestamps: true });
+```
+
+### Organization Schema
+```javascript
+// models/Organization.js
+const organizationSchema = new mongoose.Schema({
+  name: { type: String, required: true },
+  nameEn: String,
+  type: { type: String, enum: ['company', 'government', 'ngo', 'court', 'law_firm', 'other'], required: true },
+  commercialRegistration: String,
+  unifiedNumber: String,
+  vatNumber: String,
+  email: String,
+  phone: String,
+  website: String,
+  address: { street: String, city: String, district: String, postalCode: String, country: { type: String, default: 'SA' } },
+  contacts: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Contact' }],
+  notes: String,
+  createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
+}, { timestamps: true });
+```
+
+### Task Schema
+```javascript
+// models/Task.js
+const taskSchema = new mongoose.Schema({
+  title: { type: String, required: true },
+  description: String,
+  clientId: { type: mongoose.Schema.Types.ObjectId, ref: 'Client' },
+  caseId: { type: mongoose.Schema.Types.ObjectId, ref: 'Case' },
+  assignedTo: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  dueDate: Date,
+  completedAt: Date,
+  status: { type: String, enum: ['pending', 'in_progress', 'completed', 'cancelled', 'on_hold'], default: 'pending' },
+  priority: { type: String, enum: ['low', 'medium', 'high', 'urgent'], default: 'medium' },
+  billable: { type: Boolean, default: false },
+  billableAmount: { type: Number, default: 0 },
+  billed: { type: Boolean, default: false },
+  invoiceId: { type: mongoose.Schema.Types.ObjectId, ref: 'Invoice' },
+  isRecurring: { type: Boolean, default: false },
+  recurrencePattern: { frequency: { type: String, enum: ['daily', 'weekly', 'monthly', 'yearly'] }, interval: Number, endDate: Date },
+  notes: String,
+  tags: [String],
+  createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
+}, { timestamps: true });
+```
+
+### Event Schema
+```javascript
+// models/Event.js
+const eventSchema = new mongoose.Schema({
+  title: { type: String, required: true },
+  description: String,
+  eventType: { type: String, enum: ['hearing', 'meeting', 'deadline', 'appointment', 'reminder', 'other'], required: true },
+  clientId: { type: mongoose.Schema.Types.ObjectId, ref: 'Client' },
+  caseId: { type: mongoose.Schema.Types.ObjectId, ref: 'Case' },
+  startDate: { type: Date, required: true },
+  endDate: Date,
+  allDay: { type: Boolean, default: false },
+  location: String,
+  isVirtual: { type: Boolean, default: false },
+  virtualMeetingUrl: String,
+  attendees: [{ userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }, status: { type: String, enum: ['pending', 'accepted', 'declined'], default: 'pending' } }],
+  externalAttendees: [{ name: String, email: String }],
+  billable: { type: Boolean, default: false },
+  billableAmount: { type: Number, default: 0 },
+  billed: { type: Boolean, default: false },
+  invoiceId: { type: mongoose.Schema.Types.ObjectId, ref: 'Invoice' },
+  reminders: [{ type: { type: String, enum: ['email', 'push', 'sms'] }, minutesBefore: Number }],
+  isRecurring: { type: Boolean, default: false },
+  recurrenceRule: String,
+  status: { type: String, enum: ['scheduled', 'completed', 'cancelled', 'postponed'], default: 'scheduled' },
+  notes: String,
+  createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
+}, { timestamps: true });
+```
+
+### Reminder Schema
+```javascript
+// models/Reminder.js
+const reminderSchema = new mongoose.Schema({
+  title: { type: String, required: true },
+  description: String,
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  clientId: { type: mongoose.Schema.Types.ObjectId, ref: 'Client' },
+  caseId: { type: mongoose.Schema.Types.ObjectId, ref: 'Case' },
+  taskId: { type: mongoose.Schema.Types.ObjectId, ref: 'Task' },
+  eventId: { type: mongoose.Schema.Types.ObjectId, ref: 'Event' },
+  reminderDate: { type: Date, required: true },
+  channels: [{ type: String, enum: ['email', 'push', 'sms', 'in_app'] }],
+  status: { type: String, enum: ['pending', 'sent', 'snoozed', 'dismissed'], default: 'pending' },
+  sentAt: Date,
+  snoozeUntil: Date,
+  priority: { type: String, enum: ['low', 'medium', 'high', 'urgent'], default: 'medium' },
+  createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
+}, { timestamps: true });
+```
+
+### Message Schema
+```javascript
+// models/Message.js
+const messageSchema = new mongoose.Schema({
+  subject: String,
+  body: { type: String, required: true },
+  messageType: { type: String, enum: ['internal', 'client_email', 'sms', 'whatsapp'], default: 'internal' },
+  from: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  to: [{ type: { type: String, enum: ['user', 'client', 'contact', 'external'] }, userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }, clientId: { type: mongoose.Schema.Types.ObjectId, ref: 'Client' }, contactId: { type: mongoose.Schema.Types.ObjectId, ref: 'Contact' }, externalEmail: String }],
+  clientId: { type: mongoose.Schema.Types.ObjectId, ref: 'Client' },
+  caseId: { type: mongoose.Schema.Types.ObjectId, ref: 'Case' },
+  threadId: { type: mongoose.Schema.Types.ObjectId, ref: 'Message' },
+  parentId: { type: mongoose.Schema.Types.ObjectId, ref: 'Message' },
+  attachments: [{ filename: String, originalName: String, mimeType: String, size: Number, url: String }],
+  status: { type: String, enum: ['draft', 'sent', 'delivered', 'read', 'failed'], default: 'draft' },
+  sentAt: Date,
+  readAt: Date,
+  createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
+}, { timestamps: true });
+```
+
+### Referral Schema
+```javascript
+// models/Referral.js
+const referralSchema = new mongoose.Schema({
+  referrerType: { type: String, enum: ['client', 'contact', 'employee', 'external'], required: true },
+  referrerClientId: { type: mongoose.Schema.Types.ObjectId, ref: 'Client' },
+  referrerContactId: { type: mongoose.Schema.Types.ObjectId, ref: 'Contact' },
+  referrerEmployeeId: { type: mongoose.Schema.Types.ObjectId, ref: 'Employee' },
+  referrerName: String,
+  referrerEmail: String,
+  referrerPhone: String,
+  referredLeadId: { type: mongoose.Schema.Types.ObjectId, ref: 'Lead' },
+  referredClientId: { type: mongoose.Schema.Types.ObjectId, ref: 'Client' },
+  referralDate: { type: Date, default: Date.now },
+  notes: String,
+  status: { type: String, enum: ['pending', 'contacted', 'converted', 'lost'], default: 'pending' },
+  convertedAt: Date,
+  rewardType: { type: String, enum: ['none', 'discount', 'commission', 'gift'] },
+  rewardValue: Number,
+  rewardPaid: { type: Boolean, default: false },
+  createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
+}, { timestamps: true });
+```
+
+### Activity Log Schema
+```javascript
+// models/ActivityLog.js
+const activityLogSchema = new mongoose.Schema({
+  action: { type: String, enum: ['created', 'updated', 'deleted', 'viewed', 'sent', 'received', 'converted', 'assigned', 'completed', 'comment'], required: true },
+  description: String,
+  entityType: { type: String, enum: ['lead', 'client', 'case', 'task', 'event', 'invoice', 'payment', 'document', 'message'], required: true },
+  entityId: { type: mongoose.Schema.Types.ObjectId, required: true },
+  clientId: { type: mongoose.Schema.Types.ObjectId, ref: 'Client' },
+  caseId: { type: mongoose.Schema.Types.ObjectId, ref: 'Case' },
+  leadId: { type: mongoose.Schema.Types.ObjectId, ref: 'Lead' },
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  changes: { before: mongoose.Schema.Types.Mixed, after: mongoose.Schema.Types.Mixed },
+  ipAddress: String,
+  userAgent: String
+}, { timestamps: true });
+```
+
+### Document Schema
+```javascript
+// models/Document.js
+const documentSchema = new mongoose.Schema({
+  title: { type: String, required: true },
+  description: String,
+  filename: { type: String, required: true },
+  originalName: String,
+  mimeType: String,
+  size: Number,
+  url: String,
+  documentType: { type: String, enum: ['contract', 'court_document', 'evidence', 'correspondence', 'identification', 'financial', 'other'], default: 'other' },
+  clientId: { type: mongoose.Schema.Types.ObjectId, ref: 'Client' },
+  caseId: { type: mongoose.Schema.Types.ObjectId, ref: 'Case' },
+  version: { type: Number, default: 1 },
+  parentDocumentId: { type: mongoose.Schema.Types.ObjectId, ref: 'Document' },
+  accessLevel: { type: String, enum: ['private', 'team', 'client', 'public'], default: 'team' },
+  sharedWith: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+  status: { type: String, enum: ['draft', 'review', 'approved', 'archived'], default: 'draft' },
+  tags: [String],
+  createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  lastModifiedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
+}, { timestamps: true });
+```
+
+### Service Schema
+```javascript
+// models/Service.js
+const serviceSchema = new mongoose.Schema({
+  name: { type: String, required: true },
+  nameEn: String,
+  description: String,
+  category: { type: String, enum: ['litigation', 'consultation', 'contract', 'corporate', 'real_estate', 'labor', 'criminal', 'family', 'arbitration', 'notary', 'other'], required: true },
+  pricingType: { type: String, enum: ['fixed', 'hourly', 'percentage', 'custom'], required: true },
+  basePrice: Number,
+  hourlyRate: Number,
+  percentageRate: Number,
+  estimatedDuration: String,
+  isActive: { type: Boolean, default: true },
+  requiredDocuments: [String],
+  createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
+}, { timestamps: true });
+```
+
+### Employee Schema
+```javascript
+// models/Employee.js
+const employeeSchema = new mongoose.Schema({
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', unique: true },
+  employeeNumber: { type: String, unique: true, required: true },
+  firstName: { type: String, required: true },
+  lastName: { type: String, required: true },
+  nationalId: { type: String, required: true },
+  dateOfBirth: Date,
+  gender: { type: String, enum: ['male', 'female'] },
+  maritalStatus: { type: String, enum: ['single', 'married', 'divorced', 'widowed'] },
+  nationality: { type: String, default: 'SA' },
+  email: { type: String, required: true },
+  phone: String,
+  mobile: String,
+  address: { street: String, city: String, district: String, postalCode: String },
+  emergencyContact: { name: String, relationship: String, phone: String },
+  department: String,
+  position: String,
+  employmentType: { type: String, enum: ['full_time', 'part_time', 'contract', 'intern'], default: 'full_time' },
+  joinDate: { type: Date, required: true },
+  endDate: Date,
+  status: { type: String, enum: ['active', 'on_leave', 'terminated', 'resigned'], default: 'active' },
+  managerId: { type: mongoose.Schema.Types.ObjectId, ref: 'Employee' },
+  salary: { basic: { type: Number, required: true }, housing: { type: Number, default: 0 }, transportation: { type: Number, default: 0 }, other: { type: Number, default: 0 } },
+  bankAccount: { bankName: String, accountNumber: String, iban: String },
+  leaveBalance: { annual: { type: Number, default: 21 }, sick: { type: Number, default: 30 }, used: { annual: { type: Number, default: 0 }, sick: { type: Number, default: 0 } } },
+  documents: [{ type: { type: String, enum: ['id_copy', 'contract', 'certificate', 'other'] }, filename: String, url: String, uploadedAt: Date }],
+  gosiNumber: String,
+  insuranceNumber: String,
+  notes: String,
+  createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
+}, { timestamps: true });
+```
+
+### Payroll Schema
+```javascript
+// models/Payroll.js
+const payrollSchema = new mongoose.Schema({
+  month: { type: Number, required: true },
+  year: { type: Number, required: true },
+  status: { type: String, enum: ['draft', 'processing', 'approved', 'paid', 'cancelled'], default: 'draft' },
+  entries: [{
+    employeeId: { type: mongoose.Schema.Types.ObjectId, ref: 'Employee', required: true },
+    basicSalary: Number,
+    housing: Number,
+    transportation: Number,
+    otherAllowances: Number,
+    overtime: Number,
+    bonus: Number,
+    totalEarnings: Number,
+    gosiEmployee: Number,
+    absenceDeduction: Number,
+    lateDeduction: Number,
+    loanDeduction: Number,
+    otherDeductions: Number,
+    totalDeductions: Number,
+    netSalary: Number,
+    paymentMethod: { type: String, enum: ['bank_transfer', 'check', 'cash'] },
+    paymentStatus: { type: String, enum: ['pending', 'paid'], default: 'pending' },
+    paidAt: Date,
+    transactionId: { type: mongoose.Schema.Types.ObjectId, ref: 'Transaction' }
+  }],
+  totals: { totalEarnings: Number, totalDeductions: Number, totalNet: Number, employeeCount: Number },
+  gosiEmployer: Number,
+  gosiTotal: Number,
+  approvedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  approvedAt: Date,
+  createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
+}, { timestamps: true });
+```
+
+### Leave Schema
+```javascript
+// models/Leave.js
+const leaveSchema = new mongoose.Schema({
+  employeeId: { type: mongoose.Schema.Types.ObjectId, ref: 'Employee', required: true },
+  leaveType: { type: String, enum: ['annual', 'sick', 'unpaid', 'maternity', 'paternity', 'hajj', 'death', 'marriage', 'other'], required: true },
+  startDate: { type: Date, required: true },
+  endDate: { type: Date, required: true },
+  days: { type: Number, required: true },
+  reason: String,
+  status: { type: String, enum: ['pending', 'approved', 'rejected', 'cancelled'], default: 'pending' },
+  approvedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  approvedAt: Date,
+  rejectionReason: String,
+  attachments: [{ filename: String, url: String }],
+  createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
+}, { timestamps: true });
+```
+
+### Attendance Schema
+```javascript
+// models/Attendance.js
+const attendanceSchema = new mongoose.Schema({
+  employeeId: { type: mongoose.Schema.Types.ObjectId, ref: 'Employee', required: true },
+  date: { type: Date, required: true },
+  checkIn: Date,
+  checkOut: Date,
+  workHours: Number,
+  overtime: Number,
+  lateMinutes: Number,
+  earlyLeaveMinutes: Number,
+  status: { type: String, enum: ['present', 'absent', 'late', 'half_day', 'on_leave', 'holiday', 'weekend'], default: 'present' },
+  leaveId: { type: mongoose.Schema.Types.ObjectId, ref: 'Leave' },
+  notes: String,
+  checkInLocation: { latitude: Number, longitude: Number },
+  checkOutLocation: { latitude: Number, longitude: Number }
+}, { timestamps: true });
+```
+
+### Evaluation Schema
+```javascript
+// models/Evaluation.js
+const evaluationSchema = new mongoose.Schema({
+  employeeId: { type: mongoose.Schema.Types.ObjectId, ref: 'Employee', required: true },
+  evaluatorId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  evaluationPeriod: { type: String, enum: ['monthly', 'quarterly', 'semi_annual', 'annual'], required: true },
+  periodStart: Date,
+  periodEnd: Date,
+  scores: { performance: { type: Number, min: 1, max: 5 }, quality: { type: Number, min: 1, max: 5 }, punctuality: { type: Number, min: 1, max: 5 }, teamwork: { type: Number, min: 1, max: 5 }, communication: { type: Number, min: 1, max: 5 }, initiative: { type: Number, min: 1, max: 5 } },
+  overallScore: Number,
+  strengths: String,
+  areasForImprovement: String,
+  goals: String,
+  evaluatorComments: String,
+  employeeComments: String,
+  status: { type: String, enum: ['draft', 'submitted', 'acknowledged', 'final'], default: 'draft' },
+  acknowledgedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  acknowledgedAt: Date,
+  createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
+}, { timestamps: true });
+```
+
+### Transaction Schema
+```javascript
+// models/Transaction.js
+const transactionSchema = new mongoose.Schema({
+  transactionNumber: { type: String, unique: true, required: true },
+  transactionType: { type: String, enum: ['income', 'expense', 'transfer', 'salary_payment', 'client_payment', 'vendor_payment', 'refund', 'adjustment'], required: true },
+  amount: { type: Number, required: true },
+  currency: { type: String, default: 'SAR' },
+  transactionDate: { type: Date, required: true },
+  fromAccountId: { type: mongoose.Schema.Types.ObjectId, ref: 'BankAccount' },
+  toAccountId: { type: mongoose.Schema.Types.ObjectId, ref: 'BankAccount' },
+  paymentId: { type: mongoose.Schema.Types.ObjectId, ref: 'Payment' },
+  invoiceId: { type: mongoose.Schema.Types.ObjectId, ref: 'Invoice' },
+  expenseId: { type: mongoose.Schema.Types.ObjectId, ref: 'Expense' },
+  payrollId: { type: mongoose.Schema.Types.ObjectId, ref: 'Payroll' },
+  employeeId: { type: mongoose.Schema.Types.ObjectId, ref: 'Employee' },
+  clientId: { type: mongoose.Schema.Types.ObjectId, ref: 'Client' },
+  vendorId: { type: mongoose.Schema.Types.ObjectId, ref: 'Vendor' },
+  description: String,
+  reference: String,
+  isReconciled: { type: Boolean, default: false },
+  reconciledAt: Date,
+  reconciledBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  status: { type: String, enum: ['pending', 'completed', 'failed', 'cancelled'], default: 'completed' },
+  createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
+}, { timestamps: true });
+```
+
+### Expense Schema
+```javascript
+// models/Expense.js
+const expenseSchema = new mongoose.Schema({
+  expenseNumber: { type: String, unique: true },
+  description: { type: String, required: true },
+  category: { type: String, enum: ['office', 'travel', 'meals', 'supplies', 'professional', 'court_fees', 'filing_fees', 'other'], required: true },
+  amount: { type: Number, required: true },
+  currency: { type: String, default: 'SAR' },
+  vatAmount: { type: Number, default: 0 },
+  date: { type: Date, required: true },
+  clientId: { type: mongoose.Schema.Types.ObjectId, ref: 'Client' },
+  caseId: { type: mongoose.Schema.Types.ObjectId, ref: 'Case' },
+  vendorId: { type: mongoose.Schema.Types.ObjectId, ref: 'Vendor' },
+  employeeId: { type: mongoose.Schema.Types.ObjectId, ref: 'Employee' },
+  paymentMethod: { type: String, enum: ['cash', 'bank_transfer', 'credit_card', 'petty_cash'], default: 'cash' },
+  bankAccountId: { type: mongoose.Schema.Types.ObjectId, ref: 'BankAccount' },
+  paidBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  reimbursable: { type: Boolean, default: false },
+  reimbursed: { type: Boolean, default: false },
+  reimbursedAt: Date,
+  billable: { type: Boolean, default: false },
+  billed: { type: Boolean, default: false },
+  invoiceId: { type: mongoose.Schema.Types.ObjectId, ref: 'Invoice' },
+  status: { type: String, enum: ['draft', 'pending_approval', 'approved', 'rejected', 'paid'], default: 'draft' },
+  approvedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  approvedAt: Date,
+  receipt: { filename: String, url: String },
+  notes: String,
+  createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
+}, { timestamps: true });
+```
+
+---
+
+## API Endpoints Summary
+
+### Sales (المبيعات)
+```
+GET/POST   /leads                    - List/Create leads
+GET/PUT    /leads/:id                - Get/Update lead
+POST       /leads/:id/convert        - Convert to client
+GET        /leads/:id/conversion-preview
+GET/POST   /referrals                - List/Create referrals
+GET        /pipeline                 - Sales pipeline view
+GET        /activity-log             - Activity history
+```
+
+### Clients & Communication (العملاء والتواصل)
+```
+GET/POST   /clients                  - List/Create clients
+GET/PUT    /clients/:id              - Get/Update client
+GET        /clients/:id/billing-info - Billing info for invoices
+GET/POST   /contacts                 - List/Create contacts
+GET/POST   /organizations            - List/Create organizations
+GET        /team                     - Team members (Users)
+```
+
+### Business (الأعمال)
+```
+GET/POST   /cases                    - List/Create cases
+GET/PUT    /cases/:id                - Get/Update case
+GET        /cases/:id/financial-summary
+GET/POST   /documents                - List/Create documents
+GET/POST   /services                 - List/Create services
+```
+
+### Productivity (الإنتاجية)
+```
+GET/POST   /tasks                    - List/Create tasks
+GET/PUT    /tasks/:id                - Get/Update task
+GET/POST   /events                   - List/Create events
+GET/PUT    /events/:id               - Get/Update event
+GET/POST   /reminders                - List/Create reminders
+GET/POST   /messages                 - List/Create messages
+GET        /calendar                 - Calendar view
+```
+
+### Finance (المالية)
+```
+GET/POST   /invoices                 - List/Create invoices
+GET        /invoices/billable-items  - Get unbilled items
+GET/PUT    /invoices/:id             - Get/Update invoice
+GET/POST   /payments                 - List/Create payments
+GET        /payments/open-invoices/:clientId
+POST       /payments/:id/apply       - Apply to invoices
+GET/POST   /expenses                 - List/Create expenses
+GET/POST   /time-entries             - List/Create time entries
+GET/POST   /transactions             - List/Create transactions
+GET        /accounts/dashboard       - Financial overview
+```
+
+### HR (الموارد البشرية)
+```
+GET/POST   /employees                - List/Create employees
+GET/PUT    /employees/:id            - Get/Update employee
+GET/POST   /payroll                  - List/Create payroll
+POST       /payroll/:id/process      - Process payroll
+GET/POST   /leaves                   - List/Create leave requests
+PUT        /leaves/:id/approve       - Approve leave
+GET/POST   /attendance               - List/Create attendance
+GET/POST   /evaluations              - List/Create evaluations
 ```
 
 ---
