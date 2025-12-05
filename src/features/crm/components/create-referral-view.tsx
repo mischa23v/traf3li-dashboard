@@ -3,14 +3,18 @@ import {
   ArrowRight, Save, User,
   FileText, Loader2, Plus, X, Phone, Mail,
   Building, DollarSign, Users,
-  ChevronDown, ChevronUp, Percent, Star,
-  Link as LinkIcon
+  Percent, Star, Calendar,
+  Award, TrendingUp, Shield,
+  MessageSquare, Clock, CheckCircle,
+  AlertTriangle, Briefcase, Scale,
+  CreditCard, Receipt, Target,
+  Gift, Handshake, Globe
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Badge } from '@/components/ui/badge'
-import { Checkbox } from '@/components/ui/checkbox'
+import { Switch } from '@/components/ui/switch'
 import {
   Select,
   SelectContent,
@@ -19,10 +23,17 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible"
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion"
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
 import { Header } from '@/components/layout/header'
 import { TopNav } from '@/components/layout/top-nav'
 import { DynamicIsland } from '@/components/dynamic-island'
@@ -31,36 +42,84 @@ import { Link, useNavigate } from '@tanstack/react-router'
 import { SalesSidebar } from './sales-sidebar'
 import { ProductivityHero } from '@/components/productivity-hero'
 import { useCreateReferral } from '@/hooks/useCrm'
+import { cn } from '@/lib/utils'
 import type { ReferralType, ReferralStatus, FeeType } from '@/types/crm'
 
-const TYPE_OPTIONS: { value: ReferralType; label: string }[] = [
-  { value: 'client', label: 'عميل' },
-  { value: 'lawyer', label: 'محامي' },
-  { value: 'law_firm', label: 'مكتب محاماة' },
-  { value: 'contact', label: 'جهة اتصال' },
-  { value: 'employee', label: 'موظف' },
-  { value: 'partner', label: 'شريك' },
-  { value: 'organization', label: 'منظمة' },
-  { value: 'other', label: 'آخر' },
+// Referral Types
+const TYPE_OPTIONS: { value: ReferralType; label: string; icon: any }[] = [
+  { value: 'client', label: 'عميل', icon: User },
+  { value: 'lawyer', label: 'محامي', icon: Scale },
+  { value: 'law_firm', label: 'مكتب محاماة', icon: Building },
+  { value: 'contact', label: 'جهة اتصال', icon: Users },
+  { value: 'employee', label: 'موظف', icon: Briefcase },
+  { value: 'partner', label: 'شريك', icon: Handshake },
+  { value: 'organization', label: 'منظمة', icon: Building },
+  { value: 'other', label: 'آخر', icon: User },
 ]
 
-const STATUS_OPTIONS: { value: ReferralStatus; label: string }[] = [
-  { value: 'active', label: 'نشط' },
-  { value: 'inactive', label: 'غير نشط' },
+// Status Options
+const STATUS_OPTIONS: { value: ReferralStatus; label: string; color: string }[] = [
+  { value: 'active', label: 'نشط', color: 'bg-emerald-500' },
+  { value: 'inactive', label: 'غير نشط', color: 'bg-slate-400' },
 ]
 
-const FEE_TYPE_OPTIONS: { value: FeeType; label: string }[] = [
-  { value: 'none', label: 'لا يوجد' },
-  { value: 'percentage', label: 'نسبة مئوية' },
-  { value: 'fixed', label: 'مبلغ ثابت' },
-  { value: 'tiered', label: 'متدرج' },
+// Fee Type Options
+const FEE_TYPE_OPTIONS: { value: FeeType; label: string; description: string }[] = [
+  { value: 'none', label: 'لا يوجد', description: 'لا توجد عمولة' },
+  { value: 'percentage', label: 'نسبة مئوية', description: 'نسبة من قيمة القضية' },
+  { value: 'fixed', label: 'مبلغ ثابت', description: 'مبلغ ثابت لكل إحالة' },
+  { value: 'tiered', label: 'متدرج', description: 'شرائح حسب القيمة' },
 ]
 
+// Priority Options
 const PRIORITY_OPTIONS = [
-  { value: 'low', label: 'منخفض' },
-  { value: 'normal', label: 'عادي' },
-  { value: 'high', label: 'عالي' },
-  { value: 'vip', label: 'VIP' },
+  { value: 'low', label: 'منخفض', color: 'bg-slate-400' },
+  { value: 'normal', label: 'عادي', color: 'bg-blue-400' },
+  { value: 'high', label: 'عالي', color: 'bg-orange-500' },
+  { value: 'vip', label: 'VIP', color: 'bg-purple-500' },
+]
+
+// Relationship Type
+const RELATIONSHIP_TYPES = [
+  { value: 'new', label: 'جديد' },
+  { value: 'occasional', label: 'عرضي' },
+  { value: 'regular', label: 'منتظم' },
+  { value: 'strategic', label: 'استراتيجي' },
+  { value: 'preferred', label: 'مفضل' },
+]
+
+// Practice Areas
+const PRACTICE_AREAS = [
+  { value: 'corporate', label: 'قانون الشركات' },
+  { value: 'litigation', label: 'التقاضي' },
+  { value: 'labor', label: 'القانون العمالي' },
+  { value: 'real_estate', label: 'العقارات' },
+  { value: 'intellectual_property', label: 'الملكية الفكرية' },
+  { value: 'criminal', label: 'القانون الجنائي' },
+  { value: 'family', label: 'قانون الأسرة' },
+  { value: 'banking', label: 'القانون المصرفي' },
+  { value: 'arbitration', label: 'التحكيم' },
+  { value: 'all', label: 'جميع المجالات' },
+]
+
+// Payment Terms
+const PAYMENT_TERMS = [
+  { value: 'on_retainer', label: 'عند التوكيل' },
+  { value: 'on_settlement', label: 'عند التسوية' },
+  { value: 'on_invoice', label: 'عند الفاتورة' },
+  { value: 'net_30', label: '30 يوم' },
+  { value: 'net_60', label: '60 يوم' },
+  { value: 'net_90', label: '90 يوم' },
+  { value: 'custom', label: 'مخصص' },
+]
+
+// Agreement Status
+const AGREEMENT_STATUSES = [
+  { value: 'none', label: 'لا يوجد', color: 'bg-slate-400' },
+  { value: 'draft', label: 'مسودة', color: 'bg-yellow-500' },
+  { value: 'sent', label: 'تم الإرسال', color: 'bg-blue-500' },
+  { value: 'signed', label: 'موقعة', color: 'bg-emerald-500' },
+  { value: 'expired', label: 'منتهية', color: 'bg-red-500' },
 ]
 
 export function CreateReferralView() {
@@ -75,30 +134,86 @@ export function CreateReferralView() {
     type: 'client' as ReferralType,
     status: 'active' as ReferralStatus,
     priority: 'normal' as 'low' | 'normal' | 'high' | 'vip',
-    // External source info
-    externalName: '',
-    externalEmail: '',
-    externalPhone: '',
-    externalCompany: '',
+    relationshipType: 'new',
+
+    // Contact info
+    contactName: '',
+    contactTitle: '',
+    email: '',
+    alternateEmail: '',
+    phone: '',
+    alternatePhone: '',
+    whatsapp: '',
+    preferredContactMethod: 'phone',
+
+    // Organization info
+    organizationName: '',
+    website: '',
+    address: '',
+    city: '',
+    country: 'المملكة العربية السعودية',
+
+    // Referral preferences
+    practiceAreas: [] as string[],
+    minimumCaseValue: 0,
+    maximumCaseValue: 0,
+    preferredCaseTypes: '',
+    exclusions: '',
+
     // Fee agreement
     hasFeeAgreement: false,
     feeType: 'none' as FeeType,
     feePercentage: 0,
     feeFixedAmount: 0,
+    feeCap: 0,
+    minimumFee: 0,
+    paymentTerms: 'on_retainer',
+    gracePeriodDays: 30,
+
+    // Tiered fee structure
+    tieredFees: [] as { minValue: number; maxValue: number; percentage: number }[],
+
+    // Agreement details
+    agreementStatus: 'none',
+    agreementStartDate: '',
+    agreementEndDate: '',
+    agreementNotes: '',
+    autoRenew: false,
+
+    // Tracking
+    trackCommissions: true,
+    sendPaymentNotifications: true,
+    sendReferralNotifications: true,
+
+    // Banking info (for commission payments)
+    bankName: '',
+    accountHolderName: '',
+    iban: '',
+    swiftCode: '',
+
+    // Mutual referrals
+    isMutual: false,
+    mutualAgreementDetails: '',
+
     // Other
     notes: '',
+    internalNotes: '',
     tags: [] as string[],
   })
 
   // Tags input
   const [tagInput, setTagInput] = useState('')
 
-  // Section toggles
-  const [showFeeAgreement, setShowFeeAgreement] = useState(false)
-  const [showExternalSource, setShowExternalSource] = useState(false)
-
   const handleChange = (field: string, value: any) => {
     setFormData(prev => ({ ...prev, [field]: value }))
+  }
+
+  const togglePracticeArea = (area: string) => {
+    if (formData.practiceAreas.includes(area)) {
+      handleChange('practiceAreas', formData.practiceAreas.filter(a => a !== area))
+    } else {
+      handleChange('practiceAreas', [...formData.practiceAreas, area])
+    }
   }
 
   const addTag = () => {
@@ -112,6 +227,23 @@ export function CreateReferralView() {
     handleChange('tags', formData.tags.filter(t => t !== tag))
   }
 
+  const addTieredFee = () => {
+    handleChange('tieredFees', [
+      ...formData.tieredFees,
+      { minValue: 0, maxValue: 0, percentage: 0 }
+    ])
+  }
+
+  const updateTieredFee = (index: number, field: string, value: number) => {
+    const updated = [...formData.tieredFees]
+    updated[index] = { ...updated[index], [field]: value }
+    handleChange('tieredFees', updated)
+  }
+
+  const removeTieredFee = (index: number) => {
+    handleChange('tieredFees', formData.tieredFees.filter((_, i) => i !== index))
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
@@ -121,26 +253,77 @@ export function CreateReferralView() {
       type: formData.type,
       status: formData.status,
       priority: formData.priority,
-      // External source
-      ...(showExternalSource && (formData.externalName || formData.externalEmail || formData.externalPhone || formData.externalCompany) && {
-        externalSource: {
-          name: formData.externalName || undefined,
-          email: formData.externalEmail || undefined,
-          phone: formData.externalPhone || undefined,
-          company: formData.externalCompany || undefined,
-        },
-      }),
+      relationshipType: formData.relationshipType,
+      // Contact
+      contact: {
+        name: formData.contactName || undefined,
+        title: formData.contactTitle || undefined,
+        email: formData.email || undefined,
+        alternateEmail: formData.alternateEmail || undefined,
+        phone: formData.phone || undefined,
+        alternatePhone: formData.alternatePhone || undefined,
+        whatsapp: formData.whatsapp || undefined,
+        preferredContactMethod: formData.preferredContactMethod,
+      },
+      // Organization
+      organization: {
+        name: formData.organizationName || undefined,
+        website: formData.website || undefined,
+        address: formData.address || undefined,
+        city: formData.city || undefined,
+        country: formData.country,
+      },
+      // Preferences
+      preferences: {
+        practiceAreas: formData.practiceAreas.length > 0 ? formData.practiceAreas : undefined,
+        minimumCaseValue: formData.minimumCaseValue || undefined,
+        maximumCaseValue: formData.maximumCaseValue || undefined,
+        preferredCaseTypes: formData.preferredCaseTypes || undefined,
+        exclusions: formData.exclusions || undefined,
+      },
       // Fee agreement
       hasFeeAgreement: formData.hasFeeAgreement,
       feeType: formData.hasFeeAgreement ? formData.feeType : 'none',
-      ...(formData.hasFeeAgreement && formData.feeType === 'percentage' && {
-        feePercentage: formData.feePercentage,
+      ...(formData.hasFeeAgreement && {
+        feeDetails: {
+          percentage: formData.feeType === 'percentage' ? formData.feePercentage : undefined,
+          fixedAmount: formData.feeType === 'fixed' ? formData.feeFixedAmount : undefined,
+          cap: formData.feeCap || undefined,
+          minimumFee: formData.minimumFee || undefined,
+          paymentTerms: formData.paymentTerms,
+          gracePeriodDays: formData.gracePeriodDays,
+          tieredFees: formData.feeType === 'tiered' ? formData.tieredFees : undefined,
+        },
       }),
-      ...(formData.hasFeeAgreement && formData.feeType === 'fixed' && {
-        feeFixedAmount: formData.feeFixedAmount,
+      // Agreement
+      agreement: {
+        status: formData.agreementStatus,
+        startDate: formData.agreementStartDate || undefined,
+        endDate: formData.agreementEndDate || undefined,
+        notes: formData.agreementNotes || undefined,
+        autoRenew: formData.autoRenew,
+      },
+      // Tracking
+      tracking: {
+        commissions: formData.trackCommissions,
+        paymentNotifications: formData.sendPaymentNotifications,
+        referralNotifications: formData.sendReferralNotifications,
+      },
+      // Banking
+      ...(formData.bankName && {
+        banking: {
+          bankName: formData.bankName,
+          accountHolderName: formData.accountHolderName || undefined,
+          iban: formData.iban || undefined,
+          swiftCode: formData.swiftCode || undefined,
+        },
       }),
+      // Mutual
+      isMutual: formData.isMutual,
+      mutualAgreementDetails: formData.mutualAgreementDetails || undefined,
       // Other
       notes: formData.notes || undefined,
+      internalNotes: formData.internalNotes || undefined,
       tags: formData.tags.length > 0 ? formData.tags : undefined,
     }
 
@@ -180,26 +363,26 @@ export function CreateReferralView() {
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* RIGHT COLUMN (Main Content) */}
-          <div className="lg:col-span-2 space-y-8">
+          <div className="lg:col-span-2 space-y-6">
+            <form onSubmit={handleSubmit} className="space-y-6">
 
-            {/* Form Card */}
-            <div className="bg-white rounded-3xl p-8 shadow-sm border border-slate-100">
-              <form onSubmit={handleSubmit} className="space-y-8">
-                {/* Basic Info */}
-                <div className="space-y-6">
-                  <h3 className="text-lg font-bold text-navy flex items-center gap-2">
+              {/* Basic Info Card */}
+              <Card className="border-0 shadow-sm">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
                     <User className="w-5 h-5 text-purple-500" />
                     المعلومات الأساسية
-                  </h3>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <label className="text-sm font-medium text-slate-700">
                         الاسم (بالإنجليزية) <span className="text-red-500">*</span>
                       </label>
                       <Input
                         placeholder="Ahmed Law Firm"
-                        className="rounded-xl border-slate-200 focus:border-purple-500 focus:ring-purple-500"
+                        className="rounded-xl"
                         dir="ltr"
                         required
                         value={formData.name}
@@ -212,59 +395,63 @@ export function CreateReferralView() {
                       </label>
                       <Input
                         placeholder="مكتب أحمد للمحاماة"
-                        className="rounded-xl border-slate-200 focus:border-purple-500 focus:ring-purple-500"
+                        className="rounded-xl"
                         value={formData.nameAr}
                         onChange={(e) => handleChange('nameAr', e.target.value)}
                       />
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div className="space-y-2">
                       <label className="text-sm font-medium text-slate-700">
                         النوع <span className="text-red-500">*</span>
                       </label>
                       <Select value={formData.type} onValueChange={(value) => handleChange('type', value)}>
-                        <SelectTrigger className="rounded-xl border-slate-200 focus:ring-purple-500">
+                        <SelectTrigger className="rounded-xl">
                           <SelectValue placeholder="اختر النوع" />
                         </SelectTrigger>
                         <SelectContent>
-                          {TYPE_OPTIONS.map(option => (
-                            <SelectItem key={option.value} value={option.value}>
-                              {option.label}
-                            </SelectItem>
-                          ))}
+                          {TYPE_OPTIONS.map(option => {
+                            const Icon = option.icon
+                            return (
+                              <SelectItem key={option.value} value={option.value}>
+                                <div className="flex items-center gap-2">
+                                  <Icon className="w-4 h-4" />
+                                  {option.label}
+                                </div>
+                              </SelectItem>
+                            )
+                          })}
                         </SelectContent>
                       </Select>
                     </div>
                     <div className="space-y-2">
-                      <label className="text-sm font-medium text-slate-700">
-                        الحالة
-                      </label>
+                      <label className="text-sm font-medium text-slate-700">الحالة</label>
                       <Select value={formData.status} onValueChange={(value) => handleChange('status', value)}>
-                        <SelectTrigger className="rounded-xl border-slate-200 focus:ring-purple-500">
-                          <SelectValue placeholder="اختر الحالة" />
+                        <SelectTrigger className="rounded-xl">
+                          <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
                           {STATUS_OPTIONS.map(option => (
                             <SelectItem key={option.value} value={option.value}>
-                              {option.label}
+                              <div className="flex items-center gap-2">
+                                <span className={cn("w-2 h-2 rounded-full", option.color)} />
+                                {option.label}
+                              </div>
                             </SelectItem>
                           ))}
                         </SelectContent>
                       </Select>
                     </div>
                     <div className="space-y-2">
-                      <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                        <Star className="w-4 h-4 text-yellow-500" />
-                        الأولوية
-                      </label>
-                      <Select value={formData.priority} onValueChange={(value) => handleChange('priority', value)}>
-                        <SelectTrigger className="rounded-xl border-slate-200 focus:ring-purple-500">
-                          <SelectValue placeholder="اختر الأولوية" />
+                      <label className="text-sm font-medium text-slate-700">نوع العلاقة</label>
+                      <Select value={formData.relationshipType} onValueChange={(value) => handleChange('relationshipType', value)}>
+                        <SelectTrigger className="rounded-xl">
+                          <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                          {PRIORITY_OPTIONS.map(option => (
+                          {RELATIONSHIP_TYPES.map(option => (
                             <SelectItem key={option.value} value={option.value}>
                               {option.label}
                             </SelectItem>
@@ -273,18 +460,231 @@ export function CreateReferralView() {
                       </Select>
                     </div>
                   </div>
-                </div>
 
-                {/* Tags */}
-                <div className="border-t border-slate-100 pt-6 space-y-4">
-                  <label className="text-sm font-medium text-slate-700">
+                  <div className="flex items-center gap-4">
+                    <div className="space-y-2 flex-1">
+                      <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                        <Star className="w-4 h-4 text-yellow-500" />
+                        الأولوية
+                      </label>
+                      <Select value={formData.priority} onValueChange={(value) => handleChange('priority', value)}>
+                        <SelectTrigger className="rounded-xl">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {PRIORITY_OPTIONS.map(option => (
+                            <SelectItem key={option.value} value={option.value}>
+                              <div className="flex items-center gap-2">
+                                <span className={cn("w-2 h-2 rounded-full", option.color)} />
+                                {option.label}
+                              </div>
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="flex items-center gap-4 pt-6">
+                      <Switch
+                        checked={formData.isMutual}
+                        onCheckedChange={(checked) => handleChange('isMutual', checked)}
+                      />
+                      <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                        <Handshake className="w-4 h-4 text-purple-500" />
+                        إحالة متبادلة
+                      </label>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Contact Information Card */}
+              <Card className="border-0 shadow-sm">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Phone className="w-5 h-5 text-purple-500" />
+                    معلومات الاتصال
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-slate-700">اسم جهة الاتصال</label>
+                      <Input
+                        placeholder="أحمد محمد"
+                        className="rounded-xl"
+                        value={formData.contactName}
+                        onChange={(e) => handleChange('contactName', e.target.value)}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-slate-700">المسمى الوظيفي</label>
+                      <Input
+                        placeholder="الشريك المؤسس"
+                        className="rounded-xl"
+                        value={formData.contactTitle}
+                        onChange={(e) => handleChange('contactTitle', e.target.value)}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-slate-700">رقم الهاتف</label>
+                      <Input
+                        placeholder="+966 5x xxx xxxx"
+                        className="rounded-xl"
+                        dir="ltr"
+                        value={formData.phone}
+                        onChange={(e) => handleChange('phone', e.target.value)}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                        <MessageSquare className="w-4 h-4 text-green-500" />
+                        واتساب
+                      </label>
+                      <Input
+                        placeholder="+966 5x xxx xxxx"
+                        className="rounded-xl"
+                        dir="ltr"
+                        value={formData.whatsapp}
+                        onChange={(e) => handleChange('whatsapp', e.target.value)}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                        <Mail className="w-4 h-4 text-blue-500" />
+                        البريد الإلكتروني
+                      </label>
+                      <Input
+                        type="email"
+                        placeholder="email@example.com"
+                        className="rounded-xl"
+                        dir="ltr"
+                        value={formData.email}
+                        onChange={(e) => handleChange('email', e.target.value)}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-slate-700">طريقة الاتصال المفضلة</label>
+                      <Select value={formData.preferredContactMethod} onValueChange={(v) => handleChange('preferredContactMethod', v)}>
+                        <SelectTrigger className="rounded-xl">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="phone">هاتف</SelectItem>
+                          <SelectItem value="whatsapp">واتساب</SelectItem>
+                          <SelectItem value="email">بريد إلكتروني</SelectItem>
+                          <SelectItem value="in_person">شخصياً</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Organization Info */}
+              <Card className="border-0 shadow-sm">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Building className="w-5 h-5 text-purple-500" />
+                    معلومات المنظمة
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-slate-700">اسم المنظمة</label>
+                      <Input
+                        placeholder="شركة الأمل للمحاماة"
+                        className="rounded-xl"
+                        value={formData.organizationName}
+                        onChange={(e) => handleChange('organizationName', e.target.value)}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                        <Globe className="w-4 h-4 text-blue-500" />
+                        الموقع الإلكتروني
+                      </label>
+                      <Input
+                        placeholder="https://example.com"
+                        className="rounded-xl"
+                        dir="ltr"
+                        value={formData.website}
+                        onChange={(e) => handleChange('website', e.target.value)}
+                      />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-slate-700">المدينة</label>
+                      <Input
+                        placeholder="الرياض"
+                        className="rounded-xl"
+                        value={formData.city}
+                        onChange={(e) => handleChange('city', e.target.value)}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-slate-700">العنوان</label>
+                      <Input
+                        placeholder="شارع الملك فهد"
+                        className="rounded-xl"
+                        value={formData.address}
+                        onChange={(e) => handleChange('address', e.target.value)}
+                      />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Practice Areas */}
+              <Card className="border-0 shadow-sm">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Scale className="w-5 h-5 text-purple-500" />
+                    مجالات الإحالة المفضلة
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex flex-wrap gap-2">
+                    {PRACTICE_AREAS.map(area => (
+                      <Badge
+                        key={area.value}
+                        variant={formData.practiceAreas.includes(area.value) ? 'default' : 'outline'}
+                        className={cn(
+                          'cursor-pointer transition-colors px-3 py-1.5',
+                          formData.practiceAreas.includes(area.value)
+                            ? 'bg-purple-500 hover:bg-purple-600'
+                            : 'hover:bg-purple-50'
+                        )}
+                        onClick={() => togglePracticeArea(area.value)}
+                      >
+                        {area.label}
+                      </Badge>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Tags */}
+              <Card className="border-0 shadow-sm">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Gift className="w-5 h-5 text-purple-500" />
                     الوسوم
-                  </label>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
                   <div className="flex flex-wrap gap-2 mb-2">
                     {formData.tags.map(tag => (
-                      <Badge key={tag} variant="secondary" className="gap-1">
+                      <Badge key={tag} variant="secondary" className="gap-1 px-3 py-1">
                         {tag}
-                        <button type="button" onClick={() => removeTag(tag)} className="hover:text-red-500">
+                        <button type="button" onClick={() => removeTag(tag)} className="hover:text-red-500 mr-1">
                           <X className="w-3 h-3" />
                         </button>
                       </Badge>
@@ -293,7 +693,7 @@ export function CreateReferralView() {
                   <div className="flex gap-2">
                     <Input
                       placeholder="أضف وسم..."
-                      className="rounded-xl border-slate-200 focus:border-purple-500 focus:ring-purple-500 flex-1"
+                      className="rounded-xl flex-1"
                       value={tagInput}
                       onChange={(e) => setTagInput(e.target.value)}
                       onKeyDown={(e) => {
@@ -307,109 +707,35 @@ export function CreateReferralView() {
                       <Plus className="w-4 h-4" />
                     </Button>
                   </div>
-                </div>
+                </CardContent>
+              </Card>
 
-                {/* External Source Section */}
-                <Collapsible open={showExternalSource} onOpenChange={setShowExternalSource}>
-                  <div className="border-t border-slate-100 pt-6">
-                    <CollapsibleTrigger asChild>
-                      <Button variant="ghost" className="w-full justify-between p-0 h-auto hover:bg-transparent">
-                        <h3 className="text-lg font-semibold text-slate-800 flex items-center gap-2">
-                          <Building className="w-5 h-5 text-purple-500" />
-                          معلومات التواصل (اختياري)
-                        </h3>
-                        {showExternalSource ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
-                      </Button>
-                    </CollapsibleTrigger>
-                    <CollapsibleContent className="mt-4">
-                      <div className="space-y-4 p-4 bg-slate-50 rounded-xl">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          <div className="space-y-2">
-                            <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                              <User className="w-4 h-4 text-purple-500" />
-                              اسم جهة الاتصال
-                            </label>
-                            <Input
-                              placeholder="أحمد محمد"
-                              className="rounded-xl"
-                              value={formData.externalName}
-                              onChange={(e) => handleChange('externalName', e.target.value)}
-                            />
-                          </div>
-                          <div className="space-y-2">
-                            <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                              <Building className="w-4 h-4 text-purple-500" />
-                              الشركة
-                            </label>
-                            <Input
-                              placeholder="اسم الشركة"
-                              className="rounded-xl"
-                              value={formData.externalCompany}
-                              onChange={(e) => handleChange('externalCompany', e.target.value)}
-                            />
-                          </div>
-                        </div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          <div className="space-y-2">
-                            <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                              <Phone className="w-4 h-4 text-green-500" />
-                              الهاتف
-                            </label>
-                            <Input
-                              placeholder="+966 5x xxx xxxx"
-                              className="rounded-xl"
-                              dir="ltr"
-                              value={formData.externalPhone}
-                              onChange={(e) => handleChange('externalPhone', e.target.value)}
-                            />
-                          </div>
-                          <div className="space-y-2">
-                            <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                              <Mail className="w-4 h-4 text-blue-500" />
-                              البريد الإلكتروني
-                            </label>
-                            <Input
-                              type="email"
-                              placeholder="email@example.com"
-                              className="rounded-xl"
-                              dir="ltr"
-                              value={formData.externalEmail}
-                              onChange={(e) => handleChange('externalEmail', e.target.value)}
-                            />
-                          </div>
-                        </div>
+              {/* Advanced Sections */}
+              <Accordion type="multiple" className="space-y-4">
+
+                {/* Fee Agreement */}
+                <AccordionItem value="fees" className="border rounded-2xl bg-white shadow-sm">
+                  <AccordionTrigger className="px-6 hover:no-underline">
+                    <span className="flex items-center gap-2 text-lg font-semibold">
+                      <DollarSign className="w-5 h-5 text-green-500" />
+                      اتفاقية العمولة
+                    </span>
+                  </AccordionTrigger>
+                  <AccordionContent className="px-6 pb-6">
+                    <div className="space-y-4">
+                      <div className="flex items-center gap-4">
+                        <Switch
+                          checked={formData.hasFeeAgreement}
+                          onCheckedChange={(checked) => handleChange('hasFeeAgreement', checked)}
+                        />
+                        <label className="text-sm font-medium text-slate-700">
+                          يوجد اتفاقية عمولة
+                        </label>
                       </div>
-                    </CollapsibleContent>
-                  </div>
-                </Collapsible>
 
-                {/* Fee Agreement Section */}
-                <Collapsible open={showFeeAgreement} onOpenChange={setShowFeeAgreement}>
-                  <div className="border-t border-slate-100 pt-6">
-                    <CollapsibleTrigger asChild>
-                      <Button variant="ghost" className="w-full justify-between p-0 h-auto hover:bg-transparent">
-                        <h3 className="text-lg font-semibold text-slate-800 flex items-center gap-2">
-                          <DollarSign className="w-5 h-5 text-green-500" />
-                          اتفاقية العمولة
-                        </h3>
-                        {showFeeAgreement ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
-                      </Button>
-                    </CollapsibleTrigger>
-                    <CollapsibleContent className="mt-4">
-                      <div className="space-y-4 p-4 bg-slate-50 rounded-xl">
-                        <div className="flex items-center gap-3">
-                          <Checkbox
-                            id="hasFeeAgreement"
-                            checked={formData.hasFeeAgreement}
-                            onCheckedChange={(checked) => handleChange('hasFeeAgreement', checked === true)}
-                          />
-                          <label htmlFor="hasFeeAgreement" className="text-sm font-medium text-slate-700">
-                            يوجد اتفاقية عمولة
-                          </label>
-                        </div>
-
-                        {formData.hasFeeAgreement && (
-                          <div className="space-y-4 pt-4">
+                      {formData.hasFeeAgreement && (
+                        <div className="space-y-4 pt-4 border-t">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div className="space-y-2">
                               <label className="text-sm font-medium text-slate-700">نوع العمولة</label>
                               <Select value={formData.feeType} onValueChange={(value) => handleChange('feeType', value)}>
@@ -419,14 +745,34 @@ export function CreateReferralView() {
                                 <SelectContent>
                                   {FEE_TYPE_OPTIONS.map(option => (
                                     <SelectItem key={option.value} value={option.value}>
-                                      {option.label}
+                                      <div>
+                                        <div>{option.label}</div>
+                                        <div className="text-xs text-slate-400">{option.description}</div>
+                                      </div>
                                     </SelectItem>
                                   ))}
                                 </SelectContent>
                               </Select>
                             </div>
+                            <div className="space-y-2">
+                              <label className="text-sm font-medium text-slate-700">شروط الدفع</label>
+                              <Select value={formData.paymentTerms} onValueChange={(v) => handleChange('paymentTerms', v)}>
+                                <SelectTrigger className="rounded-xl">
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {PAYMENT_TERMS.map(term => (
+                                    <SelectItem key={term.value} value={term.value}>
+                                      {term.label}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            </div>
+                          </div>
 
-                            {formData.feeType === 'percentage' && (
+                          {formData.feeType === 'percentage' && (
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 bg-slate-50 rounded-xl">
                               <div className="space-y-2">
                                 <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
                                   <Percent className="w-4 h-4 text-blue-500" />
@@ -439,15 +785,36 @@ export function CreateReferralView() {
                                   placeholder="10"
                                   className="rounded-xl"
                                   value={formData.feePercentage || ''}
-                                  onChange={(e) => handleChange('feePercentage', parseInt(e.target.value) || 0)}
+                                  onChange={(e) => handleChange('feePercentage', parseFloat(e.target.value) || 0)}
                                 />
-                                <p className="text-xs text-slate-500">
-                                  ستُحسب العمولة كنسبة من قيمة القضية
-                                </p>
                               </div>
-                            )}
+                              <div className="space-y-2">
+                                <label className="text-sm font-medium text-slate-700">الحد الأقصى (ر.س)</label>
+                                <Input
+                                  type="number"
+                                  min="0"
+                                  placeholder="50000"
+                                  className="rounded-xl"
+                                  value={formData.feeCap || ''}
+                                  onChange={(e) => handleChange('feeCap', parseInt(e.target.value) || 0)}
+                                />
+                              </div>
+                              <div className="space-y-2">
+                                <label className="text-sm font-medium text-slate-700">الحد الأدنى (ر.س)</label>
+                                <Input
+                                  type="number"
+                                  min="0"
+                                  placeholder="1000"
+                                  className="rounded-xl"
+                                  value={formData.minimumFee || ''}
+                                  onChange={(e) => handleChange('minimumFee', parseInt(e.target.value) || 0)}
+                                />
+                              </div>
+                            </div>
+                          )}
 
-                            {formData.feeType === 'fixed' && (
+                          {formData.feeType === 'fixed' && (
+                            <div className="p-4 bg-slate-50 rounded-xl">
                               <div className="space-y-2">
                                 <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
                                   <DollarSign className="w-4 h-4 text-green-500" />
@@ -456,67 +823,311 @@ export function CreateReferralView() {
                                 <Input
                                   type="number"
                                   min="0"
-                                  placeholder="1000"
+                                  placeholder="5000"
                                   className="rounded-xl"
                                   value={formData.feeFixedAmount || ''}
                                   onChange={(e) => handleChange('feeFixedAmount', parseInt(e.target.value) || 0)}
                                 />
                               </div>
-                            )}
+                            </div>
+                          )}
 
-                            {formData.feeType === 'tiered' && (
-                              <p className="text-sm text-slate-500 p-3 bg-yellow-50 rounded-xl">
-                                العمولة المتدرجة: يمكن تعديل تفاصيل الشرائح لاحقاً من صفحة التفاصيل
-                              </p>
-                            )}
-                          </div>
-                        )}
+                          {formData.feeType === 'tiered' && (
+                            <div className="p-4 bg-slate-50 rounded-xl space-y-4">
+                              <div className="flex items-center justify-between">
+                                <label className="text-sm font-medium text-slate-700">شرائح العمولة</label>
+                                <Button type="button" variant="outline" size="sm" onClick={addTieredFee} className="rounded-xl">
+                                  <Plus className="w-4 h-4 ml-1" />
+                                  إضافة شريحة
+                                </Button>
+                              </div>
+                              {formData.tieredFees.map((tier, index) => (
+                                <div key={index} className="grid grid-cols-4 gap-3 items-end">
+                                  <div className="space-y-1">
+                                    <label className="text-xs text-slate-500">من (ر.س)</label>
+                                    <Input
+                                      type="number"
+                                      min="0"
+                                      className="rounded-lg h-9"
+                                      value={tier.minValue || ''}
+                                      onChange={(e) => updateTieredFee(index, 'minValue', parseInt(e.target.value) || 0)}
+                                    />
+                                  </div>
+                                  <div className="space-y-1">
+                                    <label className="text-xs text-slate-500">إلى (ر.س)</label>
+                                    <Input
+                                      type="number"
+                                      min="0"
+                                      className="rounded-lg h-9"
+                                      value={tier.maxValue || ''}
+                                      onChange={(e) => updateTieredFee(index, 'maxValue', parseInt(e.target.value) || 0)}
+                                    />
+                                  </div>
+                                  <div className="space-y-1">
+                                    <label className="text-xs text-slate-500">النسبة (%)</label>
+                                    <Input
+                                      type="number"
+                                      min="0"
+                                      max="100"
+                                      className="rounded-lg h-9"
+                                      value={tier.percentage || ''}
+                                      onChange={(e) => updateTieredFee(index, 'percentage', parseFloat(e.target.value) || 0)}
+                                    />
+                                  </div>
+                                  <Button
+                                    type="button"
+                                    variant="ghost"
+                                    size="icon"
+                                    className="h-9 text-red-500 hover:text-red-700"
+                                    onClick={() => removeTieredFee(index)}
+                                  >
+                                    <X className="w-4 h-4" />
+                                  </Button>
+                                </div>
+                              ))}
+                              {formData.tieredFees.length === 0 && (
+                                <p className="text-sm text-slate-500 text-center py-4">
+                                  أضف شرائح العمولة المتدرجة
+                                </p>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+
+                {/* Agreement Details */}
+                <AccordionItem value="agreement" className="border rounded-2xl bg-white shadow-sm">
+                  <AccordionTrigger className="px-6 hover:no-underline">
+                    <span className="flex items-center gap-2 text-lg font-semibold">
+                      <FileText className="w-5 h-5 text-purple-500" />
+                      تفاصيل الاتفاقية
+                    </span>
+                  </AccordionTrigger>
+                  <AccordionContent className="px-6 pb-6">
+                    <div className="space-y-4">
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div className="space-y-2">
+                          <label className="text-sm font-medium text-slate-700">حالة الاتفاقية</label>
+                          <Select value={formData.agreementStatus} onValueChange={(v) => handleChange('agreementStatus', v)}>
+                            <SelectTrigger className="rounded-xl">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {AGREEMENT_STATUSES.map(status => (
+                                <SelectItem key={status.value} value={status.value}>
+                                  <div className="flex items-center gap-2">
+                                    <span className={cn("w-2 h-2 rounded-full", status.color)} />
+                                    {status.label}
+                                  </div>
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div className="space-y-2">
+                          <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                            <Calendar className="w-4 h-4 text-purple-500" />
+                            تاريخ البداية
+                          </label>
+                          <Input
+                            type="date"
+                            className="rounded-xl"
+                            value={formData.agreementStartDate}
+                            onChange={(e) => handleChange('agreementStartDate', e.target.value)}
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                            <Calendar className="w-4 h-4 text-red-500" />
+                            تاريخ الانتهاء
+                          </label>
+                          <Input
+                            type="date"
+                            className="rounded-xl"
+                            value={formData.agreementEndDate}
+                            onChange={(e) => handleChange('agreementEndDate', e.target.value)}
+                          />
+                        </div>
                       </div>
-                    </CollapsibleContent>
-                  </div>
-                </Collapsible>
+                      <div className="flex items-center gap-4">
+                        <Switch
+                          checked={formData.autoRenew}
+                          onCheckedChange={(checked) => handleChange('autoRenew', checked)}
+                        />
+                        <label className="text-sm font-medium text-slate-700">تجديد تلقائي</label>
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium text-slate-700">ملاحظات الاتفاقية</label>
+                        <Textarea
+                          placeholder="أي شروط خاصة أو ملاحظات..."
+                          className="min-h-[80px] rounded-xl"
+                          value={formData.agreementNotes}
+                          onChange={(e) => handleChange('agreementNotes', e.target.value)}
+                        />
+                      </div>
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
 
-                {/* Notes */}
-                <div className="border-t border-slate-100 pt-6 space-y-2">
-                  <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                    <FileText className="w-4 h-4 text-purple-500" />
+                {/* Banking Info */}
+                <AccordionItem value="banking" className="border rounded-2xl bg-white shadow-sm">
+                  <AccordionTrigger className="px-6 hover:no-underline">
+                    <span className="flex items-center gap-2 text-lg font-semibold">
+                      <CreditCard className="w-5 h-5 text-purple-500" />
+                      معلومات الحساب البنكي
+                    </span>
+                  </AccordionTrigger>
+                  <AccordionContent className="px-6 pb-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium text-slate-700">اسم البنك</label>
+                        <Input
+                          placeholder="البنك الأهلي"
+                          className="rounded-xl"
+                          value={formData.bankName}
+                          onChange={(e) => handleChange('bankName', e.target.value)}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium text-slate-700">اسم صاحب الحساب</label>
+                        <Input
+                          placeholder="اسم صاحب الحساب"
+                          className="rounded-xl"
+                          value={formData.accountHolderName}
+                          onChange={(e) => handleChange('accountHolderName', e.target.value)}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium text-slate-700">رقم الآيبان (IBAN)</label>
+                        <Input
+                          placeholder="SA..."
+                          className="rounded-xl"
+                          dir="ltr"
+                          value={formData.iban}
+                          onChange={(e) => handleChange('iban', e.target.value)}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium text-slate-700">رمز السويفت</label>
+                        <Input
+                          placeholder="NCBKSAJE"
+                          className="rounded-xl"
+                          dir="ltr"
+                          value={formData.swiftCode}
+                          onChange={(e) => handleChange('swiftCode', e.target.value)}
+                        />
+                      </div>
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+
+                {/* Notifications & Tracking */}
+                <AccordionItem value="tracking" className="border rounded-2xl bg-white shadow-sm">
+                  <AccordionTrigger className="px-6 hover:no-underline">
+                    <span className="flex items-center gap-2 text-lg font-semibold">
+                      <Target className="w-5 h-5 text-purple-500" />
+                      التتبع والإشعارات
+                    </span>
+                  </AccordionTrigger>
+                  <AccordionContent className="px-6 pb-6">
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between p-3 bg-slate-50 rounded-xl">
+                        <div>
+                          <p className="font-medium text-slate-700">تتبع العمولات</p>
+                          <p className="text-sm text-slate-500">تتبع العمولات المستحقة والمدفوعة</p>
+                        </div>
+                        <Switch
+                          checked={formData.trackCommissions}
+                          onCheckedChange={(checked) => handleChange('trackCommissions', checked)}
+                        />
+                      </div>
+                      <div className="flex items-center justify-between p-3 bg-slate-50 rounded-xl">
+                        <div>
+                          <p className="font-medium text-slate-700">إشعارات الدفع</p>
+                          <p className="text-sm text-slate-500">إرسال إشعار عند استحقاق أو دفع العمولة</p>
+                        </div>
+                        <Switch
+                          checked={formData.sendPaymentNotifications}
+                          onCheckedChange={(checked) => handleChange('sendPaymentNotifications', checked)}
+                        />
+                      </div>
+                      <div className="flex items-center justify-between p-3 bg-slate-50 rounded-xl">
+                        <div>
+                          <p className="font-medium text-slate-700">إشعارات الإحالات</p>
+                          <p className="text-sm text-slate-500">إرسال إشعار عند تسجيل إحالة جديدة</p>
+                        </div>
+                        <Switch
+                          checked={formData.sendReferralNotifications}
+                          onCheckedChange={(checked) => handleChange('sendReferralNotifications', checked)}
+                        />
+                      </div>
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
+
+              {/* Notes */}
+              <Card className="border-0 shadow-sm">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <FileText className="w-5 h-5 text-purple-500" />
                     ملاحظات
-                  </label>
-                  <Textarea
-                    placeholder="أي ملاحظات إضافية عن مصدر الإحالة..."
-                    className="min-h-[120px] rounded-xl border-slate-200 focus:border-purple-500 focus:ring-purple-500"
-                    value={formData.notes}
-                    onChange={(e) => handleChange('notes', e.target.value)}
-                  />
-                </div>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-slate-700">ملاحظات عامة</label>
+                    <Textarea
+                      placeholder="أي ملاحظات إضافية عن مصدر الإحالة..."
+                      className="min-h-[100px] rounded-xl"
+                      value={formData.notes}
+                      onChange={(e) => handleChange('notes', e.target.value)}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                      <Shield className="w-4 h-4 text-yellow-500" />
+                      ملاحظات داخلية (للفريق فقط)
+                    </label>
+                    <Textarea
+                      placeholder="ملاحظات داخلية..."
+                      className="min-h-[80px] rounded-xl bg-yellow-50"
+                      value={formData.internalNotes}
+                      onChange={(e) => handleChange('internalNotes', e.target.value)}
+                    />
+                  </div>
+                </CardContent>
+              </Card>
 
-                {/* Submit */}
-                <div className="flex items-center justify-end gap-4 pt-6 border-t border-slate-100">
-                  <Link to="/dashboard/crm/referrals">
-                    <Button type="button" variant="ghost" className="text-slate-500 hover:text-navy">
-                      إلغاء
-                    </Button>
-                  </Link>
-                  <Button
-                    type="submit"
-                    className="bg-purple-500 hover:bg-purple-600 text-white min-w-[140px] rounded-xl shadow-lg shadow-purple-500/20"
-                    disabled={createReferralMutation.isPending}
-                  >
-                    {createReferralMutation.isPending ? (
-                      <span className="flex items-center gap-2">
-                        <Loader2 className="w-4 h-4 animate-spin" />
-                        جاري الحفظ...
-                      </span>
-                    ) : (
-                      <span className="flex items-center gap-2">
-                        <Save className="w-4 h-4" />
-                        حفظ مصدر الإحالة
-                      </span>
-                    )}
+              {/* Submit */}
+              <div className="flex items-center justify-end gap-4 pt-6">
+                <Link to="/dashboard/crm/referrals">
+                  <Button type="button" variant="ghost" className="text-slate-500 hover:text-navy">
+                    إلغاء
                   </Button>
-                </div>
-              </form>
-            </div>
+                </Link>
+                <Button
+                  type="submit"
+                  className="bg-purple-500 hover:bg-purple-600 text-white min-w-[160px] rounded-xl shadow-lg shadow-purple-500/20"
+                  disabled={createReferralMutation.isPending}
+                >
+                  {createReferralMutation.isPending ? (
+                    <span className="flex items-center gap-2">
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      جاري الحفظ...
+                    </span>
+                  ) : (
+                    <span className="flex items-center gap-2">
+                      <Save className="w-4 h-4" />
+                      حفظ مصدر الإحالة
+                    </span>
+                  )}
+                </Button>
+              </div>
+            </form>
           </div>
 
           {/* Sidebar Widgets */}
