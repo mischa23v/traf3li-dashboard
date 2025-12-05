@@ -1211,6 +1211,778 @@ curl -X POST http://localhost:5000/api/invoices \
 
 ---
 
+## Unified Data Architecture
+
+### Overview
+
+The Traf3li system uses a **unified data architecture** where data entered once flows automatically throughout the system. Users should NEVER need to re-enter information in different sections.
+
+### Core Principle: Entity Linking
+
+```
+┌─────────────┐     ┌─────────────┐     ┌─────────────┐
+│   CLIENT    │────▶│    CASE     │────▶│  TIME/TASK  │
+│   Entity    │     │   Entity    │     │   Entity    │
+└─────────────┘     └─────────────┘     └─────────────┘
+       │                   │                   │
+       │                   │                   │
+       ▼                   ▼                   ▼
+┌─────────────────────────────────────────────────────┐
+│                    FINANCE SECTION                   │
+│  ┌─────────┐  ┌─────────┐  ┌─────────┐  ┌─────────┐│
+│  │ Invoice │  │ Payment │  │ Expense │  │ Retainer││
+│  └─────────┘  └─────────┘  └─────────┘  └─────────┘│
+└─────────────────────────────────────────────────────┘
+```
+
+### 1. Client Data Flow
+
+When a client is created, their billing information automatically populates in finance forms:
+
+```javascript
+// routes/clients.js - Get client with billing data for invoices
+router.get('/:id/billing-info', authenticate, async (req, res) => {
+  try {
+    const client = await Client.findById(req.params.id)
+      .select('clientNumber clientType firstName lastName companyName companyNameEn nationalId commercialRegistration vatNumber email phone address billingArrangement defaultHourlyRate paymentTerms creditLimit creditBalance')
+      .lean();
+
+    if (!client) {
+      return res.status(404).json({ error: 'Client not found' });
+    }
+
+    // Return formatted billing info for invoice/payment forms
+    res.json({
+      clientId: client._id,
+      clientNumber: client.clientNumber,
+      displayName: client.clientType === 'individual'
+        ? `${client.firstName} ${client.lastName}`
+        : client.companyName,
+      displayNameEn: client.clientType === 'individual'
+        ? `${client.firstName} ${client.lastName}`
+        : client.companyNameEn,
+      clientType: client.clientType,
+      vatNumber: client.vatNumber,
+      crNumber: client.commercialRegistration,
+      nationalId: client.nationalId,
+      email: client.email,
+      phone: client.phone,
+      address: client.address,
+      billing: {
+        arrangement: client.billingArrangement,
+        hourlyRate: client.defaultHourlyRate,
+        paymentTerms: client.paymentTerms,
+        creditLimit: client.creditLimit,
+        creditBalance: client.creditBalance
+      }
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+```
+
+### 2. Billable Items Flow to Invoices
+
+When creating time entries, tasks, or events marked as "billable", they automatically appear in the invoice creation form:
+
+```javascript
+// routes/invoices.js - Get billable items for a client/case
+router.get('/billable-items', authenticate, async (req, res) => {
+  try {
+    const { clientId, caseId, startDate, endDate } = req.query;
+
+    const query = {
+      billable: true,
+      billed: false,
+      status: { $ne: 'rejected' }
+    };
+
+    if (clientId) query.clientId = clientId;
+    if (caseId) query.caseId = caseId;
+    if (startDate && endDate) {
+      query.date = { $gte: new Date(startDate), $lte: new Date(endDate) };
+    }
+
+    // Get unbilled time entries
+    const timeEntries = await TimeEntry.find(query)
+      .populate('userId', 'firstName lastName hourlyRate')
+      .populate('caseId', 'caseNumber title')
+      .sort({ date: -1 })
+      .lean();
+
+    // Get unbilled expenses
+    const expenses = await Expense.find({
+      ...query,
+      reimbursable: true,
+      reimbursed: false
+    })
+      .populate('caseId', 'caseNumber title')
+      .sort({ date: -1 })
+      .lean();
+
+    // Get billable tasks
+    const tasks = await Task.find({
+      ...query,
+      billableAmount: { $gt: 0 }
+    })
+      .populate('caseId', 'caseNumber title')
+      .lean();
+
+    // Get billable events
+    const events = await Event.find({
+      ...query,
+      billableAmount: { $gt: 0 }
+    })
+      .populate('caseId', 'caseNumber title')
+      .lean();
+
+    res.json({
+      timeEntries: timeEntries.map(t => ({
+        id: t._id,
+        type: 'time',
+        date: t.date,
+        description: t.description,
+        attorney: `${t.userId.firstName} ${t.userId.lastName}`,
+        hours: t.duration,
+        rate: t.hourlyRate,
+        amount: t.amount,
+        case: t.caseId?.title
+      })),
+      expenses: expenses.map(e => ({
+        id: e._id,
+        type: 'expense',
+        date: e.date,
+        description: e.description,
+        amount: e.amount,
+        case: e.caseId?.title
+      })),
+      tasks: tasks.map(t => ({
+        id: t._id,
+        type: 'task',
+        date: t.completedAt || t.dueDate,
+        description: t.title,
+        amount: t.billableAmount,
+        case: t.caseId?.title
+      })),
+      events: events.map(e => ({
+        id: e._id,
+        type: 'event',
+        date: e.date,
+        description: e.title,
+        amount: e.billableAmount,
+        case: e.caseId?.title
+      })),
+      totals: {
+        timeTotal: timeEntries.reduce((sum, t) => sum + t.amount, 0),
+        expenseTotal: expenses.reduce((sum, e) => sum + e.amount, 0),
+        taskTotal: tasks.reduce((sum, t) => sum + (t.billableAmount || 0), 0),
+        eventTotal: events.reduce((sum, e) => sum + (e.billableAmount || 0), 0)
+      }
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+```
+
+### 3. Invoice → Payment Linking
+
+When creating a payment, fetch open invoices for the selected client:
+
+```javascript
+// routes/payments.js - Get open invoices for payment application
+router.get('/open-invoices/:clientId', authenticate, async (req, res) => {
+  try {
+    const invoices = await Invoice.find({
+      clientId: req.params.clientId,
+      status: { $in: ['sent', 'partial', 'overdue', 'viewed'] },
+      balanceDue: { $gt: 0 }
+    })
+      .select('invoiceNumber issueDate dueDate totalAmount amountPaid balanceDue status caseId')
+      .populate('caseId', 'caseNumber title')
+      .sort({ dueDate: 1 })
+      .lean();
+
+    res.json(invoices.map(inv => ({
+      invoiceId: inv._id,
+      invoiceNumber: inv.invoiceNumber,
+      issueDate: inv.issueDate,
+      dueDate: inv.dueDate,
+      total: inv.totalAmount,
+      paid: inv.amountPaid,
+      balance: inv.balanceDue,
+      status: inv.status,
+      case: inv.caseId ? {
+        caseNumber: inv.caseId.caseNumber,
+        title: inv.caseId.title
+      } : null,
+      isOverdue: new Date(inv.dueDate) < new Date()
+    })));
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+```
+
+### 4. Case Data Aggregation
+
+Get complete financial summary for a case:
+
+```javascript
+// routes/cases.js - Get case with all linked financial data
+router.get('/:id/financial-summary', authenticate, async (req, res) => {
+  try {
+    const caseId = req.params.id;
+
+    const [caseData, timeEntries, expenses, invoices, payments] = await Promise.all([
+      Case.findById(caseId)
+        .populate('clientId', 'firstName lastName companyName clientNumber')
+        .populate('responsibleAttorneyId', 'firstName lastName')
+        .lean(),
+
+      TimeEntry.aggregate([
+        { $match: { caseId: mongoose.Types.ObjectId(caseId) } },
+        { $group: {
+          _id: null,
+          totalHours: { $sum: '$duration' },
+          totalAmount: { $sum: '$amount' },
+          billableHours: { $sum: { $cond: ['$billable', '$duration', 0] } },
+          billedAmount: { $sum: { $cond: ['$billed', '$amount', 0] } }
+        }}
+      ]),
+
+      Expense.aggregate([
+        { $match: { caseId: mongoose.Types.ObjectId(caseId) } },
+        { $group: {
+          _id: null,
+          totalExpenses: { $sum: '$amount' },
+          reimbursableExpenses: { $sum: { $cond: ['$reimbursable', '$amount', 0] } }
+        }}
+      ]),
+
+      Invoice.aggregate([
+        { $match: { caseId: mongoose.Types.ObjectId(caseId) } },
+        { $group: {
+          _id: null,
+          totalInvoiced: { $sum: '$totalAmount' },
+          totalPaid: { $sum: '$amountPaid' },
+          totalOutstanding: { $sum: '$balanceDue' },
+          invoiceCount: { $sum: 1 }
+        }}
+      ]),
+
+      Payment.aggregate([
+        {
+          $match: {
+            'invoiceApplications.invoiceId': {
+              $in: await Invoice.find({ caseId }).distinct('_id')
+            }
+          }
+        },
+        { $group: {
+          _id: null,
+          totalPayments: { $sum: '$amount' },
+          paymentCount: { $sum: 1 }
+        }}
+      ])
+    ]);
+
+    res.json({
+      case: caseData,
+      financials: {
+        time: timeEntries[0] || { totalHours: 0, totalAmount: 0, billableHours: 0, billedAmount: 0 },
+        expenses: expenses[0] || { totalExpenses: 0, reimbursableExpenses: 0 },
+        invoices: invoices[0] || { totalInvoiced: 0, totalPaid: 0, totalOutstanding: 0, invoiceCount: 0 },
+        payments: payments[0] || { totalPayments: 0, paymentCount: 0 },
+        budget: caseData?.budget || 0,
+        budgetRemaining: (caseData?.budget || 0) - (timeEntries[0]?.totalAmount || 0) - (expenses[0]?.totalExpenses || 0)
+      }
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+```
+
+### 5. Attorney/Employee Selection with Hourly Rates
+
+When selecting an attorney in time entry or invoice, their hourly rate auto-populates:
+
+```javascript
+// routes/users.js - Get attorneys with billing rates
+router.get('/attorneys', authenticate, async (req, res) => {
+  try {
+    const attorneys = await User.find({
+      role: { $in: ['lawyer', 'paralegal', 'admin'] },
+      status: 'active'
+    })
+      .select('firstName lastName email role hourlyRate barNumber specialization')
+      .sort({ lastName: 1 })
+      .lean();
+
+    res.json(attorneys.map(a => ({
+      id: a._id,
+      name: `${a.firstName} ${a.lastName}`,
+      email: a.email,
+      role: a.role,
+      hourlyRate: a.hourlyRate || 0,
+      barNumber: a.barNumber,
+      specialization: a.specialization
+    })));
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+```
+
+---
+
+## Saudi Government API Integration
+
+### 1. Yakeen API (National ID Verification)
+
+Verify Saudi National ID and auto-fill citizen information:
+
+```javascript
+// services/yakeenService.js
+const axios = require('axios');
+
+class YakeenService {
+  constructor() {
+    this.baseUrl = process.env.YAKEEN_API_URL || 'https://yakeen.mic.gov.sa';
+    this.username = process.env.YAKEEN_USERNAME;
+    this.password = process.env.YAKEEN_PASSWORD;
+    this.chargeCode = process.env.YAKEEN_CHARGE_CODE;
+  }
+
+  async verifyNationalId(nationalId, birthDate) {
+    try {
+      // Hijri date format required
+      const hijriBirthDate = this.convertToHijri(birthDate);
+
+      const response = await axios.post(`${this.baseUrl}/Yakeen/CitizenInfo`, {
+        NIN: nationalId,
+        DateOfBirth: hijriBirthDate,
+        ChargeCode: this.chargeCode
+      }, {
+        auth: {
+          username: this.username,
+          password: this.password
+        },
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (response.data.success) {
+        return {
+          verified: true,
+          data: {
+            nationalId: nationalId,
+            firstNameAr: response.data.firstName,
+            fatherNameAr: response.data.fatherName,
+            grandfatherNameAr: response.data.grandFatherName,
+            lastNameAr: response.data.familyName,
+            firstNameEn: response.data.englishFirstName,
+            lastNameEn: response.data.englishFamilyName,
+            gender: response.data.gender === 'M' ? 'male' : 'female',
+            birthDate: response.data.dateOfBirth,
+            birthDateHijri: response.data.dateOfBirthH,
+            nationality: response.data.nationality || 'SA',
+            idExpiryDate: response.data.idExpiryDate,
+            idExpiryDateHijri: response.data.idExpiryDateH
+          }
+        };
+      }
+
+      return { verified: false, error: response.data.message };
+    } catch (error) {
+      console.error('Yakeen verification error:', error);
+      return { verified: false, error: error.message };
+    }
+  }
+
+  convertToHijri(gregorianDate) {
+    // Implementation for Gregorian to Hijri conversion
+    // Use a library like 'moment-hijri' or 'hijri-converter'
+    const moment = require('moment-hijri');
+    return moment(gregorianDate).format('iYYYY-iMM-iDD');
+  }
+}
+
+module.exports = new YakeenService();
+```
+
+### 2. Wathq API (Commercial Registry Verification)
+
+Verify company CR number and auto-fill company information:
+
+```javascript
+// services/wathqService.js
+const axios = require('axios');
+
+class WathqService {
+  constructor() {
+    this.baseUrl = process.env.WATHQ_API_URL || 'https://api.wathq.sa';
+    this.apiKey = process.env.WATHQ_API_KEY;
+  }
+
+  async verifyCommercialRegistry(crNumber) {
+    try {
+      const response = await axios.get(`${this.baseUrl}/v5/commercialregistration/info/${crNumber}`, {
+        headers: {
+          'apiKey': this.apiKey,
+          'Accept': 'application/json'
+        }
+      });
+
+      if (response.data) {
+        const company = response.data;
+        return {
+          verified: true,
+          data: {
+            crNumber: company.crNumber,
+            crEntityNumber: company.crEntityNumber,
+            companyName: company.crName,
+            companyNameEn: company.crMainActivity || company.crName,
+            status: company.status?.name || 'active',
+            issueDate: company.issueDate,
+            expiryDate: company.expiryDate,
+            businessType: company.businessType?.name,
+            location: {
+              city: company.location?.city,
+              region: company.location?.region
+            },
+            activities: company.activities?.map(a => ({
+              code: a.id,
+              name: a.name,
+              isMainActivity: a.isMainActivity
+            })) || [],
+            capital: company.capital,
+            // Parties/Owners
+            parties: company.parties?.map(p => ({
+              name: p.name,
+              nationalId: p.identity,
+              nationality: p.nationality?.name,
+              role: p.relation?.name,
+              sharePercentage: p.sharePercentage
+            })) || []
+          }
+        };
+      }
+
+      return { verified: false, error: 'Company not found' };
+    } catch (error) {
+      console.error('Wathq verification error:', error);
+      return { verified: false, error: error.message };
+    }
+  }
+}
+
+module.exports = new WathqService();
+```
+
+### 3. MOJ API (Ministry of Justice - Attorney Verification)
+
+Verify attorney license and power of attorney documents:
+
+```javascript
+// services/mojService.js
+const axios = require('axios');
+
+class MOJService {
+  constructor() {
+    this.baseUrl = process.env.MOJ_API_URL || 'https://api.moj.gov.sa';
+    this.apiKey = process.env.MOJ_API_KEY;
+  }
+
+  async verifyAttorney(licenseNumber) {
+    try {
+      const response = await axios.get(`${this.baseUrl}/lawyers/verify/${licenseNumber}`, {
+        headers: {
+          'Authorization': `Bearer ${this.apiKey}`,
+          'Accept': 'application/json'
+        }
+      });
+
+      if (response.data && response.data.valid) {
+        return {
+          verified: true,
+          data: {
+            licenseNumber: response.data.licenseNumber,
+            name: response.data.lawyerName,
+            nationalId: response.data.nationalId,
+            status: response.data.status,
+            issueDate: response.data.issueDate,
+            expiryDate: response.data.expiryDate,
+            specializations: response.data.specializations || [],
+            region: response.data.region,
+            contact: {
+              phone: response.data.phone,
+              email: response.data.email
+            }
+          }
+        };
+      }
+
+      return { verified: false, error: 'Attorney license not valid' };
+    } catch (error) {
+      console.error('MOJ verification error:', error);
+      return { verified: false, error: error.message };
+    }
+  }
+
+  async verifyPowerOfAttorney(poaNumber) {
+    try {
+      const response = await axios.get(`${this.baseUrl}/poa/verify/${poaNumber}`, {
+        headers: {
+          'Authorization': `Bearer ${this.apiKey}`,
+          'Accept': 'application/json'
+        }
+      });
+
+      if (response.data && response.data.valid) {
+        return {
+          verified: true,
+          data: {
+            poaNumber: response.data.poaNumber,
+            issueDate: response.data.issueDate,
+            expiryDate: response.data.expiryDate,
+            isActive: response.data.isActive,
+            principal: {
+              name: response.data.principal?.name,
+              nationalId: response.data.principal?.nationalId
+            },
+            attorney: {
+              name: response.data.attorney?.name,
+              licenseNumber: response.data.attorney?.licenseNumber
+            },
+            scope: response.data.scope || [],
+            restrictions: response.data.restrictions || []
+          }
+        };
+      }
+
+      return { verified: false, error: 'Power of Attorney not found or expired' };
+    } catch (error) {
+      console.error('MOJ POA verification error:', error);
+      return { verified: false, error: error.message };
+    }
+  }
+}
+
+module.exports = new MOJService();
+```
+
+### 4. Verification Routes
+
+```javascript
+// routes/verify.js
+const router = require('express').Router();
+const yakeenService = require('../services/yakeenService');
+const wathqService = require('../services/wathqService');
+const mojService = require('../services/mojService');
+const { authenticate } = require('../middleware/auth');
+
+router.use(authenticate);
+
+// Verify National ID via Yakeen
+router.post('/yakeen', async (req, res) => {
+  try {
+    const { nationalId, birthDate } = req.body;
+
+    if (!nationalId || !birthDate) {
+      return res.status(400).json({ error: 'National ID and birth date required' });
+    }
+
+    const result = await yakeenService.verifyNationalId(nationalId, birthDate);
+    res.json(result);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Verify Commercial Registry via Wathq
+router.get('/wathq/:crNumber', async (req, res) => {
+  try {
+    const { crNumber } = req.params;
+
+    if (!crNumber) {
+      return res.status(400).json({ error: 'CR number required' });
+    }
+
+    const result = await wathqService.verifyCommercialRegistry(crNumber);
+    res.json(result);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Verify Attorney License via MOJ
+router.get('/moj/attorney/:licenseNumber', async (req, res) => {
+  try {
+    const { licenseNumber } = req.params;
+
+    if (!licenseNumber) {
+      return res.status(400).json({ error: 'License number required' });
+    }
+
+    const result = await mojService.verifyAttorney(licenseNumber);
+    res.json(result);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Verify Power of Attorney via MOJ
+router.get('/moj/poa/:poaNumber', async (req, res) => {
+  try {
+    const { poaNumber } = req.params;
+
+    if (!poaNumber) {
+      return res.status(400).json({ error: 'POA number required' });
+    }
+
+    const result = await mojService.verifyPowerOfAttorney(poaNumber);
+    res.json(result);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+module.exports = router;
+```
+
+---
+
+## Frontend Integration Examples
+
+### 1. Client Selection in Invoice Form
+
+```typescript
+// When client is selected, auto-fill billing info
+const handleClientSelect = async (clientId: string) => {
+  const response = await fetch(`/api/clients/${clientId}/billing-info`);
+  const billingInfo = await response.json();
+
+  // Auto-populate form fields
+  setForm({
+    ...form,
+    clientId,
+    clientType: billingInfo.clientType,
+    vatNumber: billingInfo.vatNumber,
+    crNumber: billingInfo.crNumber,
+    billingArrangement: billingInfo.billing.arrangement,
+    hourlyRate: billingInfo.billing.hourlyRate,
+    paymentTerms: billingInfo.billing.paymentTerms
+  });
+};
+```
+
+### 2. Loading Billable Items
+
+```typescript
+// When case is selected, load billable items
+const handleCaseSelect = async (caseId: string) => {
+  const response = await fetch(`/api/invoices/billable-items?caseId=${caseId}`);
+  const { timeEntries, expenses, tasks, events, totals } = await response.json();
+
+  // Populate line items table
+  const items = [
+    ...timeEntries.map(t => ({
+      type: 'time',
+      description: t.description,
+      quantity: t.hours,
+      unitPrice: t.rate,
+      amount: t.amount,
+      sourceId: t.id
+    })),
+    ...expenses.map(e => ({
+      type: 'expense',
+      description: e.description,
+      quantity: 1,
+      unitPrice: e.amount,
+      amount: e.amount,
+      sourceId: e.id
+    }))
+  ];
+
+  setLineItems(items);
+  setTotals(totals);
+};
+```
+
+### 3. Payment with Auto-Apply
+
+```typescript
+// When client is selected in payment form
+const handleClientSelectForPayment = async (clientId: string) => {
+  // Fetch client info
+  const clientRes = await fetch(`/api/clients/${clientId}/billing-info`);
+  const client = await clientRes.json();
+
+  // Fetch open invoices
+  const invoicesRes = await fetch(`/api/payments/open-invoices/${clientId}`);
+  const invoices = await invoicesRes.json();
+
+  setClientInfo(client);
+  setOpenInvoices(invoices);
+
+  // Calculate suggested payment amount (oldest invoices first)
+  const suggestedAmount = invoices
+    .sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate))
+    .reduce((sum, inv) => sum + inv.balance, 0);
+
+  setPaymentAmount(suggestedAmount);
+};
+```
+
+---
+
+## Environment Variables for Saudi APIs
+
+```bash
+# Saudi Government APIs
+
+# Yakeen (National ID Verification)
+YAKEEN_API_URL=https://yakeen.mic.gov.sa
+YAKEEN_USERNAME=your-yakeen-username
+YAKEEN_PASSWORD=your-yakeen-password
+YAKEEN_CHARGE_CODE=your-charge-code
+
+# Wathq (Commercial Registry)
+WATHQ_API_URL=https://api.wathq.sa
+WATHQ_API_KEY=your-wathq-api-key
+
+# MOJ (Ministry of Justice)
+MOJ_API_URL=https://api.moj.gov.sa
+MOJ_API_KEY=your-moj-api-key
+```
+
+---
+
+## Data Validation Rules
+
+### Client Creation/Update
+1. Individual clients MUST have national ID verified via Yakeen before save
+2. Company clients MUST have CR number verified via Wathq before save
+3. Attorney assignments MUST be verified via MOJ
+
+### Invoice Creation
+1. Client billing info auto-populates from Client entity
+2. VAT number for ZATCA comes from Client.vatNumber
+3. Billable items must reference valid TimeEntry/Expense/Task IDs
+4. Mark source entities as `billed: true` after invoice creation
+
+### Payment Application
+1. Payment amount cannot exceed total of selected invoice balances
+2. After payment application, update Invoice.amountPaid and Invoice.balanceDue
+3. Check Client.creditBalance for available credit
+4. Update Client.creditBalance if payment creates credit
+
+---
+
 ## Notes
 
 - All monetary amounts are stored as Numbers (not Decimal128) for simplicity
@@ -1220,3 +1992,5 @@ curl -X POST http://localhost:5000/api/invoices \
 - Rate limiting is applied to prevent abuse
 - File uploads are limited to 10MB per file
 - ZATCA integration requires sandbox testing before production
+- **Saudi Government APIs require official registration and API keys from respective ministries**
+- **Always cache verification results (e.g., 24 hours) to reduce API calls and costs**
