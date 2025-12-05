@@ -1616,7 +1616,36 @@ module.exports = new YakeenService();
 
 ### 2. Wathq API (Commercial Registry Verification)
 
-Verify company CR number and auto-fill company information:
+Verify company CR number and auto-fill company information.
+
+**Example Wathq Response for CR: 2050012516**
+```json
+{
+  "crNumber": "2050012516",
+  "unifiedNumber": "7001862338",
+  "crName": "شركة مجموعة ماس الاهلية",
+  "crNameEn": "Mas Al Ahliya Group Company",
+  "crEntityStatus": "نشط",
+  "entityDuration": 0,
+  "capital": 8000000.0,
+  "phone": "0138174055",
+  "issueDate": "1982-06-15",
+  "mainActivity": "أعمال الدهانات والطلاء للمباني الداخلية والخارجية - ترميمات المباني السكنية والغير سكنية",
+  "website": "",
+  "ecommerceLink": "",
+  "city": "الدمام",
+  "address": "حي الفيصلية",
+  "owners": [
+    { "name": "محمد أحمد", "share": 50 },
+    { "name": "علي محمد", "share": 50 }
+  ],
+  "managers": [
+    { "name": "محمد أحمد", "position": "المدير العام" }
+  ]
+}
+```
+
+**Service Implementation:**
 
 ```javascript
 // services/wathqService.js
@@ -1642,31 +1671,50 @@ class WathqService {
         return {
           verified: true,
           data: {
-            crNumber: company.crNumber,
-            crEntityNumber: company.crEntityNumber,
-            companyName: company.crName,
-            companyNameEn: company.crMainActivity || company.crName,
-            status: company.status?.name || 'active',
-            issueDate: company.issueDate,
-            expiryDate: company.expiryDate,
-            businessType: company.businessType?.name,
-            location: {
-              city: company.location?.city,
-              region: company.location?.region
-            },
+            // Basic Info
+            crNumber: company.crNumber,                    // رقم السجل التجاري
+            unifiedNumber: company.crEntityNumber,         // الرقم الوطني الموحد للمنشأة
+            crName: company.crName,                        // الكيان التجاري (اسم الشركة)
+            crNameEn: company.crNameEn || '',              // الاسم بالإنجليزية
+            crEntityStatus: company.status?.name || company.crStatus || 'نشط',  // حالة السجل
+            entityDuration: company.entityDuration || 0,   // مدة المنشأة
+
+            // Financial
+            capital: company.capital || 0,                 // رأس المال
+
+            // Contact
+            phone: company.phone || '',                    // هاتف
+            website: company.website || '',                // الموقع الإلكتروني
+            ecommerceLink: company.ecommerceLink || '',    // رابط المتجر الإلكتروني
+
+            // Location
+            city: company.location?.city || company.city || '',       // المدينة
+            address: company.location?.address || company.address || '', // العنوان
+
+            // Dates
+            issueDate: company.issueDate,                  // تاريخ إصدار السجل
+            expiryDate: company.expiryDate,                // تاريخ انتهاء السجل
+
+            // Activity
+            mainActivity: company.activities?.find(a => a.isMainActivity)?.name
+              || company.mainActivity || '',               // النشاط التجاري
             activities: company.activities?.map(a => ({
               code: a.id,
               name: a.name,
               isMainActivity: a.isMainActivity
             })) || [],
-            capital: company.capital,
-            // Parties/Owners
-            parties: company.parties?.map(p => ({
+
+            // Parties
+            owners: company.parties?.filter(p => p.relation?.id === 1)?.map(p => ({
               name: p.name,
               nationalId: p.identity,
               nationality: p.nationality?.name,
-              role: p.relation?.name,
-              sharePercentage: p.sharePercentage
+              share: p.sharePercentage
+            })) || [],
+            managers: company.parties?.filter(p => p.relation?.id === 2)?.map(p => ({
+              name: p.name,
+              nationalId: p.identity,
+              position: p.relation?.name
             })) || []
           }
         };
@@ -1682,6 +1730,27 @@ class WathqService {
 
 module.exports = new WathqService();
 ```
+
+**Field Mapping Reference:**
+
+| Arabic Field | English Key | Description |
+|--------------|-------------|-------------|
+| رقم السجل التجاري | crNumber | Commercial Registration Number |
+| الرقم الوطني الموحد للمنشأة | unifiedNumber | National Entity Number |
+| الكيان التجاري | crName | Company Name (Arabic) |
+| الاسم بالإنجليزية | crNameEn | Company Name (English) |
+| حالة السجل | crEntityStatus | CR Status (نشط/منتهي) |
+| مدة المنشأة | entityDuration | Entity Duration (years) |
+| رأس المال | capital | Capital (SAR) |
+| هاتف | phone | Phone Number |
+| تاريخ إصدار السجل | issueDate | Issue Date |
+| الموقع الإلكتروني | website | Website URL |
+| رابط المتجر الإلكتروني | ecommerceLink | E-commerce Link |
+| النشاط التجاري | mainActivity | Business Activity |
+| المدينة | city | City |
+| العنوان | address | Address |
+| الملاك | owners | Owners/Shareholders |
+| المديرون | managers | Managers |
 
 ### 3. MOJ API (Ministry of Justice - Attorney Verification)
 

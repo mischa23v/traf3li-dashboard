@@ -963,8 +963,19 @@ export function CreateClientView() {
                                                         <Input value={companyCity} disabled className="bg-white/50 rounded-xl" />
                                                     </div>
                                                     <div className="space-y-2">
+                                                        <Label className="text-sm text-slate-600">العنوان</Label>
+                                                        <Input value={companyAddress || 'غير متوفر'} disabled className="bg-white/50 rounded-xl" />
+                                                    </div>
+                                                </div>
+
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                    <div className="space-y-2">
                                                         <Label className="text-sm text-slate-600">الموقع الإلكتروني</Label>
                                                         <Input value={website || 'غير متوفر'} disabled className="bg-white/50 rounded-xl" dir="ltr" />
+                                                    </div>
+                                                    <div className="space-y-2">
+                                                        <Label className="text-sm text-slate-600">رابط المتجر الإلكتروني</Label>
+                                                        <Input value={ecommerceLink || 'غير متوفر'} disabled className="bg-white/50 rounded-xl" dir="ltr" />
                                                     </div>
                                                 </div>
 
