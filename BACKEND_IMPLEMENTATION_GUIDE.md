@@ -1963,7 +1963,202 @@ module.exports = router;
 
 ## Frontend Integration Examples
 
-### 1. Client Selection in Invoice Form
+### 1. Wathq Commercial Registration Verification
+
+```typescript
+// Verify CR number and auto-populate client data
+const verifyCommercialRegistration = async (clientId: string, crNumber: string) => {
+  const response = await fetch(`/api/clients/${clientId}/verify/wathq`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    },
+    body: JSON.stringify({
+      crNumber: crNumber,    // 10-digit CR number
+      fullInfo: true         // true = full details, false = basic info
+    })
+  });
+  return response.json();
+  // Returns: { success, message, data: { companyName, status, capital, activities, parties, ... } }
+};
+```
+
+### 2. Get Additional Wathq Data
+
+```typescript
+// Get managers/board of directors
+const getManagers = async (clientId: string) => {
+  const res = await fetch(`/api/clients/${clientId}/wathq/managers`, {
+    headers: { 'Authorization': `Bearer ${token}` }
+  });
+  return res.json();
+  // Returns: { success, data: [{ name, typeName, nationalId, nationality, positions }] }
+};
+
+// Get owners/partners with shares
+const getOwners = async (clientId: string) => {
+  const res = await fetch(`/api/clients/${clientId}/wathq/owners`, {
+    headers: { 'Authorization': `Bearer ${token}` }
+  });
+  return res.json();
+  // Returns: { success, data: [{ name, nationalId, nationality, share, shareType }] }
+};
+
+// Get capital information
+const getCapital = async (clientId: string) => {
+  const res = await fetch(`/api/clients/${clientId}/wathq/capital`, {
+    headers: { 'Authorization': `Bearer ${token}` }
+  });
+  return res.json();
+  // Returns: { success, data: { currency, capital, contributionCapital, stockCapital } }
+};
+
+// Get company branches
+const getBranches = async (clientId: string) => {
+  const res = await fetch(`/api/clients/${clientId}/wathq/branches`, {
+    headers: { 'Authorization': `Bearer ${token}` }
+  });
+  return res.json();
+  // Returns: { success, data: [{ crNumber, name, isMain, entityType }] }
+};
+
+// Get CR status
+const getStatus = async (clientId: string) => {
+  const res = await fetch(`/api/clients/${clientId}/wathq/status`, {
+    headers: { 'Authorization': `Bearer ${token}` }
+  });
+  return res.json();
+  // Returns: { success, data: { crNumber, statusName, isActive } }
+};
+```
+
+### 3. Wathq Verification React Component
+
+```tsx
+import { useState } from 'react';
+
+interface ClientVerificationProps {
+  clientId: string;
+  token: string;
+}
+
+const ClientVerification = ({ clientId, token }: ClientVerificationProps) => {
+  const [crNumber, setCrNumber] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [result, setResult] = useState<any>(null);
+
+  const handleVerify = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch(`/api/clients/${clientId}/verify/wathq`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ crNumber, fullInfo: true })
+      });
+      const data = await res.json();
+      setResult(data);
+    } catch (error: any) {
+      setResult({ success: false, message: error.message });
+    }
+    setLoading(false);
+  };
+
+  return (
+    <div>
+      <h3>التحقق من السجل التجاري</h3>
+      <input
+        type="text"
+        value={crNumber}
+        onChange={(e) => setCrNumber(e.target.value)}
+        placeholder="رقم السجل التجاري (10 أرقام)"
+        maxLength={10}
+        dir="ltr"
+      />
+      <button onClick={handleVerify} disabled={loading}>
+        {loading ? 'جاري التحقق...' : 'تحقق'}
+      </button>
+
+      {result && (
+        <div className={result.success ? 'success' : 'error'}>
+          {result.success ? (
+            <div>
+              <p>اسم الشركة: {result.data.companyName}</p>
+              <p>الحالة: {result.data.status?.name}</p>
+              <p>رأس المال: {result.data.capital} ريال</p>
+            </div>
+          ) : (
+            <p>{result.message}</p>
+          )}
+        </div>
+      )}
+    </div>
+  );
+};
+```
+
+### 4. Wathq Error Handling
+
+```typescript
+const verifyClient = async (clientId: string, crNumber: string) => {
+  try {
+    const res = await fetch(`/api/clients/${clientId}/verify/wathq`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({ crNumber })
+    });
+
+    const data = await res.json();
+
+    if (res.status === 503) {
+      // Service not configured
+      alert('خدمة واثق غير مفعلة');
+    } else if (res.status === 400) {
+      // Missing CR number
+      alert('رقم السجل التجاري مطلوب');
+    } else if (!data.success) {
+      // API error
+      alert(data.message || 'حدث خطأ في التحقق');
+    } else {
+      // Success
+      return data.data;
+    }
+  } catch (error) {
+    alert('خطأ في الاتصال');
+  }
+};
+```
+
+### Wathq API Endpoints Summary
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/clients/:id/verify/wathq` | POST | Verify CR and get company info |
+| `/api/clients/:id/wathq/managers` | GET | Get managers/board of directors |
+| `/api/clients/:id/wathq/owners` | GET | Get owners/partners with shares |
+| `/api/clients/:id/wathq/capital` | GET | Get capital information |
+| `/api/clients/:id/wathq/branches` | GET | Get company branches |
+| `/api/clients/:id/wathq/status` | GET | Get CR status |
+
+### API Response Codes
+
+| Code | Meaning |
+|------|---------|
+| 200 | Success |
+| 400 | Missing required field (CR number, POA number, etc.) |
+| 403 | Not authorized to access this client |
+| 404 | Client not found |
+| 503 | Service not configured (missing API keys) |
+
+---
+
+### 5. Client Selection in Invoice Form
 
 ```typescript
 // When client is selected, auto-fill billing info
@@ -1985,7 +2180,7 @@ const handleClientSelect = async (clientId: string) => {
 };
 ```
 
-### 2. Loading Billable Items
+### 6. Loading Billable Items
 
 ```typescript
 // When case is selected, load billable items
@@ -2043,7 +2238,7 @@ const handleClientSelectForPayment = async (clientId: string) => {
 };
 ```
 
-### 4. MOJ Verification - Power of Attorney (الوكالة)
+### 8. MOJ Verification - Power of Attorney (الوكالة)
 
 ```typescript
 // POST /api/clients/:clientId/verify/moj
@@ -2105,7 +2300,7 @@ const result = await verifyPowerOfAttorney('clientId123', '4412345678');
 }
 ```
 
-### 5. MOJ Verification - Attorney License (رخصة المحامي)
+### 9. MOJ Verification - Attorney License (رخصة المحامي)
 
 ```typescript
 // POST /api/clients/:clientId/verify/attorney
@@ -2152,7 +2347,7 @@ const result = await verifyAttorney('clientId123', '1098765432');
 }
 ```
 
-### 6. POA Verification React Component
+### 10. POA Verification React Component
 
 ```tsx
 // components/POAVerification.tsx
@@ -2266,7 +2461,7 @@ export function POAVerification({ clientId, clientNationalId }: POAVerificationP
 }
 ```
 
-### 7. Validation Utilities
+### 11. Validation Utilities
 
 ```typescript
 // utils/validation.ts
