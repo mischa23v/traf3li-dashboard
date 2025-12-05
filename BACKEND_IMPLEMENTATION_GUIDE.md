@@ -98,9 +98,7 @@ backend/
 │   │   └── upload.js            # File uploads
 │   ├── services/
 │   │   ├── zatcaService.js      # ZATCA e-invoicing
-│   │   ├── yakeenService.js     # National ID verification
 │   │   ├── wathqService.js      # Commercial Registry verification
-│   │   ├── mojService.js        # Attorney/POA verification
 │   │   ├── emailService.js      # Email notifications
 │   │   ├── pdfService.js        # PDF generation
 │   │   └── storageService.js    # File storage
@@ -1576,81 +1574,7 @@ router.get('/attorneys', authenticate, async (req, res) => {
 
 ## Saudi Government API Integration
 
-### 1. Yakeen API (National ID Verification)
-
-Verify Saudi National ID and auto-fill citizen information:
-
-```javascript
-// services/yakeenService.js
-const axios = require('axios');
-
-class YakeenService {
-  constructor() {
-    this.baseUrl = process.env.YAKEEN_API_URL || 'https://yakeen.mic.gov.sa';
-    this.username = process.env.YAKEEN_USERNAME;
-    this.password = process.env.YAKEEN_PASSWORD;
-    this.chargeCode = process.env.YAKEEN_CHARGE_CODE;
-  }
-
-  async verifyNationalId(nationalId, birthDate) {
-    try {
-      // Hijri date format required
-      const hijriBirthDate = this.convertToHijri(birthDate);
-
-      const response = await axios.post(`${this.baseUrl}/Yakeen/CitizenInfo`, {
-        NIN: nationalId,
-        DateOfBirth: hijriBirthDate,
-        ChargeCode: this.chargeCode
-      }, {
-        auth: {
-          username: this.username,
-          password: this.password
-        },
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      });
-
-      if (response.data.success) {
-        return {
-          verified: true,
-          data: {
-            nationalId: nationalId,
-            firstNameAr: response.data.firstName,
-            fatherNameAr: response.data.fatherName,
-            grandfatherNameAr: response.data.grandFatherName,
-            lastNameAr: response.data.familyName,
-            firstNameEn: response.data.englishFirstName,
-            lastNameEn: response.data.englishFamilyName,
-            gender: response.data.gender === 'M' ? 'male' : 'female',
-            birthDate: response.data.dateOfBirth,
-            birthDateHijri: response.data.dateOfBirthH,
-            nationality: response.data.nationality || 'SA',
-            idExpiryDate: response.data.idExpiryDate,
-            idExpiryDateHijri: response.data.idExpiryDateH
-          }
-        };
-      }
-
-      return { verified: false, error: response.data.message };
-    } catch (error) {
-      console.error('Yakeen verification error:', error);
-      return { verified: false, error: error.message };
-    }
-  }
-
-  convertToHijri(gregorianDate) {
-    // Implementation for Gregorian to Hijri conversion
-    // Use a library like 'moment-hijri' or 'hijri-converter'
-    const moment = require('moment-hijri');
-    return moment(gregorianDate).format('iYYYY-iMM-iDD');
-  }
-}
-
-module.exports = new YakeenService();
-```
-
-### 2. Wathq API (Commercial Registry Verification)
+### 1. Wathq API (Commercial Registry Verification)
 
 Verify company CR number and auto-fill company information.
 
@@ -1788,125 +1712,15 @@ module.exports = new WathqService();
 | الملاك | owners | Owners/Shareholders |
 | المديرون | managers | Managers |
 
-### 3. MOJ API (Ministry of Justice - Attorney Verification)
-
-Verify attorney license and power of attorney documents:
-
-```javascript
-// services/mojService.js
-const axios = require('axios');
-
-class MOJService {
-  constructor() {
-    this.baseUrl = process.env.MOJ_API_URL || 'https://api.moj.gov.sa';
-    this.apiKey = process.env.MOJ_API_KEY;
-  }
-
-  async verifyAttorney(licenseNumber) {
-    try {
-      const response = await axios.get(`${this.baseUrl}/lawyers/verify/${licenseNumber}`, {
-        headers: {
-          'Authorization': `Bearer ${this.apiKey}`,
-          'Accept': 'application/json'
-        }
-      });
-
-      if (response.data && response.data.valid) {
-        return {
-          verified: true,
-          data: {
-            licenseNumber: response.data.licenseNumber,
-            name: response.data.lawyerName,
-            nationalId: response.data.nationalId,
-            status: response.data.status,
-            issueDate: response.data.issueDate,
-            expiryDate: response.data.expiryDate,
-            specializations: response.data.specializations || [],
-            region: response.data.region,
-            contact: {
-              phone: response.data.phone,
-              email: response.data.email
-            }
-          }
-        };
-      }
-
-      return { verified: false, error: 'Attorney license not valid' };
-    } catch (error) {
-      console.error('MOJ verification error:', error);
-      return { verified: false, error: error.message };
-    }
-  }
-
-  async verifyPowerOfAttorney(poaNumber) {
-    try {
-      const response = await axios.get(`${this.baseUrl}/poa/verify/${poaNumber}`, {
-        headers: {
-          'Authorization': `Bearer ${this.apiKey}`,
-          'Accept': 'application/json'
-        }
-      });
-
-      if (response.data && response.data.valid) {
-        return {
-          verified: true,
-          data: {
-            poaNumber: response.data.poaNumber,
-            issueDate: response.data.issueDate,
-            expiryDate: response.data.expiryDate,
-            isActive: response.data.isActive,
-            principal: {
-              name: response.data.principal?.name,
-              nationalId: response.data.principal?.nationalId
-            },
-            attorney: {
-              name: response.data.attorney?.name,
-              licenseNumber: response.data.attorney?.licenseNumber
-            },
-            scope: response.data.scope || [],
-            restrictions: response.data.restrictions || []
-          }
-        };
-      }
-
-      return { verified: false, error: 'Power of Attorney not found or expired' };
-    } catch (error) {
-      console.error('MOJ POA verification error:', error);
-      return { verified: false, error: error.message };
-    }
-  }
-}
-
-module.exports = new MOJService();
-```
-
-### 4. Verification Routes
+### 2. Verification Routes
 
 ```javascript
 // routes/verify.js
 const router = require('express').Router();
-const yakeenService = require('../services/yakeenService');
 const wathqService = require('../services/wathqService');
-const mojService = require('../services/mojService');
 const { authenticate } = require('../middleware/auth');
 
 router.use(authenticate);
-
-// Verify National ID via Yakeen
-router.post('/yakeen', async (req, res) => {
-  try {
-    const { nationalId, birthDate } = req.body;
-
-    if (!nationalId || !birthDate) {
-      return res.status(400).json({ error: 'National ID and birth date required' });
-    }
-
-    const result = await yakeenService.verifyNationalId(nationalId, birthDate);
-    res.json(result);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
 
 // Verify Commercial Registry via Wathq
 router.get('/wathq/:crNumber', async (req, res) => {
@@ -1924,32 +1738,46 @@ router.get('/wathq/:crNumber', async (req, res) => {
   }
 });
 
-// Verify Attorney License via MOJ
-router.get('/moj/attorney/:licenseNumber', async (req, res) => {
+// Get additional Wathq data endpoints
+router.get('/wathq/:crNumber/managers', async (req, res) => {
   try {
-    const { licenseNumber } = req.params;
-
-    if (!licenseNumber) {
-      return res.status(400).json({ error: 'License number required' });
-    }
-
-    const result = await mojService.verifyAttorney(licenseNumber);
+    const result = await wathqService.getManagers(req.params.crNumber);
     res.json(result);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 });
 
-// Verify Power of Attorney via MOJ
-router.get('/moj/poa/:poaNumber', async (req, res) => {
+router.get('/wathq/:crNumber/owners', async (req, res) => {
   try {
-    const { poaNumber } = req.params;
+    const result = await wathqService.getOwners(req.params.crNumber);
+    res.json(result);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
 
-    if (!poaNumber) {
-      return res.status(400).json({ error: 'POA number required' });
-    }
+router.get('/wathq/:crNumber/capital', async (req, res) => {
+  try {
+    const result = await wathqService.getCapital(req.params.crNumber);
+    res.json(result);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
 
-    const result = await mojService.verifyPowerOfAttorney(poaNumber);
+router.get('/wathq/:crNumber/branches', async (req, res) => {
+  try {
+    const result = await wathqService.getBranches(req.params.crNumber);
+    res.json(result);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+router.get('/wathq/:crNumber/status', async (req, res) => {
+  try {
+    const result = await wathqService.getStatus(req.params.crNumber);
     res.json(result);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -2238,230 +2066,7 @@ const handleClientSelectForPayment = async (clientId: string) => {
 };
 ```
 
-### 8. MOJ Verification - Power of Attorney (الوكالة)
-
-```typescript
-// POST /api/clients/:clientId/verify/moj
-const verifyPowerOfAttorney = async (clientId: string, poaNumber: string, idNumber?: string) => {
-  const response = await fetch(`/api/clients/${clientId}/verify/moj`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
-    },
-    body: JSON.stringify({
-      poaNumber,      // Required: رقم الوكالة (e.g., "1234567890")
-      idNumber        // Optional: رقم الهوية - uses client's nationalId if not provided
-    })
-  });
-
-  return response.json();
-};
-
-// Example usage
-const result = await verifyPowerOfAttorney('clientId123', '4412345678');
-
-// Success response
-{
-  "success": true,
-  "message": "تم التحقق من الوكالة بنجاح",
-  "data": {
-    "poaNumber": "4412345678",
-    "status": "سارية",
-    "isActive": true,
-    "isValid": true,
-    "isExpired": false,
-    "daysUntilExpiry": 180,
-    "principal": {
-      "name": "محمد أحمد",
-      "idNumber": "1098765432"
-    },
-    "attorney": {
-      "name": "عبدالله محمد",
-      "idNumber": "1087654321",
-      "type": "خاص"
-    },
-    "issueDate": "2024-01-15",
-    "expiryDate": "2025-01-15",
-    "notaryNumber": "123456",
-    "powers": ["البيع", "الشراء", "التوقيع"],
-    "verified": true,
-    "verifiedAt": "2024-12-05T10:30:00.000Z",
-    "source": "MOJ Portal"
-  },
-  "fromCache": false
-}
-
-// Error response
-{
-  "success": false,
-  "message": "لم يتم العثور على بيانات الوكالة",
-  "data": null
-}
-```
-
-### 9. MOJ Verification - Attorney License (رخصة المحامي)
-
-```typescript
-// POST /api/clients/:clientId/verify/attorney
-const verifyAttorney = async (clientId: string, attorneyId: string) => {
-  const response = await fetch(`/api/clients/${clientId}/verify/attorney`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
-    },
-    body: JSON.stringify({
-      attorneyId   // Required: رقم هوية المحامي
-    })
-  });
-
-  return response.json();
-};
-
-// Example usage
-const result = await verifyAttorney('clientId123', '1098765432');
-
-// Success response
-{
-  "success": true,
-  "message": "تم التحقق من المحامي بنجاح",
-  "data": {
-    "attorneyId": "1098765432",
-    "name": "عبدالله محمد الشمري",
-    "licenseNumber": "12345",
-    "licenseStatus": "نشط",
-    "isActive": true,
-    "isValid": true,
-    "isExpired": false,
-    "daysUntilExpiry": 365,
-    "specializations": ["قانون تجاري", "قانون عمل"],
-    "region": "الرياض",
-    "issueDate": "2020-01-01",
-    "expiryDate": "2025-12-31",
-    "verified": true,
-    "verifiedAt": "2024-12-05T10:30:00.000Z",
-    "source": "MOJ Portal"
-  },
-  "fromCache": false
-}
-```
-
-### 10. POA Verification React Component
-
-```tsx
-// components/POAVerification.tsx
-import { useState } from 'react';
-
-interface POAVerificationProps {
-  clientId: string;
-  clientNationalId?: string;
-}
-
-export function POAVerification({ clientId, clientNationalId }: POAVerificationProps) {
-  const [poaNumber, setPoaNumber] = useState('');
-  const [idNumber, setIdNumber] = useState(clientNationalId || '');
-  const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState<any>(null);
-  const [error, setError] = useState('');
-
-  const handleVerify = async () => {
-    if (!poaNumber) {
-      setError('رقم الوكالة مطلوب');
-      return;
-    }
-
-    setLoading(true);
-    setError('');
-
-    try {
-      const response = await fetch(`/api/clients/${clientId}/verify/moj`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        },
-        body: JSON.stringify({ poaNumber, idNumber: idNumber || undefined })
-      });
-
-      const data = await response.json();
-
-      if (data.success) {
-        setResult(data.data);
-      } else {
-        setError(data.message);
-      }
-    } catch (err) {
-      setError('فشل الاتصال بالخادم');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  return (
-    <div className="poa-verification">
-      <h3>التحقق من الوكالة</h3>
-
-      <div className="form-group">
-        <label>رقم الوكالة *</label>
-        <input
-          type="text"
-          value={poaNumber}
-          onChange={(e) => setPoaNumber(e.target.value)}
-          placeholder="أدخل رقم الوكالة"
-          dir="ltr"
-        />
-      </div>
-
-      <div className="form-group">
-        <label>رقم الهوية</label>
-        <input
-          type="text"
-          value={idNumber}
-          onChange={(e) => setIdNumber(e.target.value)}
-          placeholder="رقم هوية الموكل أو الوكيل"
-          dir="ltr"
-        />
-        <small>اختياري - سيتم استخدام رقم هوية العميل إذا لم يتم إدخاله</small>
-      </div>
-
-      <button onClick={handleVerify} disabled={loading}>
-        {loading ? 'جاري التحقق...' : 'تحقق من الوكالة'}
-      </button>
-
-      {error && <div className="error">{error}</div>}
-
-      {result && (
-        <div className="result">
-          <div className={`status ${result.isValid ? 'valid' : 'invalid'}`}>
-            {result.isValid ? '✅ الوكالة سارية' : '❌ الوكالة غير سارية'}
-          </div>
-
-          <table>
-            <tbody>
-              <tr><td>رقم الوكالة:</td><td>{result.poaNumber}</td></tr>
-              <tr><td>الموكل:</td><td>{result.principal?.name}</td></tr>
-              <tr><td>الوكيل:</td><td>{result.attorney?.name}</td></tr>
-              <tr><td>تاريخ الإصدار:</td><td>{result.issueDate}</td></tr>
-              <tr><td>تاريخ الانتهاء:</td><td>{result.expiryDate}</td></tr>
-              {result.daysUntilExpiry && (
-                <tr><td>أيام حتى الانتهاء:</td><td>{result.daysUntilExpiry} يوم</td></tr>
-              )}
-              <tr><td>الصلاحيات:</td><td>{result.powers?.join('، ')}</td></tr>
-            </tbody>
-          </table>
-
-          {result.fromCache && (
-            <small>* البيانات من الذاكرة المؤقتة (صالحة لمدة 24 ساعة)</small>
-          )}
-        </div>
-      )}
-    </div>
-  );
-}
-```
-
-### 11. Validation Utilities
+### 8. Validation Utilities
 
 ```typescript
 // utils/validation.ts
@@ -2472,31 +2077,12 @@ export const validateNationalId = (id: string): boolean => {
   return regex.test(id);
 };
 
-// Validate POA Number format (10+ digits)
-export const validatePOANumber = (poa: string): boolean => {
-  const regex = /^\d{10,}$/;
-  return regex.test(poa);
-};
-
-// Validate Attorney License Number
-export const validateAttorneyLicense = (license: string): boolean => {
-  const regex = /^\d{4,}$/;
-  return regex.test(license);
+// Validate CR Number format (10 digits)
+export const validateCRNumber = (cr: string): boolean => {
+  const regex = /^\d{10}$/;
+  return regex.test(cr);
 };
 ```
-
-### MOJ API Endpoints Summary
-
-| Endpoint | Method | Body | Description |
-|----------|--------|------|-------------|
-| `/api/clients/:id/verify/moj` | POST | `{ poaNumber, idNumber? }` | Verify Power of Attorney (الوكالة) |
-| `/api/clients/:id/verify/attorney` | POST | `{ attorneyId }` | Verify Attorney License (رخصة المحامي) |
-
-**Notes:**
-- **Caching**: Results are cached for 24 hours. The `fromCache: true` flag indicates cached data.
-- **Auto-save**: When POA verification succeeds, the client record is automatically updated with the POA details.
-- **Error Handling**: Always check `success` field in response before using data.
-- **Rate Limiting**: Be mindful of request frequency - the service respects the public portal's capacity.
 
 ---
 
@@ -2505,19 +2091,9 @@ export const validateAttorneyLicense = (license: string): boolean => {
 ```bash
 # Saudi Government APIs
 
-# Yakeen (National ID Verification)
-YAKEEN_API_URL=https://yakeen.mic.gov.sa
-YAKEEN_USERNAME=your-yakeen-username
-YAKEEN_PASSWORD=your-yakeen-password
-YAKEEN_CHARGE_CODE=your-charge-code
-
-# Wathq (Commercial Registry)
+# Wathq (Commercial Registry Verification)
 WATHQ_API_URL=https://api.wathq.sa
 WATHQ_API_KEY=your-wathq-api-key
-
-# MOJ (Ministry of Justice)
-MOJ_API_URL=https://api.moj.gov.sa
-MOJ_API_KEY=your-moj-api-key
 ```
 
 ---
@@ -2525,9 +2101,9 @@ MOJ_API_KEY=your-moj-api-key
 ## Data Validation Rules
 
 ### Client Creation/Update
-1. Individual clients MUST have national ID verified via Yakeen before save
-2. Company clients MUST have CR number verified via Wathq before save
-3. Attorney assignments MUST be verified via MOJ
+1. Company clients MUST have CR number verified via Wathq before save
+2. National ID format should be validated (starts with 1 or 2, 10 digits total)
+3. CR number format should be validated (10 digits)
 
 ### Invoice Creation
 1. Client billing info auto-populates from Client entity
