@@ -2043,6 +2043,266 @@ const handleClientSelectForPayment = async (clientId: string) => {
 };
 ```
 
+### 4. MOJ Verification - Power of Attorney (الوكالة)
+
+```typescript
+// POST /api/clients/:clientId/verify/moj
+const verifyPowerOfAttorney = async (clientId: string, poaNumber: string, idNumber?: string) => {
+  const response = await fetch(`/api/clients/${clientId}/verify/moj`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    },
+    body: JSON.stringify({
+      poaNumber,      // Required: رقم الوكالة (e.g., "1234567890")
+      idNumber        // Optional: رقم الهوية - uses client's nationalId if not provided
+    })
+  });
+
+  return response.json();
+};
+
+// Example usage
+const result = await verifyPowerOfAttorney('clientId123', '4412345678');
+
+// Success response
+{
+  "success": true,
+  "message": "تم التحقق من الوكالة بنجاح",
+  "data": {
+    "poaNumber": "4412345678",
+    "status": "سارية",
+    "isActive": true,
+    "isValid": true,
+    "isExpired": false,
+    "daysUntilExpiry": 180,
+    "principal": {
+      "name": "محمد أحمد",
+      "idNumber": "1098765432"
+    },
+    "attorney": {
+      "name": "عبدالله محمد",
+      "idNumber": "1087654321",
+      "type": "خاص"
+    },
+    "issueDate": "2024-01-15",
+    "expiryDate": "2025-01-15",
+    "notaryNumber": "123456",
+    "powers": ["البيع", "الشراء", "التوقيع"],
+    "verified": true,
+    "verifiedAt": "2024-12-05T10:30:00.000Z",
+    "source": "MOJ Portal"
+  },
+  "fromCache": false
+}
+
+// Error response
+{
+  "success": false,
+  "message": "لم يتم العثور على بيانات الوكالة",
+  "data": null
+}
+```
+
+### 5. MOJ Verification - Attorney License (رخصة المحامي)
+
+```typescript
+// POST /api/clients/:clientId/verify/attorney
+const verifyAttorney = async (clientId: string, attorneyId: string) => {
+  const response = await fetch(`/api/clients/${clientId}/verify/attorney`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    },
+    body: JSON.stringify({
+      attorneyId   // Required: رقم هوية المحامي
+    })
+  });
+
+  return response.json();
+};
+
+// Example usage
+const result = await verifyAttorney('clientId123', '1098765432');
+
+// Success response
+{
+  "success": true,
+  "message": "تم التحقق من المحامي بنجاح",
+  "data": {
+    "attorneyId": "1098765432",
+    "name": "عبدالله محمد الشمري",
+    "licenseNumber": "12345",
+    "licenseStatus": "نشط",
+    "isActive": true,
+    "isValid": true,
+    "isExpired": false,
+    "daysUntilExpiry": 365,
+    "specializations": ["قانون تجاري", "قانون عمل"],
+    "region": "الرياض",
+    "issueDate": "2020-01-01",
+    "expiryDate": "2025-12-31",
+    "verified": true,
+    "verifiedAt": "2024-12-05T10:30:00.000Z",
+    "source": "MOJ Portal"
+  },
+  "fromCache": false
+}
+```
+
+### 6. POA Verification React Component
+
+```tsx
+// components/POAVerification.tsx
+import { useState } from 'react';
+
+interface POAVerificationProps {
+  clientId: string;
+  clientNationalId?: string;
+}
+
+export function POAVerification({ clientId, clientNationalId }: POAVerificationProps) {
+  const [poaNumber, setPoaNumber] = useState('');
+  const [idNumber, setIdNumber] = useState(clientNationalId || '');
+  const [loading, setLoading] = useState(false);
+  const [result, setResult] = useState<any>(null);
+  const [error, setError] = useState('');
+
+  const handleVerify = async () => {
+    if (!poaNumber) {
+      setError('رقم الوكالة مطلوب');
+      return;
+    }
+
+    setLoading(true);
+    setError('');
+
+    try {
+      const response = await fetch(`/api/clients/${clientId}/verify/moj`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify({ poaNumber, idNumber: idNumber || undefined })
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setResult(data.data);
+      } else {
+        setError(data.message);
+      }
+    } catch (err) {
+      setError('فشل الاتصال بالخادم');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="poa-verification">
+      <h3>التحقق من الوكالة</h3>
+
+      <div className="form-group">
+        <label>رقم الوكالة *</label>
+        <input
+          type="text"
+          value={poaNumber}
+          onChange={(e) => setPoaNumber(e.target.value)}
+          placeholder="أدخل رقم الوكالة"
+          dir="ltr"
+        />
+      </div>
+
+      <div className="form-group">
+        <label>رقم الهوية</label>
+        <input
+          type="text"
+          value={idNumber}
+          onChange={(e) => setIdNumber(e.target.value)}
+          placeholder="رقم هوية الموكل أو الوكيل"
+          dir="ltr"
+        />
+        <small>اختياري - سيتم استخدام رقم هوية العميل إذا لم يتم إدخاله</small>
+      </div>
+
+      <button onClick={handleVerify} disabled={loading}>
+        {loading ? 'جاري التحقق...' : 'تحقق من الوكالة'}
+      </button>
+
+      {error && <div className="error">{error}</div>}
+
+      {result && (
+        <div className="result">
+          <div className={`status ${result.isValid ? 'valid' : 'invalid'}`}>
+            {result.isValid ? '✅ الوكالة سارية' : '❌ الوكالة غير سارية'}
+          </div>
+
+          <table>
+            <tbody>
+              <tr><td>رقم الوكالة:</td><td>{result.poaNumber}</td></tr>
+              <tr><td>الموكل:</td><td>{result.principal?.name}</td></tr>
+              <tr><td>الوكيل:</td><td>{result.attorney?.name}</td></tr>
+              <tr><td>تاريخ الإصدار:</td><td>{result.issueDate}</td></tr>
+              <tr><td>تاريخ الانتهاء:</td><td>{result.expiryDate}</td></tr>
+              {result.daysUntilExpiry && (
+                <tr><td>أيام حتى الانتهاء:</td><td>{result.daysUntilExpiry} يوم</td></tr>
+              )}
+              <tr><td>الصلاحيات:</td><td>{result.powers?.join('، ')}</td></tr>
+            </tbody>
+          </table>
+
+          {result.fromCache && (
+            <small>* البيانات من الذاكرة المؤقتة (صالحة لمدة 24 ساعة)</small>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+```
+
+### 7. Validation Utilities
+
+```typescript
+// utils/validation.ts
+
+// Validate Saudi National ID (10 digits, starts with 1 or 2)
+export const validateNationalId = (id: string): boolean => {
+  const regex = /^[12]\d{9}$/;
+  return regex.test(id);
+};
+
+// Validate POA Number format (10+ digits)
+export const validatePOANumber = (poa: string): boolean => {
+  const regex = /^\d{10,}$/;
+  return regex.test(poa);
+};
+
+// Validate Attorney License Number
+export const validateAttorneyLicense = (license: string): boolean => {
+  const regex = /^\d{4,}$/;
+  return regex.test(license);
+};
+```
+
+### MOJ API Endpoints Summary
+
+| Endpoint | Method | Body | Description |
+|----------|--------|------|-------------|
+| `/api/clients/:id/verify/moj` | POST | `{ poaNumber, idNumber? }` | Verify Power of Attorney (الوكالة) |
+| `/api/clients/:id/verify/attorney` | POST | `{ attorneyId }` | Verify Attorney License (رخصة المحامي) |
+
+**Notes:**
+- **Caching**: Results are cached for 24 hours. The `fromCache: true` flag indicates cached data.
+- **Auto-save**: When POA verification succeeds, the client record is automatically updated with the POA details.
+- **Error Handling**: Always check `success` field in response before using data.
+- **Rate Limiting**: Be mindful of request frequency - the service respects the public portal's capacity.
+
 ---
 
 ## Environment Variables for Saudi APIs
