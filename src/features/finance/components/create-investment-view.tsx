@@ -31,51 +31,8 @@ import { FinanceSidebar } from './finance-sidebar'
 import { ProductivityHero } from '@/components/productivity-hero'
 import { StockSymbolSearch } from './stock-symbol-search'
 import type { StockSymbol } from '../data/saudi-stocks'
-
-// API Hook - Replace with actual implementation using React Query or similar
-interface CreateInvestmentData {
-    symbol: string
-    name: string
-    nameEn: string
-    type: 'stock' | 'mutual_fund' | 'etf' | 'reit' | 'sukuk' | 'bond'
-    market: 'tadawul' | 'international'
-    category: string
-    purchaseDate: string
-    purchasePrice: number      // in halalas
-    quantity: number
-    fees: number               // in halalas
-    totalCost: number          // in halalas
-    sector: string
-    sectorEn: string
-    notes: string
-}
-
-function useCreateInvestment() {
-    // TODO: Replace with actual API call using React Query useMutation
-    // Example implementation:
-    // return useMutation({
-    //     mutationFn: (data: CreateInvestmentData) =>
-    //         fetch('/api/investments', {
-    //             method: 'POST',
-    //             headers: { 'Content-Type': 'application/json' },
-    //             body: JSON.stringify(data),
-    //         }).then(res => {
-    //             if (!res.ok) throw new Error('Failed to create investment')
-    //             return res.json()
-    //         }),
-    // })
-
-    return {
-        mutate: (_data: CreateInvestmentData, options?: { onSuccess?: () => void; onError?: (error: Error) => void }) => {
-            // Simulate API call - remove this when backend is ready
-            console.error('API NOT IMPLEMENTED: POST /api/investments')
-            options?.onError?.(new Error('Backend API not implemented. Please connect to your backend.'))
-        },
-        isPending: false,
-        isError: false,
-        error: null as Error | null,
-    }
-}
+import { useCreateInvestment } from '@/hooks/useFinance'
+import { CreateInvestmentData } from '@/services/financeService'
 
 // Investment types
 const investmentTypes = [

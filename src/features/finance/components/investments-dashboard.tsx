@@ -37,6 +37,7 @@ import { FinanceSidebar } from './finance-sidebar'
 import { ProductivityHero } from '@/components/productivity-hero'
 import { Skeleton } from '@/components/ui/skeleton'
 import { cn } from '@/lib/utils'
+import { useInvestments, useRefreshAllPrices } from '@/hooks/useFinance'
 
 // ============================================================================
 // TYPES - These match the backend API models
@@ -89,52 +90,9 @@ export interface InvestmentsResponse {
 }
 
 // ============================================================================
-// API HOOKS - Replace with your actual API implementation
+// API HOOKS - Imported from useFinance.ts
 // ============================================================================
-
-/**
- * Custom hook to fetch investments from API
- * TODO: Implement with your backend API (React Query, SWR, or fetch)
- *
- * Example with React Query:
- * ```
- * import { useQuery } from '@tanstack/react-query'
- *
- * export function useInvestments(params: InvestmentParams) {
- *   return useQuery({
- *     queryKey: ['investments', params],
- *     queryFn: () => api.get('/api/investments', { params }),
- *   })
- * }
- * ```
- */
-function useInvestments(params: {
-    status: string
-    type: string
-    search: string
-    page: number
-    limit: number
-}) {
-    // TODO: Replace with actual API call
-    // This is a placeholder that returns empty state
-    return {
-        data: null as InvestmentsResponse | null,
-        isLoading: false,
-        error: null as Error | null,
-        refetch: () => Promise.resolve(),
-    }
-}
-
-/**
- * Custom hook to refresh all investment prices
- * TODO: Implement with your backend API
- */
-function useRefreshPrices() {
-    return {
-        mutate: () => Promise.resolve(),
-        isPending: false,
-    }
-}
+// useInvestments and useRefreshAllPrices are imported from @/hooks/useFinance
 
 // ============================================================================
 // UTILITY FUNCTIONS
@@ -285,12 +243,11 @@ export default function InvestmentsDashboard() {
         limit: itemsPerPage,
     })
 
-    // Refresh prices mutation
-    const refreshPrices = useRefreshPrices()
+    // Refresh all prices mutation
+    const refreshAllPrices = useRefreshAllPrices()
 
     const handleRefreshPrices = async () => {
-        await refreshPrices.mutate()
-        refetch()
+        refreshAllPrices.mutate()
     }
 
     const investments = data?.investments ?? []
@@ -444,9 +401,9 @@ export default function InvestmentsDashboard() {
                                                 size="icon"
                                                 className="rounded-xl"
                                                 onClick={handleRefreshPrices}
-                                                disabled={refreshPrices.isPending}
+                                                disabled={refreshAllPrices.isPending}
                                             >
-                                                <RefreshCw className={cn("h-4 w-4", refreshPrices.isPending && "animate-spin")} />
+                                                <RefreshCw className={cn("h-4 w-4", refreshAllPrices.isPending && "animate-spin")} />
                                             </Button>
                                             <Button variant="outline" className="rounded-xl gap-2">
                                                 <Download className="h-4 w-4" />

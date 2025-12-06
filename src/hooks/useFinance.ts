@@ -14,6 +14,12 @@ import financeService, {
   CreateTimeEntryData,
   CreatePaymentData,
   CreateTransactionData,
+  InvestmentFilters,
+  CreateInvestmentData,
+  CreateTransactionPayload,
+  Investment,
+  InvestmentsResponse,
+  InvestmentTransaction,
 } from '@/services/financeService'
 
 // ==================== INVOICES ====================
@@ -968,6 +974,250 @@ export const useDeleteAccountActivity = () => {
     },
     onSettled: async () => {
       return await queryClient.invalidateQueries({ queryKey: ['activities'] })
+    },
+  })
+}
+
+// ==================== INVESTMENTS ====================
+
+/**
+ * Fetch all investments with portfolio summary
+ */
+export const useInvestments = (filters?: InvestmentFilters) => {
+  return useQuery({
+    queryKey: ['investments', filters],
+    queryFn: () => financeService.getInvestments(filters),
+    staleTime: 2 * 60 * 1000,
+  })
+}
+
+/**
+ * Fetch single investment by ID
+ */
+export const useInvestment = (id: string) => {
+  return useQuery({
+    queryKey: ['investments', id],
+    queryFn: () => financeService.getInvestment(id),
+    enabled: !!id,
+  })
+}
+
+/**
+ * Create new investment
+ */
+export const useCreateInvestment = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (data: CreateInvestmentData) =>
+      financeService.createInvestment(data),
+    onSuccess: (data) => {
+      toast.success('تم إنشاء الاستثمار بنجاح')
+
+      // Manually update the cache
+      queryClient.setQueriesData({ queryKey: ['investments'] }, (old: any) => {
+        if (!old) return old
+
+        if (old.investments && Array.isArray(old.investments)) {
+          return {
+            ...old,
+            investments: [data, ...old.investments],
+          }
+        }
+
+        return old
+      })
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'فشل إنشاء الاستثمار')
+    },
+    onSettled: async () => {
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      return await queryClient.invalidateQueries({ queryKey: ['investments'], refetchType: 'all' })
+    },
+  })
+}
+
+/**
+ * Update investment
+ */
+export const useUpdateInvestment = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: Partial<CreateInvestmentData> }) =>
+      financeService.updateInvestment(id, data),
+    onSuccess: () => {
+      toast.success('تم تحديث الاستثمار بنجاح')
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'فشل تحديث الاستثمار')
+    },
+    onSettled: async (_, __, { id }) => {
+      await queryClient.invalidateQueries({ queryKey: ['investments'] })
+      return await queryClient.invalidateQueries({ queryKey: ['investments', id] })
+    },
+  })
+}
+
+/**
+ * Delete investment
+ */
+export const useDeleteInvestment = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (id: string) => financeService.deleteInvestment(id),
+    onSuccess: () => {
+      toast.success('تم حذف الاستثمار بنجاح')
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'فشل حذف الاستثمار')
+    },
+    onSettled: async () => {
+      return await queryClient.invalidateQueries({ queryKey: ['investments'] })
+    },
+  })
+}
+
+/**
+ * Fetch portfolio summary
+ */
+export const usePortfolioSummary = () => {
+  return useQuery({
+    queryKey: ['investments', 'summary'],
+    queryFn: () => financeService.getPortfolioSummary(),
+    staleTime: 2 * 60 * 1000,
+  })
+}
+
+/**
+ * Fetch investment transactions
+ */
+export const useInvestmentTransactions = (investmentId: string) => {
+  return useQuery({
+    queryKey: ['investments', investmentId, 'transactions'],
+    queryFn: () => financeService.getInvestmentTransactions(investmentId),
+    enabled: !!investmentId,
+  })
+}
+
+/**
+ * Add transaction to investment (dividend, purchase, or sale)
+ */
+export const useAddInvestmentTransaction = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({ investmentId, data }: { investmentId: string; data: CreateTransactionPayload }) =>
+      financeService.addInvestmentTransaction(investmentId, data),
+    onSuccess: (_, { data }) => {
+      const messages: Record<string, string> = {
+        dividend: 'تم تسجيل التوزيعات بنجاح',
+        purchase: 'تم تسجيل عملية الشراء بنجاح',
+        sale: 'تم تسجيل عملية البيع بنجاح',
+      }
+      toast.success(messages[data.type] || 'تم تسجيل العملية بنجاح')
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'فشل تسجيل العملية')
+    },
+    onSettled: async (_, __, { investmentId }) => {
+      await queryClient.invalidateQueries({ queryKey: ['investments'] })
+      await queryClient.invalidateQueries({ queryKey: ['investments', investmentId] })
+      return await queryClient.invalidateQueries({ queryKey: ['investments', investmentId, 'transactions'] })
+    },
+  })
+}
+
+/**
+ * Refresh single investment price from market
+ */
+export const useRefreshInvestmentPrice = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (investmentId: string) =>
+      financeService.refreshInvestmentPrice(investmentId),
+    onSuccess: () => {
+      toast.success('تم تحديث السعر بنجاح')
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'فشل تحديث السعر')
+    },
+    onSettled: async (_, __, investmentId) => {
+      await queryClient.invalidateQueries({ queryKey: ['investments'] })
+      return await queryClient.invalidateQueries({ queryKey: ['investments', investmentId] })
+    },
+  })
+}
+
+/**
+ * Refresh all investment prices
+ */
+export const useRefreshAllPrices = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: () => financeService.refreshAllPrices(),
+    onSuccess: (result) => {
+      toast.success(`تم تحديث ${result.updated} سعر بنجاح`)
+      if (result.errors > 0) {
+        toast.warning(`فشل تحديث ${result.errors} سعر`)
+      }
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'فشل تحديث الأسعار')
+    },
+    onSettled: async () => {
+      return await queryClient.invalidateQueries({ queryKey: ['investments'] })
+    },
+  })
+}
+
+/**
+ * Search for stock symbols
+ */
+export const useSearchSymbols = (query: string) => {
+  return useQuery({
+    queryKey: ['symbols', 'search', query],
+    queryFn: () => financeService.searchSymbols(query),
+    enabled: query.length >= 2,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  })
+}
+
+/**
+ * Get stock quote
+ */
+export const useStockQuote = (symbol: string) => {
+  return useQuery({
+    queryKey: ['symbols', 'quote', symbol],
+    queryFn: () => financeService.getQuote(symbol),
+    enabled: !!symbol,
+    staleTime: 1 * 60 * 1000, // 1 minute
+  })
+}
+
+/**
+ * Sell investment (full or partial)
+ */
+export const useSellInvestment = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({ investmentId, data }: { investmentId: string; data: { quantity: number; salePrice: number; saleDate: string; fees?: number } }) =>
+      financeService.sellInvestment(investmentId, data),
+    onSuccess: () => {
+      toast.success('تم بيع الاستثمار بنجاح')
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'فشل بيع الاستثمار')
+    },
+    onSettled: async (_, __, { investmentId }) => {
+      await queryClient.invalidateQueries({ queryKey: ['investments'] })
+      await queryClient.invalidateQueries({ queryKey: ['investments', investmentId] })
+      return await queryClient.invalidateQueries({ queryKey: ['investments', investmentId, 'transactions'] })
     },
   })
 }
