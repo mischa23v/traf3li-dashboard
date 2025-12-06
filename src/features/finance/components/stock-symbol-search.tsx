@@ -1,5 +1,5 @@
-import { useState, useEffect, useRef } from 'react'
-import { Search, X, TrendingUp, Building2, Landmark } from 'lucide-react'
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
+import { Search, X, TrendingUp, Building2, Landmark, Loader2 } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -23,6 +23,23 @@ import {
     searchSaudiSecurities,
     saudiSectors
 } from '../data/saudi-stocks'
+
+// Custom debounce hook
+function useDebounce<T>(value: T, delay: number): T {
+    const [debouncedValue, setDebouncedValue] = useState<T>(value)
+
+    useEffect(() => {
+        const handler = setTimeout(() => {
+            setDebouncedValue(value)
+        }, delay)
+
+        return () => {
+            clearTimeout(handler)
+        }
+    }, [value, delay])
+
+    return debouncedValue
+}
 
 interface StockSymbolSearchProps {
     value: string
@@ -68,52 +85,70 @@ export function StockSymbolSearch({
     className
 }: StockSymbolSearchProps) {
     const [open, setOpen] = useState(false)
-    const [query, setQuery] = useState(value)
+    const [inputValue, setInputValue] = useState(value)
     const [activeMarket, setActiveMarket] = useState<'saudi' | 'international'>('saudi')
     const [activeSector, setActiveSector] = useState('all')
+    const [isSearching, setIsSearching] = useState(false)
     const inputRef = useRef<HTMLInputElement>(null)
 
-    const getFilteredResults = (): StockSymbol[] => {
+    // Debounce the search query
+    const debouncedQuery = useDebounce(inputValue, 150)
+
+    // Sync external value changes to internal state
+    useEffect(() => {
+        if (value !== inputValue && !open) {
+            setInputValue(value)
+        }
+    }, [value])
+
+    // Memoized filtered results
+    const filteredResults = useMemo(() => {
+        setIsSearching(false)
         if (activeMarket === 'saudi') {
-            return searchSaudiSecurities(query, activeSector)
+            return searchSaudiSecurities(debouncedQuery, activeSector)
         } else {
             let results = internationalAssets
             if (activeSector && activeSector !== 'all') {
                 results = results.filter(s => s.sector === activeSector)
             }
-            if (query) {
-                const normalizedQuery = query.toLowerCase()
+            if (debouncedQuery) {
+                const normalizedQuery = debouncedQuery.toLowerCase()
                 results = results.filter(s =>
                     s.symbol.toLowerCase().includes(normalizedQuery) ||
-                    s.nameAr.includes(query) ||
+                    s.nameAr.includes(debouncedQuery) ||
                     s.nameEn.toLowerCase().includes(normalizedQuery)
                 )
             }
             return results
         }
-    }
+    }, [debouncedQuery, activeMarket, activeSector])
 
-    const filteredResults = getFilteredResults()
-
-    const handleSelect = (stock: StockSymbol) => {
+    const handleSelect = useCallback((stock: StockSymbol) => {
+        setInputValue(stock.symbol)
         onChange(stock.symbol)
-        setQuery(stock.symbol)
         onSelectStock?.(stock)
         setOpen(false)
-    }
+    }, [onChange, onSelectStock])
 
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
         const newValue = e.target.value.toUpperCase()
-        setQuery(newValue)
-        onChange(newValue)
+        setInputValue(newValue)
+        setIsSearching(true)
         if (!open) setOpen(true)
-    }
+    }, [open])
 
-    const handleClear = () => {
-        setQuery('')
+    // Update parent only when debounced value changes
+    useEffect(() => {
+        if (debouncedQuery !== value) {
+            onChange(debouncedQuery)
+        }
+    }, [debouncedQuery])
+
+    const handleClear = useCallback(() => {
+        setInputValue('')
         onChange('')
         inputRef.current?.focus()
-    }
+    }, [onChange])
 
     const getTypeIcon = (type: StockSymbol['type']) => {
         switch (type) {
@@ -140,16 +175,20 @@ export function StockSymbolSearch({
         <Popover open={open} onOpenChange={setOpen}>
             <PopoverTrigger asChild>
                 <div className={cn("relative", className)}>
-                    <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground pointer-events-none" />
+                    {isSearching ? (
+                        <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground pointer-events-none animate-spin" />
+                    ) : (
+                        <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground pointer-events-none" />
+                    )}
                     <Input
                         ref={inputRef}
                         placeholder={placeholder}
-                        value={query}
+                        value={inputValue}
                         onChange={handleInputChange}
                         onFocus={() => setOpen(true)}
                         className="pr-10 pl-10 rounded-xl h-12 text-lg font-bold"
                     />
-                    {query && (
+                    {inputValue && (
                         <Button
                             variant="ghost"
                             size="icon"
