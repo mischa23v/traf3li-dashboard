@@ -53,6 +53,12 @@ export function ProductivityHero({ badge, title = 'الإنتاجية', type = '
         tasks: { label: 'المهام', href: '/dashboard/tasks/list' },
         reminders: { label: 'التذكيرات', href: '/dashboard/tasks/reminders' },
         events: { label: 'الأحداث', href: '/dashboard/tasks/events' },
+        employees: { label: 'الموظفين', href: '/dashboard/hr/employees' },
+        salaries: { label: 'الرواتب', href: '/dashboard/hr/salaries' },
+        payroll: { label: 'مسيرات الرواتب', href: '/dashboard/hr/payroll' },
+        leaves: { label: 'الإجازات', href: '/dashboard/hr/leaves' },
+        attendance: { label: 'الحضور', href: '/dashboard/hr/attendance' },
+        evaluations: { label: 'التقييمات', href: '/dashboard/hr/evaluations' },
     }
 
     const buttonConfig: Record<string, { label: string; href: string }> = {
@@ -81,7 +87,6 @@ export function ProductivityHero({ badge, title = 'الإنتاجية', type = '
         leaves: { label: 'إجازة جديدة', href: '/dashboard/hr/leaves/new' },
         attendance: { label: 'سجل حضور جديد', href: '/dashboard/hr/attendance/new' },
         evaluations: { label: 'تقييم جديد', href: '/dashboard/hr/evaluations/new' },
-        payslips: { label: 'قسيمة راتب جديدة', href: '/dashboard/hr/payslips/new' },
         laws: { label: 'قانون جديد', href: '/dashboard/knowledge/laws/new' },
         judgments: { label: 'حكم جديد', href: '/dashboard/knowledge/judgments/new' },
         forms: { label: 'نموذج جديد', href: '/dashboard/knowledge/forms/new' },

@@ -1,7 +1,8 @@
 import { useState, useMemo } from 'react'
 import {
     Clock, Bell, MapPin, Calendar as CalendarIcon,
-    Plus, CheckSquare, Trash2, List, X, ChevronRight, Loader2, AlertCircle
+    Plus, CheckSquare, Trash2, List, X, ChevronRight, Loader2, AlertCircle,
+    Edit3, Eye, Users
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -13,11 +14,16 @@ import { format, addDays, startOfDay, endOfDay, isSameDay } from 'date-fns'
 import { arSA } from 'date-fns/locale'
 
 interface HRSidebarProps {
-    context?: 'employees' | 'attendance' | 'leaves' | 'evaluations' | 'payroll' | 'salaries' | 'payslips'
+    context?: 'employees' | 'salaries' | 'payroll' | 'leaves' | 'attendance' | 'evaluations'
     isSelectionMode?: boolean
     onToggleSelectionMode?: () => void
     selectedCount?: number
     onDeleteSelected?: () => void
+    // Details page specific props
+    employeeId?: string
+    onEditEmployee?: () => void
+    onDeleteEmployee?: () => void
+    isDeletePending?: boolean
 }
 
 export function HRSidebar({
@@ -25,7 +31,12 @@ export function HRSidebar({
     isSelectionMode = false,
     onToggleSelectionMode,
     selectedCount = 0,
-    onDeleteSelected
+    onDeleteSelected,
+    // Details props
+    employeeId,
+    onEditEmployee,
+    onDeleteEmployee,
+    isDeletePending = false
 }: HRSidebarProps) {
     const [activeTab, setActiveTab] = useState<'calendar' | 'notifications'>('calendar')
     const [selectedDate, setSelectedDate] = useState(new Date())
@@ -57,34 +68,30 @@ export function HRSidebar({
         return upcomingRemindersData.data.slice(0, 5)
     }, [upcomingRemindersData])
 
-    const links = {
+    const links: Record<string, { create: string; viewAll: string }> = {
         employees: {
             create: '/dashboard/hr/employees/new',
             viewAll: '/dashboard/hr/employees'
-        },
-        attendance: {
-            create: '/dashboard/hr/attendance/new',
-            viewAll: '/dashboard/hr/attendance'
-        },
-        leaves: {
-            create: '/dashboard/hr/leaves/new',
-            viewAll: '/dashboard/hr/leaves'
-        },
-        evaluations: {
-            create: '/dashboard/hr/evaluations/new',
-            viewAll: '/dashboard/hr/evaluations'
-        },
-        payroll: {
-            create: '/dashboard/hr/payroll/new',
-            viewAll: '/dashboard/hr/payroll'
         },
         salaries: {
             create: '/dashboard/hr/salaries/new',
             viewAll: '/dashboard/hr/salaries'
         },
-        payslips: {
-            create: '/dashboard/hr/payslips/new',
-            viewAll: '/dashboard/hr/payslips'
+        payroll: {
+            create: '/dashboard/hr/payroll/new',
+            viewAll: '/dashboard/hr/payroll'
+        },
+        leaves: {
+            create: '/dashboard/hr/leaves/new',
+            viewAll: '/dashboard/hr/leaves'
+        },
+        attendance: {
+            create: '/dashboard/hr/attendance/new',
+            viewAll: '/dashboard/hr/attendance'
+        },
+        evaluations: {
+            create: '/dashboard/hr/evaluations/new',
+            viewAll: '/dashboard/hr/evaluations'
         }
     }
 
@@ -143,49 +150,96 @@ export function HRSidebar({
 
                 {/* Content */}
                 <div className="relative z-10 grid grid-cols-2 gap-4 animate-in fade-in slide-in-from-bottom-2 duration-300">
-                    {/* Create Button - White + Green Text + Glow */}
-                    <Button asChild className="bg-white hover:bg-emerald-50 text-emerald-600 h-auto py-6 flex flex-col items-center justify-center gap-2 rounded-3xl shadow-lg shadow-white/10 transition-all duration-300 hover:scale-[1.02] border-0">
-                        <Link to={currentLinks.create}>
-                            <Plus className="h-7 w-7" />
-                            <span className="text-sm font-bold">إنشاء</span>
-                        </Link>
-                    </Button>
+                    {employeeId ? (
+                        // Details View - Show Edit, Delete, View All
+                        <>
+                            {/* Edit Button */}
+                            <Button asChild className="bg-white hover:bg-blue-50 text-blue-600 h-auto py-6 flex flex-col items-center justify-center gap-2 rounded-3xl shadow-lg shadow-white/10 transition-all duration-300 hover:scale-[1.02] border-0">
+                                <Link to="/dashboard/hr/employees/new" search={{ editId: employeeId }}>
+                                    <Edit3 className="h-7 w-7" />
+                                    <span className="text-sm font-bold">تعديل</span>
+                                </Link>
+                            </Button>
 
-                    {/* Select Button - White + Dark Text + Glow */}
-                    <Button
-                        variant="ghost"
-                        className={cn(
-                            "h-auto py-6 flex flex-col items-center justify-center gap-2 rounded-3xl transition-all duration-300 hover:scale-[1.02] shadow-lg",
-                            isSelectionMode
-                                ? "bg-emerald-100 text-emerald-800 ring-2 ring-emerald-400 shadow-emerald-500/20"
-                                : "bg-white hover:bg-slate-50 text-emerald-950 shadow-white/10"
-                        )}
-                        onClick={onToggleSelectionMode}
-                    >
-                        {isSelectionMode ? <X className="h-6 w-6" /> : <CheckSquare className="h-6 w-6" />}
-                        <span className="text-sm font-bold">{isSelectionMode ? 'إلغاء' : 'تحديد'}</span>
-                    </Button>
+                            {/* Delete Button */}
+                            <Button
+                                variant="ghost"
+                                className="bg-white hover:bg-red-50 text-red-500 hover:text-red-600 h-auto py-6 flex flex-col items-center justify-center gap-2 rounded-3xl disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 hover:scale-[1.02] shadow-lg shadow-white/10"
+                                onClick={onDeleteEmployee}
+                                disabled={isDeletePending}
+                            >
+                                {isDeletePending ? (
+                                    <Loader2 className="h-6 w-6 animate-spin" />
+                                ) : (
+                                    <Trash2 className="h-6 w-6" />
+                                )}
+                                <span className="text-sm font-bold">حذف</span>
+                            </Button>
 
-                    {/* Delete Button - White + Red Text + Glow */}
-                    <Button
-                        variant="ghost"
-                        className="bg-white hover:bg-red-50 text-red-500 hover:text-red-600 h-auto py-6 flex flex-col items-center justify-center gap-2 rounded-3xl disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 hover:scale-[1.02] shadow-lg shadow-white/10"
-                        onClick={onDeleteSelected}
-                        disabled={!isSelectionMode || selectedCount === 0}
-                    >
-                        <Trash2 className="h-6 w-6" />
-                        <span className="text-sm font-bold">
-                            {selectedCount > 0 ? `حذف (${selectedCount})` : 'حذف'}
-                        </span>
-                    </Button>
+                            {/* Create New Button */}
+                            <Button asChild className="bg-white hover:bg-emerald-50 text-emerald-600 h-auto py-6 flex flex-col items-center justify-center gap-2 rounded-3xl shadow-lg shadow-white/10 transition-all duration-300 hover:scale-[1.02] border-0">
+                                <Link to={currentLinks.create}>
+                                    <Plus className="h-7 w-7" />
+                                    <span className="text-sm font-bold">إضافة</span>
+                                </Link>
+                            </Button>
 
-                    {/* View All Button - White + Dark Text + Glow */}
-                    <Button asChild variant="ghost" className="bg-white hover:bg-slate-50 text-emerald-950 h-auto py-6 flex flex-col items-center justify-center gap-2 rounded-3xl transition-all duration-300 hover:scale-[1.02] shadow-lg shadow-white/10">
-                        <Link to={currentLinks.viewAll}>
-                            <List className="h-6 w-6" />
-                            <span className="text-sm font-bold">عرض جميع</span>
-                        </Link>
-                    </Button>
+                            {/* View All Button */}
+                            <Button asChild variant="ghost" className="bg-white hover:bg-slate-50 text-emerald-950 h-auto py-6 flex flex-col items-center justify-center gap-2 rounded-3xl transition-all duration-300 hover:scale-[1.02] shadow-lg shadow-white/10">
+                                <Link to={currentLinks.viewAll}>
+                                    <List className="h-6 w-6" />
+                                    <span className="text-sm font-bold">عرض جميع</span>
+                                </Link>
+                            </Button>
+                        </>
+                    ) : (
+                        // List View - Show Create, Select, Delete, View All
+                        <>
+                            {/* Create Button - White + Green Text + Glow */}
+                            <Button asChild className="bg-white hover:bg-emerald-50 text-emerald-600 h-auto py-6 flex flex-col items-center justify-center gap-2 rounded-3xl shadow-lg shadow-white/10 transition-all duration-300 hover:scale-[1.02] border-0">
+                                <Link to={currentLinks.create}>
+                                    <Plus className="h-7 w-7" />
+                                    <span className="text-sm font-bold">إضافة</span>
+                                </Link>
+                            </Button>
+
+                            {/* Select Button - White + Dark Text + Glow */}
+                            <Button
+                                variant="ghost"
+                                className={cn(
+                                    "h-auto py-6 flex flex-col items-center justify-center gap-2 rounded-3xl transition-all duration-300 hover:scale-[1.02] shadow-lg",
+                                    isSelectionMode
+                                        ? "bg-emerald-100 text-emerald-800 ring-2 ring-emerald-400 shadow-emerald-500/20"
+                                        : "bg-white hover:bg-slate-50 text-emerald-950 shadow-white/10"
+                                )}
+                                onClick={onToggleSelectionMode}
+                            >
+                                {isSelectionMode ? <X className="h-6 w-6" /> : <CheckSquare className="h-6 w-6" />}
+                                <span className="text-sm font-bold">{isSelectionMode ? 'إلغاء' : 'تحديد'}</span>
+                            </Button>
+
+                            {/* Delete Button - White + Red Text + Glow */}
+                            <Button
+                                variant="ghost"
+                                className="bg-white hover:bg-red-50 text-red-500 hover:text-red-600 h-auto py-6 flex flex-col items-center justify-center gap-2 rounded-3xl disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 hover:scale-[1.02] shadow-lg shadow-white/10"
+                                onClick={onDeleteSelected}
+                                disabled={!isSelectionMode || selectedCount === 0}
+                            >
+                                <Trash2 className="h-6 w-6" />
+                                <span className="text-sm font-bold">
+                                    {selectedCount > 0 ? `حذف (${selectedCount})` : 'حذف'}
+                                </span>
+                            </Button>
+
+                            {/* View All Button - White + Dark Text + Glow */}
+                            <Button asChild variant="ghost" className="bg-white hover:bg-slate-50 text-emerald-950 h-auto py-6 flex flex-col items-center justify-center gap-2 rounded-3xl transition-all duration-300 hover:scale-[1.02] shadow-lg shadow-white/10">
+                                <Link to={currentLinks.viewAll}>
+                                    <List className="h-6 w-6" />
+                                    <span className="text-sm font-bold">عرض جميع</span>
+                                </Link>
+                            </Button>
+                        </>
+                    )}
                 </div>
             </div>
 

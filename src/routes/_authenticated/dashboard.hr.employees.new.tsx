@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { EmployeeCreate } from '@/features/hr/employees/employee-create'
+import { EmployeeCreateView } from '@/features/hr/components/employee-create-view'
 
 export const Route = createFileRoute('/_authenticated/dashboard/hr/employees/new')({
-    component: EmployeeCreate,
+  component: EmployeeCreateView,
 })
