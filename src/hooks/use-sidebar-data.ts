@@ -11,6 +11,7 @@ import {
   BookOpen,
   TrendingUp,
   UserCog,
+  UserPlus,
 } from 'lucide-react'
 import { useAuthStore } from '@/stores/auth-store'
 import { usePermissionsStore } from '@/stores/permissions-store'
@@ -331,6 +332,16 @@ export function useSidebarData(): SidebarData {
             {
               title: 'تقييم الأداء',
               url: '/dashboard/hr/performance',
+              module: 'hr',
+            },
+            {
+              title: 'التوظيف',
+              url: '/dashboard/hr/recruitment/jobs',
+              module: 'hr',
+            },
+            {
+              title: 'المتقدمين',
+              url: '/dashboard/hr/recruitment/applicants',
               module: 'hr',
             },
           ],
