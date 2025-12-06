@@ -273,7 +273,7 @@ export function ActivityDetailsView() {
         {!isLoading && !isError && activity && (
           <>
             {/* Activity Hero Content */}
-            <ProductivityHero badge="إدارة النشاطات" title={activity.titleAr || activity.title} type="crm" listMode={true} hideButtons={true}>
+            <ProductivityHero badge="إدارة النشاطات" title={activity.titleAr || activity.title} type="activities" listMode={true} hideButtons={true}>
               <div className="flex flex-wrap gap-3">
                 <Select
                   value={activity.status}

@@ -170,7 +170,7 @@ export function CreateActivityView() {
 
       <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-r border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
         {/* HERO CARD */}
-        <ProductivityHero badge="إدارة النشاطات" title="تسجيل نشاط جديد" type="crm" listMode={true} hideButtons={true}>
+        <ProductivityHero badge="إدارة النشاطات" title="تسجيل نشاط جديد" type="activities" listMode={true} hideButtons={true}>
           <Link to="/dashboard/crm/activities">
             <Button variant="ghost" size="icon" className="rounded-full bg-white/10 hover:bg-white/20 text-white">
               <ArrowRight className="w-5 h-5" />
