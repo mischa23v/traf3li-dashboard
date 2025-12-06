@@ -985,6 +985,194 @@ When a trade is created or updated, automatically calculate:
 
 ---
 
+## Stock Data API Integration (Yahoo Finance)
+
+### Overview
+
+For fetching real-time stock prices and market data, use the `yahoo-finance2` npm package. This provides access to:
+- Saudi stocks (Tadawul) via `.SR` suffix symbols
+- International stocks
+- Forex pairs
+- Cryptocurrencies
+- Commodities
+
+### Installation
+
+```bash
+npm install yahoo-finance2
+```
+
+### Saudi Stock Symbol Format
+
+Saudi stocks use the format `XXXX.SR` where XXXX is a 4-digit number:
+
+| Company | Symbol | Yahoo Symbol |
+|---------|--------|--------------|
+| Al Rajhi Bank | 1120 | 1120.SR |
+| Saudi Aramco | 2222 | 2222.SR |
+| STC | 7010 | 7010.SR |
+| SABIC | 2010 | 2010.SR |
+| Almarai | 2280 | 2280.SR |
+| TASI Index | ^TASI | ^TASI.SR |
+
+### API Endpoints for Stock Data
+
+#### GET /api/stocks/search
+Search for stocks by symbol or name.
+
+```typescript
+// Query params
+interface StockSearchParams {
+  q: string           // Search query
+  market?: string     // 'saudi' | 'international' | 'all'
+  sector?: string     // Sector filter
+  limit?: number      // Max results (default: 20)
+}
+
+// Response
+interface StockSearchResult {
+  symbol: string
+  yahooSymbol: string
+  nameAr: string
+  nameEn: string
+  sector: string
+  sectorAr: string
+  type: 'stock' | 'etf' | 'reit' | 'sukuk'
+}
+```
+
+#### GET /api/stocks/quote/:symbol
+Get real-time quote for a symbol.
+
+```typescript
+// Server-side implementation using yahoo-finance2
+import yahooFinance from 'yahoo-finance2'
+
+async function getQuote(yahooSymbol: string) {
+  const quote = await yahooFinance.quote(yahooSymbol)
+  return {
+    symbol: quote.symbol,
+    price: quote.regularMarketPrice,
+    previousClose: quote.regularMarketPreviousClose,
+    change: quote.regularMarketChange,
+    changePercent: quote.regularMarketChangePercent,
+    open: quote.regularMarketOpen,
+    high: quote.regularMarketDayHigh,
+    low: quote.regularMarketDayLow,
+    volume: quote.regularMarketVolume,
+    marketCap: quote.marketCap,
+    currency: quote.currency,
+    exchange: quote.exchange,
+  }
+}
+```
+
+#### GET /api/stocks/historical/:symbol
+Get historical price data.
+
+```typescript
+// Query params
+interface HistoricalParams {
+  period1: string   // Start date (ISO)
+  period2: string   // End date (ISO)
+  interval: '1d' | '1wk' | '1mo'  // Data interval
+}
+
+// Server-side implementation
+async function getHistoricalData(yahooSymbol: string, params: HistoricalParams) {
+  const data = await yahooFinance.historical(yahooSymbol, {
+    period1: params.period1,
+    period2: params.period2,
+    interval: params.interval,
+  })
+  return data.map(d => ({
+    date: d.date,
+    open: d.open,
+    high: d.high,
+    low: d.low,
+    close: d.close,
+    volume: d.volume,
+  }))
+}
+```
+
+#### GET /api/stocks/batch-quotes
+Get quotes for multiple symbols at once.
+
+```typescript
+// Request
+interface BatchQuotesRequest {
+  symbols: string[]  // Array of Yahoo symbols
+}
+
+// Response
+interface BatchQuotesResponse {
+  quotes: Record<string, StockQuote>
+  errors: Record<string, string>
+}
+```
+
+### Frontend Stock Data (Pre-loaded)
+
+The frontend includes pre-loaded Saudi stock data in `/src/features/finance/data/saudi-stocks.ts`:
+- 50+ major Saudi stocks
+- 10+ REITs
+- Mutual funds (ETFs)
+- Sector mappings
+- Search function
+
+This allows instant symbol lookup without API calls, while prices are fetched from backend.
+
+### Price Update Strategy
+
+1. **Initial Load**: Fetch current price when viewing trade details
+2. **Trade Entry**: Fetch price to validate entry (optional)
+3. **Portfolio View**: Batch fetch prices for all open positions
+4. **Refresh Interval**: Every 60 seconds for open market hours (9:00 AM - 3:00 PM Saudi time)
+
+### Market Hours (Tadawul)
+
+```typescript
+const TADAWUL_HOURS = {
+  timezone: 'Asia/Riyadh',
+  openingHour: 10,      // 10:00 AM
+  closingHour: 15,      // 3:00 PM
+  workDays: [0, 1, 2, 3, 4], // Sunday to Thursday
+}
+
+function isTadawulOpen(): boolean {
+  const now = new Date()
+  const options = { timeZone: 'Asia/Riyadh' }
+  const hours = parseInt(now.toLocaleTimeString('en-US', { ...options, hour: '2-digit', hour12: false }))
+  const day = new Date().toLocaleDateString('en-US', { ...options, weekday: 'short' })
+
+  const isWorkDay = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu'].includes(day)
+  const isMarketHours = hours >= 10 && hours < 15
+
+  return isWorkDay && isMarketHours
+}
+```
+
+### Arabic Labels for Stock Data
+
+| English | Arabic |
+|---------|--------|
+| Price | السعر |
+| Change | التغير |
+| Change % | نسبة التغير |
+| Open | الافتتاح |
+| High | الأعلى |
+| Low | الأدنى |
+| Close | الإغلاق |
+| Volume | حجم التداول |
+| Market Cap | القيمة السوقية |
+| 52 Week High | أعلى سعر (52 أسبوع) |
+| 52 Week Low | أدنى سعر (52 أسبوع) |
+| P/E Ratio | مكرر الربحية |
+| Dividend Yield | عائد التوزيعات |
+
+---
+
 ## Implementation Priority
 
 ### Phase 1: Core Trading (MVP)

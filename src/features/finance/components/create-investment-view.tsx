@@ -30,6 +30,8 @@ import { ConfigDrawer } from '@/components/config-drawer'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { FinanceSidebar } from './finance-sidebar'
 import { ProductivityHero } from '@/components/productivity-hero'
+import { StockSymbolSearch } from './stock-symbol-search'
+import type { StockSymbol } from '../data/saudi-stocks'
 
 export default function CreateInvestmentView() {
     const navigate = useNavigate()
@@ -246,11 +248,25 @@ export default function CreateInvestmentView() {
                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                                 <div className="space-y-2">
                                                     <Label className="text-navy font-bold">الرمز *</Label>
-                                                    <Input
-                                                        placeholder="مثال: AAPL, EUR/USD, BTC"
+                                                    <StockSymbolSearch
                                                         value={formData.symbol}
-                                                        onChange={(e) => handleInputChange('symbol', e.target.value.toUpperCase())}
-                                                        className="rounded-xl h-12 text-lg font-bold"
+                                                        onChange={(symbol) => handleInputChange('symbol', symbol)}
+                                                        onSelectStock={(stock: StockSymbol) => {
+                                                            // Auto-set asset type based on selected stock
+                                                            if (stock.type === 'reit' || stock.type === 'etf') {
+                                                                handleInputChange('assetType', 'stock')
+                                                            }
+                                                            if (stock.sector === 'Forex') {
+                                                                handleInputChange('assetType', 'forex')
+                                                            }
+                                                            if (stock.sector === 'Crypto') {
+                                                                handleInputChange('assetType', 'crypto')
+                                                            }
+                                                            if (stock.sector === 'Commodities') {
+                                                                handleInputChange('assetType', 'futures')
+                                                            }
+                                                        }}
+                                                        placeholder="البحث عن السهم أو العملة..."
                                                     />
                                                 </div>
                                                 <div className="space-y-2">
