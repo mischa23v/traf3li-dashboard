@@ -3,11 +3,10 @@ import {
     ArrowLeft, Save, Loader2, Search,
     TrendingUp, Building2, Landmark, PieChart,
     Calendar, DollarSign, Hash, FileText, AlertCircle,
-    AlertTriangle
+    AlertTriangle, Bell
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import {
     Select,
@@ -16,7 +15,6 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select"
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Link, useNavigate } from '@tanstack/react-router'
 import { Header } from '@/components/layout/header'
@@ -146,108 +144,96 @@ export default function CreateInvestmentView() {
         })
     }
 
+    const topNav = [
+        { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
+        { title: 'المهام', href: '/dashboard/tasks/list', isActive: false },
+        { title: 'القضايا', href: '/dashboard/cases', isActive: false },
+        { title: 'الاستثمارات', href: '/dashboard/finance/investments', isActive: true },
+    ]
+
     return (
         <>
-            <Header>
-                <TopNav>
-                    <div className="flex items-center gap-3">
-                        <LanguageSwitcher />
-                        <ThemeSwitch />
-                        <ConfigDrawer />
-                        <DynamicIsland />
-                        <ProfileDropdown />
-                    </div>
-                </TopNav>
+            {/* Header - Matches Tasks Layout */}
+            <Header className="bg-navy shadow-none relative">
+                <TopNav links={topNav} className="[&>a]:text-slate-300 [&>a:hover]:text-white [&>a[aria-current='page']]:text-white" />
+
+                {/* Dynamic Island - Centered */}
+                <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
+                    <DynamicIsland />
+                </div>
+
+                <div className='ms-auto flex items-center space-x-4'>
+                    <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white">
+                        <Bell className="h-5 w-5" />
+                        <span className="absolute top-2 right-2 h-2 w-2 bg-red-500 rounded-full border border-navy"></span>
+                    </Button>
+                    <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white" />
+                    <ThemeSwitch className="text-slate-300 hover:bg-white/10 hover:text-white" />
+                    <ConfigDrawer className="text-slate-300 hover:bg-white/10 hover:text-white" />
+                    <ProfileDropdown className="text-slate-300 hover:bg-white/10 hover:text-white" />
+                </div>
+                {/* Bottom Gradient Line */}
+                <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-emerald-500/50 to-transparent"></div>
             </Header>
 
-            <Main>
+            <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-r border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
+
+                {/* HERO CARD - Same as create task */}
+                <ProductivityHero badge="المحفظة الاستثمارية" title="إضافة استثمار جديد" type="investments" listMode={true} />
+
+                {/* MAIN GRID LAYOUT - Same as create task */}
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    {/* Sidebar */}
-                    <div className="lg:col-span-1 order-2 lg:order-1">
-                        <FinanceSidebar context="investments" />
-                    </div>
 
-                    {/* Main Content */}
-                    <div className="lg:col-span-2 order-1 lg:order-2 space-y-6">
-                        {/* Hero Card */}
-                        <ProductivityHero
-                            badge="المحفظة الاستثمارية"
-                            title="إضافة استثمار جديد"
-                            type="investments"
-                            listMode={true}
-                            hideButtons={true}
-                        >
-                            <Button
-                                onClick={handleSubmit}
-                                disabled={createInvestment.isPending || !formData.symbol || !formData.purchasePrice || !formData.quantity}
-                                className="bg-emerald-500 hover:bg-emerald-600 text-white h-12 px-8 rounded-xl font-bold shadow-lg shadow-emerald-500/20 border-0"
-                            >
-                                {createInvestment.isPending ? (
-                                    <>
-                                        <Loader2 className="ml-2 h-5 w-5 animate-spin" />
-                                        جاري الحفظ...
-                                    </>
-                                ) : (
-                                    <>
-                                        <Save className="ml-2 h-5 w-5" />
-                                        حفظ الاستثمار
-                                    </>
-                                )}
-                            </Button>
-                        </ProductivityHero>
+                    {/* RIGHT COLUMN (Main Content) */}
+                    <div className="lg:col-span-2 space-y-8">
 
-                        {/* Back Link */}
-                        <Link
-                            to="/dashboard/finance/investments"
-                            className="inline-flex items-center gap-2 text-muted-foreground hover:text-navy transition-colors"
-                        >
-                            <ArrowLeft className="h-4 w-4" />
-                            العودة إلى المحفظة
-                        </Link>
+                        {/* Form Card */}
+                        <div className="bg-white rounded-3xl p-8 shadow-sm border border-slate-100">
+                            <div className="space-y-8">
 
-                        {/* Form */}
-                        <div className="space-y-6">
-                            {/* Investment Selection */}
-                            <Card>
-                                <CardHeader>
-                                    <CardTitle className="text-navy flex items-center gap-2">
-                                        <Search className="h-5 w-5" />
+                                {/* Investment Selection Section */}
+                                <div className="space-y-6">
+                                    <h3 className="text-lg font-semibold text-navy flex items-center gap-2">
+                                        <Search className="w-5 h-5 text-emerald-500" />
                                         اختيار الاستثمار
-                                    </CardTitle>
-                                </CardHeader>
-                                <CardContent className="space-y-4">
+                                    </h3>
+
                                     <div className="space-y-2">
-                                        <Label className="text-navy font-bold">البحث عن السهم أو الصندوق *</Label>
+                                        <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                                            <TrendingUp className="w-4 h-4 text-emerald-500" />
+                                            البحث عن السهم أو الصندوق <span className="text-red-500">*</span>
+                                        </label>
                                         <StockSymbolSearch
                                             value={formData.symbol}
                                             onChange={(symbol) => handleInputChange('symbol', symbol)}
                                             onSelectStock={handleStockSelect}
                                             placeholder="ابحث برقم السهم أو الاسم..."
                                         />
-                                        <p className="text-sm text-muted-foreground">
+                                        <p className="text-sm text-slate-500">
                                             اختر من القائمة أو أدخل الرمز يدوياً
                                         </p>
                                     </div>
 
                                     {selectedStock && (
-                                        <Alert className="bg-navy/5 border-navy/20">
-                                            <AlertDescription className="flex items-center gap-3">
-                                                <div className="w-10 h-10 rounded-xl bg-navy/10 flex items-center justify-center">
-                                                    <TrendingUp className="h-5 w-5 text-navy" />
-                                                </div>
-                                                <div>
-                                                    <p className="font-bold text-navy">{selectedStock.symbol} - {selectedStock.nameAr}</p>
-                                                    <p className="text-sm text-muted-foreground">{selectedStock.nameEn} • {selectedStock.sectorAr}</p>
-                                                </div>
-                                            </AlertDescription>
-                                        </Alert>
+                                        <div className="bg-emerald-50 rounded-xl p-4 flex items-center gap-3 border border-emerald-100">
+                                            <div className="w-12 h-12 rounded-xl bg-emerald-100 flex items-center justify-center">
+                                                <TrendingUp className="h-6 w-6 text-emerald-600" />
+                                            </div>
+                                            <div>
+                                                <p className="font-bold text-navy">{selectedStock.symbol} - {selectedStock.nameAr}</p>
+                                                <p className="text-sm text-slate-600">{selectedStock.nameEn} • {selectedStock.sectorAr}</p>
+                                            </div>
+                                        </div>
                                     )}
 
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                         <div className="space-y-2">
-                                            <Label className="text-navy font-bold">نوع الاستثمار *</Label>
+                                            <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                                                <PieChart className="w-4 h-4 text-emerald-500" />
+                                                نوع الاستثمار <span className="text-red-500">*</span>
+                                            </label>
                                             <Select value={formData.type} onValueChange={(v) => handleInputChange('type', v)}>
-                                                <SelectTrigger className="rounded-xl h-12">
+                                                <SelectTrigger className="rounded-xl border-slate-200 focus:ring-emerald-500">
                                                     <SelectValue />
                                                 </SelectTrigger>
                                                 <SelectContent>
@@ -264,9 +250,12 @@ export default function CreateInvestmentView() {
                                         </div>
 
                                         <div className="space-y-2">
-                                            <Label className="text-navy font-bold">التصنيف للتقارير</Label>
+                                            <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                                                <Building2 className="w-4 h-4 text-emerald-500" />
+                                                التصنيف للتقارير
+                                            </label>
                                             <Select value={formData.category} onValueChange={(v) => handleInputChange('category', v)}>
-                                                <SelectTrigger className="rounded-xl h-12">
+                                                <SelectTrigger className="rounded-xl border-slate-200 focus:ring-emerald-500">
                                                     <SelectValue />
                                                 </SelectTrigger>
                                                 <SelectContent>
@@ -281,101 +270,101 @@ export default function CreateInvestmentView() {
                                     </div>
 
                                     {!selectedStock && (
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                             <div className="space-y-2">
-                                                <Label className="text-navy font-bold">اسم الاستثمار (عربي)</Label>
+                                                <label className="text-sm font-medium text-slate-700">اسم الاستثمار (عربي)</label>
                                                 <Input
                                                     placeholder="مثال: مصرف الراجحي"
                                                     value={formData.name}
                                                     onChange={(e) => handleInputChange('name', e.target.value)}
-                                                    className="rounded-xl h-12"
+                                                    className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500"
                                                 />
                                             </div>
                                             <div className="space-y-2">
-                                                <Label className="text-navy font-bold">القطاع</Label>
+                                                <label className="text-sm font-medium text-slate-700">القطاع</label>
                                                 <Input
                                                     placeholder="مثال: البنوك"
                                                     value={formData.sector}
                                                     onChange={(e) => handleInputChange('sector', e.target.value)}
-                                                    className="rounded-xl h-12"
+                                                    className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500"
                                                 />
                                             </div>
                                         </div>
                                     )}
-                                </CardContent>
-                            </Card>
+                                </div>
 
-                            {/* Purchase Details */}
-                            <Card>
-                                <CardHeader>
-                                    <CardTitle className="text-navy flex items-center gap-2">
-                                        <DollarSign className="h-5 w-5" />
+                                {/* Purchase Details Section */}
+                                <div className="border-t border-slate-100 pt-6 space-y-6">
+                                    <h3 className="text-lg font-semibold text-navy flex items-center gap-2">
+                                        <DollarSign className="w-5 h-5 text-emerald-500" />
                                         تفاصيل الشراء
-                                    </CardTitle>
-                                </CardHeader>
-                                <CardContent className="space-y-4">
-                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                    </h3>
+
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                                         <div className="space-y-2">
-                                            <Label className="text-navy font-bold">تاريخ الشراء *</Label>
-                                            <div className="relative">
-                                                <Calendar className="absolute right-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                                                <Input
-                                                    type="date"
-                                                    value={formData.purchaseDate}
-                                                    onChange={(e) => handleInputChange('purchaseDate', e.target.value)}
-                                                    className="rounded-xl h-12 pr-10"
-                                                />
-                                            </div>
+                                            <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                                                <Calendar className="w-4 h-4 text-emerald-500" />
+                                                تاريخ الشراء <span className="text-red-500">*</span>
+                                            </label>
+                                            <Input
+                                                type="date"
+                                                value={formData.purchaseDate}
+                                                onChange={(e) => handleInputChange('purchaseDate', e.target.value)}
+                                                className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500"
+                                            />
                                         </div>
 
                                         <div className="space-y-2">
-                                            <Label className="text-navy font-bold">سعر الوحدة (ر.س) *</Label>
-                                            <div className="relative">
-                                                <DollarSign className="absolute right-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                                                <Input
-                                                    type="number"
-                                                    step="0.01"
-                                                    placeholder="0.00"
-                                                    value={formData.purchasePrice}
-                                                    onChange={(e) => handleInputChange('purchasePrice', e.target.value)}
-                                                    className="rounded-xl h-12 pr-10"
-                                                />
-                                            </div>
+                                            <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                                                <DollarSign className="w-4 h-4 text-emerald-500" />
+                                                سعر الوحدة (ر.س) <span className="text-red-500">*</span>
+                                            </label>
+                                            <Input
+                                                type="number"
+                                                step="0.01"
+                                                placeholder="0.00"
+                                                value={formData.purchasePrice}
+                                                onChange={(e) => handleInputChange('purchasePrice', e.target.value)}
+                                                className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500"
+                                            />
                                         </div>
 
                                         <div className="space-y-2">
-                                            <Label className="text-navy font-bold">الكمية *</Label>
-                                            <div className="relative">
-                                                <Hash className="absolute right-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                                                <Input
-                                                    type="number"
-                                                    placeholder="0"
-                                                    value={formData.quantity}
-                                                    onChange={(e) => handleInputChange('quantity', e.target.value)}
-                                                    className="rounded-xl h-12 pr-10"
-                                                />
-                                            </div>
+                                            <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                                                <Hash className="w-4 h-4 text-emerald-500" />
+                                                الكمية <span className="text-red-500">*</span>
+                                            </label>
+                                            <Input
+                                                type="number"
+                                                placeholder="0"
+                                                value={formData.quantity}
+                                                onChange={(e) => handleInputChange('quantity', e.target.value)}
+                                                className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500"
+                                            />
                                         </div>
                                     </div>
 
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                         <div className="space-y-2">
-                                            <Label className="text-navy font-bold">رسوم الشراء (ر.س)</Label>
+                                            <label className="text-sm font-medium text-slate-700">رسوم الشراء (ر.س)</label>
                                             <Input
                                                 type="number"
                                                 step="0.01"
                                                 placeholder="0.00"
                                                 value={formData.fees}
                                                 onChange={(e) => handleInputChange('fees', e.target.value)}
-                                                className="rounded-xl h-12"
+                                                className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500"
                                             />
-                                            <p className="text-xs text-muted-foreground">عمولة الوسيط + رسوم أخرى</p>
+                                            <p className="text-xs text-slate-500">عمولة الوسيط + رسوم أخرى</p>
                                         </div>
 
                                         <div className="space-y-2">
-                                            <Label className="text-navy font-bold">السوق</Label>
+                                            <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                                                <Landmark className="w-4 h-4 text-emerald-500" />
+                                                السوق
+                                            </label>
                                             <Select value={formData.market} onValueChange={(v) => handleInputChange('market', v)}>
-                                                <SelectTrigger className="rounded-xl h-12">
+                                                <SelectTrigger className="rounded-xl border-slate-200 focus:ring-emerald-500">
                                                     <SelectValue />
                                                 </SelectTrigger>
                                                 <SelectContent>
@@ -390,61 +379,86 @@ export default function CreateInvestmentView() {
                                     {(purchasePrice > 0 || quantity > 0) && (
                                         <div className="bg-slate-50 rounded-xl p-4 space-y-2">
                                             <div className="flex justify-between text-sm">
-                                                <span>القيمة الإجمالية ({quantity} × {purchasePrice.toFixed(2)})</span>
-                                                <span className="font-medium">{subtotal.toFixed(2)} ر.س</span>
+                                                <span className="text-slate-600">القيمة الإجمالية ({quantity} × {purchasePrice.toFixed(2)})</span>
+                                                <span className="font-medium text-slate-900">{subtotal.toFixed(2)} ر.س</span>
                                             </div>
                                             {fees > 0 && (
                                                 <div className="flex justify-between text-sm">
-                                                    <span>الرسوم</span>
-                                                    <span className="font-medium">{fees.toFixed(2)} ر.س</span>
+                                                    <span className="text-slate-600">الرسوم</span>
+                                                    <span className="font-medium text-slate-900">{fees.toFixed(2)} ر.س</span>
                                                 </div>
                                             )}
-                                            <div className="border-t pt-2 flex justify-between font-bold text-navy">
-                                                <span>إجمالي التكلفة</span>
-                                                <span>{totalCost.toFixed(2)} ر.س</span>
+                                            <div className="border-t pt-2 flex justify-between font-bold">
+                                                <span className="text-navy">إجمالي التكلفة</span>
+                                                <span className="text-emerald-600">{totalCost.toFixed(2)} ر.س</span>
                                             </div>
                                         </div>
                                     )}
-                                </CardContent>
-                            </Card>
+                                </div>
 
-                            {/* Notes */}
-                            <Card>
-                                <CardHeader>
-                                    <CardTitle className="text-navy flex items-center gap-2">
-                                        <FileText className="h-5 w-5" />
+                                {/* Notes Section */}
+                                <div className="border-t border-slate-100 pt-6 space-y-4">
+                                    <h3 className="text-lg font-semibold text-navy flex items-center gap-2">
+                                        <FileText className="w-5 h-5 text-emerald-500" />
                                         ملاحظات
-                                    </CardTitle>
-                                </CardHeader>
-                                <CardContent>
+                                    </h3>
                                     <Textarea
                                         placeholder="أي ملاحظات إضافية عن هذا الاستثمار..."
                                         value={formData.notes}
                                         onChange={(e) => handleInputChange('notes', e.target.value)}
-                                        className="rounded-xl min-h-[100px]"
+                                        className="min-h-[120px] rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500"
                                     />
-                                </CardContent>
-                            </Card>
+                                </div>
 
-                            {/* Error Alert */}
-                            {submitError && (
-                                <Alert className="bg-red-50 border-red-200">
-                                    <AlertTriangle className="h-4 w-4 text-red-600" />
-                                    <AlertDescription className="text-red-800">
-                                        {submitError}
+                                {/* Error Alert */}
+                                {submitError && (
+                                    <Alert className="bg-red-50 border-red-200 rounded-xl">
+                                        <AlertTriangle className="h-4 w-4 text-red-600" />
+                                        <AlertDescription className="text-red-800">
+                                            {submitError}
+                                        </AlertDescription>
+                                    </Alert>
+                                )}
+
+                                {/* Info Alert */}
+                                <Alert className="bg-blue-50 border-blue-200 rounded-xl">
+                                    <AlertCircle className="h-4 w-4 text-blue-600" />
+                                    <AlertDescription className="text-blue-800">
+                                        سيتم تحديث أسعار الاستثمارات تلقائياً من السوق. يمكنك لاحقاً تسجيل التوزيعات والمبيعات.
                                     </AlertDescription>
                                 </Alert>
-                            )}
 
-                            {/* Info Alert */}
-                            <Alert className="bg-blue-50 border-blue-200">
-                                <AlertCircle className="h-4 w-4 text-blue-600" />
-                                <AlertDescription className="text-blue-800">
-                                    سيتم تحديث أسعار الاستثمارات تلقائياً من السوق. يمكنك لاحقاً تسجيل التوزيعات والمبيعات.
-                                </AlertDescription>
-                            </Alert>
+                                {/* Submit Button */}
+                                <div className="flex items-center justify-end gap-4 pt-6 border-t border-slate-100">
+                                    <Link to="/dashboard/finance/investments">
+                                        <Button type="button" variant="ghost" className="text-slate-500 hover:text-navy">
+                                            إلغاء
+                                        </Button>
+                                    </Link>
+                                    <Button
+                                        onClick={handleSubmit}
+                                        disabled={createInvestment.isPending || !formData.symbol || !formData.purchasePrice || !formData.quantity}
+                                        className="bg-emerald-500 hover:bg-emerald-600 text-white min-w-[140px] rounded-xl shadow-lg shadow-emerald-500/20"
+                                    >
+                                        {createInvestment.isPending ? (
+                                            <span className="flex items-center gap-2">
+                                                <Loader2 className="w-4 h-4 animate-spin" />
+                                                جاري الحفظ...
+                                            </span>
+                                        ) : (
+                                            <span className="flex items-center gap-2">
+                                                <Save className="w-4 h-4" />
+                                                حفظ الاستثمار
+                                            </span>
+                                        )}
+                                    </Button>
+                                </div>
+                            </div>
                         </div>
                     </div>
+
+                    {/* LEFT COLUMN (Sidebar) */}
+                    <FinanceSidebar context="investments" />
                 </div>
             </Main>
         </>
