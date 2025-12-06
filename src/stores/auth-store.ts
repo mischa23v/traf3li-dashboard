@@ -47,16 +47,23 @@ export const useAuthStore = create<AuthState>()(
             error: null,
           })
 
-          // Fetch user permissions after successful login
-          // Only fetch if user has a firm (lawyer/firm member)
-          if (user.firmId || user.role === 'lawyer') {
-            try {
-              await usePermissionsStore.getState().fetchPermissions()
-            } catch (permError) {
-              console.warn('Could not fetch permissions:', permError)
-              // Don't fail login if permissions fetch fails
+          // Handle permissions based on user type
+          if (user.role === 'lawyer') {
+            // Solo lawyers get permissions directly from login response
+            if (user.isSoloLawyer && user.permissions) {
+              // Set permissions directly from login response
+              usePermissionsStore.getState().setPermissionsFromLogin(user.permissions, true)
+            } else if (user.firmId) {
+              // Firm members need to fetch permissions from firm API
+              try {
+                await usePermissionsStore.getState().fetchPermissions()
+              } catch (permError) {
+                console.warn('Could not fetch permissions:', permError)
+                // Don't fail login if permissions fetch fails
+              }
             }
           }
+          // Clients don't need permissions
         } catch (error: any) {
           set({
             user: null,
@@ -130,13 +137,19 @@ export const useAuthStore = create<AuthState>()(
             error: null,
           })
 
-          // Fetch permissions if user is authenticated and has a firm
-          if (user && (user.firmId || user.role === 'lawyer')) {
-            try {
-              await usePermissionsStore.getState().fetchPermissions()
-            } catch (permError) {
-              console.warn('Could not fetch permissions:', permError)
-              // Don't fail auth check if permissions fetch fails
+          // Handle permissions based on user type
+          if (user && user.role === 'lawyer') {
+            // Solo lawyers get permissions directly from login/me response
+            if (user.isSoloLawyer && user.permissions) {
+              usePermissionsStore.getState().setPermissionsFromLogin(user.permissions, true)
+            } else if (user.firmId) {
+              // Firm members need to fetch permissions from firm API
+              try {
+                await usePermissionsStore.getState().fetchPermissions()
+              } catch (permError) {
+                console.warn('Could not fetch permissions:', permError)
+                // Don't fail auth check if permissions fetch fails
+              }
             }
           }
         } catch (error: any) {
@@ -192,3 +205,11 @@ export const selectIsFirmOwner = (state: AuthState) =>
   state.user?.firmRole === 'owner'
 export const selectIsFirmAdmin = (state: AuthState) =>
   state.user?.firmRole === 'admin' || state.user?.firmRole === 'owner'
+
+/**
+ * Solo lawyer selectors
+ */
+export const selectIsSoloLawyer = (state: AuthState) =>
+  state.user?.isSoloLawyer === true
+export const selectLawyerWorkMode = (state: AuthState) =>
+  state.user?.lawyerWorkMode

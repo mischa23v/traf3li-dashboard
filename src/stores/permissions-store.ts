@@ -16,11 +16,13 @@ interface PermissionsState {
   error: string | null
   lastFetched: number | null
   noFirmAssociated: boolean // Track if user has no firm associated
+  isSoloLawyer: boolean // Track if user is a solo lawyer
 
   // Actions
   fetchPermissions: () => Promise<void>
   clearPermissions: () => void
   setPermissions: (permissions: UserPermissions | null) => void
+  setPermissionsFromLogin: (loginPermissions: any, isSolo: boolean) => void
 
   // Permission Checks (for convenience)
   hasPermission: (module: ModuleKey, level?: PermissionLevel) => boolean
@@ -44,6 +46,7 @@ export const usePermissionsStore = create<PermissionsState>()(
       error: null,
       lastFetched: null,
       noFirmAssociated: false,
+      isSoloLawyer: false,
 
       /**
        * Fetch permissions from API
@@ -98,6 +101,7 @@ export const usePermissionsStore = create<PermissionsState>()(
           error: null,
           lastFetched: null,
           noFirmAssociated: false,
+          isSoloLawyer: false,
         })
       },
 
@@ -108,6 +112,49 @@ export const usePermissionsStore = create<PermissionsState>()(
         set({
           permissions,
           lastFetched: permissions ? Date.now() : null,
+        })
+      },
+
+      /**
+       * Set permissions from login response (for solo lawyers)
+       * Converts the login response permissions format to the store format
+       */
+      setPermissionsFromLogin: (loginPermissions: any, isSolo: boolean) => {
+        if (!loginPermissions) {
+          set({ isSoloLawyer: isSolo, noFirmAssociated: false })
+          return
+        }
+
+        // Convert login permissions to store format
+        const modules: Record<string, PermissionLevel> = {}
+        if (loginPermissions.modules) {
+          for (const [key, value] of Object.entries(loginPermissions.modules)) {
+            // Map string values like 'full', 'edit', 'view', 'none' to PermissionLevel
+            modules[key] = value as PermissionLevel
+          }
+        }
+
+        const special: Record<string, boolean> = {}
+        if (loginPermissions.special) {
+          for (const [key, value] of Object.entries(loginPermissions.special)) {
+            special[key] = value as boolean
+          }
+        }
+
+        const permissions: UserPermissions = {
+          modules: modules as any,
+          special: special as any,
+          role: isSolo ? 'owner' : undefined, // Solo lawyers have full control
+          isDeparted: false,
+        }
+
+        set({
+          permissions,
+          isLoading: false,
+          error: null,
+          lastFetched: Date.now(),
+          noFirmAssociated: false,
+          isSoloLawyer: isSolo,
         })
       },
 
@@ -191,3 +238,4 @@ export const selectError = (state: PermissionsState) => state.error
 export const selectIsDeparted = (state: PermissionsState) => state.isDeparted()
 export const selectIsAdminOrOwner = (state: PermissionsState) => state.isAdminOrOwner()
 export const selectNoFirmAssociated = (state: PermissionsState) => state.noFirmAssociated
+export const selectIsSoloLawyer = (state: PermissionsState) => state.isSoloLawyer

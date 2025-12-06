@@ -117,11 +117,18 @@ export function SignIn() {
         password: formData.password,
       });
 
-      // Check if user has no firm associated (permissions API returned 404)
-      const { noFirmAssociated } = usePermissionsStore.getState();
-      if (noFirmAssociated) {
-        navigate({ to: '/no-firm' });
-        return;
+      // Get user from store to check user type
+      const user = useAuthStore.getState().user;
+
+      // Solo lawyers and firm members go directly to dashboard
+      // Only redirect to /no-firm if lawyer has no firm AND is not a solo lawyer
+      // (This is an edge case that shouldn't happen with proper backend)
+      if (user?.role === 'lawyer' && !user.isSoloLawyer && !user.firmId) {
+        const { noFirmAssociated } = usePermissionsStore.getState();
+        if (noFirmAssociated) {
+          navigate({ to: '/no-firm' });
+          return;
+        }
       }
 
       // Navigate to redirect URL or dashboard
