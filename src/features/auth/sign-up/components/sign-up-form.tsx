@@ -41,35 +41,47 @@ export function SignUpForm() {
   const [loading, setLoading] = useState(false);
 
   const [formData, setFormData] = useState({
-    userType: '', 
-    lawyerMode: '', 
-    firstName: '', 
-    lastName: '', 
-    username: '', 
-    email: '', 
-    password: '', 
-    confirmPassword: '', 
-    phone: '', 
-    nationality: '', 
-    region: '', 
+    userType: '',
+    lawyerMode: '',
+    lawyerWorkMode: '' as '' | 'solo' | 'create_firm' | 'join_firm', // For dashboard lawyers
+    firstName: '',
+    lastName: '',
+    username: '',
+    email: '',
+    password: '',
+    confirmPassword: '',
+    phone: '',
+    nationality: '',
+    region: '',
     city: '',
-    isLicensed: null as boolean | null, 
-    licenseNumber: '', 
-    courts: {} as Record<string, { selected?: boolean; caseCount?: string; name?: string }>, 
-    yearsOfExperience: '', 
-    workType: '', 
+    isLicensed: null as boolean | null,
+    licenseNumber: '',
+    courts: {} as Record<string, { selected?: boolean; caseCount?: string; name?: string }>,
+    yearsOfExperience: '',
+    workType: '',
     firmName: '',
-    specializations: [] as string[], 
-    languages: ['العربية'] as string[], 
-    bio: '', 
-    isRegisteredKhebra: null as boolean | null, 
-    serviceType: '', 
+    // Firm data for create_firm mode
+    firmNameEn: '',
+    firmLicenseNumber: '',
+    firmEmail: '',
+    firmPhone: '',
+    firmAddress: '',
+    firmWebsite: '',
+    firmDescription: '',
+    firmSpecializations: [] as string[],
+    // Invitation code for join_firm mode
+    invitationCode: '',
+    specializations: [] as string[],
+    languages: ['العربية'] as string[],
+    bio: '',
+    isRegisteredKhebra: null as boolean | null,
+    serviceType: '',
     pricingModel: [] as string[],
-    hourlyRateMin: '', 
-    hourlyRateMax: '', 
-    acceptsRemote: '', 
-    agreedTerms: false, 
-    agreedPrivacy: false, 
+    hourlyRateMin: '',
+    hourlyRateMax: '',
+    acceptsRemote: '',
+    agreedTerms: false,
+    agreedPrivacy: false,
     agreedConflict: false,
   });
 
@@ -119,6 +131,11 @@ export function SignUpForm() {
         if (!formData.phone) newErrors.phone = 'الحقل مطلوب';
         else if (!validatePhone(formData.phone)) newErrors.phone = 'رقم الجوال غير صحيح';
       }
+      // Invitation code validation for join_firm mode
+      if (formData.lawyerWorkMode === 'join_firm') {
+        if (!formData.invitationCode.trim()) newErrors.invitationCode = 'كود الدعوة مطلوب';
+        else if (formData.invitationCode.length < 4) newErrors.invitationCode = 'كود الدعوة غير صحيح';
+      }
     }
     
     // Step 2 - Password + Location (Client & Dashboard Lawyer) - Phone moved to step 1
@@ -132,8 +149,22 @@ export function SignUpForm() {
       if (!formData.city.trim()) newErrors.city = 'الحقل مطلوب';
     }
 
-    // Step 3 - Terms (Client & Dashboard Lawyer)
-    if (step === 3 && (formData.userType === 'client' || formData.lawyerMode === 'dashboard')) {
+    // Step 3 - Firm Data (create_firm mode only)
+    if (step === 3 && formData.lawyerWorkMode === 'create_firm') {
+      if (!formData.firmName.trim()) newErrors.firmName = 'اسم المكتب مطلوب';
+      if (!formData.firmLicenseNumber.trim()) newErrors.firmLicenseNumber = 'رقم الترخيص مطلوب';
+      if (!formData.firmEmail.trim()) newErrors.firmEmail = 'البريد الإلكتروني مطلوب';
+      else if (!validateEmail(formData.firmEmail)) newErrors.firmEmail = 'البريد الإلكتروني غير صحيح';
+      if (!formData.firmPhone) newErrors.firmPhone = 'هاتف المكتب مطلوب';
+      else if (!validatePhone(formData.firmPhone)) newErrors.firmPhone = 'رقم الهاتف غير صحيح';
+      if (!formData.firmAddress.trim()) newErrors.firmAddress = 'عنوان المكتب مطلوب';
+    }
+
+    // Step 3/4 - Terms (Client & Dashboard Lawyer)
+    // Step 3 for client, solo, and join_firm; Step 4 for create_firm
+    const isTermsStep = (step === 3 && (formData.userType === 'client' || (formData.lawyerMode === 'dashboard' && formData.lawyerWorkMode !== 'create_firm'))) ||
+                        (step === 4 && formData.lawyerWorkMode === 'create_firm');
+    if (isTermsStep) {
       if (!formData.agreedTerms) newErrors.agreedTerms = 'يرجى الموافقة';
       if (!formData.agreedPrivacy) newErrors.agreedPrivacy = 'يرجى الموافقة';
       if (formData.userType === 'lawyer' && !formData.agreedConflict) newErrors.agreedConflict = 'يرجى الموافقة';
@@ -197,9 +228,12 @@ export function SignUpForm() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const getTotalSteps = () => { 
+  const getTotalSteps = () => {
     if (formData.userType === 'client') return 3;
-    if (formData.lawyerMode === 'dashboard') return 3;
+    if (formData.lawyerMode === 'dashboard') {
+      // create_firm needs an extra step for firm data
+      return formData.lawyerWorkMode === 'create_firm' ? 4 : 3;
+    }
     return 9; // marketplace lawyer
   };
 
@@ -235,22 +269,53 @@ export function SignUpForm() {
           city: formData.city || null 
         };
         
+        // Dashboard lawyer fields
+        if (isLawyer && formData.lawyerMode === 'dashboard') {
+          Object.assign(payload, {
+            lawyerWorkMode: formData.lawyerWorkMode || 'solo',
+          });
+
+          // Add firm data for create_firm mode
+          if (formData.lawyerWorkMode === 'create_firm') {
+            Object.assign(payload, {
+              firmData: {
+                name: formData.firmName,
+                nameEn: formData.firmNameEn || null,
+                licenseNumber: formData.firmLicenseNumber,
+                email: formData.firmEmail,
+                phone: formData.firmPhone,
+                address: formData.firmAddress,
+                website: formData.firmWebsite || null,
+                description: formData.firmDescription || null,
+              }
+            });
+          }
+
+          // Add invitation code for join_firm mode
+          if (formData.lawyerWorkMode === 'join_firm') {
+            Object.assign(payload, {
+              invitationCode: formData.invitationCode,
+            });
+          }
+        }
+
+        // Marketplace lawyer fields
         if (isLawyer && formData.lawyerMode === 'marketplace') {
-          Object.assign(payload, { 
-            isLicensed: formData.isLicensed || false, 
-            licenseNumber: formData.licenseNumber || null, 
-            courts: formData.courts, 
-            yearsOfExperience: formData.yearsOfExperience, 
-            workType: formData.workType || null, 
-            firmName: formData.firmName || null, 
-            specializations: formData.specializations, 
-            languages: formData.languages, 
-            isRegisteredKhebra: formData.isRegisteredKhebra || false, 
-            serviceType: formData.serviceType || null, 
-            pricingModel: formData.pricingModel, 
-            hourlyRateMin: formData.hourlyRateMin || null, 
-            hourlyRateMax: formData.hourlyRateMax || null, 
-            acceptsRemote: formData.acceptsRemote || null 
+          Object.assign(payload, {
+            isLicensed: formData.isLicensed || false,
+            licenseNumber: formData.licenseNumber || null,
+            courts: formData.courts,
+            yearsOfExperience: formData.yearsOfExperience,
+            workType: formData.workType || null,
+            firmName: formData.firmName || null,
+            specializations: formData.specializations,
+            languages: formData.languages,
+            isRegisteredKhebra: formData.isRegisteredKhebra || false,
+            serviceType: formData.serviceType || null,
+            pricingModel: formData.pricingModel,
+            hourlyRateMin: formData.hourlyRateMin || null,
+            hourlyRateMax: formData.hourlyRateMax || null,
+            acceptsRemote: formData.acceptsRemote || null
           });
         }
         
@@ -320,11 +385,31 @@ export function SignUpForm() {
                       <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${formData.lawyerMode === 'marketplace' ? 'bg-emerald-500 text-white' : 'bg-slate-100 text-slate-600'}`}><Icons.Store /></div>
                       <div className="flex-1"><h4 className="font-bold text-[#0f172a] text-sm">السوق + لوحة التحكم</h4><p className="text-xs text-slate-500">استقبال عملاء جدد وإدارة القضايا</p></div>
                     </button>
-                    <button onClick={() => { updateField('lawyerMode', 'dashboard'); setCurrentStep(1); }} className={`w-full p-4 rounded-xl border-2 transition-all flex items-center gap-4 text-right ${formData.lawyerMode === 'dashboard' ? 'border-emerald-500 bg-white' : 'border-slate-200 hover:border-slate-300 bg-white'}`}>
+                    <button onClick={() => updateField('lawyerMode', 'dashboard')} className={`w-full p-4 rounded-xl border-2 transition-all flex items-center gap-4 text-right ${formData.lawyerMode === 'dashboard' ? 'border-emerald-500 bg-white' : 'border-slate-200 hover:border-slate-300 bg-white'}`}>
                       <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${formData.lawyerMode === 'dashboard' ? 'bg-emerald-500 text-white' : 'bg-slate-100 text-slate-600'}`}><Icons.Layout /></div>
                       <div className="flex-1"><h4 className="font-bold text-[#0f172a] text-sm">لوحة التحكم فقط</h4><p className="text-xs text-slate-500">إدارة القضايا الحالية</p></div>
                     </button>
                   </div>
+                  {/* Work Mode Selection for Dashboard Lawyers */}
+                  {formData.lawyerMode === 'dashboard' && (
+                    <div className="mt-4 pt-4 border-t border-slate-200 animate-fadeIn">
+                      <h4 className="font-bold text-[#0f172a] mb-3 text-sm">كيف تريد العمل؟</h4>
+                      <div className="space-y-2">
+                        <button onClick={() => { updateField('lawyerWorkMode', 'solo'); setCurrentStep(1); }} className={`w-full p-3 rounded-xl border-2 transition-all flex items-center gap-3 text-right ${formData.lawyerWorkMode === 'solo' ? 'border-emerald-500 bg-emerald-50' : 'border-slate-200 hover:border-slate-300'}`}>
+                          <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${formData.lawyerWorkMode === 'solo' ? 'bg-emerald-500 text-white' : 'bg-slate-100 text-slate-600'}`}><Icons.User /></div>
+                          <div className="flex-1"><h5 className="font-bold text-[#0f172a] text-xs">محامي مستقل</h5><p className="text-xs text-slate-500">العمل بشكل مستقل بدون مكتب</p></div>
+                        </button>
+                        <button onClick={() => { updateField('lawyerWorkMode', 'create_firm'); setCurrentStep(1); }} className={`w-full p-3 rounded-xl border-2 transition-all flex items-center gap-3 text-right ${formData.lawyerWorkMode === 'create_firm' ? 'border-emerald-500 bg-emerald-50' : 'border-slate-200 hover:border-slate-300'}`}>
+                          <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${formData.lawyerWorkMode === 'create_firm' ? 'bg-emerald-500 text-white' : 'bg-slate-100 text-slate-600'}`}><Icons.Store /></div>
+                          <div className="flex-1"><h5 className="font-bold text-[#0f172a] text-xs">إنشاء مكتب جديد</h5><p className="text-xs text-slate-500">إنشاء مكتب محاماة وإدارة الفريق</p></div>
+                        </button>
+                        <button onClick={() => { updateField('lawyerWorkMode', 'join_firm'); setCurrentStep(1); }} className={`w-full p-3 rounded-xl border-2 transition-all flex items-center gap-3 text-right ${formData.lawyerWorkMode === 'join_firm' ? 'border-emerald-500 bg-emerald-50' : 'border-slate-200 hover:border-slate-300'}`}>
+                          <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${formData.lawyerWorkMode === 'join_firm' ? 'bg-emerald-500 text-white' : 'bg-slate-100 text-slate-600'}`}><Icons.Users /></div>
+                          <div className="flex-1"><h5 className="font-bold text-[#0f172a] text-xs">الانضمام لمكتب</h5><p className="text-xs text-slate-500">لدي كود دعوة للانضمام لمكتب</p></div>
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
@@ -349,6 +434,17 @@ export function SignUpForm() {
     }
 
     if (formData.lawyerMode === 'dashboard') {
+      // Different steps for create_firm mode (includes firm data step)
+      if (formData.lawyerWorkMode === 'create_firm') {
+        const steps = [
+          { title: 'البيانات الأساسية والجوال', icon: <Icons.User /> },
+          { title: 'كلمة المرور والموقع', icon: <Icons.Lock /> },
+          { title: 'بيانات المكتب', icon: <Icons.Briefcase /> },
+          { title: 'الإقرارات والموافقات', icon: <Icons.Shield /> }
+        ];
+        return steps[currentStep - 1] || steps[0];
+      }
+      // Default steps for solo and join_firm modes
       const steps = [
         { title: 'البيانات الأساسية والجوال', icon: <Icons.User /> },
         { title: 'كلمة المرور والموقع', icon: <Icons.Lock /> },
@@ -436,6 +532,18 @@ export function SignUpForm() {
                       {errors.phone && <p className="text-red-500 text-xs mt-1">{errors.phone}</p>}
                     </div>
                   )}
+                  {/* Invitation code field for join_firm mode */}
+                  {formData.lawyerWorkMode === 'join_firm' && (
+                    <div>
+                      <label className="block text-sm font-medium text-[#0f172a] mb-2">كود الدعوة <span className="text-red-500">*</span></label>
+                      <div className="relative">
+                        <div className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400"><Icons.Award /></div>
+                        <input type="text" value={formData.invitationCode} onChange={(e) => updateField('invitationCode', e.target.value.toUpperCase())} className={`w-full h-12 pr-12 pl-4 rounded-xl border bg-slate-50 text-[#0f172a] outline-none transition-all ${errors.invitationCode ? 'border-red-400' : 'border-slate-200 focus:border-[#0f172a]'}`} placeholder="أدخل كود الدعوة من المكتب" dir="ltr" style={{ textAlign: 'left' }} />
+                      </div>
+                      {errors.invitationCode && <p className="text-red-500 text-xs mt-1">{errors.invitationCode}</p>}
+                      <p className="text-xs text-slate-400 mt-1">يمكنك الحصول على كود الدعوة من مدير المكتب</p>
+                    </div>
+                  )}
                 </>
               )}
 
@@ -484,8 +592,57 @@ export function SignUpForm() {
                 </>
               )}
 
-              {/* STEP 3: Terms (Client & Dashboard Lawyer) */}
-              {currentStep === 3 && (formData.userType === 'client' || formData.lawyerMode === 'dashboard') && (
+              {/* STEP 3: Firm Data (create_firm mode only) */}
+              {currentStep === 3 && formData.lawyerWorkMode === 'create_firm' && (
+                <>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-[#0f172a] mb-2">اسم المكتب (عربي) <span className="text-red-500">*</span></label>
+                      <input type="text" value={formData.firmName} onChange={(e) => updateField('firmName', e.target.value)} className={`w-full h-12 px-4 rounded-xl border bg-slate-50 text-[#0f172a] outline-none transition-all ${errors.firmName ? 'border-red-400' : 'border-slate-200 focus:border-[#0f172a]'}`} placeholder="مكتب المحامي..." />
+                      {errors.firmName && <p className="text-red-500 text-xs mt-1">{errors.firmName}</p>}
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-[#0f172a] mb-2">اسم المكتب (إنجليزي)</label>
+                      <input type="text" value={formData.firmNameEn} onChange={(e) => updateField('firmNameEn', e.target.value)} className="w-full h-12 px-4 rounded-xl border bg-slate-50 text-[#0f172a] outline-none transition-all border-slate-200 focus:border-[#0f172a]" placeholder="Law Office..." dir="ltr" style={{ textAlign: 'left' }} />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-[#0f172a] mb-2">رقم رخصة المكتب <span className="text-red-500">*</span></label>
+                    <input type="text" value={formData.firmLicenseNumber} onChange={(e) => updateField('firmLicenseNumber', e.target.value)} className={`w-full h-12 px-4 rounded-xl border bg-slate-50 text-[#0f172a] outline-none transition-all ${errors.firmLicenseNumber ? 'border-red-400' : 'border-slate-200 focus:border-[#0f172a]'}`} placeholder="رقم الترخيص" dir="ltr" style={{ textAlign: 'left' }} />
+                    {errors.firmLicenseNumber && <p className="text-red-500 text-xs mt-1">{errors.firmLicenseNumber}</p>}
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-[#0f172a] mb-2">البريد الإلكتروني للمكتب <span className="text-red-500">*</span></label>
+                      <input type="email" value={formData.firmEmail} onChange={(e) => updateField('firmEmail', e.target.value)} className={`w-full h-12 px-4 rounded-xl border bg-slate-50 text-[#0f172a] outline-none transition-all ${errors.firmEmail ? 'border-red-400' : 'border-slate-200 focus:border-[#0f172a]'}`} placeholder="info@lawfirm.com" dir="ltr" style={{ textAlign: 'left' }} />
+                      {errors.firmEmail && <p className="text-red-500 text-xs mt-1">{errors.firmEmail}</p>}
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-[#0f172a] mb-2">هاتف المكتب <span className="text-red-500">*</span></label>
+                      <input type="tel" value={formData.firmPhone} onChange={(e) => updateField('firmPhone', e.target.value.replace(/\D/g, '').slice(0, 10))} className={`w-full h-12 px-4 rounded-xl border bg-slate-50 text-[#0f172a] outline-none transition-all ${errors.firmPhone ? 'border-red-400' : 'border-slate-200 focus:border-[#0f172a]'}`} placeholder="05XXXXXXXX" dir="ltr" style={{ textAlign: 'left' }} maxLength={10} />
+                      {errors.firmPhone && <p className="text-red-500 text-xs mt-1">{errors.firmPhone}</p>}
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-[#0f172a] mb-2">عنوان المكتب <span className="text-red-500">*</span></label>
+                    <input type="text" value={formData.firmAddress} onChange={(e) => updateField('firmAddress', e.target.value)} className={`w-full h-12 px-4 rounded-xl border bg-slate-50 text-[#0f172a] outline-none transition-all ${errors.firmAddress ? 'border-red-400' : 'border-slate-200 focus:border-[#0f172a]'}`} placeholder="العنوان الكامل" />
+                    {errors.firmAddress && <p className="text-red-500 text-xs mt-1">{errors.firmAddress}</p>}
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-[#0f172a] mb-2">الموقع الإلكتروني <span className="text-slate-400 text-xs">(اختياري)</span></label>
+                    <input type="url" value={formData.firmWebsite} onChange={(e) => updateField('firmWebsite', e.target.value)} className="w-full h-12 px-4 rounded-xl border bg-slate-50 text-[#0f172a] outline-none transition-all border-slate-200 focus:border-[#0f172a]" placeholder="https://www.lawfirm.com" dir="ltr" style={{ textAlign: 'left' }} />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-[#0f172a] mb-2">نبذة عن المكتب <span className="text-slate-400 text-xs">(اختياري)</span></label>
+                    <textarea value={formData.firmDescription} onChange={(e) => updateField('firmDescription', e.target.value)} rows={3} className="w-full p-4 rounded-xl border border-slate-200 bg-slate-50 text-[#0f172a] outline-none focus:border-[#0f172a] resize-none" maxLength={500} placeholder="وصف مختصر للمكتب وخدماته..." />
+                    <p className="text-xs text-slate-400 mt-1">{formData.firmDescription.length}/500</p>
+                  </div>
+                </>
+              )}
+
+              {/* STEP 3/4: Terms (Client & Dashboard Lawyer) - Step 4 for create_firm, Step 3 for others */}
+              {((currentStep === 3 && (formData.userType === 'client' || (formData.lawyerMode === 'dashboard' && formData.lawyerWorkMode !== 'create_firm'))) ||
+                (currentStep === 4 && formData.lawyerWorkMode === 'create_firm')) && (
                 <div className="space-y-3">
                   <div className={`flex items-start gap-3 p-4 rounded-xl border ${errors.agreedTerms ? 'border-red-300' : formData.agreedTerms ? 'border-emerald-200 bg-emerald-50/50' : 'border-slate-200'}`}>
                     <button type="button" onClick={() => updateField('agreedTerms', !formData.agreedTerms)} className={`w-6 h-6 rounded-lg border-2 flex items-center justify-center shrink-0 ${formData.agreedTerms ? 'bg-emerald-500 border-emerald-500 text-white' : 'border-slate-300'}`}>{formData.agreedTerms && <Icons.Check />}</button>
