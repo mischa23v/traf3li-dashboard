@@ -3,7 +3,7 @@ import {
     ArrowLeft, Edit3, Trash2,
     TrendingUp, TrendingDown, DollarSign,
     Calendar, FileText, Building2, PieChart, Landmark,
-    BarChart3, RefreshCw, Plus, History
+    BarChart3, RefreshCw, Plus, History, AlertTriangle, Loader2
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -26,6 +26,8 @@ import {
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { Skeleton } from '@/components/ui/skeleton'
+import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Link, useParams, useNavigate } from '@tanstack/react-router'
 import { Header } from '@/components/layout/header'
 import { TopNav } from '@/components/layout/top-nav'
@@ -39,69 +41,92 @@ import { FinanceSidebar } from './finance-sidebar'
 import { ProductivityHero } from '@/components/productivity-hero'
 import { cn } from '@/lib/utils'
 
-// Mock investment data - will be replaced with API
-const mockInvestment = {
-    _id: '1',
-    symbol: '1120',
-    name: 'مصرف الراجحي',
-    nameEn: 'Al Rajhi Bank',
-    type: 'stock' as const,
-    market: 'tadawul',
-
-    // Purchase Details
-    purchaseDate: '2024-06-15',
-    purchasePrice: 8500, // 85.00 SAR in halalas
-    quantity: 500,
-    totalCost: 4250000, // 42,500 SAR
-    fees: 12750, // 127.50 SAR
-
-    // Current Value
-    currentPrice: 9200, // 92.00 SAR
-    currentValue: 4600000, // 46,000 SAR
-    lastUpdated: new Date().toISOString(),
-
-    // Performance
-    gainLoss: 350000, // 3,500 SAR
-    gainLossPercent: 8.24,
-    dividendsReceived: 75000, // 750 SAR
-    totalReturn: 425000, // 4,250 SAR
-    totalReturnPercent: 10.0,
-
-    // Classification
-    sector: 'البنوك',
-    sectorEn: 'Banking',
-    category: 'equities',
-
-    status: 'active' as const,
-    notes: 'استثمار طويل الأجل في القطاع البنكي',
+// Investment type from API
+export interface Investment {
+    _id: string
+    symbol: string
+    name: string
+    nameEn: string
+    type: 'stock' | 'mutual_fund' | 'etf' | 'reit' | 'sukuk' | 'bond'
+    market: 'tadawul' | 'international'
+    purchaseDate: string
+    purchasePrice: number       // halalas
+    quantity: number
+    totalCost: number           // halalas
+    fees: number                // halalas
+    currentPrice: number        // halalas
+    currentValue: number        // halalas
+    lastUpdated: string
+    gainLoss: number            // halalas
+    gainLossPercent: number
+    dividendsReceived: number   // halalas
+    totalReturn: number         // halalas
+    totalReturnPercent: number
+    sector: string
+    sectorEn: string
+    category: string
+    status: 'active' | 'sold' | 'partial_sold'
+    notes: string
 }
 
-// Mock transactions (dividends, partial sales, additional purchases)
-const mockTransactions = [
-    {
-        _id: 't1',
-        date: '2024-09-15',
-        type: 'dividend',
-        amount: 37500, // 375 SAR
-        description: 'توزيعات أرباح الربع الثالث 2024',
-    },
-    {
-        _id: 't2',
-        date: '2024-06-20',
-        type: 'dividend',
-        amount: 37500, // 375 SAR
-        description: 'توزيعات أرباح الربع الثاني 2024',
-    },
-    {
-        _id: 't3',
-        date: '2024-06-15',
-        type: 'purchase',
-        amount: -4262750, // -42,627.50 SAR (cost + fees)
-        quantity: 500,
-        price: 8500,
-        description: 'شراء أولي',
-    },
-]
+export interface InvestmentTransaction {
+    _id: string
+    date: string
+    type: 'dividend' | 'purchase' | 'sale'
+    amount: number              // halalas (positive for income, negative for expense)
+    quantity?: number
+    price?: number              // halalas
+    description: string
+}
+
+// API Hooks - Replace with actual implementation using React Query
+function useInvestment(investmentId: string) {
+    // TODO: Replace with actual API call
+    // Example:
+    // return useQuery({
+    //     queryKey: ['investment', investmentId],
+    //     queryFn: () => fetch(`/api/investments/${investmentId}`).then(res => res.json()),
+    // })
+
+    return {
+        data: null as Investment | null,
+        isLoading: false,
+        error: new Error('Backend API not implemented. Please connect to your backend.') as Error | null,
+        refetch: () => Promise.resolve(),
+    }
+}
+
+function useInvestmentTransactions(investmentId: string) {
+    // TODO: Replace with actual API call
+    // Example:
+    // return useQuery({
+    //     queryKey: ['investment-transactions', investmentId],
+    //     queryFn: () => fetch(`/api/investments/${investmentId}/transactions`).then(res => res.json()),
+    // })
+
+    return {
+        data: [] as InvestmentTransaction[],
+        isLoading: false,
+        error: null as Error | null,
+    }
+}
+
+function useRefreshInvestmentPrice() {
+    // TODO: Replace with actual API call using React Query useMutation
+    // Example:
+    // return useMutation({
+    //     mutationFn: (investmentId: string) =>
+    //         fetch(`/api/investments/${investmentId}/refresh-price`, { method: 'POST' }).then(res => res.json()),
+    // })
+
+    return {
+        mutate: (_investmentId: string, options?: { onSuccess?: () => void; onError?: (error: Error) => void }) => {
+            console.error('API NOT IMPLEMENTED: POST /api/investments/:id/refresh-price')
+            options?.onError?.(new Error('Backend API not implemented'))
+        },
+        isPending: false,
+    }
+}
 
 // Format currency
 function formatCurrency(halalas: number): string {
@@ -163,21 +188,190 @@ function getTransactionTypeInfo(type: string) {
     }
 }
 
+// Loading skeleton component
+function LoadingSkeleton() {
+    return (
+        <div className="space-y-6">
+            <Skeleton className="h-48 w-full rounded-3xl" />
+            <Skeleton className="h-8 w-48" />
+            <Skeleton className="h-32 w-full rounded-xl" />
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                {[...Array(4)].map((_, i) => (
+                    <Skeleton key={i} className="h-28 rounded-xl" />
+                ))}
+            </div>
+            <Skeleton className="h-64 w-full rounded-xl" />
+        </div>
+    )
+}
+
+// Error state component
+function ErrorState({ error, onRetry }: { error: Error; onRetry?: () => void }) {
+    return (
+        <div className="flex flex-col items-center justify-center py-16 text-center">
+            <div className="w-20 h-20 rounded-full bg-red-100 flex items-center justify-center mb-6">
+                <AlertTriangle className="h-10 w-10 text-red-500" />
+            </div>
+            <h3 className="text-xl font-bold text-navy mb-2">حدث خطأ</h3>
+            <p className="text-muted-foreground mb-6 max-w-md">
+                {error.message || 'تعذر تحميل بيانات الاستثمار. يرجى المحاولة مرة أخرى.'}
+            </p>
+            {onRetry && (
+                <Button onClick={onRetry} className="bg-navy hover:bg-navy/90">
+                    <RefreshCw className="ml-2 h-4 w-4" />
+                    إعادة المحاولة
+                </Button>
+            )}
+            <Link
+                to="/dashboard/finance/investments"
+                className="mt-4 text-sm text-muted-foreground hover:text-navy"
+            >
+                العودة إلى المحفظة
+            </Link>
+        </div>
+    )
+}
+
+// Not found state
+function NotFoundState() {
+    return (
+        <div className="flex flex-col items-center justify-center py-16 text-center">
+            <div className="w-20 h-20 rounded-full bg-amber-100 flex items-center justify-center mb-6">
+                <AlertTriangle className="h-10 w-10 text-amber-500" />
+            </div>
+            <h3 className="text-xl font-bold text-navy mb-2">الاستثمار غير موجود</h3>
+            <p className="text-muted-foreground mb-6">
+                لم يتم العثور على الاستثمار المطلوب. قد يكون تم حذفه أو نقله.
+            </p>
+            <Link to="/dashboard/finance/investments">
+                <Button className="bg-navy hover:bg-navy/90">
+                    <ArrowLeft className="ml-2 h-4 w-4" />
+                    العودة إلى المحفظة
+                </Button>
+            </Link>
+        </div>
+    )
+}
+
 export default function InvestmentDetailsView() {
     const params = useParams({ strict: false })
     const navigate = useNavigate()
     const [activeTab, setActiveTab] = useState('overview')
-    const [isRefreshing, setIsRefreshing] = useState(false)
 
-    // In real app, fetch investment by ID
-    const investment = mockInvestment
-    const transactions = mockTransactions
+    // Get investment ID from URL params
+    const investmentId = (params as { investmentId?: string }).investmentId || ''
 
-    const handleRefreshPrice = async () => {
-        setIsRefreshing(true)
-        // TODO: Call API to refresh price from TradingView/Yahoo Finance
-        await new Promise(resolve => setTimeout(resolve, 1500))
-        setIsRefreshing(false)
+    // Fetch investment data from API
+    const {
+        data: investment,
+        isLoading: isLoadingInvestment,
+        error: investmentError,
+        refetch: refetchInvestment
+    } = useInvestment(investmentId)
+
+    // Fetch transactions from API
+    const {
+        data: transactions,
+        isLoading: isLoadingTransactions,
+        error: transactionsError
+    } = useInvestmentTransactions(investmentId)
+
+    // Refresh price mutation
+    const refreshPrice = useRefreshInvestmentPrice()
+
+    const handleRefreshPrice = () => {
+        refreshPrice.mutate(investmentId, {
+            onSuccess: () => {
+                refetchInvestment()
+            },
+        })
+    }
+
+    // Show loading state
+    if (isLoadingInvestment) {
+        return (
+            <>
+                <Header>
+                    <TopNav>
+                        <div className="flex items-center gap-3">
+                            <LanguageSwitcher />
+                            <ThemeSwitch />
+                            <ConfigDrawer />
+                            <DynamicIsland />
+                            <ProfileDropdown />
+                        </div>
+                    </TopNav>
+                </Header>
+                <Main>
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                        <div className="lg:col-span-1 order-2 lg:order-1">
+                            <FinanceSidebar context="investments" />
+                        </div>
+                        <div className="lg:col-span-2 order-1 lg:order-2">
+                            <LoadingSkeleton />
+                        </div>
+                    </div>
+                </Main>
+            </>
+        )
+    }
+
+    // Show error state
+    if (investmentError) {
+        return (
+            <>
+                <Header>
+                    <TopNav>
+                        <div className="flex items-center gap-3">
+                            <LanguageSwitcher />
+                            <ThemeSwitch />
+                            <ConfigDrawer />
+                            <DynamicIsland />
+                            <ProfileDropdown />
+                        </div>
+                    </TopNav>
+                </Header>
+                <Main>
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                        <div className="lg:col-span-1 order-2 lg:order-1">
+                            <FinanceSidebar context="investments" />
+                        </div>
+                        <div className="lg:col-span-2 order-1 lg:order-2">
+                            <ErrorState error={investmentError} onRetry={() => refetchInvestment()} />
+                        </div>
+                    </div>
+                </Main>
+            </>
+        )
+    }
+
+    // Show not found state
+    if (!investment) {
+        return (
+            <>
+                <Header>
+                    <TopNav>
+                        <div className="flex items-center gap-3">
+                            <LanguageSwitcher />
+                            <ThemeSwitch />
+                            <ConfigDrawer />
+                            <DynamicIsland />
+                            <ProfileDropdown />
+                        </div>
+                    </TopNav>
+                </Header>
+                <Main>
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                        <div className="lg:col-span-1 order-2 lg:order-1">
+                            <FinanceSidebar context="investments" />
+                        </div>
+                        <div className="lg:col-span-2 order-1 lg:order-2">
+                            <NotFoundState />
+                        </div>
+                    </div>
+                </Main>
+            </>
+        )
     }
 
     return (
@@ -215,10 +409,10 @@ export default function InvestmentDetailsView() {
                                 <Button
                                     variant="outline"
                                     onClick={handleRefreshPrice}
-                                    disabled={isRefreshing}
+                                    disabled={refreshPrice.isPending}
                                     className="rounded-xl border-white/30 text-white hover:bg-white/10"
                                 >
-                                    <RefreshCw className={cn("ml-2 h-4 w-4", isRefreshing && "animate-spin")} />
+                                    <RefreshCw className={cn("ml-2 h-4 w-4", refreshPrice.isPending && "animate-spin")} />
                                     تحديث السعر
                                 </Button>
                                 <Button
