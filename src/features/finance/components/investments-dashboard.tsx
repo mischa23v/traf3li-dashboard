@@ -250,7 +250,7 @@ export default function InvestmentsDashboard() {
         refreshAllPrices.mutate()
     }
 
-    const investments = data?.investments ?? []
+    const investments = Array.isArray(data?.investments) ? data.investments : []
     const summary = data?.summary ?? {
         totalInvested: 0,
         currentValue: 0,
