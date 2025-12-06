@@ -173,10 +173,10 @@ export const usePermissionsStore = create<PermissionsState>()(
     {
       name: 'permissions-storage',
       partialize: (state) => ({
-        // Only persist permissions, lastFetched, and noFirmAssociated
+        // Only persist permissions and lastFetched
+        // DO NOT persist noFirmAssociated - it should be determined fresh on each session
         permissions: state.permissions,
         lastFetched: state.lastFetched,
-        noFirmAssociated: state.noFirmAssociated,
       }),
     }
   )

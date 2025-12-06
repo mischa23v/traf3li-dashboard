@@ -24,8 +24,9 @@ export const Route = createFileRoute('/_authenticated')({
 
       // Check if user has no firm associated after auth check
       // The checkAuth function in auth-store calls fetchPermissions which sets noFirmAssociated
-      const { noFirmAssociated } = usePermissionsStore.getState()
-      if (noFirmAssociated) {
+      // Only redirect if noFirmAssociated is true AND permissions is null (fresh fetch confirmed no firm)
+      const { noFirmAssociated, permissions, isLoading } = usePermissionsStore.getState()
+      if (noFirmAssociated && !permissions && !isLoading) {
         throw redirect({
           to: '/no-firm',
         })
