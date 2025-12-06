@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import {
-    ArrowLeft, Save, Loader2, Search,
+    ArrowLeft, Save, Loader2, Search, Bell,
     TrendingUp, Building2, Landmark, PieChart,
     Calendar, DollarSign, Hash, FileText, AlertCircle,
     AlertTriangle
@@ -146,55 +146,52 @@ export default function CreateInvestmentView() {
         })
     }
 
+    const topNav = [
+        { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
+        { title: 'المهام', href: '/dashboard/tasks/list', isActive: false },
+        { title: 'القضايا', href: '/dashboard/cases', isActive: false },
+        { title: 'العملاء', href: '/dashboard/clients', isActive: false },
+    ]
+
     return (
         <>
-            <Header>
-                <TopNav>
-                    <div className="flex items-center gap-3">
-                        <LanguageSwitcher />
-                        <ThemeSwitch />
-                        <ConfigDrawer />
-                        <DynamicIsland />
-                        <ProfileDropdown />
+            {/* Header - Matches tasks page exactly */}
+            <Header className="bg-navy shadow-none relative">
+                <TopNav links={topNav} className="[&>a]:text-slate-300 [&>a:hover]:text-white [&>a[aria-current='page']]:text-white" />
+
+                {/* Dynamic Island - Centered */}
+                <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
+                    <DynamicIsland />
+                </div>
+
+                <div className='ms-auto flex items-center space-x-4'>
+                    <div className="relative hidden md:block">
+                        <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                        <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pr-9 pl-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
                     </div>
-                </TopNav>
+                    <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white">
+                        <Bell className="h-5 w-5" />
+                        <span className="absolute top-2 right-2 h-2 w-2 bg-red-500 rounded-full border border-navy"></span>
+                    </Button>
+                    <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white" />
+                    <ThemeSwitch className="text-slate-300 hover:bg-white/10 hover:text-white" />
+                    <ConfigDrawer className="text-slate-300 hover:bg-white/10 hover:text-white" />
+                    <ProfileDropdown className="text-slate-300 hover:bg-white/10 hover:text-white" />
+                </div>
+                {/* Bottom Gradient Line */}
+                <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-emerald-500/50 to-transparent"></div>
             </Header>
 
-            <Main>
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    {/* Sidebar */}
-                    <div className="lg:col-span-1 order-2 lg:order-1">
-                        <FinanceSidebar context="investments" />
-                    </div>
+            <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-r border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
 
-                    {/* Main Content */}
-                    <div className="lg:col-span-2 order-1 lg:order-2 space-y-6">
-                        {/* Hero Card */}
-                        <ProductivityHero
-                            badge="المحفظة الاستثمارية"
-                            title="إضافة استثمار جديد"
-                            type="investments"
-                            listMode={true}
-                            hideButtons={true}
-                        >
-                            <Button
-                                onClick={handleSubmit}
-                                disabled={createInvestment.isPending || !formData.symbol || !formData.purchasePrice || !formData.quantity}
-                                className="bg-emerald-500 hover:bg-emerald-600 text-white h-12 px-8 rounded-xl font-bold shadow-lg shadow-emerald-500/20 border-0"
-                            >
-                                {createInvestment.isPending ? (
-                                    <>
-                                        <Loader2 className="ml-2 h-5 w-5 animate-spin" />
-                                        جاري الحفظ...
-                                    </>
-                                ) : (
-                                    <>
-                                        <Save className="ml-2 h-5 w-5" />
-                                        حفظ الاستثمار
-                                    </>
-                                )}
-                            </Button>
-                        </ProductivityHero>
+                {/* HERO CARD */}
+                <ProductivityHero badge="المحفظة الاستثمارية" title="إضافة استثمار جديد" type="investments" />
+
+                {/* MAIN GRID LAYOUT */}
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+                    {/* RIGHT COLUMN (Main Content) */}
+                    <div className="lg:col-span-2 space-y-6">
 
                         {/* Back Link */}
                         <Link
@@ -443,8 +440,41 @@ export default function CreateInvestmentView() {
                                     سيتم تحديث أسعار الاستثمارات تلقائياً من السوق. يمكنك لاحقاً تسجيل التوزيعات والمبيعات.
                                 </AlertDescription>
                             </Alert>
+
+                            {/* Submit Button */}
+                            <div className="flex justify-end gap-4">
+                                <Button
+                                    variant="outline"
+                                    asChild
+                                    className="h-12 px-8 rounded-xl"
+                                >
+                                    <Link to="/dashboard/finance/investments">
+                                        إلغاء
+                                    </Link>
+                                </Button>
+                                <Button
+                                    onClick={handleSubmit}
+                                    disabled={createInvestment.isPending || !formData.symbol || !formData.purchasePrice || !formData.quantity}
+                                    className="bg-emerald-500 hover:bg-emerald-600 text-white h-12 px-8 rounded-xl font-bold shadow-lg shadow-emerald-500/20 border-0"
+                                >
+                                    {createInvestment.isPending ? (
+                                        <>
+                                            <Loader2 className="ml-2 h-5 w-5 animate-spin" />
+                                            جاري الحفظ...
+                                        </>
+                                    ) : (
+                                        <>
+                                            <Save className="ml-2 h-5 w-5" />
+                                            حفظ الاستثمار
+                                        </>
+                                    )}
+                                </Button>
+                            </div>
                         </div>
                     </div>
+
+                    {/* LEFT COLUMN (Sidebar) */}
+                    <FinanceSidebar context="investments" />
                 </div>
             </Main>
         </>

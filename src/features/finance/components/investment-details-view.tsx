@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import {
-    ArrowLeft, Edit3, Trash2,
+    ArrowLeft, Edit3, Trash2, Bell, Search,
     TrendingUp, TrendingDown, DollarSign,
     Calendar, FileText, Building2, PieChart, Landmark,
     BarChart3, RefreshCw, Plus, History, AlertTriangle, Loader2
@@ -168,6 +168,44 @@ function NotFoundState() {
     )
 }
 
+// Consistent page header
+const topNav = [
+    { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
+    { title: 'المهام', href: '/dashboard/tasks/list', isActive: false },
+    { title: 'القضايا', href: '/dashboard/cases', isActive: false },
+    { title: 'العملاء', href: '/dashboard/clients', isActive: false },
+]
+
+function PageHeader() {
+    return (
+        <Header className="bg-navy shadow-none relative">
+            <TopNav links={topNav} className="[&>a]:text-slate-300 [&>a:hover]:text-white [&>a[aria-current='page']]:text-white" />
+
+            {/* Dynamic Island - Centered */}
+            <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
+                <DynamicIsland />
+            </div>
+
+            <div className='ms-auto flex items-center space-x-4'>
+                <div className="relative hidden md:block">
+                    <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                    <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pr-9 pl-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
+                </div>
+                <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white">
+                    <Bell className="h-5 w-5" />
+                    <span className="absolute top-2 right-2 h-2 w-2 bg-red-500 rounded-full border border-navy"></span>
+                </Button>
+                <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white" />
+                <ThemeSwitch className="text-slate-300 hover:bg-white/10 hover:text-white" />
+                <ConfigDrawer className="text-slate-300 hover:bg-white/10 hover:text-white" />
+                <ProfileDropdown className="text-slate-300 hover:bg-white/10 hover:text-white" />
+            </div>
+            {/* Bottom Gradient Line */}
+            <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-emerald-500/50 to-transparent"></div>
+        </Header>
+    )
+}
+
 export default function InvestmentDetailsView() {
     const params = useParams({ strict: false })
     const navigate = useNavigate()
@@ -209,25 +247,14 @@ export default function InvestmentDetailsView() {
     if (isLoadingInvestment) {
         return (
             <>
-                <Header>
-                    <TopNav>
-                        <div className="flex items-center gap-3">
-                            <LanguageSwitcher />
-                            <ThemeSwitch />
-                            <ConfigDrawer />
-                            <DynamicIsland />
-                            <ProfileDropdown />
-                        </div>
-                    </TopNav>
-                </Header>
-                <Main>
+                <PageHeader />
+                <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-r border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
+                    <ProductivityHero badge="المحفظة الاستثمارية" title="تفاصيل الاستثمار" type="investments" />
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                        <div className="lg:col-span-1 order-2 lg:order-1">
-                            <FinanceSidebar context="investments" />
-                        </div>
-                        <div className="lg:col-span-2 order-1 lg:order-2">
+                        <div className="lg:col-span-2">
                             <LoadingSkeleton />
                         </div>
+                        <FinanceSidebar context="investments" />
                     </div>
                 </Main>
             </>
@@ -238,25 +265,14 @@ export default function InvestmentDetailsView() {
     if (investmentError) {
         return (
             <>
-                <Header>
-                    <TopNav>
-                        <div className="flex items-center gap-3">
-                            <LanguageSwitcher />
-                            <ThemeSwitch />
-                            <ConfigDrawer />
-                            <DynamicIsland />
-                            <ProfileDropdown />
-                        </div>
-                    </TopNav>
-                </Header>
-                <Main>
+                <PageHeader />
+                <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-r border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
+                    <ProductivityHero badge="المحفظة الاستثمارية" title="تفاصيل الاستثمار" type="investments" />
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                        <div className="lg:col-span-1 order-2 lg:order-1">
-                            <FinanceSidebar context="investments" />
-                        </div>
-                        <div className="lg:col-span-2 order-1 lg:order-2">
+                        <div className="lg:col-span-2">
                             <ErrorState error={investmentError} onRetry={() => refetchInvestment()} />
                         </div>
+                        <FinanceSidebar context="investments" />
                     </div>
                 </Main>
             </>
@@ -267,25 +283,14 @@ export default function InvestmentDetailsView() {
     if (!investment) {
         return (
             <>
-                <Header>
-                    <TopNav>
-                        <div className="flex items-center gap-3">
-                            <LanguageSwitcher />
-                            <ThemeSwitch />
-                            <ConfigDrawer />
-                            <DynamicIsland />
-                            <ProfileDropdown />
-                        </div>
-                    </TopNav>
-                </Header>
-                <Main>
+                <PageHeader />
+                <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-r border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
+                    <ProductivityHero badge="المحفظة الاستثمارية" title="تفاصيل الاستثمار" type="investments" />
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                        <div className="lg:col-span-1 order-2 lg:order-1">
-                            <FinanceSidebar context="investments" />
-                        </div>
-                        <div className="lg:col-span-2 order-1 lg:order-2">
+                        <div className="lg:col-span-2">
                             <NotFoundState />
                         </div>
+                        <FinanceSidebar context="investments" />
                     </div>
                 </Main>
             </>
@@ -294,63 +299,44 @@ export default function InvestmentDetailsView() {
 
     return (
         <>
-            <Header>
-                <TopNav>
-                    <div className="flex items-center gap-3">
-                        <LanguageSwitcher />
-                        <ThemeSwitch />
-                        <ConfigDrawer />
-                        <DynamicIsland />
-                        <ProfileDropdown />
-                    </div>
-                </TopNav>
-            </Header>
+            <PageHeader />
 
-            <Main>
+            <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-r border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
+
+                {/* HERO CARD */}
+                <ProductivityHero badge="المحفظة الاستثمارية" title={`${investment.symbol} - ${investment.name}`} type="investments" />
+
+                {/* MAIN GRID LAYOUT */}
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    {/* Sidebar */}
-                    <div className="lg:col-span-1 order-2 lg:order-1">
-                        <FinanceSidebar context="investments" />
-                    </div>
 
-                    {/* Main Content */}
-                    <div className="lg:col-span-2 order-1 lg:order-2 space-y-6">
-                        {/* Hero Card */}
-                        <ProductivityHero
-                            badge="المحفظة الاستثمارية"
-                            title={`${investment.symbol} - ${investment.name}`}
-                            type="investments"
-                            listMode={true}
-                            hideButtons={true}
-                        >
-                            <div className="flex gap-2">
-                                <Button
-                                    variant="outline"
-                                    onClick={handleRefreshPrice}
-                                    disabled={refreshPrice.isPending}
-                                    className="rounded-xl border-white/30 text-white hover:bg-white/10"
-                                >
-                                    <RefreshCw className={cn("ml-2 h-4 w-4", refreshPrice.isPending && "animate-spin")} />
-                                    تحديث السعر
-                                </Button>
-                                <Button
-                                    variant="outline"
-                                    className="rounded-xl border-white/30 text-white hover:bg-white/10"
-                                >
-                                    <Edit3 className="ml-2 h-4 w-4" />
-                                    تعديل
-                                </Button>
-                            </div>
-                        </ProductivityHero>
+                    {/* RIGHT COLUMN (Main Content) */}
+                    <div className="lg:col-span-2 space-y-6">
 
-                        {/* Back Link */}
-                        <Link
-                            to="/dashboard/finance/investments"
-                            className="inline-flex items-center gap-2 text-muted-foreground hover:text-navy transition-colors"
-                        >
-                            <ArrowLeft className="h-4 w-4" />
-                            العودة إلى المحفظة
-                        </Link>
+                        {/* Action Buttons */}
+                        <div className="flex gap-2">
+                            <Button
+                                onClick={handleRefreshPrice}
+                                disabled={refreshPrice.isPending}
+                                className="bg-emerald-500 hover:bg-emerald-600 rounded-xl"
+                            >
+                                <RefreshCw className={cn("ml-2 h-4 w-4", refreshPrice.isPending && "animate-spin")} />
+                                تحديث السعر
+                            </Button>
+                            <Button
+                                variant="outline"
+                                className="rounded-xl"
+                            >
+                                <Edit3 className="ml-2 h-4 w-4" />
+                                تعديل
+                            </Button>
+                            <Link
+                                to="/dashboard/finance/investments"
+                                className="inline-flex items-center gap-2 text-muted-foreground hover:text-navy transition-colors mr-auto"
+                            >
+                                <ArrowLeft className="h-4 w-4" />
+                                العودة إلى المحفظة
+                            </Link>
+                        </div>
 
                         {/* Investment Info Card */}
                         <Card>
@@ -745,6 +731,9 @@ export default function InvestmentDetailsView() {
                             </Button>
                         </div>
                     </div>
+
+                    {/* LEFT COLUMN (Sidebar) */}
+                    <FinanceSidebar context="investments" />
                 </div>
             </Main>
         </>
