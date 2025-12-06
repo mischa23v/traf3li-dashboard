@@ -201,6 +201,27 @@ export function EmployeeCreateView() {
         return basicSalary + totalAllowances
     }, [basicSalary, totalAllowances])
 
+    // Calculate years of service and minimum annual leave
+    const yearsOfService = useMemo(() => {
+        if (!hireDate) return 0
+        const hire = new Date(hireDate)
+        const now = new Date()
+        const diffMs = now.getTime() - hire.getTime()
+        const years = diffMs / (1000 * 60 * 60 * 24 * 365.25)
+        return Math.max(0, parseFloat(years.toFixed(2)))
+    }, [hireDate])
+
+    const minAnnualLeave = useMemo(() => {
+        return yearsOfService >= 5 ? 30 : 21
+    }, [yearsOfService])
+
+    // Auto-update leave entitlement when minimum changes
+    useEffect(() => {
+        if (annualLeaveEntitlement < minAnnualLeave) {
+            setAnnualLeaveEntitlement(minAnnualLeave)
+        }
+    }, [minAnnualLeave])
+
     // Allowance handlers
     const addAllowance = () => {
         setAllowances([...allowances, { id: Date.now().toString(), name: '', nameAr: '', amount: 0 }])
@@ -1284,17 +1305,38 @@ export function EmployeeCreateView() {
                                     </CollapsibleTrigger>
                                     <CollapsibleContent>
                                         <CardContent className="space-y-4 pt-0">
+                                            {/* Years of Service Info */}
+                                            {hireDate && (
+                                                <div className="bg-blue-50 rounded-xl p-4 border border-blue-100">
+                                                    <div className="flex items-center gap-3">
+                                                        <Clock className="w-5 h-5 text-blue-500" />
+                                                        <div>
+                                                            <span className="text-sm text-blue-700">سنوات الخدمة: </span>
+                                                            <span className="font-bold text-blue-800">{yearsOfService} سنة</span>
+                                                            <span className="text-sm text-blue-600 mr-3">
+                                                                (الحد الأدنى للإجازة: {minAnnualLeave} يوم)
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            )}
+
                                             <div className="space-y-2">
                                                 <Label className="text-navy font-medium">رصيد الإجازة السنوية (أيام)</Label>
                                                 <Input
                                                     type="number"
                                                     value={annualLeaveEntitlement}
-                                                    onChange={(e) => setAnnualLeaveEntitlement(parseInt(e.target.value) || 21)}
-                                                    min={21}
-                                                    max={30}
+                                                    onChange={(e) => {
+                                                        const value = parseInt(e.target.value) || minAnnualLeave
+                                                        setAnnualLeaveEntitlement(Math.max(value, minAnnualLeave))
+                                                    }}
+                                                    min={minAnnualLeave}
                                                     className="h-11 rounded-xl max-w-xs"
                                                 />
-                                                <p className="text-xs text-slate-500">21 يوم (أقل من 5 سنوات) أو 30 يوم (5 سنوات فأكثر)</p>
+                                                <p className="text-xs text-slate-500">
+                                                    الحد الأدنى: {minAnnualLeave} يوم
+                                                    ({yearsOfService >= 5 ? '5 سنوات خدمة فأكثر' : 'أقل من 5 سنوات خدمة'})
+                                                </p>
                                             </div>
                                         </CardContent>
                                     </CollapsibleContent>

@@ -582,6 +582,27 @@ export function EmployeeDetailsView() {
 
                                             {/* Leave Tab */}
                                             <TabsContent value="leave" className="mt-0 space-y-6">
+                                                {/* Years of Service Info */}
+                                                {(employee as any).yearsOfService !== undefined && (
+                                                    <Card className="border-none shadow-sm bg-blue-50 rounded-2xl overflow-hidden border border-blue-100">
+                                                        <CardContent className="p-4">
+                                                            <div className="flex items-center justify-between">
+                                                                <div className="flex items-center gap-3">
+                                                                    <Clock className="w-5 h-5 text-blue-600" />
+                                                                    <div>
+                                                                        <span className="text-sm text-blue-700">سنوات الخدمة</span>
+                                                                        <span className="font-bold text-blue-800 text-lg mr-2">{(employee as any).yearsOfService} سنة</span>
+                                                                    </div>
+                                                                </div>
+                                                                <div className="text-left">
+                                                                    <span className="text-sm text-blue-600">الحد الأدنى للإجازة</span>
+                                                                    <span className="font-bold text-blue-800 text-lg mr-2">{(employee as any).minAnnualLeave || 21} يوم</span>
+                                                                </div>
+                                                            </div>
+                                                        </CardContent>
+                                                    </Card>
+                                                )}
+
                                                 {/* Annual Leave */}
                                                 <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
                                                     <CardHeader className="pb-3">
@@ -593,7 +614,7 @@ export function EmployeeDetailsView() {
                                                     <CardContent>
                                                         <div className="grid grid-cols-4 gap-4 text-center">
                                                             <div className="bg-blue-50 rounded-xl p-4">
-                                                                <div className="text-2xl font-bold text-blue-700">{employee.leave?.annualLeave?.entitlement || 21}</div>
+                                                                <div className="text-2xl font-bold text-blue-700">{employee.leave?.annualLeave?.entitlement || (employee as any).minAnnualLeave || 21}</div>
                                                                 <div className="text-xs text-blue-600">الاستحقاق</div>
                                                             </div>
                                                             <div className="bg-amber-50 rounded-xl p-4">
@@ -605,7 +626,7 @@ export function EmployeeDetailsView() {
                                                                 <div className="text-xs text-purple-600">معلق</div>
                                                             </div>
                                                             <div className="bg-emerald-50 rounded-xl p-4">
-                                                                <div className="text-2xl font-bold text-emerald-700">{employee.leave?.annualLeave?.remaining || 21}</div>
+                                                                <div className="text-2xl font-bold text-emerald-700">{employee.leave?.annualLeave?.remaining || (employee as any).minAnnualLeave || 21}</div>
                                                                 <div className="text-xs text-emerald-600">متبقي</div>
                                                             </div>
                                                         </div>
