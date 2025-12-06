@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
+import { Switch } from '@/components/ui/switch'
 import {
     Select,
     SelectContent,
@@ -25,9 +26,13 @@ import { DynamicIsland } from '@/components/dynamic-island'
 import { useCreateEmployee, useUpdateEmployee, useEmployee } from '@/hooks/useHR'
 import {
     Search, Bell, User, Phone, Mail, MapPin, Building2, Calendar, Briefcase,
-    CreditCard, Wallet, Loader2, CheckCircle, DollarSign, Clock, UserCog, FileText
+    CreditCard, Wallet, Loader2, CheckCircle, DollarSign, Clock, UserCog, FileText,
+    Sliders, Building, UserCircle, GraduationCap, Award, Users, ChevronDown
 } from 'lucide-react'
 import type { CreateEmployeeData, NationalIdType, Gender, EmploymentType, ContractType, PaymentFrequency, PaymentMethod } from '@/services/hrService'
+
+type PracticeType = 'solo' | 'firm'
+type FormMode = 'basic' | 'advanced'
 
 export function EmployeeCreateView() {
     const navigate = useNavigate()
@@ -42,6 +47,10 @@ export function EmployeeCreateView() {
     // Mutations
     const createMutation = useCreateEmployee()
     const updateMutation = useUpdateEmployee()
+
+    // Mode and Practice Type
+    const [formMode, setFormMode] = useState<FormMode>('basic')
+    const [practiceType, setPracticeType] = useState<PracticeType>('firm')
 
     // Form State - Personal Info
     const [fullNameArabic, setFullNameArabic] = useState('')
@@ -97,6 +106,33 @@ export function EmployeeCreateView() {
     // GOSI
     const [gosiRegistered, setGosiRegistered] = useState(false)
     const [gosiNumber, setGosiNumber] = useState('')
+
+    // Advanced Fields - Extended Personal Info
+    const [bloodType, setBloodType] = useState('')
+    const [drivingLicense, setDrivingLicense] = useState('')
+    const [passportNumber, setPassportNumber] = useState('')
+    const [passportExpiry, setPassportExpiry] = useState('')
+    const [notes, setNotes] = useState('')
+
+    // Advanced Fields - Qualifications
+    const [educationLevel, setEducationLevel] = useState('')
+    const [educationMajor, setEducationMajor] = useState('')
+    const [educationInstitution, setEducationInstitution] = useState('')
+    const [educationYear, setEducationYear] = useState('')
+
+    // Firm-Only Fields
+    const [departmentId, setDepartmentId] = useState('')
+    const [branchId, setBranchId] = useState('')
+    const [teamId, setTeamId] = useState('')
+    const [costCenter, setCostCenter] = useState('')
+    const [isTeamLeader, setIsTeamLeader] = useState(false)
+    const [supervisorId, setSupervisorId] = useState('')
+
+    // Solo-Only Fields
+    const [practiceName, setPracticeName] = useState('')
+    const [barNumber, setBarNumber] = useState('')
+    const [barLicenseExpiry, setBarLicenseExpiry] = useState('')
+    const [practiceSpecialization, setPracticeSpecialization] = useState<string[]>([])
 
     // Populate form when editing
     useEffect(() => {
@@ -326,6 +362,94 @@ export function EmployeeCreateView() {
                     <div className="lg:col-span-2 space-y-6">
 
                         <form onSubmit={handleSubmit} className="space-y-6">
+
+                            {/* MODE SELECTION CARD */}
+                            <Card className="border border-slate-100 shadow-sm rounded-2xl overflow-hidden">
+                                <CardContent className="p-6">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        {/* Practice Type Selection */}
+                                        <div className="space-y-3">
+                                            <Label className="text-navy font-bold text-base flex items-center gap-2">
+                                                <Building className="w-5 h-5 text-blue-600" />
+                                                نوع الممارسة
+                                            </Label>
+                                            <div className="grid grid-cols-2 gap-3">
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setPracticeType('solo')}
+                                                    className={`p-4 rounded-xl border-2 transition-all flex flex-col items-center gap-2 ${
+                                                        practiceType === 'solo'
+                                                            ? 'border-emerald-500 bg-emerald-50 text-emerald-700'
+                                                            : 'border-slate-200 hover:border-slate-300 text-slate-600'
+                                                    }`}
+                                                >
+                                                    <UserCircle className="w-8 h-8" />
+                                                    <span className="font-medium">مكتب فردي</span>
+                                                    <span className="text-xs opacity-75">محامي مستقل</span>
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setPracticeType('firm')}
+                                                    className={`p-4 rounded-xl border-2 transition-all flex flex-col items-center gap-2 ${
+                                                        practiceType === 'firm'
+                                                            ? 'border-emerald-500 bg-emerald-50 text-emerald-700'
+                                                            : 'border-slate-200 hover:border-slate-300 text-slate-600'
+                                                    }`}
+                                                >
+                                                    <Building2 className="w-8 h-8" />
+                                                    <span className="font-medium">مكتب / شركة</span>
+                                                    <span className="text-xs opacity-75">منشأة قانونية</span>
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        {/* Form Mode Toggle */}
+                                        <div className="space-y-3">
+                                            <Label className="text-navy font-bold text-base flex items-center gap-2">
+                                                <Sliders className="w-5 h-5 text-purple-600" />
+                                                مستوى التفاصيل
+                                            </Label>
+                                            <div className="grid grid-cols-2 gap-3">
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setFormMode('basic')}
+                                                    className={`p-4 rounded-xl border-2 transition-all flex flex-col items-center gap-2 ${
+                                                        formMode === 'basic'
+                                                            ? 'border-emerald-500 bg-emerald-50 text-emerald-700'
+                                                            : 'border-slate-200 hover:border-slate-300 text-slate-600'
+                                                    }`}
+                                                >
+                                                    <div className="w-8 h-8 rounded-full bg-current/10 flex items-center justify-center">
+                                                        <span className="text-lg font-bold">أ</span>
+                                                    </div>
+                                                    <span className="font-medium">أساسي</span>
+                                                    <span className="text-xs opacity-75">الحقول الأساسية فقط</span>
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setFormMode('advanced')}
+                                                    className={`p-4 rounded-xl border-2 transition-all flex flex-col items-center gap-2 ${
+                                                        formMode === 'advanced'
+                                                            ? 'border-emerald-500 bg-emerald-50 text-emerald-700'
+                                                            : 'border-slate-200 hover:border-slate-300 text-slate-600'
+                                                    }`}
+                                                >
+                                                    <div className="w-8 h-8 rounded-full bg-current/10 flex items-center justify-center">
+                                                        <span className="text-lg font-bold">م</span>
+                                                    </div>
+                                                    <span className="font-medium">متقدم</span>
+                                                    <span className="text-xs opacity-75">جميع الحقول</span>
+                                                </button>
+                                            </div>
+                                            <p className="text-xs text-slate-500 mt-2">
+                                                {formMode === 'basic'
+                                                    ? 'يتم عرض الحقول الأساسية المطلوبة لإضافة موظف (80% من الحالات)'
+                                                    : 'يتم عرض جميع الحقول بما في ذلك المؤهلات والأداء والبيانات المتقدمة'}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </CardContent>
+                            </Card>
 
                             {/* PERSONAL INFORMATION SECTION */}
                             <Card className="border border-slate-100 shadow-sm rounded-2xl overflow-hidden">
@@ -1087,6 +1211,392 @@ export function EmployeeCreateView() {
                                     </div>
                                 </CardContent>
                             </Card>
+
+                            {/* FIRM-ONLY: ORGANIZATIONAL STRUCTURE */}
+                            {practiceType === 'firm' && (
+                                <Card className="border border-blue-100 shadow-sm rounded-2xl overflow-hidden">
+                                    <CardHeader className="bg-blue-50/50 border-b border-blue-100">
+                                        <CardTitle className="text-lg font-bold text-navy flex items-center gap-2">
+                                            <Building2 className="w-5 h-5 text-blue-600" />
+                                            الهيكل التنظيمي
+                                            <span className="text-xs font-normal text-blue-600 bg-blue-100 px-2 py-1 rounded-full mr-auto">للمنشآت فقط</span>
+                                        </CardTitle>
+                                    </CardHeader>
+                                    <CardContent className="p-6 space-y-6">
+                                        {/* Branch & Department */}
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            <div className="space-y-2">
+                                                <Label htmlFor="branchId" className="text-navy font-medium">
+                                                    الفرع
+                                                </Label>
+                                                <Select value={branchId} onValueChange={setBranchId}>
+                                                    <SelectTrigger className="h-11 rounded-xl">
+                                                        <SelectValue placeholder="اختر الفرع" />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                        <SelectItem value="main">المقر الرئيسي</SelectItem>
+                                                        <SelectItem value="riyadh">فرع الرياض</SelectItem>
+                                                        <SelectItem value="jeddah">فرع جدة</SelectItem>
+                                                        <SelectItem value="dammam">فرع الدمام</SelectItem>
+                                                    </SelectContent>
+                                                </Select>
+                                            </div>
+                                            <div className="space-y-2">
+                                                <Label htmlFor="departmentId" className="text-navy font-medium">
+                                                    القسم
+                                                </Label>
+                                                <Select value={departmentId} onValueChange={setDepartmentId}>
+                                                    <SelectTrigger className="h-11 rounded-xl">
+                                                        <SelectValue placeholder="اختر القسم" />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                        <SelectItem value="legal">الشؤون القانونية</SelectItem>
+                                                        <SelectItem value="litigation">الترافع</SelectItem>
+                                                        <SelectItem value="corporate">الشركات</SelectItem>
+                                                        <SelectItem value="ip">الملكية الفكرية</SelectItem>
+                                                        <SelectItem value="admin">الشؤون الإدارية</SelectItem>
+                                                        <SelectItem value="finance">الشؤون المالية</SelectItem>
+                                                    </SelectContent>
+                                                </Select>
+                                            </div>
+                                        </div>
+
+                                        {/* Team & Supervisor */}
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            <div className="space-y-2">
+                                                <Label htmlFor="teamId" className="text-navy font-medium">
+                                                    <Users className="w-4 h-4 inline ml-1" />
+                                                    الفريق
+                                                </Label>
+                                                <Select value={teamId} onValueChange={setTeamId}>
+                                                    <SelectTrigger className="h-11 rounded-xl">
+                                                        <SelectValue placeholder="اختر الفريق" />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                        <SelectItem value="team1">فريق القضايا التجارية</SelectItem>
+                                                        <SelectItem value="team2">فريق القضايا الجنائية</SelectItem>
+                                                        <SelectItem value="team3">فريق العقود</SelectItem>
+                                                        <SelectItem value="team4">فريق الاستشارات</SelectItem>
+                                                    </SelectContent>
+                                                </Select>
+                                            </div>
+                                            <div className="space-y-2">
+                                                <Label htmlFor="supervisorId" className="text-navy font-medium">
+                                                    المشرف المباشر
+                                                </Label>
+                                                <Select value={supervisorId} onValueChange={setSupervisorId}>
+                                                    <SelectTrigger className="h-11 rounded-xl">
+                                                        <SelectValue placeholder="اختر المشرف" />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                        <SelectItem value="none">بدون مشرف</SelectItem>
+                                                        <SelectItem value="manager1">أ. محمد العمري (مدير)</SelectItem>
+                                                        <SelectItem value="manager2">أ. أحمد السعيد (مشرف)</SelectItem>
+                                                    </SelectContent>
+                                                </Select>
+                                            </div>
+                                        </div>
+
+                                        {/* Cost Center & Team Leader */}
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            <div className="space-y-2">
+                                                <Label htmlFor="costCenter" className="text-navy font-medium">
+                                                    مركز التكلفة
+                                                </Label>
+                                                <Input
+                                                    id="costCenter"
+                                                    value={costCenter}
+                                                    onChange={(e) => setCostCenter(e.target.value)}
+                                                    placeholder="CC-001"
+                                                    className="h-11 rounded-xl"
+                                                />
+                                            </div>
+                                            <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl">
+                                                <Label htmlFor="isTeamLeader" className="text-navy font-medium cursor-pointer">
+                                                    قائد فريق
+                                                </Label>
+                                                <Switch
+                                                    id="isTeamLeader"
+                                                    checked={isTeamLeader}
+                                                    onCheckedChange={setIsTeamLeader}
+                                                />
+                                            </div>
+                                        </div>
+                                    </CardContent>
+                                </Card>
+                            )}
+
+                            {/* SOLO-ONLY: PRACTICE INFO */}
+                            {practiceType === 'solo' && (
+                                <Card className="border border-purple-100 shadow-sm rounded-2xl overflow-hidden">
+                                    <CardHeader className="bg-purple-50/50 border-b border-purple-100">
+                                        <CardTitle className="text-lg font-bold text-navy flex items-center gap-2">
+                                            <UserCircle className="w-5 h-5 text-purple-600" />
+                                            بيانات المحامي المستقل
+                                            <span className="text-xs font-normal text-purple-600 bg-purple-100 px-2 py-1 rounded-full mr-auto">للمكتب الفردي</span>
+                                        </CardTitle>
+                                    </CardHeader>
+                                    <CardContent className="p-6 space-y-6">
+                                        {/* Practice Name & Bar Number */}
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            <div className="space-y-2">
+                                                <Label htmlFor="practiceName" className="text-navy font-medium">
+                                                    اسم المكتب <span className="text-red-500">*</span>
+                                                </Label>
+                                                <Input
+                                                    id="practiceName"
+                                                    value={practiceName}
+                                                    onChange={(e) => setPracticeName(e.target.value)}
+                                                    placeholder="مكتب المحامي محمد للمحاماة"
+                                                    className="h-11 rounded-xl"
+                                                />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <Label htmlFor="barNumber" className="text-navy font-medium">
+                                                    رقم الترخيص <span className="text-red-500">*</span>
+                                                </Label>
+                                                <Input
+                                                    id="barNumber"
+                                                    value={barNumber}
+                                                    onChange={(e) => setBarNumber(e.target.value)}
+                                                    placeholder="123456"
+                                                    className="h-11 rounded-xl"
+                                                    dir="ltr"
+                                                />
+                                            </div>
+                                        </div>
+
+                                        {/* License Expiry */}
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            <div className="space-y-2">
+                                                <Label htmlFor="barLicenseExpiry" className="text-navy font-medium">
+                                                    <Calendar className="w-4 h-4 inline ml-1" />
+                                                    تاريخ انتهاء الترخيص
+                                                </Label>
+                                                <Input
+                                                    id="barLicenseExpiry"
+                                                    type="date"
+                                                    value={barLicenseExpiry}
+                                                    onChange={(e) => setBarLicenseExpiry(e.target.value)}
+                                                    className="h-11 rounded-xl"
+                                                />
+                                            </div>
+                                        </div>
+
+                                        {/* Specializations */}
+                                        <div className="space-y-3">
+                                            <Label className="text-navy font-medium">
+                                                <Award className="w-4 h-4 inline ml-1" />
+                                                التخصصات
+                                            </Label>
+                                            <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                                                {[
+                                                    { value: 'commercial', label: 'تجاري' },
+                                                    { value: 'criminal', label: 'جنائي' },
+                                                    { value: 'family', label: 'أحوال شخصية' },
+                                                    { value: 'labor', label: 'عمالي' },
+                                                    { value: 'real_estate', label: 'عقاري' },
+                                                    { value: 'ip', label: 'ملكية فكرية' },
+                                                ].map((spec) => (
+                                                    <label
+                                                        key={spec.value}
+                                                        className={`flex items-center gap-2 p-3 rounded-xl border cursor-pointer transition-all ${
+                                                            practiceSpecialization.includes(spec.value)
+                                                                ? 'border-purple-500 bg-purple-50 text-purple-700'
+                                                                : 'border-slate-200 hover:border-slate-300'
+                                                        }`}
+                                                    >
+                                                        <input
+                                                            type="checkbox"
+                                                            className="sr-only"
+                                                            checked={practiceSpecialization.includes(spec.value)}
+                                                            onChange={(e) => {
+                                                                if (e.target.checked) {
+                                                                    setPracticeSpecialization([...practiceSpecialization, spec.value])
+                                                                } else {
+                                                                    setPracticeSpecialization(practiceSpecialization.filter(s => s !== spec.value))
+                                                                }
+                                                            }}
+                                                        />
+                                                        <span className="text-sm font-medium">{spec.label}</span>
+                                                    </label>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    </CardContent>
+                                </Card>
+                            )}
+
+                            {/* ADVANCED-ONLY: ADDITIONAL INFO */}
+                            {formMode === 'advanced' && (
+                                <>
+                                    {/* Extended Personal Info */}
+                                    <Card className="border border-amber-100 shadow-sm rounded-2xl overflow-hidden">
+                                        <CardHeader className="bg-amber-50/50 border-b border-amber-100">
+                                            <CardTitle className="text-lg font-bold text-navy flex items-center gap-2">
+                                                <User className="w-5 h-5 text-amber-600" />
+                                                بيانات شخصية إضافية
+                                                <span className="text-xs font-normal text-amber-600 bg-amber-100 px-2 py-1 rounded-full mr-auto">متقدم</span>
+                                            </CardTitle>
+                                        </CardHeader>
+                                        <CardContent className="p-6 space-y-6">
+                                            {/* Passport & Blood Type */}
+                                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                                <div className="space-y-2">
+                                                    <Label htmlFor="passportNumber" className="text-navy font-medium">
+                                                        رقم جواز السفر
+                                                    </Label>
+                                                    <Input
+                                                        id="passportNumber"
+                                                        value={passportNumber}
+                                                        onChange={(e) => setPassportNumber(e.target.value)}
+                                                        placeholder="A12345678"
+                                                        className="h-11 rounded-xl"
+                                                        dir="ltr"
+                                                    />
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <Label htmlFor="passportExpiry" className="text-navy font-medium">
+                                                        تاريخ انتهاء الجواز
+                                                    </Label>
+                                                    <Input
+                                                        id="passportExpiry"
+                                                        type="date"
+                                                        value={passportExpiry}
+                                                        onChange={(e) => setPassportExpiry(e.target.value)}
+                                                        className="h-11 rounded-xl"
+                                                    />
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <Label htmlFor="bloodType" className="text-navy font-medium">
+                                                        فصيلة الدم
+                                                    </Label>
+                                                    <Select value={bloodType} onValueChange={setBloodType}>
+                                                        <SelectTrigger className="h-11 rounded-xl">
+                                                            <SelectValue placeholder="اختر" />
+                                                        </SelectTrigger>
+                                                        <SelectContent>
+                                                            <SelectItem value="A+">A+</SelectItem>
+                                                            <SelectItem value="A-">A-</SelectItem>
+                                                            <SelectItem value="B+">B+</SelectItem>
+                                                            <SelectItem value="B-">B-</SelectItem>
+                                                            <SelectItem value="O+">O+</SelectItem>
+                                                            <SelectItem value="O-">O-</SelectItem>
+                                                            <SelectItem value="AB+">AB+</SelectItem>
+                                                            <SelectItem value="AB-">AB-</SelectItem>
+                                                        </SelectContent>
+                                                    </Select>
+                                                </div>
+                                            </div>
+
+                                            {/* Driving License */}
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                <div className="space-y-2">
+                                                    <Label htmlFor="drivingLicense" className="text-navy font-medium">
+                                                        رخصة القيادة
+                                                    </Label>
+                                                    <Select value={drivingLicense} onValueChange={setDrivingLicense}>
+                                                        <SelectTrigger className="h-11 rounded-xl">
+                                                            <SelectValue placeholder="اختر نوع الرخصة" />
+                                                        </SelectTrigger>
+                                                        <SelectContent>
+                                                            <SelectItem value="none">لا يوجد</SelectItem>
+                                                            <SelectItem value="private">خاصة</SelectItem>
+                                                            <SelectItem value="public">عامة</SelectItem>
+                                                            <SelectItem value="heavy">مركبات ثقيلة</SelectItem>
+                                                            <SelectItem value="motorcycle">دراجة نارية</SelectItem>
+                                                        </SelectContent>
+                                                    </Select>
+                                                </div>
+                                            </div>
+
+                                            {/* Notes */}
+                                            <div className="space-y-2">
+                                                <Label htmlFor="notes" className="text-navy font-medium">
+                                                    ملاحظات
+                                                </Label>
+                                                <Textarea
+                                                    id="notes"
+                                                    value={notes}
+                                                    onChange={(e) => setNotes(e.target.value)}
+                                                    placeholder="أي ملاحظات إضافية..."
+                                                    className="rounded-xl min-h-[100px]"
+                                                />
+                                            </div>
+                                        </CardContent>
+                                    </Card>
+
+                                    {/* Qualifications */}
+                                    <Card className="border border-emerald-100 shadow-sm rounded-2xl overflow-hidden">
+                                        <CardHeader className="bg-emerald-50/50 border-b border-emerald-100">
+                                            <CardTitle className="text-lg font-bold text-navy flex items-center gap-2">
+                                                <GraduationCap className="w-5 h-5 text-emerald-600" />
+                                                المؤهلات العلمية
+                                                <span className="text-xs font-normal text-emerald-600 bg-emerald-100 px-2 py-1 rounded-full mr-auto">متقدم</span>
+                                            </CardTitle>
+                                        </CardHeader>
+                                        <CardContent className="p-6 space-y-6">
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                <div className="space-y-2">
+                                                    <Label htmlFor="educationLevel" className="text-navy font-medium">
+                                                        المستوى التعليمي
+                                                    </Label>
+                                                    <Select value={educationLevel} onValueChange={setEducationLevel}>
+                                                        <SelectTrigger className="h-11 rounded-xl">
+                                                            <SelectValue placeholder="اختر المستوى" />
+                                                        </SelectTrigger>
+                                                        <SelectContent>
+                                                            <SelectItem value="high_school">ثانوية عامة</SelectItem>
+                                                            <SelectItem value="diploma">دبلوم</SelectItem>
+                                                            <SelectItem value="bachelor">بكالوريوس</SelectItem>
+                                                            <SelectItem value="master">ماجستير</SelectItem>
+                                                            <SelectItem value="phd">دكتوراه</SelectItem>
+                                                        </SelectContent>
+                                                    </Select>
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <Label htmlFor="educationMajor" className="text-navy font-medium">
+                                                        التخصص
+                                                    </Label>
+                                                    <Input
+                                                        id="educationMajor"
+                                                        value={educationMajor}
+                                                        onChange={(e) => setEducationMajor(e.target.value)}
+                                                        placeholder="القانون"
+                                                        className="h-11 rounded-xl"
+                                                    />
+                                                </div>
+                                            </div>
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                <div className="space-y-2">
+                                                    <Label htmlFor="educationInstitution" className="text-navy font-medium">
+                                                        الجامعة / المؤسسة
+                                                    </Label>
+                                                    <Input
+                                                        id="educationInstitution"
+                                                        value={educationInstitution}
+                                                        onChange={(e) => setEducationInstitution(e.target.value)}
+                                                        placeholder="جامعة الملك سعود"
+                                                        className="h-11 rounded-xl"
+                                                    />
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <Label htmlFor="educationYear" className="text-navy font-medium">
+                                                        سنة التخرج
+                                                    </Label>
+                                                    <Input
+                                                        id="educationYear"
+                                                        value={educationYear}
+                                                        onChange={(e) => setEducationYear(e.target.value)}
+                                                        placeholder="2020"
+                                                        className="h-11 rounded-xl"
+                                                    />
+                                                </div>
+                                            </div>
+                                        </CardContent>
+                                    </Card>
+                                </>
+                            )}
 
                             {/* SUBMIT BUTTON */}
                             <div className="flex justify-end gap-4">
