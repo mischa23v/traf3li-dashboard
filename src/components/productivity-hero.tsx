@@ -53,7 +53,6 @@ export function ProductivityHero({ badge, title = 'الإنتاجية', type = '
         tasks: { label: 'المهام', href: '/dashboard/tasks/list' },
         reminders: { label: 'التذكيرات', href: '/dashboard/tasks/reminders' },
         events: { label: 'الأحداث', href: '/dashboard/tasks/events' },
-        investments: { label: 'الاستثمارات', href: '/dashboard/finance/investments' },
     }
 
     const buttonConfig: Record<string, { label: string; href: string }> = {
@@ -87,7 +86,6 @@ export function ProductivityHero({ badge, title = 'الإنتاجية', type = '
         judgments: { label: 'حكم جديد', href: '/dashboard/knowledge/judgments/new' },
         forms: { label: 'نموذج جديد', href: '/dashboard/knowledge/forms/new' },
         jobs: { label: 'خدمة جديدة', href: '/dashboard/jobs/new' },
-        investments: { label: 'صفقة جديدة', href: '/dashboard/finance/investments/new' },
     }
 
     const currentButtonConfig = buttonConfig[type]

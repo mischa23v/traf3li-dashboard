@@ -291,11 +291,6 @@ export function useSidebarData(): SidebarData {
               url: '/dashboard/finance/time-tracking',
               module: 'timeTracking',
             },
-            {
-              title: 'الاستثمارات',
-              url: '/dashboard/finance/investments',
-              module: 'invoices',
-            },
           ],
         },
       ],
