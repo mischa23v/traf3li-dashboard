@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { apiClient } from '@/lib/api';
 
+
 const Icons = {
   TrafliLogo: () => (<svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3" /></svg>),
   User: () => (<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>),
@@ -40,46 +41,35 @@ export function SignUpForm() {
   const [loading, setLoading] = useState(false);
 
   const [formData, setFormData] = useState({
-    userType: '',
-    lawyerWorkMode: '' as '' | 'solo' | 'create_firm' | 'join_firm', // Updated to match backend API
-    firstName: '',
-    lastName: '',
-    username: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
-    phone: '',
-    nationality: '',
-    region: '',
+    userType: '', 
+    lawyerMode: '', 
+    firstName: '', 
+    lastName: '', 
+    username: '', 
+    email: '', 
+    password: '', 
+    confirmPassword: '', 
+    phone: '', 
+    nationality: '', 
+    region: '', 
     city: '',
-    isLicensed: null as boolean | null,
-    licenseNumber: '',
-    courts: {} as Record<string, { selected?: boolean; caseCount?: string; name?: string }>,
-    yearsOfExperience: '',
-    workType: '',
-    // Firm data for create_firm mode
+    isLicensed: null as boolean | null, 
+    licenseNumber: '', 
+    courts: {} as Record<string, { selected?: boolean; caseCount?: string; name?: string }>, 
+    yearsOfExperience: '', 
+    workType: '', 
     firmName: '',
-    firmNameEn: '',
-    firmLicenseNumber: '',
-    firmEmail: '',
-    firmPhone: '',
-    firmAddress: '',
-    firmWebsite: '',
-    firmDescription: '',
-    firmSpecializations: [] as string[],
-    // Invitation code for join_firm mode
-    invitationCode: '',
-    specializations: [] as string[],
-    languages: ['العربية'] as string[],
-    bio: '',
-    isRegisteredKhebra: null as boolean | null,
-    serviceType: '',
+    specializations: [] as string[], 
+    languages: ['العربية'] as string[], 
+    bio: '', 
+    isRegisteredKhebra: null as boolean | null, 
+    serviceType: '', 
     pricingModel: [] as string[],
-    hourlyRateMin: '',
-    hourlyRateMax: '',
-    acceptsRemote: '',
-    agreedTerms: false,
-    agreedPrivacy: false,
+    hourlyRateMin: '', 
+    hourlyRateMax: '', 
+    acceptsRemote: '', 
+    agreedTerms: false, 
+    agreedPrivacy: false, 
     agreedConflict: false,
   });
 
@@ -124,18 +114,15 @@ export function SignUpForm() {
       else if (formData.username.length < 3) newErrors.username = 'يجب أن لا يقل عن 3 أحرف';
       if (!formData.email.trim()) newErrors.email = 'الحقل مطلوب';
       else if (!validateEmail(formData.email)) newErrors.email = 'البريد الإلكتروني غير صحيح';
-      // Phone validation for client and all lawyer modes
-      if (!formData.phone) newErrors.phone = 'الحقل مطلوب';
-      else if (!validatePhone(formData.phone)) newErrors.phone = 'رقم الجوال غير صحيح';
-
-      // Invitation code required for join_firm mode
-      if (formData.lawyerWorkMode === 'join_firm') {
-        if (!formData.invitationCode.trim()) newErrors.invitationCode = 'كود الدعوة مطلوب';
+      // Phone validation for client and dashboard lawyer (moved from step 2)
+      if (formData.userType === 'client' || formData.lawyerMode === 'dashboard') {
+        if (!formData.phone) newErrors.phone = 'الحقل مطلوب';
+        else if (!validatePhone(formData.phone)) newErrors.phone = 'رقم الجوال غير صحيح';
       }
     }
-
-    // Step 2 - Password + Location (All users)
-    if (step === 2) {
+    
+    // Step 2 - Password + Location (Client & Dashboard Lawyer) - Phone moved to step 1
+    if (step === 2 && (formData.userType === 'client' || formData.lawyerMode === 'dashboard')) {
       if (!formData.password) newErrors.password = 'الحقل مطلوب';
       else if (formData.password.length < 8) newErrors.password = 'يجب أن تكون مكونة من 8 خانات على الأقل';
       if (!formData.confirmPassword) newErrors.confirmPassword = 'الحقل مطلوب';
@@ -145,30 +132,75 @@ export function SignUpForm() {
       if (!formData.city.trim()) newErrors.city = 'الحقل مطلوب';
     }
 
-    // Step 3 - Firm Data (create_firm mode only)
-    if (step === 3 && formData.lawyerWorkMode === 'create_firm') {
-      if (!formData.firmName.trim()) newErrors.firmName = 'اسم المكتب مطلوب';
-      if (!formData.firmLicenseNumber.trim()) newErrors.firmLicenseNumber = 'رقم الترخيص مطلوب';
-    }
-
-    // Final Step - Terms (all users)
-    const finalStep = getTotalSteps();
-    if (step === finalStep) {
+    // Step 3 - Terms (Client & Dashboard Lawyer)
+    if (step === 3 && (formData.userType === 'client' || formData.lawyerMode === 'dashboard')) {
       if (!formData.agreedTerms) newErrors.agreedTerms = 'يرجى الموافقة';
       if (!formData.agreedPrivacy) newErrors.agreedPrivacy = 'يرجى الموافقة';
       if (formData.userType === 'lawyer' && !formData.agreedConflict) newErrors.agreedConflict = 'يرجى الموافقة';
+    }
+
+    // Marketplace Lawyer Steps
+    if (formData.lawyerMode === 'marketplace') {
+      // Step 2 - Password + Phone
+      if (step === 2) {
+        if (!formData.password) newErrors.password = 'الحقل مطلوب';
+        else if (formData.password.length < 8) newErrors.password = 'يجب أن تكون مكونة من 8 خانات على الأقل';
+        if (!formData.confirmPassword) newErrors.confirmPassword = 'الحقل مطلوب';
+        else if (formData.password !== formData.confirmPassword) newErrors.confirmPassword = 'كلمة المرور غير متطابقة';
+        if (!formData.phone) newErrors.phone = 'الحقل مطلوب';
+        else if (!validatePhone(formData.phone)) newErrors.phone = 'رقم الجوال غير صحيح';
+      }
+
+      // Step 3 - Location
+      if (step === 3) {
+        if (!formData.nationality) newErrors.nationality = 'الحقل مطلوب';
+        if (!formData.region) newErrors.region = 'الحقل مطلوب';
+        if (!formData.city.trim()) newErrors.city = 'الحقل مطلوب';
+      }
+
+      // Step 4 - License
+      if (step === 4 && formData.isLicensed === null) newErrors.isLicensed = 'يرجى الاختيار';
+
+      // Step 5 - Courts
+      if (step === 5) {
+        const selectedCourts = Object.values(formData.courts).filter(c => c.selected);
+        if (selectedCourts.length === 0) newErrors.courts = 'يرجى اختيار محكمة واحدة على الأقل';
+      }
+
+      // Step 6 - Experience
+      if (step === 6) {
+        if (!formData.yearsOfExperience) newErrors.yearsOfExperience = 'الحقل مطلوب';
+        if (!formData.workType) newErrors.workType = 'الحقل مطلوب';
+        if (formData.specializations.length === 0) newErrors.specializations = 'يرجى اختيار تخصص واحد على الأقل';
+        if (formData.languages.length === 0) newErrors.languages = 'يرجى اختيار لغة واحدة على الأقل';
+      }
+
+      // Step 7 - Khebra
+      if (step === 7 && formData.isRegisteredKhebra === null) newErrors.isRegisteredKhebra = 'يرجى الاختيار';
+
+      // Step 8 - Marketplace Settings
+      if (step === 8) {
+        if (!formData.serviceType) newErrors.serviceType = 'الحقل مطلوب';
+        if (formData.pricingModel.length === 0) newErrors.pricingModel = 'يرجى اختيار نموذج واحد على الأقل';
+        if (!formData.acceptsRemote) newErrors.acceptsRemote = 'الحقل مطلوب';
+      }
+
+      // Step 9 - Terms
+      if (step === 9) {
+        if (!formData.agreedTerms) newErrors.agreedTerms = 'يرجى الموافقة';
+        if (!formData.agreedPrivacy) newErrors.agreedPrivacy = 'يرجى الموافقة';
+        if (!formData.agreedConflict) newErrors.agreedConflict = 'يرجى الموافقة';
+      }
     }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  const getTotalSteps = () => {
+  const getTotalSteps = () => { 
     if (formData.userType === 'client') return 3;
-    if (formData.lawyerWorkMode === 'solo') return 3; // Solo lawyer: basic info, password, terms
-    if (formData.lawyerWorkMode === 'join_firm') return 3; // Join firm: basic info + code, password, terms
-    if (formData.lawyerWorkMode === 'create_firm') return 4; // Create firm: basic info, password, firm data, terms
-    return 3;
+    if (formData.lawyerMode === 'dashboard') return 3;
+    return 9; // marketplace lawyer
   };
 
   const nextStep = () => { 
@@ -186,48 +218,42 @@ export function SignUpForm() {
       setLoading(true);
       try {
         const isLawyer = formData.userType === 'lawyer';
-
-        // Build base payload
-        const payload: Record<string, any> = {
-          username: formData.username,
-          email: formData.email,
-          password: formData.password,
-          phone: formData.phone,
-          firstName: formData.firstName,
-          lastName: formData.lastName,
-          description: formData.bio || null,
-          role: isLawyer ? 'lawyer' : 'client',
-          country: 'Saudi Arabia',
-          nationality: formData.nationality || null,
-          region: formData.region || null,
-          city: formData.city || null
+        const payload = { 
+          username: formData.username, 
+          email: formData.email, 
+          password: formData.password, 
+          phone: formData.phone, 
+          firstName: formData.firstName, 
+          lastName: formData.lastName, 
+          description: formData.bio || null, 
+          isSeller: isLawyer, 
+          role: isLawyer ? 'lawyer' : 'client', 
+          lawyerMode: isLawyer ? formData.lawyerMode : null, 
+          country: 'Saudi Arabia', 
+          nationality: formData.nationality || null, 
+          region: formData.region || null, 
+          city: formData.city || null 
         };
-
-        // Add lawyer-specific fields
-        if (isLawyer) {
-          payload.lawyerWorkMode = formData.lawyerWorkMode;
-
-          // Add firmData for create_firm mode
-          if (formData.lawyerWorkMode === 'create_firm') {
-            payload.firmData = {
-              name: formData.firmName,
-              nameEn: formData.firmNameEn || null,
-              licenseNumber: formData.firmLicenseNumber,
-              email: formData.firmEmail || null,
-              phone: formData.firmPhone || null,
-              address: formData.firmAddress || null,
-              website: formData.firmWebsite || null,
-              description: formData.firmDescription || null,
-              specializations: formData.firmSpecializations.length > 0 ? formData.firmSpecializations : null,
-            };
-          }
-
-          // Add invitationCode for join_firm mode
-          if (formData.lawyerWorkMode === 'join_firm') {
-            payload.invitationCode = formData.invitationCode;
-          }
+        
+        if (isLawyer && formData.lawyerMode === 'marketplace') {
+          Object.assign(payload, { 
+            isLicensed: formData.isLicensed || false, 
+            licenseNumber: formData.licenseNumber || null, 
+            courts: formData.courts, 
+            yearsOfExperience: formData.yearsOfExperience, 
+            workType: formData.workType || null, 
+            firmName: formData.firmName || null, 
+            specializations: formData.specializations, 
+            languages: formData.languages, 
+            isRegisteredKhebra: formData.isRegisteredKhebra || false, 
+            serviceType: formData.serviceType || null, 
+            pricingModel: formData.pricingModel, 
+            hourlyRateMin: formData.hourlyRateMin || null, 
+            hourlyRateMax: formData.hourlyRateMax || null, 
+            acceptsRemote: formData.acceptsRemote || null 
+          });
         }
-
+        
         const response = await apiClient.post('/auth/register', payload);
         if (response.status === 201) setShowSuccess(true);
       } catch (error: any) {
@@ -288,19 +314,15 @@ export function SignUpForm() {
               </div>
               {formData.userType === 'lawyer' && (
                 <div className="bg-[#F8F9FA] rounded-2xl p-5 border border-slate-100 animate-fadeIn">
-                  <h3 className="font-bold text-[#0f172a] mb-4">كيف تريد العمل؟</h3>
+                  <h3 className="font-bold text-[#0f172a] mb-4">نوع الاستخدام</h3>
                   <div className="space-y-3">
-                    <button onClick={() => { updateField('lawyerWorkMode', 'solo'); setCurrentStep(1); }} className={`w-full p-4 rounded-xl border-2 transition-all flex items-center gap-4 text-right ${formData.lawyerWorkMode === 'solo' ? 'border-emerald-500 bg-white' : 'border-slate-200 hover:border-slate-300 bg-white'}`}>
-                      <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${formData.lawyerWorkMode === 'solo' ? 'bg-emerald-500 text-white' : 'bg-slate-100 text-slate-600'}`}><Icons.User /></div>
-                      <div className="flex-1"><h4 className="font-bold text-[#0f172a] text-sm">محامي مستقل</h4><p className="text-xs text-slate-500">العمل بشكل مستقل بدون مكتب</p></div>
+                    <button onClick={() => { updateField('lawyerMode', 'marketplace'); setCurrentStep(1); }} className={`w-full p-4 rounded-xl border-2 transition-all flex items-center gap-4 text-right ${formData.lawyerMode === 'marketplace' ? 'border-emerald-500 bg-white' : 'border-slate-200 hover:border-slate-300 bg-white'}`}>
+                      <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${formData.lawyerMode === 'marketplace' ? 'bg-emerald-500 text-white' : 'bg-slate-100 text-slate-600'}`}><Icons.Store /></div>
+                      <div className="flex-1"><h4 className="font-bold text-[#0f172a] text-sm">السوق + لوحة التحكم</h4><p className="text-xs text-slate-500">استقبال عملاء جدد وإدارة القضايا</p></div>
                     </button>
-                    <button onClick={() => { updateField('lawyerWorkMode', 'create_firm'); setCurrentStep(1); }} className={`w-full p-4 rounded-xl border-2 transition-all flex items-center gap-4 text-right ${formData.lawyerWorkMode === 'create_firm' ? 'border-emerald-500 bg-white' : 'border-slate-200 hover:border-slate-300 bg-white'}`}>
-                      <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${formData.lawyerWorkMode === 'create_firm' ? 'bg-emerald-500 text-white' : 'bg-slate-100 text-slate-600'}`}><Icons.Store /></div>
-                      <div className="flex-1"><h4 className="font-bold text-[#0f172a] text-sm">إنشاء مكتب جديد</h4><p className="text-xs text-slate-500">إنشاء مكتب محاماة وإدارة الفريق</p></div>
-                    </button>
-                    <button onClick={() => { updateField('lawyerWorkMode', 'join_firm'); setCurrentStep(1); }} className={`w-full p-4 rounded-xl border-2 transition-all flex items-center gap-4 text-right ${formData.lawyerWorkMode === 'join_firm' ? 'border-emerald-500 bg-white' : 'border-slate-200 hover:border-slate-300 bg-white'}`}>
-                      <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${formData.lawyerWorkMode === 'join_firm' ? 'bg-emerald-500 text-white' : 'bg-slate-100 text-slate-600'}`}><Icons.Users /></div>
-                      <div className="flex-1"><h4 className="font-bold text-[#0f172a] text-sm">الانضمام لمكتب</h4><p className="text-xs text-slate-500">لدي كود دعوة للانضمام لمكتب</p></div>
+                    <button onClick={() => { updateField('lawyerMode', 'dashboard'); setCurrentStep(1); }} className={`w-full p-4 rounded-xl border-2 transition-all flex items-center gap-4 text-right ${formData.lawyerMode === 'dashboard' ? 'border-emerald-500 bg-white' : 'border-slate-200 hover:border-slate-300 bg-white'}`}>
+                      <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${formData.lawyerMode === 'dashboard' ? 'bg-emerald-500 text-white' : 'bg-slate-100 text-slate-600'}`}><Icons.Layout /></div>
+                      <div className="flex-1"><h4 className="font-bold text-[#0f172a] text-sm">لوحة التحكم فقط</h4><p className="text-xs text-slate-500">إدارة القضايا الحالية</p></div>
                     </button>
                   </div>
                 </div>
@@ -326,29 +348,24 @@ export function SignUpForm() {
       return steps[currentStep - 1] || steps[0];
     }
 
-    if (formData.lawyerWorkMode === 'solo' || formData.lawyerWorkMode === 'join_firm') {
-      const steps = [
-        { title: formData.lawyerWorkMode === 'join_firm' ? 'البيانات الأساسية وكود الدعوة' : 'البيانات الأساسية والجوال', icon: <Icons.User /> },
-        { title: 'كلمة المرور والموقع', icon: <Icons.Lock /> },
-        { title: 'الإقرارات والموافقات', icon: <Icons.Shield /> }
-      ];
-      return steps[currentStep - 1] || steps[0];
-    }
-
-    if (formData.lawyerWorkMode === 'create_firm') {
+    if (formData.lawyerMode === 'dashboard') {
       const steps = [
         { title: 'البيانات الأساسية والجوال', icon: <Icons.User /> },
         { title: 'كلمة المرور والموقع', icon: <Icons.Lock /> },
-        { title: 'بيانات المكتب', icon: <Icons.Store /> },
         { title: 'الإقرارات والموافقات', icon: <Icons.Shield /> }
       ];
       return steps[currentStep - 1] || steps[0];
     }
-
-    // Default fallback
+    
     const steps = [
       { title: 'البيانات الأساسية', icon: <Icons.User /> },
-      { title: 'كلمة المرور والموقع', icon: <Icons.Lock /> },
+      { title: 'كلمة المرور', icon: <Icons.Lock /> },
+      { title: 'بيانات الموقع', icon: <Icons.MapPin /> },
+      { title: 'بيانات الترخيص', icon: <Icons.Award /> },
+      { title: 'المحاكم', icon: <Icons.Briefcase /> },
+      { title: 'الخبرة والتخصص', icon: <Icons.Briefcase /> },
+      { title: 'منصة خبرة', icon: <Icons.Award /> },
+      { title: 'إعدادات السوق', icon: <Icons.Banknote /> },
       { title: 'الإقرارات والموافقات', icon: <Icons.Shield /> }
     ];
     return steps[currentStep - 1] || steps[0];
@@ -408,33 +425,22 @@ export function SignUpForm() {
                     </div>
                     {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
                   </div>
-                  {/* Phone field for all users */}
-                  <div>
-                    <label className="block text-sm font-medium text-[#0f172a] mb-2">رقم الجوال <span className="text-red-500">*</span></label>
-                    <div className="relative">
-                      <div className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400"><Icons.Phone /></div>
-                      <input type="tel" value={formData.phone} onChange={(e) => updateField('phone', e.target.value.replace(/\D/g, '').slice(0, 10))} className={`w-full h-12 pr-12 pl-4 rounded-xl border bg-slate-50 text-[#0f172a] outline-none transition-all ${errors.phone ? 'border-red-400' : 'border-slate-200 focus:border-[#0f172a]'}`} placeholder="05XXXXXXXX" dir="ltr" style={{ textAlign: 'left' }} maxLength={10} />
-                    </div>
-                    {errors.phone && <p className="text-red-500 text-xs mt-1">{errors.phone}</p>}
-                  </div>
-
-                  {/* Invitation code field for join_firm mode */}
-                  {formData.lawyerWorkMode === 'join_firm' && (
+                  {/* Phone field for client and dashboard lawyer (moved from step 2) */}
+                  {(formData.userType === 'client' || formData.lawyerMode === 'dashboard') && (
                     <div>
-                      <label className="block text-sm font-medium text-[#0f172a] mb-2">كود الدعوة <span className="text-red-500">*</span></label>
+                      <label className="block text-sm font-medium text-[#0f172a] mb-2">رقم الجوال <span className="text-red-500">*</span></label>
                       <div className="relative">
-                        <div className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400"><Icons.Award /></div>
-                        <input type="text" value={formData.invitationCode} onChange={(e) => updateField('invitationCode', e.target.value.toUpperCase())} className={`w-full h-12 pr-12 pl-4 rounded-xl border bg-slate-50 text-[#0f172a] outline-none transition-all ${errors.invitationCode ? 'border-red-400' : 'border-slate-200 focus:border-[#0f172a]'}`} placeholder="أدخل كود الدعوة" dir="ltr" style={{ textAlign: 'left' }} />
+                        <div className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400"><Icons.Phone /></div>
+                        <input type="tel" value={formData.phone} onChange={(e) => updateField('phone', e.target.value.replace(/\D/g, '').slice(0, 10))} className={`w-full h-12 pr-12 pl-4 rounded-xl border bg-slate-50 text-[#0f172a] outline-none transition-all ${errors.phone ? 'border-red-400' : 'border-slate-200 focus:border-[#0f172a]'}`} placeholder="05XXXXXXXX" dir="ltr" style={{ textAlign: 'left' }} maxLength={10} />
                       </div>
-                      {errors.invitationCode && <p className="text-red-500 text-xs mt-1">{errors.invitationCode}</p>}
-                      <p className="text-xs text-slate-400 mt-1">احصل على كود الدعوة من مالك المكتب</p>
+                      {errors.phone && <p className="text-red-500 text-xs mt-1">{errors.phone}</p>}
                     </div>
                   )}
                 </>
               )}
 
-              {/* STEP 2: Password + Location (All users) */}
-              {currentStep === 2 && (
+              {/* STEP 2: Password + Location (Client & Dashboard Lawyer) - Phone moved to step 1 */}
+              {currentStep === 2 && (formData.userType === 'client' || formData.lawyerMode === 'dashboard') && (
                 <>
                   <div>
                     <label className="block text-sm font-medium text-[#0f172a] mb-2">كلمة المرور <span className="text-red-500">*</span></label>
@@ -478,52 +484,8 @@ export function SignUpForm() {
                 </>
               )}
 
-              {/* STEP 3: Firm Data (create_firm mode only) */}
-              {currentStep === 3 && formData.lawyerWorkMode === 'create_firm' && (
-                <>
-                  <div>
-                    <label className="block text-sm font-medium text-[#0f172a] mb-2">اسم المكتب (بالعربية) <span className="text-red-500">*</span></label>
-                    <div className="relative">
-                      <div className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400"><Icons.Store /></div>
-                      <input type="text" value={formData.firmName} onChange={(e) => updateField('firmName', e.target.value)} className={`w-full h-12 pr-12 pl-4 rounded-xl border bg-slate-50 text-[#0f172a] outline-none transition-all ${errors.firmName ? 'border-red-400' : 'border-slate-200 focus:border-[#0f172a]'}`} placeholder="مكتب المحاماة" />
-                    </div>
-                    {errors.firmName && <p className="text-red-500 text-xs mt-1">{errors.firmName}</p>}
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-[#0f172a] mb-2">اسم المكتب (بالإنجليزية) <span className="text-slate-400 text-xs">(اختياري)</span></label>
-                    <input type="text" value={formData.firmNameEn} onChange={(e) => updateField('firmNameEn', e.target.value)} className="w-full h-12 px-4 rounded-xl border border-slate-200 bg-slate-50 text-[#0f172a] outline-none focus:border-[#0f172a]" placeholder="Law Firm Name" dir="ltr" style={{ textAlign: 'left' }} />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-[#0f172a] mb-2">رقم ترخيص المكتب <span className="text-red-500">*</span></label>
-                    <div className="relative">
-                      <div className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400"><Icons.Award /></div>
-                      <input type="text" value={formData.firmLicenseNumber} onChange={(e) => updateField('firmLicenseNumber', e.target.value)} className={`w-full h-12 pr-12 pl-4 rounded-xl border bg-slate-50 text-[#0f172a] outline-none transition-all ${errors.firmLicenseNumber ? 'border-red-400' : 'border-slate-200 focus:border-[#0f172a]'}`} placeholder="رقم الترخيص" dir="ltr" style={{ textAlign: 'left' }} />
-                    </div>
-                    {errors.firmLicenseNumber && <p className="text-red-500 text-xs mt-1">{errors.firmLicenseNumber}</p>}
-                  </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-[#0f172a] mb-2">البريد الإلكتروني للمكتب <span className="text-slate-400 text-xs">(اختياري)</span></label>
-                      <input type="email" value={formData.firmEmail} onChange={(e) => updateField('firmEmail', e.target.value)} className="w-full h-12 px-4 rounded-xl border border-slate-200 bg-slate-50 text-[#0f172a] outline-none focus:border-[#0f172a]" dir="ltr" style={{ textAlign: 'left' }} />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-[#0f172a] mb-2">هاتف المكتب <span className="text-slate-400 text-xs">(اختياري)</span></label>
-                      <input type="tel" value={formData.firmPhone} onChange={(e) => updateField('firmPhone', e.target.value.replace(/\D/g, ''))} className="w-full h-12 px-4 rounded-xl border border-slate-200 bg-slate-50 text-[#0f172a] outline-none focus:border-[#0f172a]" dir="ltr" style={{ textAlign: 'left' }} />
-                    </div>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-[#0f172a] mb-2">عنوان المكتب <span className="text-slate-400 text-xs">(اختياري)</span></label>
-                    <input type="text" value={formData.firmAddress} onChange={(e) => updateField('firmAddress', e.target.value)} className="w-full h-12 px-4 rounded-xl border border-slate-200 bg-slate-50 text-[#0f172a] outline-none focus:border-[#0f172a]" placeholder="العنوان الكامل" />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-[#0f172a] mb-2">الموقع الإلكتروني <span className="text-slate-400 text-xs">(اختياري)</span></label>
-                    <input type="url" value={formData.firmWebsite} onChange={(e) => updateField('firmWebsite', e.target.value)} className="w-full h-12 px-4 rounded-xl border border-slate-200 bg-slate-50 text-[#0f172a] outline-none focus:border-[#0f172a]" placeholder="https://example.com" dir="ltr" style={{ textAlign: 'left' }} />
-                  </div>
-                </>
-              )}
-
-              {/* FINAL STEP: Terms (All users - step 3 for client/solo/join_firm, step 4 for create_firm) */}
-              {currentStep === totalSteps && (
+              {/* STEP 3: Terms (Client & Dashboard Lawyer) */}
+              {currentStep === 3 && (formData.userType === 'client' || formData.lawyerMode === 'dashboard') && (
                 <div className="space-y-3">
                   <div className={`flex items-start gap-3 p-4 rounded-xl border ${errors.agreedTerms ? 'border-red-300' : formData.agreedTerms ? 'border-emerald-200 bg-emerald-50/50' : 'border-slate-200'}`}>
                     <button type="button" onClick={() => updateField('agreedTerms', !formData.agreedTerms)} className={`w-6 h-6 rounded-lg border-2 flex items-center justify-center shrink-0 ${formData.agreedTerms ? 'bg-emerald-500 border-emerald-500 text-white' : 'border-slate-300'}`}>{formData.agreedTerms && <Icons.Check />}</button>
@@ -540,6 +502,244 @@ export function SignUpForm() {
                     </div>
                   )}
                 </div>
+              )}
+
+              {/* MARKETPLACE LAWYER STEPS */}
+              {formData.lawyerMode === 'marketplace' && (
+                <>
+                  {/* STEP 2: Password + Phone */}
+                  {currentStep === 2 && (
+                    <>
+                      <div>
+                        <label className="block text-sm font-medium text-[#0f172a] mb-2">كلمة المرور <span className="text-red-500">*</span></label>
+                        <div className="relative">
+                          <div className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400"><Icons.Lock /></div>
+                          <input type={showPassword ? 'text' : 'password'} value={formData.password} onChange={(e) => updateField('password', e.target.value)} className={`w-full h-12 pr-12 pl-12 rounded-xl border bg-slate-50 text-[#0f172a] outline-none transition-all ${errors.password ? 'border-red-400' : 'border-slate-200 focus:border-[#0f172a]'}`} dir="ltr" style={{ textAlign: 'left' }} />
+                          <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">{showPassword ? <Icons.EyeOff /> : <Icons.Eye />}</button>
+                        </div>
+                        {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password}</p>}
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-[#0f172a] mb-2">تأكيد كلمة المرور <span className="text-red-500">*</span></label>
+                        <div className="relative">
+                          <div className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400"><Icons.Lock /></div>
+                          <input type={showConfirmPassword ? 'text' : 'password'} value={formData.confirmPassword} onChange={(e) => updateField('confirmPassword', e.target.value)} className={`w-full h-12 pr-12 pl-12 rounded-xl border bg-slate-50 text-[#0f172a] outline-none transition-all ${errors.confirmPassword ? 'border-red-400' : 'border-slate-200 focus:border-[#0f172a]'}`} dir="ltr" style={{ textAlign: 'left' }} />
+                          <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">{showConfirmPassword ? <Icons.EyeOff /> : <Icons.Eye />}</button>
+                        </div>
+                        {errors.confirmPassword && <p className="text-red-500 text-xs mt-1">{errors.confirmPassword}</p>}
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-[#0f172a] mb-2">رقم الجوال <span className="text-red-500">*</span></label>
+                        <div className="relative">
+                          <div className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400"><Icons.Phone /></div>
+                          <input type="tel" value={formData.phone} onChange={(e) => updateField('phone', e.target.value.replace(/\D/g, '').slice(0, 10))} className={`w-full h-12 pr-12 pl-4 rounded-xl border bg-slate-50 text-[#0f172a] outline-none transition-all ${errors.phone ? 'border-red-400' : 'border-slate-200 focus:border-[#0f172a]'}`} placeholder="05XXXXXXXX" dir="ltr" style={{ textAlign: 'left' }} maxLength={10} />
+                        </div>
+                        {errors.phone && <p className="text-red-500 text-xs mt-1">{errors.phone}</p>}
+                      </div>
+                    </>
+                  )}
+
+                  {/* STEP 3: Location */}
+                  {currentStep === 3 && (
+                    <>
+                      <div>
+                        <label className="block text-sm font-medium text-[#0f172a] mb-2">الجنسية <span className="text-red-500">*</span></label>
+                        <select value={formData.nationality} onChange={(e) => updateField('nationality', e.target.value)} className={`w-full h-12 px-4 rounded-xl border bg-slate-50 text-[#0f172a] outline-none appearance-none ${errors.nationality ? 'border-red-400' : 'border-slate-200 focus:border-[#0f172a]'}`}>
+                          <option value="">اختر</option>
+                          {NATIONALITIES.map(n => <option key={n} value={n}>{n}</option>)}
+                        </select>
+                        {errors.nationality && <p className="text-red-500 text-xs mt-1">{errors.nationality}</p>}
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-[#0f172a] mb-2">المنطقة <span className="text-red-500">*</span></label>
+                        <select value={formData.region} onChange={(e) => updateField('region', e.target.value)} className={`w-full h-12 px-4 rounded-xl border bg-slate-50 text-[#0f172a] outline-none appearance-none ${errors.region ? 'border-red-400' : 'border-slate-200 focus:border-[#0f172a]'}`}>
+                          <option value="">اختر</option>
+                          {REGIONS.map(r => <option key={r} value={r}>{r}</option>)}
+                        </select>
+                        {errors.region && <p className="text-red-500 text-xs mt-1">{errors.region}</p>}
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-[#0f172a] mb-2">المدينة <span className="text-red-500">*</span></label>
+                        <input type="text" value={formData.city} onChange={(e) => updateField('city', e.target.value)} className={`w-full h-12 px-4 rounded-xl border bg-slate-50 text-[#0f172a] outline-none ${errors.city ? 'border-red-400' : 'border-slate-200 focus:border-[#0f172a]'}`} />
+                        {errors.city && <p className="text-red-500 text-xs mt-1">{errors.city}</p>}
+                      </div>
+                    </>
+                  )}
+
+                  {/* STEP 4: License */}
+                  {currentStep === 4 && (
+                    <div className={`bg-[#F8F9FA] rounded-2xl p-5 border ${errors.isLicensed ? 'border-red-300' : 'border-slate-100'}`}>
+                      <h3 className="font-bold text-[#0f172a] mb-4">هل لديك رخصة محاماة سارية؟ <span className="text-red-500">*</span></h3>
+                      <div className="flex gap-4">
+                        <button type="button" onClick={() => updateField('isLicensed', true)} className={`flex-1 h-12 rounded-xl border-2 font-medium transition-all ${formData.isLicensed === true ? 'border-emerald-500 bg-emerald-50 text-emerald-700' : 'border-slate-200 text-slate-600 hover:border-slate-300'}`}>نعم</button>
+                        <button type="button" onClick={() => updateField('isLicensed', false)} className={`flex-1 h-12 rounded-xl border-2 font-medium transition-all ${formData.isLicensed === false ? 'border-emerald-500 bg-emerald-50 text-emerald-700' : 'border-slate-200 text-slate-600 hover:border-slate-300'}`}>لا</button>
+                      </div>
+                      {errors.isLicensed && <p className="text-red-500 text-xs mt-2">{errors.isLicensed}</p>}
+                      {formData.isLicensed && (
+                        <div className="mt-4 animate-fadeIn">
+                          <label className="block text-sm font-medium text-[#0f172a] mb-2">رقم الترخيص <span className="text-slate-400 text-xs">(اختياري)</span></label>
+                          <input type="text" value={formData.licenseNumber} onChange={(e) => updateField('licenseNumber', e.target.value)} className="w-full h-12 px-4 rounded-xl border border-slate-200 bg-white text-[#0f172a] outline-none focus:border-[#0f172a]" />
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* STEP 5: Courts */}
+                  {currentStep === 5 && (
+                    <div className="space-y-4">
+                      <p className="text-slate-600 text-sm">المحاكم التي لديك خبرة بها <span className="text-red-500">*</span></p>
+                      {errors.courts && <p className="text-red-500 text-xs bg-red-50 p-2 rounded-lg">{errors.courts}</p>}
+                      <div className="grid grid-cols-2 gap-3">
+                        {COURTS.map(court => {
+                          const courtData = formData.courts[court.id] || {};
+                          const isSelected = courtData.selected;
+                          return (
+                            <button key={court.id} type="button" onClick={() => updateCourt(court.id, 'selected', !isSelected)} className={`p-4 rounded-xl border-2 text-right transition-all ${isSelected ? 'border-emerald-500 bg-emerald-50' : 'border-slate-200 hover:border-slate-300'}`}>
+                              <div className="flex items-center gap-2">
+                                <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${isSelected ? 'border-emerald-500 bg-emerald-500' : 'border-slate-300'}`}>{isSelected && <Icons.Check />}</div>
+                                <span className={`font-medium text-sm ${isSelected ? 'text-emerald-700' : 'text-[#0f172a]'}`}>{court.name}</span>
+                              </div>
+                            </button>
+                          );
+                        })}
+                      </div>
+                      {Object.entries(formData.courts).filter(([_, v]) => v.selected).length > 0 && (
+                        <div className="mt-4 p-4 bg-slate-50 rounded-xl space-y-3">
+                          <p className="text-sm font-medium text-[#0f172a]">عدد القضايا (تقريبي)</p>
+                          {Object.entries(formData.courts).filter(([_, v]) => v.selected).map(([id, _]) => {
+                            const court = COURTS.find(c => c.id === id);
+                            return (
+                              <div key={id} className="flex items-center justify-between gap-4">
+                                <span className="text-sm text-slate-600">{court?.name}</span>
+                                <select value={formData.courts[id]?.caseCount || ''} onChange={(e) => updateCourt(id, 'caseCount', e.target.value)} className="h-9 px-3 rounded-lg border border-slate-200 bg-white text-sm text-[#0f172a] outline-none">
+                                  <option value="">اختر</option>
+                                  {CASE_RANGES.map(range => <option key={range} value={range}>{range}</option>)}
+                                </select>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* STEP 6: Experience */}
+                  {currentStep === 6 && (
+                    <>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-sm font-medium text-[#0f172a] mb-2">سنوات الخبرة <span className="text-red-500">*</span></label>
+                          <input type="number" value={formData.yearsOfExperience} onChange={(e) => updateField('yearsOfExperience', e.target.value.replace(/\D/g, ''))} min="0" max="60" className={`w-full h-12 px-4 rounded-xl border bg-slate-50 text-[#0f172a] outline-none ${errors.yearsOfExperience ? 'border-red-400' : 'border-slate-200 focus:border-[#0f172a]'}`} placeholder="0" />
+                          {errors.yearsOfExperience && <p className="text-red-500 text-xs mt-1">{errors.yearsOfExperience}</p>}
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-[#0f172a] mb-2">طبيعة العمل <span className="text-red-500">*</span></label>
+                          <select value={formData.workType} onChange={(e) => updateField('workType', e.target.value)} className={`w-full h-12 px-4 rounded-xl border bg-slate-50 text-[#0f172a] outline-none appearance-none ${errors.workType ? 'border-red-400' : 'border-slate-200 focus:border-[#0f172a]'}`}>
+                            <option value="">اختر</option>
+                            {WORK_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
+                          </select>
+                          {errors.workType && <p className="text-red-500 text-xs mt-1">{errors.workType}</p>}
+                        </div>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-[#0f172a] mb-2">اسم جهة العمل <span className="text-slate-400 text-xs">(اختياري)</span></label>
+                        <input type="text" value={formData.firmName} onChange={(e) => updateField('firmName', e.target.value)} placeholder="المكتب أو الشركة" className="w-full h-12 px-4 rounded-xl border border-slate-200 bg-slate-50 text-[#0f172a] placeholder-slate-400 outline-none focus:border-[#0f172a]" />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-[#0f172a] mb-3">التخصصات <span className="text-red-500">*</span></label>
+                        {errors.specializations && <p className="text-red-500 text-xs mb-2">{errors.specializations}</p>}
+                        <div className="flex flex-wrap gap-2">
+                          {SPECIALIZATIONS.map(spec => (
+                            <button key={spec.id} type="button" onClick={() => toggleArrayItem('specializations', spec.id)} className={`px-3 py-1.5 rounded-full border-2 text-sm font-medium transition-all ${formData.specializations.includes(spec.id) ? 'border-emerald-500 bg-emerald-50 text-emerald-700' : 'border-slate-200 text-slate-600 hover:border-slate-300'}`}>
+                              {formData.specializations.includes(spec.id) && <span className="ml-1">✓</span>}
+                              {spec.name}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-[#0f172a] mb-3">اللغات <span className="text-red-500">*</span></label>
+                        {errors.languages && <p className="text-red-500 text-xs mb-2">{errors.languages}</p>}
+                        <select multiple value={formData.languages} onChange={(e) => { const selected = Array.from(e.target.selectedOptions, option => option.value); updateField('languages', selected); }} className="w-full h-32 p-3 rounded-xl border border-slate-200 bg-slate-50 text-[#0f172a] outline-none focus:border-[#0f172a]">
+                          {LANGUAGES.map(lang => <option key={lang} value={lang}>{lang}</option>)}
+                        </select>
+                        <p className="text-xs text-slate-400 mt-1">اضغط مع الاستمرار لاختيار أكثر من لغة</p>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-[#0f172a] mb-2">نبذة عنك <span className="text-slate-400 text-xs">(اختياري)</span></label>
+                        <textarea value={formData.bio} onChange={(e) => updateField('bio', e.target.value)} rows={3} className="w-full p-4 rounded-xl border border-slate-200 bg-slate-50 text-[#0f172a] outline-none focus:border-[#0f172a] resize-none" maxLength={500} />
+                        <p className="text-xs text-slate-400 mt-1">{formData.bio.length}/500</p>
+                      </div>
+                    </>
+                  )}
+
+                  {/* STEP 7: Khebra */}
+                  {currentStep === 7 && (
+                    <div className={`bg-[#F8F9FA] rounded-2xl p-5 border ${errors.isRegisteredKhebra ? 'border-red-300' : 'border-slate-100'}`}>
+                      <h3 className="font-bold text-[#0f172a] mb-4">هل لديك حساب في منصة خبرة؟ <span className="text-red-500">*</span></h3>
+                      <div className="flex gap-4">
+                        <button type="button" onClick={() => updateField('isRegisteredKhebra', true)} className={`flex-1 h-12 rounded-xl border-2 font-medium transition-all ${formData.isRegisteredKhebra === true ? 'border-emerald-500 bg-emerald-50 text-emerald-700' : 'border-slate-200 text-slate-600'}`}>نعم</button>
+                        <button type="button" onClick={() => updateField('isRegisteredKhebra', false)} className={`flex-1 h-12 rounded-xl border-2 font-medium transition-all ${formData.isRegisteredKhebra === false ? 'border-emerald-500 bg-emerald-50 text-emerald-700' : 'border-slate-200 text-slate-600'}`}>لا</button>
+                      </div>
+                      {errors.isRegisteredKhebra && <p className="text-red-500 text-xs mt-2">{errors.isRegisteredKhebra}</p>}
+                    </div>
+                  )}
+
+                  {/* STEP 8: Marketplace Settings */}
+                  {currentStep === 8 && (
+                    <>
+                      <div>
+                        <label className="block text-sm font-medium text-[#0f172a] mb-3">نوع الخدمة <span className="text-red-500">*</span></label>
+                        {errors.serviceType && <p className="text-red-500 text-xs mb-2">{errors.serviceType}</p>}
+                        <div className="space-y-2">
+                          {[{ v: 'consultation', l: 'استشارات' }, { v: 'litigation', l: 'ترافع' }, { v: 'both', l: 'كلاهما' }].map(opt => (
+                            <button key={opt.v} type="button" onClick={() => updateField('serviceType', opt.v)} className={`w-full p-3 rounded-xl border-2 text-right font-medium transition-all text-sm ${formData.serviceType === opt.v ? 'border-emerald-500 bg-emerald-50 text-emerald-700' : 'border-slate-200 text-slate-600'}`}>
+                              {formData.serviceType === opt.v && <span className="ml-2">✓</span>}{opt.l}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-[#0f172a] mb-3">نموذج التسعير <span className="text-red-500">*</span></label>
+                        {errors.pricingModel && <p className="text-red-500 text-xs mb-2">{errors.pricingModel}</p>}
+                        <div className="flex flex-wrap gap-2">
+                          {[{ v: 'hourly', l: 'بالساعة' }, { v: 'fixed', l: 'مبلغ ثابت' }, { v: 'success', l: 'نسبة نجاح' }].map(opt => (
+                            <button key={opt.v} type="button" onClick={() => toggleArrayItem('pricingModel', opt.v)} className={`px-4 py-2 rounded-full border-2 text-sm font-medium transition-all ${formData.pricingModel.includes(opt.v) ? 'border-emerald-500 bg-emerald-50 text-emerald-700' : 'border-slate-200 text-slate-600'}`}>
+                              {formData.pricingModel.includes(opt.v) && <span className="ml-1">✓</span>}{opt.l}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-[#0f172a] mb-3">قبول العمل عن بعد <span className="text-red-500">*</span></label>
+                        {errors.acceptsRemote && <p className="text-red-500 text-xs mb-2">{errors.acceptsRemote}</p>}
+                        <div className="flex gap-3">
+                          {['نعم', 'لا', 'كلاهما'].map(opt => (
+                            <button key={opt} type="button" onClick={() => updateField('acceptsRemote', opt)} className={`flex-1 h-12 rounded-xl border-2 font-medium transition-all ${formData.acceptsRemote === opt ? 'border-emerald-500 bg-emerald-50 text-emerald-700' : 'border-slate-200 text-slate-600'}`}>{opt}</button>
+                          ))}
+                        </div>
+                      </div>
+                    </>
+                  )}
+
+                  {/* STEP 9: Terms */}
+                  {currentStep === 9 && (
+                    <div className="space-y-3">
+                      <div className={`flex items-start gap-3 p-4 rounded-xl border ${errors.agreedTerms ? 'border-red-300' : formData.agreedTerms ? 'border-emerald-200 bg-emerald-50/50' : 'border-slate-200'}`}>
+                        <button type="button" onClick={() => updateField('agreedTerms', !formData.agreedTerms)} className={`w-6 h-6 rounded-lg border-2 flex items-center justify-center shrink-0 ${formData.agreedTerms ? 'bg-emerald-500 border-emerald-500 text-white' : 'border-slate-300'}`}>{formData.agreedTerms && <Icons.Check />}</button>
+                        <span className="text-[#0f172a]">أقر بموافقتي على <a href="/terms" target="_blank" className="text-emerald-600 font-medium hover:underline">الشروط والأحكام</a></span>
+                      </div>
+                      <div className={`flex items-start gap-3 p-4 rounded-xl border ${errors.agreedPrivacy ? 'border-red-300' : formData.agreedPrivacy ? 'border-emerald-200 bg-emerald-50/50' : 'border-slate-200'}`}>
+                        <button type="button" onClick={() => updateField('agreedPrivacy', !formData.agreedPrivacy)} className={`w-6 h-6 rounded-lg border-2 flex items-center justify-center shrink-0 ${formData.agreedPrivacy ? 'bg-emerald-500 border-emerald-500 text-white' : 'border-slate-300'}`}>{formData.agreedPrivacy && <Icons.Check />}</button>
+                        <span className="text-[#0f172a]">أقر بموافقتي على <a href="/privacy" target="_blank" className="text-emerald-600 font-medium hover:underline">سياسة الخصوصية</a></span>
+                      </div>
+                      <div className={`flex items-start gap-3 p-4 rounded-xl border ${errors.agreedConflict ? 'border-red-300' : formData.agreedConflict ? 'border-emerald-200 bg-emerald-50/50' : 'border-slate-200'}`}>
+                        <button type="button" onClick={() => updateField('agreedConflict', !formData.agreedConflict)} className={`w-6 h-6 rounded-lg border-2 flex items-center justify-center shrink-0 ${formData.agreedConflict ? 'bg-emerald-500 border-emerald-500 text-white' : 'border-slate-300'}`}>{formData.agreedConflict && <Icons.Check />}</button>
+                        <span className="text-[#0f172a]">أقر بموافقتي على <a href="/conflict-policy" target="_blank" className="text-emerald-600 font-medium hover:underline">سياسة تعارض المصالح</a></span>
+                      </div>
+                    </div>
+                  )}
+                </>
               )}
 
             </div>
