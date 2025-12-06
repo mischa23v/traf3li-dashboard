@@ -323,6 +323,16 @@ export function useSidebarData(): SidebarData {
               url: '/dashboard/hr/leave',
               module: 'hr',
             },
+            {
+              title: 'الحضور',
+              url: '/dashboard/hr/attendance',
+              module: 'hr',
+            },
+            {
+              title: 'تقييم الأداء',
+              url: '/dashboard/hr/performance',
+              module: 'hr',
+            },
           ],
         },
       ],
