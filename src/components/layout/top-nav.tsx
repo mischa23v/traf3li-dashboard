@@ -18,7 +18,7 @@ type TopNavProps = React.HTMLAttributes<HTMLElement> & {
   }[]
 }
 
-export function TopNav({ className, links, ...props }: TopNavProps) {
+export function TopNav({ className, links = [], ...props }: TopNavProps) {
   return (
     <>
       <div className='lg:hidden'>
@@ -29,7 +29,7 @@ export function TopNav({ className, links, ...props }: TopNavProps) {
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent side='bottom' align='start'>
-            {links.map(({ title, href, isActive, disabled }) => (
+            {(links ?? []).map(({ title, href, isActive, disabled }) => (
               <DropdownMenuItem key={`${title}-${href}`} asChild>
                 <Link
                   to={href}
@@ -51,7 +51,7 @@ export function TopNav({ className, links, ...props }: TopNavProps) {
         )}
         {...props}
       >
-        {links.map(({ title, href, isActive, disabled }) => (
+        {(links ?? []).map(({ title, href, isActive, disabled }) => (
           <Link
             key={`${title}-${href}`}
             to={href}
