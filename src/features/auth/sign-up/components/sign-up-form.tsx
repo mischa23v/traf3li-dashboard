@@ -1,5 +1,15 @@
-import { useState } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { apiClient } from '@/lib/api';
+
+// Debounce hook for real-time validation
+function useDebounce<T>(value: T, delay: number): T {
+  const [debouncedValue, setDebouncedValue] = useState<T>(value);
+  useEffect(() => {
+    const handler = setTimeout(() => setDebouncedValue(value), delay);
+    return () => clearTimeout(handler);
+  }, [value, delay]);
+  return debouncedValue;
+}
 
 
 const Icons = {
@@ -84,6 +94,86 @@ export function SignUpForm() {
     agreedPrivacy: false,
     agreedConflict: false,
   });
+
+  // Real-time availability validation
+  type AvailabilityStatus = 'idle' | 'checking' | 'available' | 'taken';
+  const [availability, setAvailability] = useState<{
+    email: AvailabilityStatus;
+    username: AvailabilityStatus;
+    phone: AvailabilityStatus;
+  }>({ email: 'idle', username: 'idle', phone: 'idle' });
+
+  // Debounced values for validation
+  const debouncedEmail = useDebounce(formData.email, 500);
+  const debouncedUsername = useDebounce(formData.username, 500);
+  const debouncedPhone = useDebounce(formData.phone, 500);
+
+  // Check availability function
+  const checkAvailability = useCallback(async (field: 'email' | 'username' | 'phone', value: string) => {
+    if (!value || value.length < 3) {
+      setAvailability(prev => ({ ...prev, [field]: 'idle' }));
+      return;
+    }
+
+    // Validate format before checking
+    if (field === 'email' && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+      setAvailability(prev => ({ ...prev, [field]: 'idle' }));
+      return;
+    }
+    if (field === 'phone' && (!/^05\d{8}$/.test(value))) {
+      setAvailability(prev => ({ ...prev, [field]: 'idle' }));
+      return;
+    }
+
+    setAvailability(prev => ({ ...prev, [field]: 'checking' }));
+
+    try {
+      const response = await apiClient.post('/auth/check-availability', { [field]: value });
+      const isAvailable = response.data?.available !== false;
+      setAvailability(prev => ({ ...prev, [field]: isAvailable ? 'available' : 'taken' }));
+
+      // Set error if taken
+      if (!isAvailable) {
+        const errorMessages = {
+          email: 'البريد الإلكتروني مستخدم بالفعل',
+          username: 'اسم المستخدم مستخدم بالفعل',
+          phone: 'رقم الجوال مستخدم بالفعل'
+        };
+        setErrors(prev => ({ ...prev, [field]: errorMessages[field] }));
+      }
+    } catch (error: any) {
+      // If endpoint doesn't exist yet, show as idle (not an error)
+      setAvailability(prev => ({ ...prev, [field]: 'idle' }));
+    }
+  }, []);
+
+  // Effect to check availability when debounced values change
+  useEffect(() => {
+    if (debouncedEmail && debouncedEmail.length >= 3) {
+      checkAvailability('email', debouncedEmail);
+    }
+  }, [debouncedEmail, checkAvailability]);
+
+  useEffect(() => {
+    if (debouncedUsername && debouncedUsername.length >= 3) {
+      checkAvailability('username', debouncedUsername);
+    }
+  }, [debouncedUsername, checkAvailability]);
+
+  useEffect(() => {
+    if (debouncedPhone && debouncedPhone.length === 10) {
+      checkAvailability('phone', debouncedPhone);
+    }
+  }, [debouncedPhone, checkAvailability]);
+
+  // Availability indicator component
+  const AvailabilityIndicator = ({ status }: { status: AvailabilityStatus }) => {
+    if (status === 'idle') return null;
+    if (status === 'checking') return <span className="text-xs text-slate-400 animate-pulse">جاري التحقق...</span>;
+    if (status === 'available') return <span className="text-xs text-green-600 flex items-center gap-1"><Icons.Check /> متاح</span>;
+    if (status === 'taken') return <span className="text-xs text-red-500">مستخدم بالفعل</span>;
+    return null;
+  };
 
   const updateField = (field: string, value: any) => { 
     setFormData(prev => ({ ...prev, [field]: value })); 
@@ -506,28 +596,37 @@ export function SignUpForm() {
                     </div>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-[#0f172a] mb-2">اسم المستخدم <span className="text-red-500">*</span></label>
+                    <div className="flex items-center justify-between mb-2">
+                      <label className="block text-sm font-medium text-[#0f172a]">اسم المستخدم <span className="text-red-500">*</span></label>
+                      <AvailabilityIndicator status={availability.username} />
+                    </div>
                     <div className="relative">
                       <div className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400"><Icons.User /></div>
-                      <input type="text" value={formData.username} onChange={(e) => updateField('username', e.target.value.replace(/[^a-zA-Z0-9_]/g, '').toLowerCase())} className={`w-full h-12 pr-12 pl-4 rounded-xl border bg-slate-50 text-[#0f172a] outline-none transition-all ${errors.username ? 'border-red-400' : 'border-slate-200 focus:border-[#0f172a]'}`} dir="ltr" style={{ textAlign: 'left' }} maxLength={20} />
+                      <input type="text" value={formData.username} onChange={(e) => updateField('username', e.target.value.replace(/[^a-zA-Z0-9_]/g, '').toLowerCase())} className={`w-full h-12 pr-12 pl-4 rounded-xl border bg-slate-50 text-[#0f172a] outline-none transition-all ${errors.username || availability.username === 'taken' ? 'border-red-400' : availability.username === 'available' ? 'border-green-400' : 'border-slate-200 focus:border-[#0f172a]'}`} dir="ltr" style={{ textAlign: 'left' }} maxLength={20} />
                     </div>
                     {errors.username && <p className="text-red-500 text-xs mt-1">{errors.username}</p>}
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-[#0f172a] mb-2">البريد الإلكتروني <span className="text-red-500">*</span></label>
+                    <div className="flex items-center justify-between mb-2">
+                      <label className="block text-sm font-medium text-[#0f172a]">البريد الإلكتروني <span className="text-red-500">*</span></label>
+                      <AvailabilityIndicator status={availability.email} />
+                    </div>
                     <div className="relative">
                       <div className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400"><Icons.Mail /></div>
-                      <input type="email" value={formData.email} onChange={(e) => updateField('email', e.target.value)} className={`w-full h-12 pr-12 pl-4 rounded-xl border bg-slate-50 text-[#0f172a] outline-none transition-all ${errors.email ? 'border-red-400' : 'border-slate-200 focus:border-[#0f172a]'}`} dir="ltr" style={{ textAlign: 'left' }} />
+                      <input type="email" value={formData.email} onChange={(e) => updateField('email', e.target.value)} className={`w-full h-12 pr-12 pl-4 rounded-xl border bg-slate-50 text-[#0f172a] outline-none transition-all ${errors.email || availability.email === 'taken' ? 'border-red-400' : availability.email === 'available' ? 'border-green-400' : 'border-slate-200 focus:border-[#0f172a]'}`} dir="ltr" style={{ textAlign: 'left' }} />
                     </div>
                     {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
                   </div>
                   {/* Phone field for client and dashboard lawyer (moved from step 2) */}
                   {(formData.userType === 'client' || formData.lawyerMode === 'dashboard') && (
                     <div>
-                      <label className="block text-sm font-medium text-[#0f172a] mb-2">رقم الجوال <span className="text-red-500">*</span></label>
+                      <div className="flex items-center justify-between mb-2">
+                        <label className="block text-sm font-medium text-[#0f172a]">رقم الجوال <span className="text-red-500">*</span></label>
+                        <AvailabilityIndicator status={availability.phone} />
+                      </div>
                       <div className="relative">
                         <div className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400"><Icons.Phone /></div>
-                        <input type="tel" value={formData.phone} onChange={(e) => updateField('phone', e.target.value.replace(/\D/g, '').slice(0, 10))} className={`w-full h-12 pr-12 pl-4 rounded-xl border bg-slate-50 text-[#0f172a] outline-none transition-all ${errors.phone ? 'border-red-400' : 'border-slate-200 focus:border-[#0f172a]'}`} placeholder="05XXXXXXXX" dir="ltr" style={{ textAlign: 'left' }} maxLength={10} />
+                        <input type="tel" value={formData.phone} onChange={(e) => updateField('phone', e.target.value.replace(/\D/g, '').slice(0, 10))} className={`w-full h-12 pr-12 pl-4 rounded-xl border bg-slate-50 text-[#0f172a] outline-none transition-all ${errors.phone || availability.phone === 'taken' ? 'border-red-400' : availability.phone === 'available' ? 'border-green-400' : 'border-slate-200 focus:border-[#0f172a]'}`} placeholder="05XXXXXXXX" dir="ltr" style={{ textAlign: 'left' }} maxLength={10} />
                       </div>
                       {errors.phone && <p className="text-red-500 text-xs mt-1">{errors.phone}</p>}
                     </div>
@@ -686,10 +785,13 @@ export function SignUpForm() {
                         {errors.confirmPassword && <p className="text-red-500 text-xs mt-1">{errors.confirmPassword}</p>}
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-[#0f172a] mb-2">رقم الجوال <span className="text-red-500">*</span></label>
+                        <div className="flex items-center justify-between mb-2">
+                          <label className="block text-sm font-medium text-[#0f172a]">رقم الجوال <span className="text-red-500">*</span></label>
+                          <AvailabilityIndicator status={availability.phone} />
+                        </div>
                         <div className="relative">
                           <div className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400"><Icons.Phone /></div>
-                          <input type="tel" value={formData.phone} onChange={(e) => updateField('phone', e.target.value.replace(/\D/g, '').slice(0, 10))} className={`w-full h-12 pr-12 pl-4 rounded-xl border bg-slate-50 text-[#0f172a] outline-none transition-all ${errors.phone ? 'border-red-400' : 'border-slate-200 focus:border-[#0f172a]'}`} placeholder="05XXXXXXXX" dir="ltr" style={{ textAlign: 'left' }} maxLength={10} />
+                          <input type="tel" value={formData.phone} onChange={(e) => updateField('phone', e.target.value.replace(/\D/g, '').slice(0, 10))} className={`w-full h-12 pr-12 pl-4 rounded-xl border bg-slate-50 text-[#0f172a] outline-none transition-all ${errors.phone || availability.phone === 'taken' ? 'border-red-400' : availability.phone === 'available' ? 'border-green-400' : 'border-slate-200 focus:border-[#0f172a]'}`} placeholder="05XXXXXXXX" dir="ltr" style={{ textAlign: 'left' }} maxLength={10} />
                         </div>
                         {errors.phone && <p className="text-red-500 text-xs mt-1">{errors.phone}</p>}
                       </div>

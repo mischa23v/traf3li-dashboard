@@ -22,9 +22,14 @@ type TeamSwitcherProps = {
   }[]
 }
 
-export function TeamSwitcher({ teams }: TeamSwitcherProps) {
+export function TeamSwitcher({ teams = [] }: TeamSwitcherProps) {
   const { isMobile } = useSidebar()
-  const [activeTeam, setActiveTeam] = React.useState(teams[0])
+  const [activeTeam, setActiveTeam] = React.useState(teams[0] || { name: '', logo: () => null, plan: '' })
+
+  // Return null if no teams
+  if (!teams || teams.length === 0) {
+    return null
+  }
 
   return (
     <SidebarMenu>
