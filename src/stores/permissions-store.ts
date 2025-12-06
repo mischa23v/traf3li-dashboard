@@ -15,6 +15,7 @@ interface PermissionsState {
   isLoading: boolean
   error: string | null
   lastFetched: number | null
+  noFirmAssociated: boolean // Track if user has no firm associated
 
   // Actions
   fetchPermissions: () => Promise<void>
@@ -42,6 +43,7 @@ export const usePermissionsStore = create<PermissionsState>()(
       isLoading: false,
       error: null,
       lastFetched: null,
+      noFirmAssociated: false,
 
       /**
        * Fetch permissions from API
@@ -58,7 +60,7 @@ export const usePermissionsStore = create<PermissionsState>()(
           return
         }
 
-        set({ isLoading: true, error: null })
+        set({ isLoading: true, error: null, noFirmAssociated: false })
         try {
           const permissions = await firmService.getMyPermissions()
           set({
@@ -66,14 +68,22 @@ export const usePermissionsStore = create<PermissionsState>()(
             isLoading: false,
             error: null,
             lastFetched: Date.now(),
+            noFirmAssociated: false,
           })
         } catch (error: any) {
           console.error('Fetch permissions error:', error)
+          // Check if error indicates no firm associated (404 with specific message)
+          const isNoFirmError =
+            error.message?.includes('لا يوجد مكتب') ||
+            error.message?.includes('no firm') ||
+            error.message?.toLowerCase().includes('not found')
+
           set({
             permissions: null,
             isLoading: false,
-            error: error.message || 'فشل في جلب الصلاحيات',
+            error: isNoFirmError ? null : (error.message || 'فشل في جلب الصلاحيات'),
             lastFetched: null,
+            noFirmAssociated: isNoFirmError,
           })
         }
       },
@@ -87,6 +97,7 @@ export const usePermissionsStore = create<PermissionsState>()(
           isLoading: false,
           error: null,
           lastFetched: null,
+          noFirmAssociated: false,
         })
       },
 
@@ -162,9 +173,10 @@ export const usePermissionsStore = create<PermissionsState>()(
     {
       name: 'permissions-storage',
       partialize: (state) => ({
-        // Only persist permissions and lastFetched, not loading/error states
+        // Only persist permissions, lastFetched, and noFirmAssociated
         permissions: state.permissions,
         lastFetched: state.lastFetched,
+        noFirmAssociated: state.noFirmAssociated,
       }),
     }
   )
@@ -178,3 +190,4 @@ export const selectIsLoading = (state: PermissionsState) => state.isLoading
 export const selectError = (state: PermissionsState) => state.error
 export const selectIsDeparted = (state: PermissionsState) => state.isDeparted()
 export const selectIsAdminOrOwner = (state: PermissionsState) => state.isAdminOrOwner()
+export const selectNoFirmAssociated = (state: PermissionsState) => state.noFirmAssociated

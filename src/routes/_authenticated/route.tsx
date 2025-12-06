@@ -1,6 +1,7 @@
 import { createFileRoute, redirect } from '@tanstack/react-router'
 import { AuthenticatedLayout } from '@/components/layout/authenticated-layout'
 import { useAuthStore } from '@/stores/auth-store'
+import { usePermissionsStore } from '@/stores/permissions-store'
 
 export const Route = createFileRoute('/_authenticated')({
   beforeLoad: async ({ location }) => {
@@ -20,7 +21,21 @@ export const Route = createFileRoute('/_authenticated')({
           },
         })
       }
+
+      // Check if user has no firm associated after auth check
+      // The checkAuth function in auth-store calls fetchPermissions which sets noFirmAssociated
+      const { noFirmAssociated } = usePermissionsStore.getState()
+      if (noFirmAssociated) {
+        throw redirect({
+          to: '/no-firm',
+        })
+      }
     } catch (error) {
+      // Check if this is a redirect (not an actual error)
+      if (error && typeof error === 'object' && 'to' in error) {
+        throw error
+      }
+
       // Clear any stale auth state
       useAuthStore.getState().logout()
       throw redirect({

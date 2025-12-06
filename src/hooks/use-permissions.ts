@@ -29,6 +29,7 @@ export function usePermissions() {
   const permissions = usePermissionsStore((state) => state.permissions)
   const isLoading = usePermissionsStore((state) => state.isLoading)
   const error = usePermissionsStore((state) => state.error)
+  const noFirmAssociated = usePermissionsStore((state) => state.noFirmAssociated)
   const fetchPermissions = usePermissionsStore((state) => state.fetchPermissions)
   const user = useAuthStore((state) => state.user)
 
@@ -97,6 +98,7 @@ export function usePermissions() {
     permissions,
     isLoading,
     error,
+    noFirmAssociated,
 
     // Actions
     fetchPermissions,
