@@ -10,7 +10,6 @@ import { HRSidebar } from './hr-sidebar'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Textarea } from '@/components/ui/textarea'
 import { Switch } from '@/components/ui/switch'
 import {
     Select,
@@ -20,124 +19,135 @@ import {
     SelectValue,
 } from '@/components/ui/select'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import {
+    Collapsible,
+    CollapsibleContent,
+    CollapsibleTrigger,
+} from "@/components/ui/collapsible"
 import { Header } from '@/components/layout/header'
 import { TopNav } from '@/components/layout/top-nav'
 import { DynamicIsland } from '@/components/dynamic-island'
 import { useCreateEmployee, useUpdateEmployee, useEmployee } from '@/hooks/useHR'
+import { cn } from '@/lib/utils'
 import {
     Search, Bell, User, Phone, Mail, MapPin, Building2, Calendar, Briefcase,
-    CreditCard, Wallet, Loader2, CheckCircle, DollarSign, Clock, UserCog, FileText,
-    Sliders, Building, UserCircle, GraduationCap, Award, Users, ChevronDown
+    CreditCard, Wallet, Loader2, CheckCircle, DollarSign, Clock, FileText,
+    Building, Users, ChevronDown, Plus, Trash2, AlertCircle, Shield
 } from 'lucide-react'
 import type { CreateEmployeeData, NationalIdType, Gender, EmploymentType, ContractType, PaymentFrequency, PaymentMethod } from '@/services/hrService'
 
-type PracticeType = 'solo' | 'firm'
-type FormMode = 'basic' | 'advanced'
+type OfficeType = 'solo' | 'small' | 'medium' | 'firm'
+
+interface Allowance {
+    id: string
+    name: string
+    nameAr: string
+    amount: number
+}
+
+const COMMON_ALLOWANCES = [
+    { name: 'Housing Allowance', nameAr: 'بدل سكن' },
+    { name: 'Transportation Allowance', nameAr: 'بدل نقل' },
+    { name: 'Food Allowance', nameAr: 'بدل طعام' },
+    { name: 'Phone Allowance', nameAr: 'بدل هاتف' },
+    { name: 'Medical Allowance', nameAr: 'بدل طبي' },
+    { name: 'Education Allowance', nameAr: 'بدل تعليم' },
+    { name: 'Fuel Allowance', nameAr: 'بدل وقود' },
+    { name: 'Remote Work Allowance', nameAr: 'بدل عمل عن بعد' },
+]
+
+const OFFICE_TYPES = [
+    { value: 'solo', labelAr: 'محامي فردي', descriptionAr: 'محامي مستقل', icon: User },
+    { value: 'small', labelAr: 'مكتب صغير', descriptionAr: '٢-٥ موظفين', icon: Users },
+    { value: 'medium', labelAr: 'مكتب متوسط', descriptionAr: '٦-٢٠ موظف', icon: Building },
+    { value: 'firm', labelAr: 'شركة محاماة', descriptionAr: '٢٠+ موظف', icon: Building2 },
+]
 
 export function EmployeeCreateView() {
     const navigate = useNavigate()
     const searchParams = useSearch({ strict: false }) as { editId?: string }
     const editId = searchParams?.editId
-
     const isEditMode = !!editId
 
-    // Fetch employee data if editing
     const { data: existingEmployee, isLoading: isLoadingEmployee } = useEmployee(editId || '')
-
-    // Mutations
     const createMutation = useCreateEmployee()
     const updateMutation = useUpdateEmployee()
 
-    // Mode and Practice Type
-    const [formMode, setFormMode] = useState<FormMode>('basic')
-    const [practiceType, setPracticeType] = useState<PracticeType>('firm')
+    // Office Type
+    const [officeType, setOfficeType] = useState<OfficeType>('solo')
 
-    // Form State - Personal Info
+    // Collapsible sections state
+    const [openSections, setOpenSections] = useState<string[]>([])
+
+    // Form State - Personal Info (Basic)
     const [fullNameArabic, setFullNameArabic] = useState('')
     const [fullNameEnglish, setFullNameEnglish] = useState('')
     const [nationalId, setNationalId] = useState('')
     const [nationalIdType, setNationalIdType] = useState<NationalIdType>('saudi_id')
-    const [nationalIdExpiry, setNationalIdExpiry] = useState('')
     const [nationality, setNationality] = useState('Saudi Arabia')
     const [gender, setGender] = useState<Gender>('male')
     const [dateOfBirth, setDateOfBirth] = useState('')
     const [mobile, setMobile] = useState('')
     const [email, setEmail] = useState('')
+
+    // Form State - Employment (Basic)
+    const [jobTitleArabic, setJobTitleArabic] = useState('')
+    const [jobTitle, setJobTitle] = useState('')
+    const [employmentType, setEmploymentType] = useState<EmploymentType>('full_time')
+    const [hireDate, setHireDate] = useState('')
+
+    // Form State - Salary (Basic)
+    const [basicSalary, setBasicSalary] = useState<number>(0)
+    const [allowances, setAllowances] = useState<Allowance[]>([])
+
+    // Advanced - Personal Info Extended
+    const [nationalIdExpiry, setNationalIdExpiry] = useState('')
     const [personalEmail, setPersonalEmail] = useState('')
     const [city, setCity] = useState('')
     const [region, setRegion] = useState('')
     const [maritalStatus, setMaritalStatus] = useState<string>('')
     const [numberOfDependents, setNumberOfDependents] = useState<number>(0)
 
-    // Emergency Contact
+    // Advanced - Emergency Contact
     const [emergencyName, setEmergencyName] = useState('')
     const [emergencyRelationship, setEmergencyRelationship] = useState('')
     const [emergencyPhone, setEmergencyPhone] = useState('')
 
-    // Form State - Employment
+    // Advanced - Contract Details
     const [employeeNumber, setEmployeeNumber] = useState('')
-    const [jobTitle, setJobTitle] = useState('')
-    const [jobTitleArabic, setJobTitleArabic] = useState('')
-    const [employmentType, setEmploymentType] = useState<EmploymentType>('full_time')
     const [contractType, setContractType] = useState<ContractType>('indefinite')
     const [contractStartDate, setContractStartDate] = useState('')
     const [contractEndDate, setContractEndDate] = useState('')
-    const [hireDate, setHireDate] = useState('')
     const [probationPeriod, setProbationPeriod] = useState<number>(90)
-    const [reportsTo, setReportsTo] = useState('')
-    const [departmentName, setDepartmentName] = useState('')
 
-    // Work Schedule
+    // Advanced - Work Schedule
     const [weeklyHours, setWeeklyHours] = useState<number>(48)
     const [dailyHours, setDailyHours] = useState<number>(8)
-    const [workDays, setWorkDays] = useState<string[]>(['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday'])
     const [restDay, setRestDay] = useState('Friday')
 
-    // Form State - Compensation
-    const [basicSalary, setBasicSalary] = useState<number>(0)
-    const [housingAllowance, setHousingAllowance] = useState<number>(0)
-    const [transportationAllowance, setTransportationAllowance] = useState<number>(0)
-    const [foodAllowance, setFoodAllowance] = useState<number>(0)
+    // Advanced - Payment Details
     const [paymentFrequency, setPaymentFrequency] = useState<PaymentFrequency>('monthly')
     const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('bank_transfer')
     const [bankName, setBankName] = useState('')
     const [iban, setIban] = useState('')
 
-    // GOSI
+    // Advanced - GOSI
     const [gosiRegistered, setGosiRegistered] = useState(false)
     const [gosiNumber, setGosiNumber] = useState('')
 
-    // Advanced Fields - Extended Personal Info
-    const [bloodType, setBloodType] = useState('')
-    const [drivingLicense, setDrivingLicense] = useState('')
-    const [passportNumber, setPassportNumber] = useState('')
-    const [passportExpiry, setPassportExpiry] = useState('')
-    const [notes, setNotes] = useState('')
-
-    // Advanced Fields - Qualifications
-    const [educationLevel, setEducationLevel] = useState('')
-    const [educationMajor, setEducationMajor] = useState('')
-    const [educationInstitution, setEducationInstitution] = useState('')
-    const [educationYear, setEducationYear] = useState('')
-
-    // Firm-Only Fields
-    const [departmentId, setDepartmentId] = useState('')
+    // Advanced - Organization (medium/firm only)
+    const [departmentName, setDepartmentName] = useState('')
     const [branchId, setBranchId] = useState('')
     const [teamId, setTeamId] = useState('')
-    const [costCenter, setCostCenter] = useState('')
-    const [isTeamLeader, setIsTeamLeader] = useState(false)
     const [supervisorId, setSupervisorId] = useState('')
+    const [costCenter, setCostCenter] = useState('')
 
-    // Solo-Only Fields
-    const [practiceName, setPracticeName] = useState('')
-    const [barNumber, setBarNumber] = useState('')
-    const [barLicenseExpiry, setBarLicenseExpiry] = useState('')
-    const [practiceSpecialization, setPracticeSpecialization] = useState<string[]>([])
+    // Advanced - Leave Balance
+    const [annualLeaveEntitlement, setAnnualLeaveEntitlement] = useState<number>(21)
 
     // Populate form when editing
     useEffect(() => {
         if (existingEmployee && isEditMode) {
-            // Personal Info
             setFullNameArabic(existingEmployee.personalInfo?.fullNameArabic || '')
             setFullNameEnglish(existingEmployee.personalInfo?.fullNameEnglish || '')
             setNationalId(existingEmployee.personalInfo?.nationalId || '')
@@ -153,13 +163,9 @@ export function EmployeeCreateView() {
             setRegion(existingEmployee.personalInfo?.currentAddress?.region || '')
             setMaritalStatus(existingEmployee.personalInfo?.maritalStatus || '')
             setNumberOfDependents(existingEmployee.personalInfo?.numberOfDependents || 0)
-
-            // Emergency Contact
             setEmergencyName(existingEmployee.personalInfo?.emergencyContact?.name || '')
             setEmergencyRelationship(existingEmployee.personalInfo?.emergencyContact?.relationship || '')
             setEmergencyPhone(existingEmployee.personalInfo?.emergencyContact?.phone || '')
-
-            // Employment
             setEmployeeNumber(existingEmployee.employeeNumber || '')
             setJobTitle(existingEmployee.employment?.jobTitle || '')
             setJobTitleArabic(existingEmployee.employment?.jobTitleArabic || '')
@@ -169,47 +175,73 @@ export function EmployeeCreateView() {
             setContractEndDate(existingEmployee.employment?.contractEndDate?.split('T')[0] || '')
             setHireDate(existingEmployee.employment?.hireDate?.split('T')[0] || '')
             setProbationPeriod(existingEmployee.employment?.probationPeriod || 90)
-            setReportsTo(existingEmployee.employment?.reportsTo || '')
-            setDepartmentName(existingEmployee.employment?.departmentName || '')
-
-            // Work Schedule
             setWeeklyHours(existingEmployee.employment?.workSchedule?.weeklyHours || 48)
             setDailyHours(existingEmployee.employment?.workSchedule?.dailyHours || 8)
-            setWorkDays(existingEmployee.employment?.workSchedule?.workDays || ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday'])
             setRestDay(existingEmployee.employment?.workSchedule?.restDay || 'Friday')
-
-            // Compensation
             setBasicSalary(existingEmployee.compensation?.basicSalary || 0)
-            setHousingAllowance(existingEmployee.compensation?.allowances?.housingAllowance || 0)
-            setTransportationAllowance(existingEmployee.compensation?.allowances?.transportationAllowance || 0)
-            setFoodAllowance(existingEmployee.compensation?.allowances?.foodAllowance || 0)
             setPaymentFrequency(existingEmployee.compensation?.paymentFrequency || 'monthly')
             setPaymentMethod(existingEmployee.compensation?.paymentMethod || 'bank_transfer')
             setBankName(existingEmployee.compensation?.bankDetails?.bankName || '')
             setIban(existingEmployee.compensation?.bankDetails?.iban || '')
-
-            // GOSI
             setGosiRegistered(existingEmployee.gosi?.registered || false)
             setGosiNumber(existingEmployee.gosi?.gosiNumber || '')
+            setDepartmentName(existingEmployee.employment?.departmentName || '')
         }
     }, [existingEmployee, isEditMode])
 
-    // Calculate if Saudi
     const isSaudi = useMemo(() => {
         return nationalIdType === 'saudi_id' || nationality === 'Saudi Arabia'
     }, [nationalIdType, nationality])
 
-    // Calculate total allowances
     const totalAllowances = useMemo(() => {
-        return housingAllowance + transportationAllowance + foodAllowance
-    }, [housingAllowance, transportationAllowance, foodAllowance])
+        return allowances.reduce((sum, a) => sum + a.amount, 0)
+    }, [allowances])
 
-    // Calculate gross salary
     const grossSalary = useMemo(() => {
         return basicSalary + totalAllowances
     }, [basicSalary, totalAllowances])
 
-    // Handle Submit
+    // Allowance handlers
+    const addAllowance = () => {
+        setAllowances([...allowances, { id: Date.now().toString(), name: '', nameAr: '', amount: 0 }])
+    }
+
+    const removeAllowance = (id: string) => {
+        setAllowances(allowances.filter(a => a.id !== id))
+    }
+
+    const updateAllowance = (id: string, field: keyof Allowance, value: string | number) => {
+        setAllowances(allowances.map(a => {
+            if (a.id === id) {
+                if (field === 'name') {
+                    const preset = COMMON_ALLOWANCES.find(c => c.name === value)
+                    if (preset) {
+                        return { ...a, name: preset.name, nameAr: preset.nameAr }
+                    }
+                }
+                return { ...a, [field]: value }
+            }
+            return a
+        }))
+    }
+
+    const toggleSection = (section: string) => {
+        setOpenSections(prev =>
+            prev.includes(section)
+                ? prev.filter(s => s !== section)
+                : [...prev, section]
+        )
+    }
+
+    // Field visibility based on office type
+    const shouldHideField = (fieldName: string) => {
+        if (officeType === 'solo') {
+            const hiddenForSolo = ['branch', 'team', 'supervisor', 'costCenter', 'department']
+            return hiddenForSolo.includes(fieldName)
+        }
+        return false
+    }
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
 
@@ -247,7 +279,7 @@ export function EmployeeCreateView() {
                 jobTitleArabic: jobTitleArabic || undefined,
                 employmentType,
                 contractType,
-                contractStartDate,
+                contractStartDate: contractStartDate || hireDate,
                 contractEndDate: contractEndDate || undefined,
                 hireDate,
                 probationPeriod,
@@ -255,19 +287,27 @@ export function EmployeeCreateView() {
                 workSchedule: {
                     weeklyHours,
                     dailyHours,
-                    workDays,
+                    workDays: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday'],
                     restDay,
                 },
-                reportsTo: reportsTo || undefined,
+                reportsTo: supervisorId || undefined,
                 departmentName: departmentName || undefined,
             },
             compensation: {
                 basicSalary,
                 currency: 'SAR',
                 allowances: {
-                    housingAllowance,
-                    transportationAllowance,
-                    foodAllowance,
+                    housingAllowance: allowances.find(a => a.name === 'Housing Allowance')?.amount || 0,
+                    transportationAllowance: allowances.find(a => a.name === 'Transportation Allowance')?.amount || 0,
+                    foodAllowance: allowances.find(a => a.name === 'Food Allowance')?.amount || 0,
+                    otherAllowances: allowances.filter(a => !['Housing Allowance', 'Transportation Allowance', 'Food Allowance'].includes(a.name)).map(a => ({
+                        allowanceName: a.name,
+                        allowanceNameAr: a.nameAr,
+                        amount: a.amount,
+                        taxable: true,
+                        includedInEOSB: true,
+                        includedInGOSI: false,
+                    })),
                     totalAllowances,
                 },
                 grossSalary,
@@ -312,21 +352,15 @@ export function EmployeeCreateView() {
     const topNav = [
         { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
         { title: 'الموظفين', href: '/dashboard/hr/employees', isActive: true },
-        { title: 'الرواتب', href: '/dashboard/hr/salaries', isActive: false },
-        { title: 'الإجازات', href: '/dashboard/hr/leaves', isActive: false },
     ]
 
     return (
         <>
-            {/* Header */}
             <Header className="bg-navy shadow-none relative">
                 <TopNav links={topNav} className="[&>a]:text-slate-300 [&>a:hover]:text-white [&>a[aria-current='page']]:text-white" />
-
-                {/* Dynamic Island - Centered */}
                 <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
                     <DynamicIsland />
                 </div>
-
                 <div className='ms-auto flex items-center space-x-4'>
                     <div className="relative hidden md:block">
                         <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
@@ -341,13 +375,10 @@ export function EmployeeCreateView() {
                     <ConfigDrawer className="text-slate-300 hover:bg-white/10 hover:text-white" />
                     <ProfileDropdown className="text-slate-300 hover:bg-white/10 hover:text-white" />
                 </div>
-                {/* Bottom Gradient Line */}
                 <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-emerald-500/50 to-transparent"></div>
             </Header>
 
             <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-r border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
-
-                {/* HERO CARD */}
                 <ProductivityHero
                     badge="الموارد البشرية"
                     title={isEditMode ? 'تعديل بيانات موظف' : 'إضافة موظف جديد'}
@@ -355,119 +386,58 @@ export function EmployeeCreateView() {
                     listMode={true}
                 />
 
-                {/* MAIN GRID LAYOUT */}
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-
-                    {/* RIGHT COLUMN (Main Content) */}
                     <div className="lg:col-span-2 space-y-6">
-
                         <form onSubmit={handleSubmit} className="space-y-6">
 
-                            {/* MODE SELECTION CARD */}
-                            <Card className="border border-slate-100 shadow-sm rounded-2xl overflow-hidden">
-                                <CardContent className="p-6">
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                        {/* Practice Type Selection */}
-                                        <div className="space-y-3">
-                                            <Label className="text-navy font-bold text-base flex items-center gap-2">
-                                                <Building className="w-5 h-5 text-blue-600" />
-                                                نوع الممارسة
-                                            </Label>
-                                            <div className="grid grid-cols-2 gap-3">
-                                                <button
-                                                    type="button"
-                                                    onClick={() => setPracticeType('solo')}
-                                                    className={`p-4 rounded-xl border-2 transition-all flex flex-col items-center gap-2 ${
-                                                        practiceType === 'solo'
-                                                            ? 'border-emerald-500 bg-emerald-50 text-emerald-700'
-                                                            : 'border-slate-200 hover:border-slate-300 text-slate-600'
-                                                    }`}
-                                                >
-                                                    <UserCircle className="w-8 h-8" />
-                                                    <span className="font-medium">مكتب فردي</span>
-                                                    <span className="text-xs opacity-75">محامي مستقل</span>
-                                                </button>
-                                                <button
-                                                    type="button"
-                                                    onClick={() => setPracticeType('firm')}
-                                                    className={`p-4 rounded-xl border-2 transition-all flex flex-col items-center gap-2 ${
-                                                        practiceType === 'firm'
-                                                            ? 'border-emerald-500 bg-emerald-50 text-emerald-700'
-                                                            : 'border-slate-200 hover:border-slate-300 text-slate-600'
-                                                    }`}
-                                                >
-                                                    <Building2 className="w-8 h-8" />
-                                                    <span className="font-medium">مكتب / شركة</span>
-                                                    <span className="text-xs opacity-75">منشأة قانونية</span>
-                                                </button>
-                                            </div>
-                                        </div>
-
-                                        {/* Form Mode Toggle */}
-                                        <div className="space-y-3">
-                                            <Label className="text-navy font-bold text-base flex items-center gap-2">
-                                                <Sliders className="w-5 h-5 text-purple-600" />
-                                                مستوى التفاصيل
-                                            </Label>
-                                            <div className="grid grid-cols-2 gap-3">
-                                                <button
-                                                    type="button"
-                                                    onClick={() => setFormMode('basic')}
-                                                    className={`p-4 rounded-xl border-2 transition-all flex flex-col items-center gap-2 ${
-                                                        formMode === 'basic'
-                                                            ? 'border-emerald-500 bg-emerald-50 text-emerald-700'
-                                                            : 'border-slate-200 hover:border-slate-300 text-slate-600'
-                                                    }`}
-                                                >
-                                                    <div className="w-8 h-8 rounded-full bg-current/10 flex items-center justify-center">
-                                                        <span className="text-lg font-bold">أ</span>
-                                                    </div>
-                                                    <span className="font-medium">أساسي</span>
-                                                    <span className="text-xs opacity-75">الحقول الأساسية فقط</span>
-                                                </button>
-                                                <button
-                                                    type="button"
-                                                    onClick={() => setFormMode('advanced')}
-                                                    className={`p-4 rounded-xl border-2 transition-all flex flex-col items-center gap-2 ${
-                                                        formMode === 'advanced'
-                                                            ? 'border-emerald-500 bg-emerald-50 text-emerald-700'
-                                                            : 'border-slate-200 hover:border-slate-300 text-slate-600'
-                                                    }`}
-                                                >
-                                                    <div className="w-8 h-8 rounded-full bg-current/10 flex items-center justify-center">
-                                                        <span className="text-lg font-bold">م</span>
-                                                    </div>
-                                                    <span className="font-medium">متقدم</span>
-                                                    <span className="text-xs opacity-75">جميع الحقول</span>
-                                                </button>
-                                            </div>
-                                            <p className="text-xs text-slate-500 mt-2">
-                                                {formMode === 'basic'
-                                                    ? 'يتم عرض الحقول الأساسية المطلوبة لإضافة موظف (80% من الحالات)'
-                                                    : 'يتم عرض جميع الحقول بما في ذلك المؤهلات والأداء والبيانات المتقدمة'}
-                                            </p>
-                                        </div>
+                            {/* OFFICE TYPE SELECTOR */}
+                            <Card className="rounded-3xl shadow-sm border-slate-100">
+                                <CardHeader className="pb-4">
+                                    <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
+                                        <Building2 className="w-5 h-5 text-emerald-500" />
+                                        نوع المكتب
+                                    </CardTitle>
+                                </CardHeader>
+                                <CardContent>
+                                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                                        {OFFICE_TYPES.map((option) => (
+                                            <button
+                                                key={option.value}
+                                                type="button"
+                                                onClick={() => setOfficeType(option.value as OfficeType)}
+                                                className={cn(
+                                                    "p-4 rounded-xl border-2 transition-all text-center",
+                                                    officeType === option.value
+                                                        ? "border-emerald-500 bg-emerald-50 text-emerald-700"
+                                                        : "border-slate-200 hover:border-slate-300 text-slate-600"
+                                                )}
+                                            >
+                                                <option.icon className="w-6 h-6 mx-auto mb-2" />
+                                                <span className="text-sm font-medium block">{option.labelAr}</span>
+                                                <span className="text-xs opacity-75">{option.descriptionAr}</span>
+                                            </button>
+                                        ))}
                                     </div>
                                 </CardContent>
                             </Card>
 
-                            {/* PERSONAL INFORMATION SECTION */}
-                            <Card className="border border-slate-100 shadow-sm rounded-2xl overflow-hidden">
-                                <CardHeader className="bg-slate-50/50 border-b border-slate-100">
-                                    <CardTitle className="text-lg font-bold text-navy flex items-center gap-2">
-                                        <User className="w-5 h-5 text-emerald-600" />
+                            {/* ===================== BASIC SECTIONS (Always Visible) ===================== */}
+
+                            {/* PERSONAL INFO - Basic */}
+                            <Card className="rounded-3xl shadow-sm border-slate-100">
+                                <CardHeader className="pb-4">
+                                    <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
+                                        <User className="w-5 h-5 text-emerald-500" />
                                         البيانات الشخصية
                                     </CardTitle>
                                 </CardHeader>
-                                <CardContent className="p-6 space-y-6">
-                                    {/* Names */}
+                                <CardContent className="space-y-4">
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         <div className="space-y-2">
-                                            <Label htmlFor="fullNameArabic" className="text-navy font-medium">
+                                            <Label className="text-navy font-medium">
                                                 الاسم الكامل بالعربية <span className="text-red-500">*</span>
                                             </Label>
                                             <Input
-                                                id="fullNameArabic"
                                                 value={fullNameArabic}
                                                 onChange={(e) => setFullNameArabic(e.target.value)}
                                                 placeholder="محمد أحمد العمري"
@@ -476,11 +446,8 @@ export function EmployeeCreateView() {
                                             />
                                         </div>
                                         <div className="space-y-2">
-                                            <Label htmlFor="fullNameEnglish" className="text-navy font-medium">
-                                                الاسم الكامل بالإنجليزية
-                                            </Label>
+                                            <Label className="text-navy font-medium">الاسم بالإنجليزية</Label>
                                             <Input
-                                                id="fullNameEnglish"
                                                 value={fullNameEnglish}
                                                 onChange={(e) => setFullNameEnglish(e.target.value)}
                                                 placeholder="Mohammed Ahmed Al-Omari"
@@ -490,12 +457,9 @@ export function EmployeeCreateView() {
                                         </div>
                                     </div>
 
-                                    {/* National ID */}
                                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                         <div className="space-y-2">
-                                            <Label htmlFor="nationalIdType" className="text-navy font-medium">
-                                                نوع الهوية <span className="text-red-500">*</span>
-                                            </Label>
+                                            <Label className="text-navy font-medium">نوع الهوية <span className="text-red-500">*</span></Label>
                                             <Select value={nationalIdType} onValueChange={(v) => setNationalIdType(v as NationalIdType)}>
                                                 <SelectTrigger className="h-11 rounded-xl">
                                                     <SelectValue />
@@ -509,11 +473,8 @@ export function EmployeeCreateView() {
                                             </Select>
                                         </div>
                                         <div className="space-y-2">
-                                            <Label htmlFor="nationalId" className="text-navy font-medium">
-                                                رقم الهوية <span className="text-red-500">*</span>
-                                            </Label>
+                                            <Label className="text-navy font-medium">رقم الهوية <span className="text-red-500">*</span></Label>
                                             <Input
-                                                id="nationalId"
                                                 value={nationalId}
                                                 onChange={(e) => setNationalId(e.target.value)}
                                                 placeholder="1234567890"
@@ -522,50 +483,8 @@ export function EmployeeCreateView() {
                                                 dir="ltr"
                                             />
                                         </div>
-                                        {nationalIdType !== 'saudi_id' && (
-                                            <div className="space-y-2">
-                                                <Label htmlFor="nationalIdExpiry" className="text-navy font-medium">
-                                                    تاريخ انتهاء الهوية
-                                                </Label>
-                                                <Input
-                                                    id="nationalIdExpiry"
-                                                    type="date"
-                                                    value={nationalIdExpiry}
-                                                    onChange={(e) => setNationalIdExpiry(e.target.value)}
-                                                    className="h-11 rounded-xl"
-                                                />
-                                            </div>
-                                        )}
-                                    </div>
-
-                                    {/* Demographics */}
-                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                         <div className="space-y-2">
-                                            <Label htmlFor="nationality" className="text-navy font-medium">
-                                                الجنسية <span className="text-red-500">*</span>
-                                            </Label>
-                                            <Select value={nationality} onValueChange={setNationality}>
-                                                <SelectTrigger className="h-11 rounded-xl">
-                                                    <SelectValue />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    <SelectItem value="Saudi Arabia">سعودي</SelectItem>
-                                                    <SelectItem value="Egypt">مصري</SelectItem>
-                                                    <SelectItem value="Jordan">أردني</SelectItem>
-                                                    <SelectItem value="Syria">سوري</SelectItem>
-                                                    <SelectItem value="Yemen">يمني</SelectItem>
-                                                    <SelectItem value="Sudan">سوداني</SelectItem>
-                                                    <SelectItem value="Pakistan">باكستاني</SelectItem>
-                                                    <SelectItem value="India">هندي</SelectItem>
-                                                    <SelectItem value="Philippines">فلبيني</SelectItem>
-                                                    <SelectItem value="Other">أخرى</SelectItem>
-                                                </SelectContent>
-                                            </Select>
-                                        </div>
-                                        <div className="space-y-2">
-                                            <Label htmlFor="gender" className="text-navy font-medium">
-                                                الجنس <span className="text-red-500">*</span>
-                                            </Label>
+                                            <Label className="text-navy font-medium">الجنس <span className="text-red-500">*</span></Label>
                                             <Select value={gender} onValueChange={(v) => setGender(v as Gender)}>
                                                 <SelectTrigger className="h-11 rounded-xl">
                                                     <SelectValue />
@@ -576,30 +495,15 @@ export function EmployeeCreateView() {
                                                 </SelectContent>
                                             </Select>
                                         </div>
-                                        <div className="space-y-2">
-                                            <Label htmlFor="dateOfBirth" className="text-navy font-medium">
-                                                تاريخ الميلاد <span className="text-red-500">*</span>
-                                            </Label>
-                                            <Input
-                                                id="dateOfBirth"
-                                                type="date"
-                                                value={dateOfBirth}
-                                                onChange={(e) => setDateOfBirth(e.target.value)}
-                                                required
-                                                className="h-11 rounded-xl"
-                                            />
-                                        </div>
                                     </div>
 
-                                    {/* Contact */}
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         <div className="space-y-2">
-                                            <Label htmlFor="mobile" className="text-navy font-medium">
-                                                <Phone className="w-4 h-4 inline ml-1" />
+                                            <Label className="text-navy font-medium flex items-center gap-1">
+                                                <Phone className="w-4 h-4" />
                                                 رقم الجوال <span className="text-red-500">*</span>
                                             </Label>
                                             <Input
-                                                id="mobile"
                                                 value={mobile}
                                                 onChange={(e) => setMobile(e.target.value)}
                                                 placeholder="+966 5XXXXXXXX"
@@ -609,12 +513,11 @@ export function EmployeeCreateView() {
                                             />
                                         </div>
                                         <div className="space-y-2">
-                                            <Label htmlFor="email" className="text-navy font-medium">
-                                                <Mail className="w-4 h-4 inline ml-1" />
+                                            <Label className="text-navy font-medium flex items-center gap-1">
+                                                <Mail className="w-4 h-4" />
                                                 البريد الإلكتروني <span className="text-red-500">*</span>
                                             </Label>
                                             <Input
-                                                id="email"
                                                 type="email"
                                                 value={email}
                                                 onChange={(e) => setEmail(e.target.value)}
@@ -625,199 +528,22 @@ export function EmployeeCreateView() {
                                             />
                                         </div>
                                     </div>
-
-                                    {/* Address */}
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                        <div className="space-y-2">
-                                            <Label htmlFor="city" className="text-navy font-medium">
-                                                <MapPin className="w-4 h-4 inline ml-1" />
-                                                المدينة <span className="text-red-500">*</span>
-                                            </Label>
-                                            <Select value={city} onValueChange={setCity}>
-                                                <SelectTrigger className="h-11 rounded-xl">
-                                                    <SelectValue placeholder="اختر المدينة" />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    <SelectItem value="Riyadh">الرياض</SelectItem>
-                                                    <SelectItem value="Jeddah">جدة</SelectItem>
-                                                    <SelectItem value="Makkah">مكة المكرمة</SelectItem>
-                                                    <SelectItem value="Madinah">المدينة المنورة</SelectItem>
-                                                    <SelectItem value="Dammam">الدمام</SelectItem>
-                                                    <SelectItem value="Khobar">الخبر</SelectItem>
-                                                    <SelectItem value="Dhahran">الظهران</SelectItem>
-                                                    <SelectItem value="Tabuk">تبوك</SelectItem>
-                                                    <SelectItem value="Abha">أبها</SelectItem>
-                                                </SelectContent>
-                                            </Select>
-                                        </div>
-                                        <div className="space-y-2">
-                                            <Label htmlFor="region" className="text-navy font-medium">
-                                                المنطقة <span className="text-red-500">*</span>
-                                            </Label>
-                                            <Select value={region} onValueChange={setRegion}>
-                                                <SelectTrigger className="h-11 rounded-xl">
-                                                    <SelectValue placeholder="اختر المنطقة" />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    <SelectItem value="Riyadh Region">منطقة الرياض</SelectItem>
-                                                    <SelectItem value="Makkah Region">منطقة مكة المكرمة</SelectItem>
-                                                    <SelectItem value="Madinah Region">منطقة المدينة المنورة</SelectItem>
-                                                    <SelectItem value="Eastern Province">المنطقة الشرقية</SelectItem>
-                                                    <SelectItem value="Asir Region">منطقة عسير</SelectItem>
-                                                    <SelectItem value="Tabuk Region">منطقة تبوك</SelectItem>
-                                                    <SelectItem value="Qassim Region">منطقة القصيم</SelectItem>
-                                                </SelectContent>
-                                            </Select>
-                                        </div>
-                                    </div>
-
-                                    {/* Marital Status */}
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                        <div className="space-y-2">
-                                            <Label htmlFor="maritalStatus" className="text-navy font-medium">
-                                                الحالة الاجتماعية
-                                            </Label>
-                                            <Select value={maritalStatus} onValueChange={setMaritalStatus}>
-                                                <SelectTrigger className="h-11 rounded-xl">
-                                                    <SelectValue placeholder="اختر الحالة" />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    <SelectItem value="single">أعزب</SelectItem>
-                                                    <SelectItem value="married">متزوج</SelectItem>
-                                                    <SelectItem value="divorced">مطلق</SelectItem>
-                                                    <SelectItem value="widowed">أرمل</SelectItem>
-                                                </SelectContent>
-                                            </Select>
-                                        </div>
-                                        <div className="space-y-2">
-                                            <Label htmlFor="numberOfDependents" className="text-navy font-medium">
-                                                عدد المعالين
-                                            </Label>
-                                            <Input
-                                                id="numberOfDependents"
-                                                type="number"
-                                                value={numberOfDependents}
-                                                onChange={(e) => setNumberOfDependents(parseInt(e.target.value) || 0)}
-                                                min={0}
-                                                className="h-11 rounded-xl"
-                                            />
-                                        </div>
-                                    </div>
                                 </CardContent>
                             </Card>
 
-                            {/* EMERGENCY CONTACT SECTION */}
-                            <Card className="border border-slate-100 shadow-sm rounded-2xl overflow-hidden">
-                                <CardHeader className="bg-slate-50/50 border-b border-slate-100">
-                                    <CardTitle className="text-lg font-bold text-navy flex items-center gap-2">
-                                        <Phone className="w-5 h-5 text-red-500" />
-                                        جهة اتصال الطوارئ
-                                    </CardTitle>
-                                </CardHeader>
-                                <CardContent className="p-6 space-y-4">
-                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                        <div className="space-y-2">
-                                            <Label htmlFor="emergencyName" className="text-navy font-medium">
-                                                الاسم <span className="text-red-500">*</span>
-                                            </Label>
-                                            <Input
-                                                id="emergencyName"
-                                                value={emergencyName}
-                                                onChange={(e) => setEmergencyName(e.target.value)}
-                                                placeholder="اسم جهة الاتصال"
-                                                required
-                                                className="h-11 rounded-xl"
-                                            />
-                                        </div>
-                                        <div className="space-y-2">
-                                            <Label htmlFor="emergencyRelationship" className="text-navy font-medium">
-                                                صلة القرابة <span className="text-red-500">*</span>
-                                            </Label>
-                                            <Select value={emergencyRelationship} onValueChange={setEmergencyRelationship}>
-                                                <SelectTrigger className="h-11 rounded-xl">
-                                                    <SelectValue placeholder="اختر صلة القرابة" />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    <SelectItem value="Father">الأب</SelectItem>
-                                                    <SelectItem value="Mother">الأم</SelectItem>
-                                                    <SelectItem value="Spouse">الزوج/الزوجة</SelectItem>
-                                                    <SelectItem value="Brother">الأخ</SelectItem>
-                                                    <SelectItem value="Sister">الأخت</SelectItem>
-                                                    <SelectItem value="Son">الابن</SelectItem>
-                                                    <SelectItem value="Daughter">الابنة</SelectItem>
-                                                    <SelectItem value="Other">أخرى</SelectItem>
-                                                </SelectContent>
-                                            </Select>
-                                        </div>
-                                        <div className="space-y-2">
-                                            <Label htmlFor="emergencyPhone" className="text-navy font-medium">
-                                                رقم الهاتف <span className="text-red-500">*</span>
-                                            </Label>
-                                            <Input
-                                                id="emergencyPhone"
-                                                value={emergencyPhone}
-                                                onChange={(e) => setEmergencyPhone(e.target.value)}
-                                                placeholder="+966 5XXXXXXXX"
-                                                required
-                                                className="h-11 rounded-xl"
-                                                dir="ltr"
-                                            />
-                                        </div>
-                                    </div>
-                                </CardContent>
-                            </Card>
-
-                            {/* EMPLOYMENT SECTION */}
-                            <Card className="border border-slate-100 shadow-sm rounded-2xl overflow-hidden">
-                                <CardHeader className="bg-slate-50/50 border-b border-slate-100">
-                                    <CardTitle className="text-lg font-bold text-navy flex items-center gap-2">
-                                        <Briefcase className="w-5 h-5 text-blue-600" />
+                            {/* EMPLOYMENT - Basic */}
+                            <Card className="rounded-3xl shadow-sm border-slate-100">
+                                <CardHeader className="pb-4">
+                                    <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
+                                        <Briefcase className="w-5 h-5 text-blue-500" />
                                         بيانات التوظيف
                                     </CardTitle>
                                 </CardHeader>
-                                <CardContent className="p-6 space-y-6">
-                                    {/* Basic Employment */}
+                                <CardContent className="space-y-4">
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         <div className="space-y-2">
-                                            <Label htmlFor="employeeNumber" className="text-navy font-medium">
-                                                الرقم الوظيفي
-                                            </Label>
+                                            <Label className="text-navy font-medium">المسمى الوظيفي (عربي) <span className="text-red-500">*</span></Label>
                                             <Input
-                                                id="employeeNumber"
-                                                value={employeeNumber}
-                                                onChange={(e) => setEmployeeNumber(e.target.value)}
-                                                placeholder="EMP001"
-                                                className="h-11 rounded-xl"
-                                            />
-                                        </div>
-                                        <div className="space-y-2">
-                                            <Label htmlFor="departmentName" className="text-navy font-medium">
-                                                القسم
-                                            </Label>
-                                            <Select value={departmentName} onValueChange={setDepartmentName}>
-                                                <SelectTrigger className="h-11 rounded-xl">
-                                                    <SelectValue placeholder="اختر القسم" />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    <SelectItem value="Legal">الشؤون القانونية</SelectItem>
-                                                    <SelectItem value="Finance">المالية</SelectItem>
-                                                    <SelectItem value="HR">الموارد البشرية</SelectItem>
-                                                    <SelectItem value="IT">تقنية المعلومات</SelectItem>
-                                                    <SelectItem value="Administration">الإدارة</SelectItem>
-                                                    <SelectItem value="Operations">العمليات</SelectItem>
-                                                </SelectContent>
-                                            </Select>
-                                        </div>
-                                    </div>
-
-                                    {/* Job Title */}
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                        <div className="space-y-2">
-                                            <Label htmlFor="jobTitleArabic" className="text-navy font-medium">
-                                                المسمى الوظيفي (عربي) <span className="text-red-500">*</span>
-                                            </Label>
-                                            <Input
-                                                id="jobTitleArabic"
                                                 value={jobTitleArabic}
                                                 onChange={(e) => setJobTitleArabic(e.target.value)}
                                                 placeholder="محامي"
@@ -826,11 +552,8 @@ export function EmployeeCreateView() {
                                             />
                                         </div>
                                         <div className="space-y-2">
-                                            <Label htmlFor="jobTitle" className="text-navy font-medium">
-                                                المسمى الوظيفي (إنجليزي)
-                                            </Label>
+                                            <Label className="text-navy font-medium">المسمى الوظيفي (إنجليزي)</Label>
                                             <Input
-                                                id="jobTitle"
                                                 value={jobTitle}
                                                 onChange={(e) => setJobTitle(e.target.value)}
                                                 placeholder="Attorney"
@@ -840,12 +563,9 @@ export function EmployeeCreateView() {
                                         </div>
                                     </div>
 
-                                    {/* Employment Type & Contract */}
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         <div className="space-y-2">
-                                            <Label htmlFor="employmentType" className="text-navy font-medium">
-                                                نوع التوظيف <span className="text-red-500">*</span>
-                                            </Label>
+                                            <Label className="text-navy font-medium">نوع التوظيف <span className="text-red-500">*</span></Label>
                                             <Select value={employmentType} onValueChange={(v) => setEmploymentType(v as EmploymentType)}>
                                                 <SelectTrigger className="h-11 rounded-xl">
                                                     <SelectValue />
@@ -859,30 +579,11 @@ export function EmployeeCreateView() {
                                             </Select>
                                         </div>
                                         <div className="space-y-2">
-                                            <Label htmlFor="contractType" className="text-navy font-medium">
-                                                نوع العقد <span className="text-red-500">*</span>
-                                            </Label>
-                                            <Select value={contractType} onValueChange={(v) => setContractType(v as ContractType)}>
-                                                <SelectTrigger className="h-11 rounded-xl">
-                                                    <SelectValue />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    <SelectItem value="indefinite">غير محدد المدة</SelectItem>
-                                                    <SelectItem value="fixed_term">محدد المدة</SelectItem>
-                                                </SelectContent>
-                                            </Select>
-                                        </div>
-                                    </div>
-
-                                    {/* Dates */}
-                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                        <div className="space-y-2">
-                                            <Label htmlFor="hireDate" className="text-navy font-medium">
-                                                <Calendar className="w-4 h-4 inline ml-1" />
+                                            <Label className="text-navy font-medium flex items-center gap-1">
+                                                <Calendar className="w-4 h-4" />
                                                 تاريخ التعيين <span className="text-red-500">*</span>
                                             </Label>
                                             <Input
-                                                id="hireDate"
                                                 type="date"
                                                 value={hireDate}
                                                 onChange={(e) => setHireDate(e.target.value)}
@@ -890,186 +591,118 @@ export function EmployeeCreateView() {
                                                 className="h-11 rounded-xl"
                                             />
                                         </div>
-                                        <div className="space-y-2">
-                                            <Label htmlFor="contractStartDate" className="text-navy font-medium">
-                                                تاريخ بداية العقد <span className="text-red-500">*</span>
-                                            </Label>
-                                            <Input
-                                                id="contractStartDate"
-                                                type="date"
-                                                value={contractStartDate}
-                                                onChange={(e) => setContractStartDate(e.target.value)}
-                                                required
-                                                className="h-11 rounded-xl"
-                                            />
-                                        </div>
-                                        {contractType === 'fixed_term' && (
-                                            <div className="space-y-2">
-                                                <Label htmlFor="contractEndDate" className="text-navy font-medium">
-                                                    تاريخ نهاية العقد
-                                                </Label>
-                                                <Input
-                                                    id="contractEndDate"
-                                                    type="date"
-                                                    value={contractEndDate}
-                                                    onChange={(e) => setContractEndDate(e.target.value)}
-                                                    className="h-11 rounded-xl"
-                                                />
-                                            </div>
-                                        )}
-                                    </div>
-
-                                    {/* Probation */}
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                        <div className="space-y-2">
-                                            <Label htmlFor="probationPeriod" className="text-navy font-medium">
-                                                فترة التجربة (بالأيام)
-                                            </Label>
-                                            <Input
-                                                id="probationPeriod"
-                                                type="number"
-                                                value={probationPeriod}
-                                                onChange={(e) => setProbationPeriod(parseInt(e.target.value) || 90)}
-                                                min={0}
-                                                max={180}
-                                                className="h-11 rounded-xl"
-                                            />
-                                            <p className="text-xs text-slate-500">الحد الأقصى 90 يوم (180 للمناصب العليا)</p>
-                                        </div>
-                                    </div>
-
-                                    {/* Work Schedule */}
-                                    <div className="border-t border-slate-100 pt-4 mt-4">
-                                        <h4 className="font-semibold text-navy mb-4 flex items-center gap-2">
-                                            <Clock className="w-4 h-4 text-slate-500" />
-                                            جدول العمل
-                                        </h4>
-                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                            <div className="space-y-2">
-                                                <Label htmlFor="weeklyHours" className="text-navy font-medium">
-                                                    ساعات العمل الأسبوعية
-                                                </Label>
-                                                <Input
-                                                    id="weeklyHours"
-                                                    type="number"
-                                                    value={weeklyHours}
-                                                    onChange={(e) => setWeeklyHours(parseInt(e.target.value) || 48)}
-                                                    max={48}
-                                                    className="h-11 rounded-xl"
-                                                />
-                                            </div>
-                                            <div className="space-y-2">
-                                                <Label htmlFor="dailyHours" className="text-navy font-medium">
-                                                    ساعات العمل اليومية
-                                                </Label>
-                                                <Input
-                                                    id="dailyHours"
-                                                    type="number"
-                                                    value={dailyHours}
-                                                    onChange={(e) => setDailyHours(parseInt(e.target.value) || 8)}
-                                                    max={8}
-                                                    className="h-11 rounded-xl"
-                                                />
-                                            </div>
-                                            <div className="space-y-2">
-                                                <Label htmlFor="restDay" className="text-navy font-medium">
-                                                    يوم الراحة
-                                                </Label>
-                                                <Select value={restDay} onValueChange={setRestDay}>
-                                                    <SelectTrigger className="h-11 rounded-xl">
-                                                        <SelectValue />
-                                                    </SelectTrigger>
-                                                    <SelectContent>
-                                                        <SelectItem value="Friday">الجمعة</SelectItem>
-                                                        <SelectItem value="Saturday">السبت</SelectItem>
-                                                        <SelectItem value="Sunday">الأحد</SelectItem>
-                                                    </SelectContent>
-                                                </Select>
-                                            </div>
-                                        </div>
                                     </div>
                                 </CardContent>
                             </Card>
 
-                            {/* COMPENSATION SECTION */}
-                            <Card className="border border-slate-100 shadow-sm rounded-2xl overflow-hidden">
-                                <CardHeader className="bg-slate-50/50 border-b border-slate-100">
-                                    <CardTitle className="text-lg font-bold text-navy flex items-center gap-2">
-                                        <Wallet className="w-5 h-5 text-amber-600" />
+                            {/* SALARY & ALLOWANCES - Basic */}
+                            <Card className="rounded-3xl shadow-sm border-slate-100">
+                                <CardHeader className="pb-4">
+                                    <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
+                                        <Wallet className="w-5 h-5 text-amber-500" />
                                         الراتب والبدلات
                                     </CardTitle>
                                 </CardHeader>
-                                <CardContent className="p-6 space-y-6">
-                                    {/* Basic Salary */}
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                        <div className="space-y-2">
-                                            <Label htmlFor="basicSalary" className="text-navy font-medium">
-                                                <DollarSign className="w-4 h-4 inline ml-1" />
-                                                الراتب الأساسي (ر.س) <span className="text-red-500">*</span>
-                                            </Label>
-                                            <Input
-                                                id="basicSalary"
-                                                type="number"
-                                                value={basicSalary}
-                                                onChange={(e) => setBasicSalary(parseFloat(e.target.value) || 0)}
-                                                min={0}
-                                                step={100}
-                                                required
-                                                className="h-11 rounded-xl"
-                                            />
-                                        </div>
+                                <CardContent className="space-y-6">
+                                    <div className="space-y-2">
+                                        <Label className="text-navy font-medium flex items-center gap-1">
+                                            <DollarSign className="w-4 h-4" />
+                                            الراتب الأساسي (ر.س) <span className="text-red-500">*</span>
+                                        </Label>
+                                        <Input
+                                            type="number"
+                                            value={basicSalary}
+                                            onChange={(e) => setBasicSalary(parseFloat(e.target.value) || 0)}
+                                            min={0}
+                                            step={100}
+                                            required
+                                            className="h-11 rounded-xl max-w-xs"
+                                        />
                                     </div>
 
-                                    {/* Allowances */}
+                                    {/* Dynamic Allowances */}
                                     <div className="border-t border-slate-100 pt-4">
-                                        <h4 className="font-semibold text-navy mb-4">البدلات</h4>
-                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                            <div className="space-y-2">
-                                                <Label htmlFor="housingAllowance" className="text-navy font-medium">
-                                                    بدل السكن (ر.س)
-                                                </Label>
-                                                <Input
-                                                    id="housingAllowance"
-                                                    type="number"
-                                                    value={housingAllowance}
-                                                    onChange={(e) => setHousingAllowance(parseFloat(e.target.value) || 0)}
-                                                    min={0}
-                                                    step={100}
-                                                    className="h-11 rounded-xl"
-                                                />
-                                            </div>
-                                            <div className="space-y-2">
-                                                <Label htmlFor="transportationAllowance" className="text-navy font-medium">
-                                                    بدل النقل (ر.س)
-                                                </Label>
-                                                <Input
-                                                    id="transportationAllowance"
-                                                    type="number"
-                                                    value={transportationAllowance}
-                                                    onChange={(e) => setTransportationAllowance(parseFloat(e.target.value) || 0)}
-                                                    min={0}
-                                                    step={100}
-                                                    className="h-11 rounded-xl"
-                                                />
-                                            </div>
-                                            <div className="space-y-2">
-                                                <Label htmlFor="foodAllowance" className="text-navy font-medium">
-                                                    بدل الطعام (ر.س)
-                                                </Label>
-                                                <Input
-                                                    id="foodAllowance"
-                                                    type="number"
-                                                    value={foodAllowance}
-                                                    onChange={(e) => setFoodAllowance(parseFloat(e.target.value) || 0)}
-                                                    min={0}
-                                                    step={100}
-                                                    className="h-11 rounded-xl"
-                                                />
-                                            </div>
+                                        <div className="flex items-center justify-between mb-4">
+                                            <h4 className="font-semibold text-navy">البدلات</h4>
+                                            <Button type="button" variant="outline" size="sm" onClick={addAllowance} className="rounded-xl">
+                                                <Plus className="w-4 h-4 ml-1" />
+                                                إضافة بدل
+                                            </Button>
                                         </div>
+
+                                        {allowances.length === 0 ? (
+                                            <div className="text-center py-8 text-slate-400 bg-slate-50 rounded-xl border-2 border-dashed border-slate-200">
+                                                <DollarSign className="w-8 h-8 mx-auto mb-2 opacity-50" />
+                                                <p>لا توجد بدلات</p>
+                                                <p className="text-sm">اضغط على "إضافة بدل" لإضافة بدلات للموظف</p>
+                                            </div>
+                                        ) : (
+                                            <div className="space-y-3">
+                                                {allowances.map((allowance) => (
+                                                    <div key={allowance.id} className="flex gap-3 items-start p-3 bg-slate-50 rounded-xl">
+                                                        <div className="flex-1">
+                                                            <Select
+                                                                value={allowance.name}
+                                                                onValueChange={(v) => updateAllowance(allowance.id, 'name', v)}
+                                                            >
+                                                                <SelectTrigger className="h-10 rounded-lg">
+                                                                    <SelectValue placeholder="اختر البدل" />
+                                                                </SelectTrigger>
+                                                                <SelectContent>
+                                                                    {COMMON_ALLOWANCES.map((a) => (
+                                                                        <SelectItem key={a.name} value={a.name}>
+                                                                            {a.nameAr}
+                                                                        </SelectItem>
+                                                                    ))}
+                                                                    <SelectItem value="custom">مخصص...</SelectItem>
+                                                                </SelectContent>
+                                                            </Select>
+                                                        </div>
+                                                        {allowance.name === 'custom' && (
+                                                            <div className="flex-1">
+                                                                <Input
+                                                                    value={allowance.nameAr}
+                                                                    onChange={(e) => updateAllowance(allowance.id, 'nameAr', e.target.value)}
+                                                                    placeholder="اسم البدل"
+                                                                    className="h-10 rounded-lg"
+                                                                />
+                                                            </div>
+                                                        )}
+                                                        <div className="w-32">
+                                                            <Input
+                                                                type="number"
+                                                                value={allowance.amount}
+                                                                onChange={(e) => updateAllowance(allowance.id, 'amount', parseFloat(e.target.value) || 0)}
+                                                                min={0}
+                                                                placeholder="المبلغ"
+                                                                className="h-10 rounded-lg"
+                                                            />
+                                                        </div>
+                                                        <Button
+                                                            type="button"
+                                                            variant="ghost"
+                                                            size="icon"
+                                                            onClick={() => removeAllowance(allowance.id)}
+                                                            className="text-red-500 hover:text-red-700 hover:bg-red-50"
+                                                        >
+                                                            <Trash2 className="w-4 h-4" />
+                                                        </Button>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        )}
+
+                                        {allowances.length > 0 && (
+                                            <div className="mt-4 p-3 bg-emerald-50 rounded-xl border border-emerald-100">
+                                                <div className="flex justify-between items-center text-sm">
+                                                    <span className="text-slate-600">إجمالي البدلات:</span>
+                                                    <span className="font-bold text-emerald-600">{totalAllowances.toLocaleString('ar-SA')} ر.س</span>
+                                                </div>
+                                            </div>
+                                        )}
                                     </div>
 
-                                    {/* Summary */}
+                                    {/* Total Salary Summary */}
                                     <div className="bg-emerald-50 rounded-xl p-4 border border-emerald-100">
                                         <div className="flex justify-between items-center">
                                             <span className="font-bold text-navy">إجمالي الراتب الشهري</span>
@@ -1081,525 +714,595 @@ export function EmployeeCreateView() {
                                             = الراتب الأساسي ({basicSalary.toLocaleString('ar-SA')}) + البدلات ({totalAllowances.toLocaleString('ar-SA')})
                                         </div>
                                     </div>
-
-                                    {/* Payment Details */}
-                                    <div className="border-t border-slate-100 pt-4">
-                                        <h4 className="font-semibold text-navy mb-4">تفاصيل الدفع</h4>
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                            <div className="space-y-2">
-                                                <Label htmlFor="paymentFrequency" className="text-navy font-medium">
-                                                    دورة الدفع
-                                                </Label>
-                                                <Select value={paymentFrequency} onValueChange={(v) => setPaymentFrequency(v as PaymentFrequency)}>
-                                                    <SelectTrigger className="h-11 rounded-xl">
-                                                        <SelectValue />
-                                                    </SelectTrigger>
-                                                    <SelectContent>
-                                                        <SelectItem value="monthly">شهري</SelectItem>
-                                                        <SelectItem value="bi_weekly">كل أسبوعين</SelectItem>
-                                                        <SelectItem value="weekly">أسبوعي</SelectItem>
-                                                    </SelectContent>
-                                                </Select>
-                                            </div>
-                                            <div className="space-y-2">
-                                                <Label htmlFor="paymentMethod" className="text-navy font-medium">
-                                                    طريقة الدفع
-                                                </Label>
-                                                <Select value={paymentMethod} onValueChange={(v) => setPaymentMethod(v as PaymentMethod)}>
-                                                    <SelectTrigger className="h-11 rounded-xl">
-                                                        <SelectValue />
-                                                    </SelectTrigger>
-                                                    <SelectContent>
-                                                        <SelectItem value="bank_transfer">تحويل بنكي</SelectItem>
-                                                        <SelectItem value="cash">نقدي</SelectItem>
-                                                        <SelectItem value="check">شيك</SelectItem>
-                                                    </SelectContent>
-                                                </Select>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    {/* Bank Details */}
-                                    <div className="border-t border-slate-100 pt-4">
-                                        <h4 className="font-semibold text-navy mb-4 flex items-center gap-2">
-                                            <CreditCard className="w-4 h-4 text-slate-500" />
-                                            البيانات البنكية
-                                        </h4>
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                            <div className="space-y-2">
-                                                <Label htmlFor="bankName" className="text-navy font-medium">
-                                                    اسم البنك
-                                                </Label>
-                                                <Select value={bankName} onValueChange={setBankName}>
-                                                    <SelectTrigger className="h-11 rounded-xl">
-                                                        <SelectValue placeholder="اختر البنك" />
-                                                    </SelectTrigger>
-                                                    <SelectContent>
-                                                        <SelectItem value="Al Rajhi Bank">مصرف الراجحي</SelectItem>
-                                                        <SelectItem value="National Commercial Bank">البنك الأهلي</SelectItem>
-                                                        <SelectItem value="Riyad Bank">بنك الرياض</SelectItem>
-                                                        <SelectItem value="Saudi British Bank">البنك السعودي البريطاني</SelectItem>
-                                                        <SelectItem value="Banque Saudi Fransi">البنك السعودي الفرنسي</SelectItem>
-                                                        <SelectItem value="Arab National Bank">البنك العربي الوطني</SelectItem>
-                                                        <SelectItem value="Alinma Bank">مصرف الإنماء</SelectItem>
-                                                    </SelectContent>
-                                                </Select>
-                                            </div>
-                                            <div className="space-y-2">
-                                                <Label htmlFor="iban" className="text-navy font-medium">
-                                                    رقم الآيبان (IBAN)
-                                                </Label>
-                                                <Input
-                                                    id="iban"
-                                                    value={iban}
-                                                    onChange={(e) => setIban(e.target.value)}
-                                                    placeholder="SA0000000000000000000000"
-                                                    className="h-11 rounded-xl"
-                                                    dir="ltr"
-                                                />
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    {/* GOSI */}
-                                    <div className="border-t border-slate-100 pt-4">
-                                        <h4 className="font-semibold text-navy mb-4 flex items-center gap-2">
-                                            <FileText className="w-4 h-4 text-slate-500" />
-                                            التأمينات الاجتماعية (GOSI)
-                                        </h4>
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                            <div className="space-y-2">
-                                                <Label htmlFor="gosiRegistered" className="text-navy font-medium">
-                                                    مسجل في التأمينات
-                                                </Label>
-                                                <Select value={gosiRegistered ? 'yes' : 'no'} onValueChange={(v) => setGosiRegistered(v === 'yes')}>
-                                                    <SelectTrigger className="h-11 rounded-xl">
-                                                        <SelectValue />
-                                                    </SelectTrigger>
-                                                    <SelectContent>
-                                                        <SelectItem value="yes">نعم</SelectItem>
-                                                        <SelectItem value="no">لا</SelectItem>
-                                                    </SelectContent>
-                                                </Select>
-                                            </div>
-                                            {gosiRegistered && (
-                                                <div className="space-y-2">
-                                                    <Label htmlFor="gosiNumber" className="text-navy font-medium">
-                                                        رقم التأمينات
-                                                    </Label>
-                                                    <Input
-                                                        id="gosiNumber"
-                                                        value={gosiNumber}
-                                                        onChange={(e) => setGosiNumber(e.target.value)}
-                                                        placeholder="رقم التأمينات الاجتماعية"
-                                                        className="h-11 rounded-xl"
-                                                    />
-                                                </div>
-                                            )}
-                                        </div>
-                                        {isSaudi && (
-                                            <div className="mt-4 bg-blue-50 rounded-xl p-4 border border-blue-100">
-                                                <div className="text-sm text-blue-800">
-                                                    <strong>نسبة الاستقطاع للموظف السعودي:</strong>
-                                                    <ul className="mt-2 mr-4 list-disc">
-                                                        <li>حصة الموظف: 9.75% من الراتب الأساسي</li>
-                                                        <li>حصة صاحب العمل: 12.75% من الراتب الأساسي</li>
-                                                    </ul>
-                                                </div>
-                                            </div>
-                                        )}
-                                    </div>
                                 </CardContent>
                             </Card>
 
-                            {/* FIRM-ONLY: ORGANIZATIONAL STRUCTURE */}
-                            {practiceType === 'firm' && (
-                                <Card className="border border-blue-100 shadow-sm rounded-2xl overflow-hidden">
-                                    <CardHeader className="bg-blue-50/50 border-b border-blue-100">
-                                        <CardTitle className="text-lg font-bold text-navy flex items-center gap-2">
-                                            <Building2 className="w-5 h-5 text-blue-600" />
-                                            الهيكل التنظيمي
-                                            <span className="text-xs font-normal text-blue-600 bg-blue-100 px-2 py-1 rounded-full mr-auto">للمنشآت فقط</span>
-                                        </CardTitle>
-                                    </CardHeader>
-                                    <CardContent className="p-6 space-y-6">
-                                        {/* Branch & Department */}
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                            <div className="space-y-2">
-                                                <Label htmlFor="branchId" className="text-navy font-medium">
-                                                    الفرع
-                                                </Label>
-                                                <Select value={branchId} onValueChange={setBranchId}>
-                                                    <SelectTrigger className="h-11 rounded-xl">
-                                                        <SelectValue placeholder="اختر الفرع" />
-                                                    </SelectTrigger>
-                                                    <SelectContent>
-                                                        <SelectItem value="main">المقر الرئيسي</SelectItem>
-                                                        <SelectItem value="riyadh">فرع الرياض</SelectItem>
-                                                        <SelectItem value="jeddah">فرع جدة</SelectItem>
-                                                        <SelectItem value="dammam">فرع الدمام</SelectItem>
-                                                    </SelectContent>
-                                                </Select>
-                                            </div>
-                                            <div className="space-y-2">
-                                                <Label htmlFor="departmentId" className="text-navy font-medium">
-                                                    القسم
-                                                </Label>
-                                                <Select value={departmentId} onValueChange={setDepartmentId}>
-                                                    <SelectTrigger className="h-11 rounded-xl">
-                                                        <SelectValue placeholder="اختر القسم" />
-                                                    </SelectTrigger>
-                                                    <SelectContent>
-                                                        <SelectItem value="legal">الشؤون القانونية</SelectItem>
-                                                        <SelectItem value="litigation">الترافع</SelectItem>
-                                                        <SelectItem value="corporate">الشركات</SelectItem>
-                                                        <SelectItem value="ip">الملكية الفكرية</SelectItem>
-                                                        <SelectItem value="admin">الشؤون الإدارية</SelectItem>
-                                                        <SelectItem value="finance">الشؤون المالية</SelectItem>
-                                                    </SelectContent>
-                                                </Select>
-                                            </div>
-                                        </div>
+                            {/* ===================== ADVANCED SECTIONS (Collapsible) ===================== */}
 
-                                        {/* Team & Supervisor */}
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                            <div className="space-y-2">
-                                                <Label htmlFor="teamId" className="text-navy font-medium">
-                                                    <Users className="w-4 h-4 inline ml-1" />
-                                                    الفريق
-                                                </Label>
-                                                <Select value={teamId} onValueChange={setTeamId}>
-                                                    <SelectTrigger className="h-11 rounded-xl">
-                                                        <SelectValue placeholder="اختر الفريق" />
-                                                    </SelectTrigger>
-                                                    <SelectContent>
-                                                        <SelectItem value="team1">فريق القضايا التجارية</SelectItem>
-                                                        <SelectItem value="team2">فريق القضايا الجنائية</SelectItem>
-                                                        <SelectItem value="team3">فريق العقود</SelectItem>
-                                                        <SelectItem value="team4">فريق الاستشارات</SelectItem>
-                                                    </SelectContent>
-                                                </Select>
+                            {/* Extended Personal Info */}
+                            <Collapsible open={openSections.includes('personal_advanced')} onOpenChange={() => toggleSection('personal_advanced')}>
+                                <Card className="rounded-3xl shadow-sm border-slate-100">
+                                    <CollapsibleTrigger asChild>
+                                        <CardHeader className="cursor-pointer hover:bg-slate-50 transition-colors rounded-t-3xl">
+                                            <div className="flex items-center justify-between">
+                                                <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
+                                                    <User className="w-5 h-5 text-purple-500" />
+                                                    معلومات شخصية إضافية
+                                                </CardTitle>
+                                                <ChevronDown className={cn("w-5 h-5 text-slate-400 transition-transform", openSections.includes('personal_advanced') && "rotate-180")} />
                                             </div>
-                                            <div className="space-y-2">
-                                                <Label htmlFor="supervisorId" className="text-navy font-medium">
-                                                    المشرف المباشر
-                                                </Label>
-                                                <Select value={supervisorId} onValueChange={setSupervisorId}>
-                                                    <SelectTrigger className="h-11 rounded-xl">
-                                                        <SelectValue placeholder="اختر المشرف" />
-                                                    </SelectTrigger>
-                                                    <SelectContent>
-                                                        <SelectItem value="none">بدون مشرف</SelectItem>
-                                                        <SelectItem value="manager1">أ. محمد العمري (مدير)</SelectItem>
-                                                        <SelectItem value="manager2">أ. أحمد السعيد (مشرف)</SelectItem>
-                                                    </SelectContent>
-                                                </Select>
-                                            </div>
-                                        </div>
-
-                                        {/* Cost Center & Team Leader */}
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                            <div className="space-y-2">
-                                                <Label htmlFor="costCenter" className="text-navy font-medium">
-                                                    مركز التكلفة
-                                                </Label>
-                                                <Input
-                                                    id="costCenter"
-                                                    value={costCenter}
-                                                    onChange={(e) => setCostCenter(e.target.value)}
-                                                    placeholder="CC-001"
-                                                    className="h-11 rounded-xl"
-                                                />
-                                            </div>
-                                            <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl">
-                                                <Label htmlFor="isTeamLeader" className="text-navy font-medium cursor-pointer">
-                                                    قائد فريق
-                                                </Label>
-                                                <Switch
-                                                    id="isTeamLeader"
-                                                    checked={isTeamLeader}
-                                                    onCheckedChange={setIsTeamLeader}
-                                                />
-                                            </div>
-                                        </div>
-                                    </CardContent>
-                                </Card>
-                            )}
-
-                            {/* SOLO-ONLY: PRACTICE INFO */}
-                            {practiceType === 'solo' && (
-                                <Card className="border border-purple-100 shadow-sm rounded-2xl overflow-hidden">
-                                    <CardHeader className="bg-purple-50/50 border-b border-purple-100">
-                                        <CardTitle className="text-lg font-bold text-navy flex items-center gap-2">
-                                            <UserCircle className="w-5 h-5 text-purple-600" />
-                                            بيانات المحامي المستقل
-                                            <span className="text-xs font-normal text-purple-600 bg-purple-100 px-2 py-1 rounded-full mr-auto">للمكتب الفردي</span>
-                                        </CardTitle>
-                                    </CardHeader>
-                                    <CardContent className="p-6 space-y-6">
-                                        {/* Practice Name & Bar Number */}
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                            <div className="space-y-2">
-                                                <Label htmlFor="practiceName" className="text-navy font-medium">
-                                                    اسم المكتب <span className="text-red-500">*</span>
-                                                </Label>
-                                                <Input
-                                                    id="practiceName"
-                                                    value={practiceName}
-                                                    onChange={(e) => setPracticeName(e.target.value)}
-                                                    placeholder="مكتب المحامي محمد للمحاماة"
-                                                    className="h-11 rounded-xl"
-                                                />
-                                            </div>
-                                            <div className="space-y-2">
-                                                <Label htmlFor="barNumber" className="text-navy font-medium">
-                                                    رقم الترخيص <span className="text-red-500">*</span>
-                                                </Label>
-                                                <Input
-                                                    id="barNumber"
-                                                    value={barNumber}
-                                                    onChange={(e) => setBarNumber(e.target.value)}
-                                                    placeholder="123456"
-                                                    className="h-11 rounded-xl"
-                                                    dir="ltr"
-                                                />
-                                            </div>
-                                        </div>
-
-                                        {/* License Expiry */}
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                            <div className="space-y-2">
-                                                <Label htmlFor="barLicenseExpiry" className="text-navy font-medium">
-                                                    <Calendar className="w-4 h-4 inline ml-1" />
-                                                    تاريخ انتهاء الترخيص
-                                                </Label>
-                                                <Input
-                                                    id="barLicenseExpiry"
-                                                    type="date"
-                                                    value={barLicenseExpiry}
-                                                    onChange={(e) => setBarLicenseExpiry(e.target.value)}
-                                                    className="h-11 rounded-xl"
-                                                />
-                                            </div>
-                                        </div>
-
-                                        {/* Specializations */}
-                                        <div className="space-y-3">
-                                            <Label className="text-navy font-medium">
-                                                <Award className="w-4 h-4 inline ml-1" />
-                                                التخصصات
-                                            </Label>
-                                            <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                                                {[
-                                                    { value: 'commercial', label: 'تجاري' },
-                                                    { value: 'criminal', label: 'جنائي' },
-                                                    { value: 'family', label: 'أحوال شخصية' },
-                                                    { value: 'labor', label: 'عمالي' },
-                                                    { value: 'real_estate', label: 'عقاري' },
-                                                    { value: 'ip', label: 'ملكية فكرية' },
-                                                ].map((spec) => (
-                                                    <label
-                                                        key={spec.value}
-                                                        className={`flex items-center gap-2 p-3 rounded-xl border cursor-pointer transition-all ${
-                                                            practiceSpecialization.includes(spec.value)
-                                                                ? 'border-purple-500 bg-purple-50 text-purple-700'
-                                                                : 'border-slate-200 hover:border-slate-300'
-                                                        }`}
-                                                    >
-                                                        <input
-                                                            type="checkbox"
-                                                            className="sr-only"
-                                                            checked={practiceSpecialization.includes(spec.value)}
-                                                            onChange={(e) => {
-                                                                if (e.target.checked) {
-                                                                    setPracticeSpecialization([...practiceSpecialization, spec.value])
-                                                                } else {
-                                                                    setPracticeSpecialization(practiceSpecialization.filter(s => s !== spec.value))
-                                                                }
-                                                            }}
-                                                        />
-                                                        <span className="text-sm font-medium">{spec.label}</span>
-                                                    </label>
-                                                ))}
-                                            </div>
-                                        </div>
-                                    </CardContent>
-                                </Card>
-                            )}
-
-                            {/* ADVANCED-ONLY: ADDITIONAL INFO */}
-                            {formMode === 'advanced' && (
-                                <>
-                                    {/* Extended Personal Info */}
-                                    <Card className="border border-amber-100 shadow-sm rounded-2xl overflow-hidden">
-                                        <CardHeader className="bg-amber-50/50 border-b border-amber-100">
-                                            <CardTitle className="text-lg font-bold text-navy flex items-center gap-2">
-                                                <User className="w-5 h-5 text-amber-600" />
-                                                بيانات شخصية إضافية
-                                                <span className="text-xs font-normal text-amber-600 bg-amber-100 px-2 py-1 rounded-full mr-auto">متقدم</span>
-                                            </CardTitle>
                                         </CardHeader>
-                                        <CardContent className="p-6 space-y-6">
-                                            {/* Passport & Blood Type */}
+                                    </CollapsibleTrigger>
+                                    <CollapsibleContent>
+                                        <CardContent className="space-y-4 pt-0">
                                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                                 <div className="space-y-2">
-                                                    <Label htmlFor="passportNumber" className="text-navy font-medium">
-                                                        رقم جواز السفر
-                                                    </Label>
+                                                    <Label className="text-navy font-medium">الجنسية</Label>
+                                                    <Select value={nationality} onValueChange={setNationality}>
+                                                        <SelectTrigger className="h-11 rounded-xl">
+                                                            <SelectValue />
+                                                        </SelectTrigger>
+                                                        <SelectContent>
+                                                            <SelectItem value="Saudi Arabia">سعودي</SelectItem>
+                                                            <SelectItem value="Egypt">مصري</SelectItem>
+                                                            <SelectItem value="Jordan">أردني</SelectItem>
+                                                            <SelectItem value="Syria">سوري</SelectItem>
+                                                            <SelectItem value="Yemen">يمني</SelectItem>
+                                                            <SelectItem value="Pakistan">باكستاني</SelectItem>
+                                                            <SelectItem value="India">هندي</SelectItem>
+                                                            <SelectItem value="Philippines">فلبيني</SelectItem>
+                                                            <SelectItem value="Other">أخرى</SelectItem>
+                                                        </SelectContent>
+                                                    </Select>
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <Label className="text-navy font-medium">تاريخ الميلاد</Label>
                                                     <Input
-                                                        id="passportNumber"
-                                                        value={passportNumber}
-                                                        onChange={(e) => setPassportNumber(e.target.value)}
-                                                        placeholder="A12345678"
+                                                        type="date"
+                                                        value={dateOfBirth}
+                                                        onChange={(e) => setDateOfBirth(e.target.value)}
+                                                        className="h-11 rounded-xl"
+                                                    />
+                                                </div>
+                                                {nationalIdType !== 'saudi_id' && (
+                                                    <div className="space-y-2">
+                                                        <Label className="text-navy font-medium">تاريخ انتهاء الهوية</Label>
+                                                        <Input
+                                                            type="date"
+                                                            value={nationalIdExpiry}
+                                                            onChange={(e) => setNationalIdExpiry(e.target.value)}
+                                                            className="h-11 rounded-xl"
+                                                        />
+                                                    </div>
+                                                )}
+                                            </div>
+
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                <div className="space-y-2">
+                                                    <Label className="text-navy font-medium flex items-center gap-1">
+                                                        <MapPin className="w-4 h-4" />
+                                                        المدينة
+                                                    </Label>
+                                                    <Select value={city} onValueChange={setCity}>
+                                                        <SelectTrigger className="h-11 rounded-xl">
+                                                            <SelectValue placeholder="اختر المدينة" />
+                                                        </SelectTrigger>
+                                                        <SelectContent>
+                                                            <SelectItem value="Riyadh">الرياض</SelectItem>
+                                                            <SelectItem value="Jeddah">جدة</SelectItem>
+                                                            <SelectItem value="Makkah">مكة المكرمة</SelectItem>
+                                                            <SelectItem value="Madinah">المدينة المنورة</SelectItem>
+                                                            <SelectItem value="Dammam">الدمام</SelectItem>
+                                                            <SelectItem value="Khobar">الخبر</SelectItem>
+                                                        </SelectContent>
+                                                    </Select>
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <Label className="text-navy font-medium">المنطقة</Label>
+                                                    <Select value={region} onValueChange={setRegion}>
+                                                        <SelectTrigger className="h-11 rounded-xl">
+                                                            <SelectValue placeholder="اختر المنطقة" />
+                                                        </SelectTrigger>
+                                                        <SelectContent>
+                                                            <SelectItem value="Riyadh Region">منطقة الرياض</SelectItem>
+                                                            <SelectItem value="Makkah Region">منطقة مكة المكرمة</SelectItem>
+                                                            <SelectItem value="Eastern Province">المنطقة الشرقية</SelectItem>
+                                                            <SelectItem value="Madinah Region">منطقة المدينة المنورة</SelectItem>
+                                                        </SelectContent>
+                                                    </Select>
+                                                </div>
+                                            </div>
+
+                                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                                <div className="space-y-2">
+                                                    <Label className="text-navy font-medium">البريد الشخصي</Label>
+                                                    <Input
+                                                        type="email"
+                                                        value={personalEmail}
+                                                        onChange={(e) => setPersonalEmail(e.target.value)}
+                                                        placeholder="personal@email.com"
                                                         className="h-11 rounded-xl"
                                                         dir="ltr"
                                                     />
                                                 </div>
                                                 <div className="space-y-2">
-                                                    <Label htmlFor="passportExpiry" className="text-navy font-medium">
-                                                        تاريخ انتهاء الجواز
-                                                    </Label>
-                                                    <Input
-                                                        id="passportExpiry"
-                                                        type="date"
-                                                        value={passportExpiry}
-                                                        onChange={(e) => setPassportExpiry(e.target.value)}
-                                                        className="h-11 rounded-xl"
-                                                    />
-                                                </div>
-                                                <div className="space-y-2">
-                                                    <Label htmlFor="bloodType" className="text-navy font-medium">
-                                                        فصيلة الدم
-                                                    </Label>
-                                                    <Select value={bloodType} onValueChange={setBloodType}>
+                                                    <Label className="text-navy font-medium">الحالة الاجتماعية</Label>
+                                                    <Select value={maritalStatus} onValueChange={setMaritalStatus}>
                                                         <SelectTrigger className="h-11 rounded-xl">
                                                             <SelectValue placeholder="اختر" />
                                                         </SelectTrigger>
                                                         <SelectContent>
-                                                            <SelectItem value="A+">A+</SelectItem>
-                                                            <SelectItem value="A-">A-</SelectItem>
-                                                            <SelectItem value="B+">B+</SelectItem>
-                                                            <SelectItem value="B-">B-</SelectItem>
-                                                            <SelectItem value="O+">O+</SelectItem>
-                                                            <SelectItem value="O-">O-</SelectItem>
-                                                            <SelectItem value="AB+">AB+</SelectItem>
-                                                            <SelectItem value="AB-">AB-</SelectItem>
+                                                            <SelectItem value="single">أعزب</SelectItem>
+                                                            <SelectItem value="married">متزوج</SelectItem>
+                                                            <SelectItem value="divorced">مطلق</SelectItem>
+                                                            <SelectItem value="widowed">أرمل</SelectItem>
                                                         </SelectContent>
                                                     </Select>
                                                 </div>
-                                            </div>
-
-                                            {/* Driving License */}
-                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                                 <div className="space-y-2">
-                                                    <Label htmlFor="drivingLicense" className="text-navy font-medium">
-                                                        رخصة القيادة
-                                                    </Label>
-                                                    <Select value={drivingLicense} onValueChange={setDrivingLicense}>
-                                                        <SelectTrigger className="h-11 rounded-xl">
-                                                            <SelectValue placeholder="اختر نوع الرخصة" />
-                                                        </SelectTrigger>
-                                                        <SelectContent>
-                                                            <SelectItem value="none">لا يوجد</SelectItem>
-                                                            <SelectItem value="private">خاصة</SelectItem>
-                                                            <SelectItem value="public">عامة</SelectItem>
-                                                            <SelectItem value="heavy">مركبات ثقيلة</SelectItem>
-                                                            <SelectItem value="motorcycle">دراجة نارية</SelectItem>
-                                                        </SelectContent>
-                                                    </Select>
+                                                    <Label className="text-navy font-medium">عدد المعالين</Label>
+                                                    <Input
+                                                        type="number"
+                                                        value={numberOfDependents}
+                                                        onChange={(e) => setNumberOfDependents(parseInt(e.target.value) || 0)}
+                                                        min={0}
+                                                        className="h-11 rounded-xl"
+                                                    />
                                                 </div>
-                                            </div>
-
-                                            {/* Notes */}
-                                            <div className="space-y-2">
-                                                <Label htmlFor="notes" className="text-navy font-medium">
-                                                    ملاحظات
-                                                </Label>
-                                                <Textarea
-                                                    id="notes"
-                                                    value={notes}
-                                                    onChange={(e) => setNotes(e.target.value)}
-                                                    placeholder="أي ملاحظات إضافية..."
-                                                    className="rounded-xl min-h-[100px]"
-                                                />
                                             </div>
                                         </CardContent>
-                                    </Card>
+                                    </CollapsibleContent>
+                                </Card>
+                            </Collapsible>
 
-                                    {/* Qualifications */}
-                                    <Card className="border border-emerald-100 shadow-sm rounded-2xl overflow-hidden">
-                                        <CardHeader className="bg-emerald-50/50 border-b border-emerald-100">
-                                            <CardTitle className="text-lg font-bold text-navy flex items-center gap-2">
-                                                <GraduationCap className="w-5 h-5 text-emerald-600" />
-                                                المؤهلات العلمية
-                                                <span className="text-xs font-normal text-emerald-600 bg-emerald-100 px-2 py-1 rounded-full mr-auto">متقدم</span>
-                                            </CardTitle>
+                            {/* Emergency Contact */}
+                            <Collapsible open={openSections.includes('emergency')} onOpenChange={() => toggleSection('emergency')}>
+                                <Card className="rounded-3xl shadow-sm border-slate-100">
+                                    <CollapsibleTrigger asChild>
+                                        <CardHeader className="cursor-pointer hover:bg-slate-50 transition-colors rounded-t-3xl">
+                                            <div className="flex items-center justify-between">
+                                                <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
+                                                    <Phone className="w-5 h-5 text-red-500" />
+                                                    جهة اتصال الطوارئ
+                                                </CardTitle>
+                                                <ChevronDown className={cn("w-5 h-5 text-slate-400 transition-transform", openSections.includes('emergency') && "rotate-180")} />
+                                            </div>
                                         </CardHeader>
-                                        <CardContent className="p-6 space-y-6">
-                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    </CollapsibleTrigger>
+                                    <CollapsibleContent>
+                                        <CardContent className="space-y-4 pt-0">
+                                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                                 <div className="space-y-2">
-                                                    <Label htmlFor="educationLevel" className="text-navy font-medium">
-                                                        المستوى التعليمي
-                                                    </Label>
-                                                    <Select value={educationLevel} onValueChange={setEducationLevel}>
+                                                    <Label className="text-navy font-medium">الاسم</Label>
+                                                    <Input
+                                                        value={emergencyName}
+                                                        onChange={(e) => setEmergencyName(e.target.value)}
+                                                        placeholder="اسم جهة الاتصال"
+                                                        className="h-11 rounded-xl"
+                                                    />
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <Label className="text-navy font-medium">صلة القرابة</Label>
+                                                    <Select value={emergencyRelationship} onValueChange={setEmergencyRelationship}>
                                                         <SelectTrigger className="h-11 rounded-xl">
-                                                            <SelectValue placeholder="اختر المستوى" />
+                                                            <SelectValue placeholder="اختر" />
                                                         </SelectTrigger>
                                                         <SelectContent>
-                                                            <SelectItem value="high_school">ثانوية عامة</SelectItem>
-                                                            <SelectItem value="diploma">دبلوم</SelectItem>
-                                                            <SelectItem value="bachelor">بكالوريوس</SelectItem>
-                                                            <SelectItem value="master">ماجستير</SelectItem>
-                                                            <SelectItem value="phd">دكتوراه</SelectItem>
+                                                            <SelectItem value="Father">الأب</SelectItem>
+                                                            <SelectItem value="Mother">الأم</SelectItem>
+                                                            <SelectItem value="Spouse">الزوج/الزوجة</SelectItem>
+                                                            <SelectItem value="Brother">الأخ</SelectItem>
+                                                            <SelectItem value="Sister">الأخت</SelectItem>
+                                                            <SelectItem value="Other">أخرى</SelectItem>
                                                         </SelectContent>
                                                     </Select>
                                                 </div>
                                                 <div className="space-y-2">
-                                                    <Label htmlFor="educationMajor" className="text-navy font-medium">
-                                                        التخصص
-                                                    </Label>
+                                                    <Label className="text-navy font-medium">رقم الهاتف</Label>
                                                     <Input
-                                                        id="educationMajor"
-                                                        value={educationMajor}
-                                                        onChange={(e) => setEducationMajor(e.target.value)}
-                                                        placeholder="القانون"
+                                                        value={emergencyPhone}
+                                                        onChange={(e) => setEmergencyPhone(e.target.value)}
+                                                        placeholder="+966 5XXXXXXXX"
+                                                        className="h-11 rounded-xl"
+                                                        dir="ltr"
+                                                    />
+                                                </div>
+                                            </div>
+                                        </CardContent>
+                                    </CollapsibleContent>
+                                </Card>
+                            </Collapsible>
+
+                            {/* Contract Details */}
+                            <Collapsible open={openSections.includes('contract')} onOpenChange={() => toggleSection('contract')}>
+                                <Card className="rounded-3xl shadow-sm border-slate-100">
+                                    <CollapsibleTrigger asChild>
+                                        <CardHeader className="cursor-pointer hover:bg-slate-50 transition-colors rounded-t-3xl">
+                                            <div className="flex items-center justify-between">
+                                                <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
+                                                    <FileText className="w-5 h-5 text-blue-500" />
+                                                    تفاصيل العقد
+                                                </CardTitle>
+                                                <ChevronDown className={cn("w-5 h-5 text-slate-400 transition-transform", openSections.includes('contract') && "rotate-180")} />
+                                            </div>
+                                        </CardHeader>
+                                    </CollapsibleTrigger>
+                                    <CollapsibleContent>
+                                        <CardContent className="space-y-4 pt-0">
+                                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                                <div className="space-y-2">
+                                                    <Label className="text-navy font-medium">الرقم الوظيفي</Label>
+                                                    <Input
+                                                        value={employeeNumber}
+                                                        onChange={(e) => setEmployeeNumber(e.target.value)}
+                                                        placeholder="EMP001"
+                                                        className="h-11 rounded-xl"
+                                                    />
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <Label className="text-navy font-medium">نوع العقد</Label>
+                                                    <Select value={contractType} onValueChange={(v) => setContractType(v as ContractType)}>
+                                                        <SelectTrigger className="h-11 rounded-xl">
+                                                            <SelectValue />
+                                                        </SelectTrigger>
+                                                        <SelectContent>
+                                                            <SelectItem value="indefinite">غير محدد المدة</SelectItem>
+                                                            <SelectItem value="fixed_term">محدد المدة</SelectItem>
+                                                        </SelectContent>
+                                                    </Select>
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <Label className="text-navy font-medium">فترة التجربة (أيام)</Label>
+                                                    <Input
+                                                        type="number"
+                                                        value={probationPeriod}
+                                                        onChange={(e) => setProbationPeriod(parseInt(e.target.value) || 90)}
+                                                        min={0}
+                                                        max={180}
                                                         className="h-11 rounded-xl"
                                                     />
                                                 </div>
                                             </div>
                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                                 <div className="space-y-2">
-                                                    <Label htmlFor="educationInstitution" className="text-navy font-medium">
-                                                        الجامعة / المؤسسة
-                                                    </Label>
+                                                    <Label className="text-navy font-medium">تاريخ بداية العقد</Label>
                                                     <Input
-                                                        id="educationInstitution"
-                                                        value={educationInstitution}
-                                                        onChange={(e) => setEducationInstitution(e.target.value)}
-                                                        placeholder="جامعة الملك سعود"
+                                                        type="date"
+                                                        value={contractStartDate}
+                                                        onChange={(e) => setContractStartDate(e.target.value)}
+                                                        className="h-11 rounded-xl"
+                                                    />
+                                                </div>
+                                                {contractType === 'fixed_term' && (
+                                                    <div className="space-y-2">
+                                                        <Label className="text-navy font-medium">تاريخ نهاية العقد</Label>
+                                                        <Input
+                                                            type="date"
+                                                            value={contractEndDate}
+                                                            onChange={(e) => setContractEndDate(e.target.value)}
+                                                            className="h-11 rounded-xl"
+                                                        />
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </CardContent>
+                                    </CollapsibleContent>
+                                </Card>
+                            </Collapsible>
+
+                            {/* Work Schedule */}
+                            <Collapsible open={openSections.includes('schedule')} onOpenChange={() => toggleSection('schedule')}>
+                                <Card className="rounded-3xl shadow-sm border-slate-100">
+                                    <CollapsibleTrigger asChild>
+                                        <CardHeader className="cursor-pointer hover:bg-slate-50 transition-colors rounded-t-3xl">
+                                            <div className="flex items-center justify-between">
+                                                <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
+                                                    <Clock className="w-5 h-5 text-indigo-500" />
+                                                    جدول العمل
+                                                </CardTitle>
+                                                <ChevronDown className={cn("w-5 h-5 text-slate-400 transition-transform", openSections.includes('schedule') && "rotate-180")} />
+                                            </div>
+                                        </CardHeader>
+                                    </CollapsibleTrigger>
+                                    <CollapsibleContent>
+                                        <CardContent className="space-y-4 pt-0">
+                                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                                <div className="space-y-2">
+                                                    <Label className="text-navy font-medium">ساعات العمل الأسبوعية</Label>
+                                                    <Input
+                                                        type="number"
+                                                        value={weeklyHours}
+                                                        onChange={(e) => setWeeklyHours(parseInt(e.target.value) || 48)}
+                                                        max={48}
                                                         className="h-11 rounded-xl"
                                                     />
                                                 </div>
                                                 <div className="space-y-2">
-                                                    <Label htmlFor="educationYear" className="text-navy font-medium">
-                                                        سنة التخرج
-                                                    </Label>
+                                                    <Label className="text-navy font-medium">ساعات العمل اليومية</Label>
                                                     <Input
-                                                        id="educationYear"
-                                                        value={educationYear}
-                                                        onChange={(e) => setEducationYear(e.target.value)}
-                                                        placeholder="2020"
+                                                        type="number"
+                                                        value={dailyHours}
+                                                        onChange={(e) => setDailyHours(parseInt(e.target.value) || 8)}
+                                                        max={8}
                                                         className="h-11 rounded-xl"
+                                                    />
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <Label className="text-navy font-medium">يوم الراحة</Label>
+                                                    <Select value={restDay} onValueChange={setRestDay}>
+                                                        <SelectTrigger className="h-11 rounded-xl">
+                                                            <SelectValue />
+                                                        </SelectTrigger>
+                                                        <SelectContent>
+                                                            <SelectItem value="Friday">الجمعة</SelectItem>
+                                                            <SelectItem value="Saturday">السبت</SelectItem>
+                                                            <SelectItem value="Sunday">الأحد</SelectItem>
+                                                        </SelectContent>
+                                                    </Select>
+                                                </div>
+                                            </div>
+                                        </CardContent>
+                                    </CollapsibleContent>
+                                </Card>
+                            </Collapsible>
+
+                            {/* Payment Details */}
+                            <Collapsible open={openSections.includes('payment')} onOpenChange={() => toggleSection('payment')}>
+                                <Card className="rounded-3xl shadow-sm border-slate-100">
+                                    <CollapsibleTrigger asChild>
+                                        <CardHeader className="cursor-pointer hover:bg-slate-50 transition-colors rounded-t-3xl">
+                                            <div className="flex items-center justify-between">
+                                                <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
+                                                    <CreditCard className="w-5 h-5 text-green-500" />
+                                                    تفاصيل الدفع
+                                                </CardTitle>
+                                                <ChevronDown className={cn("w-5 h-5 text-slate-400 transition-transform", openSections.includes('payment') && "rotate-180")} />
+                                            </div>
+                                        </CardHeader>
+                                    </CollapsibleTrigger>
+                                    <CollapsibleContent>
+                                        <CardContent className="space-y-4 pt-0">
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                <div className="space-y-2">
+                                                    <Label className="text-navy font-medium">دورة الدفع</Label>
+                                                    <Select value={paymentFrequency} onValueChange={(v) => setPaymentFrequency(v as PaymentFrequency)}>
+                                                        <SelectTrigger className="h-11 rounded-xl">
+                                                            <SelectValue />
+                                                        </SelectTrigger>
+                                                        <SelectContent>
+                                                            <SelectItem value="monthly">شهري</SelectItem>
+                                                            <SelectItem value="bi_weekly">كل أسبوعين</SelectItem>
+                                                            <SelectItem value="weekly">أسبوعي</SelectItem>
+                                                        </SelectContent>
+                                                    </Select>
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <Label className="text-navy font-medium">طريقة الدفع</Label>
+                                                    <Select value={paymentMethod} onValueChange={(v) => setPaymentMethod(v as PaymentMethod)}>
+                                                        <SelectTrigger className="h-11 rounded-xl">
+                                                            <SelectValue />
+                                                        </SelectTrigger>
+                                                        <SelectContent>
+                                                            <SelectItem value="bank_transfer">تحويل بنكي</SelectItem>
+                                                            <SelectItem value="cash">نقدي</SelectItem>
+                                                            <SelectItem value="check">شيك</SelectItem>
+                                                        </SelectContent>
+                                                    </Select>
+                                                </div>
+                                            </div>
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                <div className="space-y-2">
+                                                    <Label className="text-navy font-medium">اسم البنك</Label>
+                                                    <Select value={bankName} onValueChange={setBankName}>
+                                                        <SelectTrigger className="h-11 rounded-xl">
+                                                            <SelectValue placeholder="اختر البنك" />
+                                                        </SelectTrigger>
+                                                        <SelectContent>
+                                                            <SelectItem value="Al Rajhi Bank">مصرف الراجحي</SelectItem>
+                                                            <SelectItem value="National Commercial Bank">البنك الأهلي</SelectItem>
+                                                            <SelectItem value="Riyad Bank">بنك الرياض</SelectItem>
+                                                            <SelectItem value="Alinma Bank">مصرف الإنماء</SelectItem>
+                                                        </SelectContent>
+                                                    </Select>
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <Label className="text-navy font-medium">رقم الآيبان (IBAN)</Label>
+                                                    <Input
+                                                        value={iban}
+                                                        onChange={(e) => setIban(e.target.value)}
+                                                        placeholder="SA0000000000000000000000"
+                                                        className="h-11 rounded-xl"
+                                                        dir="ltr"
                                                     />
                                                 </div>
                                             </div>
                                         </CardContent>
+                                    </CollapsibleContent>
+                                </Card>
+                            </Collapsible>
+
+                            {/* GOSI */}
+                            <Collapsible open={openSections.includes('gosi')} onOpenChange={() => toggleSection('gosi')}>
+                                <Card className="rounded-3xl shadow-sm border-slate-100">
+                                    <CollapsibleTrigger asChild>
+                                        <CardHeader className="cursor-pointer hover:bg-slate-50 transition-colors rounded-t-3xl">
+                                            <div className="flex items-center justify-between">
+                                                <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
+                                                    <Shield className="w-5 h-5 text-cyan-500" />
+                                                    التأمينات الاجتماعية
+                                                </CardTitle>
+                                                <ChevronDown className={cn("w-5 h-5 text-slate-400 transition-transform", openSections.includes('gosi') && "rotate-180")} />
+                                            </div>
+                                        </CardHeader>
+                                    </CollapsibleTrigger>
+                                    <CollapsibleContent>
+                                        <CardContent className="space-y-4 pt-0">
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl">
+                                                    <Label className="text-navy font-medium">مسجل في التأمينات</Label>
+                                                    <Switch
+                                                        checked={gosiRegistered}
+                                                        onCheckedChange={setGosiRegistered}
+                                                    />
+                                                </div>
+                                                {gosiRegistered && (
+                                                    <div className="space-y-2">
+                                                        <Label className="text-navy font-medium">رقم التأمينات</Label>
+                                                        <Input
+                                                            value={gosiNumber}
+                                                            onChange={(e) => setGosiNumber(e.target.value)}
+                                                            placeholder="رقم التأمينات"
+                                                            className="h-11 rounded-xl"
+                                                        />
+                                                    </div>
+                                                )}
+                                            </div>
+                                            {isSaudi && (
+                                                <div className="bg-blue-50 rounded-xl p-4 border border-blue-100">
+                                                    <div className="flex items-start gap-2">
+                                                        <AlertCircle className="w-5 h-5 text-blue-500 mt-0.5" />
+                                                        <div className="text-sm text-blue-800">
+                                                            <strong>نسبة الاستقطاع للموظف السعودي:</strong>
+                                                            <ul className="mt-2 mr-4 list-disc">
+                                                                <li>حصة الموظف: 9.75% من الراتب الأساسي</li>
+                                                                <li>حصة صاحب العمل: 12.75% من الراتب الأساسي</li>
+                                                            </ul>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </CardContent>
+                                    </CollapsibleContent>
+                                </Card>
+                            </Collapsible>
+
+                            {/* Organization Structure - Only for medium/firm */}
+                            {(officeType === 'medium' || officeType === 'firm') && (
+                                <Collapsible open={openSections.includes('organization')} onOpenChange={() => toggleSection('organization')}>
+                                    <Card className="rounded-3xl shadow-sm border-blue-100">
+                                        <CollapsibleTrigger asChild>
+                                            <CardHeader className="cursor-pointer hover:bg-blue-50/50 transition-colors rounded-t-3xl bg-blue-50/30">
+                                                <div className="flex items-center justify-between">
+                                                    <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
+                                                        <Building2 className="w-5 h-5 text-blue-500" />
+                                                        الهيكل التنظيمي
+                                                        <span className="text-xs font-normal text-blue-600 bg-blue-100 px-2 py-1 rounded-full">للمكاتب المتوسطة والكبيرة</span>
+                                                    </CardTitle>
+                                                    <ChevronDown className={cn("w-5 h-5 text-slate-400 transition-transform", openSections.includes('organization') && "rotate-180")} />
+                                                </div>
+                                            </CardHeader>
+                                        </CollapsibleTrigger>
+                                        <CollapsibleContent>
+                                            <CardContent className="space-y-4 pt-0">
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                    <div className="space-y-2">
+                                                        <Label className="text-navy font-medium">الفرع</Label>
+                                                        <Select value={branchId} onValueChange={setBranchId}>
+                                                            <SelectTrigger className="h-11 rounded-xl">
+                                                                <SelectValue placeholder="اختر الفرع" />
+                                                            </SelectTrigger>
+                                                            <SelectContent>
+                                                                <SelectItem value="main">المقر الرئيسي</SelectItem>
+                                                                <SelectItem value="riyadh">فرع الرياض</SelectItem>
+                                                                <SelectItem value="jeddah">فرع جدة</SelectItem>
+                                                                <SelectItem value="dammam">فرع الدمام</SelectItem>
+                                                            </SelectContent>
+                                                        </Select>
+                                                    </div>
+                                                    <div className="space-y-2">
+                                                        <Label className="text-navy font-medium">القسم</Label>
+                                                        <Select value={departmentName} onValueChange={setDepartmentName}>
+                                                            <SelectTrigger className="h-11 rounded-xl">
+                                                                <SelectValue placeholder="اختر القسم" />
+                                                            </SelectTrigger>
+                                                            <SelectContent>
+                                                                <SelectItem value="Legal">الشؤون القانونية</SelectItem>
+                                                                <SelectItem value="Finance">المالية</SelectItem>
+                                                                <SelectItem value="HR">الموارد البشرية</SelectItem>
+                                                                <SelectItem value="IT">تقنية المعلومات</SelectItem>
+                                                                <SelectItem value="Administration">الإدارة</SelectItem>
+                                                            </SelectContent>
+                                                        </Select>
+                                                    </div>
+                                                </div>
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                    <div className="space-y-2">
+                                                        <Label className="text-navy font-medium">الفريق</Label>
+                                                        <Select value={teamId} onValueChange={setTeamId}>
+                                                            <SelectTrigger className="h-11 rounded-xl">
+                                                                <SelectValue placeholder="اختر الفريق" />
+                                                            </SelectTrigger>
+                                                            <SelectContent>
+                                                                <SelectItem value="team1">فريق القضايا التجارية</SelectItem>
+                                                                <SelectItem value="team2">فريق القضايا الجنائية</SelectItem>
+                                                                <SelectItem value="team3">فريق العقود</SelectItem>
+                                                            </SelectContent>
+                                                        </Select>
+                                                    </div>
+                                                    <div className="space-y-2">
+                                                        <Label className="text-navy font-medium">المشرف المباشر</Label>
+                                                        <Select value={supervisorId} onValueChange={setSupervisorId}>
+                                                            <SelectTrigger className="h-11 rounded-xl">
+                                                                <SelectValue placeholder="اختر المشرف" />
+                                                            </SelectTrigger>
+                                                            <SelectContent>
+                                                                <SelectItem value="none">بدون مشرف</SelectItem>
+                                                                <SelectItem value="manager1">أ. محمد العمري</SelectItem>
+                                                                <SelectItem value="manager2">أ. أحمد السعيد</SelectItem>
+                                                            </SelectContent>
+                                                        </Select>
+                                                    </div>
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <Label className="text-navy font-medium">مركز التكلفة</Label>
+                                                    <Input
+                                                        value={costCenter}
+                                                        onChange={(e) => setCostCenter(e.target.value)}
+                                                        placeholder="CC-001"
+                                                        className="h-11 rounded-xl max-w-xs"
+                                                    />
+                                                </div>
+                                            </CardContent>
+                                        </CollapsibleContent>
                                     </Card>
-                                </>
+                                </Collapsible>
                             )}
 
-                            {/* SUBMIT BUTTON */}
-                            <div className="flex justify-end gap-4">
+                            {/* Leave Balance */}
+                            <Collapsible open={openSections.includes('leave')} onOpenChange={() => toggleSection('leave')}>
+                                <Card className="rounded-3xl shadow-sm border-slate-100">
+                                    <CollapsibleTrigger asChild>
+                                        <CardHeader className="cursor-pointer hover:bg-slate-50 transition-colors rounded-t-3xl">
+                                            <div className="flex items-center justify-between">
+                                                <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
+                                                    <Calendar className="w-5 h-5 text-orange-500" />
+                                                    رصيد الإجازات
+                                                </CardTitle>
+                                                <ChevronDown className={cn("w-5 h-5 text-slate-400 transition-transform", openSections.includes('leave') && "rotate-180")} />
+                                            </div>
+                                        </CardHeader>
+                                    </CollapsibleTrigger>
+                                    <CollapsibleContent>
+                                        <CardContent className="space-y-4 pt-0">
+                                            <div className="space-y-2">
+                                                <Label className="text-navy font-medium">رصيد الإجازة السنوية (أيام)</Label>
+                                                <Input
+                                                    type="number"
+                                                    value={annualLeaveEntitlement}
+                                                    onChange={(e) => setAnnualLeaveEntitlement(parseInt(e.target.value) || 21)}
+                                                    min={21}
+                                                    max={30}
+                                                    className="h-11 rounded-xl max-w-xs"
+                                                />
+                                                <p className="text-xs text-slate-500">21 يوم (أقل من 5 سنوات) أو 30 يوم (5 سنوات فأكثر)</p>
+                                            </div>
+                                        </CardContent>
+                                    </CollapsibleContent>
+                                </Card>
+                            </Collapsible>
+
+                            {/* SUBMIT BUTTONS */}
+                            <div className="flex justify-end gap-4 pt-4">
                                 <Button
                                     type="button"
                                     variant="outline"
@@ -1629,7 +1332,6 @@ export function EmployeeCreateView() {
                         </form>
                     </div>
 
-                    {/* LEFT COLUMN (Widgets) */}
                     <HRSidebar context="employees" />
                 </div>
             </Main>
