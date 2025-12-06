@@ -49,18 +49,18 @@ export const useAuthStore = create<AuthState>()(
 
           // Handle permissions based on user type
           if (user.role === 'lawyer') {
-            // Solo lawyers get permissions directly from login response
-            if (user.isSoloLawyer && user.permissions) {
-              // Set permissions directly from login response
-              usePermissionsStore.getState().setPermissionsFromLogin(user.permissions, true)
-            } else if (user.firmId) {
-              // Firm members need to fetch permissions from firm API
+            if (user.firmId) {
+              // Firm member - fetch permissions from firm API
               try {
                 await usePermissionsStore.getState().fetchPermissions()
               } catch (permError) {
                 console.warn('Could not fetch permissions:', permError)
                 // Don't fail login if permissions fetch fails
               }
+            } else {
+              // No firm = solo lawyer
+              // Set permissions from login response if available, otherwise mark as solo
+              usePermissionsStore.getState().setPermissionsFromLogin(user.permissions || null, true)
             }
           }
           // Clients don't need permissions
@@ -139,17 +139,18 @@ export const useAuthStore = create<AuthState>()(
 
           // Handle permissions based on user type
           if (user && user.role === 'lawyer') {
-            // Solo lawyers get permissions directly from login/me response
-            if (user.isSoloLawyer && user.permissions) {
-              usePermissionsStore.getState().setPermissionsFromLogin(user.permissions, true)
-            } else if (user.firmId) {
-              // Firm members need to fetch permissions from firm API
+            if (user.firmId) {
+              // Firm member - fetch permissions from firm API
               try {
                 await usePermissionsStore.getState().fetchPermissions()
               } catch (permError) {
                 console.warn('Could not fetch permissions:', permError)
                 // Don't fail auth check if permissions fetch fails
               }
+            } else {
+              // No firm = solo lawyer
+              // Set permissions from response if available, otherwise mark as solo
+              usePermissionsStore.getState().setPermissionsFromLogin(user.permissions || null, true)
             }
           }
         } catch (error: any) {

@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, Link, useSearch } from '@tanstack/react-router';
 import { useAuthStore } from '@/stores/auth-store';
-import { usePermissionsStore } from '@/stores/permissions-store';
 
 // ============================================
 // SVG ICONS
@@ -117,21 +116,8 @@ export function SignIn() {
         password: formData.password,
       });
 
-      // Get user from store to check user type
-      const user = useAuthStore.getState().user;
-
-      // Solo lawyers and firm members go directly to dashboard
-      // Only redirect to /no-firm if lawyer has no firm AND is not a solo lawyer
-      // (This is an edge case that shouldn't happen with proper backend)
-      if (user?.role === 'lawyer' && !user.isSoloLawyer && !user.firmId) {
-        const { noFirmAssociated } = usePermissionsStore.getState();
-        if (noFirmAssociated) {
-          navigate({ to: '/no-firm' });
-          return;
-        }
-      }
-
       // Navigate to redirect URL or dashboard
+      // No firm check needed - lawyers without firm are treated as solo lawyers
       const redirectTo = search.redirect || '/';
       navigate({ to: redirectTo });
     } catch (err: any) {

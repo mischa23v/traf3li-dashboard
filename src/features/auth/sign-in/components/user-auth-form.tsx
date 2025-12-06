@@ -23,7 +23,6 @@ import { Button } from '@/components/ui/button'
 import { PasswordInput } from '@/components/password-input'
 import { cn } from '@/lib/utils'
 import { useAuthStore } from '@/stores/auth-store'
-import { usePermissionsStore } from '@/stores/permissions-store'
 
 interface UserAuthFormProps extends HTMLAttributes<HTMLDivElement> {}
 
@@ -75,18 +74,8 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
         throw new Error(t('auth.signIn.error'))
       }
 
-      // Solo lawyers and firm members go directly to dashboard
-      // Only redirect to /no-firm if lawyer has no firm AND is not a solo lawyer
-      // (This is an edge case that shouldn't happen with proper backend)
-      if (user.role === 'lawyer' && !user.isSoloLawyer && !user.firmId) {
-        const { noFirmAssociated } = usePermissionsStore.getState()
-        if (noFirmAssociated) {
-          navigate({ to: '/no-firm' })
-          return
-        }
-      }
-
       // Redirect based on role
+      // No firm check needed - lawyers without firm are treated as solo lawyers
       if (user.role === 'admin') {
         navigate({ to: '/users' })
       } else if (user.role === 'lawyer') {
