@@ -2,7 +2,8 @@ import { useState } from 'react'
 import {
     ArrowLeft, Save, Loader2, Search,
     TrendingUp, Building2, Landmark, PieChart,
-    Calendar, DollarSign, Hash, FileText, AlertCircle
+    Calendar, DollarSign, Hash, FileText, AlertCircle,
+    AlertTriangle
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -31,6 +32,51 @@ import { ProductivityHero } from '@/components/productivity-hero'
 import { StockSymbolSearch } from './stock-symbol-search'
 import type { StockSymbol } from '../data/saudi-stocks'
 
+// API Hook - Replace with actual implementation using React Query or similar
+interface CreateInvestmentData {
+    symbol: string
+    name: string
+    nameEn: string
+    type: 'stock' | 'mutual_fund' | 'etf' | 'reit' | 'sukuk' | 'bond'
+    market: 'tadawul' | 'international'
+    category: string
+    purchaseDate: string
+    purchasePrice: number      // in halalas
+    quantity: number
+    fees: number               // in halalas
+    totalCost: number          // in halalas
+    sector: string
+    sectorEn: string
+    notes: string
+}
+
+function useCreateInvestment() {
+    // TODO: Replace with actual API call using React Query useMutation
+    // Example implementation:
+    // return useMutation({
+    //     mutationFn: (data: CreateInvestmentData) =>
+    //         fetch('/api/investments', {
+    //             method: 'POST',
+    //             headers: { 'Content-Type': 'application/json' },
+    //             body: JSON.stringify(data),
+    //         }).then(res => {
+    //             if (!res.ok) throw new Error('Failed to create investment')
+    //             return res.json()
+    //         }),
+    // })
+
+    return {
+        mutate: (_data: CreateInvestmentData, options?: { onSuccess?: () => void; onError?: (error: Error) => void }) => {
+            // Simulate API call - remove this when backend is ready
+            console.error('API NOT IMPLEMENTED: POST /api/investments')
+            options?.onError?.(new Error('Backend API not implemented. Please connect to your backend.'))
+        },
+        isPending: false,
+        isError: false,
+        error: null as Error | null,
+    }
+}
+
 // Investment types
 const investmentTypes = [
     { value: 'stock', label: 'أسهم', icon: TrendingUp },
@@ -52,8 +98,11 @@ const categories = [
 
 export default function CreateInvestmentView() {
     const navigate = useNavigate()
-    const [isSubmitting, setIsSubmitting] = useState(false)
     const [selectedStock, setSelectedStock] = useState<StockSymbol | null>(null)
+    const [submitError, setSubmitError] = useState<string | null>(null)
+
+    // API mutation hook
+    const createInvestment = useCreateInvestment()
 
     // Form state
     const [formData, setFormData] = useState({
@@ -104,28 +153,40 @@ export default function CreateInvestmentView() {
     const subtotal = purchasePrice * quantity
     const totalCost = subtotal + fees
 
-    const handleSubmit = async () => {
+    const handleSubmit = () => {
         if (!formData.symbol || !formData.purchasePrice || !formData.quantity) {
+            setSubmitError('يرجى ملء جميع الحقول المطلوبة')
             return
         }
 
-        setIsSubmitting(true)
-        try {
-            // TODO: API call to create investment
-            // POST /api/investments with formData
-            console.log('Creating investment:', {
-                ...formData,
-                purchasePriceHalalas: Math.round(purchasePrice * 100),
-                totalCostHalalas: Math.round(totalCost * 100),
-                feesHalalas: Math.round(fees * 100),
-            })
+        setSubmitError(null)
 
-            // Navigate back to investments list
-            await new Promise(resolve => setTimeout(resolve, 1000))
-            navigate({ to: '/dashboard/finance/investments' })
-        } finally {
-            setIsSubmitting(false)
+        // Convert to halalas and prepare data for API
+        const investmentData: CreateInvestmentData = {
+            symbol: formData.symbol,
+            name: formData.name,
+            nameEn: formData.nameEn,
+            type: formData.type as CreateInvestmentData['type'],
+            market: formData.market as CreateInvestmentData['market'],
+            category: formData.category,
+            purchaseDate: formData.purchaseDate,
+            purchasePrice: Math.round(purchasePrice * 100),   // Convert SAR to halalas
+            quantity: quantity,
+            fees: Math.round(fees * 100),                      // Convert SAR to halalas
+            totalCost: Math.round(totalCost * 100),            // Convert SAR to halalas
+            sector: formData.sector,
+            sectorEn: formData.sectorEn,
+            notes: formData.notes,
         }
+
+        createInvestment.mutate(investmentData, {
+            onSuccess: () => {
+                navigate({ to: '/dashboard/finance/investments' })
+            },
+            onError: (error) => {
+                setSubmitError(error.message || 'حدث خطأ أثناء إنشاء الاستثمار')
+            },
+        })
     }
 
     return (
@@ -161,10 +222,10 @@ export default function CreateInvestmentView() {
                         >
                             <Button
                                 onClick={handleSubmit}
-                                disabled={isSubmitting || !formData.symbol || !formData.purchasePrice || !formData.quantity}
+                                disabled={createInvestment.isPending || !formData.symbol || !formData.purchasePrice || !formData.quantity}
                                 className="bg-emerald-500 hover:bg-emerald-600 text-white h-12 px-8 rounded-xl font-bold shadow-lg shadow-emerald-500/20 border-0"
                             >
-                                {isSubmitting ? (
+                                {createInvestment.isPending ? (
                                     <>
                                         <Loader2 className="ml-2 h-5 w-5 animate-spin" />
                                         جاري الحفظ...
@@ -407,6 +468,16 @@ export default function CreateInvestmentView() {
                                     />
                                 </CardContent>
                             </Card>
+
+                            {/* Error Alert */}
+                            {submitError && (
+                                <Alert className="bg-red-50 border-red-200">
+                                    <AlertTriangle className="h-4 w-4 text-red-600" />
+                                    <AlertDescription className="text-red-800">
+                                        {submitError}
+                                    </AlertDescription>
+                                </Alert>
+                            )}
 
                             {/* Info Alert */}
                             <Alert className="bg-blue-50 border-blue-200">
