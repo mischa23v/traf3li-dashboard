@@ -313,6 +313,11 @@ export function useSidebarData(): SidebarData {
               url: '/dashboard/hr/payroll',
               module: 'hr',
             },
+            {
+              title: 'دورات الرواتب',
+              url: '/dashboard/hr/payroll-runs',
+              module: 'hr',
+            },
           ],
         },
       ],
