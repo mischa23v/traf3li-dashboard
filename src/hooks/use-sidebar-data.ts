@@ -318,6 +318,11 @@ export function useSidebarData(): SidebarData {
               url: '/dashboard/hr/payroll-runs',
               module: 'hr',
             },
+            {
+              title: 'الإجازات',
+              url: '/dashboard/hr/leave',
+              module: 'hr',
+            },
           ],
         },
       ],
