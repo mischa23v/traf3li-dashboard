@@ -186,10 +186,13 @@ export default function InvestmentDetailsView() {
 
     // Fetch transactions from API
     const {
-        data: transactions,
+        data: transactionsData,
         isLoading: isLoadingTransactions,
         error: transactionsError
     } = useInvestmentTransactions(investmentId)
+
+    // Ensure transactions is always an array
+    const transactions = Array.isArray(transactionsData) ? transactionsData : []
 
     // Refresh price mutation
     const refreshPrice = useRefreshInvestmentPrice()
@@ -612,7 +615,7 @@ export default function InvestmentDetailsView() {
                                                 </TableRow>
                                             </TableHeader>
                                             <TableBody>
-                                                {(transactions ?? []).map(tx => {
+                                                {transactions.map(tx => {
                                                     const typeInfo = getTransactionTypeInfo(tx.type)
                                                     return (
                                                         <TableRow key={tx._id}>
@@ -708,7 +711,7 @@ export default function InvestmentDetailsView() {
                                                     </TableRow>
                                                 </TableHeader>
                                                 <TableBody>
-                                                    {(transactions ?? [])
+                                                    {transactions
                                                         .filter(tx => tx.type === 'dividend')
                                                         .map(tx => (
                                                             <TableRow key={tx._id}>
