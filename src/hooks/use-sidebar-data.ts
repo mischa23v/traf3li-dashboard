@@ -308,31 +308,6 @@ export function useSidebarData(): SidebarData {
               url: '/dashboard/hr/employees',
               module: 'hr',
             },
-            {
-              title: 'الرواتب',
-              url: '/dashboard/hr/salaries',
-              module: 'hr',
-            },
-            {
-              title: 'مسيرات الرواتب',
-              url: '/dashboard/hr/payroll',
-              module: 'hr',
-            },
-            {
-              title: 'الإجازات',
-              url: '/dashboard/hr/leaves',
-              module: 'hr',
-            },
-            {
-              title: 'الحضور والانصراف',
-              url: '/dashboard/hr/attendance',
-              module: 'hr',
-            },
-            {
-              title: 'التقييمات',
-              url: '/dashboard/hr/evaluations',
-              module: 'hr',
-            },
           ],
         },
       ],
