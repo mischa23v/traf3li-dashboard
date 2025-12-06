@@ -42,6 +42,7 @@ import { Route as authSignInRouteImport } from './routes/(auth)/sign-in'
 import { Route as authPrivacyRouteImport } from './routes/(auth)/privacy'
 import { Route as authOtpLoginRouteImport } from './routes/(auth)/otp-login'
 import { Route as authOtpRouteImport } from './routes/(auth)/otp'
+import { Route as authNoFirmRouteImport } from './routes/(auth)/no-firm'
 import { Route as authForgotPasswordRouteImport } from './routes/(auth)/forgot-password'
 import { Route as authConflictPolicyRouteImport } from './routes/(auth)/conflict-policy'
 import { Route as ClerkAuthenticatedRouteRouteImport } from './routes/clerk/_authenticated/route'
@@ -352,6 +353,11 @@ const authOtpLoginRoute = authOtpLoginRouteImport.update({
 const authOtpRoute = authOtpRouteImport.update({
   id: '/(auth)/otp',
   path: '/otp',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const authNoFirmRoute = authNoFirmRouteImport.update({
+  id: '/(auth)/no-firm',
+  path: '/no-firm',
   getParentRoute: () => rootRouteImport,
 } as any)
 const authForgotPasswordRoute = authForgotPasswordRouteImport.update({
@@ -1250,6 +1256,7 @@ export interface FileRoutesByFullPath {
   '/settings': typeof AuthenticatedSettingsRouteRouteWithChildren
   '/conflict-policy': typeof authConflictPolicyRoute
   '/forgot-password': typeof authForgotPasswordRoute
+  '/no-firm': typeof authNoFirmRoute
   '/otp': typeof authOtpRoute
   '/otp-login': typeof authOtpLoginRoute
   '/privacy': typeof authPrivacyRoute
@@ -1428,6 +1435,7 @@ export interface FileRoutesByTo {
   '/time-entries': typeof TimeEntriesRoute
   '/conflict-policy': typeof authConflictPolicyRoute
   '/forgot-password': typeof authForgotPasswordRoute
+  '/no-firm': typeof authNoFirmRoute
   '/otp': typeof authOtpRoute
   '/otp-login': typeof authOtpLoginRoute
   '/privacy': typeof authPrivacyRoute
@@ -1611,6 +1619,7 @@ export interface FileRoutesById {
   '/clerk/_authenticated': typeof ClerkAuthenticatedRouteRouteWithChildren
   '/(auth)/conflict-policy': typeof authConflictPolicyRoute
   '/(auth)/forgot-password': typeof authForgotPasswordRoute
+  '/(auth)/no-firm': typeof authNoFirmRoute
   '/(auth)/otp': typeof authOtpRoute
   '/(auth)/otp-login': typeof authOtpLoginRoute
   '/(auth)/privacy': typeof authPrivacyRoute
@@ -1792,6 +1801,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/conflict-policy'
     | '/forgot-password'
+    | '/no-firm'
     | '/otp'
     | '/otp-login'
     | '/privacy'
@@ -1970,6 +1980,7 @@ export interface FileRouteTypes {
     | '/time-entries'
     | '/conflict-policy'
     | '/forgot-password'
+    | '/no-firm'
     | '/otp'
     | '/otp-login'
     | '/privacy'
@@ -2152,6 +2163,7 @@ export interface FileRouteTypes {
     | '/clerk/_authenticated'
     | '/(auth)/conflict-policy'
     | '/(auth)/forgot-password'
+    | '/(auth)/no-firm'
     | '/(auth)/otp'
     | '/(auth)/otp-login'
     | '/(auth)/privacy'
@@ -2332,6 +2344,7 @@ export interface RootRouteChildren {
   TimeEntriesRoute: typeof TimeEntriesRoute
   authConflictPolicyRoute: typeof authConflictPolicyRoute
   authForgotPasswordRoute: typeof authForgotPasswordRoute
+  authNoFirmRoute: typeof authNoFirmRoute
   authOtpRoute: typeof authOtpRoute
   authOtpLoginRoute: typeof authOtpLoginRoute
   authPrivacyRoute: typeof authPrivacyRoute
@@ -2577,6 +2590,13 @@ declare module '@tanstack/react-router' {
       path: '/otp'
       fullPath: '/otp'
       preLoaderRoute: typeof authOtpRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/(auth)/no-firm': {
+      id: '/(auth)/no-firm'
+      path: '/no-firm'
+      fullPath: '/no-firm'
+      preLoaderRoute: typeof authNoFirmRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/(auth)/forgot-password': {
@@ -4195,6 +4215,7 @@ const rootRouteChildren: RootRouteChildren = {
   TimeEntriesRoute: TimeEntriesRoute,
   authConflictPolicyRoute: authConflictPolicyRoute,
   authForgotPasswordRoute: authForgotPasswordRoute,
+  authNoFirmRoute: authNoFirmRoute,
   authOtpRoute: authOtpRoute,
   authOtpLoginRoute: authOtpLoginRoute,
   authPrivacyRoute: authPrivacyRoute,
