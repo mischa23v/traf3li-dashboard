@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, Link, useSearch } from '@tanstack/react-router';
 import { useAuthStore } from '@/stores/auth-store';
+import { usePermissionsStore } from '@/stores/permissions-store';
 
 // ============================================
 // SVG ICONS
@@ -115,6 +116,13 @@ export function SignIn() {
         username: formData.usernameOrEmail,
         password: formData.password,
       });
+
+      // Check if user has no firm associated (permissions API returned 404)
+      const { noFirmAssociated } = usePermissionsStore.getState();
+      if (noFirmAssociated) {
+        navigate({ to: '/no-firm' });
+        return;
+      }
 
       // Navigate to redirect URL or dashboard
       const redirectTo = search.redirect || '/';

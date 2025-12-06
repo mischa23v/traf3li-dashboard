@@ -23,6 +23,7 @@ import { Button } from '@/components/ui/button'
 import { PasswordInput } from '@/components/password-input'
 import { cn } from '@/lib/utils'
 import { useAuthStore } from '@/stores/auth-store'
+import { usePermissionsStore } from '@/stores/permissions-store'
 
 interface UserAuthFormProps extends HTMLAttributes<HTMLDivElement> {}
 
@@ -72,6 +73,13 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
 
       if (!user) {
         throw new Error(t('auth.signIn.error'))
+      }
+
+      // Check if user has no firm associated (permissions API returned 404)
+      const { noFirmAssociated } = usePermissionsStore.getState()
+      if (noFirmAssociated) {
+        navigate({ to: '/no-firm' })
+        return
       }
 
       // Redirect based on role

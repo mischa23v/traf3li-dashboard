@@ -60,7 +60,7 @@ export const usePermissionsStore = create<PermissionsState>()(
           return
         }
 
-        set({ isLoading: true, error: null, noFirmAssociated: false })
+        set({ isLoading: true, error: null })
         try {
           const permissions = await firmService.getMyPermissions()
           set({
