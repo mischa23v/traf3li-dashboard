@@ -308,6 +308,11 @@ export function useSidebarData(): SidebarData {
               url: '/dashboard/hr/employees',
               module: 'hr',
             },
+            {
+              title: 'قسائم الرواتب',
+              url: '/dashboard/hr/payroll',
+              module: 'hr',
+            },
           ],
         },
       ],
