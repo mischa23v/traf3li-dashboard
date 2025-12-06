@@ -117,6 +117,7 @@ export function SignIn() {
       });
 
       // Navigate to redirect URL or dashboard
+      // No firm check needed - lawyers without firm are treated as solo lawyers
       const redirectTo = search.redirect || '/';
       navigate({ to: redirectTo });
     } catch (err: any) {

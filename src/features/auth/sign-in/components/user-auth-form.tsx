@@ -75,6 +75,7 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
       }
 
       // Redirect based on role
+      // No firm check needed - lawyers without firm are treated as solo lawyers
       if (user.role === 'admin') {
         navigate({ to: '/users' })
       } else if (user.role === 'lawyer') {

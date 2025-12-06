@@ -21,7 +21,7 @@ export function AppSidebar() {
         <TeamSwitcher teams={sidebarData.teams} />
       </SidebarHeader>
       <SidebarContent>
-        {sidebarData.navGroups.map((group) => (
+        {sidebarData.navGroups?.map((group) => (
           <NavGroup key={group.title} title={group.title} items={group.items as any} />
         ))}
       </SidebarContent>

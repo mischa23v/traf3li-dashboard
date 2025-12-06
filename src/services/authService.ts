@@ -6,6 +6,64 @@
 import apiClient, { handleApiError } from '@/lib/api'
 
 /**
+ * Firm info returned with user
+ */
+export interface UserFirm {
+  id: string
+  name: string
+  nameEn?: string
+  status: 'active' | 'suspended' | 'inactive'
+}
+
+/**
+ * Tenant info for multi-tenant support
+ */
+export interface UserTenant {
+  id: string
+  name: string
+  nameEn?: string
+  status: string
+  subscription?: {
+    plan: string
+    status: string
+  }
+}
+
+/**
+ * Permissions returned with login for solo lawyers and firm members
+ */
+export interface UserPermissions {
+  modules?: {
+    clients?: string
+    cases?: string
+    leads?: string
+    invoices?: string
+    payments?: string
+    expenses?: string
+    documents?: string
+    tasks?: string
+    events?: string
+    timeTracking?: string
+    reports?: string
+    settings?: string
+    team?: string
+    hr?: string
+    [key: string]: string | undefined
+  }
+  special?: {
+    canApproveInvoices?: boolean
+    canManageRetainers?: boolean
+    canExportData?: boolean
+    canDeleteRecords?: boolean
+    canViewFinance?: boolean
+    canManageTeam?: boolean
+    canCreateFirm?: boolean
+    canJoinFirm?: boolean
+    [key: string]: boolean | undefined
+  }
+}
+
+/**
  * User Interface matching backend response
  */
 export interface User {
@@ -20,10 +78,18 @@ export interface User {
   phone: string
   description?: string
   isSeller: boolean
+  // Solo lawyer support
+  isSoloLawyer?: boolean
+  lawyerWorkMode?: 'solo' | 'firm_owner' | 'firm_member' | null
   // Firm-related fields for RBAC
   firmId?: string
+  firm?: UserFirm | null
   firmRole?: 'owner' | 'admin' | 'partner' | 'lawyer' | 'paralegal' | 'secretary' | 'accountant' | 'departed'
   firmStatus?: 'active' | 'departed' | 'suspended' | 'pending' | null
+  // Tenant for multi-tenant support
+  tenant?: UserTenant | null
+  // Permissions returned directly from login (for solo lawyers)
+  permissions?: UserPermissions | null
   lawyerProfile?: {
     specialization: string[]
     licenseNumber?: string
