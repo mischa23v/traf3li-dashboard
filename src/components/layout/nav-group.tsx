@@ -51,7 +51,7 @@ export function NavGroup({ title, items }: NavGroupProps) {
     <SidebarGroup>
       <SidebarGroupLabel>{translatedTitle}</SidebarGroupLabel>
       <SidebarMenu>
-        {items.map((item) => {
+        {(items ?? []).map((item) => {
           const key = `${item.title}-${item.url}`
 
           if (!item.items)
@@ -121,7 +121,7 @@ function SidebarMenuCollapsible({
         </CollapsibleTrigger>
         <CollapsibleContent className='CollapsibleContent'>
           <SidebarMenuSub>
-            {item.items.map((subItem) => (
+            {(item.items ?? []).map((subItem) => (
               <SidebarMenuSubItem key={subItem.title}>
                 <SidebarMenuSubButton
                   asChild
@@ -171,7 +171,7 @@ function SidebarMenuCollapsedDropdown({
             {translatedTitle} {item.badge ? `(${item.badge})` : ''}
           </DropdownMenuLabel>
           <DropdownMenuSeparator />
-          {item.items.map((sub) => (
+          {(item.items ?? []).map((sub) => (
             <DropdownMenuItem key={`${sub.title}-${sub.url}`} asChild>
               <Link
                 to={sub.url}
