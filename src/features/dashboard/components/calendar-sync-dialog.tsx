@@ -293,7 +293,7 @@ END:VCALENDAR`
                           size="sm"
                           onClick={() => handleSync(provider.id)}
                         >
-                          <RefreshCw className="h-4 w-4 ml-1" />
+                          <RefreshCw className="h-4 w-4 ms-1" />
                           مزامنة
                         </Button>
                         <Button
@@ -302,7 +302,7 @@ END:VCALENDAR`
                           className="text-red-600 hover:text-red-700 hover:bg-red-50"
                           onClick={() => handleDisconnect(provider.id)}
                         >
-                          <X className="h-4 w-4 ml-1" />
+                          <X className="h-4 w-4 ms-1" />
                           قطع الاتصال
                         </Button>
                       </>
@@ -312,7 +312,7 @@ END:VCALENDAR`
                         size="sm"
                         onClick={() => handleConnect(provider.id)}
                       >
-                        <ExternalLink className="h-4 w-4 ml-1" />
+                        <ExternalLink className="h-4 w-4 ms-1" />
                         اتصال
                       </Button>
                     )}
@@ -391,9 +391,9 @@ END:VCALENDAR`
                   className="w-full"
                 >
                   {isExporting ? (
-                    <Loader2 className="h-4 w-4 ml-2 animate-spin" />
+                    <Loader2 className="h-4 w-4 ms-2 animate-spin" />
                   ) : (
-                    <Download className="h-4 w-4 ml-2" />
+                    <Download className="h-4 w-4 ms-2" />
                   )}
                   تصدير إلى ICS
                 </Button>
@@ -422,9 +422,9 @@ END:VCALENDAR`
                     className="w-full"
                   >
                     {isImporting ? (
-                      <Loader2 className="h-4 w-4 ml-2 animate-spin" />
+                      <Loader2 className="h-4 w-4 ms-2 animate-spin" />
                     ) : (
-                      <Upload className="h-4 w-4 ml-2" />
+                      <Upload className="h-4 w-4 ms-2" />
                     )}
                     استيراد
                   </Button>

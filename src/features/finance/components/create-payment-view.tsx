@@ -655,7 +655,7 @@ export function CreatePaymentView() {
                                                 >
                                                     <Icon className={cn(
                                                         "w-5 h-5 mx-auto mb-1",
-                                                        paymentMethod === key ? "text-emerald-600" : "text-slate-400"
+                                                        paymentMethod === key ? "text-emerald-600" : "text-slate-600"
                                                     )} />
                                                     <span className={cn(
                                                         "text-xs font-medium",
@@ -1364,9 +1364,9 @@ export function CreatePaymentView() {
                                     <AccordionContent className="px-6 pb-6">
                                         <div className="space-y-4">
                                             <div className="border-2 border-dashed border-slate-200 rounded-xl p-8 text-center hover:border-emerald-300 transition-colors cursor-pointer">
-                                                <Paperclip className="w-10 h-10 mx-auto mb-3 text-slate-400" />
+                                                <Paperclip className="w-10 h-10 mx-auto mb-3 text-slate-600" />
                                                 <p className="text-sm text-slate-600 mb-1">اسحب الملفات هنا أو اضغط للاختيار</p>
-                                                <p className="text-xs text-slate-400">PDF, JPG, PNG (حد أقصى 10 ميغابايت)</p>
+                                                <p className="text-xs text-slate-600">PDF, JPG, PNG (حد أقصى 10 ميغابايت)</p>
                                                 <input
                                                     type="file"
                                                     multiple
@@ -1385,9 +1385,9 @@ export function CreatePaymentView() {
                                                     {attachments.map((file, index) => (
                                                         <div key={index} className="flex items-center justify-between p-3 bg-slate-50 rounded-xl">
                                                             <div className="flex items-center gap-3">
-                                                                <FileText className="w-5 h-5 text-slate-400" aria-hidden="true" />
+                                                                <FileText className="w-5 h-5 text-slate-600" aria-hidden="true" />
                                                                 <span className="text-sm font-medium">{file.name}</span>
-                                                                <span className="text-xs text-slate-400">
+                                                                <span className="text-xs text-slate-600">
                                                                     ({(file.size / 1024).toFixed(1)} KB)
                                                                 </span>
                                                             </div>

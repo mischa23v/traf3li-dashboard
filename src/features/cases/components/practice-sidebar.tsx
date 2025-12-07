@@ -155,7 +155,7 @@ export function PracticeSidebar({
                     {/* Create Button - White + Green Text + Glow */}
                     <Button asChild className="bg-white hover:bg-emerald-50 text-emerald-600 h-auto py-6 flex flex-col items-center justify-center gap-2 rounded-3xl shadow-lg shadow-white/10 transition-all duration-300 hover:scale-[1.02] border-0">
                         <Link to={currentLinks.create}>
-                            <Plus className="h-7 w-7" />
+                            <Plus className="h-7 w-7" aria-hidden="true" />
                             <span className="text-sm font-bold">{t('sidebar.quickActions.create')}</span>
                         </Link>
                     </Button>
@@ -171,7 +171,7 @@ export function PracticeSidebar({
                         )}
                         onClick={onToggleSelectionMode}
                     >
-                        {isSelectionMode ? <X className="h-6 w-6" /> : <CheckSquare className="h-6 w-6" />}
+                        {isSelectionMode ? <X className="h-6 w-6" aria-hidden="true" /> : <CheckSquare className="h-6 w-6" />}
                         <span className="text-sm font-bold">{isSelectionMode ? t('common.cancel') : t('sidebar.quickActions.select')}</span>
                     </Button>
 
@@ -300,7 +300,7 @@ export function PracticeSidebar({
                                                         <div className={cn("text-sm font-bold text-slate-700 transition-colors", `group-hover:text-${colorClass}-600`)}>
                                                             {eventTime}
                                                         </div>
-                                                        <div className="text-[10px] text-slate-400">{timePeriod}</div>
+                                                        <div className="text-[10px] text-slate-500">{timePeriod}</div>
                                                     </div>
                                                     <div className={cn("absolute right-[3.25rem] top-2 w-3 h-3 rounded-full border-2 border-white shadow-sm z-10", `bg-${colorClass}-500`)}></div>
                                                     <div className={cn("flex-1 bg-white rounded-xl p-3 shadow-sm hover:shadow-md transition-all", `border-r-4 border-${colorClass}-500`)}>
@@ -385,7 +385,7 @@ export function PracticeSidebar({
                                     })}
                                 </>
                             )}
-                            <Button asChild variant="ghost" className="w-full text-xs text-slate-400 hover:text-emerald-600 hover:bg-emerald-50">
+                            <Button asChild variant="ghost" className="w-full text-xs text-slate-500 hover:text-emerald-600 hover:bg-emerald-50">
                                 <Link to="/dashboard/tasks/reminders">
                                     {t('sidebar.notifications.viewAll')}
                                 </Link>

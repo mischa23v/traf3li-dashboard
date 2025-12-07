@@ -152,7 +152,7 @@ export default function CompanySettings() {
                                                 className="w-full h-full object-contain"
                                             />
                                         ) : (
-                                            <Building2 className="h-12 w-12 text-slate-400" />
+                                            <Building2 className="h-12 w-12 text-slate-500" />
                                         )}
                                     </div>
                                     <div>

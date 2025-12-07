@@ -448,7 +448,7 @@ function ActivityCard({ activity, isLast }: { activity: CrmActivity; isLast: boo
         )}
 
         {/* Footer */}
-        <div className="flex items-center justify-between text-xs text-slate-400 pt-2 border-t border-slate-100">
+        <div className="flex items-center justify-between text-xs text-slate-500 pt-2 border-t border-slate-100">
           <div className="flex items-center gap-4">
             <span className="flex items-center gap-1">
               <Clock className="w-3 h-3" />
@@ -584,7 +584,7 @@ export function ActivitiesView() {
             <input
               type="text"
               placeholder="بحث..."
-              className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pr-9 pl-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+              className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
@@ -707,7 +707,7 @@ export function ActivitiesView() {
                     <div key={item.type} className="flex items-center gap-2 text-xs">
                       <span className={cn('w-2 h-2 rounded-full', colors?.line || 'bg-slate-400')} />
                       <span className="text-slate-600">{activityLabels[item.type]}</span>
-                      <span className="text-slate-400">{item.count}</span>
+                      <span className="text-slate-500">{item.count}</span>
                     </div>
                   )
                 })}
@@ -789,7 +789,7 @@ export function ActivitiesView() {
                 <div className="text-center py-12">
                   <div className="flex justify-center mb-4">
                     <div className="w-16 h-16 rounded-full bg-slate-50 flex items-center justify-center">
-                      <Activity className="w-8 h-8 text-slate-400" />
+                      <Activity className="w-8 h-8 text-slate-500" />
                     </div>
                   </div>
                   <h3 className="text-lg font-bold text-slate-900 mb-2">
@@ -822,7 +822,7 @@ export function ActivitiesView() {
                   </div>
 
                   {/* Activities for this date */}
-                  <div className="space-y-4 pr-2">
+                  <div className="space-y-4 pe-2">
                     {group.activities.map((activity: CrmActivity, index: number) => (
                       <ActivityCard
                         key={activity._id}

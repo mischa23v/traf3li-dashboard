@@ -139,12 +139,12 @@ export function SalesReportsListView() {
             onClick={() => refetch()}
             className="rounded-xl"
           >
-            <RefreshCw className="h-4 w-4 ml-2" />
+            <RefreshCw className="h-4 w-4 ms-2" />
             تحديث
           </Button>
           <Button asChild className="bg-emerald-500 hover:bg-emerald-600 rounded-xl">
             <Link to="/dashboard/sales/reports/new">
-              <Plus className="h-4 w-4 ml-2" />
+              <Plus className="h-4 w-4 ms-2" />
               تقرير جديد
             </Link>
           </Button>
@@ -210,18 +210,18 @@ export function SalesReportsListView() {
         <div className="flex flex-wrap items-center gap-4">
           <div className="flex-1 min-w-[200px] max-w-md">
             <div className="relative">
-              <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+              <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
               <Input
                 placeholder="بحث في التقارير..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pr-10 rounded-xl"
+                className="pe-10 rounded-xl"
               />
             </div>
           </div>
           <Select value={categoryFilter} onValueChange={setCategoryFilter}>
             <SelectTrigger className="w-[180px] rounded-xl">
-              <Filter className="h-4 w-4 ml-2" />
+              <Filter className="h-4 w-4 ms-2" />
               <SelectValue placeholder="الفئة" />
             </SelectTrigger>
             <SelectContent>
@@ -271,7 +271,7 @@ export function SalesReportsListView() {
             <p className="text-slate-500 mb-4">ابدأ بإنشاء تقرير جديد لتحليل بيانات المبيعات</p>
             <Button asChild className="bg-emerald-500 hover:bg-emerald-600 rounded-xl">
               <Link to="/dashboard/sales/reports/new">
-                <Plus className="h-4 w-4 ml-2" />
+                <Plus className="h-4 w-4 ms-2" />
                 إنشاء تقرير
               </Link>
             </Button>
@@ -335,16 +335,16 @@ export function SalesReportsListView() {
                         <DropdownMenuContent align="end">
                           <DropdownMenuItem asChild>
                             <Link to={`/dashboard/sales/reports/${report._id}`}>
-                              <Eye className="h-4 w-4 ml-2" />
+                              <Eye className="h-4 w-4 ms-2" />
                               عرض التقرير
                             </Link>
                           </DropdownMenuItem>
                           <DropdownMenuItem onClick={() => handleGenerate(report._id)}>
-                            <RefreshCw className="h-4 w-4 ml-2" />
+                            <RefreshCw className="h-4 w-4 ms-2" />
                             إعادة إنشاء
                           </DropdownMenuItem>
                           <DropdownMenuItem>
-                            <Download className="h-4 w-4 ml-2" />
+                            <Download className="h-4 w-4 ms-2" />
                             تحميل PDF
                           </DropdownMenuItem>
                           <DropdownMenuSeparator />
@@ -352,7 +352,7 @@ export function SalesReportsListView() {
                             onClick={() => handleDelete(report._id)}
                             className="text-red-600"
                           >
-                            <Trash2 className="h-4 w-4 ml-2" />
+                            <Trash2 className="h-4 w-4 ms-2" />
                             حذف
                           </DropdownMenuItem>
                         </DropdownMenuContent>

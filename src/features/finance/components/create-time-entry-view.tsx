@@ -580,7 +580,7 @@ export function CreateTimeEntryView() {
                                                                 <SelectItem key={code.code} value={code.code}>
                                                                     <div className="flex items-center gap-2">
                                                                         <Icon className="h-4 w-4 text-slate-500" />
-                                                                        <span className="font-mono text-xs text-slate-400">{code.code}</span>
+                                                                        <span className="font-mono text-xs text-slate-600">{code.code}</span>
                                                                         <span>{code.descriptionAr}</span>
                                                                     </div>
                                                                 </SelectItem>

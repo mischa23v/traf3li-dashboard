@@ -352,7 +352,7 @@ export function TasksListView() {
                                     {/* Due Date Filter */}
                                     <Select value={dueDateFilter} onValueChange={setDueDateFilter}>
                                         <SelectTrigger className="w-[150px] h-10 rounded-xl border-slate-200">
-                                            <Calendar className="h-4 w-4 ms-2 text-slate-400" />
+                                            <Calendar className="h-4 w-4 ms-2 text-slate-500" />
                                             <SelectValue placeholder={t('tasks.list.dueDate')} />
                                         </SelectTrigger>
                                         <SelectContent>
@@ -368,7 +368,7 @@ export function TasksListView() {
                                     {/* Case Filter */}
                                     <Select value={caseFilter} onValueChange={setCaseFilter}>
                                         <SelectTrigger className="w-[180px] h-10 rounded-xl border-slate-200">
-                                            <Briefcase className="h-4 w-4 ms-2 text-slate-400" />
+                                            <Briefcase className="h-4 w-4 ms-2 text-slate-500" />
                                             <SelectValue placeholder={t('tasks.list.case')} />
                                         </SelectTrigger>
                                         <SelectContent>
@@ -384,7 +384,7 @@ export function TasksListView() {
                                     {/* Sort By */}
                                     <Select value={sortBy} onValueChange={setSortBy}>
                                         <SelectTrigger className="w-[160px] h-10 rounded-xl border-slate-200">
-                                            <SortAsc className="h-4 w-4 ms-2 text-slate-400" />
+                                            <SortAsc className="h-4 w-4 ms-2 text-slate-500" />
                                             <SelectValue placeholder={t('tasks.list.sortBy')} />
                                         </SelectTrigger>
                                         <SelectContent>
@@ -503,7 +503,7 @@ export function TasksListView() {
                                             </div>
                                             <DropdownMenu>
                                                 <DropdownMenuTrigger asChild>
-                                                    <Button variant="ghost" size="icon" className="text-slate-400 hover:text-navy">
+                                                    <Button variant="ghost" size="icon" className="text-slate-500 hover:text-navy">
                                                         <MoreHorizontal className="h-5 w-5" />
                                                     </Button>
                                                 </DropdownMenuTrigger>
@@ -544,7 +544,7 @@ export function TasksListView() {
                                             <div className="flex items-center gap-4">
                                                 {/* Priority Dropdown */}
                                                 <div>
-                                                    <div className="text-xs text-slate-400 mb-1">{t('tasks.list.priorityLabel')}</div>
+                                                    <div className="text-xs text-slate-500 mb-1">{t('tasks.list.priorityLabel')}</div>
                                                     <Select
                                                         value={task.priority}
                                                         onValueChange={(value) => handlePriorityChange(task.id, value)}
@@ -567,15 +567,15 @@ export function TasksListView() {
                                                 </div>
                                                 {/* Due Date - Dual Language */}
                                                 <div className="text-center">
-                                                    <div className="text-xs text-slate-400 mb-1">{t('tasks.list.dueDate')}</div>
+                                                    <div className="text-xs text-slate-500 mb-1">{t('tasks.list.dueDate')}</div>
                                                     <div className="font-bold text-navy text-sm">{task.dueDateFormatted.arabic}</div>
-                                                    <div className="text-xs text-slate-400">{task.dueDateFormatted.english}</div>
+                                                    <div className="text-xs text-slate-500">{task.dueDateFormatted.english}</div>
                                                 </div>
                                                 {/* Creation Date - Dual Language */}
                                                 <div className="text-center">
-                                                    <div className="text-xs text-slate-400 mb-1">{t('tasks.list.createdAt')}</div>
+                                                    <div className="text-xs text-slate-500 mb-1">{t('tasks.list.createdAt')}</div>
                                                     <div className="font-bold text-slate-600 text-sm">{task.createdAtFormatted.arabic}</div>
-                                                    <div className="text-xs text-slate-400">{task.createdAtFormatted.english}</div>
+                                                    <div className="text-xs text-slate-500">{task.createdAtFormatted.english}</div>
                                                 </div>
                                             </div>
                                             <Link to={`/dashboard/tasks/${task.id}` as any}>

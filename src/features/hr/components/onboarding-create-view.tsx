@@ -499,7 +499,7 @@ export function OnboardingCreateView() {
                     <AlertTriangle className="w-4 h-4 mt-0.5 flex-shrink-0" />
                     <div>
                       <p className="font-medium">المتطلبات الأساسية:</p>
-                      <ul className="list-disc list-inside mr-4 mt-1 space-y-1">
+                      <ul className="list-disc list-inside me-4 mt-1 space-y-1">
                         <li>يجب توقيع عقد العمل قبل بدء فترة التأهيل</li>
                         <li>التدريب على أنظمة العمل إلزامي</li>
                         <li>مراجعة أداء دورية كل 30 يوم</li>

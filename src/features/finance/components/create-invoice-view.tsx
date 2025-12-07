@@ -694,7 +694,7 @@ export function CreateInvoiceView() {
                                                         <Building2 className="w-5 h-5 text-emerald-500" />
                                                         تفاصيل تنظيمية
                                                     </CardTitle>
-                                                    <ChevronDown className={cn("w-5 h-5 text-slate-400 transition-transform", showOrgFields && "rotate-180")} />
+                                                    <ChevronDown className={cn("w-5 h-5 text-slate-600 transition-transform", showOrgFields && "rotate-180")} />
                                                 </div>
                                             </CardHeader>
                                         </CollapsibleTrigger>
@@ -1174,7 +1174,7 @@ export function CreateInvoiceView() {
                                                             className="rounded-lg bg-slate-50 text-xs font-mono"
                                                             dir="ltr"
                                                         />
-                                                        <p className="text-xs text-slate-400">يتم جلبه من الإعدادات</p>
+                                                        <p className="text-xs text-slate-600">يتم جلبه من الإعدادات</p>
                                                     </div>
                                                     <div className="space-y-2">
                                                         <Label className="text-xs text-slate-500">السجل التجاري</Label>
@@ -1358,7 +1358,7 @@ export function CreateInvoiceView() {
                                                             max={Math.min(retainerBalanceAvailable, calculations.total)}
                                                             className="rounded-xl"
                                                         />
-                                                        <p className="text-xs text-slate-400">
+                                                        <p className="text-xs text-slate-600">
                                                             الحد الأقصى: {formatCurrency(Math.min(retainerBalanceAvailable, calculations.total))}
                                                         </p>
                                                     </div>
@@ -1583,7 +1583,7 @@ export function CreateInvoiceView() {
                                                     placeholder="فاتورة رقم {invoice_number} من {company_name}"
                                                     className="rounded-xl"
                                                 />
-                                                <p className="text-xs text-slate-400">
+                                                <p className="text-xs text-slate-600">
                                                     يمكنك استخدام: {'{invoice_number}'}, {'{client_name}'}, {'{amount}'}
                                                 </p>
                                             </div>

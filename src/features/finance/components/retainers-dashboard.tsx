@@ -274,7 +274,7 @@ export default function RetainersDashboard() {
                     </div>
                     <div className='ms-auto flex items-center gap-4'>
                         <div className="relative hidden md:block">
-                            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" aria-hidden="true" />
+                            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-600" aria-hidden="true" />
                             <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
                         </div>
                         <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white" aria-label="الإشعارات">
@@ -316,7 +316,7 @@ export default function RetainersDashboard() {
                     </div>
                     <div className='ms-auto flex items-center gap-4'>
                         <div className="relative hidden md:block">
-                            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" aria-hidden="true" />
+                            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-600" aria-hidden="true" />
                             <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
                         </div>
                         <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white" aria-label="الإشعارات">
@@ -360,7 +360,7 @@ export default function RetainersDashboard() {
 
                 <div className='ms-auto flex items-center gap-4'>
                     <div className="relative hidden md:block">
-                        <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" aria-hidden="true" />
+                        <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-600" aria-hidden="true" />
                         <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
                     </div>
                     <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white" aria-label="الإشعارات">
@@ -481,7 +481,7 @@ export default function RetainersDashboard() {
 
                                         <div className="flex items-center gap-3">
                                             <div className="relative w-full max-w-xs">
-                                                <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" aria-hidden="true" />
+                                                <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-600" aria-hidden="true" />
                                                 <Input
                                                     placeholder="بحث في حسابات الأمانة..."
                                                     className="pe-10 rounded-xl border-slate-200 focus:ring-[#022c22] focus:border-[#022c22]"
@@ -553,7 +553,7 @@ export default function RetainersDashboard() {
                                     {filteredRetainers.length === 0 ? (
                                         <div className="bg-white p-12 rounded-3xl text-center border border-slate-100">
                                             <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                                                <Search className="h-8 w-8 text-slate-400" aria-hidden="true" />
+                                                <Search className="h-8 w-8 text-slate-600" aria-hidden="true" />
                                             </div>
                                             <h3 className="text-lg font-bold text-slate-900 mb-2">لا توجد نتائج</h3>
                                             <p className="text-slate-500 mb-4">لم نجد حسابات أمانة تطابق البحث أو الفلاتر المحددة</p>
@@ -593,16 +593,16 @@ export default function RetainersDashboard() {
                                                                 </div>
                                                                 <p className="text-slate-700 font-medium">{retainer.clientName}</p>
                                                                 {retainer.caseName && (
-                                                                    <p className="text-xs text-slate-400">القضية: {retainer.caseName}</p>
+                                                                    <p className="text-xs text-slate-600">القضية: {retainer.caseName}</p>
                                                                 )}
-                                                                <p className="text-xs text-slate-400 mt-1">تاريخ الإنشاء: {retainer.createdAt}</p>
+                                                                <p className="text-xs text-slate-600 mt-1">تاريخ الإنشاء: {retainer.createdAt}</p>
                                                             </div>
                                                         </div>
 
                                                         <DropdownMenu>
                                                             <DropdownMenuTrigger asChild>
                                                                 <Button variant="ghost" size="icon" className="rounded-full hover:bg-slate-50" aria-label="خيارات">
-                                                                <MoreHorizontal className="w-5 h-5 text-slate-400" aria-hidden="true" />
+                                                                <MoreHorizontal className="w-5 h-5 text-slate-600" aria-hidden="true" />
                                                                 </Button>
                                                             </DropdownMenuTrigger>
                                                             <DropdownMenuContent align="end">
@@ -663,19 +663,19 @@ export default function RetainersDashboard() {
                                                     {/* Summary Stats */}
                                                     <div className="grid grid-cols-2 gap-4 pt-4 border-t border-slate-100">
                                                         <div>
-                                                            <div className="text-xs text-slate-400 mb-1">المبلغ الأولي</div>
+                                                            <div className="text-xs text-slate-600 mb-1">المبلغ الأولي</div>
                                                             <div className="font-bold text-navy">{formatSAR(retainer.initialAmount)}</div>
                                                         </div>
                                                         <div>
-                                                            <div className="text-xs text-slate-400 mb-1">الرصيد الحالي</div>
+                                                            <div className="text-xs text-slate-600 mb-1">الرصيد الحالي</div>
                                                             <div className="font-bold text-emerald-600">{formatSAR(retainer.currentBalance)}</div>
                                                         </div>
                                                         <div>
-                                                            <div className="text-xs text-slate-400 mb-1">الإيداعات</div>
+                                                            <div className="text-xs text-slate-600 mb-1">الإيداعات</div>
                                                             <div className="font-medium text-purple-600">{formatSAR(retainer.totalDeposits)}</div>
                                                         </div>
                                                         <div>
-                                                            <div className="text-xs text-slate-400 mb-1">المسحوبات</div>
+                                                            <div className="text-xs text-slate-600 mb-1">المسحوبات</div>
                                                             <div className="font-medium text-amber-600">{formatSAR(retainer.totalConsumptions)}</div>
                                                         </div>
                                                     </div>
@@ -879,7 +879,7 @@ export default function RetainersDashboard() {
                                                         </p>
                                                         <p className="text-sm text-slate-500">{transaction.description}</p>
                                                         {transaction.paymentMethod && (
-                                                            <p className="text-xs text-slate-400">
+                                                            <p className="text-xs text-slate-600">
                                                                 طريقة الدفع: {paymentMethods.find(m => m.value === transaction.paymentMethod)?.label}
                                                             </p>
                                                         )}
@@ -892,12 +892,12 @@ export default function RetainersDashboard() {
                                                         }`}>
                                                             {isDeposit ? '+' : '-'}{formatSAR(transaction.amount)}
                                                         </p>
-                                                        <p className="text-xs text-slate-400">
+                                                        <p className="text-xs text-slate-600">
                                                             الرصيد: {formatSAR(transaction.balanceAfter)}
                                                         </p>
                                                     </div>
                                                 </div>
-                                                <p className="text-xs text-slate-400">
+                                                <p className="text-xs text-slate-600">
                                                     {new Date(transaction.createdAt).toLocaleDateString('ar-SA', {
                                                         year: 'numeric',
                                                         month: 'long',
@@ -914,7 +914,7 @@ export default function RetainersDashboard() {
                         ) : (
                             <div className="text-center py-8">
                                 <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                                    <Receipt className="h-8 w-8 text-slate-400" aria-hidden="true" />
+                                    <Receipt className="h-8 w-8 text-slate-600" aria-hidden="true" />
                                 </div>
                                 <p className="text-slate-500">لا توجد معاملات حتى الآن</p>
                             </div>

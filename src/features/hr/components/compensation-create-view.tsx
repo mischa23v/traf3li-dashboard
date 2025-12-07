@@ -35,7 +35,7 @@ import {
   Search, Bell, ArrowRight, User, Building2, CheckCircle,
   ChevronDown, Briefcase, Calendar, DollarSign, Wallet,
   Percent, Receipt, Award, TrendingUp, Clock, Shield,
-  FileText, MessageSquare, Scale, Users, Plus, Trash2
+  FileText, MessageSquare, Scale, Users, Plus, Trash2, Lock
 } from 'lucide-react'
 import {
   compensationStatusLabels,
@@ -677,7 +677,7 @@ export function CompensationCreateView() {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div className="space-y-2">
                     <Label className="text-navy font-medium">
-                      الراتب الأساسي <span className="text-red-500">*</span>
+                      الراتب الأساسي<Lock className="h-3 w-3 text-slate-500 inline ms-1" aria-hidden="true" /> <span className="text-red-500">*</span>
                     </Label>
                     <Input
                       type="number"

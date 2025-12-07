@@ -246,7 +246,7 @@ export function ImportDialog({
               <div className="space-y-3">
                 <Label>{t('dataExport.importOptions')}</Label>
                 <div className="flex flex-col gap-2">
-                  <div className="flex items-center space-x-2 rtl:space-x-reverse">
+                  <div className="flex items-center gap-2 rtl:gap-reverse">
                     <Checkbox
                       id="skipDuplicates"
                       checked={skipDuplicates}
@@ -256,7 +256,7 @@ export function ImportDialog({
                       {t('dataExport.skipDuplicates')}
                     </Label>
                   </div>
-                  <div className="flex items-center space-x-2 rtl:space-x-reverse">
+                  <div className="flex items-center gap-2 rtl:gap-reverse">
                     <Checkbox
                       id="updateExisting"
                       checked={updateExisting}

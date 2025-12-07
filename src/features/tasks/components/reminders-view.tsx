@@ -468,7 +468,7 @@ export function RemindersView() {
                                             </div>
                                             <DropdownMenu>
                                                 <DropdownMenuTrigger asChild>
-                                                    <Button variant="ghost" size="icon" className="text-slate-400 hover:text-navy">
+                                                    <Button variant="ghost" size="icon" className="text-slate-500 hover:text-navy">
                                                         <MoreHorizontal className="h-5 w-5" />
                                                     </Button>
                                                 </DropdownMenuTrigger>
@@ -530,7 +530,7 @@ export function RemindersView() {
                                             <div className="flex items-center gap-4">
                                                 {/* Priority Dropdown */}
                                                 <div>
-                                                    <div className="text-xs text-slate-400 mb-1">الأولوية</div>
+                                                    <div className="text-xs text-slate-500 mb-1">الأولوية</div>
                                                     <Select
                                                         value={reminder.priority}
                                                         onValueChange={(value) => handlePriorityChange(reminder.id, value)}
@@ -553,15 +553,15 @@ export function RemindersView() {
                                                 </div>
                                                 {/* Reminder Date - Dual Language */}
                                                 <div className="text-center">
-                                                    <div className="text-xs text-slate-400 mb-1">موعد التذكير</div>
+                                                    <div className="text-xs text-slate-500 mb-1">موعد التذكير</div>
                                                     <div className="font-bold text-navy text-sm">{reminder.reminderDateFormatted.arabic}</div>
-                                                    <div className="text-xs text-slate-400">{reminder.reminderDateFormatted.english}</div>
+                                                    <div className="text-xs text-slate-500">{reminder.reminderDateFormatted.english}</div>
                                                 </div>
                                                 {/* Creation Date - Dual Language */}
                                                 <div className="text-center">
-                                                    <div className="text-xs text-slate-400 mb-1">تاريخ الإنشاء</div>
+                                                    <div className="text-xs text-slate-500 mb-1">تاريخ الإنشاء</div>
                                                     <div className="font-bold text-slate-600 text-sm">{reminder.createdAtFormatted.arabic}</div>
-                                                    <div className="text-xs text-slate-400">{reminder.createdAtFormatted.english}</div>
+                                                    <div className="text-xs text-slate-500">{reminder.createdAtFormatted.english}</div>
                                                 </div>
                                             </div>
                                             <Link to={`/dashboard/tasks/reminders/${reminder.id}` as any}>

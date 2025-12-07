@@ -249,7 +249,7 @@ export function LoansListView() {
                       placeholder="البحث باسم الموظف أو الرقم..."
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      className="pr-10 rounded-xl h-11"
+                      className="pe-10 rounded-xl h-11"
                     />
                   </div>
                   <Select value={statusFilter} onValueChange={(v) => setStatusFilter(v as LoanStatus | 'all')}>

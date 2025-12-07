@@ -142,7 +142,7 @@ export function ReferralDetailsView() {
             <input
               type="text"
               placeholder="بحث..."
-              className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pr-9 pl-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+              className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
             />
           </div>
           <Button
@@ -499,7 +499,7 @@ export function ReferralDetailsView() {
                                   )}
                                 </div>
                                 {payment.notes && (
-                                  <p className="mt-3 text-sm text-slate-600 pr-13">{payment.notes}</p>
+                                  <p className="mt-3 text-sm text-slate-600 pe-13">{payment.notes}</p>
                                 )}
                               </Card>
                             ))

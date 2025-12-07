@@ -246,7 +246,7 @@ export function GrievancesListView() {
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         placeholder="بحث عن شكوى..."
-                        className="pr-9 rounded-xl"
+                        className="pe-9 rounded-xl"
                       />
                     </div>
                     <Select value={statusFilter} onValueChange={(v) => setStatusFilter(v as GrievanceStatus | 'all')}>

@@ -33,7 +33,7 @@ import { cn } from '@/lib/utils'
 import {
   Search, Bell, ArrowRight, User, Building2, Calendar,
   CheckCircle, ChevronDown, Users, Clock, FileText,
-  AlertTriangle, Shield, UserMinus, Briefcase
+  AlertTriangle, Shield, UserMinus, Briefcase, Lock
 } from 'lucide-react'
 import { EXIT_TYPE_LABELS, type ExitType, type CreateOffboardingData } from '@/services/offboardingService'
 
@@ -329,7 +329,7 @@ export function OffboardingCreateView() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label className="text-navy font-medium">
-                      رقم الهوية <span className="text-red-500">*</span>
+                      رقم الهوية<Lock className="h-3 w-3 text-slate-500 inline ms-1" aria-hidden="true" /> <span className="text-red-500">*</span>
                     </Label>
                     <Input
                       value={nationalId}
@@ -541,7 +541,7 @@ export function OffboardingCreateView() {
                     <AlertTriangle className="w-4 h-4 mt-0.5 flex-shrink-0" />
                     <div>
                       <p className="font-medium">المادة 75 - فترة الإشعار:</p>
-                      <ul className="list-disc list-inside mr-4 mt-1 space-y-1">
+                      <ul className="list-disc list-inside me-4 mt-1 space-y-1">
                         <li>يجب على الطرف الراغب في إنهاء العقد إشعار الطرف الآخر كتابياً</li>
                         <li>فترة الإشعار 60 يوماً للموظفين بأجر شهري، 30 يوماً لغيرهم</li>
                         <li>يستحق العامل أجره عن فترة الإشعار</li>
@@ -552,7 +552,7 @@ export function OffboardingCreateView() {
                     <AlertTriangle className="w-4 h-4 mt-0.5 flex-shrink-0" />
                     <div>
                       <p className="font-medium">المادة 84-87 - مكافأة نهاية الخدمة:</p>
-                      <ul className="list-disc list-inside mr-4 mt-1 space-y-1">
+                      <ul className="list-disc list-inside me-4 mt-1 space-y-1">
                         <li>نصف راتب شهر عن كل سنة من السنوات الخمس الأولى</li>
                         <li>راتب شهر كامل عن كل سنة تالية</li>
                         <li>تحسب المكافأة على أساس آخر راتب</li>
@@ -563,7 +563,7 @@ export function OffboardingCreateView() {
                     <AlertTriangle className="w-4 h-4 mt-0.5 flex-shrink-0" />
                     <div>
                       <p className="font-medium">شهادة الخبرة:</p>
-                      <ul className="list-disc list-inside mr-4 mt-1 space-y-1">
+                      <ul className="list-disc list-inside me-4 mt-1 space-y-1">
                         <li>يلتزم صاحب العمل بإعطاء العامل شهادة خدمة مجاناً</li>
                         <li>يجب أن تتضمن تاريخ بداية ونهاية الخدمة</li>
                       </ul>

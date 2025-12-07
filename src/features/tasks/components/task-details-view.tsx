@@ -706,7 +706,7 @@ export function TaskDetailsView() {
                                                                         عرض ملف القضية
                                                                     </Link>
                                                                 ) : (
-                                                                    <span className="text-slate-400 text-sm">لا توجد قضية مرتبطة</span>
+                                                                    <span className="text-slate-500 text-sm">لا توجد قضية مرتبطة</span>
                                                                 )}
                                                             </CardContent>
                                                         </Card>
@@ -737,7 +737,7 @@ export function TaskDetailsView() {
                                                                         عرض ملف العميل
                                                                     </Link>
                                                                 ) : (
-                                                                    <span className="text-slate-400 text-sm">لا يوجد عميل مرتبط</span>
+                                                                    <span className="text-slate-500 text-sm">لا يوجد عميل مرتبط</span>
                                                                 )}
                                                             </CardContent>
                                                         </Card>
@@ -902,7 +902,7 @@ export function TaskDetailsView() {
                                                                         <Upload className="h-6 w-6" />
                                                                     </div>
                                                                     <span className="font-bold text-slate-600 group-hover:text-brand-blue">رفع مستند جديد</span>
-                                                                    <span className="text-xs text-slate-400 mt-1">PDF, DOCX, Excel, صور</span>
+                                                                    <span className="text-xs text-slate-500 mt-1">PDF, DOCX, Excel, صور</span>
                                                                 </>
                                                             )}
                                                         </div>
@@ -916,7 +916,7 @@ export function TaskDetailsView() {
                                                                 <Edit3 className="h-6 w-6" />
                                                             </div>
                                                             <span className="font-bold text-slate-600 group-hover:text-emerald-600">إنشاء مستند</span>
-                                                            <span className="text-xs text-slate-400 mt-1">محرر نصوص متقدم</span>
+                                                            <span className="text-xs text-slate-500 mt-1">محرر نصوص متقدم</span>
                                                         </div>
 
                                                         {/* Empty State - Only show if no documents (excluding voice memos) */}
@@ -942,7 +942,7 @@ export function TaskDetailsView() {
                                                                     </div>
                                                                     <DropdownMenu>
                                                                         <DropdownMenuTrigger asChild>
-                                                                            <Button variant="ghost" size="icon" aria-label="خيارات" className="h-8 w-8 -ms-2 text-slate-400 hover:text-navy">
+                                                                            <Button variant="ghost" size="icon" aria-label="خيارات" className="h-8 w-8 -ms-2 text-slate-500 hover:text-navy">
                                                                                 <MoreHorizontal className="h-4 w-4" />
                                                                             </Button>
                                                                         </DropdownMenuTrigger>
@@ -977,7 +977,7 @@ export function TaskDetailsView() {
                                                                 </div>
                                                                 <div>
                                                                     <h4 className="font-bold text-navy text-sm mb-1 line-clamp-1" title={doc.name}>{doc.name}</h4>
-                                                                    <div className="flex items-center gap-2 text-xs text-slate-400">
+                                                                    <div className="flex items-center gap-2 text-xs text-slate-500">
                                                                         {doc.size && <span>{doc.size}</span>}
                                                                         {doc.size && doc.date && <span>•</span>}
                                                                         {doc.date && <span>{doc.date}</span>}
@@ -996,7 +996,7 @@ export function TaskDetailsView() {
                                                                         variant="ghost"
                                                                         size="icon"
                                                                         aria-label="تحميل"
-                                                                        className="h-8 w-8 text-slate-400 hover:text-brand-blue"
+                                                                        className="h-8 w-8 text-slate-500 hover:text-brand-blue"
                                                                         onClick={() => handleDownloadAttachment(doc._id, doc.name, doc.url, doc.storageType)}
                                                                     >
                                                                         <Download className="h-4 w-4" />
@@ -1019,7 +1019,7 @@ export function TaskDetailsView() {
                                                                             </div>
                                                                             <DropdownMenu>
                                                                                 <DropdownMenuTrigger asChild>
-                                                                                    <Button variant="ghost" size="icon" className="h-8 w-8 -ms-2 text-slate-400 hover:text-navy">
+                                                                                    <Button variant="ghost" size="icon" className="h-8 w-8 -ms-2 text-slate-500 hover:text-navy">
                                                                                         <MoreHorizontal className="h-4 w-4" />
                                                                                     </Button>
                                                                                 </DropdownMenuTrigger>
@@ -1040,7 +1040,7 @@ export function TaskDetailsView() {
                                                                             <h4 className="font-bold text-navy text-sm mb-1 line-clamp-1" title={doc.title || doc.fileName}>
                                                                                 {doc.title || doc.fileName?.replace('.html', '') || 'مستند'}
                                                                             </h4>
-                                                                            <div className="flex items-center gap-2 text-xs text-slate-400">
+                                                                            <div className="flex items-center gap-2 text-xs text-slate-500">
                                                                                 <span>{new Date(doc.createdAt || (doc as any).uploadedAt || (doc as any).lastEditedAt || new Date()).toLocaleDateString('ar-SA')}</span>
                                                                             </div>
                                                                         </div>
@@ -1067,7 +1067,7 @@ export function TaskDetailsView() {
                                                         <CardContent className="p-6">
                                                             <div className="space-y-6 mb-6">
                                                                 {task.comments.length === 0 && (
-                                                                    <div className="text-center py-8 text-slate-400">
+                                                                    <div className="text-center py-8 text-slate-500">
                                                                         <Send className="w-12 h-12 mx-auto mb-3 opacity-30" />
                                                                         <p>لا توجد تعليقات</p>
                                                                         <p className="text-xs mt-1">كن أول من يعلق على هذه المهمة</p>
@@ -1081,7 +1081,7 @@ export function TaskDetailsView() {
                                                                         <div className="flex-1 bg-slate-50 p-4 rounded-2xl rounded-tr-none">
                                                                             <div className="flex justify-between items-center mb-2">
                                                                                 <span className="font-bold text-sm text-navy">{comment.user}</span>
-                                                                                <span className="text-xs text-slate-400">{comment.time}</span>
+                                                                                <span className="text-xs text-slate-500">{comment.time}</span>
                                                                             </div>
                                                                             <p className="text-sm text-slate-600">{comment.text}</p>
                                                                         </div>

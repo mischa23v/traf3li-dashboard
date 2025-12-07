@@ -74,7 +74,7 @@ export default function StatementsHistoryDashboard() {
 
                 <div className='ms-auto flex items-center gap-4'>
                     <div className="relative hidden md:block">
-                        <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" aria-hidden="true" />
+                        <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-600" aria-hidden="true" />
                         <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
                     </div>
                     <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white" aria-label="الإشعارات">
@@ -169,7 +169,7 @@ export default function StatementsHistoryDashboard() {
 
                                 <div className="flex items-center gap-3 flex-1 justify-end">
                                     <div className="relative w-full max-w-xs">
-                                        <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" aria-hidden="true" />
+                                        <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-600" aria-hidden="true" />
                                         <Input
                                             placeholder="بحث في الكشوفات..."
                                             className="pe-10 rounded-xl border-slate-200 focus:ring-[#022c22] focus:border-[#022c22]"
@@ -238,7 +238,7 @@ export default function StatementsHistoryDashboard() {
                                                             </Badge>
                                                         </div>
                                                         <div className="flex items-center gap-2 text-slate-500 text-sm">
-                                                            <span className="font-mono text-slate-400">{st.statementNumber}</span>
+                                                            <span className="font-mono text-slate-600">{st.statementNumber}</span>
                                                             <span className="text-slate-300">•</span>
                                                             <Calendar className="w-3 h-3" aria-hidden="true" />
                                                             {st.period}
@@ -247,7 +247,7 @@ export default function StatementsHistoryDashboard() {
                                                 </div>
                                                 <DropdownMenu>
                                                     <DropdownMenuTrigger asChild>
-                                                        <Button variant="ghost" size="icon" className="text-slate-400 hover:text-[#022c22]" aria-label="تعديل">
+                                                        <Button variant="ghost" size="icon" className="text-slate-600 hover:text-[#022c22]" aria-label="تعديل">
                                                             <MoreHorizontal className="h-5 w-5" aria-hidden="true" />
                                                         </Button>
                                                     </DropdownMenuTrigger>
@@ -266,17 +266,17 @@ export default function StatementsHistoryDashboard() {
                                             <div className="flex items-center justify-between pt-4 border-t border-slate-100">
                                                 <div className="flex items-center gap-6">
                                                     <div className="text-center">
-                                                        <div className="text-xs text-slate-400 mb-1">تاريخ الإصدار</div>
+                                                        <div className="text-xs text-slate-600 mb-1">تاريخ الإصدار</div>
                                                         <div className="font-bold text-[#022c22]">{new Date(st.generatedDate).toLocaleDateString('ar-SA')}</div>
                                                     </div>
                                                     <div className="text-center ps-4 border-l border-slate-100">
-                                                        <div className="text-xs text-slate-400 mb-1">عدد البنود</div>
+                                                        <div className="text-xs text-slate-600 mb-1">عدد البنود</div>
                                                         <div className="font-bold text-slate-700">{st.items?.length || 0}</div>
                                                     </div>
                                                 </div>
 
                                                 <div className="text-left">
-                                                    <div className="text-xs text-slate-400 mb-1">إجمالي الكشف</div>
+                                                    <div className="text-xs text-slate-600 mb-1">إجمالي الكشف</div>
                                                     <div className="font-bold text-[#022c22] text-xl">{formatCurrency(st.totalAmount)}</div>
                                                 </div>
                                             </div>

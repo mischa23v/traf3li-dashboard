@@ -255,18 +255,18 @@ export function RevenueByClientReport() {
                     <div className="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex flex-wrap items-center justify-between gap-4">
                         <div className="flex items-center gap-4">
                             <div className="flex items-center gap-2">
-                                <Filter className="w-5 h-5 text-slate-400" aria-hidden="true" />
+                                <Filter className="w-5 h-5 text-slate-600" aria-hidden="true" />
                                 <span className="text-sm font-medium text-slate-600">الفترة:</span>
                             </div>
                             <div className="flex items-center gap-2">
-                                <Calendar className="w-4 h-4 text-slate-400" aria-hidden="true" />
+                                <Calendar className="w-4 h-4 text-slate-600" aria-hidden="true" />
                                 <Input
                                     type="date"
                                     value={startDate}
                                     onChange={(e) => setStartDate(e.target.value)}
                                     className="w-[150px] rounded-xl border-slate-200"
                                 />
-                                <span className="text-slate-400">إلى</span>
+                                <span className="text-slate-600">إلى</span>
                                 <Input
                                     type="date"
                                     value={endDate}
@@ -440,7 +440,7 @@ export function RevenueByClientReport() {
                                                     </span>
                                                 </TableCell>
                                                 <TableCell className="text-center">
-                                                    <span className={client.outstandingAmount > 0 ? 'text-amber-600 font-medium' : 'text-slate-400'}>
+                                                    <span className={client.outstandingAmount > 0 ? 'text-amber-600 font-medium' : 'text-slate-600'}>
                                                         {formatCurrency(client.outstandingAmount)}
                                                     </span>
                                                 </TableCell>

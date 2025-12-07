@@ -450,7 +450,7 @@ export function EventsView() {
                                             </div>
                                             <DropdownMenu>
                                                 <DropdownMenuTrigger asChild>
-                                                    <Button variant="ghost" size="icon" className="text-slate-400 hover:text-navy">
+                                                    <Button variant="ghost" size="icon" className="text-slate-500 hover:text-navy">
                                                         <MoreHorizontal className="h-5 w-5" />
                                                     </Button>
                                                 </DropdownMenuTrigger>
@@ -494,7 +494,7 @@ export function EventsView() {
                                             <div className="flex items-center gap-4">
                                                 {/* Attendees */}
                                                 <div className="flex items-center gap-2">
-                                                    <div className="flex -space-x-2">
+                                                    <div className="flex -gap-2">
                                                         {[...Array(Math.min(3, event.attendees))].map((_, i) => (
                                                             <div key={i} className="w-8 h-8 rounded-full bg-slate-200 border-2 border-white flex items-center justify-center text-xs font-bold text-slate-500">
                                                                 <Users className="w-4 h-4" />
@@ -509,15 +509,15 @@ export function EventsView() {
                                                 </div>
                                                 {/* Event Date - Dual Language */}
                                                 <div className="text-center">
-                                                    <div className="text-xs text-slate-400 mb-1">موعد الحدث</div>
+                                                    <div className="text-xs text-slate-500 mb-1">موعد الحدث</div>
                                                     <div className="font-bold text-navy text-sm">{event.eventDateFormatted.arabic}</div>
-                                                    <div className="text-xs text-slate-400">{event.eventDateFormatted.english}</div>
+                                                    <div className="text-xs text-slate-500">{event.eventDateFormatted.english}</div>
                                                 </div>
                                                 {/* Creation Date - Dual Language */}
                                                 <div className="text-center">
-                                                    <div className="text-xs text-slate-400 mb-1">تاريخ الإنشاء</div>
+                                                    <div className="text-xs text-slate-500 mb-1">تاريخ الإنشاء</div>
                                                     <div className="font-bold text-slate-600 text-sm">{event.createdAtFormatted.arabic}</div>
-                                                    <div className="text-xs text-slate-400">{event.createdAtFormatted.english}</div>
+                                                    <div className="text-xs text-slate-500">{event.createdAtFormatted.english}</div>
                                                 </div>
                                             </div>
                                             <div className="flex gap-2">

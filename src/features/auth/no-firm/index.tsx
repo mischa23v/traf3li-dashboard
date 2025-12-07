@@ -99,7 +99,7 @@ export function NoFirmPage() {
           </div>
 
           {/* Help text */}
-          <p className="text-xs text-center text-slate-400">
+          <p className="text-xs text-center text-slate-500">
             {t('noFirm.helpText')}
           </p>
         </CardContent>

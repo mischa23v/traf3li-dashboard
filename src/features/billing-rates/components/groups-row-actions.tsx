@@ -35,11 +35,11 @@ export function GroupsRowActions({ row }: GroupsRowActionsProps) {
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-[160px]">
         <DropdownMenuItem onClick={() => handleAction('view-group')}>
-          <Eye className="me-2 h-4 w-4" />
+          <Eye className="me-2 h-4 w-4" aria-hidden="true" />
           {t('common.view')}
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => handleAction('edit-group')}>
-          <Pencil className="me-2 h-4 w-4" />
+          <Pencil className="me-2 h-4 w-4" aria-hidden="true" />
           {t('common.edit')}
         </DropdownMenuItem>
         <DropdownMenuSeparator />
@@ -47,7 +47,7 @@ export function GroupsRowActions({ row }: GroupsRowActionsProps) {
           onClick={() => handleAction('delete-group')}
           className="text-destructive focus:text-destructive"
         >
-          <Trash2 className="me-2 h-4 w-4" />
+          <Trash2 className="me-2 h-4 w-4" aria-hidden="true" />
           {t('common.delete')}
         </DropdownMenuItem>
       </DropdownMenuContent>

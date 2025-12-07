@@ -449,7 +449,7 @@ export function RichDocumentForm({
                 className="rounded-xl"
                 disabled={isLoading}
               >
-                <X className="w-4 h-4 me-2" />
+                <X className="w-4 h-4 me-2" aria-hidden="true" />
                 {isArabic ? 'إلغاء' : 'Cancel'}
               </Button>
             )}
@@ -461,7 +461,7 @@ export function RichDocumentForm({
               {isLoading ? (
                 <Loader2 className="w-4 h-4 me-2 animate-spin" />
               ) : (
-                <Save className="w-4 h-4 me-2" />
+                <Save className="w-4 h-4 me-2" aria-hidden="true" />
               )}
               {isLoading
                 ? (isArabic ? 'جاري الحفظ...' : 'Saving...')

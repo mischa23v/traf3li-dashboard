@@ -147,7 +147,7 @@ export function MyServices() {
 
         <div className="ms-auto flex items-center gap-4">
           <div className="relative hidden md:block">
-            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
             <input
               type="text"
               placeholder={t('common.search', 'بحث...')}
@@ -240,7 +240,7 @@ export function MyServices() {
               <CardContent className="p-4">
                 <div className="flex flex-col sm:flex-row gap-4">
                   <div className="relative flex-1">
-                    <Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                    <Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
                     <Input
                       placeholder={isRTL ? 'بحث في الخدمات...' : 'Search services...'}
                       value={searchQuery}
@@ -292,7 +292,7 @@ export function MyServices() {
                       </div>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-navy">
+                          <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-500 hover:text-navy">
                             <MoreVertical className="h-4 w-4" />
                           </Button>
                         </DropdownMenuTrigger>
@@ -326,9 +326,9 @@ export function MyServices() {
                       <div className="flex items-center font-bold text-navy">
                         <DollarSign className="h-4 w-4 me-1 text-emerald-500" />
                         <span>{service.price} {isRTL ? 'ر.س' : 'SAR'}</span>
-                        <span className="ms-1 text-slate-400 font-normal text-xs">/ {service.priceType === 'hourly' ? (isRTL ? 'ساعة' : 'hour') : (isRTL ? 'ثابت' : 'fixed')}</span>
+                        <span className="ms-1 text-slate-500 font-normal text-xs">/ {service.priceType === 'hourly' ? (isRTL ? 'ساعة' : 'hour') : (isRTL ? 'ثابت' : 'fixed')}</span>
                       </div>
-                      <div className="flex items-center gap-3 text-slate-400">
+                      <div className="flex items-center gap-3 text-slate-500">
                         <span className="flex items-center text-xs">
                           <Eye className="h-3.5 w-3.5 me-1" />
                           {service.views}

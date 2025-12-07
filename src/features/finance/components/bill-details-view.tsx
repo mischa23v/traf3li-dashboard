@@ -178,7 +178,7 @@ export function BillDetailsView() {
                     </div>
                     <div className="bg-white rounded-3xl p-12 text-center border border-slate-100 shadow-sm">
                         <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <FileText className="h-8 w-8 text-slate-400" aria-hidden="true" />
+                            <FileText className="h-8 w-8 text-slate-600" aria-hidden="true" />
                         </div>
                         <h3 className="text-xl font-bold text-slate-900 mb-2">الفاتورة غير موجودة</h3>
                         <p className="text-slate-500 mb-6">لم نتمكن من العثور على الفاتورة المطلوبة</p>

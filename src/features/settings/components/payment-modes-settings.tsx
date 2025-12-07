@@ -239,7 +239,7 @@ export default function PaymentModesSettings() {
                                                         </div>
                                                         <p className="text-sm text-slate-500" dir="ltr">{mode.name}</p>
                                                         {mode.descriptionAr && (
-                                                            <p className="text-sm text-slate-400 mt-1">{mode.descriptionAr}</p>
+                                                            <p className="text-sm text-slate-500 mt-1">{mode.descriptionAr}</p>
                                                         )}
                                                     </div>
                                                 </div>

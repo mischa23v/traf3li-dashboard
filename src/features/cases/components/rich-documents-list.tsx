@@ -294,7 +294,7 @@ export function RichDocumentsList({
                   </CardTitle>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-navy" aria-label="خيارات">
+                      <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-500 hover:text-navy" aria-label="خيارات">
                         <MoreHorizontal className="h-4 w-4" aria-hidden="true" />
                       </Button>
                     </DropdownMenuTrigger>
@@ -386,7 +386,7 @@ export function RichDocumentsList({
                 </div>
 
                 {/* Date */}
-                <div className="text-xs text-slate-400">
+                <div className="text-xs text-slate-500">
                   {isArabic ? 'آخر تعديل: ' : 'Updated: '}
                   {new Date(doc.updatedAt).toLocaleDateString(isArabic ? 'ar-SA' : 'en-US')}
                 </div>

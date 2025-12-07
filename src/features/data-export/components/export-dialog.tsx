@@ -183,7 +183,7 @@ export function ExportDialog({
             <ScrollArea className="h-40 rounded-md border p-3">
               <div className="grid grid-cols-2 gap-2">
                 {columns.map((column) => (
-                  <div key={column.field} className="flex items-center space-x-2 rtl:space-x-reverse">
+                  <div key={column.field} className="flex items-center gap-2 rtl:gap-reverse">
                     <Checkbox
                       id={column.field}
                       checked={
@@ -210,7 +210,7 @@ export function ExportDialog({
           {/* Additional Options */}
           <div className="space-y-3">
             <Label>{t('dataExport.additionalOptions')}</Label>
-            <div className="flex items-center space-x-2 rtl:space-x-reverse">
+            <div className="flex items-center gap-2 rtl:gap-reverse">
               <Checkbox
                 id="includeRelated"
                 checked={includeRelated}

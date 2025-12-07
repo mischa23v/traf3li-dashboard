@@ -747,7 +747,7 @@ export function CreateReferralView() {
                                     <SelectItem key={option.value} value={option.value}>
                                       <div>
                                         <div>{option.label}</div>
-                                        <div className="text-xs text-slate-400">{option.description}</div>
+                                        <div className="text-xs text-slate-500">{option.description}</div>
                                       </div>
                                     </SelectItem>
                                   ))}

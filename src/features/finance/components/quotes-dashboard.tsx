@@ -193,7 +193,7 @@ export default function QuotesDashboard() {
                     </div>
                     <div className='ms-auto flex items-center gap-4'>
                         <div className="relative hidden md:block">
-                            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" aria-hidden="true" />
+                            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-600" aria-hidden="true" />
                             <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
                         </div>
                         <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white" aria-label="الإشعارات">
@@ -241,7 +241,7 @@ export default function QuotesDashboard() {
 
                 <div className='ms-auto flex items-center gap-4'>
                     <div className="relative hidden md:block">
-                        <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" aria-hidden="true" />
+                        <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-600" aria-hidden="true" />
                         <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
                     </div>
                     <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white" aria-label="الإشعارات">
@@ -347,7 +347,7 @@ export default function QuotesDashboard() {
 
                                             <div className="flex items-center gap-3">
                                                 <div className="relative w-full max-w-xs">
-                                                    <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" aria-hidden="true" />
+                                                    <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-600" aria-hidden="true" />
                                                     <Input
                                                         placeholder="بحث في عروض الأسعار..."
                                                         className="pe-10 rounded-xl border-slate-200 focus:ring-[#022c22] focus:border-[#022c22]"
@@ -457,7 +457,7 @@ export default function QuotesDashboard() {
                                         {filteredQuotes.length === 0 ? (
                                             <div className="bg-white p-12 rounded-3xl text-center border border-slate-100">
                                                 <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                                                    <Search className="h-8 w-8 text-slate-400" aria-hidden="true" />
+                                                    <Search className="h-8 w-8 text-slate-600" aria-hidden="true" />
                                                 </div>
                                                 <h3 className="text-lg font-bold text-slate-900 mb-2">لا توجد نتائج</h3>
                                                 <p className="text-slate-500 mb-4">لم نجد عروض أسعار تطابق البحث أو الفلاتر المحددة</p>
@@ -500,23 +500,23 @@ export default function QuotesDashboard() {
                                                     </div>
                                                     <div className="flex items-center gap-8 border-t md:border-t-0 border-slate-100 pt-4 md:pt-0">
                                                         <div className="text-center md:text-right">
-                                                            <div className="text-xs text-slate-400 mb-1">تاريخ الإصدار</div>
+                                                            <div className="text-xs text-slate-600 mb-1">تاريخ الإصدار</div>
                                                             <div className="font-bold text-navy">{quote.date}</div>
                                                         </div>
                                                         {quote.expiryDate && (
                                                             <div className="text-center md:text-right">
-                                                                <div className="text-xs text-slate-400 mb-1">تاريخ الانتهاء</div>
+                                                                <div className="text-xs text-slate-600 mb-1">تاريخ الانتهاء</div>
                                                                 <div className="font-medium text-slate-700">{quote.expiryDate}</div>
                                                             </div>
                                                         )}
                                                         <div className="text-center md:text-right">
-                                                            <div className="text-xs text-slate-400 mb-1">المبلغ</div>
+                                                            <div className="text-xs text-slate-600 mb-1">المبلغ</div>
                                                             <div className="font-bold text-xl text-navy">{formatCurrency(quote.amount)}</div>
                                                         </div>
                                                         <DropdownMenu>
                                                             <DropdownMenuTrigger asChild>
                                                                 <Button variant="ghost" size="icon" className="rounded-full hover:bg-slate-50" aria-label="خيارات">
-                                                                <MoreHorizontal className="w-5 h-5 text-slate-400" aria-hidden="true" />
+                                                                <MoreHorizontal className="w-5 h-5 text-slate-600" aria-hidden="true" />
                                                                 </Button>
                                                             </DropdownMenuTrigger>
                                                             <DropdownMenuContent align="end">

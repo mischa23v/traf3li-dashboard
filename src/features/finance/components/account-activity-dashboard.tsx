@@ -151,7 +151,7 @@ export default function AccountActivityDashboard() {
 
                 <div className='ms-auto flex items-center gap-4'>
                     <div className="relative hidden md:block">
-                        <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" aria-hidden="true" />
+                        <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-600" aria-hidden="true" />
                         <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
                     </div>
                     <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white" aria-label="الإشعارات">
@@ -389,7 +389,7 @@ export default function AccountActivityDashboard() {
 
                                             <div className="flex items-center gap-3 flex-1 justify-end">
                                                 <div className="relative w-full max-w-xs">
-                                                    <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" aria-hidden="true" />
+                                                    <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-600" aria-hidden="true" />
                                                     <Input
                                                         placeholder="بحث في السجل..."
                                                         className="pe-10 rounded-xl border-slate-200 focus:ring-[#022c22] focus:border-[#022c22]"
@@ -435,7 +435,7 @@ export default function AccountActivityDashboard() {
                                                                                     <p className="text-slate-600 text-sm">{activity.description}</p>
                                                                                 </div>
                                                                                 <div className="text-left">
-                                                                                    <span className="text-xs text-slate-400 bg-slate-50 px-2 py-1 rounded-md">{activity.time}</span>
+                                                                                    <span className="text-xs text-slate-600 bg-slate-50 px-2 py-1 rounded-md">{activity.time}</span>
                                                                                 </div>
                                                                             </div>
 
@@ -445,7 +445,7 @@ export default function AccountActivityDashboard() {
                                                                                         <User className="h-3 w-3" />
                                                                                         {activity.userName}
                                                                                     </span>
-                                                                                    <span className="font-mono bg-slate-50 px-1.5 py-0.5 rounded text-slate-400">{activity.reference}</span>
+                                                                                    <span className="font-mono bg-slate-50 px-1.5 py-0.5 rounded text-slate-600">{activity.reference}</span>
                                                                                     <Badge variant="secondary" className="text-[10px] h-5">{activity.status}</Badge>
                                                                                 </div>
 

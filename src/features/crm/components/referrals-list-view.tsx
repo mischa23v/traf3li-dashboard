@@ -144,7 +144,7 @@ export function ReferralsListView() {
             <input
               type="text"
               placeholder="بحث..."
-              className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pr-9 pl-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+              className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
             />
           </div>
           <Button
@@ -366,7 +366,7 @@ export function ReferralsListView() {
                             <Button
                               variant="ghost"
                               size="icon"
-                              className="text-slate-400 hover:text-navy"
+                              className="text-slate-500 hover:text-navy"
                             >
                               <MoreHorizontal className="h-5 w-5" />
                             </Button>
@@ -390,7 +390,7 @@ export function ReferralsListView() {
                       <div className="flex items-center justify-between pt-4 border-t border-slate-200/50">
                         <div className="flex items-center gap-6">
                           <div className="text-center">
-                            <div className="text-xs text-slate-400 mb-1">
+                            <div className="text-xs text-slate-500 mb-1">
                               الإحالات
                             </div>
                             <div className="font-bold text-navy">
@@ -398,13 +398,13 @@ export function ReferralsListView() {
                             </div>
                           </div>
                           <div className="text-center">
-                            <div className="text-xs text-slate-400 mb-1">ناجحة</div>
+                            <div className="text-xs text-slate-500 mb-1">ناجحة</div>
                             <div className="font-bold text-emerald-600">
                               {referral.successfulReferrals}
                             </div>
                           </div>
                           <div className="text-center">
-                            <div className="text-xs text-slate-400 mb-1">
+                            <div className="text-xs text-slate-500 mb-1">
                               معدل التحويل
                             </div>
                             <div className="font-bold text-blue-600">
@@ -413,7 +413,7 @@ export function ReferralsListView() {
                           </div>
                           {referral.outstandingFees > 0 && (
                             <div className="text-center">
-                              <div className="text-xs text-slate-400 mb-1">
+                              <div className="text-xs text-slate-500 mb-1">
                                 مستحق
                               </div>
                               <div className="font-bold text-orange-600">

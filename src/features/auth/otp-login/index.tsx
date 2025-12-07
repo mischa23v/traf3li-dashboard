@@ -251,7 +251,7 @@ export function OtpLogin({ purpose = 'login' }: OtpLoginProps) {
                     {t('otpLogin.email', 'البريد الإلكتروني')} <span className="text-red-500">*</span>
                   </label>
                   <div className="relative" dir="ltr">
-                    <div className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
+                    <div className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500">
                       <Icons.Mail />
                     </div>
                     <input
@@ -294,7 +294,7 @@ export function OtpLogin({ purpose = 'login' }: OtpLoginProps) {
                     <span className="w-full border-t border-slate-200" />
                   </div>
                   <div className="relative flex justify-center text-xs uppercase">
-                    <span className="bg-white px-4 text-slate-400">{t('otpLogin.or', 'أو')}</span>
+                    <span className="bg-white px-4 text-slate-500">{t('otpLogin.or', 'أو')}</span>
                   </div>
                 </div>
 
@@ -394,7 +394,7 @@ export function OtpLogin({ purpose = 'login' }: OtpLoginProps) {
                   <button
                     onClick={handleResendOtp}
                     disabled={countdown > 0 || isLoading}
-                    className="text-sm font-medium text-emerald-600 hover:text-emerald-700 disabled:text-slate-400 disabled:cursor-not-allowed"
+                    className="text-sm font-medium text-emerald-600 hover:text-emerald-700 disabled:text-slate-500 disabled:cursor-not-allowed"
                   >
                     {countdown > 0
                       ? t('otpLogin.resendIn', 'إعادة الإرسال خلال {{seconds}} ثانية', { seconds: countdown })

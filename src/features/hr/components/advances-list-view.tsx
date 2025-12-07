@@ -225,7 +225,7 @@ export function AdvancesListView() {
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         placeholder="بحث عن سلفة..."
-                        className="pr-9 rounded-xl"
+                        className="pe-9 rounded-xl"
                       />
                     </div>
                     <Select value={statusFilter} onValueChange={(v) => setStatusFilter(v as AdvanceStatus | 'all')}>

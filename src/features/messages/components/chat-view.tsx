@@ -158,7 +158,7 @@ export function ChatView() {
                                 <input
                                     type="text"
                                     placeholder="بحث في المحادثات..."
-                                    className="h-12 w-full rounded-xl border border-slate-200 bg-slate-50 pr-12 pl-4 text-sm focus:outline-none focus:border-navy focus:ring-1 focus:ring-navy transition-all"
+                                    className="h-12 w-full rounded-xl border border-slate-200 bg-slate-50 pe-12 ps-4 text-sm focus:outline-none focus:border-navy focus:ring-1 focus:ring-navy transition-all"
                                 />
                             </div>
                         </div>
@@ -345,7 +345,7 @@ export function ChatView() {
                                                             }`}>
                                                             {msg.description}
                                                             {msg.isEdited && (
-                                                                <span className="text-xs opacity-70 ml-2">(معدلة)</span>
+                                                                <span className="text-xs opacity-70 ms-2">(معدلة)</span>
                                                             )}
                                                         </div>
                                                     )}
@@ -425,7 +425,7 @@ export function ChatView() {
                                         {sendMessageMutation.isPending ? (
                                             <Loader2 className="h-4 w-4 animate-spin" />
                                         ) : (
-                                            <Send className="h-4 w-4 ml-0.5" />
+                                            <Send className="h-4 w-4 ms-0.5" />
                                         )}
                                     </Button>
                                 </div>

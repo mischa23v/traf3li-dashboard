@@ -191,7 +191,7 @@ export function LeadDetailsView() {
               type="text"
               placeholder="بحث..."
               aria-label="بحث"
-              className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pr-9 pl-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+              className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
             />
           </div>
           <Button
@@ -435,7 +435,7 @@ export function LeadDetailsView() {
                                 </div>
                                 {lead.alternatePhone && (
                                   <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-xl">
-                                    <Phone className="h-5 w-5 text-slate-400" aria-hidden="true" />
+                                    <Phone className="h-5 w-5 text-slate-500" aria-hidden="true" />
                                     <div>
                                       <p className="text-xs text-slate-500">
                                         هاتف بديل

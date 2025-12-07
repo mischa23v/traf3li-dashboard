@@ -115,7 +115,7 @@ function MetricCard({
             <p className="text-sm text-slate-500">{title}</p>
             <p className="text-2xl font-bold text-navy">{value}</p>
             {subtitle && (
-              <p className="text-xs text-slate-400">{subtitle}</p>
+              <p className="text-xs text-slate-500">{subtitle}</p>
             )}
           </div>
           <div className={cn('p-2 rounded-xl', colorClasses[color])}>
@@ -139,7 +139,7 @@ function MetricCard({
             {trend === 'neutral' && (
               <span className="text-slate-500">{trendValue}</span>
             )}
-            <span className="text-slate-400 me-1">من الشهر الماضي</span>
+            <span className="text-slate-500 me-1">من الشهر الماضي</span>
           </div>
         )}
       </CardContent>
@@ -281,7 +281,7 @@ function LeadCard({
 
       {/* Lead score and probability */}
       {(lead.qualification?.score || lead.probability) && (
-        <div className="mt-2 flex items-center gap-3 text-xs text-slate-400">
+        <div className="mt-2 flex items-center gap-3 text-xs text-slate-500">
           {lead.qualification?.score && (
             <div className="flex items-center gap-1">
               <Target className="w-3 h-3" />
@@ -298,7 +298,7 @@ function LeadCard({
       )}
 
       {/* Time ago */}
-      <div className="mt-2 text-xs text-slate-400">
+      <div className="mt-2 text-xs text-slate-500">
         {formatDistanceToNow(new Date(lead.createdAt), {
           addSuffix: true,
           locale: ar,
@@ -472,7 +472,7 @@ export function PipelineView() {
             <input
               type="text"
               placeholder="بحث..."
-              className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pr-9 pl-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+              className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
             />
           </div>
           <Button
@@ -603,7 +603,7 @@ export function PipelineView() {
         {pipeline && (
           <div className="flex items-center gap-4 flex-wrap">
             <div className="flex items-center gap-2">
-              <Filter className="w-4 h-4 text-slate-400" />
+              <Filter className="w-4 h-4 text-slate-500" />
               <span className="text-sm text-slate-600">تصفية:</span>
             </div>
             <Select value={filterSource} onValueChange={setFilterSource}>
@@ -751,7 +751,7 @@ export function PipelineView() {
                         )}
                       >
                         {stageLeads.length === 0 ? (
-                          <div className="h-full flex items-center justify-center text-slate-400 text-sm">
+                          <div className="h-full flex items-center justify-center text-slate-500 text-sm">
                             اسحب العملاء هنا
                           </div>
                         ) : (

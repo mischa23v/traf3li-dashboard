@@ -439,7 +439,7 @@ export function EditInvoiceView() {
                                             ))}
 
                                             {lineItems.length === 0 && (
-                                                <div className="text-center py-8 text-slate-400">
+                                                <div className="text-center py-8 text-slate-600">
                                                     لا توجد عناصر. اضغط "إضافة عنصر" للبدء.
                                                 </div>
                                             )}

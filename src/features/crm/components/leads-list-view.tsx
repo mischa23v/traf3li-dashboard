@@ -137,7 +137,7 @@ export function LeadsListView() {
             <input
               type="text"
               placeholder={t('common.search')}
-              className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pr-9 pl-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+              className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
             />
           </div>
           <Button
@@ -329,7 +329,7 @@ export function LeadsListView() {
                             <Button
                               variant="ghost"
                               size="icon"
-                              className="text-slate-400 hover:text-navy"
+                              className="text-slate-500 hover:text-navy"
                             >
                               <MoreHorizontal className="h-5 w-5" />
                             </Button>
@@ -361,7 +361,7 @@ export function LeadsListView() {
                         <div className="flex items-center gap-6">
                           {lead.estimatedValue > 0 && (
                             <div className="text-center">
-                              <div className="text-xs text-slate-400 mb-1">
+                              <div className="text-xs text-slate-500 mb-1">
                                 {t('leads.estimatedValue')}
                               </div>
                               <div className="font-bold text-emerald-600">
@@ -371,7 +371,7 @@ export function LeadsListView() {
                           )}
                           {lead.intake?.caseType && (
                             <div className="text-center">
-                              <div className="text-xs text-slate-400 mb-1">
+                              <div className="text-xs text-slate-500 mb-1">
                                 {t('leads.caseType')}
                               </div>
                               <div className="font-bold text-navy">
@@ -381,7 +381,7 @@ export function LeadsListView() {
                           )}
                           {lead.source?.type && (
                             <div className="text-center">
-                              <div className="text-xs text-slate-400 mb-1">{t('leads.source')}</div>
+                              <div className="text-xs text-slate-500 mb-1">{t('leads.source')}</div>
                               <div className="font-bold text-navy">
                                 {lead.source.type}
                               </div>

@@ -146,11 +146,11 @@ export function ContactDetailsView() {
 
         <div className="ms-auto flex items-center gap-4">
           <div className="relative hidden md:block">
-            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
             <input
               type="text"
               placeholder="بحث..."
-              className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pr-9 pl-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+              className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
             />
           </div>
           <Button
@@ -362,7 +362,7 @@ export function ContactDetailsView() {
                               {/* Additional Phones */}
                               {contact.phones?.slice(1).map((phone: any, idx: number) => (
                                 <div key={idx} className="flex items-center gap-3 p-3 bg-slate-50 rounded-xl">
-                                  <Phone className="h-5 w-5 text-slate-400" />
+                                  <Phone className="h-5 w-5 text-slate-500" />
                                   <div>
                                     <p className="text-xs text-slate-500">{phone.type === 'mobile' ? 'جوال' : phone.type === 'work' ? 'عمل' : phone.type}</p>
                                     <p className="font-medium text-navy" dir="ltr">{phone.number}</p>
@@ -384,7 +384,7 @@ export function ContactDetailsView() {
                               {/* Additional Emails */}
                               {contact.emails?.slice(1).map((email: any, idx: number) => (
                                 <div key={idx} className="flex items-center gap-3 p-3 bg-slate-50 rounded-xl">
-                                  <Mail className="h-5 w-5 text-slate-400" />
+                                  <Mail className="h-5 w-5 text-slate-500" />
                                   <div>
                                     <p className="text-xs text-slate-500">{email.type === 'work' ? 'عمل' : email.type === 'personal' ? 'شخصي' : email.type}</p>
                                     <p className="font-medium text-navy" dir="ltr">{email.email}</p>
@@ -427,11 +427,11 @@ export function ContactDetailsView() {
                                 <p className="text-xs text-slate-500 mb-1">VIP</p>
                                 {contact.vipStatus ? (
                                   <Badge className="bg-yellow-100 text-yellow-700">
-                                    <Star className="h-3 w-3 ml-1" />
+                                    <Star className="h-3 w-3 ms-1" />
                                     VIP
                                   </Badge>
                                 ) : (
-                                  <span className="text-slate-400 text-sm">لا</span>
+                                  <span className="text-slate-500 text-sm">لا</span>
                                 )}
                               </div>
                             </div>
@@ -579,7 +579,7 @@ export function ContactDetailsView() {
                               )}
                             </div>
                             {!contact.nationalId && !contact.iqamaNumber && !contact.passportNumber && (
-                              <p className="text-slate-400 text-center py-8">لا توجد معلومات هوية مسجلة</p>
+                              <p className="text-slate-500 text-center py-8">لا توجد معلومات هوية مسجلة</p>
                             )}
                           </CardContent>
                         </Card>
@@ -626,7 +626,7 @@ export function ContactDetailsView() {
                             <div className="flex flex-wrap gap-3 pt-4">
                               {contact.doNotContact && (
                                 <Badge className="bg-red-100 text-red-700">
-                                  <AlertTriangle className="h-3 w-3 ml-1" />
+                                  <AlertTriangle className="h-3 w-3 ms-1" />
                                   عدم التواصل نهائياً
                                 </Badge>
                               )}

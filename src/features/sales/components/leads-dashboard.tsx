@@ -157,7 +157,7 @@ function LeadCard({
     >
       <div className="flex items-start justify-between mb-3">
         <div className="flex items-center gap-2 flex-1">
-          {draggable && <GripVertical className="h-4 w-4 text-slate-400" />}
+          {draggable && <GripVertical className="h-4 w-4 text-slate-500" />}
           <div className="flex-1">
             <h4 className="font-semibold text-navy text-sm">
               {lead.firstName} {lead.lastName}
@@ -959,12 +959,12 @@ export function LeadsDashboard() {
 
           <div className="flex items-center gap-2 flex-1 max-w-md">
             <div className="relative flex-1">
-              <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+              <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
               <Input
                 placeholder="بحث عن عملاء محتملين..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pr-10 rounded-xl"
+                className="pe-10 rounded-xl"
               />
             </div>
           </div>
@@ -1050,7 +1050,7 @@ export function LeadsDashboard() {
                     )}
                   >
                     {stageLeads.length === 0 ? (
-                      <div className="h-full flex items-center justify-center text-slate-400 text-sm">
+                      <div className="h-full flex items-center justify-center text-slate-500 text-sm">
                         لا يوجد عملاء
                       </div>
                     ) : (

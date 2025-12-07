@@ -217,7 +217,7 @@ export function CasesView() {
                                             قضية عمالية
                                         </Badge>
                                         <span className="text-blue-200 text-sm">{caseData.court}</span>
-                                        <span className="text-slate-400 text-sm">•</span>
+                                        <span className="text-slate-500 text-sm">•</span>
                                         <span className="text-blue-200 text-sm font-mono">{caseData.id}</span>
                                     </div>
                                     <Link to={`/dashboard/cases/${caseData.id}` as any} className="hover:underline decoration-emerald-400 underline-offset-4">
@@ -297,7 +297,7 @@ export function CasesView() {
                                                         <div className="flex justify-between items-start">
                                                             <h4 className={`font-bold text-sm ${index === 0 ? 'text-navy' : 'text-slate-600'}`}>{event.title}</h4>
                                                         </div>
-                                                        <div className="text-xs text-slate-400">{event.date}</div>
+                                                        <div className="text-xs text-slate-500">{event.date}</div>
                                                         <div className="text-xs text-slate-500 bg-slate-50 p-2 rounded-lg inline-block">
                                                             {typeof event.location === 'string' ? event.location : (event.location?.name || event.location?.address || 'عن بعد')}
                                                         </div>
@@ -418,32 +418,32 @@ export function CasesView() {
                                                 </CardHeader>
                                                 <CardContent className="pt-4 space-y-4">
                                                     <div className="space-y-1">
-                                                        <span className="text-xs text-slate-400">الاسم الكامل</span>
+                                                        <span className="text-xs text-slate-500">الاسم الكامل</span>
                                                         <div className="font-bold text-navy">{parties.plaintiff.name}</div>
                                                     </div>
                                                     <div className="grid grid-cols-2 gap-4">
                                                         <div className="space-y-1">
-                                                            <span className="text-xs text-slate-400">رقم الهوية</span>
+                                                            <span className="text-xs text-slate-500">رقم الهوية</span>
                                                             <div className="font-medium text-navy">{parties.plaintiff.id}</div>
                                                         </div>
                                                         <div className="space-y-1">
-                                                            <span className="text-xs text-slate-400">الجنسية</span>
+                                                            <span className="text-xs text-slate-500">الجنسية</span>
                                                             <div className="font-medium text-navy">{parties.plaintiff.nationality}</div>
                                                         </div>
                                                         <div className="space-y-1">
-                                                            <span className="text-xs text-slate-400">تاريخ الميلاد</span>
+                                                            <span className="text-xs text-slate-500">تاريخ الميلاد</span>
                                                             <div className="font-medium text-navy">{parties.plaintiff.dobGregorian}</div>
                                                         </div>
                                                         <div className="space-y-1">
-                                                            <span className="text-xs text-slate-400">المهنة</span>
+                                                            <span className="text-xs text-slate-500">المهنة</span>
                                                             <div className="font-medium text-navy">{parties.plaintiff.job}</div>
                                                         </div>
                                                         <div className="space-y-1">
-                                                            <span className="text-xs text-slate-400">رقم الهاتف</span>
+                                                            <span className="text-xs text-slate-500">رقم الهاتف</span>
                                                             <div className="font-medium text-navy" dir="ltr">{parties.plaintiff.phone}</div>
                                                         </div>
                                                         <div className="space-y-1">
-                                                            <span className="text-xs text-slate-400">المنطقة</span>
+                                                            <span className="text-xs text-slate-500">المنطقة</span>
                                                             <div className="font-medium text-navy">{parties.plaintiff.region} - {parties.plaintiff.city}</div>
                                                         </div>
                                                     </div>
@@ -465,28 +465,28 @@ export function CasesView() {
                                                 </CardHeader>
                                                 <CardContent className="pt-4 space-y-4">
                                                     <div className="space-y-1">
-                                                        <span className="text-xs text-slate-400">اسم الجهة</span>
+                                                        <span className="text-xs text-slate-500">اسم الجهة</span>
                                                         <div className="font-bold text-navy">{parties.defendant.name}</div>
                                                     </div>
                                                     <div className="grid grid-cols-2 gap-4">
                                                         <div className="space-y-1">
-                                                            <span className="text-xs text-slate-400">رقم السجل التجاري</span>
+                                                            <span className="text-xs text-slate-500">رقم السجل التجاري</span>
                                                             <div className="font-medium text-navy">{parties.defendant.crNo}</div>
                                                         </div>
                                                         <div className="space-y-1">
-                                                            <span className="text-xs text-slate-400">رقم الملف</span>
+                                                            <span className="text-xs text-slate-500">رقم الملف</span>
                                                             <div className="font-medium text-navy">{parties.defendant.fileNo}</div>
                                                         </div>
                                                         <div className="space-y-1">
-                                                            <span className="text-xs text-slate-400">الرقم الموحد</span>
+                                                            <span className="text-xs text-slate-500">الرقم الموحد</span>
                                                             <div className="font-medium text-navy">{parties.defendant.unifiedNo}</div>
                                                         </div>
                                                         <div className="space-y-1">
-                                                            <span className="text-xs text-slate-400">نوع الجهة</span>
+                                                            <span className="text-xs text-slate-500">نوع الجهة</span>
                                                             <div className="font-medium text-navy">{parties.defendant.type}</div>
                                                         </div>
                                                         <div className="space-y-1">
-                                                            <span className="text-xs text-slate-400">المنطقة</span>
+                                                            <span className="text-xs text-slate-500">المنطقة</span>
                                                             <div className="font-medium text-navy">{parties.defendant.region} - {parties.defendant.city}</div>
                                                         </div>
                                                     </div>
@@ -504,31 +504,31 @@ export function CasesView() {
                                                 <CardContent className="pt-4">
                                                     <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
                                                         <div className="space-y-1">
-                                                            <span className="text-xs text-slate-400">نوع الأجر</span>
+                                                            <span className="text-xs text-slate-500">نوع الأجر</span>
                                                             <Badge variant="outline" className="rounded-lg">{workDetails.wageType}</Badge>
                                                         </div>
                                                         <div className="space-y-1">
-                                                            <span className="text-xs text-slate-400">الراتب الحالي</span>
+                                                            <span className="text-xs text-slate-500">الراتب الحالي</span>
                                                             <div className="font-bold text-navy">{workDetails.salary.toLocaleString()} ر.س</div>
                                                         </div>
                                                         <div className="space-y-1">
-                                                            <span className="text-xs text-slate-400">نوع العقد</span>
+                                                            <span className="text-xs text-slate-500">نوع العقد</span>
                                                             <div className="font-medium text-navy">{workDetails.contractType}</div>
                                                         </div>
                                                         <div className="space-y-1">
-                                                            <span className="text-xs text-slate-400">رقم العقد</span>
+                                                            <span className="text-xs text-slate-500">رقم العقد</span>
                                                             <div className="font-medium text-navy">{workDetails.contractNo}</div>
                                                         </div>
                                                         <div className="space-y-1">
-                                                            <span className="text-xs text-slate-400">تاريخ البدء</span>
+                                                            <span className="text-xs text-slate-500">تاريخ البدء</span>
                                                             <div className="font-medium text-navy">{workDetails.startDateGregorian}</div>
                                                         </div>
                                                         <div className="space-y-1">
-                                                            <span className="text-xs text-slate-400">تاريخ النهاية</span>
+                                                            <span className="text-xs text-slate-500">تاريخ النهاية</span>
                                                             <div className="font-medium text-navy">{workDetails.lastDay}</div>
                                                         </div>
                                                         <div className="space-y-1">
-                                                            <span className="text-xs text-slate-400">على رأس العمل</span>
+                                                            <span className="text-xs text-slate-500">على رأس العمل</span>
                                                             <Badge variant="outline" className="bg-red-50 text-red-600 border-red-200 rounded-lg">لا</Badge>
                                                         </div>
                                                     </div>
@@ -561,12 +561,12 @@ export function CasesView() {
                                                     </div>
                                                     <div className="bg-slate-50 rounded-xl p-3 grid grid-cols-2 gap-4 text-sm">
                                                         <div>
-                                                            <span className="text-slate-400 text-xs block mb-1">من تاريخ</span>
+                                                            <span className="text-slate-500 text-xs block mb-1">من تاريخ</span>
                                                             <span className="font-medium text-navy">{claim.period.fromG}</span>
                                                             <span className="text-xs text-slate-400 mx-1">({claim.period.fromH})</span>
                                                         </div>
                                                         <div>
-                                                            <span className="text-slate-400 text-xs block mb-1">إلى تاريخ</span>
+                                                            <span className="text-slate-500 text-xs block mb-1">إلى تاريخ</span>
                                                             <span className="font-medium text-navy">{claim.period.toG}</span>
                                                             <span className="text-xs text-slate-400 mx-1">({claim.period.toH})</span>
                                                         </div>
@@ -679,7 +679,7 @@ export function CasesView() {
                                                                 {doc.party}
                                                             </Badge>
                                                         </div>
-                                                        <Button variant="ghost" size="icon" className="text-slate-400 hover:text-brand-blue rounded-full" aria-label="تنزيل">
+                                                        <Button variant="ghost" size="icon" className="text-slate-500 hover:text-brand-blue rounded-full" aria-label="تنزيل">
                                                             <Download className="h-4 w-4" aria-hidden="true" />
                                                         </Button>
                                                     </div>
@@ -712,7 +712,7 @@ export function CasesView() {
                                                                 {doc.category}
                                                             </Badge>
                                                         </div>
-                                                        <Button variant="ghost" size="icon" className="text-slate-400 hover:text-brand-blue rounded-full" aria-label="تنزيل">
+                                                        <Button variant="ghost" size="icon" className="text-slate-500 hover:text-brand-blue rounded-full" aria-label="تنزيل">
                                                             <Download className="h-4 w-4" aria-hidden="true" />
                                                         </Button>
                                                     </div>

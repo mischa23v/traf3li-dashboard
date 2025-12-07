@@ -159,11 +159,11 @@ export function StaffDetailsView() {
 
         <div className="ms-auto flex items-center gap-4">
           <div className="relative hidden md:block">
-            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
             <input
               type="text"
               placeholder="بحث..."
-              className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pr-9 pl-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+              className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
             />
           </div>
           <Button
@@ -411,7 +411,7 @@ export function StaffDetailsView() {
                               </div>
                               {staff.workEmail && staff.workEmail !== staff.email && (
                                 <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-xl">
-                                  <Mail className="h-5 w-5 text-slate-400" />
+                                  <Mail className="h-5 w-5 text-slate-500" />
                                   <div>
                                     <p className="text-xs text-slate-500">البريد الرسمي</p>
                                     <p className="font-medium text-navy" dir="ltr">{staff.workEmail}</p>
@@ -431,11 +431,11 @@ export function StaffDetailsView() {
                               </div>
                               {staff.officePhone && (
                                 <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-xl">
-                                  <Phone className="h-5 w-5 text-slate-400" />
+                                  <Phone className="h-5 w-5 text-slate-500" />
                                   <div>
                                     <p className="text-xs text-slate-500">هاتف المكتب</p>
                                     <p className="font-medium text-navy" dir="ltr">{staff.officePhone}</p>
-                                    {staff.extension && <span className="text-xs text-slate-400"> تحويلة: {staff.extension}</span>}
+                                    {staff.extension && <span className="text-xs text-slate-500"> تحويلة: {staff.extension}</span>}
                                   </div>
                                 </div>
                               )}
@@ -564,7 +564,7 @@ export function StaffDetailsView() {
                                 ))}
                               </div>
                             ) : (
-                              <p className="text-slate-400 text-center py-8">لا توجد تراخيص مسجلة</p>
+                              <p className="text-slate-500 text-center py-8">لا توجد تراخيص مسجلة</p>
                             )}
                           </CardContent>
                         </Card>

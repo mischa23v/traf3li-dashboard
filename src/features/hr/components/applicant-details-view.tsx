@@ -110,7 +110,7 @@ export function ApplicantDetailsView() {
         <div className='ms-auto flex items-center gap-4'>
           <div className="relative hidden md:block">
             <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
-            <input type="text" placeholder="بحث..." aria-label="بحث" className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pr-9 pl-4 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
+            <input type="text" placeholder="بحث..." aria-label="بحث" className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
           </div>
           <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white" aria-label="الإشعارات">
             <Bell className="h-5 w-5" aria-hidden="true" />
@@ -387,14 +387,14 @@ export function ApplicantDetailsView() {
                           <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-xl">
                             <Mail className="w-5 h-5 text-slate-500" aria-hidden="true" />
                             <div>
-                              <p className="text-xs text-slate-500">البريد الإلكتروني<Lock className="h-3 w-3 text-muted-foreground inline ms-1" /></p>
+                              <p className="text-xs text-slate-500">البريد الإلكتروني<Lock className="h-3 w-3 text-foreground/70 inline ms-1" /></p>
                               <p className="font-medium text-navy">{applicant.personalInfo?.email}</p>
                             </div>
                           </div>
                           <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-xl">
                             <Phone className="w-5 h-5 text-slate-500" aria-hidden="true" />
                             <div>
-                              <p className="text-xs text-slate-500">رقم الهاتف<Lock className="h-3 w-3 text-muted-foreground inline ms-1" /></p>
+                              <p className="text-xs text-slate-500">رقم الهاتف<Lock className="h-3 w-3 text-foreground/70 inline ms-1" /></p>
                               <p className="font-medium text-navy">{applicant.personalInfo?.phone}</p>
                             </div>
                           </div>
@@ -520,7 +520,7 @@ export function ApplicantDetailsView() {
                             <div className="absolute right-4 top-0 bottom-0 w-0.5 bg-emerald-200"></div>
                             <div className="space-y-6">
                               {applicant.workExperience.workHistory.map((work, index) => (
-                                <div key={index} className="relative flex items-start gap-4 pr-4">
+                                <div key={index} className="relative flex items-start gap-4 pe-4">
                                   <div className="w-3 h-3 rounded-full bg-emerald-500 z-10 mt-1.5"></div>
                                   <div className="flex-1 bg-slate-50 rounded-xl p-4">
                                     <div className="flex items-start justify-between">

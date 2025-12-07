@@ -710,7 +710,7 @@ export function CreateClientView() {
                                                     : "border-slate-200 hover:border-slate-300"
                                             )}
                                         >
-                                            <User className={cn("w-8 h-8 mx-auto mb-2", clientType === 'individual' ? "text-emerald-600" : "text-slate-400")} />
+                                            <User className={cn("w-8 h-8 mx-auto mb-2", clientType === 'individual' ? "text-emerald-600" : "text-slate-500")} />
                                             <span className={cn("text-lg font-medium", clientType === 'individual' ? "text-emerald-700" : "text-slate-600")}>
                                                 فرد
                                             </span>
@@ -726,7 +726,7 @@ export function CreateClientView() {
                                                     : "border-slate-200 hover:border-slate-300"
                                             )}
                                         >
-                                            <Building2 className={cn("w-8 h-8 mx-auto mb-2", clientType === 'company' ? "text-emerald-600" : "text-slate-400")} />
+                                            <Building2 className={cn("w-8 h-8 mx-auto mb-2", clientType === 'company' ? "text-emerald-600" : "text-slate-500")} />
                                             <span className={cn("text-lg font-medium", clientType === 'company' ? "text-emerald-700" : "text-slate-600")}>
                                                 شركة
                                             </span>

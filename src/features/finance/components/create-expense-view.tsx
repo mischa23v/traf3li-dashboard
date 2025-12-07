@@ -667,7 +667,7 @@ export function CreateExpenseView() {
                                                     variant="ghost"
                                                     size="sm"
                                                     onClick={() => setReceiptImage(null)}
-                                                    className="text-slate-400 hover:text-red-500"
+                                                    className="text-slate-600 hover:text-red-500"
                                                 >
                                                     <Trash className="h-4 w-4" />
                                                 </Button>
@@ -1198,7 +1198,7 @@ export function CreateExpenseView() {
                                                         {attachments.map((file, i) => (
                                                             <div key={i} className="flex items-center justify-between p-3 border rounded-xl bg-slate-50">
                                                                 <div className="flex items-center gap-3">
-                                                                    <FileText className="h-5 w-5 text-slate-400" aria-hidden="true" />
+                                                                    <FileText className="h-5 w-5 text-slate-600" aria-hidden="true" />
                                                                     <div>
                                                                         <p className="text-sm font-medium text-slate-700">{file.filename}</p>
                                                                         <p className="text-xs text-slate-500">{formatFileSize(file.size)}</p>

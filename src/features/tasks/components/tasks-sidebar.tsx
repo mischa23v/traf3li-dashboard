@@ -136,8 +136,8 @@ export function TasksSidebar({
             {/* QUICK ACTIONS WIDGET */}
             <div className="bg-gradient-to-br from-emerald-900 to-slate-900 rounded-3xl p-6 shadow-xl shadow-emerald-900/20 ring-1 ring-white/10 relative overflow-hidden">
                 {/* Background Glow */}
-                <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl -mr-32 -mt-32 pointer-events-none"></div>
-                <div className="absolute bottom-0 left-0 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl -ml-32 -mb-32 pointer-events-none"></div>
+                <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl -me-32 -mt-32 pointer-events-none"></div>
+                <div className="absolute bottom-0 left-0 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl -ms-32 -mb-32 pointer-events-none"></div>
 
                 {/* Header */}
                 <div className="flex items-center justify-between mb-6 relative z-10">
@@ -256,8 +256,8 @@ export function TasksSidebar({
             {/* MERGED CALENDAR & AGENDA WIDGET */}
             <div className="bg-[#022c22] rounded-3xl p-6 shadow-lg shadow-emerald-900/20 group hover:shadow-xl transition-all duration-300 relative overflow-hidden">
                 {/* Background Pattern */}
-                <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/5 rounded-full blur-3xl -mr-32 -mt-32 pointer-events-none"></div>
-                <div className="absolute bottom-0 left-0 w-64 h-64 bg-emerald-500/5 rounded-full blur-3xl -ml-32 -mb-32 pointer-events-none"></div>
+                <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/5 rounded-full blur-3xl -me-32 -mt-32 pointer-events-none"></div>
+                <div className="absolute bottom-0 left-0 w-64 h-64 bg-emerald-500/5 rounded-full blur-3xl -ms-32 -mb-32 pointer-events-none"></div>
 
                 {/* Decorative Lines */}
                 <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-emerald-500/20 to-transparent"></div>
@@ -357,7 +357,7 @@ export function TasksSidebar({
                                                         <div className={cn("text-sm font-bold text-slate-700 transition-colors", `group-hover:text-${colorClass}-600`)}>
                                                             {eventTime}
                                                         </div>
-                                                        <div className="text-[10px] text-slate-400">{timePeriod}</div>
+                                                        <div className="text-[10px] text-slate-500">{timePeriod}</div>
                                                     </div>
                                                     <div className={cn("absolute right-[3.25rem] top-2 w-3 h-3 rounded-full border-2 border-white shadow-sm z-10", `bg-${colorClass}-500`)}></div>
                                                     <div className={cn("flex-1 bg-white rounded-xl p-3 shadow-sm hover:shadow-md transition-all", `border-r-4 border-${colorClass}-500`)}>
@@ -442,7 +442,7 @@ export function TasksSidebar({
                                     })}
                                 </>
                             )}
-                            <Button asChild variant="ghost" className="w-full text-xs text-slate-400 hover:text-emerald-600 hover:bg-emerald-50">
+                            <Button asChild variant="ghost" className="w-full text-xs text-slate-500 hover:text-emerald-600 hover:bg-emerald-50">
                                 <Link to="/dashboard/tasks/reminders">
                                     عرض كل التنبيهات
                                 </Link>

@@ -420,7 +420,7 @@ export function ReportConfigDialog({
                             control={form.control}
                             name="columns"
                             render={({ field }) => (
-                              <FormItem className="flex items-center space-x-2 rtl:space-x-reverse">
+                              <FormItem className="flex items-center gap-2 rtl:gap-reverse">
                                 <FormControl>
                                   <Checkbox
                                     checked={field.value?.includes(column.key)}
@@ -622,7 +622,7 @@ export function ReportConfigDialog({
                   control={form.control}
                   name="isScheduled"
                   render={({ field }) => (
-                    <FormItem className="flex items-center space-x-2 rtl:space-x-reverse">
+                    <FormItem className="flex items-center gap-2 rtl:gap-reverse">
                       <FormControl>
                         <Checkbox
                           checked={field.value}

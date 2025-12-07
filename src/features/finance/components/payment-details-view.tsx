@@ -265,7 +265,7 @@ export default function PaymentDetailsView() {
                                                 <p className="font-medium text-navy">فاتورة</p>
                                                 <p className="text-sm text-slate-500">عرض الفاتورة</p>
                                             </div>
-                                            <ArrowRight className="h-5 w-5 text-slate-400 rotate-180" />
+                                            <ArrowRight className="h-5 w-5 text-slate-600 rotate-180" />
                                         </Link>
                                     </CardContent>
                                 </Card>

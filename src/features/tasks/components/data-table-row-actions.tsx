@@ -74,7 +74,7 @@ export function DataTableRowActions<TData>({
         >
           حذف
           <DropdownMenuShortcut>
-            <Trash2 size={16} />
+            <Trash2 size={16} aria-hidden='true' />
           </DropdownMenuShortcut>
         </DropdownMenuItem>
       </DropdownMenuContent>

@@ -25,6 +25,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { SelectDropdown } from '@/components/select-dropdown'
 import { type Vendor } from '@/services/accountingService'
 import { useCreateVendor, useUpdateVendor } from '@/hooks/useAccounting'
+import { Lock } from 'lucide-react'
 
 const vendorCategories = [
   { value: 'consultants', label: 'استشاريون', labelEn: 'Consultants' },
@@ -238,7 +239,7 @@ export function VendorsActionDialog({
                     name='email'
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>البريد الإلكتروني</FormLabel>
+                        <FormLabel>البريد الإلكتروني<Lock className="h-3 w-3 text-slate-500 inline ms-1" aria-hidden="true" /></FormLabel>
                         <FormControl>
                           <Input
                             type='email'
@@ -256,7 +257,7 @@ export function VendorsActionDialog({
                     name='phone'
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>رقم الهاتف</FormLabel>
+                        <FormLabel>رقم الهاتف<Lock className="h-3 w-3 text-slate-500 inline ms-1" aria-hidden="true" /></FormLabel>
                         <FormControl>
                           <Input
                             placeholder="+966 50 123 4567"
@@ -355,7 +356,7 @@ export function VendorsActionDialog({
                     name='bankAccountNumber'
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>رقم الحساب البنكي</FormLabel>
+                        <FormLabel>رقم الحساب البنكي<Lock className="h-3 w-3 text-slate-500 inline ms-1" aria-hidden="true" /></FormLabel>
                         <FormControl>
                           <Input
                             placeholder="رقم الحساب"
@@ -372,7 +373,7 @@ export function VendorsActionDialog({
                     name='iban'
                     render={({ field }) => (
                       <FormItem className="sm:col-span-2">
-                        <FormLabel>رقم الآيبان (IBAN)</FormLabel>
+                        <FormLabel>رقم الآيبان (IBAN)<Lock className="h-3 w-3 text-slate-500 inline ms-1" aria-hidden="true" /></FormLabel>
                         <FormControl>
                           <Input
                             placeholder="SA00 0000 0000 0000 0000 0000"

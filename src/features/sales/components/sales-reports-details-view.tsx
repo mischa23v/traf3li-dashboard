@@ -239,7 +239,7 @@ export function SalesReportsDetailsView() {
             {report.description ? (
               <p className="text-slate-600">{report.description}</p>
             ) : (
-              <p className="text-slate-400 italic">لا يوجد وصف متاح</p>
+              <p className="text-slate-500 italic">لا يوجد وصف متاح</p>
             )}
 
             {report.status === ReportStatus.COMPLETED && (
@@ -284,7 +284,7 @@ export function SalesReportsDetailsView() {
                     <h4 className="font-medium text-navy">المبيعات حسب الشهر</h4>
                   </div>
                   <div className="h-48 bg-slate-50 rounded-lg flex items-center justify-center">
-                    <span className="text-slate-400">الرسم البياني سيظهر هنا</span>
+                    <span className="text-slate-500">الرسم البياني سيظهر هنا</span>
                   </div>
                 </div>
                 <div className="border border-slate-200 rounded-xl p-4">
@@ -293,7 +293,7 @@ export function SalesReportsDetailsView() {
                     <h4 className="font-medium text-navy">توزيع المبيعات حسب المنتج</h4>
                   </div>
                   <div className="h-48 bg-slate-50 rounded-lg flex items-center justify-center">
-                    <span className="text-slate-400">الرسم البياني سيظهر هنا</span>
+                    <span className="text-slate-500">الرسم البياني سيظهر هنا</span>
                   </div>
                 </div>
                 <div className="border border-slate-200 rounded-xl p-4">
@@ -302,7 +302,7 @@ export function SalesReportsDetailsView() {
                     <h4 className="font-medium text-navy">اتجاه الإيرادات</h4>
                   </div>
                   <div className="h-48 bg-slate-50 rounded-lg flex items-center justify-center">
-                    <span className="text-slate-400">الرسم البياني سيظهر هنا</span>
+                    <span className="text-slate-500">الرسم البياني سيظهر هنا</span>
                   </div>
                 </div>
                 <div className="border border-slate-200 rounded-xl p-4">
@@ -311,7 +311,7 @@ export function SalesReportsDetailsView() {
                     <h4 className="font-medium text-navy">أداء مندوبي المبيعات</h4>
                   </div>
                   <div className="h-48 bg-slate-50 rounded-lg flex items-center justify-center">
-                    <span className="text-slate-400">الرسم البياني سيظهر هنا</span>
+                    <span className="text-slate-500">الرسم البياني سيظهر هنا</span>
                   </div>
                 </div>
               </div>
@@ -341,7 +341,7 @@ export function SalesReportsDetailsView() {
                   <tbody>
                     <tr className="border-b border-slate-100">
                       <td className="p-3 text-slate-600" colSpan={4}>
-                        <div className="text-center py-8 text-slate-400">
+                        <div className="text-center py-8 text-slate-500">
                           لا توجد بيانات متاحة
                         </div>
                       </td>

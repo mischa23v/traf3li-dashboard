@@ -255,7 +255,7 @@ export function AssetAssignmentListView() {
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         placeholder="بحث عن أصل أو موظف..."
-                        className="pr-9 rounded-xl"
+                        className="pe-9 rounded-xl"
                       />
                     </div>
                     <Select value={statusFilter} onValueChange={(v) => setStatusFilter(v as AssetAssignmentStatus | 'all')}>

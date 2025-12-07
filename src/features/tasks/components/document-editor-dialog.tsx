@@ -133,7 +133,7 @@ export function DocumentEditorDialog({
                 {isLoading ? (
                     <div className="flex items-center justify-center py-12">
                         <Loader2 className="h-8 w-8 animate-spin text-slate-400" />
-                        <span className="mr-3 text-slate-500">جاري تحميل المستند...</span>
+                        <span className="me-3 text-slate-500">جاري تحميل المستند...</span>
                     </div>
                 ) : (
                     <div className="flex-1 overflow-auto space-y-4">

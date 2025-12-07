@@ -251,7 +251,7 @@ export function OrganizationalStructureListView() {
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         placeholder="بحث عن وحدة..."
-                        className="pr-9 rounded-xl"
+                        className="pe-9 rounded-xl"
                       />
                     </div>
                     <Select value={statusFilter} onValueChange={(v) => setStatusFilter(v as UnitStatus | 'all')}>

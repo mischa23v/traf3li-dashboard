@@ -213,7 +213,7 @@ export function BrowseJobs() {
 
         <div className="ms-auto flex items-center gap-4">
           <div className="relative hidden md:block">
-            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
             <input
               type="text"
               placeholder={t('common.search', 'بحث...')}
@@ -253,7 +253,7 @@ export function BrowseJobs() {
               <CardContent className="p-4">
                 <div className="flex flex-col gap-4">
                   <div className="relative">
-                    <Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                    <Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
                     <Input
                       placeholder={isRTL ? 'بحث بالعنوان، الشركة...' : 'Search by title, company...'}
                       value={searchQuery}
@@ -328,7 +328,7 @@ export function BrowseJobs() {
                     <div className="flex flex-col md:flex-row md:items-start gap-4">
                       {/* Company Logo Placeholder */}
                       <div className="h-16 w-16 bg-slate-50 rounded-xl flex items-center justify-center shrink-0 border border-slate-100">
-                        <Building2 className="h-8 w-8 text-slate-400" />
+                        <Building2 className="h-8 w-8 text-slate-500" />
                       </div>
 
                       {/* Job Details */}
@@ -361,15 +361,15 @@ export function BrowseJobs() {
 
                         <div className="flex flex-wrap items-center gap-3 mt-3 text-sm text-slate-500">
                           <span className="flex items-center bg-slate-50 px-2 py-1 rounded-lg">
-                            <MapPin className="h-3.5 w-3.5 me-1 text-slate-400" />
+                            <MapPin className="h-3.5 w-3.5 me-1 text-slate-500" />
                             {isRTL ? job.location : job.locationEn}
                           </span>
                           <span className="flex items-center bg-slate-50 px-2 py-1 rounded-lg">
-                            <Clock className="h-3.5 w-3.5 me-1 text-slate-400" />
+                            <Clock className="h-3.5 w-3.5 me-1 text-slate-500" />
                             {isRTL ? job.experience : job.experienceEn}
                           </span>
                           <span className="flex items-center bg-slate-50 px-2 py-1 rounded-lg">
-                            <DollarSign className="h-3.5 w-3.5 me-1 text-slate-400" />
+                            <DollarSign className="h-3.5 w-3.5 me-1 text-slate-500" />
                             {job.salary.min.toLocaleString()} - {job.salary.max.toLocaleString()} {isRTL ? 'ر.س' : 'SAR'}
                           </span>
                         </div>

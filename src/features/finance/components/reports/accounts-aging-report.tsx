@@ -254,7 +254,7 @@ export function AccountsAgingReport() {
                     {/* Filter Bar */}
                     <div className="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between gap-4">
                         <div className="flex items-center gap-3">
-                            <Filter className="w-5 h-5 text-slate-400" aria-hidden="true" />
+                            <Filter className="w-5 h-5 text-slate-600" aria-hidden="true" />
                             <span className="text-sm font-medium text-slate-600">تصفية حسب:</span>
                             <Select value={selectedClient} onValueChange={setSelectedClient}>
                                 <SelectTrigger className="w-[200px] rounded-xl border-slate-200">
@@ -379,29 +379,29 @@ export function AccountsAgingReport() {
                                                     >
                                                         <TableCell className="w-8">
                                                             {expandedClients.includes(client.clientId) ? (
-                                                                <ChevronUp className="w-4 h-4 text-slate-400" />
+                                                                <ChevronUp className="w-4 h-4 text-slate-600" />
                                                             ) : (
-                                                                <ChevronDown className="w-4 h-4 text-slate-400" />
+                                                                <ChevronDown className="w-4 h-4 text-slate-600" />
                                                             )}
                                                         </TableCell>
                                                         <TableCell className="font-medium text-navy">{client.clientName}</TableCell>
                                                         <TableCell className="text-center">
-                                                            <span className={client.zeroToThirtyDays > 0 ? 'text-emerald-600 font-medium' : 'text-slate-400'}>
+                                                            <span className={client.zeroToThirtyDays > 0 ? 'text-emerald-600 font-medium' : 'text-slate-600'}>
                                                                 {formatCurrency(client.zeroToThirtyDays)}
                                                             </span>
                                                         </TableCell>
                                                         <TableCell className="text-center">
-                                                            <span className={client.thirtyOneToSixtyDays > 0 ? 'text-yellow-600 font-medium' : 'text-slate-400'}>
+                                                            <span className={client.thirtyOneToSixtyDays > 0 ? 'text-yellow-600 font-medium' : 'text-slate-600'}>
                                                                 {formatCurrency(client.thirtyOneToSixtyDays)}
                                                             </span>
                                                         </TableCell>
                                                         <TableCell className="text-center">
-                                                            <span className={client.sixtyOneToNinetyDays > 0 ? 'text-orange-600 font-medium' : 'text-slate-400'}>
+                                                            <span className={client.sixtyOneToNinetyDays > 0 ? 'text-orange-600 font-medium' : 'text-slate-600'}>
                                                                 {formatCurrency(client.sixtyOneToNinetyDays)}
                                                             </span>
                                                         </TableCell>
                                                         <TableCell className="text-center">
-                                                            <span className={client.ninetyPlusDays > 0 ? 'text-red-600 font-medium' : 'text-slate-400'}>
+                                                            <span className={client.ninetyPlusDays > 0 ? 'text-red-600 font-medium' : 'text-slate-600'}>
                                                                 {formatCurrency(client.ninetyPlusDays)}
                                                             </span>
                                                         </TableCell>
@@ -417,7 +417,7 @@ export function AccountsAgingReport() {
                                                                     {client.invoices.map((invoice) => (
                                                                         <div key={invoice.invoiceNumber} className="flex items-center justify-between bg-white p-3 rounded-xl border border-slate-100">
                                                                             <div className="flex items-center gap-3">
-                                                                                <FileText className="w-4 h-4 text-slate-400" aria-hidden="true" />
+                                                                                <FileText className="w-4 h-4 text-slate-600" aria-hidden="true" />
                                                                                 <span className="font-medium text-navy">{invoice.invoiceNumber}</span>
                                                                             </div>
                                                                             <div className="flex items-center gap-6">

@@ -26,6 +26,7 @@ import { SelectDropdown } from '@/components/select-dropdown'
 import { clientStatuses, contactMethods } from '../data/data'
 import { type Client } from '../data/schema'
 import { useCreateClient, useUpdateClient } from '@/hooks/useClients'
+import { Lock } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
 const formSchema = z.object({

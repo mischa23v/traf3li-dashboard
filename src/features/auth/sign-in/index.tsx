@@ -164,7 +164,7 @@ export function SignIn() {
                   {t('auth.signIn.usernameOrEmail')} <span className="text-red-500">*</span>
                 </label>
                 <div className="relative" dir="ltr">
-                  <div className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
+                  <div className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500">
                     <Icons.User />
                   </div>
                   <input
@@ -199,7 +199,7 @@ export function SignIn() {
                   </a>
                 </div>
                 <div className="relative" dir="ltr">
-                  <div className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
+                  <div className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500">
                     <Icons.Lock />
                   </div>
                   <input
@@ -217,7 +217,7 @@ export function SignIn() {
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-600"
                     disabled={isLoading}
                   >
                     {showPassword ? <Icons.EyeOff /> : <Icons.Eye />}
@@ -250,7 +250,7 @@ export function SignIn() {
                   <span className="w-full border-t border-slate-200" />
                 </div>
                 <div className="relative flex justify-center text-xs uppercase">
-                  <span className="bg-white px-4 text-slate-400">{t('auth.signIn.orContinueWith')}</span>
+                  <span className="bg-white px-4 text-slate-500">{t('auth.signIn.orContinueWith')}</span>
                 </div>
               </div>
 
