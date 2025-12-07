@@ -126,7 +126,30 @@
     "account": "Account",
     "appearance": "Appearance",
     "notifications": "Notifications",
-    "display": "Display"
+    "display": "Display",
+    "quickActions": {
+      "title": "Quick Actions",
+      "create": "Create",
+      "add": "Add",
+      "select": "Select",
+      "viewAll": "View All",
+      "readOnlyTitle": "Read-Only Log",
+      "readOnlyDescription": "Entries are created automatically when documents are posted"
+    },
+    "calendar": {
+      "title": "Calendar",
+      "noEvents": "No events for this day",
+      "am": "AM",
+      "pm": "PM",
+      "remote": "Remote",
+      "viewFullSchedule": "View Full Schedule"
+    },
+    "notifications": {
+      "title": "Notifications",
+      "noReminders": "No upcoming reminders",
+      "overdue": "Overdue",
+      "viewAll": "View All Reminders"
+    }
   },
   "auth": {
     "signIn": {
@@ -976,7 +999,8 @@
     "sort": "Sort",
     "actions": "Actions",
     "error": "An error occurred, please try again",
-    "currency": "SAR"
+    "currency": "SAR",
+    "notSpecified": "Not specified"
   },
   "validation": {
     "required": "This field is required",
