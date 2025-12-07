@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react'
+import { useTranslation } from 'react-i18next'
 import {
   MoreHorizontal,
   Plus,
@@ -38,16 +39,7 @@ import type { Lead, LeadStatus } from '@/types/crm'
 import { SalesSidebar } from './sales-sidebar'
 import { ProductivityHero } from '@/components/productivity-hero'
 
-const statusLabels: Record<LeadStatus, string> = {
-  new: 'جديد',
-  contacted: 'تم التواصل',
-  qualified: 'مؤهل',
-  proposal: 'عرض سعر',
-  negotiation: 'تفاوض',
-  won: 'تم الكسب',
-  lost: 'خسارة',
-  dormant: 'خامل',
-}
+// Status labels are now handled via i18n in the component
 
 const statusColors: Record<LeadStatus, string> = {
   new: 'bg-blue-100 text-blue-700',
@@ -61,6 +53,7 @@ const statusColors: Record<LeadStatus, string> = {
 }
 
 export function LeadsListView() {
+  const { t } = useTranslation()
   const [activeStatusTab, setActiveStatusTab] = useState<string>('all')
   const [isSelectionMode, setIsSelectionMode] = useState(false)
   const [selectedLeadIds, setSelectedLeadIds] = useState<string[]>([])
@@ -112,18 +105,18 @@ export function LeadsListView() {
   }
 
   const topNav = [
-    { title: 'العملاء المحتملين', href: '/dashboard/crm/leads', isActive: true },
-    { title: 'مسار المبيعات', href: '/dashboard/crm/pipeline', isActive: false },
-    { title: 'الإحالات', href: '/dashboard/crm/referrals', isActive: false },
-    { title: 'سجل الأنشطة', href: '/dashboard/crm/activities', isActive: false },
+    { title: t('sidebar.nav.leads'), href: '/dashboard/crm/leads', isActive: true },
+    { title: t('sidebar.nav.pipeline'), href: '/dashboard/crm/pipeline', isActive: false },
+    { title: t('sidebar.nav.referrals'), href: '/dashboard/crm/referrals', isActive: false },
+    { title: t('sidebar.nav.activities'), href: '/dashboard/crm/activities', isActive: false },
   ]
 
   const statusTabs = [
-    { id: 'all', label: 'الكل' },
-    { id: 'new', label: 'جديد' },
-    { id: 'contacted', label: 'تم التواصل' },
-    { id: 'qualified', label: 'مؤهل' },
-    { id: 'won', label: 'مكتسب' },
+    { id: 'all', label: t('common.all') },
+    { id: 'new', label: t('leads.status.new') },
+    { id: 'contacted', label: t('leads.status.contacted') },
+    { id: 'qualified', label: t('leads.status.qualified') },
+    { id: 'won', label: t('leads.status.won') },
   ]
 
   return (
@@ -143,7 +136,7 @@ export function LeadsListView() {
             <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
             <input
               type="text"
-              placeholder="بحث..."
+              placeholder={t('common.search')}
               className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pr-9 pl-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
             />
           </div>
@@ -168,14 +161,14 @@ export function LeadsListView() {
         className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-r border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']"
       >
         {/* HERO CARD */}
-        <ProductivityHero badge="إدارة العملاء المحتملين" title="إدارة العملاء المحتملين" type="leads" hideButtons={true}>
+        <ProductivityHero badge={t('leads.management')} title={t('leads.title')} type="leads" hideButtons={true}>
           <Button
             asChild
             className="bg-emerald-500 hover:bg-emerald-600 text-white h-12 px-8 rounded-xl font-bold shadow-lg shadow-emerald-500/20 border-0"
           >
             <Link to="/dashboard/crm/leads/new">
               <Plus className="ml-2 h-5 w-5" />
-              عميل محتمل جديد
+              {t('leads.newLead')}
             </Link>
           </Button>
           <Button
@@ -184,7 +177,7 @@ export function LeadsListView() {
           >
             <Link to="/dashboard/crm/pipeline">
               <TrendingUp className="ml-2 h-5 w-5" />
-              مسار المبيعات
+              {t('sidebar.nav.pipeline')}
             </Link>
           </Button>
         </ProductivityHero>
@@ -196,7 +189,7 @@ export function LeadsListView() {
             {/* LEADS LIST */}
             <div className="bg-white rounded-3xl p-1 shadow-sm border border-slate-100">
               <div className="p-6 pb-2 flex justify-between items-center">
-                <h3 className="font-bold text-navy text-xl">العملاء المحتملين</h3>
+                <h3 className="font-bold text-navy text-xl">{t('sidebar.nav.leads')}</h3>
                 <div className="flex gap-2 flex-wrap">
                   {statusTabs.map((tab) => (
                     <Button
@@ -246,16 +239,16 @@ export function LeadsListView() {
                       </div>
                     </div>
                     <h3 className="text-lg font-bold text-slate-900 mb-2">
-                      حدث خطأ أثناء تحميل العملاء المحتملين
+                      {t('leads.loadError')}
                     </h3>
                     <p className="text-slate-500 mb-4">
-                      {error?.message || 'تعذر الاتصال بالخادم'}
+                      {error?.message || t('common.serverError')}
                     </p>
                     <Button
                       onClick={() => refetch()}
                       className="bg-emerald-500 hover:bg-emerald-600"
                     >
-                      إعادة المحاولة
+                      {t('common.retry')}
                     </Button>
                   </div>
                 )}
@@ -269,13 +262,13 @@ export function LeadsListView() {
                       </div>
                     </div>
                     <h3 className="text-lg font-bold text-slate-900 mb-2">
-                      لا يوجد عملاء محتملين
+                      {t('leads.noLeads')}
                     </h3>
-                    <p className="text-slate-500 mb-4">ابدأ بإضافة عميل محتمل جديد</p>
+                    <p className="text-slate-500 mb-4">{t('leads.startAddingLead')}</p>
                     <Button asChild className="bg-emerald-500 hover:bg-emerald-600">
                       <Link to="/dashboard/crm/leads/new">
                         <Plus className="w-4 h-4 ml-2" />
-                        عميل محتمل جديد
+                        {t('leads.newLead')}
                       </Link>
                     </Button>
                   </div>
@@ -312,7 +305,7 @@ export function LeadsListView() {
                               <Badge
                                 className={`${statusColors[lead.status]} border-0 rounded-md px-2`}
                               >
-                                {statusLabels[lead.status]}
+                                {t(`leads.status.${lead.status}`)}
                               </Badge>
                             </div>
                             <div className="flex items-center gap-4 text-slate-500 text-sm">
@@ -344,7 +337,7 @@ export function LeadsListView() {
                           <DropdownMenuContent align="end">
                             <DropdownMenuItem asChild>
                               <Link to={`/dashboard/crm/leads/${lead._id}`}>
-                                عرض التفاصيل
+                                {t('common.viewDetails')}
                               </Link>
                             </DropdownMenuItem>
                             <DropdownMenuItem
@@ -352,13 +345,13 @@ export function LeadsListView() {
                               disabled={lead.convertedToClient}
                             >
                               <ArrowUpRight className="h-4 w-4 ml-2" />
-                              تحويل لعميل
+                              {t('leads.convertToClient')}
                             </DropdownMenuItem>
                             <DropdownMenuItem
                               onClick={() => deleteLead(lead._id)}
                               className="text-red-600"
                             >
-                              حذف
+                              {t('common.delete')}
                             </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
@@ -369,17 +362,17 @@ export function LeadsListView() {
                           {lead.estimatedValue > 0 && (
                             <div className="text-center">
                               <div className="text-xs text-slate-400 mb-1">
-                                القيمة المتوقعة
+                                {t('leads.estimatedValue')}
                               </div>
                               <div className="font-bold text-emerald-600">
-                                {lead.estimatedValue.toLocaleString('ar-SA')} ر.س
+                                {lead.estimatedValue.toLocaleString('ar-SA')} {t('common.sar')}
                               </div>
                             </div>
                           )}
                           {lead.intake?.caseType && (
                             <div className="text-center">
                               <div className="text-xs text-slate-400 mb-1">
-                                نوع القضية
+                                {t('leads.caseType')}
                               </div>
                               <div className="font-bold text-navy">
                                 {lead.intake.caseType}
@@ -388,7 +381,7 @@ export function LeadsListView() {
                           )}
                           {lead.source?.type && (
                             <div className="text-center">
-                              <div className="text-xs text-slate-400 mb-1">المصدر</div>
+                              <div className="text-xs text-slate-400 mb-1">{t('leads.source')}</div>
                               <div className="font-bold text-navy">
                                 {lead.source.type}
                               </div>
@@ -397,7 +390,7 @@ export function LeadsListView() {
                         </div>
                         <Link to={`/dashboard/crm/leads/${lead._id}`}>
                           <Button className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg px-6 shadow-lg shadow-emerald-500/20">
-                            عرض التفاصيل
+                            {t('common.viewDetails')}
                           </Button>
                         </Link>
                       </div>
@@ -410,7 +403,7 @@ export function LeadsListView() {
                   variant="ghost"
                   className="text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 w-full rounded-xl py-6"
                 >
-                  عرض جميع العملاء المحتملين
+                  {t('leads.viewAllLeads')}
                   <ChevronLeft className="h-4 w-4 mr-2" />
                 </Button>
               </div>
