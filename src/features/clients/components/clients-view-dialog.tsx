@@ -88,7 +88,8 @@ export function ClientsViewDialog({
               <div className='flex items-center gap-3'>
                 <Phone className='h-4 w-4 text-muted-foreground' />
                 <div>
-                  {t('clients.form.phone')}<Lock className="h-3 w-3 text-muted-foreground inline ms-1" aria-hidden="true" /><Lock className="h-3 w-3 text-muted-foreground inline ms-1" aria-hidden="true" />
+                  <p className='text-sm text-muted-foreground'>
+                    {t('clients.form.phone')}<Lock className="h-3 w-3 text-muted-foreground inline ms-1" aria-hidden="true" />
                   </p>
                   <p className='font-medium' dir='ltr'>
                     {currentRow.phone}
