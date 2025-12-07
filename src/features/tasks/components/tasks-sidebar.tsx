@@ -14,7 +14,7 @@ import { format, addDays, startOfDay, endOfDay, isSameDay } from 'date-fns'
 import { arSA } from 'date-fns/locale'
 
 interface TasksSidebarProps {
-    context?: 'tasks' | 'reminders' | 'events'
+    context?: 'tasks' | 'reminders' | 'events' | 'reports'
     isSelectionMode?: boolean
     onToggleSelectionMode?: () => void
     selectedCount?: number
@@ -84,6 +84,10 @@ export function TasksSidebar({
         events: {
             create: '/dashboard/tasks/events/new',
             viewAll: '/dashboard/tasks/events'
+        },
+        reports: {
+            create: '/dashboard/tasks/reports/new',
+            viewAll: '/dashboard/tasks/reports'
         }
     }
 

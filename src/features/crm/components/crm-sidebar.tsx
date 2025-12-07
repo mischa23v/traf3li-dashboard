@@ -11,6 +11,8 @@ import {
   Trash2,
   Phone,
   Calendar,
+  FileBarChart,
+  BarChart3,
 } from 'lucide-react'
 import { useLeadStats, useLeadsNeedingFollowUp, useUpcomingTasks } from '@/hooks/useCrm'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -18,11 +20,32 @@ import { formatDistanceToNow } from 'date-fns'
 import { ar } from 'date-fns/locale'
 
 interface CrmSidebarProps {
-  context: 'leads' | 'pipeline' | 'referrals' | 'activities'
+  context: 'leads' | 'pipeline' | 'referrals' | 'activities' | 'reports'
   isSelectionMode?: boolean
   onToggleSelectionMode?: () => void
   selectedCount?: number
   onDeleteSelected?: () => void
+}
+
+const links = {
+  leads: {
+    create: '/dashboard/crm/leads/new',
+    viewAll: '/dashboard/crm/leads',
+  },
+  pipeline: {
+    viewAll: '/dashboard/crm/pipeline',
+  },
+  activities: {
+    viewAll: '/dashboard/crm/activities',
+  },
+  referrals: {
+    create: '/dashboard/crm/referrals/new',
+    viewAll: '/dashboard/crm/referrals',
+  },
+  reports: {
+    create: '/dashboard/crm/reports/new',
+    viewAll: '/dashboard/crm/reports',
+  },
 }
 
 export function CrmSidebar({
@@ -73,6 +96,27 @@ export function CrmSidebar({
               سجل الأنشطة
             </Link>
           </Button>
+          <Button
+            asChild
+            variant="outline"
+            className="w-full rounded-xl h-12 justify-start border-slate-200 hover:bg-slate-50"
+          >
+            <Link to={links.reports.viewAll}>
+              <BarChart3 className="ml-3 h-5 w-5 text-purple-600" />
+              التقارير والتحليلات
+            </Link>
+          </Button>
+          {context === 'reports' && (
+            <Button
+              asChild
+              className="w-full bg-purple-500 hover:bg-purple-600 text-white rounded-xl h-12 justify-start"
+            >
+              <Link to={links.reports.create}>
+                <FileBarChart className="ml-3 h-5 w-5" />
+                إنشاء تقرير جديد
+              </Link>
+            </Button>
+          )}
 
           {/* Selection Mode Actions */}
           {isSelectionMode && selectedCount > 0 && (

@@ -107,7 +107,7 @@ export function FinanceSidebar({
             viewAll: '/dashboard/finance/recurring'
         },
         reports: {
-            create: '',
+            create: '/dashboard/finance/reports/new',
             viewAll: '/dashboard/finance/reports'
         },
         'fiscal-periods': {

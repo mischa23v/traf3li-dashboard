@@ -65,6 +65,11 @@ export function ProductivityHero({ badge, title = 'الإنتاجية', type = '
         'succession-planning': { label: 'تخطيط التعاقب', href: '/dashboard/hr/succession-planning' },
         'compensation': { label: 'التعويضات', href: '/dashboard/hr/compensation' },
         'reports': { label: 'التقارير', href: '/dashboard/hr/reports' },
+        'hr-reports': { label: 'تقارير الموارد البشرية', href: '/dashboard/hr/reports' },
+        'finance-reports': { label: 'التقارير المالية', href: '/dashboard/finance/reports' },
+        'tasks-reports': { label: 'تقارير الإنتاجية', href: '/dashboard/tasks/reports' },
+        'crm-reports': { label: 'تقارير العملاء', href: '/dashboard/crm/reports' },
+        'sales-reports': { label: 'تقارير المبيعات', href: '/dashboard/sales/reports' },
     }
 
     const buttonConfig: Record<string, { label: string; href: string }> = {
@@ -99,6 +104,11 @@ export function ProductivityHero({ badge, title = 'الإنتاجية', type = '
         'succession-planning': { label: 'خطة تعاقب جديدة', href: '/dashboard/hr/succession-planning/new' },
         'compensation': { label: 'سجل تعويضات جديد', href: '/dashboard/hr/compensation/new' },
         'reports': { label: 'تقرير جديد', href: '/dashboard/hr/reports/new' },
+        'hr-reports': { label: 'تقرير موارد بشرية جديد', href: '/dashboard/hr/reports/new' },
+        'finance-reports': { label: 'تقرير مالي جديد', href: '/dashboard/finance/reports/new' },
+        'tasks-reports': { label: 'تقرير إنتاجية جديد', href: '/dashboard/tasks/reports/new' },
+        'crm-reports': { label: 'تقرير عملاء جديد', href: '/dashboard/crm/reports/new' },
+        'sales-reports': { label: 'تقرير مبيعات جديد', href: '/dashboard/sales/reports/new' },
         laws: { label: 'قانون جديد', href: '/dashboard/knowledge/laws/new' },
         judgments: { label: 'حكم جديد', href: '/dashboard/knowledge/judgments/new' },
         forms: { label: 'نموذج جديد', href: '/dashboard/knowledge/forms/new' },

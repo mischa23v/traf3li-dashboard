@@ -6,6 +6,7 @@ import {
   CreateReportInput,
   UpdateReportInput,
   ReportCategory,
+  ReportSection,
   OutputFormat,
   ScheduleFrequency,
   DataModule,
@@ -22,6 +23,7 @@ export const reportKeys = {
   details: () => [...reportKeys.all, 'detail'] as const,
   detail: (id: string) => [...reportKeys.details(), id] as const,
   byCategory: (category: ReportCategory) => [...reportKeys.all, 'by-category', category] as const,
+  bySection: (section: ReportSection) => [...reportKeys.all, 'by-section', section] as const,
   stats: (officeId?: string) => [...reportKeys.all, 'stats', officeId] as const,
   favorites: () => [...reportKeys.all, 'favorites'] as const,
   executionHistory: (id: string) => [...reportKeys.all, 'execution-history', id] as const,
@@ -53,6 +55,15 @@ export function useReportsByCategory(category: ReportCategory) {
     queryKey: reportKeys.byCategory(category),
     queryFn: () => reportsApi.getByCategory(category),
     enabled: !!category
+  })
+}
+
+// Get reports by section
+export function useReportsBySection(section: ReportSection) {
+  return useQuery({
+    queryKey: reportKeys.bySection(section),
+    queryFn: () => reportsApi.getBySection(section),
+    enabled: !!section
   })
 }
 
