@@ -151,11 +151,11 @@ export default function AccountActivityDashboard() {
 
                 <div className='ms-auto flex items-center gap-4'>
                     <div className="relative hidden md:block">
-                        <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                        <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" aria-hidden="true" />
                         <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
                     </div>
-                    <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white">
-                        <Bell className="h-5 w-5" />
+                    <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white" aria-label="الإشعارات">
+                        <Bell className="h-5 w-5" aria-hidden="true" />
                         <span className="absolute top-2 right-2 h-2 w-2 bg-red-500 rounded-full border border-navy"></span>
                     </Button>
                     <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white" />
@@ -194,7 +194,7 @@ export default function AccountActivityDashboard() {
                 ) : isError ? (
                     <div className="max-w-7xl mx-auto">
                         <div className="bg-white rounded-3xl p-12 text-center border border-red-100">
-                            <AlertCircle className="h-16 w-16 text-red-500 mx-auto mb-4" />
+                            <AlertCircle className="h-16 w-16 text-red-500 mx-auto mb-4" aria-hidden="true" />
                             <h3 className="text-xl font-bold mb-2 text-slate-900">فشل تحميل سجل النشاط</h3>
                             <p className="text-slate-500 mb-4">{error?.message || 'حدث خطأ أثناء تحميل البيانات'}</p>
                             <Button onClick={() => window.location.reload()}>إعادة المحاولة</Button>
@@ -229,16 +229,16 @@ export default function AccountActivityDashboard() {
                                     </div>
                                     <div className="flex gap-3">
                                         <Button variant="outline" className="bg-white/5 border-white/10 text-white hover:bg-white/10 rounded-xl">
-                                            <Download className="w-4 h-4 ms-2" />
+                                            <Download className="w-4 h-4 ms-2" aria-hidden="true" />
                                             تصدير السجل
                                         </Button>
                                         <Button className="bg-white/10 hover:bg-white/20 text-white border-0 backdrop-blur-sm rounded-xl">
-                                            <Filter className="w-4 h-4 ms-2" />
+                                            <Filter className="w-4 h-4 ms-2" aria-hidden="true" />
                                             تصفية متقدمة
                                         </Button>
                                         <Button asChild className="bg-brand-blue hover:bg-blue-600 text-white border-0 shadow-lg shadow-blue-500/20 rounded-xl">
                                             <Link to="/dashboard/finance/activity/new">
-                                                <Plus className="w-4 h-4 ms-2" />
+                                                <Plus className="w-4 h-4 ms-2" aria-hidden="true" />
                                                 تسجيل نشاط
                                             </Link>
                                         </Button>
@@ -302,7 +302,7 @@ export default function AccountActivityDashboard() {
                                 <CardContent className="p-6">
                                     <div className="flex justify-between items-start mb-4">
                                         <div className="w-12 h-12 rounded-2xl bg-emerald-50 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                                            <Check className="w-6 h-6 text-emerald-600" />
+                                            <Check className="w-6 h-6 text-emerald-600" aria-hidden="true" />
                                         </div>
                                         <Badge variant="outline" className="bg-emerald-50 text-emerald-700 border-emerald-100">
                                             دفعات
@@ -349,7 +349,7 @@ export default function AccountActivityDashboard() {
                                         <p className="text-slate-500 mb-6">لم يتم تسجيل أي نشاط مالي بعد</p>
                                         <Button asChild className="bg-brand-blue hover:bg-blue-600 text-white px-8">
                                             <Link to="/dashboard/finance/activity/new">
-                                                <Plus className="ms-2 h-4 w-4" />
+                                                <Plus className="ms-2 h-4 w-4" aria-hidden="true" />
                                                 تسجيل نشاط جديد
                                             </Link>
                                         </Button>
@@ -389,7 +389,7 @@ export default function AccountActivityDashboard() {
 
                                             <div className="flex items-center gap-3 flex-1 justify-end">
                                                 <div className="relative w-full max-w-xs">
-                                                    <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                                                    <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" aria-hidden="true" />
                                                     <Input
                                                         placeholder="بحث في السجل..."
                                                         className="pe-10 rounded-xl border-slate-200 focus:ring-[#022c22] focus:border-[#022c22]"
@@ -406,7 +406,7 @@ export default function AccountActivityDashboard() {
                                                 <div key={date} className="space-y-4">
                                                     <div className="flex items-center gap-3">
                                                         <div className="flex items-center gap-2 px-4 py-1.5 bg-slate-100 rounded-full border border-slate-200">
-                                                            <Calendar className="h-4 w-4 text-slate-600" />
+                                                            <Calendar className="h-4 w-4 text-slate-600" aria-hidden="true" />
                                                             <span className="text-sm font-bold text-slate-700">{date}</span>
                                                         </div>
                                                         <div className="flex-1 h-px bg-slate-200"></div>

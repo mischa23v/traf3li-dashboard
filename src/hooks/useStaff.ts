@@ -23,7 +23,6 @@ const staffService = {
       const response = await apiClient.post('/lawyers', data)
       return response.data.lawyer || response.data.data
     } catch (error: any) {
-      console.error('Create staff error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -33,7 +32,6 @@ const staffService = {
       const response = await apiClient.put(`/lawyers/${id}`, data)
       return response.data.lawyer || response.data.data
     } catch (error: any) {
-      console.error('Update staff error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -42,7 +40,6 @@ const staffService = {
     try {
       await apiClient.delete(`/lawyers/${id}`)
     } catch (error: any) {
-      console.error('Delete staff error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -54,7 +51,6 @@ const staffService = {
       })
       return response.data
     } catch (error: any) {
-      console.error('Bulk delete staff error:', error)
       throw new Error(handleApiError(error))
     }
   },

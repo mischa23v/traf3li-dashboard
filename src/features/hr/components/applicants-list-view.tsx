@@ -155,19 +155,19 @@ export function ApplicantsListView() {
           <DynamicIsland />
         </div>
 
-        <div className='ms-auto flex items-center gap-4'>
-          <div className="relative hidden md:block">
-            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-            <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pr-9 pl-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
+        <div className='ms-auto flex items-center gap-2 sm:gap-4 overflow-x-auto min-w-0'>
+          <div className="relative hidden md:block min-w-0">
+            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
+            <input type="text" placeholder="بحث..." aria-label="بحث" className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pr-9 pl-4 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
           </div>
-          <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white">
-            <Bell className="h-5 w-5" />
+          <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white flex-shrink-0" aria-label="الإشعارات">
+            <Bell className="h-5 w-5" aria-hidden="true" />
             <span className="absolute top-2 right-2 h-2 w-2 bg-red-500 rounded-full border border-navy"></span>
           </Button>
-          <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white" />
-          <ThemeSwitch className="text-slate-300 hover:bg-white/10 hover:text-white" />
-          <ConfigDrawer className="text-slate-300 hover:bg-white/10 hover:text-white" />
-          <ProfileDropdown className="text-slate-300 hover:bg-white/10 hover:text-white" />
+          <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white flex-shrink-0" />
+          <ThemeSwitch className="text-slate-300 hover:bg-white/10 hover:text-white hidden sm:flex flex-shrink-0" />
+          <ConfigDrawer className="text-slate-300 hover:bg-white/10 hover:text-white hidden lg:flex flex-shrink-0" />
+          <ProfileDropdown className="text-slate-300 hover:bg-white/10 hover:text-white flex-shrink-0" />
         </div>
         <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-emerald-500/50 to-transparent"></div>
       </Header>
@@ -195,14 +195,14 @@ export function ApplicantsListView() {
                   onClick={() => navigate({ to: '/dashboard/hr/recruitment/jobs' })}
                   className="rounded-xl"
                 >
-                  <Briefcase className="w-4 h-4 ms-2" />
+                  <Briefcase className="w-4 h-4 ms-2" aria-hidden="true" />
                   الوظائف
                 </Button>
                 <Button
                   onClick={() => navigate({ to: '/dashboard/hr/recruitment/applicants/new' })}
                   className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl"
                 >
-                  <Plus className="w-4 h-4 ms-2" />
+                  <Plus className="w-4 h-4 ms-2" aria-hidden="true" />
                   متقدم جديد
                 </Button>
               </div>
@@ -213,10 +213,10 @@ export function ApplicantsListView() {
               <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
                 {/* Search */}
                 <div className="relative flex-1 max-w-md">
-                  <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                  <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
                   <Input
                     type="text"
-                    placeholder="بحث بالاسم أو البريد الإلكتروني..."
+                    placeholder="بحث بالاسم أو البريد الإلكتروني..." aria-label="بحث بالاسم أو البريد الإلكتروني"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="w-full pr-10 rounded-xl"
@@ -227,7 +227,7 @@ export function ApplicantsListView() {
                 <div className="flex items-center gap-3 flex-wrap">
                   <Select value={statusFilter} onValueChange={(v) => setStatusFilter(v as ApplicantStatus | 'all')}>
                     <SelectTrigger className="w-40 rounded-xl">
-                      <Filter className="w-4 h-4 ms-2" />
+                      <Filter className="w-4 h-4 ms-2" aria-hidden="true" />
                       <SelectValue placeholder="الحالة" />
                     </SelectTrigger>
                     <SelectContent>
@@ -241,7 +241,7 @@ export function ApplicantsListView() {
                   </Select>
                   <Select value={sourceFilter} onValueChange={(v) => setSourceFilter(v as ApplicationSource | 'all')}>
                     <SelectTrigger className="w-40 rounded-xl">
-                      <TrendingUp className="w-4 h-4 ms-2" />
+                      <TrendingUp className="w-4 h-4 ms-2" aria-hidden="true" />
                       <SelectValue placeholder="المصدر" />
                     </SelectTrigger>
                     <SelectContent>
@@ -253,7 +253,7 @@ export function ApplicantsListView() {
                   </Select>
                   <Select value={jobFilter} onValueChange={setJobFilter}>
                     <SelectTrigger className="w-48 rounded-xl">
-                      <Briefcase className="w-4 h-4 ms-2" />
+                      <Briefcase className="w-4 h-4 ms-2" aria-hidden="true" />
                       <SelectValue placeholder="الوظيفة" />
                     </SelectTrigger>
                     <SelectContent>
@@ -302,7 +302,7 @@ export function ApplicantsListView() {
                   <div className="bg-white rounded-2xl p-12 border border-slate-100 text-center">
                     <div className="flex justify-center mb-4">
                       <div className="w-16 h-16 rounded-full bg-red-50 flex items-center justify-center">
-                        <AlertCircle className="w-8 h-8 text-red-500" />
+                        <AlertCircle className="w-8 h-8 text-red-500" aria-hidden="true" />
                       </div>
                     </div>
                     <h3 className="text-lg font-bold text-slate-900 mb-2">حدث خطأ أثناء تحميل المتقدمين</h3>
@@ -324,7 +324,7 @@ export function ApplicantsListView() {
                       onClick={() => navigate({ to: '/dashboard/hr/recruitment/applicants/new' })}
                       className="bg-emerald-500 hover:bg-emerald-600"
                     >
-                      <Plus className="w-4 h-4 ms-2" />
+                      <Plus className="w-4 h-4 ms-2" aria-hidden="true" />
                       إضافة متقدم جديد
                     </Button>
                   </div>
@@ -372,22 +372,22 @@ export function ApplicantsListView() {
                       </div>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon" className="text-slate-400 hover:text-navy">
-                            <MoreHorizontal className="h-5 w-5" />
+                          <Button variant="ghost" size="icon" className="text-slate-500 hover:text-navy" aria-label="خيارات">
+                            <MoreHorizontal className="h-5 w-5" aria-hidden="true" />
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="w-48">
                           <DropdownMenuItem onClick={() => navigate({ to: '/dashboard/hr/recruitment/applicants/$applicantId', params: { applicantId: applicant._id } })}>
-                            <Eye className="h-4 w-4 ms-2" />
+                            <Eye className="h-4 w-4 ms-2" aria-hidden="true" />
                             عرض التفاصيل
                           </DropdownMenuItem>
                           <DropdownMenuItem>
-                            <Edit3 className="h-4 w-4 ms-2 text-blue-500" />
+                            <Edit3 className="h-4 w-4 ms-2 text-blue-500" aria-hidden="true" />
                             تعديل البيانات
                           </DropdownMenuItem>
                           <DropdownMenuSeparator />
                           <DropdownMenuItem className="text-red-600 focus:text-red-600">
-                            <Trash2 className="h-4 w-4 ms-2" />
+                            <Trash2 className="h-4 w-4 ms-2" aria-hidden="true" />
                             حذف المتقدم
                           </DropdownMenuItem>
                         </DropdownMenuContent>
@@ -399,22 +399,22 @@ export function ApplicantsListView() {
                         {/* Contact Info */}
                         <div className="flex items-center gap-4 text-sm text-slate-500">
                           <span className="flex items-center gap-1">
-                            <Mail className="h-4 w-4" />
+                            <Mail className="h-4 w-4" aria-hidden="true" />
                             {applicant.personalInfo?.email}
                           </span>
                           <span className="flex items-center gap-1">
-                            <Phone className="h-4 w-4" />
+                            <Phone className="h-4 w-4" aria-hidden="true" />
                             {applicant.personalInfo?.phone}
                           </span>
                         </div>
                         {/* Additional Info */}
                         <div className="flex items-center gap-3">
                           <div className="text-center">
-                            <div className="text-xs text-slate-400">الخبرة</div>
+                            <div className="text-xs text-slate-600">الخبرة</div>
                             <div className="font-medium text-navy text-sm">{applicant.workExperience?.totalExperience || 0} سنة</div>
                           </div>
                           <div className="text-center">
-                            <div className="text-xs text-slate-400">المؤهل</div>
+                            <div className="text-xs text-slate-600">المؤهل</div>
                             <Badge className="bg-blue-100 text-blue-700 border-0 text-xs">
                               {applicant.qualifications?.education?.[0]?.level
                                 ? EDUCATION_LABELS[applicant.qualifications.education[0].level]?.ar
@@ -437,7 +437,7 @@ export function ApplicantsListView() {
               <div className="p-4 pt-0 text-center">
                 <Button variant="ghost" className="text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 w-full rounded-xl py-6">
                   عرض جميع المتقدمين
-                  <ChevronLeft className="h-4 w-4 me-2" />
+                  <ChevronLeft className="h-4 w-4 me-2" aria-hidden="true" />
                 </Button>
               </div>
             </div>

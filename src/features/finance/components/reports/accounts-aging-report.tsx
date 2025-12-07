@@ -128,7 +128,7 @@ export function AccountsAgingReport() {
                 <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8">
                     <div className="bg-white rounded-3xl p-12 text-center border border-slate-100 shadow-sm">
                         <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <AlertCircle className="h-8 w-8 text-red-500" />
+                            <AlertCircle className="h-8 w-8 text-red-500" aria-hidden="true" />
                         </div>
                         <h3 className="text-xl font-bold text-slate-900 mb-2">فشل تحميل التقرير</h3>
                         <p className="text-slate-500 mb-6">{error?.message || 'حدث خطأ أثناء تحميل البيانات'}</p>
@@ -220,7 +220,7 @@ export function AccountsAgingReport() {
                             <div>
                                 <div className="flex items-center gap-3 mb-3">
                                     <Badge className="bg-white/20 hover:bg-white/30 text-white border-0 backdrop-blur-sm">
-                                        <Clock className="w-3 h-3 ms-2" />
+                                        <Clock className="w-3 h-3 ms-2" aria-hidden="true" />
                                         تقرير الأعمار
                                     </Badge>
                                 </div>
@@ -236,7 +236,7 @@ export function AccountsAgingReport() {
                                     onClick={() => handleExport('csv')}
                                     disabled={isExporting}
                                 >
-                                    <Download className="w-4 h-4 ms-2" />
+                                    <Download className="w-4 h-4 ms-2" aria-hidden="true" />
                                     تصدير CSV
                                 </Button>
                                 <Button
@@ -244,7 +244,7 @@ export function AccountsAgingReport() {
                                     onClick={() => handleExport('pdf')}
                                     disabled={isExporting}
                                 >
-                                    <Download className="w-4 h-4 ms-2" />
+                                    <Download className="w-4 h-4 ms-2" aria-hidden="true" />
                                     تصدير PDF
                                 </Button>
                             </div>
@@ -254,7 +254,7 @@ export function AccountsAgingReport() {
                     {/* Filter Bar */}
                     <div className="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between gap-4">
                         <div className="flex items-center gap-3">
-                            <Filter className="w-5 h-5 text-slate-400" />
+                            <Filter className="w-5 h-5 text-slate-400" aria-hidden="true" />
                             <span className="text-sm font-medium text-slate-600">تصفية حسب:</span>
                             <Select value={selectedClient} onValueChange={setSelectedClient}>
                                 <SelectTrigger className="w-[200px] rounded-xl border-slate-200">
@@ -293,7 +293,7 @@ export function AccountsAgingReport() {
                             <CardContent className="p-5">
                                 <div className="flex items-center gap-3 mb-3">
                                     <div className="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center">
-                                        <Clock className="w-5 h-5 text-emerald-600" />
+                                        <Clock className="w-5 h-5 text-emerald-600" aria-hidden="true" />
                                     </div>
                                     <span className="text-sm text-emerald-700">0-30 يوم</span>
                                 </div>
@@ -306,7 +306,7 @@ export function AccountsAgingReport() {
                             <CardContent className="p-5">
                                 <div className="flex items-center gap-3 mb-3">
                                     <div className="w-10 h-10 rounded-xl bg-yellow-100 flex items-center justify-center">
-                                        <Clock className="w-5 h-5 text-yellow-600" />
+                                        <Clock className="w-5 h-5 text-yellow-600" aria-hidden="true" />
                                     </div>
                                     <span className="text-sm text-yellow-700">31-60 يوم</span>
                                 </div>
@@ -319,7 +319,7 @@ export function AccountsAgingReport() {
                             <CardContent className="p-5">
                                 <div className="flex items-center gap-3 mb-3">
                                     <div className="w-10 h-10 rounded-xl bg-orange-100 flex items-center justify-center">
-                                        <Clock className="w-5 h-5 text-orange-600" />
+                                        <Clock className="w-5 h-5 text-orange-600" aria-hidden="true" />
                                     </div>
                                     <span className="text-sm text-orange-700">61-90 يوم</span>
                                 </div>
@@ -332,7 +332,7 @@ export function AccountsAgingReport() {
                             <CardContent className="p-5">
                                 <div className="flex items-center gap-3 mb-3">
                                     <div className="w-10 h-10 rounded-xl bg-red-100 flex items-center justify-center">
-                                        <AlertCircle className="w-5 h-5 text-red-600" />
+                                        <AlertCircle className="w-5 h-5 text-red-600" aria-hidden="true" />
                                     </div>
                                     <span className="text-sm text-red-700">+90 يوم</span>
                                 </div>
@@ -417,7 +417,7 @@ export function AccountsAgingReport() {
                                                                     {client.invoices.map((invoice) => (
                                                                         <div key={invoice.invoiceNumber} className="flex items-center justify-between bg-white p-3 rounded-xl border border-slate-100">
                                                                             <div className="flex items-center gap-3">
-                                                                                <FileText className="w-4 h-4 text-slate-400" />
+                                                                                <FileText className="w-4 h-4 text-slate-400" aria-hidden="true" />
                                                                                 <span className="font-medium text-navy">{invoice.invoiceNumber}</span>
                                                                             </div>
                                                                             <div className="flex items-center gap-6">

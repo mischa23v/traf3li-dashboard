@@ -75,7 +75,6 @@ const conversationsService = {
         total: response.data.total || 0,
       }
     } catch (error: any) {
-      console.error('Get conversations error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -88,7 +87,6 @@ const conversationsService = {
       const response = await apiClient.get(`/conversations/${id}`)
       return response.data.conversation || response.data.data
     } catch (error: any) {
-      console.error('Get conversation error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -103,7 +101,6 @@ const conversationsService = {
       const response = await apiClient.post('/conversations', data)
       return response.data.conversation || response.data.data
     } catch (error: any) {
-      console.error('Create conversation error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -125,7 +122,6 @@ const conversationsService = {
         total: response.data.total || 0,
       }
     } catch (error: any) {
-      console.error('Get messages error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -144,7 +140,6 @@ const conversationsService = {
       )
       return response.data.message || response.data.data
     } catch (error: any) {
-      console.error('Send message error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -156,7 +151,6 @@ const conversationsService = {
     try {
       await apiClient.post(`/conversations/${conversationId}/read`)
     } catch (error: any) {
-      console.error('Mark as read error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -168,7 +162,6 @@ const conversationsService = {
     try {
       await apiClient.delete(`/conversations/${id}`)
     } catch (error: any) {
-      console.error('Delete conversation error:', error)
       throw new Error(handleApiError(error))
     }
   },

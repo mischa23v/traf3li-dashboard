@@ -225,11 +225,11 @@ export function AdvancesDetailsView() {
         </div>
         <div className='ms-auto flex items-center gap-4'>
           <div className="relative hidden md:block">
-            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-            <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
+            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
+            <input type="text" placeholder="بحث..." aria-label="بحث" className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
           </div>
-          <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white">
-            <Bell className="h-5 w-5" />
+          <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white" aria-label="الإشعارات">
+            <Bell className="h-5 w-5" aria-hidden="true" />
             <span className="absolute top-2 right-2 h-2 w-2 bg-red-500 rounded-full border border-navy"></span>
           </Button>
           <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white" />
@@ -271,7 +271,7 @@ export function AdvancesDetailsView() {
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="outline" className="rounded-xl">
-                    <MoreHorizontal className="w-4 h-4 ms-2" />
+                    <MoreHorizontal className="w-4 h-4 ms-2" aria-hidden="true" />
                     إجراءات
                   </Button>
                 </DropdownMenuTrigger>
@@ -279,7 +279,7 @@ export function AdvancesDetailsView() {
                   <DropdownMenuItem
                     onClick={() => navigate({ to: `/dashboard/hr/advances/new?editId=${advanceId}` })}
                   >
-                    <Edit className="w-4 h-4 ms-2" />
+                    <Edit className="w-4 h-4 ms-2" aria-hidden="true" />
                     تعديل
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
@@ -321,7 +321,7 @@ export function AdvancesDetailsView() {
                   )}
                   <DropdownMenuSeparator />
                   <DropdownMenuItem className="text-red-600" onClick={handleDelete}>
-                    <Trash2 className="w-4 h-4 ms-2" />
+                    <Trash2 className="w-4 h-4 ms-2" aria-hidden="true" />
                     حذف
                   </DropdownMenuItem>
                 </DropdownMenuContent>
@@ -339,7 +339,7 @@ export function AdvancesDetailsView() {
             ) : error ? (
               <Card className="rounded-2xl border-slate-100">
                 <CardContent className="p-8 text-center">
-                  <AlertCircle className="w-8 h-8 mx-auto text-red-500" />
+                  <AlertCircle className="w-8 h-8 mx-auto text-red-500" aria-hidden="true" />
                   <p className="mt-4 text-red-600">حدث خطأ في تحميل البيانات</p>
                 </CardContent>
               </Card>
@@ -399,7 +399,7 @@ export function AdvancesDetailsView() {
                     <CardContent className="p-4">
                       <div className="flex items-center gap-3">
                         <div className="p-2 bg-amber-100 rounded-xl">
-                          <Calendar className="w-5 h-5 text-amber-600" />
+                          <Calendar className="w-5 h-5 text-amber-600" aria-hidden="true" />
                         </div>
                         <div>
                           <p className="text-xs text-slate-500">عدد الأقساط</p>
@@ -635,7 +635,7 @@ export function AdvancesDetailsView() {
                         </div>
                       ) : (
                         <div className="text-center py-8">
-                          <Calendar className="w-12 h-12 mx-auto text-slate-300" />
+                          <Calendar className="w-12 h-12 mx-auto text-slate-300" aria-hidden="true" />
                           <p className="mt-4 text-slate-500">لم يتم إنشاء جدول السداد بعد</p>
                         </div>
                       )}
@@ -732,7 +732,7 @@ export function AdvancesDetailsView() {
                               <CardContent className="p-4">
                                 <div className="flex items-center justify-between">
                                   <div className="flex items-center gap-3">
-                                    <TrendingUp className="w-5 h-5 text-emerald-500" />
+                                    <TrendingUp className="w-5 h-5 text-emerald-500" aria-hidden="true" />
                                     <span className="font-medium">تقييم السداد</span>
                                   </div>
                                   <Badge className={`px-4 py-2 ${
@@ -752,7 +752,7 @@ export function AdvancesDetailsView() {
                         </>
                       ) : (
                         <div className="text-center py-8">
-                          <TrendingUp className="w-12 h-12 mx-auto text-slate-300" />
+                          <TrendingUp className="w-12 h-12 mx-auto text-slate-300" aria-hidden="true" />
                           <p className="mt-4 text-slate-500">لا تتوفر بيانات أداء بعد</p>
                         </div>
                       )}

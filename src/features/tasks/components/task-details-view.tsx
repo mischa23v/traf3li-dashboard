@@ -108,7 +108,6 @@ export function TaskDetailsView() {
     const deleteDocumentMutation = useDeleteDocument()
 
     // Debug Render
-    console.log(`[${new Date().toISOString()}] 🖼️ TaskDetailsView Render. Documents count:`, documentsData?.documents?.length)
 
     const handleDelete = () => {
         deleteTaskMutation.mutate(taskId, {
@@ -480,10 +479,10 @@ export function TaskDetailsView() {
 
                 <div className='ms-auto flex items-center gap-4'>
                     <div className="relative hidden md:block">
-                        <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                        <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
+                        <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" aria-hidden="true" />
+                        <input type="text" placeholder="بحث..." aria-label="بحث" className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
                     </div>
-                    <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white">
+                    <Button variant="ghost" size="icon" aria-label="التنبيهات" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white">
                         <Bell className="h-5 w-5" />
                         <span className="absolute top-2 right-2 h-2 w-2 bg-red-500 rounded-full border border-navy"></span>
                     </Button>
@@ -943,16 +942,16 @@ export function TaskDetailsView() {
                                                                     </div>
                                                                     <DropdownMenu>
                                                                         <DropdownMenuTrigger asChild>
-                                                                            <Button variant="ghost" size="icon" className="h-8 w-8 -ms-2 text-slate-400 hover:text-navy">
+                                                                            <Button variant="ghost" size="icon" aria-label="خيارات" className="h-8 w-8 -ms-2 text-slate-400 hover:text-navy">
                                                                                 <MoreHorizontal className="h-4 w-4" />
                                                                             </Button>
                                                                         </DropdownMenuTrigger>
                                                                         <DropdownMenuContent align="end">
                                                                             <DropdownMenuItem onClick={() => handlePreviewAttachment(doc._id, doc.name, doc.url, doc.storageType)}>
-                                                                                <Eye className="h-4 w-4 ms-2" /> معاينة
+                                                                                <Eye className="h-4 w-4 ms-2" aria-hidden="true" /> معاينة
                                                                             </DropdownMenuItem>
                                                                             <DropdownMenuItem onClick={() => handleDownloadAttachment(doc._id, doc.name, doc.url, doc.storageType)}>
-                                                                                <Download className="h-4 w-4 ms-2" /> تحميل
+                                                                                <Download className="h-4 w-4 ms-2" aria-hidden="true" /> تحميل
                                                                             </DropdownMenuItem>
                                                                             {doc.storageType === 's3' && (
                                                                                 <DropdownMenuItem
@@ -971,7 +970,7 @@ export function TaskDetailsView() {
                                                                                 onClick={() => handleDeleteAttachment(doc._id)}
                                                                                 className="text-red-600 focus:text-red-600"
                                                                             >
-                                                                                <Trash2 className="h-4 w-4 ms-2" /> حذف
+                                                                                <Trash2 className="h-4 w-4 ms-2" aria-hidden="true" /> حذف
                                                                             </DropdownMenuItem>
                                                                         </DropdownMenuContent>
                                                                     </DropdownMenu>
@@ -996,6 +995,7 @@ export function TaskDetailsView() {
                                                                     <Button
                                                                         variant="ghost"
                                                                         size="icon"
+                                                                        aria-label="تحميل"
                                                                         className="h-8 w-8 text-slate-400 hover:text-brand-blue"
                                                                         onClick={() => handleDownloadAttachment(doc._id, doc.name, doc.url, doc.storageType)}
                                                                     >
@@ -1025,13 +1025,13 @@ export function TaskDetailsView() {
                                                                                 </DropdownMenuTrigger>
                                                                                 <DropdownMenuContent align="end">
                                                                                     <DropdownMenuItem onClick={() => handleOpenDocumentEditor(doc._id)}>
-                                                                                        <Edit3 className="h-4 w-4 ms-2" /> تحرير
+                                                                                        <Edit3 className="h-4 w-4 ms-2" aria-hidden="true" /> تحرير
                                                                                     </DropdownMenuItem>
                                                                                     <DropdownMenuItem
                                                                                         onClick={() => handleDeleteDocument(doc._id)}
                                                                                         className="text-red-600 focus:text-red-600"
                                                                                     >
-                                                                                        <Trash2 className="h-4 w-4 ms-2" /> حذف
+                                                                                        <Trash2 className="h-4 w-4 ms-2" aria-hidden="true" /> حذف
                                                                                     </DropdownMenuItem>
                                                                                 </DropdownMenuContent>
                                                                             </DropdownMenu>
@@ -1107,6 +1107,7 @@ export function TaskDetailsView() {
                                                                     />
                                                                     <Button
                                                                         size="icon"
+                                                                        aria-label="إرسال"
                                                                         onClick={handleAddComment}
                                                                         disabled={!newComment.trim() || addCommentMutation.isPending}
                                                                         className="absolute bottom-2 left-2 w-8 h-8 rounded-lg bg-brand-blue hover:bg-blue-600 disabled:opacity-50"

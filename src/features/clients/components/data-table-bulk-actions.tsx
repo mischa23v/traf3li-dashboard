@@ -39,7 +39,7 @@ export function DataTableBulkActions({ table }: DataTableBulkActionsProps) {
         onClick={handleBulkDelete}
         disabled={isPending}
       >
-        <Trash2 className='me-2 h-4 w-4' />
+        <Trash2 className='me-2 h-4 w-4' aria-hidden='true' />
         {t('common.delete')}
       </Button>
       <Button
@@ -47,7 +47,7 @@ export function DataTableBulkActions({ table }: DataTableBulkActionsProps) {
         size='sm'
         onClick={() => table.resetRowSelection()}
       >
-        <X className='me-2 h-4 w-4' />
+        <X className='me-2 h-4 w-4' aria-hidden='true' />
         {t('common.cancel')}
       </Button>
     </div>

@@ -374,11 +374,11 @@ export function BenefitsCreateView() {
         </div>
         <div className='ms-auto flex items-center gap-4'>
           <div className="relative hidden md:block">
-            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-            <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
+            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
+            <input type="text" placeholder="بحث..." aria-label="بحث" className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
           </div>
-          <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white">
-            <Bell className="h-5 w-5" />
+          <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white" aria-label="الإشعارات">
+            <Bell className="h-5 w-5" aria-hidden="true" />
             <span className="absolute top-2 right-2 h-2 w-2 bg-red-500 rounded-full border border-navy"></span>
           </Button>
           <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white" />
@@ -424,7 +424,7 @@ export function BenefitsCreateView() {
             <Card className="rounded-3xl shadow-sm border-slate-100">
               <CardHeader className="pb-4">
                 <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                  <Building2 className="w-5 h-5 text-emerald-500" />
+                  <Building2 className="w-5 h-5 text-emerald-500" aria-hidden="true" />
                   نوع المكتب
                 </CardTitle>
               </CardHeader>
@@ -597,7 +597,7 @@ export function BenefitsCreateView() {
             <Card className="rounded-3xl shadow-sm border-slate-100">
               <CardHeader className="pb-4">
                 <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                  <Calendar className="w-5 h-5 text-emerald-500" />
+                  <Calendar className="w-5 h-5 text-emerald-500" aria-hidden="true" />
                   تفاصيل التسجيل
                 </CardTitle>
               </CardHeader>
@@ -715,14 +715,14 @@ export function BenefitsCreateView() {
                   <CardHeader className="cursor-pointer hover:bg-slate-50 transition-colors rounded-t-3xl">
                     <div className="flex items-center justify-between">
                       <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                        <Building2 className="w-5 h-5 text-blue-500" />
+                        <Building2 className="w-5 h-5 text-blue-500" aria-hidden="true" />
                         مقدم الخدمة
                       </CardTitle>
                       <div className="flex items-center gap-2">
                         {providerName && (
                           <Badge className="bg-blue-100 text-blue-700">{providerName}</Badge>
                         )}
-                        <ChevronDown className={cn("w-5 h-5 text-slate-400 transition-transform", openSections.includes('provider') && "rotate-180")} />
+                        <ChevronDown className={cn("w-5 h-5 text-slate-500 transition-transform", openSections.includes('provider') && "rotate-180")} />
                       </div>
                     </div>
                   </CardHeader>
@@ -789,7 +789,7 @@ export function BenefitsCreateView() {
                           <Heart className="w-5 h-5 text-blue-500" />
                           تفاصيل التأمين الصحي
                         </CardTitle>
-                        <ChevronDown className={cn("w-5 h-5 text-slate-400 transition-transform", openSections.includes('health') && "rotate-180")} />
+                        <ChevronDown className={cn("w-5 h-5 text-slate-500 transition-transform", openSections.includes('health') && "rotate-180")} />
                       </div>
                     </CardHeader>
                   </CollapsibleTrigger>
@@ -877,7 +877,7 @@ export function BenefitsCreateView() {
                           <Shield className="w-5 h-5 text-purple-500" />
                           تفاصيل التأمين على الحياة
                         </CardTitle>
-                        <ChevronDown className={cn("w-5 h-5 text-slate-400 transition-transform", openSections.includes('life') && "rotate-180")} />
+                        <ChevronDown className={cn("w-5 h-5 text-slate-500 transition-transform", openSections.includes('life') && "rotate-180")} />
                       </div>
                     </CardHeader>
                   </CollapsibleTrigger>
@@ -937,7 +937,7 @@ export function BenefitsCreateView() {
                           <Wallet className="w-5 h-5 text-emerald-500" />
                           تفاصيل البدل
                         </CardTitle>
-                        <ChevronDown className={cn("w-5 h-5 text-slate-400 transition-transform", openSections.includes('allowance') && "rotate-180")} />
+                        <ChevronDown className={cn("w-5 h-5 text-slate-500 transition-transform", openSections.includes('allowance') && "rotate-180")} />
                       </div>
                     </CardHeader>
                   </CollapsibleTrigger>
@@ -1026,7 +1026,7 @@ export function BenefitsCreateView() {
                         <FileText className="w-5 h-5 text-purple-500" />
                         الملاحظات
                       </CardTitle>
-                      <ChevronDown className={cn("w-5 h-5 text-slate-400 transition-transform", openSections.includes('notes') && "rotate-180")} />
+                      <ChevronDown className={cn("w-5 h-5 text-slate-500 transition-transform", openSections.includes('notes') && "rotate-180")} />
                     </div>
                   </CardHeader>
                 </CollapsibleTrigger>

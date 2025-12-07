@@ -21,7 +21,7 @@ import {
   Briefcase, MapPin, Clock, CheckCircle, FileText, Mail,
   Phone, Calendar, MoreVertical, Star, GraduationCap,
   Globe, Award, Edit, MessageCircle, DollarSign, User,
-  Building2, UserCheck, UserX, Flag, Download, Send
+  Building2, UserCheck, UserX, Flag, Download, Send, Lock
 } from 'lucide-react'
 import {
   DropdownMenu,
@@ -109,11 +109,11 @@ export function ApplicantDetailsView() {
 
         <div className='ms-auto flex items-center gap-4'>
           <div className="relative hidden md:block">
-            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-            <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pr-9 pl-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
+            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
+            <input type="text" placeholder="بحث..." aria-label="بحث" className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pr-9 pl-4 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
           </div>
-          <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white">
-            <Bell className="h-5 w-5" />
+          <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white" aria-label="الإشعارات">
+            <Bell className="h-5 w-5" aria-hidden="true" />
             <span className="absolute top-2 right-2 h-2 w-2 bg-red-500 rounded-full border border-navy"></span>
           </Button>
           <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white" />
@@ -146,7 +146,7 @@ export function ApplicantDetailsView() {
           <div className="bg-white rounded-2xl p-12 border border-slate-100 text-center">
             <div className="flex justify-center mb-4">
               <div className="w-16 h-16 rounded-full bg-red-50 flex items-center justify-center">
-                <AlertCircle className="w-8 h-8 text-red-500" />
+                <AlertCircle className="w-8 h-8 text-red-500" aria-hidden="true" />
               </div>
             </div>
             <h3 className="text-lg font-bold text-slate-900 mb-2">حدث خطأ أثناء تحميل بيانات المتقدم</h3>
@@ -267,7 +267,7 @@ export function ApplicantDetailsView() {
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
                         <DropdownMenuItem>
-                          <Edit className="w-4 h-4 ms-2" />
+                          <Edit className="w-4 h-4 ms-2" aria-hidden="true" />
                           تعديل
                         </DropdownMenuItem>
                         <DropdownMenuItem>
@@ -275,7 +275,7 @@ export function ApplicantDetailsView() {
                           إرسال بريد
                         </DropdownMenuItem>
                         <DropdownMenuItem>
-                          <Download className="w-4 h-4 ms-2" />
+                          <Download className="w-4 h-4 ms-2" aria-hidden="true" />
                           تحميل السيرة الذاتية
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
@@ -294,7 +294,7 @@ export function ApplicantDetailsView() {
                     <CardContent className="p-4">
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center">
-                          <Briefcase className="w-5 h-5 text-blue-600" />
+                          <Briefcase className="w-5 h-5 text-blue-600" aria-hidden="true" />
                         </div>
                         <div>
                           <p className="text-xs text-slate-500">الخبرة</p>
@@ -339,7 +339,7 @@ export function ApplicantDetailsView() {
                     <CardContent className="p-4">
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center">
-                          <Calendar className="w-5 h-5 text-amber-600" />
+                          <Calendar className="w-5 h-5 text-amber-600" aria-hidden="true" />
                         </div>
                         <div>
                           <p className="text-xs text-slate-500">تاريخ التقديم</p>
@@ -385,21 +385,21 @@ export function ApplicantDetailsView() {
                         </CardHeader>
                         <CardContent className="space-y-3">
                           <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-xl">
-                            <Mail className="w-5 h-5 text-slate-400" />
+                            <Mail className="w-5 h-5 text-slate-500" aria-hidden="true" />
                             <div>
-                              <p className="text-xs text-slate-500">البريد الإلكتروني</p>
+                              <p className="text-xs text-slate-500">البريد الإلكتروني<Lock className="h-3 w-3 text-muted-foreground inline ms-1" /></p>
                               <p className="font-medium text-navy">{applicant.personalInfo?.email}</p>
                             </div>
                           </div>
                           <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-xl">
-                            <Phone className="w-5 h-5 text-slate-400" />
+                            <Phone className="w-5 h-5 text-slate-500" aria-hidden="true" />
                             <div>
-                              <p className="text-xs text-slate-500">رقم الهاتف</p>
+                              <p className="text-xs text-slate-500">رقم الهاتف<Lock className="h-3 w-3 text-muted-foreground inline ms-1" /></p>
                               <p className="font-medium text-navy">{applicant.personalInfo?.phone}</p>
                             </div>
                           </div>
                           <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-xl">
-                            <MapPin className="w-5 h-5 text-slate-400" />
+                            <MapPin className="w-5 h-5 text-slate-500" aria-hidden="true" />
                             <div>
                               <p className="text-xs text-slate-500">الموقع</p>
                               <p className="font-medium text-navy">{applicant.personalInfo?.currentLocation || '-'}</p>
@@ -412,7 +412,7 @@ export function ApplicantDetailsView() {
                       <Card className="border-none shadow-sm bg-white rounded-2xl">
                         <CardHeader className="pb-2">
                           <CardTitle className="text-base font-bold text-navy flex items-center gap-2">
-                            <Briefcase className="w-4 h-4 text-emerald-600" />
+                            <Briefcase className="w-4 h-4 text-emerald-600" aria-hidden="true" />
                             تفاصيل التقديم
                           </CardTitle>
                         </CardHeader>
@@ -507,7 +507,7 @@ export function ApplicantDetailsView() {
                     <Card className="border-none shadow-sm bg-white rounded-2xl">
                       <CardHeader className="pb-2">
                         <CardTitle className="text-base font-bold text-navy flex items-center gap-2">
-                          <Briefcase className="w-4 h-4 text-emerald-600" />
+                          <Briefcase className="w-4 h-4 text-emerald-600" aria-hidden="true" />
                           الخبرة العملية
                           <Badge className="bg-blue-100 text-blue-700 border-0">
                             {applicant.workExperience?.totalExperience || 0} سنة
@@ -527,7 +527,7 @@ export function ApplicantDetailsView() {
                                       <div>
                                         <h4 className="font-bold text-navy">{work.jobTitle}</h4>
                                         <p className="text-sm text-slate-600 flex items-center gap-1">
-                                          <Building2 className="w-4 h-4" />
+                                          <Building2 className="w-4 h-4" aria-hidden="true" />
                                           {work.company}
                                         </p>
                                       </div>
@@ -562,7 +562,7 @@ export function ApplicantDetailsView() {
                             المقابلات
                           </CardTitle>
                           <Button className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl">
-                            <Calendar className="w-4 h-4 ms-2" />
+                            <Calendar className="w-4 h-4 ms-2" aria-hidden="true" />
                             جدولة مقابلة
                           </Button>
                         </div>

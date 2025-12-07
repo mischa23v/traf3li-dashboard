@@ -128,11 +128,11 @@ export function OffboardingDetailsView() {
         </div>
         <div className='ms-auto flex items-center gap-4'>
           <div className="relative hidden md:block">
-            <Search className="absolute end-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-            <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
+            <Search className="absolute end-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
+            <input type="text" placeholder="بحث..." aria-label="بحث" className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
           </div>
-          <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white">
-            <Bell className="h-5 w-5" />
+          <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white" aria-label="الإشعارات">
+            <Bell className="h-5 w-5" aria-hidden="true" />
             <span className="absolute top-2 end-2 h-2 w-2 bg-red-500 rounded-full border border-navy"></span>
           </Button>
           <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white" />
@@ -174,7 +174,7 @@ export function OffboardingDetailsView() {
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="outline" className="rounded-xl">
-                    <MoreHorizontal className="w-4 h-4 ms-2" />
+                    <MoreHorizontal className="w-4 h-4 ms-2" aria-hidden="true" />
                     إجراءات
                   </Button>
                 </DropdownMenuTrigger>
@@ -182,7 +182,7 @@ export function OffboardingDetailsView() {
                   <DropdownMenuItem
                     onClick={() => navigate({ to: `/dashboard/hr/offboarding/new?editId=${offboardingId}` })}
                   >
-                    <Edit className="w-4 h-4 ms-2" />
+                    <Edit className="w-4 h-4 ms-2" aria-hidden="true" />
                     تعديل
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
@@ -206,7 +206,7 @@ export function OffboardingDetailsView() {
                   )}
                   <DropdownMenuSeparator />
                   <DropdownMenuItem className="text-red-600" onClick={handleDelete}>
-                    <Trash2 className="w-4 h-4 ms-2" />
+                    <Trash2 className="w-4 h-4 ms-2" aria-hidden="true" />
                     حذف
                   </DropdownMenuItem>
                 </DropdownMenuContent>
@@ -224,7 +224,7 @@ export function OffboardingDetailsView() {
             ) : error ? (
               <Card className="rounded-2xl border-slate-100">
                 <CardContent className="p-8 text-center">
-                  <AlertCircle className="w-8 h-8 mx-auto text-red-500" />
+                  <AlertCircle className="w-8 h-8 mx-auto text-red-500" aria-hidden="true" />
                   <p className="mt-4 text-red-600">حدث خطأ في تحميل البيانات</p>
                 </CardContent>
               </Card>
@@ -251,19 +251,19 @@ export function OffboardingDetailsView() {
                     </div>
                     <Progress value={calculateCompletionPercentage()} className="h-3" />
                     <div className="flex items-center justify-between mt-4 text-sm">
-                      <div className={`flex items-center gap-1 ${offboarding.completion?.exitInterviewCompleted ? 'text-emerald-600' : 'text-slate-400'}`}>
+                      <div className={`flex items-center gap-1 ${offboarding.completion?.exitInterviewCompleted ? 'text-emerald-600' : 'text-slate-500'}`}>
                         <CheckCircle className="w-4 h-4" />
                         مقابلة الخروج
                       </div>
-                      <div className={`flex items-center gap-1 ${offboarding.completion?.clearanceCompleted ? 'text-emerald-600' : 'text-slate-400'}`}>
+                      <div className={`flex items-center gap-1 ${offboarding.completion?.clearanceCompleted ? 'text-emerald-600' : 'text-slate-500'}`}>
                         <CheckCircle className="w-4 h-4" />
                         الإخلاء
                       </div>
-                      <div className={`flex items-center gap-1 ${offboarding.completion?.finalSettlementCompleted ? 'text-emerald-600' : 'text-slate-400'}`}>
+                      <div className={`flex items-center gap-1 ${offboarding.completion?.finalSettlementCompleted ? 'text-emerald-600' : 'text-slate-500'}`}>
                         <CheckCircle className="w-4 h-4" />
                         التسوية
                       </div>
-                      <div className={`flex items-center gap-1 ${offboarding.completion?.documentsIssued ? 'text-emerald-600' : 'text-slate-400'}`}>
+                      <div className={`flex items-center gap-1 ${offboarding.completion?.documentsIssued ? 'text-emerald-600' : 'text-slate-500'}`}>
                         <CheckCircle className="w-4 h-4" />
                         الشهادات
                       </div>
@@ -277,7 +277,7 @@ export function OffboardingDetailsView() {
                     <CardContent className="p-4">
                       <div className="flex items-center gap-3">
                         <div className="p-2 bg-blue-100 rounded-xl">
-                          <Calendar className="w-5 h-5 text-blue-600" />
+                          <Calendar className="w-5 h-5 text-blue-600" aria-hidden="true" />
                         </div>
                         <div>
                           <p className="text-xs text-slate-500">آخر يوم عمل</p>
@@ -307,7 +307,7 @@ export function OffboardingDetailsView() {
                     <CardContent className="p-4">
                       <div className="flex items-center gap-3">
                         <div className="p-2 bg-emerald-100 rounded-xl">
-                          <Briefcase className="w-5 h-5 text-emerald-600" />
+                          <Briefcase className="w-5 h-5 text-emerald-600" aria-hidden="true" />
                         </div>
                         <div>
                           <p className="text-xs text-slate-500">مدة الخدمة</p>
@@ -741,7 +741,7 @@ export function OffboardingDetailsView() {
                           <CardHeader className="pb-3">
                             <CardTitle className="text-sm font-medium flex items-center justify-between">
                               <span className="flex items-center gap-2">
-                                <Building2 className="w-4 h-4 text-amber-500" />
+                                <Building2 className="w-4 h-4 text-amber-500" aria-hidden="true" />
                                 إخلاء التأمينات
                               </span>
                               <Badge className={offboarding.finalDocuments?.gosiClearance?.clearanceCertificateIssued ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}>

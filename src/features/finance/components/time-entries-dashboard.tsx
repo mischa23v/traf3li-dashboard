@@ -186,11 +186,11 @@ export default function TimeEntriesDashboard() {
 
                 <div className='ms-auto flex items-center gap-4'>
                     <div className="relative hidden md:block">
-                        <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                        <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" aria-hidden="true" />
                         <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
                     </div>
-                    <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white">
-                        <Bell className="h-5 w-5" />
+                    <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white" aria-label="الإشعارات">
+                        <Bell className="h-5 w-5" aria-hidden="true" />
                         <span className="absolute top-2 right-2 h-2 w-2 bg-red-500 rounded-full border border-navy"></span>
                     </Button>
                     <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white" />
@@ -239,7 +239,7 @@ export default function TimeEntriesDashboard() {
 
                                 <div className="flex items-center gap-3 flex-1 justify-end">
                                     <div className="relative w-full max-w-xs">
-                                        <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                                        <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" aria-hidden="true" />
                                         <Input
                                             placeholder="بحث في السجلات..."
                                             className="pe-10 rounded-xl border-slate-200 focus:ring-[#022c22] focus:border-[#022c22]"
@@ -275,7 +275,7 @@ export default function TimeEntriesDashboard() {
                                     <div className="bg-white rounded-2xl p-12 border border-slate-100 text-center">
                                         <div className="flex justify-center mb-4">
                                             <div className="w-16 h-16 rounded-full bg-red-50 flex items-center justify-center">
-                                                <AlertCircle className="w-8 h-8 text-red-500" />
+                                                <AlertCircle className="w-8 h-8 text-red-500" aria-hidden="true" />
                                             </div>
                                         </div>
                                         <h3 className="text-lg font-bold text-slate-900 mb-2">حدث خطأ أثناء تحميل السجلات</h3>
@@ -291,14 +291,14 @@ export default function TimeEntriesDashboard() {
                                     <div className="bg-white rounded-2xl p-12 border border-slate-100 text-center">
                                         <div className="flex justify-center mb-4">
                                             <div className="w-16 h-16 rounded-full bg-blue-50 flex items-center justify-center">
-                                                <Clock className="w-8 h-8 text-brand-blue" />
+                                                <Clock className="w-8 h-8 text-brand-blue" aria-hidden="true" />
                                             </div>
                                         </div>
                                         <h3 className="text-lg font-bold text-slate-900 mb-2">لا توجد سجلات وقت</h3>
                                         <p className="text-slate-500 mb-4">ابدأ بتتبع وقتك باستخدام المؤقت أو سجل الوقت يدوياً</p>
                                         <Button asChild className="bg-brand-blue hover:bg-blue-600">
                                             <Link to="/dashboard/finance/time-tracking/new">
-                                                <Plus className="w-4 h-4 ms-2" />
+                                                <Plus className="w-4 h-4 ms-2" aria-hidden="true" />
                                                 تسجيل يدوي
                                             </Link>
                                         </Button>
@@ -311,7 +311,7 @@ export default function TimeEntriesDashboard() {
                                         <div className="flex justify-between items-start mb-4">
                                             <div className="flex gap-4 items-start">
                                                 <div className="w-12 h-12 rounded-xl bg-blue-50 text-brand-blue flex items-center justify-center shadow-sm mt-1">
-                                                    <Clock className="h-6 w-6" />
+                                                    <Clock className="h-6 w-6" aria-hidden="true" />
                                                 </div>
                                                 <div>
                                                     <div className="flex items-center gap-2 mb-1">
@@ -328,15 +328,15 @@ export default function TimeEntriesDashboard() {
                                                         <User className="w-3 h-3" />
                                                         {entry.client}
                                                         <span className="text-slate-300">•</span>
-                                                        <FileText className="w-3 h-3" />
+                                                        <FileText className="w-3 h-3" aria-hidden="true" />
                                                         {entry.caseNumber}
                                                     </div>
                                                 </div>
                                             </div>
                                             <DropdownMenu>
                                                 <DropdownMenuTrigger asChild>
-                                                    <Button variant="ghost" size="icon" className="text-slate-400 hover:text-[#022c22]">
-                                                        <MoreHorizontal className="h-5 w-5" />
+                                                    <Button variant="ghost" size="icon" className="text-slate-400 hover:text-[#022c22]" aria-label="تعديل">
+                                                        <MoreHorizontal className="h-5 w-5" aria-hidden="true" />
                                                     </Button>
                                                 </DropdownMenuTrigger>
                                                 <DropdownMenuContent align="end">

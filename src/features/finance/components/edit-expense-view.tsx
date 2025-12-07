@@ -136,7 +136,7 @@ export function EditExpenseView() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+        <div className="flex items-center gap-2 text-sm text-foreground/70">
           <span>المالية</span>
           <ArrowRight className="h-4 w-4 rotate-180" />
           <span>المصروفات</span>
@@ -147,7 +147,7 @@ export function EditExpenseView() {
         <AlertDialog>
           <AlertDialogTrigger asChild>
             <Button variant="destructive" size="sm">
-              <Trash2 className="h-4 w-4 ms-2" />
+              <Trash2 className="h-4 w-4 ms-2" aria-hidden="true" />
               حذف
             </Button>
           </AlertDialogTrigger>
@@ -317,10 +317,10 @@ export function EditExpenseView() {
 
               {existingAttachments.length > 0 && (
                 <div className="space-y-2 mb-4">
-                  <p className="text-sm text-muted-foreground">المرفقات الحالية:</p>
+                  <p className="text-sm text-slate-600">المرفقات الحالية:</p>
                   {existingAttachments.map((attachment, index) => (
                     <div key={index} className="flex items-center gap-2 p-2 bg-muted rounded">
-                      <FileText className="h-4 w-4" />
+                      <FileText className="h-4 w-4" aria-hidden="true" />
                       <span className="flex-1 text-sm">{attachment}</span>
                       <Button
                         type="button"
@@ -337,8 +337,8 @@ export function EditExpenseView() {
 
               <div className="border-2 border-dashed rounded-lg p-4">
                 <label className="flex flex-col items-center cursor-pointer">
-                  <Upload className="h-8 w-8 text-muted-foreground mb-2" />
-                  <span className="text-sm text-muted-foreground">اضغط لإضافة مرفقات جديدة</span>
+                  <Upload className="h-8 w-8 text-slate-500 mb-2" />
+                  <span className="text-sm text-slate-600">اضغط لإضافة مرفقات جديدة</span>
                   <input
                     type="file"
                     multiple
@@ -351,10 +351,10 @@ export function EditExpenseView() {
 
               {attachments.length > 0 && (
                 <div className="space-y-2">
-                  <p className="text-sm text-muted-foreground">مرفقات جديدة:</p>
+                  <p className="text-sm text-slate-600">مرفقات جديدة:</p>
                   {attachments.map((file, index) => (
                     <div key={index} className="flex items-center gap-2 p-2 bg-muted rounded">
-                      <FileText className="h-4 w-4" />
+                      <FileText className="h-4 w-4" aria-hidden="true" />
                       <span className="flex-1 text-sm">{file.name}</span>
                       <Button
                         type="button"
@@ -372,7 +372,7 @@ export function EditExpenseView() {
 
             <div className="flex gap-4 pt-4">
               <Button type="submit" disabled={updateExpense.isPending}>
-                <Save className="h-4 w-4 ms-2" />
+                <Save className="h-4 w-4 ms-2" aria-hidden="true" />
                 {updateExpense.isPending ? 'جاري الحفظ...' : 'حفظ التعديلات'}
               </Button>
               <Button

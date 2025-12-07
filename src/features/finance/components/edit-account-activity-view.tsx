@@ -134,7 +134,7 @@ export function EditAccountActivityView() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+        <div className="flex items-center gap-2 text-sm text-foreground/70">
           <span>المالية</span>
           <ArrowRight className="h-4 w-4 rotate-180" />
           <span>نشاط الحساب</span>
@@ -145,7 +145,7 @@ export function EditAccountActivityView() {
         <AlertDialog>
           <AlertDialogTrigger asChild>
             <Button variant="destructive" size="sm">
-              <Trash2 className="h-4 w-4 ms-2" />
+              <Trash2 className="h-4 w-4 ms-2" aria-hidden="true" />
               حذف
             </Button>
           </AlertDialogTrigger>
@@ -320,7 +320,7 @@ export function EditAccountActivityView() {
 
                 <div className="flex gap-4 pt-4">
                   <Button type="submit" disabled={updateActivity.isPending}>
-                    <Save className="h-4 w-4 ms-2" />
+                    <Save className="h-4 w-4 ms-2" aria-hidden="true" />
                     {updateActivity.isPending ? 'جاري الحفظ...' : 'حفظ التعديلات'}
                   </Button>
                   <Button
@@ -343,25 +343,25 @@ export function EditAccountActivityView() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex justify-between">
-                <span className="text-muted-foreground">نوع النشاط</span>
+                <span className="text-slate-600">نوع النشاط</span>
                 <span className={`font-medium ${getTypeInfo().color}`}>{getTypeInfo().label}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-muted-foreground">المبلغ</span>
+                <span className="text-slate-600">المبلغ</span>
                 <span className="font-medium">{formData.amount.toLocaleString('ar-SA')} ر.س</span>
               </div>
               <hr />
               <div className="flex justify-between">
-                <span className="text-muted-foreground">الرصيد السابق</span>
+                <span className="text-slate-600">الرصيد السابق</span>
                 <span className="font-medium">{formData.balanceBefore.toLocaleString('ar-SA')} ر.س</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-muted-foreground">الرصيد الجديد</span>
+                <span className="text-slate-600">الرصيد الجديد</span>
                 <span className="font-bold text-primary">{calculateBalanceAfter().toLocaleString('ar-SA')} ر.س</span>
               </div>
               <hr />
               <div className="flex justify-between">
-                <span className="text-muted-foreground">حالة المطابقة</span>
+                <span className="text-slate-600">حالة المطابقة</span>
                 <span className={`font-medium ${formData.reconciled ? 'text-green-600' : 'text-yellow-600'}`}>
                   {formData.reconciled ? 'تمت المطابقة' : 'معلقة'}
                 </span>

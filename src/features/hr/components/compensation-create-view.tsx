@@ -537,11 +537,11 @@ export function CompensationCreateView() {
         </div>
         <div className='ms-auto flex items-center gap-4'>
           <div className="relative hidden md:block">
-            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-            <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
+            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
+            <input type="text" placeholder="بحث..." aria-label="بحث" className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
           </div>
-          <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white">
-            <Bell className="h-5 w-5" />
+          <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white" aria-label="الإشعارات">
+            <Bell className="h-5 w-5" aria-hidden="true" />
             <span className="absolute top-2 right-2 h-2 w-2 bg-red-500 rounded-full border border-navy"></span>
           </Button>
           <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white" />
@@ -587,7 +587,7 @@ export function CompensationCreateView() {
             <Card className="rounded-3xl shadow-sm border-slate-100">
               <CardHeader className="pb-4">
                 <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                  <Building2 className="w-5 h-5 text-emerald-500" />
+                  <Building2 className="w-5 h-5 text-emerald-500" aria-hidden="true" />
                   نوع المكتب
                 </CardTitle>
               </CardHeader>
@@ -738,7 +738,7 @@ export function CompensationCreateView() {
             <Card className="rounded-3xl shadow-sm border-slate-100">
               <CardHeader className="pb-4">
                 <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                  <TrendingUp className="w-5 h-5 text-purple-500" />
+                  <TrendingUp className="w-5 h-5 text-purple-500" aria-hidden="true" />
                   الدرجة الوظيفية ونطاق الراتب
                 </CardTitle>
               </CardHeader>
@@ -1023,7 +1023,7 @@ export function CompensationCreateView() {
             <Card className="rounded-3xl shadow-sm border-slate-100">
               <CardHeader className="pb-4">
                 <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                  <Calendar className="w-5 h-5 text-purple-500" />
+                  <Calendar className="w-5 h-5 text-purple-500" aria-hidden="true" />
                   التواريخ
                 </CardTitle>
               </CardHeader>
@@ -1074,7 +1074,7 @@ export function CompensationCreateView() {
                         <Receipt className="w-5 h-5 text-green-500" />
                         بدلات إضافية
                       </CardTitle>
-                      <ChevronDown className={cn("w-5 h-5 text-slate-400 transition-transform", openSections.includes('allowances') && "rotate-180")} />
+                      <ChevronDown className={cn("w-5 h-5 text-slate-500 transition-transform", openSections.includes('allowances') && "rotate-180")} />
                     </div>
                   </CardHeader>
                 </CollapsibleTrigger>
@@ -1082,7 +1082,7 @@ export function CompensationCreateView() {
                   <CardContent className="space-y-4">
                     {allowances.length === 0 ? (
                       <div className="text-center py-8 text-slate-500">
-                        <Receipt className="w-12 h-12 mx-auto mb-2 opacity-50" />
+                        <Receipt className="w-12 h-12 mx-auto mb-2 opacity-70" />
                         <p>لم تتم إضافة بدلات إضافية</p>
                       </div>
                     ) : (
@@ -1096,7 +1096,7 @@ export function CompensationCreateView() {
                               onClick={() => removeAllowance(index)}
                               className="text-red-500 hover:text-red-700"
                             >
-                              <Trash2 className="w-4 h-4" />
+                              <Trash2 className="w-4 h-4" aria-hidden="true" />
                             </Button>
                           </div>
                           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -1144,7 +1144,7 @@ export function CompensationCreateView() {
                       onClick={addAllowance}
                       className="w-full rounded-xl"
                     >
-                      <Plus className="w-4 h-4 ms-1" />
+                      <Plus className="w-4 h-4 ms-1" aria-hidden="true" />
                       إضافة بدل
                     </Button>
                   </CardContent>
@@ -1162,7 +1162,7 @@ export function CompensationCreateView() {
                         <Award className="w-5 h-5 text-amber-500" />
                         التعويضات المتغيرة
                       </CardTitle>
-                      <ChevronDown className={cn("w-5 h-5 text-slate-400 transition-transform", openSections.includes('variable') && "rotate-180")} />
+                      <ChevronDown className={cn("w-5 h-5 text-slate-500 transition-transform", openSections.includes('variable') && "rotate-180")} />
                     </div>
                   </CardHeader>
                 </CollapsibleTrigger>
@@ -1244,7 +1244,7 @@ export function CompensationCreateView() {
                         <Scale className="w-5 h-5 text-indigo-500" />
                         تعويضات المحامي
                       </CardTitle>
-                      <ChevronDown className={cn("w-5 h-5 text-slate-400 transition-transform", openSections.includes('attorney') && "rotate-180")} />
+                      <ChevronDown className={cn("w-5 h-5 text-slate-500 transition-transform", openSections.includes('attorney') && "rotate-180")} />
                     </div>
                   </CardHeader>
                 </CollapsibleTrigger>
@@ -1331,7 +1331,7 @@ export function CompensationCreateView() {
                         <Clock className="w-5 h-5 text-cyan-500" />
                         مراجعة الراتب
                       </CardTitle>
-                      <ChevronDown className={cn("w-5 h-5 text-slate-400 transition-transform", openSections.includes('review') && "rotate-180")} />
+                      <ChevronDown className={cn("w-5 h-5 text-slate-500 transition-transform", openSections.includes('review') && "rotate-180")} />
                     </div>
                   </CardHeader>
                 </CollapsibleTrigger>
@@ -1392,7 +1392,7 @@ export function CompensationCreateView() {
                         <Shield className="w-5 h-5 text-red-500" />
                         الامتثال والتوافق
                       </CardTitle>
-                      <ChevronDown className={cn("w-5 h-5 text-slate-400 transition-transform", openSections.includes('compliance') && "rotate-180")} />
+                      <ChevronDown className={cn("w-5 h-5 text-slate-500 transition-transform", openSections.includes('compliance') && "rotate-180")} />
                     </div>
                   </CardHeader>
                 </CollapsibleTrigger>
@@ -1427,7 +1427,7 @@ export function CompensationCreateView() {
                         <MessageSquare className="w-5 h-5 text-gray-500" />
                         ملاحظات
                       </CardTitle>
-                      <ChevronDown className={cn("w-5 h-5 text-slate-400 transition-transform", openSections.includes('notes') && "rotate-180")} />
+                      <ChevronDown className={cn("w-5 h-5 text-slate-500 transition-transform", openSections.includes('notes') && "rotate-180")} />
                     </div>
                   </CardHeader>
                 </CollapsibleTrigger>

@@ -189,7 +189,7 @@ export function CreateRecurringView({ mode = 'create' }: CreateRecurringViewProp
                     <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-emerald-500/50 to-transparent"></div>
                 </Header>
                 <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 flex items-center justify-center">
-                    <Loader2 className="h-8 w-8 animate-spin text-emerald-500" />
+                    <Loader2 className="h-8 w-8 animate-spin text-emerald-500" aria-hidden="true" />
                 </Main>
             </>
         )
@@ -224,7 +224,7 @@ export function CreateRecurringView({ mode = 'create' }: CreateRecurringViewProp
                                     {/* Basic Information */}
                                     <div className="space-y-2">
                                         <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                            <FileText className="w-4 h-4 text-emerald-500" />
+                                            <FileText className="w-4 h-4 text-emerald-500" aria-hidden="true" />
                                             اسم المعاملة <span className="text-red-500">*</span>
                                         </label>
                                         <Input
@@ -261,7 +261,7 @@ export function CreateRecurringView({ mode = 'create' }: CreateRecurringViewProp
 
                                         <div className="space-y-2">
                                             <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                                <RefreshCw className="w-4 h-4 text-emerald-500" />
+                                                <RefreshCw className="w-4 h-4 text-emerald-500" aria-hidden="true" />
                                                 التكرار <span className="text-red-500">*</span>
                                             </label>
                                             <Select
@@ -370,7 +370,7 @@ export function CreateRecurringView({ mode = 'create' }: CreateRecurringViewProp
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                         <div className="space-y-2">
                                             <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                                <Calendar className="w-4 h-4 text-emerald-500" />
+                                                <Calendar className="w-4 h-4 text-emerald-500" aria-hidden="true" />
                                                 تاريخ البدء <span className="text-red-500">*</span>
                                             </label>
                                             <Input
@@ -383,7 +383,7 @@ export function CreateRecurringView({ mode = 'create' }: CreateRecurringViewProp
                                         </div>
                                         <div className="space-y-2">
                                             <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                                <Calendar className="w-4 h-4 text-emerald-500" />
+                                                <Calendar className="w-4 h-4 text-emerald-500" aria-hidden="true" />
                                                 تاريخ الانتهاء (اختياري)
                                             </label>
                                             <Input
@@ -477,7 +477,7 @@ export function CreateRecurringView({ mode = 'create' }: CreateRecurringViewProp
                                                 onClick={handleAddItem}
                                                 className="text-emerald-600 border-emerald-500"
                                             >
-                                                <Plus className="h-4 w-4 ms-2" />
+                                                <Plus className="h-4 w-4 ms-2" aria-hidden="true" />
                                                 إضافة بند
                                             </Button>
                                         </div>
@@ -628,7 +628,7 @@ export function CreateRecurringView({ mode = 'create' }: CreateRecurringViewProp
                                     {/* Notes */}
                                     <div className="space-y-2">
                                         <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                            <FileText className="w-4 h-4 text-emerald-500" />
+                                            <FileText className="w-4 h-4 text-emerald-500" aria-hidden="true" />
                                             ملاحظات إضافية
                                         </label>
                                         <Textarea
@@ -653,12 +653,12 @@ export function CreateRecurringView({ mode = 'create' }: CreateRecurringViewProp
                                     >
                                         {createMutation.isPending || updateMutation.isPending ? (
                                             <span className="flex items-center gap-2">
-                                                <Loader2 className="w-4 h-4 animate-spin" />
+                                                <Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" />
                                                 جاري الحفظ...
                                             </span>
                                         ) : (
                                             <span className="flex items-center gap-2">
-                                                <Save className="w-4 h-4" />
+                                                <Save className="w-4 h-4" aria-hidden="true" />
                                                 {isEditMode ? 'حفظ التعديلات' : 'حفظ المعاملة'}
                                             </span>
                                         )}

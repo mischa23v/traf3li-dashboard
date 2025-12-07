@@ -144,7 +144,7 @@ export function MonthCalendarView() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+        <div className="flex items-center gap-2 text-sm text-foreground/70">
           <span>المالية</span>
           <ArrowRight className="h-4 w-4 rotate-180" />
           <span>تتبع الوقت</span>
@@ -160,13 +160,13 @@ export function MonthCalendarView() {
           </Link>
           <Link to="/dashboard/finance/time-tracking/weekly">
             <Button variant="outline" size="sm">
-              <Calendar className="h-4 w-4 ms-2" />
+              <Calendar className="h-4 w-4 ms-2" aria-hidden="true" />
               أسبوعي
             </Button>
           </Link>
           <Link to="/dashboard/finance/time-tracking/new">
             <Button size="sm">
-              <Plus className="h-4 w-4 ms-2" />
+              <Plus className="h-4 w-4 ms-2" aria-hidden="true" />
               إضافة إدخال
             </Button>
           </Link>
@@ -179,10 +179,10 @@ export function MonthCalendarView() {
           <CardContent className="pt-6">
             <div className="flex items-center gap-4">
               <div className="p-3 bg-blue-100 rounded-lg">
-                <Clock className="h-6 w-6 text-blue-600" />
+                <Clock className="h-6 w-6 text-blue-600" aria-hidden="true" />
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">إجمالي الشهر</p>
+                <p className="text-sm text-slate-600">إجمالي الشهر</p>
                 <p className="text-2xl font-bold">{formatDuration(monthTotal)}</p>
               </div>
             </div>
@@ -193,10 +193,10 @@ export function MonthCalendarView() {
           <CardContent className="pt-6">
             <div className="flex items-center gap-4">
               <div className="p-3 bg-green-100 rounded-lg">
-                <Clock className="h-6 w-6 text-green-600" />
+                <Clock className="h-6 w-6 text-green-600" aria-hidden="true" />
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">قابل للفوترة</p>
+                <p className="text-sm text-slate-600">قابل للفوترة</p>
                 <p className="text-2xl font-bold text-green-600">{formatDuration(billableTotal)}</p>
               </div>
             </div>
@@ -207,10 +207,10 @@ export function MonthCalendarView() {
           <CardContent className="pt-6">
             <div className="flex items-center gap-4">
               <div className="p-3 bg-gray-100 rounded-lg">
-                <Clock className="h-6 w-6 text-gray-600" />
+                <Clock className="h-6 w-6 text-gray-600" aria-hidden="true" />
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">غير قابل للفوترة</p>
+                <p className="text-sm text-slate-600">غير قابل للفوترة</p>
                 <p className="text-2xl font-bold text-gray-600">{formatDuration(monthTotal - billableTotal)}</p>
               </div>
             </div>
@@ -221,10 +221,10 @@ export function MonthCalendarView() {
           <CardContent className="pt-6">
             <div className="flex items-center gap-4">
               <div className="p-3 bg-purple-100 rounded-lg">
-                <Calendar className="h-6 w-6 text-purple-600" />
+                <Calendar className="h-6 w-6 text-purple-600" aria-hidden="true" />
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">عدد الإدخالات</p>
+                <p className="text-sm text-slate-600">عدد الإدخالات</p>
                 <p className="text-2xl font-bold">{entries.length}</p>
               </div>
             </div>
@@ -237,13 +237,13 @@ export function MonthCalendarView() {
         <CardHeader className="flex flex-row items-center justify-between">
           <div className="flex items-center gap-4">
             <Button variant="outline" size="icon" onClick={goToPreviousMonth}>
-              <ChevronRight className="h-4 w-4" />
+              <ChevronRight className="h-4 w-4" aria-hidden="true" />
             </Button>
             <CardTitle>
               {arabicMonths[currentDate.getMonth()]} {currentDate.getFullYear()}
             </CardTitle>
             <Button variant="outline" size="icon" onClick={goToNextMonth}>
-              <ChevronLeft className="h-4 w-4" />
+              <ChevronLeft className="h-4 w-4" aria-hidden="true" />
             </Button>
             <Button variant="outline" size="sm" onClick={goToToday}>
               اليوم
@@ -268,7 +268,7 @@ export function MonthCalendarView() {
           {/* Day Headers */}
           <div className="grid grid-cols-7 gap-1 mb-2">
             {arabicDays.map((day) => (
-              <div key={day} className="text-center text-sm font-medium text-muted-foreground p-2">
+              <div key={day} className="text-center text-sm font-medium text-slate-600 p-2">
                 {day}
               </div>
             ))}
@@ -317,7 +317,7 @@ export function MonthCalendarView() {
                             </div>
                           ))}
                           {dayEntries.length > 2 && (
-                            <div className="text-xs text-muted-foreground">
+                            <div className="text-xs text-slate-600">
                               +{dayEntries.length - 2} أخرى
                             </div>
                           )}
@@ -335,7 +335,7 @@ export function MonthCalendarView() {
                       {dayEntries.length > 0 ? (
                         <>
                           <div className="flex justify-between text-sm">
-                            <span className="text-muted-foreground">إجمالي اليوم:</span>
+                            <span className="text-slate-600">إجمالي اليوم:</span>
                             <span className="font-bold">{formatDuration(totalDuration)}</span>
                           </div>
                           <div className="space-y-2">
@@ -349,7 +349,7 @@ export function MonthCalendarView() {
                                   <div>
                                     <p className="font-medium">{entry.description}</p>
                                     {entry.clientName && (
-                                      <p className="text-sm text-muted-foreground">{entry.clientName}</p>
+                                      <p className="text-sm text-slate-600">{entry.clientName}</p>
                                     )}
                                   </div>
                                   <div className="text-left">
@@ -364,7 +364,7 @@ export function MonthCalendarView() {
                           </div>
                         </>
                       ) : (
-                        <p className="text-center text-muted-foreground py-4">
+                        <p className="text-center text-slate-600 py-4">
                           لا توجد إدخالات في هذا اليوم
                         </p>
                       )}
@@ -372,7 +372,7 @@ export function MonthCalendarView() {
                         className="w-full"
                         onClick={() => navigate({ to: '/dashboard/finance/time-tracking/new' })}
                       >
-                        <Plus className="h-4 w-4 ms-2" />
+                        <Plus className="h-4 w-4 ms-2" aria-hidden="true" />
                         إضافة إدخال جديد
                       </Button>
                     </div>

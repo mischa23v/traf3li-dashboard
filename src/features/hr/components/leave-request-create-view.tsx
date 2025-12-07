@@ -454,11 +454,11 @@ export function LeaveRequestCreateView() {
 
                 <div className='ms-auto flex items-center gap-4'>
                     <div className="relative hidden md:block">
-                        <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                        <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
+                        <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
+                        <input type="text" placeholder="بحث..." aria-label="بحث" className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
                     </div>
-                    <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white">
-                        <Bell className="h-5 w-5" />
+                    <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white" aria-label="الإشعارات">
+                        <Bell className="h-5 w-5" aria-hidden="true" />
                         <span className="absolute top-2 right-2 h-2 w-2 bg-red-500 rounded-full border border-navy"></span>
                     </Button>
                     <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white" />
@@ -502,7 +502,7 @@ export function LeaveRequestCreateView() {
                     <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden mb-6">
                         <CardHeader className="pb-4">
                             <CardTitle className="text-lg font-bold text-navy flex items-center gap-2">
-                                <Building2 className="w-5 h-5 text-emerald-600" />
+                                <Building2 className="w-5 h-5 text-emerald-600" aria-hidden="true" />
                                 نوع المكتب
                             </CardTitle>
                             <p className="text-sm text-slate-500">اختر نوع المكتب لتخصيص خيارات الإجازة</p>
@@ -541,7 +541,7 @@ export function LeaveRequestCreateView() {
                     <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden mb-6">
                         <CardHeader className="pb-4">
                             <CardTitle className="text-lg font-bold text-navy flex items-center gap-2">
-                                <Palmtree className="w-5 h-5 text-emerald-600" />
+                                <Palmtree className="w-5 h-5 text-emerald-600" aria-hidden="true" />
                                 نوع الإجازة
                             </CardTitle>
                             <p className="text-sm text-slate-500">اختر نوع الإجازة حسب نظام العمل السعودي</p>
@@ -572,7 +572,7 @@ export function LeaveRequestCreateView() {
                                                 <p className="text-xs text-slate-500 mt-1">{type.maxDays} يوم</p>
                                             )}
                                             {type.article && (
-                                                <p className="text-xs text-slate-400">{type.article}</p>
+                                                <p className="text-xs text-slate-600">{type.article}</p>
                                             )}
                                         </button>
                                     )
@@ -585,7 +585,7 @@ export function LeaveRequestCreateView() {
                     <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden mb-6">
                         <CardHeader className="pb-4">
                             <CardTitle className="text-lg font-bold text-navy flex items-center gap-2">
-                                <Calendar className="w-5 h-5 text-emerald-600" />
+                                <Calendar className="w-5 h-5 text-emerald-600" aria-hidden="true" />
                                 تواريخ الإجازة
                             </CardTitle>
                         </CardHeader>
@@ -748,7 +748,7 @@ export function LeaveRequestCreateView() {
                                                     </Badge>
                                                 )}
                                             </CardTitle>
-                                            <ChevronDown className={`w-5 h-5 text-slate-400 transition-transform ${openSections.typeSpecific ? 'rotate-180' : ''}`} />
+                                            <ChevronDown className={`w-5 h-5 text-slate-500 transition-transform ${openSections.typeSpecific ? 'rotate-180' : ''}`} />
                                         </div>
                                     </CardHeader>
                                 </CollapsibleTrigger>
@@ -1007,10 +1007,10 @@ export function LeaveRequestCreateView() {
                                     <CardHeader className="cursor-pointer hover:bg-slate-50 transition-colors pb-4">
                                         <div className="flex items-center justify-between">
                                             <CardTitle className="text-lg font-bold text-navy flex items-center gap-2">
-                                                <Phone className="w-5 h-5 text-blue-600" />
+                                                <Phone className="w-5 h-5 text-blue-600" aria-hidden="true" />
                                                 التواصل أثناء الإجازة
                                             </CardTitle>
-                                            <ChevronDown className={`w-5 h-5 text-slate-400 transition-transform ${openSections.contact ? 'rotate-180' : ''}`} />
+                                            <ChevronDown className={`w-5 h-5 text-slate-500 transition-transform ${openSections.contact ? 'rotate-180' : ''}`} />
                                         </div>
                                     </CardHeader>
                                 </CollapsibleTrigger>
@@ -1105,7 +1105,7 @@ export function LeaveRequestCreateView() {
                                             <FileText className="w-5 h-5 text-slate-600" />
                                             ملاحظات إضافية
                                         </CardTitle>
-                                        <ChevronDown className={`w-5 h-5 text-slate-400 transition-transform ${openSections.notes ? 'rotate-180' : ''}`} />
+                                        <ChevronDown className={`w-5 h-5 text-slate-500 transition-transform ${openSections.notes ? 'rotate-180' : ''}`} />
                                     </div>
                                 </CardHeader>
                             </CollapsibleTrigger>

@@ -33,7 +33,7 @@ import { cn } from '@/lib/utils'
 import {
     Search, Bell, User, Wallet, Calendar, Briefcase, CreditCard, Loader2, CheckCircle,
     DollarSign, Clock, FileText, Building, Users, ChevronDown, Plus, Trash2, AlertCircle,
-    Building2, Calculator, Minus, TrendingDown
+    Building2, Calculator, Minus, TrendingDown, Lock
 } from 'lucide-react'
 import type { CreateSalarySlipData, PaymentMethod } from '@/services/payrollService'
 
@@ -353,11 +353,11 @@ export function PayrollCreateView() {
                 </div>
                 <div className='ms-auto flex items-center gap-4'>
                     <div className="relative hidden md:block">
-                        <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                        <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
+                        <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
+                        <input type="text" placeholder="بحث..." aria-label="بحث" className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
                     </div>
-                    <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white">
-                        <Bell className="h-5 w-5" />
+                    <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white" aria-label="الإشعارات">
+                        <Bell className="h-5 w-5" aria-hidden="true" />
                         <span className="absolute top-2 right-2 h-2 w-2 bg-red-500 rounded-full border border-navy"></span>
                     </Button>
                     <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white" />
@@ -384,7 +384,7 @@ export function PayrollCreateView() {
                             <Card className="rounded-3xl shadow-sm border-slate-100">
                                 <CardHeader className="pb-4">
                                     <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                                        <Building2 className="w-5 h-5 text-emerald-500" />
+                                        <Building2 className="w-5 h-5 text-emerald-500" aria-hidden="true" />
                                         نوع المكتب
                                     </CardTitle>
                                 </CardHeader>
@@ -469,7 +469,7 @@ export function PayrollCreateView() {
                             <Card className="rounded-3xl shadow-sm border-slate-100">
                                 <CardHeader className="pb-4">
                                     <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                                        <Calendar className="w-5 h-5 text-blue-500" />
+                                        <Calendar className="w-5 h-5 text-blue-500" aria-hidden="true" />
                                         فترة الراتب
                                     </CardTitle>
                                 </CardHeader>
@@ -560,14 +560,14 @@ export function PayrollCreateView() {
                                         <div className="flex items-center justify-between mb-4">
                                             <h4 className="font-semibold text-navy">البدلات والإضافات</h4>
                                             <Button type="button" variant="outline" size="sm" onClick={addAllowance} className="rounded-xl">
-                                                <Plus className="w-4 h-4 ms-1" />
+                                                <Plus className="w-4 h-4 ms-1" aria-hidden="true" />
                                                 إضافة
                                             </Button>
                                         </div>
 
                                         {allowances.length === 0 ? (
-                                            <div className="text-center py-6 text-slate-400 bg-slate-50 rounded-xl border-2 border-dashed border-slate-200">
-                                                <DollarSign className="w-8 h-8 mx-auto mb-2 opacity-50" />
+                                            <div className="text-center py-6 text-slate-500 bg-slate-50 rounded-xl border-2 border-dashed border-slate-200">
+                                                <DollarSign className="w-8 h-8 mx-auto mb-2 opacity-70" />
                                                 <p className="text-sm">لا توجد بدلات</p>
                                             </div>
                                         ) : (
@@ -608,7 +608,7 @@ export function PayrollCreateView() {
                                                             onClick={() => removeAllowance(allowance.id)}
                                                             className="text-red-500 hover:text-red-700 hover:bg-red-50"
                                                         >
-                                                            <Trash2 className="w-4 h-4" />
+                                                            <Trash2 className="w-4 h-4" aria-hidden="true" />
                                                         </Button>
                                                     </div>
                                                 ))}
@@ -650,7 +650,7 @@ export function PayrollCreateView() {
                                     <div className="bg-blue-50 rounded-xl p-4 border border-blue-100">
                                         <div className="flex items-center justify-between mb-3">
                                             <div className="flex items-center gap-2">
-                                                <AlertCircle className="w-5 h-5 text-blue-500" />
+                                                <AlertCircle className="w-5 h-5 text-blue-500" aria-hidden="true" />
                                                 <span className="font-semibold text-blue-800">التأمينات الاجتماعية (GOSI)</span>
                                             </div>
                                             <div className="flex items-center gap-2">
@@ -687,8 +687,8 @@ export function PayrollCreateView() {
                                         </div>
 
                                         {deductions.length === 0 ? (
-                                            <div className="text-center py-6 text-slate-400 bg-slate-50 rounded-xl border-2 border-dashed border-slate-200">
-                                                <Minus className="w-8 h-8 mx-auto mb-2 opacity-50" />
+                                            <div className="text-center py-6 text-slate-500 bg-slate-50 rounded-xl border-2 border-dashed border-slate-200">
+                                                <Minus className="w-8 h-8 mx-auto mb-2 opacity-70" />
                                                 <p className="text-sm">لا توجد خصومات إضافية</p>
                                             </div>
                                         ) : (
@@ -729,7 +729,7 @@ export function PayrollCreateView() {
                                                             onClick={() => removeDeduction(deduction.id)}
                                                             className="text-red-500 hover:text-red-700 hover:bg-red-50"
                                                         >
-                                                            <Trash2 className="w-4 h-4" />
+                                                            <Trash2 className="w-4 h-4" aria-hidden="true" />
                                                         </Button>
                                                     </div>
                                                 ))}
@@ -781,7 +781,7 @@ export function PayrollCreateView() {
                                                     <Clock className="w-5 h-5 text-purple-500" />
                                                     العمل الإضافي
                                                 </CardTitle>
-                                                <ChevronDown className={cn("w-5 h-5 text-slate-400 transition-transform", openSections.includes('overtime') && "rotate-180")} />
+                                                <ChevronDown className={cn("w-5 h-5 text-slate-500 transition-transform", openSections.includes('overtime') && "rotate-180")} />
                                             </div>
                                         </CardHeader>
                                     </CollapsibleTrigger>
@@ -834,7 +834,7 @@ export function PayrollCreateView() {
                                                     <CreditCard className="w-5 h-5 text-green-500" />
                                                     تفاصيل الدفع
                                                 </CardTitle>
-                                                <ChevronDown className={cn("w-5 h-5 text-slate-400 transition-transform", openSections.includes('payment') && "rotate-180")} />
+                                                <ChevronDown className={cn("w-5 h-5 text-slate-500 transition-transform", openSections.includes('payment') && "rotate-180")} />
                                             </div>
                                         </CardHeader>
                                     </CollapsibleTrigger>
@@ -875,7 +875,7 @@ export function PayrollCreateView() {
                                                     />
                                                 </div>
                                                 <div className="space-y-2">
-                                                    <Label className="text-navy font-medium">رقم الآيبان (IBAN)</Label>
+                                                    <Label className="text-navy font-medium">رقم الآيبان (IBAN)<Lock className="h-3 w-3 text-slate-500 inline ms-1" /></Label>
                                                     <Input
                                                         value={iban}
                                                         onChange={(e) => setIban(e.target.value)}
@@ -900,7 +900,7 @@ export function PayrollCreateView() {
                                                     <FileText className="w-5 h-5 text-amber-500" />
                                                     ملاحظات
                                                 </CardTitle>
-                                                <ChevronDown className={cn("w-5 h-5 text-slate-400 transition-transform", openSections.includes('notes') && "rotate-180")} />
+                                                <ChevronDown className={cn("w-5 h-5 text-slate-500 transition-transform", openSections.includes('notes') && "rotate-180")} />
                                             </div>
                                         </CardHeader>
                                     </CollapsibleTrigger>

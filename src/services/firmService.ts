@@ -39,7 +39,6 @@ const firmService = {
       )
       return response.data.data
     } catch (error: any) {
-      console.error('Get permissions error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -55,7 +54,6 @@ const firmService = {
       )
       return response.data.data
     } catch (error: any) {
-      console.error('Get roles error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -76,7 +74,6 @@ const firmService = {
       )
       return response.data.data
     } catch (error: any) {
-      console.error('Get team members error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -94,7 +91,6 @@ const firmService = {
       )
       return response.data.data
     } catch (error: any) {
-      console.error('Get departed members error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -115,7 +111,6 @@ const firmService = {
       )
       return response.data.data
     } catch (error: any) {
-      console.error('Process departure error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -134,7 +129,6 @@ const firmService = {
       )
       return response.data.data
     } catch (error: any) {
-      console.error('Reinstate member error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -155,7 +149,6 @@ const firmService = {
       )
       return response.data.data
     } catch (error: any) {
-      console.error('Update member role error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -180,7 +173,6 @@ const firmService = {
       )
       return response.data.data
     } catch (error: any) {
-      console.error('Invite member error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -193,7 +185,6 @@ const firmService = {
     try {
       await apiClient.delete(`/firms/${firmId}/members/${memberId}`)
     } catch (error: any) {
-      console.error('Remove member error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -209,7 +200,6 @@ const firmService = {
       )
       return response.data.data
     } catch (error: any) {
-      console.error('Get firm details error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -223,7 +213,6 @@ const firmService = {
       const response = await apiClient.get<ApiResponse<any>>('/firms/my')
       return response.data.data
     } catch (error: any) {
-      console.error('Get my firm error:', error)
       throw new Error(handleApiError(error))
     }
   },

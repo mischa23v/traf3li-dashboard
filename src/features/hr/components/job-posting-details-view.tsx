@@ -157,7 +157,7 @@ export function JobPostingDetailsView() {
         </Header>
         <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-6 rounded-tr-3xl shadow-inner border-r border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
           <div className="text-center py-12">
-            <AlertCircle className="w-16 h-16 text-red-300 mx-auto mb-4" />
+            <AlertCircle className="w-16 h-16 text-red-300 mx-auto mb-4" aria-hidden="true" />
             <h3 className="text-lg font-bold text-slate-700 mb-2">حدث خطأ</h3>
             <p className="text-slate-500">فشل في تحميل تفاصيل الوظيفة</p>
             <Button
@@ -187,11 +187,11 @@ export function JobPostingDetailsView() {
 
         <div className='ms-auto flex items-center gap-4'>
           <div className="relative hidden md:block">
-            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-            <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pr-9 pl-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
+            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
+            <input type="text" placeholder="بحث..." aria-label="بحث" className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pr-9 pl-4 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
           </div>
-          <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white">
-            <Bell className="h-5 w-5" />
+          <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white" aria-label="الإشعارات">
+            <Bell className="h-5 w-5" aria-hidden="true" />
           </Button>
           <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white" />
           <ThemeSwitch className="text-slate-300 hover:bg-white/10 hover:text-white" />
@@ -261,7 +261,7 @@ export function JobPostingDetailsView() {
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
                 <DropdownMenuItem>
-                  <Edit className="w-4 h-4 ms-2" />
+                  <Edit className="w-4 h-4 ms-2" aria-hidden="true" />
                   تعديل
                 </DropdownMenuItem>
                 <DropdownMenuItem>
@@ -333,7 +333,7 @@ export function JobPostingDetailsView() {
             <CardContent className="p-4">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center">
-                  <Calendar className="w-5 h-5 text-blue-600" />
+                  <Calendar className="w-5 h-5 text-blue-600" aria-hidden="true" />
                 </div>
                 <div>
                   <p className="text-xs text-slate-500">تاريخ النشر</p>
@@ -420,28 +420,28 @@ export function JobPostingDetailsView() {
               <Card className="border-none shadow-sm bg-white rounded-2xl">
                 <CardHeader className="pb-2">
                   <CardTitle className="text-base font-bold text-navy flex items-center gap-2">
-                    <Briefcase className="w-4 h-4 text-emerald-600" />
+                    <Briefcase className="w-4 h-4 text-emerald-600" aria-hidden="true" />
                     تفاصيل الوظيفة
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="flex items-center justify-between py-2 border-b border-slate-100">
                     <span className="text-slate-500 flex items-center gap-2">
-                      <Building2 className="w-4 h-4" />
+                      <Building2 className="w-4 h-4" aria-hidden="true" />
                       القسم
                     </span>
                     <span className="font-medium text-navy">{job.departmentNameAr || job.departmentName}</span>
                   </div>
                   <div className="flex items-center justify-between py-2 border-b border-slate-100">
                     <span className="text-slate-500 flex items-center gap-2">
-                      <MapPin className="w-4 h-4" />
+                      <MapPin className="w-4 h-4" aria-hidden="true" />
                       الموقع
                     </span>
                     <span className="font-medium text-navy">{job.location}</span>
                   </div>
                   <div className="flex items-center justify-between py-2 border-b border-slate-100">
                     <span className="text-slate-500 flex items-center gap-2">
-                      <Briefcase className="w-4 h-4" />
+                      <Briefcase className="w-4 h-4" aria-hidden="true" />
                       نوع التوظيف
                     </span>
                     <span className="font-medium text-navy">{EMPLOYMENT_TYPE_LABELS[job.employmentType]?.ar}</span>
@@ -656,7 +656,7 @@ export function JobPostingDetailsView() {
                 <Card className="border-none shadow-sm bg-white rounded-2xl">
                   <CardHeader className="pb-2">
                     <CardTitle className="text-base font-bold text-navy flex items-center gap-2">
-                      <Calendar className="w-4 h-4 text-emerald-600" />
+                      <Calendar className="w-4 h-4 text-emerald-600" aria-hidden="true" />
                       الإجازات
                     </CardTitle>
                   </CardHeader>
@@ -712,7 +712,7 @@ export function JobPostingDetailsView() {
                               {stage.stageType === 'onboarding' && 'التهيئة'}
                             </p>
                             {stage.duration && (
-                              <p className="text-xs text-slate-400 mt-1">المدة المتوقعة: {stage.duration} أيام</p>
+                              <p className="text-xs text-slate-600 mt-1">المدة المتوقعة: {stage.duration} أيام</p>
                             )}
                           </div>
                         </div>
@@ -739,7 +739,7 @@ export function JobPostingDetailsView() {
                     onClick={() => navigate({ to: '/dashboard/hr/recruitment/applicants/new', search: { jobId } })}
                     className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl"
                   >
-                    <Plus className="w-4 h-4 ms-2" />
+                    <Plus className="w-4 h-4 ms-2" aria-hidden="true" />
                     إضافة متقدم
                   </Button>
                 </div>
@@ -788,7 +788,7 @@ export function JobPostingDetailsView() {
                               {statusConfig?.ar || applicant.status}
                             </Badge>
                             <Button variant="ghost" size="icon" className="rounded-xl">
-                              <Eye className="w-4 h-4" />
+                              <Eye className="w-4 h-4" aria-hidden="true" />
                             </Button>
                           </div>
                         </div>
@@ -817,7 +817,7 @@ export function JobPostingDetailsView() {
               <Card className="border-none shadow-sm bg-white rounded-2xl">
                 <CardHeader className="pb-2">
                   <CardTitle className="text-base font-bold text-navy flex items-center gap-2">
-                    <TrendingUp className="w-4 h-4 text-purple-600" />
+                    <TrendingUp className="w-4 h-4 text-purple-600" aria-hidden="true" />
                     توزيع المتقدمين حسب المرحلة
                   </CardTitle>
                 </CardHeader>

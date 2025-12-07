@@ -84,7 +84,6 @@ const calendarService = {
       })
       return response.data
     } catch (error: any) {
-      console.error('Get calendar error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -99,7 +98,6 @@ const calendarService = {
       )
       return response.data
     } catch (error: any) {
-      console.error('Get calendar by date error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -117,7 +115,6 @@ const calendarService = {
       )
       return response.data
     } catch (error: any) {
-      console.error('Get calendar by month error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -135,7 +132,6 @@ const calendarService = {
       )
       return response.data
     } catch (error: any) {
-      console.error('Get upcoming items error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -150,7 +146,6 @@ const calendarService = {
       )
       return response.data
     } catch (error: any) {
-      console.error('Get overdue items error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -168,7 +163,6 @@ const calendarService = {
       })
       return response.data
     } catch (error: any) {
-      console.error('Get calendar stats error:', error)
       throw new Error(handleApiError(error))
     }
   },

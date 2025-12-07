@@ -217,7 +217,6 @@ function QuickLogDialog({ trigger }: { trigger: React.ReactNode }) {
 
   const handleSubmit = () => {
     // This would call the API to create the activity
-    console.log({ type: selectedType, title, description, callOutcome, duration })
     setOpen(false)
     // Reset form
     setTitle('')

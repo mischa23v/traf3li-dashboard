@@ -249,11 +249,11 @@ export default function FiscalPeriodsDashboard() {
           </div>
           <div className='ms-auto flex items-center gap-4'>
             <div className="relative hidden md:block">
-              <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+              <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" aria-hidden="true" />
               <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
             </div>
-            <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white">
-              <Bell className="h-5 w-5" />
+            <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white" aria-label="الإشعارات">
+                        <Bell className="h-5 w-5" aria-hidden="true" />
               <span className="absolute top-2 right-2 h-2 w-2 bg-red-500 rounded-full border border-navy"></span>
             </Button>
             <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white" />
@@ -291,7 +291,7 @@ export default function FiscalPeriodsDashboard() {
 
         <div className='ms-auto flex items-center gap-4'>
           <div className="relative hidden md:block">
-            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" aria-hidden="true" />
             <input
               type="text"
               placeholder="بحث في الفترات..."
@@ -300,8 +300,8 @@ export default function FiscalPeriodsDashboard() {
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
-          <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white">
-            <Bell className="h-5 w-5" />
+          <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white" aria-label="الإشعارات">
+                        <Bell className="h-5 w-5" aria-hidden="true" />
             <span className="absolute top-2 right-2 h-2 w-2 bg-red-500 rounded-full border border-navy"></span>
           </Button>
           <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white" />
@@ -326,7 +326,7 @@ export default function FiscalPeriodsDashboard() {
             <Dialog open={yearEndWizardOpen} onOpenChange={setYearEndWizardOpen}>
               <DialogTrigger asChild>
                 <Button variant="outline" className="bg-white/5 border-white/10 text-white hover:bg-white/10 rounded-xl h-10 px-5 backdrop-blur-sm">
-                  <Calendar className="w-4 h-4 ms-2" />
+                  <Calendar className="w-4 h-4 ms-2" aria-hidden="true" />
                   إغلاق نهاية السنة
                 </Button>
               </DialogTrigger>
@@ -360,7 +360,7 @@ export default function FiscalPeriodsDashboard() {
                   {selectedYearForClosing && periodsByYear[selectedYearForClosing] && (
                     <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
                       <div className="flex items-start gap-3">
-                        <AlertCircle className="w-5 h-5 text-amber-600 mt-0.5" />
+                        <AlertCircle className="w-5 h-5 text-amber-600 mt-0.5" aria-hidden="true" />
                         <div className="text-sm text-amber-900">
                           <p className="font-bold mb-2">تحذير: هذا الإجراء لا يمكن التراجع عنه</p>
                           <ul className="space-y-1 text-xs">
@@ -389,7 +389,7 @@ export default function FiscalPeriodsDashboard() {
                   >
                     {yearEndClosing.isPending ? (
                       <>
-                        <Loader2 className="w-4 h-4 ms-2 animate-spin" />
+                        <Loader2 className="w-4 h-4 ms-2 animate-spin" aria-hidden="true" />
                         جاري الإغلاق...
                       </>
                     ) : (
@@ -406,7 +406,7 @@ export default function FiscalPeriodsDashboard() {
             <Dialog open={createYearOpen} onOpenChange={setCreateYearOpen}>
               <DialogTrigger asChild>
                 <Button className="bg-emerald-500 hover:bg-emerald-600 text-white border-0 shadow-lg shadow-emerald-500/20 rounded-xl h-10 px-5 font-bold">
-                  <Plus className="w-4 h-4 ms-2" />
+                  <Plus className="w-4 h-4 ms-2" aria-hidden="true" />
                   سنة مالية جديدة
                 </Button>
               </DialogTrigger>
@@ -456,7 +456,7 @@ export default function FiscalPeriodsDashboard() {
 
                   <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
                     <div className="flex items-start gap-3">
-                      <FileText className="w-5 h-5 text-blue-600 mt-0.5" />
+                      <FileText className="w-5 h-5 text-blue-600 mt-0.5" aria-hidden="true" />
                       <div className="text-sm text-blue-900">
                         <p className="font-medium">معلومة:</p>
                         <p className="text-xs mt-1">
@@ -482,12 +482,12 @@ export default function FiscalPeriodsDashboard() {
                   >
                     {createFiscalYear.isPending ? (
                       <>
-                        <Loader2 className="w-4 h-4 ms-2 animate-spin" />
+                        <Loader2 className="w-4 h-4 ms-2 animate-spin" aria-hidden="true" />
                         جاري الإنشاء...
                       </>
                     ) : (
                       <>
-                        <Plus className="w-4 h-4 ms-2" />
+                        <Plus className="w-4 h-4 ms-2" aria-hidden="true" />
                         إنشاء السنة المالية
                       </>
                     )}
@@ -542,7 +542,7 @@ export default function FiscalPeriodsDashboard() {
             {filteredYears.length === 0 ? (
               <div className="bg-white rounded-3xl p-12 text-center border border-slate-100 shadow-sm">
                 <div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Calendar className="h-8 w-8 text-brand-blue" />
+                  <Calendar className="h-8 w-8 text-brand-blue" aria-hidden="true" />
                 </div>
                 <h3 className="text-xl font-bold text-slate-900 mb-2">لا توجد فترات مالية</h3>
                 <p className="text-slate-500 mb-6">ابدأ بإنشاء سنة مالية جديدة</p>
@@ -550,7 +550,7 @@ export default function FiscalPeriodsDashboard() {
                   onClick={() => setCreateYearOpen(true)}
                   className="bg-brand-blue hover:bg-blue-600 text-white px-8"
                 >
-                  <Plus className="ms-2 h-4 w-4" />
+                  <Plus className="ms-2 h-4 w-4" aria-hidden="true" />
                   إنشاء سنة مالية
                 </Button>
               </div>
@@ -594,7 +594,7 @@ export default function FiscalPeriodsDashboard() {
                             }}
                             className="rounded-xl"
                           >
-                            <Calendar className="w-4 h-4 ms-2" />
+                            <Calendar className="w-4 h-4 ms-2" aria-hidden="true" />
                             إغلاق السنة
                           </Button>
                         </div>
@@ -617,8 +617,8 @@ export default function FiscalPeriodsDashboard() {
                                 </div>
                                 <DropdownMenu>
                                   <DropdownMenuTrigger asChild>
-                                    <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full">
-                                      <MoreHorizontal className="w-4 h-4" />
+                                    <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full" aria-label="خيارات">
+                                    <MoreHorizontal className="w-4 h-4" aria-hidden="true" />
                                     </Button>
                                   </DropdownMenuTrigger>
                                   <DropdownMenuContent align="end">
@@ -751,7 +751,7 @@ export default function FiscalPeriodsDashboard() {
                   <CardContent className="p-4">
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 rounded-xl bg-purple-50 flex items-center justify-center">
-                        <FileText className="w-5 h-5 text-purple-600" />
+                        <FileText className="w-5 h-5 text-purple-600" aria-hidden="true" />
                       </div>
                       <div>
                         <p className="text-xs text-slate-500">الإيرادات</p>
@@ -767,7 +767,7 @@ export default function FiscalPeriodsDashboard() {
                   <CardContent className="p-4">
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center">
-                        <FileText className="w-5 h-5 text-amber-600" />
+                        <FileText className="w-5 h-5 text-amber-600" aria-hidden="true" />
                       </div>
                       <div>
                         <p className="text-xs text-slate-500">المصروفات</p>
@@ -799,7 +799,7 @@ export default function FiscalPeriodsDashboard() {
               <div className={`rounded-xl p-4 flex items-center gap-3 ${balancesData.isBalanced ? 'bg-emerald-50 border border-emerald-200' : 'bg-red-50 border border-red-200'}`}>
                 {balancesData.isBalanced ? (
                   <>
-                    <CheckCircle className="w-5 h-5 text-emerald-600" />
+                    <CheckCircle className="w-5 h-5 text-emerald-600" aria-hidden="true" />
                     <div className="text-sm text-emerald-900">
                       <p className="font-bold">الميزانية متوازنة</p>
                       <p className="text-xs">الأصول = الخصوم + حقوق الملكية</p>
@@ -818,7 +818,7 @@ export default function FiscalPeriodsDashboard() {
             </div>
           ) : (
             <div className="py-12 text-center">
-              <Loader2 className="w-8 h-8 animate-spin text-slate-400 mx-auto mb-3" />
+              <Loader2 className="w-8 h-8 animate-spin text-slate-400 mx-auto mb-3" aria-hidden="true" />
               <p className="text-slate-500">جاري تحميل الأرصدة...</p>
             </div>
           )}

@@ -578,7 +578,6 @@ const tasksService = {
         pagination: response.data.pagination || {}
       }
     } catch (error: any) {
-      console.error('Get tasks error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -591,7 +590,6 @@ const tasksService = {
       const response = await apiClient.get(`/tasks/${id}`)
       return response.data.task || response.data.data
     } catch (error: any) {
-      console.error('Get task error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -604,7 +602,6 @@ const tasksService = {
       const response = await apiClient.post('/tasks', data)
       return response.data.task || response.data.data
     } catch (error: any) {
-      console.error('Create task error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -617,7 +614,6 @@ const tasksService = {
       const response = await apiClient.put(`/tasks/${id}`, data)
       return response.data.task || response.data.data
     } catch (error: any) {
-      console.error('Update task error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -629,7 +625,6 @@ const tasksService = {
     try {
       await apiClient.delete(`/tasks/${id}`)
     } catch (error: any) {
-      console.error('Delete task error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -644,7 +639,6 @@ const tasksService = {
       const response = await apiClient.patch(`/tasks/${id}/status`, { status })
       return response.data.task || response.data.data
     } catch (error: any) {
-      console.error('Update task status error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -660,7 +654,6 @@ const tasksService = {
       const response = await apiClient.patch(`/tasks/${id}/progress`, payload)
       return response.data.task || response.data.data
     } catch (error: any) {
-      console.error('Update task progress error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -673,7 +666,6 @@ const tasksService = {
       const response = await apiClient.post(`/tasks/${id}/complete`, { completionNotes })
       return response.data.task || response.data.data
     } catch (error: any) {
-      console.error('Complete task error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -686,7 +678,6 @@ const tasksService = {
       const response = await apiClient.post(`/tasks/${id}/reopen`)
       return response.data.task || response.data.data
     } catch (error: any) {
-      console.error('Reopen task error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -701,7 +692,6 @@ const tasksService = {
       const response = await apiClient.post(`/tasks/${taskId}/subtasks`, subtask)
       return response.data.task || response.data.data
     } catch (error: any) {
-      console.error('Add subtask error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -714,7 +704,6 @@ const tasksService = {
       const response = await apiClient.patch(`/tasks/${taskId}/subtasks/${subtaskId}`, data)
       return response.data.task || response.data.data
     } catch (error: any) {
-      console.error('Update subtask error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -727,7 +716,6 @@ const tasksService = {
       const response = await apiClient.post(`/tasks/${taskId}/subtasks/${subtaskId}/toggle`)
       return response.data.task || response.data.data
     } catch (error: any) {
-      console.error('Toggle subtask error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -740,7 +728,6 @@ const tasksService = {
       const response = await apiClient.delete(`/tasks/${taskId}/subtasks/${subtaskId}`)
       return response.data.task || response.data.data
     } catch (error: any) {
-      console.error('Delete subtask error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -753,7 +740,6 @@ const tasksService = {
       const response = await apiClient.patch(`/tasks/${taskId}/subtasks/reorder`, { subtaskIds })
       return response.data.task || response.data.data
     } catch (error: any) {
-      console.error('Reorder subtasks error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -768,7 +754,6 @@ const tasksService = {
       const response = await apiClient.post(`/tasks/${taskId}/time-tracking/start`)
       return response.data.task || response.data.data
     } catch (error: any) {
-      console.error('Start time tracking error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -781,7 +766,6 @@ const tasksService = {
       const response = await apiClient.post(`/tasks/${taskId}/time-tracking/stop`, { notes })
       return response.data.task || response.data.data
     } catch (error: any) {
-      console.error('Stop time tracking error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -794,7 +778,6 @@ const tasksService = {
       const response = await apiClient.post(`/tasks/${taskId}/time-tracking/manual`, data)
       return response.data.task || response.data.data
     } catch (error: any) {
-      console.error('Add time entry error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -807,7 +790,6 @@ const tasksService = {
       const response = await apiClient.get(`/tasks/${taskId}/time-tracking`)
       return response.data
     } catch (error: any) {
-      console.error('Get time tracking summary error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -822,7 +804,6 @@ const tasksService = {
       const response = await apiClient.post(`/tasks/${taskId}/comments`, { text, mentions })
       return response.data.task || response.data.data
     } catch (error: any) {
-      console.error('Add comment error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -835,7 +816,6 @@ const tasksService = {
       const response = await apiClient.patch(`/tasks/${taskId}/comments/${commentId}`, { text })
       return response.data.task || response.data.data
     } catch (error: any) {
-      console.error('Update comment error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -848,7 +828,6 @@ const tasksService = {
       const response = await apiClient.delete(`/tasks/${taskId}/comments/${commentId}`)
       return response.data.task || response.data.data
     } catch (error: any) {
-      console.error('Delete comment error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -878,7 +857,6 @@ const tasksService = {
       })
       return response.data.attachment || response.data.data
     } catch (error: any) {
-      console.error('Upload attachment error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -900,7 +878,6 @@ const tasksService = {
       )
       return response.data.downloadUrl
     } catch (error: any) {
-      console.error('Get attachment download URL error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -917,7 +894,6 @@ const tasksService = {
       )
       return response.data.downloadUrl
     } catch (error: any) {
-      console.error('Get attachment preview URL error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -929,7 +905,6 @@ const tasksService = {
     try {
       await apiClient.delete(`/tasks/${taskId}/attachments/${attachmentId}`)
     } catch (error: any) {
-      console.error('Delete attachment error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -949,7 +924,6 @@ const tasksService = {
       )
       return response.data
     } catch (error: any) {
-      console.error('Get attachment versions error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -976,7 +950,6 @@ const tasksService = {
       )
       return response.data
     } catch (error: any) {
-      console.error('Get attachment version download URL error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -1013,7 +986,6 @@ const tasksService = {
       })
       return response.data.task || response.data.data
     } catch (error: any) {
-      console.error('Add dependency error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -1026,7 +998,6 @@ const tasksService = {
       const response = await apiClient.delete(`/tasks/${taskId}/dependencies/${dependencyTaskId}`)
       return response.data.task || response.data.data
     } catch (error: any) {
-      console.error('Remove dependency error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -1039,7 +1010,6 @@ const tasksService = {
       const response = await apiClient.get(`/tasks/${taskId}/available-dependencies`)
       return response.data.tasks || response.data.data || []
     } catch (error: any) {
-      console.error('Get available dependencies error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -1054,7 +1024,6 @@ const tasksService = {
       const response = await apiClient.post(`/tasks/${taskId}/workflow-rules`, rule)
       return response.data.task || response.data.data
     } catch (error: any) {
-      console.error('Add workflow rule error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -1067,7 +1036,6 @@ const tasksService = {
       const response = await apiClient.patch(`/tasks/${taskId}/workflow-rules/${ruleId}`, rule)
       return response.data.task || response.data.data
     } catch (error: any) {
-      console.error('Update workflow rule error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -1080,7 +1048,6 @@ const tasksService = {
       const response = await apiClient.delete(`/tasks/${taskId}/workflow-rules/${ruleId}`)
       return response.data.task || response.data.data
     } catch (error: any) {
-      console.error('Delete workflow rule error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -1093,7 +1060,6 @@ const tasksService = {
       const response = await apiClient.post(`/tasks/${taskId}/workflow-rules/${ruleId}/toggle`)
       return response.data.task || response.data.data
     } catch (error: any) {
-      console.error('Toggle workflow rule error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -1108,7 +1074,6 @@ const tasksService = {
       const response = await apiClient.patch(`/tasks/${taskId}/outcome`, outcome)
       return response.data.task || response.data.data
     } catch (error: any) {
-      console.error('Update outcome error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -1123,7 +1088,6 @@ const tasksService = {
       const response = await apiClient.patch(`/tasks/${taskId}/estimate`, estimate)
       return response.data.task || response.data.data
     } catch (error: any) {
-      console.error('Update estimate error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -1147,7 +1111,6 @@ const tasksService = {
       const response = await apiClient.get(`/tasks/${taskId}/time-tracking/summary`)
       return response.data
     } catch (error: any) {
-      console.error('Get time tracking details error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -1162,7 +1125,6 @@ const tasksService = {
       const response = await apiClient.get('/tasks/upcoming', { params: { days } })
       return response.data.tasks || response.data.data || []
     } catch (error: any) {
-      console.error('Get upcoming tasks error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -1175,7 +1137,6 @@ const tasksService = {
       const response = await apiClient.get('/tasks/overdue')
       return response.data.tasks || response.data.data || []
     } catch (error: any) {
-      console.error('Get overdue tasks error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -1188,7 +1149,6 @@ const tasksService = {
       const response = await apiClient.get('/tasks/due-today')
       return response.data.tasks || response.data.data || []
     } catch (error: any) {
-      console.error('Get due today tasks error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -1204,7 +1164,6 @@ const tasksService = {
         total: response.data.total || 0
       }
     } catch (error: any) {
-      console.error('Get my tasks error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -1217,7 +1176,6 @@ const tasksService = {
       const response = await apiClient.get('/tasks/stats', { params: filters })
       return response.data.stats || response.data.data
     } catch (error: any) {
-      console.error('Get task stats error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -1232,7 +1190,6 @@ const tasksService = {
       const response = await apiClient.get('/tasks/templates')
       return response.data.templates || response.data.data || []
     } catch (error: any) {
-      console.error('Get templates error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -1245,7 +1202,6 @@ const tasksService = {
       const response = await apiClient.post(`/tasks/templates/${templateId}/create`, overrides)
       return response.data.task || response.data.data
     } catch (error: any) {
-      console.error('Create from template error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -1258,7 +1214,6 @@ const tasksService = {
       const response = await apiClient.post(`/tasks/${taskId}/save-as-template`, { name: templateName })
       return response.data.template || response.data.data
     } catch (error: any) {
-      console.error('Save as template error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -1273,7 +1228,6 @@ const tasksService = {
       const response = await apiClient.patch('/tasks/bulk', { taskIds, ...data })
       return response.data
     } catch (error: any) {
-      console.error('Bulk update error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -1286,7 +1240,6 @@ const tasksService = {
       const response = await apiClient.delete('/tasks/bulk', { data: { taskIds } })
       return response.data
     } catch (error: any) {
-      console.error('Bulk delete error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -1299,7 +1252,6 @@ const tasksService = {
       const response = await apiClient.post('/tasks/bulk/complete', { taskIds })
       return response.data
     } catch (error: any) {
-      console.error('Bulk complete error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -1312,7 +1264,6 @@ const tasksService = {
       const response = await apiClient.post('/tasks/bulk/assign', { taskIds, assignedTo })
       return response.data
     } catch (error: any) {
-      console.error('Bulk assign error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -1331,7 +1282,6 @@ const tasksService = {
       })
       return response.data
     } catch (error: any) {
-      console.error('Import tasks error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -1347,7 +1297,6 @@ const tasksService = {
       })
       return response.data
     } catch (error: any) {
-      console.error('Export tasks error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -1362,7 +1311,6 @@ const tasksService = {
       const response = await apiClient.post(`/tasks/${taskId}/recurring/skip`)
       return response.data.task || response.data.data
     } catch (error: any) {
-      console.error('Skip recurrence error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -1375,7 +1323,6 @@ const tasksService = {
       const response = await apiClient.post(`/tasks/${taskId}/recurring/stop`)
       return response.data.task || response.data.data
     } catch (error: any) {
-      console.error('Stop recurrence error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -1388,7 +1335,6 @@ const tasksService = {
       const response = await apiClient.get(`/tasks/${taskId}/recurring/history`)
       return response.data
     } catch (error: any) {
-      console.error('Get recurrence history error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -1413,7 +1359,6 @@ const tasksService = {
       })
       return response.data
     } catch (error: any) {
-      console.error('Create document error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -1429,10 +1374,8 @@ const tasksService = {
     } catch (error: any) {
       // Handle 404 gracefully
       if (error?.response?.status === 404) {
-        console.warn('Document not found:', documentId)
         return { document: null }
       }
-      console.error('Get document error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -1452,7 +1395,6 @@ const tasksService = {
       })
       return response.data
     } catch (error: any) {
-      console.error('Update document error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -1469,7 +1411,6 @@ const tasksService = {
       if (error?.response?.status === 404 || error?.status === 404 || error?.status === '404') {
         return
       }
-      console.error('Delete document error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -1485,10 +1426,8 @@ const tasksService = {
     } catch (error: any) {
       // Handle 404 gracefully - endpoint may not be implemented yet
       if (error?.response?.status === 404) {
-        console.warn('Documents endpoint not available for task:', taskId)
         return { documents: [] }
       }
-      console.error('Get documents error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -1515,7 +1454,6 @@ const tasksService = {
       })
       return response.data
     } catch (error: any) {
-      console.error('Upload voice memo error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -1534,7 +1472,6 @@ const tasksService = {
       })
       return response.data
     } catch (error: any) {
-      console.error('Update voice memo transcription error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -1546,7 +1483,6 @@ const tasksService = {
     try {
       await apiClient.delete(`/tasks/${taskId}/voice-memos/${memoId}`)
     } catch (error: any) {
-      console.error('Delete voice memo error:', error)
       throw new Error(handleApiError(error))
     }
   },

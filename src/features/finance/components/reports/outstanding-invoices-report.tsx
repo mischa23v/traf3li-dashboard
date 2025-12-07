@@ -103,7 +103,7 @@ export function OutstandingInvoicesReport() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+        <div className="flex items-center gap-2 text-sm text-foreground/70">
           <span>المالية</span>
           <ArrowRight className="h-4 w-4 rotate-180" />
           <span>التقارير</span>
@@ -112,15 +112,15 @@ export function OutstandingInvoicesReport() {
         </div>
         <div className="flex gap-2">
           <Button variant="outline" size="sm" onClick={() => setShowFilters(!showFilters)}>
-            <Filter className="h-4 w-4 ms-2" />
+            <Filter className="h-4 w-4 ms-2" aria-hidden="true" />
             فلترة
           </Button>
           <Button variant="outline" size="sm" onClick={() => handleExport('csv')}>
-            <Download className="h-4 w-4 ms-2" />
+            <Download className="h-4 w-4 ms-2" aria-hidden="true" />
             CSV
           </Button>
           <Button variant="outline" size="sm" onClick={() => handleExport('pdf')}>
-            <FileText className="h-4 w-4 ms-2" />
+            <FileText className="h-4 w-4 ms-2" aria-hidden="true" />
             PDF
           </Button>
         </div>
@@ -185,10 +185,10 @@ export function OutstandingInvoicesReport() {
           <CardContent className="pt-6">
             <div className="flex items-center gap-4">
               <div className="p-3 bg-blue-100 rounded-lg">
-                <FileText className="h-6 w-6 text-blue-600" />
+                <FileText className="h-6 w-6 text-blue-600" aria-hidden="true" />
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">إجمالي المستحق</p>
+                <p className="text-sm text-slate-600">إجمالي المستحق</p>
                 <p className="text-2xl font-bold">{data.summary.totalOutstanding.toLocaleString('ar-SA')} ر.س</p>
               </div>
             </div>
@@ -202,7 +202,7 @@ export function OutstandingInvoicesReport() {
                 <AlertTriangle className="h-6 w-6 text-red-600" />
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">إجمالي المتأخر</p>
+                <p className="text-sm text-slate-600">إجمالي المتأخر</p>
                 <p className="text-2xl font-bold text-red-600">{data.summary.totalOverdue.toLocaleString('ar-SA')} ر.س</p>
               </div>
             </div>
@@ -213,10 +213,10 @@ export function OutstandingInvoicesReport() {
           <CardContent className="pt-6">
             <div className="flex items-center gap-4">
               <div className="p-3 bg-yellow-100 rounded-lg">
-                <Clock className="h-6 w-6 text-yellow-600" />
+                <Clock className="h-6 w-6 text-yellow-600" aria-hidden="true" />
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">قريبة الاستحقاق</p>
+                <p className="text-sm text-slate-600">قريبة الاستحقاق</p>
                 <p className="text-2xl font-bold text-yellow-600">{data.summary.totalDueSoon.toLocaleString('ar-SA')} ر.س</p>
               </div>
             </div>
@@ -227,10 +227,10 @@ export function OutstandingInvoicesReport() {
           <CardContent className="pt-6">
             <div className="flex items-center gap-4">
               <div className="p-3 bg-gray-100 rounded-lg">
-                <FileText className="h-6 w-6 text-gray-600" />
+                <FileText className="h-6 w-6 text-gray-600" aria-hidden="true" />
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">عدد الفواتير</p>
+                <p className="text-sm text-slate-600">عدد الفواتير</p>
                 <p className="text-2xl font-bold">{data.summary.invoiceCount}</p>
                 <p className="text-xs text-red-600">{data.summary.overdueCount} متأخرة</p>
               </div>
@@ -285,10 +285,10 @@ export function OutstandingInvoicesReport() {
                         size="sm"
                         onClick={() => navigate({ to: '/dashboard/finance/invoices/$invoiceId', params: { invoiceId: invoice.id } })}
                       >
-                        <Eye className="h-4 w-4" />
+                        <Eye className="h-4 w-4" aria-hidden="true" />
                       </Button>
                       <Button variant="ghost" size="sm">
-                        <Send className="h-4 w-4" />
+                        <Send className="h-4 w-4" aria-hidden="true" />
                       </Button>
                     </div>
                   </TableCell>
@@ -310,7 +310,7 @@ export function OutstandingInvoicesReport() {
               <div key={index} className="flex items-center justify-between p-4 bg-muted/50 rounded-lg">
                 <div>
                   <p className="font-medium">{client}</p>
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-sm text-slate-600">
                     {index + 1} فاتورة {index < 2 ? 'متأخرة' : 'مستحقة'}
                   </p>
                 </div>

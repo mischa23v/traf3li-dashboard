@@ -134,11 +134,11 @@ export function OrganizationalStructureDetailsView() {
         </div>
         <div className='ms-auto flex items-center gap-4'>
           <div className="relative hidden md:block">
-            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-            <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
+            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
+            <input type="text" placeholder="بحث..." aria-label="بحث" className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
           </div>
-          <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white">
-            <Bell className="h-5 w-5" />
+          <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white" aria-label="الإشعارات">
+            <Bell className="h-5 w-5" aria-hidden="true" />
             <span className="absolute top-2 right-2 h-2 w-2 bg-red-500 rounded-full border border-navy"></span>
           </Button>
           <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white" />
@@ -171,7 +171,7 @@ export function OrganizationalStructureDetailsView() {
             ) : error || !unit ? (
               <Card className="rounded-2xl border-slate-100">
                 <CardContent className="p-8 text-center">
-                  <AlertCircle className="w-12 h-12 mx-auto text-red-500 mb-4" />
+                  <AlertCircle className="w-12 h-12 mx-auto text-red-500 mb-4" aria-hidden="true" />
                   <p className="text-red-600">حدث خطأ في تحميل بيانات الوحدة</p>
                   <Button
                     onClick={() => navigate({ to: '/dashboard/hr/organizational-structure' })}
@@ -212,17 +212,17 @@ export function OrganizationalStructureDetailsView() {
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button variant="outline" size="icon" className="rounded-xl">
-                          <MoreHorizontal className="w-4 h-4" />
+                          <MoreHorizontal className="w-4 h-4" aria-hidden="true" />
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
                         <DropdownMenuItem onClick={() => navigate({ to: `/dashboard/hr/organizational-structure/new?editId=${unit._id}` })}>
-                          <Edit className="w-4 h-4 ms-2" />
+                          <Edit className="w-4 h-4 ms-2" aria-hidden="true" />
                           تعديل
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem className="text-red-600" onClick={handleDelete}>
-                          <Trash2 className="w-4 h-4 ms-2" />
+                          <Trash2 className="w-4 h-4 ms-2" aria-hidden="true" />
                           حذف
                         </DropdownMenuItem>
                       </DropdownMenuContent>
@@ -431,7 +431,7 @@ export function OrganizationalStructureDetailsView() {
                       <Card className="rounded-2xl border-slate-100">
                         <CardHeader className="pb-4">
                           <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                            <MapPin className="w-5 h-5 text-emerald-500" />
+                            <MapPin className="w-5 h-5 text-emerald-500" aria-hidden="true" />
                             الموقع والاتصال
                           </CardTitle>
                         </CardHeader>
@@ -470,7 +470,7 @@ export function OrganizationalStructureDetailsView() {
                     <Card className="rounded-2xl border-slate-100">
                       <CardHeader className="pb-4">
                         <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                          <Calendar className="w-5 h-5 text-emerald-500" />
+                          <Calendar className="w-5 h-5 text-emerald-500" aria-hidden="true" />
                           التواريخ
                         </CardTitle>
                       </CardHeader>
@@ -656,7 +656,7 @@ export function OrganizationalStructureDetailsView() {
                           <Card className="rounded-2xl border-emerald-200 bg-emerald-50/50">
                             <CardHeader className="pb-4">
                               <CardTitle className="text-lg font-bold text-emerald-800 flex items-center gap-2">
-                                <TrendingUp className="w-5 h-5 text-emerald-600" />
+                                <TrendingUp className="w-5 h-5 text-emerald-600" aria-hidden="true" />
                                 السعودة
                               </CardTitle>
                             </CardHeader>

@@ -60,7 +60,7 @@ const REVIEW_TYPE_LABELS: Record<ReviewType, { ar: string; en: string }> = {
 
 // Rating labels
 const RATING_LABELS: Record<OverallRating, { ar: string; en: string; color: string; icon: React.ReactNode }> = {
-  exceptional: { ar: 'استثنائي', en: 'Exceptional', color: 'emerald', icon: <TrendingUp className="w-4 h-4" /> },
+  exceptional: { ar: 'استثنائي', en: 'Exceptional', color: 'emerald', icon: <TrendingUp className="w-4 h-4" aria-hidden="true" /> },
   exceeds_expectations: { ar: 'يتجاوز التوقعات', en: 'Exceeds Expectations', color: 'blue', icon: <Star className="w-4 h-4" /> },
   meets_expectations: { ar: 'يلبي التوقعات', en: 'Meets Expectations', color: 'amber', icon: <Target className="w-4 h-4" /> },
   needs_improvement: { ar: 'يحتاج تحسين', en: 'Needs Improvement', color: 'orange', icon: <AlertTriangle className="w-4 h-4" /> },
@@ -205,7 +205,7 @@ export function PerformanceReviewsListView() {
 
   // Get score color
   const getScoreColor = (score?: number) => {
-    if (!score) return 'text-slate-400'
+    if (!score) return 'text-slate-500'
     if (score >= 4.5) return 'text-emerald-600'
     if (score >= 3.5) return 'text-blue-600'
     if (score >= 2.5) return 'text-amber-600'
@@ -241,19 +241,19 @@ export function PerformanceReviewsListView() {
           <DynamicIsland />
         </div>
 
-        <div className='ms-auto flex items-center gap-4'>
-          <div className="relative hidden md:block">
-            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-            <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pr-9 pl-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
+        <div className='ms-auto flex items-center gap-2 sm:gap-4 overflow-x-auto min-w-0'>
+          <div className="relative hidden md:block min-w-0">
+            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
+            <input type="text" placeholder="بحث..." aria-label="بحث" className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pr-9 pl-4 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
           </div>
-          <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white">
-            <Bell className="h-5 w-5" />
+          <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white flex-shrink-0" aria-label="الإشعارات">
+            <Bell className="h-5 w-5" aria-hidden="true" />
             <span className="absolute top-2 right-2 h-2 w-2 bg-red-500 rounded-full border border-navy"></span>
           </Button>
-          <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white" />
-          <ThemeSwitch className="text-slate-300 hover:bg-white/10 hover:text-white" />
-          <ConfigDrawer className="text-slate-300 hover:bg-white/10 hover:text-white" />
-          <ProfileDropdown className="text-slate-300 hover:bg-white/10 hover:text-white" />
+          <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white flex-shrink-0" />
+          <ThemeSwitch className="text-slate-300 hover:bg-white/10 hover:text-white hidden sm:flex flex-shrink-0" />
+          <ConfigDrawer className="text-slate-300 hover:bg-white/10 hover:text-white hidden lg:flex flex-shrink-0" />
+          <ProfileDropdown className="text-slate-300 hover:bg-white/10 hover:text-white flex-shrink-0" />
         </div>
         <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-emerald-500/50 to-transparent"></div>
       </Header>
@@ -276,7 +276,7 @@ export function PerformanceReviewsListView() {
                 <div className="flex flex-wrap items-center gap-3">
                   {/* Year Filter */}
                   <div className="flex items-center gap-2">
-                    <Calendar className="w-5 h-5 text-slate-500" />
+                    <Calendar className="w-5 h-5 text-slate-500" aria-hidden="true" />
                     <Select value={yearFilter.toString()} onValueChange={(v) => setYearFilter(parseInt(v))}>
                       <SelectTrigger className="w-32 rounded-xl">
                         <SelectValue placeholder="السنة" />
@@ -291,7 +291,7 @@ export function PerformanceReviewsListView() {
 
                   {/* Search Input */}
                   <div className="relative flex-1 min-w-[200px] max-w-md">
-                    <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                    <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
                     <Input
                       type="text"
                       placeholder="بحث بالاسم أو رقم التقييم..."
@@ -321,7 +321,7 @@ export function PerformanceReviewsListView() {
 
                   <Select value={typeFilter} onValueChange={(v) => setTypeFilter(v as ReviewType | 'all')}>
                     <SelectTrigger className="w-[140px] h-10 rounded-xl border-slate-200">
-                      <Target className="h-4 w-4 ms-2 text-slate-400" />
+                      <Target className="h-4 w-4 ms-2 text-slate-500" />
                       <SelectValue placeholder="النوع" />
                     </SelectTrigger>
                     <SelectContent>
@@ -337,7 +337,7 @@ export function PerformanceReviewsListView() {
 
                   <Select value={departmentFilter} onValueChange={setDepartmentFilter}>
                     <SelectTrigger className="w-[140px] h-10 rounded-xl border-slate-200">
-                      <Building2 className="h-4 w-4 ms-2 text-slate-400" />
+                      <Building2 className="h-4 w-4 ms-2 text-slate-500" aria-hidden="true" />
                       <SelectValue placeholder="القسم" />
                     </SelectTrigger>
                     <SelectContent>
@@ -357,7 +357,7 @@ export function PerformanceReviewsListView() {
                       onClick={clearFilters}
                       className="h-10 px-4 text-red-500 hover:text-red-600 hover:bg-red-50 rounded-xl"
                     >
-                      <X className="h-4 w-4 ms-2" />
+                      <X className="h-4 w-4 ms-2" aria-hidden="true" />
                       مسح الفلاتر
                     </Button>
                   )}
@@ -401,7 +401,7 @@ export function PerformanceReviewsListView() {
                   <div className="bg-white rounded-2xl p-12 border border-slate-100 text-center">
                     <div className="flex justify-center mb-4">
                       <div className="w-16 h-16 rounded-full bg-red-50 flex items-center justify-center">
-                        <AlertCircle className="w-8 h-8 text-red-500" />
+                        <AlertCircle className="w-8 h-8 text-red-500" aria-hidden="true" />
                       </div>
                     </div>
                     <h3 className="text-lg font-bold text-slate-900 mb-2">حدث خطأ</h3>
@@ -424,7 +424,7 @@ export function PerformanceReviewsListView() {
                     <p className="text-slate-500 mb-4">لا توجد تقييمات أداء مطابقة للبحث</p>
                     <Button asChild className="bg-emerald-500 hover:bg-emerald-600">
                       <Link to="/dashboard/hr/performance/new">
-                        <Plus className="w-4 h-4 ms-2" />
+                        <Plus className="w-4 h-4 ms-2" aria-hidden="true" />
                         تقييم جديد
                       </Link>
                     </Button>
@@ -459,17 +459,17 @@ export function PerformanceReviewsListView() {
                       </div>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon" className="text-slate-400 hover:text-navy">
-                            <MoreHorizontal className="h-5 w-5" />
+                          <Button variant="ghost" size="icon" className="text-slate-500 hover:text-navy" aria-label="خيارات">
+                            <MoreHorizontal className="h-5 w-5" aria-hidden="true" />
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="w-48">
                           <DropdownMenuItem onClick={() => handleViewReview(review._id)}>
-                            <Eye className="h-4 w-4 ms-2" />
+                            <Eye className="h-4 w-4 ms-2" aria-hidden="true" />
                             عرض التفاصيل
                           </DropdownMenuItem>
                           <DropdownMenuItem onClick={() => handleEditReview(review._id)}>
-                            <Edit3 className="h-4 w-4 ms-2 text-blue-500" />
+                            <Edit3 className="h-4 w-4 ms-2 text-blue-500" aria-hidden="true" />
                             تعديل التقييم
                           </DropdownMenuItem>
                           <DropdownMenuSeparator />
@@ -477,7 +477,7 @@ export function PerformanceReviewsListView() {
                             onClick={() => handleDeleteReview(review._id)}
                             className="text-red-600 focus:text-red-600"
                           >
-                            <Trash2 className="h-4 w-4 ms-2" />
+                            <Trash2 className="h-4 w-4 ms-2" aria-hidden="true" />
                             حذف التقييم
                           </DropdownMenuItem>
                         </DropdownMenuContent>
@@ -508,7 +508,7 @@ export function PerformanceReviewsListView() {
                           {review.finalRating ? (
                             getRatingBadge(review.finalRating)
                           ) : (
-                            <span className="text-slate-400 text-sm">-</span>
+                            <span className="text-slate-500 text-sm">-</span>
                           )}
                         </div>
                       </div>

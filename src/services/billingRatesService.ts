@@ -380,7 +380,6 @@ const billingRatesService = {
         total: response.data.total || response.data.rates?.length || 0,
       }
     } catch (error: any) {
-      console.error('Get rates error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -394,7 +393,6 @@ const billingRatesService = {
       const response = await apiClient.get<RateResponse>(`/billing/rates/${id}`)
       return response.data.rate
     } catch (error: any) {
-      console.error('Get rate error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -408,7 +406,6 @@ const billingRatesService = {
       const response = await apiClient.post<RateResponse>('/billing/rates', data)
       return response.data.rate
     } catch (error: any) {
-      console.error('Create rate error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -422,7 +419,6 @@ const billingRatesService = {
       const response = await apiClient.patch<RateResponse>(`/billing/rates/${id}`, data)
       return response.data.rate
     } catch (error: any) {
-      console.error('Update rate error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -435,7 +431,6 @@ const billingRatesService = {
     try {
       await apiClient.delete(`/billing/rates/${id}`)
     } catch (error: any) {
-      console.error('Delete rate error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -464,7 +459,6 @@ const billingRatesService = {
         total: response.data.total || response.data.groups?.length || 0,
       }
     } catch (error: any) {
-      console.error('Get rate groups error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -478,7 +472,6 @@ const billingRatesService = {
       const response = await apiClient.get<RateGroupResponse>(`/billing/groups/${id}`)
       return response.data.group
     } catch (error: any) {
-      console.error('Get rate group error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -492,7 +485,6 @@ const billingRatesService = {
       const response = await apiClient.post<RateGroupResponse>('/billing/groups', data)
       return response.data.group
     } catch (error: any) {
-      console.error('Create rate group error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -506,7 +498,6 @@ const billingRatesService = {
       const response = await apiClient.patch<RateGroupResponse>(`/billing/groups/${id}`, data)
       return response.data.group
     } catch (error: any) {
-      console.error('Update rate group error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -519,7 +510,6 @@ const billingRatesService = {
     try {
       await apiClient.delete(`/billing/groups/${id}`)
     } catch (error: any) {
-      console.error('Delete rate group error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -533,7 +523,6 @@ const billingRatesService = {
       const response = await apiClient.post<RateGroupResponse>(`/billing/groups/${groupId}/rates/${rateId}`)
       return response.data.group
     } catch (error: any) {
-      console.error('Add rate to group error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -547,7 +536,6 @@ const billingRatesService = {
       const response = await apiClient.delete<RateGroupResponse>(`/billing/groups/${groupId}/rates/${rateId}`)
       return response.data.group
     } catch (error: any) {
-      console.error('Remove rate from group error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -574,7 +562,6 @@ const billingRatesService = {
         total: response.data.total || response.data.rateCards?.length || 0,
       }
     } catch (error: any) {
-      console.error('Get rate cards error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -589,7 +576,6 @@ const billingRatesService = {
       return response.data.rateCard
     } catch (error: any) {
       if (error.response?.status === 404) return null
-      console.error('Get rate card error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -603,7 +589,6 @@ const billingRatesService = {
       const response = await apiClient.post<RateCardResponse>('/billing/rate-cards', data)
       return response.data.rateCard
     } catch (error: any) {
-      console.error('Create rate card error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -617,7 +602,6 @@ const billingRatesService = {
       const response = await apiClient.patch<RateCardResponse>(`/billing/rate-cards/${id}`, data)
       return response.data.rateCard
     } catch (error: any) {
-      console.error('Update rate card error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -630,7 +614,6 @@ const billingRatesService = {
     try {
       await apiClient.delete(`/billing/rate-cards/${id}`)
     } catch (error: any) {
-      console.error('Delete rate card error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -664,7 +647,6 @@ const billingRatesService = {
         total: response.data.total || response.data.entries?.length || 0,
       }
     } catch (error: any) {
-      console.error('Get time entries error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -678,7 +660,6 @@ const billingRatesService = {
       const response = await apiClient.post<TimeEntryResponse>('/billing/time-entries', data)
       return response.data.entry
     } catch (error: any) {
-      console.error('Create time entry error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -692,7 +673,6 @@ const billingRatesService = {
       const response = await apiClient.patch<TimeEntryResponse>(`/billing/time-entries/${id}`, data)
       return response.data.entry
     } catch (error: any) {
-      console.error('Update time entry error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -705,7 +685,6 @@ const billingRatesService = {
     try {
       await apiClient.delete(`/billing/time-entries/${id}`)
     } catch (error: any) {
-      console.error('Delete time entry error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -719,7 +698,6 @@ const billingRatesService = {
       const response = await apiClient.post<TimeEntriesResponse>('/billing/time-entries/approve', { ids })
       return response.data.entries || []
     } catch (error: any) {
-      console.error('Approve time entries error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -735,7 +713,6 @@ const billingRatesService = {
       const response = await apiClient.get<StatisticsResponse>('/billing/statistics')
       return response.data.statistics
     } catch (error: any) {
-      console.error('Get billing statistics error:', error)
       throw new Error(handleApiError(error))
     }
   },

@@ -352,11 +352,11 @@ export function JobPostingCreateView() {
 
         <div className='ms-auto flex items-center gap-4'>
           <div className="relative hidden md:block">
-            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-            <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pr-9 pl-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
+            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
+            <input type="text" placeholder="بحث..." aria-label="بحث" className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pr-9 pl-4 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
           </div>
-          <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white">
-            <Bell className="h-5 w-5" />
+          <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white" aria-label="الإشعارات">
+            <Bell className="h-5 w-5" aria-hidden="true" />
           </Button>
           <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white" />
           <ThemeSwitch className="text-slate-300 hover:bg-white/10 hover:text-white" />
@@ -418,7 +418,7 @@ export function JobPostingCreateView() {
         <Card className="border-none shadow-sm bg-white rounded-2xl">
           <CardHeader className="pb-2">
             <CardTitle className="text-base font-bold text-navy flex items-center gap-2">
-              <Briefcase className="w-4 h-4 text-emerald-600" />
+              <Briefcase className="w-4 h-4 text-emerald-600" aria-hidden="true" />
               المعلومات الأساسية
             </CardTitle>
           </CardHeader>
@@ -579,7 +579,7 @@ export function JobPostingCreateView() {
                       option.color === 'red' ? 'text-red-500' :
                       option.color === 'amber' ? 'text-amber-500' :
                       option.color === 'blue' ? 'text-blue-500' :
-                      'text-slate-400'
+                      'text-slate-500'
                     }`} />
                     <span className={urgency === option.value ? 'text-emerald-700 font-bold' : 'text-slate-600'}>
                       {option.label}
@@ -619,7 +619,7 @@ export function JobPostingCreateView() {
                       onClick={() => removeResponsibility(index)}
                       className="text-red-500 hover:bg-red-50"
                     >
-                      <Trash2 className="w-4 h-4" />
+                      <Trash2 className="w-4 h-4" aria-hidden="true" />
                     </Button>
                   )}
                 </div>
@@ -629,7 +629,7 @@ export function JobPostingCreateView() {
                 onClick={addResponsibility}
                 className="rounded-xl"
               >
-                <Plus className="w-4 h-4 ms-2" />
+                <Plus className="w-4 h-4 ms-2" aria-hidden="true" />
                 إضافة مسؤولية
               </Button>
             </div>
@@ -647,7 +647,7 @@ export function JobPostingCreateView() {
                       <GraduationCap className="w-4 h-4 text-emerald-600" />
                       المتطلبات والمؤهلات
                     </CardTitle>
-                    <ChevronDown className={`w-5 h-5 text-slate-400 transition-transform ${isRequirementsOpen ? 'rotate-180' : ''}`} />
+                    <ChevronDown className={`w-5 h-5 text-slate-500 transition-transform ${isRequirementsOpen ? 'rotate-180' : ''}`} />
                   </div>
                 </CardHeader>
               </CollapsibleTrigger>
@@ -747,7 +747,7 @@ export function JobPostingCreateView() {
                       <DollarSign className="w-4 h-4 text-emerald-600" />
                       الراتب والبدلات
                     </CardTitle>
-                    <ChevronDown className={`w-5 h-5 text-slate-400 transition-transform ${isSalaryOpen ? 'rotate-180' : ''}`} />
+                    <ChevronDown className={`w-5 h-5 text-slate-500 transition-transform ${isSalaryOpen ? 'rotate-180' : ''}`} />
                   </div>
                 </CardHeader>
               </CollapsibleTrigger>
@@ -850,7 +850,7 @@ export function JobPostingCreateView() {
                         </span>
                       )}
                     </CardTitle>
-                    <ChevronDown className={`w-5 h-5 text-slate-400 transition-transform ${isBenefitsOpen ? 'rotate-180' : ''}`} />
+                    <ChevronDown className={`w-5 h-5 text-slate-500 transition-transform ${isBenefitsOpen ? 'rotate-180' : ''}`} />
                   </div>
                 </CardHeader>
               </CollapsibleTrigger>
@@ -904,7 +904,7 @@ export function JobPostingCreateView() {
                             onClick={() => removeBenefit(index)}
                             className="text-red-500 hover:bg-red-50"
                           >
-                            <Trash2 className="w-4 h-4" />
+                            <Trash2 className="w-4 h-4" aria-hidden="true" />
                           </Button>
                         </div>
                       ))}
@@ -937,7 +937,7 @@ export function JobPostingCreateView() {
                       disabled={!newBenefit}
                       className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl"
                     >
-                      <Plus className="w-4 h-4" />
+                      <Plus className="w-4 h-4" aria-hidden="true" />
                     </Button>
                   </div>
                 </CardContent>
@@ -962,7 +962,7 @@ export function JobPostingCreateView() {
                         </span>
                       )}
                     </CardTitle>
-                    <ChevronDown className={`w-5 h-5 text-slate-400 transition-transform ${isHiringProcessOpen ? 'rotate-180' : ''}`} />
+                    <ChevronDown className={`w-5 h-5 text-slate-500 transition-transform ${isHiringProcessOpen ? 'rotate-180' : ''}`} />
                   </div>
                 </CardHeader>
               </CollapsibleTrigger>
@@ -1002,7 +1002,7 @@ export function JobPostingCreateView() {
                           onClick={() => removeHiringStage(index)}
                           className="text-red-500 hover:bg-red-50"
                         >
-                          <Trash2 className="w-4 h-4" />
+                          <Trash2 className="w-4 h-4" aria-hidden="true" />
                         </Button>
                       )}
                     </div>
@@ -1012,7 +1012,7 @@ export function JobPostingCreateView() {
                     onClick={addHiringStage}
                     className="rounded-xl w-full"
                   >
-                    <Plus className="w-4 h-4 ms-2" />
+                    <Plus className="w-4 h-4 ms-2" aria-hidden="true" />
                     إضافة مرحلة
                   </Button>
                 </CardContent>
@@ -1032,7 +1032,7 @@ export function JobPostingCreateView() {
                       <Scale className="w-4 h-4 text-emerald-600" />
                       متطلبات المحامين
                     </CardTitle>
-                    <ChevronDown className={`w-5 h-5 text-slate-400 transition-transform ${isAttorneyReqOpen ? 'rotate-180' : ''}`} />
+                    <ChevronDown className={`w-5 h-5 text-slate-500 transition-transform ${isAttorneyReqOpen ? 'rotate-180' : ''}`} />
                   </div>
                 </CardHeader>
               </CollapsibleTrigger>

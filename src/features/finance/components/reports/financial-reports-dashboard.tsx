@@ -183,11 +183,11 @@ export default function FinancialReportsDashboard() {
                     </div>
                     <div className='ms-auto flex items-center gap-4'>
                         <div className="relative hidden md:block">
-                            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" aria-hidden="true" />
                             <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
                         </div>
-                        <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white">
-                            <Bell className="h-5 w-5" />
+                        <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white" aria-label="الإشعارات">
+                        <Bell className="h-5 w-5" aria-hidden="true" />
                         </Button>
                         <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white" />
                         <ThemeSwitch className="text-slate-300 hover:bg-white/10 hover:text-white" />
@@ -223,11 +223,11 @@ export default function FinancialReportsDashboard() {
                 </div>
                 <div className='ms-auto flex items-center gap-4'>
                     <div className="relative hidden md:block">
-                        <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                        <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" aria-hidden="true" />
                         <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
                     </div>
-                    <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white">
-                        <Bell className="h-5 w-5" />
+                    <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white" aria-label="الإشعارات">
+                        <Bell className="h-5 w-5" aria-hidden="true" />
                     </Button>
                     <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white" />
                     <ThemeSwitch className="text-slate-300 hover:bg-white/10 hover:text-white" />
@@ -246,7 +246,7 @@ export default function FinancialReportsDashboard() {
                     type="finance"
                 >
                     <Button variant="outline" className="bg-white/5 border-white/10 text-white hover:bg-white/10 rounded-xl h-10 px-5 backdrop-blur-sm">
-                        <Download className="w-4 h-4 ms-2" />
+                        <Download className="w-4 h-4 ms-2" aria-hidden="true" />
                         تصدير PDF
                     </Button>
                 </ProductivityHero>
@@ -256,7 +256,7 @@ export default function FinancialReportsDashboard() {
                     <CardContent className="p-6">
                         <div className="flex flex-col md:flex-row items-start md:items-center gap-4">
                             <div className="flex items-center gap-3">
-                                <Calendar className="w-5 h-5 text-slate-500" />
+                                <Calendar className="w-5 h-5 text-slate-500" aria-hidden="true" />
                                 <span className="text-sm font-bold text-navy">الفترة المالية:</span>
                             </div>
                             <div className="flex flex-wrap items-center gap-3">
@@ -361,7 +361,7 @@ export default function FinancialReportsDashboard() {
                                 <div className="flex items-center justify-between">
                                     <CardTitle className="text-2xl font-bold text-navy flex items-center gap-3">
                                         <div className="p-2 bg-amber-50 rounded-xl">
-                                            <FileText className="w-6 h-6 text-amber-600" />
+                                            <FileText className="w-6 h-6 text-amber-600" aria-hidden="true" />
                                         </div>
                                         الفواتير المستحقة
                                     </CardTitle>
@@ -532,7 +532,7 @@ export default function FinancialReportsDashboard() {
                                 <div className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-2xl p-6 border border-amber-100">
                                     <div className="flex items-center justify-between mb-2">
                                         <span className="text-sm font-bold text-amber-700">المبالغ المستحقة</span>
-                                        <FileText className="w-5 h-5 text-amber-600" />
+                                        <FileText className="w-5 h-5 text-amber-600" aria-hidden="true" />
                                     </div>
                                     <div className="text-3xl font-bold text-amber-900 mb-1">
                                         {formatCurrency(bankSummary.unpaidInvoicesTotal)}
@@ -546,12 +546,12 @@ export default function FinancialReportsDashboard() {
                                         <span className="text-slate-600">الوضع المالي</span>
                                         {bankSummary.banksTotal > bankSummary.unpaidInvoicesTotal / 2 ? (
                                             <Badge className="bg-emerald-100 text-emerald-700 border-0">
-                                                <CheckCircle className="w-3 h-3 ms-1" />
+                                                <CheckCircle className="w-3 h-3 ms-1" aria-hidden="true" />
                                                 جيد
                                             </Badge>
                                         ) : (
                                             <Badge className="bg-amber-100 text-amber-700 border-0">
-                                                <AlertCircle className="w-3 h-3 ms-1" />
+                                                <AlertCircle className="w-3 h-3 ms-1" aria-hidden="true" />
                                                 يحتاج متابعة
                                             </Badge>
                                         )}

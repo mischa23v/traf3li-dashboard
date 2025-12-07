@@ -218,8 +218,8 @@ export function CasesListView() {
           <DynamicIsland />
         </div>
 
-        <div className="ms-auto flex items-center gap-4">
-          <div className="relative hidden md:block">
+        <div className="ms-auto flex items-center gap-2 sm:gap-4 overflow-x-auto min-w-0">
+          <div className="relative hidden md:block min-w-0">
             <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
             <input
               type="text"
@@ -230,15 +230,15 @@ export function CasesListView() {
           <Button
             variant="ghost"
             size="icon"
-            className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white"
+            className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white flex-shrink-0"
           >
             <Bell className="h-5 w-5" />
             <span className="absolute top-2 right-2 h-2 w-2 bg-red-500 rounded-full border border-navy"></span>
           </Button>
-          <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white" />
-          <ThemeSwitch className="text-slate-300 hover:bg-white/10 hover:text-white" />
-          <ConfigDrawer className="text-slate-300 hover:bg-white/10 hover:text-white" />
-          <ProfileDropdown className="text-slate-300 hover:bg-white/10 hover:text-white" />
+          <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white flex-shrink-0" />
+          <ThemeSwitch className="text-slate-300 hover:bg-white/10 hover:text-white hidden sm:flex flex-shrink-0" />
+          <ConfigDrawer className="text-slate-300 hover:bg-white/10 hover:text-white hidden lg:flex flex-shrink-0" />
+          <ProfileDropdown className="text-slate-300 hover:bg-white/10 hover:text-white flex-shrink-0" />
         </div>
         {/* Bottom Gradient Line */}
         <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-emerald-500/50 to-transparent"></div>

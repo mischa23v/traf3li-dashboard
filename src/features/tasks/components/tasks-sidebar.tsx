@@ -174,7 +174,7 @@ export function TasksSidebar({
                             {/* Edit Button */}
                             <Button asChild className="bg-white hover:bg-blue-50 text-blue-600 h-auto py-6 flex flex-col items-center justify-center gap-2 rounded-3xl shadow-lg shadow-white/10 transition-all duration-300 hover:scale-[1.02] border-0">
                                 <Link to="/dashboard/tasks/create" search={{ editId: taskId }}>
-                                    <Edit3 className="h-7 w-7" />
+                                    <Edit3 className="h-7 w-7" aria-hidden="true" />
                                     <span className="text-sm font-bold">تعديل</span>
                                 </Link>
                             </Button>
@@ -187,9 +187,9 @@ export function TasksSidebar({
                                 disabled={isDeletePending}
                             >
                                 {isDeletePending ? (
-                                    <Loader2 className="h-6 w-6 animate-spin" />
+                                    <Loader2 className="h-6 w-6 animate-spin" aria-hidden="true" />
                                 ) : (
-                                    <Trash2 className="h-6 w-6" />
+                                    <Trash2 className="h-6 w-6" aria-hidden="true" />
                                 )}
                                 <span className="text-sm font-bold">حذف</span>
                             </Button>
@@ -197,7 +197,7 @@ export function TasksSidebar({
                             {/* View All Button */}
                             <Button asChild variant="ghost" className="bg-white hover:bg-slate-50 text-emerald-950 h-auto py-6 flex flex-col items-center justify-center gap-2 rounded-3xl transition-all duration-300 hover:scale-[1.02] shadow-lg shadow-white/10">
                                 <Link to={currentLinks.viewAll}>
-                                    <List className="h-6 w-6" />
+                                    <List className="h-6 w-6" aria-hidden="true" />
                                     <span className="text-sm font-bold">عرض جميع</span>
                                 </Link>
                             </Button>
@@ -208,7 +208,7 @@ export function TasksSidebar({
                             {/* Create Button - White + Green Text + Glow */}
                             <Button asChild className="bg-white hover:bg-emerald-50 text-emerald-600 h-auto py-6 flex flex-col items-center justify-center gap-2 rounded-3xl shadow-lg shadow-white/10 transition-all duration-300 hover:scale-[1.02] border-0">
                                 <Link to={currentLinks.create}>
-                                    <Plus className="h-7 w-7" />
+                                    <Plus className="h-7 w-7" aria-hidden="true" />
                                     <span className="text-sm font-bold">إنشاء</span>
                                 </Link>
                             </Button>
@@ -224,7 +224,7 @@ export function TasksSidebar({
                                 )}
                                 onClick={onToggleSelectionMode}
                             >
-                                {isSelectionMode ? <X className="h-6 w-6" /> : <CheckSquare className="h-6 w-6" />}
+                                {isSelectionMode ? <X className="h-6 w-6" aria-hidden="true" /> : <CheckSquare className="h-6 w-6" aria-hidden="true" />}
                                 <span className="text-sm font-bold">{isSelectionMode ? 'إلغاء' : 'تحديد'}</span>
                             </Button>
 
@@ -235,7 +235,7 @@ export function TasksSidebar({
                                 onClick={onDeleteSelected}
                                 disabled={!isSelectionMode || selectedCount === 0}
                             >
-                                <Trash2 className="h-6 w-6" />
+                                <Trash2 className="h-6 w-6" aria-hidden="true" />
                                 <span className="text-sm font-bold">
                                     {selectedCount > 0 ? `حذف (${selectedCount})` : 'حذف'}
                                 </span>
@@ -244,7 +244,7 @@ export function TasksSidebar({
                             {/* View All Button - White + Dark Text + Glow */}
                             <Button asChild variant="ghost" className="bg-white hover:bg-slate-50 text-emerald-950 h-auto py-6 flex flex-col items-center justify-center gap-2 rounded-3xl transition-all duration-300 hover:scale-[1.02] shadow-lg shadow-white/10">
                                 <Link to={currentLinks.viewAll}>
-                                    <List className="h-6 w-6" />
+                                    <List className="h-6 w-6" aria-hidden="true" />
                                     <span className="text-sm font-bold">عرض جميع</span>
                                 </Link>
                             </Button>
@@ -267,6 +267,7 @@ export function TasksSidebar({
                     <div className="flex bg-[#033a2d] p-1 rounded-xl">
                         <button
                             onClick={() => setActiveTab('calendar')}
+                            aria-label="التقويم"
                             className={cn(
                                 "px-4 py-2 text-sm font-bold rounded-lg transition-all duration-200",
                                 activeTab === 'calendar'
@@ -278,6 +279,7 @@ export function TasksSidebar({
                         </button>
                         <button
                             onClick={() => setActiveTab('notifications')}
+                            aria-label="التنبيهات"
                             className={cn(
                                 "px-4 py-2 text-sm font-bold rounded-lg transition-all duration-200",
                                 activeTab === 'notifications'

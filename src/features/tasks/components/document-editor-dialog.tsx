@@ -114,7 +114,6 @@ export function DocumentEditorDialog({
             onOpenChange(false)
             onSuccess?.()
         } catch (error: any) {
-            console.error('Failed to save document:', error)
             toast.error(error.message || 'فشل في حفظ المستند')
         }
     }

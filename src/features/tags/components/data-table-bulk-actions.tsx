@@ -28,7 +28,6 @@ export function DataTableBulkActions<TData>({
         className='h-8 text-destructive hover:text-destructive'
         onClick={() => {
           // TODO: Implement bulk delete
-          console.log('Delete selected:', selectedRows.map((r) => r.original))
         }}
       >
         <Trash className='me-2 h-4 w-4' />

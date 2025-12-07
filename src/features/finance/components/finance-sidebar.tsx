@@ -190,7 +190,7 @@ export function FinanceSidebar({
                     {!isReadOnlyContext && (
                         <Button asChild className="bg-white hover:bg-emerald-50 text-emerald-600 h-auto py-6 flex flex-col items-center justify-center gap-2 rounded-3xl shadow-lg shadow-white/10 transition-all duration-300 hover:scale-[1.02] border-0">
                             <Link to={currentLinks.create}>
-                                <Plus className="h-7 w-7" />
+                                <Plus className="h-7 w-7" aria-hidden="true" />
                                 <span className="text-sm font-bold">{t('sidebar.quickActions.create')}</span>
                             </Link>
                         </Button>
@@ -221,7 +221,7 @@ export function FinanceSidebar({
                             onClick={onDeleteSelected}
                             disabled={!isSelectionMode || selectedCount === 0}
                         >
-                            <Trash2 className="h-6 w-6" />
+                            <Trash2 className="h-6 w-6" aria-hidden="true" />
                             <span className="text-sm font-bold">
                                 {selectedCount > 0 ? `${t('common.delete')} (${selectedCount})` : t('common.delete')}
                             </span>
@@ -326,7 +326,7 @@ export function FinanceSidebar({
                             <div className="space-y-6 relative min-h-[200px]">
                                 {isCalendarLoading ? (
                                     <div className="flex items-center justify-center h-full py-12">
-                                        <Loader2 className="h-6 w-6 animate-spin text-emerald-600" />
+                                        <Loader2 className="h-6 w-6 animate-spin text-emerald-600" aria-hidden="true" />
                                     </div>
                                 ) : selectedDateEvents.length === 0 ? (
                                     <div className="flex flex-col items-center justify-center py-8 text-slate-400">
@@ -372,7 +372,7 @@ export function FinanceSidebar({
                             <Button asChild variant="ghost" className="w-full mt-6 text-slate-500 hover:text-emerald-700 hover:bg-emerald-50 group cursor-pointer">
                                 <Link to="/dashboard/calendar">
                                     <span>{t('sidebar.calendar.viewFullSchedule')}</span>
-                                    <ChevronRight className="w-4 h-4 me-2 transition-transform group-hover:-translate-x-1 rtl:group-hover:translate-x-1 rtl:rotate-180" />
+                                    <ChevronRight className="w-4 h-4 me-2 transition-transform group-hover:-translate-x-1 rtl:group-hover:translate-x-1 rtl:rotate-180" aria-hidden="true" />
                                 </Link>
                             </Button>
                         </div>
@@ -380,11 +380,11 @@ export function FinanceSidebar({
                         <div className="space-y-3 animate-in fade-in slide-in-from-bottom-2 duration-300 min-h-[200px]">
                             {isRemindersLoading ? (
                                 <div className="flex items-center justify-center h-full py-12">
-                                    <Loader2 className="h-6 w-6 animate-spin text-emerald-600" />
+                                    <Loader2 className="h-6 w-6 animate-spin text-emerald-600" aria-hidden="true" />
                                 </div>
                             ) : upcomingReminders.length === 0 ? (
                                 <div className="flex flex-col items-center justify-center py-8 text-slate-400">
-                                    <Bell className="h-10 w-10 mb-2 opacity-20" />
+                                    <Bell className="h-10 w-10 mb-2 opacity-20" aria-hidden="true" />
                                     <p className="text-xs font-medium">{t('sidebar.notifications.noReminders')}</p>
                                 </div>
                             ) : (
@@ -406,7 +406,7 @@ export function FinanceSidebar({
                                                         ? "bg-red-50 text-red-500 group-hover:bg-red-500 group-hover:text-white"
                                                         : `bg-${priorityColor}-50 text-${priorityColor}-500 group-hover:bg-${priorityColor}-500 group-hover:text-white`
                                                 )}>
-                                                    {isOverdue ? <AlertCircle className="w-5 h-5" /> : <Bell className="w-5 h-5" />}
+                                                    {isOverdue ? <AlertCircle className="w-5 h-5" aria-hidden="true" /> : <Bell className="w-5 h-5" aria-hidden="true" />}
                                                 </div>
                                                 <div className="flex-1 min-w-0">
                                                     <p className={cn(

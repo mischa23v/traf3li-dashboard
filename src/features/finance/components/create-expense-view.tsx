@@ -414,7 +414,7 @@ export function CreateExpenseView() {
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                         <div className="space-y-2">
                                             <Label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                                <FileText className="w-4 h-4 text-emerald-500" />
+                                                <FileText className="w-4 h-4 text-emerald-500" aria-hidden="true" />
                                                 وصف المصروف <span className="text-red-500">*</span>
                                             </Label>
                                             <Textarea
@@ -429,7 +429,7 @@ export function CreateExpenseView() {
                                         </div>
                                         <div className="space-y-2">
                                             <Label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                                <Calendar className="w-4 h-4 text-emerald-500" />
+                                                <Calendar className="w-4 h-4 text-emerald-500" aria-hidden="true" />
                                                 تاريخ المصروف <span className="text-red-500">*</span>
                                             </Label>
                                             <Input
@@ -590,7 +590,7 @@ export function CreateExpenseView() {
                                     </div>
                                     <div className="space-y-2">
                                         <Label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                            <CreditCard className="w-4 h-4 text-emerald-500" />
+                                            <CreditCard className="w-4 h-4 text-emerald-500" aria-hidden="true" />
                                             طريقة الدفع <span className="text-red-500">*</span>
                                         </Label>
                                         <Select value={formData.paymentMethod} onValueChange={(value) => updateField('paymentMethod', value)}>
@@ -624,7 +624,7 @@ export function CreateExpenseView() {
                                     </div>
                                     <div className="space-y-2">
                                         <Label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                            <Receipt className="w-4 h-4 text-emerald-500" />
+                                            <Receipt className="w-4 h-4 text-emerald-500" aria-hidden="true" />
                                             رقم الإيصال / الفاتورة
                                         </Label>
                                         <Input
@@ -774,7 +774,7 @@ export function CreateExpenseView() {
                                 {/* ========== NOTES ========== */}
                                 <div className="space-y-2">
                                     <Label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                        <FileText className="w-4 h-4 text-emerald-500" />
+                                        <FileText className="w-4 h-4 text-emerald-500" aria-hidden="true" />
                                         ملاحظات إضافية
                                     </Label>
                                     <Textarea
@@ -995,7 +995,7 @@ export function CreateExpenseView() {
                                         <AccordionItem value="government" className="border rounded-xl overflow-hidden">
                                             <AccordionTrigger className="px-4 hover:no-underline hover:bg-slate-50">
                                                 <div className="flex items-center gap-2">
-                                                    <FileText className="h-4 w-4 text-purple-500" />
+                                                    <FileText className="h-4 w-4 text-purple-500" aria-hidden="true" />
                                                     <span className="font-medium">المرجع الحكومي / القضائي</span>
                                                 </div>
                                             </AccordionTrigger>
@@ -1046,7 +1046,7 @@ export function CreateExpenseView() {
                                     <AccordionItem value="tax" className="border rounded-xl overflow-hidden">
                                         <AccordionTrigger className="px-4 hover:no-underline hover:bg-slate-50">
                                             <div className="flex items-center gap-2">
-                                                <Receipt className="h-4 w-4 text-green-500" />
+                                                <Receipt className="h-4 w-4 text-green-500" aria-hidden="true" />
                                                 <span className="font-medium">تفاصيل الضريبة</span>
                                             </div>
                                         </AccordionTrigger>
@@ -1198,7 +1198,7 @@ export function CreateExpenseView() {
                                                         {attachments.map((file, i) => (
                                                             <div key={i} className="flex items-center justify-between p-3 border rounded-xl bg-slate-50">
                                                                 <div className="flex items-center gap-3">
-                                                                    <FileText className="h-5 w-5 text-slate-400" />
+                                                                    <FileText className="h-5 w-5 text-slate-400" aria-hidden="true" />
                                                                     <div>
                                                                         <p className="text-sm font-medium text-slate-700">{file.filename}</p>
                                                                         <p className="text-xs text-slate-500">{formatFileSize(file.size)}</p>
@@ -1207,7 +1207,7 @@ export function CreateExpenseView() {
                                                                 <div className="flex gap-2">
                                                                     <Button type="button" variant="ghost" size="sm" asChild>
                                                                         <a href={file.url} download={file.filename}>
-                                                                            <Download className="h-4 w-4" />
+                                                                            <Download className="h-4 w-4" aria-hidden="true" />
                                                                         </a>
                                                                     </Button>
                                                                     <Button type="button" variant="ghost" size="sm" onClick={() => removeAttachment(i)}>
@@ -1234,7 +1234,7 @@ export function CreateExpenseView() {
                                             </Button>
                                         </Link>
                                         <Button type="button" variant="outline" className="rounded-xl">
-                                            <Save className="ms-2 h-4 w-4" />
+                                            <Save className="ms-2 h-4 w-4" aria-hidden="true" />
                                             حفظ كمسودة
                                         </Button>
                                     </div>
@@ -1247,12 +1247,12 @@ export function CreateExpenseView() {
                                         >
                                             {createExpenseMutation.isPending ? (
                                                 <span className="flex items-center gap-2">
-                                                    <Loader2 className="w-4 h-4 animate-spin" />
+                                                    <Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" />
                                                     جاري الحفظ...
                                                 </span>
                                             ) : (
                                                 <span className="flex items-center gap-2">
-                                                    <CheckCircle className="w-4 h-4" />
+                                                    <CheckCircle className="w-4 h-4" aria-hidden="true" />
                                                     حفظ واعتماد
                                                 </span>
                                             )}

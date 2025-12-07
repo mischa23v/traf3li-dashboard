@@ -181,11 +181,11 @@ export function CasesView() {
 
                 <div className='ms-auto flex items-center gap-4'>
                     <div className="relative hidden md:block">
-                        <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                        <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
+                        <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" aria-hidden="true" />
+                        <input type="text" placeholder="بحث..." aria-label="بحث" className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
                     </div>
-                    <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white">
-                        <Bell className="h-5 w-5" />
+                    <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white" aria-label="التنبيهات">
+                        <Bell className="h-5 w-5" aria-hidden="true" />
                         <span className="absolute top-2 right-2 h-2 w-2 bg-red-500 rounded-full border border-navy"></span>
                     </Button>
                     <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white" />
@@ -213,7 +213,7 @@ export function CasesView() {
                                 <div>
                                     <div className="flex items-center gap-3 mb-3">
                                         <Badge className="bg-white/10 hover:bg-white/20 text-white border-0 backdrop-blur-sm">
-                                            <Scale className="w-3 h-3 ms-2" />
+                                            <Scale className="w-3 h-3 ms-2" aria-hidden="true" />
                                             قضية عمالية
                                         </Badge>
                                         <span className="text-blue-200 text-sm">{caseData.court}</span>
@@ -228,11 +228,11 @@ export function CasesView() {
                                 </div>
                                 <div className="flex gap-3">
                                     <Button className="bg-emerald-500 hover:bg-emerald-600 text-white border-0 shadow-lg shadow-emerald-500/20">
-                                        <Plus className="w-4 h-4 ms-2" />
+                                        <Plus className="w-4 h-4 ms-2" aria-hidden="true" />
                                         إجراء جديد
                                     </Button>
                                     <Button variant="outline" className="bg-white/5 border-white/10 text-white hover:bg-white/10">
-                                        <Upload className="w-4 h-4 ms-2" />
+                                        <Upload className="w-4 h-4 ms-2" aria-hidden="true" />
                                         مشاركة
                                     </Button>
                                 </div>
@@ -262,15 +262,15 @@ export function CasesView() {
 
                             <div className="flex flex-wrap gap-6 mt-6 text-sm text-blue-200/80">
                                 <div className="flex items-center gap-2">
-                                    <Calendar className="w-4 h-4" />
+                                    <Calendar className="w-4 h-4" aria-hidden="true" />
                                     تاريخ الفتح: {caseData.filingDate}
                                 </div>
                                 <div className="flex items-center gap-2 text-amber-300">
-                                    <Clock className="w-4 h-4" />
+                                    <Clock className="w-4 h-4" aria-hidden="true" />
                                     الجلسة القادمة: {caseData.nextHearing}
                                 </div>
                                 <div className="flex items-center gap-2">
-                                    <Building className="w-4 h-4" />
+                                    <Building className="w-4 h-4" aria-hidden="true" />
                                     مكتب العمل: {caseData.laborOffice}
                                 </div>
                             </div>
@@ -284,7 +284,7 @@ export function CasesView() {
                                 <CardHeader className="bg-white border-b border-slate-100 pb-4">
                                     <CardTitle className="text-lg font-bold text-navy flex items-center justify-between">
                                         <span>السجل الزمني</span>
-                                        <Clock className="w-5 h-5 text-brand-blue" />
+                                        <Clock className="w-5 h-5 text-brand-blue" aria-hidden="true" />
                                     </CardTitle>
                                 </CardHeader>
                                 <CardContent className="p-0">
@@ -408,7 +408,7 @@ export function CasesView() {
                                                 <CardHeader className="pb-3 border-b border-slate-100 bg-green-50/50">
                                                     <div className="flex items-center gap-3">
                                                         <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center text-green-600">
-                                                            <User className="h-5 w-5" />
+                                                            <User className="h-5 w-5" aria-hidden="true" />
                                                         </div>
                                                         <div>
                                                             <CardTitle className="text-base font-bold text-navy">المدعي</CardTitle>
@@ -455,7 +455,7 @@ export function CasesView() {
                                                 <CardHeader className="pb-3 border-b border-slate-100 bg-amber-50/50">
                                                     <div className="flex items-center gap-3">
                                                         <div className="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center text-amber-600">
-                                                            <Building2 className="h-5 w-5" />
+                                                            <Building2 className="h-5 w-5" aria-hidden="true" />
                                                         </div>
                                                         <div>
                                                             <CardTitle className="text-base font-bold text-navy">المدعى عليه</CardTitle>
@@ -497,7 +497,7 @@ export function CasesView() {
                                             <Card className="border-slate-200 shadow-sm xl:col-span-2 rounded-2xl">
                                                 <CardHeader className="pb-3 border-b border-slate-100 bg-slate-50/50">
                                                     <CardTitle className="text-base font-bold text-navy flex items-center gap-2">
-                                                        <Briefcase className="h-5 w-5 text-slate-500" />
+                                                        <Briefcase className="h-5 w-5 text-slate-500" aria-hidden="true" />
                                                         بيانات العمل
                                                     </CardTitle>
                                                 </CardHeader>
@@ -545,7 +545,7 @@ export function CasesView() {
                                                     <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-4">
                                                         <div className="flex items-center gap-3">
                                                             <div className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center text-brand-blue">
-                                                                <DollarSign className="h-5 w-5" />
+                                                                <DollarSign className="h-5 w-5" aria-hidden="true" />
                                                             </div>
                                                             <div>
                                                                 <h4 className="font-bold text-navy">{claim.title}</h4>
@@ -608,11 +608,11 @@ export function CasesView() {
                                                                 </div>
                                                                 <div className="flex flex-wrap gap-4 text-sm text-slate-500">
                                                                     <div className="flex items-center gap-1">
-                                                                        <Calendar className="h-4 w-4" />
+                                                                        <Calendar className="h-4 w-4" aria-hidden="true" />
                                                                         {hearing.date}
                                                                     </div>
                                                                     <div className="flex items-center gap-1">
-                                                                        <MapPin className="h-4 w-4" />
+                                                                        <MapPin className="h-4 w-4" aria-hidden="true" />
                                                                         {typeof hearing.location === 'string' ? hearing.location : (hearing.location?.name || hearing.location?.address || 'عن بعد')}
                                                                     </div>
                                                                 </div>
@@ -625,7 +625,7 @@ export function CasesView() {
 
                                                     {hearing.result && (
                                                         <div className="bg-red-50 border border-red-100 rounded-xl p-3 mb-6 text-red-700 text-sm font-medium flex items-center gap-2">
-                                                            <AlertCircle className="h-4 w-4" />
+                                                            <AlertCircle className="h-4 w-4" aria-hidden="true" />
                                                             النتيجة: {hearing.result}
                                                         </div>
                                                     )}
@@ -659,14 +659,14 @@ export function CasesView() {
                                         {/* Memos Section */}
                                         <div>
                                             <h3 className="font-bold text-navy mb-4 flex items-center gap-2">
-                                                <FileText className="h-5 w-5 text-brand-blue" />
+                                                <FileText className="h-5 w-5 text-brand-blue" aria-hidden="true" />
                                                 المذكرات القانونية
                                             </h3>
                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                                 {documents.memos.map((doc, i) => (
                                                     <div key={i} className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-4 hover:shadow-md transition-all">
                                                         <div className="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center text-brand-blue shrink-0">
-                                                            <FileText className="h-6 w-6" />
+                                                            <FileText className="h-6 w-6" aria-hidden="true" />
                                                         </div>
                                                         <div className="flex-1 min-w-0">
                                                             <div className="font-bold text-navy truncate">{doc.name}</div>
@@ -679,8 +679,8 @@ export function CasesView() {
                                                                 {doc.party}
                                                             </Badge>
                                                         </div>
-                                                        <Button variant="ghost" size="icon" className="text-slate-400 hover:text-brand-blue rounded-full">
-                                                            <Download className="h-4 w-4" />
+                                                        <Button variant="ghost" size="icon" className="text-slate-400 hover:text-brand-blue rounded-full" aria-label="تنزيل">
+                                                            <Download className="h-4 w-4" aria-hidden="true" />
                                                         </Button>
                                                     </div>
                                                 ))}
@@ -692,14 +692,14 @@ export function CasesView() {
                                         {/* Evidence Section */}
                                         <div>
                                             <h3 className="font-bold text-navy mb-4 flex items-center gap-2">
-                                                <Briefcase className="h-5 w-5 text-slate-500" />
+                                                <Briefcase className="h-5 w-5 text-slate-500" aria-hidden="true" />
                                                 الأدلة والمستندات الداعمة
                                             </h3>
                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                                 {documents.evidence.map((doc, i) => (
                                                     <div key={i} className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-4 hover:shadow-md transition-all">
                                                         <div className="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center text-slate-500 shrink-0">
-                                                            <FileCheck className="h-6 w-6" />
+                                                            <FileCheck className="h-6 w-6" aria-hidden="true" />
                                                         </div>
                                                         <div className="flex-1 min-w-0">
                                                             <div className="font-bold text-navy truncate">{doc.name}</div>
@@ -712,8 +712,8 @@ export function CasesView() {
                                                                 {doc.category}
                                                             </Badge>
                                                         </div>
-                                                        <Button variant="ghost" size="icon" className="text-slate-400 hover:text-brand-blue rounded-full">
-                                                            <Download className="h-4 w-4" />
+                                                        <Button variant="ghost" size="icon" className="text-slate-400 hover:text-brand-blue rounded-full" aria-label="تنزيل">
+                                                            <Download className="h-4 w-4" aria-hidden="true" />
                                                         </Button>
                                                     </div>
                                                 ))}

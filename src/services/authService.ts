@@ -189,7 +189,6 @@ const authService = {
 
       return response.data.user
     } catch (error: any) {
-      console.error('Login error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -208,7 +207,6 @@ const authService = {
         throw new Error(response.data.message || 'فشل التسجيل')
       }
     } catch (error: any) {
-      console.error('Register error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -222,7 +220,6 @@ const authService = {
       await apiClient.post('/auth/logout')
       localStorage.removeItem('user')
     } catch (error: any) {
-      console.error('Logout error:', error)
       // Even if API call fails, clear local storage
       localStorage.removeItem('user')
     }
@@ -245,7 +242,6 @@ const authService = {
 
       return response.data.user
     } catch (error: any) {
-      console.error('Get current user error:', error)
       // If unauthorized, clear localStorage
       if (error?.status === 401) {
         localStorage.removeItem('user')
@@ -264,7 +260,6 @@ const authService = {
       if (!userStr) return null
       return JSON.parse(userStr)
     } catch (error) {
-      console.error('Error parsing cached user:', error)
       localStorage.removeItem('user')
       return null
     }

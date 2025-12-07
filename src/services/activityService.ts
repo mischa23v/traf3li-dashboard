@@ -230,7 +230,6 @@ const activityService = {
       const response = await apiClient.post('/activities', input)
       return response.data
     } catch (error) {
-      console.error('Create activity error:', error)
       throw error
     }
   },
@@ -259,7 +258,6 @@ const activityService = {
       const response = await apiClient.get(`/activities?${params.toString()}`)
       return response.data
     } catch (error) {
-      console.error('Get activities error:', error)
       throw error
     }
   },
@@ -278,7 +276,6 @@ const activityService = {
       )
       return response.data.activities || response.data
     } catch (error) {
-      console.error('Get entity activities error:', error)
       throw error
     }
   },
@@ -291,7 +288,6 @@ const activityService = {
       const response = await apiClient.get(`/activities/recent?limit=${limit}`)
       return response.data.activities || response.data
     } catch (error) {
-      console.error('Get recent activities error:', error)
       throw error
     }
   },
@@ -320,9 +316,8 @@ const activityService = {
         oldValue,
         newValue,
       })
-    } catch (error) {
+    } catch {
       // Log error but don't throw - activity logging should not break the main flow
-      console.error('Log task activity error:', error)
       return null
     }
   },
@@ -347,8 +342,7 @@ const activityService = {
         descriptionAr: description?.ar || type,
         metadata,
       })
-    } catch (error) {
-      console.error('Log event activity error:', error)
+    } catch {
       return null
     }
   },
@@ -373,8 +367,7 @@ const activityService = {
         descriptionAr: description?.ar || type,
         metadata,
       })
-    } catch (error) {
-      console.error('Log reminder activity error:', error)
+    } catch {
       return null
     }
   },

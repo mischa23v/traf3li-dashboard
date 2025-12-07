@@ -4,6 +4,7 @@ import { VariantProps, cva } from 'class-variance-authority'
 import { PanelLeftIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useIsMobile } from '@/hooks/use-mobile'
+import { useDirection } from '@/context/direction-provider'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Separator } from '@/components/ui/separator'
@@ -512,6 +513,7 @@ function SidebarMenuButton({
 } & VariantProps<typeof sidebarMenuButtonVariants>) {
   const Comp = asChild ? Slot : 'button'
   const { isMobile, state } = useSidebar()
+  const { dir } = useDirection()
 
   const button = (
     <Comp
@@ -538,7 +540,7 @@ function SidebarMenuButton({
     <Tooltip>
       <TooltipTrigger asChild>{button}</TooltipTrigger>
       <TooltipContent
-        side='right'
+        side={dir === 'rtl' ? 'left' : 'right'}
         align='center'
         hidden={state !== 'collapsed' || isMobile}
         {...tooltip}

@@ -260,13 +260,13 @@ export function EditInvoiceView() {
                                     disabled={isSending}
                                     className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl"
                                 >
-                                    {isSending ? <Loader2 className="w-4 h-4 animate-spin ms-2" /> : <Send className="w-4 h-4 ms-2" />}
+                                    {isSending ? <Loader2 className="w-4 h-4 animate-spin ms-2" aria-hidden="true" /> : <Send className="w-4 h-4 ms-2" aria-hidden="true" />}
                                     إرسال للعميل
                                 </Button>
                                 <AlertDialog>
                                     <AlertDialogTrigger asChild>
                                         <Button variant="outline" className="bg-red-500/10 border-red-500/20 text-red-300 hover:bg-red-500/20 rounded-xl">
-                                            <Trash2 className="w-4 h-4 ms-2" />
+                                            <Trash2 className="w-4 h-4 ms-2" aria-hidden="true" />
                                             حذف
                                         </Button>
                                     </AlertDialogTrigger>
@@ -280,7 +280,7 @@ export function EditInvoiceView() {
                                         <AlertDialogFooter>
                                             <AlertDialogCancel>إلغاء</AlertDialogCancel>
                                             <AlertDialogAction onClick={handleDelete} className="bg-red-500 hover:bg-red-600">
-                                                {isDeleting ? <Loader2 className="w-4 h-4 animate-spin ms-2" /> : null}
+                                                {isDeleting ? <Loader2 className="w-4 h-4 animate-spin ms-2" aria-hidden="true" /> : null}
                                                 حذف الفاتورة
                                             </AlertDialogAction>
                                         </AlertDialogFooter>
@@ -319,7 +319,7 @@ export function EditInvoiceView() {
                                         </div>
                                         <div className="space-y-2">
                                             <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                                <FileText className="w-4 h-4 text-blue-500" />
+                                                <FileText className="w-4 h-4 text-blue-500" aria-hidden="true" />
                                                 القضية (اختياري)
                                             </label>
                                             <Select
@@ -346,7 +346,7 @@ export function EditInvoiceView() {
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                         <div className="space-y-2">
                                             <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                                <Calendar className="w-4 h-4 text-blue-500" />
+                                                <Calendar className="w-4 h-4 text-blue-500" aria-hidden="true" />
                                                 تاريخ الإصدار
                                             </label>
                                             <Input
@@ -358,7 +358,7 @@ export function EditInvoiceView() {
                                         </div>
                                         <div className="space-y-2">
                                             <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                                <Calendar className="w-4 h-4 text-blue-500" />
+                                                <Calendar className="w-4 h-4 text-blue-500" aria-hidden="true" />
                                                 تاريخ الاستحقاق <span className="text-red-500">*</span>
                                             </label>
                                             <Input
@@ -378,7 +378,7 @@ export function EditInvoiceView() {
                                                 عناصر الفاتورة
                                             </label>
                                             <Button type="button" onClick={addLineItem} variant="outline" size="sm" className="rounded-xl">
-                                                <Plus className="w-4 h-4 ms-2" />
+                                                <Plus className="w-4 h-4 ms-2" aria-hidden="true" />
                                                 إضافة عنصر
                                             </Button>
                                         </div>
@@ -507,7 +507,7 @@ export function EditInvoiceView() {
                                     {/* Notes */}
                                     <div className="space-y-2">
                                         <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                            <FileText className="w-4 h-4 text-blue-500" />
+                                            <FileText className="w-4 h-4 text-blue-500" aria-hidden="true" />
                                             ملاحظات
                                         </label>
                                         <Textarea
@@ -533,12 +533,12 @@ export function EditInvoiceView() {
                                     >
                                         {isUpdating ? (
                                             <span className="flex items-center gap-2">
-                                                <Loader2 className="w-4 h-4 animate-spin" />
+                                                <Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" />
                                                 جاري الحفظ...
                                             </span>
                                         ) : (
                                             <span className="flex items-center gap-2">
-                                                <Save className="w-4 h-4" />
+                                                <Save className="w-4 h-4" aria-hidden="true" />
                                                 حفظ التغييرات
                                             </span>
                                         )}

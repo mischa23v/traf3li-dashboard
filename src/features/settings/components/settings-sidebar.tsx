@@ -61,7 +61,7 @@ export function SettingsSidebar({
                     {/* Create Button - White + Green Text + Glow */}
                     <Button asChild className="bg-white hover:bg-emerald-50 text-emerald-600 h-auto py-6 flex flex-col items-center justify-center gap-2 rounded-3xl shadow-lg shadow-white/10 transition-all duration-300 hover:scale-[1.02] border-0">
                         <Link to={currentLinks.create}>
-                            <Plus className="h-7 w-7" />
+                            <Plus className="h-7 w-7" aria-hidden="true" />
                             <span className="text-sm font-bold">إنشاء</span>
                         </Link>
                     </Button>
@@ -77,7 +77,7 @@ export function SettingsSidebar({
                         )}
                         onClick={onToggleSelectionMode}
                     >
-                        {isSelectionMode ? <X className="h-6 w-6" /> : <CheckSquare className="h-6 w-6" />}
+                        {isSelectionMode ? <X className="h-6 w-6" aria-hidden="true" /> : <CheckSquare className="h-6 w-6" aria-hidden="true" />}
                         <span className="text-sm font-bold">{isSelectionMode ? 'إلغاء' : 'تحديد'}</span>
                     </Button>
 
@@ -88,7 +88,7 @@ export function SettingsSidebar({
                         onClick={onDeleteSelected}
                         disabled={!isSelectionMode || selectedCount === 0}
                     >
-                        <Trash2 className="h-6 w-6" />
+                        <Trash2 className="h-6 w-6" aria-hidden="true" />
                         <span className="text-sm font-bold">
                             {selectedCount > 0 ? `حذف (${selectedCount})` : 'حذف'}
                         </span>
@@ -97,7 +97,7 @@ export function SettingsSidebar({
                     {/* View All Button - White + Dark Text + Glow */}
                     <Button asChild variant="ghost" className="bg-white hover:bg-slate-50 text-emerald-950 h-auto py-6 flex flex-col items-center justify-center gap-2 rounded-3xl transition-all duration-300 hover:scale-[1.02] shadow-lg shadow-white/10">
                         <Link to={currentLinks.viewAll}>
-                            <List className="h-6 w-6" />
+                            <List className="h-6 w-6" aria-hidden="true" />
                             <span className="text-sm font-bold">عرض جميع</span>
                         </Link>
                     </Button>
@@ -174,7 +174,7 @@ export function SettingsSidebar({
                                     <div className="flex-1 bg-white rounded-xl p-3 border-r-4 border-emerald-500 shadow-sm hover:shadow-md transition-all">
                                         <div className="font-bold text-slate-800 text-sm mb-1">جلسة مرافعة</div>
                                         <div className="text-xs text-slate-500 flex items-center gap-1">
-                                            <MapPin className="h-3 w-3" />
+                                            <MapPin className="h-3 w-3" aria-hidden="true" />
                                             المحكمة العامة
                                         </div>
                                     </div>
@@ -190,7 +190,7 @@ export function SettingsSidebar({
                                     <div className="flex-1 bg-white rounded-xl p-3 border-r-4 border-purple-500 shadow-sm hover:shadow-md transition-all">
                                         <div className="font-bold text-slate-800 text-sm mb-1">غداء عمل</div>
                                         <div className="text-xs text-slate-500 flex items-center gap-1">
-                                            <MapPin className="h-3 w-3" />
+                                            <MapPin className="h-3 w-3" aria-hidden="true" />
                                             مطعم الشرفة
                                         </div>
                                     </div>
@@ -206,7 +206,7 @@ export function SettingsSidebar({
                                     <div className="flex-1 bg-white rounded-xl p-3 border-r-4 border-blue-500 shadow-sm hover:shadow-md transition-all">
                                         <div className="font-bold text-slate-800 text-sm mb-1">مراجعة العقود</div>
                                         <div className="text-xs text-slate-500 flex items-center gap-1">
-                                            <Clock className="h-3 w-3" />
+                                            <Clock className="h-3 w-3" aria-hidden="true" />
                                             المكتب الرئيسي
                                         </div>
                                     </div>
@@ -215,7 +215,7 @@ export function SettingsSidebar({
 
                             <Button variant="ghost" className="w-full mt-6 text-slate-500 hover:text-emerald-700 hover:bg-emerald-50 group">
                                 <span>عرض الجدول الكامل</span>
-                                <ChevronRight className="w-4 h-4 me-2 transition-transform group-hover:-translate-x-1 rtl:group-hover:translate-x-1 rtl:rotate-180" />
+                                <ChevronRight className="w-4 h-4 me-2 transition-transform group-hover:-translate-x-1 rtl:group-hover:translate-x-1 rtl:rotate-180" aria-hidden="true" />
                             </Button>
                         </div>
                     ) : (
@@ -223,7 +223,7 @@ export function SettingsSidebar({
                             {[1, 2, 3].map((_, i) => (
                                 <div key={i} className="flex gap-3 p-3 rounded-xl bg-white border border-slate-100 hover:shadow-md transition-all cursor-pointer group">
                                     <div className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center text-blue-500 shrink-0 group-hover:bg-blue-500 group-hover:text-white transition-colors">
-                                        <Bell className="w-5 h-5" />
+                                        <Bell className="w-5 h-5" aria-hidden="true" />
                                     </div>
                                     <div>
                                         <p className="text-sm font-bold text-slate-800 group-hover:text-blue-600 transition-colors">تذكير جديد</p>

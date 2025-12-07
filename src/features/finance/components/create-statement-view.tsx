@@ -97,10 +97,10 @@ export function CreateStatementView() {
                             <div className="hidden md:block relative w-64 h-64">
                                 <div className="absolute inset-0 bg-gradient-to-tr from-emerald-500 to-teal-500 rounded-full opacity-20 blur-3xl animate-pulse"></div>
                                 <div className="absolute inset-4 bg-emerald-950 rounded-2xl border border-white/10 flex items-center justify-center transform rotate-6 shadow-2xl">
-                                    <FileText className="h-24 w-24 text-emerald-400" />
+                                    <FileText className="h-24 w-24 text-emerald-400" aria-hidden="true" />
                                 </div>
                                 <div className="absolute inset-4 bg-emerald-950/80 rounded-2xl border border-white/10 flex items-center justify-center transform -rotate-6 backdrop-blur-sm">
-                                    <Filter className="h-24 w-24 text-teal-400" />
+                                    <Filter className="h-24 w-24 text-teal-400" aria-hidden="true" />
                                 </div>
                             </div>
                         </div>
@@ -134,7 +134,7 @@ export function CreateStatementView() {
                                         </div>
                                         <div className="space-y-2">
                                             <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                                <FileText className="w-4 h-4 text-emerald-500" />
+                                                <FileText className="w-4 h-4 text-emerald-500" aria-hidden="true" />
                                                 الفترة
                                             </label>
                                             <Input
@@ -151,7 +151,7 @@ export function CreateStatementView() {
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                         <div className="space-y-2">
                                             <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                                <Calendar className="w-4 h-4 text-emerald-500" />
+                                                <Calendar className="w-4 h-4 text-emerald-500" aria-hidden="true" />
                                                 من تاريخ
                                             </label>
                                             <Input
@@ -164,7 +164,7 @@ export function CreateStatementView() {
                                         </div>
                                         <div className="space-y-2">
                                             <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                                <Calendar className="w-4 h-4 text-emerald-500" />
+                                                <Calendar className="w-4 h-4 text-emerald-500" aria-hidden="true" />
                                                 إلى تاريخ
                                             </label>
                                             <Input
@@ -179,7 +179,7 @@ export function CreateStatementView() {
 
                                     <div className="space-y-2">
                                         <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                            <FileText className="w-4 h-4 text-emerald-500" />
+                                            <FileText className="w-4 h-4 text-emerald-500" aria-hidden="true" />
                                             ملاحظات للتقرير
                                         </label>
                                         <Textarea
@@ -192,7 +192,7 @@ export function CreateStatementView() {
 
                                     <div className="space-y-2">
                                         <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                            <Save className="w-4 h-4 text-emerald-500" />
+                                            <Save className="w-4 h-4 text-emerald-500" aria-hidden="true" />
                                             الحالة
                                         </label>
                                         <Select
@@ -223,12 +223,12 @@ export function CreateStatementView() {
                                     >
                                         {isPending ? (
                                             <span className="flex items-center gap-2">
-                                                <Loader2 className="w-4 h-4 animate-spin" />
+                                                <Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" />
                                                 جاري الحفظ...
                                             </span>
                                         ) : (
                                             <span className="flex items-center gap-2">
-                                                <Save className="w-4 h-4" />
+                                                <Save className="w-4 h-4" aria-hidden="true" />
                                                 إنشاء الكشف
                                             </span>
                                         )}

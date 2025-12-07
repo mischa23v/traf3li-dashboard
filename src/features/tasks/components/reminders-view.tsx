@@ -245,7 +245,6 @@ export function RemindersView() {
                 setIsSelectionMode(false)
                 setSelectedReminderIds([])
             } catch (error) {
-                console.error("Failed to delete reminders", error)
                 toast.error(t('reminders.toast.deleteError'))
             }
         }

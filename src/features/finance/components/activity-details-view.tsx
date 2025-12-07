@@ -45,11 +45,11 @@ export function ActivityDetailsView() {
                 </div>
                 <div className='ms-auto flex items-center gap-4'>
                     <div className="relative hidden md:block">
-                        <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                        <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" aria-hidden="true" />
                         <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
                     </div>
-                    <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white">
-                        <Bell className="h-5 w-5" />
+                    <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white" aria-label="الإشعارات">
+                        <Bell className="h-5 w-5" aria-hidden="true" />
                         <span className="absolute top-2 right-2 h-2 w-2 bg-red-500 rounded-full border border-navy"></span>
                     </Button>
                     <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white" />
@@ -78,7 +78,7 @@ export function ActivityDetailsView() {
                 ) : isError ? (
                     <div className="max-w-[1600px] mx-auto">
                         <div className="bg-white rounded-3xl p-12 text-center border border-red-100">
-                            <AlertCircle className="h-16 w-16 text-red-500 mx-auto mb-4" />
+                            <AlertCircle className="h-16 w-16 text-red-500 mx-auto mb-4" aria-hidden="true" />
                             <h3 className="text-xl font-bold mb-2 text-slate-900">فشل تحميل النشاط</h3>
                             <p className="text-slate-500 mb-4">{error?.message || 'حدث خطأ أثناء تحميل النشاط'}</p>
                             <Button onClick={() => window.location.reload()}>
@@ -101,7 +101,7 @@ export function ActivityDetailsView() {
                     <>
                         <div className="max-w-[1600px] mx-auto mb-6">
                             <Link to="/dashboard/finance/activity" className="inline-flex items-center text-slate-500 hover:text-navy transition-colors">
-                                <ArrowLeft className="h-4 w-4 ms-2" />
+                                <ArrowLeft className="h-4 w-4 ms-2" aria-hidden="true" />
                                 العودة إلى سجل النشاط
                             </Link>
                         </div>
@@ -133,7 +133,7 @@ export function ActivityDetailsView() {
                                     <span>المستخدم: <span className="text-white font-medium">{activity.userName}</span></span>
                                 </div>
                                 <div className="flex items-center gap-2">
-                                    <Clock className="h-4 w-4 text-emerald-400" />
+                                    <Clock className="h-4 w-4 text-emerald-400" aria-hidden="true" />
                                     <span>الوقت: <span className="text-white font-medium">{new Date(activity.date).toLocaleDateString('ar-SA')} - {activity.time}</span></span>
                                 </div>
                                 <div className="flex items-center gap-2">

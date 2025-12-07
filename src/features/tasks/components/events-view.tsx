@@ -219,7 +219,6 @@ export function EventsView() {
                 setIsSelectionMode(false)
                 setSelectedEventIds([])
             } catch (error) {
-                console.error("Failed to delete events", error)
                 toast.error(t('events.toast.deleteError'))
             }
         }

@@ -74,7 +74,6 @@ export const usePermissionsStore = create<PermissionsState>()(
             noFirmAssociated: false,
           })
         } catch (error: any) {
-          console.error('Fetch permissions error:', error)
           // Check if error indicates no firm associated (404 with specific message)
           const isNoFirmError =
             error.message?.includes('لا يوجد مكتب') ||

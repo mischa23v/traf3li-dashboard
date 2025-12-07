@@ -92,7 +92,7 @@ export function OffboardingListView() {
     switch (status) {
       case 'initiated': return <Clock className="w-4 h-4" />
       case 'in_progress': return <Loader2 className="w-4 h-4 animate-spin" />
-      case 'clearance_pending': return <AlertCircle className="w-4 h-4" />
+      case 'clearance_pending': return <AlertCircle className="w-4 h-4" aria-hidden="true" />
       case 'completed': return <CheckCircle className="w-4 h-4" />
       case 'cancelled': return <XCircle className="w-4 h-4" />
       default: return null
@@ -137,19 +137,19 @@ export function OffboardingListView() {
         <div className="absolute start-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
           <DynamicIsland />
         </div>
-        <div className='ms-auto flex items-center gap-4'>
-          <div className="relative hidden md:block">
-            <Search className="absolute end-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-            <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
+        <div className='ms-auto flex items-center gap-2 sm:gap-4 overflow-x-auto min-w-0'>
+          <div className="relative hidden md:block min-w-0">
+            <Search className="absolute end-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
+            <input type="text" placeholder="بحث..." aria-label="بحث" className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
           </div>
-          <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white">
-            <Bell className="h-5 w-5" />
+          <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white flex-shrink-0" aria-label="الإشعارات">
+            <Bell className="h-5 w-5" aria-hidden="true" />
             <span className="absolute top-2 end-2 h-2 w-2 bg-red-500 rounded-full border border-navy"></span>
           </Button>
-          <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white" />
-          <ThemeSwitch className="text-slate-300 hover:bg-white/10 hover:text-white" />
-          <ConfigDrawer className="text-slate-300 hover:bg-white/10 hover:text-white" />
-          <ProfileDropdown className="text-slate-300 hover:bg-white/10 hover:text-white" />
+          <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white flex-shrink-0" />
+          <ThemeSwitch className="text-slate-300 hover:bg-white/10 hover:text-white hidden sm:flex flex-shrink-0" />
+          <ConfigDrawer className="text-slate-300 hover:bg-white/10 hover:text-white hidden lg:flex flex-shrink-0" />
+          <ProfileDropdown className="text-slate-300 hover:bg-white/10 hover:text-white flex-shrink-0" />
         </div>
         <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-emerald-500/50 to-transparent"></div>
       </Header>
@@ -226,7 +226,7 @@ export function OffboardingListView() {
               <CardContent className="p-4">
                 <div className="flex flex-col md:flex-row gap-4">
                   <div className="relative flex-1">
-                    <Search className="absolute end-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                    <Search className="absolute end-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
                     <Input
                       placeholder="البحث باسم الموظف أو الرقم..."
                       value={searchQuery}
@@ -260,7 +260,7 @@ export function OffboardingListView() {
                     onClick={() => navigate({ to: '/dashboard/hr/offboarding/new' })}
                     className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl shadow-lg shadow-emerald-500/20"
                   >
-                    <Plus className="w-4 h-4 ms-2" />
+                    <Plus className="w-4 h-4 ms-2" aria-hidden="true" />
                     إضافة جديد
                   </Button>
                 </div>
@@ -282,7 +282,7 @@ export function OffboardingListView() {
                       disabled={bulkDeleteMutation.isPending}
                       className="rounded-xl"
                     >
-                      <Trash2 className="w-4 h-4 ms-2" />
+                      <Trash2 className="w-4 h-4 ms-2" aria-hidden="true" />
                       حذف المحدد
                     </Button>
                     <Button
@@ -312,7 +312,7 @@ export function OffboardingListView() {
             ) : error ? (
               <Card className="rounded-2xl border-slate-100">
                 <CardContent className="p-8 text-center">
-                  <AlertCircle className="w-8 h-8 mx-auto text-red-500" />
+                  <AlertCircle className="w-8 h-8 mx-auto text-red-500" aria-hidden="true" />
                   <p className="mt-4 text-red-600">حدث خطأ في تحميل البيانات</p>
                 </CardContent>
               </Card>
@@ -325,7 +325,7 @@ export function OffboardingListView() {
                     onClick={() => navigate({ to: '/dashboard/hr/offboarding/new' })}
                     className="mt-4 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl"
                   >
-                    <Plus className="w-4 h-4 ms-2" />
+                    <Plus className="w-4 h-4 ms-2" aria-hidden="true" />
                     إضافة سجل جديد
                   </Button>
                 </CardContent>
@@ -363,7 +363,7 @@ export function OffboardingListView() {
                               </div>
                               <div className="flex items-center gap-4 text-sm text-slate-500">
                                 <span className="flex items-center gap-1">
-                                  <Building2 className="w-4 h-4" />
+                                  <Building2 className="w-4 h-4" aria-hidden="true" />
                                   {offboarding.department || 'غير محدد'}
                                 </span>
                                 <span>{offboarding.jobTitle}</span>
@@ -379,7 +379,7 @@ export function OffboardingListView() {
 
                           <div className="flex items-center gap-6 mt-4 text-sm">
                             <div className="flex items-center gap-2 text-slate-500">
-                              <Calendar className="w-4 h-4" />
+                              <Calendar className="w-4 h-4" aria-hidden="true" />
                               <span>آخر يوم عمل: {new Date(offboarding.dates.lastWorkingDay).toLocaleDateString('ar-SA')}</span>
                             </div>
                             {offboarding.noticePeriod && (
@@ -392,19 +392,19 @@ export function OffboardingListView() {
 
                           {/* Progress indicators */}
                           <div className="flex items-center gap-4 mt-4">
-                            <div className={`flex items-center gap-1 text-xs ${offboarding.completion?.exitInterviewCompleted ? 'text-emerald-600' : 'text-slate-400'}`}>
+                            <div className={`flex items-center gap-1 text-xs ${offboarding.completion?.exitInterviewCompleted ? 'text-emerald-600' : 'text-slate-500'}`}>
                               <CheckCircle className="w-3 h-3" />
                               مقابلة الخروج
                             </div>
-                            <div className={`flex items-center gap-1 text-xs ${offboarding.completion?.clearanceCompleted ? 'text-emerald-600' : 'text-slate-400'}`}>
+                            <div className={`flex items-center gap-1 text-xs ${offboarding.completion?.clearanceCompleted ? 'text-emerald-600' : 'text-slate-500'}`}>
                               <CheckCircle className="w-3 h-3" />
                               الإخلاء
                             </div>
-                            <div className={`flex items-center gap-1 text-xs ${offboarding.completion?.finalSettlementCompleted ? 'text-emerald-600' : 'text-slate-400'}`}>
+                            <div className={`flex items-center gap-1 text-xs ${offboarding.completion?.finalSettlementCompleted ? 'text-emerald-600' : 'text-slate-500'}`}>
                               <CheckCircle className="w-3 h-3" />
                               التسوية
                             </div>
-                            <div className={`flex items-center gap-1 text-xs ${offboarding.completion?.documentsIssued ? 'text-emerald-600' : 'text-slate-400'}`}>
+                            <div className={`flex items-center gap-1 text-xs ${offboarding.completion?.documentsIssued ? 'text-emerald-600' : 'text-slate-500'}`}>
                               <CheckCircle className="w-3 h-3" />
                               الشهادات
                             </div>
@@ -413,21 +413,21 @@ export function OffboardingListView() {
 
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon" className="rounded-xl">
-                              <MoreHorizontal className="w-4 h-4" />
+                            <Button variant="ghost" size="icon" className="rounded-xl" aria-label="خيارات">
+                              <MoreHorizontal className="w-4 h-4" aria-hidden="true" />
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end" className="w-48">
                             <DropdownMenuItem
                               onClick={() => navigate({ to: `/dashboard/hr/offboarding/${offboarding._id}` })}
                             >
-                              <Eye className="w-4 h-4 ms-2" />
+                              <Eye className="w-4 h-4 ms-2" aria-hidden="true" />
                               عرض التفاصيل
                             </DropdownMenuItem>
                             <DropdownMenuItem
                               onClick={() => navigate({ to: `/dashboard/hr/offboarding/new?editId=${offboarding._id}` })}
                             >
-                              <Edit className="w-4 h-4 ms-2" />
+                              <Edit className="w-4 h-4 ms-2" aria-hidden="true" />
                               تعديل
                             </DropdownMenuItem>
                             <DropdownMenuSeparator />
@@ -445,7 +445,7 @@ export function OffboardingListView() {
                               className="text-red-600"
                               onClick={() => deleteMutation.mutate(offboarding._id)}
                             >
-                              <Trash2 className="w-4 h-4 ms-2" />
+                              <Trash2 className="w-4 h-4 ms-2" aria-hidden="true" />
                               حذف
                             </DropdownMenuItem>
                           </DropdownMenuContent>

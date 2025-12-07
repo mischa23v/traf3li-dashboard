@@ -84,7 +84,6 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
         navigate({ to: '/' }) // Client dashboard
       }
     } catch (error: any) {
-      console.error('Login error:', error)
       // Error is handled by the store
     } finally {
       setIsLoading(false)

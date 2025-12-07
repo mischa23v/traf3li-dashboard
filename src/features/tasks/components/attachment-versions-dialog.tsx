@@ -140,7 +140,7 @@ export function AttachmentVersionsDialog({
                   {isArabic ? 'فشل في تحميل سجل النسخ' : 'Failed to load version history'}
                 </div>
               ) : versions.length === 0 ? (
-                <div className='text-center py-8 text-muted-foreground'>
+                <div className='text-center py-8 text-slate-600'>
                   <GitBranch className='mx-auto h-12 w-12 mb-4 opacity-50' />
                   <p className='text-sm'>
                     {isArabic ? 'لا توجد نسخ سابقة' : 'No previous versions'}
@@ -207,7 +207,7 @@ export function AttachmentVersionsDialog({
                                     </Badge>
                                   )}
                                 </div>
-                                <div className='flex flex-wrap items-center gap-3 text-sm text-muted-foreground'>
+                                <div className='flex flex-wrap items-center gap-3 text-sm text-slate-600'>
                                   <span className='flex items-center gap-1'>
                                     <Clock className='h-3 w-3' />
                                     {formatDate(version.lastModified)}
@@ -216,7 +216,7 @@ export function AttachmentVersionsDialog({
                                     {formatFileSize(version.size)}
                                   </span>
                                 </div>
-                                <div className='mt-1 text-xs text-muted-foreground'>
+                                <div className='mt-1 text-xs text-slate-600'>
                                   {formatDistanceToNow(new Date(version.lastModified), {
                                     addSuffix: true,
                                     locale: isArabic ? ar : enUS,
@@ -277,7 +277,7 @@ export function AttachmentVersionsDialog({
           </div>
 
           {/* Help text */}
-          <div className='text-xs text-muted-foreground bg-muted/50 p-3 rounded-lg'>
+          <div className='text-xs text-slate-600 bg-muted/50 p-3 rounded-lg'>
             {isArabic
               ? 'لإضافة نسخة جديدة، قم برفع ملف بنفس الاسم. سيتم حفظ النسخة السابقة تلقائياً.'
               : 'To add a new version, upload a file with the same name. The previous version will be saved automatically.'}

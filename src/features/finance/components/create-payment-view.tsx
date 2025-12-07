@@ -443,7 +443,7 @@ export function CreatePaymentView() {
                             <Card className="rounded-3xl shadow-sm border-slate-100">
                                 <CardHeader className="pb-4">
                                     <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                                        <Receipt className="w-5 h-5 text-emerald-500" />
+                                        <Receipt className="w-5 h-5 text-emerald-500" aria-hidden="true" />
                                         نوع الدفعة
                                     </CardTitle>
                                 </CardHeader>
@@ -559,7 +559,7 @@ export function CreatePaymentView() {
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         <div className="space-y-2">
                                             <Label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                                <Calendar className="w-4 h-4 text-emerald-500" />
+                                                <Calendar className="w-4 h-4 text-emerald-500" aria-hidden="true" />
                                                 تاريخ الدفع <span className="text-red-500">*</span>
                                             </Label>
                                             <Input
@@ -632,7 +632,7 @@ export function CreatePaymentView() {
                             <Card className="rounded-3xl shadow-sm border-slate-100">
                                 <CardHeader className="pb-4">
                                     <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                                        <CreditCard className="w-5 h-5 text-emerald-500" />
+                                        <CreditCard className="w-5 h-5 text-emerald-500" aria-hidden="true" />
                                         طريقة الدفع
                                     </CardTitle>
                                 </CardHeader>
@@ -695,7 +695,7 @@ export function CreatePaymentView() {
                                 <Card className="rounded-3xl shadow-sm border-amber-200 bg-amber-50/50">
                                     <CardHeader className="pb-4">
                                         <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                                            <FileText className="w-5 h-5 text-amber-500" />
+                                            <FileText className="w-5 h-5 text-amber-500" aria-hidden="true" />
                                             تفاصيل الشيك
                                         </CardTitle>
                                     </CardHeader>
@@ -788,7 +788,7 @@ export function CreatePaymentView() {
 
                                         {checkStatus === 'bounced' && (
                                             <Alert className="rounded-xl bg-red-50 border-red-200">
-                                                <AlertCircle className="h-4 w-4 text-red-600" />
+                                                <AlertCircle className="h-4 w-4 text-red-600" aria-hidden="true" />
                                                 <AlertDescription className="text-red-700">
                                                     هذا الشيك مرتجع. يرجى متابعة العميل لتسوية المبلغ.
                                                 </AlertDescription>
@@ -803,7 +803,7 @@ export function CreatePaymentView() {
                                 <Card className="rounded-3xl shadow-sm border-blue-200 bg-blue-50/50">
                                     <CardHeader className="pb-4">
                                         <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                                            <CreditCard className="w-5 h-5 text-blue-500" />
+                                            <CreditCard className="w-5 h-5 text-blue-500" aria-hidden="true" />
                                             تفاصيل البطاقة
                                         </CardTitle>
                                     </CardHeader>
@@ -913,12 +913,12 @@ export function CreatePaymentView() {
                                     <CardContent>
                                         {loadingInvoices ? (
                                             <div className="text-center py-8 text-slate-500">
-                                                <Loader2 className="w-6 h-6 animate-spin mx-auto mb-2" />
+                                                <Loader2 className="w-6 h-6 animate-spin mx-auto mb-2" aria-hidden="true" />
                                                 جاري تحميل الفواتير...
                                             </div>
                                         ) : applyToInvoices.length === 0 ? (
                                             <div className="text-center py-8 text-slate-500">
-                                                <FileText className="w-10 h-10 mx-auto mb-2 opacity-50" />
+                                                <FileText className="w-10 h-10 mx-auto mb-2 opacity-50" aria-hidden="true" />
                                                 <p>لا توجد فواتير لهذا العميل</p>
                                             </div>
                                         ) : (
@@ -1154,7 +1154,7 @@ export function CreatePaymentView() {
                                     <AccordionItem value="refund" className="border rounded-3xl shadow-sm border-slate-100 overflow-hidden">
                                         <AccordionTrigger className="px-6 py-4 hover:bg-slate-50">
                                             <div className="flex items-center gap-2">
-                                                <RefreshCw className="h-5 w-5 text-amber-500" />
+                                                <RefreshCw className="h-5 w-5 text-amber-500" aria-hidden="true" />
                                                 <span className="font-bold text-slate-800">تفاصيل الاسترداد</span>
                                             </div>
                                         </AccordionTrigger>
@@ -1232,7 +1232,7 @@ export function CreatePaymentView() {
                                 <AccordionItem value="reconciliation" className="border rounded-3xl shadow-sm border-slate-100 overflow-hidden">
                                     <AccordionTrigger className="px-6 py-4 hover:bg-slate-50">
                                         <div className="flex items-center gap-2">
-                                            <CheckCircle className="h-5 w-5 text-blue-500" />
+                                            <CheckCircle className="h-5 w-5 text-blue-500" aria-hidden="true" />
                                             <span className="font-bold text-slate-800">المطابقة البنكية</span>
                                             {isReconciled && (
                                                 <Badge className="rounded-full bg-blue-100 text-blue-700">مطابق</Badge>
@@ -1385,7 +1385,7 @@ export function CreatePaymentView() {
                                                     {attachments.map((file, index) => (
                                                         <div key={index} className="flex items-center justify-between p-3 bg-slate-50 rounded-xl">
                                                             <div className="flex items-center gap-3">
-                                                                <FileText className="w-5 h-5 text-slate-400" />
+                                                                <FileText className="w-5 h-5 text-slate-400" aria-hidden="true" />
                                                                 <span className="text-sm font-medium">{file.name}</span>
                                                                 <span className="text-xs text-slate-400">
                                                                     ({(file.size / 1024).toFixed(1)} KB)
@@ -1398,7 +1398,7 @@ export function CreatePaymentView() {
                                                                 onClick={() => setAttachments(attachments.filter((_, i) => i !== index))}
                                                                 className="text-red-500 hover:text-red-700"
                                                             >
-                                                                <Trash2 className="w-4 h-4" />
+                                                                <Trash2 className="w-4 h-4" aria-hidden="true" />
                                                             </Button>
                                                         </div>
                                                     ))}
@@ -1475,14 +1475,14 @@ export function CreatePaymentView() {
                                         </Button>
                                     </Link>
                                     <Button type="button" variant="outline" className="rounded-xl">
-                                        <Save className="ms-2 h-4 w-4" />
+                                        <Save className="ms-2 h-4 w-4" aria-hidden="true" />
                                         حفظ كمسودة
                                     </Button>
                                 </div>
 
                                 <div className="flex gap-2">
                                     <Button type="button" variant="outline" className="rounded-xl">
-                                        <Eye className="ms-2 h-4 w-4" />
+                                        <Eye className="ms-2 h-4 w-4" aria-hidden="true" />
                                         معاينة الإيصال
                                     </Button>
 
@@ -1495,7 +1495,7 @@ export function CreatePaymentView() {
                                             >
                                                 {createPaymentMutation.isPending ? (
                                                     <span className="flex items-center gap-2">
-                                                        <Loader2 className="w-4 h-4 animate-spin" />
+                                                        <Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" />
                                                         جاري الحفظ...
                                                     </span>
                                                 ) : (
@@ -1512,16 +1512,16 @@ export function CreatePaymentView() {
                                                 حفظ و إرسال الإيصال
                                             </DropdownMenuItem>
                                             <DropdownMenuItem>
-                                                <Download className="ms-2 h-4 w-4" />
+                                                <Download className="ms-2 h-4 w-4" aria-hidden="true" />
                                                 حفظ و تحميل PDF
                                             </DropdownMenuItem>
                                             <DropdownMenuItem>
-                                                <Printer className="ms-2 h-4 w-4" />
+                                                <Printer className="ms-2 h-4 w-4" aria-hidden="true" />
                                                 حفظ و طباعة
                                             </DropdownMenuItem>
                                             <DropdownMenuSeparator />
                                             <DropdownMenuItem onClick={(e) => { setSendReceipt(false); handleSubmit(e as any) }}>
-                                                <Save className="ms-2 h-4 w-4" />
+                                                <Save className="ms-2 h-4 w-4" aria-hidden="true" />
                                                 حفظ فقط
                                             </DropdownMenuItem>
                                         </DropdownMenuContent>

@@ -441,7 +441,7 @@ export function CreateTimeEntryView() {
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         <div className="space-y-2">
                                             <Label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                                <Calendar className="w-4 h-4 text-emerald-500" />
+                                                <Calendar className="w-4 h-4 text-emerald-500" aria-hidden="true" />
                                                 التاريخ <span className="text-red-500">*</span>
                                             </Label>
                                             <Input
@@ -603,11 +603,11 @@ export function CreateTimeEntryView() {
                                     <Tabs value={formData.entryMethod} onValueChange={(v: any) => setFormData({ ...formData, entryMethod: v })}>
                                         <TabsList className="grid grid-cols-3 w-full mb-6">
                                             <TabsTrigger value="duration" className="data-[state=active]:bg-emerald-500 data-[state=active]:text-white">
-                                                <Clock className="ms-2 h-4 w-4" />
+                                                <Clock className="ms-2 h-4 w-4" aria-hidden="true" />
                                                 المدة المباشرة
                                             </TabsTrigger>
                                             <TabsTrigger value="start_end" className="data-[state=active]:bg-emerald-500 data-[state=active]:text-white">
-                                                <Calendar className="ms-2 h-4 w-4" />
+                                                <Calendar className="ms-2 h-4 w-4" aria-hidden="true" />
                                                 وقت البدء/الانتهاء
                                             </TabsTrigger>
                                             <TabsTrigger value="timer" className="data-[state=active]:bg-emerald-500 data-[state=active]:text-white">
@@ -1079,7 +1079,7 @@ export function CreateTimeEntryView() {
                                 <AccordionItem value="notes" className="border rounded-xl px-4">
                                     <AccordionTrigger className="hover:no-underline">
                                         <div className="flex items-center gap-2">
-                                            <FileText className="h-4 w-4 text-slate-500" />
+                                            <FileText className="h-4 w-4 text-slate-500" aria-hidden="true" />
                                             <span className="font-semibold">ملاحظات إضافية</span>
                                         </div>
                                     </AccordionTrigger>
@@ -1103,7 +1103,7 @@ export function CreateTimeEntryView() {
                                         إلغاء
                                     </Button>
                                     <Button type="button" variant="outline" onClick={(e) => handleSubmit(e as any, 'draft')} className="rounded-xl">
-                                        <Save className="ms-2 h-4 w-4" />
+                                        <Save className="ms-2 h-4 w-4" aria-hidden="true" />
                                         حفظ كمسودة
                                     </Button>
                                 </div>
@@ -1117,11 +1117,11 @@ export function CreateTimeEntryView() {
                                         </DropdownMenuTrigger>
                                         <DropdownMenuContent align="end">
                                             <DropdownMenuItem>
-                                                <Copy className="ms-2 h-4 w-4" />
+                                                <Copy className="ms-2 h-4 w-4" aria-hidden="true" />
                                                 نسخ القيد
                                             </DropdownMenuItem>
                                             <DropdownMenuItem>
-                                                <FileText className="ms-2 h-4 w-4" />
+                                                <FileText className="ms-2 h-4 w-4" aria-hidden="true" />
                                                 حفظ كقالب
                                             </DropdownMenuItem>
                                             <DropdownMenuSeparator />
@@ -1139,12 +1139,12 @@ export function CreateTimeEntryView() {
                                     >
                                         {createTimeEntryMutation.isPending ? (
                                             <span className="flex items-center gap-2">
-                                                <Loader2 className="h-4 w-4 animate-spin" />
+                                                <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
                                                 جاري الحفظ...
                                             </span>
                                         ) : (
                                             <span className="flex items-center gap-2">
-                                                <CheckCircle className="h-4 w-4" />
+                                                <CheckCircle className="h-4 w-4" aria-hidden="true" />
                                                 حفظ و اعتماد
                                             </span>
                                         )}

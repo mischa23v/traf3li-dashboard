@@ -196,11 +196,11 @@ export default function PaymentsDashboard() {
                     </div>
                     <div className='ms-auto flex items-center gap-4'>
                         <div className="relative hidden md:block">
-                            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" aria-hidden="true" />
                             <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
                         </div>
-                        <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white">
-                            <Bell className="h-5 w-5" />
+                        <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white" aria-label="الإشعارات">
+                            <Bell className="h-5 w-5" aria-hidden="true" />
                             <span className="absolute top-2 right-2 h-2 w-2 bg-red-500 rounded-full border border-navy"></span>
                         </Button>
                         <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white" />
@@ -241,11 +241,11 @@ export default function PaymentsDashboard() {
                     </div>
                     <div className='ms-auto flex items-center gap-4'>
                         <div className="relative hidden md:block">
-                            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" aria-hidden="true" />
                             <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
                         </div>
-                        <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white">
-                            <Bell className="h-5 w-5" />
+                        <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white" aria-label="الإشعارات">
+                            <Bell className="h-5 w-5" aria-hidden="true" />
                             <span className="absolute top-2 right-2 h-2 w-2 bg-red-500 rounded-full border border-navy"></span>
                         </Button>
                         <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white" />
@@ -258,12 +258,12 @@ export default function PaymentsDashboard() {
                 <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8">
                     <div className="bg-white rounded-3xl p-12 text-center border border-slate-100 shadow-sm">
                         <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <AlertCircle className="h-8 w-8 text-red-500" />
+                            <AlertCircle className="h-8 w-8 text-red-500" aria-hidden="true" />
                         </div>
                         <h3 className="text-xl font-bold text-slate-900 mb-2">فشل تحميل المدفوعات</h3>
                         <p className="text-slate-500 mb-6">{error?.message || 'حدث خطأ أثناء تحميل البيانات'}</p>
                         <Button onClick={() => refetch()} className="bg-emerald-500 hover:bg-emerald-600 text-white px-8">
-                            <Loader2 className="ms-2 h-4 w-4" />
+                            <Loader2 className="ms-2 h-4 w-4" aria-hidden="true" />
                             إعادة المحاولة
                         </Button>
                     </div>
@@ -287,11 +287,11 @@ export default function PaymentsDashboard() {
 
                 <div className='ms-auto flex items-center gap-4'>
                     <div className="relative hidden md:block">
-                        <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                        <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" aria-hidden="true" />
                         <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
                     </div>
                     <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white">
-                        <Bell className="h-5 w-5" />
+                        <Bell className="h-5 w-5" aria-hidden="true" />
                         <span className="absolute top-2 right-2 h-2 w-2 bg-red-500 rounded-full border border-navy"></span>
                     </Button>
                     <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white" />
@@ -316,13 +316,13 @@ export default function PaymentsDashboard() {
                             {filteredPayments.length === 0 && !searchQuery && activeTab === 'all' ? (
                                 <div className="bg-white rounded-3xl p-12 text-center border border-slate-100 shadow-sm">
                                     <div className="w-16 h-16 bg-emerald-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                                        <CreditCard className="h-8 w-8 text-emerald-600" />
+                                        <CreditCard className="h-8 w-8 text-emerald-600" aria-hidden="true" />
                                     </div>
                                     <h3 className="text-xl font-bold text-slate-900 mb-2">لا توجد مدفوعات بعد</h3>
                                     <p className="text-slate-500 mb-6">ستظهر المدفوعات هنا عند تسجيل دفعات للفواتير</p>
                                     <Button asChild className="bg-emerald-600 hover:bg-emerald-700 text-white px-8">
                                         <Link to="/dashboard/finance/invoices">
-                                            <CreditCard className="ms-2 h-4 w-4" />
+                                            <CreditCard className="ms-2 h-4 w-4" aria-hidden="true" />
                                             عرض الفواتير
                                         </Link>
                                     </Button>
@@ -363,7 +363,7 @@ export default function PaymentsDashboard() {
 
                                             <div className="flex items-center gap-3">
                                                 <div className="relative w-full max-w-xs">
-                                                    <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                                                    <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" aria-hidden="true" />
                                                     <Input
                                                         placeholder="بحث في المدفوعات..."
                                                         className="pe-10 rounded-xl border-slate-200 focus:ring-[#022c22] focus:border-[#022c22]"
@@ -374,7 +374,7 @@ export default function PaymentsDashboard() {
                                                 <Popover open={showFilters} onOpenChange={setShowFilters}>
                                                     <PopoverTrigger asChild>
                                                         <Button variant="outline" className="rounded-xl border-slate-200 relative">
-                                                            <Filter className="w-4 h-4 ms-2" />
+                                                            <Filter className="w-4 h-4 ms-2" aria-hidden="true" />
                                                             تصفية متقدمة
                                                             {activeFilterCount > 0 && (
                                                                 <Badge className="absolute -top-2 -left-2 h-5 w-5 p-0 flex items-center justify-center bg-emerald-600 text-white text-xs">
@@ -389,7 +389,7 @@ export default function PaymentsDashboard() {
                                                                 <h4 className="font-bold text-navy">تصفية متقدمة</h4>
                                                                 {activeFilterCount > 0 && (
                                                                     <Button variant="ghost" size="sm" onClick={clearFilters} className="text-slate-500 hover:text-red-500">
-                                                                        <X className="w-4 h-4 ms-1" />
+                                                                        <X className="w-4 h-4 ms-1" aria-hidden="true" />
                                                                         مسح
                                                                     </Button>
                                                                 )}
@@ -413,7 +413,7 @@ export default function PaymentsDashboard() {
                                                             <div className="grid grid-cols-2 gap-3">
                                                                 <div className="space-y-2">
                                                                     <label className="text-sm font-medium text-slate-700 flex items-center gap-1">
-                                                                        <Calendar className="w-3 h-3" />
+                                                                        <Calendar className="w-3 h-3" aria-hidden="true" />
                                                                         من تاريخ
                                                                     </label>
                                                                     <Input
@@ -425,7 +425,7 @@ export default function PaymentsDashboard() {
                                                                 </div>
                                                                 <div className="space-y-2">
                                                                     <label className="text-sm font-medium text-slate-700 flex items-center gap-1">
-                                                                        <Calendar className="w-3 h-3" />
+                                                                        <Calendar className="w-3 h-3" aria-hidden="true" />
                                                                         إلى تاريخ
                                                                     </label>
                                                                     <Input
@@ -444,7 +444,7 @@ export default function PaymentsDashboard() {
                                                                     disabled={isExporting}
                                                                     className="flex-1 rounded-xl"
                                                                 >
-                                                                    <Download className="w-4 h-4 ms-1" />
+                                                                    <Download className="w-4 h-4 ms-1" aria-hidden="true" />
                                                                     CSV
                                                                 </Button>
                                                                 <Button
@@ -454,7 +454,7 @@ export default function PaymentsDashboard() {
                                                                     disabled={isExporting}
                                                                     className="flex-1 rounded-xl"
                                                                 >
-                                                                    <Download className="w-4 h-4 ms-1" />
+                                                                    <Download className="w-4 h-4 ms-1" aria-hidden="true" />
                                                                     PDF
                                                                 </Button>
                                                             </div>
@@ -471,19 +471,19 @@ export default function PaymentsDashboard() {
                                                 {selectedClient && selectedClient !== 'all' && (
                                                     <Badge variant="outline" className="bg-blue-50 border-blue-200 text-blue-700 gap-1">
                                                         العميل
-                                                        <X className="w-3 h-3 cursor-pointer" onClick={() => setSelectedClient('')} />
+                                                        <X className="w-3 h-3 cursor-pointer" aria-label="إزالة" onClick={() => setSelectedClient('')} />
                                                     </Badge>
                                                 )}
                                                 {startDate && (
                                                     <Badge variant="outline" className="bg-purple-50 border-purple-200 text-purple-700 gap-1">
                                                         من: {new Date(startDate).toLocaleDateString('ar-SA')}
-                                                        <X className="w-3 h-3 cursor-pointer" onClick={() => setStartDate('')} />
+                                                        <X className="w-3 h-3 cursor-pointer" aria-label="إزالة" onClick={() => setStartDate('')} />
                                                     </Badge>
                                                 )}
                                                 {endDate && (
                                                     <Badge variant="outline" className="bg-purple-50 border-purple-200 text-purple-700 gap-1">
                                                         إلى: {new Date(endDate).toLocaleDateString('ar-SA')}
-                                                        <X className="w-3 h-3 cursor-pointer" onClick={() => setEndDate('')} />
+                                                        <X className="w-3 h-3 cursor-pointer" aria-label="إزالة" onClick={() => setEndDate('')} />
                                                     </Badge>
                                                 )}
                                             </div>
@@ -495,7 +495,7 @@ export default function PaymentsDashboard() {
                                         {filteredPayments.length === 0 ? (
                                             <div className="bg-white p-12 rounded-3xl text-center border border-slate-100">
                                                 <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                                                    <Search className="h-8 w-8 text-slate-400" />
+                                                    <Search className="h-8 w-8 text-slate-400" aria-hidden="true" />
                                                 </div>
                                                 <h3 className="text-lg font-bold text-slate-900 mb-2">لا توجد نتائج</h3>
                                                 <p className="text-slate-500 mb-4">لم نجد مدفوعات تطابق البحث أو الفلاتر المحددة</p>
@@ -517,13 +517,13 @@ export default function PaymentsDashboard() {
                                                 <div key={payment.id} className="bg-white p-6 rounded-[24px] border border-slate-100 shadow-sm hover:shadow-md transition-all flex flex-col md:flex-row md:items-center justify-between gap-4">
                                                     <div className="flex items-center gap-4">
                                                         <div className="w-14 h-14 rounded-2xl bg-emerald-50 flex items-center justify-center text-emerald-600">
-                                                            <CreditCard className="w-7 h-7" />
+                                                            <CreditCard className="w-7 h-7" aria-hidden="true" />
                                                         </div>
                                                         <div>
                                                             <div className="flex items-center gap-2 mb-1">
                                                                 <h4 className="font-bold text-navy text-lg">{payment.id}</h4>
                                                                 <Badge className={`${status.bgColor} ${status.color} border-0 px-2 py-0.5`}>
-                                                                    <StatusIcon className="w-3 h-3 ms-1" />
+                                                                    <StatusIcon className="w-3 h-3 ms-1" aria-hidden="true" />
                                                                     {status.label}
                                                                 </Badge>
                                                             </div>
@@ -548,8 +548,8 @@ export default function PaymentsDashboard() {
                                                         </div>
                                                         <DropdownMenu>
                                                             <DropdownMenuTrigger asChild>
-                                                                <Button variant="ghost" size="icon" className="rounded-full hover:bg-slate-50">
-                                                                    <MoreHorizontal className="w-5 h-5 text-slate-400" />
+                                                                <Button variant="ghost" size="icon" className="rounded-full hover:bg-slate-50" aria-label="خيارات">
+                                                                    <MoreHorizontal className="w-5 h-5 text-slate-400" aria-hidden="true" />
                                                                 </Button>
                                                             </DropdownMenuTrigger>
                                                             <DropdownMenuContent align="end">
@@ -593,8 +593,9 @@ export default function PaymentsDashboard() {
                                                     onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
                                                     disabled={currentPage === 1}
                                                     className="rounded-lg h-9 w-9"
+                                                    aria-label="الصفحة السابقة"
                                                 >
-                                                    <ChevronRight className="w-4 h-4" />
+                                                    <ChevronRight className="w-4 h-4" aria-hidden="true" />
                                                 </Button>
                                                 <div className="flex items-center gap-1">
                                                     {Array.from({ length: Math.min(5, Math.ceil((paymentsData?.pagination?.total || filteredPayments.length) / itemsPerPage)) }, (_, i) => i + 1).map((page) => (
@@ -615,8 +616,9 @@ export default function PaymentsDashboard() {
                                                     onClick={() => setCurrentPage(p => p + 1)}
                                                     disabled={currentPage >= Math.ceil((paymentsData?.pagination?.total || filteredPayments.length) / itemsPerPage)}
                                                     className="rounded-lg h-9 w-9"
+                                                    aria-label="الصفحة التالية"
                                                 >
-                                                    <ChevronLeft className="w-4 h-4" />
+                                                    <ChevronLeft className="w-4 h-4" aria-hidden="true" />
                                                 </Button>
                                             </div>
                                         </div>

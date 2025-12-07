@@ -631,7 +631,7 @@ export function CreateInvoiceView() {
                                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                         <div className="space-y-2">
                                             <Label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                                <Calendar className="w-4 h-4 text-emerald-500" />
+                                                <Calendar className="w-4 h-4 text-emerald-500" aria-hidden="true" />
                                                 تاريخ الإصدار <span className="text-red-500">*</span>
                                             </Label>
                                             <Input
@@ -644,7 +644,7 @@ export function CreateInvoiceView() {
 
                                         <div className="space-y-2">
                                             <Label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                                <Calendar className="w-4 h-4 text-emerald-500" />
+                                                <Calendar className="w-4 h-4 text-emerald-500" aria-hidden="true" />
                                                 شروط الدفع <span className="text-red-500">*</span>
                                             </Label>
                                             <Select value={paymentTerms} onValueChange={(v) => handlePaymentTermsChange(v as PaymentTerms)}>
@@ -667,7 +667,7 @@ export function CreateInvoiceView() {
 
                                         <div className="space-y-2">
                                             <Label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                                <Calendar className="w-4 h-4 text-emerald-500" />
+                                                <Calendar className="w-4 h-4 text-emerald-500" aria-hidden="true" />
                                                 تاريخ الاستحقاق <span className="text-red-500">*</span>
                                             </Label>
                                             <Input
@@ -803,7 +803,7 @@ export function CreateInvoiceView() {
                                 <CardHeader className="pb-4">
                                     <div className="flex items-center justify-between">
                                         <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                                            <FileText className="w-5 h-5 text-emerald-500" />
+                                            <FileText className="w-5 h-5 text-emerald-500" aria-hidden="true" />
                                             بنود الفاتورة
                                         </CardTitle>
                                     </div>
@@ -949,20 +949,20 @@ export function CreateInvoiceView() {
                                                 <div className="w-10">
                                                     <DropdownMenu>
                                                         <DropdownMenuTrigger asChild>
-                                                            <Button variant="ghost" size="icon" className="h-9 w-9">
+                                                            <Button variant="ghost" size="icon" className="h-9 w-9" aria-label="خيارات">
                                                                 <MoreVertical className="h-4 w-4" />
                                                             </Button>
                                                         </DropdownMenuTrigger>
                                                         <DropdownMenuContent align="end">
                                                             <DropdownMenuItem onClick={() => duplicateLineItem(item.id)}>
-                                                                <Copy className="h-4 w-4 ms-2" />
+                                                                <Copy className="h-4 w-4 ms-2" aria-hidden="true" />
                                                                 نسخ
                                                             </DropdownMenuItem>
                                                             <DropdownMenuItem
                                                                 onClick={() => removeLineItem(item.id)}
                                                                 className="text-red-600"
                                                             >
-                                                                <Trash2 className="h-4 w-4 ms-2" />
+                                                                <Trash2 className="h-4 w-4 ms-2" aria-hidden="true" />
                                                                 حذف
                                                             </DropdownMenuItem>
                                                         </DropdownMenuContent>
@@ -975,18 +975,18 @@ export function CreateInvoiceView() {
                                     {/* Add Line Buttons */}
                                     <div className="flex gap-2 pt-2">
                                         <Button type="button" variant="outline" onClick={() => addLineItem('time')} className="rounded-xl">
-                                            <Plus className="h-4 w-4 ms-2" />
+                                            <Plus className="h-4 w-4 ms-2" aria-hidden="true" />
                                             إضافة بند
                                         </Button>
 
                                         {firmSize !== 'solo' && (
                                             <>
                                                 <Button type="button" variant="outline" className="rounded-xl text-blue-600 border-blue-200 hover:bg-blue-50">
-                                                    <Clock className="h-4 w-4 ms-2" />
+                                                    <Clock className="h-4 w-4 ms-2" aria-hidden="true" />
                                                     استيراد من الساعات
                                                 </Button>
                                                 <Button type="button" variant="outline" className="rounded-xl text-purple-600 border-purple-200 hover:bg-purple-50">
-                                                    <Receipt className="h-4 w-4 ms-2" />
+                                                    <Receipt className="h-4 w-4 ms-2" aria-hidden="true" />
                                                     استيراد من المصروفات
                                                 </Button>
                                             </>
@@ -1153,7 +1153,7 @@ export function CreateInvoiceView() {
                                     </AccordionTrigger>
                                     <AccordionContent className="px-6 pb-6">
                                         <Alert className="mb-4 rounded-xl">
-                                            <AlertCircle className="h-4 w-4" />
+                                            <AlertCircle className="h-4 w-4" aria-hidden="true" />
                                             <AlertDescription>
                                                 هذه المعلومات مطلوبة للفواتير الضريبية حسب نظام ZATCA
                                             </AlertDescription>
@@ -1241,7 +1241,7 @@ export function CreateInvoiceView() {
                                     <AccordionItem value="wip" className="border rounded-3xl shadow-sm border-slate-100 overflow-hidden">
                                         <AccordionTrigger className="px-6 py-4 hover:bg-slate-50">
                                             <div className="flex items-center gap-2">
-                                                <Clock className="h-5 w-5 text-blue-500" />
+                                                <Clock className="h-5 w-5 text-blue-500" aria-hidden="true" />
                                                 <span className="font-bold text-slate-800">WIP & ميزانية المشروع</span>
                                             </div>
                                         </AccordionTrigger>
@@ -1364,7 +1364,7 @@ export function CreateInvoiceView() {
                                                     </div>
                                                     {applyFromRetainer > 0 && (
                                                         <Alert className="rounded-xl bg-green-50 border-green-200">
-                                                            <AlertCircle className="h-4 w-4 text-green-600" />
+                                                            <AlertCircle className="h-4 w-4 text-green-600" aria-hidden="true" />
                                                             <AlertDescription className="text-green-700">
                                                                 سيتم خصم {formatCurrency(applyFromRetainer)} من رصيد العربون
                                                             </AlertDescription>
@@ -1464,7 +1464,7 @@ export function CreateInvoiceView() {
                                 <AccordionItem value="payment" className="border rounded-3xl shadow-sm border-slate-100 overflow-hidden">
                                     <AccordionTrigger className="px-6 py-4 hover:bg-slate-50">
                                         <div className="flex items-center gap-2">
-                                            <CreditCard className="h-5 w-5 text-green-500" />
+                                            <CreditCard className="h-5 w-5 text-green-500" aria-hidden="true" />
                                             <span className="font-bold text-slate-800">إعدادات الدفع</span>
                                         </div>
                                     </AccordionTrigger>
@@ -1611,7 +1611,7 @@ export function CreateInvoiceView() {
                                     className="h-4 w-4 text-blue-600 rounded border-slate-300"
                                 />
                                 <label htmlFor="sendAfterCreate" className="text-sm font-medium text-blue-800 flex items-center gap-2">
-                                    <Send className="w-4 h-4" />
+                                    <Send className="w-4 h-4" aria-hidden="true" />
                                     إرسال الفاتورة للعميل بعد الإنشاء
                                 </label>
                             </div>
@@ -1626,14 +1626,14 @@ export function CreateInvoiceView() {
                                         </Button>
                                     </Link>
                                     <Button type="button" variant="outline" className="rounded-xl">
-                                        <Save className="ms-2 h-4 w-4" />
+                                        <Save className="ms-2 h-4 w-4" aria-hidden="true" />
                                         حفظ كمسودة
                                     </Button>
                                 </div>
 
                                 <div className="flex gap-2">
                                     <Button type="button" variant="outline" className="rounded-xl">
-                                        <Eye className="ms-2 h-4 w-4" />
+                                        <Eye className="ms-2 h-4 w-4" aria-hidden="true" />
                                         معاينة PDF
                                     </Button>
 
@@ -1641,12 +1641,12 @@ export function CreateInvoiceView() {
                                         <Button type="submit" className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl shadow-lg shadow-emerald-500/20">
                                             {createInvoiceMutation.isPending ? (
                                                 <span className="flex items-center gap-2">
-                                                    <Loader2 className="w-4 h-4 animate-spin" />
+                                                    <Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" />
                                                     جاري الإرسال...
                                                 </span>
                                             ) : (
                                                 <span className="flex items-center gap-2">
-                                                    <Send className="w-4 h-4" />
+                                                    <Send className="w-4 h-4" aria-hidden="true" />
                                                     إرسال للموافقة
                                                 </span>
                                             )}
@@ -1661,7 +1661,7 @@ export function CreateInvoiceView() {
                                                 >
                                                     {createInvoiceMutation.isPending || sendInvoiceMutation.isPending ? (
                                                         <span className="flex items-center gap-2">
-                                                            <Loader2 className="w-4 h-4 animate-spin" />
+                                                            <Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" />
                                                             جاري الحفظ...
                                                         </span>
                                                     ) : (
@@ -1678,16 +1678,16 @@ export function CreateInvoiceView() {
                                                     حفظ و إرسال بالبريد
                                                 </DropdownMenuItem>
                                                 <DropdownMenuItem>
-                                                    <Download className="ms-2 h-4 w-4" />
+                                                    <Download className="ms-2 h-4 w-4" aria-hidden="true" />
                                                     حفظ و تحميل PDF
                                                 </DropdownMenuItem>
                                                 <DropdownMenuItem>
-                                                    <Printer className="ms-2 h-4 w-4" />
+                                                    <Printer className="ms-2 h-4 w-4" aria-hidden="true" />
                                                     حفظ و طباعة
                                                 </DropdownMenuItem>
                                                 <DropdownMenuSeparator />
                                                 <DropdownMenuItem onClick={(e) => { setSendAfterCreate(false); handleSubmit(e as any) }}>
-                                                    <Save className="ms-2 h-4 w-4" />
+                                                    <Save className="ms-2 h-4 w-4" aria-hidden="true" />
                                                     حفظ فقط
                                                 </DropdownMenuItem>
                                             </DropdownMenuContent>

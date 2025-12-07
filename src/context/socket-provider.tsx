@@ -75,7 +75,6 @@ export function SocketProvider({ children }: SocketProviderProps) {
 
     // Connection events
     newSocket.on('connect', () => {
-      console.log('Socket connected:', newSocket.id)
       setIsConnected(true)
 
       // Join user session
@@ -83,18 +82,15 @@ export function SocketProvider({ children }: SocketProviderProps) {
     })
 
     newSocket.on('disconnect', (reason) => {
-      console.log('Socket disconnected:', reason)
       setIsConnected(false)
     })
 
     newSocket.on('connect_error', (error) => {
-      console.error('Socket connection error:', error)
       setIsConnected(false)
     })
 
     // Notification events
     newSocket.on('notification', (notification: Notification) => {
-      console.log('New notification received:', notification)
       setNotifications((prev) => [notification, ...prev])
       setUnreadCount((prev) => prev + 1)
     })

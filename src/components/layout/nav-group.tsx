@@ -2,6 +2,7 @@ import { type ReactNode } from 'react'
 import { Link, useLocation } from '@tanstack/react-router'
 import { ChevronRight } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
+import { useDirection } from '@/context/direction-provider'
 import {
   Collapsible,
   CollapsibleContent,
@@ -150,6 +151,7 @@ function SidebarMenuCollapsedDropdown({
   href: string
 }) {
   const { t } = useTranslation()
+  const { dir } = useDirection()
   const translateTitle = (title: string) => title.includes('.') ? t(title) : title
   const translatedTitle = translateTitle(item.title)
   return (
@@ -166,7 +168,7 @@ function SidebarMenuCollapsedDropdown({
             <ChevronRight className='ms-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90' />
           </SidebarMenuButton>
         </DropdownMenuTrigger>
-        <DropdownMenuContent side='right' align='start' sideOffset={4}>
+        <DropdownMenuContent side={dir === 'rtl' ? 'left' : 'right'} align='start' sideOffset={4}>
           <DropdownMenuLabel>
             {translatedTitle} {item.badge ? `(${item.badge})` : ''}
           </DropdownMenuLabel>

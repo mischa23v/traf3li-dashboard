@@ -427,7 +427,6 @@ const remindersService = {
         pagination: response.data.pagination || {}
       }
     } catch (error: any) {
-      console.error('Get reminders error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -440,7 +439,6 @@ const remindersService = {
       const response = await apiClient.get(`/reminders/${id}`)
       return response.data.reminder || response.data.data
     } catch (error: any) {
-      console.error('Get reminder error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -453,7 +451,6 @@ const remindersService = {
       const response = await apiClient.post('/reminders', data)
       return response.data.reminder || response.data.data
     } catch (error: any) {
-      console.error('Create reminder error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -466,7 +463,6 @@ const remindersService = {
       const response = await apiClient.put(`/reminders/${id}`, data)
       return response.data.reminder || response.data.data
     } catch (error: any) {
-      console.error('Update reminder error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -478,7 +474,6 @@ const remindersService = {
     try {
       await apiClient.delete(`/reminders/${id}`)
     } catch (error: any) {
-      console.error('Delete reminder error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -493,7 +488,6 @@ const remindersService = {
       const response = await apiClient.post(`/reminders/${id}/complete`, { completionNote })
       return response.data.reminder || response.data.data
     } catch (error: any) {
-      console.error('Complete reminder error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -506,7 +500,6 @@ const remindersService = {
       const response = await apiClient.post(`/reminders/${id}/dismiss`, { reason })
       return response.data.reminder || response.data.data
     } catch (error: any) {
-      console.error('Dismiss reminder error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -519,7 +512,6 @@ const remindersService = {
       const response = await apiClient.post(`/reminders/${id}/reopen`)
       return response.data.reminder || response.data.data
     } catch (error: any) {
-      console.error('Reopen reminder error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -553,7 +545,6 @@ const remindersService = {
       const response = await apiClient.post(`/reminders/${id}/snooze`, payload)
       return response.data.reminder || response.data.data
     } catch (error: any) {
-      console.error('Snooze reminder error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -566,7 +557,6 @@ const remindersService = {
       const response = await apiClient.post(`/reminders/${id}/cancel-snooze`)
       return response.data.reminder || response.data.data
     } catch (error: any) {
-      console.error('Cancel snooze error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -610,7 +600,6 @@ const remindersService = {
       const response = await apiClient.post(`/reminders/${id}/delegate`, { delegateTo, delegationNote })
       return response.data.reminder || response.data.data
     } catch (error: any) {
-      console.error('Delegate reminder error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -628,7 +617,6 @@ const remindersService = {
         count: response.data.count || response.data.total || 0
       }
     } catch (error: any) {
-      console.error('Get upcoming reminders error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -644,7 +632,6 @@ const remindersService = {
         count: response.data.count || response.data.total || 0
       }
     } catch (error: any) {
-      console.error('Get overdue reminders error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -660,7 +647,6 @@ const remindersService = {
         count: response.data.count || response.data.total || 0
       }
     } catch (error: any) {
-      console.error('Get today reminders error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -676,7 +662,6 @@ const remindersService = {
         count: response.data.count || response.data.total || 0
       }
     } catch (error: any) {
-      console.error('Get snoozed reminders error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -692,7 +677,6 @@ const remindersService = {
         count: response.data.count || response.data.total || 0
       }
     } catch (error: any) {
-      console.error('Get snoozed due reminders error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -708,7 +692,6 @@ const remindersService = {
         count: response.data.count || response.data.total || 0
       }
     } catch (error: any) {
-      console.error('Get delegated reminders error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -724,7 +707,6 @@ const remindersService = {
         total: response.data.total || 0
       }
     } catch (error: any) {
-      console.error('Get my reminders error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -737,7 +719,6 @@ const remindersService = {
       const response = await apiClient.get('/reminders/stats', { params: filters })
       return response.data.stats || response.data.data
     } catch (error: any) {
-      console.error('Get reminder stats error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -752,7 +733,6 @@ const remindersService = {
       const response = await apiClient.post(`/reminders/${id}/recurring/skip`)
       return response.data.reminder || response.data.data
     } catch (error: any) {
-      console.error('Skip recurrence error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -765,7 +745,6 @@ const remindersService = {
       const response = await apiClient.post(`/reminders/${id}/recurring/stop`)
       return response.data.reminder || response.data.data
     } catch (error: any) {
-      console.error('Stop recurrence error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -778,7 +757,6 @@ const remindersService = {
       const response = await apiClient.get(`/reminders/${id}/recurring/history`)
       return response.data
     } catch (error: any) {
-      console.error('Get recurrence history error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -793,7 +771,6 @@ const remindersService = {
       const response = await apiClient.patch(`/reminders/${id}/notification`, config)
       return response.data.reminder || response.data.data
     } catch (error: any) {
-      console.error('Update notification config error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -806,7 +783,6 @@ const remindersService = {
       const response = await apiClient.post(`/reminders/${id}/notification/test`, { channel })
       return response.data
     } catch (error: any) {
-      console.error('Send test notification error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -819,7 +795,6 @@ const remindersService = {
       const response = await apiClient.post(`/reminders/${id}/acknowledge`)
       return response.data.reminder || response.data.data
     } catch (error: any) {
-      console.error('Acknowledge notification error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -834,7 +809,6 @@ const remindersService = {
       const response = await apiClient.patch('/reminders/bulk', { reminderIds, ...data })
       return response.data
     } catch (error: any) {
-      console.error('Bulk update error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -847,7 +821,6 @@ const remindersService = {
       const response = await apiClient.delete('/reminders/bulk', { data: { reminderIds } })
       return response.data
     } catch (error: any) {
-      console.error('Bulk delete reminders error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -860,7 +833,6 @@ const remindersService = {
       const response = await apiClient.post('/reminders/bulk/complete', { reminderIds })
       return response.data
     } catch (error: any) {
-      console.error('Bulk complete error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -873,7 +845,6 @@ const remindersService = {
       const response = await apiClient.post('/reminders/bulk/snooze', { reminderIds, ...options })
       return response.data
     } catch (error: any) {
-      console.error('Bulk snooze error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -886,7 +857,6 @@ const remindersService = {
       const response = await apiClient.post('/reminders/bulk/dismiss', { reminderIds })
       return response.data
     } catch (error: any) {
-      console.error('Bulk dismiss error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -906,7 +876,6 @@ const remindersService = {
       })
       return response.data
     } catch (error: any) {
-      console.error('Import reminders error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -922,7 +891,6 @@ const remindersService = {
       })
       return response.data
     } catch (error: any) {
-      console.error('Export reminders error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -940,7 +908,6 @@ const remindersService = {
         count: response.data.count || 0
       }
     } catch (error: any) {
-      console.error('Get templates error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -953,7 +920,6 @@ const remindersService = {
       const response = await apiClient.post(`/reminders/templates/${templateId}/create`, overrides)
       return response.data.reminder || response.data.data
     } catch (error: any) {
-      console.error('Create from template error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -966,7 +932,6 @@ const remindersService = {
       const response = await apiClient.post(`/reminders/${id}/save-as-template`, { name: templateName })
       return response.data.template || response.data.data
     } catch (error: any) {
-      console.error('Save as template error:', error)
       throw new Error(handleApiError(error))
     }
   },

@@ -379,11 +379,11 @@ export function ExpenseClaimsCreateView() {
         </div>
         <div className='ms-auto flex items-center gap-4'>
           <div className="relative hidden md:block">
-            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-            <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
+            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
+            <input type="text" placeholder="بحث..." aria-label="بحث" className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
           </div>
-          <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white">
-            <Bell className="h-5 w-5" />
+          <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white" aria-label="الإشعارات">
+            <Bell className="h-5 w-5" aria-hidden="true" />
             <span className="absolute top-2 right-2 h-2 w-2 bg-red-500 rounded-full border border-navy"></span>
           </Button>
           <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white" />
@@ -429,7 +429,7 @@ export function ExpenseClaimsCreateView() {
             <Card className="rounded-3xl shadow-sm border-slate-100">
               <CardHeader className="pb-4">
                 <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                  <Building2 className="w-5 h-5 text-emerald-500" />
+                  <Building2 className="w-5 h-5 text-emerald-500" aria-hidden="true" />
                   نوع المكتب
                 </CardTitle>
               </CardHeader>
@@ -592,7 +592,7 @@ export function ExpenseClaimsCreateView() {
                     onClick={addLineItem}
                     className="rounded-xl"
                   >
-                    <Plus className="w-4 h-4 ms-1" />
+                    <Plus className="w-4 h-4 ms-1" aria-hidden="true" />
                     إضافة بند
                   </Button>
                 </div>
@@ -608,7 +608,7 @@ export function ExpenseClaimsCreateView() {
                       className="mt-4 rounded-xl"
                       onClick={addLineItem}
                     >
-                      <Plus className="w-4 h-4 ms-1" />
+                      <Plus className="w-4 h-4 ms-1" aria-hidden="true" />
                       إضافة بند جديد
                     </Button>
                   </div>
@@ -630,7 +630,7 @@ export function ExpenseClaimsCreateView() {
                             onClick={() => removeLineItem(item.id)}
                             className="text-red-500 hover:text-red-700 hover:bg-red-50 rounded-xl"
                           >
-                            <Trash2 className="w-4 h-4" />
+                            <Trash2 className="w-4 h-4" aria-hidden="true" />
                           </Button>
                         </div>
 
@@ -760,7 +760,7 @@ export function ExpenseClaimsCreateView() {
                         {includeTravelDetails && (
                           <Badge className="bg-blue-100 text-blue-700">مفعّل</Badge>
                         )}
-                        <ChevronDown className={cn("w-5 h-5 text-slate-400 transition-transform", openSections.includes('travel') && "rotate-180")} />
+                        <ChevronDown className={cn("w-5 h-5 text-slate-500 transition-transform", openSections.includes('travel') && "rotate-180")} />
                       </div>
                     </div>
                   </CardHeader>
@@ -863,7 +863,7 @@ export function ExpenseClaimsCreateView() {
                         {includeMileage && (
                           <Badge className="bg-teal-100 text-teal-700">مفعّل</Badge>
                         )}
-                        <ChevronDown className={cn("w-5 h-5 text-slate-400 transition-transform", openSections.includes('mileage') && "rotate-180")} />
+                        <ChevronDown className={cn("w-5 h-5 text-slate-500 transition-transform", openSections.includes('mileage') && "rotate-180")} />
                       </div>
                     </div>
                   </CardHeader>
@@ -920,7 +920,7 @@ export function ExpenseClaimsCreateView() {
                             onClick={addMileageJourney}
                             className="rounded-xl"
                           >
-                            <Plus className="w-4 h-4 ms-1" />
+                            <Plus className="w-4 h-4 ms-1" aria-hidden="true" />
                             إضافة رحلة
                           </Button>
                         </div>
@@ -936,7 +936,7 @@ export function ExpenseClaimsCreateView() {
                                 onClick={() => removeMileageJourney(journey.id)}
                                 className="text-red-500 hover:text-red-700 hover:bg-red-50 rounded-xl"
                               >
-                                <Trash2 className="w-4 h-4" />
+                                <Trash2 className="w-4 h-4" aria-hidden="true" />
                               </Button>
                             </div>
                             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -1031,7 +1031,7 @@ export function ExpenseClaimsCreateView() {
                         <FileText className="w-5 h-5 text-purple-500" />
                         الملاحظات
                       </CardTitle>
-                      <ChevronDown className={cn("w-5 h-5 text-slate-400 transition-transform", openSections.includes('notes') && "rotate-180")} />
+                      <ChevronDown className={cn("w-5 h-5 text-slate-500 transition-transform", openSections.includes('notes') && "rotate-180")} />
                     </div>
                   </CardHeader>
                 </CollapsibleTrigger>

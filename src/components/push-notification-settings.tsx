@@ -99,7 +99,6 @@ export function PushNotificationSettings() {
         }
       }
     } catch (err: any) {
-      console.error('Push notification toggle error:', err)
       setError(err.message || t('pushSettings.error', 'An error occurred'))
     } finally {
       setIsLoading(false)

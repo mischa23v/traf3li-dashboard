@@ -149,7 +149,7 @@ export function EditTimeEntryView() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+        <div className="flex items-center gap-2 text-sm text-foreground/70">
           <span>المالية</span>
           <ArrowRight className="h-4 w-4 rotate-180" />
           <span>تتبع الوقت</span>
@@ -159,13 +159,13 @@ export function EditTimeEntryView() {
 
         <div className="flex gap-2">
           <Button variant="outline" size="sm" onClick={handleDuplicate}>
-            <Copy className="h-4 w-4 ms-2" />
+            <Copy className="h-4 w-4 ms-2" aria-hidden="true" />
             نسخ
           </Button>
           <AlertDialog>
             <AlertDialogTrigger asChild>
               <Button variant="destructive" size="sm">
-                <Trash2 className="h-4 w-4 ms-2" />
+                <Trash2 className="h-4 w-4 ms-2" aria-hidden="true" />
                 حذف
               </Button>
             </AlertDialogTrigger>
@@ -220,7 +220,7 @@ export function EditTimeEntryView() {
                             onChange={(e) => setFormData({ ...formData, hours: parseInt(e.target.value) || 0 })}
                             className="text-center"
                           />
-                          <span className="text-sm text-muted-foreground">ساعة</span>
+                          <span className="text-sm text-slate-600">ساعة</span>
                         </div>
                       </div>
                       <div className="flex-1">
@@ -233,7 +233,7 @@ export function EditTimeEntryView() {
                             onChange={(e) => setFormData({ ...formData, minutes: parseInt(e.target.value) || 0 })}
                             className="text-center"
                           />
-                          <span className="text-sm text-muted-foreground">دقيقة</span>
+                          <span className="text-sm text-slate-600">دقيقة</span>
                         </div>
                       </div>
                     </div>
@@ -351,7 +351,7 @@ export function EditTimeEntryView() {
 
                 <div className="flex gap-4 pt-4">
                   <Button type="submit" disabled={updateTimeEntry.isPending}>
-                    <Save className="h-4 w-4 ms-2" />
+                    <Save className="h-4 w-4 ms-2" aria-hidden="true" />
                     {updateTimeEntry.isPending ? 'جاري الحفظ...' : 'حفظ التعديلات'}
                   </Button>
                   <Button
@@ -371,21 +371,21 @@ export function EditTimeEntryView() {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Clock className="h-5 w-5" />
+                <Clock className="h-5 w-5" aria-hidden="true" />
                 ملخص
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex justify-between">
-                <span className="text-muted-foreground">المدة</span>
+                <span className="text-slate-600">المدة</span>
                 <span className="font-medium">{formData.hours} ساعة {formData.minutes} دقيقة</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-muted-foreground">السعر</span>
+                <span className="text-slate-600">السعر</span>
                 <span className="font-medium">{formData.hourlyRate.toLocaleString('ar-SA')} ر.س/ساعة</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-muted-foreground">قابل للفوترة</span>
+                <span className="text-slate-600">قابل للفوترة</span>
                 <span className="font-medium">{formData.billable ? 'نعم' : 'لا'}</span>
               </div>
               <hr />

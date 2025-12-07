@@ -134,11 +134,11 @@ export default function InvoiceDashboard() {
 
                 <div className='ms-auto flex items-center gap-4'>
                     <div className="relative hidden md:block">
-                        <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                        <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" aria-hidden="true" />
                         <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
                     </div>
-                    <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white">
-                        <Bell className="h-5 w-5" />
+                    <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white" aria-label="الإشعارات">
+                        <Bell className="h-5 w-5" aria-hidden="true" />
                         <span className="absolute top-2 right-2 h-2 w-2 bg-red-500 rounded-full border border-navy"></span>
                     </Button>
                     <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white" />
@@ -166,7 +166,7 @@ export default function InvoiceDashboard() {
                                 <div>
                                     <div className="flex items-center gap-3 mb-3">
                                         <Badge className="bg-white/10 hover:bg-white/20 text-white border-0 backdrop-blur-sm">
-                                            <FileText className="w-3 h-3 ms-2" />
+                                            <FileText className="w-3 h-3 ms-2" aria-hidden="true" />
                                             المالية
                                         </Badge>
                                         <span className="text-blue-200 text-sm">السنة المالية 2025</span>
@@ -178,11 +178,11 @@ export default function InvoiceDashboard() {
                                 </div>
                                 <div className="flex gap-3">
                                     <Button variant="outline" className="bg-white/5 border-white/10 text-white hover:bg-white/10 rounded-xl">
-                                        <Download className="w-4 h-4 ms-2" />
+                                        <Download className="w-4 h-4 ms-2" aria-hidden="true" />
                                         تصدير التقرير
                                     </Button>
                                     <Button className="bg-emerald-500 hover:bg-emerald-600 text-white border-0 shadow-lg shadow-emerald-500/20 rounded-xl">
-                                        <Plus className="w-4 h-4 ms-2" />
+                                        <Plus className="w-4 h-4 ms-2" aria-hidden="true" />
                                         فاتورة جديدة
                                     </Button>
                                 </div>
@@ -203,7 +203,7 @@ export default function InvoiceDashboard() {
                                         <div className="text-2xl font-bold">{totalInvoices} فاتورة</div>
                                     </div>
                                     <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center">
-                                        <FileText className="w-5 h-5 text-blue-200" />
+                                        <FileText className="w-5 h-5 text-blue-200" aria-hidden="true" />
                                     </div>
                                 </div>
                                 <div className="flex justify-between items-center border-r border-white/10 pe-6">
@@ -226,7 +226,7 @@ export default function InvoiceDashboard() {
                             <CardContent className="p-6">
                                 <div className="flex justify-between items-start mb-4">
                                     <div className="w-12 h-12 rounded-2xl bg-emerald-50 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                                        <CheckCircle className="w-6 h-6 text-emerald-600" />
+                                        <CheckCircle className="w-6 h-6 text-emerald-600" aria-hidden="true" />
                                     </div>
                                     <Badge variant="outline" className="bg-emerald-50 text-emerald-700 border-emerald-100">
                                         مدفوع
@@ -245,7 +245,7 @@ export default function InvoiceDashboard() {
                             <CardContent className="p-6">
                                 <div className="flex justify-between items-start mb-4">
                                     <div className="w-12 h-12 rounded-2xl bg-amber-50 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                                        <Clock className="w-6 h-6 text-amber-600" />
+                                        <Clock className="w-6 h-6 text-amber-600" aria-hidden="true" />
                                     </div>
                                     <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-100">
                                         معلق
@@ -264,7 +264,7 @@ export default function InvoiceDashboard() {
                             <CardContent className="p-6">
                                 <div className="flex justify-between items-start mb-4">
                                     <div className="w-12 h-12 rounded-2xl bg-red-50 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                                        <AlertCircle className="w-6 h-6 text-red-600" />
+                                        <AlertCircle className="w-6 h-6 text-red-600" aria-hidden="true" />
                                     </div>
                                     <Badge variant="outline" className="bg-red-50 text-red-700 border-red-100">
                                         متأخر
@@ -316,7 +316,7 @@ export default function InvoiceDashboard() {
 
                                 <div className="flex items-center gap-3 flex-1 justify-end">
                                     <div className="relative w-full max-w-xs">
-                                        <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                                        <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" aria-hidden="true" />
                                         <Input
                                             placeholder="بحث برقم الفاتورة أو العميل..."
                                             className="pe-10 rounded-xl border-slate-200 focus:ring-navy focus:border-navy"
@@ -325,7 +325,7 @@ export default function InvoiceDashboard() {
                                         />
                                     </div>
                                     <Button variant="outline" size="icon" className="rounded-xl border-slate-200">
-                                        <Filter className="h-4 w-4 text-slate-500" />
+                                        <Filter className="h-4 w-4 text-slate-500" aria-hidden="true" />
                                     </Button>
                                 </div>
                             </div>
@@ -340,7 +340,7 @@ export default function InvoiceDashboard() {
                                                     invoice.status === 'معلقة' ? 'bg-amber-50 text-amber-600' :
                                                         'bg-red-50 text-red-600'
                                                     }`}>
-                                                    <FileText className="h-6 w-6" />
+                                                    <FileText className="h-6 w-6" aria-hidden="true" />
                                                 </div>
                                                 <div>
                                                     <div className="flex items-center gap-2 mb-1">
@@ -355,7 +355,7 @@ export default function InvoiceDashboard() {
                                             <DropdownMenu>
                                                 <DropdownMenuTrigger asChild>
                                                     <Button variant="ghost" size="icon" className="text-slate-400 hover:text-navy">
-                                                        <MoreHorizontal className="h-5 w-5" />
+                                                        <MoreHorizontal className="h-5 w-5" aria-hidden="true" />
                                                     </Button>
                                                 </DropdownMenuTrigger>
                                                 <DropdownMenuContent align="end">
@@ -436,7 +436,7 @@ export default function InvoiceDashboard() {
                             <Card className="border-none shadow-sm bg-white rounded-3xl overflow-hidden hover:shadow-md transition-all duration-300">
                                 <CardHeader className="border-b border-slate-100 pb-4">
                                     <CardTitle className="text-lg font-bold text-navy flex items-center gap-2">
-                                        <Clock className="w-5 h-5 text-amber-500" />
+                                        <Clock className="w-5 h-5 text-amber-500" aria-hidden="true" />
                                         استحقاقات قريبة
                                     </CardTitle>
                                 </CardHeader>

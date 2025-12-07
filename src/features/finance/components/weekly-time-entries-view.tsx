@@ -186,7 +186,7 @@ export function WeeklyTimeEntriesView() {
                 <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8">
                     <div className="bg-white rounded-3xl p-12 text-center border border-slate-100 shadow-sm">
                         <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <AlertCircle className="h-8 w-8 text-red-500" />
+                            <AlertCircle className="h-8 w-8 text-red-500" aria-hidden="true" />
                         </div>
                         <h3 className="text-xl font-bold text-slate-900 mb-2">فشل تحميل البيانات</h3>
                         <p className="text-slate-500 mb-6">{error?.message || 'حدث خطأ أثناء تحميل البيانات'}</p>
@@ -223,7 +223,7 @@ export function WeeklyTimeEntriesView() {
                             <div>
                                 <div className="flex items-center gap-3 mb-3">
                                     <Badge className="bg-white/20 hover:bg-white/30 text-white border-0 backdrop-blur-sm">
-                                        <Calendar className="w-3 h-3 ms-2" />
+                                        <Calendar className="w-3 h-3 ms-2" aria-hidden="true" />
                                         عرض أسبوعي
                                     </Badge>
                                 </div>
@@ -237,12 +237,12 @@ export function WeeklyTimeEntriesView() {
                                     variant="outline"
                                     className="bg-white/10 border-white/20 text-white hover:bg-white/20 rounded-xl"
                                 >
-                                    <Download className="w-4 h-4 ms-2" />
+                                    <Download className="w-4 h-4 ms-2" aria-hidden="true" />
                                     تصدير
                                 </Button>
                                 <Button asChild className="bg-white text-purple-700 hover:bg-purple-50 rounded-xl shadow-lg">
                                     <Link to="/dashboard/finance/time-tracking/new">
-                                        <Plus className="w-4 h-4 ms-2" />
+                                        <Plus className="w-4 h-4 ms-2" aria-hidden="true" />
                                         إضافة سجل
                                     </Link>
                                 </Button>
@@ -254,10 +254,10 @@ export function WeeklyTimeEntriesView() {
                     <div className="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between">
                         <div className="flex items-center gap-3">
                             <Button variant="outline" size="icon" onClick={goToPreviousWeek} className="rounded-xl">
-                                <ChevronRight className="w-5 h-5" />
+                                <ChevronRight className="w-5 h-5" aria-hidden="true" />
                             </Button>
                             <Button variant="outline" size="icon" onClick={goToNextWeek} className="rounded-xl">
-                                <ChevronLeft className="w-5 h-5" />
+                                <ChevronLeft className="w-5 h-5" aria-hidden="true" />
                             </Button>
                             <Button variant="ghost" onClick={goToCurrentWeek} className="text-purple-600 hover:text-purple-700 hover:bg-purple-50">
                                 هذا الأسبوع
@@ -302,13 +302,13 @@ export function WeeklyTimeEntriesView() {
                             {projects.length === 0 ? (
                                 <div className="p-12 text-center">
                                     <div className="w-16 h-16 bg-purple-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                                        <Clock className="h-8 w-8 text-purple-500" />
+                                        <Clock className="h-8 w-8 text-purple-500" aria-hidden="true" />
                                     </div>
                                     <h3 className="text-lg font-bold text-slate-900 mb-2">لا توجد سجلات لهذا الأسبوع</h3>
                                     <p className="text-slate-500 mb-4">ابدأ بتسجيل وقتك</p>
                                     <Button asChild className="bg-purple-600 hover:bg-purple-700">
                                         <Link to="/dashboard/finance/time-tracking/new">
-                                            <Plus className="w-4 h-4 ms-2" />
+                                            <Plus className="w-4 h-4 ms-2" aria-hidden="true" />
                                             إضافة سجل جديد
                                         </Link>
                                     </Button>
@@ -375,7 +375,7 @@ export function WeeklyTimeEntriesView() {
                         <Card className="border-0 shadow-sm rounded-2xl">
                             <CardContent className="p-6 text-center">
                                 <div className="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center mx-auto mb-3">
-                                    <Clock className="w-6 h-6 text-purple-600" />
+                                    <Clock className="w-6 h-6 text-purple-600" aria-hidden="true" />
                                 </div>
                                 <div className="text-3xl font-bold text-navy mb-1">
                                     {formatMinutesToTime(weeklyTotal)}
@@ -387,7 +387,7 @@ export function WeeklyTimeEntriesView() {
                         <Card className="border-0 shadow-sm rounded-2xl">
                             <CardContent className="p-6 text-center">
                                 <div className="w-12 h-12 rounded-full bg-emerald-100 flex items-center justify-center mx-auto mb-3">
-                                    <Calendar className="w-6 h-6 text-emerald-600" />
+                                    <Calendar className="w-6 h-6 text-emerald-600" aria-hidden="true" />
                                 </div>
                                 <div className="text-3xl font-bold text-navy mb-1">
                                     {projects.length}
@@ -399,7 +399,7 @@ export function WeeklyTimeEntriesView() {
                         <Card className="border-0 shadow-sm rounded-2xl">
                             <CardContent className="p-6 text-center">
                                 <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center mx-auto mb-3">
-                                    <Clock className="w-6 h-6 text-blue-600" />
+                                    <Clock className="w-6 h-6 text-blue-600" aria-hidden="true" />
                                 </div>
                                 <div className="text-3xl font-bold text-navy mb-1">
                                     {weeklyTotal > 0 ? Math.round((weeklyTotal / 60) / 7 * 10) / 10 : 0}

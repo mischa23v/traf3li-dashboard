@@ -107,7 +107,7 @@ export default function PaymentDetailsView() {
                             </Link>
                         </Button>
                         <Card className="border-0 shadow-sm rounded-3xl p-12 text-center">
-                            <AlertCircle className="h-16 w-16 text-rose-400 mx-auto mb-4" />
+                            <AlertCircle className="h-16 w-16 text-rose-400 mx-auto mb-4" aria-hidden="true" />
                             <h3 className="text-xl font-bold text-navy mb-2">فشل تحميل الدفعة</h3>
                             <p className="text-slate-500">{error?.message || 'الدفعة غير موجودة'}</p>
                         </Card>
@@ -146,11 +146,11 @@ export default function PaymentDetailsView() {
                         </Button>
                         <div className="flex gap-2">
                             <Button variant="outline">
-                                <Download className="h-4 w-4 ms-2" />
+                                <Download className="h-4 w-4 ms-2" aria-hidden="true" />
                                 تحميل الإيصال
                             </Button>
                             <Button variant="outline">
-                                <Printer className="h-4 w-4 ms-2" />
+                                <Printer className="h-4 w-4 ms-2" aria-hidden="true" />
                                 طباعة
                             </Button>
                             <Button variant="outline">
@@ -175,7 +175,7 @@ export default function PaymentDetailsView() {
                             <Card className="border-0 shadow-sm rounded-3xl">
                                 <CardHeader className="border-b border-slate-100">
                                     <CardTitle className="text-lg font-bold text-navy flex items-center gap-2">
-                                        <CreditCard className="h-5 w-5 text-brand-blue" />
+                                        <CreditCard className="h-5 w-5 text-brand-blue" aria-hidden="true" />
                                         تفاصيل الدفعة
                                     </CardTitle>
                                 </CardHeader>
@@ -251,7 +251,7 @@ export default function PaymentDetailsView() {
                                 <Card className="border-0 shadow-sm rounded-3xl">
                                     <CardHeader className="border-b border-slate-100">
                                         <CardTitle className="text-lg font-bold text-navy flex items-center gap-2">
-                                            <FileText className="h-5 w-5 text-brand-blue" />
+                                            <FileText className="h-5 w-5 text-brand-blue" aria-hidden="true" />
                                             الفاتورة المرتبطة
                                         </CardTitle>
                                     </CardHeader>
@@ -275,7 +275,7 @@ export default function PaymentDetailsView() {
                             <Card className="border-0 shadow-sm rounded-3xl">
                                 <CardHeader className="border-b border-slate-100">
                                     <CardTitle className="text-lg font-bold text-navy flex items-center gap-2">
-                                        <Calendar className="h-5 w-5 text-brand-blue" />
+                                        <Calendar className="h-5 w-5 text-brand-blue" aria-hidden="true" />
                                         التواريخ
                                     </CardTitle>
                                 </CardHeader>
@@ -302,7 +302,7 @@ export default function PaymentDetailsView() {
                                         إرسال الإيصال بالبريد
                                     </Button>
                                     <Button variant="outline" className="w-full justify-start">
-                                        <Receipt className="h-4 w-4 ms-2" />
+                                        <Receipt className="h-4 w-4 ms-2" aria-hidden="true" />
                                         تحميل إيصال PDF
                                     </Button>
                                 </CardContent>

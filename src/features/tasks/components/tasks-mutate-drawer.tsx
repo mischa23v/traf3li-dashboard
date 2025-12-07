@@ -202,7 +202,6 @@ export function TasksMutateDrawer({
   const onSubmit = async (data: TaskFormData) => {
     try {
       // TODO: Implement API call
-      console.log('Form data:', data)
       toast.success(isUpdate ? 'تم تحديث المهمة بنجاح' : 'تم إنشاء المهمة بنجاح')
       onOpenChange(false)
       form.reset()

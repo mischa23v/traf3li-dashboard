@@ -499,7 +499,6 @@ const casesService = {
         pagination: response.data.pagination,
       }
     } catch (error: any) {
-      console.error('Get cases error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -513,7 +512,6 @@ const casesService = {
       const response = await apiClient.get<CaseResponse>(`/cases/${id}`)
       return response.data.case
     } catch (error: any) {
-      console.error('Get case error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -527,7 +525,6 @@ const casesService = {
       const response = await apiClient.post<CaseResponse>('/cases/', data)
       return response.data.case
     } catch (error: any) {
-      console.error('Create case error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -541,7 +538,6 @@ const casesService = {
       const response = await apiClient.post<CaseResponse>('/cases/', data)
       return response.data.case
     } catch (error: any) {
-      console.error('Create case from contract error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -555,7 +551,6 @@ const casesService = {
       const response = await apiClient.patch<CaseResponse>(`/cases/${id}`, data)
       return response.data.case
     } catch (error: any) {
-      console.error('Update case error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -569,7 +564,6 @@ const casesService = {
       const response = await apiClient.post<CaseResponse>(`/cases/${id}/note`, data)
       return response.data.case
     } catch (error: any) {
-      console.error('Add note error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -583,7 +577,6 @@ const casesService = {
       const response = await apiClient.post<CaseResponse>(`/cases/${id}/document`, data)
       return response.data.case
     } catch (error: any) {
-      console.error('Add document error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -597,7 +590,6 @@ const casesService = {
       const response = await apiClient.post<CaseResponse>(`/cases/${id}/hearing`, data)
       return response.data.case
     } catch (error: any) {
-      console.error('Add hearing error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -611,7 +603,6 @@ const casesService = {
       const response = await apiClient.post<CaseResponse>(`/cases/${id}/claim`, data)
       return response.data.case
     } catch (error: any) {
-      console.error('Add claim error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -625,7 +616,6 @@ const casesService = {
       const response = await apiClient.patch<CaseResponse>(`/cases/${id}/status`, { status })
       return response.data.case
     } catch (error: any) {
-      console.error('Update status error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -639,7 +629,6 @@ const casesService = {
       const response = await apiClient.patch<CaseResponse>(`/cases/${id}/outcome`, { outcome })
       return response.data.case
     } catch (error: any) {
-      console.error('Update outcome error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -652,7 +641,6 @@ const casesService = {
     try {
       await apiClient.delete(`/cases/${id}`)
     } catch (error: any) {
-      console.error('Delete case error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -709,7 +697,6 @@ const casesService = {
       const response = await apiClient.get<StatisticsResponse>('/cases/statistics')
       return response.data.statistics
     } catch (error: any) {
-      console.error('Get statistics error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -725,7 +712,6 @@ const casesService = {
       const response = await apiClient.patch<CaseResponse>(`/cases/${caseId}/notes/${noteId}`, data)
       return response.data.case
     } catch (error: any) {
-      console.error('Update note error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -739,7 +725,6 @@ const casesService = {
       const response = await apiClient.delete<CaseResponse>(`/cases/${caseId}/notes/${noteId}`)
       return response.data.case
     } catch (error: any) {
-      console.error('Delete note error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -755,7 +740,6 @@ const casesService = {
       const response = await apiClient.patch<CaseResponse>(`/cases/${caseId}/hearings/${hearingId}`, data)
       return response.data.case
     } catch (error: any) {
-      console.error('Update hearing error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -769,7 +753,6 @@ const casesService = {
       const response = await apiClient.delete<CaseResponse>(`/cases/${caseId}/hearings/${hearingId}`)
       return response.data.case
     } catch (error: any) {
-      console.error('Delete hearing error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -785,7 +768,6 @@ const casesService = {
       const response = await apiClient.patch<CaseResponse>(`/cases/${caseId}/claims/${claimId}`, data)
       return response.data.case
     } catch (error: any) {
-      console.error('Update claim error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -799,7 +781,6 @@ const casesService = {
       const response = await apiClient.delete<CaseResponse>(`/cases/${caseId}/claims/${claimId}`)
       return response.data.case
     } catch (error: any) {
-      console.error('Delete claim error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -815,7 +796,6 @@ const casesService = {
       const response = await apiClient.post<CaseResponse>(`/cases/${caseId}/timeline`, data)
       return response.data.case
     } catch (error: any) {
-      console.error('Add timeline event error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -829,7 +809,6 @@ const casesService = {
       const response = await apiClient.patch<CaseResponse>(`/cases/${caseId}/timeline/${eventId}`, data)
       return response.data.case
     } catch (error: any) {
-      console.error('Update timeline event error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -843,7 +822,6 @@ const casesService = {
       const response = await apiClient.delete<CaseResponse>(`/cases/${caseId}/timeline/${eventId}`)
       return response.data.case
     } catch (error: any) {
-      console.error('Delete timeline event error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -863,7 +841,6 @@ const casesService = {
         bucket: response.data.bucket,
       }
     } catch (error: any) {
-      console.error('Get upload URL error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -877,7 +854,6 @@ const casesService = {
       const response = await apiClient.post<CaseResponse>(`/cases/${caseId}/documents/confirm`, data)
       return response.data.case
     } catch (error: any) {
-      console.error('Confirm upload error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -894,7 +870,6 @@ const casesService = {
         filename: response.data.filename,
       }
     } catch (error: any) {
-      console.error('Get download URL error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -908,7 +883,6 @@ const casesService = {
       const response = await apiClient.delete<CaseResponse>(`/cases/${caseId}/documents/${docId}`)
       return response.data.case
     } catch (error: any) {
-      console.error('Delete document error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -926,7 +900,6 @@ const casesService = {
         },
       })
     } catch (error: any) {
-      console.error('S3 upload error:', error)
       throw new Error('Failed to upload file to storage')
     }
   },
@@ -942,7 +915,6 @@ const casesService = {
       const response = await apiClient.get<AuditLogResponse>(`/cases/${caseId}/audit`)
       return response.data.logs || []
     } catch (error: any) {
-      console.error('Get audit history error:', error)
       throw new Error(handleApiError(error))
     }
   },

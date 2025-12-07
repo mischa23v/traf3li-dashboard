@@ -369,7 +369,6 @@ const eventsService = {
         pagination: response.data.pagination || {}
       }
     } catch (error: any) {
-      console.error('Get events error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -382,7 +381,6 @@ const eventsService = {
       const response = await apiClient.get('/events/calendar', { params: { view, date } })
       return response.data
     } catch (error: any) {
-      console.error('Get calendar view error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -395,7 +393,6 @@ const eventsService = {
       const response = await apiClient.get(`/events/${id}`)
       return response.data.event || response.data.data || response.data
     } catch (error: any) {
-      console.error('Get event error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -408,7 +405,6 @@ const eventsService = {
       const response = await apiClient.post('/events', data)
       return response.data.event || response.data.data || response.data
     } catch (error: any) {
-      console.error('Create event error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -421,7 +417,6 @@ const eventsService = {
       const response = await apiClient.put(`/events/${id}`, data)
       return response.data.event || response.data.data || response.data
     } catch (error: any) {
-      console.error('Update event error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -433,7 +428,6 @@ const eventsService = {
     try {
       await apiClient.delete(`/events/${id}`)
     } catch (error: any) {
-      console.error('Delete event error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -448,7 +442,6 @@ const eventsService = {
       const response = await apiClient.post(`/events/${id}/complete`, { minutesNotes })
       return response.data.event || response.data.data || response.data
     } catch (error: any) {
-      console.error('Complete event error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -461,7 +454,6 @@ const eventsService = {
       const response = await apiClient.post(`/events/${id}/cancel`, { reason })
       return response.data.event || response.data.data || response.data
     } catch (error: any) {
-      console.error('Cancel event error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -474,7 +466,6 @@ const eventsService = {
       const response = await apiClient.post(`/events/${id}/postpone`, { newDateTime, reason })
       return response.data.event || response.data.data || response.data
     } catch (error: any) {
-      console.error('Postpone event error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -492,7 +483,6 @@ const eventsService = {
       })
       return response.data.event || response.data.data || response.data
     } catch (error: any) {
-      console.error('Reschedule event error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -505,7 +495,6 @@ const eventsService = {
       const response = await apiClient.post(`/events/${id}/start`)
       return response.data.event || response.data.data || response.data
     } catch (error: any) {
-      console.error('Start event error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -520,7 +509,6 @@ const eventsService = {
       const response = await apiClient.post(`/events/${eventId}/attendees`, attendee)
       return response.data.event || response.data.data
     } catch (error: any) {
-      console.error('Add attendee error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -533,7 +521,6 @@ const eventsService = {
       const response = await apiClient.patch(`/events/${eventId}/attendees/${attendeeId}`, data)
       return response.data.event || response.data.data
     } catch (error: any) {
-      console.error('Update attendee error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -548,7 +535,6 @@ const eventsService = {
       })
       return response.data.event || response.data.data
     } catch (error: any) {
-      console.error('Remove attendee error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -561,7 +547,6 @@ const eventsService = {
       const res = await apiClient.post(`/events/${eventId}/rsvp`, response)
       return res.data.event || res.data.data
     } catch (error: any) {
-      console.error('RSVP error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -574,7 +559,6 @@ const eventsService = {
       const response = await apiClient.post(`/events/${eventId}/send-invitations`)
       return response.data
     } catch (error: any) {
-      console.error('Send invitations error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -587,7 +571,6 @@ const eventsService = {
       const response = await apiClient.post(`/events/${eventId}/attendees/${attendeeId}/check-in`)
       return response.data.event || response.data.data
     } catch (error: any) {
-      console.error('Check in error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -600,7 +583,6 @@ const eventsService = {
       const response = await apiClient.post(`/events/${eventId}/attendees/${attendeeId}/check-out`)
       return response.data.event || response.data.data
     } catch (error: any) {
-      console.error('Check out error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -615,7 +597,6 @@ const eventsService = {
       const response = await apiClient.patch(`/events/${eventId}/agenda`, { agenda })
       return response.data.event || response.data.data
     } catch (error: any) {
-      console.error('Update agenda error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -628,7 +609,6 @@ const eventsService = {
       const response = await apiClient.patch(`/events/${eventId}/notes`, { meetingNotes: notes })
       return response.data.event || response.data.data
     } catch (error: any) {
-      console.error('Update meeting notes error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -641,7 +621,6 @@ const eventsService = {
       const response = await apiClient.post(`/events/${eventId}/action-items`, actionItem)
       return response.data.event || response.data.data
     } catch (error: any) {
-      console.error('Add action item error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -654,7 +633,6 @@ const eventsService = {
       const response = await apiClient.post(`/events/${eventId}/action-items/${actionItemId}/toggle`)
       return response.data.event || response.data.data
     } catch (error: any) {
-      console.error('Toggle action item error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -674,7 +652,6 @@ const eventsService = {
       })
       return response.data.attachment || response.data.data
     } catch (error: any) {
-      console.error('Upload attachment error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -686,7 +663,6 @@ const eventsService = {
     try {
       await apiClient.delete(`/events/${eventId}/attachments/${attachmentId}`)
     } catch (error: any) {
-      console.error('Delete attachment error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -701,7 +677,6 @@ const eventsService = {
       const response = await apiClient.post(`/events/${eventId}/comments`, { text })
       return response.data.event || response.data.data
     } catch (error: any) {
-      console.error('Add comment error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -714,7 +689,6 @@ const eventsService = {
       const response = await apiClient.patch(`/events/${eventId}/comments/${commentId}`, { text })
       return response.data.event || response.data.data
     } catch (error: any) {
-      console.error('Update comment error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -727,7 +701,6 @@ const eventsService = {
       const response = await apiClient.delete(`/events/${eventId}/comments/${commentId}`)
       return response.data.event || response.data.data
     } catch (error: any) {
-      console.error('Delete comment error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -742,7 +715,6 @@ const eventsService = {
       const response = await apiClient.get('/events/upcoming', { params: { days } })
       return response.data.events || response.data.data || []
     } catch (error: any) {
-      console.error('Get upcoming events error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -755,7 +727,6 @@ const eventsService = {
       const response = await apiClient.get('/events/today')
       return response.data.events || response.data.data || []
     } catch (error: any) {
-      console.error('Get today events error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -771,7 +742,6 @@ const eventsService = {
         total: response.data.total || 0
       }
     } catch (error: any) {
-      console.error('Get my events error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -784,7 +754,6 @@ const eventsService = {
       const response = await apiClient.get('/events/pending-rsvp')
       return response.data.events || response.data.data || []
     } catch (error: any) {
-      console.error('Get pending RSVP events error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -797,7 +766,6 @@ const eventsService = {
       const response = await apiClient.get('/events/stats', { params: filters })
       return response.data.stats || response.data.data
     } catch (error: any) {
-      console.error('Get event stats error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -812,7 +780,6 @@ const eventsService = {
       const response = await apiClient.post(`/events/${eventId}/recurring/skip`)
       return response.data.event || response.data.data
     } catch (error: any) {
-      console.error('Skip recurrence error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -825,7 +792,6 @@ const eventsService = {
       const response = await apiClient.post(`/events/${eventId}/recurring/stop`)
       return response.data.event || response.data.data
     } catch (error: any) {
-      console.error('Stop recurrence error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -840,7 +806,6 @@ const eventsService = {
       })
       return response.data.instances || response.data.data || []
     } catch (error: any) {
-      console.error('Get recurrence instances error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -853,7 +818,6 @@ const eventsService = {
       const response = await apiClient.put(`/events/${eventId}/recurring/instance/${instanceDate}`, data)
       return response.data.event || response.data.data
     } catch (error: any) {
-      console.error('Update instance error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -868,7 +832,6 @@ const eventsService = {
       const response = await apiClient.post(`/events/${eventId}/calendar-sync`, { provider })
       return response.data.sync || response.data.data
     } catch (error: any) {
-      console.error('Sync calendar error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -883,7 +846,6 @@ const eventsService = {
       })
       return response.data
     } catch (error: any) {
-      console.error('Export to ICS error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -900,7 +862,6 @@ const eventsService = {
       })
       return response.data
     } catch (error: any) {
-      console.error('Import from ICS error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -915,7 +876,6 @@ const eventsService = {
       const response = await apiClient.patch('/events/bulk', { eventIds, ...data })
       return response.data
     } catch (error: any) {
-      console.error('Bulk update error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -928,7 +888,6 @@ const eventsService = {
       const response = await apiClient.delete('/events/bulk', { data: { eventIds } })
       return response.data
     } catch (error: any) {
-      console.error('Bulk delete error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -941,7 +900,6 @@ const eventsService = {
       const response = await apiClient.post('/events/bulk/cancel', { eventIds, reason })
       return response.data
     } catch (error: any) {
-      console.error('Bulk cancel error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -956,7 +914,6 @@ const eventsService = {
       const response = await apiClient.get('/events/templates')
       return response.data.templates || response.data.data || []
     } catch (error: any) {
-      console.error('Get templates error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -969,7 +926,6 @@ const eventsService = {
       const response = await apiClient.post(`/events/templates/${templateId}/create`, overrides)
       return response.data.event || response.data.data
     } catch (error: any) {
-      console.error('Create from template error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -982,7 +938,6 @@ const eventsService = {
       const response = await apiClient.post(`/events/${eventId}/save-as-template`, { name: templateName })
       return response.data.template || response.data.data
     } catch (error: any) {
-      console.error('Save as template error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -1005,7 +960,6 @@ const eventsService = {
       })
       return response.data
     } catch (error: any) {
-      console.error('Check availability error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -1024,7 +978,6 @@ const eventsService = {
       })
       return response.data
     } catch (error: any) {
-      console.error('Find available slots error:', error)
       throw new Error(handleApiError(error))
     }
   },

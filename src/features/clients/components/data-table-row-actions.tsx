@@ -38,7 +38,7 @@ export function DataTableRowActions({ row }: DataTableRowActionsProps) {
             setOpen('view')
           }}
         >
-          <Eye className='me-2 h-4 w-4' />
+          <Eye className='me-2 h-4 w-4' aria-hidden='true' />
           {t('common.view')}
         </DropdownMenuItem>
         <DropdownMenuItem
@@ -47,7 +47,7 @@ export function DataTableRowActions({ row }: DataTableRowActionsProps) {
             setOpen('edit')
           }}
         >
-          <Pencil className='me-2 h-4 w-4' />
+          <Pencil className='me-2 h-4 w-4' aria-hidden='true' />
           {t('common.edit')}
         </DropdownMenuItem>
         <DropdownMenuSeparator />
@@ -58,7 +58,7 @@ export function DataTableRowActions({ row }: DataTableRowActionsProps) {
           }}
           className='text-destructive focus:text-destructive'
         >
-          <Trash2 className='me-2 h-4 w-4' />
+          <Trash2 className='me-2 h-4 w-4' aria-hidden='true' />
           {t('common.delete')}
         </DropdownMenuItem>
       </DropdownMenuContent>

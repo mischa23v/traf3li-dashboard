@@ -118,7 +118,7 @@ export function EditStatementView() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+        <div className="flex items-center gap-2 text-sm text-foreground/70">
           <span>المالية</span>
           <ArrowRight className="h-4 w-4 rotate-180" />
           <span>كشوف الحساب</span>
@@ -128,21 +128,21 @@ export function EditStatementView() {
 
         <div className="flex gap-2">
           <Button variant="outline" size="sm" onClick={() => handleDownload('pdf')}>
-            <Download className="h-4 w-4 ms-2" />
+            <Download className="h-4 w-4 ms-2" aria-hidden="true" />
             PDF
           </Button>
           <Button variant="outline" size="sm" onClick={() => handleDownload('xlsx')}>
-            <FileText className="h-4 w-4 ms-2" />
+            <FileText className="h-4 w-4 ms-2" aria-hidden="true" />
             Excel
           </Button>
           <Button variant="outline" size="sm" onClick={handleSend} disabled={sendStatement.isPending}>
-            <Send className="h-4 w-4 ms-2" />
+            <Send className="h-4 w-4 ms-2" aria-hidden="true" />
             {sendStatement.isPending ? 'جاري الإرسال...' : 'إرسال للعميل'}
           </Button>
           <AlertDialog>
             <AlertDialogTrigger asChild>
               <Button variant="destructive" size="sm">
-                <Trash2 className="h-4 w-4 ms-2" />
+                <Trash2 className="h-4 w-4 ms-2" aria-hidden="true" />
                 حذف
               </Button>
             </AlertDialogTrigger>
@@ -316,7 +316,7 @@ export function EditStatementView() {
 
                 <div className="flex gap-4 pt-4">
                   <Button type="submit" disabled={updateStatement.isPending}>
-                    <Save className="h-4 w-4 ms-2" />
+                    <Save className="h-4 w-4 ms-2" aria-hidden="true" />
                     {updateStatement.isPending ? 'جاري الحفظ...' : 'حفظ التعديلات'}
                   </Button>
                   <Button
@@ -341,24 +341,24 @@ export function EditStatementView() {
               {selectedClient ? (
                 <div className="space-y-3">
                   <div>
-                    <p className="text-sm text-muted-foreground">الاسم</p>
+                    <p className="text-sm text-slate-600">الاسم</p>
                     <p className="font-medium">{selectedClient.name}</p>
                   </div>
                   {selectedClient.email && (
                     <div>
-                      <p className="text-sm text-muted-foreground">البريد الإلكتروني</p>
+                      <p className="text-sm text-slate-600">البريد الإلكتروني</p>
                       <p className="font-medium">{selectedClient.email}</p>
                     </div>
                   )}
                   {selectedClient.phone && (
                     <div>
-                      <p className="text-sm text-muted-foreground">الهاتف</p>
+                      <p className="text-sm text-slate-600">الهاتف</p>
                       <p className="font-medium">{selectedClient.phone}</p>
                     </div>
                   )}
                 </div>
               ) : (
-                <p className="text-muted-foreground text-sm">اختر عميلاً لعرض معلوماته</p>
+                <p className="text-slate-600 text-sm">اختر عميلاً لعرض معلوماته</p>
               )}
             </CardContent>
           </Card>
@@ -369,16 +369,16 @@ export function EditStatementView() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex justify-between">
-                <span className="text-muted-foreground">الرصيد الافتتاحي</span>
+                <span className="text-slate-600">الرصيد الافتتاحي</span>
                 <span className="font-medium">{formData.openingBalance.toLocaleString('ar-SA')} ر.س</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-muted-foreground">الرصيد الختامي</span>
+                <span className="text-slate-600">الرصيد الختامي</span>
                 <span className="font-medium">{formData.closingBalance.toLocaleString('ar-SA')} ر.س</span>
               </div>
               <hr />
               <div className="flex justify-between">
-                <span className="text-muted-foreground">الفرق</span>
+                <span className="text-slate-600">الفرق</span>
                 <span className={`font-bold ${formData.closingBalance - formData.openingBalance >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                   {(formData.closingBalance - formData.openingBalance).toLocaleString('ar-SA')} ر.س
                 </span>

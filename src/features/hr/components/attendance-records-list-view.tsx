@@ -151,9 +151,9 @@ export function AttendanceRecordsListView() {
       absent: <XCircle className="w-3 h-3" />,
       late: <AlertTriangle className="w-3 h-3" />,
       early_departure: <LogOut className="w-3 h-3" />,
-      on_leave: <Calendar className="w-3 h-3" />,
+      on_leave: <Calendar className="w-3 h-3" aria-hidden="true" />,
       weekend: <Coffee className="w-3 h-3" />,
-      holiday: <Calendar className="w-3 h-3" />,
+      holiday: <Calendar className="w-3 h-3" aria-hidden="true" />,
       half_day: <Timer className="w-3 h-3" />,
     }
     return (
@@ -224,19 +224,19 @@ export function AttendanceRecordsListView() {
           <DynamicIsland />
         </div>
 
-        <div className='ms-auto flex items-center gap-4'>
-          <div className="relative hidden md:block">
-            <Search className="absolute end-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-            <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
+        <div className='ms-auto flex items-center gap-2 sm:gap-4 overflow-x-auto min-w-0'>
+          <div className="relative hidden md:block min-w-0">
+            <Search className="absolute end-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
+            <input type="text" placeholder="بحث..." aria-label="بحث" className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
           </div>
-          <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white">
-            <Bell className="h-5 w-5" />
+          <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white flex-shrink-0" aria-label="الإشعارات">
+            <Bell className="h-5 w-5" aria-hidden="true" />
             <span className="absolute top-2 end-2 h-2 w-2 bg-red-500 rounded-full border border-navy"></span>
           </Button>
-          <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white" />
-          <ThemeSwitch className="text-slate-300 hover:bg-white/10 hover:text-white" />
-          <ConfigDrawer className="text-slate-300 hover:bg-white/10 hover:text-white" />
-          <ProfileDropdown className="text-slate-300 hover:bg-white/10 hover:text-white" />
+          <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white flex-shrink-0" />
+          <ThemeSwitch className="text-slate-300 hover:bg-white/10 hover:text-white hidden sm:flex flex-shrink-0" />
+          <ConfigDrawer className="text-slate-300 hover:bg-white/10 hover:text-white hidden lg:flex flex-shrink-0" />
+          <ProfileDropdown className="text-slate-300 hover:bg-white/10 hover:text-white flex-shrink-0" />
         </div>
         {/* Bottom Gradient Line */}
         <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-emerald-500/50 to-transparent"></div>
@@ -266,10 +266,10 @@ export function AttendanceRecordsListView() {
                       className="rounded-xl h-10 w-10"
                       onClick={() => navigateDate('prev')}
                     >
-                      <ChevronRight className="w-4 h-4" />
+                      <ChevronRight className="w-4 h-4" aria-hidden="true" />
                     </Button>
                     <div className="flex items-center gap-2 px-4 py-2 bg-slate-50 rounded-xl h-10">
-                      <Calendar className="w-4 h-4 text-slate-500" />
+                      <Calendar className="w-4 h-4 text-slate-500" aria-hidden="true" />
                       <Input
                         type="date"
                         value={dateFilter}
@@ -283,7 +283,7 @@ export function AttendanceRecordsListView() {
                       className="rounded-xl h-10 w-10"
                       onClick={() => navigateDate('next')}
                     >
-                      <ChevronLeft className="w-4 h-4" />
+                      <ChevronLeft className="w-4 h-4" aria-hidden="true" />
                     </Button>
                     <Button
                       variant="outline"
@@ -297,10 +297,10 @@ export function AttendanceRecordsListView() {
 
                   {/* Search Input */}
                   <div className="relative flex-1 min-w-[200px] max-w-md">
-                    <Search className="absolute end-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                    <Search className="absolute end-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
                     <Input
                       type="text"
-                      placeholder="بحث بالاسم أو الرقم الوظيفي..."
+                      placeholder="بحث بالاسم أو الرقم الوظيفي..." aria-label="بحث بالاسم أو الرقم الوظيفي"
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                       className="pe-10 h-10 rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500/20"
@@ -329,7 +329,7 @@ export function AttendanceRecordsListView() {
                   {/* Department Filter */}
                   <Select value={departmentFilter} onValueChange={setDepartmentFilter}>
                     <SelectTrigger className="w-[140px] h-10 rounded-xl border-slate-200">
-                      <Building2 className="h-4 w-4 ms-2 text-slate-400" />
+                      <Building2 className="h-4 w-4 ms-2 text-slate-500" aria-hidden="true" />
                       <SelectValue placeholder="القسم" />
                     </SelectTrigger>
                     <SelectContent>
@@ -344,7 +344,7 @@ export function AttendanceRecordsListView() {
                   {/* Sort By */}
                   <Select value={sortBy} onValueChange={setSortBy}>
                     <SelectTrigger className="w-[160px] h-10 rounded-xl border-slate-200">
-                      <SortAsc className="h-4 w-4 ms-2 text-slate-400" />
+                      <SortAsc className="h-4 w-4 ms-2 text-slate-500" aria-hidden="true" />
                       <SelectValue placeholder="ترتيب حسب" />
                     </SelectTrigger>
                     <SelectContent>
@@ -362,7 +362,7 @@ export function AttendanceRecordsListView() {
                       onClick={clearFilters}
                       className="h-10 px-4 text-red-500 hover:text-red-600 hover:bg-red-50 rounded-xl"
                     >
-                      <X className="h-4 w-4 ms-2" />
+                      <X className="h-4 w-4 ms-2" aria-hidden="true" />
                       مسح الفلاتر
                     </Button>
                   )}
@@ -406,7 +406,7 @@ export function AttendanceRecordsListView() {
                   <div className="bg-white rounded-2xl p-12 border border-slate-100 text-center">
                     <div className="flex justify-center mb-4">
                       <div className="w-16 h-16 rounded-full bg-red-50 flex items-center justify-center">
-                        <AlertCircle className="w-8 h-8 text-red-500" />
+                        <AlertCircle className="w-8 h-8 text-red-500" aria-hidden="true" />
                       </div>
                     </div>
                     <h3 className="text-lg font-bold text-slate-900 mb-2">حدث خطأ أثناء تحميل السجلات</h3>
@@ -429,7 +429,7 @@ export function AttendanceRecordsListView() {
                     <p className="text-slate-500 mb-4">لا توجد سجلات حضور لهذا اليوم</p>
                     <Button asChild className="bg-emerald-500 hover:bg-emerald-600">
                       <Link to="/dashboard/hr/attendance/new">
-                        <Plus className="w-4 h-4 ms-2" />
+                        <Plus className="w-4 h-4 ms-2" aria-hidden="true" />
                         تسجيل حضور
                       </Link>
                     </Button>
@@ -466,17 +466,17 @@ export function AttendanceRecordsListView() {
                       </div>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon" className="text-slate-400 hover:text-navy">
-                            <MoreHorizontal className="h-5 w-5" />
+                          <Button variant="ghost" size="icon" className="text-slate-500 hover:text-navy" aria-label="خيارات">
+                            <MoreHorizontal className="h-5 w-5" aria-hidden="true" />
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="w-48">
                           <DropdownMenuItem onClick={() => handleViewRecord(record._id)}>
-                            <Eye className="h-4 w-4 ms-2" />
+                            <Eye className="h-4 w-4 ms-2" aria-hidden="true" />
                             عرض التفاصيل
                           </DropdownMenuItem>
                           <DropdownMenuItem onClick={() => handleEditRecord(record._id)}>
-                            <Edit3 className="h-4 w-4 ms-2 text-blue-500" />
+                            <Edit3 className="h-4 w-4 ms-2 text-blue-500" aria-hidden="true" />
                             تعديل السجل
                           </DropdownMenuItem>
                           <DropdownMenuSeparator />
@@ -484,7 +484,7 @@ export function AttendanceRecordsListView() {
                             onClick={() => handleDeleteRecord(record._id)}
                             className="text-red-600 focus:text-red-600"
                           >
-                            <Trash2 className="h-4 w-4 ms-2" />
+                            <Trash2 className="h-4 w-4 ms-2" aria-hidden="true" />
                             حذف السجل
                           </DropdownMenuItem>
                         </DropdownMenuContent>
@@ -529,7 +529,7 @@ export function AttendanceRecordsListView() {
                         {/* Location */}
                         {record.workLocation && (
                           <div className="text-center">
-                            <MapPin className="w-4 h-4 text-slate-400 mx-auto" />
+                            <MapPin className="w-4 h-4 text-slate-500 mx-auto" aria-hidden="true" />
                             <p className="text-xs text-slate-500">
                               {record.workLocation === 'office' ? 'المكتب' :
                                record.workLocation === 'remote' ? 'عن بعد' :
@@ -552,7 +552,7 @@ export function AttendanceRecordsListView() {
               <div className="p-4 pt-0 text-center">
                 <Button variant="ghost" className="text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 w-full rounded-xl py-6">
                   عرض جميع السجلات
-                  <ChevronLeft className="h-4 w-4 me-2" />
+                  <ChevronLeft className="h-4 w-4 me-2" aria-hidden="true" />
                 </Button>
               </div>
             </div>

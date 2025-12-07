@@ -339,11 +339,11 @@ export function OrganizationalStructureCreateView() {
         </div>
         <div className='ms-auto flex items-center gap-4'>
           <div className="relative hidden md:block">
-            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-            <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
+            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
+            <input type="text" placeholder="بحث..." aria-label="بحث" className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
           </div>
-          <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white">
-            <Bell className="h-5 w-5" />
+          <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white" aria-label="الإشعارات">
+            <Bell className="h-5 w-5" aria-hidden="true" />
             <span className="absolute top-2 right-2 h-2 w-2 bg-red-500 rounded-full border border-navy"></span>
           </Button>
           <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white" />
@@ -389,7 +389,7 @@ export function OrganizationalStructureCreateView() {
             <Card className="rounded-3xl shadow-sm border-slate-100">
               <CardHeader className="pb-4">
                 <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                  <Building2 className="w-5 h-5 text-emerald-500" />
+                  <Building2 className="w-5 h-5 text-emerald-500" aria-hidden="true" />
                   نوع المكتب
                 </CardTitle>
               </CardHeader>
@@ -628,7 +628,7 @@ export function OrganizationalStructureCreateView() {
             <Card className="rounded-3xl shadow-sm border-slate-100">
               <CardHeader className="pb-4">
                 <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                  <Calendar className="w-5 h-5 text-emerald-500" />
+                  <Calendar className="w-5 h-5 text-emerald-500" aria-hidden="true" />
                   التواريخ
                 </CardTitle>
               </CardHeader>
@@ -668,7 +668,7 @@ export function OrganizationalStructureCreateView() {
                         <LayoutGrid className="w-5 h-5 text-blue-500" />
                         الوصف والرسالة
                       </CardTitle>
-                      <ChevronDown className={cn("w-5 h-5 text-slate-400 transition-transform", openSections.includes('description') && "rotate-180")} />
+                      <ChevronDown className={cn("w-5 h-5 text-slate-500 transition-transform", openSections.includes('description') && "rotate-180")} />
                     </div>
                   </CardHeader>
                 </CollapsibleTrigger>
@@ -732,7 +732,7 @@ export function OrganizationalStructureCreateView() {
                         {annualBudget > 0 && (
                           <Badge className="bg-amber-100 text-amber-700">{annualBudget.toLocaleString()} {currency}</Badge>
                         )}
-                        <ChevronDown className={cn("w-5 h-5 text-slate-400 transition-transform", openSections.includes('budget') && "rotate-180")} />
+                        <ChevronDown className={cn("w-5 h-5 text-slate-500 transition-transform", openSections.includes('budget') && "rotate-180")} />
                       </div>
                     </div>
                   </CardHeader>
@@ -796,7 +796,7 @@ export function OrganizationalStructureCreateView() {
                         <Layers className="w-5 h-5 text-purple-500" />
                         مركز التكلفة
                       </CardTitle>
-                      <ChevronDown className={cn("w-5 h-5 text-slate-400 transition-transform", openSections.includes('costCenter') && "rotate-180")} />
+                      <ChevronDown className={cn("w-5 h-5 text-slate-500 transition-transform", openSections.includes('costCenter') && "rotate-180")} />
                     </div>
                   </CardHeader>
                 </CollapsibleTrigger>
@@ -860,10 +860,10 @@ export function OrganizationalStructureCreateView() {
                   <CardHeader className="cursor-pointer hover:bg-slate-50 transition-colors rounded-t-3xl">
                     <div className="flex items-center justify-between">
                       <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                        <MapPin className="w-5 h-5 text-red-500" />
+                        <MapPin className="w-5 h-5 text-red-500" aria-hidden="true" />
                         الموقع والعنوان
                       </CardTitle>
-                      <ChevronDown className={cn("w-5 h-5 text-slate-400 transition-transform", openSections.includes('location') && "rotate-180")} />
+                      <ChevronDown className={cn("w-5 h-5 text-slate-500 transition-transform", openSections.includes('location') && "rotate-180")} />
                     </div>
                   </CardHeader>
                 </CollapsibleTrigger>
@@ -940,10 +940,10 @@ export function OrganizationalStructureCreateView() {
                   <CardHeader className="cursor-pointer hover:bg-slate-50 transition-colors rounded-t-3xl">
                     <div className="flex items-center justify-between">
                       <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                        <Phone className="w-5 h-5 text-cyan-500" />
+                        <Phone className="w-5 h-5 text-cyan-500" aria-hidden="true" />
                         معلومات الاتصال
                       </CardTitle>
-                      <ChevronDown className={cn("w-5 h-5 text-slate-400 transition-transform", openSections.includes('contact') && "rotate-180")} />
+                      <ChevronDown className={cn("w-5 h-5 text-slate-500 transition-transform", openSections.includes('contact') && "rotate-180")} />
                     </div>
                   </CardHeader>
                 </CollapsibleTrigger>
@@ -997,7 +997,7 @@ export function OrganizationalStructureCreateView() {
                         <Shield className="w-5 h-5 text-emerald-500" />
                         الامتثال والالتزام
                       </CardTitle>
-                      <ChevronDown className={cn("w-5 h-5 text-slate-400 transition-transform", openSections.includes('compliance') && "rotate-180")} />
+                      <ChevronDown className={cn("w-5 h-5 text-slate-500 transition-transform", openSections.includes('compliance') && "rotate-180")} />
                     </div>
                   </CardHeader>
                 </CollapsibleTrigger>
@@ -1032,7 +1032,7 @@ export function OrganizationalStructureCreateView() {
                         <Target className="w-5 h-5 text-indigo-500" />
                         صلاحيات الاعتماد
                       </CardTitle>
-                      <ChevronDown className={cn("w-5 h-5 text-slate-400 transition-transform", openSections.includes('approval') && "rotate-180")} />
+                      <ChevronDown className={cn("w-5 h-5 text-slate-500 transition-transform", openSections.includes('approval') && "rotate-180")} />
                     </div>
                   </CardHeader>
                 </CollapsibleTrigger>
@@ -1091,7 +1091,7 @@ export function OrganizationalStructureCreateView() {
                         <Layers className="w-5 h-5 text-gray-500" />
                         الملاحظات
                       </CardTitle>
-                      <ChevronDown className={cn("w-5 h-5 text-slate-400 transition-transform", openSections.includes('notes') && "rotate-180")} />
+                      <ChevronDown className={cn("w-5 h-5 text-slate-500 transition-transform", openSections.includes('notes') && "rotate-180")} />
                     </div>
                   </CardHeader>
                 </CollapsibleTrigger>

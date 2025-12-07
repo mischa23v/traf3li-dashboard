@@ -152,7 +152,7 @@ export function VendorsActionDialog({
             >
               {/* Basic Info Section */}
               <div className='space-y-4'>
-                <h4 className='text-sm font-medium text-muted-foreground'>
+                <h4 className='text-sm font-medium text-slate-600'>
                   المعلومات الأساسية
                 </h4>
                 <div className='grid grid-cols-1 gap-4 sm:grid-cols-2'>
@@ -229,7 +229,7 @@ export function VendorsActionDialog({
 
               {/* Contact Info Section */}
               <div className='space-y-4'>
-                <h4 className='text-sm font-medium text-muted-foreground'>
+                <h4 className='text-sm font-medium text-slate-600'>
                   معلومات الاتصال
                 </h4>
                 <div className='grid grid-cols-1 gap-4 sm:grid-cols-2'>
@@ -273,7 +273,7 @@ export function VendorsActionDialog({
 
               {/* Address Section */}
               <div className='space-y-4'>
-                <h4 className='text-sm font-medium text-muted-foreground'>
+                <h4 className='text-sm font-medium text-slate-600'>
                   العنوان
                 </h4>
                 <div className='grid grid-cols-1 gap-4 sm:grid-cols-2'>
@@ -330,7 +330,7 @@ export function VendorsActionDialog({
 
               {/* Banking Info Section */}
               <div className='space-y-4'>
-                <h4 className='text-sm font-medium text-muted-foreground'>
+                <h4 className='text-sm font-medium text-slate-600'>
                   المعلومات البنكية
                 </h4>
                 <div className='grid grid-cols-1 gap-4 sm:grid-cols-2'>

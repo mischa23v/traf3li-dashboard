@@ -304,7 +304,6 @@ export function SignUp() {
 
   const handleSubmit = () => {
     if (validateStep(currentStep)) {
-      console.log('Form Data:', formData);
       setShowSuccess(true);
     }
   };

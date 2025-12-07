@@ -54,7 +54,6 @@ export const useAuthStore = create<AuthState>()(
               try {
                 await usePermissionsStore.getState().fetchPermissions()
               } catch (permError) {
-                console.warn('Could not fetch permissions:', permError)
                 // Don't fail login if permissions fetch fails
               }
             } else {
@@ -91,7 +90,6 @@ export const useAuthStore = create<AuthState>()(
           // Clear permissions on logout
           usePermissionsStore.getState().clearPermissions()
         } catch (error: any) {
-          console.error('Logout error:', error)
           // Even if API fails, clear state
           set({
             user: null,
@@ -144,7 +142,6 @@ export const useAuthStore = create<AuthState>()(
               try {
                 await usePermissionsStore.getState().fetchPermissions()
               } catch (permError) {
-                console.warn('Could not fetch permissions:', permError)
                 // Don't fail auth check if permissions fetch fails
               }
             } else {
