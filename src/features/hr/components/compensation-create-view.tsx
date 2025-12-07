@@ -1082,7 +1082,7 @@ export function CompensationCreateView() {
                   <CardContent className="space-y-4">
                     {allowances.length === 0 ? (
                       <div className="text-center py-8 text-slate-500">
-                        <Receipt className="w-12 h-12 mx-auto mb-2 opacity-50" />
+                        <Receipt className="w-12 h-12 mx-auto mb-2 opacity-70" />
                         <p>لم تتم إضافة بدلات إضافية</p>
                       </div>
                     ) : (

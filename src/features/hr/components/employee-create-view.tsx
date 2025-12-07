@@ -496,7 +496,7 @@ export function EmployeeCreateView() {
                                         <div className="space-y-2">
                                             <Label className="text-navy font-medium">
                                                 رقم الهوية <span className="text-red-500">*</span>
-                                                <Lock className="h-3 w-3 text-muted-foreground inline ms-1" />
+                                                <Lock className="h-3 w-3 text-slate-500 inline ms-1" />
                                             </Label>
                                             <Input
                                                 value={nationalId}
@@ -526,7 +526,7 @@ export function EmployeeCreateView() {
                                             <Label className="text-navy font-medium flex items-center gap-1">
                                                 <Phone className="w-4 h-4" aria-hidden="true" />
                                                 رقم الجوال <span className="text-red-500">*</span>
-                                                <Lock className="h-3 w-3 text-muted-foreground inline ms-1" />
+                                                <Lock className="h-3 w-3 text-slate-500 inline ms-1" />
                                             </Label>
                                             <Input
                                                 value={mobile}
@@ -541,7 +541,7 @@ export function EmployeeCreateView() {
                                             <Label className="text-navy font-medium flex items-center gap-1">
                                                 <Mail className="w-4 h-4" aria-hidden="true" />
                                                 البريد الإلكتروني <span className="text-red-500">*</span>
-                                                <Lock className="h-3 w-3 text-muted-foreground inline ms-1" />
+                                                <Lock className="h-3 w-3 text-slate-500 inline ms-1" />
                                             </Label>
                                             <Input
                                                 type="email"
@@ -658,7 +658,7 @@ export function EmployeeCreateView() {
 
                                         {allowances.length === 0 ? (
                                             <div className="text-center py-8 text-slate-500 bg-slate-50 rounded-xl border-2 border-dashed border-slate-200">
-                                                <DollarSign className="w-8 h-8 mx-auto mb-2 opacity-50" />
+                                                <DollarSign className="w-8 h-8 mx-auto mb-2 opacity-70" />
                                                 <p>لا توجد بدلات</p>
                                                 <p className="text-sm">اضغط على "إضافة بدل" لإضافة بدلات للموظف</p>
                                             </div>
@@ -926,7 +926,7 @@ export function EmployeeCreateView() {
                                                 <div className="space-y-2">
                                                     <Label className="text-navy font-medium">
                                                         رقم الهاتف
-                                                        <Lock className="h-3 w-3 text-muted-foreground inline ms-1" />
+                                                        <Lock className="h-3 w-3 text-slate-500 inline ms-1" />
                                                     </Label>
                                                     <Input
                                                         value={emergencyPhone}
@@ -1137,7 +1137,7 @@ export function EmployeeCreateView() {
                                                 <div className="space-y-2">
                                                     <Label className="text-navy font-medium">
                                                         رقم الآيبان (IBAN)
-                                                        <Lock className="h-3 w-3 text-muted-foreground inline ms-1" />
+                                                        <Lock className="h-3 w-3 text-slate-500 inline ms-1" />
                                                     </Label>
                                                     <Input
                                                         value={iban}
@@ -1181,7 +1181,7 @@ export function EmployeeCreateView() {
                                                     <div className="space-y-2">
                                                         <Label className="text-navy font-medium">
                                                             رقم التأمينات
-                                                            <Lock className="h-3 w-3 text-muted-foreground inline ms-1" />
+                                                            <Lock className="h-3 w-3 text-slate-500 inline ms-1" />
                                                         </Label>
                                                         <Input
                                                             value={gosiNumber}

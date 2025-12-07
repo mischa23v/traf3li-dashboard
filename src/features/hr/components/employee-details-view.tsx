@@ -273,7 +273,7 @@ export function EmployeeDetailsView() {
                                                         </CardHeader>
                                                         <CardContent className="space-y-3">
                                                             <div className="flex justify-between text-sm">
-                                                                <span className="text-slate-500">رقم الهوية<Lock className="h-3 w-3 text-muted-foreground inline ms-1" /></span>
+                                                                <span className="text-slate-500">رقم الهوية<Lock className="h-3 w-3 text-slate-500 inline ms-1" /></span>
                                                                 <span className="font-medium text-slate-900">{employee.personalInfo?.nationalId || 'غير محدد'}</span>
                                                             </div>
                                                             <div className="flex justify-between text-sm">
@@ -314,11 +314,11 @@ export function EmployeeDetailsView() {
                                                         </CardHeader>
                                                         <CardContent className="space-y-3">
                                                             <div className="flex justify-between text-sm">
-                                                                <span className="text-slate-500">الجوال<Lock className="h-3 w-3 text-muted-foreground inline ms-1" /></span>
+                                                                <span className="text-slate-500">الجوال<Lock className="h-3 w-3 text-slate-500 inline ms-1" /></span>
                                                                 <span className="font-medium text-slate-900" dir="ltr">{employee.personalInfo?.mobile || 'غير محدد'}</span>
                                                             </div>
                                                             <div className="flex justify-between text-sm">
-                                                                <span className="text-slate-500">البريد الإلكتروني<Lock className="h-3 w-3 text-muted-foreground inline ms-1" /></span>
+                                                                <span className="text-slate-500">البريد الإلكتروني<Lock className="h-3 w-3 text-slate-500 inline ms-1" /></span>
                                                                 <span className="font-medium text-slate-900" dir="ltr">{employee.personalInfo?.email || 'غير محدد'}</span>
                                                             </div>
                                                             <div className="flex justify-between text-sm">
@@ -352,7 +352,7 @@ export function EmployeeDetailsView() {
                                                                 <span className="font-medium text-slate-900">{employee.personalInfo?.emergencyContact?.relationship || 'غير محدد'}</span>
                                                             </div>
                                                             <div>
-                                                                <span className="text-sm text-slate-500 block">رقم الهاتف<Lock className="h-3 w-3 text-muted-foreground inline ms-1" /></span>
+                                                                <span className="text-sm text-slate-500 block">رقم الهاتف<Lock className="h-3 w-3 text-slate-500 inline ms-1" /></span>
                                                                 <span className="font-medium text-slate-900" dir="ltr">{employee.personalInfo?.emergencyContact?.phone || 'غير محدد'}</span>
                                                             </div>
                                                         </div>
@@ -534,7 +534,7 @@ export function EmployeeDetailsView() {
                                                                 <span className="font-medium text-slate-900">{employee.compensation?.bankDetails?.bankName || 'غير محدد'}</span>
                                                             </div>
                                                             <div>
-                                                                <span className="text-sm text-slate-500 block">رقم الآيبان (IBAN)<Lock className="h-3 w-3 text-muted-foreground inline ms-1" /></span>
+                                                                <span className="text-sm text-slate-500 block">رقم الآيبان (IBAN)<Lock className="h-3 w-3 text-slate-500 inline ms-1" /></span>
                                                                 <span className="font-medium text-slate-900" dir="ltr">{employee.compensation?.bankDetails?.iban || 'غير محدد'}</span>
                                                             </div>
                                                         </div>
@@ -559,7 +559,7 @@ export function EmployeeDetailsView() {
                                                             </div>
                                                             {employee.gosi?.gosiNumber && (
                                                                 <div>
-                                                                    <span className="text-sm text-slate-500 block">رقم التأمينات<Lock className="h-3 w-3 text-muted-foreground inline ms-1" /></span>
+                                                                    <span className="text-sm text-slate-500 block">رقم التأمينات<Lock className="h-3 w-3 text-slate-500 inline ms-1" /></span>
                                                                     <span className="font-medium text-slate-900">{employee.gosi.gosiNumber}</span>
                                                                 </div>
                                                             )}

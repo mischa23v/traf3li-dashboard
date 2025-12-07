@@ -567,7 +567,7 @@ export function PayrollCreateView() {
 
                                         {allowances.length === 0 ? (
                                             <div className="text-center py-6 text-slate-500 bg-slate-50 rounded-xl border-2 border-dashed border-slate-200">
-                                                <DollarSign className="w-8 h-8 mx-auto mb-2 opacity-50" />
+                                                <DollarSign className="w-8 h-8 mx-auto mb-2 opacity-70" />
                                                 <p className="text-sm">لا توجد بدلات</p>
                                             </div>
                                         ) : (
@@ -688,7 +688,7 @@ export function PayrollCreateView() {
 
                                         {deductions.length === 0 ? (
                                             <div className="text-center py-6 text-slate-500 bg-slate-50 rounded-xl border-2 border-dashed border-slate-200">
-                                                <Minus className="w-8 h-8 mx-auto mb-2 opacity-50" />
+                                                <Minus className="w-8 h-8 mx-auto mb-2 opacity-70" />
                                                 <p className="text-sm">لا توجد خصومات إضافية</p>
                                             </div>
                                         ) : (
@@ -875,7 +875,7 @@ export function PayrollCreateView() {
                                                     />
                                                 </div>
                                                 <div className="space-y-2">
-                                                    <Label className="text-navy font-medium">رقم الآيبان (IBAN)<Lock className="h-3 w-3 text-muted-foreground inline ms-1" /></Label>
+                                                    <Label className="text-navy font-medium">رقم الآيبان (IBAN)<Lock className="h-3 w-3 text-slate-500 inline ms-1" /></Label>
                                                     <Input
                                                         value={iban}
                                                         onChange={(e) => setIban(e.target.value)}

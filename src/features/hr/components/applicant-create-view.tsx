@@ -29,7 +29,7 @@ import {
   Search, Bell, ArrowRight, User, Building, Users, Briefcase,
   ChevronDown, Mail, Phone, MapPin, Plus, Trash2, Upload,
   Info, CheckCircle, GraduationCap, FileText, Languages,
-  DollarSign, Calendar, Globe, Scale
+  DollarSign, Calendar, Globe, Scale, Lock
 } from 'lucide-react'
 import type {
   EducationLevel,
@@ -449,7 +449,7 @@ export function ApplicantCreateView() {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="email">البريد الإلكتروني *</Label>
+                <Label htmlFor="email">البريد الإلكتروني *<Lock className="h-3 w-3 text-slate-500 inline ms-1" /></Label>
                 <div className="relative">
                   <Mail className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
                   <Input
@@ -463,7 +463,7 @@ export function ApplicantCreateView() {
                 </div>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="phone">رقم الهاتف *</Label>
+                <Label htmlFor="phone">رقم الهاتف *<Lock className="h-3 w-3 text-slate-500 inline ms-1" /></Label>
                 <div className="relative">
                   <Phone className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
                   <Input
