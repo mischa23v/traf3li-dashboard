@@ -302,7 +302,7 @@ export function CreateBillView({ mode = 'create' }: CreateBillViewProps) {
                                                 بنود الفاتورة
                                             </label>
                                             <Button type="button" onClick={handleAddItem} variant="outline" size="sm" className="text-emerald-600 border-emerald-200 hover:bg-emerald-50">
-                                                <Plus className="w-4 h-4 ml-2" />
+                                                <Plus className="w-4 h-4 ms-2" />
                                                 إضافة بند
                                             </Button>
                                         </div>

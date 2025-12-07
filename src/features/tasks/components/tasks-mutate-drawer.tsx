@@ -365,7 +365,7 @@ export function TasksMutateDrawer({
                       {labelOptions.map((option) => (
                         <FormItem
                           key={option.value}
-                          className='flex items-center space-x-2 space-x-reverse'
+                          className='flex items-center gap-2'
                         >
                           <FormControl>
                             <RadioGroupItem value={option.value} />
@@ -566,7 +566,7 @@ export function TasksMutateDrawer({
                   control={form.control}
                   name='billing.isBillable'
                   render={({ field }) => (
-                    <FormItem className='flex items-center space-x-2 space-x-reverse'>
+                    <FormItem className='flex items-center gap-2'>
                       <FormControl>
                         <Checkbox
                           checked={field.value}

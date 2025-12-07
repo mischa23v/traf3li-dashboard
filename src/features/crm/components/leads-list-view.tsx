@@ -131,7 +131,7 @@ export function LeadsListView() {
           <DynamicIsland />
         </div>
 
-        <div className="ms-auto flex items-center space-x-4">
+        <div className="ms-auto flex items-center gap-4">
           <div className="relative hidden md:block">
             <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
             <input
@@ -167,7 +167,7 @@ export function LeadsListView() {
             className="bg-emerald-500 hover:bg-emerald-600 text-white h-12 px-8 rounded-xl font-bold shadow-lg shadow-emerald-500/20 border-0"
           >
             <Link to="/dashboard/crm/leads/new">
-              <Plus className="ml-2 h-5 w-5" />
+              <Plus className="ms-2 h-5 w-5" />
               {t('leads.newLead')}
             </Link>
           </Button>
@@ -176,7 +176,7 @@ export function LeadsListView() {
             className="bg-white text-slate-900 hover:bg-slate-100 h-12 px-8 rounded-xl font-bold shadow-lg border-0 transition-all hover:scale-105"
           >
             <Link to="/dashboard/crm/pipeline">
-              <TrendingUp className="ml-2 h-5 w-5" />
+              <TrendingUp className="ms-2 h-5 w-5" />
               {t('sidebar.nav.pipeline')}
             </Link>
           </Button>
@@ -267,7 +267,7 @@ export function LeadsListView() {
                     <p className="text-slate-500 mb-4">{t('leads.startAddingLead')}</p>
                     <Button asChild className="bg-emerald-500 hover:bg-emerald-600">
                       <Link to="/dashboard/crm/leads/new">
-                        <Plus className="w-4 h-4 ml-2" />
+                        <Plus className="w-4 h-4 ms-2" />
                         {t('leads.newLead')}
                       </Link>
                     </Button>
@@ -344,7 +344,7 @@ export function LeadsListView() {
                               onClick={() => convertLead(lead._id)}
                               disabled={lead.convertedToClient}
                             >
-                              <ArrowUpRight className="h-4 w-4 ml-2" />
+                              <ArrowUpRight className="h-4 w-4 ms-2" />
                               {t('leads.convertToClient')}
                             </DropdownMenuItem>
                             <DropdownMenuItem
@@ -404,7 +404,7 @@ export function LeadsListView() {
                   className="text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 w-full rounded-xl py-6"
                 >
                   {t('leads.viewAllLeads')}
-                  <ChevronLeft className="h-4 w-4 mr-2" />
+                  <ChevronLeft className="h-4 w-4 me-2" />
                 </Button>
               </div>
             </div>

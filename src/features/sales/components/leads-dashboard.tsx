@@ -182,7 +182,7 @@ function LeadCard({
             </DropdownMenuItem>
             {canConvert && !lead.convertedToClientId && (
               <DropdownMenuItem onClick={() => onConvert(lead._id)}>
-                <ArrowUpRight className="h-4 w-4 ml-2" />
+                <ArrowUpRight className="h-4 w-4 ms-2" />
                 تحويل إلى عميل
               </DropdownMenuItem>
             )}
@@ -313,7 +313,7 @@ function ConvertLeadDialog({
               </label>
 
               {createCase && (
-                <div className="space-y-2 mr-6">
+                <div className="space-y-2 me-6">
                   <label className="text-sm text-slate-600">نوع القضية</label>
                   <Select value={caseType} onValueChange={setCaseType}>
                     <SelectTrigger>
@@ -350,7 +350,7 @@ function ConvertLeadDialog({
             onClick={handleConfirm}
             className="bg-emerald-500 hover:bg-emerald-600 rounded-xl"
           >
-            <ArrowUpRight className="h-4 w-4 ml-2" />
+            <ArrowUpRight className="h-4 w-4 ms-2" />
             تحويل الآن
           </Button>
         </DialogFooter>
@@ -602,7 +602,7 @@ function LeadFormDialog({
               type="submit"
               className="bg-emerald-500 hover:bg-emerald-600 rounded-xl"
             >
-              <Plus className="h-4 w-4 ml-2" />
+              <Plus className="h-4 w-4 ms-2" />
               حفظ
             </Button>
           </DialogFooter>
@@ -973,7 +973,7 @@ export function LeadsDashboard() {
             onClick={() => setShowLeadForm(true)}
             className="bg-emerald-500 hover:bg-emerald-600 rounded-xl"
           >
-            <Plus className="h-4 w-4 ml-2" />
+            <Plus className="h-4 w-4 ms-2" />
             عميل محتمل جديد
           </Button>
         </div>

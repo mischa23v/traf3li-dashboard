@@ -212,7 +212,7 @@ export function PayrollRunDetailsView() {
                     <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
                         <DynamicIsland />
                     </div>
-                    <div className='ms-auto flex items-center space-x-4'>
+                    <div className='ms-auto flex items-center gap-4'>
                         <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white" />
                         <ThemeSwitch className="text-slate-300 hover:bg-white/10 hover:text-white" />
                         <ConfigDrawer className="text-slate-300 hover:bg-white/10 hover:text-white" />
@@ -243,7 +243,7 @@ export function PayrollRunDetailsView() {
                     <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
                         <DynamicIsland />
                     </div>
-                    <div className='ms-auto flex items-center space-x-4'>
+                    <div className='ms-auto flex items-center gap-4'>
                         <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white" />
                         <ThemeSwitch className="text-slate-300 hover:bg-white/10 hover:text-white" />
                         <ConfigDrawer className="text-slate-300 hover:bg-white/10 hover:text-white" />
@@ -279,10 +279,10 @@ export function PayrollRunDetailsView() {
                     <DynamicIsland />
                 </div>
 
-                <div className='ms-auto flex items-center space-x-4'>
+                <div className='ms-auto flex items-center gap-4'>
                     <div className="relative hidden md:block">
-                        <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                        <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pr-9 pl-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
+                        <Search className="absolute end-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                        <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
                     </div>
                     <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white">
                         <Bell className="h-5 w-5" />
@@ -325,7 +325,7 @@ export function PayrollRunDetailsView() {
                                 className="bg-blue-500 hover:bg-blue-600 text-white rounded-xl"
                                 disabled={calculateMutation.isPending}
                             >
-                                <Calculator className="w-4 h-4 ml-2" />
+                                <Calculator className="w-4 h-4 ms-2" />
                                 {calculateMutation.isPending ? 'جاري الحساب...' : 'حساب الرواتب'}
                             </Button>
                         )}
@@ -337,14 +337,14 @@ export function PayrollRunDetailsView() {
                                     className="rounded-xl"
                                     disabled={validateMutation.isPending}
                                 >
-                                    <CheckCircle className="w-4 h-4 ml-2" />
+                                    <CheckCircle className="w-4 h-4 ms-2" />
                                     تحقق
                                 </Button>
                                 <Button
                                     onClick={() => setShowApproveDialog(true)}
                                     className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl"
                                 >
-                                    <CheckCircle className="w-4 h-4 ml-2" />
+                                    <CheckCircle className="w-4 h-4 ms-2" />
                                     اعتماد
                                 </Button>
                             </>
@@ -357,7 +357,7 @@ export function PayrollRunDetailsView() {
                                     className="rounded-xl"
                                     disabled={generateWPSMutation.isPending}
                                 >
-                                    <FileSpreadsheet className="w-4 h-4 ml-2" />
+                                    <FileSpreadsheet className="w-4 h-4 ms-2" />
                                     إنشاء ملف WPS
                                 </Button>
                                 <Button
@@ -365,7 +365,7 @@ export function PayrollRunDetailsView() {
                                     className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl"
                                     disabled={processPaymentsMutation.isPending}
                                 >
-                                    <CreditCard className="w-4 h-4 ml-2" />
+                                    <CreditCard className="w-4 h-4 ms-2" />
                                     {processPaymentsMutation.isPending ? 'جاري المعالجة...' : 'معالجة الدفع'}
                                 </Button>
                             </>
@@ -376,7 +376,7 @@ export function PayrollRunDetailsView() {
                                 className="bg-blue-500 hover:bg-blue-600 text-white rounded-xl"
                                 disabled={sendNotificationsMutation.isPending}
                             >
-                                <Send className="w-4 h-4 ml-2" />
+                                <Send className="w-4 h-4 ms-2" />
                                 {sendNotificationsMutation.isPending ? 'جاري الإرسال...' : 'إرسال القسائم'}
                             </Button>
                         )}
@@ -390,11 +390,11 @@ export function PayrollRunDetailsView() {
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end" className="w-48">
                                 <DropdownMenuItem>
-                                    <Download className="h-4 w-4 ml-2" />
+                                    <Download className="h-4 w-4 ms-2" />
                                     تصدير التقرير
                                 </DropdownMenuItem>
                                 <DropdownMenuItem>
-                                    <FileSpreadsheet className="h-4 w-4 ml-2" />
+                                    <FileSpreadsheet className="h-4 w-4 ms-2" />
                                     تصدير Excel
                                 </DropdownMenuItem>
                                 <DropdownMenuSeparator />
@@ -403,7 +403,7 @@ export function PayrollRunDetailsView() {
                                         onClick={() => setShowCancelDialog(true)}
                                         className="text-red-600 focus:text-red-600"
                                     >
-                                        <Ban className="h-4 w-4 ml-2" />
+                                        <Ban className="h-4 w-4 ms-2" />
                                         إلغاء الدورة
                                     </DropdownMenuItem>
                                 )}
@@ -744,15 +744,15 @@ export function PayrollRunDetailsView() {
                                                     </div>
                                                 </div>
                                                 <div className="flex items-center gap-6">
-                                                    <div className="text-left">
+                                                    <div className="text-start">
                                                         <div className="text-xs text-slate-400">إجمالي</div>
                                                         <div className="font-medium text-navy">{formatCurrency(employee.earnings.grossPay)}</div>
                                                     </div>
-                                                    <div className="text-left">
+                                                    <div className="text-start">
                                                         <div className="text-xs text-slate-400">خصومات</div>
                                                         <div className="font-medium text-red-600">{formatCurrency(employee.deductions.totalDeductions)}</div>
                                                     </div>
-                                                    <div className="text-left">
+                                                    <div className="text-start">
                                                         <div className="text-xs text-slate-400">صافي</div>
                                                         <div className="font-bold text-emerald-600">{formatCurrency(employee.netPay)}</div>
                                                     </div>
@@ -959,7 +959,7 @@ export function PayrollRunDetailsView() {
                                                             <div className="font-medium text-navy">{dept.departmentName}</div>
                                                             <div className="text-sm text-slate-500">{dept.employeeCount} موظف</div>
                                                         </div>
-                                                        <div className="flex items-center gap-6 text-left">
+                                                        <div className="flex items-center gap-6 text-start">
                                                             <div>
                                                                 <div className="text-xs text-slate-400">إجمالي</div>
                                                                 <div className="font-medium">{formatCurrency(dept.totalGrossPay)}</div>
@@ -1070,7 +1070,7 @@ export function PayrollRunDetailsView() {
                                     {run.wps.sifFile.generated && (
                                         <div className="flex gap-3">
                                             <Button variant="outline" className="rounded-xl">
-                                                <Download className="w-4 h-4 ml-2" />
+                                                <Download className="w-4 h-4 ms-2" />
                                                 تحميل ملف SIF
                                             </Button>
                                         </div>
@@ -1211,11 +1211,11 @@ export function PayrollRunDetailsView() {
                             <div className="grid grid-cols-2 gap-4 text-sm">
                                 <div>
                                     <span className="text-emerald-600">عدد الموظفين:</span>
-                                    <span className="font-bold text-emerald-800 mr-2">{run.employees.totalEmployees}</span>
+                                    <span className="font-bold text-emerald-800 ms-2">{run.employees.totalEmployees}</span>
                                 </div>
                                 <div>
                                     <span className="text-emerald-600">إجمالي صافي:</span>
-                                    <span className="font-bold text-emerald-800 mr-2">{formatCurrency(run.financialSummary.totalNetPay)}</span>
+                                    <span className="font-bold text-emerald-800 ms-2">{formatCurrency(run.financialSummary.totalNetPay)}</span>
                                 </div>
                             </div>
                         </div>

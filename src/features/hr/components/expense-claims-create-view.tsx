@@ -377,10 +377,10 @@ export function ExpenseClaimsCreateView() {
         <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
           <DynamicIsland />
         </div>
-        <div className='ms-auto flex items-center space-x-4'>
+        <div className='ms-auto flex items-center gap-4'>
           <div className="relative hidden md:block">
             <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-            <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pr-9 pl-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
+            <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
           </div>
           <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white">
             <Bell className="h-5 w-5" />
@@ -592,7 +592,7 @@ export function ExpenseClaimsCreateView() {
                     onClick={addLineItem}
                     className="rounded-xl"
                   >
-                    <Plus className="w-4 h-4 ml-1" />
+                    <Plus className="w-4 h-4 ms-1" />
                     إضافة بند
                   </Button>
                 </div>
@@ -608,7 +608,7 @@ export function ExpenseClaimsCreateView() {
                       className="mt-4 rounded-xl"
                       onClick={addLineItem}
                     >
-                      <Plus className="w-4 h-4 ml-1" />
+                      <Plus className="w-4 h-4 ms-1" />
                       إضافة بند جديد
                     </Button>
                   </div>
@@ -920,7 +920,7 @@ export function ExpenseClaimsCreateView() {
                             onClick={addMileageJourney}
                             className="rounded-xl"
                           >
-                            <Plus className="w-4 h-4 ml-1" />
+                            <Plus className="w-4 h-4 ms-1" />
                             إضافة رحلة
                           </Button>
                         </div>
@@ -1084,7 +1084,7 @@ export function ExpenseClaimsCreateView() {
                     <Paperclip className="w-4 h-4 mt-0.5 flex-shrink-0" />
                     <div>
                       <p className="font-medium">الإيصالات:</p>
-                      <ul className="list-disc list-inside mr-4 mt-1 space-y-1">
+                      <ul className="list-disc list-inside me-4 mt-1 space-y-1">
                         <li>مطلوبة لجميع المصروفات أكثر من 100 ريال</li>
                         <li>يجب أن تتضمن الرقم الضريبي للمورد</li>
                         <li>صور واضحة ومقروءة</li>
@@ -1095,7 +1095,7 @@ export function ExpenseClaimsCreateView() {
                     <Clock className="w-4 h-4 mt-0.5 flex-shrink-0" />
                     <div>
                       <p className="font-medium">مدة التقديم:</p>
-                      <ul className="list-disc list-inside mr-4 mt-1 space-y-1">
+                      <ul className="list-disc list-inside me-4 mt-1 space-y-1">
                         <li>خلال 30 يوم من تاريخ المصروف</li>
                         <li>المطالبات المتأخرة تحتاج موافقة استثنائية</li>
                       </ul>
@@ -1105,7 +1105,7 @@ export function ExpenseClaimsCreateView() {
                     <Calculator className="w-4 h-4 mt-0.5 flex-shrink-0" />
                     <div>
                       <p className="font-medium">الحدود:</p>
-                      <ul className="list-disc list-inside mr-4 mt-1 space-y-1">
+                      <ul className="list-disc list-inside me-4 mt-1 space-y-1">
                         <li>الوجبات: حتى 150 ريال/يوم</li>
                         <li>الفنادق: حسب السياسة</li>
                         <li>المسافات: {mileageRates?.personal_car || 0.5} ريال/كم</li>
@@ -1134,7 +1134,7 @@ export function ExpenseClaimsCreateView() {
                   <>جاري الحفظ...</>
                 ) : (
                   <>
-                    <CheckCircle className="w-4 h-4 ml-2" />
+                    <CheckCircle className="w-4 h-4 ms-2" />
                     {isEditMode ? 'حفظ التعديلات' : 'تقديم المطالبة'}
                   </>
                 )}

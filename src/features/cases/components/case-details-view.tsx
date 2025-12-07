@@ -561,13 +561,13 @@ export function CaseDetailsView() {
           <DynamicIsland />
         </div>
 
-        <div className="ms-auto flex items-center space-x-4">
+        <div className="ms-auto flex items-center gap-4">
           <div className="relative hidden md:block">
             <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
             <input
               type="text"
               placeholder={t('common.search', 'بحث...')}
-              className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pr-9 pl-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+              className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
             />
           </div>
           <Button
@@ -640,7 +640,7 @@ export function CaseDetailsView() {
             <p className="text-slate-500 mb-4">{t('cases.notFoundDescription', 'القضية المطلوبة غير موجودة أو تم حذفها')}</p>
             <Button asChild className="bg-blue-500 hover:bg-blue-600 text-white rounded-xl">
               <Link to="/dashboard/cases">
-                <ArrowLeft className="ml-2 h-4 w-4" />
+                <ArrowLeft className="ms-2 h-4 w-4" />
                 {t('cases.backToCases', 'العودة إلى القضايا')}
               </Link>
             </Button>
@@ -658,7 +658,7 @@ export function CaseDetailsView() {
                     variant="ghost"
                     className="bg-white/10 text-white hover:bg-white/20 rounded-xl h-10 px-4"
                   >
-                    <ArrowLeft className="h-4 w-4 ml-2" />
+                    <ArrowLeft className="h-4 w-4 ms-2" />
                     {t('cases.backToCases', 'العودة إلى القضايا')}
                   </Button>
                 </Link>
@@ -720,13 +720,13 @@ export function CaseDetailsView() {
                                       </DropdownMenuTrigger>
                                       <DropdownMenuContent align="end">
                                         <DropdownMenuItem onClick={() => handleEditTimeline(event)}>
-                                          <Edit className="h-4 w-4 ml-2" /> {t('common.edit', 'تعديل')}
+                                          <Edit className="h-4 w-4 ms-2" /> {t('common.edit', 'تعديل')}
                                         </DropdownMenuItem>
                                         <DropdownMenuItem
                                           className="text-red-600"
                                           onClick={() => event._id && setDeleteTimelineId(event._id)}
                                         >
-                                          <Trash2 className="h-4 w-4 ml-2" /> {t('common.delete', 'حذف')}
+                                          <Trash2 className="h-4 w-4 ms-2" /> {t('common.delete', 'حذف')}
                                         </DropdownMenuItem>
                                       </DropdownMenuContent>
                                     </DropdownMenu>
@@ -824,7 +824,7 @@ export function CaseDetailsView() {
                     <Dialog open={isAddNoteOpen} onOpenChange={setIsAddNoteOpen}>
                       <DialogTrigger asChild>
                         <Button variant="outline" className="w-full justify-start">
-                          <MessageSquare className="h-4 w-4 ml-2" />
+                          <MessageSquare className="h-4 w-4 ms-2" />
                           {t('cases.addNote', 'إضافة ملاحظة')}
                         </Button>
                       </DialogTrigger>
@@ -844,7 +844,7 @@ export function CaseDetailsView() {
                             disabled={addNoteMutation.isPending}
                             className="w-full bg-brand-blue"
                           >
-                            {addNoteMutation.isPending && <Loader2 className="h-4 w-4 ml-2 animate-spin" />}
+                            {addNoteMutation.isPending && <Loader2 className="h-4 w-4 ms-2 animate-spin" />}
                             {t('common.add', 'إضافة')}
                           </Button>
                         </div>
@@ -984,7 +984,7 @@ export function CaseDetailsView() {
                         <Dialog open={isAddHearingOpen} onOpenChange={setIsAddHearingOpen}>
                           <DialogTrigger asChild>
                             <Button size="sm" className="bg-brand-blue hover:bg-blue-600 text-white">
-                              <Plus className="h-4 w-4 ml-2" />
+                              <Plus className="h-4 w-4 ms-2" />
                               {t('cases.addHearing', 'إضافة جلسة')}
                             </Button>
                           </DialogTrigger>
@@ -1022,7 +1022,7 @@ export function CaseDetailsView() {
                                 disabled={addHearingMutation.isPending || !hearingDate || !hearingLocation}
                                 className="w-full bg-brand-blue"
                               >
-                                {addHearingMutation.isPending && <Loader2 className="h-4 w-4 ml-2 animate-spin" />}
+                                {addHearingMutation.isPending && <Loader2 className="h-4 w-4 ms-2 animate-spin" />}
                                 {t('common.add', 'إضافة')}
                               </Button>
                             </div>
@@ -1084,13 +1084,13 @@ export function CaseDetailsView() {
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="end">
                                   <DropdownMenuItem onClick={() => handleEditHearing(hearing)}>
-                                    <Edit className="h-4 w-4 ml-2" /> {t('common.edit', 'تعديل')}
+                                    <Edit className="h-4 w-4 ms-2" /> {t('common.edit', 'تعديل')}
                                   </DropdownMenuItem>
                                   <DropdownMenuItem
                                     className="text-red-600"
                                     onClick={() => hearing._id && setDeleteHearingId(hearing._id)}
                                   >
-                                    <Trash2 className="h-4 w-4 ml-2" /> {t('common.delete', 'حذف')}
+                                    <Trash2 className="h-4 w-4 ms-2" /> {t('common.delete', 'حذف')}
                                   </DropdownMenuItem>
                                 </DropdownMenuContent>
                               </DropdownMenu>
@@ -1119,7 +1119,7 @@ export function CaseDetailsView() {
                               : 'text-slate-500 hover:text-navy'
                               }`}
                           >
-                            <FileText className="h-4 w-4 inline-block ml-2" />
+                            <FileText className="h-4 w-4 inline-block ms-2" />
                             {t('cases.documents.general', 'مستندات عامة')}
                           </button>
                           <button
@@ -1129,7 +1129,7 @@ export function CaseDetailsView() {
                               : 'text-slate-500 hover:text-navy'
                               }`}
                           >
-                            <Gavel className="h-4 w-4 inline-block ml-2" />
+                            <Gavel className="h-4 w-4 inline-block ms-2" />
                             {t('cases.documents.judgments', 'الأحكام')}
                           </button>
                         </div>
@@ -1138,7 +1138,7 @@ export function CaseDetailsView() {
                         <Dialog open={isUploadDocOpen} onOpenChange={setIsUploadDocOpen}>
                           <DialogTrigger asChild>
                             <Button className="bg-brand-blue hover:bg-blue-600 text-white">
-                              <Upload className="h-4 w-4 ml-2" />
+                              <Upload className="h-4 w-4 ms-2" />
                               {t('cases.uploadDocument', 'رفع مستند')}
                             </Button>
                           </DialogTrigger>
@@ -1211,12 +1211,12 @@ export function CaseDetailsView() {
                                 <p className="text-slate-600">
                                   {uploadCategory === 'judgment' ? (
                                     <>
-                                      <Shield className="h-4 w-4 inline-block ml-1 text-amber-500" />
+                                      <Shield className="h-4 w-4 inline-block ms-1 text-amber-500" />
                                       {t('cases.judgmentBucketInfo', 'سيتم حفظ الحكم في مخزن الأحكام المشفر')}
                                     </>
                                   ) : (
                                     <>
-                                      <Shield className="h-4 w-4 inline-block ml-1 text-blue-500" />
+                                      <Shield className="h-4 w-4 inline-block ms-1 text-blue-500" />
                                       {t('cases.generalBucketInfo', 'سيتم حفظ المستند في المخزن الآمن')}
                                     </>
                                   )}
@@ -1231,12 +1231,12 @@ export function CaseDetailsView() {
                               >
                                 {uploadDocMutation.isPending ? (
                                   <>
-                                    <Loader2 className="h-4 w-4 ml-2 animate-spin" />
+                                    <Loader2 className="h-4 w-4 ms-2 animate-spin" />
                                     {t('common.uploading', 'جاري الرفع...')}
                                   </>
                                 ) : (
                                   <>
-                                    <Upload className="h-4 w-4 ml-2" />
+                                    <Upload className="h-4 w-4 ms-2" />
                                     {t('cases.uploadDocument', 'رفع المستند')}
                                   </>
                                 )}
@@ -1297,7 +1297,7 @@ export function CaseDetailsView() {
                                     <Button
                                       variant="ghost"
                                       size="icon"
-                                      className="h-8 w-8 -ml-2 text-slate-400 hover:text-navy"
+                                      className="h-8 w-8 -ms-2 text-slate-400 hover:text-navy"
                                     >
                                       <MoreHorizontal className="h-4 w-4" />
                                     </Button>
@@ -1306,13 +1306,13 @@ export function CaseDetailsView() {
                                     <DropdownMenuItem
                                       onClick={() => doc._id && handleDownloadDocument(doc._id)}
                                     >
-                                      <Download className="h-4 w-4 ml-2" /> {t('common.download', 'تحميل')}
+                                      <Download className="h-4 w-4 ms-2" /> {t('common.download', 'تحميل')}
                                     </DropdownMenuItem>
                                     <DropdownMenuItem
                                       className="text-red-600"
                                       onClick={() => doc._id && setDeleteDocId(doc._id)}
                                     >
-                                      <Trash2 className="h-4 w-4 ml-2" /> {t('common.delete', 'حذف')}
+                                      <Trash2 className="h-4 w-4 ms-2" /> {t('common.delete', 'حذف')}
                                     </DropdownMenuItem>
                                   </DropdownMenuContent>
                                 </DropdownMenu>
@@ -1353,7 +1353,7 @@ export function CaseDetailsView() {
                         <Dialog open={isAddClaimOpen} onOpenChange={setIsAddClaimOpen}>
                           <DialogTrigger asChild>
                             <Button size="sm" className="bg-emerald-500 hover:bg-emerald-600 text-white border-0">
-                              <Plus className="h-4 w-4 ml-2" />
+                              <Plus className="h-4 w-4 ms-2" />
                               {t('cases.addClaim', 'إضافة مطالبة')}
                             </Button>
                           </DialogTrigger>
@@ -1416,7 +1416,7 @@ export function CaseDetailsView() {
                                 disabled={addClaimMutation.isPending || !claimType || !claimAmount}
                                 className="w-full bg-emerald-500 hover:bg-emerald-600"
                               >
-                                {addClaimMutation.isPending && <Loader2 className="h-4 w-4 ml-2 animate-spin" />}
+                                {addClaimMutation.isPending && <Loader2 className="h-4 w-4 ms-2 animate-spin" />}
                                 {t('common.add', 'إضافة')}
                               </Button>
                             </div>
@@ -1450,13 +1450,13 @@ export function CaseDetailsView() {
                                     </DropdownMenuTrigger>
                                     <DropdownMenuContent align="end">
                                       <DropdownMenuItem onClick={() => handleEditClaim(claim)}>
-                                        <Edit className="h-4 w-4 ml-2" /> {t('common.edit', 'تعديل')}
+                                        <Edit className="h-4 w-4 ms-2" /> {t('common.edit', 'تعديل')}
                                       </DropdownMenuItem>
                                       <DropdownMenuItem
                                         className="text-red-600"
                                         onClick={() => claim._id && setDeleteClaimId(claim._id)}
                                       >
-                                        <Trash2 className="h-4 w-4 ml-2" /> {t('common.delete', 'حذف')}
+                                        <Trash2 className="h-4 w-4 ms-2" /> {t('common.delete', 'حذف')}
                                       </DropdownMenuItem>
                                     </DropdownMenuContent>
                                   </DropdownMenu>
@@ -1511,7 +1511,7 @@ export function CaseDetailsView() {
                           className="bg-brand-blue hover:bg-blue-600 text-white"
                           onClick={() => setIsAddNoteOpen(true)}
                         >
-                          <Plus className="h-4 w-4 ml-2" />
+                          <Plus className="h-4 w-4 ms-2" />
                           {t('cases.addNote', 'إضافة ملاحظة')}
                         </Button>
                       </div>
@@ -1534,18 +1534,18 @@ export function CaseDetailsView() {
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="end">
                                   <DropdownMenuItem onClick={() => handleEditNote(note)}>
-                                    <Edit className="h-4 w-4 ml-2" /> {t('common.edit', 'تعديل')}
+                                    <Edit className="h-4 w-4 ms-2" /> {t('common.edit', 'تعديل')}
                                   </DropdownMenuItem>
                                   <DropdownMenuItem
                                     className="text-red-600"
                                     onClick={() => note._id && setDeleteNoteId(note._id)}
                                   >
-                                    <Trash2 className="h-4 w-4 ml-2" /> {t('common.delete', 'حذف')}
+                                    <Trash2 className="h-4 w-4 ms-2" /> {t('common.delete', 'حذف')}
                                   </DropdownMenuItem>
                                 </DropdownMenuContent>
                               </DropdownMenu>
                             </div>
-                            <p className="text-slate-700 pr-10">{note.text}</p>
+                            <p className="text-slate-700 pe-10">{note.text}</p>
                           </div>
                         ))
                       ) : (

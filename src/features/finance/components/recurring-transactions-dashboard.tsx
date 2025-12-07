@@ -230,7 +230,7 @@ export default function RecurringTransactionsDashboard() {
                     <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
                         <DynamicIsland />
                     </div>
-                    <div className='ms-auto flex items-center space-x-4'>
+                    <div className='ms-auto flex items-center gap-4'>
                         <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white" />
                         <ThemeSwitch className="text-slate-300 hover:bg-white/10 hover:text-white" />
                         <ConfigDrawer className="text-slate-300 hover:bg-white/10 hover:text-white" />
@@ -263,7 +263,7 @@ export default function RecurringTransactionsDashboard() {
                     <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
                         <DynamicIsland />
                     </div>
-                    <div className='ms-auto flex items-center space-x-4'>
+                    <div className='ms-auto flex items-center gap-4'>
                         <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white" />
                         <ThemeSwitch className="text-slate-300 hover:bg-white/10 hover:text-white" />
                         <ConfigDrawer className="text-slate-300 hover:bg-white/10 hover:text-white" />
@@ -279,7 +279,7 @@ export default function RecurringTransactionsDashboard() {
                         <h3 className="text-xl font-bold text-slate-900 mb-2">فشل تحميل المعاملات المتكررة</h3>
                         <p className="text-slate-500 mb-6">{error?.message || 'حدث خطأ أثناء تحميل البيانات'}</p>
                         <Button onClick={() => refetch()} className="bg-emerald-500 hover:bg-emerald-600 text-white px-8">
-                            <Loader2 className="ml-2 h-4 w-4" />
+                            <Loader2 className="ms-2 h-4 w-4" />
                             إعادة المحاولة
                         </Button>
                     </div>
@@ -298,10 +298,10 @@ export default function RecurringTransactionsDashboard() {
                     <DynamicIsland />
                 </div>
 
-                <div className='ms-auto flex items-center space-x-4'>
+                <div className='ms-auto flex items-center gap-4'>
                     <div className="relative hidden md:block">
                         <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                        <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pr-9 pl-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
+                        <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
                     </div>
                     <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white">
                         <Bell className="h-5 w-5" />
@@ -328,7 +328,7 @@ export default function RecurringTransactionsDashboard() {
                         onClick={() => setIsCreateDialogOpen(true)}
                         className="bg-emerald-500 hover:bg-emerald-600 text-white h-10 px-5 rounded-xl font-bold shadow-lg shadow-emerald-500/20 border-0 text-sm"
                     >
-                        <Plus className="ml-2 h-4 w-4" />
+                        <Plus className="ms-2 h-4 w-4" />
                         إنشاء معاملة متكررة
                     </Button>
                 </ProductivityHero>
@@ -349,7 +349,7 @@ export default function RecurringTransactionsDashboard() {
                                     onClick={() => setIsCreateDialogOpen(true)}
                                     className="bg-brand-blue hover:bg-blue-600 text-white px-8"
                                 >
-                                    <Plus className="ml-2 h-4 w-4" />
+                                    <Plus className="ms-2 h-4 w-4" />
                                     إنشاء معاملة متكررة
                                 </Button>
                             </div>
@@ -391,7 +391,7 @@ export default function RecurringTransactionsDashboard() {
                                             <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                                             <Input
                                                 placeholder="بحث في المعاملات..."
-                                                className="pr-10 rounded-xl border-slate-200 focus:ring-[#022c22] focus:border-[#022c22]"
+                                                className="pe-10 rounded-xl border-slate-200 focus:ring-[#022c22] focus:border-[#022c22]"
                                                 value={searchQuery}
                                                 onChange={(e) => setSearchQuery(e.target.value)}
                                             />
@@ -420,7 +420,7 @@ export default function RecurringTransactionsDashboard() {
                                                             <div className="flex items-center gap-2 mb-1 flex-wrap">
                                                                 <h4 className="font-bold text-[#022c22] text-lg">{transaction.name}</h4>
                                                                 <Badge className={`${statusInfo.color} border-0 px-2 rounded-md`}>
-                                                                    <StatusIcon className="h-3 w-3 ml-1 inline" />
+                                                                    <StatusIcon className="h-3 w-3 ms-1 inline" />
                                                                     {statusInfo.label}
                                                                 </Badge>
                                                                 <Badge className="bg-blue-100 text-blue-700 border-0 px-2 rounded-md">
@@ -443,18 +443,18 @@ export default function RecurringTransactionsDashboard() {
                                                             {transaction.status === 'active' && (
                                                                 <>
                                                                     <DropdownMenuItem onClick={() => handleGenerate(transaction._id)}>
-                                                                        <Play className="h-4 w-4 ml-2" />
+                                                                        <Play className="h-4 w-4 ms-2" />
                                                                         إنشاء الآن
                                                                     </DropdownMenuItem>
                                                                     <DropdownMenuItem onClick={() => handlePause(transaction._id)}>
-                                                                        <Pause className="h-4 w-4 ml-2" />
+                                                                        <Pause className="h-4 w-4 ms-2" />
                                                                         إيقاف مؤقت
                                                                     </DropdownMenuItem>
                                                                 </>
                                                             )}
                                                             {transaction.status === 'paused' && (
                                                                 <DropdownMenuItem onClick={() => handleResume(transaction._id)}>
-                                                                    <Play className="h-4 w-4 ml-2" />
+                                                                    <Play className="h-4 w-4 ms-2" />
                                                                     استئناف
                                                                 </DropdownMenuItem>
                                                             )}
@@ -463,7 +463,7 @@ export default function RecurringTransactionsDashboard() {
                                                                     onClick={() => handleCancel(transaction._id)}
                                                                     className="text-red-600"
                                                                 >
-                                                                    <X className="h-4 w-4 ml-2" />
+                                                                    <X className="h-4 w-4 ms-2" />
                                                                     إلغاء
                                                                 </DropdownMenuItem>
                                                             )}
@@ -640,7 +640,7 @@ export default function RecurringTransactionsDashboard() {
                         </div>
 
                         {/* Auto Send */}
-                        <div className="flex items-center justify-between space-x-2 p-4 rounded-lg bg-slate-50">
+                        <div className="flex items-center justify-between gap-2 p-4 rounded-lg bg-slate-50">
                             <div className="space-y-0.5">
                                 <Label htmlFor="autoSend" className="text-base">إرسال تلقائي</Label>
                                 <p className="text-sm text-slate-500">
@@ -677,12 +677,12 @@ export default function RecurringTransactionsDashboard() {
                         >
                             {createMutation.isPending ? (
                                 <>
-                                    <Loader2 className="ml-2 h-4 w-4 animate-spin" />
+                                    <Loader2 className="ms-2 h-4 w-4 animate-spin" />
                                     جاري الإنشاء...
                                 </>
                             ) : (
                                 <>
-                                    <Plus className="ml-2 h-4 w-4" />
+                                    <Plus className="ms-2 h-4 w-4" />
                                     إنشاء
                                 </>
                             )}

@@ -107,15 +107,15 @@ export function TimeEntriesReport() {
         </div>
         <div className="flex gap-2">
           <Button variant="outline" size="sm" onClick={() => setShowFilters(!showFilters)}>
-            <Filter className="h-4 w-4 ml-2" />
+            <Filter className="h-4 w-4 ms-2" />
             فلترة
           </Button>
           <Button variant="outline" size="sm" onClick={() => handleExport('csv')}>
-            <Download className="h-4 w-4 ml-2" />
+            <Download className="h-4 w-4 ms-2" />
             CSV
           </Button>
           <Button variant="outline" size="sm" onClick={() => handleExport('pdf')}>
-            <FileText className="h-4 w-4 ml-2" />
+            <FileText className="h-4 w-4 ms-2" />
             PDF
           </Button>
         </div>

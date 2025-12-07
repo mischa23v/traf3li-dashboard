@@ -60,7 +60,7 @@ function ClientsContent() {
         <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
           <DynamicIsland />
         </div>
-        <div className='ms-auto flex items-center space-x-4'>
+        <div className='ms-auto flex items-center gap-4'>
           <div className="relative hidden md:block">
             <SearchIcon className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
             <input type="text" placeholder={t('common.search')} className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pr-9 pl-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
@@ -98,7 +98,7 @@ function ClientsContent() {
                   <h3 className="text-xl font-bold text-slate-900 mb-2">{t('clients.noClients')}</h3>
                   <p className="text-slate-500 mb-6">{t('clients.startAddingClient')}</p>
                   <Button onClick={() => setOpen('add')} className="bg-brand-blue hover:bg-blue-600 text-white px-8">
-                    <Plus className="ml-2 h-4 w-4" />
+                    <Plus className="ms-2 h-4 w-4" />
                     {t('clients.addNewClient')}
                   </Button>
                 </div>

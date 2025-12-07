@@ -247,10 +247,10 @@ export default function FiscalPeriodsDashboard() {
           <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
             <DynamicIsland />
           </div>
-          <div className='ms-auto flex items-center space-x-4'>
+          <div className='ms-auto flex items-center gap-4'>
             <div className="relative hidden md:block">
               <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-              <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pr-9 pl-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
+              <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
             </div>
             <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white">
               <Bell className="h-5 w-5" />
@@ -289,13 +289,13 @@ export default function FiscalPeriodsDashboard() {
           <DynamicIsland />
         </div>
 
-        <div className='ms-auto flex items-center space-x-4'>
+        <div className='ms-auto flex items-center gap-4'>
           <div className="relative hidden md:block">
             <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
             <input
               type="text"
               placeholder="بحث في الفترات..."
-              className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pr-9 pl-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+              className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
@@ -326,7 +326,7 @@ export default function FiscalPeriodsDashboard() {
             <Dialog open={yearEndWizardOpen} onOpenChange={setYearEndWizardOpen}>
               <DialogTrigger asChild>
                 <Button variant="outline" className="bg-white/5 border-white/10 text-white hover:bg-white/10 rounded-xl h-10 px-5 backdrop-blur-sm">
-                  <Calendar className="w-4 h-4 ml-2" />
+                  <Calendar className="w-4 h-4 ms-2" />
                   إغلاق نهاية السنة
                 </Button>
               </DialogTrigger>
@@ -389,12 +389,12 @@ export default function FiscalPeriodsDashboard() {
                   >
                     {yearEndClosing.isPending ? (
                       <>
-                        <Loader2 className="w-4 h-4 ml-2 animate-spin" />
+                        <Loader2 className="w-4 h-4 ms-2 animate-spin" />
                         جاري الإغلاق...
                       </>
                     ) : (
                       <>
-                        <Lock className="w-4 h-4 ml-2" />
+                        <Lock className="w-4 h-4 ms-2" />
                         إغلاق نهاية السنة
                       </>
                     )}
@@ -406,7 +406,7 @@ export default function FiscalPeriodsDashboard() {
             <Dialog open={createYearOpen} onOpenChange={setCreateYearOpen}>
               <DialogTrigger asChild>
                 <Button className="bg-emerald-500 hover:bg-emerald-600 text-white border-0 shadow-lg shadow-emerald-500/20 rounded-xl h-10 px-5 font-bold">
-                  <Plus className="w-4 h-4 ml-2" />
+                  <Plus className="w-4 h-4 ms-2" />
                   سنة مالية جديدة
                 </Button>
               </DialogTrigger>
@@ -482,12 +482,12 @@ export default function FiscalPeriodsDashboard() {
                   >
                     {createFiscalYear.isPending ? (
                       <>
-                        <Loader2 className="w-4 h-4 ml-2 animate-spin" />
+                        <Loader2 className="w-4 h-4 ms-2 animate-spin" />
                         جاري الإنشاء...
                       </>
                     ) : (
                       <>
-                        <Plus className="w-4 h-4 ml-2" />
+                        <Plus className="w-4 h-4 ms-2" />
                         إنشاء السنة المالية
                       </>
                     )}
@@ -550,7 +550,7 @@ export default function FiscalPeriodsDashboard() {
                   onClick={() => setCreateYearOpen(true)}
                   className="bg-brand-blue hover:bg-blue-600 text-white px-8"
                 >
-                  <Plus className="ml-2 h-4 w-4" />
+                  <Plus className="ms-2 h-4 w-4" />
                   إنشاء سنة مالية
                 </Button>
               </div>
@@ -594,7 +594,7 @@ export default function FiscalPeriodsDashboard() {
                             }}
                             className="rounded-xl"
                           >
-                            <Calendar className="w-4 h-4 ml-2" />
+                            <Calendar className="w-4 h-4 ms-2" />
                             إغلاق السنة
                           </Button>
                         </div>
@@ -628,7 +628,7 @@ export default function FiscalPeriodsDashboard() {
                                         setBalancesDialogOpen(true)
                                       }}
                                     >
-                                      <DollarSign className="w-4 h-4 ml-2" />
+                                      <DollarSign className="w-4 h-4 ms-2" />
                                       عرض الأرصدة
                                     </DropdownMenuItem>
                                     <DropdownMenuSeparator />
@@ -637,7 +637,7 @@ export default function FiscalPeriodsDashboard() {
                                         key={idx}
                                         onClick={action.onClick}
                                       >
-                                        <action.icon className="w-4 h-4 ml-2" />
+                                        <action.icon className="w-4 h-4 ms-2" />
                                         {action.label}
                                       </DropdownMenuItem>
                                     ))}

@@ -51,7 +51,7 @@ export function ClientDetails() {
       <>
         <Header fixed>
           <Search />
-          <div className='ms-auto flex items-center space-x-4'>
+          <div className='ms-auto flex items-center gap-4'>
             <ThemeSwitch />
             <ConfigDrawer />
             <ProfileDropdown />
@@ -70,7 +70,7 @@ export function ClientDetails() {
       <>
         <Header fixed>
           <Search />
-          <div className='ms-auto flex items-center space-x-4'>
+          <div className='ms-auto flex items-center gap-4'>
             <ThemeSwitch />
             <ConfigDrawer />
             <ProfileDropdown />
@@ -100,7 +100,7 @@ export function ClientDetails() {
     <>
       <Header fixed>
         <Search />
-        <div className='ms-auto flex items-center space-x-4'>
+        <div className='ms-auto flex items-center gap-4'>
           <ThemeSwitch />
           <ConfigDrawer />
           <ProfileDropdown />

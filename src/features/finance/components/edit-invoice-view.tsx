@@ -260,13 +260,13 @@ export function EditInvoiceView() {
                                     disabled={isSending}
                                     className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl"
                                 >
-                                    {isSending ? <Loader2 className="w-4 h-4 animate-spin ml-2" /> : <Send className="w-4 h-4 ml-2" />}
+                                    {isSending ? <Loader2 className="w-4 h-4 animate-spin ms-2" /> : <Send className="w-4 h-4 ms-2" />}
                                     إرسال للعميل
                                 </Button>
                                 <AlertDialog>
                                     <AlertDialogTrigger asChild>
                                         <Button variant="outline" className="bg-red-500/10 border-red-500/20 text-red-300 hover:bg-red-500/20 rounded-xl">
-                                            <Trash2 className="w-4 h-4 ml-2" />
+                                            <Trash2 className="w-4 h-4 ms-2" />
                                             حذف
                                         </Button>
                                     </AlertDialogTrigger>
@@ -280,7 +280,7 @@ export function EditInvoiceView() {
                                         <AlertDialogFooter>
                                             <AlertDialogCancel>إلغاء</AlertDialogCancel>
                                             <AlertDialogAction onClick={handleDelete} className="bg-red-500 hover:bg-red-600">
-                                                {isDeleting ? <Loader2 className="w-4 h-4 animate-spin ml-2" /> : null}
+                                                {isDeleting ? <Loader2 className="w-4 h-4 animate-spin ms-2" /> : null}
                                                 حذف الفاتورة
                                             </AlertDialogAction>
                                         </AlertDialogFooter>
@@ -378,7 +378,7 @@ export function EditInvoiceView() {
                                                 عناصر الفاتورة
                                             </label>
                                             <Button type="button" onClick={addLineItem} variant="outline" size="sm" className="rounded-xl">
-                                                <Plus className="w-4 h-4 ml-2" />
+                                                <Plus className="w-4 h-4 ms-2" />
                                                 إضافة عنصر
                                             </Button>
                                         </div>

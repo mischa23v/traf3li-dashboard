@@ -212,10 +212,10 @@ export function ExpenseClaimsDetailsView() {
         <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
           <DynamicIsland />
         </div>
-        <div className='ms-auto flex items-center space-x-4'>
+        <div className='ms-auto flex items-center gap-4'>
           <div className="relative hidden md:block">
             <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-            <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pr-9 pl-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
+            <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
           </div>
           <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white">
             <Bell className="h-5 w-5" />
@@ -260,7 +260,7 @@ export function ExpenseClaimsDetailsView() {
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="outline" className="rounded-xl">
-                    <MoreHorizontal className="w-4 h-4 ml-2" />
+                    <MoreHorizontal className="w-4 h-4 ms-2" />
                     إجراءات
                   </Button>
                 </DropdownMenuTrigger>
@@ -268,41 +268,41 @@ export function ExpenseClaimsDetailsView() {
                   <DropdownMenuItem
                     onClick={() => navigate({ to: `/dashboard/hr/expense-claims/new?editId=${claimId}` })}
                   >
-                    <Edit className="w-4 h-4 ml-2" />
+                    <Edit className="w-4 h-4 ms-2" />
                     تعديل
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   {claim?.status === 'draft' && (
                     <DropdownMenuItem onClick={handleSubmit}>
-                      <Send className="w-4 h-4 ml-2 text-blue-500" />
+                      <Send className="w-4 h-4 ms-2 text-blue-500" />
                       تقديم المطالبة
                     </DropdownMenuItem>
                   )}
                   {(claim?.status === 'submitted' || claim?.status === 'under_review' || claim?.status === 'pending_approval') && (
                     <>
                       <DropdownMenuItem onClick={() => setShowApproveDialog(true)}>
-                        <CheckCircle className="w-4 h-4 ml-2 text-emerald-500" />
+                        <CheckCircle className="w-4 h-4 ms-2 text-emerald-500" />
                         اعتماد المطالبة
                       </DropdownMenuItem>
                       <DropdownMenuItem onClick={() => setShowRejectDialog(true)}>
-                        <XCircle className="w-4 h-4 ml-2 text-red-500" />
+                        <XCircle className="w-4 h-4 ms-2 text-red-500" />
                         رفض المطالبة
                       </DropdownMenuItem>
                       <DropdownMenuItem onClick={() => setShowChangesDialog(true)}>
-                        <FileText className="w-4 h-4 ml-2 text-amber-500" />
+                        <FileText className="w-4 h-4 ms-2 text-amber-500" />
                         طلب تعديلات
                       </DropdownMenuItem>
                     </>
                   )}
                   {claim?.status === 'approved' && (
                     <DropdownMenuItem onClick={() => setShowPaymentDialog(true)}>
-                      <Banknote className="w-4 h-4 ml-2 text-blue-500" />
+                      <Banknote className="w-4 h-4 ms-2 text-blue-500" />
                       معالجة الدفع
                     </DropdownMenuItem>
                   )}
                   <DropdownMenuSeparator />
                   <DropdownMenuItem className="text-red-600" onClick={handleDelete}>
-                    <Trash2 className="w-4 h-4 ml-2" />
+                    <Trash2 className="w-4 h-4 ms-2" />
                     حذف
                   </DropdownMenuItem>
                 </DropdownMenuContent>
@@ -386,7 +386,7 @@ export function ExpenseClaimsDetailsView() {
                         </Badge>
                         {claim.billable?.isBillable && (
                           <Badge className="bg-teal-100 text-teal-700">
-                            <DollarSign className="w-3 h-3 ml-1" />
+                            <DollarSign className="w-3 h-3 ms-1" />
                             قابل للفوترة
                           </Badge>
                         )}
@@ -672,7 +672,7 @@ export function ExpenseClaimsDetailsView() {
                                     className="w-full mt-2 rounded-xl"
                                     onClick={() => window.open(receipt.fileUrl, '_blank')}
                                   >
-                                    <Eye className="w-4 h-4 ml-1" />
+                                    <Eye className="w-4 h-4 ms-1" />
                                     عرض
                                   </Button>
                                 )}
@@ -845,7 +845,7 @@ export function ExpenseClaimsDetailsView() {
               disabled={approveMutation.isPending}
               className="bg-emerald-500 hover:bg-emerald-600 rounded-xl"
             >
-              <CheckCircle className="w-4 h-4 ml-2" />
+              <CheckCircle className="w-4 h-4 ms-2" />
               اعتماد
             </Button>
           </DialogFooter>
@@ -878,7 +878,7 @@ export function ExpenseClaimsDetailsView() {
               disabled={!rejectReason || rejectMutation.isPending}
               className="bg-red-500 hover:bg-red-600 rounded-xl"
             >
-              <XCircle className="w-4 h-4 ml-2" />
+              <XCircle className="w-4 h-4 ms-2" />
               رفض
             </Button>
           </DialogFooter>
@@ -911,7 +911,7 @@ export function ExpenseClaimsDetailsView() {
               disabled={!changesRequested || changesMutation.isPending}
               className="bg-amber-500 hover:bg-amber-600 rounded-xl"
             >
-              <FileText className="w-4 h-4 ml-2" />
+              <FileText className="w-4 h-4 ms-2" />
               إرسال
             </Button>
           </DialogFooter>
@@ -996,7 +996,7 @@ export function ExpenseClaimsDetailsView() {
               disabled={paymentMutation.isPending || (paymentMethod === 'bank_transfer' && (!bankName || !iban))}
               className="bg-blue-500 hover:bg-blue-600 rounded-xl"
             >
-              <Banknote className="w-4 h-4 ml-2" />
+              <Banknote className="w-4 h-4 ms-2" />
               تنفيذ الدفع
             </Button>
           </DialogFooter>

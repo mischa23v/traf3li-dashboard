@@ -108,7 +108,7 @@ export const useClientsColumns = (): ColumnDef<Client>[] => {
         const method = row.getValue('preferredContactMethod') as string
         const contactMethod = contactMethods.find((m) => m.value === method)
         return (
-          <div className='flex items-center gap-x-2'>
+          <div className='flex items-center gap-2'>
             {contactMethod?.icon && (
               <contactMethod.icon size={16} className='text-muted-foreground' />
             )}
@@ -132,7 +132,7 @@ export const useClientsColumns = (): ColumnDef<Client>[] => {
         const status = row.getValue('status') as string
         const badgeColor = clientStatusColors.get(status as any)
         return (
-          <div className='flex space-x-2'>
+          <div className='flex gap-2'>
             <Badge variant='outline' className={cn('capitalize', badgeColor)}>
               {t(`clients.statuses.${status}`)}
             </Badge>

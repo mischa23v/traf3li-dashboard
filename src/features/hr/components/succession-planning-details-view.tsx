@@ -150,7 +150,7 @@ export function SuccessionPlanningDetailsView() {
         <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
           <DynamicIsland />
         </div>
-        <div className='ms-auto flex items-center space-x-4'>
+        <div className='ms-auto flex items-center gap-4'>
           <div className="relative hidden md:block">
             <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
             <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pr-9 pl-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
@@ -235,7 +235,7 @@ export function SuccessionPlanningDetailsView() {
                         disabled={submitMutation.isPending}
                         className="rounded-xl"
                       >
-                        <Send className="w-4 h-4 ml-1" />
+                        <Send className="w-4 h-4 ms-1" />
                         تقديم للموافقة
                       </Button>
                     )}
@@ -246,7 +246,7 @@ export function SuccessionPlanningDetailsView() {
                         disabled={approveMutation.isPending}
                         className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl"
                       >
-                        <ThumbsUp className="w-4 h-4 ml-1" />
+                        <ThumbsUp className="w-4 h-4 ms-1" />
                         اعتماد
                       </Button>
                     )}
@@ -258,12 +258,12 @@ export function SuccessionPlanningDetailsView() {
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
                         <DropdownMenuItem onClick={() => navigate({ to: `/dashboard/hr/succession-planning/new?editId=${planId}` })}>
-                          <Edit className="w-4 h-4 ml-2" />
+                          <Edit className="w-4 h-4 ms-2" />
                           تعديل
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem className="text-red-600" onClick={handleDelete}>
-                          <Trash2 className="w-4 h-4 ml-2" />
+                          <Trash2 className="w-4 h-4 ms-2" />
                           حذف
                         </DropdownMenuItem>
                       </DropdownMenuContent>

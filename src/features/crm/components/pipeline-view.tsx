@@ -139,7 +139,7 @@ function MetricCard({
             {trend === 'neutral' && (
               <span className="text-slate-500">{trendValue}</span>
             )}
-            <span className="text-slate-400 mr-1">من الشهر الماضي</span>
+            <span className="text-slate-400 me-1">من الشهر الماضي</span>
           </div>
         )}
       </CardContent>
@@ -228,7 +228,7 @@ function LeadCard({
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={onConvert}>
-                <ArrowUpRight className="h-4 w-4 ml-2" />
+                <ArrowUpRight className="h-4 w-4 ms-2" />
                 تحويل لعميل
               </DropdownMenuItem>
             </DropdownMenuContent>
@@ -466,7 +466,7 @@ export function PipelineView() {
           <DynamicIsland />
         </div>
 
-        <div className="ms-auto flex items-center space-x-4">
+        <div className="ms-auto flex items-center gap-4">
           <div className="relative hidden md:block">
             <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
             <input
@@ -518,7 +518,7 @@ export function PipelineView() {
               className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl shadow-lg border-0"
             >
               <Link to="/dashboard/crm/leads/new">
-                <Plus className="ml-2 h-4 w-4" />
+                <Plus className="ms-2 h-4 w-4" />
                 إضافة عميل
               </Link>
             </Button>

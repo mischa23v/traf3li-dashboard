@@ -132,10 +132,10 @@ export default function InvoiceDashboard() {
                     <DynamicIsland />
                 </div>
 
-                <div className='ms-auto flex items-center space-x-4'>
+                <div className='ms-auto flex items-center gap-4'>
                     <div className="relative hidden md:block">
                         <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                        <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pr-9 pl-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
+                        <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
                     </div>
                     <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white">
                         <Bell className="h-5 w-5" />
@@ -166,7 +166,7 @@ export default function InvoiceDashboard() {
                                 <div>
                                     <div className="flex items-center gap-3 mb-3">
                                         <Badge className="bg-white/10 hover:bg-white/20 text-white border-0 backdrop-blur-sm">
-                                            <FileText className="w-3 h-3 ml-2" />
+                                            <FileText className="w-3 h-3 ms-2" />
                                             المالية
                                         </Badge>
                                         <span className="text-blue-200 text-sm">السنة المالية 2025</span>
@@ -178,11 +178,11 @@ export default function InvoiceDashboard() {
                                 </div>
                                 <div className="flex gap-3">
                                     <Button variant="outline" className="bg-white/5 border-white/10 text-white hover:bg-white/10 rounded-xl">
-                                        <Download className="w-4 h-4 ml-2" />
+                                        <Download className="w-4 h-4 ms-2" />
                                         تصدير التقرير
                                     </Button>
                                     <Button className="bg-emerald-500 hover:bg-emerald-600 text-white border-0 shadow-lg shadow-emerald-500/20 rounded-xl">
-                                        <Plus className="w-4 h-4 ml-2" />
+                                        <Plus className="w-4 h-4 ms-2" />
                                         فاتورة جديدة
                                     </Button>
                                 </div>
@@ -197,7 +197,7 @@ export default function InvoiceDashboard() {
                                     <div className="text-3xl font-bold">{formatCurrency(totalRevenue)}</div>
                                     <Progress value={65} className="h-1.5 bg-white/10" indicatorClassName="bg-emerald-500" />
                                 </div>
-                                <div className="flex justify-between items-center border-r border-white/10 pr-6">
+                                <div className="flex justify-between items-center border-r border-white/10 pe-6">
                                     <div>
                                         <div className="text-blue-200 text-sm mb-1">عدد الفواتير</div>
                                         <div className="text-2xl font-bold">{totalInvoices} فاتورة</div>
@@ -206,7 +206,7 @@ export default function InvoiceDashboard() {
                                         <FileText className="w-5 h-5 text-blue-200" />
                                     </div>
                                 </div>
-                                <div className="flex justify-between items-center border-r border-white/10 pr-6">
+                                <div className="flex justify-between items-center border-r border-white/10 pe-6">
                                     <div>
                                         <div className="text-blue-200 text-sm mb-1">نسبة التحصيل</div>
                                         <div className="text-2xl font-bold text-emerald-400">{Math.round((paidRevenue / totalRevenue) * 100)}%</div>
@@ -319,7 +319,7 @@ export default function InvoiceDashboard() {
                                         <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                                         <Input
                                             placeholder="بحث برقم الفاتورة أو العميل..."
-                                            className="pr-10 rounded-xl border-slate-200 focus:ring-navy focus:border-navy"
+                                            className="pe-10 rounded-xl border-slate-200 focus:ring-navy focus:border-navy"
                                             value={searchQuery}
                                             onChange={(e) => setSearchQuery(e.target.value)}
                                         />
@@ -420,7 +420,7 @@ export default function InvoiceDashboard() {
                                                 </div>
                                                 <div className="text-right">
                                                     <div className="font-bold text-navy text-sm">{formatCurrency(data.total)}</div>
-                                                    <div className="w-16 h-1.5 bg-slate-100 rounded-full mt-1 ml-auto">
+                                                    <div className="w-16 h-1.5 bg-slate-100 rounded-full mt-1 ms-auto">
                                                         <div
                                                             className="h-full bg-brand-blue rounded-full"
                                                             style={{ width: `${(data.total / totalRevenue) * 100}%` }}

@@ -128,21 +128,21 @@ export function EditStatementView() {
 
         <div className="flex gap-2">
           <Button variant="outline" size="sm" onClick={() => handleDownload('pdf')}>
-            <Download className="h-4 w-4 ml-2" />
+            <Download className="h-4 w-4 ms-2" />
             PDF
           </Button>
           <Button variant="outline" size="sm" onClick={() => handleDownload('xlsx')}>
-            <FileText className="h-4 w-4 ml-2" />
+            <FileText className="h-4 w-4 ms-2" />
             Excel
           </Button>
           <Button variant="outline" size="sm" onClick={handleSend} disabled={sendStatement.isPending}>
-            <Send className="h-4 w-4 ml-2" />
+            <Send className="h-4 w-4 ms-2" />
             {sendStatement.isPending ? 'جاري الإرسال...' : 'إرسال للعميل'}
           </Button>
           <AlertDialog>
             <AlertDialogTrigger asChild>
               <Button variant="destructive" size="sm">
-                <Trash2 className="h-4 w-4 ml-2" />
+                <Trash2 className="h-4 w-4 ms-2" />
                 حذف
               </Button>
             </AlertDialogTrigger>
@@ -316,7 +316,7 @@ export function EditStatementView() {
 
                 <div className="flex gap-4 pt-4">
                   <Button type="submit" disabled={updateStatement.isPending}>
-                    <Save className="h-4 w-4 ml-2" />
+                    <Save className="h-4 w-4 ms-2" />
                     {updateStatement.isPending ? 'جاري الحفظ...' : 'حفظ التعديلات'}
                   </Button>
                   <Button

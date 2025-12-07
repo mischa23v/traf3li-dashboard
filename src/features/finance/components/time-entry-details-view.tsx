@@ -85,10 +85,10 @@ export function TimeEntryDetailsView() {
                 <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
                     <DynamicIsland />
                 </div>
-                <div className='ms-auto flex items-center space-x-4'>
+                <div className='ms-auto flex items-center gap-4'>
                     <div className="relative hidden md:block">
                         <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                        <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pr-9 pl-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
+                        <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
                     </div>
                     <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white">
                         <Bell className="h-5 w-5" />
@@ -105,7 +105,7 @@ export function TimeEntryDetailsView() {
             <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-r border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
                 <div className="max-w-[1600px] mx-auto mb-6">
                     <Link to="/dashboard/finance/time-tracking" className="inline-flex items-center text-slate-500 hover:text-navy transition-colors">
-                        <ArrowLeft className="h-4 w-4 ml-2" />
+                        <ArrowLeft className="h-4 w-4 ms-2" />
                         العودة إلى تتبع الوقت
                     </Link>
                 </div>
@@ -180,7 +180,7 @@ export function TimeEntryDetailsView() {
                                 </div>
                                 <span className="text-emerald-100 font-medium">سجل وقت</span>
                                 <span className="text-white/20">•</span>
-                                <Badge variant="outline" className="mr-2 border-emerald-500/30 text-emerald-300 bg-emerald-500/10">
+                                <Badge variant="outline" className="me-2 border-emerald-500/30 text-emerald-300 bg-emerald-500/10">
                                     {entry.status === 'billed' ? 'تمت الفوترة' : 'غير مفوتر'}
                                 </Badge>
                             </div>

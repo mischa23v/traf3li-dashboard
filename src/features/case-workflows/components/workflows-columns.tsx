@@ -77,7 +77,7 @@ export function useWorkflowsColumns(): ColumnDef<WorkflowTemplate>[] {
         const stages = row.original.stages || []
         return (
           <div className="flex items-center gap-1">
-            <div className="flex -space-x-1">
+            <div className="flex gap-[-0.25rem]">
               {stages.slice(0, 5).map((stage, index) => (
                 <div
                   key={stage._id || index}

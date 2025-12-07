@@ -176,10 +176,10 @@ export function GrievancesDetailsView() {
         <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
           <DynamicIsland />
         </div>
-        <div className='ms-auto flex items-center space-x-4'>
+        <div className='ms-auto flex items-center gap-4'>
           <div className="relative hidden md:block">
             <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-            <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pr-9 pl-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
+            <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
           </div>
           <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white">
             <Bell className="h-5 w-5" />
@@ -261,12 +261,12 @@ export function GrievancesDetailsView() {
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
                         <DropdownMenuItem onClick={() => navigate({ to: `/dashboard/hr/grievances/new?editId=${grievance._id}` })}>
-                          <Edit className="w-4 h-4 ml-2" />
+                          <Edit className="w-4 h-4 ms-2" />
                           تعديل
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem className="text-red-600" onClick={handleDelete}>
-                          <Trash2 className="w-4 h-4 ml-2" />
+                          <Trash2 className="w-4 h-4 ms-2" />
                           حذف
                         </DropdownMenuItem>
                       </DropdownMenuContent>
@@ -282,7 +282,7 @@ export function GrievancesDetailsView() {
                         <Dialog open={showInvestigationDialog} onOpenChange={setShowInvestigationDialog}>
                           <DialogTrigger asChild>
                             <Button className="bg-amber-500 hover:bg-amber-600 text-white rounded-xl">
-                              <Play className="w-4 h-4 ml-2" />
+                              <Play className="w-4 h-4 ms-2" />
                               بدء التحقيق
                             </Button>
                           </DialogTrigger>
@@ -335,7 +335,7 @@ export function GrievancesDetailsView() {
                         <Dialog open={showResolveDialog} onOpenChange={setShowResolveDialog}>
                           <DialogTrigger asChild>
                             <Button className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl">
-                              <CheckCircle className="w-4 h-4 ml-2" />
+                              <CheckCircle className="w-4 h-4 ms-2" />
                               حل الشكوى
                             </Button>
                           </DialogTrigger>
@@ -403,7 +403,7 @@ export function GrievancesDetailsView() {
                           <Dialog open={showEscalateDialog} onOpenChange={setShowEscalateDialog}>
                             <DialogTrigger asChild>
                               <Button variant="outline" className="rounded-xl border-red-200 text-red-600 hover:bg-red-50">
-                                <ArrowUpRight className="w-4 h-4 ml-2" />
+                                <ArrowUpRight className="w-4 h-4 ms-2" />
                                 تصعيد
                               </Button>
                             </DialogTrigger>
@@ -450,7 +450,7 @@ export function GrievancesDetailsView() {
                           <Dialog open={showWithdrawDialog} onOpenChange={setShowWithdrawDialog}>
                             <DialogTrigger asChild>
                               <Button variant="outline" className="rounded-xl">
-                                <XCircle className="w-4 h-4 ml-2" />
+                                <XCircle className="w-4 h-4 ms-2" />
                                 سحب الشكوى
                               </Button>
                             </DialogTrigger>
@@ -557,19 +557,19 @@ export function GrievancesDetailsView() {
                         <div className="flex flex-wrap gap-2">
                           {grievance.confidential && (
                             <Badge className="bg-amber-100 text-amber-700">
-                              <Shield className="w-3 h-3 ml-1" />
+                              <Shield className="w-3 h-3 ms-1" />
                               سرية
                             </Badge>
                           )}
                           {grievance.anonymousComplaint && (
                             <Badge className="bg-purple-100 text-purple-700">
-                              <Eye className="w-3 h-3 ml-1" />
+                              <Eye className="w-3 h-3 ms-1" />
                               مجهولة الهوية
                             </Badge>
                           )}
                           {grievance.protectedDisclosure && (
                             <Badge className="bg-blue-100 text-blue-700">
-                              <Shield className="w-3 h-3 ml-1" />
+                              <Shield className="w-3 h-3 ms-1" />
                               حماية المبلغين
                             </Badge>
                           )}

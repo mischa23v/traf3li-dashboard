@@ -478,10 +478,10 @@ export function TaskDetailsView() {
                     <DynamicIsland />
                 </div>
 
-                <div className='ms-auto flex items-center space-x-4'>
+                <div className='ms-auto flex items-center gap-4'>
                     <div className="relative hidden md:block">
                         <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                        <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pr-9 pl-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
+                        <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
                     </div>
                     <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white">
                         <Bell className="h-5 w-5" />
@@ -602,7 +602,7 @@ export function TaskDetailsView() {
                                                                 <CheckSquare className="w-4 h-4 text-emerald-600" />
                                                                 المهام الفرعية
                                                                 {task.subtasks.length > 0 && (
-                                                                    <Badge variant="secondary" className="mr-2 bg-slate-100 text-slate-600">
+                                                                    <Badge variant="secondary" className="me-2 bg-slate-100 text-slate-600">
                                                                         {task.subtasks.filter(s => s.completed).length}/{task.subtasks.length}
                                                                     </Badge>
                                                                 )}
@@ -674,7 +674,7 @@ export function TaskDetailsView() {
                                                                     onClick={() => setIsAddingSubtask(true)}
                                                                     className="w-full justify-start text-slate-500 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl"
                                                                 >
-                                                                    <Plus className="w-5 h-5 ml-2" /> إضافة مهمة فرعية
+                                                                    <Plus className="w-5 h-5 ms-2" /> إضافة مهمة فرعية
                                                                 </Button>
                                                             )}
                                                         </CardContent>
@@ -800,7 +800,7 @@ export function TaskDetailsView() {
                                                                                     disabled={updateOutcomeMutation.isPending}
                                                                                     className="border-emerald-200 text-emerald-700 hover:bg-emerald-50"
                                                                                 >
-                                                                                    <TrendingUp className="h-3 w-3 ml-1" />
+                                                                                    <TrendingUp className="h-3 w-3 ms-1" />
                                                                                     فوز
                                                                                 </Button>
                                                                                 <Button
@@ -943,16 +943,16 @@ export function TaskDetailsView() {
                                                                     </div>
                                                                     <DropdownMenu>
                                                                         <DropdownMenuTrigger asChild>
-                                                                            <Button variant="ghost" size="icon" className="h-8 w-8 -ml-2 text-slate-400 hover:text-navy">
+                                                                            <Button variant="ghost" size="icon" className="h-8 w-8 -ms-2 text-slate-400 hover:text-navy">
                                                                                 <MoreHorizontal className="h-4 w-4" />
                                                                             </Button>
                                                                         </DropdownMenuTrigger>
                                                                         <DropdownMenuContent align="end">
                                                                             <DropdownMenuItem onClick={() => handlePreviewAttachment(doc._id, doc.name, doc.url, doc.storageType)}>
-                                                                                <Eye className="h-4 w-4 ml-2" /> معاينة
+                                                                                <Eye className="h-4 w-4 ms-2" /> معاينة
                                                                             </DropdownMenuItem>
                                                                             <DropdownMenuItem onClick={() => handleDownloadAttachment(doc._id, doc.name, doc.url, doc.storageType)}>
-                                                                                <Download className="h-4 w-4 ml-2" /> تحميل
+                                                                                <Download className="h-4 w-4 ms-2" /> تحميل
                                                                             </DropdownMenuItem>
                                                                             {doc.storageType === 's3' && (
                                                                                 <DropdownMenuItem
@@ -964,14 +964,14 @@ export function TaskDetailsView() {
                                                                                         }
                                                                                     }}
                                                                                 >
-                                                                                    <History className="h-4 w-4 ml-2" /> سجل النسخ
+                                                                                    <History className="h-4 w-4 ms-2" /> سجل النسخ
                                                                                 </DropdownMenuItem>
                                                                             )}
                                                                             <DropdownMenuItem
                                                                                 onClick={() => handleDeleteAttachment(doc._id)}
                                                                                 className="text-red-600 focus:text-red-600"
                                                                             >
-                                                                                <Trash2 className="h-4 w-4 ml-2" /> حذف
+                                                                                <Trash2 className="h-4 w-4 ms-2" /> حذف
                                                                             </DropdownMenuItem>
                                                                         </DropdownMenuContent>
                                                                     </DropdownMenu>
@@ -1019,19 +1019,19 @@ export function TaskDetailsView() {
                                                                             </div>
                                                                             <DropdownMenu>
                                                                                 <DropdownMenuTrigger asChild>
-                                                                                    <Button variant="ghost" size="icon" className="h-8 w-8 -ml-2 text-slate-400 hover:text-navy">
+                                                                                    <Button variant="ghost" size="icon" className="h-8 w-8 -ms-2 text-slate-400 hover:text-navy">
                                                                                         <MoreHorizontal className="h-4 w-4" />
                                                                                     </Button>
                                                                                 </DropdownMenuTrigger>
                                                                                 <DropdownMenuContent align="end">
                                                                                     <DropdownMenuItem onClick={() => handleOpenDocumentEditor(doc._id)}>
-                                                                                        <Edit3 className="h-4 w-4 ml-2" /> تحرير
+                                                                                        <Edit3 className="h-4 w-4 ms-2" /> تحرير
                                                                                     </DropdownMenuItem>
                                                                                     <DropdownMenuItem
                                                                                         onClick={() => handleDeleteDocument(doc._id)}
                                                                                         className="text-red-600 focus:text-red-600"
                                                                                     >
-                                                                                        <Trash2 className="h-4 w-4 ml-2" /> حذف
+                                                                                        <Trash2 className="h-4 w-4 ms-2" /> حذف
                                                                                     </DropdownMenuItem>
                                                                                 </DropdownMenuContent>
                                                                             </DropdownMenu>
@@ -1051,7 +1051,7 @@ export function TaskDetailsView() {
                                                                                 className="flex-1 h-8 text-xs border-emerald-200 text-emerald-700 hover:bg-emerald-50"
                                                                                 onClick={() => handleOpenDocumentEditor(doc._id)}
                                                                             >
-                                                                                <Edit3 className="h-3 w-3 ml-1" />
+                                                                                <Edit3 className="h-3 w-3 ms-1" />
                                                                                 تحرير
                                                                             </Button>
                                                                         </div>
@@ -1103,7 +1103,7 @@ export function TaskDetailsView() {
                                                                             }
                                                                         }}
                                                                         placeholder="اكتب تعليقاً..."
-                                                                        className="min-h-[80px] rounded-xl resize-none pr-12 bg-slate-50 border-slate-200 focus:border-brand-blue"
+                                                                        className="min-h-[80px] rounded-xl resize-none pe-12 bg-slate-50 border-slate-200 focus:border-brand-blue"
                                                                     />
                                                                     <Button
                                                                         size="icon"
@@ -1174,9 +1174,9 @@ export function TaskDetailsView() {
                                 className="px-6 rounded-xl bg-red-500 hover:bg-red-600 text-white"
                             >
                                 {deleteTaskMutation.isPending ? (
-                                    <Loader2 className="h-4 w-4 animate-spin ml-2" />
+                                    <Loader2 className="h-4 w-4 animate-spin ms-2" />
                                 ) : (
-                                    <Trash2 className="h-4 w-4 ml-2" />
+                                    <Trash2 className="h-4 w-4 ms-2" />
                                 )}
                                 حذف المهمة
                             </Button>

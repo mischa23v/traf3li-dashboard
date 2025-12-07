@@ -154,19 +154,19 @@ export function MonthCalendarView() {
         <div className="flex gap-2">
           <Link to="/dashboard/finance/time-tracking">
             <Button variant="outline" size="sm">
-              <List className="h-4 w-4 ml-2" />
+              <List className="h-4 w-4 ms-2" />
               القائمة
             </Button>
           </Link>
           <Link to="/dashboard/finance/time-tracking/weekly">
             <Button variant="outline" size="sm">
-              <Calendar className="h-4 w-4 ml-2" />
+              <Calendar className="h-4 w-4 ms-2" />
               أسبوعي
             </Button>
           </Link>
           <Link to="/dashboard/finance/time-tracking/new">
             <Button size="sm">
-              <Plus className="h-4 w-4 ml-2" />
+              <Plus className="h-4 w-4 ms-2" />
               إضافة إدخال
             </Button>
           </Link>
@@ -372,7 +372,7 @@ export function MonthCalendarView() {
                         className="w-full"
                         onClick={() => navigate({ to: '/dashboard/finance/time-tracking/new' })}
                       >
-                        <Plus className="h-4 w-4 ml-2" />
+                        <Plus className="h-4 w-4 ms-2" />
                         إضافة إدخال جديد
                       </Button>
                     </div>

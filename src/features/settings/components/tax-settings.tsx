@@ -132,7 +132,7 @@ export default function TaxSettings() {
         return (
             <>
                 <Header>
-                    <div className='ms-auto flex items-center space-x-4'>
+                    <div className='ms-auto flex items-center gap-4'>
                         <LanguageSwitcher />
                         <ThemeSwitch />
                         <ProfileDropdown />
@@ -151,7 +151,7 @@ export default function TaxSettings() {
     return (
         <>
             <Header>
-                <div className='ms-auto flex items-center space-x-4'>
+                <div className='ms-auto flex items-center gap-4'>
                     <LanguageSwitcher />
                     <ThemeSwitch />
                     <ProfileDropdown />
@@ -167,7 +167,7 @@ export default function TaxSettings() {
                             <p className="text-slate-500">إدارة معدلات الضرائب المطبقة على الفواتير</p>
                         </div>
                         <Button onClick={() => handleOpenDialog()} className="bg-brand-blue hover:bg-brand-blue/90">
-                            <Plus className="h-4 w-4 ml-2" />
+                            <Plus className="h-4 w-4 ms-2" />
                             إضافة ضريبة
                         </Button>
                     </div>
@@ -206,7 +206,7 @@ export default function TaxSettings() {
                                     <h3 className="text-lg font-medium text-navy mb-2">لا توجد ضرائب</h3>
                                     <p className="text-slate-500 mb-4">قم بإضافة معدل ضريبة للبدء</p>
                                     <Button onClick={() => handleOpenDialog()} variant="outline">
-                                        <Plus className="h-4 w-4 ml-2" />
+                                        <Plus className="h-4 w-4 ms-2" />
                                         إضافة ضريبة
                                     </Button>
                                 </div>
@@ -242,7 +242,7 @@ export default function TaxSettings() {
                                                 <TableCell className="text-center">
                                                     {tax.isDefault ? (
                                                         <Badge className="bg-emerald-100 text-emerald-700 border-0">
-                                                            <Star className="h-3 w-3 ml-1 fill-current" />
+                                                            <Star className="h-3 w-3 ms-1 fill-current" />
                                                             افتراضي
                                                         </Badge>
                                                     ) : (
@@ -266,7 +266,7 @@ export default function TaxSettings() {
                                                         </DropdownMenuTrigger>
                                                         <DropdownMenuContent align="end">
                                                             <DropdownMenuItem onClick={() => handleOpenDialog(tax)}>
-                                                                <Edit className="h-4 w-4 ml-2" />
+                                                                <Edit className="h-4 w-4 ms-2" />
                                                                 تعديل
                                                             </DropdownMenuItem>
                                                             <DropdownMenuItem
@@ -274,7 +274,7 @@ export default function TaxSettings() {
                                                                 className="text-red-600"
                                                                 disabled={tax.isDefault}
                                                             >
-                                                                <Trash2 className="h-4 w-4 ml-2" />
+                                                                <Trash2 className="h-4 w-4 ms-2" />
                                                                 حذف
                                                             </DropdownMenuItem>
                                                         </DropdownMenuContent>
@@ -360,7 +360,7 @@ export default function TaxSettings() {
                                 disabled={createTaxMutation.isPending || updateTaxMutation.isPending}
                             >
                                 {(createTaxMutation.isPending || updateTaxMutation.isPending) ? (
-                                    <Loader2 className="h-4 w-4 ml-2 animate-spin" />
+                                    <Loader2 className="h-4 w-4 ms-2 animate-spin" />
                                 ) : null}
                                 {editingTax ? 'حفظ التغييرات' : 'إضافة'}
                             </Button>

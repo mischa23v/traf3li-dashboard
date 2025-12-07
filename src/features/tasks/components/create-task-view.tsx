@@ -664,7 +664,7 @@ export function CreateTaskView() {
                                                 }}
                                             />
                                             <Button type="button" variant="outline" onClick={addSubtask} className="rounded-xl">
-                                                <Plus className="w-4 h-4 ml-2" />
+                                                <Plus className="w-4 h-4 ms-2" />
                                                 إضافة
                                             </Button>
                                         </div>
@@ -888,7 +888,7 @@ export function CreateTaskView() {
                                                     </div>
                                                 ))}
                                                 <Button type="button" variant="outline" onClick={addReminder} className="rounded-xl">
-                                                    <Plus className="w-4 h-4 ml-2" />
+                                                    <Plus className="w-4 h-4 ms-2" />
                                                     إضافة تذكير
                                                 </Button>
                                             </div>

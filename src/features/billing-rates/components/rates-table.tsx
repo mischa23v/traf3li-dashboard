@@ -82,7 +82,7 @@ export function RatesTable({ data }: RatesTableProps) {
     <div className="space-y-4">
       {/* Toolbar */}
       <div className="flex items-center justify-between">
-        <div className="flex flex-1 items-center space-x-2 rtl:space-x-reverse">
+        <div className="flex flex-1 items-center gap-2">
           <Input
             placeholder={t('billingRates.searchRates')}
             value={(table.getColumn('name')?.getFilterValue() as string) ?? ''}

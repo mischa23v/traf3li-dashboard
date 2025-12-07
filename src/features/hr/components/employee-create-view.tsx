@@ -382,10 +382,10 @@ export function EmployeeCreateView() {
                 <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
                     <DynamicIsland />
                 </div>
-                <div className='ms-auto flex items-center space-x-4'>
+                <div className='ms-auto flex items-center gap-4'>
                     <div className="relative hidden md:block">
                         <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                        <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pr-9 pl-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
+                        <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
                     </div>
                     <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white">
                         <Bell className="h-5 w-5" />
@@ -646,7 +646,7 @@ export function EmployeeCreateView() {
                                         <div className="flex items-center justify-between mb-4">
                                             <h4 className="font-semibold text-navy">البدلات</h4>
                                             <Button type="button" variant="outline" size="sm" onClick={addAllowance} className="rounded-xl">
-                                                <Plus className="w-4 h-4 ml-1" />
+                                                <Plus className="w-4 h-4 ms-1" />
                                                 إضافة بدل
                                             </Button>
                                         </div>
@@ -1184,7 +1184,7 @@ export function EmployeeCreateView() {
                                                         <AlertCircle className="w-5 h-5 text-blue-500 mt-0.5" />
                                                         <div className="text-sm text-blue-800">
                                                             <strong>نسبة الاستقطاع للموظف السعودي:</strong>
-                                                            <ul className="mt-2 mr-4 list-disc">
+                                                            <ul className="mt-2 me-4 list-disc">
                                                                 <li>حصة الموظف: 9.75% من الراتب الأساسي</li>
                                                                 <li>حصة صاحب العمل: 12.75% من الراتب الأساسي</li>
                                                             </ul>
@@ -1313,7 +1313,7 @@ export function EmployeeCreateView() {
                                                         <div>
                                                             <span className="text-sm text-blue-700">سنوات الخدمة: </span>
                                                             <span className="font-bold text-blue-800">{yearsOfService} سنة</span>
-                                                            <span className="text-sm text-blue-600 mr-3">
+                                                            <span className="text-sm text-blue-600 me-3">
                                                                 (الحد الأدنى للإجازة: {minAnnualLeave} يوم)
                                                             </span>
                                                         </div>
@@ -1360,12 +1360,12 @@ export function EmployeeCreateView() {
                                 >
                                     {isPending ? (
                                         <>
-                                            <Loader2 className="h-5 w-5 ml-2 animate-spin" />
+                                            <Loader2 className="h-5 w-5 ms-2 animate-spin" />
                                             جاري الحفظ...
                                         </>
                                     ) : (
                                         <>
-                                            <CheckCircle className="h-5 w-5 ml-2" />
+                                            <CheckCircle className="h-5 w-5 ms-2" />
                                             {isEditMode ? 'حفظ التغييرات' : 'إضافة الموظف'}
                                         </>
                                     )}

@@ -413,7 +413,7 @@ export function ForgotPassword() {
                       type={showNewPassword ? 'text' : 'password'}
                       value={newPassword}
                       onChange={(e) => { setNewPassword(e.target.value); if (errors.newPassword) setErrors({...errors, newPassword: ''}); }}
-                      className={`w-full h-12 pr-12 pl-12 rounded-xl border bg-slate-50 text-[#0f172a] outline-none transition-all ${
+                      className={`w-full h-12 pe-12 ps-12 rounded-xl border bg-slate-50 text-[#0f172a] outline-none transition-all ${
                         errors.newPassword ? 'border-red-400' : 'border-slate-200 focus:border-[#0f172a]'
                       }`}
                       placeholder=""
@@ -447,7 +447,7 @@ export function ForgotPassword() {
                       type={showConfirmPassword ? 'text' : 'password'}
                       value={confirmPassword}
                       onChange={(e) => { setConfirmPassword(e.target.value); if (errors.confirmPassword) setErrors({...errors, confirmPassword: ''}); }}
-                      className={`w-full h-12 pr-12 pl-12 rounded-xl border bg-slate-50 text-[#0f172a] outline-none transition-all ${
+                      className={`w-full h-12 pe-12 ps-12 rounded-xl border bg-slate-50 text-[#0f172a] outline-none transition-all ${
                         errors.confirmPassword ? 'border-red-400' : 'border-slate-200 focus:border-[#0f172a]'
                       }`}
                       placeholder=""
@@ -643,7 +643,7 @@ export function ForgotPassword() {
                     type="email"
                     value={email}
                     onChange={(e) => { setEmail(e.target.value); if (errors.email) setErrors({...errors, email: ''}); if (apiError) setApiError(''); }}
-                    className={`w-full h-12 pr-12 pl-4 rounded-xl border bg-slate-50 text-[#0f172a] outline-none transition-all ${
+                    className={`w-full h-12 pe-12 ps-4 rounded-xl border bg-slate-50 text-[#0f172a] outline-none transition-all ${
                       errors.email ? 'border-red-400' : 'border-slate-200 focus:border-[#0f172a]'
                     }`}
                     placeholder=""

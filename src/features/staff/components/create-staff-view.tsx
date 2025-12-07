@@ -1098,7 +1098,7 @@ export function CreateStaffView() {
                             <div className="flex items-center justify-between pt-6 border-t border-slate-200">
                                 <Link to="/dashboard/staff">
                                     <Button type="button" variant="ghost" className="text-slate-500 hover:text-navy">
-                                        <X className="ml-2 h-4 w-4" />
+                                        <X className="ms-2 h-4 w-4" />
                                         إلغاء
                                     </Button>
                                 </Link>

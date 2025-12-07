@@ -231,7 +231,7 @@ export function AssetAssignmentDetailsView() {
           <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
             <DynamicIsland />
           </div>
-          <div className='ms-auto flex items-center space-x-4'>
+          <div className='ms-auto flex items-center gap-4'>
             <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white" />
             <ThemeSwitch className="text-slate-300 hover:bg-white/10 hover:text-white" />
             <ConfigDrawer className="text-slate-300 hover:bg-white/10 hover:text-white" />
@@ -261,7 +261,7 @@ export function AssetAssignmentDetailsView() {
           <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
             <DynamicIsland />
           </div>
-          <div className='ms-auto flex items-center space-x-4'>
+          <div className='ms-auto flex items-center gap-4'>
             <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white" />
             <ThemeSwitch className="text-slate-300 hover:bg-white/10 hover:text-white" />
             <ConfigDrawer className="text-slate-300 hover:bg-white/10 hover:text-white" />
@@ -292,10 +292,10 @@ export function AssetAssignmentDetailsView() {
         <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
           <DynamicIsland />
         </div>
-        <div className='ms-auto flex items-center space-x-4'>
+        <div className='ms-auto flex items-center gap-4'>
           <div className="relative hidden md:block">
             <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-            <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pr-9 pl-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
+            <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
           </div>
           <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white">
             <Bell className="h-5 w-5" />
@@ -355,7 +355,7 @@ export function AssetAssignmentDetailsView() {
                   disabled={acknowledgeMutation.isPending}
                   className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl shadow-lg shadow-emerald-500/20"
                 >
-                  <UserCheck className="w-4 h-4 ml-2" />
+                  <UserCheck className="w-4 h-4 ms-2" />
                   تأكيد الاستلام
                 </Button>
               )}
@@ -365,7 +365,7 @@ export function AssetAssignmentDetailsView() {
                   disabled={updateStatusMutation.isPending}
                   className="bg-blue-500 hover:bg-blue-600 text-white rounded-xl"
                 >
-                  <CheckCircle className="w-4 h-4 ml-2" />
+                  <CheckCircle className="w-4 h-4 ms-2" />
                   قيد الاستخدام
                 </Button>
               )}
@@ -375,7 +375,7 @@ export function AssetAssignmentDetailsView() {
                   onClick={() => setShowReturnDialog(true)}
                   className="rounded-xl border-amber-300 text-amber-700 hover:bg-amber-50"
                 >
-                  <RotateCcw className="w-4 h-4 ml-2" />
+                  <RotateCcw className="w-4 h-4 ms-2" />
                   بدء إجراء الإرجاع
                 </Button>
               )}
@@ -384,7 +384,7 @@ export function AssetAssignmentDetailsView() {
                   onClick={() => setShowCompleteReturnDialog(true)}
                   className="bg-amber-500 hover:bg-amber-600 text-white rounded-xl"
                 >
-                  <CheckCircle className="w-4 h-4 ml-2" />
+                  <CheckCircle className="w-4 h-4 ms-2" />
                   إتمام الإرجاع
                 </Button>
               )}
@@ -393,7 +393,7 @@ export function AssetAssignmentDetailsView() {
                 onClick={() => setShowMaintenanceDialog(true)}
                 className="rounded-xl"
               >
-                <Wrench className="w-4 h-4 ml-2" />
+                <Wrench className="w-4 h-4 ms-2" />
                 تسجيل صيانة
               </Button>
               <Button
@@ -401,7 +401,7 @@ export function AssetAssignmentDetailsView() {
                 onClick={() => setShowIncidentDialog(true)}
                 className="rounded-xl border-red-300 text-red-700 hover:bg-red-50"
               >
-                <AlertTriangle className="w-4 h-4 ml-2" />
+                <AlertTriangle className="w-4 h-4 ms-2" />
                 الإبلاغ عن حادث
               </Button>
               <Button
@@ -409,7 +409,7 @@ export function AssetAssignmentDetailsView() {
                 onClick={() => navigate({ to: `/dashboard/hr/asset-assignment/new?editId=${assignment._id}` })}
                 className="rounded-xl"
               >
-                <Edit className="w-4 h-4 ml-2" />
+                <Edit className="w-4 h-4 ms-2" />
                 تعديل
               </Button>
             </div>

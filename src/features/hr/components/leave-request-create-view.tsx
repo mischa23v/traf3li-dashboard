@@ -428,8 +428,8 @@ export function LeaveRequestCreateView() {
         try {
             const result = await createRequestMutation.mutateAsync(data)
             navigate({ to: '/dashboard/hr/leave/$requestId', params: { requestId: result._id } })
-        } catch (error) {
-            console.error('Error creating leave request:', error)
+        } catch {
+            // Error is handled by mutation's onError callback
         }
     }
 
@@ -452,10 +452,10 @@ export function LeaveRequestCreateView() {
                     <DynamicIsland />
                 </div>
 
-                <div className='ms-auto flex items-center space-x-4'>
+                <div className='ms-auto flex items-center gap-4'>
                     <div className="relative hidden md:block">
                         <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                        <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pr-9 pl-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
+                        <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
                     </div>
                     <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white">
                         <Bell className="h-5 w-5" />
@@ -493,7 +493,7 @@ export function LeaveRequestCreateView() {
                             className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl px-6"
                             disabled={createRequestMutation.isPending}
                         >
-                            <Save className="w-4 h-4 ml-2" />
+                            <Save className="w-4 h-4 ms-2" />
                             {createRequestMutation.isPending ? 'جاري الحفظ...' : 'تقديم الطلب'}
                         </Button>
                     </div>
@@ -633,7 +633,7 @@ export function LeaveRequestCreateView() {
                                     <Label>عدد الأيام</Label>
                                     <div className="h-10 flex items-center">
                                         <span className="text-2xl font-bold text-emerald-600">{totalDays}</span>
-                                        <span className="text-slate-500 mr-2">يوم</span>
+                                        <span className="text-slate-500 me-2">يوم</span>
                                     </div>
                                 </div>
                             </div>
@@ -661,7 +661,7 @@ export function LeaveRequestCreateView() {
                                         </div>
                                         <div className="text-left">
                                             <span className="font-bold text-emerald-800 text-lg">{leaveBalance.annualLeave.remaining}</span>
-                                            <span className="text-emerald-600 mr-1">يوم متبقي</span>
+                                            <span className="text-emerald-600 me-1">يوم متبقي</span>
                                         </div>
                                     </div>
                                 </div>
@@ -743,7 +743,7 @@ export function LeaveRequestCreateView() {
                                                 })()}
                                                 تفاصيل {selectedLeaveType.labelAr}
                                                 {selectedLeaveType.requiresDoc && (
-                                                    <Badge className="bg-amber-100 text-amber-700 border-0 mr-2">
+                                                    <Badge className="bg-amber-100 text-amber-700 border-0 me-2">
                                                         يتطلب مستند
                                                     </Badge>
                                                 )}
@@ -1140,7 +1140,7 @@ export function LeaveRequestCreateView() {
                             className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl px-8"
                             disabled={createRequestMutation.isPending}
                         >
-                            <Save className="w-4 h-4 ml-2" />
+                            <Save className="w-4 h-4 ms-2" />
                             {createRequestMutation.isPending ? 'جاري الحفظ...' : 'تقديم طلب الإجازة'}
                         </Button>
                     </div>

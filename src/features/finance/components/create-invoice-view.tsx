@@ -955,14 +955,14 @@ export function CreateInvoiceView() {
                                                         </DropdownMenuTrigger>
                                                         <DropdownMenuContent align="end">
                                                             <DropdownMenuItem onClick={() => duplicateLineItem(item.id)}>
-                                                                <Copy className="h-4 w-4 ml-2" />
+                                                                <Copy className="h-4 w-4 ms-2" />
                                                                 نسخ
                                                             </DropdownMenuItem>
                                                             <DropdownMenuItem
                                                                 onClick={() => removeLineItem(item.id)}
                                                                 className="text-red-600"
                                                             >
-                                                                <Trash2 className="h-4 w-4 ml-2" />
+                                                                <Trash2 className="h-4 w-4 ms-2" />
                                                                 حذف
                                                             </DropdownMenuItem>
                                                         </DropdownMenuContent>
@@ -975,18 +975,18 @@ export function CreateInvoiceView() {
                                     {/* Add Line Buttons */}
                                     <div className="flex gap-2 pt-2">
                                         <Button type="button" variant="outline" onClick={() => addLineItem('time')} className="rounded-xl">
-                                            <Plus className="h-4 w-4 ml-2" />
+                                            <Plus className="h-4 w-4 ms-2" />
                                             إضافة بند
                                         </Button>
 
                                         {firmSize !== 'solo' && (
                                             <>
                                                 <Button type="button" variant="outline" className="rounded-xl text-blue-600 border-blue-200 hover:bg-blue-50">
-                                                    <Clock className="h-4 w-4 ml-2" />
+                                                    <Clock className="h-4 w-4 ms-2" />
                                                     استيراد من الساعات
                                                 </Button>
                                                 <Button type="button" variant="outline" className="rounded-xl text-purple-600 border-purple-200 hover:bg-purple-50">
-                                                    <Receipt className="h-4 w-4 ml-2" />
+                                                    <Receipt className="h-4 w-4 ms-2" />
                                                     استيراد من المصروفات
                                                 </Button>
                                             </>
@@ -1621,19 +1621,19 @@ export function CreateInvoiceView() {
                                 <div className="flex gap-2">
                                     <Link to="/dashboard/finance/invoices">
                                         <Button type="button" variant="ghost" className="text-slate-500 hover:text-slate-700 rounded-xl">
-                                            <X className="ml-2 h-4 w-4" />
+                                            <X className="ms-2 h-4 w-4" />
                                             إلغاء
                                         </Button>
                                     </Link>
                                     <Button type="button" variant="outline" className="rounded-xl">
-                                        <Save className="ml-2 h-4 w-4" />
+                                        <Save className="ms-2 h-4 w-4" />
                                         حفظ كمسودة
                                     </Button>
                                 </div>
 
                                 <div className="flex gap-2">
                                     <Button type="button" variant="outline" className="rounded-xl">
-                                        <Eye className="ml-2 h-4 w-4" />
+                                        <Eye className="ms-2 h-4 w-4" />
                                         معاينة PDF
                                     </Button>
 
@@ -1674,20 +1674,20 @@ export function CreateInvoiceView() {
                                             </DropdownMenuTrigger>
                                             <DropdownMenuContent align="end" className="w-48">
                                                 <DropdownMenuItem onClick={(e) => { setSendAfterCreate(true); handleSubmit(e as any) }}>
-                                                    <Mail className="ml-2 h-4 w-4" />
+                                                    <Mail className="ms-2 h-4 w-4" />
                                                     حفظ و إرسال بالبريد
                                                 </DropdownMenuItem>
                                                 <DropdownMenuItem>
-                                                    <Download className="ml-2 h-4 w-4" />
+                                                    <Download className="ms-2 h-4 w-4" />
                                                     حفظ و تحميل PDF
                                                 </DropdownMenuItem>
                                                 <DropdownMenuItem>
-                                                    <Printer className="ml-2 h-4 w-4" />
+                                                    <Printer className="ms-2 h-4 w-4" />
                                                     حفظ و طباعة
                                                 </DropdownMenuItem>
                                                 <DropdownMenuSeparator />
                                                 <DropdownMenuItem onClick={(e) => { setSendAfterCreate(false); handleSubmit(e as any) }}>
-                                                    <Save className="ml-2 h-4 w-4" />
+                                                    <Save className="ms-2 h-4 w-4" />
                                                     حفظ فقط
                                                 </DropdownMenuItem>
                                             </DropdownMenuContent>

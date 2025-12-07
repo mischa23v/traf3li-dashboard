@@ -477,7 +477,7 @@ export function CreateRecurringView({ mode = 'create' }: CreateRecurringViewProp
                                                 onClick={handleAddItem}
                                                 className="text-emerald-600 border-emerald-500"
                                             >
-                                                <Plus className="h-4 w-4 ml-2" />
+                                                <Plus className="h-4 w-4 ms-2" />
                                                 إضافة بند
                                             </Button>
                                         </div>
@@ -591,7 +591,7 @@ export function CreateRecurringView({ mode = 'create' }: CreateRecurringViewProp
 
                                     {/* Checkboxes */}
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                        <div className="flex items-center space-x-2 space-x-reverse p-4 bg-slate-50 rounded-xl">
+                                        <div className="flex items-center gap-2 gap-reverse p-4 bg-slate-50 rounded-xl">
                                             <Checkbox
                                                 id="autoSend"
                                                 checked={formData.autoSend}
@@ -607,7 +607,7 @@ export function CreateRecurringView({ mode = 'create' }: CreateRecurringViewProp
                                                 إرسال تلقائي
                                             </label>
                                         </div>
-                                        <div className="flex items-center space-x-2 space-x-reverse p-4 bg-slate-50 rounded-xl">
+                                        <div className="flex items-center gap-2 gap-reverse p-4 bg-slate-50 rounded-xl">
                                             <Checkbox
                                                 id="autoApprove"
                                                 checked={formData.autoApprove}

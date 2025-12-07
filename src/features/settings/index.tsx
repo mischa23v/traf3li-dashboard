@@ -46,7 +46,7 @@ export function Settings() {
       {/* ===== Top Heading ===== */}
       <Header>
         <Search />
-        <div className='ms-auto flex items-center space-x-4'>
+        <div className='ms-auto flex items-center gap-4'>
           <ThemeSwitch />
           <ConfigDrawer />
           <ProfileDropdown />
@@ -63,7 +63,7 @@ export function Settings() {
           </p>
         </div>
         <Separator className='my-4 lg:my-6' />
-        <div className='flex flex-1 flex-col space-y-2 overflow-hidden md:space-y-2 lg:flex-row lg:space-y-0 lg:space-x-12'>
+        <div className='flex flex-1 flex-col space-y-2 overflow-hidden md:space-y-2 lg:flex-row lg:space-y-0 lg:gap-12'>
           <aside className='top-0 lg:sticky lg:w-1/5'>
             <SidebarNav items={sidebarNavItems} />
           </aside>

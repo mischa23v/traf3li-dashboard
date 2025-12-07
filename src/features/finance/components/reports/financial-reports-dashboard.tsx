@@ -181,10 +181,10 @@ export default function FinancialReportsDashboard() {
                     <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
                         <DynamicIsland />
                     </div>
-                    <div className='ms-auto flex items-center space-x-4'>
+                    <div className='ms-auto flex items-center gap-4'>
                         <div className="relative hidden md:block">
                             <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                            <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pr-9 pl-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
+                            <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
                         </div>
                         <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white">
                             <Bell className="h-5 w-5" />
@@ -221,10 +221,10 @@ export default function FinancialReportsDashboard() {
                 <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
                     <DynamicIsland />
                 </div>
-                <div className='ms-auto flex items-center space-x-4'>
+                <div className='ms-auto flex items-center gap-4'>
                     <div className="relative hidden md:block">
                         <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                        <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pr-9 pl-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
+                        <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
                     </div>
                     <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white">
                         <Bell className="h-5 w-5" />
@@ -246,7 +246,7 @@ export default function FinancialReportsDashboard() {
                     type="finance"
                 >
                     <Button variant="outline" className="bg-white/5 border-white/10 text-white hover:bg-white/10 rounded-xl h-10 px-5 backdrop-blur-sm">
-                        <Download className="w-4 h-4 ml-2" />
+                        <Download className="w-4 h-4 ms-2" />
                         تصدير PDF
                     </Button>
                 </ProductivityHero>
@@ -546,12 +546,12 @@ export default function FinancialReportsDashboard() {
                                         <span className="text-slate-600">الوضع المالي</span>
                                         {bankSummary.banksTotal > bankSummary.unpaidInvoicesTotal / 2 ? (
                                             <Badge className="bg-emerald-100 text-emerald-700 border-0">
-                                                <CheckCircle className="w-3 h-3 ml-1" />
+                                                <CheckCircle className="w-3 h-3 ms-1" />
                                                 جيد
                                             </Badge>
                                         ) : (
                                             <Badge className="bg-amber-100 text-amber-700 border-0">
-                                                <AlertCircle className="w-3 h-3 ml-1" />
+                                                <AlertCircle className="w-3 h-3 ms-1" />
                                                 يحتاج متابعة
                                             </Badge>
                                         )}

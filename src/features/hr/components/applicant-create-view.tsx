@@ -265,8 +265,8 @@ export function ApplicantCreateView() {
 
       await createMutation.mutateAsync(applicantData)
       navigate({ to: '/dashboard/hr/recruitment/applicants' })
-    } catch (error) {
-      console.error('Failed to create applicant:', error)
+    } catch {
+      // Error is handled by mutation's onError callback
     }
   }
 
@@ -286,7 +286,7 @@ export function ApplicantCreateView() {
           <DynamicIsland />
         </div>
 
-        <div className='ms-auto flex items-center space-x-4'>
+        <div className='ms-auto flex items-center gap-4'>
           <div className="relative hidden md:block">
             <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
             <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pr-9 pl-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
@@ -974,7 +974,7 @@ export function ApplicantCreateView() {
                   <>جاري الإضافة...</>
                 ) : (
                   <>
-                    <CheckCircle className="w-4 h-4 ml-2" />
+                    <CheckCircle className="w-4 h-4 ms-2" />
                     إضافة المتقدم
                   </>
                 )}

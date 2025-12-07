@@ -268,10 +268,10 @@ export function RemindersView() {
                     <DynamicIsland />
                 </div>
 
-                <div className='ms-auto flex items-center space-x-4'>
+                <div className='ms-auto flex items-center gap-4'>
                     <div className="relative hidden md:block">
                         <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                        <input type="text" placeholder={t('tasks.list.search')} className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pr-9 pl-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
+                        <input type="text" placeholder={t('tasks.list.search')} className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
                     </div>
                     <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white">
                         <Bell className="h-5 w-5" />
@@ -308,7 +308,7 @@ export function RemindersView() {
                                         placeholder={t('reminders.list.searchPlaceholder')}
                                         value={searchQuery}
                                         onChange={(e) => setSearchQuery(e.target.value)}
-                                        className="pr-10 h-10 rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500/20"
+                                        className="pe-10 h-10 rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500/20"
                                     />
                                 </div>
 
@@ -355,7 +355,7 @@ export function RemindersView() {
                                 {/* Sort By */}
                                 <Select value={sortBy} onValueChange={setSortBy}>
                                     <SelectTrigger className="w-[160px] h-10 rounded-xl border-slate-200">
-                                        <SortAsc className="h-4 w-4 ml-2 text-slate-400" />
+                                        <SortAsc className="h-4 w-4 ms-2 text-slate-400" />
                                         <SelectValue placeholder={t('reminders.list.sortBy')} />
                                     </SelectTrigger>
                                     <SelectContent>
@@ -373,7 +373,7 @@ export function RemindersView() {
                                         onClick={clearFilters}
                                         className="h-10 px-4 text-red-500 hover:text-red-600 hover:bg-red-50 rounded-xl"
                                     >
-                                        <X className="h-4 w-4 ml-2" />
+                                        <X className="h-4 w-4 ms-2" />
                                         {t('reminders.list.clearFilters')}
                                     </Button>
                                 )}
@@ -435,7 +435,7 @@ export function RemindersView() {
                                         <p className="text-slate-500 mb-4">أنت جاهز تماماً! لا توجد تذكيرات في الوقت الحالي.</p>
                                         <Button asChild className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl">
                                             <Link to="/dashboard/tasks/reminders/new">
-                                                <Plus className="ml-2 h-4 w-4" />
+                                                <Plus className="ms-2 h-4 w-4" />
                                                 إضافة تذكير جديد
                                             </Link>
                                         </Button>
@@ -475,26 +475,26 @@ export function RemindersView() {
                                                 </DropdownMenuTrigger>
                                                 <DropdownMenuContent align="end" className="w-48">
                                                     <DropdownMenuItem onClick={() => handleViewReminder(reminder.id)}>
-                                                        <Eye className="h-4 w-4 ml-2" />
+                                                        <Eye className="h-4 w-4 ms-2" />
                                                         عرض التفاصيل
                                                     </DropdownMenuItem>
                                                     <DropdownMenuSeparator />
                                                     {reminder.status !== 'completed' && (
                                                         <DropdownMenuItem onClick={() => handleCompleteReminder(reminder.id)}>
-                                                            <CheckCircle className="h-4 w-4 ml-2" />
+                                                            <CheckCircle className="h-4 w-4 ms-2" />
                                                             إكمال
                                                         </DropdownMenuItem>
                                                     )}
                                                     {reminder.status !== 'dismissed' && (
                                                         <DropdownMenuItem onClick={() => handleDismissReminder(reminder.id)}>
-                                                            <XCircle className="h-4 w-4 ml-2" />
+                                                            <XCircle className="h-4 w-4 ms-2" />
                                                             تجاهل
                                                         </DropdownMenuItem>
                                                     )}
                                                     {reminder.status !== 'completed' && reminder.status !== 'dismissed' && (
                                                         <DropdownMenuSub>
                                                             <DropdownMenuSubTrigger>
-                                                                <Clock className="h-4 w-4 ml-2" />
+                                                                <Clock className="h-4 w-4 ms-2" />
                                                                 تأجيل
                                                             </DropdownMenuSubTrigger>
                                                             <DropdownMenuSubContent>
@@ -511,7 +511,7 @@ export function RemindersView() {
                                                     )}
                                                     {reminder.status !== 'completed' && reminder.status !== 'dismissed' && (
                                                         <DropdownMenuItem onClick={() => setDelegateReminderId(reminder.id)}>
-                                                            <UserPlus className="h-4 w-4 ml-2" />
+                                                            <UserPlus className="h-4 w-4 ms-2" />
                                                             تفويض
                                                         </DropdownMenuItem>
                                                     )}
@@ -520,7 +520,7 @@ export function RemindersView() {
                                                         onClick={() => handleDeleteReminder(reminder.id)}
                                                         className="text-red-600 focus:text-red-600"
                                                     >
-                                                        <Trash2 className="h-4 w-4 ml-2" />
+                                                        <Trash2 className="h-4 w-4 ms-2" />
                                                         حذف
                                                     </DropdownMenuItem>
                                                 </DropdownMenuContent>
@@ -578,7 +578,7 @@ export function RemindersView() {
                             <div className="p-4 pt-0 text-center">
                                 <Button variant="ghost" className="text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 w-full rounded-xl py-6">
                                     عرض جميع التذكيرات
-                                    <ChevronLeft className="h-4 w-4 mr-2" />
+                                    <ChevronLeft className="h-4 w-4 me-2" />
                                 </Button>
                             </div>
                         </div>
@@ -647,7 +647,7 @@ export function RemindersView() {
                         >
                             {delegateReminderMutation.isPending ? (
                                 <>
-                                    <Loader2 className="h-4 w-4 ml-2 animate-spin" />
+                                    <Loader2 className="h-4 w-4 ms-2 animate-spin" />
                                     {t('reminders.delegate.delegating')}
                                 </>
                             ) : (

@@ -138,7 +138,7 @@ export function ReferralsListView() {
           <DynamicIsland />
         </div>
 
-        <div className="ms-auto flex items-center space-x-4">
+        <div className="ms-auto flex items-center gap-4">
           <div className="relative hidden md:block">
             <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
             <input
@@ -174,7 +174,7 @@ export function ReferralsListView() {
             className="bg-emerald-500 hover:bg-emerald-600 text-white h-12 px-8 rounded-xl font-bold shadow-lg shadow-emerald-500/20 border-0"
           >
             <Link to="/dashboard/crm/referrals/new">
-              <Plus className="ml-2 h-5 w-5" />
+              <Plus className="ms-2 h-5 w-5" />
               مصدر إحالة جديد
             </Link>
           </Button>
@@ -312,7 +312,7 @@ export function ReferralsListView() {
                     <p className="text-slate-500 mb-4">ابدأ بإضافة مصدر إحالة جديد</p>
                     <Button asChild className="bg-emerald-500 hover:bg-emerald-600">
                       <Link to="/dashboard/crm/referrals/new">
-                        <Plus className="w-4 h-4 ml-2" />
+                        <Plus className="w-4 h-4 ms-2" />
                         مصدر إحالة جديد
                       </Link>
                     </Button>
@@ -438,7 +438,7 @@ export function ReferralsListView() {
                   className="text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 w-full rounded-xl py-6"
                 >
                   عرض جميع مصادر الإحالة
-                  <ChevronLeft className="h-4 w-4 mr-2" />
+                  <ChevronLeft className="h-4 w-4 me-2" />
                 </Button>
               </div>
             </div>

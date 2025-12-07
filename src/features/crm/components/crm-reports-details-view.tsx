@@ -137,7 +137,7 @@ export function CrmReportsDetailsView() {
         <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
           <DynamicIsland />
         </div>
-        <div className='ms-auto flex items-center space-x-4'>
+        <div className='ms-auto flex items-center gap-4'>
           <div className="relative hidden md:block">
             <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
             <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pr-9 pl-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
@@ -192,11 +192,11 @@ export function CrmReportsDetailsView() {
                   </div>
                   <div className="flex items-center gap-2">
                     <Button size="sm" onClick={handleRunReport} disabled={runMutation.isPending} className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl">
-                      <Play className="w-4 h-4 ml-1" />تشغيل
+                      <Play className="w-4 h-4 ms-1" />تشغيل
                     </Button>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button variant="outline" size="sm" className="rounded-xl"><Download className="w-4 h-4 ml-1" />تصدير</Button>
+                        <Button variant="outline" size="sm" className="rounded-xl"><Download className="w-4 h-4 ms-1" />تصدير</Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
                         {report.outputFormats.map((format) => (
@@ -212,11 +212,11 @@ export function CrmReportsDetailsView() {
                         <Button variant="outline" size="icon" className="rounded-xl"><MoreHorizontal className="w-4 h-4" /></Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => navigate({ to: `/dashboard/crm/reports/new?editId=${reportId}` })}><Edit className="w-4 h-4 ml-2" />تعديل</DropdownMenuItem>
-                        <DropdownMenuItem onClick={handleDuplicate}><Copy className="w-4 h-4 ml-2" />نسخ</DropdownMenuItem>
-                        <DropdownMenuItem><Share2 className="w-4 h-4 ml-2" />مشاركة</DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => navigate({ to: `/dashboard/crm/reports/new?editId=${reportId}` })}><Edit className="w-4 h-4 ms-2" />تعديل</DropdownMenuItem>
+                        <DropdownMenuItem onClick={handleDuplicate}><Copy className="w-4 h-4 ms-2" />نسخ</DropdownMenuItem>
+                        <DropdownMenuItem><Share2 className="w-4 h-4 ms-2" />مشاركة</DropdownMenuItem>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem className="text-red-600" onClick={handleDelete}><Trash2 className="w-4 h-4 ml-2" />حذف</DropdownMenuItem>
+                        <DropdownMenuItem className="text-red-600" onClick={handleDelete}><Trash2 className="w-4 h-4 ms-2" />حذف</DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </div>
@@ -303,7 +303,7 @@ export function CrmReportsDetailsView() {
                               <div className="flex items-center gap-2">
                                 <Badge className={getScheduleStatusColor(report.scheduling.scheduleStatus)}>{scheduleStatusLabels[report.scheduling.scheduleStatus]?.ar}</Badge>
                                 <Button variant="outline" size="sm" onClick={handleToggleSchedule} className="rounded-xl">
-                                  {report.scheduling.scheduleStatus === ScheduleStatus.ACTIVE ? <><Pause className="w-4 h-4 ml-1" />إيقاف</> : <><Play className="w-4 h-4 ml-1" />استئناف</>}
+                                  {report.scheduling.scheduleStatus === ScheduleStatus.ACTIVE ? <><Pause className="w-4 h-4 ms-1" />إيقاف</> : <><Play className="w-4 h-4 ms-1" />استئناف</>}
                                 </Button>
                               </div>
                             </div>

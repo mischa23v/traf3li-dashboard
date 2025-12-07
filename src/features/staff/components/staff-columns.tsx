@@ -103,7 +103,7 @@ export const useStaffColumns = (): ColumnDef<Staff>[] => {
         const RoleIcon = staffRole?.icon
 
         return (
-          <div className='flex items-center gap-x-2'>
+          <div className='flex items-center gap-2'>
             {RoleIcon && (
               <RoleIcon size={16} className='text-muted-foreground' />
             )}
@@ -142,7 +142,7 @@ export const useStaffColumns = (): ColumnDef<Staff>[] => {
         const status = row.getValue('status') as string
         const badgeColor = staffStatusColors.get(status as any)
         return (
-          <div className='flex space-x-2'>
+          <div className='flex gap-2'>
             <Badge variant='outline' className={cn('capitalize', badgeColor)}>
               {t(`staff.statuses.${status}`)}
             </Badge>

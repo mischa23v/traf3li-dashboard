@@ -107,7 +107,7 @@ export function ApplicantDetailsView() {
           <DynamicIsland />
         </div>
 
-        <div className='ms-auto flex items-center space-x-4'>
+        <div className='ms-auto flex items-center gap-4'>
           <div className="relative hidden md:block">
             <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
             <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pr-9 pl-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
@@ -246,7 +246,7 @@ export function ApplicantDetailsView() {
                           disabled={updateStatusMutation.isPending}
                           className="bg-purple-500 hover:bg-purple-600 text-white rounded-xl"
                         >
-                          <UserCheck className="w-4 h-4 ml-2" />
+                          <UserCheck className="w-4 h-4 ms-2" />
                           جدولة مقابلة
                         </Button>
                         <Button
@@ -254,7 +254,7 @@ export function ApplicantDetailsView() {
                           disabled={hireMutation.isPending}
                           className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl"
                         >
-                          <CheckCircle className="w-4 h-4 ml-2" />
+                          <CheckCircle className="w-4 h-4 ms-2" />
                           تعيين
                         </Button>
                       </>
@@ -267,20 +267,20 @@ export function ApplicantDetailsView() {
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
                         <DropdownMenuItem>
-                          <Edit className="w-4 h-4 ml-2" />
+                          <Edit className="w-4 h-4 ms-2" />
                           تعديل
                         </DropdownMenuItem>
                         <DropdownMenuItem>
-                          <Send className="w-4 h-4 ml-2" />
+                          <Send className="w-4 h-4 ms-2" />
                           إرسال بريد
                         </DropdownMenuItem>
                         <DropdownMenuItem>
-                          <Download className="w-4 h-4 ml-2" />
+                          <Download className="w-4 h-4 ms-2" />
                           تحميل السيرة الذاتية
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem onClick={handleReject} className="text-red-600">
-                          <UserX className="w-4 h-4 ml-2" />
+                          <UserX className="w-4 h-4 ms-2" />
                           رفض الطلب
                         </DropdownMenuItem>
                       </DropdownMenuContent>
@@ -562,7 +562,7 @@ export function ApplicantDetailsView() {
                             المقابلات
                           </CardTitle>
                           <Button className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl">
-                            <Calendar className="w-4 h-4 ml-2" />
+                            <Calendar className="w-4 h-4 ms-2" />
                             جدولة مقابلة
                           </Button>
                         </div>

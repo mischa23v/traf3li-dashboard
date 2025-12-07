@@ -81,9 +81,9 @@ export function NoFirmPage() {
               className="w-full bg-emerald-600 hover:bg-emerald-700"
             >
               {isLoading ? (
-                <RefreshCw className={`w-4 h-4 ${isRtl ? 'ml-2' : 'mr-2'} animate-spin`} />
+                <RefreshCw className={`w-4 h-4 ${isRtl ? 'ms-2' : 'me-2'} animate-spin`} />
               ) : (
-                <RefreshCw className={`w-4 h-4 ${isRtl ? 'ml-2' : 'mr-2'}`} />
+                <RefreshCw className={`w-4 h-4 ${isRtl ? 'ms-2' : 'me-2'}`} />
               )}
               {t('noFirm.refreshStatus')}
             </Button>
@@ -93,7 +93,7 @@ export function NoFirmPage() {
               onClick={handleLogout}
               className="w-full"
             >
-              <LogOut className={`w-4 h-4 ${isRtl ? 'ml-2' : 'mr-2'}`} />
+              <LogOut className={`w-4 h-4 ${isRtl ? 'ms-2' : 'me-2'}`} />
               {t('noFirm.signOut')}
             </Button>
           </div>

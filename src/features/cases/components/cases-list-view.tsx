@@ -218,13 +218,13 @@ export function CasesListView() {
           <DynamicIsland />
         </div>
 
-        <div className="ms-auto flex items-center space-x-4">
+        <div className="ms-auto flex items-center gap-4">
           <div className="relative hidden md:block">
             <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
             <input
               type="text"
               placeholder={t('common.search', 'بحث...')}
-              className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pr-9 pl-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+              className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
             />
           </div>
           <Button
@@ -254,7 +254,7 @@ export function CasesListView() {
             <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
               <DialogTrigger asChild>
                 <Button className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl h-10 px-5 font-bold shadow-lg shadow-emerald-500/20 border-0 text-sm">
-                  <Plus className="ml-2 h-4 w-4" />
+                  <Plus className="ms-2 h-4 w-4" />
                   {t('cases.newCase', 'قضية جديدة')}
                 </Button>
               </DialogTrigger>
@@ -275,7 +275,7 @@ export function CasesListView() {
           {/* --- Main Content (Cases List) --- */}
           <div className="lg:col-span-2 flex flex-col gap-6">
             {/* Filters Toolbar */}
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-white p-2 pr-4 rounded-[20px] border border-slate-100 shadow-sm">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-white p-2 pe-4 rounded-[20px] border border-slate-100 shadow-sm">
               <div className="flex items-center gap-2 w-full sm:w-auto">
                 <Search className="w-5 h-5 text-slate-400" />
                 <Input
@@ -375,7 +375,7 @@ export function CasesListView() {
                     onClick={() => setIsCreateDialogOpen(true)}
                     className="bg-blue-500 hover:bg-blue-600 text-white rounded-xl"
                   >
-                    <Plus className="ml-2 h-4 w-4" />
+                    <Plus className="ms-2 h-4 w-4" />
                     {t('cases.createNewCase', 'إنشاء قضية جديدة')}
                   </Button>
                 </div>

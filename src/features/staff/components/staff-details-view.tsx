@@ -157,7 +157,7 @@ export function StaffDetailsView() {
           <DynamicIsland />
         </div>
 
-        <div className="ms-auto flex items-center space-x-4">
+        <div className="ms-auto flex items-center gap-4">
           <div className="relative hidden md:block">
             <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
             <input
@@ -192,7 +192,7 @@ export function StaffDetailsView() {
             to="/dashboard/staff"
             className="inline-flex items-center text-slate-500 hover:text-navy transition-colors"
           >
-            <ArrowLeft className="h-4 w-4 ml-2" />
+            <ArrowLeft className="h-4 w-4 ms-2" />
             العودة إلى قائمة فريق العمل
           </Link>
         </div>
@@ -272,7 +272,7 @@ export function StaffDetailsView() {
                     variant="outline"
                     className="border-white/10 text-white hover:bg-white/10 hover:text-white backdrop-blur-sm"
                   >
-                    <Edit3 className="h-4 w-4 ml-2" />
+                    <Edit3 className="h-4 w-4 ms-2" />
                     تعديل
                   </Button>
                 </Link>
@@ -501,9 +501,9 @@ export function StaffDetailsView() {
                                     key={i}
                                     className={`${area.isPrimary ? 'bg-purple-100 text-purple-700' : 'bg-slate-100 text-slate-700'} rounded-full`}
                                   >
-                                    {area.isPrimary && <Star className="h-3 w-3 ml-1" />}
+                                    {area.isPrimary && <Star className="h-3 w-3 ms-1" />}
                                     {area.name || area}
-                                    {area.yearsExperience && <span className="text-xs mr-1">({area.yearsExperience} سنة)</span>}
+                                    {area.yearsExperience && <span className="text-xs me-1">({area.yearsExperience} سنة)</span>}
                                   </Badge>
                                 ))}
                               </div>

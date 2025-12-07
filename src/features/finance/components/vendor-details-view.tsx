@@ -75,7 +75,7 @@ export default function VendorDetailsView() {
                     <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
                         <DynamicIsland />
                     </div>
-                    <div className='ms-auto flex items-center space-x-4'>
+                    <div className='ms-auto flex items-center gap-4'>
                         <LanguageSwitcher className="text-slate-300" />
                         <ThemeSwitch className="text-slate-300" />
                         <ProfileDropdown className="text-slate-300" />
@@ -100,7 +100,7 @@ export default function VendorDetailsView() {
                     <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
                         <DynamicIsland />
                     </div>
-                    <div className='ms-auto flex items-center space-x-4'>
+                    <div className='ms-auto flex items-center gap-4'>
                         <LanguageSwitcher className="text-slate-300" />
                         <ThemeSwitch className="text-slate-300" />
                         <ProfileDropdown className="text-slate-300" />
@@ -110,7 +110,7 @@ export default function VendorDetailsView() {
                     <div className="max-w-7xl mx-auto">
                         <Button asChild variant="ghost" className="mb-6">
                             <Link to="/dashboard/finance/vendors">
-                                <ArrowRight className="h-4 w-4 ml-2" />
+                                <ArrowRight className="h-4 w-4 ms-2" />
                                 العودة للموردين
                             </Link>
                         </Button>
@@ -132,7 +132,7 @@ export default function VendorDetailsView() {
                 <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
                     <DynamicIsland />
                 </div>
-                <div className='ms-auto flex items-center space-x-4'>
+                <div className='ms-auto flex items-center gap-4'>
                     <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white" />
                     <ThemeSwitch className="text-slate-300 hover:bg-white/10 hover:text-white" />
                     <ProfileDropdown className="text-slate-300 hover:bg-white/10 hover:text-white" />
@@ -145,14 +145,14 @@ export default function VendorDetailsView() {
                     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
                         <Button asChild variant="ghost" className="text-slate-600 hover:text-navy">
                             <Link to="/dashboard/finance/vendors">
-                                <ArrowRight className="h-4 w-4 ml-2" />
+                                <ArrowRight className="h-4 w-4 ms-2" />
                                 العودة للموردين
                             </Link>
                         </Button>
                         <div className="flex gap-2">
                             <Button asChild variant="outline">
                                 <Link to="/dashboard/finance/vendors/$vendorId/edit" params={{ vendorId }}>
-                                    <Edit className="h-4 w-4 ml-2" />
+                                    <Edit className="h-4 w-4 ms-2" />
                                     تعديل
                                 </Link>
                             </Button>
@@ -163,9 +163,9 @@ export default function VendorDetailsView() {
                                 disabled={deleteVendorMutation.isPending}
                             >
                                 {deleteVendorMutation.isPending ? (
-                                    <Loader2 className="h-4 w-4 ml-2 animate-spin" />
+                                    <Loader2 className="h-4 w-4 ms-2 animate-spin" />
                                 ) : (
-                                    <Trash2 className="h-4 w-4 ml-2" />
+                                    <Trash2 className="h-4 w-4 ms-2" />
                                 )}
                                 حذف
                             </Button>

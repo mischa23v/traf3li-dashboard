@@ -326,7 +326,7 @@ export function GLTransactionsView({
                 <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                 <Input
                   placeholder="بحث في الوصف..."
-                  className="pr-10 rounded-xl border-slate-200 focus:ring-emerald-500 focus:border-emerald-500"
+                  className="pe-10 rounded-xl border-slate-200 focus:ring-emerald-500 focus:border-emerald-500"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />

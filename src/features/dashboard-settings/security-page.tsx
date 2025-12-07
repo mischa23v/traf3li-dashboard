@@ -93,7 +93,7 @@ export function SecurityPage() {
         <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
           <DynamicIsland />
         </div>
-        <div className='ms-auto flex items-center space-x-4'>
+        <div className='ms-auto flex items-center gap-4'>
           <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white" />
           <ThemeSwitch className="text-slate-300 hover:bg-white/10 hover:text-white" />
           <ConfigDrawer className="text-slate-300 hover:bg-white/10 hover:text-white" />

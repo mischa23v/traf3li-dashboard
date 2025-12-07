@@ -183,18 +183,18 @@ export function OnboardingListView() {
         <TopNav links={topNav} className="[&>a]:text-slate-300 [&>a:hover]:text-white [&>a[aria-current='page']]:text-white" />
 
         {/* Dynamic Island - Centered */}
-        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
+        <div className="absolute start-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
           <DynamicIsland />
         </div>
 
-        <div className='ms-auto flex items-center space-x-4'>
+        <div className='ms-auto flex items-center gap-4'>
           <div className="relative hidden md:block">
-            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-            <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pr-9 pl-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
+            <Search className="absolute end-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+            <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
           </div>
           <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white">
             <Bell className="h-5 w-5" />
-            <span className="absolute top-2 right-2 h-2 w-2 bg-red-500 rounded-full border border-navy"></span>
+            <span className="absolute top-2 end-2 h-2 w-2 bg-red-500 rounded-full border border-navy"></span>
           </Button>
           <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white" />
           <ThemeSwitch className="text-slate-300 hover:bg-white/10 hover:text-white" />
@@ -223,13 +223,13 @@ export function OnboardingListView() {
                 <div className="flex flex-wrap items-center gap-3">
                   {/* Search Input */}
                   <div className="relative flex-1 min-w-[200px] max-w-md">
-                    <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                    <Search className="absolute end-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                     <Input
                       type="text"
                       placeholder="بحث بالاسم أو رقم الموظف..."
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      className="pr-10 h-10 rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500/20"
+                      className="pe-10 h-10 rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500/20"
                     />
                   </div>
 
@@ -270,7 +270,7 @@ export function OnboardingListView() {
                       onClick={clearFilters}
                       className="h-10 px-4 text-red-500 hover:text-red-600 hover:bg-red-50 rounded-xl"
                     >
-                      <X className="h-4 w-4 ml-2" />
+                      <X className="h-4 w-4 ms-2" />
                       مسح الفلاتر
                     </Button>
                   )}
@@ -290,7 +290,7 @@ export function OnboardingListView() {
                     onClick={() => navigate({ to: '/dashboard/hr/onboarding/new' })}
                     className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl"
                   >
-                    <Plus className="w-4 h-4 ml-2" />
+                    <Plus className="w-4 h-4 ms-2" />
                     برنامج جديد
                   </Button>
                 </div>
@@ -343,7 +343,7 @@ export function OnboardingListView() {
                     <p className="text-slate-500 mb-4">ابدأ بإضافة برنامج تأهيل جديد</p>
                     <Button asChild className="bg-emerald-500 hover:bg-emerald-600">
                       <Link to="/dashboard/hr/onboarding/new">
-                        <Plus className="w-4 h-4 ml-2" />
+                        <Plus className="w-4 h-4 ms-2" />
                         إضافة برنامج تأهيل
                       </Link>
                     </Button>
@@ -381,11 +381,11 @@ export function OnboardingListView() {
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="w-48">
                           <DropdownMenuItem onClick={() => handleViewOnboarding(onboarding._id)}>
-                            <Eye className="h-4 w-4 ml-2" />
+                            <Eye className="h-4 w-4 ms-2" />
                             عرض التفاصيل
                           </DropdownMenuItem>
                           <DropdownMenuItem onClick={() => handleEditOnboarding(onboarding._id)}>
-                            <Edit3 className="h-4 w-4 ml-2 text-blue-500" />
+                            <Edit3 className="h-4 w-4 ms-2 text-blue-500" />
                             تعديل البيانات
                           </DropdownMenuItem>
                           <DropdownMenuSeparator />
@@ -393,7 +393,7 @@ export function OnboardingListView() {
                             onClick={() => handleDeleteOnboarding(onboarding._id)}
                             className="text-red-600 focus:text-red-600"
                           >
-                            <Trash2 className="h-4 w-4 ml-2" />
+                            <Trash2 className="h-4 w-4 ms-2" />
                             حذف البرنامج
                           </DropdownMenuItem>
                         </DropdownMenuContent>
@@ -446,7 +446,7 @@ export function OnboardingListView() {
               <div className="p-4 pt-0 text-center">
                 <Button variant="ghost" className="text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 w-full rounded-xl py-6">
                   عرض جميع البرامج
-                  <ChevronLeft className="h-4 w-4 mr-2" />
+                  <ChevronLeft className="h-4 w-4 me-2" />
                 </Button>
               </div>
             </div>

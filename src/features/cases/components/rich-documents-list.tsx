@@ -161,7 +161,7 @@ export function RichDocumentsList({
                 placeholder={isArabic ? 'بحث في المستندات...' : 'Search documents...'}
                 value={filters.search}
                 onChange={(e) => setFilters(prev => ({ ...prev, search: e.target.value }))}
-                className="pr-10 rounded-xl"
+                className="pe-10 rounded-xl"
               />
             </div>
             <Select

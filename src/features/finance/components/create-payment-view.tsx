@@ -904,7 +904,7 @@ export function CreatePaymentView() {
                                                     onClick={autoApplyToInvoices}
                                                     className="rounded-xl"
                                                 >
-                                                    <Calculator className="w-4 h-4 ml-2" />
+                                                    <Calculator className="w-4 h-4 ms-2" />
                                                     تطبيق تلقائي
                                                 </Button>
                                             </div>
@@ -1470,19 +1470,19 @@ export function CreatePaymentView() {
                                 <div className="flex gap-2">
                                     <Link to="/dashboard/finance/payments">
                                         <Button type="button" variant="ghost" className="text-slate-500 hover:text-slate-700 rounded-xl">
-                                            <X className="ml-2 h-4 w-4" />
+                                            <X className="ms-2 h-4 w-4" />
                                             إلغاء
                                         </Button>
                                     </Link>
                                     <Button type="button" variant="outline" className="rounded-xl">
-                                        <Save className="ml-2 h-4 w-4" />
+                                        <Save className="ms-2 h-4 w-4" />
                                         حفظ كمسودة
                                     </Button>
                                 </div>
 
                                 <div className="flex gap-2">
                                     <Button type="button" variant="outline" className="rounded-xl">
-                                        <Eye className="ml-2 h-4 w-4" />
+                                        <Eye className="ms-2 h-4 w-4" />
                                         معاينة الإيصال
                                     </Button>
 
@@ -1508,20 +1508,20 @@ export function CreatePaymentView() {
                                         </DropdownMenuTrigger>
                                         <DropdownMenuContent align="end" className="w-48">
                                             <DropdownMenuItem onClick={(e) => { setSendReceipt(true); handleSubmit(e as any) }}>
-                                                <Mail className="ml-2 h-4 w-4" />
+                                                <Mail className="ms-2 h-4 w-4" />
                                                 حفظ و إرسال الإيصال
                                             </DropdownMenuItem>
                                             <DropdownMenuItem>
-                                                <Download className="ml-2 h-4 w-4" />
+                                                <Download className="ms-2 h-4 w-4" />
                                                 حفظ و تحميل PDF
                                             </DropdownMenuItem>
                                             <DropdownMenuItem>
-                                                <Printer className="ml-2 h-4 w-4" />
+                                                <Printer className="ms-2 h-4 w-4" />
                                                 حفظ و طباعة
                                             </DropdownMenuItem>
                                             <DropdownMenuSeparator />
                                             <DropdownMenuItem onClick={(e) => { setSendReceipt(false); handleSubmit(e as any) }}>
-                                                <Save className="ml-2 h-4 w-4" />
+                                                <Save className="ms-2 h-4 w-4" />
                                                 حفظ فقط
                                             </DropdownMenuItem>
                                         </DropdownMenuContent>

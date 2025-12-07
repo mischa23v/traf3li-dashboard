@@ -206,7 +206,7 @@ export function CreateCaseForm({ onSuccess }: CreateCaseFormProps) {
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
             <Label htmlFor="clientName">
-              <User className="inline h-4 w-4 ml-1" />
+              <User className="inline h-4 w-4 ms-1" />
               {t('cases.form.clientName', 'اسم العميل')} *
             </Label>
             <Input
@@ -220,7 +220,7 @@ export function CreateCaseForm({ onSuccess }: CreateCaseFormProps) {
 
           <div className="space-y-2">
             <Label htmlFor="clientPhone">
-              <Phone className="inline h-4 w-4 ml-1" />
+              <Phone className="inline h-4 w-4 ms-1" />
               {t('cases.form.clientPhone', 'رقم الهاتف')}
             </Label>
             <Input
@@ -239,7 +239,7 @@ export function CreateCaseForm({ onSuccess }: CreateCaseFormProps) {
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
             <Label htmlFor="caseNumber">
-              <FileText className="inline h-4 w-4 ml-1" />
+              <FileText className="inline h-4 w-4 ms-1" />
               {t('cases.form.caseNumber', 'رقم القضية')}
             </Label>
             <Input
@@ -251,7 +251,7 @@ export function CreateCaseForm({ onSuccess }: CreateCaseFormProps) {
 
           <div className="space-y-2">
             <Label htmlFor="court">
-              <MapPin className="inline h-4 w-4 ml-1" />
+              <MapPin className="inline h-4 w-4 ms-1" />
               {t('cases.form.court', 'المحكمة')}
             </Label>
             <Input
@@ -264,7 +264,7 @@ export function CreateCaseForm({ onSuccess }: CreateCaseFormProps) {
 
         <div className="space-y-2">
           <Label htmlFor="startDate">
-            <Calendar className="inline h-4 w-4 ml-1" />
+            <Calendar className="inline h-4 w-4 ms-1" />
             {t('cases.form.startDate', 'تاريخ البدء')}
           </Label>
           <Input
@@ -357,7 +357,7 @@ export function CreateCaseForm({ onSuccess }: CreateCaseFormProps) {
           className="bg-brand-blue hover:bg-blue-600"
         >
           {(isSubmitting || createCaseMutation.isPending) && (
-            <Loader2 className="ml-2 h-4 w-4 animate-spin" />
+            <Loader2 className="ms-2 h-4 w-4 animate-spin" />
           )}
           {t('cases.form.createCase', 'إنشاء القضية')}
         </Button>

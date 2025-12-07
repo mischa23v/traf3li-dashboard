@@ -138,7 +138,7 @@ export function BillDetailsView() {
                 <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8">
                     <div className="max-w-[1600px] mx-auto mb-6">
                         <Link to="/dashboard/finance/bills" className="inline-flex items-center text-slate-500 hover:text-navy transition-colors">
-                            <ArrowLeft className="h-4 w-4 ml-2" />
+                            <ArrowLeft className="h-4 w-4 ms-2" />
                             العودة إلى الفواتير
                         </Link>
                     </div>
@@ -149,7 +149,7 @@ export function BillDetailsView() {
                         <h3 className="text-xl font-bold text-slate-900 mb-2">فشل تحميل تفاصيل الفاتورة</h3>
                         <p className="text-slate-500 mb-6">{(error as any)?.message || 'حدث خطأ أثناء تحميل البيانات'}</p>
                         <Button onClick={() => refetch()} className="bg-emerald-500 hover:bg-emerald-600 text-white px-8">
-                            <Loader2 className="ml-2 h-4 w-4" />
+                            <Loader2 className="ms-2 h-4 w-4" />
                             إعادة المحاولة
                         </Button>
                     </div>
@@ -172,7 +172,7 @@ export function BillDetailsView() {
                 <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8">
                     <div className="max-w-[1600px] mx-auto mb-6">
                         <Link to="/dashboard/finance/bills" className="inline-flex items-center text-slate-500 hover:text-navy transition-colors">
-                            <ArrowLeft className="h-4 w-4 ml-2" />
+                            <ArrowLeft className="h-4 w-4 ms-2" />
                             العودة إلى الفواتير
                         </Link>
                     </div>
@@ -184,7 +184,7 @@ export function BillDetailsView() {
                         <p className="text-slate-500 mb-6">لم نتمكن من العثور على الفاتورة المطلوبة</p>
                         <Button asChild className="bg-brand-blue hover:bg-blue-600 text-white px-8">
                             <Link to="/dashboard/finance/bills">
-                                <ArrowLeft className="ml-2 h-4 w-4" />
+                                <ArrowLeft className="ms-2 h-4 w-4" />
                                 العودة إلى قائمة الفواتير
                             </Link>
                         </Button>
@@ -210,7 +210,7 @@ export function BillDetailsView() {
             <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-r border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
                 <div className="max-w-[1600px] mx-auto mb-6">
                     <Link to="/dashboard/finance/bills" className="inline-flex items-center text-slate-500 hover:text-navy transition-colors">
-                        <ArrowLeft className="h-4 w-4 ml-2" />
+                        <ArrowLeft className="h-4 w-4 ms-2" />
                         العودة إلى الفواتير
                     </Link>
                 </div>
@@ -322,30 +322,30 @@ export function BillDetailsView() {
                                 <div className="flex flex-wrap gap-3">
                                     {bill.status === 'pending' && (
                                         <Button className="bg-blue-500 hover:bg-blue-600 text-white">
-                                            <CheckCircle2 className="ml-2 h-4 w-4" />
+                                            <CheckCircle2 className="ms-2 h-4 w-4" />
                                             الموافقة على الفاتورة
                                         </Button>
                                     )}
                                     {(bill.status === 'approved' || bill.status === 'pending') && (
                                         <Button className="bg-emerald-500 hover:bg-emerald-600 text-white">
-                                            <DollarSign className="ml-2 h-4 w-4" />
+                                            <DollarSign className="ms-2 h-4 w-4" />
                                             تسجيل دفعة
                                         </Button>
                                     )}
                                     {bill.status === 'paid' && (
                                         <Button className="bg-purple-500 hover:bg-purple-600 text-white">
-                                            <CheckSquare className="ml-2 h-4 w-4" />
+                                            <CheckSquare className="ms-2 h-4 w-4" />
                                             ترحيل إلى دفتر الأستاذ
                                         </Button>
                                     )}
                                     <Button asChild variant="outline">
                                         <Link to={`/dashboard/finance/bills/${billId}/edit`}>
-                                            <Edit className="ml-2 h-4 w-4" />
+                                            <Edit className="ms-2 h-4 w-4" />
                                             تعديل
                                         </Link>
                                     </Button>
                                     <Button variant="outline" className="text-red-500 hover:bg-red-50 hover:text-red-600">
-                                        <Trash2 className="ml-2 h-4 w-4" />
+                                        <Trash2 className="ms-2 h-4 w-4" />
                                         حذف
                                     </Button>
                                 </div>

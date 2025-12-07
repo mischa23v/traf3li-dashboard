@@ -665,7 +665,7 @@ export function CreateClientView() {
         if (status === 'verified') {
             return (
                 <Badge className="bg-green-100 text-green-700 rounded-full">
-                    <CheckCircle className="w-3 h-3 ml-1" />
+                    <CheckCircle className="w-3 h-3 ms-1" />
                     تم التحقق عبر {service}
                 </Badge>
             )
@@ -773,7 +773,7 @@ export function CreateClientView() {
                                                         <Loader2 className="w-4 h-4 animate-spin" />
                                                     ) : (
                                                         <>
-                                                            <Search className="w-4 h-4 ml-2" />
+                                                            <Search className="w-4 h-4 ms-2" />
                                                             تحقق عبر يقين
                                                         </>
                                                     )}
@@ -899,7 +899,7 @@ export function CreateClientView() {
                                                         <Loader2 className="w-4 h-4 animate-spin" />
                                                     ) : (
                                                         <>
-                                                            <Search className="w-4 h-4 ml-2" />
+                                                            <Search className="w-4 h-4 ms-2" />
                                                             تحقق عبر وثق
                                                         </>
                                                     )}
@@ -1613,7 +1613,7 @@ export function CreateClientView() {
                                                                     <Loader2 className="w-4 h-4 animate-spin" />
                                                                 ) : (
                                                                     <>
-                                                                        <Search className="w-4 h-4 ml-2" />
+                                                                        <Search className="w-4 h-4 ms-2" />
                                                                         تحقق
                                                                     </>
                                                                 )}
@@ -1829,7 +1829,7 @@ export function CreateClientView() {
                                                         {tags.map((tag) => (
                                                             <Badge key={tag} variant="secondary" className="rounded-full">
                                                                 {tag}
-                                                                <button onClick={() => removeTag(tag)} className="ml-1 hover:text-red-500">
+                                                                <button onClick={() => removeTag(tag)} className="ms-1 hover:text-red-500">
                                                                     <X className="w-3 h-3" />
                                                                 </button>
                                                             </Badge>
@@ -1846,14 +1846,14 @@ export function CreateClientView() {
                             <div className="flex justify-between items-center pt-6 border-t border-slate-100">
                                 <Link to="/dashboard/clients">
                                     <Button type="button" variant="ghost" className="text-slate-500 hover:text-slate-700 rounded-xl">
-                                        <X className="ml-2 h-4 w-4" />
+                                        <X className="ms-2 h-4 w-4" />
                                         إلغاء
                                     </Button>
                                 </Link>
 
                                 <div className="flex gap-2">
                                     <Button type="button" variant="outline" className="rounded-xl">
-                                        <Save className="ml-2 h-4 w-4" />
+                                        <Save className="ms-2 h-4 w-4" />
                                         حفظ كمسودة
                                     </Button>
 
@@ -1879,15 +1879,15 @@ export function CreateClientView() {
                                         </DropdownMenuTrigger>
                                         <DropdownMenuContent align="end" className="w-48">
                                             <DropdownMenuItem onClick={handleSubmit}>
-                                                <Save className="ml-2 h-4 w-4" />
+                                                <Save className="ms-2 h-4 w-4" />
                                                 حفظ فقط
                                             </DropdownMenuItem>
                                             <DropdownMenuItem>
-                                                <Briefcase className="ml-2 h-4 w-4" />
+                                                <Briefcase className="ms-2 h-4 w-4" />
                                                 حفظ وإنشاء قضية
                                             </DropdownMenuItem>
                                             <DropdownMenuItem>
-                                                <Mail className="ml-2 h-4 w-4" />
+                                                <Mail className="ms-2 h-4 w-4" />
                                                 حفظ وإرسال ترحيب
                                             </DropdownMenuItem>
                                         </DropdownMenuContent>

@@ -220,7 +220,7 @@ export function RevenueByClientReport() {
                             <div>
                                 <div className="flex items-center gap-3 mb-3">
                                     <Badge className="bg-white/20 hover:bg-white/30 text-white border-0 backdrop-blur-sm">
-                                        <BarChart3 className="w-3 h-3 ml-2" />
+                                        <BarChart3 className="w-3 h-3 ms-2" />
                                         تقرير الإيرادات
                                     </Badge>
                                 </div>
@@ -236,7 +236,7 @@ export function RevenueByClientReport() {
                                     onClick={() => handleExport('csv')}
                                     disabled={isExporting}
                                 >
-                                    <Download className="w-4 h-4 ml-2" />
+                                    <Download className="w-4 h-4 ms-2" />
                                     تصدير CSV
                                 </Button>
                                 <Button
@@ -244,7 +244,7 @@ export function RevenueByClientReport() {
                                     onClick={() => handleExport('pdf')}
                                     disabled={isExporting}
                                 >
-                                    <Download className="w-4 h-4 ml-2" />
+                                    <Download className="w-4 h-4 ms-2" />
                                     تصدير PDF
                                 </Button>
                             </div>
