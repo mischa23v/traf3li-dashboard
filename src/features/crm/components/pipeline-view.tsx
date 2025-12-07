@@ -468,11 +468,11 @@ export function PipelineView() {
 
         <div className="ms-auto flex items-center gap-4">
           <div className="relative hidden md:block">
-            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" aria-hidden="true" />
+            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
             <input
               type="text"
               placeholder="بحث..."
-              className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+              className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
             />
           </div>
           <Button
@@ -603,7 +603,7 @@ export function PipelineView() {
         {pipeline && (
           <div className="flex items-center gap-4 flex-wrap">
             <div className="flex items-center gap-2">
-              <Filter className="w-4 h-4 text-slate-500" aria-hidden="true" />
+              <Filter className="w-4 h-4 text-slate-600" aria-hidden="true" />
               <span className="text-sm text-slate-600">تصفية:</span>
             </div>
             <Select value={filterSource} onValueChange={setFilterSource}>

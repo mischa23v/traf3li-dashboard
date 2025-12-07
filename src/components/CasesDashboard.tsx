@@ -50,7 +50,7 @@ export default function CasesDashboard() {
             timeValue: 1030,
             lawyer: 'sara',
             actionRequired: 'لا يوجد إجراء',
-            actionColor: 'text-slate-400'
+            actionColor: 'text-slate-500'
         },
         {
             id: '411',
@@ -100,7 +100,7 @@ export default function CasesDashboard() {
                         <div className="flex justify-between items-start mb-6">
                             <div>
                                 <h3 className="font-bold text-navy text-xl">المهام العاجلة</h3>
-                                <p className="text-slate-400 text-sm mt-1">تستحق الانتباه</p>
+                                <p className="text-slate-500 text-sm mt-1">تستحق الانتباه</p>
                             </div>
                             <div className="h-12 w-12 rounded-2xl bg-red-50 flex items-center justify-center shadow-sm"><AlertCircle className="h-6 w-6 text-red-500" aria-hidden="true" /></div>
                         </div>
@@ -220,7 +220,7 @@ export default function CasesDashboard() {
                                         </div>
                                         <div>
                                             <div className="font-bold text-xl text-navy mb-1">قضية #{caseItem.id}</div>
-                                            <div className="text-xs font-bold text-slate-400 uppercase tracking-wider">{caseItem.typeLabel}</div>
+                                            <div className="text-xs font-bold text-slate-500 uppercase tracking-wider">{caseItem.typeLabel}</div>
                                         </div>
                                     </div>
                                     <span className={`px-3 py-1.5 rounded-xl text-xs font-bold border ${caseItem.statusColor}`}>{caseItem.statusLabel}</span>
@@ -242,7 +242,7 @@ export default function CasesDashboard() {
                                     {/* Location */}
                                     <div className="flex justify-between items-center text-sm pb-3 border-b border-slate-50 border-dashed">
                                         <span className="text-slate-500 font-medium flex items-center gap-1.5">
-                                            <MapPin className="h-4 w-4 text-slate-400" aria-hidden="true" />
+                                            <MapPin className="h-4 w-4 text-slate-500" aria-hidden="true" />
                                             الموقع
                                         </span>
                                         <span className="font-bold text-slate-800 text-xs bg-slate-50 px-2 py-1 rounded-lg">{typeof caseItem.location === 'string' ? caseItem.location : (caseItem.location?.name || caseItem.location?.address || 'عن بعد')}</span>
@@ -263,7 +263,7 @@ export default function CasesDashboard() {
                                     <div className={`w-2 h-2 rounded-full ${caseItem.actionColor === 'text-brand-blue' ? 'bg-brand-blue animate-pulse' : 'bg-slate-300'}`}></div>
                                     {caseItem.actionRequired}
                                 </span>
-                                <button className="h-9 w-9 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-400 hover:bg-brand-blue hover:text-white hover:border-transparent transition-all duration-300 shadow-sm">
+                                <button className="h-9 w-9 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-500 hover:bg-brand-blue hover:text-white hover:border-transparent transition-all duration-300 shadow-sm">
                                     <ChevronLeft className="h-5 w-5" aria-hidden="true" />
                                 </button>
                             </div>

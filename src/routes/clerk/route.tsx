@@ -96,7 +96,7 @@ function MissingClerkPubKey() {
               <span className='ps-1'>.env</span>
               <pre className='overflow-auto overscroll-x-contain rounded bg-slate-950 px-2 py-1 text-xs'>
                 <code>
-                  <span className='before:text-slate-400 md:before:pe-2 md:before:content-["1."]'>
+                  <span className='before:text-slate-500 md:before:pe-2 md:before:content-["1."]'>
                     VITE_CLERK_PUBLISHABLE_KEY=YOUR_PUBLISHABLE_KEY
                   </span>
                 </code>

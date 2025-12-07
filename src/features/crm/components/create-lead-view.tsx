@@ -318,7 +318,7 @@ export function CreateLeadView() {
     if (score >= 100) return 'text-emerald-600'
     if (score >= 70) return 'text-blue-600'
     if (score >= 40) return 'text-yellow-600'
-    return 'text-slate-400'
+    return 'text-slate-600'
   }
 
   const getScoreLabel = (score: number) => {

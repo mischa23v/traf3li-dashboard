@@ -139,7 +139,7 @@ function ActivityItem({ activity }: ActivityItemProps) {
             </Avatar>
           )}
         </div>
-        <p className="text-xs text-slate-400 mt-1">
+        <p className="text-xs text-slate-500 mt-1">
           {formatDistanceToNow(new Date(activity.createdAt), {
             addSuffix: true,
             locale: dateLocale,

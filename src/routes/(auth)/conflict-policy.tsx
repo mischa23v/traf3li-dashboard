@@ -334,7 +334,7 @@ function ConflictPolicyPage() {
           <p className="text-slate-500 text-sm">
             آخر تحديث: ٢٥ نوفمبر ٢٠٢٥ | الإصدار 1.0
           </p>
-          <p className="text-slate-400 text-xs">
+          <p className="text-slate-500 text-xs">
             © ٢٠٢٥ ترافعلي (TRAF3LI) - جميع الحقوق محفوظة
           </p>
         </div>

@@ -224,7 +224,7 @@ export function CasesListView() {
             <input
               type="text"
               placeholder={t('common.search', 'بحث...')}
-              className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+              className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
             />
           </div>
           <Button
@@ -282,7 +282,7 @@ export function CasesListView() {
                   placeholder={t('cases.searchPlaceholder', 'بحث في القضايا...')}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="border-0 focus-visible:ring-0 text-navy placeholder:text-slate-400 h-9 w-full sm:w-64"
+                  className="border-0 focus-visible:ring-0 text-navy placeholder:text-slate-500 h-9 w-full sm:w-64"
                 />
               </div>
               <div className="flex items-center gap-3">

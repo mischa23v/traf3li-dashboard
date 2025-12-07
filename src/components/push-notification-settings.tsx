@@ -167,7 +167,7 @@ export function PushNotificationSettings() {
         {/* Loading State */}
         {status === 'loading' && (
           <div className="flex items-center justify-center py-4">
-            <Loader2 className="w-6 h-6 animate-spin text-slate-400" />
+            <Loader2 className="w-6 h-6 animate-spin text-slate-500" />
           </div>
         )}
 
