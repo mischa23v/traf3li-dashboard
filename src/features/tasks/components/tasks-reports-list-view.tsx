@@ -167,8 +167,8 @@ export function TasksReportsListView() {
         </div>
         <div className='ms-auto flex items-center gap-2 sm:gap-4 overflow-x-auto min-w-0'>
           <div className="relative hidden md:block min-w-0">
-            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" aria-hidden="true" />
-            <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
+            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
+            <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
           </div>
           <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white flex-shrink-0">
             <Bell className="h-5 w-5" />
@@ -254,7 +254,7 @@ export function TasksReportsListView() {
                 <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
                   <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
                     <div className="relative flex-1 md:w-48">
-                      <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" aria-hidden="true" />
+                      <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
                       <Input
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
@@ -416,7 +416,7 @@ export function TasksReportsListView() {
                                   {report.isFavorite ? (
                                     <Star className="w-4 h-4 text-amber-500 fill-amber-500" />
                                   ) : (
-                                    <StarOff className="w-4 h-4 text-slate-400" />
+                                    <StarOff className="w-4 h-4 text-slate-500" />
                                   )}
                                 </Button>
                                 <DropdownMenu>

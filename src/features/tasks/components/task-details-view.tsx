@@ -479,8 +479,8 @@ export function TaskDetailsView() {
 
                 <div className='ms-auto flex items-center gap-4'>
                     <div className="relative hidden md:block">
-                        <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" aria-hidden="true" />
-                        <input type="text" placeholder="بحث..." aria-label="بحث" className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
+                        <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
+                        <input type="text" placeholder="بحث..." aria-label="بحث" className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
                     </div>
                     <Button variant="ghost" size="icon" aria-label="التنبيهات" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white">
                         <Bell className="h-5 w-5" />
@@ -609,7 +609,7 @@ export function TaskDetailsView() {
                                                         </CardHeader>
                                                         <CardContent className="space-y-3">
                                                             {task.subtasks.length === 0 && !isAddingSubtask && (
-                                                                <div className="text-center py-6 text-slate-400">
+                                                                <div className="text-center py-6 text-slate-500">
                                                                     <CheckSquare className="w-10 h-10 mx-auto mb-2 opacity-30" />
                                                                     <p className="text-sm">لا توجد مهام فرعية</p>
                                                                 </div>
@@ -623,7 +623,7 @@ export function TaskDetailsView() {
                                                                         {subtask.completed && <CheckSquare className="w-3 h-3" />}
                                                                         {toggleSubtaskMutation.isPending && <Loader2 className="w-3 h-3 animate-spin" />}
                                                                     </div>
-                                                                    <span className={`flex-1 font-medium ${subtask.completed ? 'text-slate-400 line-through' : 'text-navy'}`}>
+                                                                    <span className={`flex-1 font-medium ${subtask.completed ? 'text-slate-500 line-through' : 'text-navy'}`}>
                                                                         {subtask.title}
                                                                     </span>
                                                                 </div>
@@ -898,7 +898,7 @@ export function TaskDetailsView() {
                                                                 </>
                                                             ) : (
                                                                 <>
-                                                                    <div className="w-12 h-12 rounded-full bg-slate-100 group-hover:bg-blue-100 flex items-center justify-center text-slate-400 group-hover:text-brand-blue mb-3 transition-colors">
+                                                                    <div className="w-12 h-12 rounded-full bg-slate-100 group-hover:bg-blue-100 flex items-center justify-center text-slate-500 group-hover:text-brand-blue mb-3 transition-colors">
                                                                         <Upload className="h-6 w-6" aria-hidden="true" />
                                                                     </div>
                                                                     <span className="font-bold text-slate-600 group-hover:text-brand-blue">رفع مستند جديد</span>
@@ -921,7 +921,7 @@ export function TaskDetailsView() {
 
                                                         {/* Empty State - Only show if no documents (excluding voice memos) */}
                                                         {task.attachments.filter(a => !a.isVoiceMemo).length === 0 && (
-                                                            <div className="col-span-2 flex flex-col items-center justify-center p-8 text-slate-400">
+                                                            <div className="col-span-2 flex flex-col items-center justify-center p-8 text-slate-500">
                                                                 <FileText className="w-12 h-12 mb-3 opacity-30" aria-hidden="true" />
                                                                 <p>لا توجد مرفقات</p>
                                                                 <p className="text-xs mt-1">اضغط على رفع مستند لإضافة ملفات</p>
