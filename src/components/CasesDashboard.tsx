@@ -186,7 +186,7 @@ export default function CasesDashboard() {
                     <div className="flex items-center gap-3 mt-8 pt-6 border-t border-slate-100">
                         <Button className="bg-brand-blue hover:bg-blue-700 text-white rounded-xl px-8 h-11 font-bold shadow-lg shadow-blue-600/20 transition-all hover:-translate-y-0.5">تطبيق التصفية</Button>
                         <Button variant="ghost" className="text-slate-500 hover:text-red-500 hover:bg-red-50 rounded-xl px-6 h-11 font-medium transition-colors">
-                            <X className="h-4 w-4 ml-2" />
+                            <X className="h-4 w-4 ms-2" />
                             مسح الكل
                         </Button>
                     </div>

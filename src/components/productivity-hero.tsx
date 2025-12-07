@@ -164,7 +164,7 @@ export function ProductivityHero({ badge, title = 'الإنتاجية', type = '
                                     // List mode: Show "Go to List" button
                                     <Button asChild className="bg-emerald-500 hover:bg-emerald-600 text-white h-10 px-5 rounded-xl font-bold shadow-lg shadow-emerald-500/20 border-0 text-sm">
                                         <Link to={listButtonConfig[type]?.href || '/dashboard/tasks/list'}>
-                                            <List className="ml-2 h-4 w-4" />
+                                            <List className="ms-2 h-4 w-4" />
                                             {listButtonConfig[type]?.label || 'القائمة'}
                                         </Link>
                                     </Button>
@@ -172,14 +172,14 @@ export function ProductivityHero({ badge, title = 'الإنتاجية', type = '
                                     // Default mode: Show "Create New" button
                                     <Button asChild className="bg-emerald-500 hover:bg-emerald-600 text-white h-10 px-5 rounded-xl font-bold shadow-lg shadow-emerald-500/20 border-0 text-sm">
                                         <Link to={currentButtonConfig.href}>
-                                            <Plus className="ml-2 h-4 w-4" />
+                                            <Plus className="ms-2 h-4 w-4" />
                                             {currentButtonConfig.label}
                                         </Link>
                                     </Button>
                                 )}
                                 <Button asChild variant="outline" className="h-10 px-5 rounded-xl font-bold border-white/10 text-white hover:bg-white/10 hover:text-white bg-transparent text-sm">
                                     <Link to="/dashboard/tasks/events">
-                                        <CalendarIcon className="ml-2 h-4 w-4" />
+                                        <CalendarIcon className="ms-2 h-4 w-4" />
                                         التقويم
                                     </Link>
                                 </Button>
