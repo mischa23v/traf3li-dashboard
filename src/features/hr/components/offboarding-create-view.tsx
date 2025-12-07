@@ -7,7 +7,7 @@ import { ConfigDrawer } from '@/components/config-drawer'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { ProductivityHero } from '@/components/productivity-hero'
 import { useNavigate, useSearch } from '@tanstack/react-router'
-import { useCreateOnboarding, useUpdateOnboarding, useOnboarding } from '@/hooks/useOnboarding'
+import { useCreateOffboarding, useUpdateOffboarding, useOffboarding } from '@/hooks/useOffboarding'
 import { useEmployees } from '@/hooks/useHR'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -31,11 +31,11 @@ import {
 } from '@/components/ui/collapsible'
 import { cn } from '@/lib/utils'
 import {
-  Search, Bell, ArrowRight, User, Building2, Calendar, Briefcase,
-  CheckCircle, ChevronDown, Users, ClipboardList, Clock, FileText,
-  UserCog, AlertTriangle, Shield
+  Search, Bell, ArrowRight, User, Building2, Calendar,
+  CheckCircle, ChevronDown, Users, Clock, FileText,
+  AlertTriangle, Shield, UserMinus, Briefcase
 } from 'lucide-react'
-import type { CreateOnboardingData } from '@/services/onboardingService'
+import { EXIT_TYPE_LABELS, type ExitType, type CreateOffboardingData } from '@/services/offboardingService'
 
 type OfficeType = 'solo' | 'small' | 'medium' | 'firm'
 
@@ -46,15 +46,15 @@ const OFFICE_TYPES = [
   { value: 'firm', labelAr: 'شركة محاماة', descriptionAr: '٢٠+ موظف', icon: Building2 },
 ]
 
-export function OnboardingCreateView() {
+export function OffboardingCreateView() {
   const navigate = useNavigate()
   const searchParams = useSearch({ strict: false }) as { editId?: string }
   const editId = searchParams?.editId
   const isEditMode = !!editId
 
-  const { data: existingOnboarding, isLoading: isLoadingOnboarding } = useOnboarding(editId || '')
-  const createMutation = useCreateOnboarding()
-  const updateMutation = useUpdateOnboarding()
+  const { data: existingOffboarding, isLoading: isLoadingOffboarding } = useOffboarding(editId || '')
+  const createMutation = useCreateOffboarding()
+  const updateMutation = useUpdateOffboarding()
 
   // Fetch employees for selection
   const { data: employeesData } = useEmployees({ status: 'active' })
@@ -69,16 +69,21 @@ export function OnboardingCreateView() {
   const [employeeId, setEmployeeId] = useState('')
   const [employeeName, setEmployeeName] = useState('')
   const [employeeNameAr, setEmployeeNameAr] = useState('')
+  const [nationalId, setNationalId] = useState('')
   const [jobTitle, setJobTitle] = useState('')
   const [jobTitleAr, setJobTitleAr] = useState('')
   const [department, setDepartment] = useState('')
   const [managerId, setManagerId] = useState('')
   const [managerName, setManagerName] = useState('')
-  const [startDate, setStartDate] = useState('')
-  const [completionTargetDate, setCompletionTargetDate] = useState('')
 
-  // Form State - Probation
-  const [probationPeriod, setProbationPeriod] = useState<number>(90)
+  // Form State - Exit Details
+  const [exitType, setExitType] = useState<ExitType>('resignation')
+  const [noticeDate, setNoticeDate] = useState('')
+  const [lastWorkingDay, setLastWorkingDay] = useState('')
+  const [exitEffectiveDate, setExitEffectiveDate] = useState('')
+
+  // Form State - Notice Period
+  const [noticePeriodDays, setNoticePeriodDays] = useState<number>(30)
 
   // Form State - Notes
   const [hrNotes, setHrNotes] = useState('')
@@ -95,22 +100,25 @@ export function OnboardingCreateView() {
 
   // Populate form when editing
   useEffect(() => {
-    if (existingOnboarding && isEditMode) {
-      setEmployeeId(existingOnboarding.employeeId || '')
-      setEmployeeName(existingOnboarding.employeeName || '')
-      setEmployeeNameAr(existingOnboarding.employeeNameAr || '')
-      setJobTitle(existingOnboarding.jobTitle || '')
-      setJobTitleAr(existingOnboarding.jobTitleAr || '')
-      setDepartment(existingOnboarding.department || '')
-      setManagerId(existingOnboarding.managerId || '')
-      setManagerName(existingOnboarding.managerName || '')
-      setStartDate(existingOnboarding.startDate?.split('T')[0] || '')
-      setCompletionTargetDate(existingOnboarding.completionTargetDate?.split('T')[0] || '')
-      setProbationPeriod(existingOnboarding.probation?.probationPeriod || 90)
-      setHrNotes(existingOnboarding.notes?.hrNotes || '')
-      setManagerNotes(existingOnboarding.notes?.managerNotes || '')
+    if (existingOffboarding && isEditMode) {
+      setEmployeeId(existingOffboarding.employeeId || '')
+      setEmployeeName(existingOffboarding.employeeName || '')
+      setEmployeeNameAr(existingOffboarding.employeeNameAr || '')
+      setNationalId(existingOffboarding.nationalId || '')
+      setJobTitle(existingOffboarding.jobTitle || '')
+      setJobTitleAr(existingOffboarding.jobTitleAr || '')
+      setDepartment(existingOffboarding.department || '')
+      setManagerId(existingOffboarding.managerId || '')
+      setManagerName(existingOffboarding.managerName || '')
+      setExitType(existingOffboarding.exitType)
+      setNoticeDate(existingOffboarding.dates?.noticeDate?.split('T')[0] || '')
+      setLastWorkingDay(existingOffboarding.dates?.lastWorkingDay?.split('T')[0] || '')
+      setExitEffectiveDate(existingOffboarding.dates?.exitEffectiveDate?.split('T')[0] || '')
+      setNoticePeriodDays(existingOffboarding.noticePeriod?.requiredDays || 30)
+      setHrNotes(existingOffboarding.notes?.hrNotes || '')
+      setManagerNotes(existingOffboarding.notes?.managerNotes || '')
     }
-  }, [existingOnboarding, isEditMode])
+  }, [existingOffboarding, isEditMode])
 
   // Handle employee selection
   const handleEmployeeSelect = (selectedEmployeeId: string) => {
@@ -119,6 +127,7 @@ export function OnboardingCreateView() {
     if (employee) {
       setEmployeeName(employee.personalInfo?.fullNameEnglish || '')
       setEmployeeNameAr(employee.personalInfo?.fullNameArabic || '')
+      setNationalId(employee.personalInfo?.nationalId || '')
       setJobTitle(employee.employment?.jobTitle || '')
       setJobTitleAr(employee.employment?.jobTitleArabic || '')
       setDepartment(employee.employment?.departmentName || '')
@@ -136,18 +145,21 @@ export function OnboardingCreateView() {
 
   // Handle submit
   const handleSubmit = async () => {
-    const data: CreateOnboardingData = {
+    const data: CreateOffboardingData = {
       employeeId,
       employeeName,
       employeeNameAr,
+      nationalId,
       jobTitle,
       jobTitleAr,
       department,
       managerId,
       managerName,
-      startDate,
-      completionTargetDate: completionTargetDate || undefined,
-      probationPeriod,
+      exitType,
+      noticeDate: noticeDate || undefined,
+      lastWorkingDay,
+      exitEffectiveDate: exitEffectiveDate || undefined,
+      noticePeriodDays,
       notes: {
         hrNotes: hrNotes || undefined,
         managerNotes: managerNotes || undefined,
@@ -156,7 +168,7 @@ export function OnboardingCreateView() {
 
     if (isEditMode && editId) {
       await updateMutation.mutateAsync({
-        onboardingId: editId,
+        offboardingId: editId,
         data: {
           employeeName,
           employeeNameAr,
@@ -165,9 +177,13 @@ export function OnboardingCreateView() {
           department,
           managerId,
           managerName,
-          startDate,
-          completionTargetDate,
-          probation: { probationPeriod },
+          exitType,
+          dates: {
+            noticeDate,
+            lastWorkingDay,
+            exitEffectiveDate,
+          },
+          noticePeriod: { requiredDays: noticePeriodDays },
           notes: { hrNotes, managerNotes },
         },
       })
@@ -175,13 +191,13 @@ export function OnboardingCreateView() {
       await createMutation.mutateAsync(data)
     }
 
-    navigate({ to: '/dashboard/hr/onboarding' })
+    navigate({ to: '/dashboard/hr/offboarding' })
   }
 
   const topNav = [
     { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
     { title: 'الموظفين', href: '/dashboard/hr/employees', isActive: false },
-    { title: 'التأهيل', href: '/dashboard/hr/onboarding', isActive: true },
+    { title: 'إنهاء الخدمة', href: '/dashboard/hr/offboarding', isActive: true },
   ]
 
   const isPending = createMutation.isPending || updateMutation.isPending
@@ -213,7 +229,7 @@ export function OnboardingCreateView() {
       <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-r border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
         <ProductivityHero
           badge="الموارد البشرية"
-          title={isEditMode ? 'تعديل برنامج التأهيل' : 'إضافة برنامج تأهيل جديد'}
+          title={isEditMode ? 'تعديل سجل إنهاء الخدمة' : 'إضافة سجل إنهاء خدمة جديد'}
           type="employees"
           listMode={true}
         />
@@ -227,16 +243,16 @@ export function OnboardingCreateView() {
                 variant="ghost"
                 size="icon"
                 className="rounded-xl hover:bg-white"
-                onClick={() => navigate({ to: '/dashboard/hr/onboarding' })}
+                onClick={() => navigate({ to: '/dashboard/hr/offboarding' })}
               >
                 <ArrowRight className="h-5 w-5" />
               </Button>
               <div>
                 <h1 className="text-2xl font-bold text-navy">
-                  {isEditMode ? 'تعديل برنامج التأهيل' : 'برنامج تأهيل جديد'}
+                  {isEditMode ? 'تعديل سجل إنهاء الخدمة' : 'سجل إنهاء خدمة جديد'}
                 </h1>
                 <p className="text-slate-500">
-                  {isEditMode ? 'تعديل بيانات برنامج التأهيل' : 'إنشاء برنامج تأهيل لموظف جديد'}
+                  {isEditMode ? 'تعديل بيانات سجل إنهاء الخدمة' : 'إنشاء سجل إنهاء خدمة لموظف'}
                 </p>
               </div>
             </div>
@@ -312,11 +328,13 @@ export function OnboardingCreateView() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label className="text-navy font-medium">المسمى الوظيفي</Label>
+                    <Label className="text-navy font-medium">
+                      رقم الهوية <span className="text-red-500">*</span>
+                    </Label>
                     <Input
-                      value={jobTitleAr}
-                      onChange={(e) => setJobTitleAr(e.target.value)}
-                      placeholder="المسمى الوظيفي بالعربية"
+                      value={nationalId}
+                      onChange={(e) => setNationalId(e.target.value)}
+                      placeholder="رقم الهوية الوطنية أو الإقامة"
                       className="h-11 rounded-xl"
                     />
                   </div>
@@ -333,9 +351,16 @@ export function OnboardingCreateView() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label className="text-navy font-medium">
-                      المدير المباشر <span className="text-red-500">*</span>
-                    </Label>
+                    <Label className="text-navy font-medium">المسمى الوظيفي</Label>
+                    <Input
+                      value={jobTitleAr}
+                      onChange={(e) => setJobTitleAr(e.target.value)}
+                      placeholder="المسمى الوظيفي بالعربية"
+                      className="h-11 rounded-xl"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-navy font-medium">المدير المباشر</Label>
                     <Select value={managerId} onValueChange={handleManagerSelect}>
                       <SelectTrigger className="h-11 rounded-xl">
                         <SelectValue placeholder="اختر المدير" />
@@ -349,15 +374,36 @@ export function OnboardingCreateView() {
                       </SelectContent>
                     </Select>
                   </div>
-                  <div className="space-y-2">
-                    <Label className="text-navy font-medium">اسم المدير</Label>
-                    <Input
-                      value={managerName}
-                      onChange={(e) => setManagerName(e.target.value)}
-                      placeholder="اسم المدير المباشر"
-                      className="h-11 rounded-xl"
-                    />
-                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* EXIT TYPE - Basic */}
+            <Card className="rounded-3xl shadow-sm border-slate-100">
+              <CardHeader className="pb-4">
+                <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
+                  <UserMinus className="w-5 h-5 text-emerald-500" />
+                  نوع إنهاء الخدمة
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                  {Object.entries(EXIT_TYPE_LABELS).map(([key, label]) => (
+                    <button
+                      key={key}
+                      type="button"
+                      onClick={() => setExitType(key as ExitType)}
+                      className={cn(
+                        "p-4 rounded-xl border-2 transition-all text-center",
+                        exitType === key
+                          ? "border-emerald-500 bg-emerald-50 text-emerald-700"
+                          : "border-slate-200 hover:border-slate-300 text-slate-600"
+                      )}
+                    >
+                      <span className="text-sm font-medium block">{label.ar}</span>
+                      <span className="text-xs opacity-75">{label.en}</span>
+                    </button>
+                  ))}
                 </div>
               </CardContent>
             </Card>
@@ -371,24 +417,33 @@ export function OnboardingCreateView() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div className="space-y-2">
-                    <Label className="text-navy font-medium">
-                      تاريخ البدء <span className="text-red-500">*</span>
-                    </Label>
+                    <Label className="text-navy font-medium">تاريخ الإشعار</Label>
                     <Input
                       type="date"
-                      value={startDate}
-                      onChange={(e) => setStartDate(e.target.value)}
+                      value={noticeDate}
+                      onChange={(e) => setNoticeDate(e.target.value)}
                       className="h-11 rounded-xl"
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-navy font-medium">تاريخ الإكمال المستهدف</Label>
+                    <Label className="text-navy font-medium">
+                      آخر يوم عمل <span className="text-red-500">*</span>
+                    </Label>
                     <Input
                       type="date"
-                      value={completionTargetDate}
-                      onChange={(e) => setCompletionTargetDate(e.target.value)}
+                      value={lastWorkingDay}
+                      onChange={(e) => setLastWorkingDay(e.target.value)}
+                      className="h-11 rounded-xl"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-navy font-medium">تاريخ سريان الإنهاء</Label>
+                    <Input
+                      type="date"
+                      value={exitEffectiveDate}
+                      onChange={(e) => setExitEffectiveDate(e.target.value)}
                       className="h-11 rounded-xl"
                     />
                   </div>
@@ -396,37 +451,35 @@ export function OnboardingCreateView() {
               </CardContent>
             </Card>
 
-            {/* PROBATION - Basic */}
+            {/* NOTICE PERIOD - Basic */}
             <Card className="rounded-3xl shadow-sm border-slate-100">
               <CardHeader className="pb-4">
                 <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
                   <Clock className="w-5 h-5 text-emerald-500" />
-                  فترة التجربة
+                  فترة الإشعار (المادة 75)
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label className="text-navy font-medium">
-                      مدة فترة التجربة (أيام) <span className="text-red-500">*</span>
+                      مدة فترة الإشعار (أيام) <span className="text-red-500">*</span>
                     </Label>
                     <Select
-                      value={probationPeriod.toString()}
-                      onValueChange={(v) => setProbationPeriod(parseInt(v))}
+                      value={noticePeriodDays.toString()}
+                      onValueChange={(v) => setNoticePeriodDays(parseInt(v))}
                     >
                       <SelectTrigger className="h-11 rounded-xl">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="30">30 يوم</SelectItem>
-                        <SelectItem value="60">60 يوم</SelectItem>
-                        <SelectItem value="90">90 يوم (الافتراضي)</SelectItem>
-                        <SelectItem value="120">120 يوم</SelectItem>
-                        <SelectItem value="180">180 يوم (الحد الأقصى)</SelectItem>
+                        <SelectItem value="30">30 يوم (للموظفين)</SelectItem>
+                        <SelectItem value="60">60 يوم (للمناصب القيادية)</SelectItem>
+                        <SelectItem value="0">بدون فترة إشعار</SelectItem>
                       </SelectContent>
                     </Select>
                     <p className="text-xs text-slate-500">
-                      وفقاً للمادة 53 من نظام العمل السعودي: الحد الأقصى لفترة التجربة 180 يوم
+                      وفقاً للمادة 75 من نظام العمل السعودي
                     </p>
                   </div>
                 </div>
@@ -487,22 +540,32 @@ export function OnboardingCreateView() {
                   <div className="flex items-start gap-2">
                     <AlertTriangle className="w-4 h-4 mt-0.5 flex-shrink-0" />
                     <div>
-                      <p className="font-medium">المادة 53 - فترة التجربة:</p>
+                      <p className="font-medium">المادة 75 - فترة الإشعار:</p>
                       <ul className="list-disc list-inside mr-4 mt-1 space-y-1">
-                        <li>الحد الأقصى لفترة التجربة 180 يوماً</li>
-                        <li>يجب النص عليها كتابةً في عقد العمل</li>
-                        <li>لا تحتسب إجازات العيدين والإجازات المرضية</li>
+                        <li>يجب على الطرف الراغب في إنهاء العقد إشعار الطرف الآخر كتابياً</li>
+                        <li>فترة الإشعار 60 يوماً للموظفين بأجر شهري، 30 يوماً لغيرهم</li>
+                        <li>يستحق العامل أجره عن فترة الإشعار</li>
                       </ul>
                     </div>
                   </div>
                   <div className="flex items-start gap-2">
                     <AlertTriangle className="w-4 h-4 mt-0.5 flex-shrink-0" />
                     <div>
-                      <p className="font-medium">المتطلبات الأساسية:</p>
+                      <p className="font-medium">المادة 84-87 - مكافأة نهاية الخدمة:</p>
                       <ul className="list-disc list-inside mr-4 mt-1 space-y-1">
-                        <li>يجب توقيع عقد العمل قبل بدء فترة التأهيل</li>
-                        <li>التدريب على أنظمة العمل إلزامي</li>
-                        <li>مراجعة أداء دورية كل 30 يوم</li>
+                        <li>نصف راتب شهر عن كل سنة من السنوات الخمس الأولى</li>
+                        <li>راتب شهر كامل عن كل سنة تالية</li>
+                        <li>تحسب المكافأة على أساس آخر راتب</li>
+                      </ul>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <AlertTriangle className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                    <div>
+                      <p className="font-medium">شهادة الخبرة:</p>
+                      <ul className="list-disc list-inside mr-4 mt-1 space-y-1">
+                        <li>يلتزم صاحب العمل بإعطاء العامل شهادة خدمة مجاناً</li>
+                        <li>يجب أن تتضمن تاريخ بداية ونهاية الخدمة</li>
                       </ul>
                     </div>
                   </div>
@@ -514,14 +577,14 @@ export function OnboardingCreateView() {
             <div className="flex items-center justify-end gap-4">
               <Button
                 variant="outline"
-                onClick={() => navigate({ to: '/dashboard/hr/onboarding' })}
+                onClick={() => navigate({ to: '/dashboard/hr/offboarding' })}
                 className="rounded-xl"
               >
                 إلغاء
               </Button>
               <Button
                 onClick={handleSubmit}
-                disabled={!employeeId || !managerId || !startDate || isPending}
+                disabled={!employeeId || !nationalId || !lastWorkingDay || isPending}
                 className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl px-8"
               >
                 {isPending ? (
@@ -529,7 +592,7 @@ export function OnboardingCreateView() {
                 ) : (
                   <>
                     <CheckCircle className="w-4 h-4 ml-2" />
-                    {isEditMode ? 'حفظ التعديلات' : 'إنشاء برنامج التأهيل'}
+                    {isEditMode ? 'حفظ التعديلات' : 'إنشاء سجل إنهاء الخدمة'}
                   </>
                 )}
               </Button>

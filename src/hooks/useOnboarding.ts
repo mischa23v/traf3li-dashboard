@@ -207,7 +207,7 @@ export const useAddProbationReview = () => {
   })
 }
 
-// Complete probation
+// Complete probation (no extension - max 180 days per Saudi Labor Law Article 53)
 export const useCompleteProbation = () => {
   const queryClient = useQueryClient()
 
@@ -218,14 +218,11 @@ export const useCompleteProbation = () => {
         decision: ProbationDecision
         decisionReason: string
         confirmationDate?: string
-        extensionDays?: number
-        extensionReason?: string
       }
     }) => completeProbation(onboardingId, data),
     onSuccess: (_, variables) => {
       const messages: Record<ProbationDecision, string> = {
         confirm: 'تم تثبيت الموظف بنجاح',
-        extend: 'تم تمديد فترة التجربة',
         terminate: 'تم إنهاء فترة التجربة',
       }
       toast.success(messages[variables.data.decision])
