@@ -98,7 +98,6 @@ export function RichDocumentView({
       await restoreMutation.mutateAsync({ caseId, docId, versionNumber })
       setShowVersions(false)
     } catch (err) {
-      console.error('Restore error:', err)
     }
   }
 
@@ -141,12 +140,12 @@ export function RichDocumentView({
       <div className="space-y-6">
         {onBack && (
           <Button variant="outline" onClick={onBack} className="rounded-xl">
-            <ArrowLeft className="h-4 w-4 me-2" />
+            <ArrowLeft className="h-4 w-4 me-2" aria-hidden="true" />
             {isArabic ? 'رجوع' : 'Back'}
           </Button>
         )}
         <Alert className="border-red-200 bg-red-50">
-          <AlertCircle className="h-4 w-4 text-red-600" />
+          <AlertCircle className="h-4 w-4 text-red-600" aria-hidden="true" />
           <AlertDescription className="text-red-800">
             {isArabic ? 'حدث خطأ أثناء تحميل المستند' : 'Error loading document'}: {error?.message}
           </AlertDescription>
@@ -160,12 +159,12 @@ export function RichDocumentView({
       <div className="space-y-6">
         {onBack && (
           <Button variant="outline" onClick={onBack} className="rounded-xl">
-            <ArrowLeft className="h-4 w-4 me-2" />
+            <ArrowLeft className="h-4 w-4 me-2" aria-hidden="true" />
             {isArabic ? 'رجوع' : 'Back'}
           </Button>
         )}
         <Alert className="border-amber-200 bg-amber-50">
-          <AlertCircle className="h-4 w-4 text-amber-600" />
+          <AlertCircle className="h-4 w-4 text-amber-600" aria-hidden="true" />
           <AlertDescription className="text-amber-800">
             {isArabic ? 'المستند غير موجود' : 'Document not found'}
           </AlertDescription>
@@ -181,7 +180,7 @@ export function RichDocumentView({
         <div className="flex items-center gap-4">
           {onBack && (
             <Button variant="outline" onClick={onBack} className="rounded-xl">
-              <ArrowLeft className="h-4 w-4 me-2" />
+              <ArrowLeft className="h-4 w-4 me-2" aria-hidden="true" />
               {isArabic ? 'رجوع' : 'Back'}
             </Button>
           )}
@@ -190,7 +189,7 @@ export function RichDocumentView({
               {isArabic ? document.titleAr || document.title : document.title || document.titleAr}
             </h1>
             <div className="flex items-center gap-2 mt-1 text-sm text-slate-500">
-              <Clock className="h-4 w-4" />
+              <Clock className="h-4 w-4" aria-hidden="true" />
               {isArabic ? 'آخر تعديل: ' : 'Last updated: '}
               {new Date(document.updatedAt).toLocaleString(isArabic ? 'ar-SA' : 'en-US')}
             </div>
@@ -202,14 +201,14 @@ export function RichDocumentView({
               onClick={() => onEdit(document)}
               className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl"
             >
-              <Edit className="h-4 w-4 me-2" />
+              <Edit className="h-4 w-4 me-2" aria-hidden="true" />
               {isArabic ? 'تعديل' : 'Edit'}
             </Button>
           )}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" className="rounded-xl">
-                <Download className="h-4 w-4 me-2" />
+                <Download className="h-4 w-4 me-2" aria-hidden="true" />
                 {isArabic ? 'تصدير' : 'Export'}
               </Button>
             </DropdownMenuTrigger>
@@ -218,21 +217,21 @@ export function RichDocumentView({
                 onClick={() => handleExport('pdf')}
                 disabled={exportMutation.isPending}
               >
-                <Download className="h-4 w-4 me-2" />
+                <Download className="h-4 w-4 me-2" aria-hidden="true" />
                 PDF
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() => handleExport('latex')}
                 disabled={exportMutation.isPending}
               >
-                <FileCode className="h-4 w-4 me-2" />
+                <FileCode className="h-4 w-4 me-2" aria-hidden="true" />
                 LaTeX
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() => handleExport('markdown')}
                 disabled={exportMutation.isPending}
               >
-                <FileType className="h-4 w-4 me-2" />
+                <FileType className="h-4 w-4 me-2" aria-hidden="true" />
                 Markdown
               </DropdownMenuItem>
               <DropdownMenuSeparator />
@@ -240,7 +239,7 @@ export function RichDocumentView({
                 onClick={() => handleExport('preview')}
                 disabled={exportMutation.isPending}
               >
-                <Eye className="h-4 w-4 me-2" />
+                <Eye className="h-4 w-4 me-2" aria-hidden="true" />
                 {isArabic ? 'معاينة' : 'Preview'}
               </DropdownMenuItem>
             </DropdownMenuContent>
@@ -250,7 +249,7 @@ export function RichDocumentView({
             onClick={() => setShowVersions(true)}
             className="rounded-xl"
           >
-            <History className="h-4 w-4 me-2" />
+            <History className="h-4 w-4 me-2" aria-hidden="true" />
             {isArabic ? 'سجل الإصدارات' : 'Version History'}
           </Button>
         </div>
@@ -277,7 +276,7 @@ export function RichDocumentView({
               </Badge>
             </div>
             <div className="flex items-center gap-2 text-sm text-slate-600">
-              <FileText className="h-4 w-4" />
+              <FileText className="h-4 w-4" aria-hidden="true" />
               {isArabic ? 'الإصدار' : 'Version'} {document.version}
             </div>
             {document.wordCount && (
@@ -287,7 +286,7 @@ export function RichDocumentView({
             )}
             {document.showOnCalendar && (
               <div className="flex items-center gap-2 text-sm text-emerald-600">
-                <Calendar className="h-4 w-4" />
+                <Calendar className="h-4 w-4" aria-hidden="true" />
                 {isArabic ? 'مُضاف للتقويم' : 'On Calendar'}
               </div>
             )}
@@ -299,7 +298,7 @@ export function RichDocumentView({
       <Card className="border border-slate-100 shadow-sm rounded-2xl">
         <CardHeader className="border-b border-slate-50">
           <CardTitle className="text-lg font-bold text-navy flex items-center gap-2">
-            <FileText className="h-5 w-5 text-emerald-500" />
+            <FileText className="h-5 w-5 text-emerald-500" aria-hidden="true" />
             {isArabic ? 'محتوى المستند' : 'Document Content'}
           </CardTitle>
         </CardHeader>
@@ -322,7 +321,7 @@ export function RichDocumentView({
         <DialogContent className="max-w-2xl max-h-[80vh]">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <History className="h-5 w-5 text-emerald-500" />
+              <History className="h-5 w-5 text-emerald-500" aria-hidden="true" />
               {isArabic ? 'سجل الإصدارات' : 'Version History'}
             </DialogTitle>
           </DialogHeader>
@@ -361,11 +360,11 @@ export function RichDocumentView({
                         </div>
                         <div className="flex items-center gap-4 text-sm text-slate-500">
                           <span className="flex items-center gap-1">
-                            <Clock className="h-3 w-3" />
+                            <Clock className="h-3 w-3" aria-hidden="true" />
                             {new Date(version.editedAt).toLocaleString(isArabic ? 'ar-SA' : 'en-US')}
                           </span>
                           <span className="flex items-center gap-1">
-                            <User className="h-3 w-3" />
+                            <User className="h-3 w-3" aria-hidden="true" />
                             {getEditorName(version.editedBy)}
                           </span>
                         </div>
@@ -383,7 +382,7 @@ export function RichDocumentView({
                           disabled={restoreMutation.isPending}
                           className="rounded-lg"
                         >
-                          <RotateCcw className="h-4 w-4 me-1" />
+                          <RotateCcw className="h-4 w-4 me-1" aria-hidden="true" />
                           {isArabic ? 'استعادة' : 'Restore'}
                         </Button>
                       )}

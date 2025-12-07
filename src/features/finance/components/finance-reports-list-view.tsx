@@ -227,7 +227,7 @@ export function FinanceReportsListView() {
                 <CardContent className="p-4">
                   <div className="flex items-center gap-3">
                     <div className="p-2 bg-purple-100 rounded-xl">
-                      <Clock className="w-5 h-5 text-purple-600" />
+                      <Clock className="w-5 h-5 text-purple-600" aria-hidden="true" />
                     </div>
                     <div>
                       <p className="text-xs text-slate-500">تقارير مجدولة</p>
@@ -349,7 +349,7 @@ export function FinanceReportsListView() {
             ) : error ? (
               <Card className="rounded-2xl border-slate-100">
                 <CardContent className="p-8 text-center">
-                  <AlertCircle className="w-8 h-8 mx-auto text-red-500" />
+                  <AlertCircle className="w-8 h-8 mx-auto text-red-500" aria-hidden="true" />
                   <p className="mt-4 text-red-600">حدث خطأ في تحميل البيانات</p>
                 </CardContent>
               </Card>
@@ -430,7 +430,7 @@ export function FinanceReportsListView() {
                                   </DropdownMenuTrigger>
                                   <DropdownMenuContent align="end">
                                     <DropdownMenuItem onClick={() => navigate({ to: `/dashboard/finance/reports/${report.reportId}` })}>
-                                      <Eye className="w-4 h-4 ms-2" />
+                                      <Eye className="w-4 h-4 ms-2" aria-hidden="true" />
                                       عرض التفاصيل
                                     </DropdownMenuItem>
                                     <DropdownMenuItem>
