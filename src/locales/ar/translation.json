@@ -2131,5 +2131,1120 @@
     "testSent": "تم إرسال الإشعار التجريبي",
     "testFailed": "فشل في إرسال الإشعار التجريبي",
     "error": "حدث خطأ"
+  },
+  "hr": {
+    "title": "الموارد البشرية",
+    "nav": {
+      "overview": "نظرة عامة",
+      "employees": "الموظفون",
+      "salaries": "الرواتب",
+      "leaves": "الإجازات",
+      "payroll": "كشوف الرواتب"
+    },
+    "employees": {
+      "title": "الموظفون",
+      "listTitle": "قائمة الموظفين",
+      "addButton": "إضافة موظف",
+      "editEmployee": "تعديل الموظف",
+      "newEmployee": "إضافة موظف جديد",
+      "viewProfile": "عرض الملف الشخصي",
+      "viewAll": "عرض جميع الموظفين",
+      "deleteButton": "حذف الموظف",
+      "deleteConfirm": "هل أنت متأكد من حذف هذا الموظف؟",
+      "bulkDeleteConfirm": "هل أنت متأكد من حذف {{count}} موظف؟",
+      "loadError": "خطأ في تحميل الموظفين",
+      "searchPlaceholder": "البحث بالاسم أو رقم الموظف...",
+      "employeeCount": "موظف",
+      "empty": {
+        "title": "لا يوجد موظفون",
+        "subtitle": "ابدأ بإضافة موظف جديد"
+      },
+      "stats": {
+        "totalEmployees": "إجمالي الموظفين",
+        "active": "نشط",
+        "onLeave": "في إجازة",
+        "saudizationRate": "نسبة السعودة"
+      },
+      "fields": {
+        "fullNameArabic": "الاسم الكامل (بالعربية)",
+        "fullNameEnglish": "الاسم الكامل (بالإنجليزية)",
+        "nationalId": "رقم الهوية",
+        "nationalIdType": "نوع الهوية",
+        "nationalIdExpiry": "تاريخ انتهاء الهوية",
+        "gender": "الجنس",
+        "dateOfBirth": "تاريخ الميلاد",
+        "nationality": "الجنسية",
+        "maritalStatus": "الحالة الاجتماعية",
+        "dependents": "عدد المعالين",
+        "mobile": "رقم الجوال",
+        "email": "البريد الإلكتروني",
+        "personalEmail": "البريد الإلكتروني الشخصي",
+        "city": "المدينة",
+        "region": "المنطقة",
+        "emergencyContact": "جهة الاتصال للطوارئ",
+        "relationship": "صلة القرابة",
+        "phone": "رقم الهاتف",
+        "hireDate": "تاريخ التعيين",
+        "jobTitle": "المسمى الوظيفي",
+        "jobTitleArabic": "المسمى الوظيفي (بالعربية)",
+        "jobTitleEnglish": "المسمى الوظيفي (بالإنجليزية)",
+        "department": "القسم",
+        "employmentType": "نوع التوظيف",
+        "contractType": "نوع العقد",
+        "contractStartDate": "تاريخ بداية العقد",
+        "contractEndDate": "تاريخ نهاية العقد",
+        "probationPeriod": "فترة التجربة (أيام)",
+        "employeeNumber": "الرقم الوظيفي",
+        "weeklyHours": "ساعات العمل الأسبوعية",
+        "dailyHours": "ساعات العمل اليومية",
+        "restDay": "يوم الراحة",
+        "basicSalary": "الراتب الأساسي",
+        "grossSalary": "إجمالي الراتب الشهري",
+        "bankName": "اسم البنك",
+        "iban": "رقم الآيبان",
+        "gosiRegistered": "مسجل في التأمينات",
+        "gosiNumber": "رقم التأمينات",
+        "branch": "الفرع",
+        "team": "الفريق",
+        "supervisor": "المشرف المباشر",
+        "costCenter": "مركز التكلفة",
+        "annualLeaveBalance": "رصيد الإجازة السنوية (أيام)"
+      }
+    },
+    "employmentStatus": {
+      "active": "نشط",
+      "onLeave": "في إجازة",
+      "suspended": "موقوف",
+      "terminated": "منتهي"
+    },
+    "employmentType": {
+      "fullTime": "دوام كامل",
+      "partTime": "دوام جزئي",
+      "contract": "عقد",
+      "temporary": "مؤقت"
+    },
+    "contractType": {
+      "indefinite": "غير محدد المدة",
+      "fixedTerm": "محدد المدة"
+    },
+    "allowances": {
+      "title": "البدلات",
+      "housing": "بدل السكن",
+      "transportation": "بدل المواصلات",
+      "food": "بدل الطعام",
+      "phone": "بدل الهاتف",
+      "medical": "بدل طبي",
+      "education": "بدل تعليم",
+      "fuel": "بدل وقود",
+      "remoteWork": "بدل العمل عن بُعد",
+      "custom": "مخصص...",
+      "total": "إجمالي البدلات",
+      "add": "إضافة بدل",
+      "none": "لا توجد بدلات",
+      "addInstruction": "انقر \"إضافة بدل\" لإضافة بدلات الموظف"
+    },
+    "leave": {
+      "title": "طلبات الإجازة",
+      "listTitle": "طلبات الإجازة",
+      "addRequest": "طلب إجازة",
+      "newRequest": "طلب إجازة جديد",
+      "viewRequest": "عرض الطلب",
+      "viewAll": "عرض جميع الطلبات",
+      "deleteConfirm": "هل أنت متأكد من حذف هذا الطلب؟",
+      "loadError": "خطأ في تحميل الطلبات",
+      "searchPlaceholder": "البحث بالاسم أو الرقم...",
+      "requestCount": "طلب",
+      "subtitle": "تقديم طلب إجازة وفقاً لنظام العمل السعودي",
+      "submitRequest": "تقديم الطلب",
+      "empty": {
+        "title": "لا توجد طلبات إجازة",
+        "subtitle": "قدم طلب إجازة جديد للبدء"
+      },
+      "stats": {
+        "totalRequests": "إجمالي الطلبات",
+        "pendingApproval": "بانتظار الموافقة",
+        "onLeaveToday": "في إجازة اليوم",
+        "averageLeaveDays": "متوسط أيام الإجازة"
+      },
+      "fields": {
+        "type": "نوع الإجازة",
+        "startDate": "تاريخ البداية",
+        "endDate": "تاريخ النهاية",
+        "returnDate": "تاريخ العودة",
+        "numberOfDays": "عدد الأيام",
+        "remainingBalance": "الرصيد المتبقي",
+        "reason": "السبب"
+      },
+      "tabs": {
+        "overview": "نظرة عامة",
+        "details": "التفاصيل",
+        "approvals": "الموافقات",
+        "documents": "المستندات",
+        "handover": "تسليم العمل",
+        "notes": "ملاحظات"
+      },
+      "actions": {
+        "approve": "موافقة",
+        "reject": "رفض",
+        "confirmReturn": "تأكيد العودة",
+        "cancelRequest": "إلغاء الطلب"
+      },
+      "annual": {
+        "title": "الإجازة السنوية",
+        "entitlement": "الاستحقاق",
+        "used": "المستخدم",
+        "pending": "قيد الانتظار",
+        "remaining": "المتبقي"
+      },
+      "sick": {
+        "title": "الإجازة المرضية",
+        "fullPay": "100% (30 يوم)",
+        "partialPay": "75% (60 يوم)",
+        "unpaid": "بدون راتب (30 يوم)",
+        "remaining": "المتبقي من 120 يوم"
+      },
+      "hajj": {
+        "title": "إجازة الحج",
+        "eligible": "مؤهل",
+        "notEligible": "غير مؤهل (بعد سنتين من الخدمة)",
+        "usedOn": "استخدمت في"
+      }
+    },
+    "leaveType": {
+      "annual": "إجازة سنوية",
+      "sick": "إجازة مرضية",
+      "hajj": "إجازة حج",
+      "marriage": "إجازة زواج",
+      "birth": "إجازة ولادة",
+      "death": "إجازة وفاة",
+      "maternity": "إجازة أمومة",
+      "paternity": "إجازة أبوة",
+      "exam": "إجازة امتحانات",
+      "unpaid": "إجازة بدون راتب"
+    },
+    "leaveStatus": {
+      "draft": "مسودة",
+      "submitted": "مقدم",
+      "pendingApproval": "بانتظار الموافقة",
+      "approved": "موافق عليه",
+      "rejected": "مرفوض",
+      "cancelled": "ملغي",
+      "completed": "مكتمل"
+    },
+    "payroll": {
+      "title": "كشوف الرواتب",
+      "listTitle": "كشوف الرواتب",
+      "slipBadge": "كشف راتب",
+      "createSlip": "إنشاء كشف",
+      "slipCount": "كشف",
+      "deleteConfirm": "هل أنت متأكد من حذف هذا الكشف؟",
+      "loadError": "خطأ في تحميل الكشوف",
+      "searchPlaceholder": "البحث بالاسم أو الرقم...",
+      "empty": {
+        "title": "كشف الراتب غير موجود",
+        "subtitle": "كشف الراتب المطلوب غير موجود"
+      },
+      "tabs": {
+        "overview": "نظرة عامة",
+        "earnings": "المستحقات",
+        "deductions": "الاستقطاعات",
+        "payment": "الدفع"
+      },
+      "fields": {
+        "payPeriod": "فترة الدفع",
+        "month": "الشهر",
+        "workingDays": "أيام العمل",
+        "daysWorked": "الأيام المعمولة",
+        "paymentDate": "تاريخ الدفع",
+        "netPay": "صافي الراتب",
+        "totalEarnings": "إجمالي المستحقات",
+        "totalDeductions": "إجمالي الاستقطاعات",
+        "basicSalary": "الراتب الأساسي",
+        "overtime": "العمل الإضافي",
+        "socialInsurance": "التأمينات الاجتماعية",
+        "incomeTax": "ضريبة الدخل"
+      },
+      "stats": {
+        "totalSlips": "إجمالي الكشوف",
+        "paid": "مدفوع",
+        "processing": "قيد المعالجة",
+        "totalAmount": "إجمالي المبلغ"
+      }
+    },
+    "paymentStatus": {
+      "draft": "مسودة",
+      "approved": "موافق عليه",
+      "processing": "قيد المعالجة",
+      "paid": "مدفوع",
+      "failed": "فشل",
+      "cancelled": "ملغي"
+    }
+  },
+  "finance": {
+    "title": "المالية",
+    "nav": {
+      "overview": "نظرة عامة",
+      "invoices": "الفواتير",
+      "expenses": "المصروفات",
+      "statements": "كشوف الحساب",
+      "transactions": "المعاملات",
+      "timeTracking": "تتبع الوقت",
+      "accountActivity": "نشاط الحساب",
+      "quotes": "عروض الأسعار",
+      "payments": "المدفوعات"
+    },
+    "invoices": {
+      "title": "الفواتير",
+      "createNew": "إنشاء فاتورة جديدة",
+      "newInvoice": "فاتورة جديدة",
+      "viewInvoice": "عرض الفاتورة",
+      "backToList": "العودة للفواتير",
+      "taxInvoice": "فاتورة ضريبية",
+      "invoiceItems": "بنود الفاتورة",
+      "invoiceNumber": "رقم الفاتورة",
+      "loadError": "فشل في تحميل الفواتير",
+      "detailsLoadError": "فشل في تحميل تفاصيل الفاتورة",
+      "notFound": "الفاتورة غير موجودة",
+      "notFoundDescription": "لم نتمكن من العثور على الفاتورة المطلوبة",
+      "searchPlaceholder": "البحث في الفواتير...",
+      "noMatchingResults": "لا توجد فواتير تطابق البحث أو الفلاتر المحددة",
+      "sendReminder": "إرسال تذكير",
+      "empty": {
+        "title": "لا توجد فواتير بعد",
+        "description": "ابدأ بإنشاء أول فاتورة للعملاء"
+      },
+      "status": {
+        "all": "الكل",
+        "pending": "معلقة",
+        "paid": "مدفوعة",
+        "overdue": "متأخرة",
+        "cancelled": "ملغاة",
+        "draft": "مسودة",
+        "partial": "مدفوعة جزئياً",
+        "sent": "مرسلة"
+      },
+      "fields": {
+        "client": "العميل",
+        "clientUnspecified": "العميل غير محدد",
+        "case": "القضية (اختياري)",
+        "selectClient": "اختر العميل",
+        "selectClientFirst": "اختر العميل أولاً",
+        "selectCase": "اختر القضية",
+        "noCase": "بدون قضية",
+        "clientType": "نوع العميل",
+        "issueDate": "تاريخ الإصدار",
+        "dueDate": "تاريخ الاستحقاق",
+        "paymentTerms": "شروط الدفع",
+        "description": "الوصف",
+        "quantity": "الكمية",
+        "price": "السعر",
+        "total": "الإجمالي",
+        "subtotal": "المجموع الفرعي",
+        "discount": "الخصم",
+        "vat": "ضريبة القيمة المضافة (15%)",
+        "retainerApplied": "الدفعة المقدمة المطبقة",
+        "balanceDue": "الرصيد المستحق"
+      },
+      "clientTypes": {
+        "individual": "فرد",
+        "corporate": "شركة",
+        "government": "حكومي"
+      },
+      "paymentTerms": {
+        "dueOnReceipt": "عند الاستلام",
+        "net7": "7 أيام",
+        "net15": "15 يوم",
+        "net30": "30 يوم",
+        "net45": "45 يوم",
+        "net60": "60 يوم",
+        "net90": "90 يوم",
+        "eom": "نهاية الشهر",
+        "custom": "مخصص"
+      },
+      "actions": {
+        "addItem": "إضافة بند",
+        "importFromHours": "استيراد من الساعات",
+        "importFromExpenses": "استيراد من المصروفات",
+        "saveAsDraft": "حفظ كمسودة",
+        "previewPdf": "معاينة PDF",
+        "sendForApproval": "إرسال للموافقة",
+        "saveAndSend": "حفظ وإرسال",
+        "saveAndEmail": "حفظ وإرسال بالبريد",
+        "saveAndDownloadPdf": "حفظ وتحميل PDF",
+        "saveAndPrint": "حفظ وطباعة",
+        "saveOnly": "حفظ فقط"
+      }
+    },
+    "expenses": {
+      "title": "المصروفات",
+      "addNew": "إضافة مصروف جديد",
+      "viewReceipt": "عرض الإيصال",
+      "backToList": "العودة للمصروفات",
+      "expenseDetails": "تفاصيل المصروف",
+      "loadError": "فشل في تحميل المصروفات",
+      "detailsLoadError": "فشل في تحميل تفاصيل المصروف",
+      "notFound": "المصروف غير موجود",
+      "notFoundDescription": "لم نتمكن من العثور على المصروف المطلوب",
+      "searchPlaceholder": "البحث في المصروفات...",
+      "empty": {
+        "title": "لا توجد مصروفات بعد",
+        "description": "ابدأ بإضافة أول مصروف"
+      },
+      "tabs": {
+        "all": "الكل",
+        "cases": "القضايا",
+        "general": "عام",
+        "pending": "معلق"
+      },
+      "status": {
+        "approved": "موافق عليه",
+        "pending": "معلق"
+      },
+      "fields": {
+        "amount": "المبلغ",
+        "date": "التاريخ",
+        "case": "القضية",
+        "category": "الفئة",
+        "referenceNumber": "رقم المرجع",
+        "description": "الوصف",
+        "generalExpense": "مصروف عام"
+      },
+      "types": {
+        "reimbursable": "مصروف شخصي (قابل للاسترداد)",
+        "reimbursableDesc": "دفع من الموظف، سيتم استرداده",
+        "company": "مصروف الشركة",
+        "companyDesc": "دفع مباشر من الشركة"
+      }
+    },
+    "payments": {
+      "title": "المدفوعات",
+      "viewInvoices": "عرض الفواتير",
+      "downloadReceipt": "تحميل الإيصال",
+      "sendByEmail": "إرسال بالبريد",
+      "loadError": "فشل في تحميل المدفوعات",
+      "searchPlaceholder": "البحث في المدفوعات...",
+      "noMatchingResults": "لا توجد مدفوعات تطابق البحث أو الفلاتر المحددة",
+      "empty": {
+        "title": "لا توجد مدفوعات بعد",
+        "description": "ستظهر المدفوعات هنا عند تسجيل دفعات الفواتير"
+      },
+      "status": {
+        "all": "الكل",
+        "pending": "معلق",
+        "completed": "مكتمل",
+        "failed": "فاشل",
+        "refunded": "مسترد"
+      },
+      "fields": {
+        "invoice": "الفاتورة",
+        "paymentDate": "تاريخ الدفع",
+        "paymentMethod": "طريقة الدفع",
+        "amount": "المبلغ",
+        "payment": "دفعة"
+      }
+    },
+    "timeEntries": {
+      "title": "تتبع الوقت",
+      "manualEntry": "إدخال يدوي",
+      "editEntry": "تعديل الإدخال",
+      "createInvoice": "إنشاء فاتورة",
+      "loadError": "خطأ في تحميل إدخالات الوقت",
+      "searchPlaceholder": "البحث في الإدخالات...",
+      "empty": {
+        "title": "لا توجد إدخالات وقت",
+        "description": "ابدأ بتتبع وقتك باستخدام المؤقت أو سجل الوقت يدوياً"
+      },
+      "status": {
+        "all": "الكل",
+        "unbilled": "غير مفوتر",
+        "billed": "مفوتر",
+        "nonBillable": "غير قابل للفوترة"
+      },
+      "fields": {
+        "duration": "المدة",
+        "value": "القيمة",
+        "hours": "س",
+        "unspecifiedTask": "المهمة غير محددة"
+      }
+    }
+  },
+  "crm": {
+    "title": "إدارة علاقات العملاء",
+    "nav": {
+      "leads": "العملاء المحتملون",
+      "pipeline": "مسار المبيعات",
+      "referrals": "الإحالات",
+      "activities": "سجل النشاط"
+    },
+    "leads": {
+      "title": "إدارة العملاء المحتملين",
+      "createNew": "عميل محتمل جديد",
+      "addNew": "إضافة عميل محتمل",
+      "viewAll": "عرض جميع العملاء المحتملين",
+      "backToList": "العودة لقائمة العملاء المحتملين",
+      "deleteConfirm": "هل أنت متأكد من حذف {{count}} عميل محتمل؟",
+      "loadError": "خطأ في تحميل العملاء المحتملين",
+      "detailLoadError": "خطأ في تحميل تفاصيل العميل المحتمل",
+      "badge": "عملاء محتملون",
+      "searchPlaceholder": "البحث في العملاء المحتملين...",
+      "saving": "جاري الحفظ...",
+      "save": "حفظ العميل المحتمل",
+      "empty": {
+        "title": "لا يوجد عملاء محتملون",
+        "description": "ابدأ بإضافة عميل محتمل جديد",
+        "notFound": "العميل المحتمل غير موجود",
+        "notFoundDescription": "العميل المحتمل المطلوب غير موجود"
+      },
+      "status": {
+        "new": "جديد",
+        "contacted": "تم التواصل",
+        "qualified": "مؤهل",
+        "proposal": "عرض سعر",
+        "negotiation": "مفاوضات",
+        "won": "تم الفوز",
+        "lost": "خسارة",
+        "dormant": "خامل"
+      },
+      "statusTabs": {
+        "all": "الكل",
+        "new": "جديد",
+        "contacted": "تم التواصل",
+        "qualified": "مؤهل",
+        "won": "تم الفوز"
+      },
+      "fields": {
+        "estimatedValue": "القيمة المقدرة",
+        "caseType": "نوع القضية",
+        "source": "المصدر",
+        "contactInfo": "معلومات التواصل",
+        "phone": "الهاتف",
+        "email": "البريد الإلكتروني",
+        "whatsapp": "واتساب",
+        "alternatePhone": "هاتف بديل",
+        "address": "العنوان",
+        "daysSinceCreated": "الأيام منذ الإنشاء",
+        "lastContact": "آخر تواصل",
+        "activityCount": "عدد الأنشطة",
+        "probability": "الاحتمالية",
+        "urgency": "الأولوية",
+        "notes": "ملاحظات",
+        "tags": "العلامات",
+        "vip": "عميل VIP"
+      },
+      "sourceTypes": {
+        "website": "الموقع الإلكتروني",
+        "referral": "إحالة",
+        "social": "وسائل التواصل الاجتماعي",
+        "advertisement": "إعلان",
+        "directCall": "اتصال مباشر",
+        "walkIn": "حضور شخصي",
+        "event": "حدث",
+        "other": "أخرى"
+      },
+      "urgencyLevels": {
+        "critical": "حرج",
+        "urgent": "عاجل",
+        "high": "عالي",
+        "normal": "عادي",
+        "low": "منخفض"
+      },
+      "actions": {
+        "convertToClient": "تحويل لعميل",
+        "converted": "تم التحويل",
+        "changeStatus": "تغيير الحالة"
+      },
+      "tabs": {
+        "overview": "نظرة عامة",
+        "intake": "بيانات الاستقبال",
+        "qualification": "التأهيل",
+        "notes": "ملاحظات"
+      },
+      "bant": {
+        "title": "معايير التأهيل (BANT)",
+        "budget": "الميزانية",
+        "authority": "الصلاحية",
+        "need": "الحاجة",
+        "timeline": "الجدول الزمني",
+        "budgetLevels": {
+          "excellent": "ممتاز",
+          "high": "مرتفع",
+          "medium": "متوسط",
+          "low": "منخفض"
+        },
+        "authorityLevels": {
+          "decisionMaker": "صانع القرار",
+          "influencer": "مؤثر",
+          "researcher": "باحث"
+        },
+        "needLevels": {
+          "urgent": "عاجل",
+          "planning": "تخطيط",
+          "exploring": "استكشاف"
+        },
+        "timelineLevels": {
+          "immediate": "فوري",
+          "thisMonth": "هذا الشهر",
+          "thisQuarter": "هذا الربع",
+          "thisYear": "هذه السنة"
+        }
+      },
+      "intakeDetails": "تفاصيل الاستقبال",
+      "caseDescription": "وصف القضية",
+      "conflictCheck": {
+        "title": "فحص تعارض المصالح",
+        "completed": "تم الفحص",
+        "notCompleted": "لم يتم الفحص"
+      },
+      "practiceAreas": {
+        "corporate": "قانون الشركات",
+        "litigation": "التقاضي",
+        "labor": "قانون العمل",
+        "realEstate": "العقارات",
+        "ip": "الملكية الفكرية",
+        "criminal": "القانون الجنائي",
+        "family": "قانون الأسرة",
+        "banking": "القانون المصرفي",
+        "arbitration": "التحكيم",
+        "administrative": "القانون الإداري",
+        "tax": "الضرائب",
+        "other": "أخرى"
+      }
+    },
+    "activities": {
+      "title": "سجل النشاط",
+      "newActivity": "تسجيل نشاط جديد",
+      "logActivity": "تسجيل نشاط",
+      "logFirstActivity": "تسجيل أول نشاط",
+      "backToList": "العودة لسجل النشاط",
+      "loadError": "خطأ في تحميل الأنشطة",
+      "detailLoadError": "خطأ في تحميل تفاصيل النشاط",
+      "management": "إدارة الأنشطة",
+      "searchPlaceholder": "البحث في الأنشطة...",
+      "activityCount": "نشاط",
+      "distribution": "توزيع الأنشطة",
+      "empty": {
+        "title": "لا توجد أنشطة",
+        "searchOrDefault": "لا توجد نتائج مطابقة / ستظهر الأنشطة هنا عند إضافتها",
+        "notFound": "النشاط غير موجود",
+        "notFoundDescription": "النشاط المطلوب غير موجود"
+      },
+      "types": {
+        "call": "مكالمة",
+        "email": "بريد إلكتروني",
+        "sms": "رسالة نصية",
+        "whatsapp": "واتساب",
+        "meeting": "اجتماع",
+        "note": "ملاحظة",
+        "task": "مهمة",
+        "document": "مستند",
+        "quote": "عرض سعر",
+        "statusChange": "تغيير الحالة",
+        "stageChange": "تغيير المرحلة",
+        "newLead": "عميل محتمل جديد",
+        "clientConversion": "تحويل لعميل"
+      },
+      "status": {
+        "scheduled": "مجدول",
+        "inProgress": "قيد التنفيذ",
+        "completed": "مكتمل",
+        "cancelled": "ملغي"
+      },
+      "filters": {
+        "all": "الكل",
+        "calls": "المكالمات",
+        "emails": "رسائل البريد",
+        "meetings": "الاجتماعات",
+        "whatsapp": "واتساب",
+        "notes": "الملاحظات",
+        "tasks": "المهام"
+      },
+      "dateRanges": {
+        "today": "اليوم",
+        "yesterday": "أمس",
+        "thisWeek": "هذا الأسبوع",
+        "thisMonth": "هذا الشهر",
+        "all": "الكل"
+      },
+      "fields": {
+        "title": "العنوان",
+        "description": "الوصف",
+        "callOutcome": "نتيجة المكالمة",
+        "duration": "المدة (دقائق)",
+        "direction": "الاتجاه",
+        "phoneNumber": "رقم الهاتف",
+        "outcome": "النتيجة",
+        "type": "النوع",
+        "location": "الموقع",
+        "start": "البداية",
+        "end": "النهاية",
+        "agenda": "جدول الأعمال",
+        "summary": "الملخص",
+        "subject": "الموضوع",
+        "from": "من",
+        "to": "إلى"
+      },
+      "callOutcomes": {
+        "connected": "تم الاتصال",
+        "noAnswer": "لا إجابة",
+        "busy": "مشغول",
+        "voicemail": "بريد صوتي",
+        "wrongNumber": "رقم خاطئ",
+        "callbackRequested": "طلب معاودة الاتصال"
+      },
+      "callDirection": {
+        "inbound": "وارد",
+        "outbound": "صادر"
+      },
+      "meetingTypes": {
+        "inPerson": "حضوري",
+        "video": "فيديو",
+        "phone": "هاتفي",
+        "consultation": "استشارة"
+      },
+      "quickLog": {
+        "call": "مكالمة",
+        "email": "بريد",
+        "meeting": "اجتماع",
+        "note": "ملاحظة",
+        "task": "مهمة",
+        "whatsapp": "واتساب"
+      },
+      "metrics": {
+        "total": "إجمالي الأنشطة",
+        "completed": "مكتملة",
+        "calls": "مكالمات",
+        "meetings": "اجتماعات",
+        "emails": "رسائل بريد",
+        "whatsapp": "واتساب"
+      },
+      "actions": {
+        "changeStatus": "تغيير الحالة"
+      },
+      "callDetails": "تفاصيل المكالمة",
+      "meetingDetails": "تفاصيل الاجتماع",
+      "emailDetails": "تفاصيل البريد",
+      "virtualMeeting": "اجتماع افتراضي",
+      "urgent": "عاجل"
+    },
+    "pipeline": {
+      "title": "مسار المبيعات",
+      "selectPrompt": "اختر مسار المبيعات",
+      "selectPipeline": "اختر المسار",
+      "selectPipelineDescription": "اختر مسار من القائمة أعلاه لعرض العملاء المحتملين",
+      "dragLeadsHere": "اسحب العملاء المحتملين هنا",
+      "daysInStage": "أيام في هذه المرحلة",
+      "loadError": "خطأ في تحميل المسار",
+      "metrics": {
+        "totalLeads": "إجمالي العملاء المحتملين",
+        "totalValue": "القيمة الإجمالية",
+        "weightedValue": "القيمة المرجحة",
+        "conversionRate": "معدل التحويل",
+        "avgClosingDays": "متوسط أيام الإغلاق",
+        "needsFollowUp": "يحتاج متابعة"
+      },
+      "weightedByProbability": "بناءً على الاحتمالية",
+      "quickStats": {
+        "vip": "عميل VIP",
+        "won": "تم الفوز",
+        "lost": "خسارة",
+        "avgValue": "متوسط القيمة"
+      },
+      "filters": {
+        "label": "فلتر:",
+        "source": {
+          "title": "المصدر",
+          "all": "جميع المصادر",
+          "website": "الموقع الإلكتروني",
+          "referral": "إحالة",
+          "social": "وسائل التواصل",
+          "advertisement": "إعلان",
+          "directCall": "اتصال مباشر",
+          "walkIn": "حضور شخصي"
+        },
+        "urgency": {
+          "title": "الأولوية",
+          "all": "جميع الأولويات",
+          "critical": "حرج",
+          "urgent": "عاجل",
+          "high": "عالي",
+          "normal": "عادي",
+          "low": "منخفض"
+        }
+      }
+    },
+    "referrals": {
+      "title": "مصادر الإحالة",
+      "createNew": "مصدر إحالة جديد",
+      "sources": "مصادر الإحالة",
+      "sourcesList": "قائمة مصادر الإحالة",
+      "viewAll": "عرض جميع مصادر الإحالة",
+      "deleteConfirmation": "هل أنت متأكد من حذف {{count}} مصدر إحالة؟",
+      "loadError": "خطأ في تحميل مصادر الإحالة",
+      "successful": "الإحالات الناجحة",
+      "outstandingFees": "الرسوم المستحقة",
+      "conversionRate": "معدل التحويل",
+      "referralsCount": "الإحالات",
+      "outstanding": "المستحق",
+      "empty": {
+        "title": "لا توجد مصادر إحالة",
+        "description": "ابدأ بإضافة مصدر إحالة جديد"
+      },
+      "types": {
+        "client": "عميل",
+        "lawyer": "محامي",
+        "lawFirm": "مكتب محاماة",
+        "contact": "جهة اتصال",
+        "employee": "موظف",
+        "partner": "شريك",
+        "organization": "منظمة",
+        "other": "أخرى"
+      },
+      "status": {
+        "active": "نشط",
+        "inactive": "غير نشط",
+        "archived": "مؤرشف"
+      }
+    }
+  },
+  "events": {
+    "title": "الأحداث",
+    "addNew": "إضافة حدث جديد",
+    "searchPlaceholder": "البحث في الأحداث...",
+    "upcomingEvents": "الأحداث القادمة",
+    "pastEvents": "الأحداث السابقة",
+    "upcoming": "قادم",
+    "past": "سابق",
+    "eventDate": "تاريخ الحدث",
+    "eventDetails": "تفاصيل الحدث",
+    "cancelEvent": "إلغاء الحدث",
+    "postponeEvent": "تأجيل الحدث",
+    "postponeDescription": "اختر التاريخ والوقت الجديد للحدث",
+    "postponeReason": "سبب التأجيل (اختياري)",
+    "postponeReasonPlaceholder": "أدخل سبب التأجيل...",
+    "postponing": "جاري التأجيل...",
+    "confirmAttendance": "تأكيد الحضور",
+    "loadError": "خطأ في تحميل الأحداث:",
+    "notFound": "الحدث غير موجود",
+    "notFoundDescription": "الحدث المطلوب غير موجود أو تم حذفه",
+    "noTitle": "حدث بدون عنوان",
+    "noEvents": "لا توجد أحداث",
+    "emptyState": "جدولك فارغ. ابدأ بإضافة أحداث جديدة.",
+    "remote": "عن بُعد",
+    "saveEvent": "حفظ الحدث",
+    "tabs": {
+      "upcoming": "قادم",
+      "past": "سابق"
+    },
+    "status": {
+      "scheduled": "مجدول",
+      "inProgress": "قيد التنفيذ",
+      "postponed": "مؤجل",
+      "completed": "مكتمل",
+      "cancelled": "ملغي"
+    },
+    "type": {
+      "meeting": "اجتماع",
+      "courtHearing": "جلسة محكمة",
+      "courtSession": "جلسة قضائية",
+      "conference": "مؤتمر",
+      "webinar": "ندوة عبر الإنترنت",
+      "workshop": "ورشة عمل",
+      "consultation": "استشارة",
+      "documentReview": "مراجعة المستندات",
+      "training": "تدريب",
+      "deadline": "موعد نهائي",
+      "task": "مهمة",
+      "other": "أخرى"
+    },
+    "locationType": {
+      "physical": "موقع فعلي",
+      "virtual": "افتراضي",
+      "hybrid": "هجين"
+    },
+    "virtualPlatform": {
+      "custom": "رابط مخصص"
+    },
+    "fields": {
+      "title": "عنوان الحدث",
+      "titlePlaceholder": "مثال: اجتماع مراجعة العقد",
+      "type": "نوع الحدث",
+      "status": "الحالة",
+      "startDate": "تاريخ البداية",
+      "startTime": "وقت البداية",
+      "allDay": "طوال اليوم",
+      "description": "الوصف",
+      "location": "الموقع",
+      "selectPlatform": "اختر المنصة",
+      "meetingUrl": "رابط الاجتماع",
+      "attendees": "الحضور",
+      "agenda": "جدول الأعمال",
+      "agendaItem": "عنوان البند",
+      "duration": "المدة (دقائق)",
+      "presenter": "المقدم (اختياري)",
+      "billable": "قابل للفوترة",
+      "hourlyRate": "السعر بالساعة (ر.س)"
+    },
+    "reminder": {
+      "5min": "قبل 5 دقائق",
+      "10min": "قبل 10 دقائق",
+      "15min": "قبل 15 دقيقة",
+      "30min": "قبل 30 دقيقة",
+      "1hour": "قبل ساعة",
+      "2hours": "قبل ساعتين",
+      "1day": "قبل يوم",
+      "2days": "قبل يومين"
+    },
+    "attendee": {
+      "present": "حاضر"
+    },
+    "rsvp": {
+      "accepted": "سأحضر",
+      "tentative": "ربما",
+      "declined": "لن أحضر"
+    },
+    "recurring": "حدث متكرر",
+    "enableRecurrence": "تفعيل التكرار",
+    "billing": "الفوترة",
+    "actions": {
+      "complete": "إكمال",
+      "cancel": "إلغاء",
+      "postpone": "تأجيل",
+      "decline": "رفض",
+      "confirm": "تأكيد"
+    }
+  },
+  "reminders": {
+    "title": "التذكيرات",
+    "addNew": "إضافة تذكير جديد",
+    "searchPlaceholder": "البحث في التذكيرات...",
+    "upcomingReminders": "التذكيرات القادمة",
+    "pastReminders": "التذكيرات السابقة",
+    "upcoming": "قادم",
+    "past": "سابق",
+    "reminderDate": "تاريخ التذكير",
+    "description": "وصف التذكير",
+    "loadError": "خطأ في تحميل التذكيرات:",
+    "notFound": "التذكير غير موجود",
+    "notFoundDescription": "التذكير المطلوب غير موجود أو تم حذفه",
+    "noTitle": "تذكير بدون عنوان",
+    "noReminders": "لا توجد تذكيرات",
+    "allCaughtUp": "أنت على اطلاع! لا توجد تذكيرات في الوقت الحالي.",
+    "save": "حفظ التذكير",
+    "type": {
+      "general": "عام",
+      "courtHearing": "جلسة محكمة",
+      "filingDeadline": "موعد تقديم",
+      "paymentDue": "استحقاق دفعة",
+      "followUp": "متابعة",
+      "deadline": "موعد نهائي",
+      "meeting": "اجتماع",
+      "payment": "دفعة",
+      "task": "مهمة",
+      "contractRenewal": "تجديد عقد",
+      "statuteLimitation": "تقادم الدعوى"
+    },
+    "selectType": "اختر النوع",
+    "linkedCase": "القضية المرتبطة",
+    "linkedClient": "العميل المرتبط",
+    "snooze": {
+      "title": "تأجيل",
+      "15min": "15 دقيقة",
+      "30min": "30 دقيقة",
+      "1hour": "ساعة واحدة",
+      "3hours": "3 ساعات",
+      "1day": "يوم واحد",
+      "1week": "أسبوع واحد"
+    },
+    "delegate": "تفويض",
+    "delegateReminder": "تفويض التذكير",
+    "delegateDescription": "اختر الشخص الذي تريد تفويض هذا التذكير له",
+    "delegateTo": "تفويض إلى",
+    "selectTeamMember": "اختر عضو الفريق",
+    "delegateNote": "أضف ملاحظة للتفويض...",
+    "delegating": "جاري التفويض...",
+    "advanceNotification": "إشعار مسبق:",
+    "advanceNotif": {
+      "5min": "5 دقائق",
+      "10min": "10 دقائق",
+      "15min": "15 دقيقة",
+      "30min": "30 دقيقة",
+      "1hour": "ساعة واحدة",
+      "2hours": "ساعتان",
+      "1day": "يوم واحد",
+      "2days": "يومان",
+      "1week": "أسبوع واحد"
+    },
+    "enableEscalation": "تفعيل التصعيد عند عدم الاستجابة",
+    "recurring": "تذكير متكرر",
+    "enableRecurrence": "تفعيل التكرار",
+    "recurrenceEnd": "نهاية التكرار",
+    "neverEnd": "لا ينتهي",
+    "afterOccurrences": "بعد عدد من المرات",
+    "onDate": "في تاريخ محدد",
+    "occurrences": "عدد المرات",
+    "skipWeekends": "تخطي عطلة نهاية الأسبوع",
+    "skipHolidays": "تخطي الإجازات الرسمية",
+    "maxSnooze": "الحد الأقصى للتأجيل",
+    "maxSnoozeHint": "عدد مرات التأجيل المسموحة (0 = غير محدود)"
+  },
+  "filter": {
+    "status": "الحالة",
+    "allStatuses": "جميع الحالات",
+    "employmentType": "نوع التوظيف",
+    "allTypes": "جميع الأنواع",
+    "nationality": "الجنسية",
+    "all": "الكل",
+    "leaveType": "نوع الإجازة",
+    "allLeaveTypes": "جميع أنواع الإجازات",
+    "clear": "مسح الفلاتر",
+    "month": "الشهر",
+    "year": "السنة"
+  },
+  "sort": {
+    "label": "ترتيب حسب",
+    "hireDate": "تاريخ التعيين",
+    "name": "الاسم",
+    "salary": "الراتب",
+    "requestDate": "تاريخ الطلب",
+    "startDate": "تاريخ البداية",
+    "employee": "الموظف",
+    "numberOfDays": "عدد الأيام",
+    "paymentDate": "تاريخ الدفع",
+    "amount": "المبلغ",
+    "createdDate": "تاريخ الإنشاء",
+    "dueDate": "تاريخ الاستحقاق"
+  },
+  "nationality": {
+    "saudi": "سعودي",
+    "nonSaudi": "غير سعودي",
+    "egyptian": "مصري",
+    "jordanian": "أردني",
+    "syrian": "سوري",
+    "yemeni": "يمني",
+    "pakistani": "باكستاني",
+    "indian": "هندي",
+    "philippine": "فلبيني",
+    "other": "أخرى"
+  },
+  "gender": {
+    "male": "ذكر",
+    "female": "أنثى"
+  },
+  "maritalStatus": {
+    "single": "أعزب",
+    "married": "متزوج",
+    "divorced": "مطلق",
+    "widowed": "أرمل"
+  },
+  "relationship": {
+    "father": "الأب",
+    "mother": "الأم",
+    "spouse": "الزوج/الزوجة",
+    "brother": "الأخ",
+    "sister": "الأخت",
+    "parent": "الوالد",
+    "child": "الابن/الابنة",
+    "sibling": "الأخ/الأخت",
+    "grandparent": "الجد/الجدة",
+    "other": "أخرى"
+  },
+  "weekDay": {
+    "sunday": "الأحد",
+    "monday": "الإثنين",
+    "tuesday": "الثلاثاء",
+    "wednesday": "الأربعاء",
+    "thursday": "الخميس",
+    "friday": "الجمعة",
+    "saturday": "السبت"
+  },
+  "month": {
+    "january": "يناير",
+    "february": "فبراير",
+    "march": "مارس",
+    "april": "أبريل",
+    "may": "مايو",
+    "june": "يونيو",
+    "july": "يوليو",
+    "august": "أغسطس",
+    "september": "سبتمبر",
+    "october": "أكتوبر",
+    "november": "نوفمبر",
+    "december": "ديسمبر"
+  },
+  "frequency": {
+    "daily": "يومي",
+    "weekly": "أسبوعي",
+    "biweekly": "كل أسبوعين",
+    "monthly": "شهري",
+    "quarterly": "ربع سنوي",
+    "yearly": "سنوي",
+    "custom": "مخصص"
+  },
+  "city": {
+    "riyadh": "الرياض",
+    "jeddah": "جدة",
+    "makkah": "مكة المكرمة",
+    "madinah": "المدينة المنورة",
+    "dammam": "الدمام",
+    "khobar": "الخبر"
+  },
+  "region": {
+    "riyadh": "منطقة الرياض",
+    "makkah": "منطقة مكة المكرمة",
+    "eastern": "المنطقة الشرقية",
+    "madinah": "منطقة المدينة المنورة"
+  },
+  "currency": {
+    "sar": "ر.س"
+  },
+  "idType": {
+    "saudiId": "هوية سعودية",
+    "iqama": "إقامة",
+    "gccId": "هوية خليجية",
+    "passport": "جواز سفر"
+  },
+  "officeType": {
+    "solo": "ممارس فردي",
+    "soloDescription": "محامي فردي",
+    "small": "مكتب صغير",
+    "smallDescription": "2-5 موظفين",
+    "medium": "مكتب متوسط",
+    "mediumDescription": "6-20 موظف",
+    "firm": "مكتب محاماة",
+    "firmDescription": "20+ موظف"
+  },
+  "bank": {
+    "rajhi": "مصرف الراجحي",
+    "nationalCommercial": "البنك الأهلي التجاري",
+    "riyad": "بنك الرياض",
+    "alinma": "مصرف الإنماء"
+  },
+  "branch": {
+    "main": "المكتب الرئيسي",
+    "riyadh": "فرع الرياض",
+    "jeddah": "فرع جدة",
+    "dammam": "فرع الدمام"
+  },
+  "department": {
+    "legal": "الشؤون القانونية",
+    "finance": "المالية",
+    "hr": "الموارد البشرية",
+    "it": "تقنية المعلومات",
+    "administration": "الإدارة"
+  },
+  "team": {
+    "commercial": "فريق القضايا التجارية",
+    "criminal": "فريق القضايا الجنائية",
+    "contracts": "فريق العقود"
+  },
+  "paymentFrequency": {
+    "monthly": "شهري",
+    "biWeekly": "كل أسبوعين",
+    "weekly": "أسبوعي"
+  },
+  "paymentMethod": {
+    "bankTransfer": "تحويل بنكي",
+    "cash": "نقداً",
+    "check": "شيك"
   }
 }

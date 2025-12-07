@@ -2131,5 +2131,1137 @@
     "testSent": "Test notification sent",
     "testFailed": "Failed to send test notification",
     "error": "An error occurred"
+  },
+  "hr": {
+    "title": "Human Resources",
+    "nav": {
+      "overview": "Overview",
+      "employees": "Employees",
+      "salaries": "Salaries",
+      "leaves": "Leaves",
+      "payroll": "Payroll"
+    },
+    "employees": {
+      "title": "Employees",
+      "listTitle": "Employee List",
+      "addButton": "Add Employee",
+      "editEmployee": "Edit Employee",
+      "newEmployee": "Add New Employee",
+      "viewProfile": "View Profile",
+      "viewAll": "View All Employees",
+      "deleteButton": "Delete Employee",
+      "deleteConfirm": "Are you sure you want to delete this employee?",
+      "bulkDeleteConfirm": "Are you sure you want to delete {{count}} employees?",
+      "loadError": "Error loading employees",
+      "searchPlaceholder": "Search by name or employee ID...",
+      "employeeCount": "employee",
+      "empty": {
+        "title": "No Employees",
+        "subtitle": "Start by adding a new employee"
+      },
+      "stats": {
+        "totalEmployees": "Total Employees",
+        "active": "Active",
+        "onLeave": "On Leave",
+        "saudizationRate": "Saudization Rate"
+      },
+      "fields": {
+        "fullNameArabic": "Full Name (Arabic)",
+        "fullNameEnglish": "Full Name (English)",
+        "nationalId": "National ID",
+        "nationalIdType": "ID Type",
+        "nationalIdExpiry": "ID Expiry Date",
+        "gender": "Gender",
+        "dateOfBirth": "Date of Birth",
+        "nationality": "Nationality",
+        "maritalStatus": "Marital Status",
+        "dependents": "Number of Dependents",
+        "mobile": "Mobile Number",
+        "email": "Email",
+        "personalEmail": "Personal Email",
+        "city": "City",
+        "region": "Region",
+        "emergencyContact": "Emergency Contact",
+        "relationship": "Relationship",
+        "phone": "Phone Number",
+        "hireDate": "Hire Date",
+        "jobTitle": "Job Title",
+        "jobTitleArabic": "Job Title (Arabic)",
+        "jobTitleEnglish": "Job Title (English)",
+        "department": "Department",
+        "employmentType": "Employment Type",
+        "contractType": "Contract Type",
+        "contractStartDate": "Contract Start Date",
+        "contractEndDate": "Contract End Date",
+        "probationPeriod": "Probation Period (Days)",
+        "employeeNumber": "Employee Number",
+        "weeklyHours": "Weekly Working Hours",
+        "dailyHours": "Daily Working Hours",
+        "restDay": "Rest Day",
+        "basicSalary": "Basic Salary",
+        "grossSalary": "Total Monthly Salary",
+        "bankName": "Bank Name",
+        "iban": "IBAN Number",
+        "gosiRegistered": "GOSI Registered",
+        "gosiNumber": "GOSI Number",
+        "branch": "Branch",
+        "team": "Team",
+        "supervisor": "Direct Supervisor",
+        "costCenter": "Cost Center",
+        "annualLeaveBalance": "Annual Leave Balance (Days)"
+      }
+    },
+    "employmentStatus": {
+      "active": "Active",
+      "onLeave": "On Leave",
+      "suspended": "Suspended",
+      "terminated": "Terminated"
+    },
+    "employmentType": {
+      "fullTime": "Full Time",
+      "partTime": "Part Time",
+      "contract": "Contract",
+      "temporary": "Temporary"
+    },
+    "contractType": {
+      "indefinite": "Indefinite",
+      "fixedTerm": "Fixed Term"
+    },
+    "allowances": {
+      "title": "Allowances",
+      "housing": "Housing Allowance",
+      "transportation": "Transportation Allowance",
+      "food": "Food Allowance",
+      "phone": "Phone Allowance",
+      "medical": "Medical Allowance",
+      "education": "Education Allowance",
+      "fuel": "Fuel Allowance",
+      "remoteWork": "Remote Work Allowance",
+      "custom": "Custom...",
+      "total": "Total Allowances",
+      "add": "Add Allowance",
+      "none": "No Allowances",
+      "addInstruction": "Click \"Add Allowance\" to add employee allowances"
+    },
+    "leave": {
+      "title": "Leave Requests",
+      "listTitle": "Leave Requests",
+      "addRequest": "Request Leave",
+      "newRequest": "New Leave Request",
+      "viewRequest": "View Request",
+      "viewAll": "View All Requests",
+      "deleteConfirm": "Are you sure you want to delete this request?",
+      "loadError": "Error loading requests",
+      "searchPlaceholder": "Search by name or number...",
+      "requestCount": "request",
+      "subtitle": "Submit a leave request according to Saudi Labor Law",
+      "submitRequest": "Submit Request",
+      "empty": {
+        "title": "No Leave Requests",
+        "subtitle": "Submit a new leave request to get started"
+      },
+      "stats": {
+        "totalRequests": "Total Requests",
+        "pendingApproval": "Pending Approval",
+        "onLeaveToday": "On Leave Today",
+        "averageLeaveDays": "Average Leave Days"
+      },
+      "fields": {
+        "type": "Leave Type",
+        "startDate": "Start Date",
+        "endDate": "End Date",
+        "returnDate": "Return Date",
+        "numberOfDays": "Number of Days",
+        "remainingBalance": "Remaining Balance",
+        "reason": "Reason"
+      },
+      "tabs": {
+        "overview": "Overview",
+        "details": "Details",
+        "approvals": "Approvals",
+        "documents": "Documents",
+        "handover": "Work Handover",
+        "notes": "Notes"
+      },
+      "actions": {
+        "approve": "Approve",
+        "reject": "Reject",
+        "confirmReturn": "Confirm Return",
+        "cancelRequest": "Cancel Request"
+      },
+      "annual": {
+        "title": "Annual Leave",
+        "entitlement": "Entitlement",
+        "used": "Used",
+        "pending": "Pending",
+        "remaining": "Remaining"
+      },
+      "sick": {
+        "title": "Sick Leave",
+        "fullPay": "100% (30 days)",
+        "partialPay": "75% (60 days)",
+        "unpaid": "Unpaid (30 days)",
+        "remaining": "Remaining of 120 days"
+      },
+      "hajj": {
+        "title": "Hajj Leave",
+        "eligible": "Eligible",
+        "notEligible": "Not Eligible (after 2 years of service)",
+        "usedOn": "Used On"
+      }
+    },
+    "leaveType": {
+      "annual": "Annual Leave",
+      "sick": "Sick Leave",
+      "hajj": "Hajj Leave",
+      "marriage": "Marriage Leave",
+      "birth": "Birth Leave",
+      "death": "Death Leave",
+      "maternity": "Maternity Leave",
+      "paternity": "Paternity Leave",
+      "exam": "Exam Leave",
+      "unpaid": "Unpaid Leave"
+    },
+    "leaveStatus": {
+      "draft": "Draft",
+      "submitted": "Submitted",
+      "pendingApproval": "Pending Approval",
+      "approved": "Approved",
+      "rejected": "Rejected",
+      "cancelled": "Cancelled",
+      "completed": "Completed"
+    },
+    "payroll": {
+      "title": "Payroll",
+      "listTitle": "Payroll Slips",
+      "slipBadge": "Payroll Slip",
+      "createSlip": "Create Slip",
+      "slipCount": "slip",
+      "deleteConfirm": "Are you sure you want to delete this slip?",
+      "loadError": "Error loading slips",
+      "searchPlaceholder": "Search by name or number...",
+      "empty": {
+        "title": "Payroll Slip Not Found",
+        "subtitle": "The requested payroll slip was not found"
+      },
+      "tabs": {
+        "overview": "Overview",
+        "earnings": "Earnings",
+        "deductions": "Deductions",
+        "payment": "Payment"
+      },
+      "fields": {
+        "payPeriod": "Pay Period",
+        "month": "Month",
+        "workingDays": "Working Days",
+        "daysWorked": "Days Worked",
+        "paymentDate": "Payment Date",
+        "netPay": "Net Pay",
+        "totalEarnings": "Total Earnings",
+        "totalDeductions": "Total Deductions",
+        "basicSalary": "Basic Salary",
+        "overtime": "Overtime",
+        "socialInsurance": "Social Insurance",
+        "incomeTax": "Income Tax"
+      },
+      "stats": {
+        "totalSlips": "Total Slips",
+        "paid": "Paid",
+        "processing": "Processing",
+        "totalAmount": "Total Amount"
+      }
+    },
+    "paymentStatus": {
+      "draft": "Draft",
+      "approved": "Approved",
+      "processing": "Processing",
+      "paid": "Paid",
+      "failed": "Failed",
+      "cancelled": "Cancelled"
+    }
+  },
+  "finance": {
+    "title": "Finance",
+    "nav": {
+      "overview": "Overview",
+      "invoices": "Invoices",
+      "expenses": "Expenses",
+      "statements": "Statements",
+      "transactions": "Transactions",
+      "timeTracking": "Time Tracking",
+      "accountActivity": "Account Activity",
+      "quotes": "Quotes",
+      "payments": "Payments"
+    },
+    "invoices": {
+      "title": "Invoices",
+      "createNew": "Create New Invoice",
+      "newInvoice": "New Invoice",
+      "viewInvoice": "View Invoice",
+      "backToList": "Back to Invoices",
+      "taxInvoice": "Tax Invoice",
+      "invoiceItems": "Invoice Items",
+      "invoiceNumber": "Invoice Number",
+      "loadError": "Failed to load invoices",
+      "detailsLoadError": "Failed to load invoice details",
+      "notFound": "Invoice Not Found",
+      "notFoundDescription": "We couldn't find the requested invoice",
+      "searchPlaceholder": "Search invoices...",
+      "noMatchingResults": "No invoices match the search or selected filters",
+      "sendReminder": "Send Reminder",
+      "empty": {
+        "title": "No Invoices Yet",
+        "description": "Start by creating your first invoice for clients"
+      },
+      "status": {
+        "all": "All",
+        "pending": "Pending",
+        "paid": "Paid",
+        "overdue": "Overdue",
+        "cancelled": "Cancelled",
+        "draft": "Draft",
+        "partial": "Partially Paid",
+        "sent": "Sent"
+      },
+      "fields": {
+        "client": "Client",
+        "clientUnspecified": "Client Not Specified",
+        "case": "Case (Optional)",
+        "selectClient": "Select Client",
+        "selectClientFirst": "Select Client First",
+        "selectCase": "Select Case",
+        "noCase": "No Case",
+        "clientType": "Client Type",
+        "issueDate": "Issue Date",
+        "dueDate": "Due Date",
+        "paymentTerms": "Payment Terms",
+        "description": "Description",
+        "quantity": "Quantity",
+        "price": "Price",
+        "total": "Total",
+        "subtotal": "Subtotal",
+        "discount": "Discount",
+        "vat": "VAT (15%)",
+        "retainerApplied": "Retainer Applied",
+        "balanceDue": "Balance Due"
+      },
+      "clientTypes": {
+        "individual": "Individual",
+        "corporate": "Corporate",
+        "government": "Government"
+      },
+      "paymentTerms": {
+        "dueOnReceipt": "Due on Receipt",
+        "net7": "7 Days (Net 7)",
+        "net15": "15 Days (Net 15)",
+        "net30": "30 Days (Net 30)",
+        "net45": "45 Days (Net 45)",
+        "net60": "60 Days (Net 60)",
+        "net90": "90 Days (Net 90)",
+        "eom": "End of Month",
+        "custom": "Custom"
+      },
+      "actions": {
+        "addItem": "Add Item",
+        "importFromHours": "Import from Hours",
+        "importFromExpenses": "Import from Expenses",
+        "saveAsDraft": "Save as Draft",
+        "previewPdf": "Preview PDF",
+        "sendForApproval": "Send for Approval",
+        "saveAndSend": "Save & Send",
+        "saveAndEmail": "Save & Send by Email",
+        "saveAndDownloadPdf": "Save & Download PDF",
+        "saveAndPrint": "Save & Print",
+        "saveOnly": "Save Only"
+      }
+    },
+    "expenses": {
+      "title": "Expenses",
+      "addNew": "Add New Expense",
+      "viewReceipt": "View Receipt",
+      "backToList": "Back to Expenses",
+      "expenseDetails": "Expense Details",
+      "loadError": "Failed to load expenses",
+      "detailsLoadError": "Failed to load expense details",
+      "notFound": "Expense Not Found",
+      "notFoundDescription": "We couldn't find the requested expense",
+      "searchPlaceholder": "Search expenses...",
+      "empty": {
+        "title": "No Expenses Yet",
+        "description": "Start by adding your first expense"
+      },
+      "tabs": {
+        "all": "All",
+        "cases": "Cases",
+        "general": "General",
+        "pending": "Pending"
+      },
+      "status": {
+        "approved": "Approved",
+        "pending": "Pending"
+      },
+      "fields": {
+        "amount": "Amount",
+        "date": "Date",
+        "case": "Case",
+        "category": "Category",
+        "referenceNumber": "Reference Number",
+        "description": "Description",
+        "generalExpense": "General Expense"
+      },
+      "types": {
+        "reimbursable": "Personal Expense (Reimbursable)",
+        "reimbursableDesc": "Paid by employee, to be reimbursed",
+        "company": "Company Expense",
+        "companyDesc": "Paid directly by company"
+      }
+    },
+    "payments": {
+      "title": "Payments",
+      "viewInvoices": "View Invoices",
+      "downloadReceipt": "Download Receipt",
+      "sendByEmail": "Send by Email",
+      "loadError": "Failed to load payments",
+      "searchPlaceholder": "Search payments...",
+      "noMatchingResults": "No payments match the search or selected filters",
+      "empty": {
+        "title": "No Payments Yet",
+        "description": "Payments will appear here when invoice payments are recorded"
+      },
+      "status": {
+        "all": "All",
+        "pending": "Pending",
+        "completed": "Completed",
+        "failed": "Failed",
+        "refunded": "Refunded"
+      },
+      "fields": {
+        "invoice": "Invoice",
+        "paymentDate": "Payment Date",
+        "paymentMethod": "Payment Method",
+        "amount": "Amount",
+        "payment": "payment"
+      }
+    },
+    "timeEntries": {
+      "title": "Time Tracking",
+      "manualEntry": "Manual Entry",
+      "editEntry": "Edit Entry",
+      "createInvoice": "Create Invoice",
+      "loadError": "Error loading time entries",
+      "searchPlaceholder": "Search entries...",
+      "empty": {
+        "title": "No Time Entries",
+        "description": "Start tracking your time using the timer or log time manually"
+      },
+      "status": {
+        "all": "All",
+        "unbilled": "Unbilled",
+        "billed": "Billed",
+        "nonBillable": "Non-Billable"
+      },
+      "fields": {
+        "duration": "Duration",
+        "value": "Value",
+        "hours": "h",
+        "unspecifiedTask": "Task Not Specified"
+      }
+    }
+  },
+  "crm": {
+    "title": "CRM",
+    "nav": {
+      "leads": "Leads",
+      "pipeline": "Sales Pipeline",
+      "referrals": "Referrals",
+      "activities": "Activity Log"
+    },
+    "leads": {
+      "title": "Lead Management",
+      "createNew": "New Lead",
+      "addNew": "Add Lead",
+      "viewAll": "View All Leads",
+      "backToList": "Back to Lead List",
+      "deleteConfirm": "Are you sure you want to delete {{count}} lead(s)?",
+      "loadError": "Error loading leads",
+      "detailLoadError": "Error loading lead details",
+      "badge": "Leads",
+      "searchPlaceholder": "Search leads...",
+      "saving": "Saving...",
+      "save": "Save Lead",
+      "empty": {
+        "title": "No Leads",
+        "description": "Start by adding a new lead",
+        "notFound": "Lead Not Found",
+        "notFoundDescription": "The requested lead was not found"
+      },
+      "status": {
+        "new": "New",
+        "contacted": "Contacted",
+        "qualified": "Qualified",
+        "proposal": "Proposal",
+        "negotiation": "Negotiation",
+        "won": "Won",
+        "lost": "Lost",
+        "dormant": "Dormant"
+      },
+      "statusTabs": {
+        "all": "All",
+        "new": "New",
+        "contacted": "Contacted",
+        "qualified": "Qualified",
+        "won": "Won"
+      },
+      "fields": {
+        "estimatedValue": "Estimated Value",
+        "caseType": "Case Type",
+        "source": "Source",
+        "contactInfo": "Contact Information",
+        "phone": "Phone",
+        "email": "Email",
+        "whatsapp": "WhatsApp",
+        "alternatePhone": "Alternate Phone",
+        "address": "Address",
+        "daysSinceCreated": "Days Since Created",
+        "lastContact": "Last Contact",
+        "activityCount": "Activity Count",
+        "probability": "Probability",
+        "urgency": "Urgency",
+        "notes": "Notes",
+        "tags": "Tags",
+        "vip": "VIP Client"
+      },
+      "sourceTypes": {
+        "website": "Website",
+        "referral": "Referral",
+        "social": "Social Media",
+        "advertisement": "Advertisement",
+        "directCall": "Direct Call",
+        "walkIn": "Walk-in",
+        "event": "Event",
+        "other": "Other"
+      },
+      "urgencyLevels": {
+        "critical": "Critical",
+        "urgent": "Urgent",
+        "high": "High",
+        "normal": "Normal",
+        "low": "Low"
+      },
+      "actions": {
+        "convertToClient": "Convert to Client",
+        "converted": "Converted",
+        "changeStatus": "Change Status"
+      },
+      "tabs": {
+        "overview": "Overview",
+        "intake": "Intake Data",
+        "qualification": "Qualification",
+        "notes": "Notes"
+      },
+      "bant": {
+        "title": "Qualification Criteria (BANT)",
+        "budget": "Budget",
+        "authority": "Authority",
+        "need": "Need",
+        "timeline": "Timeline",
+        "budgetLevels": {
+          "excellent": "Excellent",
+          "high": "High",
+          "medium": "Medium",
+          "low": "Low"
+        },
+        "authorityLevels": {
+          "decisionMaker": "Decision Maker",
+          "influencer": "Influencer",
+          "researcher": "Researcher"
+        },
+        "needLevels": {
+          "urgent": "Urgent",
+          "planning": "Planning",
+          "exploring": "Exploring"
+        },
+        "timelineLevels": {
+          "immediate": "Immediate",
+          "thisMonth": "This Month",
+          "thisQuarter": "This Quarter",
+          "thisYear": "This Year"
+        }
+      },
+      "intakeDetails": "Intake Details",
+      "caseDescription": "Case Description",
+      "conflictCheck": {
+        "title": "Conflict of Interest Check",
+        "completed": "Completed",
+        "notCompleted": "Not Completed"
+      },
+      "practiceAreas": {
+        "corporate": "Corporate Law",
+        "litigation": "Litigation",
+        "labor": "Labor Law",
+        "realEstate": "Real Estate",
+        "ip": "Intellectual Property",
+        "criminal": "Criminal Law",
+        "family": "Family Law",
+        "banking": "Banking Law",
+        "arbitration": "Arbitration",
+        "administrative": "Administrative Law",
+        "tax": "Tax",
+        "other": "Other"
+      }
+    },
+    "activities": {
+      "title": "Activity Log",
+      "newActivity": "Log New Activity",
+      "logActivity": "Log Activity",
+      "logFirstActivity": "Log First Activity",
+      "backToList": "Back to Activity Log",
+      "loadError": "Error loading activities",
+      "detailLoadError": "Error loading activity details",
+      "management": "Activity Management",
+      "searchPlaceholder": "Search activities...",
+      "activityCount": "activity",
+      "distribution": "Activity Distribution",
+      "empty": {
+        "title": "No Activities",
+        "searchOrDefault": "No matching results / Activities will appear here when added",
+        "notFound": "Activity Not Found",
+        "notFoundDescription": "The requested activity was not found"
+      },
+      "types": {
+        "call": "Call",
+        "email": "Email",
+        "sms": "SMS",
+        "whatsapp": "WhatsApp",
+        "meeting": "Meeting",
+        "note": "Note",
+        "task": "Task",
+        "document": "Document",
+        "quote": "Quote",
+        "statusChange": "Status Change",
+        "stageChange": "Stage Change",
+        "newLead": "New Lead",
+        "clientConversion": "Client Conversion"
+      },
+      "status": {
+        "scheduled": "Scheduled",
+        "inProgress": "In Progress",
+        "completed": "Completed",
+        "cancelled": "Cancelled"
+      },
+      "filters": {
+        "all": "All",
+        "calls": "Calls",
+        "emails": "Emails",
+        "meetings": "Meetings",
+        "whatsapp": "WhatsApp",
+        "notes": "Notes",
+        "tasks": "Tasks"
+      },
+      "dateRanges": {
+        "today": "Today",
+        "yesterday": "Yesterday",
+        "thisWeek": "This Week",
+        "thisMonth": "This Month",
+        "all": "All"
+      },
+      "fields": {
+        "title": "Title",
+        "description": "Description",
+        "callOutcome": "Call Outcome",
+        "duration": "Duration (Minutes)",
+        "direction": "Direction",
+        "phoneNumber": "Phone Number",
+        "outcome": "Outcome",
+        "type": "Type",
+        "location": "Location",
+        "start": "Start",
+        "end": "End",
+        "agenda": "Agenda",
+        "summary": "Summary",
+        "subject": "Subject",
+        "from": "From",
+        "to": "To"
+      },
+      "callOutcomes": {
+        "connected": "Connected",
+        "noAnswer": "No Answer",
+        "busy": "Busy",
+        "voicemail": "Voicemail",
+        "wrongNumber": "Wrong Number",
+        "callbackRequested": "Callback Requested"
+      },
+      "callDirection": {
+        "inbound": "Inbound",
+        "outbound": "Outbound"
+      },
+      "meetingTypes": {
+        "inPerson": "In Person",
+        "video": "Video",
+        "phone": "Phone",
+        "consultation": "Consultation"
+      },
+      "quickLog": {
+        "call": "Call",
+        "email": "Email",
+        "meeting": "Meeting",
+        "note": "Note",
+        "task": "Task",
+        "whatsapp": "WhatsApp"
+      },
+      "metrics": {
+        "total": "Total Activities",
+        "completed": "Completed",
+        "calls": "Calls",
+        "meetings": "Meetings",
+        "emails": "Emails",
+        "whatsapp": "WhatsApp"
+      },
+      "actions": {
+        "changeStatus": "Change Status"
+      },
+      "callDetails": "Call Details",
+      "meetingDetails": "Meeting Details",
+      "emailDetails": "Email Details",
+      "virtualMeeting": "Virtual Meeting",
+      "urgent": "Urgent"
+    },
+    "pipeline": {
+      "title": "Sales Pipeline",
+      "selectPrompt": "Select Sales Pipeline",
+      "selectPipeline": "Select Pipeline",
+      "selectPipelineDescription": "Select a pipeline from the list above to view leads",
+      "dragLeadsHere": "Drag leads here",
+      "daysInStage": "days in this stage",
+      "loadError": "Error loading pipeline",
+      "metrics": {
+        "totalLeads": "Total Leads",
+        "totalValue": "Total Value",
+        "weightedValue": "Weighted Value",
+        "conversionRate": "Conversion Rate",
+        "avgClosingDays": "Avg. Days to Close",
+        "needsFollowUp": "Needs Follow-up"
+      },
+      "weightedByProbability": "Based on probability",
+      "quickStats": {
+        "vip": "VIP Client",
+        "won": "Won",
+        "lost": "Lost",
+        "avgValue": "Average Value"
+      },
+      "filters": {
+        "label": "Filter:",
+        "source": {
+          "title": "Source",
+          "all": "All Sources",
+          "website": "Website",
+          "referral": "Referral",
+          "social": "Social Media",
+          "advertisement": "Advertisement",
+          "directCall": "Direct Call",
+          "walkIn": "Walk-in"
+        },
+        "urgency": {
+          "title": "Urgency",
+          "all": "All Priorities",
+          "critical": "Critical",
+          "urgent": "Urgent",
+          "high": "High",
+          "normal": "Normal",
+          "low": "Low"
+        }
+      }
+    },
+    "referrals": {
+      "title": "Referral Sources",
+      "createNew": "New Referral Source",
+      "sources": "Referral Sources",
+      "sourcesList": "Referral Sources",
+      "viewAll": "View All Referral Sources",
+      "deleteConfirmation": "Are you sure you want to delete {{count}} referral source(s)?",
+      "loadError": "Error loading referral sources",
+      "successful": "Successful Referrals",
+      "outstandingFees": "Outstanding Fees",
+      "conversionRate": "Conversion Rate",
+      "referralsCount": "Referrals",
+      "outstanding": "Outstanding",
+      "empty": {
+        "title": "No Referral Sources",
+        "description": "Start by adding a new referral source"
+      },
+      "types": {
+        "client": "Client",
+        "lawyer": "Lawyer",
+        "lawFirm": "Law Firm",
+        "contact": "Contact",
+        "employee": "Employee",
+        "partner": "Partner",
+        "organization": "Organization",
+        "other": "Other"
+      },
+      "status": {
+        "active": "Active",
+        "inactive": "Inactive",
+        "archived": "Archived"
+      }
+    }
+  },
+  "events": {
+    "title": "Events",
+    "addNew": "Add New Event",
+    "searchPlaceholder": "Search events...",
+    "upcomingEvents": "Upcoming Events",
+    "pastEvents": "Past Events",
+    "upcoming": "Upcoming",
+    "past": "Past",
+    "eventDate": "Event Date",
+    "eventDetails": "Event Details",
+    "cancelEvent": "Cancel Event",
+    "postponeEvent": "Postpone Event",
+    "postponeDescription": "Select new date and time for the event",
+    "postponeReason": "Reason for Postponement (Optional)",
+    "postponeReasonPlaceholder": "Enter reason for postponement...",
+    "postponing": "Postponing...",
+    "confirmAttendance": "Confirm Attendance",
+    "loadError": "Error loading events:",
+    "notFound": "Event Not Found",
+    "notFoundDescription": "The requested event does not exist or has been deleted",
+    "noTitle": "Untitled Event",
+    "noEvents": "No Events",
+    "emptyState": "Your schedule is empty. Start by adding new events.",
+    "remote": "Remote",
+    "saveEvent": "Save Event",
+    "tabs": {
+      "upcoming": "Upcoming",
+      "past": "Past"
+    },
+    "status": {
+      "scheduled": "Scheduled",
+      "inProgress": "In Progress",
+      "postponed": "Postponed",
+      "completed": "Completed",
+      "cancelled": "Cancelled"
+    },
+    "type": {
+      "meeting": "Meeting",
+      "courtHearing": "Court Hearing",
+      "courtSession": "Court Session",
+      "conference": "Conference",
+      "webinar": "Webinar",
+      "workshop": "Workshop",
+      "consultation": "Consultation",
+      "documentReview": "Document Review",
+      "training": "Training",
+      "deadline": "Deadline",
+      "task": "Task",
+      "other": "Other"
+    },
+    "locationType": {
+      "physical": "Physical Location",
+      "virtual": "Virtual",
+      "hybrid": "Hybrid"
+    },
+    "virtualPlatform": {
+      "custom": "Custom Link"
+    },
+    "fields": {
+      "title": "Event Title",
+      "titlePlaceholder": "Example: Contract Review Meeting",
+      "type": "Event Type",
+      "status": "Status",
+      "startDate": "Start Date",
+      "startTime": "Start Time",
+      "allDay": "All Day",
+      "description": "Description",
+      "location": "Location",
+      "selectPlatform": "Select Platform",
+      "meetingUrl": "Meeting URL",
+      "attendees": "Attendees",
+      "agenda": "Agenda",
+      "agendaItem": "Item Title",
+      "duration": "Duration (Minutes)",
+      "presenter": "Presenter (Optional)",
+      "billable": "Billable",
+      "hourlyRate": "Hourly Rate (SAR)"
+    },
+    "reminder": {
+      "5min": "5 minutes before",
+      "10min": "10 minutes before",
+      "15min": "15 minutes before",
+      "30min": "30 minutes before",
+      "1hour": "1 hour before",
+      "2hours": "2 hours before",
+      "1day": "1 day before",
+      "2days": "2 days before"
+    },
+    "attendee": {
+      "present": "Present"
+    },
+    "rsvp": {
+      "accepted": "I'll Attend",
+      "tentative": "Maybe",
+      "declined": "Won't Attend"
+    },
+    "recurring": "Recurring Event",
+    "enableRecurrence": "Enable Recurrence",
+    "billing": "Billing",
+    "actions": {
+      "complete": "Complete",
+      "cancel": "Cancel",
+      "postpone": "Postpone",
+      "decline": "Decline",
+      "confirm": "Confirm"
+    }
+  },
+  "reminders": {
+    "title": "Reminders",
+    "addNew": "Add New Reminder",
+    "searchPlaceholder": "Search reminders...",
+    "upcomingReminders": "Upcoming Reminders",
+    "pastReminders": "Past Reminders",
+    "upcoming": "Upcoming",
+    "past": "Past",
+    "reminderDate": "Reminder Date",
+    "description": "Reminder Description",
+    "loadError": "Error loading reminders:",
+    "notFound": "Reminder Not Found",
+    "notFoundDescription": "The requested reminder does not exist or has been deleted",
+    "noTitle": "Untitled Reminder",
+    "noReminders": "No Reminders",
+    "allCaughtUp": "You're all caught up! No reminders at this time.",
+    "save": "Save Reminder",
+    "type": {
+      "general": "General",
+      "courtHearing": "Court Hearing",
+      "filingDeadline": "Filing Deadline",
+      "paymentDue": "Payment Due",
+      "followUp": "Follow-up",
+      "deadline": "Deadline",
+      "meeting": "Meeting",
+      "payment": "Payment",
+      "task": "Task",
+      "contractRenewal": "Contract Renewal",
+      "statuteLimitation": "Statute of Limitations"
+    },
+    "selectType": "Select Type",
+    "linkedCase": "Linked Case",
+    "linkedClient": "Linked Client",
+    "snooze": {
+      "title": "Snooze",
+      "15min": "15 minutes",
+      "30min": "30 minutes",
+      "1hour": "1 hour",
+      "3hours": "3 hours",
+      "1day": "1 day",
+      "1week": "1 week"
+    },
+    "delegate": "Delegate",
+    "delegateReminder": "Delegate Reminder",
+    "delegateDescription": "Select the person you want to delegate this reminder to",
+    "delegateTo": "Delegate To",
+    "selectTeamMember": "Select Team Member",
+    "delegateNote": "Add a note for delegation...",
+    "delegating": "Delegating...",
+    "advanceNotification": "Advance Notification:",
+    "advanceNotif": {
+      "5min": "5 minutes",
+      "10min": "10 minutes",
+      "15min": "15 minutes",
+      "30min": "30 minutes",
+      "1hour": "1 hour",
+      "2hours": "2 hours",
+      "1day": "1 day",
+      "2days": "2 days",
+      "1week": "1 week"
+    },
+    "enableEscalation": "Enable escalation if no response",
+    "recurring": "Recurring Reminder",
+    "enableRecurrence": "Enable Recurrence",
+    "recurrenceEnd": "Recurrence End",
+    "neverEnd": "Never End",
+    "afterOccurrences": "After Number of Occurrences",
+    "onDate": "On Specific Date",
+    "occurrences": "Number of Occurrences",
+    "skipWeekends": "Skip Weekends",
+    "skipHolidays": "Skip Public Holidays",
+    "maxSnooze": "Maximum Snoozes",
+    "maxSnoozeHint": "Number of allowed snoozes (0 = unlimited)"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "bell": "Notifications",
+    "empty": "No notifications yet",
+    "markAllRead": "Mark all read",
+    "viewAll": "View all",
+    "clear": "Clear",
+    "channels": "Notification Channels",
+    "selectChannels": "Select notification channels:",
+    "channel": {
+      "inApp": "In-App",
+      "push": "Push Notification",
+      "email": "Email",
+      "sms": "SMS",
+      "whatsapp": "WhatsApp"
+    }
+  },
+  "filter": {
+    "status": "Status",
+    "allStatuses": "All Statuses",
+    "employmentType": "Employment Type",
+    "allTypes": "All Types",
+    "nationality": "Nationality",
+    "all": "All",
+    "leaveType": "Leave Type",
+    "allLeaveTypes": "All Leave Types",
+    "clear": "Clear Filters",
+    "month": "Month",
+    "year": "Year"
+  },
+  "sort": {
+    "label": "Sort By",
+    "hireDate": "Hire Date",
+    "name": "Name",
+    "salary": "Salary",
+    "requestDate": "Request Date",
+    "startDate": "Start Date",
+    "employee": "Employee",
+    "numberOfDays": "Number of Days",
+    "paymentDate": "Payment Date",
+    "amount": "Amount",
+    "createdDate": "Created Date",
+    "dueDate": "Due Date"
+  },
+  "nationality": {
+    "saudi": "Saudi",
+    "nonSaudi": "Non-Saudi",
+    "egyptian": "Egyptian",
+    "jordanian": "Jordanian",
+    "syrian": "Syrian",
+    "yemeni": "Yemeni",
+    "pakistani": "Pakistani",
+    "indian": "Indian",
+    "philippine": "Philippine",
+    "other": "Other"
+  },
+  "gender": {
+    "male": "Male",
+    "female": "Female"
+  },
+  "maritalStatus": {
+    "single": "Single",
+    "married": "Married",
+    "divorced": "Divorced",
+    "widowed": "Widowed"
+  },
+  "relationship": {
+    "father": "Father",
+    "mother": "Mother",
+    "spouse": "Spouse",
+    "brother": "Brother",
+    "sister": "Sister",
+    "parent": "Parent",
+    "child": "Child",
+    "sibling": "Sibling",
+    "grandparent": "Grandparent",
+    "other": "Other"
+  },
+  "weekDay": {
+    "sunday": "Sunday",
+    "monday": "Monday",
+    "tuesday": "Tuesday",
+    "wednesday": "Wednesday",
+    "thursday": "Thursday",
+    "friday": "Friday",
+    "saturday": "Saturday"
+  },
+  "month": {
+    "january": "January",
+    "february": "February",
+    "march": "March",
+    "april": "April",
+    "may": "May",
+    "june": "June",
+    "july": "July",
+    "august": "August",
+    "september": "September",
+    "october": "October",
+    "november": "November",
+    "december": "December"
+  },
+  "frequency": {
+    "daily": "Daily",
+    "weekly": "Weekly",
+    "biweekly": "Every Two Weeks",
+    "monthly": "Monthly",
+    "quarterly": "Quarterly",
+    "yearly": "Yearly",
+    "custom": "Custom"
+  },
+  "city": {
+    "riyadh": "Riyadh",
+    "jeddah": "Jeddah",
+    "makkah": "Makkah",
+    "madinah": "Madinah",
+    "dammam": "Dammam",
+    "khobar": "Khobar"
+  },
+  "region": {
+    "riyadh": "Riyadh Region",
+    "makkah": "Makkah Region",
+    "eastern": "Eastern Region",
+    "madinah": "Madinah Region"
+  },
+  "currency": {
+    "sar": "SAR"
+  },
+  "idType": {
+    "saudiId": "Saudi ID",
+    "iqama": "Iqama",
+    "gccId": "GCC ID",
+    "passport": "Passport"
+  },
+  "officeType": {
+    "solo": "Solo Practitioner",
+    "soloDescription": "Individual Lawyer",
+    "small": "Small Firm",
+    "smallDescription": "2-5 employees",
+    "medium": "Medium Firm",
+    "mediumDescription": "6-20 employees",
+    "firm": "Law Firm",
+    "firmDescription": "20+ employees"
+  },
+  "bank": {
+    "rajhi": "Al Rajhi Bank",
+    "nationalCommercial": "National Commercial Bank",
+    "riyad": "Riyad Bank",
+    "alinma": "Alinma Bank"
+  },
+  "branch": {
+    "main": "Main Office",
+    "riyadh": "Riyadh Branch",
+    "jeddah": "Jeddah Branch",
+    "dammam": "Dammam Branch"
+  },
+  "department": {
+    "legal": "Legal Affairs",
+    "finance": "Finance",
+    "hr": "Human Resources",
+    "it": "Information Technology",
+    "administration": "Administration"
+  },
+  "team": {
+    "commercial": "Commercial Cases Team",
+    "criminal": "Criminal Cases Team",
+    "contracts": "Contracts Team"
+  },
+  "paymentFrequency": {
+    "monthly": "Monthly",
+    "biWeekly": "Bi-Weekly",
+    "weekly": "Weekly"
+  },
+  "paymentMethod": {
+    "bankTransfer": "Bank Transfer",
+    "cash": "Cash",
+    "check": "Check"
   }
 }
