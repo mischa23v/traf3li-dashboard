@@ -610,7 +610,7 @@ export function CreateContactView() {
                                         <div className="flex items-center justify-between">
                                             <Label className="text-sm font-medium text-slate-700">البريد الإلكتروني</Label>
                                             <Button type="button" variant="ghost" size="sm" onClick={addEmail} className="text-emerald-600">
-                                                <Plus className="w-4 h-4 ml-1" /> إضافة
+                                                <Plus className="w-4 h-4 ms-1" /> إضافة
                                             </Button>
                                         </div>
                                         {formData.emails.map((email, index) => (
@@ -660,7 +660,7 @@ export function CreateContactView() {
                                         <div className="flex items-center justify-between">
                                             <Label className="text-sm font-medium text-slate-700">رقم الهاتف</Label>
                                             <Button type="button" variant="ghost" size="sm" onClick={addPhone} className="text-emerald-600">
-                                                <Plus className="w-4 h-4 ml-1" /> إضافة
+                                                <Plus className="w-4 h-4 ms-1" /> إضافة
                                             </Button>
                                         </div>
                                         {formData.phones.map((phone, index) => (
@@ -1149,7 +1149,7 @@ export function CreateContactView() {
                             <div className="flex items-center justify-between pt-6 border-t border-slate-200">
                                 <Link to="/dashboard/contacts">
                                     <Button type="button" variant="ghost" className="text-slate-500 hover:text-navy">
-                                        <X className="ml-2 h-4 w-4" />
+                                        <X className="ms-2 h-4 w-4" />
                                         إلغاء
                                     </Button>
                                 </Link>
