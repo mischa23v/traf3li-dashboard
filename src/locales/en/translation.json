@@ -461,6 +461,7 @@
       "reminderDateTime": "Reminder Date",
       "createdAt": "Created At",
       "notSet": "Not set",
+      "untitledReminder": "Untitled Reminder",
       "complete": "Complete",
       "dismiss": "Dismiss",
       "snooze": "Snooze",
@@ -527,6 +528,12 @@
       "contractRenewal": "Contract Renewal",
       "statuteLimitation": "Statute of Limitation",
       "general": "General"
+    },
+    "toast": {
+      "deleteSuccess": "Successfully deleted {{count}} reminder(s)",
+      "deleteSingleSuccess": "Reminder deleted successfully",
+      "deleteError": "Failed to delete some reminders",
+      "deleteFailed": "Failed to delete reminder"
     }
   },
   "events": {
@@ -647,6 +654,12 @@
       "postponed": "Postponed",
       "completed": "Completed",
       "cancelled": "Cancelled"
+    },
+    "toast": {
+      "deleteSuccess": "Successfully deleted {{count}} event(s)",
+      "deleteError": "Failed to delete some events",
+      "rsvpAccepted": "Attendance confirmed",
+      "rsvpDeclined": "Attendance declined"
     }
   },
   "users": {
@@ -791,7 +804,8 @@
     "import": "Import",
     "filter": "Filter",
     "sort": "Sort",
-    "actions": "Actions"
+    "actions": "Actions",
+    "error": "An error occurred, please try again"
   },
   "validation": {
     "required": "This field is required",

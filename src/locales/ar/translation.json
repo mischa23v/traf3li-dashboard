@@ -461,6 +461,7 @@
       "reminderDateTime": "موعد التذكير",
       "createdAt": "تاريخ الإنشاء",
       "notSet": "غير محدد",
+      "untitledReminder": "تذكير بدون عنوان",
       "complete": "إكمال",
       "dismiss": "تجاهل",
       "snooze": "تأجيل",
@@ -527,6 +528,12 @@
       "contractRenewal": "تجديد عقد",
       "statuteLimitation": "مدة التقادم",
       "general": "عام"
+    },
+    "toast": {
+      "deleteSuccess": "تم حذف {{count}} تذكير بنجاح",
+      "deleteSingleSuccess": "تم حذف التذكير بنجاح",
+      "deleteError": "حدث خطأ أثناء حذف بعض التذكيرات",
+      "deleteFailed": "فشل حذف التذكير"
     }
   },
   "events": {
@@ -647,6 +654,12 @@
       "postponed": "مؤجل",
       "completed": "مكتمل",
       "cancelled": "ملغي"
+    },
+    "toast": {
+      "deleteSuccess": "تم حذف {{count}} حدث بنجاح",
+      "deleteError": "حدث خطأ أثناء حذف بعض الأحداث",
+      "rsvpAccepted": "تم تأكيد الحضور",
+      "rsvpDeclined": "تم الاعتذار عن الحضور"
     }
   },
   "users": {
@@ -791,7 +804,8 @@
     "import": "استيراد",
     "filter": "تصفية",
     "sort": "ترتيب",
-    "actions": "الإجراءات"
+    "actions": "الإجراءات",
+    "error": "حدث خطأ، يرجى المحاولة مرة أخرى"
   },
   "validation": {
     "required": "هذا الحقل مطلوب",
