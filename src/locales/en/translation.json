@@ -299,7 +299,58 @@
     "noTeamMembers": "No team members found",
     "viewCase": "View Case",
     "viewClient": "View Client",
-    "viewAssignee": "View Assignee"
+    "viewAssignee": "View Assignee",
+    "table": {
+      "filterPlaceholder": "Filter by title or ID...",
+      "noResults": "No results.",
+      "selectAll": "Select all",
+      "selectRow": "Select row"
+    },
+    "actions": {
+      "import": "Import",
+      "create": "Create",
+      "edit": "Edit",
+      "delete": "Delete",
+      "copy": "Make a copy",
+      "favorite": "Favorite",
+      "labels": "Labels",
+      "openMenu": "Open menu",
+      "updateStatus": "Update status",
+      "updatePriority": "Update priority",
+      "exportTasks": "Export tasks",
+      "deleteSelected": "Delete selected tasks"
+    },
+    "dialogs": {
+      "importTitle": "Import Tasks",
+      "importDescription": "Import tasks quickly from a CSV file.",
+      "importFile": "File",
+      "importSuccess": "You have imported the following file:",
+      "deleteTitle": "Delete this task: {{id}}?",
+      "deleteDescription": "You are about to delete a task with the ID {{id}}. This action cannot be undone.",
+      "deleteSuccess": "The following task has been deleted:",
+      "deleteConfirm": "Delete",
+      "bulkDeleteTitle": "Delete {{count}} task(s)",
+      "bulkDeleteDescription": "Are you sure you want to delete the selected tasks? This action cannot be undone.",
+      "confirmWord": "DELETE",
+      "confirmPrompt": "Confirm by typing \"{{word}}\":",
+      "confirmPlaceholder": "Type \"{{word}}\" to confirm.",
+      "warning": "Warning!",
+      "warningMessage": "Please be careful, this operation cannot be rolled back."
+    },
+    "toast": {
+      "updatingStatus": "Updating status...",
+      "statusUpdated": "Status updated to \"{{status}}\" for {{count}} task(s).",
+      "updatingPriority": "Updating priority...",
+      "priorityUpdated": "Priority updated to \"{{priority}}\" for {{count}} task(s).",
+      "exportingTasks": "Exporting tasks...",
+      "tasksExported": "Exported {{count}} task(s) to CSV.",
+      "deletingTasks": "Deleting tasks...",
+      "tasksDeleted": "Deleted {{count}} task(s)",
+      "error": "Error",
+      "pleaseUploadFile": "Please upload a file",
+      "pleaseUploadCsv": "Please upload CSV format.",
+      "pleaseTypeConfirm": "Please type \"{{word}}\" to confirm."
+    }
   },
   "users": {
     "title": "User List",

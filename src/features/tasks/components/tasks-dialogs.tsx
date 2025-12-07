@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import { showSubmittedData } from '@/lib/show-submitted-data'
 import { ConfirmDialog } from '@/components/confirm-dialog'
 import { TasksImportDialog } from './tasks-import-dialog'
@@ -6,6 +7,7 @@ import { useTasks } from './tasks-provider'
 
 export function TasksDialogs() {
   const { open, setOpen, currentRow, setCurrentRow } = useTasks()
+  const { t } = useTranslation()
   return (
     <>
       <TasksMutateDrawer
@@ -51,19 +53,18 @@ export function TasksDialogs() {
               }, 500)
               showSubmittedData(
                 currentRow,
-                'تم حذف المهمة التالية:'
+                t('tasks.dialogs.deleteSuccess')
               )
             }}
             className='max-w-md'
-            title={`حذف المهمة: ${currentRow.id}؟`}
+            title={t('tasks.dialogs.deleteTitle', { id: currentRow.id })}
             desc={
               <>
-                أنت على وشك حذف المهمة ذات المعرف{' '}
-                <strong>{currentRow.id}</strong>. <br />
-                لا يمكن التراجع عن هذا الإجراء.
+                {t('tasks.dialogs.deleteDescription', { id: currentRow.id }).split('{{id}}').join('')}
+                <strong>{currentRow.id}</strong>
               </>
             }
-            confirmText='حذف'
+            confirmText={t('tasks.dialogs.deleteConfirm')}
           />
         </>
       )}

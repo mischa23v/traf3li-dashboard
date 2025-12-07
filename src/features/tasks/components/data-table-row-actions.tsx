@@ -1,5 +1,6 @@
 import { DotsHorizontalIcon } from '@radix-ui/react-icons'
 import { type Row } from '@tanstack/react-table'
+import { useTranslation } from 'react-i18next'
 import { Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
@@ -27,7 +28,7 @@ export function DataTableRowActions<TData>({
   row,
 }: DataTableRowActionsProps<TData>) {
   const task = taskSchema.parse(row.original)
-
+  const { t } = useTranslation()
   const { setOpen, setCurrentRow } = useTasks()
 
   return (
@@ -38,7 +39,7 @@ export function DataTableRowActions<TData>({
           className='data-[state=open]:bg-muted flex h-8 w-8 p-0'
         >
           <DotsHorizontalIcon className='h-4 w-4' />
-          <span className='sr-only'>فتح القائمة</span>
+          <span className='sr-only'>{t('tasks.actions.openMenu')}</span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align='end' className='w-[160px]'>
@@ -48,13 +49,13 @@ export function DataTableRowActions<TData>({
             setOpen('update')
           }}
         >
-          تعديل
+          {t('tasks.actions.edit')}
         </DropdownMenuItem>
-        <DropdownMenuItem disabled>نسخ</DropdownMenuItem>
-        <DropdownMenuItem disabled>مفضلة</DropdownMenuItem>
+        <DropdownMenuItem disabled>{t('tasks.actions.copy')}</DropdownMenuItem>
+        <DropdownMenuItem disabled>{t('tasks.actions.favorite')}</DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuSub>
-          <DropdownMenuSubTrigger>التصنيفات</DropdownMenuSubTrigger>
+          <DropdownMenuSubTrigger>{t('tasks.actions.labels')}</DropdownMenuSubTrigger>
           <DropdownMenuSubContent>
             <DropdownMenuRadioGroup value={task.label}>
               {labels.map((label) => (
@@ -72,7 +73,7 @@ export function DataTableRowActions<TData>({
             setOpen('delete')
           }}
         >
-          حذف
+          {t('tasks.actions.delete')}
           <DropdownMenuShortcut>
             <Trash2 size={16} />
           </DropdownMenuShortcut>

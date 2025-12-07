@@ -299,7 +299,58 @@
     "noTeamMembers": "لا يوجد أعضاء فريق",
     "viewCase": "عرض القضية",
     "viewClient": "عرض العميل",
-    "viewAssignee": "عرض المسؤول"
+    "viewAssignee": "عرض المسؤول",
+    "table": {
+      "filterPlaceholder": "البحث بالعنوان أو المعرف...",
+      "noResults": "لا توجد نتائج.",
+      "selectAll": "تحديد الكل",
+      "selectRow": "تحديد الصف"
+    },
+    "actions": {
+      "import": "استيراد",
+      "create": "إنشاء",
+      "edit": "تعديل",
+      "delete": "حذف",
+      "copy": "نسخ",
+      "favorite": "مفضلة",
+      "labels": "التصنيفات",
+      "openMenu": "فتح القائمة",
+      "updateStatus": "تحديث الحالة",
+      "updatePriority": "تحديث الأولوية",
+      "exportTasks": "تصدير المهام",
+      "deleteSelected": "حذف المهام المحددة"
+    },
+    "dialogs": {
+      "importTitle": "استيراد المهام",
+      "importDescription": "استيراد المهام بسرعة من ملف CSV.",
+      "importFile": "الملف",
+      "importSuccess": "تم استيراد الملف التالي:",
+      "deleteTitle": "حذف المهمة: {{id}}؟",
+      "deleteDescription": "أنت على وشك حذف المهمة ذات المعرف {{id}}. لا يمكن التراجع عن هذا الإجراء.",
+      "deleteSuccess": "تم حذف المهمة التالية:",
+      "deleteConfirm": "حذف",
+      "bulkDeleteTitle": "حذف {{count}} مهام",
+      "bulkDeleteDescription": "هل أنت متأكد من حذف المهام المحددة؟ لا يمكن التراجع عن هذا الإجراء.",
+      "confirmWord": "حذف",
+      "confirmPrompt": "أكد بكتابة \"{{word}}\":",
+      "confirmPlaceholder": "اكتب \"{{word}}\" للتأكيد.",
+      "warning": "تحذير!",
+      "warningMessage": "يرجى الانتباه، لا يمكن التراجع عن هذه العملية."
+    },
+    "toast": {
+      "updatingStatus": "جاري تحديث الحالة...",
+      "statusUpdated": "تم تحديث الحالة إلى \"{{status}}\" لـ {{count}} مهام.",
+      "updatingPriority": "جاري تحديث الأولوية...",
+      "priorityUpdated": "تم تحديث الأولوية إلى \"{{priority}}\" لـ {{count}} مهام.",
+      "exportingTasks": "جاري تصدير المهام...",
+      "tasksExported": "تم تصدير {{count}} مهام إلى CSV.",
+      "deletingTasks": "جاري حذف المهام...",
+      "tasksDeleted": "تم حذف {{count}} مهام",
+      "error": "خطأ",
+      "pleaseUploadFile": "يرجى رفع ملف",
+      "pleaseUploadCsv": "يرجى رفع ملف بصيغة CSV.",
+      "pleaseTypeConfirm": "يرجى كتابة \"{{word}}\" للتأكيد."
+    }
   },
   "users": {
     "title": "قائمة المستخدمين",

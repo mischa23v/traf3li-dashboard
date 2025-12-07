@@ -1,4 +1,5 @@
 import { type ColumnDef } from '@tanstack/react-table'
+import { type TFunction } from 'i18next'
 import { Badge } from '@/components/ui/badge'
 import { Checkbox } from '@/components/ui/checkbox'
 import { DataTableColumnHeader } from '@/components/data-table'
@@ -6,7 +7,7 @@ import { labels, priorities, statuses } from '../data/data'
 import { type Task } from '../data/schema'
 import { DataTableRowActions } from './data-table-row-actions'
 
-export const tasksColumns: ColumnDef<Task>[] = [
+export const getTasksColumns = (t: TFunction): ColumnDef<Task>[] => [
   {
     id: 'select',
     header: ({ table }) => (
@@ -16,7 +17,7 @@ export const tasksColumns: ColumnDef<Task>[] = [
           (table.getIsSomePageRowsSelected() && 'indeterminate')
         }
         onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        aria-label='تحديد الكل'
+        aria-label={t('tasks.table.selectAll')}
         className='translate-y-[2px]'
       />
     ),
@@ -24,7 +25,7 @@ export const tasksColumns: ColumnDef<Task>[] = [
       <Checkbox
         checked={row.getIsSelected()}
         onCheckedChange={(value) => row.toggleSelected(!!value)}
-        aria-label='تحديد الصف'
+        aria-label={t('tasks.table.selectRow')}
         className='translate-y-[2px]'
       />
     ),
@@ -34,7 +35,7 @@ export const tasksColumns: ColumnDef<Task>[] = [
   {
     accessorKey: 'id',
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title='المهمة' />
+      <DataTableColumnHeader column={column} title={t('tasks.columns.task')} />
     ),
     cell: ({ row }) => <div className='w-[80px]'>{row.getValue('id')}</div>,
     enableSorting: false,
@@ -43,7 +44,7 @@ export const tasksColumns: ColumnDef<Task>[] = [
   {
     accessorKey: 'title',
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title='العنوان' />
+      <DataTableColumnHeader column={column} title={t('tasks.columns.title')} />
     ),
     meta: { className: 'ps-1', tdClassName: 'ps-4' },
     cell: ({ row }) => {
@@ -62,7 +63,7 @@ export const tasksColumns: ColumnDef<Task>[] = [
   {
     accessorKey: 'status',
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title='الحالة' />
+      <DataTableColumnHeader column={column} title={t('tasks.columns.status')} />
     ),
     meta: { className: 'ps-1', tdClassName: 'ps-4' },
     cell: ({ row }) => {
@@ -90,7 +91,7 @@ export const tasksColumns: ColumnDef<Task>[] = [
   {
     accessorKey: 'priority',
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title='الأولوية' />
+      <DataTableColumnHeader column={column} title={t('tasks.columns.priority')} />
     ),
     meta: { className: 'ps-1', tdClassName: 'ps-3' },
     cell: ({ row }) => {
@@ -120,3 +121,6 @@ export const tasksColumns: ColumnDef<Task>[] = [
     cell: ({ row }) => <DataTableRowActions row={row} />,
   },
 ]
+
+// Keep backwards compatibility - use default columns for non-translated usage
+export const tasksColumns = getTasksColumns((key: string) => key)

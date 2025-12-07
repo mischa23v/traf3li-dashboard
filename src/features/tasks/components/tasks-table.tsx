@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { getRouteApi } from '@tanstack/react-router'
 import {
   type SortingState,
@@ -26,7 +27,7 @@ import { DataTablePagination, DataTableToolbar } from '@/components/data-table'
 import { priorities, statuses } from '../data/data'
 import { type Task } from '../data/schema'
 import { DataTableBulkActions } from './data-table-bulk-actions'
-import { tasksColumns as columns } from './tasks-columns'
+import { getTasksColumns } from './tasks-columns'
 
 const route = getRouteApi('/_authenticated/dashboard/tasks/list')
 
@@ -35,6 +36,8 @@ type DataTableProps = {
 }
 
 export function TasksTable({ data }: DataTableProps) {
+  const { t } = useTranslation()
+  const columns = getTasksColumns(t)
   // Local UI-only states
   const [rowSelection, setRowSelection] = useState({})
   const [sorting, setSorting] = useState<SortingState>([])
@@ -113,16 +116,16 @@ export function TasksTable({ data }: DataTableProps) {
     >
       <DataTableToolbar
         table={table}
-        searchPlaceholder='البحث بالعنوان أو المعرف...'
+        searchPlaceholder={t('tasks.table.filterPlaceholder')}
         filters={[
           {
             columnId: 'status',
-            title: 'الحالة',
+            title: t('tasks.columns.status'),
             options: statuses,
           },
           {
             columnId: 'priority',
-            title: 'الأولوية',
+            title: t('tasks.columns.priority'),
             options: priorities,
           },
         ]}
@@ -183,7 +186,7 @@ export function TasksTable({ data }: DataTableProps) {
                   colSpan={columns.length}
                   className='h-24 text-center'
                 >
-                  لا توجد نتائج.
+                  {t('tasks.table.noResults')}
                 </TableCell>
               </TableRow>
             )}

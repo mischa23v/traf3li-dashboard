@@ -1,5 +1,6 @@
 import { z } from 'zod'
 import { useForm } from 'react-hook-form'
+import { useTranslation } from 'react-i18next'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { showSubmittedData } from '@/lib/show-submitted-data'
 import { Button } from '@/components/ui/button'
@@ -22,18 +23,6 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 
-const formSchema = z.object({
-  file: z
-    .instanceof(FileList)
-    .refine((files) => files.length > 0, {
-      message: 'يرجى رفع ملف',
-    })
-    .refine(
-      (files) => ['text/csv'].includes(files?.[0]?.type),
-      'يرجى رفع ملف بصيغة CSV.'
-    ),
-})
-
 type TaskImportDialogProps = {
   open: boolean
   onOpenChange: (open: boolean) => void
@@ -43,6 +32,20 @@ export function TasksImportDialog({
   open,
   onOpenChange,
 }: TaskImportDialogProps) {
+  const { t } = useTranslation()
+
+  const formSchema = z.object({
+    file: z
+      .instanceof(FileList)
+      .refine((files) => files.length > 0, {
+        message: t('tasks.toast.pleaseUploadFile'),
+      })
+      .refine(
+        (files) => ['text/csv'].includes(files?.[0]?.type),
+        t('tasks.toast.pleaseUploadCsv')
+      ),
+  })
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema) as any,
     defaultValues: { file: undefined },
@@ -59,7 +62,7 @@ export function TasksImportDialog({
         size: file[0].size,
         type: file[0].type,
       }
-      showSubmittedData(fileDetails, 'تم استيراد الملف التالي:')
+      showSubmittedData(fileDetails, t('tasks.dialogs.importSuccess'))
     }
     onOpenChange(false)
   }
@@ -74,9 +77,9 @@ export function TasksImportDialog({
     >
       <DialogContent className='gap-2 sm:max-w-sm'>
         <DialogHeader className='text-start'>
-          <DialogTitle>استيراد المهام</DialogTitle>
+          <DialogTitle>{t('tasks.dialogs.importTitle')}</DialogTitle>
           <DialogDescription>
-            استيراد المهام بسرعة من ملف CSV.
+            {t('tasks.dialogs.importDescription')}
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
@@ -86,7 +89,7 @@ export function TasksImportDialog({
               name='file'
               render={() => (
                 <FormItem className='my-2'>
-                  <FormLabel>الملف</FormLabel>
+                  <FormLabel>{t('tasks.dialogs.importFile')}</FormLabel>
                   <FormControl>
                     <Input type='file' {...fileRef} className='h-8 py-0' />
                   </FormControl>
@@ -98,10 +101,10 @@ export function TasksImportDialog({
         </Form>
         <DialogFooter className='gap-2'>
           <DialogClose asChild>
-            <Button variant='outline'>إغلاق</Button>
+            <Button variant='outline'>{t('common.close')}</Button>
           </DialogClose>
           <Button type='submit' form='task-import-form'>
-            استيراد
+            {t('tasks.actions.import')}
           </Button>
         </DialogFooter>
       </DialogContent>

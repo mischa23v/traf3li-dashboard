@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { type Table } from '@tanstack/react-table'
 import { AlertTriangle } from 'lucide-react'
 import { toast } from 'sonner'
+import { useTranslation } from 'react-i18next'
 import { sleep } from '@/lib/utils'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Input } from '@/components/ui/input'
@@ -16,34 +17,32 @@ type TaskMultiDeleteDialogProps<TData> = {
   table: Table<TData>
 }
 
-const CONFIRM_WORD = 'حذف'
-
 export function TasksMultiDeleteDialog<TData>({
   open,
   onOpenChange,
   table,
 }: TaskMultiDeleteDialogProps<TData>) {
   const [value, setValue] = useState('')
+  const { t } = useTranslation()
 
+  const CONFIRM_WORD = t('tasks.dialogs.confirmWord')
   const selectedRows = table.getFilteredSelectedRowModel().rows
 
   const handleDelete = () => {
     if (value.trim() !== CONFIRM_WORD) {
-      toast.error(`يرجى كتابة "${CONFIRM_WORD}" للتأكيد.`)
+      toast.error(t('tasks.toast.pleaseTypeConfirm', { word: CONFIRM_WORD }))
       return
     }
 
     onOpenChange(false)
 
     toast.promise(sleep(2000), {
-      loading: 'جاري حذف المهام...',
+      loading: t('tasks.toast.deletingTasks'),
       success: () => {
         table.resetRowSelection()
-        return `تم حذف ${selectedRows.length} ${
-          selectedRows.length > 1 ? 'مهام' : 'مهمة'
-        }`
+        return t('tasks.toast.tasksDeleted', { count: selectedRows.length })
       },
-      error: 'خطأ',
+      error: t('tasks.toast.error'),
     })
   }
 
@@ -59,35 +58,33 @@ export function TasksMultiDeleteDialog<TData>({
             className='stroke-destructive me-1 inline-block'
             size={18}
           />{' '}
-          حذف {selectedRows.length}{' '}
-          {selectedRows.length > 1 ? 'مهام' : 'مهمة'}
+          {t('tasks.dialogs.bulkDeleteTitle', { count: selectedRows.length })}
         </span>
       }
       desc={
         <div className='space-y-4'>
           <p className='mb-2'>
-            هل أنت متأكد من حذف المهام المحددة؟ <br />
-            لا يمكن التراجع عن هذا الإجراء.
+            {t('tasks.dialogs.bulkDeleteDescription')}
           </p>
 
           <Label className='my-4 flex flex-col items-start gap-1.5'>
-            <span className=''>أكد بكتابة "{CONFIRM_WORD}":</span>
+            <span className=''>{t('tasks.dialogs.confirmPrompt', { word: CONFIRM_WORD })}</span>
             <Input
               value={value}
               onChange={(e) => setValue(e.target.value)}
-              placeholder={`اكتب "${CONFIRM_WORD}" للتأكيد.`}
+              placeholder={t('tasks.dialogs.confirmPlaceholder', { word: CONFIRM_WORD })}
             />
           </Label>
 
           <Alert variant='destructive'>
-            <AlertTitle>تحذير!</AlertTitle>
+            <AlertTitle>{t('tasks.dialogs.warning')}</AlertTitle>
             <AlertDescription>
-              يرجى الانتباه، لا يمكن التراجع عن هذه العملية.
+              {t('tasks.dialogs.warningMessage')}
             </AlertDescription>
           </Alert>
         </div>
       }
-      confirmText='حذف'
+      confirmText={t('tasks.actions.delete')}
       destructive
     />
   )

@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { type Table } from '@tanstack/react-table'
 import { Trash2, CircleArrowUp, ArrowUpDown, Download } from 'lucide-react'
 import { toast } from 'sonner'
+import { useTranslation } from 'react-i18next'
 import { sleep } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import {
@@ -28,17 +29,18 @@ export function DataTableBulkActions<TData>({
   table,
 }: DataTableBulkActionsProps<TData>) {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+  const { t } = useTranslation()
   const selectedRows = table.getFilteredSelectedRowModel().rows
 
   const handleBulkStatusChange = (status: string) => {
     const selectedTasks = selectedRows.map((row) => row.original as Task)
     toast.promise(sleep(2000), {
-      loading: 'جاري تحديث الحالة...',
+      loading: t('tasks.toast.updatingStatus'),
       success: () => {
         table.resetRowSelection()
-        return `تم تحديث الحالة إلى "${status}" لـ ${selectedTasks.length} ${selectedTasks.length > 1 ? 'مهام' : 'مهمة'}.`
+        return t('tasks.toast.statusUpdated', { status, count: selectedTasks.length })
       },
-      error: 'خطأ',
+      error: t('tasks.toast.error'),
     })
     table.resetRowSelection()
   }
@@ -46,12 +48,12 @@ export function DataTableBulkActions<TData>({
   const handleBulkPriorityChange = (priority: string) => {
     const selectedTasks = selectedRows.map((row) => row.original as Task)
     toast.promise(sleep(2000), {
-      loading: 'جاري تحديث الأولوية...',
+      loading: t('tasks.toast.updatingPriority'),
       success: () => {
         table.resetRowSelection()
-        return `تم تحديث الأولوية إلى "${priority}" لـ ${selectedTasks.length} ${selectedTasks.length > 1 ? 'مهام' : 'مهمة'}.`
+        return t('tasks.toast.priorityUpdated', { priority, count: selectedTasks.length })
       },
-      error: 'خطأ',
+      error: t('tasks.toast.error'),
     })
     table.resetRowSelection()
   }
@@ -59,12 +61,12 @@ export function DataTableBulkActions<TData>({
   const handleBulkExport = () => {
     const selectedTasks = selectedRows.map((row) => row.original as Task)
     toast.promise(sleep(2000), {
-      loading: 'جاري تصدير المهام...',
+      loading: t('tasks.toast.exportingTasks'),
       success: () => {
         table.resetRowSelection()
-        return `تم تصدير ${selectedTasks.length} ${selectedTasks.length > 1 ? 'مهام' : 'مهمة'} إلى CSV.`
+        return t('tasks.toast.tasksExported', { count: selectedTasks.length })
       },
-      error: 'خطأ',
+      error: t('tasks.toast.error'),
     })
     table.resetRowSelection()
   }
@@ -80,16 +82,16 @@ export function DataTableBulkActions<TData>({
                   variant='outline'
                   size='icon'
                   className='size-8'
-                  aria-label='تحديث الحالة'
-                  title='تحديث الحالة'
+                  aria-label={t('tasks.actions.updateStatus')}
+                  title={t('tasks.actions.updateStatus')}
                 >
                   <CircleArrowUp />
-                  <span className='sr-only'>تحديث الحالة</span>
+                  <span className='sr-only'>{t('tasks.actions.updateStatus')}</span>
                 </Button>
               </DropdownMenuTrigger>
             </TooltipTrigger>
             <TooltipContent>
-              <p>تحديث الحالة</p>
+              <p>{t('tasks.actions.updateStatus')}</p>
             </TooltipContent>
           </Tooltip>
           <DropdownMenuContent sideOffset={14}>
@@ -116,16 +118,16 @@ export function DataTableBulkActions<TData>({
                   variant='outline'
                   size='icon'
                   className='size-8'
-                  aria-label='تحديث الأولوية'
-                  title='تحديث الأولوية'
+                  aria-label={t('tasks.actions.updatePriority')}
+                  title={t('tasks.actions.updatePriority')}
                 >
                   <ArrowUpDown />
-                  <span className='sr-only'>تحديث الأولوية</span>
+                  <span className='sr-only'>{t('tasks.actions.updatePriority')}</span>
                 </Button>
               </DropdownMenuTrigger>
             </TooltipTrigger>
             <TooltipContent>
-              <p>تحديث الأولوية</p>
+              <p>{t('tasks.actions.updatePriority')}</p>
             </TooltipContent>
           </Tooltip>
           <DropdownMenuContent sideOffset={14}>
@@ -151,15 +153,15 @@ export function DataTableBulkActions<TData>({
               size='icon'
               onClick={() => handleBulkExport()}
               className='size-8'
-              aria-label='تصدير المهام'
-              title='تصدير المهام'
+              aria-label={t('tasks.actions.exportTasks')}
+              title={t('tasks.actions.exportTasks')}
             >
               <Download />
-              <span className='sr-only'>تصدير المهام</span>
+              <span className='sr-only'>{t('tasks.actions.exportTasks')}</span>
             </Button>
           </TooltipTrigger>
           <TooltipContent>
-            <p>تصدير المهام</p>
+            <p>{t('tasks.actions.exportTasks')}</p>
           </TooltipContent>
         </Tooltip>
 
@@ -170,15 +172,15 @@ export function DataTableBulkActions<TData>({
               size='icon'
               onClick={() => setShowDeleteConfirm(true)}
               className='size-8'
-              aria-label='حذف المهام المحددة'
-              title='حذف المهام المحددة'
+              aria-label={t('tasks.actions.deleteSelected')}
+              title={t('tasks.actions.deleteSelected')}
             >
               <Trash2 />
-              <span className='sr-only'>حذف المهام المحددة</span>
+              <span className='sr-only'>{t('tasks.actions.deleteSelected')}</span>
             </Button>
           </TooltipTrigger>
           <TooltipContent>
-            <p>حذف المهام المحددة</p>
+            <p>{t('tasks.actions.deleteSelected')}</p>
           </TooltipContent>
         </Tooltip>
       </BulkActionsToolbar>
