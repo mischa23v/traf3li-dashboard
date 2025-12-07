@@ -274,7 +274,10 @@ export default function TransactionsDashboard() {
 
     // Process and filter data
     const { filteredEntries, summary } = useMemo(() => {
-        const allEntries = entriesData?.entries || []
+        // Handle different API response structures - entries could be in entriesData.entries or entriesData directly
+        const allEntries = Array.isArray(entriesData)
+            ? entriesData
+            : (Array.isArray(entriesData?.entries) ? entriesData.entries : [])
 
         // Apply local filters (search, status)
         let filtered = allEntries
@@ -317,9 +320,12 @@ export default function TransactionsDashboard() {
         }
     }, [entriesData, filters.search, filters.status])
 
-    // Pagination
-    const totalPages = Math.ceil((entriesData?.total || 0) / filters.pageSize)
-    const totalCount = entriesData?.total || 0
+    // Pagination - handle both { entries, total } and direct array formats
+    const totalFromAPI = Array.isArray(entriesData)
+        ? entriesData.length
+        : (entriesData?.total || 0)
+    const totalPages = Math.ceil(totalFromAPI / filters.pageSize)
+    const totalCount = totalFromAPI
 
     // Handle period change
     const handlePeriodChange = (period: string) => {
