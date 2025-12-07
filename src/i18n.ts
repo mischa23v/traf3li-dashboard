@@ -14,13 +14,17 @@ const resources = {
   },
 }
 
+// Check if language is stored in localStorage
+const storedLang = typeof window !== 'undefined' ? localStorage.getItem('i18nextLng') : null
+const detectedLang = storedLang || 'ar' // Default to Arabic if no stored preference
+
 i18n
   .use(LanguageDetector)
   .use(initReactI18next)
   .init({
     resources,
     fallbackLng: 'ar',
-    lng: 'ar', // Default language is Arabic
+    lng: detectedLang, // Use detected/stored language or default to Arabic
     debug: false,
     interpolation: {
       escapeValue: false,
@@ -28,6 +32,7 @@ i18n
     detection: {
       order: ['localStorage', 'navigator'],
       caches: ['localStorage'],
+      lookupLocalStorage: 'i18nextLng',
     },
   })
 
