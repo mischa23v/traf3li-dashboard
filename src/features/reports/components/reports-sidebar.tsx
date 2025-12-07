@@ -117,7 +117,7 @@ export function ReportsSidebar({ context }: ReportsSidebarProps) {
                     <h3 className="font-bold text-navy text-lg">
                         {isRTL ? 'تصفية سريعة' : 'Quick Filter'}
                     </h3>
-                    <Filter className="h-4 w-4 text-slate-400" aria-hidden="true" />
+                    <Filter className="h-4 w-4 text-slate-500" aria-hidden="true" />
                 </div>
                 <div className="space-y-2">
                     <Button variant="outline" className="w-full justify-start text-slate-600 border-slate-200 hover:bg-slate-50 hover:text-navy">

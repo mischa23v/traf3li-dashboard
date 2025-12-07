@@ -155,7 +155,7 @@ export function RichDocumentsList({
         <CardContent className="p-4">
           <div className="flex flex-col md:flex-row gap-4">
             <div className="relative flex-1">
-              <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" aria-hidden="true" />
+              <Search className="absolute end-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
               <Input
                 placeholder={isArabic ? 'بحث في المستندات...' : 'Search documents...'}
                 value={filters.search}
@@ -174,7 +174,7 @@ export function RichDocumentsList({
               }
             >
               <SelectTrigger className="w-[180px] rounded-xl">
-                <Filter className="h-4 w-4 me-2 text-slate-400" aria-hidden="true" />
+                <Filter className="h-4 w-4 me-2 text-slate-500" aria-hidden="true" />
                 <SelectValue placeholder={isArabic ? 'نوع المستند' : 'Document Type'} />
               </SelectTrigger>
               <SelectContent>

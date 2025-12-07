@@ -181,7 +181,7 @@ export function CasesView() {
 
                 <div className='ms-auto flex items-center gap-4'>
                     <div className="relative hidden md:block">
-                        <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" aria-hidden="true" />
+                        <Search className="absolute end-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
                         <input type="text" placeholder="بحث..." aria-label="بحث" className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
                     </div>
                     <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white" aria-label="التنبيهات">
@@ -563,12 +563,12 @@ export function CasesView() {
                                                         <div>
                                                             <span className="text-slate-500 text-xs block mb-1">من تاريخ</span>
                                                             <span className="font-medium text-navy">{claim.period.fromG}</span>
-                                                            <span className="text-xs text-slate-400 mx-1">({claim.period.fromH})</span>
+                                                            <span className="text-xs text-slate-500 mx-1">({claim.period.fromH})</span>
                                                         </div>
                                                         <div>
                                                             <span className="text-slate-500 text-xs block mb-1">إلى تاريخ</span>
                                                             <span className="font-medium text-navy">{claim.period.toG}</span>
-                                                            <span className="text-xs text-slate-400 mx-1">({claim.period.toH})</span>
+                                                            <span className="text-xs text-slate-500 mx-1">({claim.period.toH})</span>
                                                         </div>
                                                     </div>
                                                 </div>

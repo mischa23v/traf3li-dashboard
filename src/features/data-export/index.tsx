@@ -55,7 +55,7 @@ export default function DataExport() {
 
         <div className="ms-auto flex items-center gap-4">
           <div className="relative hidden md:block">
-            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" aria-hidden="true" />
+            <Search className="absolute end-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
             <input
               type="text"
               placeholder={t('common.search', 'بحث...')}
@@ -93,7 +93,7 @@ export default function DataExport() {
                   <Database className="w-3 h-3 ms-2" />
                   {isRTL ? 'إدارة البيانات' : 'Data Management'}
                 </Badge>
-                <span className="text-slate-400 text-sm">
+                <span className="text-slate-500 text-sm">
                   {new Date().toLocaleDateString('ar-SA', { month: 'long', year: 'numeric' })}
                 </span>
               </div>
@@ -187,7 +187,7 @@ export default function DataExport() {
                             })
                           }
                           disabled={downloadTemplate.isPending}
-                          className="text-slate-400 hover:text-emerald-600 hover:bg-emerald-100"
+                          className="text-slate-500 hover:text-emerald-600 hover:bg-emerald-100"
                         >
                           <FileDown className="h-4 w-4" />
                         </Button>

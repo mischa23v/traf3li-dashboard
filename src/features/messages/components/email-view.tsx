@@ -191,7 +191,7 @@ export function EmailView() {
             <div className="bg-white border-b border-slate-200 p-4">
               <div className="flex items-center gap-4">
                 <div className="relative flex-1">
-                  <Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" aria-hidden="true" />
+                  <Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
                   <Input
                     placeholder={isRTL ? 'بحث في البريد...' : 'Search emails...'}
                     value={searchQuery}
@@ -253,7 +253,7 @@ export function EmailView() {
                       <span className={`text-sm ${!email.isRead ? 'font-medium text-slate-800' : 'text-slate-600'}`}>
                         {isRTL ? email.subject : email.subjectEn}
                       </span>
-                      {email.hasAttachment && <Paperclip className="h-3 w-3 text-slate-400" />}
+                      {email.hasAttachment && <Paperclip className="h-3 w-3 text-slate-500" />}
                     </div>
                     <p className="text-xs text-slate-500 truncate">
                       {isRTL ? email.preview : email.previewEn}

@@ -166,7 +166,7 @@ export function BadgesView() {
 
         <div className="ms-auto flex items-center gap-4">
           <div className="relative hidden md:block">
-            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" aria-hidden="true" />
+            <Search className="absolute end-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
             <input
               type="text"
               placeholder={t('common.search', 'بحث...')}
@@ -229,7 +229,7 @@ export function BadgesView() {
                           <p className="text-sm text-slate-500 mb-2">
                             {isRTL ? badge.description : badge.descriptionEn}
                           </p>
-                          <div className="flex items-center text-xs text-slate-400">
+                          <div className="flex items-center text-xs text-slate-500">
                             <CheckCircle className="h-3 w-3 me-1 text-emerald-500" />
                             {isRTL ? 'حصلت عليها في' : 'Earned on'} {badge.earnedAt}
                           </div>
@@ -244,7 +244,7 @@ export function BadgesView() {
             {/* Locked Badges */}
             <div>
               <h2 className="text-xl font-bold text-navy mb-4 flex items-center gap-2">
-                <Lock className="h-5 w-5 text-slate-400" />
+                <Lock className="h-5 w-5 text-slate-500" />
                 {isRTL ? 'شارات قيد الفتح' : 'Badges In Progress'}
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

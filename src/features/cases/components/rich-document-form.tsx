@@ -393,7 +393,7 @@ export function RichDocumentForm({
                         <div className="space-y-2">
                           <label className="text-sm font-medium text-slate-700">
                             {isArabic ? 'تاريخ الانتهاء' : 'End Date'}{' '}
-                            <span className="text-slate-400">({isArabic ? 'اختياري' : 'optional'})</span>
+                            <span className="text-slate-500">({isArabic ? 'اختياري' : 'optional'})</span>
                           </label>
                           <Input
                             type="datetime-local"

@@ -563,7 +563,7 @@ export function CaseDetailsView() {
 
         <div className="ms-auto flex items-center gap-4">
           <div className="relative hidden md:block">
-            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" aria-hidden="true" />
+            <Search className="absolute end-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
             <input
               type="text"
               placeholder={t('common.search', 'بحث...')}
@@ -933,7 +933,7 @@ export function CaseDetailsView() {
                                 ) : daysUntilHearing === 0 ? (
                                   <span className="text-red-600">{t('cases.today', 'اليوم')}</span>
                                 ) : (
-                                  <span className="text-slate-400">{t('cases.passed', 'انتهت')}</span>
+                                  <span className="text-slate-500">{t('cases.passed', 'انتهت')}</span>
                                 )
                               ) : (
                                 t('cases.notSpecified', 'غير محدد')
@@ -1163,7 +1163,7 @@ export function CaseDetailsView() {
                                   </div>
                                 ) : (
                                   <div className="space-y-2">
-                                    <Upload className="h-10 w-10 mx-auto text-slate-400" aria-hidden="true" />
+                                    <Upload className="h-10 w-10 mx-auto text-slate-500" aria-hidden="true" />
                                     <p className="text-slate-500">{t('cases.dropFileHere', 'اضغط لاختيار ملف')}</p>
                                     <p className="text-xs text-slate-500">PDF, DOCX, JPG, PNG (max 50MB)</p>
                                   </div>

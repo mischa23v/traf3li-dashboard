@@ -211,7 +211,7 @@ export function FormsView() {
 
         <div className="ms-auto flex items-center gap-4">
           <div className="relative hidden md:block">
-            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" aria-hidden="true" />
+            <Search className="absolute end-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
             <input
               type="text"
               placeholder={t('common.search', 'بحث...')}
@@ -255,7 +255,7 @@ export function FormsView() {
               <CardContent className="p-4">
                 <div className="flex flex-col gap-4">
                   <div className="relative">
-                    <Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" aria-hidden="true" />
+                    <Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
                     <Input
                       placeholder={isRTL ? 'بحث في النماذج...' : 'Search forms...'}
                       value={searchQuery}
@@ -322,10 +322,10 @@ export function FormsView() {
                     <div className="flex items-center gap-2 mb-4 flex-wrap">
                       {getCategoryBadge(form.category)}
                       {getFormatBadge(form.format)}
-                      <span className="text-xs text-slate-400 bg-slate-50 px-2 py-1 rounded-md">{form.size}</span>
+                      <span className="text-xs text-slate-500 bg-slate-50 px-2 py-1 rounded-md">{form.size}</span>
                     </div>
 
-                    <div className="flex items-center justify-between text-xs text-slate-400 mb-4 pt-4 border-t border-slate-50">
+                    <div className="flex items-center justify-between text-xs text-slate-500 mb-4 pt-4 border-t border-slate-50">
                       <span className="flex items-center">
                         <Eye className="h-3.5 w-3.5 me-1" />
                         {form.views.toLocaleString()}

@@ -220,7 +220,7 @@ export function CasesListView() {
 
         <div className="ms-auto flex items-center gap-2 sm:gap-4 overflow-x-auto min-w-0">
           <div className="relative hidden md:block min-w-0">
-            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" aria-hidden="true" />
+            <Search className="absolute end-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
             <input
               type="text"
               placeholder={t('common.search', 'بحث...')}
@@ -277,7 +277,7 @@ export function CasesListView() {
             {/* Filters Toolbar */}
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-white p-2 pe-4 rounded-[20px] border border-slate-100 shadow-sm">
               <div className="flex items-center gap-2 w-full sm:w-auto">
-                <Search className="w-5 h-5 text-slate-400" aria-hidden="true" />
+                <Search className="w-5 h-5 text-slate-500" aria-hidden="true" />
                 <Input
                   placeholder={t('cases.searchPlaceholder', 'بحث في القضايا...')}
                   value={searchQuery}
@@ -425,13 +425,13 @@ export function CasesListView() {
                           </div>
                           <div className="space-y-2 text-sm">
                             <div className="flex items-center gap-2 text-slate-600">
-                              <Users className="h-4 w-4 text-slate-400" aria-hidden="true" />
+                              <Users className="h-4 w-4 text-slate-500" aria-hidden="true" />
                               <span className="text-green-600 font-medium">{t('cases.plaintiff', 'المدعي')}:</span>
                               <span>{getClientName(caseItem)}</span>
                             </div>
                             {getDefendantName(caseItem) !== 'غير محدد' && (
                               <div className="flex items-center gap-2 text-slate-600">
-                                <Users className="h-4 w-4 text-slate-400" aria-hidden="true" />
+                                <Users className="h-4 w-4 text-slate-500" aria-hidden="true" />
                                 <span className="text-amber-600 font-medium">{t('cases.defendant', 'المدعى عليه')}:</span>
                                 <span>{getDefendantName(caseItem)}</span>
                               </div>
@@ -439,12 +439,12 @@ export function CasesListView() {
                             <div className="flex items-center gap-4 flex-wrap">
                               {caseItem.court && (
                                 <div className="flex items-center gap-2 text-slate-600">
-                                  <MapPin className="h-4 w-4 text-slate-400" aria-hidden="true" />
+                                  <MapPin className="h-4 w-4 text-slate-500" aria-hidden="true" />
                                   <span>{caseItem.court}</span>
                                 </div>
                               )}
                               <div className="flex items-center gap-2 text-slate-600">
-                                <User className="h-4 w-4 text-slate-400" aria-hidden="true" />
+                                <User className="h-4 w-4 text-slate-500" aria-hidden="true" />
                                 <span>{getLawyerName(caseItem)}</span>
                               </div>
                             </div>
