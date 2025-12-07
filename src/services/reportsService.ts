@@ -2,7 +2,18 @@ import api from '@/lib/api'
 
 // ==================== ENUMS ====================
 
+// Report Section - which module the report belongs to
+export enum ReportSection {
+  HR = 'hr',
+  FINANCE = 'finance',
+  TASKS = 'tasks',
+  CRM = 'crm',
+  SALES = 'sales',
+  GENERAL = 'general'
+}
+
 export enum ReportCategory {
+  // HR Categories
   EMPLOYEE_DATA = 'employee_data',
   PAYROLL = 'payroll',
   ATTENDANCE = 'attendance',
@@ -13,12 +24,57 @@ export enum ReportCategory {
   BENEFITS = 'benefits',
   COMPENSATION = 'compensation',
   SUCCESSION = 'succession',
+
+  // Finance Categories
+  INVOICES = 'invoices',
+  EXPENSES = 'expenses',
+  PAYMENTS = 'payments',
+  REVENUE = 'revenue',
+  CASH_FLOW = 'cash_flow',
+  BUDGETS = 'budgets',
+  FINANCIAL_STATEMENTS = 'financial_statements',
+  TAX = 'tax',
+  ACCOUNTS_RECEIVABLE = 'accounts_receivable',
+  ACCOUNTS_PAYABLE = 'accounts_payable',
+  PROFITABILITY = 'profitability',
+
+  // Tasks/Productivity Categories
+  TASKS = 'tasks',
+  PROJECTS = 'projects',
+  WORKLOAD = 'workload',
+  DEADLINES = 'deadlines',
+  PRODUCTIVITY = 'productivity',
+  REMINDERS = 'reminders',
+  EVENTS = 'events',
+
+  // CRM Categories
+  CLIENTS = 'clients',
+  CONTACTS = 'contacts',
+  LEADS = 'leads',
+  OPPORTUNITIES = 'opportunities',
+  ACTIVITIES = 'activities',
+  CAMPAIGNS = 'campaigns',
+  CUSTOMER_SATISFACTION = 'customer_satisfaction',
+  REFERRALS = 'referrals',
+
+  // Sales Categories
+  SALES = 'sales',
+  PIPELINE = 'pipeline',
+  FORECASTS = 'forecasts',
+  QUOTAS = 'quotas',
+  COMMISSIONS = 'commissions',
+  DEALS = 'deals',
+  WIN_LOSS = 'win_loss',
+  SALES_PERFORMANCE = 'sales_performance',
+
+  // General Categories
   COMPLIANCE = 'compliance',
   LEGAL = 'legal',
   ANALYTICS = 'analytics',
   EXECUTIVE = 'executive',
   OPERATIONAL = 'operational',
-  STRATEGIC = 'strategic'
+  STRATEGIC = 'strategic',
+  CUSTOM = 'custom'
 }
 
 export enum ReportType {
@@ -175,6 +231,7 @@ export enum ReportStatus {
 }
 
 export enum DataModule {
+  // HR Modules
   EMPLOYEES = 'employees',
   PAYROLL = 'payroll',
   ATTENDANCE = 'attendance',
@@ -185,17 +242,62 @@ export enum DataModule {
   COMPENSATION = 'compensation',
   SUCCESSION = 'succession',
   GRIEVANCES = 'grievances',
-  ASSETS = 'assets',
   ORGANIZATIONAL_STRUCTURE = 'organizational_structure',
   JOB_POSITIONS = 'job_positions',
-  VIOLATIONS = 'violations',
+
+  // Finance Modules
+  INVOICES = 'invoices',
+  EXPENSES = 'expenses',
+  PAYMENTS = 'payments',
+  TRANSACTIONS = 'transactions',
+  ACCOUNTS = 'accounts',
+  BUDGETS = 'budgets',
+  TAX = 'tax',
+  TIME_ENTRIES = 'time_entries',
+
+  // Tasks Modules
+  TASKS = 'tasks',
+  PROJECTS = 'projects',
+  REMINDERS = 'reminders',
+  EVENTS = 'events',
+  CALENDARS = 'calendars',
+
+  // CRM Modules
+  CLIENTS = 'clients',
+  CONTACTS = 'contacts',
+  LEADS = 'leads',
+  OPPORTUNITIES = 'opportunities',
+  ACTIVITIES = 'activities',
+  CAMPAIGNS = 'campaigns',
+  REFERRALS = 'referrals',
+
+  // Sales Modules
+  DEALS = 'deals',
+  PIPELINE = 'pipeline',
+  QUOTES = 'quotes',
+  ORDERS = 'orders',
+
+  // Legal/Other Modules
   CASES = 'cases',
+  DOCUMENTS = 'documents',
+  ASSETS = 'assets',
+  VIOLATIONS = 'violations',
   OTHER = 'other'
 }
 
 // ==================== LABELS ====================
 
+export const reportSectionLabels: Record<ReportSection, { en: string; ar: string }> = {
+  [ReportSection.HR]: { en: 'Human Resources', ar: 'الموارد البشرية' },
+  [ReportSection.FINANCE]: { en: 'Finance', ar: 'المالية' },
+  [ReportSection.TASKS]: { en: 'Tasks & Productivity', ar: 'المهام والإنتاجية' },
+  [ReportSection.CRM]: { en: 'CRM', ar: 'إدارة العملاء' },
+  [ReportSection.SALES]: { en: 'Sales', ar: 'المبيعات' },
+  [ReportSection.GENERAL]: { en: 'General', ar: 'عام' }
+}
+
 export const reportCategoryLabels: Record<ReportCategory, { en: string; ar: string }> = {
+  // HR Categories
   [ReportCategory.EMPLOYEE_DATA]: { en: 'Employee Data', ar: 'بيانات الموظفين' },
   [ReportCategory.PAYROLL]: { en: 'Payroll', ar: 'الرواتب' },
   [ReportCategory.ATTENDANCE]: { en: 'Attendance', ar: 'الحضور' },
@@ -206,12 +308,57 @@ export const reportCategoryLabels: Record<ReportCategory, { en: string; ar: stri
   [ReportCategory.BENEFITS]: { en: 'Benefits', ar: 'المزايا' },
   [ReportCategory.COMPENSATION]: { en: 'Compensation', ar: 'التعويضات' },
   [ReportCategory.SUCCESSION]: { en: 'Succession', ar: 'التعاقب' },
+
+  // Finance Categories
+  [ReportCategory.INVOICES]: { en: 'Invoices', ar: 'الفواتير' },
+  [ReportCategory.EXPENSES]: { en: 'Expenses', ar: 'المصروفات' },
+  [ReportCategory.PAYMENTS]: { en: 'Payments', ar: 'المدفوعات' },
+  [ReportCategory.REVENUE]: { en: 'Revenue', ar: 'الإيرادات' },
+  [ReportCategory.CASH_FLOW]: { en: 'Cash Flow', ar: 'التدفق النقدي' },
+  [ReportCategory.BUDGETS]: { en: 'Budgets', ar: 'الميزانيات' },
+  [ReportCategory.FINANCIAL_STATEMENTS]: { en: 'Financial Statements', ar: 'القوائم المالية' },
+  [ReportCategory.TAX]: { en: 'Tax', ar: 'الضرائب' },
+  [ReportCategory.ACCOUNTS_RECEIVABLE]: { en: 'Accounts Receivable', ar: 'حسابات القبض' },
+  [ReportCategory.ACCOUNTS_PAYABLE]: { en: 'Accounts Payable', ar: 'حسابات الدفع' },
+  [ReportCategory.PROFITABILITY]: { en: 'Profitability', ar: 'الربحية' },
+
+  // Tasks Categories
+  [ReportCategory.TASKS]: { en: 'Tasks', ar: 'المهام' },
+  [ReportCategory.PROJECTS]: { en: 'Projects', ar: 'المشاريع' },
+  [ReportCategory.WORKLOAD]: { en: 'Workload', ar: 'حجم العمل' },
+  [ReportCategory.DEADLINES]: { en: 'Deadlines', ar: 'المواعيد النهائية' },
+  [ReportCategory.PRODUCTIVITY]: { en: 'Productivity', ar: 'الإنتاجية' },
+  [ReportCategory.REMINDERS]: { en: 'Reminders', ar: 'التذكيرات' },
+  [ReportCategory.EVENTS]: { en: 'Events', ar: 'الأحداث' },
+
+  // CRM Categories
+  [ReportCategory.CLIENTS]: { en: 'Clients', ar: 'العملاء' },
+  [ReportCategory.CONTACTS]: { en: 'Contacts', ar: 'جهات الاتصال' },
+  [ReportCategory.LEADS]: { en: 'Leads', ar: 'العملاء المحتملين' },
+  [ReportCategory.OPPORTUNITIES]: { en: 'Opportunities', ar: 'الفرص' },
+  [ReportCategory.ACTIVITIES]: { en: 'Activities', ar: 'الأنشطة' },
+  [ReportCategory.CAMPAIGNS]: { en: 'Campaigns', ar: 'الحملات' },
+  [ReportCategory.CUSTOMER_SATISFACTION]: { en: 'Customer Satisfaction', ar: 'رضا العملاء' },
+  [ReportCategory.REFERRALS]: { en: 'Referrals', ar: 'الإحالات' },
+
+  // Sales Categories
+  [ReportCategory.SALES]: { en: 'Sales', ar: 'المبيعات' },
+  [ReportCategory.PIPELINE]: { en: 'Pipeline', ar: 'خط الأنابيب' },
+  [ReportCategory.FORECASTS]: { en: 'Forecasts', ar: 'التوقعات' },
+  [ReportCategory.QUOTAS]: { en: 'Quotas', ar: 'الحصص' },
+  [ReportCategory.COMMISSIONS]: { en: 'Commissions', ar: 'العمولات' },
+  [ReportCategory.DEALS]: { en: 'Deals', ar: 'الصفقات' },
+  [ReportCategory.WIN_LOSS]: { en: 'Win/Loss', ar: 'الربح/الخسارة' },
+  [ReportCategory.SALES_PERFORMANCE]: { en: 'Sales Performance', ar: 'أداء المبيعات' },
+
+  // General Categories
   [ReportCategory.COMPLIANCE]: { en: 'Compliance', ar: 'الامتثال' },
   [ReportCategory.LEGAL]: { en: 'Legal', ar: 'قانوني' },
   [ReportCategory.ANALYTICS]: { en: 'Analytics', ar: 'التحليلات' },
   [ReportCategory.EXECUTIVE]: { en: 'Executive', ar: 'تنفيذي' },
   [ReportCategory.OPERATIONAL]: { en: 'Operational', ar: 'تشغيلي' },
-  [ReportCategory.STRATEGIC]: { en: 'Strategic', ar: 'استراتيجي' }
+  [ReportCategory.STRATEGIC]: { en: 'Strategic', ar: 'استراتيجي' },
+  [ReportCategory.CUSTOM]: { en: 'Custom', ar: 'مخصص' }
 }
 
 export const reportTypeLabels: Record<ReportType, { en: string; ar: string }> = {
@@ -341,6 +488,7 @@ export const reportStatusLabels: Record<ReportStatus, { en: string; ar: string }
 }
 
 export const dataModuleLabels: Record<DataModule, { en: string; ar: string }> = {
+  // HR Modules
   [DataModule.EMPLOYEES]: { en: 'Employees', ar: 'الموظفين' },
   [DataModule.PAYROLL]: { en: 'Payroll', ar: 'الرواتب' },
   [DataModule.ATTENDANCE]: { en: 'Attendance', ar: 'الحضور' },
@@ -351,12 +499,172 @@ export const dataModuleLabels: Record<DataModule, { en: string; ar: string }> = 
   [DataModule.COMPENSATION]: { en: 'Compensation', ar: 'التعويضات' },
   [DataModule.SUCCESSION]: { en: 'Succession', ar: 'التعاقب' },
   [DataModule.GRIEVANCES]: { en: 'Grievances', ar: 'الشكاوى' },
-  [DataModule.ASSETS]: { en: 'Assets', ar: 'الأصول' },
   [DataModule.ORGANIZATIONAL_STRUCTURE]: { en: 'Org Structure', ar: 'الهيكل التنظيمي' },
   [DataModule.JOB_POSITIONS]: { en: 'Job Positions', ar: 'المناصب' },
-  [DataModule.VIOLATIONS]: { en: 'Violations', ar: 'المخالفات' },
+
+  // Finance Modules
+  [DataModule.INVOICES]: { en: 'Invoices', ar: 'الفواتير' },
+  [DataModule.EXPENSES]: { en: 'Expenses', ar: 'المصروفات' },
+  [DataModule.PAYMENTS]: { en: 'Payments', ar: 'المدفوعات' },
+  [DataModule.TRANSACTIONS]: { en: 'Transactions', ar: 'المعاملات' },
+  [DataModule.ACCOUNTS]: { en: 'Accounts', ar: 'الحسابات' },
+  [DataModule.BUDGETS]: { en: 'Budgets', ar: 'الميزانيات' },
+  [DataModule.TAX]: { en: 'Tax', ar: 'الضرائب' },
+  [DataModule.TIME_ENTRIES]: { en: 'Time Entries', ar: 'سجلات الوقت' },
+
+  // Tasks Modules
+  [DataModule.TASKS]: { en: 'Tasks', ar: 'المهام' },
+  [DataModule.PROJECTS]: { en: 'Projects', ar: 'المشاريع' },
+  [DataModule.REMINDERS]: { en: 'Reminders', ar: 'التذكيرات' },
+  [DataModule.EVENTS]: { en: 'Events', ar: 'الأحداث' },
+  [DataModule.CALENDARS]: { en: 'Calendars', ar: 'التقويمات' },
+
+  // CRM Modules
+  [DataModule.CLIENTS]: { en: 'Clients', ar: 'العملاء' },
+  [DataModule.CONTACTS]: { en: 'Contacts', ar: 'جهات الاتصال' },
+  [DataModule.LEADS]: { en: 'Leads', ar: 'العملاء المحتملين' },
+  [DataModule.OPPORTUNITIES]: { en: 'Opportunities', ar: 'الفرص' },
+  [DataModule.ACTIVITIES]: { en: 'Activities', ar: 'الأنشطة' },
+  [DataModule.CAMPAIGNS]: { en: 'Campaigns', ar: 'الحملات' },
+  [DataModule.REFERRALS]: { en: 'Referrals', ar: 'الإحالات' },
+
+  // Sales Modules
+  [DataModule.DEALS]: { en: 'Deals', ar: 'الصفقات' },
+  [DataModule.PIPELINE]: { en: 'Pipeline', ar: 'خط الأنابيب' },
+  [DataModule.QUOTES]: { en: 'Quotes', ar: 'عروض الأسعار' },
+  [DataModule.ORDERS]: { en: 'Orders', ar: 'الطلبات' },
+
+  // Legal/Other Modules
   [DataModule.CASES]: { en: 'Cases', ar: 'القضايا' },
+  [DataModule.DOCUMENTS]: { en: 'Documents', ar: 'المستندات' },
+  [DataModule.ASSETS]: { en: 'Assets', ar: 'الأصول' },
+  [DataModule.VIOLATIONS]: { en: 'Violations', ar: 'المخالفات' },
   [DataModule.OTHER]: { en: 'Other', ar: 'أخرى' }
+}
+
+// ==================== CATEGORY BY SECTION MAPPING ====================
+
+export const categoriesBySection: Record<ReportSection, ReportCategory[]> = {
+  [ReportSection.HR]: [
+    ReportCategory.EMPLOYEE_DATA,
+    ReportCategory.PAYROLL,
+    ReportCategory.ATTENDANCE,
+    ReportCategory.TIME_TRACKING,
+    ReportCategory.PERFORMANCE,
+    ReportCategory.RECRUITMENT,
+    ReportCategory.TRAINING,
+    ReportCategory.BENEFITS,
+    ReportCategory.COMPENSATION,
+    ReportCategory.SUCCESSION
+  ],
+  [ReportSection.FINANCE]: [
+    ReportCategory.INVOICES,
+    ReportCategory.EXPENSES,
+    ReportCategory.PAYMENTS,
+    ReportCategory.REVENUE,
+    ReportCategory.CASH_FLOW,
+    ReportCategory.BUDGETS,
+    ReportCategory.FINANCIAL_STATEMENTS,
+    ReportCategory.TAX,
+    ReportCategory.ACCOUNTS_RECEIVABLE,
+    ReportCategory.ACCOUNTS_PAYABLE,
+    ReportCategory.PROFITABILITY
+  ],
+  [ReportSection.TASKS]: [
+    ReportCategory.TASKS,
+    ReportCategory.PROJECTS,
+    ReportCategory.WORKLOAD,
+    ReportCategory.DEADLINES,
+    ReportCategory.PRODUCTIVITY,
+    ReportCategory.REMINDERS,
+    ReportCategory.EVENTS
+  ],
+  [ReportSection.CRM]: [
+    ReportCategory.CLIENTS,
+    ReportCategory.CONTACTS,
+    ReportCategory.LEADS,
+    ReportCategory.OPPORTUNITIES,
+    ReportCategory.ACTIVITIES,
+    ReportCategory.CAMPAIGNS,
+    ReportCategory.CUSTOMER_SATISFACTION,
+    ReportCategory.REFERRALS
+  ],
+  [ReportSection.SALES]: [
+    ReportCategory.SALES,
+    ReportCategory.PIPELINE,
+    ReportCategory.FORECASTS,
+    ReportCategory.QUOTAS,
+    ReportCategory.COMMISSIONS,
+    ReportCategory.DEALS,
+    ReportCategory.WIN_LOSS,
+    ReportCategory.SALES_PERFORMANCE
+  ],
+  [ReportSection.GENERAL]: [
+    ReportCategory.COMPLIANCE,
+    ReportCategory.LEGAL,
+    ReportCategory.ANALYTICS,
+    ReportCategory.EXECUTIVE,
+    ReportCategory.OPERATIONAL,
+    ReportCategory.STRATEGIC,
+    ReportCategory.CUSTOM
+  ]
+}
+
+export const dataModulesBySection: Record<ReportSection, DataModule[]> = {
+  [ReportSection.HR]: [
+    DataModule.EMPLOYEES,
+    DataModule.PAYROLL,
+    DataModule.ATTENDANCE,
+    DataModule.PERFORMANCE,
+    DataModule.RECRUITMENT,
+    DataModule.TRAINING,
+    DataModule.BENEFITS,
+    DataModule.COMPENSATION,
+    DataModule.SUCCESSION,
+    DataModule.GRIEVANCES,
+    DataModule.ORGANIZATIONAL_STRUCTURE,
+    DataModule.JOB_POSITIONS
+  ],
+  [ReportSection.FINANCE]: [
+    DataModule.INVOICES,
+    DataModule.EXPENSES,
+    DataModule.PAYMENTS,
+    DataModule.TRANSACTIONS,
+    DataModule.ACCOUNTS,
+    DataModule.BUDGETS,
+    DataModule.TAX,
+    DataModule.TIME_ENTRIES
+  ],
+  [ReportSection.TASKS]: [
+    DataModule.TASKS,
+    DataModule.PROJECTS,
+    DataModule.REMINDERS,
+    DataModule.EVENTS,
+    DataModule.CALENDARS
+  ],
+  [ReportSection.CRM]: [
+    DataModule.CLIENTS,
+    DataModule.CONTACTS,
+    DataModule.LEADS,
+    DataModule.OPPORTUNITIES,
+    DataModule.ACTIVITIES,
+    DataModule.CAMPAIGNS,
+    DataModule.REFERRALS
+  ],
+  [ReportSection.SALES]: [
+    DataModule.DEALS,
+    DataModule.PIPELINE,
+    DataModule.QUOTES,
+    DataModule.ORDERS,
+    DataModule.CLIENTS
+  ],
+  [ReportSection.GENERAL]: [
+    DataModule.CASES,
+    DataModule.DOCUMENTS,
+    DataModule.ASSETS,
+    DataModule.VIOLATIONS,
+    DataModule.OTHER
+  ]
 }
 
 // ==================== HELPER INTERFACES ====================
@@ -524,6 +832,7 @@ export interface Report {
   reportDescriptionAr?: string
 
   // Classification
+  reportSection: ReportSection
   reportCategory: ReportCategory
   reportSubCategory?: string
   reportType: ReportType
@@ -774,6 +1083,7 @@ export interface Report {
 
 export interface ReportFilters {
   status?: ReportStatus
+  reportSection?: ReportSection
   reportCategory?: ReportCategory
   reportType?: ReportType
   accessLevel?: AccessLevel
@@ -816,6 +1126,12 @@ export const reportsApi = {
   // Get reports by category
   getByCategory: async (category: ReportCategory): Promise<Report[]> => {
     const response = await api.get(`/reports/category/${category}`)
+    return response.data
+  },
+
+  // Get reports by section
+  getBySection: async (section: ReportSection): Promise<Report[]> => {
+    const response = await api.get(`/reports/section/${section}`)
     return response.data
   },
 
