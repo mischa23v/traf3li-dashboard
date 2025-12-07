@@ -208,7 +208,7 @@ export function FinanceSidebar({
                             )}
                             onClick={onToggleSelectionMode}
                         >
-                            {isSelectionMode ? <X className="h-6 w-6" /> : <CheckSquare className="h-6 w-6" />}
+                            {isSelectionMode ? <X className="h-6 w-6" aria-hidden="true" /> : <CheckSquare className="h-6 w-6" />}
                             <span className="text-sm font-bold">{isSelectionMode ? t('common.cancel') : t('sidebar.quickActions.select')}</span>
                         </Button>
                     )}
@@ -357,7 +357,7 @@ export function FinanceSidebar({
                                                         <div className="font-bold text-slate-800 text-sm mb-1">{event.title}</div>
                                                         {event.location && (
                                                             <div className="text-xs text-slate-500 flex items-center gap-1">
-                                                                <MapPin className="h-3 w-3" />
+                                                                <MapPin className="h-3 w-3" aria-hidden="true" />
                                                                 {typeof event.location === 'string' ? event.location : (event.location?.name || event.location?.address || t('sidebar.calendar.remote'))}
                                                             </div>
                                                         )}

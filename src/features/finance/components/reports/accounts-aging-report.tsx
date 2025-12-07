@@ -347,7 +347,7 @@ export function AccountsAgingReport() {
                         <CardHeader className="border-b border-slate-100 pb-4">
                             <div className="flex items-center justify-between">
                                 <CardTitle className="text-xl font-bold text-navy flex items-center gap-2">
-                                    <Users className="w-5 h-5 text-amber-500" />
+                                    <Users className="w-5 h-5 text-amber-500" aria-hidden="true" />
                                     تفاصيل العملاء
                                 </CardTitle>
                                 <Badge variant="outline" className="border-slate-200">
@@ -379,9 +379,9 @@ export function AccountsAgingReport() {
                                                     >
                                                         <TableCell className="w-8">
                                                             {expandedClients.includes(client.clientId) ? (
-                                                                <ChevronUp className="w-4 h-4 text-slate-600" />
+                                                                <ChevronUp className="w-4 h-4 text-slate-600" aria-hidden="true" />
                                                             ) : (
-                                                                <ChevronDown className="w-4 h-4 text-slate-600" />
+                                                                <ChevronDown className="w-4 h-4 text-slate-600" aria-hidden="true" />
                                                             )}
                                                         </TableCell>
                                                         <TableCell className="font-medium text-navy">{client.clientName}</TableCell>

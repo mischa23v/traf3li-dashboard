@@ -126,7 +126,7 @@ export function JobsSidebar({
                     {/* Create Button - White + Green Text + Glow */}
                     <Button asChild className="bg-white hover:bg-emerald-50 text-emerald-600 h-auto py-6 flex flex-col items-center justify-center gap-2 rounded-3xl shadow-lg shadow-white/10 transition-all duration-300 hover:scale-[1.02] border-0">
                         <Link to={currentLinks.create}>
-                            <Plus className="h-7 w-7" />
+                            <Plus className="h-7 w-7" aria-hidden="true" />
                             <span className="text-sm font-bold">إنشاء</span>
                         </Link>
                     </Button>
@@ -142,7 +142,7 @@ export function JobsSidebar({
                         )}
                         onClick={onToggleSelectionMode}
                     >
-                        {isSelectionMode ? <X className="h-6 w-6" /> : <CheckSquare className="h-6 w-6" />}
+                        {isSelectionMode ? <X className="h-6 w-6" aria-hidden="true" /> : <CheckSquare className="h-6 w-6" />}
                         <span className="text-sm font-bold">{isSelectionMode ? 'إلغاء' : 'تحديد'}</span>
                     </Button>
 

@@ -602,7 +602,7 @@ function LeadFormDialog({
               type="submit"
               className="bg-emerald-500 hover:bg-emerald-600 rounded-xl"
             >
-              <Plus className="h-4 w-4 ms-2" />
+              <Plus className="h-4 w-4 ms-2" aria-hidden="true" />
               حفظ
             </Button>
           </DialogFooter>
@@ -959,7 +959,7 @@ export function LeadsDashboard() {
 
           <div className="flex items-center gap-2 flex-1 max-w-md">
             <div className="relative flex-1">
-              <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
+              <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
               <Input
                 placeholder="بحث عن عملاء محتملين..."
                 value={searchQuery}
@@ -973,7 +973,7 @@ export function LeadsDashboard() {
             onClick={() => setShowLeadForm(true)}
             className="bg-emerald-500 hover:bg-emerald-600 rounded-xl"
           >
-            <Plus className="h-4 w-4 ms-2" />
+            <Plus className="h-4 w-4 ms-2" aria-hidden="true" />
             عميل محتمل جديد
           </Button>
         </div>

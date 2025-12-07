@@ -944,7 +944,7 @@ export function CreateStaffView() {
                                                     <Badge key={cert} variant="secondary" className="gap-1">
                                                         {cert}
                                                         <button type="button" onClick={() => removeCertification(cert)} className="hover:text-red-500">
-                                                            <X className="w-3 h-3" />
+                                                            <X className="w-3 h-3" aria-hidden="true" />
                                                         </button>
                                                     </Badge>
                                                 ))}
@@ -963,7 +963,7 @@ export function CreateStaffView() {
                                                     }}
                                                 />
                                                 <Button type="button" variant="outline" onClick={addCertification} className="rounded-xl">
-                                                    <Plus className="w-4 h-4" />
+                                                    <Plus className="w-4 h-4" aria-hidden="true" />
                                                 </Button>
                                             </div>
                                         </div>
@@ -1098,7 +1098,7 @@ export function CreateStaffView() {
                             <div className="flex items-center justify-between pt-6 border-t border-slate-200">
                                 <Link to="/dashboard/staff">
                                     <Button type="button" variant="ghost" className="text-slate-500 hover:text-navy">
-                                        <X className="ms-2 h-4 w-4" />
+                                        <X className="ms-2 h-4 w-4" aria-hidden="true" />
                                         إلغاء
                                     </Button>
                                 </Link>
@@ -1114,7 +1114,7 @@ export function CreateStaffView() {
                                         </span>
                                     ) : (
                                         <span className="flex items-center gap-2">
-                                            <Save className="w-4 h-4" />
+                                            <Save className="w-4 h-4" aria-hidden="true" />
                                             حفظ الموظف
                                         </span>
                                     )}

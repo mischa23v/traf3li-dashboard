@@ -158,7 +158,7 @@ export function SalesReportsDetailsView() {
             {generateReport.isPending ? 'جارٍ الإنشاء...' : 'إعادة إنشاء'}
           </Button>
           <Button variant="outline" className="rounded-xl">
-            <Download className="h-4 w-4 ms-2" />
+            <Download className="h-4 w-4 ms-2" aria-hidden="true" />
             تحميل
           </Button>
           <Button

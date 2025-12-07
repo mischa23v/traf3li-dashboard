@@ -773,7 +773,7 @@ export function CreateClientView() {
                                                         <Loader2 className="w-4 h-4 animate-spin" />
                                                     ) : (
                                                         <>
-                                                            <Search className="w-4 h-4 ms-2" />
+                                                            <Search className="w-4 h-4 ms-2" aria-hidden="true" />
                                                             تحقق عبر يقين
                                                         </>
                                                     )}
@@ -899,7 +899,7 @@ export function CreateClientView() {
                                                         <Loader2 className="w-4 h-4 animate-spin" />
                                                     ) : (
                                                         <>
-                                                            <Search className="w-4 h-4 ms-2" />
+                                                            <Search className="w-4 h-4 ms-2" aria-hidden="true" />
                                                             تحقق عبر وثق
                                                         </>
                                                     )}
@@ -1613,7 +1613,7 @@ export function CreateClientView() {
                                                                     <Loader2 className="w-4 h-4 animate-spin" />
                                                                 ) : (
                                                                     <>
-                                                                        <Search className="w-4 h-4 ms-2" />
+                                                                        <Search className="w-4 h-4 ms-2" aria-hidden="true" />
                                                                         تحقق
                                                                     </>
                                                                 )}
@@ -1821,7 +1821,7 @@ export function CreateClientView() {
                                                         onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addTag())}
                                                     />
                                                     <Button type="button" onClick={addTag} variant="outline" className="rounded-xl">
-                                                        <Plus className="w-4 h-4" />
+                                                        <Plus className="w-4 h-4" aria-hidden="true" />
                                                     </Button>
                                                 </div>
                                                 {tags.length > 0 && (
@@ -1830,7 +1830,7 @@ export function CreateClientView() {
                                                             <Badge key={tag} variant="secondary" className="rounded-full">
                                                                 {tag}
                                                                 <button onClick={() => removeTag(tag)} className="ms-1 hover:text-red-500">
-                                                                    <X className="w-3 h-3" />
+                                                                    <X className="w-3 h-3" aria-hidden="true" />
                                                                 </button>
                                                             </Badge>
                                                         ))}
@@ -1846,14 +1846,14 @@ export function CreateClientView() {
                             <div className="flex justify-between items-center pt-6 border-t border-slate-100">
                                 <Link to="/dashboard/clients">
                                     <Button type="button" variant="ghost" className="text-slate-500 hover:text-slate-700 rounded-xl">
-                                        <X className="ms-2 h-4 w-4" />
+                                        <X className="ms-2 h-4 w-4" aria-hidden="true" />
                                         إلغاء
                                     </Button>
                                 </Link>
 
                                 <div className="flex gap-2">
                                     <Button type="button" variant="outline" className="rounded-xl">
-                                        <Save className="ms-2 h-4 w-4" />
+                                        <Save className="ms-2 h-4 w-4" aria-hidden="true" />
                                         حفظ كمسودة
                                     </Button>
 
@@ -1879,7 +1879,7 @@ export function CreateClientView() {
                                         </DropdownMenuTrigger>
                                         <DropdownMenuContent align="end" className="w-48">
                                             <DropdownMenuItem onClick={handleSubmit}>
-                                                <Save className="ms-2 h-4 w-4" />
+                                                <Save className="ms-2 h-4 w-4" aria-hidden="true" />
                                                 حفظ فقط
                                             </DropdownMenuItem>
                                             <DropdownMenuItem>

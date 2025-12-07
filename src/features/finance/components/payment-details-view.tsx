@@ -154,7 +154,7 @@ export default function PaymentDetailsView() {
                                 طباعة
                             </Button>
                             <Button variant="outline">
-                                <Mail className="h-4 w-4 ms-2" />
+                                <Mail className="h-4 w-4 ms-2" aria-hidden="true" />
                                 إرسال للعميل
                             </Button>
                         </div>
@@ -213,7 +213,7 @@ export default function PaymentDetailsView() {
                             <Card className="border-0 shadow-sm rounded-3xl">
                                 <CardHeader className="border-b border-slate-100">
                                     <CardTitle className="text-lg font-bold text-navy flex items-center gap-2">
-                                        <User className="h-5 w-5 text-brand-blue" />
+                                        <User className="h-5 w-5 text-brand-blue" aria-hidden="true" />
                                         معلومات العميل
                                     </CardTitle>
                                 </CardHeader>
@@ -298,7 +298,7 @@ export default function PaymentDetailsView() {
                                 </CardHeader>
                                 <CardContent className="p-6 space-y-3">
                                     <Button variant="outline" className="w-full justify-start">
-                                        <Mail className="h-4 w-4 ms-2" />
+                                        <Mail className="h-4 w-4 ms-2" aria-hidden="true" />
                                         إرسال الإيصال بالبريد
                                     </Button>
                                     <Button variant="outline" className="w-full justify-start">

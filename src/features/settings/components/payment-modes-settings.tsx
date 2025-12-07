@@ -188,7 +188,7 @@ export default function PaymentModesSettings() {
                             <p className="text-slate-500">إدارة طرق الدفع المتاحة للعملاء</p>
                         </div>
                         <Button onClick={() => handleOpenDialog()} className="bg-brand-blue hover:bg-brand-blue/90">
-                            <Plus className="h-4 w-4 ms-2" />
+                            <Plus className="h-4 w-4 ms-2" aria-hidden="true" />
                             إضافة طريقة دفع
                         </Button>
                     </div>
@@ -201,7 +201,7 @@ export default function PaymentModesSettings() {
                                 <h3 className="text-lg font-medium text-navy mb-2">لا توجد طرق دفع</h3>
                                 <p className="text-slate-500 mb-4">قم بإضافة طريقة دفع للبدء</p>
                                 <Button onClick={() => handleOpenDialog()} variant="outline">
-                                    <Plus className="h-4 w-4 ms-2" />
+                                    <Plus className="h-4 w-4 ms-2" aria-hidden="true" />
                                     إضافة طريقة دفع
                                 </Button>
                             </CardContent>

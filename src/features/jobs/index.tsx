@@ -147,7 +147,7 @@ export function MyServices() {
 
         <div className="ms-auto flex items-center gap-4">
           <div className="relative hidden md:block">
-            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
+            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
             <input
               type="text"
               placeholder={t('common.search', 'بحث...')}
@@ -178,7 +178,7 @@ export function MyServices() {
         {/* HERO BANNER */}
         <ProductivityHero badge={isRTL ? 'الوظائف والخدمات' : 'Jobs & Services'} title={isRTL ? 'خدماتي' : 'My Services'} type="jobs" hideButtons={true}>
           <Button className="bg-emerald-500 hover:bg-emerald-600 text-white h-10 px-5 rounded-xl shadow-lg shadow-emerald-500/20 border-0">
-            <Plus className="h-5 w-5 me-2" />
+            <Plus className="h-5 w-5 me-2" aria-hidden="true" />
             {isRTL ? 'إضافة خدمة جديدة' : 'Add New Service'}
           </Button>
         </ProductivityHero>
@@ -240,7 +240,7 @@ export function MyServices() {
               <CardContent className="p-4">
                 <div className="flex flex-col sm:flex-row gap-4">
                   <div className="relative flex-1">
-                    <Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
+                    <Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
                     <Input
                       placeholder={isRTL ? 'بحث في الخدمات...' : 'Search services...'}
                       value={searchQuery}

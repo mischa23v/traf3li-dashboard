@@ -464,7 +464,7 @@ export default function TransactionsDashboard() {
 
                 {/* READ-ONLY NOTICE */}
                 <Alert className="bg-blue-50 border-blue-200">
-                    <Info className="h-4 w-4 text-blue-600" />
+                    <Info className="h-4 w-4 text-blue-600" aria-hidden="true" />
                     <AlertTitle className="text-blue-800 font-bold">سجل للقراءة فقط</AlertTitle>
                     <AlertDescription className="text-blue-700">
                         هذا السجل يعرض جميع القيود المحاسبية التي تم إنشاؤها تلقائياً عند ترحيل الفواتير والمدفوعات والمصروفات. لا يمكن إضافة أو تعديل القيود مباشرة من هنا.
@@ -500,7 +500,7 @@ export default function TransactionsDashboard() {
                                             onClick={handleClearFilters}
                                             className="text-slate-500"
                                         >
-                                            <X className="h-4 w-4 ms-1" />
+                                            <X className="h-4 w-4 ms-1" aria-hidden="true" />
                                             مسح
                                         </Button>
                                     </div>

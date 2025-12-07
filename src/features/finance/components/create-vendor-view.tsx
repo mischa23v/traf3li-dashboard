@@ -156,14 +156,14 @@ export function CreateVendorView({ mode = 'create' }: CreateVendorViewProps) {
                                 {/* Basic Information */}
                                 <div className="space-y-6">
                                     <h3 className="text-lg font-bold text-navy flex items-center gap-2">
-                                        <Building2 className="h-5 w-5 text-emerald-500" />
+                                        <Building2 className="h-5 w-5 text-emerald-500" aria-hidden="true" />
                                         المعلومات الأساسية
                                     </h3>
 
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                         <div className="space-y-2">
                                             <Label htmlFor="name" className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                                <User className="w-4 h-4 text-emerald-500" />
+                                                <User className="w-4 h-4 text-emerald-500" aria-hidden="true" />
                                                 اسم المورد (إنجليزي) <span className="text-red-500">*</span>
                                             </Label>
                                             <Input
@@ -178,7 +178,7 @@ export function CreateVendorView({ mode = 'create' }: CreateVendorViewProps) {
 
                                         <div className="space-y-2">
                                             <Label htmlFor="nameAr" className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                                <User className="w-4 h-4 text-emerald-500" />
+                                                <User className="w-4 h-4 text-emerald-500" aria-hidden="true" />
                                                 اسم المورد (عربي)
                                             </Label>
                                             <Input
@@ -192,7 +192,7 @@ export function CreateVendorView({ mode = 'create' }: CreateVendorViewProps) {
 
                                         <div className="space-y-2">
                                             <Label htmlFor="email" className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                                <Mail className="w-4 h-4 text-emerald-500" />
+                                                <Mail className="w-4 h-4 text-emerald-500" aria-hidden="true" />
                                                 البريد الإلكتروني<Lock className="h-3 w-3 text-muted-foreground inline ms-1" />
                                             </Label>
                                             <Input
@@ -207,7 +207,7 @@ export function CreateVendorView({ mode = 'create' }: CreateVendorViewProps) {
 
                                         <div className="space-y-2">
                                             <Label htmlFor="phone" className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                                <Phone className="w-4 h-4 text-emerald-500" />
+                                                <Phone className="w-4 h-4 text-emerald-500" aria-hidden="true" />
                                                 رقم الهاتف<Lock className="h-3 w-3 text-muted-foreground inline ms-1" />
                                             </Label>
                                             <Input
@@ -252,7 +252,7 @@ export function CreateVendorView({ mode = 'create' }: CreateVendorViewProps) {
                                 {/* Address Information */}
                                 <div className="space-y-6">
                                     <h3 className="text-lg font-bold text-navy flex items-center gap-2">
-                                        <MapPin className="h-5 w-5 text-emerald-500" />
+                                        <MapPin className="h-5 w-5 text-emerald-500" aria-hidden="true" />
                                         معلومات العنوان
                                     </h3>
 

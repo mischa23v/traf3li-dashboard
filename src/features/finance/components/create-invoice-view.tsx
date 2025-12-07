@@ -494,7 +494,7 @@ export function CreateInvoiceView() {
                             <Card className="rounded-3xl shadow-sm border-slate-100">
                                 <CardHeader className="pb-4">
                                     <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                                        <Building2 className="w-5 h-5 text-emerald-500" />
+                                        <Building2 className="w-5 h-5 text-emerald-500" aria-hidden="true" />
                                         نوع المكتب
                                     </CardTitle>
                                 </CardHeader>
@@ -561,7 +561,7 @@ export function CreateInvoiceView() {
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         <div className="space-y-2">
                                             <Label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                                <User className="w-4 h-4 text-emerald-500" />
+                                                <User className="w-4 h-4 text-emerald-500" aria-hidden="true" />
                                                 العميل <span className="text-red-500">*</span>
                                             </Label>
                                             <Select value={clientId} onValueChange={setClientId} disabled={loadingClients}>
@@ -691,7 +691,7 @@ export function CreateInvoiceView() {
                                             <CardHeader className="cursor-pointer hover:bg-slate-50 transition-colors rounded-t-3xl">
                                                 <div className="flex items-center justify-between">
                                                     <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                                                        <Building2 className="w-5 h-5 text-emerald-500" />
+                                                        <Building2 className="w-5 h-5 text-emerald-500" aria-hidden="true" />
                                                         تفاصيل تنظيمية
                                                     </CardTitle>
                                                     <ChevronDown className={cn("w-5 h-5 text-slate-600 transition-transform", showOrgFields && "rotate-180")} />
@@ -1554,7 +1554,7 @@ export function CreateInvoiceView() {
                                 <AccordionItem value="email" className="border rounded-3xl shadow-sm border-slate-100 overflow-hidden">
                                     <AccordionTrigger className="px-6 py-4 hover:bg-slate-50">
                                         <div className="flex items-center gap-2">
-                                            <Mail className="h-5 w-5 text-blue-500" />
+                                            <Mail className="h-5 w-5 text-blue-500" aria-hidden="true" />
                                             <span className="font-bold text-slate-800">إعدادات البريد الإلكتروني</span>
                                         </div>
                                     </AccordionTrigger>
@@ -1621,7 +1621,7 @@ export function CreateInvoiceView() {
                                 <div className="flex gap-2">
                                     <Link to="/dashboard/finance/invoices">
                                         <Button type="button" variant="ghost" className="text-slate-500 hover:text-slate-700 rounded-xl">
-                                            <X className="ms-2 h-4 w-4" />
+                                            <X className="ms-2 h-4 w-4" aria-hidden="true" />
                                             إلغاء
                                         </Button>
                                     </Link>
@@ -1667,14 +1667,14 @@ export function CreateInvoiceView() {
                                                     ) : (
                                                         <span className="flex items-center gap-2">
                                                             حفظ و إرسال
-                                                            <ChevronDown className="w-4 h-4" />
+                                                            <ChevronDown className="w-4 h-4" aria-hidden="true" />
                                                         </span>
                                                     )}
                                                 </Button>
                                             </DropdownMenuTrigger>
                                             <DropdownMenuContent align="end" className="w-48">
                                                 <DropdownMenuItem onClick={(e) => { setSendAfterCreate(true); handleSubmit(e as any) }}>
-                                                    <Mail className="ms-2 h-4 w-4" />
+                                                    <Mail className="ms-2 h-4 w-4" aria-hidden="true" />
                                                     حفظ و إرسال بالبريد
                                                 </DropdownMenuItem>
                                                 <DropdownMenuItem>

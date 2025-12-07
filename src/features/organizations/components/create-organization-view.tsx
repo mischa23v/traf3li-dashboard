@@ -710,7 +710,7 @@ export function CreateOrganizationView() {
                                         <div className="flex items-center justify-between">
                                             <Label className="text-sm font-medium text-slate-700">البريد الإلكتروني</Label>
                                             <Button type="button" variant="ghost" size="sm" onClick={addEmail} className="text-emerald-600">
-                                                <Plus className="w-4 h-4 ms-1" /> إضافة
+                                                <Plus className="w-4 h-4 ms-1" aria-hidden="true" /> إضافة
                                             </Button>
                                         </div>
                                         {formData.emails.map((email, index) => (
@@ -734,7 +734,7 @@ export function CreateOrganizationView() {
                                                 </label>
                                                 {formData.emails.length > 1 && (
                                                     <Button type="button" variant="ghost" size="icon" onClick={() => removeEmail(index)} className="text-red-500">
-                                                        <X className="w-4 h-4" />
+                                                        <X className="w-4 h-4" aria-hidden="true" />
                                                     </Button>
                                                 )}
                                             </div>
@@ -839,7 +839,7 @@ export function CreateOrganizationView() {
                                     <AccordionContent className="space-y-4 pb-4">
                                         <div className="flex justify-end">
                                             <Button type="button" variant="outline" size="sm" onClick={addKeyContact} className="text-emerald-600">
-                                                <Plus className="w-4 h-4 ms-1" /> إضافة جهة اتصال
+                                                <Plus className="w-4 h-4 ms-1" aria-hidden="true" /> إضافة جهة اتصال
                                             </Button>
                                         </div>
                                         {formData.keyContacts.length === 0 ? (
@@ -879,7 +879,7 @@ export function CreateOrganizationView() {
                                                         رئيسي
                                                     </label>
                                                     <Button type="button" variant="ghost" size="icon" onClick={() => removeKeyContact(index)} className="text-red-500">
-                                                        <X className="w-4 h-4" />
+                                                        <X className="w-4 h-4" aria-hidden="true" />
                                                     </Button>
                                                 </div>
                                             ))
@@ -1009,7 +1009,7 @@ export function CreateOrganizationView() {
                                                 <Badge key={tag} variant="secondary" className="gap-1">
                                                     {tag}
                                                     <button type="button" onClick={() => removeTag(tag)} className="hover:text-red-500">
-                                                        <X className="w-3 h-3" />
+                                                        <X className="w-3 h-3" aria-hidden="true" />
                                                     </button>
                                                 </Badge>
                                             ))}
@@ -1028,7 +1028,7 @@ export function CreateOrganizationView() {
                                                 }}
                                             />
                                             <Button type="button" variant="outline" onClick={addTag} className="rounded-xl">
-                                                <Plus className="w-4 h-4" />
+                                                <Plus className="w-4 h-4" aria-hidden="true" />
                                             </Button>
                                         </div>
                                     </div>
@@ -1050,7 +1050,7 @@ export function CreateOrganizationView() {
                             <div className="flex items-center justify-between pt-6 border-t border-slate-200">
                                 <Link to="/dashboard/organizations">
                                     <Button type="button" variant="ghost" className="text-slate-500 hover:text-navy">
-                                        <X className="ms-2 h-4 w-4" />
+                                        <X className="ms-2 h-4 w-4" aria-hidden="true" />
                                         إلغاء
                                     </Button>
                                 </Link>
@@ -1066,7 +1066,7 @@ export function CreateOrganizationView() {
                                         </span>
                                     ) : (
                                         <span className="flex items-center gap-2">
-                                            <Save className="w-4 h-4" />
+                                            <Save className="w-4 h-4" aria-hidden="true" />
                                             حفظ المنظمة
                                         </span>
                                     )}

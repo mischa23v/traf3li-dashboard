@@ -377,7 +377,7 @@ export function SalesReportsCreateView() {
               className="w-full bg-emerald-500 hover:bg-emerald-600 rounded-xl h-12"
               disabled={createReport.isPending}
             >
-              <Save className="h-4 w-4 ms-2" />
+              <Save className="h-4 w-4 ms-2" aria-hidden="true" />
               {createReport.isPending ? 'جارٍ الإنشاء...' : 'إنشاء التقرير'}
             </Button>
             <Button

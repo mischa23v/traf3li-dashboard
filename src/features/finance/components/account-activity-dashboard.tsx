@@ -321,7 +321,7 @@ export default function AccountActivityDashboard() {
                                 <CardContent className="p-6">
                                     <div className="flex justify-between items-start mb-4">
                                         <div className="w-12 h-12 rounded-2xl bg-blue-50 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                                            <User className="w-6 h-6 text-blue-600" />
+                                            <User className="w-6 h-6 text-blue-600" aria-hidden="true" />
                                         </div>
                                         <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-100">
                                             مستخدمون
@@ -442,7 +442,7 @@ export default function AccountActivityDashboard() {
                                                                             <div className="flex items-center justify-between mt-3 pt-3 border-t border-slate-50">
                                                                                 <div className="flex items-center gap-4 text-xs text-slate-500">
                                                                                     <span className="flex items-center gap-1">
-                                                                                        <User className="h-3 w-3" />
+                                                                                        <User className="h-3 w-3" aria-hidden="true" />
                                                                                         {activity.userName}
                                                                                     </span>
                                                                                     <span className="font-mono bg-slate-50 px-1.5 py-0.5 rounded text-slate-600">{activity.reference}</span>

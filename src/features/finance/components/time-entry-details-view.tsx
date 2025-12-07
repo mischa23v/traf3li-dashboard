@@ -189,7 +189,7 @@ export function TimeEntryDetailsView() {
                             </h1>
                             <div className="flex flex-wrap gap-6 text-sm text-slate-300">
                                 <div className="flex items-center gap-2">
-                                    <User className="h-4 w-4 text-emerald-400" />
+                                    <User className="h-4 w-4 text-emerald-400" aria-hidden="true" />
                                     <span>العميل: <span className="text-white font-medium">{entry.client}</span></span>
                                 </div>
                                 <div className="flex items-center gap-2">

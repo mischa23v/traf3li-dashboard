@@ -355,7 +355,7 @@ export function RevenueByClientReport() {
                             <CardContent className="p-5">
                                 <div className="flex items-center gap-3 mb-3">
                                     <div className="w-10 h-10 rounded-xl bg-purple-100 flex items-center justify-center">
-                                        <Users className="w-5 h-5 text-purple-600" />
+                                        <Users className="w-5 h-5 text-purple-600" aria-hidden="true" />
                                     </div>
                                     <span className="text-sm text-slate-500">عدد العملاء</span>
                                 </div>
@@ -402,7 +402,7 @@ export function RevenueByClientReport() {
                             <CardHeader className="border-b border-slate-100 pb-4">
                                 <div className="flex items-center justify-between">
                                     <CardTitle className="text-lg font-bold text-navy flex items-center gap-2">
-                                        <Users className="w-5 h-5 text-emerald-500" />
+                                        <Users className="w-5 h-5 text-emerald-500" aria-hidden="true" />
                                         تفاصيل العملاء
                                     </CardTitle>
                                     <Badge variant="outline" className="border-slate-200">

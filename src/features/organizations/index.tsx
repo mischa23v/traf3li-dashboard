@@ -97,7 +97,7 @@ function OrganizationsContent() {
                   <h3 className="text-xl font-bold text-slate-900 mb-2">{t('organizations.noOrganizations')}</h3>
                   <p className="text-slate-500 mb-6">{t('organizations.startAddingOrganization')}</p>
                   <Button onClick={() => setOpen('add')} className="bg-brand-blue hover:bg-blue-600 text-white px-8">
-                    <Plus className="ms-2 h-4 w-4" />
+                    <Plus className="ms-2 h-4 w-4" aria-hidden="true" />
                     {t('organizations.addNewOrganization')}
                   </Button>
                 </div>

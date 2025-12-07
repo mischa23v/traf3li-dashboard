@@ -144,7 +144,7 @@ export function SalesReportsListView() {
           </Button>
           <Button asChild className="bg-emerald-500 hover:bg-emerald-600 rounded-xl">
             <Link to="/dashboard/sales/reports/new">
-              <Plus className="h-4 w-4 ms-2" />
+              <Plus className="h-4 w-4 ms-2" aria-hidden="true" />
               تقرير جديد
             </Link>
           </Button>
@@ -210,7 +210,7 @@ export function SalesReportsListView() {
         <div className="flex flex-wrap items-center gap-4">
           <div className="flex-1 min-w-[200px] max-w-md">
             <div className="relative">
-              <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
+              <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
               <Input
                 placeholder="بحث في التقارير..."
                 value={searchQuery}
@@ -221,7 +221,7 @@ export function SalesReportsListView() {
           </div>
           <Select value={categoryFilter} onValueChange={setCategoryFilter}>
             <SelectTrigger className="w-[180px] rounded-xl">
-              <Filter className="h-4 w-4 ms-2" />
+              <Filter className="h-4 w-4 ms-2" aria-hidden="true" />
               <SelectValue placeholder="الفئة" />
             </SelectTrigger>
             <SelectContent>
@@ -271,7 +271,7 @@ export function SalesReportsListView() {
             <p className="text-slate-500 mb-4">ابدأ بإنشاء تقرير جديد لتحليل بيانات المبيعات</p>
             <Button asChild className="bg-emerald-500 hover:bg-emerald-600 rounded-xl">
               <Link to="/dashboard/sales/reports/new">
-                <Plus className="h-4 w-4 ms-2" />
+                <Plus className="h-4 w-4 ms-2" aria-hidden="true" />
                 إنشاء تقرير
               </Link>
             </Button>
@@ -344,7 +344,7 @@ export function SalesReportsListView() {
                             إعادة إنشاء
                           </DropdownMenuItem>
                           <DropdownMenuItem>
-                            <Download className="h-4 w-4 ms-2" />
+                            <Download className="h-4 w-4 ms-2" aria-hidden="true" />
                             تحميل PDF
                           </DropdownMenuItem>
                           <DropdownMenuSeparator />

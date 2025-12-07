@@ -133,7 +133,7 @@ export function StatementDetailsView() {
                                     <span>تاريخ الإصدار: <span className="text-white font-medium">{new Date(statement.generatedDate).toLocaleDateString('ar-SA')}</span></span>
                                 </div>
                                 <div className="flex items-center gap-2">
-                                    <User className="h-4 w-4 text-emerald-400" />
+                                    <User className="h-4 w-4 text-emerald-400" aria-hidden="true" />
                                     <span>العميل: <span className="text-white font-medium">{statement.clientName}</span></span>
                                 </div>
                             </div>

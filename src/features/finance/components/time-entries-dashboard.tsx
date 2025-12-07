@@ -325,7 +325,7 @@ export default function TimeEntriesDashboard() {
                                                         </Badge>
                                                     </div>
                                                     <div className="flex items-center gap-2 text-slate-500 text-sm">
-                                                        <User className="w-3 h-3" />
+                                                        <User className="w-3 h-3" aria-hidden="true" />
                                                         {entry.client}
                                                         <span className="text-slate-300">•</span>
                                                         <FileText className="w-3 h-3" aria-hidden="true" />

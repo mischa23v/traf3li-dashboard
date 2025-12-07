@@ -400,7 +400,7 @@ export function CreateLeadView({ editMode = false }: CreateLeadViewProps) {
                                         {(createLeadMutation.isPending || updateLeadMutation.isPending) && (
                                             <Loader2 className="h-4 w-4 ms-2 animate-spin" />
                                         )}
-                                        <Save className="w-5 h-5 ms-2" />
+                                        <Save className="w-5 h-5 ms-2" aria-hidden="true" />
                                         {editMode ? 'حفظ التغييرات' : 'إنشاء عميل محتمل'}
                                     </Button>
                                     <Button

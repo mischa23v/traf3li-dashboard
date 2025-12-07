@@ -135,7 +135,7 @@ export default function CompanySettings() {
                         <Card className="border-0 shadow-sm rounded-3xl">
                             <CardHeader>
                                 <CardTitle className="flex items-center gap-2">
-                                    <Upload className="h-5 w-5 text-brand-blue" />
+                                    <Upload className="h-5 w-5 text-brand-blue" aria-hidden="true" />
                                     شعار الشركة
                                 </CardTitle>
                                 <CardDescription>
@@ -172,7 +172,7 @@ export default function CompanySettings() {
                                             {updateLogoMutation.isPending ? (
                                                 <Loader2 className="h-4 w-4 ms-2 animate-spin" />
                                             ) : (
-                                                <Upload className="h-4 w-4 ms-2" />
+                                                <Upload className="h-4 w-4 ms-2" aria-hidden="true" />
                                             )}
                                             رفع شعار جديد
                                         </Button>
@@ -453,7 +453,7 @@ export default function CompanySettings() {
                                 {updateSettingsMutation.isPending ? (
                                     <Loader2 className="h-4 w-4 ms-2 animate-spin" />
                                 ) : (
-                                    <Save className="h-4 w-4 ms-2" />
+                                    <Save className="h-4 w-4 ms-2" aria-hidden="true" />
                                 )}
                                 حفظ التغييرات
                             </Button>

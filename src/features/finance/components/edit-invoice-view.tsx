@@ -297,7 +297,7 @@ export function EditInvoiceView() {
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                         <div className="space-y-2">
                                             <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                                <User className="w-4 h-4 text-blue-500" />
+                                                <User className="w-4 h-4 text-blue-500" aria-hidden="true" />
                                                 العميل <span className="text-red-500">*</span>
                                             </label>
                                             <Select
@@ -432,7 +432,7 @@ export function EditInvoiceView() {
                                                             onClick={() => removeLineItem(item.id)}
                                                             className="text-red-500 hover:text-red-600 hover:bg-red-50"
                                                         >
-                                                            <X className="w-4 h-4" />
+                                                            <X className="w-4 h-4" aria-hidden="true" />
                                                         </Button>
                                                     </div>
                                                 </div>

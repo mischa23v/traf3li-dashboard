@@ -177,7 +177,7 @@ export function ClientsActionDialog({
                     name='nationalId'
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>{t('clients.form.nationalId')}</FormLabel>
+                        <FormLabel>{t('clients.form.nationalId')}<Lock className="h-3 w-3 text-slate-500 inline ms-1" aria-hidden="true" /></FormLabel>
                         <FormControl>
                           <Input
                             placeholder={t('clients.form.nationalIdPlaceholder')}
@@ -202,7 +202,7 @@ export function ClientsActionDialog({
                     name='phone'
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>{t('clients.form.phone')}</FormLabel>
+                        <FormLabel>{t('clients.form.phone')}<Lock className="h-3 w-3 text-slate-500 inline ms-1" aria-hidden="true" /></FormLabel>
                         <FormControl>
                           <Input
                             placeholder={t('clients.form.phonePlaceholder')}
@@ -219,7 +219,7 @@ export function ClientsActionDialog({
                     name='alternatePhone'
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>{t('clients.form.alternatePhone')}</FormLabel>
+                        <FormLabel>{t('clients.form.alternatePhone')}<Lock className="h-3 w-3 text-slate-500 inline ms-1" aria-hidden="true" /></FormLabel>
                         <FormControl>
                           <Input
                             placeholder={t('clients.form.alternatePhonePlaceholder')}
@@ -236,7 +236,7 @@ export function ClientsActionDialog({
                     name='email'
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>{t('clients.form.email')}</FormLabel>
+                        <FormLabel>{t('clients.form.email')}<Lock className="h-3 w-3 text-slate-500 inline ms-1" aria-hidden="true" /></FormLabel>
                         <FormControl>
                           <Input
                             type='email'

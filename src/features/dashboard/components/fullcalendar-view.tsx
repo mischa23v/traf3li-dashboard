@@ -497,7 +497,7 @@ export function FullCalendarView() {
         </div>
         <div className="ms-auto flex items-center gap-4">
           <div className="relative hidden md:block">
-            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
+            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
             <input
               type="text"
               placeholder="بحث..."
@@ -552,7 +552,7 @@ export function FullCalendarView() {
                 onClick={() => setIsCreateDialogOpen(true)}
                 className="bg-brand-blue hover:bg-blue-600 text-white rounded-xl h-12 px-8 font-bold shadow-lg shadow-blue-600/30 hover:scale-105 transition-all duration-300 border-0 text-base"
               >
-                <Plus className="ms-2 h-5 w-5" />
+                <Plus className="ms-2 h-5 w-5" aria-hidden="true" />
                 حدث جديد
               </Button>
               <Button
@@ -565,7 +565,7 @@ export function FullCalendarView() {
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button className="bg-white/10 hover:bg-white/20 text-white rounded-xl h-12 px-6 font-bold backdrop-blur-md border border-white/10 transition-all duration-300">
-                    <Filter className="ms-2 h-5 w-5" />
+                    <Filter className="ms-2 h-5 w-5" aria-hidden="true" />
                     تصفية
                     {filterTypes.length > 0 && (
                       <Badge className="me-2 bg-brand-blue text-white">{filterTypes.length}</Badge>
@@ -627,7 +627,7 @@ export function FullCalendarView() {
                   </DropdownMenuCheckboxItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={() => setFilterTypes([])}>
-                    <X className="ms-2 h-4 w-4" />
+                    <X className="ms-2 h-4 w-4" aria-hidden="true" />
                     إزالة الفلاتر
                   </DropdownMenuItem>
                 </DropdownMenuContent>
@@ -911,7 +911,7 @@ export function FullCalendarView() {
               {createEventMutation.isPending ? (
                 <Loader2 className="ms-2 h-4 w-4 animate-spin" />
               ) : (
-                <Check className="ms-2 h-4 w-4" />
+                <Check className="ms-2 h-4 w-4" aria-hidden="true" />
               )}
               إنشاء الحدث
             </Button>

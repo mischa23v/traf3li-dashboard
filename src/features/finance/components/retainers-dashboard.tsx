@@ -507,7 +507,7 @@ export default function RetainersDashboard() {
                                                             <h4 className="font-bold text-navy">تصفية متقدمة</h4>
                                                             {activeFilterCount > 0 && (
                                                                 <Button variant="ghost" size="sm" onClick={clearFilters} className="text-slate-500 hover:text-red-500">
-                                                                    <X className="w-4 h-4 ms-1" />
+                                                                    <X className="w-4 h-4 ms-1" aria-hidden="true" />
                                                                     مسح
                                                                 </Button>
                                                             )}

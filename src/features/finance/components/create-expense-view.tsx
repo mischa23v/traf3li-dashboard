@@ -393,7 +393,7 @@ export function CreateExpenseView() {
                                 {formData.expenseType === 'reimbursable' && (
                                     <div className="space-y-2 p-4 bg-blue-50 rounded-xl border border-blue-100">
                                         <Label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                            <User className="w-4 h-4 text-blue-500" />
+                                            <User className="w-4 h-4 text-blue-500" aria-hidden="true" />
                                             الموظف <span className="text-red-500">*</span>
                                         </Label>
                                         <Select value={formData.employeeId} onValueChange={(value) => updateField('employeeId', value)}>
@@ -612,7 +612,7 @@ export function CreateExpenseView() {
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <div className="space-y-2">
                                         <Label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                            <Building className="w-4 h-4 text-emerald-500" />
+                                            <Building className="w-4 h-4 text-emerald-500" aria-hidden="true" />
                                             المورد / الجهة
                                         </Label>
                                         <Input
@@ -639,7 +639,7 @@ export function CreateExpenseView() {
                                 {/* ========== RECEIPT UPLOAD ========== */}
                                 <div className="space-y-2">
                                     <Label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                        <Upload className="w-4 h-4 text-emerald-500" />
+                                        <Upload className="w-4 h-4 text-emerald-500" aria-hidden="true" />
                                         إرفاق الإيصال
                                     </Label>
                                     <div className="space-y-4">
@@ -698,7 +698,7 @@ export function CreateExpenseView() {
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6 pt-6 border-t border-slate-200">
                                             <div className="space-y-2">
                                                 <Label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                                    <User className="w-4 h-4 text-amber-500" />
+                                                    <User className="w-4 h-4 text-amber-500" aria-hidden="true" />
                                                     العميل <span className="text-red-500">*</span>
                                                 </Label>
                                                 <Select
@@ -1105,7 +1105,7 @@ export function CreateExpenseView() {
                                     <AccordionItem value="organization" className="border rounded-xl overflow-hidden">
                                         <AccordionTrigger className="px-4 hover:no-underline hover:bg-slate-50">
                                             <div className="flex items-center gap-2">
-                                                <Building2 className="h-4 w-4 text-indigo-500" />
+                                                <Building2 className="h-4 w-4 text-indigo-500" aria-hidden="true" />
                                                 <span className="font-medium">معلومات تنظيمية</span>
                                             </div>
                                         </AccordionTrigger>
@@ -1229,7 +1229,7 @@ export function CreateExpenseView() {
                                     <div className="flex gap-2">
                                         <Link to="/dashboard/finance/expenses">
                                             <Button type="button" variant="outline" className="rounded-xl">
-                                                <X className="ms-2 h-4 w-4" />
+                                                <X className="ms-2 h-4 w-4" aria-hidden="true" />
                                                 إلغاء
                                             </Button>
                                         </Link>

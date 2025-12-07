@@ -292,7 +292,7 @@ export function CalendarView() {
 
                 <div className='ms-auto flex items-center gap-4'>
                     <div className="relative hidden md:block">
-                        <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
+                        <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
                         <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
                     </div>
                     <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white">
@@ -341,11 +341,11 @@ export function CalendarView() {
                         </div>
                         <div className="flex gap-3">
                             <Button className="bg-brand-blue hover:bg-blue-600 text-white rounded-xl h-12 px-8 font-bold shadow-lg shadow-blue-600/30 hover:scale-105 transition-all duration-300 border-0 text-base">
-                                <Plus className="ms-2 h-5 w-5" />
+                                <Plus className="ms-2 h-5 w-5" aria-hidden="true" />
                                 جلسة جديدة
                             </Button>
                             <Button className="bg-white/10 hover:bg-white/20 text-white rounded-xl h-12 px-6 font-bold backdrop-blur-md border border-white/10 transition-all duration-300">
-                                <Filter className="ms-2 h-5 w-5" />
+                                <Filter className="ms-2 h-5 w-5" aria-hidden="true" />
                                 تصفية
                             </Button>
                         </div>
@@ -424,7 +424,7 @@ export function CalendarView() {
                                             <p className="font-bold text-navy">لا توجد مواعيد</p>
                                             <p className="text-xs mt-1">لا توجد جلسات أو مهام مسجلة لهذا اليوم.</p>
                                             <Button variant="link" className="text-brand-blue mt-2">
-                                                <Plus className="h-4 w-4 ms-1" />
+                                                <Plus className="h-4 w-4 ms-1" aria-hidden="true" />
                                                 إضافة موعد
                                             </Button>
                                         </div>
@@ -619,7 +619,7 @@ export function CalendarView() {
                                                     {items.length === 0 && (
                                                         <div className="h-full flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
                                                             <Button variant="ghost" size="sm" className="h-8 w-8 rounded-full border border-dashed border-slate-300 text-slate-500">
-                                                                <Plus className="h-4 w-4" />
+                                                                <Plus className="h-4 w-4" aria-hidden="true" />
                                                             </Button>
                                                         </div>
                                                     )}

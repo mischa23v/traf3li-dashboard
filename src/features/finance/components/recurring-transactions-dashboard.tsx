@@ -462,7 +462,7 @@ export default function RecurringTransactionsDashboard() {
                                                                     onClick={() => handleCancel(transaction._id)}
                                                                     className="text-red-600"
                                                                 >
-                                                                    <X className="h-4 w-4 ms-2" />
+                                                                    <X className="h-4 w-4 ms-2" aria-hidden="true" />
                                                                     إلغاء
                                                                 </DropdownMenuItem>
                                                             )}

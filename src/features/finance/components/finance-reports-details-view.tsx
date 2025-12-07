@@ -567,7 +567,7 @@ export function FinanceReportsDetailsView() {
                     <Card className="rounded-2xl border-slate-100">
                       <CardHeader>
                         <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                          <Users className="w-5 h-5 text-cyan-500" />
+                          <Users className="w-5 h-5 text-cyan-500" aria-hidden="true" />
                           المالك
                         </CardTitle>
                       </CardHeader>

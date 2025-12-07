@@ -47,7 +47,7 @@ export function NoFirmPage() {
             <div className="p-4 bg-slate-50 rounded-lg border border-slate-200">
               <div className="flex items-start gap-3">
                 <div className="w-10 h-10 bg-emerald-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <Plus className="w-5 h-5 text-emerald-600" />
+                  <Plus className="w-5 h-5 text-emerald-600" aria-hidden="true" />
                 </div>
                 <div>
                   <h3 className="font-semibold text-slate-900">{t('noFirm.createFirm.title')}</h3>
