@@ -422,11 +422,11 @@ export function OnboardingCreateView() {
                         <SelectItem value="60">60 يوم</SelectItem>
                         <SelectItem value="90">90 يوم (الافتراضي)</SelectItem>
                         <SelectItem value="120">120 يوم</SelectItem>
-                        <SelectItem value="180">180 يوم (للمناصب القيادية)</SelectItem>
+                        <SelectItem value="180">180 يوم (الحد الأقصى)</SelectItem>
                       </SelectContent>
                     </Select>
                     <p className="text-xs text-slate-500">
-                      وفقاً للمادة 53 من نظام العمل السعودي: الحد الأقصى 90 يوم قابل للتمديد إلى 180
+                      وفقاً للمادة 53 من نظام العمل السعودي: الحد الأقصى لفترة التجربة 180 يوم
                     </p>
                   </div>
                 </div>
@@ -489,8 +489,8 @@ export function OnboardingCreateView() {
                     <div>
                       <p className="font-medium">المادة 53 - فترة التجربة:</p>
                       <ul className="list-disc list-inside mr-4 mt-1 space-y-1">
-                        <li>الحد الأقصى لفترة التجربة 90 يوماً</li>
-                        <li>يمكن تمديدها إلى 180 يوماً بموافقة الطرفين</li>
+                        <li>الحد الأقصى لفترة التجربة 180 يوماً</li>
+                        <li>يجب النص عليها كتابةً في عقد العمل</li>
                         <li>لا تحتسب إجازات العيدين والإجازات المرضية</li>
                       </ul>
                     </div>

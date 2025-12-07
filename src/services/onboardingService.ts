@@ -5,8 +5,8 @@ import api from './api'
 // Onboarding Status
 export type OnboardingStatus = 'pending' | 'in_progress' | 'completed' | 'on_hold' | 'cancelled'
 
-// Probation Status
-export type ProbationStatus = 'active' | 'passed' | 'failed' | 'extended'
+// Probation Status (no extension - max 180 days per Saudi Labor Law Article 53)
+export type ProbationStatus = 'active' | 'passed' | 'failed'
 
 // Task Status
 export type TaskStatus = 'not_started' | 'in_progress' | 'completed' | 'blocked' | 'not_applicable'
@@ -32,8 +32,8 @@ export type TrainingCategory = 'mandatory' | 'role_specific' | 'compliance' | 't
 export type ReviewRecommendation = 'on_track' | 'needs_improvement' | 'at_risk' |
   'recommend_confirmation' | 'recommend_extension' | 'recommend_termination'
 
-// Probation Decision
-export type ProbationDecision = 'confirm' | 'extend' | 'terminate'
+// Probation Decision (no extension - max 180 days per Saudi Labor Law Article 53)
+export type ProbationDecision = 'confirm' | 'terminate'
 
 // ==================== LABELS ====================
 
@@ -49,7 +49,6 @@ export const PROBATION_STATUS_LABELS: Record<ProbationStatus, { ar: string; en: 
   active: { ar: 'نشط', en: 'Active', color: 'blue' },
   passed: { ar: 'اجتاز', en: 'Passed', color: 'emerald' },
   failed: { ar: 'لم يجتز', en: 'Failed', color: 'red' },
-  extended: { ar: 'ممدد', en: 'Extended', color: 'amber' },
 }
 
 export const TASK_STATUS_LABELS: Record<TaskStatus, { ar: string; en: string; color: string }> = {
@@ -359,13 +358,12 @@ export interface OnboardingRecord {
     firstMonthCompletionDate?: string
   }
 
-  // Probation Tracking
+  // Probation Tracking (max 180 days, no extension per Saudi Labor Law Article 53)
   probationTracking?: {
     probationInfo: {
       probationPeriod: number
       probationStartDate: string
       probationEndDate: string
-      isExtended: boolean
       currentStatus: ProbationStatus
     }
     probationReviews: ProbationReview[]
@@ -555,13 +553,11 @@ export const addProbationReview = async (onboardingId: string, review: Partial<P
   return response.data
 }
 
-// Complete probation
+// Complete probation (no extension - max 180 days per Saudi Labor Law Article 53)
 export const completeProbation = async (onboardingId: string, data: {
   decision: ProbationDecision
   decisionReason: string
   confirmationDate?: string
-  extensionDays?: number
-  extensionReason?: string
 }): Promise<OnboardingRecord> => {
   const response = await api.post(`/hr/onboarding/${onboardingId}/complete-probation`, data)
   return response.data
