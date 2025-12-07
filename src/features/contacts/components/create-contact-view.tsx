@@ -608,7 +608,7 @@ export function CreateContactView() {
                                     {/* Emails */}
                                     <div className="space-y-3">
                                         <div className="flex items-center justify-between">
-                                            <Label className="text-sm font-medium text-slate-700">البريد الإلكتروني</Label>
+                                            <Label className="text-sm font-medium text-slate-700">البريد الإلكتروني<Lock className="h-3 w-3 text-slate-500 inline ms-1" aria-hidden="true" /></Label>
                                             <Button type="button" variant="ghost" size="sm" onClick={addEmail} className="text-emerald-600">
                                                 <Plus className="w-4 h-4 ms-1" aria-hidden="true" /> إضافة
                                             </Button>
@@ -658,7 +658,7 @@ export function CreateContactView() {
                                     {/* Phones */}
                                     <div className="space-y-3">
                                         <div className="flex items-center justify-between">
-                                            <Label className="text-sm font-medium text-slate-700">رقم الهاتف</Label>
+                                            <Label className="text-sm font-medium text-slate-700">رقم الهاتف<Lock className="h-3 w-3 text-slate-500 inline ms-1" aria-hidden="true" /></Label>
                                             <Button type="button" variant="ghost" size="sm" onClick={addPhone} className="text-emerald-600">
                                                 <Plus className="w-4 h-4 ms-1" aria-hidden="true" /> إضافة
                                             </Button>
@@ -786,7 +786,7 @@ export function CreateContactView() {
                                     <AccordionContent className="space-y-4 pb-4">
                                         <div className="grid grid-cols-2 gap-4">
                                             <div className="space-y-2">
-                                                <Label>رقم الهوية الوطنية</Label>
+                                                <Label>رقم الهوية الوطنية<Lock className="h-3 w-3 text-slate-500 inline ms-1" aria-hidden="true" /></Label>
                                                 <Input
                                                     placeholder="10 أرقام"
                                                     dir="ltr"
@@ -809,7 +809,7 @@ export function CreateContactView() {
                                         </div>
                                         <div className="grid grid-cols-2 gap-4">
                                             <div className="space-y-2">
-                                                <Label>رقم جواز السفر</Label>
+                                                <Label>رقم جواز السفر<Lock className="h-3 w-3 text-slate-500 inline ms-1" aria-hidden="true" /></Label>
                                                 <Input
                                                     placeholder="رقم الجواز"
                                                     dir="ltr"

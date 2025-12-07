@@ -3,7 +3,7 @@
 import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { User } from 'lucide-react'
+import { User, Lock } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -300,7 +300,7 @@ export function ContactsActionDialog({
                     name='email'
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>{t('contacts.form.email')}</FormLabel>
+                        <FormLabel>{t('contacts.form.email')}<Lock className="h-3 w-3 text-slate-500 inline ms-1" aria-hidden="true" /></FormLabel>
                         <FormControl>
                           <Input
                             type='email'
@@ -318,7 +318,7 @@ export function ContactsActionDialog({
                     name='phone'
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>{t('contacts.form.phone')}</FormLabel>
+                        <FormLabel>{t('contacts.form.phone')}<Lock className="h-3 w-3 text-slate-500 inline ms-1" aria-hidden="true" /></FormLabel>
                         <FormControl>
                           <Input
                             placeholder={t('contacts.form.phonePlaceholder')}
@@ -336,7 +336,7 @@ export function ContactsActionDialog({
                   name='alternatePhone'
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t('contacts.form.alternatePhone')}</FormLabel>
+                      <FormLabel>{t('contacts.form.alternatePhone')}<Lock className="h-3 w-3 text-slate-500 inline ms-1" aria-hidden="true" /></FormLabel>
                       <FormControl>
                         <Input
                           placeholder={t('contacts.form.alternatePhonePlaceholder')}

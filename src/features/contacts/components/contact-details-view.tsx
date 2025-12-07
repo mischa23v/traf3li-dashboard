@@ -37,6 +37,7 @@ import {
   Link as LinkIcon,
   Globe,
   CreditCard,
+  Lock,
 } from 'lucide-react'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useContact, useDeleteContact } from '@/hooks/useContacts'
@@ -375,7 +376,7 @@ export function ContactDetailsView() {
                               <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-xl">
                                 <Mail className="h-5 w-5 text-blue-500" aria-hidden="true" />
                                 <div>
-                                  <p className="text-xs text-slate-500">البريد الإلكتروني</p>
+                                  <p className="text-xs text-slate-500">البريد الإلكتروني<Lock className="h-3 w-3 text-slate-500 inline ms-1" aria-hidden="true" /></p>
                                   <p className="font-medium text-navy" dir="ltr">
                                     {contact.email || contact.emails?.[0]?.email || 'غير محدد'}
                                   </p>
@@ -541,7 +542,7 @@ export function ContactDetailsView() {
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                               {contact.nationalId && (
                                 <div className="p-4 bg-slate-50 rounded-xl">
-                                  <p className="text-xs text-slate-500 mb-1">رقم الهوية الوطنية</p>
+                                  <p className="text-xs text-slate-500 mb-1">رقم الهوية الوطنية<Lock className="h-3 w-3 text-slate-500 inline ms-1" aria-hidden="true" /></p>
                                   <p className="font-medium text-navy" dir="ltr">{contact.nationalId}</p>
                                 </div>
                               )}
@@ -553,7 +554,7 @@ export function ContactDetailsView() {
                               )}
                               {contact.passportNumber && (
                                 <div className="p-4 bg-slate-50 rounded-xl">
-                                  <p className="text-xs text-slate-500 mb-1">رقم جواز السفر</p>
+                                  <p className="text-xs text-slate-500 mb-1">رقم جواز السفر<Lock className="h-3 w-3 text-slate-500 inline ms-1" aria-hidden="true" /></p>
                                   <p className="font-medium text-navy" dir="ltr">{contact.passportNumber}</p>
                                 </div>
                               )}

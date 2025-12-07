@@ -752,7 +752,7 @@ export function CreateClientView() {
                                         {/* National ID with verification */}
                                         <div className="space-y-2">
                                             <Label className="text-sm font-medium text-slate-700">
-                                                رقم الهوية الوطنية / الإقامة <span className="text-red-500">*</span>
+                                                رقم الهوية الوطنية / الإقامة<Lock className="h-3 w-3 text-slate-500 inline ms-1" aria-hidden="true" /> <span className="text-red-500">*</span>
                                             </Label>
                                             <div className="flex gap-2">
                                                 <Input
@@ -1025,7 +1025,7 @@ export function CreateClientView() {
                                                 />
                                             </div>
                                             <div className="space-y-2">
-                                                <Label className="text-sm font-medium text-slate-700">رقم الهوية</Label>
+                                                <Label className="text-sm font-medium text-slate-700">رقم الهوية<Lock className="h-3 w-3 text-slate-500 inline ms-1" aria-hidden="true" /></Label>
                                                 <Input
                                                     value={legalRepId}
                                                     onChange={(e) => setLegalRepId(e.target.value)}
@@ -1044,7 +1044,7 @@ export function CreateClientView() {
                                                 />
                                             </div>
                                             <div className="space-y-2">
-                                                <Label className="text-sm font-medium text-slate-700">رقم الهاتف</Label>
+                                                <Label className="text-sm font-medium text-slate-700">رقم الهاتف<Lock className="h-3 w-3 text-slate-500 inline ms-1" aria-hidden="true" /></Label>
                                                 <Input
                                                     value={legalRepPhone}
                                                     onChange={(e) => setLegalRepPhone(e.target.value)}
@@ -1070,7 +1070,7 @@ export function CreateClientView() {
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         <div className="space-y-2">
                                             <Label className="text-sm font-medium text-slate-700">
-                                                رقم الهاتف <span className="text-red-500">*</span>
+                                                رقم الهاتف<Lock className="h-3 w-3 text-slate-500 inline ms-1" aria-hidden="true" /> <span className="text-red-500">*</span>
                                             </Label>
                                             <Input
                                                 value={phone}
@@ -1117,7 +1117,7 @@ export function CreateClientView() {
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         <div className="space-y-2">
                                             <Label className="text-sm font-medium text-slate-700">
-                                                البريد الإلكتروني <span className="text-red-500">*</span>
+                                                البريد الإلكتروني<Lock className="h-3 w-3 text-slate-500 inline ms-1" aria-hidden="true" /> <span className="text-red-500">*</span>
                                             </Label>
                                             <Input
                                                 type="email"
