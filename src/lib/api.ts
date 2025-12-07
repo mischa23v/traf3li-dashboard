@@ -91,14 +91,7 @@ apiClient.interceptors.response.use(
   async (error: AxiosError<any>) => {
     const originalRequest = error.config as any
 
-    // Log errors in development
-    if (import.meta.env.DEV) {
-        url: originalRequest?.url,
-        status: error.response?.status,
-        message: error.response?.data?.message || error.message,
-        data: error.response?.data // Log full data to see validation errors
-      })
-    }
+    // Error handling is done by the calling code
 
     // Retry logic for network errors or 5xx errors
     if (
