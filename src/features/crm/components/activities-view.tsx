@@ -79,6 +79,7 @@ import { ar } from 'date-fns/locale'
 import { SalesSidebar } from './sales-sidebar'
 import { ProductivityHero } from '@/components/productivity-hero'
 import { cn } from '@/lib/utils'
+import { useTranslation } from 'react-i18next'
 
 const activityIcons: Record<ActivityType, React.ReactNode> = {
   call: <Phone className="h-5 w-5" />,
@@ -94,22 +95,6 @@ const activityIcons: Record<ActivityType, React.ReactNode> = {
   stage_change: <TrendingUp className="h-5 w-5" />,
   lead_created: <Plus className="h-5 w-5" />,
   lead_converted: <CheckCircle2 className="h-5 w-5" />,
-}
-
-const activityLabels: Record<ActivityType, string> = {
-  call: 'مكالمة',
-  email: 'بريد إلكتروني',
-  sms: 'رسالة نصية',
-  whatsapp: 'واتساب',
-  meeting: 'اجتماع',
-  note: 'ملاحظة',
-  task: 'مهمة',
-  document: 'مستند',
-  proposal: 'عرض سعر',
-  status_change: 'تغيير الحالة',
-  stage_change: 'تغيير المرحلة',
-  lead_created: 'عميل محتمل جديد',
-  lead_converted: 'تحويل العميل',
 }
 
 const activityColors: Record<ActivityType, { bg: string; text: string; border: string; line: string }> = {
@@ -128,14 +113,14 @@ const activityColors: Record<ActivityType, { bg: string; text: string; border: s
   lead_converted: { bg: 'bg-green-50', text: 'text-green-600', border: 'border-green-200', line: 'bg-green-500' },
 }
 
-// Quick log activity types
+// Quick log activity types - will be translated in the component
 const QUICK_LOG_TYPES = [
-  { value: 'call', label: 'مكالمة', icon: Phone, color: 'bg-blue-500' },
-  { value: 'email', label: 'بريد', icon: Mail, color: 'bg-purple-500' },
-  { value: 'meeting', label: 'اجتماع', icon: Calendar, color: 'bg-emerald-500' },
-  { value: 'note', label: 'ملاحظة', icon: FileText, color: 'bg-yellow-500' },
-  { value: 'task', label: 'مهمة', icon: CheckCircle2, color: 'bg-indigo-500' },
-  { value: 'whatsapp', label: 'واتساب', icon: MessageSquare, color: 'bg-green-500' },
+  { value: 'call', icon: Phone, color: 'bg-blue-500' },
+  { value: 'email', icon: Mail, color: 'bg-purple-500' },
+  { value: 'meeting', icon: Calendar, color: 'bg-emerald-500' },
+  { value: 'note', icon: FileText, color: 'bg-yellow-500' },
+  { value: 'task', icon: CheckCircle2, color: 'bg-indigo-500' },
+  { value: 'whatsapp', icon: MessageSquare, color: 'bg-green-500' },
 ]
 
 // Call outcomes
@@ -472,9 +457,27 @@ function ActivityCard({ activity, isLast }: { activity: CrmActivity; isLast: boo
 }
 
 export function ActivitiesView() {
+  const { t } = useTranslation()
   const [activeTypeFilter, setActiveTypeFilter] = useState<string>('all')
   const [dateRange, setDateRange] = useState<string>('week')
   const [searchQuery, setSearchQuery] = useState('')
+
+  // Activity labels using translation
+  const activityLabels: Record<ActivityType, string> = {
+    call: t('crm.activities.types.call'),
+    email: t('crm.activities.types.email'),
+    sms: t('crm.activities.types.sms'),
+    whatsapp: t('crm.activities.types.whatsapp'),
+    meeting: t('crm.activities.types.meeting'),
+    note: t('crm.activities.types.note'),
+    task: t('crm.activities.types.task'),
+    document: t('crm.activities.types.document'),
+    proposal: t('crm.activities.types.proposal'),
+    status_change: t('crm.activities.types.statusChange'),
+    stage_change: t('crm.activities.types.stageChange'),
+    lead_created: t('crm.activities.types.leadCreated'),
+    lead_converted: t('crm.activities.types.leadConverted'),
+  }
 
   // API Params
   const params = useMemo(() => {
@@ -551,20 +554,20 @@ export function ActivitiesView() {
   }, [stats])
 
   const topNav = [
-    { title: 'العملاء المحتملين', href: '/dashboard/crm/leads', isActive: false },
-    { title: 'مسار المبيعات', href: '/dashboard/crm/pipeline', isActive: false },
-    { title: 'الإحالات', href: '/dashboard/crm/referrals', isActive: false },
-    { title: 'سجل الأنشطة', href: '/dashboard/crm/activities', isActive: true },
+    { title: t('crm.leads.title'), href: '/dashboard/crm/leads', isActive: false },
+    { title: t('crm.pipeline.title'), href: '/dashboard/crm/pipeline', isActive: false },
+    { title: t('crm.referrals.title'), href: '/dashboard/crm/referrals', isActive: false },
+    { title: t('crm.activities.title'), href: '/dashboard/crm/activities', isActive: true },
   ]
 
   const typeFilters = [
-    { id: 'all', label: 'الكل', icon: Activity },
-    { id: 'call', label: 'مكالمات', icon: Phone },
-    { id: 'email', label: 'بريد', icon: Mail },
-    { id: 'meeting', label: 'اجتماعات', icon: Calendar },
-    { id: 'whatsapp', label: 'واتساب', icon: MessageSquare },
-    { id: 'note', label: 'ملاحظات', icon: FileText },
-    { id: 'task', label: 'مهام', icon: CheckCircle2 },
+    { id: 'all', label: t('filter.all'), icon: Activity },
+    { id: 'call', label: t('crm.activities.filters.calls'), icon: Phone },
+    { id: 'email', label: t('crm.activities.filters.emails'), icon: Mail },
+    { id: 'meeting', label: t('crm.activities.filters.meetings'), icon: Calendar },
+    { id: 'whatsapp', label: t('crm.activities.filters.whatsapp'), icon: MessageSquare },
+    { id: 'note', label: t('crm.activities.filters.notes'), icon: FileText },
+    { id: 'task', label: t('crm.activities.filters.tasks'), icon: CheckCircle2 },
   ]
 
   return (
@@ -584,7 +587,7 @@ export function ActivitiesView() {
             <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
             <input
               type="text"
-              placeholder="بحث..."
+              placeholder={t('common.search')}
               className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pr-9 pl-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
@@ -611,7 +614,7 @@ export function ActivitiesView() {
         className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-6 rounded-tr-3xl shadow-inner border-r border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']"
       >
         {/* Header */}
-        <ProductivityHero badge="سجل الأنشطة" title="سجل الأنشطة" type="activities" hideButtons={true}>
+        <ProductivityHero badge={t('crm.activities.badge')} title={t('crm.activities.title')} type="activities" hideButtons={true}>
           <div className="flex items-center gap-3">
             <Select value={dateRange} onValueChange={setDateRange}>
               <SelectTrigger className="w-[140px] rounded-xl bg-white/10 border-white/10 text-white">
@@ -620,7 +623,7 @@ export function ActivitiesView() {
               <SelectContent>
                 {DATE_RANGES.map((range) => (
                   <SelectItem key={range.value} value={range.value}>
-                    {range.label}
+                    {t(`crm.activities.dateRanges.${range.value}`)}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -629,7 +632,7 @@ export function ActivitiesView() {
               trigger={
                 <Button className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl shadow-lg border-0">
                   <Plus className="ml-2 h-4 w-4" />
-                  تسجيل نشاط
+                  {t('crm.activities.logActivity')}
                 </Button>
               }
             />
@@ -639,7 +642,7 @@ export function ActivitiesView() {
         {/* Stats Cards */}
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
           <MetricCard
-            title="إجمالي الأنشطة"
+            title={t('crm.activities.stats.total')}
             value={stats?.total || 0}
             icon={Activity}
             change="+12%"
@@ -647,31 +650,31 @@ export function ActivitiesView() {
             color="blue"
           />
           <MetricCard
-            title="مكتملة"
+            title={t('crm.activities.stats.completed')}
             value={stats?.completed || 0}
             icon={CheckCircle2}
             color="emerald"
           />
           <MetricCard
-            title="مكالمات"
+            title={t('crm.activities.stats.calls')}
             value={stats?.byType?.find((t: any) => t._id === 'call')?.count || 0}
             icon={Phone}
             color="blue"
           />
           <MetricCard
-            title="اجتماعات"
+            title={t('crm.activities.stats.meetings')}
             value={stats?.byType?.find((t: any) => t._id === 'meeting')?.count || 0}
             icon={Calendar}
             color="purple"
           />
           <MetricCard
-            title="بريد"
+            title={t('crm.activities.stats.emails')}
             value={stats?.byType?.find((t: any) => t._id === 'email')?.count || 0}
             icon={Mail}
             color="purple"
           />
           <MetricCard
-            title="واتساب"
+            title={t('crm.activities.stats.whatsapp')}
             value={stats?.byType?.find((t: any) => t._id === 'whatsapp')?.count || 0}
             icon={MessageSquare}
             color="emerald"
@@ -684,7 +687,7 @@ export function ActivitiesView() {
             <CardHeader className="pb-2">
               <CardTitle className="text-sm text-slate-600 flex items-center gap-2">
                 <BarChart3 className="w-4 h-4" />
-                توزيع الأنشطة
+                {t('crm.activities.distribution')}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -771,16 +774,16 @@ export function ActivitiesView() {
                     </div>
                   </div>
                   <h3 className="text-lg font-bold text-slate-900 mb-2">
-                    حدث خطأ أثناء تحميل الأنشطة
+                    {t('errors.loadingActivities')}
                   </h3>
                   <p className="text-slate-500 mb-4">
-                    {error?.message || 'تعذر الاتصال بالخادم'}
+                    {error?.message || t('errors.serverConnection')}
                   </p>
                   <Button
                     onClick={() => refetch()}
                     className="bg-emerald-500 hover:bg-emerald-600 rounded-xl"
                   >
-                    إعادة المحاولة
+                    {t('common.retry')}
                   </Button>
                 </div>
               )}
@@ -794,16 +797,16 @@ export function ActivitiesView() {
                     </div>
                   </div>
                   <h3 className="text-lg font-bold text-slate-900 mb-2">
-                    لا توجد أنشطة
+                    {t('crm.activities.noActivities')}
                   </h3>
                   <p className="text-slate-500 mb-4">
-                    {searchQuery ? 'لا توجد نتائج مطابقة للبحث' : 'سيتم عرض الأنشطة هنا عند إضافتها'}
+                    {searchQuery ? t('common.noSearchResults') : t('crm.activities.noActivitiesDescription')}
                   </p>
                   <QuickLogDialog
                     trigger={
                       <Button className="bg-emerald-500 hover:bg-emerald-600 rounded-xl">
                         <Plus className="ml-2 h-4 w-4" />
-                        تسجيل أول نشاط
+                        {t('crm.activities.logFirstActivity')}
                       </Button>
                     }
                   />

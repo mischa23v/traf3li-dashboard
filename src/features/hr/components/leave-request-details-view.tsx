@@ -47,6 +47,7 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import type { LeaveStatus, LeaveType } from '@/services/leaveService'
 import { LEAVE_TYPE_LABELS } from '@/services/leaveService'
+import { useTranslation } from 'react-i18next'
 
 // Leave type icons
 const LEAVE_TYPE_ICONS: Record<LeaveType, typeof Palmtree> = {
@@ -79,6 +80,7 @@ const LEAVE_TYPE_COLORS: Record<LeaveType, { bg: string; text: string; border: s
 }
 
 export function LeaveRequestDetailsView() {
+    const { t, i18n } = useTranslation()
     const navigate = useNavigate()
     const { requestId } = useParams({ from: '/_authenticated/dashboard/hr/leave/$requestId' })
 
@@ -114,13 +116,13 @@ export function LeaveRequestDetailsView() {
             completed: 'bg-green-100 text-green-700',
         }
         const labels: Record<LeaveStatus, string> = {
-            draft: 'مسودة',
-            submitted: 'مقدم',
-            pending_approval: 'بانتظار الموافقة',
-            approved: 'موافق عليه',
-            rejected: 'مرفوض',
-            cancelled: 'ملغي',
-            completed: 'مكتمل',
+            draft: t('hr.leaveStatus.draft'),
+            submitted: t('hr.leaveStatus.submitted'),
+            pending_approval: t('hr.leaveStatus.pendingApproval'),
+            approved: t('hr.leaveStatus.approved'),
+            rejected: t('hr.leaveStatus.rejected'),
+            cancelled: t('hr.leaveStatus.cancelled'),
+            completed: t('hr.leaveStatus.completed'),
         }
         const icons: Record<LeaveStatus, React.ReactNode> = {
             draft: <FileText className="w-3 h-3" />,
@@ -194,9 +196,9 @@ export function LeaveRequestDetailsView() {
     }
 
     const topNav = [
-        { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
-        { title: 'الموظفين', href: '/dashboard/hr/employees', isActive: false },
-        { title: 'الإجازات', href: '/dashboard/hr/leave', isActive: true },
+        { title: t('common.overview'), href: '/dashboard/overview', isActive: false },
+        { title: t('hr.employees.title'), href: '/dashboard/hr/employees', isActive: false },
+        { title: t('hr.leave.title'), href: '/dashboard/hr/leave', isActive: true },
     ]
 
     // Loading state
@@ -249,10 +251,10 @@ export function LeaveRequestDetailsView() {
                 <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8">
                     <div className="bg-white rounded-2xl p-12 text-center">
                         <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
-                        <h2 className="text-xl font-bold text-slate-900 mb-2">لم يتم العثور على الطلب</h2>
-                        <p className="text-slate-500 mb-4">{error?.message || 'حدث خطأ أثناء تحميل بيانات الطلب'}</p>
+                        <h2 className="text-xl font-bold text-slate-900 mb-2">{t('hr.leave.requestNotFound')}</h2>
+                        <p className="text-slate-500 mb-4">{error?.message || t('common.errorLoading')}</p>
                         <Button onClick={() => navigate({ to: '/dashboard/hr/leave' })} className="bg-emerald-500 hover:bg-emerald-600">
-                            العودة للقائمة
+                            {t('common.backToList')}
                         </Button>
                     </div>
                 </Main>
@@ -276,7 +278,7 @@ export function LeaveRequestDetailsView() {
                 <div className='ms-auto flex items-center space-x-4'>
                     <div className="relative hidden md:block">
                         <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                        <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pr-9 pl-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
+                        <input type="text" placeholder={t('common.search')} className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pr-9 pl-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
                     </div>
                     <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white">
                         <Bell className="h-5 w-5" />
@@ -303,7 +305,7 @@ export function LeaveRequestDetailsView() {
                         </Button>
                         <div>
                             <div className="flex items-center gap-3 mb-1">
-                                <h1 className="text-2xl font-bold text-navy">طلب إجازة</h1>
+                                <h1 className="text-2xl font-bold text-navy">{t('hr.leave.leaveRequest')}</h1>
                                 {getStatusBadge(request.status)}
                                 {getLeaveTypeBadge(request.leaveType)}
                             </div>
@@ -322,14 +324,14 @@ export function LeaveRequestDetailsView() {
                                     className="rounded-xl border-red-200 text-red-600 hover:bg-red-50"
                                 >
                                     <XCircle className="w-4 h-4 ml-2" />
-                                    رفض
+                                    {t('common.reject')}
                                 </Button>
                                 <Button
                                     onClick={() => setShowApproveDialog(true)}
                                     className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl"
                                 >
                                     <CheckCircle className="w-4 h-4 ml-2" />
-                                    موافقة
+                                    {t('common.approve')}
                                 </Button>
                             </>
                         )}
@@ -339,7 +341,7 @@ export function LeaveRequestDetailsView() {
                                 className="bg-blue-500 hover:bg-blue-600 text-white rounded-xl"
                             >
                                 <UserCheck className="w-4 h-4 ml-2" />
-                                تأكيد العودة
+                                {t('hr.leave.confirmReturn')}
                             </Button>
                         )}
 
@@ -353,11 +355,11 @@ export function LeaveRequestDetailsView() {
                             <DropdownMenuContent align="end" className="w-48">
                                 <DropdownMenuItem>
                                     <Download className="h-4 w-4 ml-2" />
-                                    تصدير PDF
+                                    {t('common.downloadPDF')}
                                 </DropdownMenuItem>
                                 <DropdownMenuItem>
                                     <Send className="h-4 w-4 ml-2" />
-                                    إرسال للموظف
+                                    {t('hr.leave.sendToEmployee')}
                                 </DropdownMenuItem>
                                 <DropdownMenuSeparator />
                                 {request.status !== 'cancelled' && request.status !== 'completed' && (
@@ -366,7 +368,7 @@ export function LeaveRequestDetailsView() {
                                         className="text-red-600 focus:text-red-600"
                                     >
                                         <Ban className="h-4 w-4 ml-2" />
-                                        إلغاء الطلب
+                                        {t('hr.leave.cancelRequest')}
                                     </DropdownMenuItem>
                                 )}
                             </DropdownMenuContent>
@@ -433,16 +435,16 @@ export function LeaveRequestDetailsView() {
                 {/* Tabs Content */}
                 <Tabs defaultValue="overview" className="space-y-6">
                     <TabsList className="bg-white rounded-xl p-1 shadow-sm">
-                        <TabsTrigger value="overview" className="rounded-lg">نظرة عامة</TabsTrigger>
-                        <TabsTrigger value="details" className="rounded-lg">التفاصيل</TabsTrigger>
-                        <TabsTrigger value="approval" className="rounded-lg">الموافقات</TabsTrigger>
+                        <TabsTrigger value="overview" className="rounded-lg">{t('common.overview')}</TabsTrigger>
+                        <TabsTrigger value="details" className="rounded-lg">{t('common.details')}</TabsTrigger>
+                        <TabsTrigger value="approval" className="rounded-lg">{t('hr.leave.approvals')}</TabsTrigger>
                         {request.documents && request.documents.length > 0 && (
-                            <TabsTrigger value="documents" className="rounded-lg">المستندات</TabsTrigger>
+                            <TabsTrigger value="documents" className="rounded-lg">{t('hr.employees.documents')}</TabsTrigger>
                         )}
                         {request.workHandover && (
-                            <TabsTrigger value="handover" className="rounded-lg">تسليم العمل</TabsTrigger>
+                            <TabsTrigger value="handover" className="rounded-lg">{t('hr.leave.workHandover')}</TabsTrigger>
                         )}
-                        <TabsTrigger value="notes" className="rounded-lg">الملاحظات</TabsTrigger>
+                        <TabsTrigger value="notes" className="rounded-lg">{t('common.notes')}</TabsTrigger>
                     </TabsList>
 
                     {/* Overview Tab */}
@@ -1103,9 +1105,9 @@ export function LeaveRequestDetailsView() {
             <Dialog open={showApproveDialog} onOpenChange={setShowApproveDialog}>
                 <DialogContent>
                     <DialogHeader>
-                        <DialogTitle>الموافقة على طلب الإجازة</DialogTitle>
+                        <DialogTitle>{t('hr.leave.approveRequest')}</DialogTitle>
                         <DialogDescription>
-                            سيتم الموافقة على طلب الإجازة وإخطار الموظف.
+                            {t('hr.leave.approveRequestDesc')}
                         </DialogDescription>
                     </DialogHeader>
                     <div className="space-y-4 py-4">
@@ -1122,26 +1124,26 @@ export function LeaveRequestDetailsView() {
                             </div>
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="approveComments">ملاحظات (اختياري)</Label>
+                            <Label htmlFor="approveComments">{t('common.commentsOptional')}</Label>
                             <Textarea
                                 id="approveComments"
                                 value={approveComments}
                                 onChange={(e) => setApproveComments(e.target.value)}
-                                placeholder="أي ملاحظات على الموافقة..."
+                                placeholder={t('hr.leave.approveCommentsPlaceholder')}
                                 className="rounded-xl"
                             />
                         </div>
                     </div>
                     <DialogFooter>
                         <Button variant="outline" onClick={() => setShowApproveDialog(false)} className="rounded-xl">
-                            تراجع
+                            {t('common.cancel')}
                         </Button>
                         <Button
                             onClick={handleApprove}
                             className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl"
                             disabled={approveMutation.isPending}
                         >
-                            {approveMutation.isPending ? 'جاري الموافقة...' : 'موافقة'}
+                            {approveMutation.isPending ? t('common.approving') : t('common.approve')}
                         </Button>
                     </DialogFooter>
                 </DialogContent>
@@ -1151,33 +1153,33 @@ export function LeaveRequestDetailsView() {
             <Dialog open={showRejectDialog} onOpenChange={setShowRejectDialog}>
                 <DialogContent>
                     <DialogHeader>
-                        <DialogTitle>رفض طلب الإجازة</DialogTitle>
+                        <DialogTitle>{t('hr.leave.rejectRequest')}</DialogTitle>
                         <DialogDescription>
-                            يرجى تحديد سبب الرفض. سيتم إخطار الموظف بالقرار.
+                            {t('hr.leave.rejectRequestDesc')}
                         </DialogDescription>
                     </DialogHeader>
                     <div className="space-y-4 py-4">
                         <div className="space-y-2">
-                            <Label htmlFor="rejectReason">سبب الرفض *</Label>
+                            <Label htmlFor="rejectReason">{t('hr.leave.rejectReason')} *</Label>
                             <Textarea
                                 id="rejectReason"
                                 value={rejectReason}
                                 onChange={(e) => setRejectReason(e.target.value)}
-                                placeholder="أدخل سبب رفض الطلب..."
+                                placeholder={t('hr.leave.rejectReasonPlaceholder')}
                                 className="rounded-xl"
                             />
                         </div>
                     </div>
                     <DialogFooter>
                         <Button variant="outline" onClick={() => setShowRejectDialog(false)} className="rounded-xl">
-                            تراجع
+                            {t('common.cancel')}
                         </Button>
                         <Button
                             onClick={handleReject}
                             className="bg-red-500 hover:bg-red-600 text-white rounded-xl"
                             disabled={!rejectReason.trim() || rejectMutation.isPending}
                         >
-                            {rejectMutation.isPending ? 'جاري الرفض...' : 'رفض الطلب'}
+                            {rejectMutation.isPending ? t('common.rejecting') : t('common.rejectRequest')}
                         </Button>
                     </DialogFooter>
                 </DialogContent>
@@ -1187,33 +1189,33 @@ export function LeaveRequestDetailsView() {
             <Dialog open={showCancelDialog} onOpenChange={setShowCancelDialog}>
                 <DialogContent>
                     <DialogHeader>
-                        <DialogTitle>إلغاء طلب الإجازة</DialogTitle>
+                        <DialogTitle>{t('hr.leave.cancelRequest')}</DialogTitle>
                         <DialogDescription>
-                            هل أنت متأكد من إلغاء هذا الطلب؟ سيتم استعادة رصيد الإجازة.
+                            {t('hr.leave.cancelRequestDesc')}
                         </DialogDescription>
                     </DialogHeader>
                     <div className="space-y-4 py-4">
                         <div className="space-y-2">
-                            <Label htmlFor="cancelReason">سبب الإلغاء *</Label>
+                            <Label htmlFor="cancelReason">{t('hr.leave.cancelReason')} *</Label>
                             <Textarea
                                 id="cancelReason"
                                 value={cancelReason}
                                 onChange={(e) => setCancelReason(e.target.value)}
-                                placeholder="أدخل سبب الإلغاء..."
+                                placeholder={t('hr.leave.cancelReasonPlaceholder')}
                                 className="rounded-xl"
                             />
                         </div>
                     </div>
                     <DialogFooter>
                         <Button variant="outline" onClick={() => setShowCancelDialog(false)} className="rounded-xl">
-                            تراجع
+                            {t('common.cancel')}
                         </Button>
                         <Button
                             onClick={handleCancel}
                             className="bg-red-500 hover:bg-red-600 text-white rounded-xl"
                             disabled={!cancelReason.trim() || cancelMutation.isPending}
                         >
-                            {cancelMutation.isPending ? 'جاري الإلغاء...' : 'إلغاء الطلب'}
+                            {cancelMutation.isPending ? t('common.cancelling') : t('hr.leave.cancelRequest')}
                         </Button>
                     </DialogFooter>
                 </DialogContent>
@@ -1223,14 +1225,14 @@ export function LeaveRequestDetailsView() {
             <Dialog open={showReturnDialog} onOpenChange={setShowReturnDialog}>
                 <DialogContent>
                     <DialogHeader>
-                        <DialogTitle>تأكيد العودة من الإجازة</DialogTitle>
+                        <DialogTitle>{t('hr.leave.confirmReturn')}</DialogTitle>
                         <DialogDescription>
-                            حدد تاريخ عودة الموظف الفعلي.
+                            {t('hr.leave.confirmReturnDesc')}
                         </DialogDescription>
                     </DialogHeader>
                     <div className="space-y-4 py-4">
                         <div className="space-y-2">
-                            <Label htmlFor="returnDate">تاريخ العودة الفعلي *</Label>
+                            <Label htmlFor="returnDate">{t('hr.leave.actualReturnDate')} *</Label>
                             <Input
                                 id="returnDate"
                                 type="date"
@@ -1242,14 +1244,14 @@ export function LeaveRequestDetailsView() {
                     </div>
                     <DialogFooter>
                         <Button variant="outline" onClick={() => setShowReturnDialog(false)} className="rounded-xl">
-                            تراجع
+                            {t('common.cancel')}
                         </Button>
                         <Button
                             onClick={handleConfirmReturn}
                             className="bg-blue-500 hover:bg-blue-600 text-white rounded-xl"
                             disabled={!returnDate || confirmReturnMutation.isPending}
                         >
-                            {confirmReturnMutation.isPending ? 'جاري التأكيد...' : 'تأكيد العودة'}
+                            {confirmReturnMutation.isPending ? t('common.confirming') : t('hr.leave.confirmReturn')}
                         </Button>
                     </DialogFooter>
                 </DialogContent>

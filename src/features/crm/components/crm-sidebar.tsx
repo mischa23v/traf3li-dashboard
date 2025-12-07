@@ -18,6 +18,7 @@ import { useLeadStats, useLeadsNeedingFollowUp, useUpcomingTasks } from '@/hooks
 import { Skeleton } from '@/components/ui/skeleton'
 import { formatDistanceToNow } from 'date-fns'
 import { ar } from 'date-fns/locale'
+import { useTranslation } from 'react-i18next'
 
 interface CrmSidebarProps {
   context: 'leads' | 'pipeline' | 'referrals' | 'activities' | 'reports'
@@ -55,6 +56,7 @@ export function CrmSidebar({
   selectedCount = 0,
   onDeleteSelected,
 }: CrmSidebarProps) {
+  const { t } = useTranslation()
   const { data: statsData, isLoading: statsLoading } = useLeadStats()
   const { data: followUpData, isLoading: followUpLoading } = useLeadsNeedingFollowUp(5)
   const { data: tasksData, isLoading: tasksLoading } = useUpcomingTasks({ limit: 5 })
@@ -65,7 +67,7 @@ export function CrmSidebar({
     <div className="space-y-6">
       {/* Quick Actions */}
       <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-100">
-        <h3 className="font-bold text-navy text-lg mb-4">إجراءات سريعة</h3>
+        <h3 className="font-bold text-navy text-lg mb-4">{t('common.quickActions')}</h3>
         <div className="space-y-3">
           <Button
             asChild
@@ -73,7 +75,7 @@ export function CrmSidebar({
           >
             <Link to="/dashboard/crm/leads/new">
               <UserPlus className="ms-3 h-5 w-5" />
-              إضافة عميل محتمل
+              {t('crm.leads.addNew')}
             </Link>
           </Button>
           <Button
@@ -83,7 +85,7 @@ export function CrmSidebar({
           >
             <Link to="/dashboard/crm/pipeline">
               <TrendingUp className="ms-3 h-5 w-5 text-emerald-600" />
-              عرض مسار المبيعات
+              {t('crm.pipeline.view')}
             </Link>
           </Button>
           <Button
@@ -93,7 +95,7 @@ export function CrmSidebar({
           >
             <Link to="/dashboard/crm/activities">
               <Clock className="ms-3 h-5 w-5 text-blue-600" />
-              سجل الأنشطة
+              {t('crm.activities.title')}
             </Link>
           </Button>
           <Button
@@ -103,7 +105,7 @@ export function CrmSidebar({
           >
             <Link to={links.reports.viewAll}>
               <BarChart3 className="ms-3 h-5 w-5 text-purple-600" />
-              التقارير والتحليلات
+              {t('crm.reports.title')}
             </Link>
           </Button>
           {context === 'reports' && (
@@ -113,7 +115,7 @@ export function CrmSidebar({
             >
               <Link to={links.reports.create}>
                 <FileBarChart className="ms-3 h-5 w-5" />
-                إنشاء تقرير جديد
+                {t('crm.reports.createNew')}
               </Link>
             </Button>
           )}
@@ -126,7 +128,7 @@ export function CrmSidebar({
               className="w-full rounded-xl h-12 justify-start"
             >
               <Trash2 className="ms-3 h-5 w-5" />
-              حذف المحدد ({selectedCount})
+              {t('common.deleteSelected', { count: selectedCount })}
             </Button>
           )}
 
@@ -136,7 +138,7 @@ export function CrmSidebar({
               variant="ghost"
               className="w-full rounded-xl h-12 justify-start text-slate-600"
             >
-              {isSelectionMode ? 'إلغاء التحديد' : 'تحديد متعدد'}
+              {isSelectionMode ? t('common.cancelSelection') : t('common.multiSelect')}
             </Button>
           )}
         </div>
@@ -144,7 +146,7 @@ export function CrmSidebar({
 
       {/* Stats Overview */}
       <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-100">
-        <h3 className="font-bold text-navy text-lg mb-4">إحصائيات المبيعات</h3>
+        <h3 className="font-bold text-navy text-lg mb-4">{t('crm.stats.sales')}</h3>
         {statsLoading ? (
           <div className="space-y-4">
             {[1, 2, 3, 4].map((i) => (
@@ -159,7 +161,7 @@ export function CrmSidebar({
             <div className="flex justify-between items-center p-3 bg-slate-50 rounded-xl">
               <span className="text-slate-600 flex items-center gap-2">
                 <Users className="h-4 w-4" />
-                إجمالي العملاء المحتملين
+                {t('crm.stats.totalLeads')}
               </span>
               <span className="font-bold text-navy text-lg">
                 {stats?.total || 0}
@@ -168,7 +170,7 @@ export function CrmSidebar({
             <div className="flex justify-between items-center p-3 bg-emerald-50 rounded-xl">
               <span className="text-emerald-700 flex items-center gap-2">
                 <ArrowUpRight className="h-4 w-4" />
-                تم التحويل
+                {t('crm.stats.converted')}
               </span>
               <span className="font-bold text-emerald-700 text-lg">
                 {stats?.converted || 0}
@@ -177,7 +179,7 @@ export function CrmSidebar({
             <div className="flex justify-between items-center p-3 bg-blue-50 rounded-xl">
               <span className="text-blue-700 flex items-center gap-2">
                 <Target className="h-4 w-4" />
-                معدل التحويل
+                {t('crm.stats.conversionRate')}
               </span>
               <span className="font-bold text-blue-700 text-lg">
                 {stats?.conversionRate || '0'}%
@@ -190,9 +192,9 @@ export function CrmSidebar({
       {/* Needs Follow Up */}
       <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-100">
         <div className="flex justify-between items-center mb-4">
-          <h3 className="font-bold text-navy text-lg">يحتاج متابعة</h3>
+          <h3 className="font-bold text-navy text-lg">{t('crm.leads.needsFollowUp')}</h3>
           <Button variant="ghost" size="sm" className="text-emerald-600" asChild>
-            <Link to="/dashboard/crm/leads?filter=followup">عرض الكل</Link>
+            <Link to="/dashboard/crm/leads?filter=followup">{t('common.viewAll')}</Link>
           </Button>
         </div>
         {followUpLoading ? (
@@ -230,16 +232,16 @@ export function CrmSidebar({
             ))}
           </div>
         ) : (
-          <p className="text-slate-500 text-center py-4">لا توجد متابعات قادمة</p>
+          <p className="text-slate-500 text-center py-4">{t('crm.leads.noUpcomingFollowups')}</p>
         )}
       </div>
 
       {/* Upcoming Tasks */}
       <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-100">
         <div className="flex justify-between items-center mb-4">
-          <h3 className="font-bold text-navy text-lg">المهام القادمة</h3>
+          <h3 className="font-bold text-navy text-lg">{t('crm.tasks.upcoming')}</h3>
           <Button variant="ghost" size="sm" className="text-emerald-600" asChild>
-            <Link to="/dashboard/crm/activities">عرض الكل</Link>
+            <Link to="/dashboard/crm/activities">{t('common.viewAll')}</Link>
           </Button>
         </div>
         {tasksLoading ? (
@@ -266,7 +268,7 @@ export function CrmSidebar({
             ))}
           </div>
         ) : (
-          <p className="text-slate-500 text-center py-4">لا توجد مهام قادمة</p>
+          <p className="text-slate-500 text-center py-4">{t('crm.tasks.noUpcoming')}</p>
         )}
       </div>
     </div>

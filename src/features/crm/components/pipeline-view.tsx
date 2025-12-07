@@ -80,6 +80,7 @@ import { formatDistanceToNow, differenceInDays } from 'date-fns'
 import { ar } from 'date-fns/locale'
 import { SalesSidebar } from './sales-sidebar'
 import { cn } from '@/lib/utils'
+import { useTranslation } from 'react-i18next'
 
 // Analytics metric card component
 function MetricCard({
@@ -190,7 +191,7 @@ function LeadCard({
                 <TooltipTrigger>
                   <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
                 </TooltipTrigger>
-                <TooltipContent>عميل VIP</TooltipContent>
+                <TooltipContent>{t('common.vipClient')}</TooltipContent>
               </Tooltip>
             </TooltipProvider>
           )}
@@ -200,7 +201,7 @@ function LeadCard({
                 <TooltipTrigger>
                   <AlertTriangle className="w-4 h-4 text-red-500" />
                 </TooltipTrigger>
-                <TooltipContent>عاجل</TooltipContent>
+                <TooltipContent>{t('common.urgent')}</TooltipContent>
               </Tooltip>
             </TooltipProvider>
           )}
@@ -210,7 +211,7 @@ function LeadCard({
                 <TooltipTrigger>
                   <Clock className="w-4 h-4 text-orange-500" />
                 </TooltipTrigger>
-                <TooltipContent>{daysInStage} يوم في هذه المرحلة</TooltipContent>
+                <TooltipContent>{daysInStage} {t('crm.pipeline.daysInStage')}</TooltipContent>
               </Tooltip>
             </TooltipProvider>
           )}
@@ -223,13 +224,13 @@ function LeadCard({
             <DropdownMenuContent align="end">
               <DropdownMenuItem asChild>
                 <Link to={`/dashboard/crm/leads/${lead._id}`}>
-                  عرض التفاصيل
+                  {t('common.viewDetails')}
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={onConvert}>
                 <ArrowUpRight className="h-4 w-4 ml-2" />
-                تحويل لعميل
+                {t('crm.leads.convertToClient')}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -309,6 +310,7 @@ function LeadCard({
 }
 
 export function PipelineView() {
+  const { t } = useTranslation()
   const [selectedPipelineId, setSelectedPipelineId] = useState<string>('')
   const [draggedLeadId, setDraggedLeadId] = useState<string | null>(null)
   const [filterSource, setFilterSource] = useState<string>('all')
@@ -421,10 +423,10 @@ export function PipelineView() {
   }
 
   const topNav = [
-    { title: 'العملاء المحتملين', href: '/dashboard/crm/leads', isActive: false },
-    { title: 'مسار المبيعات', href: '/dashboard/crm/pipeline', isActive: true },
-    { title: 'الإحالات', href: '/dashboard/crm/referrals', isActive: false },
-    { title: 'سجل الأنشطة', href: '/dashboard/crm/activities', isActive: false },
+    { title: t('crm.leads.title'), href: '/dashboard/crm/leads', isActive: false },
+    { title: t('crm.pipeline.title'), href: '/dashboard/crm/pipeline', isActive: true },
+    { title: t('crm.referrals.title'), href: '/dashboard/crm/referrals', isActive: false },
+    { title: t('crm.activities.title'), href: '/dashboard/crm/activities', isActive: false },
   ]
 
   // Calculate stage totals
@@ -471,7 +473,7 @@ export function PipelineView() {
             <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
             <input
               type="text"
-              placeholder="بحث..."
+              placeholder={t('common.search')}
               className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pr-9 pl-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
             />
           </div>
@@ -496,14 +498,14 @@ export function PipelineView() {
         className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-6 rounded-tr-3xl shadow-inner border-r border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']"
       >
         {/* Header with Pipeline Selector */}
-        <ProductivityHero badge="مسار المبيعات" title="مسار المبيعات" type="pipeline" hideButtons={true}>
+        <ProductivityHero badge={t('crm.pipeline.badge')} title={t('crm.pipeline.title')} type="pipeline" hideButtons={true}>
           <div className="flex items-center gap-4">
             <Select
               value={selectedPipelineId}
               onValueChange={setSelectedPipelineId}
             >
               <SelectTrigger className="w-[200px] rounded-xl bg-white/10 border-white/10 text-white">
-                <SelectValue placeholder="اختر مسار المبيعات" />
+                <SelectValue placeholder={t('crm.pipeline.selectPipeline')} />
               </SelectTrigger>
               <SelectContent>
                 {pipelines.map((p: Pipeline) => (
@@ -519,7 +521,7 @@ export function PipelineView() {
             >
               <Link to="/dashboard/crm/leads/new">
                 <Plus className="ml-2 h-4 w-4" />
-                إضافة عميل
+                {t('crm.leads.add')}
               </Link>
             </Button>
           </div>
@@ -529,7 +531,7 @@ export function PipelineView() {
         {pipeline && (
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
             <MetricCard
-              title="إجمالي العملاء"
+              title={t('crm.stats.totalLeads')}
               value={analytics.totalLeads}
               icon={Users}
               color="blue"
@@ -537,23 +539,23 @@ export function PipelineView() {
               trendValue="+12%"
             />
             <MetricCard
-              title="القيمة الإجمالية"
+              title={t('crm.stats.totalValue')}
               value={`${(analytics.totalValue / 1000).toFixed(0)}K`}
-              subtitle={`${analytics.totalValue.toLocaleString('ar-SA')} ر.س`}
+              subtitle={`${analytics.totalValue.toLocaleString('ar-SA')} ${t('common.currency')}`}
               icon={DollarSign}
               color="emerald"
               trend="up"
               trendValue="+8%"
             />
             <MetricCard
-              title="القيمة المرجحة"
+              title={t('crm.stats.weightedValue')}
               value={`${(analytics.weightedValue / 1000).toFixed(0)}K`}
-              subtitle="بناءً على الاحتمالية"
+              subtitle={t('crm.stats.basedOnProbability')}
               icon={Target}
               color="purple"
             />
             <MetricCard
-              title="معدل التحويل"
+              title={t('crm.stats.conversionRate')}
               value={`${analytics.conversionRate}%`}
               icon={TrendingUp}
               color="emerald"
@@ -561,16 +563,16 @@ export function PipelineView() {
               trendValue="+2%"
             />
             <MetricCard
-              title="متوسط أيام الإغلاق"
+              title={t('crm.stats.avgDaysToClose')}
               value={`${analytics.avgDaysToClose}`}
-              subtitle="يوم"
+              subtitle={t('common.day')}
               icon={Timer}
               color="orange"
             />
             <MetricCard
-              title="تحتاج متابعة"
+              title={t('crm.stats.needsFollowUp')}
               value={analytics.staleLeads}
-              subtitle={`${analytics.urgentLeads} عاجل`}
+              subtitle={`${analytics.urgentLeads} ${t('common.urgent')}`}
               icon={AlertTriangle}
               color={analytics.staleLeads > 5 ? 'red' : 'orange'}
             />
@@ -662,16 +664,16 @@ export function PipelineView() {
                   </div>
                 </div>
                 <h3 className="text-lg font-bold text-slate-900 mb-2">
-                  حدث خطأ أثناء تحميل مسار المبيعات
+                  {t('errors.loadingPipeline')}
                 </h3>
                 <p className="text-slate-500 mb-4">
-                  {error?.message || 'تعذر الاتصال بالخادم'}
+                  {error?.message || t('errors.serverConnection')}
                 </p>
                 <Button
                   onClick={() => refetch()}
                   className="bg-emerald-500 hover:bg-emerald-600"
                 >
-                  إعادة المحاولة
+                  {t('common.retry')}
                 </Button>
               </div>
             ) : !pipeline ? (
@@ -682,10 +684,10 @@ export function PipelineView() {
                   </div>
                 </div>
                 <h3 className="text-lg font-bold text-slate-900 mb-2">
-                  اختر مسار المبيعات
+                  {t('crm.pipeline.selectPipeline')}
                 </h3>
                 <p className="text-slate-500 mb-4">
-                  اختر مسار مبيعات من القائمة أعلاه لعرض العملاء المحتملين
+                  {t('crm.pipeline.selectPipelineDescription')}
                 </p>
               </div>
             ) : (
@@ -723,7 +725,7 @@ export function PipelineView() {
                       {/* Stage Value */}
                       <div className="bg-slate-100 px-4 py-2 text-xs text-slate-600 border-x border-slate-200 flex justify-between items-center">
                         <span>
-                          {totals.value > 0 ? `${totals.value.toLocaleString('ar-SA')} ر.س` : 'لا قيمة'}
+                          {totals.value > 0 ? `${totals.value.toLocaleString('ar-SA')} ${t('common.currency')}` : t('common.noValue')}
                         </span>
                         {totals.weightedValue > 0 && (
                           <TooltipProvider>
@@ -733,7 +735,7 @@ export function PipelineView() {
                                   ~{totals.weightedValue.toLocaleString('ar-SA')}
                                 </span>
                               </TooltipTrigger>
-                              <TooltipContent>القيمة المرجحة</TooltipContent>
+                              <TooltipContent>{t('crm.stats.weightedValue')}</TooltipContent>
                             </Tooltip>
                           </TooltipProvider>
                         )}
@@ -752,7 +754,7 @@ export function PipelineView() {
                       >
                         {stageLeads.length === 0 ? (
                           <div className="h-full flex items-center justify-center text-slate-400 text-sm">
-                            اسحب العملاء هنا
+                            {t('crm.pipeline.dragLeadsHere')}
                           </div>
                         ) : (
                           <div className="space-y-3">

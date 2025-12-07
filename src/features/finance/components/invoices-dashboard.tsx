@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react'
+import { useTranslation } from 'react-i18next'
 import {
     Search, Filter, Plus, MoreHorizontal,
     FileText, AlertCircle, CheckCircle, Bell, Loader2,
@@ -43,6 +44,7 @@ import { FinanceSidebar } from './finance-sidebar'
 import { ProductivityHero } from '@/components/productivity-hero'
 
 export default function InvoicesDashboard() {
+    const { t, i18n } = useTranslation()
     const [activeTab, setActiveTab] = useState('all')
     const [searchQuery, setSearchQuery] = useState('')
     const [currentPage, setCurrentPage] = useState(1)
@@ -152,13 +154,13 @@ export default function InvoicesDashboard() {
     }
 
     const topNav = [
-        { title: 'نظرة عامة', href: '/dashboard/finance/overview', isActive: false },
-        { title: 'الفواتير', href: '/dashboard/finance/invoices', isActive: true },
-        { title: 'المصروفات', href: '/dashboard/finance/expenses', isActive: false },
-        { title: 'كشف الحساب', href: '/dashboard/finance/statements', isActive: false },
-        { title: 'المعاملات', href: '/dashboard/finance/transactions', isActive: false },
-        { title: 'تتبع الوقت', href: '/dashboard/finance/time-tracking', isActive: false },
-        { title: 'نشاط الحساب', href: '/dashboard/finance/activity', isActive: false },
+        { title: t('finance.overview'), href: '/dashboard/finance/overview', isActive: false },
+        { title: t('finance.invoices.title'), href: '/dashboard/finance/invoices', isActive: true },
+        { title: t('finance.expenses.title'), href: '/dashboard/finance/expenses', isActive: false },
+        { title: t('finance.statements'), href: '/dashboard/finance/statements', isActive: false },
+        { title: t('finance.transactions'), href: '/dashboard/finance/transactions', isActive: false },
+        { title: t('finance.timeEntries.title'), href: '/dashboard/finance/time-tracking', isActive: false },
+        { title: t('finance.activity'), href: '/dashboard/finance/activity', isActive: false },
     ]
 
     // LOADING STATE
@@ -173,7 +175,7 @@ export default function InvoicesDashboard() {
                     <div className='ms-auto flex items-center space-x-4'>
                         <div className="relative hidden md:block">
                             <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                            <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pr-9 pl-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
+                            <input type="text" placeholder={t('common.search')} className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pr-9 pl-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
                         </div>
                         <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white">
                             <Bell className="h-5 w-5" />
@@ -218,7 +220,7 @@ export default function InvoicesDashboard() {
                     <div className='ms-auto flex items-center space-x-4'>
                         <div className="relative hidden md:block">
                             <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                            <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pr-9 pl-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
+                            <input type="text" placeholder={t('common.search')} className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pr-9 pl-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
                         </div>
                         <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white">
                             <Bell className="h-5 w-5" />
@@ -236,11 +238,11 @@ export default function InvoicesDashboard() {
                         <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4">
                             <AlertCircle className="h-8 w-8 text-red-500" />
                         </div>
-                        <h3 className="text-xl font-bold text-slate-900 mb-2">فشل تحميل الفواتير</h3>
-                        <p className="text-slate-500 mb-6">{error?.message || 'حدث خطأ أثناء تحميل البيانات'}</p>
+                        <h3 className="text-xl font-bold text-slate-900 mb-2">{t('finance.invoices.loadError')}</h3>
+                        <p className="text-slate-500 mb-6">{error?.message || t('common.errors.loadingData')}</p>
                         <Button onClick={() => refetch()} className="bg-emerald-500 hover:bg-emerald-600 text-white px-8">
                             <Loader2 className="ml-2 h-4 w-4" />
-                            إعادة المحاولة
+                            {t('common.retry')}
                         </Button>
                     </div>
                 </Main>
@@ -282,7 +284,7 @@ export default function InvoicesDashboard() {
             <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-r border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
 
                 {/* HERO CARD & STATS */}
-                <ProductivityHero badge="الفواتير" title="الفواتير" type="invoices" />
+                <ProductivityHero badge={t('finance.invoices.title')} title={t('finance.invoices.title')} type="invoices" />
 
                 {/* MAIN GRID LAYOUT */}
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -294,12 +296,12 @@ export default function InvoicesDashboard() {
                                     <div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-4">
                                         <FileText className="h-8 w-8 text-brand-blue" />
                                     </div>
-                                    <h3 className="text-xl font-bold text-slate-900 mb-2">لا توجد فواتير بعد</h3>
-                                    <p className="text-slate-500 mb-6">ابدأ بإنشاء أول فاتورة لعملائك</p>
+                                    <h3 className="text-xl font-bold text-slate-900 mb-2">{t('finance.invoices.empty.title')}</h3>
+                                    <p className="text-slate-500 mb-6">{t('finance.invoices.empty.description')}</p>
                                     <Button asChild className="bg-brand-blue hover:bg-blue-600 text-white px-8">
                                         <Link to="/dashboard/finance/invoices/new">
                                             <Plus className="ml-2 h-4 w-4" />
-                                            إنشاء فاتورة جديدة
+                                            {t('finance.invoices.createNew')}
                                         </Link>
                                     </Button>
                                 </div>
@@ -314,25 +316,25 @@ export default function InvoicesDashboard() {
                                                         value="all"
                                                         className="rounded-lg px-4 py-2 data-[state=active]:bg-[#022c22] data-[state=active]:text-white transition-all duration-300"
                                                     >
-                                                        الكل
+                                                        {t('filter.all')}
                                                     </TabsTrigger>
                                                     <TabsTrigger
                                                         value="pending"
                                                         className="rounded-lg px-4 py-2 data-[state=active]:bg-amber-500 data-[state=active]:text-white transition-all duration-300"
                                                     >
-                                                        معلقة
+                                                        {t('finance.invoices.status.pending')}
                                                     </TabsTrigger>
                                                     <TabsTrigger
                                                         value="paid"
                                                         className="rounded-lg px-4 py-2 data-[state=active]:bg-emerald-600 data-[state=active]:text-white transition-all duration-300"
                                                     >
-                                                        مدفوعة
+                                                        {t('finance.invoices.status.paid')}
                                                     </TabsTrigger>
                                                     <TabsTrigger
                                                         value="overdue"
                                                         className="rounded-lg px-4 py-2 data-[state=active]:bg-red-500 data-[state=active]:text-white transition-all duration-300"
                                                     >
-                                                        متأخرة
+                                                        {t('finance.invoices.status.overdue')}
                                                     </TabsTrigger>
                                                 </TabsList>
                                             </Tabs>
@@ -341,7 +343,7 @@ export default function InvoicesDashboard() {
                                                 <div className="relative w-full max-w-xs">
                                                     <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                                                     <Input
-                                                        placeholder="بحث في الفواتير..."
+                                                        placeholder={t('finance.invoices.searchPlaceholder')}
                                                         className="pr-10 rounded-xl border-slate-200 focus:ring-[#022c22] focus:border-[#022c22]"
                                                         value={searchQuery}
                                                         onChange={(e) => setSearchQuery(e.target.value)}
@@ -351,7 +353,7 @@ export default function InvoicesDashboard() {
                                                     <PopoverTrigger asChild>
                                                         <Button variant="outline" className="rounded-xl border-slate-200 relative">
                                                             <Filter className="w-4 h-4 ml-2" />
-                                                            تصفية متقدمة
+                                                            {t('filter.advancedFilter')}
                                                             {activeFilterCount > 0 && (
                                                                 <Badge className="absolute -top-2 -left-2 h-5 w-5 p-0 flex items-center justify-center bg-brand-blue text-white text-xs">
                                                                     {activeFilterCount}
@@ -362,16 +364,16 @@ export default function InvoicesDashboard() {
                                                     <PopoverContent className="w-80" align="end">
                                                         <div className="space-y-4">
                                                             <div className="flex items-center justify-between">
-                                                                <h4 className="font-bold text-navy">تصفية متقدمة</h4>
+                                                                <h4 className="font-bold text-navy">{t('filter.advancedFilter')}</h4>
                                                                 {activeFilterCount > 0 && (
                                                                     <Button variant="ghost" size="sm" onClick={clearFilters} className="text-slate-500 hover:text-red-500">
                                                                         <X className="w-4 h-4 ml-1" />
-                                                                        مسح
+                                                                        {t('filter.clear')}
                                                                     </Button>
                                                                 )}
                                                             </div>
                                                             <div className="space-y-2">
-                                                                <label className="text-sm font-medium text-slate-700">العميل</label>
+                                                                <label className="text-sm font-medium text-slate-700">{t('finance.invoices.fields.client')}</label>
                                                                 <Select value={selectedClient} onValueChange={setSelectedClient}>
                                                                     <SelectTrigger className="rounded-xl">
                                                                         <SelectValue placeholder="جميع العملاء" />
@@ -504,12 +506,12 @@ export default function InvoicesDashboard() {
                                                                                     'bg-amber-100 text-amber-700'}
                                                         border-0 px-2 py-0.5
                                                     `}>
-                                                                {inv.status === 'paid' ? 'مدفوعة' :
-                                                                    inv.status === 'overdue' ? 'متأخرة' :
-                                                                        inv.status === 'cancelled' ? 'ملغاة' :
-                                                                            inv.status === 'draft' ? 'مسودة' :
-                                                                                inv.status === 'partial' ? 'مدفوعة جزئياً' :
-                                                                                    inv.status === 'sent' ? 'مرسلة' : 'معلقة'}
+                                                                {inv.status === 'paid' ? t('finance.invoices.status.paid') :
+                                                                    inv.status === 'overdue' ? t('finance.invoices.status.overdue') :
+                                                                        inv.status === 'cancelled' ? t('finance.invoices.status.cancelled') :
+                                                                            inv.status === 'draft' ? t('finance.invoices.status.draft') :
+                                                                                inv.status === 'partial' ? t('finance.invoices.status.partial') :
+                                                                                    inv.status === 'sent' ? t('finance.invoices.status.sent') : t('finance.invoices.status.pending')}
                                                             </Badge>
                                                         </div>
                                                         <p className="text-slate-500 font-medium">{inv.client}</p>
@@ -517,11 +519,11 @@ export default function InvoicesDashboard() {
                                                 </div>
                                                 <div className="flex items-center gap-8 border-t md:border-t-0 border-slate-100 pt-4 md:pt-0">
                                                     <div className="text-center md:text-right">
-                                                        <div className="text-xs text-slate-400 mb-1">تاريخ الاستحقاق</div>
+                                                        <div className="text-xs text-slate-400 mb-1">{t('finance.invoices.fields.dueDate')}</div>
                                                         <div className="font-bold text-navy">{inv.dueDate}</div>
                                                     </div>
                                                     <div className="text-center md:text-right">
-                                                        <div className="text-xs text-slate-400 mb-1">المبلغ</div>
+                                                        <div className="text-xs text-slate-400 mb-1">{t('finance.invoices.fields.total')}</div>
                                                         <div className="font-bold text-xl text-navy">{formatCurrency(inv.amount)}</div>
                                                     </div>
                                                     <DropdownMenu>

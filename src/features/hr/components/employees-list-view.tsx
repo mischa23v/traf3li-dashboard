@@ -1,5 +1,6 @@
 import { HRSidebar } from './hr-sidebar'
 import { useState, useMemo } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Main } from '@/components/layout/main'
 import { LanguageSwitcher } from '@/components/language-switcher'
 import { ThemeSwitch } from '@/components/theme-switch'
@@ -18,7 +19,7 @@ import { DynamicIsland } from '@/components/dynamic-island'
 import { Search, Bell, AlertCircle, Users, Plus, MoreHorizontal, ChevronLeft, Eye, Trash2, Edit3, SortAsc, Filter, X, Building2, Phone, Mail, MapPin, Briefcase, Calendar, UserCog } from 'lucide-react'
 import { useNavigate } from '@tanstack/react-router'
 import { format } from 'date-fns'
-import { arSA } from 'date-fns/locale'
+import { arSA, enUS } from 'date-fns/locale'
 import { Input } from '@/components/ui/input'
 import {
     Select,
@@ -37,6 +38,9 @@ import {
 import type { Employee, EmploymentStatus, EmploymentType } from '@/services/hrService'
 
 export function EmployeesListView() {
+    const { t, i18n } = useTranslation()
+    const isRTL = i18n.language === 'ar'
+    const dateLocale = isRTL ? arSA : enUS
     const navigate = useNavigate()
     const [isSelectionMode, setIsSelectionMode] = useState(false)
     const [selectedIds, setSelectedIds] = useState<string[]>([])
@@ -108,14 +112,11 @@ export function EmployeesListView() {
     const { data: employeesData, isLoading, isError, error, refetch } = useEmployees(filters)
     const { data: stats } = useEmployeeStats()
 
-    // Helper function to format dates in both languages
-    const formatDualDate = (dateString: string | null | undefined) => {
-        if (!dateString) return { arabic: 'غير محدد', english: 'Not set' }
+    // Helper function to format dates
+    const formatDate = (dateString: string | null | undefined) => {
+        if (!dateString) return t('common.notSet')
         const date = new Date(dateString)
-        return {
-            arabic: format(date, 'd MMMM yyyy', { locale: arSA }),
-            english: format(date, 'MMM d, yyyy')
-        }
+        return format(date, isRTL ? 'd MMMM yyyy' : 'MMM d, yyyy', { locale: dateLocale })
     }
 
     // Transform API data
@@ -126,16 +127,16 @@ export function EmployeesListView() {
             id: employee._id,
             employeeId: employee.employeeId,
             employeeNumber: employee.employeeNumber,
-            fullName: employee.personalInfo?.fullNameArabic || 'غير محدد',
+            fullName: isRTL ? (employee.personalInfo?.fullNameArabic || t('common.notSet')) : (employee.personalInfo?.fullNameEnglish || employee.personalInfo?.fullNameArabic || t('common.notSet')),
             fullNameEnglish: employee.personalInfo?.fullNameEnglish || '',
-            jobTitle: employee.employment?.jobTitle || 'غير محدد',
-            jobTitleArabic: employee.employment?.jobTitleArabic || employee.employment?.jobTitle || 'غير محدد',
-            department: employee.employment?.departmentName || 'غير محدد',
+            jobTitle: isRTL ? (employee.employment?.jobTitleArabic || employee.employment?.jobTitle || t('common.notSet')) : (employee.employment?.jobTitle || t('common.notSet')),
+            jobTitleArabic: employee.employment?.jobTitleArabic || employee.employment?.jobTitle || t('common.notSet'),
+            department: employee.employment?.departmentName || t('common.notSet'),
             status: employee.employment?.employmentStatus || 'active',
             employmentType: employee.employment?.employmentType || 'full_time',
             hireDate: employee.employment?.hireDate,
-            hireDateFormatted: formatDualDate(employee.employment?.hireDate),
-            nationality: employee.personalInfo?.nationality || 'غير محدد',
+            hireDateFormatted: formatDate(employee.employment?.hireDate),
+            nationality: employee.personalInfo?.nationality || t('common.notSet'),
             isSaudi: employee.personalInfo?.isSaudi || false,
             mobile: employee.personalInfo?.mobile || '',
             email: employee.personalInfo?.email || '',
@@ -143,7 +144,7 @@ export function EmployeesListView() {
             avatar: employee.avatar,
             _id: employee._id,
         }))
-    }, [employeesData])
+    }, [employeesData, isRTL, t])
 
     // Selection Handlers
     const handleToggleSelectionMode = () => {
@@ -162,7 +163,7 @@ export function EmployeesListView() {
     const handleDeleteSelected = () => {
         if (selectedIds.length === 0) return
 
-        if (confirm(`هل أنت متأكد من حذف ${selectedIds.length} موظف؟`)) {
+        if (confirm(t('hr.employees.bulkDeleteConfirm', { count: selectedIds.length }))) {
             bulkDeleteEmployees(selectedIds, {
                 onSuccess: () => {
                     setIsSelectionMode(false)
@@ -182,7 +183,7 @@ export function EmployeesListView() {
     }
 
     const handleDeleteEmployee = (employeeId: string) => {
-        if (confirm('هل أنت متأكد من حذف هذا الموظف؟')) {
+        if (confirm(t('hr.employees.deleteConfirm'))) {
             deleteEmployeeMutation.mutate(employeeId)
         }
     }
@@ -196,10 +197,10 @@ export function EmployeesListView() {
             terminated: 'bg-slate-100 text-slate-700 border-slate-200',
         }
         const labels: Record<EmploymentStatus, string> = {
-            active: 'نشط',
-            on_leave: 'في إجازة',
-            suspended: 'موقوف',
-            terminated: 'منتهي',
+            active: t('hr.employmentStatus.active'),
+            on_leave: t('hr.employmentStatus.onLeave'),
+            suspended: t('hr.employmentStatus.suspended'),
+            terminated: t('hr.employmentStatus.terminated'),
         }
         return <Badge className={`${styles[status]} border-0 rounded-md px-2`}>{labels[status]}</Badge>
     }
@@ -207,10 +208,10 @@ export function EmployeesListView() {
     // Employment type badge
     const getTypeBadge = (type: EmploymentType) => {
         const labels: Record<EmploymentType, string> = {
-            full_time: 'دوام كامل',
-            part_time: 'دوام جزئي',
-            contract: 'عقد',
-            temporary: 'مؤقت',
+            full_time: t('hr.employmentType.fullTime'),
+            part_time: t('hr.employmentType.partTime'),
+            contract: t('hr.employmentType.contract'),
+            temporary: t('hr.employmentType.temporary'),
         }
         return <Badge variant="outline" className="text-xs">{labels[type]}</Badge>
     }
@@ -219,18 +220,18 @@ export function EmployeesListView() {
     const heroStats = useMemo(() => {
         if (!stats) return undefined
         return [
-            { label: 'إجمالي الموظفين', value: stats.total || 0, icon: Users, status: 'normal' as const },
-            { label: 'نشطين', value: stats.active || 0, icon: UserCog, status: 'normal' as const },
-            { label: 'في إجازة', value: stats.onLeave || 0, icon: Calendar, status: stats.onLeave > 0 ? 'attention' as const : 'zero' as const },
-            { label: 'نسبة السعودة', value: `${stats.saudizationRate || 0}%`, icon: Building2, status: 'normal' as const },
+            { label: t('hr.employees.stats.totalEmployees'), value: stats.total || 0, icon: Users, status: 'normal' as const },
+            { label: t('hr.employees.stats.active'), value: stats.active || 0, icon: UserCog, status: 'normal' as const },
+            { label: t('hr.employees.stats.onLeave'), value: stats.onLeave || 0, icon: Calendar, status: stats.onLeave > 0 ? 'attention' as const : 'zero' as const },
+            { label: t('hr.employees.stats.saudizationRate'), value: `${stats.saudizationRate || 0}%`, icon: Building2, status: 'normal' as const },
         ]
-    }, [stats])
+    }, [stats, t])
 
     const topNav = [
-        { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
-        { title: 'الموظفين', href: '/dashboard/hr/employees', isActive: true },
-        { title: 'الرواتب', href: '/dashboard/hr/salaries', isActive: false },
-        { title: 'الإجازات', href: '/dashboard/hr/leaves', isActive: false },
+        { title: t('hr.nav.overview'), href: '/dashboard/overview', isActive: false },
+        { title: t('hr.nav.employees'), href: '/dashboard/hr/employees', isActive: true },
+        { title: t('hr.nav.salaries'), href: '/dashboard/hr/salaries', isActive: false },
+        { title: t('hr.nav.leaves'), href: '/dashboard/hr/leaves', isActive: false },
     ]
 
     return (
@@ -265,7 +266,7 @@ export function EmployeesListView() {
             <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-r border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
 
                 {/* HERO CARD & STATS */}
-                <ProductivityHero badge="الموارد البشرية" title="الموظفين" type="employees" stats={heroStats} />
+                <ProductivityHero badge={t('hr.title')} title={t('hr.employees.title')} type="employees" stats={heroStats} />
 
                 {/* MAIN GRID LAYOUT */}
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">

@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react'
+import { useTranslation } from 'react-i18next'
 import {
     Search, Filter, Plus, MoreHorizontal,
     CreditCard, AlertCircle, CheckCircle, Bell, Loader2,
@@ -50,6 +51,7 @@ const statusConfig: Record<string, { label: string; color: string; bgColor: stri
 }
 
 export default function PaymentsDashboard() {
+    const { t, i18n } = useTranslation()
     const [activeTab, setActiveTab] = useState('all')
     const [searchQuery, setSearchQuery] = useState('')
     const [currentPage, setCurrentPage] = useState(1)
@@ -178,11 +180,11 @@ export default function PaymentsDashboard() {
     }
 
     const topNav = [
-        { title: 'نظرة عامة', href: '/dashboard/finance/overview', isActive: false },
-        { title: 'الفواتير', href: '/dashboard/finance/invoices', isActive: false },
-        { title: 'عروض الأسعار', href: '/dashboard/finance/quotes', isActive: false },
-        { title: 'المدفوعات', href: '/dashboard/finance/payments', isActive: true },
-        { title: 'المصروفات', href: '/dashboard/finance/expenses', isActive: false },
+        { title: t('finance.overview'), href: '/dashboard/finance/overview', isActive: false },
+        { title: t('finance.invoices.title'), href: '/dashboard/finance/invoices', isActive: false },
+        { title: t('finance.quotes'), href: '/dashboard/finance/quotes', isActive: false },
+        { title: t('finance.payments.title'), href: '/dashboard/finance/payments', isActive: true },
+        { title: t('finance.expenses.title'), href: '/dashboard/finance/expenses', isActive: false },
     ]
 
     // LOADING STATE
@@ -197,7 +199,7 @@ export default function PaymentsDashboard() {
                     <div className='ms-auto flex items-center space-x-4'>
                         <div className="relative hidden md:block">
                             <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                            <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pr-9 pl-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
+                            <input type="text" placeholder={t('common.search')} className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pr-9 pl-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
                         </div>
                         <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white">
                             <Bell className="h-5 w-5" />
@@ -242,7 +244,7 @@ export default function PaymentsDashboard() {
                     <div className='ms-auto flex items-center space-x-4'>
                         <div className="relative hidden md:block">
                             <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                            <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pr-9 pl-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
+                            <input type="text" placeholder={t('common.search')} className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pr-9 pl-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
                         </div>
                         <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white">
                             <Bell className="h-5 w-5" />

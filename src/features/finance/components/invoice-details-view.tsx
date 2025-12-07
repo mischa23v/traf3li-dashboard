@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react'
+import { useTranslation } from 'react-i18next'
 import {
     FileText, Calendar, CheckSquare, Clock, MoreHorizontal, Plus, Upload,
     User, ArrowLeft, Briefcase,
@@ -28,6 +29,7 @@ import { ProductivityHero } from '@/components/productivity-hero'
 import { FinanceSidebar } from './finance-sidebar'
 
 export function InvoiceDetailsView() {
+    const { t, i18n } = useTranslation()
     const { invoiceId } = useParams({ strict: false }) as { invoiceId: string }
     const [activeTab, setActiveTab] = useState('details')
 

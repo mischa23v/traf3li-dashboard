@@ -12,6 +12,7 @@ import { useCalendar } from '@/hooks/useCalendar'
 import { useUpcomingReminders } from '@/hooks/useRemindersAndEvents'
 import { format, addDays, startOfDay, endOfDay, isSameDay } from 'date-fns'
 import { arSA } from 'date-fns/locale'
+import { useTranslation } from 'react-i18next'
 
 interface HRSidebarProps {
     context?: 'employees' | 'salaries' | 'payroll' | 'leaves' | 'attendance' | 'evaluations' | 'grievances' | 'organizational-structure' | 'job-positions' | 'succession-planning' | 'compensation' | 'reports'
@@ -38,6 +39,7 @@ export function HRSidebar({
     onDeleteEmployee,
     isDeletePending = false
 }: HRSidebarProps) {
+    const { t, i18n } = useTranslation()
     const [activeTab, setActiveTab] = useState<'calendar' | 'notifications'>('calendar')
     const [selectedDate, setSelectedDate] = useState(new Date())
 
@@ -169,7 +171,7 @@ export function HRSidebar({
 
                 {/* Header */}
                 <div className="flex items-center justify-between mb-6 relative z-10">
-                    <h3 className="font-bold text-lg text-white">إجراءات سريعة</h3>
+                    <h3 className="font-bold text-lg text-white">{t('common.quickActions')}</h3>
                 </div>
 
                 {/* Content */}
@@ -181,7 +183,7 @@ export function HRSidebar({
                             <Button asChild className="bg-white hover:bg-blue-50 text-blue-600 h-auto py-6 flex flex-col items-center justify-center gap-2 rounded-3xl shadow-lg shadow-white/10 transition-all duration-300 hover:scale-[1.02] border-0">
                                 <Link to="/dashboard/hr/employees/new" search={{ editId: employeeId }}>
                                     <Edit3 className="h-7 w-7" />
-                                    <span className="text-sm font-bold">تعديل</span>
+                                    <span className="text-sm font-bold">{t('common.edit')}</span>
                                 </Link>
                             </Button>
 
@@ -197,7 +199,7 @@ export function HRSidebar({
                                 ) : (
                                     <Trash2 className="h-6 w-6" />
                                 )}
-                                <span className="text-sm font-bold">حذف</span>
+                                <span className="text-sm font-bold">{t('common.delete')}</span>
                             </Button>
 
                             {/* Create New Button */}
@@ -223,7 +225,7 @@ export function HRSidebar({
                             <Button asChild className="bg-white hover:bg-emerald-50 text-emerald-600 h-auto py-6 flex flex-col items-center justify-center gap-2 rounded-3xl shadow-lg shadow-white/10 transition-all duration-300 hover:scale-[1.02] border-0">
                                 <Link to={currentLinks.create}>
                                     <Plus className="h-7 w-7" />
-                                    <span className="text-sm font-bold">إضافة</span>
+                                    <span className="text-sm font-bold">{t('common.add')}</span>
                                 </Link>
                             </Button>
 
@@ -239,7 +241,7 @@ export function HRSidebar({
                                 onClick={onToggleSelectionMode}
                             >
                                 {isSelectionMode ? <X className="h-6 w-6" /> : <CheckSquare className="h-6 w-6" />}
-                                <span className="text-sm font-bold">{isSelectionMode ? 'إلغاء' : 'تحديد'}</span>
+                                <span className="text-sm font-bold">{isSelectionMode ? t('common.cancel') : t('common.select')}</span>
                             </Button>
 
                             {/* Delete Button - White + Red Text + Glow */}
@@ -251,7 +253,7 @@ export function HRSidebar({
                             >
                                 <Trash2 className="h-6 w-6" />
                                 <span className="text-sm font-bold">
-                                    {selectedCount > 0 ? `حذف (${selectedCount})` : 'حذف'}
+                                    {selectedCount > 0 ? `${t('common.delete')} (${selectedCount})` : t('common.delete')}
                                 </span>
                             </Button>
 
@@ -259,7 +261,7 @@ export function HRSidebar({
                             <Button asChild variant="ghost" className="bg-white hover:bg-slate-50 text-emerald-950 h-auto py-6 flex flex-col items-center justify-center gap-2 rounded-3xl transition-all duration-300 hover:scale-[1.02] shadow-lg shadow-white/10">
                                 <Link to={currentLinks.viewAll}>
                                     <List className="h-6 w-6" />
-                                    <span className="text-sm font-bold">عرض جميع</span>
+                                    <span className="text-sm font-bold">{t('common.viewAll')}</span>
                                 </Link>
                             </Button>
                         </>
@@ -288,7 +290,7 @@ export function HRSidebar({
                                     : "text-emerald-200 hover:text-white hover:bg-emerald-500/10"
                             )}
                         >
-                            التقويم
+                            {t('common.calendar')}
                         </button>
                         <button
                             onClick={() => setActiveTab('notifications')}
@@ -299,7 +301,7 @@ export function HRSidebar({
                                     : "text-emerald-200 hover:text-white hover:bg-emerald-500/10"
                             )}
                         >
-                            التنبيهات
+                            {t('common.notifications')}
                         </button>
                     </div>
                     {activeTab === 'calendar' && (
@@ -350,7 +352,7 @@ export function HRSidebar({
                                 ) : selectedDateEvents.length === 0 ? (
                                     <div className="flex flex-col items-center justify-center py-8 text-slate-400">
                                         <CalendarIcon className="h-10 w-10 mb-2 opacity-20" />
-                                        <p className="text-xs font-medium">لا توجد أحداث لهذا اليوم</p>
+                                        <p className="text-xs font-medium">{t('common.noEventsToday')}</p>
                                     </div>
                                 ) : (
                                     <>
@@ -390,7 +392,7 @@ export function HRSidebar({
 
                             <Button asChild variant="ghost" className="w-full mt-6 text-slate-500 hover:text-emerald-700 hover:bg-emerald-50 group cursor-pointer">
                                 <Link to="/dashboard/calendar">
-                                    <span>عرض الجدول الكامل</span>
+                                    <span>{t('common.viewFullCalendar')}</span>
                                     <ChevronRight className="w-4 h-4 me-2 transition-transform group-hover:-translate-x-1 rtl:group-hover:translate-x-1 rtl:rotate-180" />
                                 </Link>
                             </Button>
@@ -404,7 +406,7 @@ export function HRSidebar({
                             ) : upcomingReminders.length === 0 ? (
                                 <div className="flex flex-col items-center justify-center py-8 text-slate-400">
                                     <Bell className="h-10 w-10 mb-2 opacity-20" />
-                                    <p className="text-xs font-medium">لا توجد تنبيهات قادمة</p>
+                                    <p className="text-xs font-medium">{t('common.noUpcomingReminders')}</p>
                                 </div>
                             ) : (
                                 <>
@@ -444,7 +446,7 @@ export function HRSidebar({
                                                         )}
                                                         {isOverdue && (
                                                             <Badge variant="destructive" className="text-[10px] px-1.5 py-0">
-                                                                متأخر
+                                                                {t('common.overdue')}
                                                             </Badge>
                                                         )}
                                                     </div>
@@ -456,7 +458,7 @@ export function HRSidebar({
                             )}
                             <Button asChild variant="ghost" className="w-full text-xs text-slate-400 hover:text-emerald-600 hover:bg-emerald-50">
                                 <Link to="/dashboard/tasks/reminders">
-                                    عرض كل التنبيهات
+                                    {t('common.viewAllReminders')}
                                 </Link>
                             </Button>
                         </div>

@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo, useCallback } from 'react'
+import { useTranslation } from 'react-i18next'
 import {
     Search, Download, Plus, MoreHorizontal,
     Clock, Play, Pause, Square, DollarSign,
@@ -31,6 +32,7 @@ import { ProductivityHero } from '@/components/productivity-hero'
 import { FinanceSidebar } from './finance-sidebar'
 
 export default function TimeEntriesDashboard() {
+    const { t, i18n } = useTranslation()
     const [activeTab, setActiveTab] = useState('all')
     const [searchQuery, setSearchQuery] = useState('')
     const [currentTime, setCurrentTime] = useState(0)

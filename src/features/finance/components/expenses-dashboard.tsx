@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react'
+import { useTranslation } from 'react-i18next'
 import {
     Search, Filter, Download, Plus, MoreHorizontal,
     Briefcase, Building, Car, Coffee, FileText, Home,
@@ -43,6 +44,7 @@ const getCategoryIcon = (category: string) => {
 }
 
 export default function ExpensesDashboard() {
+    const { t, i18n } = useTranslation()
     const [activeTab, setActiveTab] = useState('all')
     const [searchQuery, setSearchQuery] = useState('')
 
@@ -125,10 +127,10 @@ export default function ExpensesDashboard() {
     }
 
     const topNav = [
-        { title: 'نظرة عامة', href: '/dashboard/finance/overview', isActive: false },
-        { title: 'الفواتير', href: '/dashboard/finance/invoices', isActive: false },
-        { title: 'المصروفات', href: '/dashboard/finance/expenses', isActive: true },
-        { title: 'كشف الحساب', href: '/dashboard/finance/statements', isActive: false },
+        { title: t('finance.overview'), href: '/dashboard/finance/overview', isActive: false },
+        { title: t('finance.invoices.title'), href: '/dashboard/finance/invoices', isActive: false },
+        { title: t('finance.expenses.title'), href: '/dashboard/finance/expenses', isActive: true },
+        { title: t('finance.statements'), href: '/dashboard/finance/statements', isActive: false },
     ]
 
     // LOADING STATE
@@ -187,11 +189,11 @@ export default function ExpensesDashboard() {
                         <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4">
                             <AlertCircle className="h-8 w-8 text-red-500" />
                         </div>
-                        <h3 className="text-xl font-bold text-slate-900 mb-2">فشل تحميل المصروفات</h3>
-                        <p className="text-slate-500 mb-6">{error?.message || 'حدث خطأ أثناء تحميل البيانات'}</p>
+                        <h3 className="text-xl font-bold text-slate-900 mb-2">{t('finance.expenses.loadError')}</h3>
+                        <p className="text-slate-500 mb-6">{error?.message || t('common.errors.loadingData')}</p>
                         <Button onClick={() => refetch()} className="bg-emerald-500 hover:bg-emerald-600 text-white px-8">
                             <Loader2 className="ml-2 h-4 w-4" />
-                            إعادة المحاولة
+                            {t('common.retry')}
                         </Button>
                     </div>
                 </Main>
@@ -215,7 +217,7 @@ export default function ExpensesDashboard() {
                 <div className='ms-auto flex items-center space-x-4'>
                     <div className="relative hidden md:block">
                         <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                        <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pr-9 pl-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
+                        <input type="text" placeholder={t('common.search')} className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pr-9 pl-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
                     </div>
                     <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white">
                         <Bell className="h-5 w-5" />
@@ -233,7 +235,7 @@ export default function ExpensesDashboard() {
             <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-r border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
 
                 {/* HERO CARD & STATS */}
-                <ProductivityHero badge="المصروفات" title="المصروفات" type="expenses" />
+                <ProductivityHero badge={t('finance.expenses.title')} title={t('finance.expenses.title')} type="expenses" />
 
                 {/* MAIN GRID LAYOUT */}
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -245,12 +247,12 @@ export default function ExpensesDashboard() {
                                     <div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-4">
                                         <Receipt className="h-8 w-8 text-brand-blue" />
                                     </div>
-                                    <h3 className="text-xl font-bold text-slate-900 mb-2">لا توجد مصروفات بعد</h3>
-                                    <p className="text-slate-500 mb-6">ابدأ بإضافة أول مصروف</p>
+                                    <h3 className="text-xl font-bold text-slate-900 mb-2">{t('finance.expenses.empty.title')}</h3>
+                                    <p className="text-slate-500 mb-6">{t('finance.expenses.empty.description')}</p>
                                     <Button asChild className="bg-brand-blue hover:bg-blue-600 text-white px-8">
                                         <Link to="/dashboard/finance/expenses/new">
                                             <Plus className="ml-2 h-4 w-4" />
-                                            إضافة مصروف جديد
+                                            {t('finance.expenses.addNew')}
                                         </Link>
                                     </Button>
                                 </div>
@@ -264,25 +266,25 @@ export default function ExpensesDashboard() {
                                                     value="all"
                                                     className="rounded-lg px-4 py-2 data-[state=active]:bg-[#022c22] data-[state=active]:text-white transition-all duration-300"
                                                 >
-                                                    الكل
+                                                    {t('filter.all')}
                                                 </TabsTrigger>
                                                 <TabsTrigger
                                                     value="case"
                                                     className="rounded-lg px-4 py-2 data-[state=active]:bg-blue-600 data-[state=active]:text-white transition-all duration-300"
                                                 >
-                                                    قضايا
+                                                    {t('filter.cases')}
                                                 </TabsTrigger>
                                                 <TabsTrigger
                                                     value="general"
                                                     className="rounded-lg px-4 py-2 data-[state=active]:bg-purple-500 data-[state=active]:text-white transition-all duration-300"
                                                 >
-                                                    عامة
+                                                    {t('filter.general')}
                                                 </TabsTrigger>
                                                 <TabsTrigger
                                                     value="pending"
                                                     className="rounded-lg px-4 py-2 data-[state=active]:bg-amber-500 data-[state=active]:text-white transition-all duration-300"
                                                 >
-                                                    معلقة
+                                                    {t('filter.pending')}
                                                 </TabsTrigger>
                                             </TabsList>
                                         </Tabs>
@@ -291,7 +293,7 @@ export default function ExpensesDashboard() {
                                             <div className="relative w-full max-w-xs">
                                                 <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                                                 <Input
-                                                    placeholder="بحث في المصروفات..."
+                                                    placeholder={t('finance.expenses.searchPlaceholder')}
                                                     className="pr-10 rounded-xl border-slate-200 focus:ring-[#022c22] focus:border-[#022c22]"
                                                     value={searchQuery}
                                                     onChange={(e) => setSearchQuery(e.target.value)}

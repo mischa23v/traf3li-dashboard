@@ -24,8 +24,10 @@ import {
 import { format } from 'date-fns'
 import { arSA } from 'date-fns/locale'
 import type { EmploymentStatus, EmploymentType, ContractType } from '@/services/hrService'
+import { useTranslation } from 'react-i18next'
 
 export function EmployeeDetailsView() {
+    const { t, i18n } = useTranslation()
     const { employeeId } = useParams({ strict: false }) as { employeeId: string }
     const navigate = useNavigate()
     const [activeTab, setActiveTab] = useState('overview')
@@ -48,7 +50,7 @@ export function EmployeeDetailsView() {
 
     // Format date helper
     const formatDate = (dateString: string | undefined | null) => {
-        if (!dateString) return 'غير محدد'
+        if (!dateString) return t('common.notSet')
         return format(new Date(dateString), 'd MMMM yyyy', { locale: arSA })
     }
 
@@ -61,10 +63,10 @@ export function EmployeeDetailsView() {
             terminated: 'bg-slate-100 text-slate-700 border-slate-200',
         }
         const labels: Record<EmploymentStatus, string> = {
-            active: 'نشط',
-            on_leave: 'في إجازة',
-            suspended: 'موقوف',
-            terminated: 'منتهي',
+            active: t('hr.employmentStatus.active'),
+            on_leave: t('hr.employmentStatus.onLeave'),
+            suspended: t('hr.employmentStatus.suspended'),
+            terminated: t('hr.employmentStatus.terminated'),
         }
         return <Badge className={`${styles[status]} border-0 rounded-md px-3 py-1`}>{labels[status]}</Badge>
     }
@@ -72,10 +74,10 @@ export function EmployeeDetailsView() {
     // Employment type label
     const getTypeLabel = (type: EmploymentType) => {
         const labels: Record<EmploymentType, string> = {
-            full_time: 'دوام كامل',
-            part_time: 'دوام جزئي',
-            contract: 'عقد',
-            temporary: 'مؤقت',
+            full_time: t('hr.employmentType.fullTime'),
+            part_time: t('hr.employmentType.partTime'),
+            contract: t('hr.employmentType.contract'),
+            temporary: t('hr.employmentType.temporary'),
         }
         return labels[type] || type
     }
@@ -83,8 +85,8 @@ export function EmployeeDetailsView() {
     // Contract type label
     const getContractLabel = (type: ContractType) => {
         const labels: Record<ContractType, string> = {
-            indefinite: 'غير محدد المدة',
-            fixed_term: 'محدد المدة',
+            indefinite: t('hr.contractType.indefinite'),
+            fixed_term: t('hr.contractType.fixedTerm'),
         }
         return labels[type] || type
     }
@@ -94,17 +96,17 @@ export function EmployeeDetailsView() {
         if (!employeeData) return null
         return {
             ...employeeData,
-            fullName: employeeData.personalInfo?.fullNameArabic || 'غير محدد',
+            fullName: employeeData.personalInfo?.fullNameArabic || t('common.notSet'),
             fullNameEnglish: employeeData.personalInfo?.fullNameEnglish || '',
             status: employeeData.employment?.employmentStatus || 'active',
         }
-    }, [employeeData])
+    }, [employeeData, t])
 
     const topNav = [
-        { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
-        { title: 'الموظفين', href: '/dashboard/hr/employees', isActive: true },
-        { title: 'الرواتب', href: '/dashboard/hr/salaries', isActive: false },
-        { title: 'الإجازات', href: '/dashboard/hr/leaves', isActive: false },
+        { title: t('common.overview'), href: '/dashboard/overview', isActive: false },
+        { title: t('hr.employees.title'), href: '/dashboard/hr/employees', isActive: true },
+        { title: t('hr.salaries.title'), href: '/dashboard/hr/salaries', isActive: false },
+        { title: t('hr.leave.title'), href: '/dashboard/hr/leaves', isActive: false },
     ]
 
     return (
@@ -121,7 +123,7 @@ export function EmployeeDetailsView() {
                 <div className='ms-auto flex items-center space-x-4'>
                     <div className="relative hidden md:block">
                         <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                        <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pr-9 pl-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
+                        <input type="text" placeholder={t('common.search')} className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pr-9 pl-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
                     </div>
                     <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white">
                         <Bell className="h-5 w-5" />
@@ -161,10 +163,10 @@ export function EmployeeDetailsView() {
                                 <AlertCircle className="w-8 h-8 text-red-500" />
                             </div>
                         </div>
-                        <h3 className="text-lg font-bold text-slate-900 mb-2">حدث خطأ أثناء تحميل بيانات الموظف</h3>
-                        <p className="text-slate-500 mb-4">{error?.message || 'تعذر الاتصال بالخادم'}</p>
+                        <h3 className="text-lg font-bold text-slate-900 mb-2">{t('common.errorLoading')}</h3>
+                        <p className="text-slate-500 mb-4">{error?.message || t('common.serverError')}</p>
                         <Button onClick={() => refetch()} className="bg-emerald-500 hover:bg-emerald-600">
-                            إعادة المحاولة
+                            {t('common.retry')}
                         </Button>
                     </div>
                 )}
@@ -177,11 +179,11 @@ export function EmployeeDetailsView() {
                                 <User className="w-8 h-8 text-emerald-500" />
                             </div>
                         </div>
-                        <h3 className="text-lg font-bold text-slate-900 mb-2">الموظف غير موجود</h3>
-                        <p className="text-slate-500 mb-4">لم يتم العثور على الموظف المطلوب</p>
+                        <h3 className="text-lg font-bold text-slate-900 mb-2">{t('hr.employees.notFound')}</h3>
+                        <p className="text-slate-500 mb-4">{t('hr.employees.notFoundDesc')}</p>
                         <Button asChild className="bg-emerald-500 hover:bg-emerald-600">
                             <Link to="/dashboard/hr/employees">
-                                العودة إلى القائمة
+                                {t('common.backToList')}
                             </Link>
                         </Button>
                     </div>
@@ -192,7 +194,7 @@ export function EmployeeDetailsView() {
                     <>
                         {/* HERO CARD */}
                         <ProductivityHero
-                            badge="الموارد البشرية"
+                            badge={t('hr.title')}
                             title={employee.fullName}
                             type="employees"
                             listMode={true}
@@ -220,10 +222,10 @@ export function EmployeeDetailsView() {
                                                             flex-1 sm:flex-initial
                                                         "
                                                     >
-                                                        {tab === 'overview' ? 'نظرة عامة' :
-                                                            tab === 'employment' ? 'التوظيف' :
-                                                            tab === 'compensation' ? 'الراتب' :
-                                                            tab === 'leave' ? 'الإجازات' : 'المستندات'}
+                                                        {tab === 'overview' ? t('common.overview') :
+                                                            tab === 'employment' ? t('hr.employees.employment') :
+                                                            tab === 'compensation' ? t('hr.employees.compensation') :
+                                                            tab === 'leave' ? t('hr.leave.title') : t('hr.employees.documents')}
                                                     </TabsTrigger>
                                                 ))}
                                             </TabsList>
@@ -745,10 +747,10 @@ export function EmployeeDetailsView() {
                             </div>
                         </div>
                         <h3 className="text-lg font-bold text-slate-900 text-center mb-2">
-                            هل أنت متأكد من حذف هذا الموظف؟
+                            {t('common.deleteConfirm')}
                         </h3>
                         <p className="text-slate-500 text-center mb-6">
-                            سيتم حذف الموظف "{employee.fullName}" نهائياً ولا يمكن استرجاعه.
+                            {t('hr.employees.deleteMessage', { name: employee.fullName })}
                         </p>
                         <div className="flex gap-3 justify-center">
                             <Button
@@ -756,7 +758,7 @@ export function EmployeeDetailsView() {
                                 onClick={() => setShowDeleteConfirm(false)}
                                 className="px-6 rounded-xl"
                             >
-                                إلغاء
+                                {t('common.cancel')}
                             </Button>
                             <Button
                                 onClick={() => {
@@ -771,7 +773,7 @@ export function EmployeeDetailsView() {
                                 ) : (
                                     <Trash2 className="h-4 w-4 ml-2" />
                                 )}
-                                حذف الموظف
+                                {t('common.deleteEmployee')}
                             </Button>
                         </div>
                     </div>

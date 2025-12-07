@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react'
+import { useTranslation } from 'react-i18next'
 import {
     Save, Calendar, Tag, FileText, DollarSign, CreditCard, Upload, Briefcase, Building, Loader2,
     User, Receipt, Wallet, Building2, Plane, Hotel, Utensils, Car, Fuel, ParkingCircle,
@@ -122,6 +123,7 @@ const formatCurrency = (amount: number) => {
 }
 
 export function CreateExpenseView() {
+    const { t, i18n } = useTranslation()
     const navigate = useNavigate()
     const createExpenseMutation = useCreateExpense()
 
@@ -320,13 +322,13 @@ export function CreateExpenseView() {
     }
 
     const topNav = [
-        { title: 'نظرة عامة', href: '/dashboard/finance/overview', isActive: false },
-        { title: 'الفواتير', href: '/dashboard/finance/invoices', isActive: false },
-        { title: 'المصروفات', href: '/dashboard/finance/expenses', isActive: true },
-        { title: 'كشف الحساب', href: '/dashboard/finance/statements', isActive: false },
-        { title: 'المعاملات', href: '/dashboard/finance/transactions', isActive: false },
-        { title: 'تتبع الوقت', href: '/dashboard/finance/time-tracking', isActive: false },
-        { title: 'نشاط الحساب', href: '/dashboard/finance/activity', isActive: false },
+        { title: t('finance.overview'), href: '/dashboard/finance/overview', isActive: false },
+        { title: t('finance.invoices.title'), href: '/dashboard/finance/invoices', isActive: false },
+        { title: t('finance.expenses.title'), href: '/dashboard/finance/expenses', isActive: true },
+        { title: t('finance.statements'), href: '/dashboard/finance/statements', isActive: false },
+        { title: t('finance.transactions'), href: '/dashboard/finance/transactions', isActive: false },
+        { title: t('finance.timeEntries.title'), href: '/dashboard/finance/time-tracking', isActive: false },
+        { title: t('finance.activity'), href: '/dashboard/finance/activity', isActive: false },
     ]
 
     return (
@@ -341,7 +343,7 @@ export function CreateExpenseView() {
 
             <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-r border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
                 {/* HERO CARD - Full width */}
-                <ProductivityHero badge="المصروفات" title="تسجيل مصروف جديد" type="expenses" listMode={true} />
+                <ProductivityHero badge={t('finance.expenses.title')} title={t('finance.expenses.createNew')} type="expenses" listMode={true} />
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     {/* RIGHT COLUMN (Main Content) */}

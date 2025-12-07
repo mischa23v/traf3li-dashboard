@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react'
+import { useTranslation } from 'react-i18next'
 import { TasksSidebar } from './tasks-sidebar'
 import {
     Calendar as CalendarIcon, MoreHorizontal, Plus,
@@ -52,6 +53,7 @@ import { format } from 'date-fns'
 import { arSA } from 'date-fns/locale'
 
 export function EventsView() {
+    const { t, i18n } = useTranslation()
     const navigate = useNavigate()
     const [activeTab, setActiveTab] = useState('upcoming')
     const [isSelectionMode, setIsSelectionMode] = useState(false)
@@ -159,12 +161,12 @@ export function EventsView() {
     }
 
     const handleDeleteEvent = async (eventId: string) => {
-        if (confirm('هل أنت متأكد من حذف هذا الحدث؟')) {
+        if (confirm(t('events.delete.confirm'))) {
             try {
                 await deleteEvent(eventId)
-                toast.success('تم حذف الحدث بنجاح')
+                toast.success(t('events.delete.success'))
             } catch (error) {
-                toast.error('فشل حذف الحدث')
+                toast.error(t('events.delete.error'))
             }
         }
     }
@@ -210,15 +212,15 @@ export function EventsView() {
     const handleDeleteSelected = async () => {
         if (selectedEventIds.length === 0) return
 
-        if (confirm(`هل أنت متأكد من حذف ${selectedEventIds.length} حدث؟`)) {
+        if (confirm(t('events.delete.confirmMultiple', { count: selectedEventIds.length }))) {
             try {
                 await Promise.all(selectedEventIds.map(id => deleteEvent(id)))
-                toast.success(`تم حذف ${selectedEventIds.length} حدث بنجاح`)
+                toast.success(t('events.delete.successMultiple', { count: selectedEventIds.length }))
                 setIsSelectionMode(false)
                 setSelectedEventIds([])
             } catch (error) {
                 console.error("Failed to delete events", error)
-                toast.error("حدث خطأ أثناء حذف بعض الأحداث")
+                toast.error(t('events.delete.errorMultiple'))
             }
         }
     }
@@ -226,16 +228,16 @@ export function EventsView() {
     const handleRSVP = (id: string, status: 'accepted' | 'declined') => {
         rsvpEvent({ id, status }, {
             onSuccess: () => {
-                toast.success(status === 'accepted' ? 'تم تأكيد الحضور' : 'تم الاعتذار عن الحضور')
+                toast.success(status === 'accepted' ? t('events.rsvp.acceptSuccess') : t('events.rsvp.declineSuccess'))
             }
         })
     }
 
     const topNav = [
-        { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
-        { title: 'المهام', href: '/dashboard/tasks/list', isActive: false },
-        { title: 'التذكيرات', href: '/dashboard/tasks/reminders', isActive: false },
-        { title: 'الأحداث', href: '/dashboard/tasks/events', isActive: true },
+        { title: t('nav.overview'), href: '/dashboard/overview', isActive: false },
+        { title: t('nav.tasks'), href: '/dashboard/tasks/list', isActive: false },
+        { title: t('nav.reminders'), href: '/dashboard/tasks/reminders', isActive: false },
+        { title: t('nav.events'), href: '/dashboard/tasks/events', isActive: true },
     ]
 
     return (
@@ -251,7 +253,7 @@ export function EventsView() {
                 <div className='ms-auto flex items-center space-x-4'>
                     <div className="relative hidden md:block">
                         <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                        <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pr-9 pl-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
+                        <input type="text" placeholder={t('common.search')} className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pr-9 pl-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
                     </div>
                     <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white">
                         <Bell className="h-5 w-5" />
@@ -269,7 +271,7 @@ export function EventsView() {
             <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-r border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
 
                 {/* HERO CARD & STATS */}
-                <ProductivityHero badge="الأحداث" title="الأحداث" type="events" />
+                <ProductivityHero badge={t('events.title')} title={t('events.title')} type="events" />
 
                 {/* MAIN GRID LAYOUT */}
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -285,7 +287,7 @@ export function EventsView() {
                                     <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                                     <Input
                                         type="text"
-                                        placeholder="بحث في الأحداث..."
+                                        placeholder={t('events.searchPlaceholder')}
                                         value={searchQuery}
                                         onChange={(e) => setSearchQuery(e.target.value)}
                                         className="pr-10 h-10 rounded-xl border-slate-200 focus:border-blue-500 focus:ring-blue-500/20"
@@ -295,26 +297,26 @@ export function EventsView() {
                                 {/* Status Filter */}
                                 <Select value={activeTab} onValueChange={setActiveTab}>
                                     <SelectTrigger className="w-[130px] h-10 rounded-xl border-slate-200">
-                                        <SelectValue placeholder="الحالة" />
+                                        <SelectValue placeholder={t('events.status.label')} />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="upcoming">القادمة</SelectItem>
-                                        <SelectItem value="past">السابقة</SelectItem>
+                                        <SelectItem value="upcoming">{t('events.upcoming')}</SelectItem>
+                                        <SelectItem value="past">{t('events.past')}</SelectItem>
                                     </SelectContent>
                                 </Select>
 
                                 {/* Type Filter */}
                                 <Select value={typeFilter} onValueChange={setTypeFilter}>
                                     <SelectTrigger className="w-[150px] h-10 rounded-xl border-slate-200">
-                                        <SelectValue placeholder="النوع" />
+                                        <SelectValue placeholder={t('events.type.label')} />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="all">كل الأنواع</SelectItem>
-                                        <SelectItem value="meeting">اجتماع</SelectItem>
-                                        <SelectItem value="court_hearing">جلسة محكمة</SelectItem>
-                                        <SelectItem value="conference">مؤتمر</SelectItem>
-                                        <SelectItem value="webinar">ندوة إلكترونية</SelectItem>
-                                        <SelectItem value="workshop">ورشة عمل</SelectItem>
+                                        <SelectItem value="all">{t('events.type.all')}</SelectItem>
+                                        <SelectItem value="meeting">{t('events.type.meeting')}</SelectItem>
+                                        <SelectItem value="court_hearing">{t('events.type.courtHearing')}</SelectItem>
+                                        <SelectItem value="conference">{t('events.type.conference')}</SelectItem>
+                                        <SelectItem value="webinar">{t('events.type.webinar')}</SelectItem>
+                                        <SelectItem value="workshop">{t('events.type.workshop')}</SelectItem>
                                     </SelectContent>
                                 </Select>
 
@@ -322,12 +324,12 @@ export function EventsView() {
                                 <Select value={sortBy} onValueChange={setSortBy}>
                                     <SelectTrigger className="w-[160px] h-10 rounded-xl border-slate-200">
                                         <SortAsc className="h-4 w-4 ml-2 text-slate-400" />
-                                        <SelectValue placeholder="ترتيب حسب" />
+                                        <SelectValue placeholder={t('common.sortBy')} />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="startDate">تاريخ الحدث</SelectItem>
-                                        <SelectItem value="createdAt">تاريخ الإنشاء</SelectItem>
-                                        <SelectItem value="title">الاسم</SelectItem>
+                                        <SelectItem value="startDate">{t('events.sort.eventDate')}</SelectItem>
+                                        <SelectItem value="createdAt">{t('events.sort.createdAt')}</SelectItem>
+                                        <SelectItem value="title">{t('events.sort.name')}</SelectItem>
                                     </SelectContent>
                                 </Select>
 
@@ -340,7 +342,7 @@ export function EventsView() {
                                         className="h-10 px-4 text-red-500 hover:text-red-600 hover:bg-red-50 rounded-xl"
                                     >
                                         <X className="h-4 w-4 ml-2" />
-                                        مسح الفلاتر
+                                        {t('common.clearFilters')}
                                     </Button>
                                 )}
                             </div>
@@ -350,10 +352,10 @@ export function EventsView() {
                         <div className="bg-white rounded-3xl p-1 shadow-sm border border-slate-100">
                             <div className="p-6 pb-2 flex justify-between items-center">
                                 <h3 className="font-bold text-navy text-xl">
-                                    {activeTab === 'upcoming' ? 'الأحداث القادمة' : 'الأحداث السابقة'}
+                                    {activeTab === 'upcoming' ? t('events.upcomingEvents') : t('events.pastEvents')}
                                 </h3>
                                 <Badge className="bg-slate-100 text-slate-600 border-0 rounded-full px-4 py-1">
-                                    {events.length} حدث
+                                    {t('events.count', { count: events.length })}
                                 </Badge>
                             </div>
 
@@ -382,9 +384,9 @@ export function EventsView() {
                                         <AlertCircle className="h-4 w-4 text-red-600" />
                                         <AlertDescription className="text-red-800">
                                             <div className="flex items-center justify-between">
-                                                <span>حدث خطأ أثناء تحميل الأحداث: {error?.message || 'خطأ غير معروف'}</span>
+                                                <span>{t('events.error.loading', { message: error?.message || t('common.unknownError') })}</span>
                                                 <Button onClick={() => refetch()} variant="outline" size="sm" className="border-red-300 text-red-700 hover:bg-red-100">
-                                                    إعادة المحاولة
+                                                    {t('common.retry')}
                                                 </Button>
                                             </div>
                                         </AlertDescription>
@@ -397,12 +399,12 @@ export function EventsView() {
                                         <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-blue-50 mb-4">
                                             <CalendarIcon className="h-8 w-8 text-blue-500" />
                                         </div>
-                                        <h4 className="text-lg font-bold text-navy mb-2">لا توجد فعاليات</h4>
-                                        <p className="text-slate-500 mb-4">جدولك خالٍ حالياً. ابدأ بإضافة أحداث جديدة.</p>
+                                        <h4 className="text-lg font-bold text-navy mb-2">{t('events.empty.title')}</h4>
+                                        <p className="text-slate-500 mb-4">{t('events.empty.description')}</p>
                                         <Button asChild className="bg-blue-500 hover:bg-blue-600 text-white rounded-xl">
                                             <Link to="/dashboard/tasks/events/new">
                                                 <Plus className="ml-2 h-4 w-4" />
-                                                إضافة حدث جديد
+                                                {t('events.addNew')}
                                             </Link>
                                         </Button>
                                     </div>
@@ -456,25 +458,25 @@ export function EventsView() {
                                                 <DropdownMenuContent align="end" className="w-48">
                                                     <DropdownMenuItem onClick={() => handleViewEvent(event.id)}>
                                                         <Eye className="h-4 w-4 ml-2" />
-                                                        عرض التفاصيل
+                                                        {t('events.actions.viewDetails')}
                                                     </DropdownMenuItem>
                                                     <DropdownMenuSeparator />
                                                     {event.status !== 'completed' && (
                                                         <DropdownMenuItem onClick={() => handleCompleteEvent(event.id)}>
                                                             <CheckCircle className="h-4 w-4 ml-2" />
-                                                            إكمال
+                                                            {t('events.actions.complete')}
                                                         </DropdownMenuItem>
                                                     )}
                                                     {event.status !== 'cancelled' && (
                                                         <DropdownMenuItem onClick={() => handleCancelEvent(event.id)}>
                                                             <XCircle className="h-4 w-4 ml-2" />
-                                                            إلغاء
+                                                            {t('events.actions.cancel')}
                                                         </DropdownMenuItem>
                                                     )}
                                                     {event.status !== 'completed' && event.status !== 'cancelled' && (
                                                         <DropdownMenuItem onClick={() => setPostponeEventId(event.id)}>
                                                             <CalendarClock className="h-4 w-4 ml-2" />
-                                                            تأجيل
+                                                            {t('events.actions.postpone')}
                                                         </DropdownMenuItem>
                                                     )}
                                                     <DropdownMenuSeparator />
@@ -483,7 +485,7 @@ export function EventsView() {
                                                         className="text-red-600 focus:text-red-600"
                                                     >
                                                         <Trash2 className="h-4 w-4 ml-2" />
-                                                        حذف
+                                                        {t('events.actions.delete')}
                                                     </DropdownMenuItem>
                                                 </DropdownMenuContent>
                                             </DropdownMenu>
@@ -508,27 +510,27 @@ export function EventsView() {
                                                 </div>
                                                 {/* Event Date - Dual Language */}
                                                 <div className="text-center">
-                                                    <div className="text-xs text-slate-400 mb-1">موعد الحدث</div>
+                                                    <div className="text-xs text-slate-400 mb-1">{t('events.eventDate')}</div>
                                                     <div className="font-bold text-navy text-sm">{event.eventDateFormatted.arabic}</div>
                                                     <div className="text-xs text-slate-400">{event.eventDateFormatted.english}</div>
                                                 </div>
                                                 {/* Creation Date - Dual Language */}
                                                 <div className="text-center">
-                                                    <div className="text-xs text-slate-400 mb-1">تاريخ الإنشاء</div>
+                                                    <div className="text-xs text-slate-400 mb-1">{t('events.createdAt')}</div>
                                                     <div className="font-bold text-slate-600 text-sm">{event.createdAtFormatted.arabic}</div>
                                                     <div className="text-xs text-slate-400">{event.createdAtFormatted.english}</div>
                                                 </div>
                                             </div>
                                             <div className="flex gap-2">
                                                 <Button variant="outline" size="sm" onClick={() => handleRSVP(event.id, 'declined')} className="text-red-600 hover:bg-red-50 border-red-200">
-                                                    اعتذار
+                                                    {t('events.rsvp.decline')}
                                                 </Button>
                                                 <Button size="sm" onClick={() => handleRSVP(event.id, 'accepted')} className="bg-blue-500 hover:bg-blue-600 text-white shadow-lg shadow-blue-500/20">
-                                                    تأكيد الحضور
+                                                    {t('events.rsvp.accept')}
                                                 </Button>
                                                 <Link to={`/dashboard/tasks/events/${event.id}` as any}>
                                                     <Button className="bg-blue-500 hover:bg-blue-600 text-white rounded-lg px-6 shadow-lg shadow-blue-500/20">
-                                                        عرض التفاصيل
+                                                        {t('events.actions.viewDetails')}
                                                     </Button>
                                                 </Link>
                                             </div>
@@ -539,7 +541,7 @@ export function EventsView() {
 
                             <div className="p-4 pt-0 text-center">
                                 <Button variant="ghost" className="text-blue-600 hover:text-blue-700 hover:bg-blue-50 w-full rounded-xl py-6">
-                                    عرض جميع الفعاليات
+                                    {t('events.viewAll')}
                                     <ChevronLeft className="h-4 w-4 mr-2" />
                                 </Button>
                             </div>
@@ -561,15 +563,15 @@ export function EventsView() {
             <Dialog open={!!postponeEventId} onOpenChange={(open) => !open && setPostponeEventId(null)}>
                 <DialogContent className="sm:max-w-[425px]">
                     <DialogHeader>
-                        <DialogTitle>تأجيل الحدث</DialogTitle>
+                        <DialogTitle>{t('events.postpone.title')}</DialogTitle>
                         <DialogDescription>
-                            حدد التاريخ والوقت الجديد للحدث
+                            {t('events.postpone.description')}
                         </DialogDescription>
                     </DialogHeader>
                     <div className="grid gap-4 py-4">
                         <div className="grid grid-cols-2 gap-4">
                             <div className="space-y-2">
-                                <label className="text-sm font-medium">التاريخ الجديد</label>
+                                <label className="text-sm font-medium">{t('events.postpone.newDate')}</label>
                                 <Input
                                     type="date"
                                     value={postponeDate}
@@ -578,7 +580,7 @@ export function EventsView() {
                                 />
                             </div>
                             <div className="space-y-2">
-                                <label className="text-sm font-medium">الوقت الجديد</label>
+                                <label className="text-sm font-medium">{t('events.postpone.newTime')}</label>
                                 <Input
                                     type="time"
                                     value={postponeTime}
@@ -588,9 +590,9 @@ export function EventsView() {
                             </div>
                         </div>
                         <div className="space-y-2">
-                            <label className="text-sm font-medium">سبب التأجيل (اختياري)</label>
+                            <label className="text-sm font-medium">{t('events.postpone.reason')}</label>
                             <Textarea
-                                placeholder="أدخل سبب التأجيل..."
+                                placeholder={t('events.postpone.reasonPlaceholder')}
                                 value={postponeReason}
                                 onChange={(e) => setPostponeReason(e.target.value)}
                                 className="rounded-xl"
@@ -599,14 +601,14 @@ export function EventsView() {
                     </div>
                     <DialogFooter>
                         <Button variant="outline" onClick={() => setPostponeEventId(null)}>
-                            إلغاء
+                            {t('common.cancel')}
                         </Button>
                         <Button
                             onClick={handlePostponeEvent}
                             disabled={!postponeDate || !postponeTime || postponeEventMutation.isPending}
                             className="bg-blue-500 hover:bg-blue-600"
                         >
-                            {postponeEventMutation.isPending ? 'جاري التأجيل...' : 'تأجيل'}
+                            {postponeEventMutation.isPending ? t('events.postpone.submitting') : t('events.postpone.submit')}
                         </Button>
                     </DialogFooter>
                 </DialogContent>

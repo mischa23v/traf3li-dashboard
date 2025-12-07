@@ -36,23 +36,7 @@ import {
 import type { Referral, ReferralType, ReferralStatus } from '@/types/crm'
 import { SalesSidebar } from './sales-sidebar'
 import { ProductivityHero } from '@/components/productivity-hero'
-
-const typeLabels: Record<ReferralType, string> = {
-  client: 'عميل',
-  lawyer: 'محامي',
-  law_firm: 'مكتب محاماة',
-  contact: 'جهة اتصال',
-  employee: 'موظف',
-  partner: 'شريك',
-  organization: 'منظمة',
-  other: 'آخر',
-}
-
-const statusLabels: Record<ReferralStatus, string> = {
-  active: 'نشط',
-  inactive: 'غير نشط',
-  archived: 'مؤرشف',
-}
+import { useTranslation } from 'react-i18next'
 
 const statusColors: Record<ReferralStatus, string> = {
   active: 'bg-emerald-100 text-emerald-700',
@@ -61,9 +45,28 @@ const statusColors: Record<ReferralStatus, string> = {
 }
 
 export function ReferralsListView() {
+  const { t } = useTranslation()
   const [activeStatusTab, setActiveStatusTab] = useState<string>('all')
   const [isSelectionMode, setIsSelectionMode] = useState(false)
   const [selectedReferralIds, setSelectedReferralIds] = useState<string[]>([])
+
+  // Type and status labels using translation
+  const typeLabels: Record<ReferralType, string> = {
+    client: t('crm.referrals.types.client'),
+    lawyer: t('crm.referrals.types.lawyer'),
+    law_firm: t('crm.referrals.types.lawFirm'),
+    contact: t('crm.referrals.types.contact'),
+    employee: t('crm.referrals.types.employee'),
+    partner: t('crm.referrals.types.partner'),
+    organization: t('crm.referrals.types.organization'),
+    other: t('crm.referrals.types.other'),
+  }
+
+  const statusLabels: Record<ReferralStatus, string> = {
+    active: t('crm.referrals.status.active'),
+    inactive: t('crm.referrals.status.inactive'),
+    archived: t('crm.referrals.status.archived'),
+  }
 
   // API Filters
   const filters = useMemo(() => {
@@ -104,7 +107,7 @@ export function ReferralsListView() {
   const handleDeleteSelected = () => {
     if (selectedReferralIds.length === 0) return
 
-    if (confirm(`هل أنت متأكد من حذف ${selectedReferralIds.length} مصدر إحالة؟`)) {
+    if (confirm(t('crm.referrals.confirmDelete', { count: selectedReferralIds.length }))) {
       selectedReferralIds.forEach((id) => {
         deleteReferral(id)
       })
@@ -114,16 +117,16 @@ export function ReferralsListView() {
   }
 
   const topNav = [
-    { title: 'العملاء المحتملين', href: '/dashboard/crm/leads', isActive: false },
-    { title: 'مسار المبيعات', href: '/dashboard/crm/pipeline', isActive: false },
-    { title: 'الإحالات', href: '/dashboard/crm/referrals', isActive: true },
-    { title: 'سجل الأنشطة', href: '/dashboard/crm/activities', isActive: false },
+    { title: t('crm.leads.title'), href: '/dashboard/crm/leads', isActive: false },
+    { title: t('crm.pipeline.title'), href: '/dashboard/crm/pipeline', isActive: false },
+    { title: t('crm.referrals.title'), href: '/dashboard/crm/referrals', isActive: true },
+    { title: t('crm.activities.title'), href: '/dashboard/crm/activities', isActive: false },
   ]
 
   const statusTabs = [
-    { id: 'all', label: 'الكل' },
-    { id: 'active', label: 'نشط' },
-    { id: 'inactive', label: 'غير نشط' },
+    { id: 'all', label: t('filter.all') },
+    { id: 'active', label: t('crm.referrals.status.active') },
+    { id: 'inactive', label: t('crm.referrals.status.inactive') },
   ]
 
   return (
@@ -143,7 +146,7 @@ export function ReferralsListView() {
             <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
             <input
               type="text"
-              placeholder="بحث..."
+              placeholder={t('common.search')}
               className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pr-9 pl-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
             />
           </div>
@@ -168,14 +171,14 @@ export function ReferralsListView() {
         className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-r border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']"
       >
         {/* HERO CARD */}
-        <ProductivityHero badge="إدارة مصادر الإحالة" title="إدارة مصادر الإحالة" type="referrals" hideButtons={true}>
+        <ProductivityHero badge={t('crm.referrals.badge')} title={t('crm.referrals.title')} type="referrals" hideButtons={true}>
           <Button
             asChild
             className="bg-emerald-500 hover:bg-emerald-600 text-white h-12 px-8 rounded-xl font-bold shadow-lg shadow-emerald-500/20 border-0"
           >
             <Link to="/dashboard/crm/referrals/new">
               <Plus className="ml-2 h-5 w-5" />
-              مصدر إحالة جديد
+              {t('crm.referrals.createNew')}
             </Link>
           </Button>
         </ProductivityHero>
@@ -188,7 +191,7 @@ export function ReferralsListView() {
                 <div className="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center">
                   <Users className="h-5 w-5 text-blue-600" />
                 </div>
-                <span className="text-slate-600">مصادر الإحالة</span>
+                <span className="text-slate-600">{t('crm.referrals.stats.totalReferrers')}</span>
               </div>
               <p className="text-2xl font-bold text-navy">{stats.totalReferrers}</p>
             </div>
@@ -197,7 +200,7 @@ export function ReferralsListView() {
                 <div className="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center">
                   <UserCheck className="h-5 w-5 text-emerald-600" />
                 </div>
-                <span className="text-slate-600">إحالات ناجحة</span>
+                <span className="text-slate-600">{t('crm.referrals.stats.successfulReferrals')}</span>
               </div>
               <p className="text-2xl font-bold text-emerald-600">
                 {stats.successfulReferrals}
@@ -208,10 +211,10 @@ export function ReferralsListView() {
                 <div className="w-10 h-10 rounded-xl bg-orange-100 flex items-center justify-center">
                   <DollarSign className="h-5 w-5 text-orange-600" />
                 </div>
-                <span className="text-slate-600">عمولات مستحقة</span>
+                <span className="text-slate-600">{t('crm.referrals.stats.feesOwed')}</span>
               </div>
               <p className="text-2xl font-bold text-orange-600">
-                {stats.totalFeesOwed?.toLocaleString('ar-SA')} ر.س
+                {stats.totalFeesOwed?.toLocaleString('ar-SA')} {t('common.currency')}
               </p>
             </div>
             <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
@@ -219,7 +222,7 @@ export function ReferralsListView() {
                 <div className="w-10 h-10 rounded-xl bg-purple-100 flex items-center justify-center">
                   <TrendingUp className="h-5 w-5 text-purple-600" />
                 </div>
-                <span className="text-slate-600">معدل التحويل</span>
+                <span className="text-slate-600">{t('crm.referrals.stats.conversionRate')}</span>
               </div>
               <p className="text-2xl font-bold text-purple-600">
                 {stats.avgConversionRate}%
@@ -235,7 +238,7 @@ export function ReferralsListView() {
             {/* REFERRALS LIST */}
             <div className="bg-white rounded-3xl p-1 shadow-sm border border-slate-100">
               <div className="p-6 pb-2 flex justify-between items-center">
-                <h3 className="font-bold text-navy text-xl">مصادر الإحالة</h3>
+                <h3 className="font-bold text-navy text-xl">{t('crm.referrals.title')}</h3>
                 <div className="flex gap-2">
                   {statusTabs.map((tab) => (
                     <Button
@@ -284,16 +287,16 @@ export function ReferralsListView() {
                       </div>
                     </div>
                     <h3 className="text-lg font-bold text-slate-900 mb-2">
-                      حدث خطأ أثناء تحميل مصادر الإحالة
+                      {t('errors.loadingReferrals')}
                     </h3>
                     <p className="text-slate-500 mb-4">
-                      {error?.message || 'تعذر الاتصال بالخادم'}
+                      {error?.message || t('errors.serverConnection')}
                     </p>
                     <Button
                       onClick={() => refetch()}
                       className="bg-emerald-500 hover:bg-emerald-600"
                     >
-                      إعادة المحاولة
+                      {t('common.retry')}
                     </Button>
                   </div>
                 )}
@@ -307,13 +310,13 @@ export function ReferralsListView() {
                       </div>
                     </div>
                     <h3 className="text-lg font-bold text-slate-900 mb-2">
-                      لا يوجد مصادر إحالة
+                      {t('crm.referrals.noReferrals')}
                     </h3>
-                    <p className="text-slate-500 mb-4">ابدأ بإضافة مصدر إحالة جديد</p>
+                    <p className="text-slate-500 mb-4">{t('crm.referrals.addFirstReferral')}</p>
                     <Button asChild className="bg-emerald-500 hover:bg-emerald-600">
                       <Link to="/dashboard/crm/referrals/new">
                         <Plus className="w-4 h-4 ml-2" />
-                        مصدر إحالة جديد
+                        {t('crm.referrals.createNew')}
                       </Link>
                     </Button>
                   </div>
@@ -374,14 +377,14 @@ export function ReferralsListView() {
                           <DropdownMenuContent align="end">
                             <DropdownMenuItem asChild>
                               <Link to={`/dashboard/crm/referrals/${referral._id}`}>
-                                عرض التفاصيل
+                                {t('common.viewDetails')}
                               </Link>
                             </DropdownMenuItem>
                             <DropdownMenuItem
                               onClick={() => deleteReferral(referral._id)}
                               className="text-red-600"
                             >
-                              حذف
+                              {t('common.delete')}
                             </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
@@ -391,21 +394,21 @@ export function ReferralsListView() {
                         <div className="flex items-center gap-6">
                           <div className="text-center">
                             <div className="text-xs text-slate-400 mb-1">
-                              الإحالات
+                              {t('crm.referrals.fields.totalReferrals')}
                             </div>
                             <div className="font-bold text-navy">
                               {referral.totalReferrals}
                             </div>
                           </div>
                           <div className="text-center">
-                            <div className="text-xs text-slate-400 mb-1">ناجحة</div>
+                            <div className="text-xs text-slate-400 mb-1">{t('crm.referrals.fields.successful')}</div>
                             <div className="font-bold text-emerald-600">
                               {referral.successfulReferrals}
                             </div>
                           </div>
                           <div className="text-center">
                             <div className="text-xs text-slate-400 mb-1">
-                              معدل التحويل
+                              {t('crm.referrals.fields.conversionRate')}
                             </div>
                             <div className="font-bold text-blue-600">
                               {referral.conversionRate}%
@@ -414,17 +417,17 @@ export function ReferralsListView() {
                           {referral.outstandingFees > 0 && (
                             <div className="text-center">
                               <div className="text-xs text-slate-400 mb-1">
-                                مستحق
+                                {t('crm.referrals.fields.outstanding')}
                               </div>
                               <div className="font-bold text-orange-600">
-                                {referral.outstandingFees.toLocaleString('ar-SA')} ر.س
+                                {referral.outstandingFees.toLocaleString('ar-SA')} {t('common.currency')}
                               </div>
                             </div>
                           )}
                         </div>
                         <Link to={`/dashboard/crm/referrals/${referral._id}`}>
                           <Button className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg px-6 shadow-lg shadow-emerald-500/20">
-                            عرض التفاصيل
+                            {t('common.viewDetails')}
                           </Button>
                         </Link>
                       </div>
@@ -437,7 +440,7 @@ export function ReferralsListView() {
                   variant="ghost"
                   className="text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 w-full rounded-xl py-6"
                 >
-                  عرض جميع مصادر الإحالة
+                  {t('crm.referrals.viewAll')}
                   <ChevronLeft className="h-4 w-4 mr-2" />
                 </Button>
               </div>

@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react'
+import { useTranslation } from 'react-i18next'
 import { TasksSidebar } from './tasks-sidebar'
 import {
     Clock, MoreHorizontal, Plus,
@@ -64,6 +65,7 @@ const SNOOZE_OPTIONS = [
 ]
 
 export function RemindersView() {
+    const { t, i18n } = useTranslation()
     const navigate = useNavigate()
     const [activeTab, setActiveTab] = useState('upcoming')
     const [isSelectionMode, setIsSelectionMode] = useState(false)
@@ -153,12 +155,12 @@ export function RemindersView() {
     }
 
     const handleDeleteReminder = async (reminderId: string) => {
-        if (confirm('هل أنت متأكد من حذف هذا التذكير؟')) {
+        if (confirm(t('reminders.delete.confirm'))) {
             try {
                 await deleteReminder(reminderId)
-                toast.success('تم حذف التذكير بنجاح')
+                toast.success(t('reminders.delete.success'))
             } catch (error) {
-                toast.error('فشل حذف التذكير')
+                toast.error(t('reminders.delete.error'))
             }
         }
     }
@@ -233,25 +235,25 @@ export function RemindersView() {
     const handleDeleteSelected = async () => {
         if (selectedReminderIds.length === 0) return
 
-        if (confirm(`هل أنت متأكد من حذف ${selectedReminderIds.length} تذكير؟`)) {
+        if (confirm(t('reminders.delete.confirmMultiple', { count: selectedReminderIds.length }))) {
             try {
                 // Loop delete since no bulk API yet
                 await Promise.all(selectedReminderIds.map(id => deleteReminder(id)))
-                toast.success(`تم حذف ${selectedReminderIds.length} تذكير بنجاح`)
+                toast.success(t('reminders.delete.successMultiple', { count: selectedReminderIds.length }))
                 setIsSelectionMode(false)
                 setSelectedReminderIds([])
             } catch (error) {
                 console.error("Failed to delete reminders", error)
-                toast.error("حدث خطأ أثناء حذف بعض التذكيرات")
+                toast.error(t('reminders.delete.errorMultiple'))
             }
         }
     }
 
     const topNav = [
-        { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
-        { title: 'المهام', href: '/dashboard/tasks/list', isActive: false },
-        { title: 'التذكيرات', href: '/dashboard/tasks/reminders', isActive: true },
-        { title: 'الأحداث', href: '/dashboard/tasks/events', isActive: false },
+        { title: t('nav.overview'), href: '/dashboard/overview', isActive: false },
+        { title: t('nav.tasks'), href: '/dashboard/tasks/list', isActive: false },
+        { title: t('nav.reminders'), href: '/dashboard/tasks/reminders', isActive: true },
+        { title: t('nav.events'), href: '/dashboard/tasks/events', isActive: false },
     ]
 
     return (
@@ -267,7 +269,7 @@ export function RemindersView() {
                 <div className='ms-auto flex items-center space-x-4'>
                     <div className="relative hidden md:block">
                         <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                        <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pr-9 pl-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
+                        <input type="text" placeholder={t('common.search')} className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pr-9 pl-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
                     </div>
                     <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white">
                         <Bell className="h-5 w-5" />
@@ -285,7 +287,7 @@ export function RemindersView() {
             <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-r border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
 
                 {/* HERO CARD & STATS */}
-                <ProductivityHero badge="التذكيرات" title="التذكيرات" type="reminders" />
+                <ProductivityHero badge={t('reminders.title')} title={t('reminders.title')} type="reminders" />
 
                 {/* MAIN GRID LAYOUT */}
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -301,7 +303,7 @@ export function RemindersView() {
                                     <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                                     <Input
                                         type="text"
-                                        placeholder="بحث في التذكيرات..."
+                                        placeholder={t('reminders.searchPlaceholder')}
                                         value={searchQuery}
                                         onChange={(e) => setSearchQuery(e.target.value)}
                                         className="pr-10 h-10 rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500/20"
@@ -311,40 +313,40 @@ export function RemindersView() {
                                 {/* Status Filter */}
                                 <Select value={activeTab} onValueChange={setActiveTab}>
                                     <SelectTrigger className="w-[130px] h-10 rounded-xl border-slate-200">
-                                        <SelectValue placeholder="الحالة" />
+                                        <SelectValue placeholder={t('reminders.status.label')} />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="upcoming">القادمة</SelectItem>
-                                        <SelectItem value="past">السابقة</SelectItem>
+                                        <SelectItem value="upcoming">{t('reminders.upcoming')}</SelectItem>
+                                        <SelectItem value="past">{t('reminders.past')}</SelectItem>
                                     </SelectContent>
                                 </Select>
 
                                 {/* Priority Filter */}
                                 <Select value={priorityFilter} onValueChange={setPriorityFilter}>
                                     <SelectTrigger className="w-[130px] h-10 rounded-xl border-slate-200">
-                                        <SelectValue placeholder="الأولوية" />
+                                        <SelectValue placeholder={t('reminders.priority.label')} />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="all">كل الأولويات</SelectItem>
-                                        <SelectItem value="critical">عاجلة جداً</SelectItem>
-                                        <SelectItem value="high">عالية</SelectItem>
-                                        <SelectItem value="medium">متوسطة</SelectItem>
-                                        <SelectItem value="low">منخفضة</SelectItem>
+                                        <SelectItem value="all">{t('reminders.priority.all')}</SelectItem>
+                                        <SelectItem value="critical">{t('reminders.priority.critical')}</SelectItem>
+                                        <SelectItem value="high">{t('reminders.priority.high')}</SelectItem>
+                                        <SelectItem value="medium">{t('reminders.priority.medium')}</SelectItem>
+                                        <SelectItem value="low">{t('reminders.priority.low')}</SelectItem>
                                     </SelectContent>
                                 </Select>
 
                                 {/* Type Filter */}
                                 <Select value={typeFilter} onValueChange={setTypeFilter}>
                                     <SelectTrigger className="w-[150px] h-10 rounded-xl border-slate-200">
-                                        <SelectValue placeholder="النوع" />
+                                        <SelectValue placeholder={t('reminders.type.label')} />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="all">كل الأنواع</SelectItem>
-                                        <SelectItem value="general">عام</SelectItem>
-                                        <SelectItem value="court_hearing">جلسة محكمة</SelectItem>
-                                        <SelectItem value="filing_deadline">موعد تقديم</SelectItem>
-                                        <SelectItem value="payment_due">دفع مالي</SelectItem>
-                                        <SelectItem value="follow_up">متابعة</SelectItem>
+                                        <SelectItem value="all">{t('reminders.type.all')}</SelectItem>
+                                        <SelectItem value="general">{t('reminders.type.general')}</SelectItem>
+                                        <SelectItem value="court_hearing">{t('reminders.type.courtHearing')}</SelectItem>
+                                        <SelectItem value="filing_deadline">{t('reminders.type.deadline')}</SelectItem>
+                                        <SelectItem value="payment_due">{t('reminders.type.payment')}</SelectItem>
+                                        <SelectItem value="follow_up">{t('reminders.type.followUp')}</SelectItem>
                                     </SelectContent>
                                 </Select>
 
@@ -352,12 +354,12 @@ export function RemindersView() {
                                 <Select value={sortBy} onValueChange={setSortBy}>
                                     <SelectTrigger className="w-[160px] h-10 rounded-xl border-slate-200">
                                         <SortAsc className="h-4 w-4 ml-2 text-slate-400" />
-                                        <SelectValue placeholder="ترتيب حسب" />
+                                        <SelectValue placeholder={t('common.sortBy')} />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="reminderDateTime">تاريخ التذكير</SelectItem>
-                                        <SelectItem value="priority">الأولوية</SelectItem>
-                                        <SelectItem value="createdAt">تاريخ الإنشاء</SelectItem>
+                                        <SelectItem value="reminderDateTime">{t('reminders.sort.reminderDate')}</SelectItem>
+                                        <SelectItem value="priority">{t('reminders.sort.priority')}</SelectItem>
+                                        <SelectItem value="createdAt">{t('reminders.sort.createdAt')}</SelectItem>
                                     </SelectContent>
                                 </Select>
 
@@ -370,7 +372,7 @@ export function RemindersView() {
                                         className="h-10 px-4 text-red-500 hover:text-red-600 hover:bg-red-50 rounded-xl"
                                     >
                                         <X className="h-4 w-4 ml-2" />
-                                        مسح الفلاتر
+                                        {t('common.clearFilters')}
                                     </Button>
                                 )}
                             </div>
@@ -380,10 +382,10 @@ export function RemindersView() {
                         <div className="bg-white rounded-3xl p-1 shadow-sm border border-slate-100">
                             <div className="p-6 pb-2 flex justify-between items-center">
                                 <h3 className="font-bold text-navy text-xl">
-                                    {activeTab === 'upcoming' ? 'التذكيرات القادمة' : 'التذكيرات السابقة'}
+                                    {activeTab === 'upcoming' ? t('reminders.upcomingReminders') : t('reminders.pastReminders')}
                                 </h3>
                                 <Badge className="bg-slate-100 text-slate-600 border-0 rounded-full px-4 py-1">
-                                    {reminders.length} تذكير
+                                    {t('reminders.count', { count: reminders.length })}
                                 </Badge>
                             </div>
 
@@ -412,9 +414,9 @@ export function RemindersView() {
                                         <AlertCircle className="h-4 w-4 text-red-600" />
                                         <AlertDescription className="text-red-800">
                                             <div className="flex items-center justify-between">
-                                                <span>حدث خطأ أثناء تحميل التذكيرات: {error?.message || 'خطأ غير معروف'}</span>
+                                                <span>{t('reminders.error.loading', { message: error?.message || t('common.unknownError') })}</span>
                                                 <Button onClick={() => refetch()} variant="outline" size="sm" className="border-red-300 text-red-700 hover:bg-red-100">
-                                                    إعادة المحاولة
+                                                    {t('common.retry')}
                                                 </Button>
                                             </div>
                                         </AlertDescription>
@@ -427,12 +429,12 @@ export function RemindersView() {
                                         <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-emerald-50 mb-4">
                                             <Bell className="h-8 w-8 text-emerald-500" />
                                         </div>
-                                        <h4 className="text-lg font-bold text-navy mb-2">لا توجد تذكيرات</h4>
-                                        <p className="text-slate-500 mb-4">أنت جاهز تماماً! لا توجد تذكيرات في الوقت الحالي.</p>
+                                        <h4 className="text-lg font-bold text-navy mb-2">{t('reminders.empty.title')}</h4>
+                                        <p className="text-slate-500 mb-4">{t('reminders.empty.description')}</p>
                                         <Button asChild className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl">
                                             <Link to="/dashboard/tasks/reminders/new">
                                                 <Plus className="ml-2 h-4 w-4" />
-                                                إضافة تذكير جديد
+                                                {t('reminders.addNew')}
                                             </Link>
                                         </Button>
                                     </div>
@@ -472,26 +474,26 @@ export function RemindersView() {
                                                 <DropdownMenuContent align="end" className="w-48">
                                                     <DropdownMenuItem onClick={() => handleViewReminder(reminder.id)}>
                                                         <Eye className="h-4 w-4 ml-2" />
-                                                        عرض التفاصيل
+                                                        {t('reminders.actions.viewDetails')}
                                                     </DropdownMenuItem>
                                                     <DropdownMenuSeparator />
                                                     {reminder.status !== 'completed' && (
                                                         <DropdownMenuItem onClick={() => handleCompleteReminder(reminder.id)}>
                                                             <CheckCircle className="h-4 w-4 ml-2" />
-                                                            إكمال
+                                                            {t('reminders.actions.complete')}
                                                         </DropdownMenuItem>
                                                     )}
                                                     {reminder.status !== 'dismissed' && (
                                                         <DropdownMenuItem onClick={() => handleDismissReminder(reminder.id)}>
                                                             <XCircle className="h-4 w-4 ml-2" />
-                                                            تجاهل
+                                                            {t('reminders.actions.dismiss')}
                                                         </DropdownMenuItem>
                                                     )}
                                                     {reminder.status !== 'completed' && reminder.status !== 'dismissed' && (
                                                         <DropdownMenuSub>
                                                             <DropdownMenuSubTrigger>
                                                                 <Clock className="h-4 w-4 ml-2" />
-                                                                تأجيل
+                                                                {t('reminders.snooze.title')}
                                                             </DropdownMenuSubTrigger>
                                                             <DropdownMenuSubContent>
                                                                 {SNOOZE_OPTIONS.map((option) => (
@@ -508,7 +510,7 @@ export function RemindersView() {
                                                     {reminder.status !== 'completed' && reminder.status !== 'dismissed' && (
                                                         <DropdownMenuItem onClick={() => setDelegateReminderId(reminder.id)}>
                                                             <UserPlus className="h-4 w-4 ml-2" />
-                                                            تفويض
+                                                            {t('reminders.delegate')}
                                                         </DropdownMenuItem>
                                                     )}
                                                     <DropdownMenuSeparator />
@@ -517,7 +519,7 @@ export function RemindersView() {
                                                         className="text-red-600 focus:text-red-600"
                                                     >
                                                         <Trash2 className="h-4 w-4 ml-2" />
-                                                        حذف
+                                                        {t('reminders.actions.delete')}
                                                     </DropdownMenuItem>
                                                 </DropdownMenuContent>
                                             </DropdownMenu>
@@ -527,7 +529,7 @@ export function RemindersView() {
                                             <div className="flex items-center gap-4">
                                                 {/* Priority Dropdown */}
                                                 <div>
-                                                    <div className="text-xs text-slate-400 mb-1">الأولوية</div>
+                                                    <div className="text-xs text-slate-400 mb-1">{t('reminders.priority.label')}</div>
                                                     <Select
                                                         value={reminder.priority}
                                                         onValueChange={(value) => handlePriorityChange(reminder.id, value)}
@@ -541,29 +543,29 @@ export function RemindersView() {
                                                             <SelectValue />
                                                         </SelectTrigger>
                                                         <SelectContent>
-                                                            <SelectItem value="critical">عاجلة جداً</SelectItem>
-                                                            <SelectItem value="high">عالية</SelectItem>
-                                                            <SelectItem value="medium">متوسطة</SelectItem>
-                                                            <SelectItem value="low">منخفضة</SelectItem>
+                                                            <SelectItem value="critical">{t('reminders.priority.critical')}</SelectItem>
+                                                            <SelectItem value="high">{t('reminders.priority.high')}</SelectItem>
+                                                            <SelectItem value="medium">{t('reminders.priority.medium')}</SelectItem>
+                                                            <SelectItem value="low">{t('reminders.priority.low')}</SelectItem>
                                                         </SelectContent>
                                                     </Select>
                                                 </div>
                                                 {/* Reminder Date - Dual Language */}
                                                 <div className="text-center">
-                                                    <div className="text-xs text-slate-400 mb-1">موعد التذكير</div>
+                                                    <div className="text-xs text-slate-400 mb-1">{t('reminders.reminderDate')}</div>
                                                     <div className="font-bold text-navy text-sm">{reminder.reminderDateFormatted.arabic}</div>
                                                     <div className="text-xs text-slate-400">{reminder.reminderDateFormatted.english}</div>
                                                 </div>
                                                 {/* Creation Date - Dual Language */}
                                                 <div className="text-center">
-                                                    <div className="text-xs text-slate-400 mb-1">تاريخ الإنشاء</div>
+                                                    <div className="text-xs text-slate-400 mb-1">{t('reminders.createdAt')}</div>
                                                     <div className="font-bold text-slate-600 text-sm">{reminder.createdAtFormatted.arabic}</div>
                                                     <div className="text-xs text-slate-400">{reminder.createdAtFormatted.english}</div>
                                                 </div>
                                             </div>
                                             <Link to={`/dashboard/tasks/reminders/${reminder.id}` as any}>
                                                 <Button className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg px-6 shadow-lg shadow-emerald-500/20">
-                                                    عرض التفاصيل
+                                                    {t('reminders.actions.viewDetails')}
                                                 </Button>
                                             </Link>
                                         </div>
@@ -573,7 +575,7 @@ export function RemindersView() {
 
                             <div className="p-4 pt-0 text-center">
                                 <Button variant="ghost" className="text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 w-full rounded-xl py-6">
-                                    عرض جميع التذكيرات
+                                    {t('reminders.viewAll')}
                                     <ChevronLeft className="h-4 w-4 mr-2" />
                                 </Button>
                             </div>
@@ -595,17 +597,17 @@ export function RemindersView() {
             <Dialog open={!!delegateReminderId} onOpenChange={(open) => !open && setDelegateReminderId(null)}>
                 <DialogContent className="sm:max-w-[425px]">
                     <DialogHeader>
-                        <DialogTitle>تفويض التذكير</DialogTitle>
+                        <DialogTitle>{t('reminders.delegate.title')}</DialogTitle>
                         <DialogDescription>
-                            اختر الشخص الذي تريد تفويض التذكير إليه
+                            {t('reminders.delegate.description')}
                         </DialogDescription>
                     </DialogHeader>
                     <div className="grid gap-4 py-4">
                         <div className="space-y-2">
-                            <label className="text-sm font-medium">تفويض إلى</label>
+                            <label className="text-sm font-medium">{t('reminders.delegate.delegateTo')}</label>
                             <Select value={delegateTo} onValueChange={setDelegateTo}>
                                 <SelectTrigger className="rounded-xl">
-                                    <SelectValue placeholder="اختر عضو الفريق" />
+                                    <SelectValue placeholder={t('reminders.delegate.selectMember')} />
                                 </SelectTrigger>
                                 <SelectContent>
                                     {teamMembers && teamMembers.length > 0 ? (
@@ -616,16 +618,16 @@ export function RemindersView() {
                                         ))
                                     ) : (
                                         <div className="text-center py-4 text-slate-500 text-sm">
-                                            لا يوجد أعضاء فريق
+                                            {t('reminders.delegate.noMembers')}
                                         </div>
                                     )}
                                 </SelectContent>
                             </Select>
                         </div>
                         <div className="space-y-2">
-                            <label className="text-sm font-medium">ملاحظة (اختياري)</label>
+                            <label className="text-sm font-medium">{t('reminders.delegate.note')}</label>
                             <Textarea
-                                placeholder="أضف ملاحظة للتفويض..."
+                                placeholder={t('reminders.delegate.notePlaceholder')}
                                 value={delegateNote}
                                 onChange={(e) => setDelegateNote(e.target.value)}
                                 className="rounded-xl"
@@ -634,7 +636,7 @@ export function RemindersView() {
                     </div>
                     <DialogFooter>
                         <Button variant="outline" onClick={() => setDelegateReminderId(null)}>
-                            إلغاء
+                            {t('common.cancel')}
                         </Button>
                         <Button
                             onClick={handleDelegateReminder}
@@ -644,10 +646,10 @@ export function RemindersView() {
                             {delegateReminderMutation.isPending ? (
                                 <>
                                     <Loader2 className="h-4 w-4 ml-2 animate-spin" />
-                                    جاري التفويض...
+                                    {t('reminders.delegate.submitting')}
                                 </>
                             ) : (
-                                'تفويض'
+                                t('reminders.delegate.submit')
                             )}
                         </Button>
                     </DialogFooter>

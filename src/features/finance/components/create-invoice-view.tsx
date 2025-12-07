@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react'
+import { useTranslation } from 'react-i18next'
 import {
     Save, Calendar, User, FileText, Plus, Trash2, Briefcase, Loader2, Percent, Hash, Send,
     Building2, Users, Clock, Receipt, MoreVertical, ChevronDown, Shield, AlertCircle,
@@ -106,6 +107,7 @@ const numberToArabicWords = (num: number): string => {
 }
 
 export function CreateInvoiceView() {
+    const { t, i18n } = useTranslation()
     const navigate = useNavigate()
     const createInvoiceMutation = useCreateInvoice()
     const sendInvoiceMutation = useSendInvoice()

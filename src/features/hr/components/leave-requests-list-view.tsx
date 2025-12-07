@@ -37,21 +37,10 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import type { LeaveType, LeaveStatus, LEAVE_TYPE_LABELS } from '@/services/leaveService'
-
-const LEAVE_TYPES: { value: LeaveType; label: string; icon: typeof Palmtree }[] = [
-    { value: 'annual', label: 'إجازة سنوية', icon: Palmtree },
-    { value: 'sick', label: 'إجازة مرضية', icon: Stethoscope },
-    { value: 'hajj', label: 'إجازة حج', icon: Plane },
-    { value: 'marriage', label: 'إجازة زواج', icon: Heart },
-    { value: 'birth', label: 'إجازة ولادة', icon: Baby },
-    { value: 'death', label: 'إجازة وفاة', icon: Heart },
-    { value: 'maternity', label: 'إجازة وضع', icon: Baby },
-    { value: 'paternity', label: 'إجازة أبوة', icon: Baby },
-    { value: 'exam', label: 'إجازة امتحان', icon: GraduationCap },
-    { value: 'unpaid', label: 'إجازة بدون راتب', icon: Calendar },
-]
+import { useTranslation } from 'react-i18next'
 
 export function LeaveRequestsListView() {
+    const { t, i18n } = useTranslation()
     const navigate = useNavigate()
     const [isSelectionMode, setIsSelectionMode] = useState(false)
     const [selectedIds, setSelectedIds] = useState<string[]>([])
@@ -137,10 +126,24 @@ export function LeaveRequestsListView() {
     }
 
     const handleDeleteRequest = (requestId: string) => {
-        if (confirm('هل أنت متأكد من حذف هذا الطلب؟')) {
+        if (confirm(t('common.deleteConfirm'))) {
             deleteRequestMutation.mutate(requestId)
         }
     }
+
+    // Leave type options with translation
+    const LEAVE_TYPES: { value: LeaveType; label: string; icon: typeof Palmtree }[] = [
+        { value: 'annual', label: t('hr.leaveType.annual'), icon: Palmtree },
+        { value: 'sick', label: t('hr.leaveType.sick'), icon: Stethoscope },
+        { value: 'hajj', label: t('hr.leaveType.hajj'), icon: Plane },
+        { value: 'marriage', label: t('hr.leaveType.marriage'), icon: Heart },
+        { value: 'birth', label: t('hr.leaveType.birth'), icon: Baby },
+        { value: 'death', label: t('hr.leaveType.death'), icon: Heart },
+        { value: 'maternity', label: t('hr.leaveType.maternity'), icon: Baby },
+        { value: 'paternity', label: t('hr.leaveType.paternity'), icon: Baby },
+        { value: 'exam', label: t('hr.leaveType.exam'), icon: GraduationCap },
+        { value: 'unpaid', label: t('hr.leaveType.unpaid'), icon: Calendar },
+    ]
 
     // Status badge styling
     const getStatusBadge = (status: LeaveStatus) => {
@@ -154,13 +157,13 @@ export function LeaveRequestsListView() {
             completed: 'bg-green-100 text-green-700',
         }
         const labels: Record<LeaveStatus, string> = {
-            draft: 'مسودة',
-            submitted: 'مقدم',
-            pending_approval: 'بانتظار الموافقة',
-            approved: 'موافق عليه',
-            rejected: 'مرفوض',
-            cancelled: 'ملغي',
-            completed: 'مكتمل',
+            draft: t('hr.leaveStatus.draft'),
+            submitted: t('hr.leaveStatus.submitted'),
+            pending_approval: t('hr.leaveStatus.pendingApproval'),
+            approved: t('hr.leaveStatus.approved'),
+            rejected: t('hr.leaveStatus.rejected'),
+            cancelled: t('hr.leaveStatus.cancelled'),
+            completed: t('hr.leaveStatus.completed'),
         }
         const icons: Record<LeaveStatus, React.ReactNode> = {
             draft: <FileText className="w-3 h-3" />,
@@ -195,17 +198,17 @@ export function LeaveRequestsListView() {
             unpaid: 'bg-orange-100 text-orange-700',
         }
         const labels: Record<LeaveType, string> = {
-            annual: 'سنوية',
-            sick: 'مرضية',
-            hajj: 'حج',
-            marriage: 'زواج',
-            birth: 'ولادة',
-            death: 'وفاة',
-            eid: 'عيد',
-            maternity: 'وضع',
-            paternity: 'أبوة',
-            exam: 'امتحان',
-            unpaid: 'بدون راتب',
+            annual: t('hr.leaveType.annual'),
+            sick: t('hr.leaveType.sick'),
+            hajj: t('hr.leaveType.hajj'),
+            marriage: t('hr.leaveType.marriage'),
+            birth: t('hr.leaveType.birth'),
+            death: t('hr.leaveType.death'),
+            eid: t('hr.leaveType.eid'),
+            maternity: t('hr.leaveType.maternity'),
+            paternity: t('hr.leaveType.paternity'),
+            exam: t('hr.leaveType.exam'),
+            unpaid: t('hr.leaveType.unpaid'),
         }
         return (
             <Badge className={`${styles[leaveType]} border-0 rounded-md px-2`}>
@@ -237,17 +240,17 @@ export function LeaveRequestsListView() {
     const heroStats = useMemo(() => {
         if (!stats) return undefined
         return [
-            { label: 'إجمالي الطلبات', value: stats.totalRequests || 0, icon: FileText, status: 'normal' as const },
-            { label: 'بانتظار الموافقة', value: stats.pendingApproval || 0, icon: Clock, status: stats.pendingApproval > 0 ? 'attention' as const : 'zero' as const },
-            { label: 'في إجازة اليوم', value: stats.onLeaveToday || 0, icon: Users, status: 'normal' as const },
-            { label: 'متوسط أيام الإجازة', value: stats.averageLeaveDays?.toFixed(1) || 0, icon: Calendar, status: 'normal' as const },
+            { label: t('hr.leave.stats.totalRequests'), value: stats.totalRequests || 0, icon: FileText, status: 'normal' as const },
+            { label: t('hr.leaveStatus.pendingApproval'), value: stats.pendingApproval || 0, icon: Clock, status: stats.pendingApproval > 0 ? 'attention' as const : 'zero' as const },
+            { label: t('hr.leave.stats.onLeaveToday'), value: stats.onLeaveToday || 0, icon: Users, status: 'normal' as const },
+            { label: t('hr.leave.stats.averageDays'), value: stats.averageLeaveDays?.toFixed(1) || 0, icon: Calendar, status: 'normal' as const },
         ]
-    }, [stats])
+    }, [stats, t])
 
     const topNav = [
-        { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
-        { title: 'الموظفين', href: '/dashboard/hr/employees', isActive: false },
-        { title: 'الإجازات', href: '/dashboard/hr/leave', isActive: true },
+        { title: t('common.overview'), href: '/dashboard/overview', isActive: false },
+        { title: t('hr.employees.title'), href: '/dashboard/hr/employees', isActive: false },
+        { title: t('hr.leave.title'), href: '/dashboard/hr/leave', isActive: true },
     ]
 
     return (
@@ -263,7 +266,7 @@ export function LeaveRequestsListView() {
                 <div className='ms-auto flex items-center space-x-4'>
                     <div className="relative hidden md:block">
                         <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                        <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pr-9 pl-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
+                        <input type="text" placeholder={t('common.search')} className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pr-9 pl-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
                     </div>
                     <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white">
                         <Bell className="h-5 w-5" />
@@ -280,7 +283,7 @@ export function LeaveRequestsListView() {
             <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-r border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
 
                 {/* HERO CARD & STATS */}
-                <ProductivityHero badge="الموارد البشرية" title="إدارة الإجازات" type="leave" stats={heroStats} />
+                <ProductivityHero badge={t('hr.title')} title={t('hr.leave.management')} type="leave" stats={heroStats} />
 
                 {/* MAIN GRID LAYOUT */}
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -298,7 +301,7 @@ export function LeaveRequestsListView() {
                                         <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                                         <Input
                                             type="text"
-                                            placeholder="بحث بالاسم أو الرقم..."
+                                            placeholder={t('common.searchPlaceholder')}
                                             value={searchQuery}
                                             onChange={(e) => setSearchQuery(e.target.value)}
                                             className="pr-10 h-10 rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500/20"
@@ -309,10 +312,10 @@ export function LeaveRequestsListView() {
                                     <Select value={typeFilter} onValueChange={setTypeFilter}>
                                         <SelectTrigger className="w-[160px] h-10 rounded-xl border-slate-200">
                                             <Palmtree className="h-4 w-4 ml-2 text-slate-400" />
-                                            <SelectValue placeholder="نوع الإجازة" />
+                                            <SelectValue placeholder={t('hr.leave.leaveType')} />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            <SelectItem value="all">كل الأنواع</SelectItem>
+                                            <SelectItem value="all">{t('filter.allTypes')}</SelectItem>
                                             {LEAVE_TYPES.map((type) => (
                                                 <SelectItem key={type.value} value={type.value}>
                                                     {type.label}
@@ -327,17 +330,17 @@ export function LeaveRequestsListView() {
                                     {/* Status Filter */}
                                     <Select value={statusFilter} onValueChange={setStatusFilter}>
                                         <SelectTrigger className="w-[160px] h-10 rounded-xl border-slate-200">
-                                            <SelectValue placeholder="الحالة" />
+                                            <SelectValue placeholder={t('common.status')} />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            <SelectItem value="all">كل الحالات</SelectItem>
-                                            <SelectItem value="draft">مسودة</SelectItem>
-                                            <SelectItem value="submitted">مقدم</SelectItem>
-                                            <SelectItem value="pending_approval">بانتظار الموافقة</SelectItem>
-                                            <SelectItem value="approved">موافق عليه</SelectItem>
-                                            <SelectItem value="rejected">مرفوض</SelectItem>
-                                            <SelectItem value="cancelled">ملغي</SelectItem>
-                                            <SelectItem value="completed">مكتمل</SelectItem>
+                                            <SelectItem value="all">{t('filter.allStatuses')}</SelectItem>
+                                            <SelectItem value="draft">{t('hr.leaveStatus.draft')}</SelectItem>
+                                            <SelectItem value="submitted">{t('hr.leaveStatus.submitted')}</SelectItem>
+                                            <SelectItem value="pending_approval">{t('hr.leaveStatus.pendingApproval')}</SelectItem>
+                                            <SelectItem value="approved">{t('hr.leaveStatus.approved')}</SelectItem>
+                                            <SelectItem value="rejected">{t('hr.leaveStatus.rejected')}</SelectItem>
+                                            <SelectItem value="cancelled">{t('hr.leaveStatus.cancelled')}</SelectItem>
+                                            <SelectItem value="completed">{t('hr.leaveStatus.completed')}</SelectItem>
                                         </SelectContent>
                                     </Select>
 
@@ -345,13 +348,13 @@ export function LeaveRequestsListView() {
                                     <Select value={sortBy} onValueChange={setSortBy}>
                                         <SelectTrigger className="w-[160px] h-10 rounded-xl border-slate-200">
                                             <SortAsc className="h-4 w-4 ml-2 text-slate-400" />
-                                            <SelectValue placeholder="ترتيب حسب" />
+                                            <SelectValue placeholder={t('sort.label')} />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            <SelectItem value="requestedOn">تاريخ الطلب</SelectItem>
-                                            <SelectItem value="startDate">تاريخ البدء</SelectItem>
-                                            <SelectItem value="employee">الموظف</SelectItem>
-                                            <SelectItem value="days">عدد الأيام</SelectItem>
+                                            <SelectItem value="requestedOn">{t('hr.leave.requestDate')}</SelectItem>
+                                            <SelectItem value="startDate">{t('hr.leave.startDate')}</SelectItem>
+                                            <SelectItem value="employee">{t('hr.employee')}</SelectItem>
+                                            <SelectItem value="days">{t('hr.leave.numberOfDays')}</SelectItem>
                                         </SelectContent>
                                     </Select>
 
@@ -364,7 +367,7 @@ export function LeaveRequestsListView() {
                                             className="h-10 px-4 text-red-500 hover:text-red-600 hover:bg-red-50 rounded-xl"
                                         >
                                             <X className="h-4 w-4 ml-2" />
-                                            مسح الفلاتر
+                                            {t('filter.clear')}
                                         </Button>
                                     )}
                                 </div>
@@ -374,15 +377,15 @@ export function LeaveRequestsListView() {
                         {/* MAIN LEAVE REQUESTS LIST */}
                         <div className="bg-white rounded-3xl p-1 shadow-sm border border-slate-100">
                             <div className="p-6 pb-2 flex justify-between items-center">
-                                <h3 className="font-bold text-navy text-xl">طلبات الإجازات</h3>
+                                <h3 className="font-bold text-navy text-xl">{t('hr.leave.requests')}</h3>
                                 <div className="flex items-center gap-3">
                                     <Badge className="bg-slate-100 text-slate-600 border-0 rounded-full px-4 py-1">
-                                        {leaveRequests.length} طلب
+                                        {leaveRequests.length} {t('hr.leave.request')}
                                     </Badge>
                                     <Button asChild className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl">
                                         <Link to="/dashboard/hr/leave/new">
                                             <Plus className="w-4 h-4 ml-2" />
-                                            طلب إجازة
+                                            {t('hr.leave.addRequest')}
                                         </Link>
                                     </Button>
                                 </div>
@@ -415,10 +418,10 @@ export function LeaveRequestsListView() {
                                                 <AlertCircle className="w-8 h-8 text-red-500" />
                                             </div>
                                         </div>
-                                        <h3 className="text-lg font-bold text-slate-900 mb-2">حدث خطأ أثناء تحميل الطلبات</h3>
-                                        <p className="text-slate-500 mb-4">{error?.message || 'تعذر الاتصال بالخادم'}</p>
+                                        <h3 className="text-lg font-bold text-slate-900 mb-2">{t('common.errorLoading')}</h3>
+                                        <p className="text-slate-500 mb-4">{error?.message || t('common.serverError')}</p>
                                         <Button onClick={() => refetch()} className="bg-emerald-500 hover:bg-emerald-600">
-                                            إعادة المحاولة
+                                            {t('common.retry')}
                                         </Button>
                                     </div>
                                 )}
@@ -431,12 +434,12 @@ export function LeaveRequestsListView() {
                                                 <Palmtree className="w-8 h-8 text-emerald-500" />
                                             </div>
                                         </div>
-                                        <h3 className="text-lg font-bold text-slate-900 mb-2">لا توجد طلبات إجازة</h3>
-                                        <p className="text-slate-500 mb-4">قدم طلب إجازة جديد للبدء</p>
+                                        <h3 className="text-lg font-bold text-slate-900 mb-2">{t('hr.leave.noRequests')}</h3>
+                                        <p className="text-slate-500 mb-4">{t('hr.leave.noRequestsDesc')}</p>
                                         <Button asChild className="bg-emerald-500 hover:bg-emerald-600">
                                             <Link to="/dashboard/hr/leave/new">
                                                 <Plus className="w-4 h-4 ml-2" />
-                                                طلب إجازة
+                                                {t('hr.leave.addRequest')}
                                             </Link>
                                         </Button>
                                     </div>
@@ -477,12 +480,12 @@ export function LeaveRequestsListView() {
                                                 <DropdownMenuContent align="end" className="w-48">
                                                     <DropdownMenuItem onClick={() => handleViewRequest(request._id)}>
                                                         <Eye className="h-4 w-4 ml-2" />
-                                                        عرض التفاصيل
+                                                        {t('common.viewDetails')}
                                                     </DropdownMenuItem>
                                                     {request.status === 'draft' && (
                                                         <DropdownMenuItem onClick={() => handleEditRequest(request._id)}>
                                                             <Edit3 className="h-4 w-4 ml-2 text-blue-500" />
-                                                            تعديل
+                                                            {t('common.edit')}
                                                         </DropdownMenuItem>
                                                     )}
                                                     <DropdownMenuSeparator />
@@ -492,7 +495,7 @@ export function LeaveRequestsListView() {
                                                             className="text-red-600 focus:text-red-600"
                                                         >
                                                             <Trash2 className="h-4 w-4 ml-2" />
-                                                            حذف
+                                                            {t('common.delete')}
                                                         </DropdownMenuItem>
                                                     )}
                                                 </DropdownMenuContent>
@@ -501,27 +504,27 @@ export function LeaveRequestsListView() {
 
                                         <div className="grid grid-cols-4 gap-4 pt-4 border-t border-slate-200/50">
                                             <div className="text-center">
-                                                <div className="text-xs text-slate-400 mb-1">تاريخ البدء</div>
+                                                <div className="text-xs text-slate-400 mb-1">{t('hr.leave.startDate')}</div>
                                                 <div className="font-medium text-navy text-sm">
                                                     {new Date(request.dates.startDate).toLocaleDateString('ar-SA')}
                                                 </div>
                                             </div>
                                             <div className="text-center">
-                                                <div className="text-xs text-slate-400 mb-1">تاريخ الانتهاء</div>
+                                                <div className="text-xs text-slate-400 mb-1">{t('hr.leave.endDate')}</div>
                                                 <div className="font-medium text-navy text-sm">
                                                     {new Date(request.dates.endDate).toLocaleDateString('ar-SA')}
                                                 </div>
                                             </div>
                                             <div className="text-center">
-                                                <div className="text-xs text-slate-400 mb-1">عدد الأيام</div>
+                                                <div className="text-xs text-slate-400 mb-1">{t('hr.leave.numberOfDays')}</div>
                                                 <div className="font-bold text-emerald-600 text-lg">
                                                     {request.dates.totalDays}
                                                 </div>
                                             </div>
                                             <div className="text-center">
-                                                <div className="text-xs text-slate-400 mb-1">الرصيد المتبقي</div>
+                                                <div className="text-xs text-slate-400 mb-1">{t('hr.leave.balanceRemaining')}</div>
                                                 <div className="font-medium text-navy text-sm">
-                                                    {request.balanceAfter} يوم
+                                                    {request.balanceAfter} {t('hr.leave.day')}
                                                 </div>
                                             </div>
                                         </div>
@@ -529,7 +532,7 @@ export function LeaveRequestsListView() {
                                         {request.reason && (
                                             <div className="mt-4 pt-4 border-t border-slate-200/50">
                                                 <p className="text-sm text-slate-600 line-clamp-2">
-                                                    <span className="font-medium">السبب:</span> {request.reason}
+                                                    <span className="font-medium">{t('hr.leave.reason')}:</span> {request.reason}
                                                 </p>
                                             </div>
                                         )}
@@ -537,7 +540,7 @@ export function LeaveRequestsListView() {
                                         <div className="flex justify-end mt-4">
                                             <Link to={`/dashboard/hr/leave/${request._id}` as any}>
                                                 <Button className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg px-6 shadow-lg shadow-emerald-500/20">
-                                                    عرض الطلب
+                                                    {t('hr.leave.viewRequest')}
                                                 </Button>
                                             </Link>
                                         </div>
@@ -547,7 +550,7 @@ export function LeaveRequestsListView() {
 
                             <div className="p-4 pt-0 text-center">
                                 <Button variant="ghost" className="text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 w-full rounded-xl py-6">
-                                    عرض جميع الطلبات
+                                    {t('common.viewAll')}
                                     <ChevronLeft className="h-4 w-4 mr-2" />
                                 </Button>
                             </div>

@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react'
+import { useTranslation } from 'react-i18next'
 import {
     FileText, Calendar, CheckSquare, Clock, MoreHorizontal, Plus, Upload,
     User, ArrowLeft, Briefcase,
@@ -27,6 +28,7 @@ import { useParams } from '@tanstack/react-router'
 import { ProductivityHero } from '@/components/productivity-hero'
 
 export function ExpenseDetailsView() {
+    const { t, i18n } = useTranslation()
     const { expenseId } = useParams({ strict: false }) as { expenseId: string }
 
     // Fetch expense data
@@ -58,10 +60,10 @@ export function ExpenseDetailsView() {
     }, [expenseData])
 
     const topNav = [
-        { title: 'نظرة عامة', href: '/dashboard/finance/overview', isActive: false },
-        { title: 'الفواتير', href: '/dashboard/finance/invoices', isActive: false },
-        { title: 'المصروفات', href: '/dashboard/finance/expenses', isActive: true },
-        { title: 'المعاملات', href: '/dashboard/finance/transactions', isActive: false },
+        { title: t('finance.overview'), href: '/dashboard/finance/overview', isActive: false },
+        { title: t('finance.invoices.title'), href: '/dashboard/finance/invoices', isActive: false },
+        { title: t('finance.expenses.title'), href: '/dashboard/finance/expenses', isActive: true },
+        { title: t('finance.transactions'), href: '/dashboard/finance/transactions', isActive: false },
     ]
 
     // LOADING STATE
@@ -118,11 +120,11 @@ export function ExpenseDetailsView() {
                         <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4">
                             <AlertCircle className="h-8 w-8 text-red-500" />
                         </div>
-                        <h3 className="text-xl font-bold text-slate-900 mb-2">فشل تحميل تفاصيل المصروف</h3>
-                        <p className="text-slate-500 mb-6">{error?.message || 'حدث خطأ أثناء تحميل البيانات'}</p>
+                        <h3 className="text-xl font-bold text-slate-900 mb-2">{t('finance.expenses.loadError')}</h3>
+                        <p className="text-slate-500 mb-6">{error?.message || t('common.errors.loadingData')}</p>
                         <Button onClick={() => refetch()} className="bg-emerald-500 hover:bg-emerald-600 text-white px-8">
                             <Loader2 className="ml-2 h-4 w-4" />
-                            إعادة المحاولة
+                            {t('common.retry')}
                         </Button>
                     </div>
                 </Main>
