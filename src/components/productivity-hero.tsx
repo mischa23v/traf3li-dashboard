@@ -59,6 +59,7 @@ export function ProductivityHero({ badge, title = 'الإنتاجية', type = '
         leaves: { label: 'الإجازات', href: '/dashboard/hr/leaves' },
         attendance: { label: 'الحضور', href: '/dashboard/hr/attendance' },
         evaluations: { label: 'التقييمات', href: '/dashboard/hr/evaluations' },
+        grievances: { label: 'الشكاوى', href: '/dashboard/hr/grievances' },
     }
 
     const buttonConfig: Record<string, { label: string; href: string }> = {
@@ -87,6 +88,7 @@ export function ProductivityHero({ badge, title = 'الإنتاجية', type = '
         leaves: { label: 'إجازة جديدة', href: '/dashboard/hr/leaves/new' },
         attendance: { label: 'سجل حضور جديد', href: '/dashboard/hr/attendance/new' },
         evaluations: { label: 'تقييم جديد', href: '/dashboard/hr/evaluations/new' },
+        grievances: { label: 'شكوى جديدة', href: '/dashboard/hr/grievances/new' },
         laws: { label: 'قانون جديد', href: '/dashboard/knowledge/laws/new' },
         judgments: { label: 'حكم جديد', href: '/dashboard/knowledge/judgments/new' },
         forms: { label: 'نموذج جديد', href: '/dashboard/knowledge/forms/new' },
