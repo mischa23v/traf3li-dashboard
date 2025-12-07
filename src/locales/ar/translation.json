@@ -126,7 +126,30 @@
     "account": "الحساب",
     "appearance": "المظهر",
     "notifications": "الإشعارات",
-    "display": "العرض"
+    "display": "العرض",
+    "quickActions": {
+      "title": "إجراءات سريعة",
+      "create": "إنشاء",
+      "add": "إضافة",
+      "select": "تحديد",
+      "viewAll": "عرض جميع",
+      "readOnlyTitle": "سجل للقراءة فقط",
+      "readOnlyDescription": "يتم إنشاء القيود تلقائياً عند ترحيل المستندات"
+    },
+    "calendar": {
+      "title": "التقويم",
+      "noEvents": "لا توجد أحداث لهذا اليوم",
+      "am": "صباحاً",
+      "pm": "مساءً",
+      "remote": "عن بعد",
+      "viewFullSchedule": "عرض الجدول الكامل"
+    },
+    "notifications": {
+      "title": "التنبيهات",
+      "noReminders": "لا توجد تنبيهات قادمة",
+      "overdue": "متأخر",
+      "viewAll": "عرض كل التنبيهات"
+    }
   },
   "auth": {
     "signIn": {
@@ -976,7 +999,8 @@
     "sort": "ترتيب",
     "actions": "الإجراءات",
     "error": "حدث خطأ، يرجى المحاولة مرة أخرى",
-    "currency": "ر.س"
+    "currency": "ر.س",
+    "notSpecified": "غير محدد"
   },
   "validation": {
     "required": "هذا الحقل مطلوب",
