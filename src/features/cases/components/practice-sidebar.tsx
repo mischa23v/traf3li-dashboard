@@ -333,7 +333,7 @@ export function PracticeSidebar({
                                     <Loader2 className="h-6 w-6 animate-spin text-emerald-600" />
                                 </div>
                             ) : upcomingReminders.length === 0 ? (
-                                <div className="flex flex-col items-center justify-center py-8 text-slate-400">
+                                <div className="flex flex-col items-center justify-center py-8 text-slate-500">
                                     <Bell className="h-10 w-10 mb-2 opacity-20" />
                                     <p className="text-xs font-medium">{t('sidebar.notifications.noReminders')}</p>
                                 </div>

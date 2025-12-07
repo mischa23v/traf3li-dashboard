@@ -274,7 +274,7 @@ export function BadgesView() {
                               <span className="text-slate-600 font-medium">{badge.progress}%</span>
                             </div>
                             <Progress value={badge.progress} className="h-2" />
-                            <div className="text-xs text-slate-400">
+                            <div className="text-xs text-slate-500">
                               {isRTL ? badge.requirement : badge.requirementEn}
                             </div>
                           </div>
