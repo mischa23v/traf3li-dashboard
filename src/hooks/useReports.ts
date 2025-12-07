@@ -1,286 +1,356 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import {
-  reportsService,
-  type ReportConfig,
-  type ReportType,
-  type SavedReport,
-  type DashboardWidget,
+  reportsApi,
+  Report,
+  ReportFilters,
+  CreateReportInput,
+  UpdateReportInput,
+  ReportCategory,
+  OutputFormat,
+  ScheduleFrequency,
+  DataModule,
+  ReportFilter,
+  DistributionRecipient
 } from '@/services/reportsService'
+import { toast } from 'sonner'
 
-// Query key factory
+// Query Keys
 export const reportKeys = {
   all: ['reports'] as const,
   lists: () => [...reportKeys.all, 'list'] as const,
-  list: (filters?: { type?: ReportType; search?: string }) => [...reportKeys.lists(), filters] as const,
+  list: (filters?: ReportFilters) => [...reportKeys.lists(), filters] as const,
   details: () => [...reportKeys.all, 'detail'] as const,
   detail: (id: string) => [...reportKeys.details(), id] as const,
-  revenue: (config: Partial<ReportConfig>) => [...reportKeys.all, 'revenue', config] as const,
-  cases: (config: Partial<ReportConfig>) => [...reportKeys.all, 'cases', config] as const,
-  clients: (config: Partial<ReportConfig>) => [...reportKeys.all, 'clients', config] as const,
-  staff: (config: Partial<ReportConfig>) => [...reportKeys.all, 'staff', config] as const,
-  timeTracking: (config: Partial<ReportConfig>) => [...reportKeys.all, 'time-tracking', config] as const,
-  billing: (config: Partial<ReportConfig>) => [...reportKeys.all, 'billing', config] as const,
-  collections: (config: Partial<ReportConfig>) => [...reportKeys.all, 'collections', config] as const,
-  summary: () => [...reportKeys.all, 'summary'] as const,
-  dashboard: () => [...reportKeys.all, 'dashboard'] as const,
-  widgets: () => [...reportKeys.dashboard(), 'widgets'] as const,
+  byCategory: (category: ReportCategory) => [...reportKeys.all, 'by-category', category] as const,
+  stats: (officeId?: string) => [...reportKeys.all, 'stats', officeId] as const,
+  favorites: () => [...reportKeys.all, 'favorites'] as const,
+  executionHistory: (id: string) => [...reportKeys.all, 'execution-history', id] as const,
+  dataSources: () => [...reportKeys.all, 'data-sources'] as const
 }
 
-// Saved Reports
-export function useSavedReports(params?: {
-  type?: ReportType
-  page?: number
-  pageSize?: number
-  search?: string
-}) {
+// ==================== QUERY HOOKS ====================
+
+// Get all reports
+export function useReports(filters?: ReportFilters) {
   return useQuery({
-    queryKey: reportKeys.list(params),
-    queryFn: () => reportsService.getSavedReports(params),
+    queryKey: reportKeys.list(filters),
+    queryFn: () => reportsApi.getAll(filters)
   })
 }
 
-export function useSavedReport(id: string) {
+// Get single report
+export function useReport(id: string) {
   return useQuery({
     queryKey: reportKeys.detail(id),
-    queryFn: () => reportsService.getSavedReport(id),
-    enabled: !!id,
+    queryFn: () => reportsApi.getById(id),
+    enabled: !!id
   })
 }
 
-export function useCreateSavedReport() {
+// Get reports by category
+export function useReportsByCategory(category: ReportCategory) {
+  return useQuery({
+    queryKey: reportKeys.byCategory(category),
+    queryFn: () => reportsApi.getByCategory(category),
+    enabled: !!category
+  })
+}
+
+// Get report statistics
+export function useReportStats(officeId?: string) {
+  return useQuery({
+    queryKey: reportKeys.stats(officeId),
+    queryFn: () => reportsApi.getStats(officeId)
+  })
+}
+
+// Get favorite reports
+export function useFavoriteReports() {
+  return useQuery({
+    queryKey: reportKeys.favorites(),
+    queryFn: () => reportsApi.getFavorites()
+  })
+}
+
+// Get execution history
+export function useExecutionHistory(id: string) {
+  return useQuery({
+    queryKey: reportKeys.executionHistory(id),
+    queryFn: () => reportsApi.getExecutionHistory(id),
+    enabled: !!id
+  })
+}
+
+// Get available data sources
+export function useDataSources() {
+  return useQuery({
+    queryKey: reportKeys.dataSources(),
+    queryFn: () => reportsApi.getDataSources()
+  })
+}
+
+// ==================== MUTATION HOOKS ====================
+
+// Create report
+export function useCreateReport() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: (data: Omit<SavedReport, '_id' | 'createdAt' | 'updatedAt'>) =>
-      reportsService.createSavedReport(data),
-    // Update cache on success (Stable & Correct)
-    onSuccess: (data) => {
-      // Manually update the cache
-      queryClient.setQueriesData({ queryKey: reportKeys.lists() }, (old: any) => {
-        if (!old) return old
-        // Handle { reports: [...] } structure
-        if (old.reports && Array.isArray(old.reports)) {
-          return {
-            ...old,
-            reports: [data, ...old.reports]
-          }
-        }
-        if (Array.isArray(old)) return [data, ...old]
-        return old
-      })
+    mutationFn: (data: CreateReportInput) => reportsApi.create(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: reportKeys.all })
+      toast.success('تم إنشاء التقرير بنجاح')
     },
-    onSettled: async () => {
-      // Delay to allow DB propagation
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      await queryClient.invalidateQueries({ queryKey: reportKeys.lists(), refetchType: 'all' })
-    },
+    onError: (error: Error) => {
+      toast.error(`فشل إنشاء التقرير: ${error.message}`)
+    }
   })
 }
 
-export function useUpdateSavedReport() {
+// Update report
+export function useUpdateReport() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: Partial<SavedReport> }) =>
-      reportsService.updateSavedReport(id, data),
-    onSettled: async (_, __, variables) => {
-      await queryClient.invalidateQueries({ queryKey: reportKeys.lists() })
-      await queryClient.invalidateQueries({ queryKey: reportKeys.detail(variables.id) })
+    mutationFn: ({ id, data }: { id: string; data: UpdateReportInput }) =>
+      reportsApi.update(id, data),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: reportKeys.all })
+      queryClient.invalidateQueries({ queryKey: reportKeys.detail(variables.id) })
+      toast.success('تم تحديث التقرير بنجاح')
     },
+    onError: (error: Error) => {
+      toast.error(`فشل تحديث التقرير: ${error.message}`)
+    }
   })
 }
 
-export function useDeleteSavedReport() {
+// Delete report
+export function useDeleteReport() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: (id: string) => reportsService.deleteSavedReport(id),
-    // Update cache on success (Stable & Correct)
-    onSuccess: (_, id) => {
-      // Manually update the cache
-      queryClient.setQueriesData({ queryKey: reportKeys.lists() }, (old: any) => {
-        if (!old) return old
-        // Handle { reports: [...] } structure
-        if (old.reports && Array.isArray(old.reports)) {
-          return {
-            ...old,
-            reports: old.reports.filter((r: any) => r._id !== id)
-          }
-        }
-        if (Array.isArray(old)) return old.filter((r: any) => r._id !== id)
-        return old
-      })
+    mutationFn: (id: string) => reportsApi.delete(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: reportKeys.all })
+      toast.success('تم حذف التقرير بنجاح')
     },
-    onSettled: async () => {
-      // Delay to allow DB propagation
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      await queryClient.invalidateQueries({ queryKey: reportKeys.lists(), refetchType: 'all' })
+    onError: (error: Error) => {
+      toast.error(`فشل حذف التقرير: ${error.message}`)
+    }
+  })
+}
+
+// Bulk delete reports
+export function useBulkDeleteReports() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (ids: string[]) => reportsApi.bulkDelete(ids),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: reportKeys.all })
+      toast.success('تم حذف التقارير المحددة بنجاح')
     },
+    onError: (error: Error) => {
+      toast.error(`فشل حذف التقارير: ${error.message}`)
+    }
   })
 }
 
-// Report Generation
-export function useRevenueReport(config: Partial<ReportConfig>, enabled = true) {
-  return useQuery({
-    queryKey: reportKeys.revenue(config),
-    queryFn: () => reportsService.getRevenueReport(config),
-    enabled,
-    staleTime: 5 * 60 * 1000, // 5 minutes
+// ==================== EXECUTION MUTATION HOOKS ====================
+
+// Run report
+export function useRunReport() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({ id, parameters }: { id: string; parameters?: Record<string, any> }) =>
+      reportsApi.runReport(id, parameters),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: reportKeys.detail(variables.id) })
+      queryClient.invalidateQueries({ queryKey: reportKeys.stats() })
+      toast.success('تم تشغيل التقرير بنجاح')
+    },
+    onError: (error: Error) => {
+      toast.error(`فشل تشغيل التقرير: ${error.message}`)
+    }
   })
 }
 
-export function useCaseReport(config: Partial<ReportConfig>, enabled = true) {
-  return useQuery({
-    queryKey: reportKeys.cases(config),
-    queryFn: () => reportsService.getCaseReport(config),
-    enabled,
-    staleTime: 5 * 60 * 1000,
-  })
-}
-
-export function useClientReport(config: Partial<ReportConfig>, enabled = true) {
-  return useQuery({
-    queryKey: reportKeys.clients(config),
-    queryFn: () => reportsService.getClientReport(config),
-    enabled,
-    staleTime: 5 * 60 * 1000,
-  })
-}
-
-export function useStaffReport(config: Partial<ReportConfig>, enabled = true) {
-  return useQuery({
-    queryKey: reportKeys.staff(config),
-    queryFn: () => reportsService.getStaffReport(config),
-    enabled,
-    staleTime: 5 * 60 * 1000,
-  })
-}
-
-export function useTimeTrackingReport(config: Partial<ReportConfig>, enabled = true) {
-  return useQuery({
-    queryKey: reportKeys.timeTracking(config),
-    queryFn: () => reportsService.getTimeTrackingReport(config),
-    enabled,
-    staleTime: 5 * 60 * 1000,
-  })
-}
-
-export function useBillingReport(config: Partial<ReportConfig>, enabled = true) {
-  return useQuery({
-    queryKey: reportKeys.billing(config),
-    queryFn: () => reportsService.getBillingReport(config),
-    enabled,
-    staleTime: 5 * 60 * 1000,
-  })
-}
-
-export function useCollectionsReport(config: Partial<ReportConfig>, enabled = true) {
-  return useQuery({
-    queryKey: reportKeys.collections(config),
-    queryFn: () => reportsService.getCollectionsReport(config),
-    enabled,
-    staleTime: 5 * 60 * 1000,
-  })
-}
-
-// Export Report
+// Export report
 export function useExportReport() {
   return useMutation({
-    mutationFn: ({
-      reportType,
-      config,
-      format,
-    }: {
-      reportType: ReportType
-      config: Partial<ReportConfig>
-      format: 'pdf' | 'xlsx' | 'csv'
-    }) => reportsService.exportReport(reportType, config, format),
-    onSuccess: (blob, variables) => {
-      // Download the file
-      const url = window.URL.createObjectURL(blob)
-      const a = document.createElement('a')
-      a.href = url
-      a.download = `${variables.reportType}-report.${variables.format}`
-      document.body.appendChild(a)
-      a.click()
-      window.URL.revokeObjectURL(url)
-      document.body.removeChild(a)
+    mutationFn: ({ id, format, parameters }: {
+      id: string
+      format: OutputFormat
+      parameters?: Record<string, any>
+    }) => reportsApi.exportReport(id, format, parameters),
+    onSuccess: (data) => {
+      toast.success('تم تصدير التقرير بنجاح')
+      // Optionally trigger download
+      if (data.fileUrl) {
+        window.open(data.fileUrl, '_blank')
+      }
     },
+    onError: (error: Error) => {
+      toast.error(`فشل تصدير التقرير: ${error.message}`)
+    }
   })
 }
 
-// Schedule Report
+// Preview report data
+export function usePreviewReportData() {
+  return useMutation({
+    mutationFn: (config: {
+      dataModules: DataModule[]
+      columns: string[]
+      filters?: ReportFilter[]
+      limit?: number
+    }) => reportsApi.previewData(config),
+    onError: (error: Error) => {
+      toast.error(`فشل معاينة البيانات: ${error.message}`)
+    }
+  })
+}
+
+// ==================== SCHEDULING MUTATION HOOKS ====================
+
+// Schedule report
 export function useScheduleReport() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: (data: {
-      reportId: string
-      frequency: 'daily' | 'weekly' | 'monthly'
-      recipients: string[]
-      format: 'pdf' | 'xlsx'
-    }) => reportsService.scheduleReport(data),
-    onSettled: async (_, __, variables) => {
-      await queryClient.invalidateQueries({ queryKey: reportKeys.detail(variables.reportId) })
+    mutationFn: ({ id, schedule }: {
+      id: string
+      schedule: {
+        frequency: ScheduleFrequency
+        startDate: string
+        endDate?: string
+        time: string
+        distributionList?: DistributionRecipient[]
+      }
+    }) => reportsApi.scheduleReport(id, schedule),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: reportKeys.detail(variables.id) })
+      queryClient.invalidateQueries({ queryKey: reportKeys.all })
+      toast.success('تم جدولة التقرير بنجاح')
     },
+    onError: (error: Error) => {
+      toast.error(`فشل جدولة التقرير: ${error.message}`)
+    }
   })
 }
 
-// Dashboard
-export function useDashboardWidgets() {
-  return useQuery({
-    queryKey: reportKeys.widgets(),
-    queryFn: () => reportsService.getDashboardWidgets(),
-  })
-}
-
-export function useUpdateDashboardWidgets() {
+// Pause schedule
+export function usePauseSchedule() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: (widgets: DashboardWidget[]) => reportsService.updateDashboardWidgets(widgets),
-    onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey: reportKeys.widgets() })
+    mutationFn: (id: string) => reportsApi.pauseSchedule(id),
+    onSuccess: (_, id) => {
+      queryClient.invalidateQueries({ queryKey: reportKeys.detail(id) })
+      queryClient.invalidateQueries({ queryKey: reportKeys.all })
+      toast.success('تم إيقاف جدولة التقرير مؤقتاً')
     },
+    onError: (error: Error) => {
+      toast.error(`فشل إيقاف الجدولة: ${error.message}`)
+    }
   })
 }
 
-export function useReportSummary() {
-  return useQuery({
-    queryKey: reportKeys.summary(),
-    queryFn: () => reportsService.getReportSummary(),
-    staleTime: 5 * 60 * 1000,
-  })
-}
+// Resume schedule
+export function useResumeSchedule() {
+  const queryClient = useQueryClient()
 
-// Generate report mutation (for on-demand generation)
-export function useGenerateReport() {
   return useMutation({
-    mutationFn: async ({
-      type,
-      config,
-    }: {
-      type: ReportType
-      config: Partial<ReportConfig>
-    }) => {
-      switch (type) {
-        case 'revenue':
-          return reportsService.getRevenueReport(config)
-        case 'cases':
-          return reportsService.getCaseReport(config)
-        case 'clients':
-          return reportsService.getClientReport(config)
-        case 'staff':
-          return reportsService.getStaffReport(config)
-        case 'time-tracking':
-          return reportsService.getTimeTrackingReport(config)
-        case 'billing':
-          return reportsService.getBillingReport(config)
-        case 'collections':
-          return reportsService.getCollectionsReport(config)
-        default:
-          throw new Error(`Unknown report type: ${type}`)
-      }
+    mutationFn: (id: string) => reportsApi.resumeSchedule(id),
+    onSuccess: (_, id) => {
+      queryClient.invalidateQueries({ queryKey: reportKeys.detail(id) })
+      queryClient.invalidateQueries({ queryKey: reportKeys.all })
+      toast.success('تم استئناف جدولة التقرير')
     },
+    onError: (error: Error) => {
+      toast.error(`فشل استئناف الجدولة: ${error.message}`)
+    }
+  })
+}
+
+// ==================== FAVORITES MUTATION HOOKS ====================
+
+// Add to favorites
+export function useAddToFavorites() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (id: string) => reportsApi.addToFavorites(id),
+    onSuccess: (_, id) => {
+      queryClient.invalidateQueries({ queryKey: reportKeys.detail(id) })
+      queryClient.invalidateQueries({ queryKey: reportKeys.favorites() })
+      queryClient.invalidateQueries({ queryKey: reportKeys.all })
+      toast.success('تم إضافة التقرير إلى المفضلة')
+    },
+    onError: (error: Error) => {
+      toast.error(`فشل إضافة التقرير إلى المفضلة: ${error.message}`)
+    }
+  })
+}
+
+// Remove from favorites
+export function useRemoveFromFavorites() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (id: string) => reportsApi.removeFromFavorites(id),
+    onSuccess: (_, id) => {
+      queryClient.invalidateQueries({ queryKey: reportKeys.detail(id) })
+      queryClient.invalidateQueries({ queryKey: reportKeys.favorites() })
+      queryClient.invalidateQueries({ queryKey: reportKeys.all })
+      toast.success('تم إزالة التقرير من المفضلة')
+    },
+    onError: (error: Error) => {
+      toast.error(`فشل إزالة التقرير من المفضلة: ${error.message}`)
+    }
+  })
+}
+
+// ==================== OTHER MUTATION HOOKS ====================
+
+// Duplicate report
+export function useDuplicateReport() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({ id, newName }: { id: string; newName: string }) =>
+      reportsApi.duplicate(id, newName),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: reportKeys.all })
+      toast.success('تم نسخ التقرير بنجاح')
+    },
+    onError: (error: Error) => {
+      toast.error(`فشل نسخ التقرير: ${error.message}`)
+    }
+  })
+}
+
+// Share report
+export function useShareReport() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({ id, recipients }: {
+      id: string
+      recipients: Array<{
+        userId?: string
+        email?: string
+        permissions: string[]
+      }>
+    }) => reportsApi.shareReport(id, recipients),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: reportKeys.detail(variables.id) })
+      toast.success('تم مشاركة التقرير بنجاح')
+    },
+    onError: (error: Error) => {
+      toast.error(`فشل مشاركة التقرير: ${error.message}`)
+    }
   })
 }
