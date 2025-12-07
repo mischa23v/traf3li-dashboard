@@ -102,9 +102,9 @@ export function AttendanceRecordDetailsView() {
       absent: <XCircle className="w-3 h-3" />,
       late: <AlertTriangle className="w-3 h-3" />,
       early_departure: <LogOut className="w-3 h-3" />,
-      on_leave: <Calendar className="w-3 h-3" />,
+      on_leave: <Calendar className="w-3 h-3" aria-hidden="true" />,
       weekend: <Coffee className="w-3 h-3" />,
-      holiday: <Calendar className="w-3 h-3" />,
+      holiday: <Calendar className="w-3 h-3" aria-hidden="true" />,
       half_day: <Timer className="w-3 h-3" />,
     }
     return (
@@ -224,11 +224,11 @@ export function AttendanceRecordDetailsView() {
 
         <div className='ms-auto flex items-center gap-4'>
           <div className="relative hidden md:block">
-            <Search className="absolute end-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-            <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
+            <Search className="absolute end-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
+            <input type="text" placeholder="بحث..." aria-label="بحث" className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
           </div>
-          <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white">
-            <Bell className="h-5 w-5" />
+          <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white" aria-label="الإشعارات">
+            <Bell className="h-5 w-5" aria-hidden="true" />
           </Button>
           <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white" />
           <ThemeSwitch className="text-slate-300 hover:bg-white/10 hover:text-white" />
@@ -265,7 +265,7 @@ export function AttendanceRecordDetailsView() {
             {/* Error State */}
             {!isLoading && (isError || !record) && (
               <div className="bg-white rounded-2xl p-12 text-center">
-                <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
+                <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" aria-hidden="true" />
                 <h2 className="text-xl font-bold text-slate-900 mb-2">لم يتم العثور على السجل</h2>
                 <p className="text-slate-500 mb-4">{error?.message || 'حدث خطأ أثناء تحميل بيانات السجل'}</p>
                 <Button onClick={() => navigate({ to: '/dashboard/hr/attendance' })} className="bg-emerald-500 hover:bg-emerald-600">
@@ -340,16 +340,16 @@ export function AttendanceRecordDetailsView() {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="outline" size="icon" className="rounded-xl">
-                  <MoreHorizontal className="h-5 w-5" />
+                  <MoreHorizontal className="h-5 w-5" aria-hidden="true" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48">
                 <DropdownMenuItem onClick={() => setShowCorrectionDialog(true)}>
-                  <Edit className="h-4 w-4 ms-2" />
+                  <Edit className="h-4 w-4 ms-2" aria-hidden="true" />
                   طلب تصحيح
                 </DropdownMenuItem>
                 <DropdownMenuItem>
-                  <Download className="h-4 w-4 ms-2" />
+                  <Download className="h-4 w-4 ms-2" aria-hidden="true" />
                   تصدير PDF
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
@@ -409,7 +409,7 @@ export function AttendanceRecordDetailsView() {
             <CardContent className="p-4">
               <div className="flex items-center gap-3">
                 <div className="w-12 h-12 rounded-xl bg-purple-50 flex items-center justify-center">
-                  <TrendingUp className="w-6 h-6 text-purple-600" />
+                  <TrendingUp className="w-6 h-6 text-purple-600" aria-hidden="true" />
                 </div>
                 <div>
                   <p className="text-sm text-slate-500">ساعات إضافية</p>
@@ -470,7 +470,7 @@ export function AttendanceRecordDetailsView() {
               <Card className="border-none shadow-sm bg-white rounded-2xl">
                 <CardHeader className="pb-3">
                   <CardTitle className="text-base font-bold text-navy flex items-center gap-2">
-                    <Calendar className="w-4 h-4 text-emerald-600" />
+                    <Calendar className="w-4 h-4 text-emerald-600" aria-hidden="true" />
                     معلومات التاريخ
                   </CardTitle>
                 </CardHeader>
@@ -507,7 +507,7 @@ export function AttendanceRecordDetailsView() {
                 <Card className="border-none shadow-sm bg-white rounded-2xl">
                   <CardHeader className="pb-3">
                     <CardTitle className="text-base font-bold text-navy flex items-center gap-2">
-                      <MapPin className="w-4 h-4 text-emerald-600" />
+                      <MapPin className="w-4 h-4 text-emerald-600" aria-hidden="true" />
                       موقع العمل
                     </CardTitle>
                   </CardHeader>

@@ -251,11 +251,11 @@ export function PerformanceReviewCreateView() {
 
         <div className='ms-auto flex items-center gap-4'>
           <div className="relative hidden md:block">
-            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-            <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
+            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
+            <input type="text" placeholder="بحث..." aria-label="بحث" className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
           </div>
-          <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white">
-            <Bell className="h-5 w-5" />
+          <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white" aria-label="الإشعارات">
+            <Bell className="h-5 w-5" aria-hidden="true" />
           </Button>
           <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white" />
           <ThemeSwitch className="text-slate-300 hover:bg-white/10 hover:text-white" />
@@ -446,7 +446,7 @@ export function PerformanceReviewCreateView() {
                         </span>
                       )}
                     </CardTitle>
-                    <ChevronDown className={`w-5 h-5 text-slate-400 transition-transform ${isGoalsOpen ? 'rotate-180' : ''}`} />
+                    <ChevronDown className={`w-5 h-5 text-slate-500 transition-transform ${isGoalsOpen ? 'rotate-180' : ''}`} />
                   </div>
                 </CardHeader>
               </CollapsibleTrigger>
@@ -477,7 +477,7 @@ export function PerformanceReviewCreateView() {
                             onClick={() => removeGoal(index)}
                             className="text-red-500 hover:bg-red-50"
                           >
-                            <Trash2 className="w-4 h-4" />
+                            <Trash2 className="w-4 h-4" aria-hidden="true" />
                           </Button>
                         </div>
                       ))}
@@ -534,7 +534,7 @@ export function PerformanceReviewCreateView() {
                         disabled={!newGoalTitle}
                         className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl"
                       >
-                        <Plus className="w-4 h-4 ms-2" />
+                        <Plus className="w-4 h-4 ms-2" aria-hidden="true" />
                         إضافة هدف
                       </Button>
                     </div>
@@ -561,7 +561,7 @@ export function PerformanceReviewCreateView() {
                         </span>
                       )}
                     </CardTitle>
-                    <ChevronDown className={`w-5 h-5 text-slate-400 transition-transform ${isCompetenciesOpen ? 'rotate-180' : ''}`} />
+                    <ChevronDown className={`w-5 h-5 text-slate-500 transition-transform ${isCompetenciesOpen ? 'rotate-180' : ''}`} />
                   </div>
                 </CardHeader>
               </CollapsibleTrigger>
@@ -621,7 +621,7 @@ export function PerformanceReviewCreateView() {
                         </span>
                       )}
                     </CardTitle>
-                    <ChevronDown className={`w-5 h-5 text-slate-400 transition-transform ${isKpisOpen ? 'rotate-180' : ''}`} />
+                    <ChevronDown className={`w-5 h-5 text-slate-500 transition-transform ${isKpisOpen ? 'rotate-180' : ''}`} />
                   </div>
                 </CardHeader>
               </CollapsibleTrigger>
@@ -645,7 +645,7 @@ export function PerformanceReviewCreateView() {
                             onClick={() => removeKpi(index)}
                             className="text-red-500 hover:bg-red-50"
                           >
-                            <Trash2 className="w-4 h-4" />
+                            <Trash2 className="w-4 h-4" aria-hidden="true" />
                           </Button>
                         </div>
                       ))}
@@ -702,7 +702,7 @@ export function PerformanceReviewCreateView() {
                           disabled={!newKpiName || !newKpiTarget}
                           className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl"
                         >
-                          <Plus className="w-4 h-4" />
+                          <Plus className="w-4 h-4" aria-hidden="true" />
                         </Button>
                       </div>
                     </div>
@@ -724,7 +724,7 @@ export function PerformanceReviewCreateView() {
                       <MessageCircle className="w-4 h-4 text-emerald-600" />
                       تقييم 360 درجة
                     </CardTitle>
-                    <ChevronDown className={`w-5 h-5 text-slate-400 transition-transform ${isFeedbackOpen ? 'rotate-180' : ''}`} />
+                    <ChevronDown className={`w-5 h-5 text-slate-500 transition-transform ${isFeedbackOpen ? 'rotate-180' : ''}`} />
                   </div>
                 </CardHeader>
               </CollapsibleTrigger>
@@ -767,7 +767,7 @@ export function PerformanceReviewCreateView() {
                       <Scale className="w-4 h-4 text-emerald-600" />
                       مقاييس المحامين
                     </CardTitle>
-                    <ChevronDown className={`w-5 h-5 text-slate-400 transition-transform ${isAttorneyMetricsOpen ? 'rotate-180' : ''}`} />
+                    <ChevronDown className={`w-5 h-5 text-slate-500 transition-transform ${isAttorneyMetricsOpen ? 'rotate-180' : ''}`} />
                   </div>
                 </CardHeader>
               </CollapsibleTrigger>

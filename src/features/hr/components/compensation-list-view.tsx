@@ -133,19 +133,19 @@ export function CompensationListView() {
         <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
           <DynamicIsland />
         </div>
-        <div className='ms-auto flex items-center gap-4'>
-          <div className="relative hidden md:block">
-            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-            <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pr-9 pl-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
+        <div className='ms-auto flex items-center gap-2 sm:gap-4 overflow-x-auto min-w-0'>
+          <div className="relative hidden md:block min-w-0">
+            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
+            <input type="text" placeholder="بحث..." aria-label="بحث" className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pr-9 pl-4 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
           </div>
-          <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white">
-            <Bell className="h-5 w-5" />
+          <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white flex-shrink-0" aria-label="الإشعارات">
+            <Bell className="h-5 w-5" aria-hidden="true" />
             <span className="absolute top-2 right-2 h-2 w-2 bg-red-500 rounded-full border border-navy"></span>
           </Button>
-          <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white" />
-          <ThemeSwitch className="text-slate-300 hover:bg-white/10 hover:text-white" />
-          <ConfigDrawer className="text-slate-300 hover:bg-white/10 hover:text-white" />
-          <ProfileDropdown className="text-slate-300 hover:bg-white/10 hover:text-white" />
+          <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white flex-shrink-0" />
+          <ThemeSwitch className="text-slate-300 hover:bg-white/10 hover:text-white hidden sm:flex flex-shrink-0" />
+          <ConfigDrawer className="text-slate-300 hover:bg-white/10 hover:text-white hidden lg:flex flex-shrink-0" />
+          <ProfileDropdown className="text-slate-300 hover:bg-white/10 hover:text-white flex-shrink-0" />
         </div>
         <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-emerald-500/50 to-transparent"></div>
       </Header>
@@ -259,7 +259,7 @@ export function CompensationListView() {
                 <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
                   <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
                     <div className="relative flex-1 md:w-48">
-                      <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                      <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
                       <Input
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
@@ -299,7 +299,7 @@ export function CompensationListView() {
                         onClick={handleBulkDelete}
                         className="rounded-xl"
                       >
-                        <Trash2 className="w-4 h-4 ms-1" />
+                        <Trash2 className="w-4 h-4 ms-1" aria-hidden="true" />
                         حذف ({selectedIds.length})
                       </Button>
                     )}
@@ -319,7 +319,7 @@ export function CompensationListView() {
                       onClick={() => navigate({ to: '/dashboard/hr/compensation/new' })}
                       className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl shadow-lg shadow-emerald-500/20"
                     >
-                      <Plus className="w-4 h-4 ms-1" />
+                      <Plus className="w-4 h-4 ms-1" aria-hidden="true" />
                       سجل جديد
                     </Button>
                   </div>
@@ -351,7 +351,7 @@ export function CompensationListView() {
             ) : error ? (
               <Card className="rounded-2xl border-slate-100">
                 <CardContent className="p-8 text-center">
-                  <AlertCircle className="w-8 h-8 mx-auto text-red-500" />
+                  <AlertCircle className="w-8 h-8 mx-auto text-red-500" aria-hidden="true" />
                   <p className="mt-4 text-red-600">حدث خطأ في تحميل البيانات</p>
                 </CardContent>
               </Card>
@@ -364,7 +364,7 @@ export function CompensationListView() {
                     onClick={() => navigate({ to: '/dashboard/hr/compensation/new' })}
                     className="mt-4 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl"
                   >
-                    <Plus className="w-4 h-4 ms-1" />
+                    <Plus className="w-4 h-4 ms-1" aria-hidden="true" />
                     إنشاء سجل جديد
                   </Button>
                 </CardContent>
@@ -410,22 +410,22 @@ export function CompensationListView() {
                               )}
                               <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
-                                  <Button variant="ghost" size="icon" className="rounded-xl">
-                                    <MoreHorizontal className="w-4 h-4" />
+                                  <Button variant="ghost" size="icon" className="rounded-xl" aria-label="خيارات">
+                                    <MoreHorizontal className="w-4 h-4" aria-hidden="true" />
                                   </Button>
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="end">
                                   <DropdownMenuItem onClick={() => navigate({ to: `/dashboard/hr/compensation/${record.compensationId}` })}>
-                                    <Eye className="w-4 h-4 ms-2" />
+                                    <Eye className="w-4 h-4 ms-2" aria-hidden="true" />
                                     عرض التفاصيل
                                   </DropdownMenuItem>
                                   <DropdownMenuItem onClick={() => navigate({ to: `/dashboard/hr/compensation/new?editId=${record.compensationId}` })}>
-                                    <Edit className="w-4 h-4 ms-2" />
+                                    <Edit className="w-4 h-4 ms-2" aria-hidden="true" />
                                     تعديل
                                   </DropdownMenuItem>
                                   <DropdownMenuSeparator />
                                   <DropdownMenuItem className="text-red-600">
-                                    <Trash2 className="w-4 h-4 ms-2" />
+                                    <Trash2 className="w-4 h-4 ms-2" aria-hidden="true" />
                                     حذف
                                   </DropdownMenuItem>
                                 </DropdownMenuContent>
@@ -437,14 +437,14 @@ export function CompensationListView() {
                             <div>
                               <p className="text-xs text-slate-500">الراتب الأساسي</p>
                               <p className="font-medium text-sm flex items-center gap-1">
-                                <DollarSign className="w-3 h-3 text-slate-400" />
+                                <DollarSign className="w-3 h-3 text-slate-500" />
                                 {formatCurrency(record.basicSalary, record.currency)}
                               </p>
                             </div>
                             <div>
                               <p className="text-xs text-slate-500">إجمالي البدلات</p>
                               <p className="font-medium text-sm flex items-center gap-1">
-                                <Receipt className="w-3 h-3 text-slate-400" />
+                                <Receipt className="w-3 h-3 text-slate-500" />
                                 {formatCurrency(record.totalAllowances, record.currency)}
                               </p>
                             </div>
@@ -458,7 +458,7 @@ export function CompensationListView() {
                             <div>
                               <p className="text-xs text-slate-500">الدرجة الوظيفية</p>
                               <p className="font-medium text-sm flex items-center gap-1">
-                                <Briefcase className="w-3 h-3 text-slate-400" />
+                                <Briefcase className="w-3 h-3 text-slate-500" aria-hidden="true" />
                                 {record.payGrade}
                               </p>
                             </div>
@@ -471,7 +471,7 @@ export function CompensationListView() {
                                 {record.compaRatio < 1 ? (
                                   <TrendingDown className="w-3 h-3" />
                                 ) : (
-                                  <TrendingUp className="w-3 h-3" />
+                                  <TrendingUp className="w-3 h-3" aria-hidden="true" />
                                 )}
                                 {(record.compaRatio * 100).toFixed(0)}%
                               </p>
@@ -505,7 +505,7 @@ export function CompensationListView() {
                             <div className="flex items-center gap-4 text-xs text-slate-500">
                               {record.department && (
                                 <span className="flex items-center gap-1">
-                                  <Building2 className="w-3 h-3" />
+                                  <Building2 className="w-3 h-3" aria-hidden="true" />
                                   {record.department}
                                 </span>
                               )}
@@ -529,7 +529,7 @@ export function CompensationListView() {
                               className="text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 rounded-xl"
                             >
                               عرض التفاصيل
-                              <ChevronLeft className="w-4 h-4 me-1" />
+                              <ChevronLeft className="w-4 h-4 me-1" aria-hidden="true" />
                             </Button>
                           </div>
                         </div>

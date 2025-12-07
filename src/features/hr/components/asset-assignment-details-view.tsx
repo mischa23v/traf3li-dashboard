@@ -273,7 +273,7 @@ export function AssetAssignmentDetailsView() {
           <ProductivityHero badge="الموارد البشرية" title="تفاصيل التخصيص" type="employees" listMode={true} />
           <Card className="rounded-2xl border-slate-100">
             <CardContent className="p-8 text-center">
-              <AlertCircle className="w-8 h-8 mx-auto text-red-500" />
+              <AlertCircle className="w-8 h-8 mx-auto text-red-500" aria-hidden="true" />
               <p className="mt-4 text-red-600">لم يتم العثور على التخصيص</p>
               <Button onClick={() => navigate({ to: '/dashboard/hr/asset-assignment' })} className="mt-4 rounded-xl">
                 العودة للقائمة
@@ -294,11 +294,11 @@ export function AssetAssignmentDetailsView() {
         </div>
         <div className='ms-auto flex items-center gap-4'>
           <div className="relative hidden md:block">
-            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-            <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
+            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
+            <input type="text" placeholder="بحث..." aria-label="بحث" className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
           </div>
-          <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white">
-            <Bell className="h-5 w-5" />
+          <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white" aria-label="الإشعارات">
+            <Bell className="h-5 w-5" aria-hidden="true" />
             <span className="absolute top-2 right-2 h-2 w-2 bg-red-500 rounded-full border border-navy"></span>
           </Button>
           <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white" />
@@ -409,7 +409,7 @@ export function AssetAssignmentDetailsView() {
                 onClick={() => navigate({ to: `/dashboard/hr/asset-assignment/new?editId=${assignment._id}` })}
                 className="rounded-xl"
               >
-                <Edit className="w-4 h-4 ms-2" />
+                <Edit className="w-4 h-4 ms-2" aria-hidden="true" />
                 تعديل
               </Button>
             </div>
@@ -816,7 +816,7 @@ export function AssetAssignmentDetailsView() {
                                   </div>
                                 </div>
                                 <Button variant="ghost" size="icon" className="rounded-xl">
-                                  <Download className="w-4 h-4" />
+                                  <Download className="w-4 h-4" aria-hidden="true" />
                                 </Button>
                               </div>
                             </CardContent>

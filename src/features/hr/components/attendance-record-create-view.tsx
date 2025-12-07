@@ -203,11 +203,11 @@ export function AttendanceRecordCreateView() {
 
         <div className='ms-auto flex items-center gap-4'>
           <div className="relative hidden md:block">
-            <Search className="absolute end-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-            <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
+            <Search className="absolute end-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
+            <input type="text" placeholder="بحث..." aria-label="بحث" className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
           </div>
-          <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white">
-            <Bell className="h-5 w-5" />
+          <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white" aria-label="الإشعارات">
+            <Bell className="h-5 w-5" aria-hidden="true" />
           </Button>
           <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white" />
           <ThemeSwitch className="text-slate-300 hover:bg-white/10 hover:text-white" />
@@ -282,7 +282,7 @@ export function AttendanceRecordCreateView() {
                     }`}
                   >
                     <div className="flex items-center gap-2 mb-2">
-                      <Clock className={`w-5 h-5 ${recordType === 'full' ? 'text-emerald-600' : 'text-slate-400'}`} />
+                      <Clock className={`w-5 h-5 ${recordType === 'full' ? 'text-emerald-600' : 'text-slate-500'}`} />
                       <span className={`font-bold ${recordType === 'full' ? 'text-emerald-700' : 'text-slate-700'}`}>
                         تسجيل كامل
                       </span>
@@ -298,7 +298,7 @@ export function AttendanceRecordCreateView() {
                     }`}
                   >
                     <div className="flex items-center gap-2 mb-2">
-                      <LogIn className={`w-5 h-5 ${recordType === 'check_in' ? 'text-emerald-600' : 'text-slate-400'}`} />
+                      <LogIn className={`w-5 h-5 ${recordType === 'check_in' ? 'text-emerald-600' : 'text-slate-500'}`} />
                       <span className={`font-bold ${recordType === 'check_in' ? 'text-emerald-700' : 'text-slate-700'}`}>
                         تسجيل حضور
                       </span>
@@ -314,7 +314,7 @@ export function AttendanceRecordCreateView() {
                     }`}
                   >
                     <div className="flex items-center gap-2 mb-2">
-                      <LogOut className={`w-5 h-5 ${recordType === 'check_out' ? 'text-red-600' : 'text-slate-400'}`} />
+                      <LogOut className={`w-5 h-5 ${recordType === 'check_out' ? 'text-red-600' : 'text-slate-500'}`} />
                       <span className={`font-bold ${recordType === 'check_out' ? 'text-red-700' : 'text-slate-700'}`}>
                         تسجيل انصراف
                       </span>
@@ -422,7 +422,7 @@ export function AttendanceRecordCreateView() {
                         <Label>موقع الحضور</Label>
                         <Select value={checkInLocation} onValueChange={(v) => setCheckInLocation(v as LocationType)}>
                           <SelectTrigger className="rounded-xl">
-                            <MapPin className="w-4 h-4 ms-2" />
+                            <MapPin className="w-4 h-4 ms-2" aria-hidden="true" />
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
@@ -495,7 +495,7 @@ export function AttendanceRecordCreateView() {
                         <Label>موقع الانصراف</Label>
                         <Select value={checkOutLocation} onValueChange={(v) => setCheckOutLocation(v as LocationType)}>
                           <SelectTrigger className="rounded-xl">
-                            <MapPin className="w-4 h-4 ms-2" />
+                            <MapPin className="w-4 h-4 ms-2" aria-hidden="true" />
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
@@ -528,10 +528,10 @@ export function AttendanceRecordCreateView() {
                   <CollapsibleTrigger className="w-full">
                     <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl hover:bg-slate-100 transition-colors">
                       <div className="flex items-center gap-2">
-                        <MapPin className="w-5 h-5 text-emerald-600" />
+                        <MapPin className="w-5 h-5 text-emerald-600" aria-hidden="true" />
                         <span className="font-bold text-navy">تفاصيل الموقع</span>
                       </div>
-                      <ChevronDown className={`w-5 h-5 text-slate-400 transition-transform ${isLocationOpen ? 'rotate-180' : ''}`} />
+                      <ChevronDown className={`w-5 h-5 text-slate-500 transition-transform ${isLocationOpen ? 'rotate-180' : ''}`} />
                     </div>
                   </CollapsibleTrigger>
                   <CollapsibleContent className="pt-4">
@@ -570,7 +570,7 @@ export function AttendanceRecordCreateView() {
                         <Settings className="w-5 h-5 text-emerald-600" />
                         <span className="font-bold text-navy">تفاصيل الدوام</span>
                       </div>
-                      <ChevronDown className={`w-5 h-5 text-slate-400 transition-transform ${isShiftOpen ? 'rotate-180' : ''}`} />
+                      <ChevronDown className={`w-5 h-5 text-slate-500 transition-transform ${isShiftOpen ? 'rotate-180' : ''}`} />
                     </div>
                   </CollapsibleTrigger>
                   <CollapsibleContent className="pt-4">
@@ -623,7 +623,7 @@ export function AttendanceRecordCreateView() {
                         <FileText className="w-5 h-5 text-emerald-600" />
                         <span className="font-bold text-navy">الملاحظات</span>
                       </div>
-                      <ChevronDown className={`w-5 h-5 text-slate-400 transition-transform ${isNotesOpen ? 'rotate-180' : ''}`} />
+                      <ChevronDown className={`w-5 h-5 text-slate-500 transition-transform ${isNotesOpen ? 'rotate-180' : ''}`} />
                     </div>
                   </CollapsibleTrigger>
                   <CollapsibleContent className="pt-4">

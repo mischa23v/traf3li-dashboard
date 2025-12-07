@@ -120,11 +120,11 @@ export function EmployeeDetailsView() {
 
                 <div className='ms-auto flex items-center gap-4'>
                     <div className="relative hidden md:block">
-                        <Search className="absolute end-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                        <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
+                        <Search className="absolute end-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
+                        <input type="text" placeholder="بحث..." aria-label="بحث" className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
                     </div>
-                    <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white">
-                        <Bell className="h-5 w-5" />
+                    <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white" aria-label="الإشعارات">
+                        <Bell className="h-5 w-5" aria-hidden="true" />
                         <span className="absolute top-2 end-2 h-2 w-2 bg-red-500 rounded-full border border-navy"></span>
                     </Button>
                     <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white" />
@@ -158,7 +158,7 @@ export function EmployeeDetailsView() {
                     <div className="bg-white rounded-2xl p-12 border border-slate-100 text-center">
                         <div className="flex justify-center mb-4">
                             <div className="w-16 h-16 rounded-full bg-red-50 flex items-center justify-center">
-                                <AlertCircle className="w-8 h-8 text-red-500" />
+                                <AlertCircle className="w-8 h-8 text-red-500" aria-hidden="true" />
                             </div>
                         </div>
                         <h3 className="text-lg font-bold text-slate-900 mb-2">حدث خطأ أثناء تحميل بيانات الموظف</h3>
@@ -254,7 +254,7 @@ export function EmployeeDetailsView() {
                                                                 <p className="text-lg text-slate-600">
                                                                     {employee.employment?.jobTitleArabic || employee.employment?.jobTitle || 'غير محدد'}
                                                                 </p>
-                                                                <p className="text-sm text-slate-400 mt-1">
+                                                                <p className="text-sm text-slate-600 mt-1">
                                                                     الرقم الوظيفي: {employee.employeeNumber || employee.employeeId}
                                                                 </p>
                                                             </div>
@@ -273,7 +273,7 @@ export function EmployeeDetailsView() {
                                                         </CardHeader>
                                                         <CardContent className="space-y-3">
                                                             <div className="flex justify-between text-sm">
-                                                                <span className="text-slate-500">رقم الهوية</span>
+                                                                <span className="text-slate-500">رقم الهوية<Lock className="h-3 w-3 text-muted-foreground inline ms-1" /></span>
                                                                 <span className="font-medium text-slate-900">{employee.personalInfo?.nationalId || 'غير محدد'}</span>
                                                             </div>
                                                             <div className="flex justify-between text-sm">
@@ -308,17 +308,17 @@ export function EmployeeDetailsView() {
                                                     <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
                                                         <CardHeader className="pb-3">
                                                             <CardTitle className="text-base font-bold text-navy flex items-center gap-2">
-                                                                <Phone className="w-4 h-4 text-blue-600" />
+                                                                <Phone className="w-4 h-4 text-blue-600" aria-hidden="true" />
                                                                 معلومات الاتصال
                                                             </CardTitle>
                                                         </CardHeader>
                                                         <CardContent className="space-y-3">
                                                             <div className="flex justify-between text-sm">
-                                                                <span className="text-slate-500">الجوال</span>
+                                                                <span className="text-slate-500">الجوال<Lock className="h-3 w-3 text-muted-foreground inline ms-1" /></span>
                                                                 <span className="font-medium text-slate-900" dir="ltr">{employee.personalInfo?.mobile || 'غير محدد'}</span>
                                                             </div>
                                                             <div className="flex justify-between text-sm">
-                                                                <span className="text-slate-500">البريد الإلكتروني</span>
+                                                                <span className="text-slate-500">البريد الإلكتروني<Lock className="h-3 w-3 text-muted-foreground inline ms-1" /></span>
                                                                 <span className="font-medium text-slate-900" dir="ltr">{employee.personalInfo?.email || 'غير محدد'}</span>
                                                             </div>
                                                             <div className="flex justify-between text-sm">
@@ -352,7 +352,7 @@ export function EmployeeDetailsView() {
                                                                 <span className="font-medium text-slate-900">{employee.personalInfo?.emergencyContact?.relationship || 'غير محدد'}</span>
                                                             </div>
                                                             <div>
-                                                                <span className="text-sm text-slate-500 block">رقم الهاتف</span>
+                                                                <span className="text-sm text-slate-500 block">رقم الهاتف<Lock className="h-3 w-3 text-muted-foreground inline ms-1" /></span>
                                                                 <span className="font-medium text-slate-900" dir="ltr">{employee.personalInfo?.emergencyContact?.phone || 'غير محدد'}</span>
                                                             </div>
                                                         </div>
@@ -365,7 +365,7 @@ export function EmployeeDetailsView() {
                                                 <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
                                                     <CardHeader className="pb-3">
                                                         <CardTitle className="text-base font-bold text-navy flex items-center gap-2">
-                                                            <Briefcase className="w-4 h-4 text-blue-600" />
+                                                            <Briefcase className="w-4 h-4 text-blue-600" aria-hidden="true" />
                                                             تفاصيل التوظيف
                                                         </CardTitle>
                                                     </CardHeader>
@@ -488,7 +488,7 @@ export function EmployeeDetailsView() {
                                                     <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
                                                         <CardHeader className="pb-3">
                                                             <CardTitle className="text-base font-bold text-navy flex items-center gap-2">
-                                                                <Building2 className="w-4 h-4 text-blue-600" />
+                                                                <Building2 className="w-4 h-4 text-blue-600" aria-hidden="true" />
                                                                 البدلات
                                                             </CardTitle>
                                                         </CardHeader>
@@ -534,7 +534,7 @@ export function EmployeeDetailsView() {
                                                                 <span className="font-medium text-slate-900">{employee.compensation?.bankDetails?.bankName || 'غير محدد'}</span>
                                                             </div>
                                                             <div>
-                                                                <span className="text-sm text-slate-500 block">رقم الآيبان</span>
+                                                                <span className="text-sm text-slate-500 block">رقم الآيبان (IBAN)<Lock className="h-3 w-3 text-muted-foreground inline ms-1" /></span>
                                                                 <span className="font-medium text-slate-900" dir="ltr">{employee.compensation?.bankDetails?.iban || 'غير محدد'}</span>
                                                             </div>
                                                         </div>
@@ -559,7 +559,7 @@ export function EmployeeDetailsView() {
                                                             </div>
                                                             {employee.gosi?.gosiNumber && (
                                                                 <div>
-                                                                    <span className="text-sm text-slate-500 block">رقم التأمينات</span>
+                                                                    <span className="text-sm text-slate-500 block">رقم التأمينات<Lock className="h-3 w-3 text-muted-foreground inline ms-1" /></span>
                                                                     <span className="font-medium text-slate-900">{employee.gosi.gosiNumber}</span>
                                                                 </div>
                                                             )}
@@ -607,7 +607,7 @@ export function EmployeeDetailsView() {
                                                 <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
                                                     <CardHeader className="pb-3">
                                                         <CardTitle className="text-base font-bold text-navy flex items-center gap-2">
-                                                            <Calendar className="w-4 h-4 text-emerald-600" />
+                                                            <Calendar className="w-4 h-4 text-emerald-600" aria-hidden="true" />
                                                             الإجازة السنوية
                                                         </CardTitle>
                                                     </CardHeader>
@@ -667,7 +667,7 @@ export function EmployeeDetailsView() {
                                                 <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
                                                     <CardHeader className="pb-3">
                                                         <CardTitle className="text-base font-bold text-navy flex items-center gap-2">
-                                                            <Building2 className="w-4 h-4 text-amber-600" />
+                                                            <Building2 className="w-4 h-4 text-amber-600" aria-hidden="true" />
                                                             إجازة الحج
                                                         </CardTitle>
                                                     </CardHeader>
@@ -710,7 +710,7 @@ export function EmployeeDetailsView() {
                                                                 ))}
                                                             </div>
                                                         ) : (
-                                                            <div className="text-center py-8 text-slate-400">
+                                                            <div className="text-center py-8 text-slate-500">
                                                                 <FileText className="w-12 h-12 mx-auto mb-3 opacity-30" />
                                                                 <p>لا توجد مستندات</p>
                                                             </div>
@@ -769,7 +769,7 @@ export function EmployeeDetailsView() {
                                 {deleteEmployeeMutation.isPending ? (
                                     <Loader2 className="h-4 w-4 animate-spin ms-2" />
                                 ) : (
-                                    <Trash2 className="h-4 w-4 ms-2" />
+                                    <Trash2 className="h-4 w-4 ms-2" aria-hidden="true" />
                                 )}
                                 حذف الموظف
                             </Button>

@@ -63,7 +63,7 @@ const REVIEW_STATUS_LABELS: Record<ReviewStatus, { ar: string; color: string }> 
 
 // Rating labels
 const RATING_LABELS: Record<OverallRating, { ar: string; color: string; icon: React.ReactNode }> = {
-  exceptional: { ar: 'استثنائي', color: 'emerald', icon: <TrendingUp className="w-4 h-4" /> },
+  exceptional: { ar: 'استثنائي', color: 'emerald', icon: <TrendingUp className="w-4 h-4" aria-hidden="true" /> },
   exceeds_expectations: { ar: 'يتجاوز التوقعات', color: 'blue', icon: <Star className="w-4 h-4" /> },
   meets_expectations: { ar: 'يلبي التوقعات', color: 'amber', icon: <Target className="w-4 h-4" /> },
   needs_improvement: { ar: 'يحتاج تحسين', color: 'orange', icon: <AlertTriangle className="w-4 h-4" /> },
@@ -154,7 +154,7 @@ export function PerformanceReviewDetailsView() {
 
   // Get rating scale badge
   const getRatingScaleBadge = (rating?: RatingScale) => {
-    if (!rating) return <span className="text-slate-400">-</span>
+    if (!rating) return <span className="text-slate-500">-</span>
     const config = RATING_SCALE_LABELS[rating]
     const colorClasses: Record<string, string> = {
       emerald: 'bg-emerald-100 text-emerald-700',
@@ -178,7 +178,7 @@ export function PerformanceReviewDetailsView() {
 
   // Get score color
   const getScoreColor = (score?: number) => {
-    if (!score) return 'text-slate-400'
+    if (!score) return 'text-slate-500'
     if (score >= 4.5) return 'text-emerald-600'
     if (score >= 3.5) return 'text-blue-600'
     if (score >= 2.5) return 'text-amber-600'
@@ -242,11 +242,11 @@ export function PerformanceReviewDetailsView() {
 
         <div className='ms-auto flex items-center gap-4'>
           <div className="relative hidden md:block">
-            <Search className="absolute end-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-            <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
+            <Search className="absolute end-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
+            <input type="text" placeholder="بحث..." aria-label="بحث" className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
           </div>
-          <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white">
-            <Bell className="h-5 w-5" />
+          <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white" aria-label="الإشعارات">
+            <Bell className="h-5 w-5" aria-hidden="true" />
           </Button>
           <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white" />
           <ThemeSwitch className="text-slate-300 hover:bg-white/10 hover:text-white" />
@@ -283,7 +283,7 @@ export function PerformanceReviewDetailsView() {
             {/* Error State */}
             {!isLoading && (isError || !review) && (
               <div className="bg-white rounded-2xl p-12 text-center">
-                <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
+                <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" aria-hidden="true" />
                 <h2 className="text-xl font-bold text-slate-900 mb-2">لم يتم العثور على التقييم</h2>
                 <p className="text-slate-500 mb-4">{error?.message || 'حدث خطأ أثناء تحميل بيانات التقييم'}</p>
                 <Button onClick={() => navigate({ to: '/dashboard/hr/performance' })} className="bg-emerald-500 hover:bg-emerald-600">
@@ -343,7 +343,7 @@ export function PerformanceReviewDetailsView() {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="outline" size="icon" className="rounded-xl">
-                  <MoreHorizontal className="h-5 w-5" />
+                  <MoreHorizontal className="h-5 w-5" aria-hidden="true" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48">
@@ -357,7 +357,7 @@ export function PerformanceReviewDetailsView() {
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem>
-                  <Download className="h-4 w-4 ms-2" />
+                  <Download className="h-4 w-4 ms-2" aria-hidden="true" />
                   تصدير PDF
                 </DropdownMenuItem>
               </DropdownMenuContent>
@@ -437,11 +437,11 @@ export function PerformanceReviewDetailsView() {
               {completionSteps.map((step, idx) => (
                 <div key={idx} className="flex flex-col items-center">
                   <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                    step.done ? 'bg-emerald-100 text-emerald-600' : 'bg-slate-100 text-slate-400'
+                    step.done ? 'bg-emerald-100 text-emerald-600' : 'bg-slate-100 text-slate-600'
                   }`}>
                     {step.done ? <CheckCircle className="w-4 h-4" /> : <span>{idx + 1}</span>}
                   </div>
-                  <span className={`text-xs mt-1 ${step.done ? 'text-emerald-600' : 'text-slate-400'}`}>
+                  <span className={`text-xs mt-1 ${step.done ? 'text-emerald-600' : 'text-slate-500'}`}>
                     {step.label}
                   </span>
                 </div>
@@ -504,7 +504,7 @@ export function PerformanceReviewDetailsView() {
               <Card className="border-none shadow-sm bg-white rounded-2xl">
                 <CardHeader className="pb-3">
                   <CardTitle className="text-base font-bold text-navy flex items-center gap-2">
-                    <Calendar className="w-4 h-4 text-emerald-600" />
+                    <Calendar className="w-4 h-4 text-emerald-600" aria-hidden="true" />
                     فترة التقييم
                   </CardTitle>
                 </CardHeader>
@@ -548,7 +548,7 @@ export function PerformanceReviewDetailsView() {
                         <span className={`text-4xl font-bold ${getScoreColor(review.overallScore)}`}>
                           {review.overallScore?.toFixed(1) || '-'}
                         </span>
-                        <span className="text-slate-400 text-lg"> / 5</span>
+                        <span className="text-slate-500 text-lg"> / 5</span>
                       </div>
                       {review.calibration && (
                         <div className="text-center">
@@ -604,7 +604,7 @@ export function PerformanceReviewDetailsView() {
                         <ul className="space-y-2">
                           {review.selfAssessment.achievements.map((item, idx) => (
                             <li key={idx} className="flex items-start gap-2 p-3 bg-emerald-50 rounded-lg">
-                              <ChevronRight className="w-4 h-4 text-emerald-600 mt-0.5" />
+                              <ChevronRight className="w-4 h-4 text-emerald-600 mt-0.5" aria-hidden="true" />
                               <span className="text-slate-700">{item}</span>
                             </li>
                           ))}
@@ -622,7 +622,7 @@ export function PerformanceReviewDetailsView() {
                         <ul className="space-y-2">
                           {review.selfAssessment.challenges.map((item, idx) => (
                             <li key={idx} className="flex items-start gap-2 p-3 bg-amber-50 rounded-lg">
-                              <ChevronRight className="w-4 h-4 text-amber-600 mt-0.5" />
+                              <ChevronRight className="w-4 h-4 text-amber-600 mt-0.5" aria-hidden="true" />
                               <span className="text-slate-700">{item}</span>
                             </li>
                           ))}
@@ -640,7 +640,7 @@ export function PerformanceReviewDetailsView() {
                         <ul className="space-y-2">
                           {review.selfAssessment.developmentAreas.map((item, idx) => (
                             <li key={idx} className="flex items-start gap-2 p-3 bg-blue-50 rounded-lg">
-                              <ChevronRight className="w-4 h-4 text-blue-600 mt-0.5" />
+                              <ChevronRight className="w-4 h-4 text-blue-600 mt-0.5" aria-hidden="true" />
                               <span className="text-slate-700">{item}</span>
                             </li>
                           ))}
@@ -652,7 +652,7 @@ export function PerformanceReviewDetailsView() {
                     {review.selfAssessment.careerAspirations && (
                       <div>
                         <h4 className="font-medium text-navy mb-3 flex items-center gap-2">
-                          <TrendingUp className="w-4 h-4 text-purple-600" />
+                          <TrendingUp className="w-4 h-4 text-purple-600" aria-hidden="true" />
                           الطموحات المهنية
                         </h4>
                         <p className="p-4 bg-purple-50 rounded-xl text-slate-700">
@@ -786,7 +786,7 @@ export function PerformanceReviewDetailsView() {
                             </div>
                             <div className="p-3 bg-white rounded-lg">
                               <p className="text-xs text-slate-500 mb-1">التقييم</p>
-                              {goal.managerRating ? getRatingScaleBadge(goal.managerRating) : <span className="text-slate-400">-</span>}
+                              {goal.managerRating ? getRatingScaleBadge(goal.managerRating) : <span className="text-slate-500">-</span>}
                             </div>
                           </div>
                         </div>
@@ -929,7 +929,7 @@ export function PerformanceReviewDetailsView() {
                 <CardHeader className="pb-3">
                   <div className="flex items-center justify-between">
                     <CardTitle className="text-base font-bold text-navy flex items-center gap-2">
-                      <Briefcase className="w-4 h-4 text-emerald-600" />
+                      <Briefcase className="w-4 h-4 text-emerald-600" aria-hidden="true" />
                       تقييم المدير
                     </CardTitle>
                     <Badge className="bg-emerald-100 text-emerald-700 border-0">
@@ -1041,7 +1041,7 @@ export function PerformanceReviewDetailsView() {
             ) : (
               <Card className="border-none shadow-sm bg-white rounded-2xl">
                 <CardContent className="p-12 text-center">
-                  <Briefcase className="w-16 h-16 text-slate-300 mx-auto mb-4" />
+                  <Briefcase className="w-16 h-16 text-slate-300 mx-auto mb-4" aria-hidden="true" />
                   <h3 className="text-lg font-bold text-slate-700 mb-2">لم يكتمل تقييم المدير</h3>
                   <p className="text-slate-500 mb-4">
                     في انتظار إكمال التقييم الذاتي
@@ -1114,7 +1114,7 @@ export function PerformanceReviewDetailsView() {
                           <p className="text-xs text-slate-500">الوظيفة الحالية</p>
                           <p className="font-medium text-navy">{review.developmentPlan.careerPath.currentRole}</p>
                         </div>
-                        <ChevronRight className="w-6 h-6 text-purple-400" />
+                        <ChevronRight className="w-6 h-6 text-purple-400" aria-hidden="true" />
                         <div className="text-center p-3 bg-white rounded-lg flex-1">
                           <p className="text-xs text-slate-500">الوظيفة المستهدفة</p>
                           <p className="font-medium text-purple-600">{review.developmentPlan.careerPath.targetRole}</p>

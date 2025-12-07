@@ -288,11 +288,11 @@ export function ApplicantCreateView() {
 
         <div className='ms-auto flex items-center gap-4'>
           <div className="relative hidden md:block">
-            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-            <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pr-9 pl-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
+            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
+            <input type="text" placeholder="بحث..." aria-label="بحث" className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pr-9 pl-4 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
           </div>
-          <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white">
-            <Bell className="h-5 w-5" />
+          <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white" aria-label="الإشعارات">
+            <Bell className="h-5 w-5" aria-hidden="true" />
           </Button>
           <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white" />
           <ThemeSwitch className="text-slate-300 hover:bg-white/10 hover:text-white" />
@@ -366,7 +366,7 @@ export function ApplicantCreateView() {
         <Card className="border-none shadow-sm bg-white rounded-2xl">
           <CardHeader className="pb-2">
             <CardTitle className="text-base font-bold text-navy flex items-center gap-2">
-              <Briefcase className="w-4 h-4 text-emerald-600" />
+              <Briefcase className="w-4 h-4 text-emerald-600" aria-hidden="true" />
               الوظيفة المتقدم لها
             </CardTitle>
           </CardHeader>
@@ -451,7 +451,7 @@ export function ApplicantCreateView() {
               <div className="space-y-2">
                 <Label htmlFor="email">البريد الإلكتروني *</Label>
                 <div className="relative">
-                  <Mail className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                  <Mail className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
                   <Input
                     id="email"
                     type="email"
@@ -465,7 +465,7 @@ export function ApplicantCreateView() {
               <div className="space-y-2">
                 <Label htmlFor="phone">رقم الهاتف *</Label>
                 <div className="relative">
-                  <Phone className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                  <Phone className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
                   <Input
                     id="phone"
                     type="tel"
@@ -496,7 +496,7 @@ export function ApplicantCreateView() {
               <div className="space-y-2">
                 <Label htmlFor="currentLocation">الموقع الحالي *</Label>
                 <div className="relative">
-                  <MapPin className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                  <MapPin className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
                   <Input
                     id="currentLocation"
                     value={currentLocation}
@@ -544,7 +544,7 @@ export function ApplicantCreateView() {
                       <GraduationCap className="w-4 h-4 text-emerald-600" />
                       التعليم
                     </CardTitle>
-                    <ChevronDown className={`w-5 h-5 text-slate-400 transition-transform ${isEducationOpen ? 'rotate-180' : ''}`} />
+                    <ChevronDown className={`w-5 h-5 text-slate-500 transition-transform ${isEducationOpen ? 'rotate-180' : ''}`} />
                   </div>
                 </CardHeader>
               </CollapsibleTrigger>
@@ -623,10 +623,10 @@ export function ApplicantCreateView() {
                 <CardHeader className="pb-2">
                   <div className="flex items-center justify-between">
                     <CardTitle className="text-base font-bold text-navy flex items-center gap-2">
-                      <Briefcase className="w-4 h-4 text-emerald-600" />
+                      <Briefcase className="w-4 h-4 text-emerald-600" aria-hidden="true" />
                       الخبرة العملية
                     </CardTitle>
-                    <ChevronDown className={`w-5 h-5 text-slate-400 transition-transform ${isExperienceOpen ? 'rotate-180' : ''}`} />
+                    <ChevronDown className={`w-5 h-5 text-slate-500 transition-transform ${isExperienceOpen ? 'rotate-180' : ''}`} />
                   </div>
                 </CardHeader>
               </CollapsibleTrigger>
@@ -701,7 +701,7 @@ export function ApplicantCreateView() {
                         </span>
                       )}
                     </CardTitle>
-                    <ChevronDown className={`w-5 h-5 text-slate-400 transition-transform ${isSkillsOpen ? 'rotate-180' : ''}`} />
+                    <ChevronDown className={`w-5 h-5 text-slate-500 transition-transform ${isSkillsOpen ? 'rotate-180' : ''}`} />
                   </div>
                 </CardHeader>
               </CollapsibleTrigger>
@@ -720,7 +720,7 @@ export function ApplicantCreateView() {
                               onClick={() => removeSkill(index)}
                               className="text-red-500 hover:text-red-700"
                             >
-                              <Trash2 className="w-3 h-3" />
+                              <Trash2 className="w-3 h-3" aria-hidden="true" />
                             </button>
                           </div>
                         ))}
@@ -749,7 +749,7 @@ export function ApplicantCreateView() {
                         disabled={!newSkillName}
                         className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl"
                       >
-                        <Plus className="w-4 h-4" />
+                        <Plus className="w-4 h-4" aria-hidden="true" />
                       </Button>
                     </div>
                   </div>
@@ -769,7 +769,7 @@ export function ApplicantCreateView() {
                                 onClick={() => removeLanguage(index)}
                                 className="text-red-500 hover:text-red-700"
                               >
-                                <Trash2 className="w-3 h-3" />
+                                <Trash2 className="w-3 h-3" aria-hidden="true" />
                               </button>
                             )}
                           </div>
@@ -799,7 +799,7 @@ export function ApplicantCreateView() {
                         disabled={!newLanguage}
                         className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl"
                       >
-                        <Plus className="w-4 h-4" />
+                        <Plus className="w-4 h-4" aria-hidden="true" />
                       </Button>
                     </div>
                   </div>
@@ -820,7 +820,7 @@ export function ApplicantCreateView() {
                       <DollarSign className="w-4 h-4 text-emerald-600" />
                       التعويضات والتوفر
                     </CardTitle>
-                    <ChevronDown className={`w-5 h-5 text-slate-400 transition-transform ${isCompensationOpen ? 'rotate-180' : ''}`} />
+                    <ChevronDown className={`w-5 h-5 text-slate-500 transition-transform ${isCompensationOpen ? 'rotate-180' : ''}`} />
                   </div>
                 </CardHeader>
               </CollapsibleTrigger>
@@ -889,7 +889,7 @@ export function ApplicantCreateView() {
                       <Scale className="w-4 h-4 text-emerald-600" />
                       معلومات المحامي
                     </CardTitle>
-                    <ChevronDown className={`w-5 h-5 text-slate-400 transition-transform ${isAttorneyOpen ? 'rotate-180' : ''}`} />
+                    <ChevronDown className={`w-5 h-5 text-slate-500 transition-transform ${isAttorneyOpen ? 'rotate-180' : ''}`} />
                   </div>
                 </CardHeader>
               </CollapsibleTrigger>

@@ -225,19 +225,19 @@ export function JobPostingsListView() {
           <DynamicIsland />
         </div>
 
-        <div className='ms-auto flex items-center gap-4'>
-          <div className="relative hidden md:block">
-            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-            <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pr-9 pl-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
+        <div className='ms-auto flex items-center gap-2 sm:gap-4 overflow-x-auto min-w-0'>
+          <div className="relative hidden md:block min-w-0">
+            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
+            <input type="text" placeholder="بحث..." aria-label="بحث" className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pr-9 pl-4 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
           </div>
-          <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white">
-            <Bell className="h-5 w-5" />
+          <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white flex-shrink-0" aria-label="الإشعارات">
+            <Bell className="h-5 w-5" aria-hidden="true" />
             <span className="absolute top-2 right-2 h-2 w-2 bg-red-500 rounded-full border border-navy"></span>
           </Button>
-          <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white" />
-          <ThemeSwitch className="text-slate-300 hover:bg-white/10 hover:text-white" />
-          <ConfigDrawer className="text-slate-300 hover:bg-white/10 hover:text-white" />
-          <ProfileDropdown className="text-slate-300 hover:bg-white/10 hover:text-white" />
+          <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white flex-shrink-0" />
+          <ThemeSwitch className="text-slate-300 hover:bg-white/10 hover:text-white hidden sm:flex flex-shrink-0" />
+          <ConfigDrawer className="text-slate-300 hover:bg-white/10 hover:text-white hidden lg:flex flex-shrink-0" />
+          <ProfileDropdown className="text-slate-300 hover:bg-white/10 hover:text-white flex-shrink-0" />
         </div>
         <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-emerald-500/50 to-transparent"></div>
       </Header>
@@ -259,7 +259,7 @@ export function JobPostingsListView() {
                 {/* Row 1: Search */}
                 <div className="flex flex-wrap items-center gap-3">
                   <div className="relative flex-1 min-w-[200px] max-w-md">
-                    <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                    <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
                     <Input
                       type="text"
                       placeholder="بحث بالمسمى الوظيفي أو القسم..."
@@ -288,7 +288,7 @@ export function JobPostingsListView() {
 
                   <Select value={employmentTypeFilter} onValueChange={(v) => setEmploymentTypeFilter(v as EmploymentType | 'all')}>
                     <SelectTrigger className="w-[130px] h-10 rounded-xl border-slate-200">
-                      <Briefcase className="h-4 w-4 ms-2 text-slate-400" />
+                      <Briefcase className="h-4 w-4 ms-2 text-slate-500" aria-hidden="true" />
                       <SelectValue placeholder="النوع" />
                     </SelectTrigger>
                     <SelectContent>
@@ -303,7 +303,7 @@ export function JobPostingsListView() {
 
                   <Select value={urgencyFilter} onValueChange={(v) => setUrgencyFilter(v as Urgency | 'all')}>
                     <SelectTrigger className="w-[130px] h-10 rounded-xl border-slate-200">
-                      <Zap className="h-4 w-4 ms-2 text-slate-400" />
+                      <Zap className="h-4 w-4 ms-2 text-slate-500" />
                       <SelectValue placeholder="الأولوية" />
                     </SelectTrigger>
                     <SelectContent>
@@ -317,7 +317,7 @@ export function JobPostingsListView() {
 
                   <Select value={departmentFilter} onValueChange={setDepartmentFilter}>
                     <SelectTrigger className="w-[130px] h-10 rounded-xl border-slate-200">
-                      <Building2 className="h-4 w-4 ms-2 text-slate-400" />
+                      <Building2 className="h-4 w-4 ms-2 text-slate-500" aria-hidden="true" />
                       <SelectValue placeholder="القسم" />
                     </SelectTrigger>
                     <SelectContent>
@@ -337,7 +337,7 @@ export function JobPostingsListView() {
                       onClick={clearFilters}
                       className="h-10 px-4 text-red-500 hover:text-red-600 hover:bg-red-50 rounded-xl"
                     >
-                      <X className="h-4 w-4 ms-2" />
+                      <X className="h-4 w-4 ms-2" aria-hidden="true" />
                       مسح الفلاتر
                     </Button>
                   )}
@@ -349,7 +349,7 @@ export function JobPostingsListView() {
             <div className="bg-white rounded-3xl p-1 shadow-sm border border-slate-100">
               <div className="p-6 pb-2 flex justify-between items-center">
                 <h3 className="font-bold text-navy text-xl flex items-center gap-2">
-                  <Briefcase className="w-5 h-5 text-emerald-600" />
+                  <Briefcase className="w-5 h-5 text-emerald-600" aria-hidden="true" />
                   الوظائف الشاغرة
                 </h3>
                 <Badge className="bg-slate-100 text-slate-600 border-0 rounded-full px-4 py-1">
@@ -381,7 +381,7 @@ export function JobPostingsListView() {
                   <div className="bg-white rounded-2xl p-12 border border-slate-100 text-center">
                     <div className="flex justify-center mb-4">
                       <div className="w-16 h-16 rounded-full bg-red-50 flex items-center justify-center">
-                        <AlertCircle className="w-8 h-8 text-red-500" />
+                        <AlertCircle className="w-8 h-8 text-red-500" aria-hidden="true" />
                       </div>
                     </div>
                     <h3 className="text-lg font-bold text-slate-900 mb-2">حدث خطأ</h3>
@@ -397,14 +397,14 @@ export function JobPostingsListView() {
                   <div className="bg-white rounded-2xl p-12 border border-slate-100 text-center">
                     <div className="flex justify-center mb-4">
                       <div className="w-16 h-16 rounded-full bg-emerald-50 flex items-center justify-center">
-                        <Briefcase className="w-8 h-8 text-emerald-500" />
+                        <Briefcase className="w-8 h-8 text-emerald-500" aria-hidden="true" />
                       </div>
                     </div>
                     <h3 className="text-lg font-bold text-slate-900 mb-2">لا توجد وظائف</h3>
                     <p className="text-slate-500 mb-4">لا توجد وظائف مطابقة للبحث</p>
                     <Button asChild className="bg-emerald-500 hover:bg-emerald-600">
                       <Link to="/dashboard/hr/recruitment/jobs/new">
-                        <Plus className="w-4 h-4 ms-2" />
+                        <Plus className="w-4 h-4 ms-2" aria-hidden="true" />
                         إضافة وظيفة جديدة
                       </Link>
                     </Button>
@@ -424,7 +424,7 @@ export function JobPostingsListView() {
                           />
                         )}
                         <div className="w-14 h-14 rounded-xl bg-white flex items-center justify-center shadow-sm text-emerald-600">
-                          <Briefcase className="w-7 h-7" />
+                          <Briefcase className="w-7 h-7" aria-hidden="true" />
                         </div>
                         <div>
                           <div className="flex items-center gap-2 mb-1 flex-wrap">
@@ -434,15 +434,15 @@ export function JobPostingsListView() {
                           </div>
                           <div className="flex items-center gap-4 text-sm text-slate-500">
                             <span className="flex items-center gap-1">
-                              <Building2 className="w-4 h-4" />
+                              <Building2 className="w-4 h-4" aria-hidden="true" />
                               {job.departmentNameAr || job.departmentName || job.department}
                             </span>
                             <span className="flex items-center gap-1">
-                              <MapPin className="w-4 h-4" />
+                              <MapPin className="w-4 h-4" aria-hidden="true" />
                               {job.location}
                             </span>
                             <span className="flex items-center gap-1">
-                              <Briefcase className="w-4 h-4" />
+                              <Briefcase className="w-4 h-4" aria-hidden="true" />
                               {EMPLOYMENT_TYPE_LABELS[job.employmentType]?.ar}
                             </span>
                           </div>
@@ -450,17 +450,17 @@ export function JobPostingsListView() {
                       </div>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon" className="text-slate-400 hover:text-navy">
-                            <MoreHorizontal className="h-5 w-5" />
+                          <Button variant="ghost" size="icon" className="text-slate-500 hover:text-navy" aria-label="خيارات">
+                            <MoreHorizontal className="h-5 w-5" aria-hidden="true" />
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="w-48">
                           <DropdownMenuItem onClick={() => handleViewJob(job._id)}>
-                            <Eye className="h-4 w-4 ms-2" />
+                            <Eye className="h-4 w-4 ms-2" aria-hidden="true" />
                             عرض التفاصيل
                           </DropdownMenuItem>
                           <DropdownMenuItem onClick={() => handleEditJob(job._id)}>
-                            <Edit3 className="h-4 w-4 ms-2 text-blue-500" />
+                            <Edit3 className="h-4 w-4 ms-2 text-blue-500" aria-hidden="true" />
                             تعديل الوظيفة
                           </DropdownMenuItem>
                           <DropdownMenuSeparator />
@@ -468,7 +468,7 @@ export function JobPostingsListView() {
                             onClick={() => handleDeleteJob(job._id)}
                             className="text-red-600 focus:text-red-600"
                           >
-                            <Trash2 className="h-4 w-4 ms-2" />
+                            <Trash2 className="h-4 w-4 ms-2" aria-hidden="true" />
                             حذف الوظيفة
                           </DropdownMenuItem>
                         </DropdownMenuContent>
@@ -502,7 +502,7 @@ export function JobPostingsListView() {
                         <div className="text-center">
                           <p className="text-xs text-slate-500 mb-1">تاريخ النشر</p>
                           <p className="text-sm font-medium text-navy flex items-center gap-1">
-                            <Calendar className="w-4 h-4" />
+                            <Calendar className="w-4 h-4" aria-hidden="true" />
                             {formatDate(job.postedDate)}
                           </p>
                         </div>

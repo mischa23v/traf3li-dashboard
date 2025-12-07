@@ -214,11 +214,11 @@ export function ExpenseClaimsDetailsView() {
         </div>
         <div className='ms-auto flex items-center gap-4'>
           <div className="relative hidden md:block">
-            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-            <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
+            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
+            <input type="text" placeholder="بحث..." aria-label="بحث" className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
           </div>
-          <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white">
-            <Bell className="h-5 w-5" />
+          <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white" aria-label="الإشعارات">
+            <Bell className="h-5 w-5" aria-hidden="true" />
             <span className="absolute top-2 right-2 h-2 w-2 bg-red-500 rounded-full border border-navy"></span>
           </Button>
           <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white" />
@@ -260,7 +260,7 @@ export function ExpenseClaimsDetailsView() {
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="outline" className="rounded-xl">
-                    <MoreHorizontal className="w-4 h-4 ms-2" />
+                    <MoreHorizontal className="w-4 h-4 ms-2" aria-hidden="true" />
                     إجراءات
                   </Button>
                 </DropdownMenuTrigger>
@@ -268,7 +268,7 @@ export function ExpenseClaimsDetailsView() {
                   <DropdownMenuItem
                     onClick={() => navigate({ to: `/dashboard/hr/expense-claims/new?editId=${claimId}` })}
                   >
-                    <Edit className="w-4 h-4 ms-2" />
+                    <Edit className="w-4 h-4 ms-2" aria-hidden="true" />
                     تعديل
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
@@ -302,7 +302,7 @@ export function ExpenseClaimsDetailsView() {
                   )}
                   <DropdownMenuSeparator />
                   <DropdownMenuItem className="text-red-600" onClick={handleDelete}>
-                    <Trash2 className="w-4 h-4 ms-2" />
+                    <Trash2 className="w-4 h-4 ms-2" aria-hidden="true" />
                     حذف
                   </DropdownMenuItem>
                 </DropdownMenuContent>
@@ -320,7 +320,7 @@ export function ExpenseClaimsDetailsView() {
             ) : error ? (
               <Card className="rounded-2xl border-slate-100">
                 <CardContent className="p-8 text-center">
-                  <AlertCircle className="w-8 h-8 mx-auto text-red-500" />
+                  <AlertCircle className="w-8 h-8 mx-auto text-red-500" aria-hidden="true" />
                   <p className="mt-4 text-red-600">حدث خطأ في تحميل البيانات</p>
                 </CardContent>
               </Card>
@@ -654,7 +654,7 @@ export function ExpenseClaimsDetailsView() {
                             <Card key={receipt.receiptId || index} className="rounded-xl border-slate-100">
                               <CardContent className="p-4">
                                 <div className="aspect-square bg-slate-100 rounded-lg flex items-center justify-center mb-3">
-                                  <Paperclip className="w-8 h-8 text-slate-400" />
+                                  <Paperclip className="w-8 h-8 text-slate-500" />
                                 </div>
                                 <p className="font-medium text-sm truncate">{receipt.fileName}</p>
                                 <div className="flex items-center justify-between mt-2">
@@ -672,7 +672,7 @@ export function ExpenseClaimsDetailsView() {
                                     className="w-full mt-2 rounded-xl"
                                     onClick={() => window.open(receipt.fileUrl, '_blank')}
                                   >
-                                    <Eye className="w-4 h-4 ms-1" />
+                                    <Eye className="w-4 h-4 ms-1" aria-hidden="true" />
                                     عرض
                                   </Button>
                                 )}

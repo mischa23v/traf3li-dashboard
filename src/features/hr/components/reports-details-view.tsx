@@ -168,11 +168,11 @@ export function ReportsDetailsView() {
         </div>
         <div className='ms-auto flex items-center gap-4'>
           <div className="relative hidden md:block">
-            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-            <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pr-9 pl-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
+            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
+            <input type="text" placeholder="بحث..." aria-label="بحث" className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pr-9 pl-4 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
           </div>
-          <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white">
-            <Bell className="h-5 w-5" />
+          <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white" aria-label="الإشعارات">
+            <Bell className="h-5 w-5" aria-hidden="true" />
             <span className="absolute top-2 right-2 h-2 w-2 bg-red-500 rounded-full border border-navy"></span>
           </Button>
           <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white" />
@@ -205,7 +205,7 @@ export function ReportsDetailsView() {
             ) : error || !report ? (
               <Card className="rounded-2xl border-slate-100">
                 <CardContent className="p-8 text-center">
-                  <AlertCircle className="w-12 h-12 mx-auto text-red-500 mb-4" />
+                  <AlertCircle className="w-12 h-12 mx-auto text-red-500 mb-4" aria-hidden="true" />
                   <p className="text-red-600">حدث خطأ في تحميل بيانات التقرير</p>
                   <Button
                     onClick={() => navigate({ to: '/dashboard/hr/reports' })}
@@ -258,7 +258,7 @@ export function ReportsDetailsView() {
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button variant="outline" size="sm" className="rounded-xl">
-                          <Download className="w-4 h-4 ms-1" />
+                          <Download className="w-4 h-4 ms-1" aria-hidden="true" />
                           تصدير
                         </Button>
                       </DropdownMenuTrigger>
@@ -285,12 +285,12 @@ export function ReportsDetailsView() {
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button variant="outline" size="icon" className="rounded-xl">
-                          <MoreHorizontal className="w-4 h-4" />
+                          <MoreHorizontal className="w-4 h-4" aria-hidden="true" />
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
                         <DropdownMenuItem onClick={() => navigate({ to: `/dashboard/hr/reports/new?editId=${reportId}` })}>
-                          <Edit className="w-4 h-4 ms-2" />
+                          <Edit className="w-4 h-4 ms-2" aria-hidden="true" />
                           تعديل
                         </DropdownMenuItem>
                         <DropdownMenuItem onClick={handleDuplicate}>
@@ -303,7 +303,7 @@ export function ReportsDetailsView() {
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem className="text-red-600" onClick={handleDelete}>
-                          <Trash2 className="w-4 h-4 ms-2" />
+                          <Trash2 className="w-4 h-4 ms-2" aria-hidden="true" />
                           حذف
                         </DropdownMenuItem>
                       </DropdownMenuContent>
@@ -646,7 +646,7 @@ export function ReportsDetailsView() {
                     <Card className="rounded-2xl border-slate-100">
                       <CardHeader>
                         <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                          <Download className="w-5 h-5 text-amber-500" />
+                          <Download className="w-5 h-5 text-amber-500" aria-hidden="true" />
                           صيغ الإخراج
                         </CardTitle>
                       </CardHeader>
@@ -801,7 +801,7 @@ export function ReportsDetailsView() {
                     <Card className="rounded-2xl border-slate-100">
                       <CardHeader>
                         <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                          <Eye className="w-5 h-5 text-indigo-500" />
+                          <Eye className="w-5 h-5 text-indigo-500" aria-hidden="true" />
                           سجل التشغيل
                         </CardTitle>
                       </CardHeader>

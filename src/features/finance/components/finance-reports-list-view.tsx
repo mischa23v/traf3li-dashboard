@@ -168,19 +168,19 @@ export function FinanceReportsListView() {
         <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
           <DynamicIsland />
         </div>
-        <div className='ms-auto flex items-center gap-4'>
-          <div className="relative hidden md:block">
+        <div className='ms-auto flex items-center gap-2 sm:gap-4 overflow-x-auto min-w-0'>
+          <div className="relative hidden md:block min-w-0">
             <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
             <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
           </div>
-          <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white">
-            <Bell className="h-5 w-5" />
+          <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white flex-shrink-0">
+            <Bell className="h-5 w-5" aria-hidden="true" />
             <span className="absolute top-2 right-2 h-2 w-2 bg-red-500 rounded-full border border-navy"></span>
           </Button>
-          <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white" />
-          <ThemeSwitch className="text-slate-300 hover:bg-white/10 hover:text-white" />
-          <ConfigDrawer className="text-slate-300 hover:bg-white/10 hover:text-white" />
-          <ProfileDropdown className="text-slate-300 hover:bg-white/10 hover:text-white" />
+          <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white flex-shrink-0" />
+          <ThemeSwitch className="text-slate-300 hover:bg-white/10 hover:text-white hidden sm:flex flex-shrink-0" />
+          <ConfigDrawer className="text-slate-300 hover:bg-white/10 hover:text-white hidden lg:flex flex-shrink-0" />
+          <ProfileDropdown className="text-slate-300 hover:bg-white/10 hover:text-white flex-shrink-0" />
         </div>
         <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-emerald-500/50 to-transparent"></div>
       </Header>
@@ -201,7 +201,7 @@ export function FinanceReportsListView() {
                 <CardContent className="p-4">
                   <div className="flex items-center gap-3">
                     <div className="p-2 bg-blue-100 rounded-xl">
-                      <FileText className="w-5 h-5 text-blue-600" />
+                      <FileText className="w-5 h-5 text-blue-600" aria-hidden="true" />
                     </div>
                     <div>
                       <p className="text-xs text-slate-500">إجمالي التقارير</p>
@@ -297,7 +297,7 @@ export function FinanceReportsListView() {
                         onClick={handleBulkDelete}
                         className="rounded-xl"
                       >
-                        <Trash2 className="w-4 h-4 ms-1" />
+                        <Trash2 className="w-4 h-4 ms-1" aria-hidden="true" />
                         حذف ({selectedIds.length})
                       </Button>
                     )}
@@ -317,7 +317,7 @@ export function FinanceReportsListView() {
                       onClick={() => navigate({ to: '/dashboard/finance/reports/new' })}
                       className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl shadow-lg shadow-emerald-500/20"
                     >
-                      <Plus className="w-4 h-4 ms-1" />
+                      <Plus className="w-4 h-4 ms-1" aria-hidden="true" />
                       تقرير جديد
                     </Button>
                   </div>
@@ -342,7 +342,7 @@ export function FinanceReportsListView() {
             {isLoading ? (
               <Card className="rounded-2xl border-slate-100">
                 <CardContent className="p-8 text-center">
-                  <Loader2 className="w-8 h-8 animate-spin mx-auto text-emerald-500" />
+                  <Loader2 className="w-8 h-8 animate-spin mx-auto text-emerald-500" aria-hidden="true" />
                   <p className="mt-4 text-slate-500">جاري تحميل التقارير...</p>
                 </CardContent>
               </Card>
@@ -356,13 +356,13 @@ export function FinanceReportsListView() {
             ) : reports.length === 0 ? (
               <Card className="rounded-2xl border-slate-100">
                 <CardContent className="p-8 text-center">
-                  <FileText className="w-12 h-12 mx-auto text-slate-300" />
+                  <FileText className="w-12 h-12 mx-auto text-slate-300" aria-hidden="true" />
                   <p className="mt-4 text-slate-500">لا توجد تقارير مالية</p>
                   <Button
                     onClick={() => navigate({ to: '/dashboard/finance/reports/new' })}
                     className="mt-4 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl"
                   >
-                    <Plus className="w-4 h-4 ms-1" />
+                    <Plus className="w-4 h-4 ms-1" aria-hidden="true" />
                     إنشاء تقرير جديد
                   </Button>
                 </CardContent>
@@ -438,16 +438,16 @@ export function FinanceReportsListView() {
                                       تشغيل التقرير
                                     </DropdownMenuItem>
                                     <DropdownMenuItem>
-                                      <Download className="w-4 h-4 ms-2" />
+                                      <Download className="w-4 h-4 ms-2" aria-hidden="true" />
                                       تصدير
                                     </DropdownMenuItem>
                                     <DropdownMenuSeparator />
                                     <DropdownMenuItem onClick={() => navigate({ to: `/dashboard/finance/reports/new?editId=${report.reportId}` })}>
-                                      <Edit className="w-4 h-4 ms-2" />
+                                      <Edit className="w-4 h-4 ms-2" aria-hidden="true" />
                                       تعديل
                                     </DropdownMenuItem>
                                     <DropdownMenuItem className="text-red-600">
-                                      <Trash2 className="w-4 h-4 ms-2" />
+                                      <Trash2 className="w-4 h-4 ms-2" aria-hidden="true" />
                                       حذف
                                     </DropdownMenuItem>
                                   </DropdownMenuContent>
@@ -487,7 +487,7 @@ export function FinanceReportsListView() {
                                 <span>{report.reportOwner.ownerName}</span>
                                 {report.lastRunDate && (
                                   <span className="flex items-center gap-1">
-                                    <Calendar className="w-3 h-3" />
+                                    <Calendar className="w-3 h-3" aria-hidden="true" />
                                     آخر تشغيل: {new Date(report.lastRunDate).toLocaleDateString('ar-SA')}
                                   </span>
                                 )}
@@ -499,7 +499,7 @@ export function FinanceReportsListView() {
                                 className="text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 rounded-xl"
                               >
                                 عرض التفاصيل
-                                <ChevronLeft className="w-4 h-4 me-1" />
+                                <ChevronLeft className="w-4 h-4 me-1" aria-hidden="true" />
                               </Button>
                             </div>
                           </div>

@@ -529,11 +529,11 @@ export function ReportsCreateView() {
         </div>
         <div className='ms-auto flex items-center gap-4'>
           <div className="relative hidden md:block">
-            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-            <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pr-9 pl-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
+            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
+            <input type="text" placeholder="بحث..." aria-label="بحث" className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pr-9 pl-4 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
           </div>
-          <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white">
-            <Bell className="h-5 w-5" />
+          <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white" aria-label="الإشعارات">
+            <Bell className="h-5 w-5" aria-hidden="true" />
             <span className="absolute top-2 right-2 h-2 w-2 bg-red-500 rounded-full border border-navy"></span>
           </Button>
           <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white" />
@@ -579,7 +579,7 @@ export function ReportsCreateView() {
             <Card className="rounded-3xl shadow-sm border-slate-100">
               <CardHeader className="pb-4">
                 <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                  <Building2 className="w-5 h-5 text-emerald-500" />
+                  <Building2 className="w-5 h-5 text-emerald-500" aria-hidden="true" />
                   نوع المكتب
                 </CardTitle>
               </CardHeader>
@@ -939,7 +939,7 @@ export function ReportsCreateView() {
                         <Columns className="w-5 h-5 text-blue-500" />
                         أعمدة التقرير
                       </CardTitle>
-                      <ChevronDown className={cn("w-5 h-5 text-slate-400 transition-transform", openSections.includes('columns') && "rotate-180")} />
+                      <ChevronDown className={cn("w-5 h-5 text-slate-500 transition-transform", openSections.includes('columns') && "rotate-180")} />
                     </div>
                   </CardHeader>
                 </CollapsibleTrigger>
@@ -961,7 +961,7 @@ export function ReportsCreateView() {
                               onClick={() => removeColumn(index)}
                               className="text-red-500 hover:text-red-700"
                             >
-                              <Trash2 className="w-4 h-4" />
+                              <Trash2 className="w-4 h-4" aria-hidden="true" />
                             </Button>
                           </div>
                           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -1002,7 +1002,7 @@ export function ReportsCreateView() {
                       onClick={addColumn}
                       className="w-full rounded-xl"
                     >
-                      <Plus className="w-4 h-4 ms-1" />
+                      <Plus className="w-4 h-4 ms-1" aria-hidden="true" />
                       إضافة عمود
                     </Button>
                   </CardContent>
@@ -1020,7 +1020,7 @@ export function ReportsCreateView() {
                         <PieChart className="w-5 h-5 text-purple-500" />
                         الرسوم البيانية
                       </CardTitle>
-                      <ChevronDown className={cn("w-5 h-5 text-slate-400 transition-transform", openSections.includes('charts') && "rotate-180")} />
+                      <ChevronDown className={cn("w-5 h-5 text-slate-500 transition-transform", openSections.includes('charts') && "rotate-180")} />
                     </div>
                   </CardHeader>
                 </CollapsibleTrigger>
@@ -1042,7 +1042,7 @@ export function ReportsCreateView() {
                               onClick={() => removeChart(index)}
                               className="text-red-500 hover:text-red-700"
                             >
-                              <Trash2 className="w-4 h-4" />
+                              <Trash2 className="w-4 h-4" aria-hidden="true" />
                             </Button>
                           </div>
                           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -1090,7 +1090,7 @@ export function ReportsCreateView() {
                       onClick={addChart}
                       className="w-full rounded-xl"
                     >
-                      <Plus className="w-4 h-4 ms-1" />
+                      <Plus className="w-4 h-4 ms-1" aria-hidden="true" />
                       إضافة رسم بياني
                     </Button>
                   </CardContent>
@@ -1108,7 +1108,7 @@ export function ReportsCreateView() {
                         <Clock className="w-5 h-5 text-cyan-500" />
                         الجدولة
                       </CardTitle>
-                      <ChevronDown className={cn("w-5 h-5 text-slate-400 transition-transform", openSections.includes('scheduling') && "rotate-180")} />
+                      <ChevronDown className={cn("w-5 h-5 text-slate-500 transition-transform", openSections.includes('scheduling') && "rotate-180")} />
                     </div>
                   </CardHeader>
                 </CollapsibleTrigger>
@@ -1186,7 +1186,7 @@ export function ReportsCreateView() {
                         <Settings className="w-5 h-5 text-gray-500" />
                         خيارات التصدير
                       </CardTitle>
-                      <ChevronDown className={cn("w-5 h-5 text-slate-400 transition-transform", openSections.includes('export') && "rotate-180")} />
+                      <ChevronDown className={cn("w-5 h-5 text-slate-500 transition-transform", openSections.includes('export') && "rotate-180")} />
                     </div>
                   </CardHeader>
                 </CollapsibleTrigger>
@@ -1252,10 +1252,10 @@ export function ReportsCreateView() {
                   <CardHeader className="cursor-pointer hover:bg-slate-50 transition-colors rounded-t-3xl">
                     <div className="flex items-center justify-between">
                       <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                        <Eye className="w-5 h-5 text-indigo-500" />
+                        <Eye className="w-5 h-5 text-indigo-500" aria-hidden="true" />
                         سجل التدقيق
                       </CardTitle>
-                      <ChevronDown className={cn("w-5 h-5 text-slate-400 transition-transform", openSections.includes('audit') && "rotate-180")} />
+                      <ChevronDown className={cn("w-5 h-5 text-slate-500 transition-transform", openSections.includes('audit') && "rotate-180")} />
                     </div>
                   </CardHeader>
                 </CollapsibleTrigger>
@@ -1290,7 +1290,7 @@ export function ReportsCreateView() {
                         <MessageSquare className="w-5 h-5 text-gray-500" />
                         التوثيق
                       </CardTitle>
-                      <ChevronDown className={cn("w-5 h-5 text-slate-400 transition-transform", openSections.includes('documentation') && "rotate-180")} />
+                      <ChevronDown className={cn("w-5 h-5 text-slate-500 transition-transform", openSections.includes('documentation') && "rotate-180")} />
                     </div>
                   </CardHeader>
                 </CollapsibleTrigger>

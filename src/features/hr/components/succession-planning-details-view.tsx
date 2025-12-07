@@ -152,11 +152,11 @@ export function SuccessionPlanningDetailsView() {
         </div>
         <div className='ms-auto flex items-center gap-4'>
           <div className="relative hidden md:block">
-            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-            <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pr-9 pl-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
+            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
+            <input type="text" placeholder="بحث..." aria-label="بحث" className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pr-9 pl-4 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
           </div>
-          <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white">
-            <Bell className="h-5 w-5" />
+          <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white" aria-label="الإشعارات">
+            <Bell className="h-5 w-5" aria-hidden="true" />
             <span className="absolute top-2 right-2 h-2 w-2 bg-red-500 rounded-full border border-navy"></span>
           </Button>
           <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white" />
@@ -189,7 +189,7 @@ export function SuccessionPlanningDetailsView() {
             ) : error || !plan ? (
               <Card className="rounded-2xl border-slate-100">
                 <CardContent className="p-8 text-center">
-                  <AlertCircle className="w-12 h-12 mx-auto text-red-500 mb-4" />
+                  <AlertCircle className="w-12 h-12 mx-auto text-red-500 mb-4" aria-hidden="true" />
                   <p className="text-red-600">حدث خطأ في تحميل بيانات الخطة</p>
                   <Button
                     onClick={() => navigate({ to: '/dashboard/hr/succession-planning' })}
@@ -253,17 +253,17 @@ export function SuccessionPlanningDetailsView() {
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button variant="outline" size="icon" className="rounded-xl">
-                          <MoreHorizontal className="w-4 h-4" />
+                          <MoreHorizontal className="w-4 h-4" aria-hidden="true" />
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
                         <DropdownMenuItem onClick={() => navigate({ to: `/dashboard/hr/succession-planning/new?editId=${planId}` })}>
-                          <Edit className="w-4 h-4 ms-2" />
+                          <Edit className="w-4 h-4 ms-2" aria-hidden="true" />
                           تعديل
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem className="text-red-600" onClick={handleDelete}>
-                          <Trash2 className="w-4 h-4 ms-2" />
+                          <Trash2 className="w-4 h-4 ms-2" aria-hidden="true" />
                           حذف
                         </DropdownMenuItem>
                       </DropdownMenuContent>
@@ -386,7 +386,7 @@ export function SuccessionPlanningDetailsView() {
                       <Card className="rounded-2xl border-slate-100">
                         <CardHeader className="pb-4">
                           <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                            <TrendingUp className="w-5 h-5 text-blue-500" />
+                            <TrendingUp className="w-5 h-5 text-blue-500" aria-hidden="true" />
                             قوة البدلاء
                           </CardTitle>
                         </CardHeader>
@@ -734,7 +734,7 @@ export function SuccessionPlanningDetailsView() {
                               </div>
                             ) : (
                               <div className="flex items-center gap-2 text-amber-600">
-                                <AlertCircle className="w-5 h-5" />
+                                <AlertCircle className="w-5 h-5" aria-hidden="true" />
                                 <span>خطة الطوارئ غير موثقة</span>
                               </div>
                             )}
@@ -748,7 +748,7 @@ export function SuccessionPlanningDetailsView() {
                       <Card className="rounded-2xl border-slate-100">
                         <CardHeader className="pb-4">
                           <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                            <TrendingUp className="w-5 h-5 text-green-500" />
+                            <TrendingUp className="w-5 h-5 text-green-500" aria-hidden="true" />
                             المؤشرات والمقاييس
                           </CardTitle>
                         </CardHeader>
@@ -790,7 +790,7 @@ export function SuccessionPlanningDetailsView() {
                   <Card className="rounded-2xl border-slate-100">
                     <CardHeader className="pb-4">
                       <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                        <Briefcase className="w-5 h-5 text-gray-500" />
+                        <Briefcase className="w-5 h-5 text-gray-500" aria-hidden="true" />
                         ملاحظات
                       </CardTitle>
                     </CardHeader>
@@ -799,7 +799,7 @@ export function SuccessionPlanningDetailsView() {
                         {plan.notes.map((note) => (
                           <div key={note.noteId} className="p-3 bg-slate-50 rounded-xl">
                             <p className="text-slate-700">{note.content}</p>
-                            <p className="text-xs text-slate-400 mt-2">
+                            <p className="text-xs text-slate-600 mt-2">
                               {new Date(note.createdAt).toLocaleDateString('ar-SA')}
                             </p>
                           </div>

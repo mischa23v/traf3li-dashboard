@@ -260,19 +260,19 @@ export function LeaveRequestsListView() {
                     <DynamicIsland />
                 </div>
 
-                <div className='ms-auto flex items-center gap-4'>
-                    <div className="relative hidden md:block">
-                        <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                        <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pr-9 pl-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
+                <div className='ms-auto flex items-center gap-2 sm:gap-4 overflow-x-auto min-w-0'>
+                    <div className="relative hidden md:block min-w-0">
+                        <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
+                        <input type="text" placeholder="بحث..." aria-label="بحث" className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pr-9 pl-4 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
                     </div>
-                    <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white">
-                        <Bell className="h-5 w-5" />
+                    <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white flex-shrink-0" aria-label="الإشعارات">
+                        <Bell className="h-5 w-5" aria-hidden="true" />
                         <span className="absolute top-2 right-2 h-2 w-2 bg-red-500 rounded-full border border-navy"></span>
                     </Button>
-                    <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white" />
-                    <ThemeSwitch className="text-slate-300 hover:bg-white/10 hover:text-white" />
-                    <ConfigDrawer className="text-slate-300 hover:bg-white/10 hover:text-white" />
-                    <ProfileDropdown className="text-slate-300 hover:bg-white/10 hover:text-white" />
+                    <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white flex-shrink-0" />
+                    <ThemeSwitch className="text-slate-300 hover:bg-white/10 hover:text-white hidden sm:flex flex-shrink-0" />
+                    <ConfigDrawer className="text-slate-300 hover:bg-white/10 hover:text-white hidden lg:flex flex-shrink-0" />
+                    <ProfileDropdown className="text-slate-300 hover:bg-white/10 hover:text-white flex-shrink-0" />
                 </div>
                 <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-emerald-500/50 to-transparent"></div>
             </Header>
@@ -295,10 +295,10 @@ export function LeaveRequestsListView() {
                                 <div className="flex flex-wrap items-center gap-3">
                                     {/* Search Input */}
                                     <div className="relative flex-1 min-w-[200px] max-w-md">
-                                        <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                                        <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
                                         <Input
                                             type="text"
-                                            placeholder="بحث بالاسم أو الرقم..."
+                                            placeholder="بحث بالاسم أو الرقم..." aria-label="بحث بالاسم أو الرقم"
                                             value={searchQuery}
                                             onChange={(e) => setSearchQuery(e.target.value)}
                                             className="pr-10 h-10 rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500/20"
@@ -308,7 +308,7 @@ export function LeaveRequestsListView() {
                                     {/* Leave Type Filter */}
                                     <Select value={typeFilter} onValueChange={setTypeFilter}>
                                         <SelectTrigger className="w-[160px] h-10 rounded-xl border-slate-200">
-                                            <Palmtree className="h-4 w-4 ms-2 text-slate-400" />
+                                            <Palmtree className="h-4 w-4 ms-2 text-slate-500" aria-hidden="true" />
                                             <SelectValue placeholder="نوع الإجازة" />
                                         </SelectTrigger>
                                         <SelectContent>
@@ -344,7 +344,7 @@ export function LeaveRequestsListView() {
                                     {/* Sort By */}
                                     <Select value={sortBy} onValueChange={setSortBy}>
                                         <SelectTrigger className="w-[160px] h-10 rounded-xl border-slate-200">
-                                            <SortAsc className="h-4 w-4 ms-2 text-slate-400" />
+                                            <SortAsc className="h-4 w-4 ms-2 text-slate-500" aria-hidden="true" />
                                             <SelectValue placeholder="ترتيب حسب" />
                                         </SelectTrigger>
                                         <SelectContent>
@@ -363,7 +363,7 @@ export function LeaveRequestsListView() {
                                             onClick={clearFilters}
                                             className="h-10 px-4 text-red-500 hover:text-red-600 hover:bg-red-50 rounded-xl"
                                         >
-                                            <X className="h-4 w-4 ms-2" />
+                                            <X className="h-4 w-4 ms-2" aria-hidden="true" />
                                             مسح الفلاتر
                                         </Button>
                                     )}
@@ -381,7 +381,7 @@ export function LeaveRequestsListView() {
                                     </Badge>
                                     <Button asChild className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl">
                                         <Link to="/dashboard/hr/leave/new">
-                                            <Plus className="w-4 h-4 ms-2" />
+                                            <Plus className="w-4 h-4 ms-2" aria-hidden="true" />
                                             طلب إجازة
                                         </Link>
                                     </Button>
@@ -412,7 +412,7 @@ export function LeaveRequestsListView() {
                                     <div className="bg-white rounded-2xl p-12 border border-slate-100 text-center">
                                         <div className="flex justify-center mb-4">
                                             <div className="w-16 h-16 rounded-full bg-red-50 flex items-center justify-center">
-                                                <AlertCircle className="w-8 h-8 text-red-500" />
+                                                <AlertCircle className="w-8 h-8 text-red-500" aria-hidden="true" />
                                             </div>
                                         </div>
                                         <h3 className="text-lg font-bold text-slate-900 mb-2">حدث خطأ أثناء تحميل الطلبات</h3>
@@ -428,14 +428,14 @@ export function LeaveRequestsListView() {
                                     <div className="bg-white rounded-2xl p-12 border border-slate-100 text-center">
                                         <div className="flex justify-center mb-4">
                                             <div className="w-16 h-16 rounded-full bg-emerald-50 flex items-center justify-center">
-                                                <Palmtree className="w-8 h-8 text-emerald-500" />
+                                                <Palmtree className="w-8 h-8 text-emerald-500" aria-hidden="true" />
                                             </div>
                                         </div>
                                         <h3 className="text-lg font-bold text-slate-900 mb-2">لا توجد طلبات إجازة</h3>
                                         <p className="text-slate-500 mb-4">قدم طلب إجازة جديد للبدء</p>
                                         <Button asChild className="bg-emerald-500 hover:bg-emerald-600">
                                             <Link to="/dashboard/hr/leave/new">
-                                                <Plus className="w-4 h-4 ms-2" />
+                                                <Plus className="w-4 h-4 ms-2" aria-hidden="true" />
                                                 طلب إجازة
                                             </Link>
                                         </Button>
@@ -470,18 +470,18 @@ export function LeaveRequestsListView() {
                                             </div>
                                             <DropdownMenu>
                                                 <DropdownMenuTrigger asChild>
-                                                    <Button variant="ghost" size="icon" className="text-slate-400 hover:text-navy">
-                                                        <MoreHorizontal className="h-5 w-5" />
+                                                    <Button variant="ghost" size="icon" className="text-slate-500 hover:text-navy" aria-label="خيارات">
+                                                        <MoreHorizontal className="h-5 w-5" aria-hidden="true" />
                                                     </Button>
                                                 </DropdownMenuTrigger>
                                                 <DropdownMenuContent align="end" className="w-48">
                                                     <DropdownMenuItem onClick={() => handleViewRequest(request._id)}>
-                                                        <Eye className="h-4 w-4 ms-2" />
+                                                        <Eye className="h-4 w-4 ms-2" aria-hidden="true" />
                                                         عرض التفاصيل
                                                     </DropdownMenuItem>
                                                     {request.status === 'draft' && (
                                                         <DropdownMenuItem onClick={() => handleEditRequest(request._id)}>
-                                                            <Edit3 className="h-4 w-4 ms-2 text-blue-500" />
+                                                            <Edit3 className="h-4 w-4 ms-2 text-blue-500" aria-hidden="true" />
                                                             تعديل
                                                         </DropdownMenuItem>
                                                     )}
@@ -491,7 +491,7 @@ export function LeaveRequestsListView() {
                                                             onClick={() => handleDeleteRequest(request._id)}
                                                             className="text-red-600 focus:text-red-600"
                                                         >
-                                                            <Trash2 className="h-4 w-4 ms-2" />
+                                                            <Trash2 className="h-4 w-4 ms-2" aria-hidden="true" />
                                                             حذف
                                                         </DropdownMenuItem>
                                                     )}
@@ -501,25 +501,25 @@ export function LeaveRequestsListView() {
 
                                         <div className="grid grid-cols-4 gap-4 pt-4 border-t border-slate-200/50">
                                             <div className="text-center">
-                                                <div className="text-xs text-slate-400 mb-1">تاريخ البدء</div>
+                                                <div className="text-xs text-slate-600 mb-1">تاريخ البدء</div>
                                                 <div className="font-medium text-navy text-sm">
                                                     {new Date(request.dates.startDate).toLocaleDateString('ar-SA')}
                                                 </div>
                                             </div>
                                             <div className="text-center">
-                                                <div className="text-xs text-slate-400 mb-1">تاريخ الانتهاء</div>
+                                                <div className="text-xs text-slate-600 mb-1">تاريخ الانتهاء</div>
                                                 <div className="font-medium text-navy text-sm">
                                                     {new Date(request.dates.endDate).toLocaleDateString('ar-SA')}
                                                 </div>
                                             </div>
                                             <div className="text-center">
-                                                <div className="text-xs text-slate-400 mb-1">عدد الأيام</div>
+                                                <div className="text-xs text-slate-600 mb-1">عدد الأيام</div>
                                                 <div className="font-bold text-emerald-600 text-lg">
                                                     {request.dates.totalDays}
                                                 </div>
                                             </div>
                                             <div className="text-center">
-                                                <div className="text-xs text-slate-400 mb-1">الرصيد المتبقي</div>
+                                                <div className="text-xs text-slate-600 mb-1">الرصيد المتبقي</div>
                                                 <div className="font-medium text-navy text-sm">
                                                     {request.balanceAfter} يوم
                                                 </div>
@@ -548,7 +548,7 @@ export function LeaveRequestsListView() {
                             <div className="p-4 pt-0 text-center">
                                 <Button variant="ghost" className="text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 w-full rounded-xl py-6">
                                     عرض جميع الطلبات
-                                    <ChevronLeft className="h-4 w-4 me-2" />
+                                    <ChevronLeft className="h-4 w-4 me-2" aria-hidden="true" />
                                 </Button>
                             </div>
                         </div>

@@ -135,11 +135,11 @@ export function PayrollDetailsView() {
 
                 <div className='ms-auto flex items-center gap-4'>
                     <div className="relative hidden md:block">
-                        <Search className="absolute end-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                        <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
+                        <Search className="absolute end-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
+                        <input type="text" placeholder="بحث..." aria-label="بحث" className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
                     </div>
-                    <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white">
-                        <Bell className="h-5 w-5" />
+                    <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white" aria-label="الإشعارات">
+                        <Bell className="h-5 w-5" aria-hidden="true" />
                         <span className="absolute top-2 end-2 h-2 w-2 bg-red-500 rounded-full border border-navy"></span>
                     </Button>
                     <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white" />
@@ -172,7 +172,7 @@ export function PayrollDetailsView() {
                     <div className="bg-white rounded-2xl p-12 border border-slate-100 text-center">
                         <div className="flex justify-center mb-4">
                             <div className="w-16 h-16 rounded-full bg-red-50 flex items-center justify-center">
-                                <AlertCircle className="w-8 h-8 text-red-500" />
+                                <AlertCircle className="w-8 h-8 text-red-500" aria-hidden="true" />
                             </div>
                         </div>
                         <h3 className="text-lg font-bold text-slate-900 mb-2">حدث خطأ أثناء تحميل بيانات القسيمة</h3>
@@ -258,7 +258,7 @@ export function PayrollDetailsView() {
                                                                     {getStatusBadge(slipData.payment.status)}
                                                                 </div>
                                                                 <p className="text-lg text-slate-600">{slipData.jobTitle}</p>
-                                                                <p className="text-sm text-slate-400 mt-1">
+                                                                <p className="text-sm text-slate-600 mt-1">
                                                                     رقم القسيمة: {slipData.slipNumber} • {slipData.employeeNumber}
                                                                 </p>
                                                             </div>
@@ -271,7 +271,7 @@ export function PayrollDetailsView() {
                                                     <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
                                                         <CardHeader className="pb-3">
                                                             <CardTitle className="text-base font-bold text-navy flex items-center gap-2">
-                                                                <Calendar className="w-4 h-4 text-blue-600" />
+                                                                <Calendar className="w-4 h-4 text-blue-600" aria-hidden="true" />
                                                                 فترة الراتب
                                                             </CardTitle>
                                                         </CardHeader>
@@ -324,7 +324,7 @@ export function PayrollDetailsView() {
                                                     <CardContent className="p-6">
                                                         <div className="grid grid-cols-3 gap-6 text-center">
                                                             <div className="bg-emerald-50 rounded-xl p-4">
-                                                                <TrendingUp className="w-6 h-6 text-emerald-600 mx-auto mb-2" />
+                                                                <TrendingUp className="w-6 h-6 text-emerald-600 mx-auto mb-2" aria-hidden="true" />
                                                                 <div className="text-2xl font-bold text-emerald-700">
                                                                     {formatCurrency(slipData.earnings.totalEarnings)}
                                                                 </div>
@@ -368,7 +368,7 @@ export function PayrollDetailsView() {
                                                 <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
                                                     <CardHeader className="pb-3">
                                                         <CardTitle className="text-base font-bold text-navy flex items-center gap-2">
-                                                            <Building2 className="w-4 h-4 text-blue-600" />
+                                                            <Building2 className="w-4 h-4 text-blue-600" aria-hidden="true" />
                                                             البدلات
                                                         </CardTitle>
                                                     </CardHeader>
@@ -380,7 +380,7 @@ export function PayrollDetailsView() {
                                                             </div>
                                                         ))}
                                                         {(!slipData.earnings.allowances || slipData.earnings.allowances.length === 0) && (
-                                                            <p className="text-slate-400 text-center py-4">لا توجد بدلات</p>
+                                                            <p className="text-slate-500 text-center py-4">لا توجد بدلات</p>
                                                         )}
                                                         <div className="flex justify-between text-sm font-bold pt-2 border-t border-slate-200">
                                                             <span>إجمالي البدلات</span>
@@ -433,7 +433,7 @@ export function PayrollDetailsView() {
                                                 <Card className="border-none shadow-sm bg-blue-50 rounded-2xl overflow-hidden border border-blue-100">
                                                     <CardHeader className="pb-3">
                                                         <CardTitle className="text-base font-bold text-blue-800 flex items-center gap-2">
-                                                            <AlertCircle className="w-4 h-4" />
+                                                            <AlertCircle className="w-4 h-4" aria-hidden="true" />
                                                             التأمينات الاجتماعية (GOSI)
                                                         </CardTitle>
                                                     </CardHeader>
@@ -637,7 +637,7 @@ export function PayrollDetailsView() {
                                 {deleteSlipMutation.isPending ? (
                                     <Loader2 className="h-4 w-4 animate-spin ms-2" />
                                 ) : (
-                                    <Trash2 className="h-4 w-4 ms-2" />
+                                    <Trash2 className="h-4 w-4 ms-2" aria-hidden="true" />
                                 )}
                                 حذف القسيمة
                             </Button>

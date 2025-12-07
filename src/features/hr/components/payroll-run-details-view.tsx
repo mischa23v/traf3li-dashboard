@@ -115,7 +115,7 @@ export function PayrollRunDetailsView() {
         }
         const icons: Record<PayrollRunStatus, React.ReactNode> = {
             draft: <FileText className="w-3 h-3" />,
-            calculating: <RefreshCw className="w-3 h-3 animate-spin" />,
+            calculating: <RefreshCw className="w-3 h-3 animate-spin" aria-hidden="true" />,
             calculated: <CheckCircle className="w-3 h-3" />,
             approved: <CheckCircle className="w-3 h-3" />,
             processing_payment: <Clock className="w-3 h-3" />,
@@ -252,7 +252,7 @@ export function PayrollRunDetailsView() {
                 </Header>
                 <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8">
                     <div className="bg-white rounded-2xl p-12 text-center">
-                        <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
+                        <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" aria-hidden="true" />
                         <h2 className="text-xl font-bold text-slate-900 mb-2">لم يتم العثور على الدورة</h2>
                         <p className="text-slate-500 mb-4">{error?.message || 'حدث خطأ أثناء تحميل بيانات الدورة'}</p>
                         <Button onClick={() => navigate({ to: '/dashboard/hr/payroll-runs' })} className="bg-emerald-500 hover:bg-emerald-600">
@@ -281,11 +281,11 @@ export function PayrollRunDetailsView() {
 
                 <div className='ms-auto flex items-center gap-4'>
                     <div className="relative hidden md:block">
-                        <Search className="absolute end-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                        <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
+                        <Search className="absolute end-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
+                        <input type="text" placeholder="بحث..." aria-label="بحث" className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
                     </div>
-                    <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white">
-                        <Bell className="h-5 w-5" />
+                    <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white" aria-label="الإشعارات">
+                        <Bell className="h-5 w-5" aria-hidden="true" />
                     </Button>
                     <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white" />
                     <ThemeSwitch className="text-slate-300 hover:bg-white/10 hover:text-white" />
@@ -385,12 +385,12 @@ export function PayrollRunDetailsView() {
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                                 <Button variant="outline" size="icon" className="rounded-xl">
-                                    <MoreHorizontal className="h-5 w-5" />
+                                    <MoreHorizontal className="h-5 w-5" aria-hidden="true" />
                                 </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end" className="w-48">
                                 <DropdownMenuItem>
-                                    <Download className="h-4 w-4 ms-2" />
+                                    <Download className="h-4 w-4 ms-2" aria-hidden="true" />
                                     تصدير التقرير
                                 </DropdownMenuItem>
                                 <DropdownMenuItem>
@@ -523,7 +523,7 @@ export function PayrollRunDetailsView() {
                             <Card className="border-none shadow-sm bg-white rounded-2xl">
                                 <CardHeader className="pb-3">
                                     <CardTitle className="text-base font-bold text-navy flex items-center gap-2">
-                                        <Calendar className="w-4 h-4 text-emerald-600" />
+                                        <Calendar className="w-4 h-4 text-emerald-600" aria-hidden="true" />
                                         معلومات الفترة
                                     </CardTitle>
                                 </CardHeader>
@@ -657,7 +657,7 @@ export function PayrollRunDetailsView() {
                             <Card className="border-none shadow-sm bg-white rounded-2xl">
                                 <CardHeader className="pb-3">
                                     <CardTitle className="text-base font-bold text-navy flex items-center gap-2">
-                                        <TrendingUp className="w-4 h-4 text-emerald-600" />
+                                        <TrendingUp className="w-4 h-4 text-emerald-600" aria-hidden="true" />
                                         مقارنة مع الدورة السابقة
                                     </CardTitle>
                                 </CardHeader>
@@ -666,21 +666,21 @@ export function PayrollRunDetailsView() {
                                         <div className="text-center">
                                             <div className="text-sm text-slate-500 mb-2">تغيير عدد الموظفين</div>
                                             <div className={`text-lg font-bold flex items-center justify-center gap-1 ${run.comparison.employeeCountChange >= 0 ? 'text-emerald-600' : 'text-red-600'}`}>
-                                                {run.comparison.employeeCountChange >= 0 ? <TrendingUp className="w-4 h-4" /> : <TrendingDown className="w-4 h-4" />}
+                                                {run.comparison.employeeCountChange >= 0 ? <TrendingUp className="w-4 h-4" aria-hidden="true" /> : <TrendingDown className="w-4 h-4" />}
                                                 {run.comparison.employeeCountChange > 0 ? '+' : ''}{run.comparison.employeeCountChange}
                                             </div>
                                         </div>
                                         <div className="text-center">
                                             <div className="text-sm text-slate-500 mb-2">تغيير إجمالي الرواتب</div>
                                             <div className={`text-lg font-bold flex items-center justify-center gap-1 ${run.comparison.grossPayChange >= 0 ? 'text-emerald-600' : 'text-red-600'}`}>
-                                                {run.comparison.grossPayChange >= 0 ? <TrendingUp className="w-4 h-4" /> : <TrendingDown className="w-4 h-4" />}
+                                                {run.comparison.grossPayChange >= 0 ? <TrendingUp className="w-4 h-4" aria-hidden="true" /> : <TrendingDown className="w-4 h-4" />}
                                                 {run.comparison.grossPayChangePercentage.toFixed(1)}%
                                             </div>
                                         </div>
                                         <div className="text-center">
                                             <div className="text-sm text-slate-500 mb-2">تغيير صافي الرواتب</div>
                                             <div className={`text-lg font-bold flex items-center justify-center gap-1 ${run.comparison.netPayChange >= 0 ? 'text-emerald-600' : 'text-red-600'}`}>
-                                                {run.comparison.netPayChange >= 0 ? <TrendingUp className="w-4 h-4" /> : <TrendingDown className="w-4 h-4" />}
+                                                {run.comparison.netPayChange >= 0 ? <TrendingUp className="w-4 h-4" aria-hidden="true" /> : <TrendingDown className="w-4 h-4" />}
                                                 {run.comparison.netPayChangePercentage.toFixed(1)}%
                                             </div>
                                         </div>
@@ -745,19 +745,19 @@ export function PayrollRunDetailsView() {
                                                 </div>
                                                 <div className="flex items-center gap-6">
                                                     <div className="text-start">
-                                                        <div className="text-xs text-slate-400">إجمالي</div>
+                                                        <div className="text-xs text-slate-600">إجمالي</div>
                                                         <div className="font-medium text-navy">{formatCurrency(employee.earnings.grossPay)}</div>
                                                     </div>
                                                     <div className="text-start">
-                                                        <div className="text-xs text-slate-400">خصومات</div>
+                                                        <div className="text-xs text-slate-600">خصومات</div>
                                                         <div className="font-medium text-red-600">{formatCurrency(employee.deductions.totalDeductions)}</div>
                                                     </div>
                                                     <div className="text-start">
-                                                        <div className="text-xs text-slate-400">صافي</div>
+                                                        <div className="text-xs text-slate-600">صافي</div>
                                                         <div className="font-bold text-emerald-600">{formatCurrency(employee.netPay)}</div>
                                                     </div>
                                                     <Button variant="ghost" size="icon" className="rounded-lg">
-                                                        <Eye className="w-4 h-4" />
+                                                        <Eye className="w-4 h-4" aria-hidden="true" />
                                                     </Button>
                                                 </div>
                                             </div>
@@ -776,7 +776,7 @@ export function PayrollRunDetailsView() {
                                 <Card className="border-none shadow-sm bg-white rounded-2xl">
                                     <CardHeader className="pb-3">
                                         <CardTitle className="text-base font-bold text-navy flex items-center gap-2">
-                                            <TrendingUp className="w-4 h-4 text-emerald-600" />
+                                            <TrendingUp className="w-4 h-4 text-emerald-600" aria-hidden="true" />
                                             تفاصيل الأرباح
                                         </CardTitle>
                                     </CardHeader>
@@ -859,7 +859,7 @@ export function PayrollRunDetailsView() {
                                                         <div className="text-lg font-bold text-navy">
                                                             {formatCurrency(run.financialBreakdown.deductions.loans.totalLoanRepayments)}
                                                         </div>
-                                                        <div className="text-xs text-slate-400">
+                                                        <div className="text-xs text-slate-600">
                                                             {run.financialBreakdown.deductions.loans.employeesWithLoans} موظف
                                                         </div>
                                                     </div>
@@ -947,7 +947,7 @@ export function PayrollRunDetailsView() {
                                     <Card className="border-none shadow-sm bg-white rounded-2xl">
                                         <CardHeader className="pb-3">
                                             <CardTitle className="text-base font-bold text-navy flex items-center gap-2">
-                                                <Building2 className="w-4 h-4 text-emerald-600" />
+                                                <Building2 className="w-4 h-4 text-emerald-600" aria-hidden="true" />
                                                 حسب القسم
                                             </CardTitle>
                                         </CardHeader>
@@ -961,15 +961,15 @@ export function PayrollRunDetailsView() {
                                                         </div>
                                                         <div className="flex items-center gap-6 text-start">
                                                             <div>
-                                                                <div className="text-xs text-slate-400">إجمالي</div>
+                                                                <div className="text-xs text-slate-600">إجمالي</div>
                                                                 <div className="font-medium">{formatCurrency(dept.totalGrossPay)}</div>
                                                             </div>
                                                             <div>
-                                                                <div className="text-xs text-slate-400">صافي</div>
+                                                                <div className="text-xs text-slate-600">صافي</div>
                                                                 <div className="font-medium text-emerald-600">{formatCurrency(dept.totalNetPay)}</div>
                                                             </div>
                                                             <div className="w-16">
-                                                                <div className="text-xs text-slate-400">نسبة</div>
+                                                                <div className="text-xs text-slate-600">نسبة</div>
                                                                 <div className="font-bold text-navy">{dept.percentOfTotalPayroll.toFixed(1)}%</div>
                                                             </div>
                                                         </div>
@@ -1007,7 +1007,7 @@ export function PayrollRunDetailsView() {
                                                              method.paymentMethod === 'cash' ? 'نقداً' : 'شيك'}
                                                         </div>
                                                         <div className="text-lg font-bold text-navy">{method.employeeCount}</div>
-                                                        <div className="text-sm text-slate-400">موظف</div>
+                                                        <div className="text-sm text-slate-600">موظف</div>
                                                         <div className="mt-2 pt-2 border-t">
                                                             <div className="text-emerald-600 font-medium">{formatCurrency(method.totalAmount)}</div>
                                                         </div>
@@ -1020,7 +1020,7 @@ export function PayrollRunDetailsView() {
                             </>
                         ) : (
                             <div className="text-center py-12 bg-white rounded-2xl">
-                                <Building2 className="w-16 h-16 text-slate-300 mx-auto mb-4" />
+                                <Building2 className="w-16 h-16 text-slate-300 mx-auto mb-4" aria-hidden="true" />
                                 <h3 className="text-lg font-bold text-slate-700 mb-2">لا توجد بيانات توزيع</h3>
                                 <p className="text-slate-500">قم بحساب الرواتب لعرض التوزيع</p>
                             </div>
@@ -1070,7 +1070,7 @@ export function PayrollRunDetailsView() {
                                     {run.wps.sifFile.generated && (
                                         <div className="flex gap-3">
                                             <Button variant="outline" className="rounded-xl">
-                                                <Download className="w-4 h-4 ms-2" />
+                                                <Download className="w-4 h-4 ms-2" aria-hidden="true" />
                                                 تحميل ملف SIF
                                             </Button>
                                         </div>

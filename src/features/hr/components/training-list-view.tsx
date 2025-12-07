@@ -110,14 +110,14 @@ export function TrainingListView() {
 
   const getTypeIcon = (type: TrainingType) => {
     const icons: Record<TrainingType, React.ReactNode> = {
-      internal: <Building2 className="w-4 h-4" />,
+      internal: <Building2 className="w-4 h-4" aria-hidden="true" />,
       external: <Users className="w-4 h-4" />,
       online: <Monitor className="w-4 h-4" />,
       certification: <Award className="w-4 h-4" />,
       conference: <Users className="w-4 h-4" />,
       workshop: <BookOpen className="w-4 h-4" />,
       mentoring: <Users className="w-4 h-4" />,
-      on_the_job: <Building2 className="w-4 h-4" />,
+      on_the_job: <Building2 className="w-4 h-4" aria-hidden="true" />,
     }
     return icons[type]
   }
@@ -135,19 +135,19 @@ export function TrainingListView() {
         <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
           <DynamicIsland />
         </div>
-        <div className='ms-auto flex items-center gap-4'>
-          <div className="relative hidden md:block">
-            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-            <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pr-9 pl-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
+        <div className='ms-auto flex items-center gap-2 sm:gap-4 overflow-x-auto min-w-0'>
+          <div className="relative hidden md:block min-w-0">
+            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
+            <input type="text" placeholder="بحث..." aria-label="بحث" className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pr-9 pl-4 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
           </div>
-          <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white">
-            <Bell className="h-5 w-5" />
+          <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white flex-shrink-0" aria-label="الإشعارات">
+            <Bell className="h-5 w-5" aria-hidden="true" />
             <span className="absolute top-2 right-2 h-2 w-2 bg-red-500 rounded-full border border-navy"></span>
           </Button>
-          <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white" />
-          <ThemeSwitch className="text-slate-300 hover:bg-white/10 hover:text-white" />
-          <ConfigDrawer className="text-slate-300 hover:bg-white/10 hover:text-white" />
-          <ProfileDropdown className="text-slate-300 hover:bg-white/10 hover:text-white" />
+          <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white flex-shrink-0" />
+          <ThemeSwitch className="text-slate-300 hover:bg-white/10 hover:text-white hidden sm:flex flex-shrink-0" />
+          <ConfigDrawer className="text-slate-300 hover:bg-white/10 hover:text-white hidden lg:flex flex-shrink-0" />
+          <ProfileDropdown className="text-slate-300 hover:bg-white/10 hover:text-white flex-shrink-0" />
         </div>
         <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-emerald-500/50 to-transparent"></div>
       </Header>
@@ -207,7 +207,7 @@ export function TrainingListView() {
                 <CardContent className="p-4">
                   <div className="flex items-center gap-3">
                     <div className="p-2 bg-purple-100 rounded-xl">
-                      <TrendingUp className="w-5 h-5 text-purple-600" />
+                      <TrendingUp className="w-5 h-5 text-purple-600" aria-hidden="true" />
                     </div>
                     <div>
                       <p className="text-xs text-slate-500">معدل الإكمال</p>
@@ -244,7 +244,7 @@ export function TrainingListView() {
                 <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
                   <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
                     <div className="relative flex-1 md:w-56">
-                      <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                      <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
                       <Input
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
@@ -284,7 +284,7 @@ export function TrainingListView() {
                         onClick={handleBulkDelete}
                         className="rounded-xl"
                       >
-                        <Trash2 className="w-4 h-4 ms-1" />
+                        <Trash2 className="w-4 h-4 ms-1" aria-hidden="true" />
                         حذف ({selectedIds.length})
                       </Button>
                     )}
@@ -304,7 +304,7 @@ export function TrainingListView() {
                       onClick={() => navigate({ to: '/dashboard/hr/training/new' })}
                       className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl shadow-lg shadow-emerald-500/20"
                     >
-                      <Plus className="w-4 h-4 ms-1" />
+                      <Plus className="w-4 h-4 ms-1" aria-hidden="true" />
                       تدريب جديد
                     </Button>
                   </div>
@@ -336,7 +336,7 @@ export function TrainingListView() {
             ) : error ? (
               <Card className="rounded-2xl border-slate-100">
                 <CardContent className="p-8 text-center">
-                  <AlertCircle className="w-8 h-8 mx-auto text-red-500" />
+                  <AlertCircle className="w-8 h-8 mx-auto text-red-500" aria-hidden="true" />
                   <p className="mt-4 text-red-600">حدث خطأ في تحميل البيانات</p>
                 </CardContent>
               </Card>
@@ -349,7 +349,7 @@ export function TrainingListView() {
                     onClick={() => navigate({ to: '/dashboard/hr/training/new' })}
                     className="mt-4 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl"
                   >
-                    <Plus className="w-4 h-4 ms-1" />
+                    <Plus className="w-4 h-4 ms-1" aria-hidden="true" />
                     إضافة تدريب جديد
                   </Button>
                 </CardContent>
@@ -396,22 +396,22 @@ export function TrainingListView() {
                               </Badge>
                               <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
-                                  <Button variant="ghost" size="icon" className="rounded-xl">
-                                    <MoreHorizontal className="w-4 h-4" />
+                                  <Button variant="ghost" size="icon" className="rounded-xl" aria-label="خيارات">
+                                    <MoreHorizontal className="w-4 h-4" aria-hidden="true" />
                                   </Button>
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="end">
                                   <DropdownMenuItem onClick={() => navigate({ to: `/dashboard/hr/training/${training._id}` })}>
-                                    <Eye className="w-4 h-4 ms-2" />
+                                    <Eye className="w-4 h-4 ms-2" aria-hidden="true" />
                                     عرض التفاصيل
                                   </DropdownMenuItem>
                                   <DropdownMenuItem onClick={() => navigate({ to: `/dashboard/hr/training/new?editId=${training._id}` })}>
-                                    <Edit className="w-4 h-4 ms-2" />
+                                    <Edit className="w-4 h-4 ms-2" aria-hidden="true" />
                                     تعديل
                                   </DropdownMenuItem>
                                   <DropdownMenuSeparator />
                                   <DropdownMenuItem className="text-red-600">
-                                    <Trash2 className="w-4 h-4 ms-2" />
+                                    <Trash2 className="w-4 h-4 ms-2" aria-hidden="true" />
                                     حذف
                                   </DropdownMenuItem>
                                 </DropdownMenuContent>
@@ -466,7 +466,7 @@ export function TrainingListView() {
                           <div className="flex items-center justify-between mt-4 pt-3 border-t border-slate-100">
                             <div className="flex items-center gap-4 text-xs text-slate-500">
                               <span className="flex items-center gap-1">
-                                <Calendar className="w-3 h-3" />
+                                <Calendar className="w-3 h-3" aria-hidden="true" />
                                 {new Date(training.startDate).toLocaleDateString('ar-SA')} - {new Date(training.endDate).toLocaleDateString('ar-SA')}
                               </span>
                               {training.costs?.totalCost && (
