@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 
 // ============================================
 // SVG ICONS
@@ -190,6 +191,9 @@ function OTPInput({ value, onChange, error, disabled }: { value: string; onChang
 // MAIN COMPONENT
 // ============================================
 export function ForgotPassword() {
+  const { t, i18n } = useTranslation();
+  const isRtl = i18n.language === 'ar';
+
   // Steps: 'email' | 'otp' | 'newPassword' | 'success'
   const [step, setStep] = useState('email');
   const [isLoading, setIsLoading] = useState(false);
@@ -230,9 +234,9 @@ export function ForgotPassword() {
 
     const newErrors: Record<string, string> = {};
     if (!email.trim()) {
-      newErrors.email = 'الحقل مطلوب';
+      newErrors.email = t('forgotPassword.errors.fieldRequired');
     } else if (!validateEmail(email)) {
-      newErrors.email = 'البريد الإلكتروني غير صحيح';
+      newErrors.email = t('forgotPassword.errors.invalidEmail');
     }
 
     if (Object.keys(newErrors).length > 0) {
@@ -251,7 +255,7 @@ export function ForgotPassword() {
       setResendTimer(60);
       setCanResend(false);
     } catch (error) {
-      setApiError('حدث خطأ، يرجى المحاولة مرة أخرى');
+      setApiError(t('forgotPassword.errors.genericError'));
     } finally {
       setIsLoading(false);
     }
@@ -262,7 +266,7 @@ export function ForgotPassword() {
     e.preventDefault();
 
     if (otp.length !== 6) {
-      setOtpError('يرجى إدخال رمز التحقق المكون من 6 أرقام');
+      setOtpError(t('forgotPassword.errors.otpRequired'));
       return;
     }
 
@@ -276,11 +280,11 @@ export function ForgotPassword() {
       if (otp === '123456') {
         setStep('newPassword');
       } else {
-        setOtpError('رمز التحقق غير صحيح');
+        setOtpError(t('forgotPassword.errors.invalidOtp'));
         setTimeout(() => setOtp(''), 500);
       }
     } catch (err) {
-      setOtpError('حدث خطأ، يرجى المحاولة مرة أخرى');
+      setOtpError(t('forgotPassword.errors.genericError'));
     } finally {
       setIsLoading(false);
     }
@@ -292,15 +296,15 @@ export function ForgotPassword() {
 
     const newErrors: Record<string, string> = {};
     if (!newPassword) {
-      newErrors.newPassword = 'الحقل مطلوب';
+      newErrors.newPassword = t('forgotPassword.errors.fieldRequired');
     } else if (newPassword.length < 8) {
-      newErrors.newPassword = 'يجب أن تكون مكونة من 8 خانات على الأقل';
+      newErrors.newPassword = t('forgotPassword.errors.passwordTooShort');
     }
 
     if (!confirmPassword) {
-      newErrors.confirmPassword = 'الحقل مطلوب';
+      newErrors.confirmPassword = t('forgotPassword.errors.fieldRequired');
     } else if (newPassword !== confirmPassword) {
-      newErrors.confirmPassword = 'كلمة المرور غير متطابقة';
+      newErrors.confirmPassword = t('forgotPassword.errors.passwordMismatch');
     }
 
     if (Object.keys(newErrors).length > 0) {
@@ -314,7 +318,7 @@ export function ForgotPassword() {
       await new Promise(resolve => setTimeout(resolve, 1500));
       setStep('success');
     } catch (error) {
-      setApiError('حدث خطأ، يرجى المحاولة مرة أخرى');
+      setApiError(t('forgotPassword.errors.genericError'));
     } finally {
       setIsLoading(false);
     }
@@ -335,7 +339,7 @@ export function ForgotPassword() {
   // ============================================
   if (step === 'success') {
     return (
-      <div className="min-h-screen bg-[#F8F9FA]" dir="rtl" style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}>
+      <div className="min-h-screen bg-[#F8F9FA]" dir={isRtl ? 'rtl' : 'ltr'} style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}>
         <div className="min-h-screen flex items-center justify-center p-6">
           <div className="w-full max-w-md text-center">
             <div className="bg-white rounded-3xl shadow-sm border border-slate-100 p-10">
@@ -343,16 +347,16 @@ export function ForgotPassword() {
                 <Icons.CheckCircle />
               </div>
 
-              <h1 className="text-2xl font-bold text-[#0f172a] mb-3">تم تغيير كلمة المرور بنجاح</h1>
+              <h1 className="text-2xl font-bold text-[#0f172a] mb-3">{t('forgotPassword.success.title')}</h1>
               <p className="text-slate-500 mb-8">
-                يمكنك الآن تسجيل الدخول باستخدام كلمة المرور الجديدة
+                {t('forgotPassword.success.description')}
               </p>
 
               <button
                 onClick={() => window.location.href = '/sign-in'}
                 className="w-full py-4 rounded-xl bg-emerald-500 text-white font-bold hover:bg-emerald-600 transition-all shadow-lg shadow-emerald-500/20"
               >
-                تسجيل الدخول
+                {t('forgotPassword.success.signIn')}
               </button>
             </div>
           </div>
@@ -373,7 +377,7 @@ export function ForgotPassword() {
   // ============================================
   if (step === 'newPassword') {
     return (
-      <div className="min-h-screen bg-[#F8F9FA]" dir="rtl" style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}>
+      <div className="min-h-screen bg-[#F8F9FA]" dir={isRtl ? 'rtl' : 'ltr'} style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}>
         <div className="min-h-screen flex items-center justify-center p-6">
           <div className="w-full max-w-md">
             {/* Header */}
@@ -381,8 +385,8 @@ export function ForgotPassword() {
               <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-[#F8F9FA] text-[#0f172a] mb-6">
                 <Icons.TrafliLogo />
               </div>
-              <h1 className="text-3xl font-bold text-[#0f172a] mb-2">كلمة المرور الجديدة</h1>
-              <p className="text-slate-500 text-lg">أدخل كلمة المرور الجديدة لحسابك</p>
+              <h1 className="text-3xl font-bold text-[#0f172a] mb-2">{t('forgotPassword.newPassword.title')}</h1>
+              <p className="text-slate-500 text-lg">{t('forgotPassword.newPassword.subtitle')}</p>
             </div>
 
             {/* Card */}
@@ -399,7 +403,7 @@ export function ForgotPassword() {
                 {/* New Password */}
                 <div>
                   <label className="block text-sm font-medium text-[#0f172a] mb-2">
-                    كلمة المرور الجديدة <span className="text-red-500">*</span>
+                    {t('forgotPassword.newPassword.newPasswordLabel')} <span className="text-red-500">*</span>
                   </label>
                   <div className="relative">
                     <div className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400">
@@ -433,7 +437,7 @@ export function ForgotPassword() {
                 {/* Confirm Password */}
                 <div>
                   <label className="block text-sm font-medium text-[#0f172a] mb-2">
-                    تأكيد كلمة المرور <span className="text-red-500">*</span>
+                    {t('forgotPassword.newPassword.confirmLabel')} <span className="text-red-500">*</span>
                   </label>
                   <div className="relative">
                     <div className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400">
@@ -473,10 +477,10 @@ export function ForgotPassword() {
                   {isLoading ? (
                     <>
                       <Icons.Spinner />
-                      جارٍ الحفظ...
+                      {t('forgotPassword.newPassword.saving')}
                     </>
                   ) : (
-                    'حفظ كلمة المرور'
+                    t('forgotPassword.newPassword.save')
                   )}
                 </button>
               </form>
@@ -492,7 +496,7 @@ export function ForgotPassword() {
   // ============================================
   if (step === 'otp') {
     return (
-      <div className="min-h-screen bg-[#F8F9FA]" dir="rtl" style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}>
+      <div className="min-h-screen bg-[#F8F9FA]" dir={isRtl ? 'rtl' : 'ltr'} style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}>
         <div className="min-h-screen flex items-center justify-center p-6">
           <div className="w-full max-w-md">
             {/* Header */}
@@ -500,8 +504,8 @@ export function ForgotPassword() {
               <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-[#F8F9FA] text-[#0f172a] mb-6">
                 <Icons.TrafliLogo />
               </div>
-              <h1 className="text-3xl font-bold text-[#0f172a] mb-2">التحقق من البريد الإلكتروني</h1>
-              <p className="text-slate-500 text-lg">أدخل رمز التحقق للمتابعة</p>
+              <h1 className="text-3xl font-bold text-[#0f172a] mb-2">{t('forgotPassword.otp.title')}</h1>
+              <p className="text-slate-500 text-lg">{t('forgotPassword.otp.subtitle')}</p>
             </div>
 
             {/* Card */}
@@ -515,7 +519,7 @@ export function ForgotPassword() {
 
                 <div className="text-center mb-4">
                   <p className="text-slate-600 mb-1">
-                    تم إرسال رمز التحقق إلى
+                    {t('forgotPassword.otp.codeSentTo')}
                   </p>
                   <p className="font-bold text-[#0f172a]" dir="ltr">
                     {email}
@@ -526,7 +530,7 @@ export function ForgotPassword() {
               <form onSubmit={handleOtpSubmit} className="px-6 pb-6 space-y-5">
                 <div>
                   <label className="block text-sm font-medium text-[#0f172a] mb-3 text-center">
-                    رمز التحقق <span className="text-red-500">*</span>
+                    {t('forgotPassword.otp.codeLabel')} <span className="text-red-500">*</span>
                   </label>
                   <OTPInput
                     value={otp}
@@ -550,10 +554,10 @@ export function ForgotPassword() {
                   {isLoading ? (
                     <>
                       <Icons.Spinner />
-                      جارٍ التحقق...
+                      {t('forgotPassword.otp.verifying')}
                     </>
                   ) : (
-                    'تأكيد'
+                    t('forgotPassword.otp.confirm')
                   )}
                 </button>
 
@@ -564,13 +568,11 @@ export function ForgotPassword() {
                       onClick={handleResend}
                       className="text-emerald-600 hover:text-emerald-700 font-medium text-sm"
                     >
-                      إعادة إرسال الرمز
+                      {t('forgotPassword.otp.resend')}
                     </button>
                   ) : (
                     <p className="text-slate-500 text-sm">
-                      إعادة الإرسال بعد{' '}
-                      <span className="font-bold text-[#0f172a]">{resendTimer}</span>{' '}
-                      ثانية
+                      {t('forgotPassword.otp.resendIn', { seconds: resendTimer })}
                     </p>
                   )}
                 </div>
@@ -583,7 +585,7 @@ export function ForgotPassword() {
                   className="w-full flex items-center justify-center gap-2 text-slate-600 hover:text-[#0f172a] font-medium text-sm"
                 >
                   <Icons.ChevronRight />
-                  تغيير البريد الإلكتروني
+                  {t('forgotPassword.otp.changeEmail')}
                 </button>
               </div>
             </div>
@@ -606,7 +608,7 @@ export function ForgotPassword() {
   // EMAIL STEP
   // ============================================
   return (
-    <div className="min-h-screen bg-[#F8F9FA]" dir="rtl" style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}>
+    <div className="min-h-screen bg-[#F8F9FA]" dir={isRtl ? 'rtl' : 'ltr'} style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}>
       <div className="min-h-screen flex items-center justify-center p-6">
         <div className="w-full max-w-md">
           {/* Header */}
@@ -614,8 +616,8 @@ export function ForgotPassword() {
             <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-[#0f172a] text-emerald-400 mb-6 shadow-xl">
               <Icons.TrafliLogo />
             </div>
-            <h1 className="text-3xl font-bold text-[#0f172a] mb-2">نسيت كلمة المرور؟</h1>
-            <p className="text-slate-500 text-lg">أدخل بريدك الإلكتروني لاستعادة حسابك</p>
+            <h1 className="text-3xl font-bold text-[#0f172a] mb-2">{t('forgotPassword.email.title')}</h1>
+            <p className="text-slate-500 text-lg">{t('forgotPassword.email.subtitle')}</p>
           </div>
 
           {/* Card */}
@@ -631,7 +633,7 @@ export function ForgotPassword() {
 
               <div>
                 <label className="block text-sm font-medium text-[#0f172a] mb-2">
-                  البريد الإلكتروني <span className="text-red-500">*</span>
+                  {t('forgotPassword.email.emailLabel')} <span className="text-red-500">*</span>
                 </label>
                 <div className="relative">
                   <div className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400">
@@ -663,11 +665,11 @@ export function ForgotPassword() {
                 {isLoading ? (
                   <>
                     <Icons.Spinner />
-                    جارٍ الإرسال...
+                    {t('forgotPassword.email.sending')}
                   </>
                 ) : (
                   <>
-                    إرسال رمز التحقق
+                    {t('forgotPassword.email.sendCode')}
                     <Icons.ChevronLeft />
                   </>
                 )}
@@ -676,9 +678,9 @@ export function ForgotPassword() {
 
             <div className="px-6 py-4 bg-slate-50 border-t border-slate-100">
               <p className="text-center text-sm text-slate-500">
-                تذكرت كلمة المرور؟{' '}
+                {t('forgotPassword.email.remembered')}{' '}
                 <a href="/sign-in" className="text-emerald-600 hover:text-emerald-700 font-medium">
-                  تسجيل الدخول
+                  {t('forgotPassword.email.signIn')}
                 </a>
               </p>
             </div>
@@ -686,9 +688,9 @@ export function ForgotPassword() {
 
           {/* Sign Up Link */}
           <p className="text-center text-slate-500 mt-6">
-            ليس لديك حساب؟{' '}
+            {t('forgotPassword.email.noAccount')}{' '}
             <a href="/sign-up" className="text-emerald-600 hover:text-emerald-700 font-bold">
-              إنشاء حساب جديد
+              {t('forgotPassword.email.createAccount')}
             </a>
           </p>
         </div>

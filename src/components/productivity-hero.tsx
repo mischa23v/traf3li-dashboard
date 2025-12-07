@@ -1,4 +1,5 @@
 import { Link } from '@tanstack/react-router'
+import { useTranslation } from 'react-i18next'
 import {
     Calendar as CalendarIcon,
     Plus,
@@ -35,7 +36,9 @@ interface ProductivityHeroProps {
     listMode?: boolean;
 }
 
-export function ProductivityHero({ badge, title = 'الإنتاجية', type = 'tasks', hideButtons = false, children, stats, backUrl, listMode = false }: ProductivityHeroProps) {
+export function ProductivityHero({ badge, title, type = 'tasks', hideButtons = false, children, stats, backUrl, listMode = false }: ProductivityHeroProps) {
+    const { t } = useTranslation()
+
     // Fetch Stats (only if stats prop is not provided)
     const { data: dueTodayTasks } = useDueTodayTasks()
     const { data: overdueTasks } = useOverdueTasks()
@@ -50,72 +53,73 @@ export function ProductivityHero({ badge, title = 'الإنتاجية', type = '
 
     // Button config for "Go to List" mode (used in detail/create pages)
     const listButtonConfig: Record<string, { label: string; href: string }> = {
-        tasks: { label: 'المهام', href: '/dashboard/tasks/list' },
-        reminders: { label: 'التذكيرات', href: '/dashboard/tasks/reminders' },
-        events: { label: 'الأحداث', href: '/dashboard/tasks/events' },
-        employees: { label: 'الموظفين', href: '/dashboard/hr/employees' },
-        salaries: { label: 'الرواتب', href: '/dashboard/hr/salaries' },
-        payroll: { label: 'مسيرات الرواتب', href: '/dashboard/hr/payroll' },
-        leaves: { label: 'الإجازات', href: '/dashboard/hr/leaves' },
-        attendance: { label: 'الحضور', href: '/dashboard/hr/attendance' },
-        evaluations: { label: 'التقييمات', href: '/dashboard/hr/evaluations' },
-        grievances: { label: 'الشكاوى', href: '/dashboard/hr/grievances' },
-        'organizational-structure': { label: 'الهيكل التنظيمي', href: '/dashboard/hr/organizational-structure' },
-        'job-positions': { label: 'المناصب الوظيفية', href: '/dashboard/hr/job-positions' },
-        'succession-planning': { label: 'تخطيط التعاقب', href: '/dashboard/hr/succession-planning' },
-        'compensation': { label: 'التعويضات', href: '/dashboard/hr/compensation' },
-        'reports': { label: 'التقارير', href: '/dashboard/hr/reports' },
-        'hr-reports': { label: 'تقارير الموارد البشرية', href: '/dashboard/hr/reports' },
-        'finance-reports': { label: 'التقارير المالية', href: '/dashboard/finance/reports' },
-        'tasks-reports': { label: 'تقارير الإنتاجية', href: '/dashboard/tasks/reports' },
-        'crm-reports': { label: 'تقارير العملاء', href: '/dashboard/crm/reports' },
-        'sales-reports': { label: 'تقارير المبيعات', href: '/dashboard/sales/reports' },
+        tasks: { label: t('hero.list.tasks'), href: '/dashboard/tasks/list' },
+        reminders: { label: t('hero.list.reminders'), href: '/dashboard/tasks/reminders' },
+        events: { label: t('hero.list.events'), href: '/dashboard/tasks/events' },
+        employees: { label: t('hero.list.employees'), href: '/dashboard/hr/employees' },
+        salaries: { label: t('hero.list.salaries'), href: '/dashboard/hr/salaries' },
+        payroll: { label: t('hero.list.payroll'), href: '/dashboard/hr/payroll' },
+        leaves: { label: t('hero.list.leaves'), href: '/dashboard/hr/leaves' },
+        attendance: { label: t('hero.list.attendance'), href: '/dashboard/hr/attendance' },
+        evaluations: { label: t('hero.list.evaluations'), href: '/dashboard/hr/evaluations' },
+        grievances: { label: t('hero.list.grievances'), href: '/dashboard/hr/grievances' },
+        'organizational-structure': { label: t('hero.list.organizationalStructure'), href: '/dashboard/hr/organizational-structure' },
+        'job-positions': { label: t('hero.list.jobPositions'), href: '/dashboard/hr/job-positions' },
+        'succession-planning': { label: t('hero.list.successionPlanning'), href: '/dashboard/hr/succession-planning' },
+        'compensation': { label: t('hero.list.compensation'), href: '/dashboard/hr/compensation' },
+        'reports': { label: t('hero.list.reports'), href: '/dashboard/hr/reports' },
+        'hr-reports': { label: t('hero.list.hrReports'), href: '/dashboard/hr/reports' },
+        'finance-reports': { label: t('hero.list.financeReports'), href: '/dashboard/finance/reports' },
+        'tasks-reports': { label: t('hero.list.tasksReports'), href: '/dashboard/tasks/reports' },
+        'crm-reports': { label: t('hero.list.crmReports'), href: '/dashboard/crm/reports' },
+        'sales-reports': { label: t('hero.list.salesReports'), href: '/dashboard/sales/reports' },
     }
 
     const buttonConfig: Record<string, { label: string; href: string }> = {
-        tasks: { label: 'مهمة جديدة', href: '/dashboard/tasks/new' },
-        reminders: { label: 'تذكير جديد', href: '/dashboard/tasks/reminders/new' },
-        events: { label: 'حدث جديد', href: '/dashboard/tasks/events/new' },
-        clients: { label: 'عميل جديد', href: '/dashboard/clients/new' },
-        contacts: { label: 'جهة اتصال جديدة', href: '/dashboard/contacts/new' },
-        organizations: { label: 'منظمة جديدة', href: '/dashboard/organizations/new' },
-        staff: { label: 'موظف جديد', href: '/dashboard/staff/new' },
-        leads: { label: 'عميل محتمل جديد', href: '/dashboard/crm/leads/new' },
-        pipeline: { label: 'صفقة جديدة', href: '/dashboard/crm/pipeline/new' },
-        referrals: { label: 'إحالة جديدة', href: '/dashboard/crm/referrals/new' },
-        activities: { label: 'نشاط جديد', href: '/dashboard/crm/activities/new' },
-        cases: { label: 'قضية جديدة', href: '/dashboard/cases/new' },
-        documents: { label: 'مستند جديد', href: '/dashboard/documents/new' },
-        invoices: { label: 'فاتورة جديدة', href: '/dashboard/finance/invoices/new' },
-        expenses: { label: 'مصروف جديد', href: '/dashboard/finance/expenses/new' },
-        payments: { label: 'دفعة جديدة', href: '/dashboard/finance/payments/new' },
-        transactions: { label: 'معاملة جديدة', href: '/dashboard/finance/transactions/new' },
-        'time-entries': { label: 'سجل وقت جديد', href: '/dashboard/finance/time-entries/new' },
-        'time-tracking': { label: 'سجل وقت جديد', href: '/dashboard/finance/time-tracking/new' },
-        employees: { label: 'موظف جديد', href: '/dashboard/hr/employees/new' },
-        salaries: { label: 'راتب جديد', href: '/dashboard/hr/salaries/new' },
-        payroll: { label: 'مسير جديد', href: '/dashboard/hr/payroll/new' },
-        leaves: { label: 'إجازة جديدة', href: '/dashboard/hr/leaves/new' },
-        attendance: { label: 'سجل حضور جديد', href: '/dashboard/hr/attendance/new' },
-        evaluations: { label: 'تقييم جديد', href: '/dashboard/hr/evaluations/new' },
-        grievances: { label: 'شكوى جديدة', href: '/dashboard/hr/grievances/new' },
-        'organizational-structure': { label: 'وحدة جديدة', href: '/dashboard/hr/organizational-structure/new' },
-        'job-positions': { label: 'منصب جديد', href: '/dashboard/hr/job-positions/new' },
-        'succession-planning': { label: 'خطة تعاقب جديدة', href: '/dashboard/hr/succession-planning/new' },
-        'compensation': { label: 'سجل تعويضات جديد', href: '/dashboard/hr/compensation/new' },
-        'reports': { label: 'تقرير جديد', href: '/dashboard/hr/reports/new' },
-        'hr-reports': { label: 'تقرير موارد بشرية جديد', href: '/dashboard/hr/reports/new' },
-        'finance-reports': { label: 'تقرير مالي جديد', href: '/dashboard/finance/reports/new' },
-        'tasks-reports': { label: 'تقرير إنتاجية جديد', href: '/dashboard/tasks/reports/new' },
-        'crm-reports': { label: 'تقرير عملاء جديد', href: '/dashboard/crm/reports/new' },
-        'sales-reports': { label: 'تقرير مبيعات جديد', href: '/dashboard/sales/reports/new' },
-        laws: { label: 'قانون جديد', href: '/dashboard/knowledge/laws/new' },
-        judgments: { label: 'حكم جديد', href: '/dashboard/knowledge/judgments/new' },
-        forms: { label: 'نموذج جديد', href: '/dashboard/knowledge/forms/new' },
-        jobs: { label: 'خدمة جديدة', href: '/dashboard/jobs/new' },
+        tasks: { label: t('hero.new.task'), href: '/dashboard/tasks/new' },
+        reminders: { label: t('hero.new.reminder'), href: '/dashboard/tasks/reminders/new' },
+        events: { label: t('hero.new.event'), href: '/dashboard/tasks/events/new' },
+        clients: { label: t('hero.new.client'), href: '/dashboard/clients/new' },
+        contacts: { label: t('hero.new.contact'), href: '/dashboard/contacts/new' },
+        organizations: { label: t('hero.new.organization'), href: '/dashboard/organizations/new' },
+        staff: { label: t('hero.new.employee'), href: '/dashboard/staff/new' },
+        leads: { label: t('hero.new.lead'), href: '/dashboard/crm/leads/new' },
+        pipeline: { label: t('hero.new.deal'), href: '/dashboard/crm/pipeline/new' },
+        referrals: { label: t('hero.new.referral'), href: '/dashboard/crm/referrals/new' },
+        activities: { label: t('hero.new.activity'), href: '/dashboard/crm/activities/new' },
+        cases: { label: t('hero.new.case'), href: '/dashboard/cases/new' },
+        documents: { label: t('hero.new.document'), href: '/dashboard/documents/new' },
+        invoices: { label: t('hero.new.invoice'), href: '/dashboard/finance/invoices/new' },
+        expenses: { label: t('hero.new.expense'), href: '/dashboard/finance/expenses/new' },
+        payments: { label: t('hero.new.payment'), href: '/dashboard/finance/payments/new' },
+        transactions: { label: t('hero.new.transaction'), href: '/dashboard/finance/transactions/new' },
+        'time-entries': { label: t('hero.new.timeEntry'), href: '/dashboard/finance/time-entries/new' },
+        'time-tracking': { label: t('hero.new.timeEntry'), href: '/dashboard/finance/time-tracking/new' },
+        employees: { label: t('hero.new.employee'), href: '/dashboard/hr/employees/new' },
+        salaries: { label: t('hero.new.salary'), href: '/dashboard/hr/salaries/new' },
+        payroll: { label: t('hero.new.payrollRun'), href: '/dashboard/hr/payroll/new' },
+        leaves: { label: t('hero.new.leave'), href: '/dashboard/hr/leaves/new' },
+        attendance: { label: t('hero.new.attendanceRecord'), href: '/dashboard/hr/attendance/new' },
+        evaluations: { label: t('hero.new.evaluation'), href: '/dashboard/hr/evaluations/new' },
+        grievances: { label: t('hero.new.grievance'), href: '/dashboard/hr/grievances/new' },
+        'organizational-structure': { label: t('hero.new.unit'), href: '/dashboard/hr/organizational-structure/new' },
+        'job-positions': { label: t('hero.new.position'), href: '/dashboard/hr/job-positions/new' },
+        'succession-planning': { label: t('hero.new.successionPlan'), href: '/dashboard/hr/succession-planning/new' },
+        'compensation': { label: t('hero.new.compensationRecord'), href: '/dashboard/hr/compensation/new' },
+        'reports': { label: t('hero.new.report'), href: '/dashboard/hr/reports/new' },
+        'hr-reports': { label: t('hero.new.hrReport'), href: '/dashboard/hr/reports/new' },
+        'finance-reports': { label: t('hero.new.financeReport'), href: '/dashboard/finance/reports/new' },
+        'tasks-reports': { label: t('hero.new.productivityReport'), href: '/dashboard/tasks/reports/new' },
+        'crm-reports': { label: t('hero.new.crmReport'), href: '/dashboard/crm/reports/new' },
+        'sales-reports': { label: t('hero.new.salesReport'), href: '/dashboard/sales/reports/new' },
+        laws: { label: t('hero.new.law'), href: '/dashboard/knowledge/laws/new' },
+        judgments: { label: t('hero.new.judgment'), href: '/dashboard/knowledge/judgments/new' },
+        forms: { label: t('hero.new.form'), href: '/dashboard/knowledge/forms/new' },
+        jobs: { label: t('hero.new.service'), href: '/dashboard/jobs/new' },
     }
 
     const currentButtonConfig = buttonConfig[type]
+    const displayTitle = title || t('hero.productivity')
 
     return (
         <div className="bg-[#022c22] rounded-3xl p-6 relative overflow-hidden text-white shadow-xl shadow-emerald-900/20">
@@ -149,7 +153,7 @@ export function ProductivityHero({ badge, title = 'الإنتاجية', type = '
                                     <CheckSquare className="w-6 h-6 text-emerald-400 fill-emerald-400/20" />
                                 </div>
                                 <h1 className="text-2xl lg:text-3xl font-bold text-white tracking-tight">
-                                    {title}
+                                    {displayTitle}
                                 </h1>
                             </div>
                         </div>
@@ -180,7 +184,7 @@ export function ProductivityHero({ badge, title = 'الإنتاجية', type = '
                                 <Button asChild variant="outline" className="h-10 px-5 rounded-xl font-bold border-white/10 text-white hover:bg-white/10 hover:text-white bg-transparent text-sm">
                                     <Link to="/dashboard/tasks/events">
                                         <CalendarIcon className="ms-2 h-4 w-4" />
-                                        التقويم
+                                        {t('hero.calendar')}
                                     </Link>
                                 </Button>
                             </div>
@@ -205,28 +209,28 @@ export function ProductivityHero({ badge, title = 'الإنتاجية', type = '
                             ) : (
                                 <>
                                     <StatCard
-                                        label="مهام اليوم"
+                                        label={t('hero.stats.todaysTasks')}
                                         value={tasksDueTodayCount}
                                         icon={ListTodo}
                                         status="normal"
                                         className="py-3 px-4"
                                     />
                                     <StatCard
-                                        label="متأخرة"
+                                        label={t('hero.stats.overdue')}
                                         value={overdueTasksCount}
                                         icon={AlertCircle}
                                         status={overdueTasksCount > 0 ? "attention" : "zero"}
                                         className="py-3 px-4"
                                     />
                                     <StatCard
-                                        label="أحداث قادمة"
+                                        label={t('hero.stats.upcomingEvents')}
                                         value={upcomingTasksCount}
                                         icon={CalendarRange}
                                         status="normal"
                                         className="py-3 px-4"
                                     />
                                     <StatCard
-                                        label="تذكيرات"
+                                        label={t('hero.stats.reminders')}
                                         value={pendingRemindersCount}
                                         icon={Bell}
                                         status="normal"

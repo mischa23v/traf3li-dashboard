@@ -4,6 +4,7 @@
  */
 
 import { ReactNode } from 'react'
+import { useTranslation } from 'react-i18next'
 import { usePermissions, useModuleAccess, useDepartedStatus } from '@/hooks/use-permissions'
 import type { ModuleKey, PermissionLevel, SpecialPermissionKey, FirmRole } from '@/types/rbac'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
@@ -52,12 +53,13 @@ interface RoleGateProps extends PermissionGateProps {
  * Displayed when a user doesn't have permission
  */
 function AccessDenied({ message }: { message?: string }) {
+  const { t } = useTranslation()
   return (
     <Alert variant="destructive" className="my-4">
       <ShieldX className="h-4 w-4" />
-      <AlertTitle>غير مصرح</AlertTitle>
+      <AlertTitle>{t('permissionGate.unauthorized')}</AlertTitle>
       <AlertDescription>
-        {message || 'ليس لديك صلاحية للوصول إلى هذا المحتوى'}
+        {message || t('permissionGate.noAccess')}
       </AlertDescription>
     </Alert>
   )
@@ -68,14 +70,15 @@ function AccessDenied({ message }: { message?: string }) {
  * Displayed for departed users trying to access restricted content
  */
 function DepartedWarning() {
+  const { t } = useTranslation()
   return (
     <Alert className="my-4 border-yellow-500 bg-yellow-50 dark:bg-yellow-950/20">
       <AlertTriangle className="h-4 w-4 text-yellow-600" />
       <AlertTitle className="text-yellow-800 dark:text-yellow-200">
-        حساب محدود الصلاحيات
+        {t('permissionGate.limitedAccount')}
       </AlertTitle>
       <AlertDescription className="text-yellow-700 dark:text-yellow-300">
-        تم تقييد صلاحياتك للوصول إلى بياناتك السابقة فقط. للمزيد من المعلومات، تواصل مع إدارة المكتب.
+        {t('permissionGate.restrictedAccess')}
       </AlertDescription>
     </Alert>
   )
@@ -307,6 +310,7 @@ export function FinanceGate({
   fallback,
   showDeniedMessage,
 }: PermissionGateProps) {
+  const { t } = useTranslation()
   const { canViewFinances, isLoading } = usePermissions()
 
   if (isLoading) {
@@ -315,7 +319,7 @@ export function FinanceGate({
 
   if (!canViewFinances()) {
     if (showDeniedMessage) {
-      return <AccessDenied message="ليس لديك صلاحية للوصول إلى البيانات المالية" />
+      return <AccessDenied message={t('permissionGate.noFinanceAccess')} />
     }
     return fallback ? <>{fallback}</> : null
   }
@@ -332,6 +336,7 @@ export function TeamManagementGate({
   fallback,
   showDeniedMessage,
 }: PermissionGateProps) {
+  const { t } = useTranslation()
   const { canManageTeam, isLoading } = usePermissions()
 
   if (isLoading) {
@@ -340,7 +345,7 @@ export function TeamManagementGate({
 
   if (!canManageTeam()) {
     if (showDeniedMessage) {
-      return <AccessDenied message="ليس لديك صلاحية لإدارة فريق العمل" />
+      return <AccessDenied message={t('permissionGate.noTeamAccess')} />
     }
     return fallback ? <>{fallback}</> : null
   }
@@ -368,12 +373,13 @@ export function ConditionalDisable({
   level = 'edit',
   disabledClassName = 'opacity-50 pointer-events-none cursor-not-allowed',
 }: ConditionalDisableProps) {
+  const { t } = useTranslation()
   const { hasPermission } = usePermissions()
   const hasAccess = hasPermission(module, level)
 
   if (!hasAccess) {
     return (
-      <div className={disabledClassName} title="ليس لديك صلاحية لهذا الإجراء">
+      <div className={disabledClassName} title={t('permissionGate.noActionAccess')}>
         {children}
       </div>
     )

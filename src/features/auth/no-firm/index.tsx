@@ -4,12 +4,15 @@
  */
 
 import { Building2, LogOut, RefreshCw, Plus, Users } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { useAuthStore } from '@/stores/auth-store'
 import { usePermissionsStore } from '@/stores/permissions-store'
 
 export function NoFirmPage() {
+  const { t, i18n } = useTranslation()
+  const isRtl = i18n.language === 'ar'
   const { logout, user } = useAuthStore()
   const { fetchPermissions, isLoading } = usePermissionsStore()
 
@@ -25,17 +28,17 @@ export function NoFirmPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center p-4" dir="rtl">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center p-4" dir={isRtl ? 'rtl' : 'ltr'}>
       <Card className="w-full max-w-lg shadow-lg">
         <CardHeader className="text-center pb-2">
           <div className="mx-auto w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center mb-4">
             <Building2 className="w-8 h-8 text-amber-600" />
           </div>
           <CardTitle className="text-2xl font-bold text-slate-900">
-            لا يوجد مكتب مرتبط بحسابك
+            {t('noFirm.title')}
           </CardTitle>
           <CardDescription className="text-slate-600 mt-2">
-            مرحباً {user?.firstName || user?.username || 'بك'}، يبدو أن حسابك غير مرتبط بأي مكتب محاماة حالياً
+            {t('noFirm.description', { name: user?.firstName || user?.username || t('noFirm.defaultName') })}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
@@ -47,9 +50,9 @@ export function NoFirmPage() {
                   <Plus className="w-5 h-5 text-emerald-600" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-slate-900">إنشاء مكتب جديد</h3>
+                  <h3 className="font-semibold text-slate-900">{t('noFirm.createFirm.title')}</h3>
                   <p className="text-sm text-slate-500 mt-1">
-                    إذا كنت محامياً مرخصاً، يمكنك إنشاء مكتب جديد وبدء استخدام النظام
+                    {t('noFirm.createFirm.description')}
                   </p>
                 </div>
               </div>
@@ -61,9 +64,9 @@ export function NoFirmPage() {
                   <Users className="w-5 h-5 text-blue-600" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-slate-900">الانضمام لمكتب موجود</h3>
+                  <h3 className="font-semibold text-slate-900">{t('noFirm.joinFirm.title')}</h3>
                   <p className="text-sm text-slate-500 mt-1">
-                    إذا كنت موظفاً، تواصل مع مدير المكتب لإرسال دعوة إليك للانضمام
+                    {t('noFirm.joinFirm.description')}
                   </p>
                 </div>
               </div>
@@ -78,11 +81,11 @@ export function NoFirmPage() {
               className="w-full bg-emerald-600 hover:bg-emerald-700"
             >
               {isLoading ? (
-                <RefreshCw className="w-4 h-4 ml-2 animate-spin" />
+                <RefreshCw className={`w-4 h-4 ${isRtl ? 'ml-2' : 'mr-2'} animate-spin`} />
               ) : (
-                <RefreshCw className="w-4 h-4 ml-2" />
+                <RefreshCw className={`w-4 h-4 ${isRtl ? 'ml-2' : 'mr-2'}`} />
               )}
-              تحديث حالة الحساب
+              {t('noFirm.refreshStatus')}
             </Button>
 
             <Button
@@ -90,14 +93,14 @@ export function NoFirmPage() {
               onClick={handleLogout}
               className="w-full"
             >
-              <LogOut className="w-4 h-4 ml-2" />
-              تسجيل الخروج
+              <LogOut className={`w-4 h-4 ${isRtl ? 'ml-2' : 'mr-2'}`} />
+              {t('noFirm.signOut')}
             </Button>
           </div>
 
           {/* Help text */}
           <p className="text-xs text-center text-slate-400">
-            إذا كنت تعتقد أن هذا خطأ، يرجى التواصل مع الدعم الفني
+            {t('noFirm.helpText')}
           </p>
         </CardContent>
       </Card>
