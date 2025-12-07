@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { ChevronsUpDown } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -23,8 +24,12 @@ type TeamSwitcherProps = {
 }
 
 export function TeamSwitcher({ teams = [] }: TeamSwitcherProps) {
+  const { t } = useTranslation()
   const { isMobile } = useSidebar()
   const [activeTeam, setActiveTeam] = React.useState(teams[0] || { name: '', logo: () => null, plan: '' })
+
+  // Helper to translate if string contains '.' (translation key)
+  const translateText = (text: string) => text.includes('.') ? t(text) : text
 
   // Return null if no teams
   if (!teams || teams.length === 0) {
@@ -45,9 +50,9 @@ export function TeamSwitcher({ teams = [] }: TeamSwitcherProps) {
               </div>
               <div className='grid flex-1 text-start text-sm leading-tight'>
                 <span className='truncate font-semibold'>
-                  {activeTeam.name}
+                  {translateText(activeTeam.name)}
                 </span>
-                <span className='truncate text-xs'>{activeTeam.plan}</span>
+                <span className='truncate text-xs'>{translateText(activeTeam.plan)}</span>
               </div>
               <ChevronsUpDown className='ms-auto' />
             </SidebarMenuButton>
@@ -59,7 +64,7 @@ export function TeamSwitcher({ teams = [] }: TeamSwitcherProps) {
             sideOffset={4}
           >
             <DropdownMenuLabel className='text-muted-foreground text-xs'>
-              الجهات
+              {t('sidebar.team.entities')}
             </DropdownMenuLabel>
             {teams.map((team) => (
               <DropdownMenuItem
@@ -70,7 +75,7 @@ export function TeamSwitcher({ teams = [] }: TeamSwitcherProps) {
                 <div className='flex size-6 items-center justify-center rounded-sm border'>
                   <team.logo className='size-4 shrink-0' />
                 </div>
-                {team.name}
+                {translateText(team.name)}
               </DropdownMenuItem>
             ))}
           </DropdownMenuContent>

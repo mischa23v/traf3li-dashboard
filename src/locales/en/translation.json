@@ -15,9 +15,96 @@
       "teams": "Teams",
       "addTeam": "Add team"
     },
+    "team": {
+      "firmName": "Law Office",
+      "firmPlan": "Licensed Attorney",
+      "entities": "Entities"
+    },
+    "nav": {
+      "homeGroup": "Home",
+      "home": "Home",
+      "overview": "Overview",
+      "calendar": "Calendar",
+      "productivityGroup": "Productivity",
+      "productivity": "Productivity",
+      "tasks": "Tasks",
+      "reminders": "Reminders",
+      "events": "Events",
+      "messagesGroup": "Messages",
+      "messages": "Messages",
+      "clientsGroup": "Clients & Communication",
+      "clientsCommunication": "Clients & Communication",
+      "clients": "Clients",
+      "contacts": "Contacts",
+      "organizations": "Organizations",
+      "staff": "Team Members",
+      "salesGroup": "Sales",
+      "sales": "Sales",
+      "leads": "Leads",
+      "pipeline": "Sales Pipeline",
+      "referrals": "Referrals",
+      "activities": "Activity Log",
+      "businessGroup": "Business",
+      "business": "Business",
+      "cases": "Cases",
+      "documents": "Documents",
+      "myServices": "My Services",
+      "browseJobs": "Browse Jobs",
+      "financeGroup": "Finance",
+      "finance": "Finance",
+      "financeOverview": "Accounts Dashboard",
+      "invoices": "Invoices",
+      "payments": "Payments",
+      "expenses": "Expenses",
+      "transactions": "Transactions",
+      "timeTracking": "Time Tracking",
+      "hrGroup": "Human Resources",
+      "hr": "Human Resources",
+      "employees": "Employees",
+      "orgStructure": "Organizational Structure",
+      "jobPositions": "Job Descriptions & Positions",
+      "attendance": "Attendance",
+      "leave": "Leave Management",
+      "payroll": "Payroll Slips",
+      "payrollRuns": "Payroll Runs",
+      "compensation": "Compensation & Bonuses",
+      "benefits": "Benefits",
+      "advances": "Advances",
+      "loans": "Loans",
+      "expenseClaims": "Expense Claims",
+      "performance": "Performance Evaluation",
+      "training": "Training & Development",
+      "successionPlanning": "Succession Planning",
+      "recruitment": "Recruitment",
+      "applicants": "Applicants",
+      "onboarding": "Onboarding",
+      "offboarding": "Offboarding",
+      "assetAssignment": "Assets & Equipment",
+      "hrDocuments": "Documents & Contracts",
+      "announcements": "Announcements",
+      "violations": "Violations & Disciplinary",
+      "grievances": "Complaints & Disputes",
+      "hrReports": "Reports & Analytics",
+      "libraryGroup": "Library",
+      "library": "Library",
+      "laws": "Laws",
+      "judgments": "Judgments",
+      "forms": "Forms",
+      "excellenceGroup": "Professional Excellence",
+      "excellence": "Professional Excellence",
+      "excellenceOverview": "Overview",
+      "badges": "My Badges",
+      "settingsGroup": "Settings",
+      "settings": "Settings",
+      "profile": "Profile",
+      "security": "Security",
+      "preferences": "Preferences",
+      "apps": "Applications",
+      "importExport": "Import/Export",
+      "helpCenter": "Help Center"
+    },
     "general": "General",
     "dashboard": "Dashboard",
-    "tasks": "Tasks",
     "apps": "Apps",
     "chats": "Chats",
     "users": "Users",
@@ -36,13 +123,10 @@
     "internalServerError": "Internal Server Error",
     "maintenanceError": "Maintenance Error",
     "other": "Other",
-    "settings": "Settings",
-    "profile": "Profile",
     "account": "Account",
     "appearance": "Appearance",
     "notifications": "Notifications",
-    "display": "Display",
-    "helpCenter": "Help Center"
+    "display": "Display"
   },
   "auth": {
     "signIn": {
@@ -701,12 +785,46 @@
       "notifications": "Notifications"
     },
     "topNav": {
+      "home": "Home",
+      "calendar": "Calendar",
+      "tasks": "Tasks",
       "overview": "Overview",
       "customers": "Customers",
       "products": "Products",
       "settings": "Settings"
     },
+    "hero": {
+      "greeting": "Good evening, Welcome!",
+      "summary": "You have <1>{{sessions}} sessions</1>, <1>{{tasks}} urgent tasks</1>, and <1>{{messages}} new messages</1>.",
+      "newCase": "New Case",
+      "newInvoice": "New Invoice"
+    },
     "stats": {
+      "noDataAvailable": "No data available at the moment",
+      "statsNotFound": "Statistics not found",
+      "tryLater": "Please try again later",
+      "noData": "No data",
+      "active": "active",
+      "closed": "closed",
+      "paid": "paid",
+      "pending": "pending",
+      "completed": "completed",
+      "cases": {
+        "title": "Cases",
+        "unit": "case"
+      },
+      "tasks": {
+        "title": "Tasks",
+        "unit": "task"
+      },
+      "invoices": {
+        "title": "Invoices",
+        "unit": "invoice"
+      },
+      "orders": {
+        "title": "Orders",
+        "unit": "order"
+      },
       "totalRevenue": {
         "title": "Total Revenue",
         "value": "$45,231.89",
@@ -727,6 +845,53 @@
         "value": "+573",
         "change": "+201 since last hour"
       }
+    },
+    "schedule": {
+      "title": "Today's Schedule",
+      "viewFullCalendar": "View Full Calendar",
+      "noAppointments": "No appointments today",
+      "notSpecified": "Not specified",
+      "remote": "Remote",
+      "eventTypes": {
+        "session": "Session",
+        "meeting": "Meeting",
+        "deadline": "Deadline"
+      }
+    },
+    "jobs": {
+      "title": "New Job Opportunities",
+      "new": "New",
+      "partTime": "Part-time",
+      "remote": "Remote",
+      "browseAll": "Browse All Opportunities",
+      "sampleJob": {
+        "title": "Legal Consultant (Contracts)",
+        "company": "Major Tech Company - Riyadh"
+      }
+    },
+    "training": {
+      "title": "Training & Development",
+      "progress": "{{percent}}% complete",
+      "continue": "Continue Training",
+      "sampleCourse": {
+        "title": "Commercial Contract Drafting Course",
+        "provider": "Justice Training Center"
+      }
+    },
+    "finance": {
+      "title": "Financial Summary",
+      "noData": "No financial data available",
+      "revenue": "Revenue",
+      "paid": "Paid",
+      "pending": "Pending",
+      "netIncome": "Net Income",
+      "goToFinance": "Go to Finance"
+    },
+    "messages": {
+      "title": "Recent Messages",
+      "viewAll": "View All",
+      "noMessages": "No recent messages",
+      "defaultUser": "User"
     },
     "overview": {
       "title": "Overview",
@@ -788,7 +953,7 @@
     "system": "System"
   },
   "common": {
-    "search": "Search",
+    "search": "Search...",
     "loading": "Loading...",
     "uploading": "Uploading...",
     "submit": "Submit",
@@ -810,7 +975,8 @@
     "filter": "Filter",
     "sort": "Sort",
     "actions": "Actions",
-    "error": "An error occurred, please try again"
+    "error": "An error occurred, please try again",
+    "currency": "SAR"
   },
   "validation": {
     "required": "This field is required",
