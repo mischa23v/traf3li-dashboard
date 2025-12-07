@@ -1,5 +1,6 @@
 import { type ChangeEvent, useState, useMemo } from 'react'
 import { getRouteApi } from '@tanstack/react-router'
+import { useTranslation } from 'react-i18next'
 import { SlidersHorizontal, ArrowUpAZ, ArrowDownAZ } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -25,12 +26,6 @@ import { getAppIcon } from './utils/icon-mapper'
 const route = getRouteApi('/_authenticated/dashboard/apps/')
 
 type AppType = 'all' | 'connected' | 'notConnected'
-
-const appText = new Map<AppType, string>([
-  ['all', 'جميع التطبيقات'],
-  ['connected', 'متصل'],
-  ['notConnected', 'غير متصل'],
-])
 
 // Arabic app names and descriptions
 const appTranslations: Record<string, { name: string; desc: string }> = {
@@ -163,6 +158,7 @@ function getAppTranslation(appName: string) {
 }
 
 export function Apps() {
+  const { t } = useTranslation()
   const {
     filter = '',
     type = 'all',
@@ -173,6 +169,12 @@ export function Apps() {
   const [sort, setSort] = useState(initSort)
   const [appType, setAppType] = useState(type)
   const [searchTerm, setSearchTerm] = useState(filter)
+
+  const appText = new Map<AppType, string>([
+    ['all', t('apps.allApps')],
+    ['connected', t('apps.connected')],
+    ['notConnected', t('apps.notConnected')],
+  ])
 
   // Fetch apps from API
   const { data: apps, isLoading } = useApps()
@@ -256,16 +258,16 @@ export function Apps() {
       <Main fixed>
         <div>
           <h1 className='text-2xl font-bold tracking-tight'>
-            تكامل التطبيقات
+            {t('apps.title')}
           </h1>
           <p className='text-muted-foreground'>
-            قم بربط تطبيقاتك المفضلة لتحسين سير العمل وزيادة الإنتاجية
+            {t('apps.description')}
           </p>
         </div>
         <div className='my-4 flex items-end justify-between sm:my-0 sm:items-center'>
           <div className='flex flex-col gap-4 sm:my-4 sm:flex-row'>
             <Input
-              placeholder='البحث في التطبيقات...'
+              placeholder={t('apps.searchPlaceholder')}
               className='h-9 w-40 lg:w-[250px]'
               value={searchTerm}
               onChange={handleSearch}
@@ -275,9 +277,9 @@ export function Apps() {
                 <SelectValue>{appText.get(appType)}</SelectValue>
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value='all'>جميع التطبيقات</SelectItem>
-                <SelectItem value='connected'>متصل</SelectItem>
-                <SelectItem value='notConnected'>غير متصل</SelectItem>
+                <SelectItem value='all'>{t('apps.allApps')}</SelectItem>
+                <SelectItem value='connected'>{t('apps.connected')}</SelectItem>
+                <SelectItem value='notConnected'>{t('apps.notConnected')}</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -292,13 +294,13 @@ export function Apps() {
               <SelectItem value='asc'>
                 <div className='flex items-center gap-4'>
                   <ArrowUpAZ size={16} />
-                  <span>تصاعدي</span>
+                  <span>{t('apps.ascending')}</span>
                 </div>
               </SelectItem>
               <SelectItem value='desc'>
                 <div className='flex items-center gap-4'>
                   <ArrowDownAZ size={16} />
-                  <span>تنازلي</span>
+                  <span>{t('apps.descending')}</span>
                 </div>
               </SelectItem>
             </SelectContent>
@@ -314,10 +316,10 @@ export function Apps() {
         ) : filteredApps.length === 0 ? (
           <div className='flex flex-col items-center justify-center py-12 text-center'>
             <p className='text-muted-foreground text-lg'>
-              لا توجد تطبيقات متاحة
+              {t('apps.noApps')}
             </p>
             <p className='text-muted-foreground text-sm'>
-              سيتم إضافة المزيد من التطبيقات قريباً
+              {t('apps.moreAppsSoon')}
             </p>
           </div>
         ) : (
@@ -344,7 +346,7 @@ export function Apps() {
                       onClick={() => handleToggleConnect(app.id, app.connected)}
                       className={`${app.connected ? 'border border-blue-300 bg-blue-50 hover:bg-blue-100 dark:border-blue-700 dark:bg-blue-950 dark:hover:bg-blue-900' : ''}`}
                     >
-                      {app.connected ? 'متصل' : 'ربط'}
+                      {app.connected ? t('apps.connectedLabel') : t('apps.connect')}
                     </Button>
                   </div>
                   <div>

@@ -9,7 +9,8 @@ import { cn } from '@/lib/utils'
 import { useCalendar } from '@/hooks/useCalendar'
 import { useUpcomingReminders } from '@/hooks/useRemindersAndEvents'
 import { format, addDays, startOfDay, endOfDay, isSameDay } from 'date-fns'
-import { arSA } from 'date-fns/locale'
+import { arSA, enUS } from 'date-fns/locale'
+import { useTranslation } from 'react-i18next'
 
 interface CrmSidebarProps {
     context: 'clients' | 'contacts' | 'organizations' | 'staff'
@@ -26,6 +27,8 @@ export function CrmSidebar({
     selectedCount = 0,
     onDeleteSelected
 }: CrmSidebarProps) {
+    const { t, i18n } = useTranslation()
+    const dateLocale = i18n.language === 'ar' ? arSA : enUS
     const [activeTab, setActiveTab] = useState<'calendar' | 'notifications'>('calendar')
     const [selectedDate, setSelectedDate] = useState(new Date())
 
@@ -83,11 +86,11 @@ export function CrmSidebar({
             const date = addDays(new Date(), i)
             return {
                 date,
-                dayName: format(date, 'EEEE', { locale: arSA }),
+                dayName: format(date, 'EEEE', { locale: dateLocale }),
                 dayNumber: format(date, 'd')
             }
         })
-    }, [])
+    }, [dateLocale])
 
     // Get color based on event type
     const getEventColor = (event: { type?: string; isOverdue?: boolean }) => {
@@ -111,7 +114,7 @@ export function CrmSidebar({
     const formatReminderTime = (dateString?: string) => {
         if (!dateString) return ''
         const date = new Date(dateString)
-        return format(date, 'h:mm a', { locale: arSA })
+        return format(date, 'h:mm a', { locale: dateLocale })
     }
 
     return (
@@ -125,7 +128,7 @@ export function CrmSidebar({
 
                 {/* Header */}
                 <div className="flex items-center justify-between mb-6 relative z-10">
-                    <h3 className="font-bold text-lg text-white">إجراءات سريعة</h3>
+                    <h3 className="font-bold text-lg text-white">{t('crmSidebar.quickActions')}</h3>
                 </div>
 
                 {/* Content */}
@@ -134,7 +137,7 @@ export function CrmSidebar({
                     <Button asChild className="bg-white hover:bg-emerald-50 text-emerald-600 h-auto py-6 flex flex-col items-center justify-center gap-2 rounded-3xl shadow-lg shadow-white/10 transition-all duration-300 hover:scale-[1.02] border-0">
                         <Link to={currentLinks.create}>
                             <Plus className="h-7 w-7" />
-                            <span className="text-sm font-bold">إنشاء</span>
+                            <span className="text-sm font-bold">{t('crmSidebar.create')}</span>
                         </Link>
                     </Button>
 
@@ -150,7 +153,7 @@ export function CrmSidebar({
                         onClick={onToggleSelectionMode}
                     >
                         {isSelectionMode ? <X className="h-6 w-6" /> : <CheckSquare className="h-6 w-6" />}
-                        <span className="text-sm font-bold">{isSelectionMode ? 'إلغاء' : 'تحديد'}</span>
+                        <span className="text-sm font-bold">{isSelectionMode ? t('crmSidebar.cancel') : t('crmSidebar.select')}</span>
                     </Button>
 
                     {/* Delete Button - White + Red Text + Glow */}
@@ -162,7 +165,7 @@ export function CrmSidebar({
                     >
                         <Trash2 className="h-6 w-6" />
                         <span className="text-sm font-bold">
-                            {selectedCount > 0 ? `حذف (${selectedCount})` : 'حذف'}
+                            {selectedCount > 0 ? t('crmSidebar.deleteCount', { count: selectedCount }) : t('crmSidebar.delete')}
                         </span>
                     </Button>
 
@@ -170,7 +173,7 @@ export function CrmSidebar({
                     <Button asChild variant="ghost" className="bg-white hover:bg-slate-50 text-emerald-950 h-auto py-6 flex flex-col items-center justify-center gap-2 rounded-3xl transition-all duration-300 hover:scale-[1.02] shadow-lg shadow-white/10">
                         <Link to={currentLinks.viewAll}>
                             <List className="h-6 w-6" />
-                            <span className="text-sm font-bold">عرض جميع</span>
+                            <span className="text-sm font-bold">{t('crmSidebar.viewAll')}</span>
                         </Link>
                     </Button>
                 </div>
@@ -197,7 +200,7 @@ export function CrmSidebar({
                                     : "text-emerald-200 hover:text-white hover:bg-emerald-500/10"
                             )}
                         >
-                            التقويم
+                            {t('crmSidebar.calendar')}
                         </button>
                         <button
                             onClick={() => setActiveTab('notifications')}
@@ -208,12 +211,12 @@ export function CrmSidebar({
                                     : "text-emerald-200 hover:text-white hover:bg-emerald-500/10"
                             )}
                         >
-                            التنبيهات
+                            {t('crmSidebar.notifications')}
                         </button>
                     </div>
                     {activeTab === 'calendar' && (
                         <Badge className="bg-emerald-500/20 text-emerald-100 border-0 rounded-full px-3 hover:bg-emerald-500/30">
-                            {format(new Date(), 'MMMM', { locale: arSA })}
+                            {format(new Date(), 'MMMM', { locale: dateLocale })}
                         </Badge>
                     )}
                     {activeTab === 'notifications' && upcomingReminders.length > 0 && (
@@ -259,7 +262,7 @@ export function CrmSidebar({
                                 ) : selectedDateEvents.length === 0 ? (
                                     <div className="flex flex-col items-center justify-center py-8 text-slate-400">
                                         <CalendarIcon className="h-10 w-10 mb-2 opacity-20" />
-                                        <p className="text-xs font-medium">لا توجد أحداث لهذا اليوم</p>
+                                        <p className="text-xs font-medium">{t('crmSidebar.noEventsToday')}</p>
                                     </div>
                                 ) : (
                                     <>
@@ -268,8 +271,9 @@ export function CrmSidebar({
 
                                         {selectedDateEvents.map((event) => {
                                             const eventDate = event.startDate ? new Date(event.startDate) : null
-                                            const eventTime = eventDate ? eventDate.toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit', hour12: false }) : 'غير محدد'
-                                            const timePeriod = eventDate ? (eventDate.getHours() < 12 ? 'صباحاً' : 'مساءً') : ''
+                                            const localeCode = i18n.language === 'ar' ? 'ar-SA' : 'en-US'
+                                            const eventTime = eventDate ? eventDate.toLocaleTimeString(localeCode, { hour: '2-digit', minute: '2-digit', hour12: false }) : t('crmSidebar.notSpecified')
+                                            const timePeriod = eventDate ? (eventDate.getHours() < 12 ? t('crmSidebar.am') : t('crmSidebar.pm')) : ''
                                             const colorClass = getEventColor(event)
 
                                             return (
@@ -286,7 +290,7 @@ export function CrmSidebar({
                                                         {event.location && (
                                                             <div className="text-xs text-slate-500 flex items-center gap-1">
                                                                 <MapPin className="h-3 w-3" />
-                                                                {typeof event.location === 'string' ? event.location : (event.location?.name || event.location?.address || 'عن بعد')}
+                                                                {typeof event.location === 'string' ? event.location : (event.location?.name || event.location?.address || t('crmSidebar.remote'))}
                                                             </div>
                                                         )}
                                                     </div>
@@ -299,7 +303,7 @@ export function CrmSidebar({
 
                             <Button asChild variant="ghost" className="w-full mt-6 text-slate-500 hover:text-emerald-700 hover:bg-emerald-50 group cursor-pointer">
                                 <Link to="/dashboard/calendar">
-                                    <span>عرض الجدول الكامل</span>
+                                    <span>{t('crmSidebar.viewFullSchedule')}</span>
                                     <ChevronRight className="w-4 h-4 me-2 transition-transform group-hover:-translate-x-1 rtl:group-hover:translate-x-1 rtl:rotate-180" />
                                 </Link>
                             </Button>
@@ -313,7 +317,7 @@ export function CrmSidebar({
                             ) : upcomingReminders.length === 0 ? (
                                 <div className="flex flex-col items-center justify-center py-8 text-slate-400">
                                     <Bell className="h-10 w-10 mb-2 opacity-20" />
-                                    <p className="text-xs font-medium">لا توجد تنبيهات قادمة</p>
+                                    <p className="text-xs font-medium">{t('crmSidebar.noUpcomingNotifications')}</p>
                                 </div>
                             ) : (
                                 <>
@@ -346,14 +350,14 @@ export function CrmSidebar({
                                                     <div className="flex items-center gap-2 mt-1">
                                                         {reminderDate && (
                                                             <p className="text-xs text-slate-500">
-                                                                {format(new Date(reminderDate), 'dd MMM', { locale: arSA })}
+                                                                {format(new Date(reminderDate), 'dd MMM', { locale: dateLocale })}
                                                                 {' - '}
                                                                 {formatReminderTime(reminderDate)}
                                                             </p>
                                                         )}
                                                         {isOverdue && (
                                                             <Badge variant="destructive" className="text-[10px] px-1.5 py-0">
-                                                                متأخر
+                                                                {t('crmSidebar.overdue')}
                                                             </Badge>
                                                         )}
                                                     </div>
@@ -365,7 +369,7 @@ export function CrmSidebar({
                             )}
                             <Button asChild variant="ghost" className="w-full text-xs text-slate-400 hover:text-emerald-600 hover:bg-emerald-50">
                                 <Link to="/dashboard/tasks/reminders">
-                                    عرض كل التنبيهات
+                                    {t('crmSidebar.viewAllNotifications')}
                                 </Link>
                             </Button>
                         </div>

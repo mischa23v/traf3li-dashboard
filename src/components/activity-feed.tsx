@@ -4,7 +4,8 @@
  */
 
 import { formatDistanceToNow } from 'date-fns'
-import { ar } from 'date-fns/locale'
+import { ar, enUS } from 'date-fns/locale'
+import { useTranslation } from 'react-i18next'
 import {
   CheckCircle,
   Circle,
@@ -111,8 +112,10 @@ interface ActivityItemProps {
 }
 
 function ActivityItem({ activity }: ActivityItemProps) {
+  const { i18n } = useTranslation()
   const Icon = activityIcons[activity.type] || Circle
   const colorClass = activityColors[activity.type] || 'text-gray-500 bg-gray-50'
+  const dateLocale = i18n.language === 'ar' ? ar : enUS
 
   return (
     <div className="flex gap-3 py-3 border-b border-slate-100 last:border-0">
@@ -122,7 +125,7 @@ function ActivityItem({ activity }: ActivityItemProps) {
       <div className="flex-1 min-w-0">
         <div className="flex items-start justify-between gap-2">
           <div className="flex-1">
-            <p className="text-sm text-slate-700">{formatActivityMessage(activity, 'ar')}</p>
+            <p className="text-sm text-slate-700">{formatActivityMessage(activity, i18n.language)}</p>
             {activity.entityTitle && (
               <p className="text-xs text-slate-500 truncate mt-0.5">{activity.entityTitle}</p>
             )}
@@ -139,7 +142,7 @@ function ActivityItem({ activity }: ActivityItemProps) {
         <p className="text-xs text-slate-400 mt-1">
           {formatDistanceToNow(new Date(activity.createdAt), {
             addSuffix: true,
-            locale: ar,
+            locale: dateLocale,
           })}
         </p>
       </div>
@@ -171,6 +174,8 @@ export function ActivityFeed({
   showTitle = true,
   maxHeight = 400,
 }: ActivityFeedProps) {
+  const { t } = useTranslation()
+
   // Use the appropriate hook based on entity type
   const taskQuery = useTaskActivities(entityType === 'task' ? entityId : '', limit)
   const eventQuery = useEventActivities(entityType === 'event' ? entityId : '', limit)
@@ -182,13 +187,13 @@ export function ActivityFeed({
   const getTitle = () => {
     switch (entityType) {
       case 'task':
-        return 'سجل النشاط'
+        return t('activityFeed.taskLog')
       case 'event':
-        return 'سجل الحدث'
+        return t('activityFeed.eventLog')
       case 'reminder':
-        return 'سجل التذكير'
+        return t('activityFeed.reminderLog')
       default:
-        return 'الأنشطة'
+        return t('activityFeed.activities')
     }
   }
 
@@ -214,11 +219,11 @@ export function ActivityFeed({
             </>
           ) : isError ? (
             <div className="text-center py-6 text-slate-500 text-sm">
-              حدث خطأ في تحميل الأنشطة
+              {t('activityFeed.loadError')}
             </div>
           ) : activities.length === 0 ? (
             <div className="text-center py-6 text-slate-500 text-sm">
-              لا توجد أنشطة بعد
+              {t('activityFeed.noActivities')}
             </div>
           ) : (
             activities.map((activity) => (

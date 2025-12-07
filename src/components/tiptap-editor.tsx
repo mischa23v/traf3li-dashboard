@@ -1,7 +1,8 @@
 import { useEditor, EditorContent } from '@tiptap/react'
 import BubbleMenuExtension from '@tiptap/extension-bubble-menu'
 import FloatingMenuExtension from '@tiptap/extension-floating-menu'
-import { useEffect, useCallback } from 'react'
+import { useEffect, useCallback, useMemo } from 'react'
+import { useTranslation } from 'react-i18next'
 import StarterKit from '@tiptap/starter-kit'
 import TextAlign from '@tiptap/extension-text-align'
 import Image from '@tiptap/extension-image'
@@ -49,32 +50,32 @@ interface TipTapEditorProps {
     showCharacterCount?: boolean
 }
 
-// Predefined colors for text and highlight
-const TEXT_COLORS = [
-    { name: 'أسود', color: '#000000' },
-    { name: 'أحمر', color: '#ef4444' },
-    { name: 'أخضر', color: '#22c55e' },
-    { name: 'أزرق', color: '#3b82f6' },
-    { name: 'برتقالي', color: '#f97316' },
-    { name: 'بنفسجي', color: '#8b5cf6' },
-    { name: 'وردي', color: '#ec4899' },
-    { name: 'رمادي', color: '#6b7280' },
+// Color definitions (names are translation keys)
+const TEXT_COLOR_KEYS = [
+    { key: 'black', color: '#000000' },
+    { key: 'red', color: '#ef4444' },
+    { key: 'green', color: '#22c55e' },
+    { key: 'blue', color: '#3b82f6' },
+    { key: 'orange', color: '#f97316' },
+    { key: 'purple', color: '#8b5cf6' },
+    { key: 'pink', color: '#ec4899' },
+    { key: 'gray', color: '#6b7280' },
 ]
 
-const HIGHLIGHT_COLORS = [
-    { name: 'أصفر', color: '#fef08a' },
-    { name: 'أخضر', color: '#bbf7d0' },
-    { name: 'أزرق', color: '#bfdbfe' },
-    { name: 'وردي', color: '#fbcfe8' },
-    { name: 'برتقالي', color: '#fed7aa' },
-    { name: 'بنفسجي', color: '#ddd6fe' },
+const HIGHLIGHT_COLOR_KEYS = [
+    { key: 'yellow', color: '#fef08a' },
+    { key: 'green', color: '#bbf7d0' },
+    { key: 'blue', color: '#bfdbfe' },
+    { key: 'pink', color: '#fbcfe8' },
+    { key: 'orange', color: '#fed7aa' },
+    { key: 'purple', color: '#ddd6fe' },
 ]
 
 export const TipTapEditor = ({
     content = '',
     contentJson,
     onChange,
-    placeholder = 'اكتب هنا...',
+    placeholder,
     editable = true,
     dir = 'rtl',
     className,
@@ -82,6 +83,20 @@ export const TipTapEditor = ({
     maxCharacters,
     showCharacterCount = false
 }: TipTapEditorProps) => {
+    const { t } = useTranslation()
+    const defaultPlaceholder = placeholder || t('editor.placeholder')
+
+    // Get color names with translations
+    const textColors = useMemo(() => TEXT_COLOR_KEYS.map(c => ({
+        name: t(`editor.colors.${c.key}`),
+        color: c.color
+    })), [t])
+
+    const highlightColors = useMemo(() => HIGHLIGHT_COLOR_KEYS.map(c => ({
+        name: t(`editor.colors.${c.key}`),
+        color: c.color
+    })), [t])
+
     const editor = useEditor({
         immediatelyRender: false, // Required for SSR safety
         extensions: [
@@ -109,7 +124,7 @@ export const TipTapEditor = ({
                 },
             }),
             Placeholder.configure({
-                placeholder,
+                placeholder: defaultPlaceholder,
                 emptyEditorClass: 'is-editor-empty',
             }),
             Underline,
@@ -172,17 +187,17 @@ export const TipTapEditor = ({
     }, [editor, contentJson, content])
 
     const addImage = useCallback(() => {
-        const url = window.prompt('رابط الصورة:')
+        const url = window.prompt(t('editor.prompts.imageUrl'))
         if (url && editor) {
             editor.chain().focus().setImage({ src: url }).run()
         }
-    }, [editor])
+    }, [editor, t])
 
     const addLink = useCallback(() => {
         if (!editor) return
 
         const previousUrl = editor.getAttributes('link').href
-        const url = window.prompt('الرابط:', previousUrl)
+        const url = window.prompt(t('editor.prompts.linkUrl'), previousUrl)
 
         if (url === null) return
 
@@ -251,49 +266,49 @@ export const TipTapEditor = ({
                     <ToolbarButton
                         onClick={() => editor.chain().focus().toggleBold().run()}
                         isActive={editor.isActive('bold')}
-                        title="عريض (Ctrl+B)"
+                        title={t('editor.toolbar.bold')}
                     >
                         <Bold className="h-4 w-4" />
                     </ToolbarButton>
                     <ToolbarButton
                         onClick={() => editor.chain().focus().toggleItalic().run()}
                         isActive={editor.isActive('italic')}
-                        title="مائل (Ctrl+I)"
+                        title={t('editor.toolbar.italic')}
                     >
                         <Italic className="h-4 w-4" />
                     </ToolbarButton>
                     <ToolbarButton
                         onClick={() => editor.chain().focus().toggleUnderline().run()}
                         isActive={editor.isActive('underline')}
-                        title="تسطير (Ctrl+U)"
+                        title={t('editor.toolbar.underline')}
                     >
                         <UnderlineIcon className="h-4 w-4" />
                     </ToolbarButton>
                     <ToolbarButton
                         onClick={() => editor.chain().focus().toggleStrike().run()}
                         isActive={editor.isActive('strike')}
-                        title="يتوسطه خط"
+                        title={t('editor.toolbar.strikethrough')}
                     >
                         <Strikethrough className="h-4 w-4" />
                     </ToolbarButton>
                     <ToolbarButton
                         onClick={() => editor.chain().focus().toggleCode().run()}
                         isActive={editor.isActive('code')}
-                        title="كود"
+                        title={t('editor.toolbar.code')}
                     >
                         <Code className="h-4 w-4" />
                     </ToolbarButton>
                     <ToolbarButton
                         onClick={() => editor.chain().focus().toggleSubscript().run()}
                         isActive={editor.isActive('subscript')}
-                        title="نص سفلي"
+                        title={t('editor.toolbar.subscript')}
                     >
                         <SubscriptIcon className="h-4 w-4" />
                     </ToolbarButton>
                     <ToolbarButton
                         onClick={() => editor.chain().focus().toggleSuperscript().run()}
                         isActive={editor.isActive('superscript')}
-                        title="نص علوي"
+                        title={t('editor.toolbar.superscript')}
                     >
                         <SuperscriptIcon className="h-4 w-4" />
                     </ToolbarButton>
@@ -303,12 +318,12 @@ export const TipTapEditor = ({
                     {/* Text Color */}
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon" className="h-8 w-8" title="لون النص">
+                            <Button variant="ghost" size="icon" className="h-8 w-8" title={t('editor.toolbar.textColor')}>
                                 <Palette className="h-4 w-4" />
                             </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="start" className="min-w-[120px]">
-                            {TEXT_COLORS.map((c) => (
+                            {textColors.map((c) => (
                                 <DropdownMenuItem
                                     key={c.color}
                                     onClick={() => editor.chain().focus().setColor(c.color).run()}
@@ -320,7 +335,7 @@ export const TipTapEditor = ({
                             ))}
                             <DropdownMenuSeparator />
                             <DropdownMenuItem onClick={() => editor.chain().focus().unsetColor().run()}>
-                                إزالة اللون
+                                {t('editor.toolbar.removeColor')}
                             </DropdownMenuItem>
                         </DropdownMenuContent>
                     </DropdownMenu>
@@ -328,12 +343,12 @@ export const TipTapEditor = ({
                     {/* Highlight Color */}
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon" className="h-8 w-8" title="تظليل النص">
+                            <Button variant="ghost" size="icon" className="h-8 w-8" title={t('editor.toolbar.highlight')}>
                                 <Highlighter className="h-4 w-4" />
                             </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="start" className="min-w-[120px]">
-                            {HIGHLIGHT_COLORS.map((c) => (
+                            {highlightColors.map((c) => (
                                 <DropdownMenuItem
                                     key={c.color}
                                     onClick={() => editor.chain().focus().toggleHighlight({ color: c.color }).run()}
@@ -345,7 +360,7 @@ export const TipTapEditor = ({
                             ))}
                             <DropdownMenuSeparator />
                             <DropdownMenuItem onClick={() => editor.chain().focus().unsetHighlight().run()}>
-                                إزالة التظليل
+                                {t('editor.toolbar.removeHighlight')}
                             </DropdownMenuItem>
                         </DropdownMenuContent>
                     </DropdownMenu>
@@ -356,28 +371,28 @@ export const TipTapEditor = ({
                     <ToolbarButton
                         onClick={() => editor.chain().focus().setTextAlign('right').run()}
                         isActive={editor.isActive({ textAlign: 'right' })}
-                        title="محاذاة لليمين"
+                        title={t('editor.toolbar.alignRight')}
                     >
                         <AlignRight className="h-4 w-4" />
                     </ToolbarButton>
                     <ToolbarButton
                         onClick={() => editor.chain().focus().setTextAlign('center').run()}
                         isActive={editor.isActive({ textAlign: 'center' })}
-                        title="توسيط"
+                        title={t('editor.toolbar.alignCenter')}
                     >
                         <AlignCenter className="h-4 w-4" />
                     </ToolbarButton>
                     <ToolbarButton
                         onClick={() => editor.chain().focus().setTextAlign('left').run()}
                         isActive={editor.isActive({ textAlign: 'left' })}
-                        title="محاذاة لليسار"
+                        title={t('editor.toolbar.alignLeft')}
                     >
                         <AlignLeft className="h-4 w-4" />
                     </ToolbarButton>
                     <ToolbarButton
                         onClick={() => editor.chain().focus().setTextAlign('justify').run()}
                         isActive={editor.isActive({ textAlign: 'justify' })}
-                        title="ضبط"
+                        title={t('editor.toolbar.justify')}
                     >
                         <AlignJustify className="h-4 w-4" />
                     </ToolbarButton>
@@ -388,21 +403,21 @@ export const TipTapEditor = ({
                     <ToolbarButton
                         onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
                         isActive={editor.isActive('heading', { level: 1 })}
-                        title="عنوان 1"
+                        title={t('editor.toolbar.heading1')}
                     >
                         <Heading1 className="h-4 w-4" />
                     </ToolbarButton>
                     <ToolbarButton
                         onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
                         isActive={editor.isActive('heading', { level: 2 })}
-                        title="عنوان 2"
+                        title={t('editor.toolbar.heading2')}
                     >
                         <Heading2 className="h-4 w-4" />
                     </ToolbarButton>
                     <ToolbarButton
                         onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
                         isActive={editor.isActive('heading', { level: 3 })}
-                        title="عنوان 3"
+                        title={t('editor.toolbar.heading3')}
                     >
                         <Heading3 className="h-4 w-4" />
                     </ToolbarButton>
@@ -413,34 +428,34 @@ export const TipTapEditor = ({
                     <ToolbarButton
                         onClick={() => editor.chain().focus().toggleBulletList().run()}
                         isActive={editor.isActive('bulletList')}
-                        title="قائمة نقطية"
+                        title={t('editor.toolbar.bulletList')}
                     >
                         <List className="h-4 w-4" />
                     </ToolbarButton>
                     <ToolbarButton
                         onClick={() => editor.chain().focus().toggleOrderedList().run()}
                         isActive={editor.isActive('orderedList')}
-                        title="قائمة مرقمة"
+                        title={t('editor.toolbar.orderedList')}
                     >
                         <ListOrdered className="h-4 w-4" />
                     </ToolbarButton>
                     <ToolbarButton
                         onClick={() => editor.chain().focus().toggleTaskList().run()}
                         isActive={editor.isActive('taskList')}
-                        title="قائمة مهام"
+                        title={t('editor.toolbar.taskList')}
                     >
                         <ListTodo className="h-4 w-4" />
                     </ToolbarButton>
                     <ToolbarButton
                         onClick={() => editor.chain().focus().toggleBlockquote().run()}
                         isActive={editor.isActive('blockquote')}
-                        title="اقتباس"
+                        title={t('editor.toolbar.blockquote')}
                     >
                         <Quote className="h-4 w-4" />
                     </ToolbarButton>
                     <ToolbarButton
                         onClick={() => editor.chain().focus().setHorizontalRule().run()}
-                        title="خط أفقي"
+                        title={t('editor.toolbar.horizontalRule')}
                     >
                         <Minus className="h-4 w-4" />
                     </ToolbarButton>
@@ -454,7 +469,7 @@ export const TipTapEditor = ({
                                 variant="ghost"
                                 size="icon"
                                 className={cn('h-8 w-8', editor.isActive('table') && 'bg-slate-200')}
-                                title="جدول"
+                                title={t('editor.toolbar.table')}
                             >
                                 <TableIcon className="h-4 w-4" />
                             </Button>
@@ -462,7 +477,7 @@ export const TipTapEditor = ({
                         <DropdownMenuContent align="start" className="min-w-[160px]">
                             <DropdownMenuItem onClick={insertTable} className="flex items-center gap-2">
                                 <Plus className="h-4 w-4" />
-                                <span>إدراج جدول</span>
+                                <span>{t('editor.toolbar.insertTable')}</span>
                             </DropdownMenuItem>
                             {editor.isActive('table') && (
                                 <>
@@ -472,28 +487,28 @@ export const TipTapEditor = ({
                                         className="flex items-center gap-2"
                                     >
                                         <Columns3 className="h-4 w-4" />
-                                        <span>إضافة عمود</span>
+                                        <span>{t('editor.toolbar.addColumn')}</span>
                                     </DropdownMenuItem>
                                     <DropdownMenuItem
                                         onClick={() => editor.chain().focus().addRowAfter().run()}
                                         className="flex items-center gap-2"
                                     >
                                         <Rows3 className="h-4 w-4" />
-                                        <span>إضافة صف</span>
+                                        <span>{t('editor.toolbar.addRow')}</span>
                                     </DropdownMenuItem>
                                     <DropdownMenuItem
                                         onClick={() => editor.chain().focus().deleteColumn().run()}
                                         className="flex items-center gap-2 text-red-600"
                                     >
                                         <Columns3 className="h-4 w-4" />
-                                        <span>حذف عمود</span>
+                                        <span>{t('editor.toolbar.deleteColumn')}</span>
                                     </DropdownMenuItem>
                                     <DropdownMenuItem
                                         onClick={() => editor.chain().focus().deleteRow().run()}
                                         className="flex items-center gap-2 text-red-600"
                                     >
                                         <Rows3 className="h-4 w-4" />
-                                        <span>حذف صف</span>
+                                        <span>{t('editor.toolbar.deleteRow')}</span>
                                     </DropdownMenuItem>
                                     <DropdownMenuSeparator />
                                     <DropdownMenuItem
@@ -501,7 +516,7 @@ export const TipTapEditor = ({
                                         className="flex items-center gap-2 text-red-600"
                                     >
                                         <Trash2 className="h-4 w-4" />
-                                        <span>حذف الجدول</span>
+                                        <span>{t('editor.toolbar.deleteTable')}</span>
                                     </DropdownMenuItem>
                                 </>
                             )}
@@ -511,18 +526,18 @@ export const TipTapEditor = ({
                     <ToolbarDivider />
 
                     {/* Image and Link */}
-                    <ToolbarButton onClick={addImage} title="إضافة صورة">
+                    <ToolbarButton onClick={addImage} title={t('editor.toolbar.addImage')}>
                         <ImageIcon className="h-4 w-4" />
                     </ToolbarButton>
                     <ToolbarButton
                         onClick={addLink}
                         isActive={editor.isActive('link')}
-                        title="إضافة رابط"
+                        title={t('editor.toolbar.addLink')}
                     >
                         <LinkIcon className="h-4 w-4" />
                     </ToolbarButton>
                     {editor.isActive('link') && (
-                        <ToolbarButton onClick={removeLink} title="إزالة الرابط">
+                        <ToolbarButton onClick={removeLink} title={t('editor.toolbar.removeLink')}>
                             <Unlink className="h-4 w-4" />
                         </ToolbarButton>
                     )}
@@ -533,14 +548,14 @@ export const TipTapEditor = ({
                     <ToolbarButton
                         onClick={() => editor.chain().focus().undo().run()}
                         disabled={!editor.can().undo()}
-                        title="تراجع (Ctrl+Z)"
+                        title={t('editor.toolbar.undo')}
                     >
                         <Undo className="h-4 w-4" />
                     </ToolbarButton>
                     <ToolbarButton
                         onClick={() => editor.chain().focus().redo().run()}
                         disabled={!editor.can().redo()}
-                        title="إعادة (Ctrl+Y)"
+                        title={t('editor.toolbar.redo')}
                     >
                         <Redo className="h-4 w-4" />
                     </ToolbarButton>
@@ -723,10 +738,10 @@ export const TipTapEditor = ({
             {showCharacterCount && (
                 <div className="px-4 py-2 border-t bg-slate-50 text-xs text-slate-500 flex justify-between">
                     <span>
-                        {editor.storage.characterCount.characters()} حرف
+                        {editor.storage.characterCount.characters()} {t('editor.characters')}
                         {maxCharacters && ` / ${maxCharacters}`}
                     </span>
-                    <span>{editor.storage.characterCount.words()} كلمة</span>
+                    <span>{editor.storage.characterCount.words()} {t('editor.words')}</span>
                 </div>
             )}
 
