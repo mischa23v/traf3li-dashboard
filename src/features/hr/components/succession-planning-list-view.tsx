@@ -41,9 +41,9 @@ import {
   riskLevelLabels,
   planStatusLabels,
   readinessLevelLabels,
-  PositionCriticality,
-  RiskLevel,
-  PlanStatus,
+  type PositionCriticality,
+  type RiskLevel,
+  type PlanStatus,
 } from '@/services/successionPlanningService'
 
 export function SuccessionPlanningListView() {

@@ -4,7 +4,7 @@
  * Handles authentication, credentials, and error responses
  */
 
-import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios'
+import axios, { type AxiosError, type InternalAxiosRequestConfig } from 'axios'
 
 // API Base URL - Change based on environment
 const API_BASE_URL =

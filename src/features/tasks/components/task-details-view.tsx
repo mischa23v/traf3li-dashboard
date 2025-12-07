@@ -15,7 +15,7 @@ import {
     useStartTimeTracking, useStopTimeTracking, useUpdateOutcome,
     useDocuments, useDeleteDocument
 } from '@/hooks/useTasks'
-import { OutcomeType, VOICE_MEMO_TYPES } from '@/services/tasksService'
+import { type OutcomeType, VOICE_MEMO_TYPES } from '@/services/tasksService'
 import tasksService from '@/services/tasksService'
 import { API_DOMAIN, API_URL } from '@/lib/api'
 import { toast } from 'sonner'

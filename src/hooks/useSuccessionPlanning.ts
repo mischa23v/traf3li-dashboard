@@ -2,10 +2,10 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import {
   successionPlanningApi,
   SuccessionPlan,
-  SuccessionPlanFilters,
-  CreateSuccessionPlanInput,
-  UpdateSuccessionPlanInput,
-  Successor
+  type SuccessionPlanFilters,
+  type CreateSuccessionPlanInput,
+  type UpdateSuccessionPlanInput,
+  type Successor
 } from '@/services/successionPlanningService'
 import { toast } from 'sonner'
 

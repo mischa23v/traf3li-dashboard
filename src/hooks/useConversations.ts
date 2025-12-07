@@ -6,8 +6,8 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import conversationsService, {
-  CreateConversationData,
-  SendMessageData,
+  type CreateConversationData,
+  type SendMessageData,
 } from '@/services/conversationsService'
 
 // ==================== CONVERSATIONS ====================

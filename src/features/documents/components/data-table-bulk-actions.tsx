@@ -1,4 +1,4 @@
-import { Table } from '@tanstack/react-table'
+import { type Table } from '@tanstack/react-table'
 import { Trash, Download } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useBulkDeleteDocuments } from '@/hooks/useDocuments'

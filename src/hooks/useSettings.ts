@@ -1,9 +1,9 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import settingsService, {
-  UpdateAccountSettings,
-  UpdateAppearanceSettings,
-  UpdateDisplaySettings,
-  UpdateNotificationSettings,
+  type UpdateAccountSettings,
+  type UpdateAppearanceSettings,
+  type UpdateDisplaySettings,
+  type UpdateNotificationSettings,
 } from '@/services/settingsService'
 import { toast } from 'sonner'
 

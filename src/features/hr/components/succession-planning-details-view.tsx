@@ -50,11 +50,11 @@ import {
   transferStatusLabels,
   benchStrengthScoreLabels,
   partnerTrackLabels,
-  PositionCriticality,
-  RiskLevel,
+  type PositionCriticality,
+  type RiskLevel,
   PlanStatus,
-  ReadinessLevel,
-  BenchStrengthScore,
+  type ReadinessLevel,
+  type BenchStrengthScore,
 } from '@/services/successionPlanningService'
 
 export function SuccessionPlanningDetailsView() {

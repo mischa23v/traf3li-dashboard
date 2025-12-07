@@ -33,7 +33,7 @@ import {
   reportStatusLabels, reportCategoryLabels, reportTypeLabels, reportFormatLabels,
   outputFormatLabels, usageFrequencyLabels, criticalityLevelLabels, accessLevelLabels,
   scheduleStatusLabels, scheduleFrequencyLabels, executionStatusLabels, dataModuleLabels,
-  chartTypeLabels, ReportStatus, ExecutionStatus, ScheduleStatus, OutputFormat, ReportCategory,
+  chartTypeLabels, type ReportStatus, ExecutionStatus, ScheduleStatus, type OutputFormat, ReportCategory,
 } from '@/services/reportsService'
 
 export function CrmReportsDetailsView() {

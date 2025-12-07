@@ -56,10 +56,10 @@ import {
   executionStatusLabels,
   dataModuleLabels,
   chartTypeLabels,
-  ReportStatus,
+  type ReportStatus,
   ExecutionStatus,
   ScheduleStatus,
-  OutputFormat,
+  type OutputFormat,
 } from '@/services/reportsService'
 
 export function ReportsDetailsView() {

@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { useNavigate, Link, useSearch } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 import { useAuthStore } from '@/stores/auth-store'
-import otpService, { OtpPurpose } from '@/services/otpService'
+import otpService, { type OtpPurpose } from '@/services/otpService'
 import {
   InputOTP,
   InputOTPGroup,

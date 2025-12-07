@@ -3,7 +3,7 @@
  * Components for conditionally rendering UI based on user permissions
  */
 
-import { ReactNode } from 'react'
+import { type ReactNode } from 'react'
 import { usePermissions, useModuleAccess, useDepartedStatus } from '@/hooks/use-permissions'
 import type { ModuleKey, PermissionLevel, SpecialPermissionKey, FirmRole } from '@/types/rbac'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'

@@ -4,7 +4,7 @@
  */
 
 import { useQuery } from '@tanstack/react-query'
-import calendarService, { CalendarFilters } from '@/services/calendarService'
+import calendarService, { type CalendarFilters } from '@/services/calendarService'
 
 /**
  * Get unified calendar view

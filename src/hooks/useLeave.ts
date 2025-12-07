@@ -18,9 +18,9 @@ import {
   uploadLeaveDocument,
   completeHandover,
   getPendingApprovals,
-  LeaveRequestFilters,
-  CreateLeaveRequestData,
-  UpdateLeaveRequestData,
+  type LeaveRequestFilters,
+  type CreateLeaveRequestData,
+  type UpdateLeaveRequestData,
 } from '@/services/leaveService'
 
 // Query keys

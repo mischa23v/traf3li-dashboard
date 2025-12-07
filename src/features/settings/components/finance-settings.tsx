@@ -60,7 +60,7 @@ import {
     useDeletePriceLevel,
     useSetDefaultPriceLevel,
 } from '@/hooks/useAccounting'
-import { Account, AccountType, AccountSubType, PriceLevel } from '@/services/accountingService'
+import { type Account, type AccountType, type AccountSubType, type PriceLevel } from '@/services/accountingService'
 import { Skeleton } from '@/components/ui/skeleton'
 import { formatSAR } from '@/lib/currency'
 

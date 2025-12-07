@@ -6,12 +6,12 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import remindersService, {
-  ReminderFilters,
-  CreateReminderData,
+  type ReminderFilters,
+  type CreateReminderData,
 } from '@/services/remindersService'
 import eventsService, {
-  EventFilters,
-  CreateEventData,
+  type EventFilters,
+  type CreateEventData,
 } from '@/services/eventsService'
 
 // ==================== REMINDERS ====================

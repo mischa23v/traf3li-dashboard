@@ -5,7 +5,7 @@
 
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import authService, { User, LoginCredentials } from '@/services/authService'
+import authService, { type User, type LoginCredentials } from '@/services/authService'
 import { usePermissionsStore } from './permissions-store'
 
 interface AuthState {

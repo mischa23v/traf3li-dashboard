@@ -6,10 +6,10 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import billingSettingsService, {
-  UpdateCompanySettingsData,
-  CreateTaxData,
-  CreatePaymentModeData,
-  UpdateFinanceSettingsData,
+  type UpdateCompanySettingsData,
+  type CreateTaxData,
+  type CreatePaymentModeData,
+  type UpdateFinanceSettingsData,
 } from '@/services/billingSettingsService'
 
 // ==================== COMPANY SETTINGS ====================

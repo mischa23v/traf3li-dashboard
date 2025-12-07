@@ -3,7 +3,7 @@
  * Connects to Traf3li backend for authentication
  */
 
-import { HTMLAttributes, useState } from 'react'
+import { type HTMLAttributes, useState } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'

@@ -341,7 +341,7 @@ export function CreateInvoiceView() {
         const numInstallments = parseInt(installments)
         const amount = calculations.balanceDue / numInstallments
         const schedule = []
-        let currentDate = new Date(dueDate || issueDate)
+        const currentDate = new Date(dueDate || issueDate)
 
         for (let i = 0; i < numInstallments; i++) {
             schedule.push({

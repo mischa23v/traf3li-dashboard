@@ -62,7 +62,7 @@ import {
   ReviewStatus,
   CompaRatioCategory,
   CompensationModel,
-  PartnershipTier,
+  type PartnershipTier,
   EmploymentType,
   type CreateCompensationInput,
   type Allowance,

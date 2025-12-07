@@ -48,7 +48,7 @@ import {
   compensationModelLabels,
   partnershipTierLabels,
   employmentTypeLabels,
-  CompensationStatus,
+  type CompensationStatus,
   CompaRatioCategory,
   ReviewStatus,
 } from '@/services/compensationService'

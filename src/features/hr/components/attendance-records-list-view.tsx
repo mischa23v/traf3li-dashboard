@@ -75,7 +75,7 @@ export function AttendanceRecordsListView() {
   // Filter records based on search
   const filteredRecords = useMemo(() => {
     if (!attendanceData?.data) return []
-    let records = attendanceData.data.filter((record) => {
+    const records = attendanceData.data.filter((record) => {
       const matchesSearch =
         record.employeeName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
         record.employeeNameAr?.includes(searchQuery) ||

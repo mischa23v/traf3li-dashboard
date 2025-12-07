@@ -1,10 +1,10 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import hrService, {
-  EmployeeFilters,
-  CreateEmployeeData,
-  UpdateEmployeeData,
-  DocumentType,
+  type EmployeeFilters,
+  type CreateEmployeeData,
+  type UpdateEmployeeData,
+  type DocumentType,
 } from '@/services/hrService'
 
 // ==================== EMPLOYEES ====================

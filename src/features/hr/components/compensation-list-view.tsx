@@ -39,8 +39,8 @@ import {
 import {
   compensationStatusLabels,
   compaRatioCategoryLabels,
-  CompensationStatus,
-  CompaRatioCategory,
+  type CompensationStatus,
+  type CompaRatioCategory,
 } from '@/services/compensationService'
 
 export function CompensationListView() {

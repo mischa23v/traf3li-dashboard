@@ -29,7 +29,7 @@ import { toast } from 'sonner'
 import {
   ReportSection,
   ReportCategory,
-  DataModule,
+  type DataModule,
   ReportFormat,
   reportCategoryLabels,
   dataModuleLabels,

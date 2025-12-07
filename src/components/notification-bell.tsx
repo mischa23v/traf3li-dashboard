@@ -19,7 +19,7 @@ import {
 } from '@/components/ui/popover'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Separator } from '@/components/ui/separator'
-import { useNotifications, Notification } from '@/context/socket-provider'
+import { useNotifications, type Notification } from '@/context/socket-provider'
 
 // Notification type icons
 const notificationIcons: Record<string, string> = {

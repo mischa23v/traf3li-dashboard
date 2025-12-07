@@ -2,13 +2,13 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import {
   compensationApi,
   CompensationReward,
-  CompensationFilters,
-  CreateCompensationInput,
-  UpdateCompensationInput,
-  Allowance,
-  RecognitionAward,
-  ChangeType,
-  BonusType
+  type CompensationFilters,
+  type CreateCompensationInput,
+  type UpdateCompensationInput,
+  type Allowance,
+  type RecognitionAward,
+  type ChangeType,
+  type BonusType
 } from '@/services/compensationService'
 import { toast } from 'sonner'
 

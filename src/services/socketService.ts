@@ -3,7 +3,7 @@
  * Handles all Socket.IO real-time communication
  */
 
-import { io, Socket } from 'socket.io-client'
+import { io, type Socket } from 'socket.io-client'
 
 const SOCKET_URL =
   import.meta.env.VITE_API_URL?.replace('/api', '') ||

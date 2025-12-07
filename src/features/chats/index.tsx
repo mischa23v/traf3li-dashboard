@@ -1,4 +1,4 @@
-import { useState, useMemo, FormEvent } from 'react'
+import { useState, useMemo, type FormEvent } from 'react'
 import { Fragment } from 'react/jsx-runtime'
 import { format } from 'date-fns'
 import {

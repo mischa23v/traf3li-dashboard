@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import appsService, { GetAppsParams, ConnectAppData } from '@/services/appsService'
+import appsService, { type GetAppsParams, type ConnectAppData } from '@/services/appsService'
 import { toast } from 'sonner'
 
 export const useApps = (params?: GetAppsParams) => {

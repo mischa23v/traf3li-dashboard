@@ -44,9 +44,9 @@ import {
   reportFormatLabels,
   accessLevelLabels,
   usageFrequencyLabels,
-  ReportStatus,
-  ReportCategory,
-  ReportType,
+  type ReportStatus,
+  type ReportCategory,
+  type ReportType,
   ReportSection,
   categoriesBySection,
 } from '@/services/reportsService'

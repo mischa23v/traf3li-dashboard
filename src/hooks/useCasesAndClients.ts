@@ -8,31 +8,31 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { useTranslation } from 'react-i18next'
 import casesService, {
-  CaseFilters,
-  CreateCaseData,
-  UpdateCaseData,
-  AddNoteData,
-  AddDocumentData,
-  AddHearingData,
-  AddClaimData,
-  UpdateNoteData,
-  UpdateHearingData,
-  UpdateClaimData,
-  AddTimelineEventData,
-  UpdateTimelineEventData,
+  type CaseFilters,
+  type CreateCaseData,
+  type UpdateCaseData,
+  type AddNoteData,
+  type AddDocumentData,
+  type AddHearingData,
+  type AddClaimData,
+  type UpdateNoteData,
+  type UpdateHearingData,
+  type UpdateClaimData,
+  type AddTimelineEventData,
+  type UpdateTimelineEventData,
   GetUploadUrlData,
   ConfirmUploadData,
-  CaseStatus,
-  CaseOutcome,
-  Case,
+  type CaseStatus,
+  type CaseOutcome,
+  type Case,
   AuditLogEntry,
 } from '@/services/casesService'
 import clientsService, {
-  ClientFilters,
-  CreateClientData,
+  type ClientFilters,
+  type CreateClientData,
 } from '@/services/clientsService'
 import lawyersService, {
-  LawyerFilters,
+  type LawyerFilters,
   Lawyer,
 } from '@/services/lawyersService'
 import eventsService from '@/services/eventsService'

@@ -3,8 +3,8 @@
  * Provides Socket.IO connection and real-time notification handling
  */
 
-import { createContext, useContext, useEffect, useState, useCallback, ReactNode } from 'react'
-import { io, Socket } from 'socket.io-client'
+import { createContext, useContext, useEffect, useState, useCallback, type ReactNode } from 'react'
+import { io, type Socket } from 'socket.io-client'
 import { useAuthStore } from '@/stores/auth-store'
 
 const SOCKET_URL =

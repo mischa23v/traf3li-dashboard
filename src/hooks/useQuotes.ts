@@ -5,7 +5,7 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
-import quoteService, { QuoteFilters, CreateQuoteData, QuoteStatus } from '@/services/quoteService'
+import quoteService, { type QuoteFilters, type CreateQuoteData, type QuoteStatus } from '@/services/quoteService'
 
 // Get all quotes
 export const useQuotes = (filters?: QuoteFilters) => {

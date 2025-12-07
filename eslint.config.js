@@ -7,7 +7,7 @@ import { defineConfig } from 'eslint/config'
 import tseslint from 'typescript-eslint'
 
 export default defineConfig(
-  { ignores: ['dist', 'src/components/ui', 'newdesigns', 'CaseAce-law-firm-management-system-frontend-main'] },
+  { ignores: ['dist', 'src/components/ui', 'newdesigns', 'CaseAce-law-firm-management-system-frontend-main', 'traf3li-backend-for testing only different github', 'miru-web-develop', 'test'] },
   {
     extends: [
       js.configs.recommended,

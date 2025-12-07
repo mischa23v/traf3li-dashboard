@@ -6,17 +6,17 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import tasksService, {
-  TaskFilters,
-  CreateTaskData,
-  TaskStatus,
-  Subtask,
-  Task,
-  TaskStats,
-  BulkOperationResult,
-  WorkflowRule,
-  TaskOutcome,
-  TimeBudget,
-  Comment,
+  type TaskFilters,
+  type CreateTaskData,
+  type TaskStatus,
+  type Subtask,
+  type Task,
+  type TaskStats,
+  type BulkOperationResult,
+  type WorkflowRule,
+  type TaskOutcome,
+  type TimeBudget,
+  type Comment,
   TaskDocument,
   Attachment,
 } from '@/services/tasksService'

@@ -1,8 +1,8 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import usersService, {
-  GetUsersParams,
-  CreateUserData,
-  UpdateUserData,
+  type GetUsersParams,
+  type CreateUserData,
+  type UpdateUserData,
 } from '@/services/usersService'
 import { toast } from 'sonner'
 

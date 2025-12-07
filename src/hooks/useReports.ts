@@ -2,16 +2,16 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import {
   reportsApi,
   Report,
-  ReportFilters,
-  CreateReportInput,
-  UpdateReportInput,
-  ReportCategory,
-  ReportSection,
-  OutputFormat,
-  ScheduleFrequency,
-  DataModule,
-  ReportFilter,
-  DistributionRecipient
+  type ReportFilters,
+  type CreateReportInput,
+  type UpdateReportInput,
+  type ReportCategory,
+  type ReportSection,
+  type OutputFormat,
+  type ScheduleFrequency,
+  type DataModule,
+  type ReportFilter,
+  type DistributionRecipient
 } from '@/services/reportsService'
 import { toast } from 'sonner'
 
