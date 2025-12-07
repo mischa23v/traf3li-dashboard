@@ -63,6 +63,7 @@ export function ProductivityHero({ badge, title = 'الإنتاجية', type = '
         'organizational-structure': { label: 'الهيكل التنظيمي', href: '/dashboard/hr/organizational-structure' },
         'job-positions': { label: 'المناصب الوظيفية', href: '/dashboard/hr/job-positions' },
         'succession-planning': { label: 'تخطيط التعاقب', href: '/dashboard/hr/succession-planning' },
+        'compensation': { label: 'التعويضات', href: '/dashboard/hr/compensation' },
     }
 
     const buttonConfig: Record<string, { label: string; href: string }> = {
@@ -95,6 +96,7 @@ export function ProductivityHero({ badge, title = 'الإنتاجية', type = '
         'organizational-structure': { label: 'وحدة جديدة', href: '/dashboard/hr/organizational-structure/new' },
         'job-positions': { label: 'منصب جديد', href: '/dashboard/hr/job-positions/new' },
         'succession-planning': { label: 'خطة تعاقب جديدة', href: '/dashboard/hr/succession-planning/new' },
+        'compensation': { label: 'سجل تعويضات جديد', href: '/dashboard/hr/compensation/new' },
         laws: { label: 'قانون جديد', href: '/dashboard/knowledge/laws/new' },
         judgments: { label: 'حكم جديد', href: '/dashboard/knowledge/judgments/new' },
         forms: { label: 'نموذج جديد', href: '/dashboard/knowledge/forms/new' },
