@@ -1,0 +1,500 @@
+import { HRSidebar } from './hr-sidebar'
+import { useState } from 'react'
+import { Main } from '@/components/layout/main'
+import { LanguageSwitcher } from '@/components/language-switcher'
+import { ThemeSwitch } from '@/components/theme-switch'
+import { ConfigDrawer } from '@/components/config-drawer'
+import { ProfileDropdown } from '@/components/profile-dropdown'
+import { ProductivityHero } from '@/components/productivity-hero'
+import { useNavigate } from '@tanstack/react-router'
+import { useTrainings, useTrainingStats, useBulkDeleteTrainings } from '@/hooks/useTraining'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Card, CardContent } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import { Checkbox } from '@/components/ui/checkbox'
+import { Header } from '@/components/layout/header'
+import { TopNav } from '@/components/layout/top-nav'
+import { DynamicIsland } from '@/components/dynamic-island'
+import { Progress } from '@/components/ui/progress'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+import {
+  Search, Bell, Plus, MoreHorizontal, Eye, Edit, Trash2,
+  AlertCircle, Loader2, GraduationCap, Clock, CheckCircle, BookOpen,
+  Users, Calendar, Award, TrendingUp, Monitor, Building2, Scale
+} from 'lucide-react'
+import {
+  TRAINING_TYPE_LABELS,
+  TRAINING_STATUS_LABELS,
+  TRAINING_CATEGORY_LABELS,
+  DIFFICULTY_LABELS,
+  type TrainingStatus,
+  type TrainingType,
+  type TrainingCategory,
+} from '@/services/trainingService'
+
+export function TrainingListView() {
+  const navigate = useNavigate()
+  const [searchQuery, setSearchQuery] = useState('')
+  const [statusFilter, setStatusFilter] = useState<TrainingStatus | 'all'>('all')
+  const [typeFilter, setTypeFilter] = useState<TrainingType | 'all'>('all')
+  const [categoryFilter, setCategoryFilter] = useState<TrainingCategory | 'all'>('all')
+  const [selectedIds, setSelectedIds] = useState<string[]>([])
+  const [selectionMode, setSelectionMode] = useState(false)
+
+  const { data: trainingsData, isLoading, error } = useTrainings({
+    status: statusFilter !== 'all' ? statusFilter : undefined,
+    trainingType: typeFilter !== 'all' ? typeFilter : undefined,
+    trainingCategory: categoryFilter !== 'all' ? categoryFilter : undefined,
+    search: searchQuery || undefined,
+  })
+
+  const { data: stats } = useTrainingStats()
+  const bulkDeleteMutation = useBulkDeleteTrainings()
+
+  const trainings = trainingsData?.data || []
+
+  const handleSelectAll = () => {
+    if (selectedIds.length === trainings.length) {
+      setSelectedIds([])
+    } else {
+      setSelectedIds(trainings.map(t => t._id))
+    }
+  }
+
+  const handleSelectOne = (id: string) => {
+    if (selectedIds.includes(id)) {
+      setSelectedIds(selectedIds.filter(i => i !== id))
+    } else {
+      setSelectedIds([...selectedIds, id])
+    }
+  }
+
+  const handleBulkDelete = () => {
+    if (selectedIds.length > 0 && confirm(`هل أنت متأكد من حذف ${selectedIds.length} تدريب؟`)) {
+      bulkDeleteMutation.mutate(selectedIds, {
+        onSuccess: () => {
+          setSelectedIds([])
+          setSelectionMode(false)
+        },
+      })
+    }
+  }
+
+  const getStatusColor = (status: TrainingStatus) => {
+    const colors: Record<TrainingStatus, string> = {
+      requested: 'bg-slate-100 text-slate-700 border-slate-200',
+      approved: 'bg-blue-100 text-blue-700 border-blue-200',
+      rejected: 'bg-red-100 text-red-700 border-red-200',
+      enrolled: 'bg-purple-100 text-purple-700 border-purple-200',
+      in_progress: 'bg-amber-100 text-amber-700 border-amber-200',
+      completed: 'bg-emerald-100 text-emerald-700 border-emerald-200',
+      cancelled: 'bg-gray-100 text-gray-700 border-gray-200',
+      failed: 'bg-red-100 text-red-700 border-red-200',
+    }
+    return colors[status]
+  }
+
+  const getTypeIcon = (type: TrainingType) => {
+    const icons: Record<TrainingType, React.ReactNode> = {
+      internal: <Building2 className="w-4 h-4" />,
+      external: <Users className="w-4 h-4" />,
+      online: <Monitor className="w-4 h-4" />,
+      certification: <Award className="w-4 h-4" />,
+      conference: <Users className="w-4 h-4" />,
+      workshop: <BookOpen className="w-4 h-4" />,
+      mentoring: <Users className="w-4 h-4" />,
+      on_the_job: <Building2 className="w-4 h-4" />,
+    }
+    return icons[type]
+  }
+
+  const topNav = [
+    { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
+    { title: 'الموظفين', href: '/dashboard/hr/employees', isActive: false },
+    { title: 'التدريب', href: '/dashboard/hr/training', isActive: true },
+  ]
+
+  return (
+    <>
+      <Header className="bg-navy shadow-none relative">
+        <TopNav links={topNav} className="[&>a]:text-slate-300 [&>a:hover]:text-white [&>a[aria-current='page']]:text-white" />
+        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
+          <DynamicIsland />
+        </div>
+        <div className='ms-auto flex items-center space-x-4'>
+          <div className="relative hidden md:block">
+            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+            <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pr-9 pl-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
+          </div>
+          <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white">
+            <Bell className="h-5 w-5" />
+            <span className="absolute top-2 right-2 h-2 w-2 bg-red-500 rounded-full border border-navy"></span>
+          </Button>
+          <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white" />
+          <ThemeSwitch className="text-slate-300 hover:bg-white/10 hover:text-white" />
+          <ConfigDrawer className="text-slate-300 hover:bg-white/10 hover:text-white" />
+          <ProfileDropdown className="text-slate-300 hover:bg-white/10 hover:text-white" />
+        </div>
+        <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-emerald-500/50 to-transparent"></div>
+      </Header>
+
+      <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-r border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
+        <ProductivityHero
+          badge="الموارد البشرية"
+          title="التدريب والتطوير"
+          type="employees"
+          listMode={true}
+        />
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="lg:col-span-2 space-y-6">
+            {/* Stats Cards */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <Card className="rounded-2xl border-slate-100">
+                <CardContent className="p-4">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-blue-100 rounded-xl">
+                      <GraduationCap className="w-5 h-5 text-blue-600" />
+                    </div>
+                    <div>
+                      <p className="text-xs text-slate-500">إجمالي التدريبات</p>
+                      <p className="text-xl font-bold text-navy">{stats?.totalTrainings || 0}</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+              <Card className="rounded-2xl border-slate-100">
+                <CardContent className="p-4">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-amber-100 rounded-xl">
+                      <Clock className="w-5 h-5 text-amber-600" />
+                    </div>
+                    <div>
+                      <p className="text-xs text-slate-500">قيد التنفيذ</p>
+                      <p className="text-xl font-bold text-navy">{stats?.inProgress || 0}</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+              <Card className="rounded-2xl border-slate-100">
+                <CardContent className="p-4">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-emerald-100 rounded-xl">
+                      <CheckCircle className="w-5 h-5 text-emerald-600" />
+                    </div>
+                    <div>
+                      <p className="text-xs text-slate-500">المكتملة هذا الشهر</p>
+                      <p className="text-xl font-bold text-navy">{stats?.completedThisMonth || 0}</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+              <Card className="rounded-2xl border-slate-100">
+                <CardContent className="p-4">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-purple-100 rounded-xl">
+                      <TrendingUp className="w-5 h-5 text-purple-600" />
+                    </div>
+                    <div>
+                      <p className="text-xs text-slate-500">معدل الإكمال</p>
+                      <p className="text-xl font-bold text-navy">{stats?.completionRate || 0}%</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* CLE Credits Card (for attorneys) */}
+            {stats?.cleCreditsEarned !== undefined && stats.cleCreditsEarned > 0 && (
+              <Card className="rounded-2xl border-slate-100 bg-amber-50/50">
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 bg-amber-100 rounded-xl">
+                        <Scale className="w-5 h-5 text-amber-600" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-amber-800">نقاط التعليم القانوني المستمر (CLE)</p>
+                        <p className="text-xs text-amber-600">الساعات المكتسبة هذا العام</p>
+                      </div>
+                    </div>
+                    <p className="text-2xl font-bold text-amber-700">{stats.cleCreditsEarned}</p>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Filter Bar */}
+            <Card className="rounded-2xl border-slate-100">
+              <CardContent className="p-4">
+                <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
+                  <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
+                    <div className="relative flex-1 md:w-56">
+                      <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                      <Input
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        placeholder="بحث عن تدريب..."
+                        className="pr-9 rounded-xl"
+                      />
+                    </div>
+                    <Select value={statusFilter} onValueChange={(v) => setStatusFilter(v as TrainingStatus | 'all')}>
+                      <SelectTrigger className="w-[130px] rounded-xl">
+                        <SelectValue placeholder="الحالة" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">كل الحالات</SelectItem>
+                        {Object.entries(TRAINING_STATUS_LABELS).map(([key, label]) => (
+                          <SelectItem key={key} value={key}>{label.ar}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <Select value={typeFilter} onValueChange={(v) => setTypeFilter(v as TrainingType | 'all')}>
+                      <SelectTrigger className="w-[130px] rounded-xl">
+                        <SelectValue placeholder="النوع" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">كل الأنواع</SelectItem>
+                        {Object.entries(TRAINING_TYPE_LABELS).map(([key, label]) => (
+                          <SelectItem key={key} value={key}>{label.ar}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    {selectionMode && selectedIds.length > 0 && (
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        onClick={handleBulkDelete}
+                        className="rounded-xl"
+                      >
+                        <Trash2 className="w-4 h-4 ml-1" />
+                        حذف ({selectedIds.length})
+                      </Button>
+                    )}
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        setSelectionMode(!selectionMode)
+                        setSelectedIds([])
+                      }}
+                      className="rounded-xl"
+                    >
+                      {selectionMode ? 'إلغاء' : 'تحديد'}
+                    </Button>
+                    <Button
+                      size="sm"
+                      onClick={() => navigate({ to: '/dashboard/hr/training/new' })}
+                      className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl shadow-lg shadow-emerald-500/20"
+                    >
+                      <Plus className="w-4 h-4 ml-1" />
+                      تدريب جديد
+                    </Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Selection Header */}
+            {selectionMode && (
+              <div className="flex items-center gap-4 px-4 py-2 bg-slate-100 rounded-xl">
+                <Checkbox
+                  checked={selectedIds.length === trainings.length && trainings.length > 0}
+                  onCheckedChange={handleSelectAll}
+                />
+                <span className="text-sm text-slate-600">
+                  تحديد الكل ({trainings.length})
+                </span>
+              </div>
+            )}
+
+            {/* Trainings List */}
+            {isLoading ? (
+              <Card className="rounded-2xl border-slate-100">
+                <CardContent className="p-8 text-center">
+                  <Loader2 className="w-8 h-8 animate-spin mx-auto text-emerald-500" />
+                  <p className="mt-4 text-slate-500">جاري تحميل التدريبات...</p>
+                </CardContent>
+              </Card>
+            ) : error ? (
+              <Card className="rounded-2xl border-slate-100">
+                <CardContent className="p-8 text-center">
+                  <AlertCircle className="w-8 h-8 mx-auto text-red-500" />
+                  <p className="mt-4 text-red-600">حدث خطأ في تحميل البيانات</p>
+                </CardContent>
+              </Card>
+            ) : trainings.length === 0 ? (
+              <Card className="rounded-2xl border-slate-100">
+                <CardContent className="p-8 text-center">
+                  <GraduationCap className="w-12 h-12 mx-auto text-slate-300" />
+                  <p className="mt-4 text-slate-500">لا توجد تدريبات</p>
+                  <Button
+                    onClick={() => navigate({ to: '/dashboard/hr/training/new' })}
+                    className="mt-4 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl"
+                  >
+                    <Plus className="w-4 h-4 ml-1" />
+                    إضافة تدريب جديد
+                  </Button>
+                </CardContent>
+              </Card>
+            ) : (
+              <div className="space-y-4">
+                {trainings.map((training) => (
+                  <Card key={training._id} className="rounded-2xl border-slate-100 hover:shadow-md transition-shadow">
+                    <CardContent className="p-4">
+                      <div className="flex items-start gap-4">
+                        {selectionMode && (
+                          <Checkbox
+                            checked={selectedIds.includes(training._id)}
+                            onCheckedChange={() => handleSelectOne(training._id)}
+                            className="mt-1"
+                          />
+                        )}
+                        <div className="flex-1">
+                          <div className="flex items-start justify-between">
+                            <div>
+                              <div className="flex items-center gap-2 mb-1">
+                                <h3 className="font-bold text-navy">
+                                  {training.trainingTitleAr || training.trainingTitle}
+                                </h3>
+                                {training.cleDetails?.isCLE && (
+                                  <Badge className="bg-amber-100 text-amber-700 text-xs">
+                                    <Scale className="w-3 h-3 ml-1" />
+                                    CLE {training.cleDetails.cleCredits}
+                                  </Badge>
+                                )}
+                                {training.complianceTracking?.isMandatory && (
+                                  <Badge className="bg-red-100 text-red-700 text-xs">
+                                    إلزامي
+                                  </Badge>
+                                )}
+                              </div>
+                              <p className="text-sm text-slate-500">
+                                {training.trainingNumber} - {training.employeeNameAr || training.employeeName}
+                              </p>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <Badge className={getStatusColor(training.status)}>
+                                {TRAINING_STATUS_LABELS[training.status]?.ar}
+                              </Badge>
+                              <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                  <Button variant="ghost" size="icon" className="rounded-xl">
+                                    <MoreHorizontal className="w-4 h-4" />
+                                  </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end">
+                                  <DropdownMenuItem onClick={() => navigate({ to: `/dashboard/hr/training/${training._id}` })}>
+                                    <Eye className="w-4 h-4 ml-2" />
+                                    عرض التفاصيل
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem onClick={() => navigate({ to: `/dashboard/hr/training/new?editId=${training._id}` })}>
+                                    <Edit className="w-4 h-4 ml-2" />
+                                    تعديل
+                                  </DropdownMenuItem>
+                                  <DropdownMenuSeparator />
+                                  <DropdownMenuItem className="text-red-600">
+                                    <Trash2 className="w-4 h-4 ml-2" />
+                                    حذف
+                                  </DropdownMenuItem>
+                                </DropdownMenuContent>
+                              </DropdownMenu>
+                            </div>
+                          </div>
+
+                          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
+                            <div>
+                              <p className="text-xs text-slate-500">نوع التدريب</p>
+                              <div className="flex items-center gap-1 mt-1">
+                                {getTypeIcon(training.trainingType)}
+                                <Badge className={`bg-${TRAINING_TYPE_LABELS[training.trainingType]?.color}-100 text-${TRAINING_TYPE_LABELS[training.trainingType]?.color}-700`}>
+                                  {TRAINING_TYPE_LABELS[training.trainingType]?.ar}
+                                </Badge>
+                              </div>
+                            </div>
+                            <div>
+                              <p className="text-xs text-slate-500">التصنيف</p>
+                              <Badge className={`mt-1 bg-${TRAINING_CATEGORY_LABELS[training.trainingCategory]?.color}-100 text-${TRAINING_CATEGORY_LABELS[training.trainingCategory]?.color}-700`}>
+                                {TRAINING_CATEGORY_LABELS[training.trainingCategory]?.ar}
+                              </Badge>
+                            </div>
+                            <div>
+                              <p className="text-xs text-slate-500">المدة</p>
+                              <p className="font-medium">{training.duration.totalHours} ساعة</p>
+                            </div>
+                            <div>
+                              <p className="text-xs text-slate-500">المستوى</p>
+                              <Badge className={`bg-${DIFFICULTY_LABELS[training.difficultyLevel]?.color}-100 text-${DIFFICULTY_LABELS[training.difficultyLevel]?.color}-700`}>
+                                {DIFFICULTY_LABELS[training.difficultyLevel]?.ar}
+                              </Badge>
+                            </div>
+                          </div>
+
+                          {/* Progress for in-progress trainings */}
+                          {training.status === 'in_progress' && training.progress && (
+                            <div className="mt-4">
+                              <div className="flex justify-between text-sm mb-1">
+                                <span className="text-slate-500">التقدم</span>
+                                <span className="font-medium text-emerald-600">
+                                  {training.progress.progressPercentage}%
+                                </span>
+                              </div>
+                              <Progress value={training.progress.progressPercentage} className="h-2" />
+                              <p className="text-xs text-slate-500 mt-1">
+                                {training.progress.completedModules} / {training.progress.totalModules} وحدة
+                              </p>
+                            </div>
+                          )}
+
+                          <div className="flex items-center justify-between mt-4 pt-3 border-t border-slate-100">
+                            <div className="flex items-center gap-4 text-xs text-slate-500">
+                              <span className="flex items-center gap-1">
+                                <Calendar className="w-3 h-3" />
+                                {new Date(training.startDate).toLocaleDateString('ar-SA')} - {new Date(training.endDate).toLocaleDateString('ar-SA')}
+                              </span>
+                              {training.costs?.totalCost && (
+                                <span>{training.costs.totalCost.toLocaleString('ar-SA')} ر.س</span>
+                              )}
+                            </div>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => navigate({ to: `/dashboard/hr/training/${training._id}` })}
+                              className="text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 rounded-xl"
+                            >
+                              عرض التفاصيل
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Sidebar */}
+          <HRSidebar context="employees" />
+        </div>
+      </Main>
+    </>
+  )
+}
