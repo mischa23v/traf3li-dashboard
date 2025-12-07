@@ -18,7 +18,6 @@ class SocketService {
    */
   connect(userId: string): void {
     if (this.socket?.connected) {
-      console.log('Socket already connected')
       return
     }
 
@@ -34,7 +33,6 @@ class SocketService {
     })
 
     this.socket.on('connect', () => {
-      console.log('Socket connected:', this.socket?.id)
       // Join user session
       if (this.userId) {
         this.socket?.emit('user:join', this.userId)
@@ -42,15 +40,12 @@ class SocketService {
     })
 
     this.socket.on('disconnect', (reason) => {
-      console.log('Socket disconnected:', reason)
     })
 
     this.socket.on('connect_error', (error) => {
-      console.error('Socket connection error:', error)
     })
 
     this.socket.on('error', (error) => {
-      console.error('Socket error:', error)
     })
   }
 

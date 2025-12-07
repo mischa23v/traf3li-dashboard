@@ -74,7 +74,6 @@ export function ChatView() {
             setMessageText('')
             setSelectedFiles([])
         } catch (error) {
-            console.error('Failed to send message:', error)
         }
     }
 

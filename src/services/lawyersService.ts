@@ -57,7 +57,6 @@ const lawyersService = {
       })
       return response.data.lawyers
     } catch (error: any) {
-      console.error('Get lawyers error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -71,7 +70,6 @@ const lawyersService = {
       const response = await apiClient.get<LawyerResponse>(`/lawyers/${id}`)
       return response.data.lawyer
     } catch (error: any) {
-      console.error('Get lawyer error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -84,8 +82,7 @@ const lawyersService = {
     try {
       const response = await apiClient.get<LawyersResponse>('/lawyers/team')
       return response.data.lawyers
-    } catch (error: any) {
-      console.error('Get team members error:', error)
+    } catch {
       // Fallback to getAll if team endpoint doesn't exist
       return lawyersService.getAll({ status: 'active' })
     }

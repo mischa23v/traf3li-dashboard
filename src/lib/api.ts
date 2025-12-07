@@ -46,7 +46,6 @@ apiClient.interceptors.request.use(
       if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
         // Return cached data
         if (import.meta.env.DEV) {
-          console.log(`📦 Cache Hit: ${config.url}`)
         }
         // Abort request and use cached data
         config.adapter = () => Promise.resolve({
@@ -61,12 +60,10 @@ apiClient.interceptors.request.use(
 
     // Log requests in development
     if (import.meta.env.DEV) {
-      console.log(`🚀 API Request: ${config.method?.toUpperCase()} ${config.url}`)
     }
     return config
   },
   (error: AxiosError) => {
-    console.error('❌ Request Error:', error)
     return Promise.reject(error)
   }
 )
@@ -88,7 +85,6 @@ apiClient.interceptors.response.use(
 
     // Log successful responses in development
     if (import.meta.env.DEV) {
-      console.log(`✅ API Response: ${response.config.url}`)
     }
     return response
   },
@@ -97,7 +93,6 @@ apiClient.interceptors.response.use(
 
     // Log errors in development
     if (import.meta.env.DEV) {
-      console.error('❌ API Error:', {
         url: originalRequest?.url,
         status: error.response?.status,
         message: error.response?.data?.message || error.message,
@@ -118,7 +113,6 @@ apiClient.interceptors.response.use(
         const delay = Math.min(1000 * Math.pow(2, originalRequest._retryCount - 1), 4000)
 
         if (import.meta.env.DEV) {
-          console.log(`🔄 Retrying request (${originalRequest._retryCount}/2) after ${delay}ms`)
         }
 
         await new Promise(resolve => setTimeout(resolve, delay))

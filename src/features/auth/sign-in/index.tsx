@@ -131,7 +131,6 @@ export function SignIn() {
 
   // Handle Google Login
   const handleGoogleLogin = () => {
-    console.log('Google login clicked');
   };
 
   return (

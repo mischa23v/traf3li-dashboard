@@ -186,16 +186,18 @@ export function LeadDetailsView() {
 
         <div className="ms-auto flex items-center gap-4">
           <div className="relative hidden md:block">
-            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" aria-hidden="true" />
             <input
               type="text"
               placeholder="بحث..."
+              aria-label="بحث"
               className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pr-9 pl-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
             />
           </div>
           <Button
             variant="ghost"
             size="icon"
+            aria-label="التنبيهات"
             className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white"
           >
             <Bell className="h-5 w-5" />
@@ -297,7 +299,7 @@ export function LeadDetailsView() {
                     variant="outline"
                     className="border-white/10 text-white hover:bg-white/10 hover:text-white backdrop-blur-sm"
                   >
-                    <Edit3 className="h-4 w-4 ms-2" />
+                    <Edit3 className="h-4 w-4 ms-2" aria-hidden="true" />
                     تعديل
                   </Button>
                 </Link>
@@ -309,9 +311,9 @@ export function LeadDetailsView() {
                   className="bg-emerald-500 hover:bg-emerald-600 text-white shadow-lg border-0"
                 >
                   {convertLeadMutation.isPending ? (
-                    <Loader2 className="h-4 w-4 animate-spin ms-2" />
+                    <Loader2 className="h-4 w-4 animate-spin ms-2" aria-hidden="true" />
                   ) : (
-                    <ArrowUpRight className="h-4 w-4 ms-2" />
+                    <ArrowUpRight className="h-4 w-4 ms-2" aria-hidden="true" />
                   )}
                   {lead.convertedToClient ? 'تم التحويل' : 'تحويل لعميل'}
                 </Button>
@@ -335,6 +337,7 @@ export function LeadDetailsView() {
                 {!showDeleteConfirm ? (
                   <Button
                     variant="outline"
+                    aria-label="حذف"
                     onClick={() => setShowDeleteConfirm(true)}
                     className="border-red-500/30 text-red-300 hover:bg-red-500/20 hover:text-red-200 backdrop-blur-sm"
                   >
@@ -358,7 +361,7 @@ export function LeadDetailsView() {
                       className="bg-red-500 hover:bg-red-600"
                     >
                       {deleteLeadMutation.isPending ? (
-                        <Loader2 className="h-4 w-4 animate-spin" />
+                        <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
                       ) : (
                         'تأكيد'
                       )}
@@ -417,7 +420,7 @@ export function LeadDetailsView() {
                             <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-6">
                               <div className="space-y-4">
                                 <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-xl">
-                                  <Phone className="h-5 w-5 text-emerald-500" />
+                                  <Phone className="h-5 w-5 text-emerald-500" aria-hidden="true" />
                                   <div>
                                     <p className="text-xs text-slate-500">
                                       الهاتف
@@ -432,7 +435,7 @@ export function LeadDetailsView() {
                                 </div>
                                 {lead.alternatePhone && (
                                   <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-xl">
-                                    <Phone className="h-5 w-5 text-slate-400" />
+                                    <Phone className="h-5 w-5 text-slate-400" aria-hidden="true" />
                                     <div>
                                       <p className="text-xs text-slate-500">
                                         هاتف بديل
@@ -449,7 +452,7 @@ export function LeadDetailsView() {
                               </div>
                               <div className="space-y-4">
                                 <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-xl">
-                                  <Mail className="h-5 w-5 text-blue-500" />
+                                  <Mail className="h-5 w-5 text-blue-500" aria-hidden="true" />
                                   <div>
                                     <p className="text-xs text-slate-500">
                                       البريد الإلكتروني
@@ -461,7 +464,7 @@ export function LeadDetailsView() {
                                 </div>
                                 {lead.whatsapp && (
                                   <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-xl">
-                                    <MessageSquare className="h-5 w-5 text-green-500" />
+                                    <MessageSquare className="h-5 w-5 text-green-500" aria-hidden="true" />
                                     <div>
                                       <p className="text-xs text-slate-500">
                                         واتساب
@@ -484,7 +487,7 @@ export function LeadDetailsView() {
                             <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
                               <CardHeader>
                                 <CardTitle className="text-lg font-bold text-navy flex items-center gap-2">
-                                  <MapPin className="h-5 w-5 text-red-500" />
+                                  <MapPin className="h-5 w-5 text-red-500" aria-hidden="true" />
                                   العنوان
                                 </CardTitle>
                               </CardHeader>

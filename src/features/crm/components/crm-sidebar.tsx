@@ -72,7 +72,7 @@ export function CrmSidebar({
             className="w-full bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl h-12 justify-start"
           >
             <Link to="/dashboard/crm/leads/new">
-              <UserPlus className="ms-3 h-5 w-5" />
+              <UserPlus className="ms-3 h-5 w-5" aria-hidden="true" />
               إضافة عميل محتمل
             </Link>
           </Button>
@@ -82,7 +82,7 @@ export function CrmSidebar({
             className="w-full rounded-xl h-12 justify-start border-slate-200 hover:bg-slate-50"
           >
             <Link to="/dashboard/crm/pipeline">
-              <TrendingUp className="ms-3 h-5 w-5 text-emerald-600" />
+              <TrendingUp className="ms-3 h-5 w-5 text-emerald-600" aria-hidden="true" />
               عرض مسار المبيعات
             </Link>
           </Button>
@@ -92,7 +92,7 @@ export function CrmSidebar({
             className="w-full rounded-xl h-12 justify-start border-slate-200 hover:bg-slate-50"
           >
             <Link to="/dashboard/crm/activities">
-              <Clock className="ms-3 h-5 w-5 text-blue-600" />
+              <Clock className="ms-3 h-5 w-5 text-blue-600" aria-hidden="true" />
               سجل الأنشطة
             </Link>
           </Button>
@@ -102,7 +102,7 @@ export function CrmSidebar({
             className="w-full rounded-xl h-12 justify-start border-slate-200 hover:bg-slate-50"
           >
             <Link to={links.reports.viewAll}>
-              <BarChart3 className="ms-3 h-5 w-5 text-purple-600" />
+              <BarChart3 className="ms-3 h-5 w-5 text-purple-600" aria-hidden="true" />
               التقارير والتحليلات
             </Link>
           </Button>
@@ -112,7 +112,7 @@ export function CrmSidebar({
               className="w-full bg-purple-500 hover:bg-purple-600 text-white rounded-xl h-12 justify-start"
             >
               <Link to={links.reports.create}>
-                <FileBarChart className="ms-3 h-5 w-5" />
+                <FileBarChart className="ms-3 h-5 w-5" aria-hidden="true" />
                 إنشاء تقرير جديد
               </Link>
             </Button>
@@ -125,7 +125,7 @@ export function CrmSidebar({
               variant="destructive"
               className="w-full rounded-xl h-12 justify-start"
             >
-              <Trash2 className="ms-3 h-5 w-5" />
+              <Trash2 className="ms-3 h-5 w-5" aria-hidden="true" />
               حذف المحدد ({selectedCount})
             </Button>
           )}
@@ -158,7 +158,7 @@ export function CrmSidebar({
           <div className="space-y-4">
             <div className="flex justify-between items-center p-3 bg-slate-50 rounded-xl">
               <span className="text-slate-600 flex items-center gap-2">
-                <Users className="h-4 w-4" />
+                <Users className="h-4 w-4" aria-hidden="true" />
                 إجمالي العملاء المحتملين
               </span>
               <span className="font-bold text-navy text-lg">
@@ -167,7 +167,7 @@ export function CrmSidebar({
             </div>
             <div className="flex justify-between items-center p-3 bg-emerald-50 rounded-xl">
               <span className="text-emerald-700 flex items-center gap-2">
-                <ArrowUpRight className="h-4 w-4" />
+                <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
                 تم التحويل
               </span>
               <span className="font-bold text-emerald-700 text-lg">
@@ -176,7 +176,7 @@ export function CrmSidebar({
             </div>
             <div className="flex justify-between items-center p-3 bg-blue-50 rounded-xl">
               <span className="text-blue-700 flex items-center gap-2">
-                <Target className="h-4 w-4" />
+                <Target className="h-4 w-4" aria-hidden="true" />
                 معدل التحويل
               </span>
               <span className="font-bold text-blue-700 text-lg">
@@ -213,7 +213,7 @@ export function CrmSidebar({
                   <div>
                     <p className="font-medium text-navy">{lead.displayName}</p>
                     <p className="text-xs text-slate-500 flex items-center gap-1 mt-1">
-                      <Phone className="h-3 w-3" />
+                      <Phone className="h-3 w-3" aria-hidden="true" />
                       {lead.phone}
                     </p>
                   </div>
@@ -258,7 +258,7 @@ export function CrmSidebar({
                 <p className="font-medium text-navy">{task.title}</p>
                 {task.taskData?.dueDate && (
                   <p className="text-xs text-slate-500 flex items-center gap-1 mt-1">
-                    <Calendar className="h-3 w-3" />
+                    <Calendar className="h-3 w-3" aria-hidden="true" />
                     {new Date(task.taskData.dueDate).toLocaleDateString('ar-SA')}
                   </p>
                 )}

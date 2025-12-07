@@ -412,7 +412,6 @@ export function SignUpForm() {
         const response = await apiClient.post('/auth/register', payload);
         if (response.status === 201) setShowSuccess(true);
       } catch (error: any) {
-        console.error('Registration error:', error);
         alert(error.response?.data?.message || 'حدث خطأ ما، يرجى المحاولة مرة أخرى');
       } finally {
         setLoading(false);

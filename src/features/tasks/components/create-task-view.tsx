@@ -264,7 +264,6 @@ export function CreateTaskView() {
             }),
         }
 
-        console.log('Submitting Task Data:', taskData)
 
         createTaskMutation.mutate(taskData, {
             onSuccess: () => {

@@ -39,12 +39,10 @@ export function getNotificationPermission(): NotificationPermission {
  */
 export async function requestNotificationPermission(): Promise<NotificationPermission> {
   if (!('Notification' in window)) {
-    console.warn('Notifications not supported')
     return 'denied'
   }
 
   const permission = await Notification.requestPermission()
-  console.log('Notification permission:', permission)
   return permission
 }
 
@@ -53,7 +51,6 @@ export async function requestNotificationPermission(): Promise<NotificationPermi
  */
 export async function registerServiceWorker(): Promise<ServiceWorkerRegistration | null> {
   if (!('serviceWorker' in navigator)) {
-    console.warn('Service workers not supported')
     return null
   }
 
@@ -64,7 +61,6 @@ export async function registerServiceWorker(): Promise<ServiceWorkerRegistration
       if (registration.active?.scriptURL.includes('sw.js')) {
         // Keep our service worker
         swRegistration = registration
-        console.log('Existing service worker found:', registration)
         return registration
       }
     }
@@ -74,16 +70,13 @@ export async function registerServiceWorker(): Promise<ServiceWorkerRegistration
       scope: '/',
     })
 
-    console.log('Service worker registered:', registration)
     swRegistration = registration
 
     // Wait for the service worker to be ready
     await navigator.serviceWorker.ready
-    console.log('Service worker ready')
 
     return registration
   } catch (error) {
-    console.error('Service worker registration failed:', error)
     return null
   }
 }
@@ -105,7 +98,6 @@ export async function getServiceWorkerRegistration(): Promise<ServiceWorkerRegis
     swRegistration = registration
     return registration
   } catch (error) {
-    console.error('Failed to get service worker registration:', error)
     return null
   }
 }
@@ -135,21 +127,18 @@ export async function subscribeToPush(): Promise<PushSubscription | null> {
     // Request permission first
     const permission = await requestNotificationPermission()
     if (permission !== 'granted') {
-      console.warn('Notification permission not granted')
       return null
     }
 
     // Get service worker registration
     const registration = await getServiceWorkerRegistration()
     if (!registration) {
-      console.error('No service worker registration')
       return null
     }
 
     // Check existing subscription
     let subscription = await registration.pushManager.getSubscription()
     if (subscription) {
-      console.log('Existing push subscription found')
       // Save to backend (in case it changed)
       await saveSubscriptionToBackend(subscription)
       return subscription
@@ -161,14 +150,12 @@ export async function subscribeToPush(): Promise<PushSubscription | null> {
       applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY),
     })
 
-    console.log('Push subscription created:', subscription)
 
     // Save subscription to backend
     await saveSubscriptionToBackend(subscription)
 
     return subscription
   } catch (error) {
-    console.error('Failed to subscribe to push:', error)
     return null
   }
 }
@@ -190,14 +177,12 @@ export async function unsubscribeFromPush(): Promise<boolean> {
 
     // Unsubscribe
     await subscription.unsubscribe()
-    console.log('Unsubscribed from push notifications')
 
     // Remove from backend
     await removeSubscriptionFromBackend()
 
     return true
   } catch (error) {
-    console.error('Failed to unsubscribe from push:', error)
     return false
   }
 }
@@ -215,7 +200,6 @@ export async function isSubscribedToPush(): Promise<boolean> {
     const subscription = await registration.pushManager.getSubscription()
     return subscription !== null
   } catch (error) {
-    console.error('Failed to check push subscription:', error)
     return false
   }
 }
@@ -228,9 +212,7 @@ async function saveSubscriptionToBackend(subscription: PushSubscription): Promis
     await apiClient.post('/users/push-subscription', {
       subscription: subscription.toJSON(),
     })
-    console.log('Push subscription saved to backend')
   } catch (error) {
-    console.error('Failed to save subscription to backend:', error)
     throw error
   }
 }
@@ -241,9 +223,7 @@ async function saveSubscriptionToBackend(subscription: PushSubscription): Promis
 async function removeSubscriptionFromBackend(): Promise<void> {
   try {
     await apiClient.delete('/users/push-subscription')
-    console.log('Push subscription removed from backend')
   } catch (error) {
-    console.error('Failed to remove subscription from backend:', error)
   }
 }
 
@@ -255,7 +235,6 @@ export async function getVapidPublicKey(): Promise<string> {
     const response = await apiClient.get<{ vapidPublicKey: string }>('/users/vapid-public-key')
     return response.data.vapidPublicKey
   } catch (error) {
-    console.error('Failed to get VAPID public key:', error)
     return VAPID_PUBLIC_KEY
   }
 }
@@ -266,7 +245,6 @@ export async function getVapidPublicKey(): Promise<string> {
  */
 export async function initializePushNotifications(): Promise<void> {
   if (!isPushSupported()) {
-    console.log('Push notifications not supported')
     return
   }
 
@@ -294,13 +272,11 @@ export async function initializePushNotifications(): Promise<void> {
 export async function showTestNotification(): Promise<void> {
   const permission = await requestNotificationPermission()
   if (permission !== 'granted') {
-    console.warn('Cannot show test notification: permission not granted')
     return
   }
 
   const registration = await getServiceWorkerRegistration()
   if (!registration) {
-    console.error('No service worker registration')
     return
   }
 

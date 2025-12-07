@@ -62,7 +62,6 @@ export function DocumentsViewDialog({
         url = await previewUrlMutation.mutateAsync(currentRow._id)
       } catch {
         // Fall back to existing URL if API fails
-        console.warn('Failed to get preview URL, using existing URL')
       }
 
       openSmartPreview({

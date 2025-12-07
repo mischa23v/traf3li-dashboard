@@ -420,7 +420,6 @@ const financeService = {
         total: response.data.total || 0,
       }
     } catch (error: any) {
-      console.error('Get invoices error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -433,7 +432,6 @@ const financeService = {
       const response = await apiClient.get(`/invoices/${id}`)
       return response.data.invoice || response.data.data
     } catch (error: any) {
-      console.error('Get invoice error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -446,7 +444,6 @@ const financeService = {
       const response = await apiClient.post('/invoices', data)
       return response.data.invoice || response.data.data
     } catch (error: any) {
-      console.error('Create invoice error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -459,7 +456,6 @@ const financeService = {
       const response = await apiClient.patch(`/invoices/${id}`, data)
       return response.data.invoice || response.data.data
     } catch (error: any) {
-      console.error('Update invoice error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -472,7 +468,6 @@ const financeService = {
       const response = await apiClient.post(`/invoices/${id}/send`)
       return response.data.invoice || response.data.data
     } catch (error: any) {
-      console.error('Send invoice error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -484,7 +479,6 @@ const financeService = {
     try {
       await apiClient.delete(`/invoices/${id}`)
     } catch (error: any) {
-      console.error('Delete invoice error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -497,7 +491,6 @@ const financeService = {
       const response = await apiClient.get('/invoices/overdue')
       return response.data.invoices || response.data.data || []
     } catch (error: any) {
-      console.error('Get overdue invoices error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -515,7 +508,6 @@ const financeService = {
         total: response.data.total || 0,
       }
     } catch (error: any) {
-      console.error('Get expenses error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -528,7 +520,6 @@ const financeService = {
       const response = await apiClient.get(`/expenses/${id}`)
       return response.data.expense || response.data.data
     } catch (error: any) {
-      console.error('Get expense error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -541,7 +532,6 @@ const financeService = {
       const response = await apiClient.post('/expenses', data)
       return response.data.expense || response.data.data
     } catch (error: any) {
-      console.error('Create expense error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -554,7 +544,6 @@ const financeService = {
       const response = await apiClient.patch(`/expenses/${id}`, data)
       return response.data.expense || response.data.data
     } catch (error: any) {
-      console.error('Update expense error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -573,7 +562,6 @@ const financeService = {
       })
       return response.data.receipt || response.data.data
     } catch (error: any) {
-      console.error('Upload receipt error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -586,7 +574,6 @@ const financeService = {
       const response = await apiClient.get('/expenses/stats', { params: filters })
       return response.data.stats || response.data.data
     } catch (error: any) {
-      console.error('Get expense stats error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -598,7 +585,6 @@ const financeService = {
     try {
       await apiClient.delete(`/expenses/${id}`)
     } catch (error: any) {
-      console.error('Delete expense error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -618,7 +604,6 @@ const financeService = {
       const response = await apiClient.post('/time-tracking/timer/start', data)
       return response.data
     } catch (error: any) {
-      console.error('Start timer error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -631,7 +616,6 @@ const financeService = {
       const response = await apiClient.post('/time-tracking/timer/pause')
       return response.data
     } catch (error: any) {
-      console.error('Pause timer error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -644,7 +628,6 @@ const financeService = {
       const response = await apiClient.post('/time-tracking/timer/resume')
       return response.data
     } catch (error: any) {
-      console.error('Resume timer error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -657,7 +640,6 @@ const financeService = {
       const response = await apiClient.post('/time-tracking/timer/stop', data)
       return response.data.timeEntry || response.data.data
     } catch (error: any) {
-      console.error('Stop timer error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -670,7 +652,6 @@ const financeService = {
       const response = await apiClient.get('/time-tracking/timer/status')
       return response.data
     } catch (error: any) {
-      console.error('Get timer status error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -683,7 +664,6 @@ const financeService = {
       const response = await apiClient.post('/time-tracking/entries', data)
       return response.data.timeEntry || response.data.data
     } catch (error: any) {
-      console.error('Create time entry error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -698,7 +678,6 @@ const financeService = {
       })
       return response.data
     } catch (error: any) {
-      console.error('Get time entries error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -711,7 +690,6 @@ const financeService = {
       const response = await apiClient.get(`/time-tracking/entries/${id}`)
       return response.data
     } catch (error: any) {
-      console.error('Get time entry error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -726,7 +704,6 @@ const financeService = {
       })
       return response.data
     } catch (error: any) {
-      console.error('Get time stats error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -739,7 +716,6 @@ const financeService = {
       const response = await apiClient.patch(`/time-tracking/entries/${id}`, data)
       return response.data.timeEntry || response.data.data
     } catch (error: any) {
-      console.error('Update time entry error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -751,7 +727,6 @@ const financeService = {
     try {
       await apiClient.delete(`/time-tracking/entries/${id}`)
     } catch (error: any) {
-      console.error('Delete time entry error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -766,7 +741,6 @@ const financeService = {
       const response = await apiClient.get('/payments', { params: filters })
       return response.data
     } catch (error: any) {
-      console.error('Get payments error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -779,7 +753,6 @@ const financeService = {
       const response = await apiClient.post('/payments', data)
       return response.data.payment || response.data.data
     } catch (error: any) {
-      console.error('Create payment error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -792,7 +765,6 @@ const financeService = {
       const response = await apiClient.get(`/payments/${id}`)
       return { payment: response.data.payment || response.data.data || response.data }
     } catch (error: any) {
-      console.error('Get payment error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -805,7 +777,6 @@ const financeService = {
       const response = await apiClient.post(`/payments/${id}/complete`)
       return response.data.payment || response.data.data
     } catch (error: any) {
-      console.error('Complete payment error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -818,7 +789,6 @@ const financeService = {
       const response = await apiClient.post(`/invoices/${invoiceId}/payments`, data)
       return response.data.payment || response.data.data
     } catch (error: any) {
-      console.error('Record payment error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -831,7 +801,6 @@ const financeService = {
       const response = await apiClient.get('/payments/summary', { params: filters })
       return response.data.summary || response.data.data || response.data
     } catch (error: any) {
-      console.error('Get payments summary error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -846,7 +815,6 @@ const financeService = {
       const response = await apiClient.get('/transactions', { params: filters })
       return response.data
     } catch (error: any) {
-      console.error('Get transactions error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -859,7 +827,6 @@ const financeService = {
       const response = await apiClient.get(`/transactions/${id}`)
       return response.data
     } catch (error: any) {
-      console.error('Get transaction error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -872,7 +839,6 @@ const financeService = {
       const response = await apiClient.post('/transactions', data)
       return response.data.transaction || response.data.data
     } catch (error: any) {
-      console.error('Create transaction error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -887,7 +853,6 @@ const financeService = {
       })
       return response.data
     } catch (error: any) {
-      console.error('Get account balance error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -902,7 +867,6 @@ const financeService = {
       })
       return response.data.summary || response.data.data
     } catch (error: any) {
-      console.error('Get transaction summary error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -915,7 +879,6 @@ const financeService = {
       const response = await apiClient.patch(`/transactions/${id}`, data)
       return response.data.transaction || response.data.data
     } catch (error: any) {
-      console.error('Update transaction error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -927,7 +890,6 @@ const financeService = {
     try {
       await apiClient.delete(`/transactions/${id}`)
     } catch (error: any) {
-      console.error('Delete transaction error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -942,7 +904,6 @@ const financeService = {
       const response = await apiClient.get('/statements', { params: filters })
       return response.data
     } catch (error: any) {
-      console.error('Get statements error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -955,7 +916,6 @@ const financeService = {
       const response = await apiClient.get(`/statements/${id}`)
       return response.data
     } catch (error: any) {
-      console.error('Get statement error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -968,7 +928,6 @@ const financeService = {
       const response = await apiClient.post('/statements', data)
       return response.data.statement || response.data.data
     } catch (error: any) {
-      console.error('Create statement error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -981,7 +940,6 @@ const financeService = {
       const response = await apiClient.put(`/statements/${id}`, data)
       return response.data.statement || response.data.data
     } catch (error: any) {
-      console.error('Update statement error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -993,7 +951,6 @@ const financeService = {
     try {
       await apiClient.delete(`/statements/${id}`)
     } catch (error: any) {
-      console.error('Delete statement error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -1006,7 +963,6 @@ const financeService = {
       const response = await apiClient.post(`/statements/${id}/send`)
       return response.data.statement || response.data.data
     } catch (error: any) {
-      console.error('Send statement error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -1022,7 +978,6 @@ const financeService = {
       })
       return response.data
     } catch (error: any) {
-      console.error('Download statement error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -1037,7 +992,6 @@ const financeService = {
       const response = await apiClient.get('/activities', { params: filters })
       return response.data
     } catch (error: any) {
-      console.error('Get activities error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -1050,7 +1004,6 @@ const financeService = {
       const response = await apiClient.get(`/activities/${id}`)
       return response.data
     } catch (error: any) {
-      console.error('Get activity error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -1063,7 +1016,6 @@ const financeService = {
       const response = await apiClient.post('/activities', data)
       return response.data.activity || response.data.data
     } catch (error: any) {
-      console.error('Create activity error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -1076,7 +1028,6 @@ const financeService = {
       const response = await apiClient.patch(`/activities/${id}`, data)
       return response.data.activity || response.data.data
     } catch (error: any) {
-      console.error('Update activity error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -1088,7 +1039,6 @@ const financeService = {
     try {
       await apiClient.delete(`/activities/${id}`)
     } catch (error: any) {
-      console.error('Delete activity error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -1104,7 +1054,6 @@ const financeService = {
       const response = await apiClient.get('/reports/accounts-aging', { params: filters })
       return response.data.report || response.data.data || response.data
     } catch (error: any) {
-      console.error('Get accounts aging report error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -1117,7 +1066,6 @@ const financeService = {
       const response = await apiClient.get('/reports/revenue-by-client', { params: filters })
       return response.data.report || response.data.data || response.data
     } catch (error: any) {
-      console.error('Get revenue by client report error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -1130,7 +1078,6 @@ const financeService = {
       const response = await apiClient.get('/reports/outstanding-invoices', { params: filters })
       return response.data.report || response.data.data || response.data
     } catch (error: any) {
-      console.error('Get outstanding invoices report error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -1143,7 +1090,6 @@ const financeService = {
       const response = await apiClient.get('/reports/time-entries', { params: filters })
       return response.data.report || response.data.data || response.data
     } catch (error: any) {
-      console.error('Get time entries report error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -1159,7 +1105,6 @@ const financeService = {
       })
       return response.data
     } catch (error: any) {
-      console.error('Export report error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -1172,7 +1117,6 @@ const financeService = {
       const response = await apiClient.get('/time-tracking/weekly', { params: { weekStartDate } })
       return response.data.data || response.data
     } catch (error: any) {
-      console.error('Get weekly time entries error:', error)
       throw new Error(handleApiError(error))
     }
   },

@@ -69,7 +69,6 @@ export function NewChat({ onOpenChange, open }: NewChatProps) {
       toast.success('Conversation created successfully')
       handleOpenChange(false)
     } catch (error: any) {
-      console.error('Failed to create conversation:', error)
       toast.error(error.message || 'Failed to create conversation')
     } finally {
       setIsSubmitting(false)

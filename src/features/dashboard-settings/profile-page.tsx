@@ -105,7 +105,6 @@ export function ProfilePage() {
   ]
 
   function onSubmit(data: ProfileFormValues) {
-    console.log('Profile update:', data)
   }
 
   return (

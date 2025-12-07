@@ -112,13 +112,11 @@ export const useCreateTask = () => {
     mutationFn: (data: CreateTaskData) => tasksService.createTask(data),
     // Update cache with real server data on success (Stable & Correct)
     onSuccess: (data) => {
-      console.log('✅ Task Created Successfully:', data)
       toast.success('تم إنشاء المهمة بنجاح')
 
       // Manually update the cache with the REAL task from server
       // This avoids "flickering" and "missing fields" issues
       queryClient.setQueriesData({ queryKey: ['tasks'] }, (old: any) => {
-        console.log('🔄 Updating Cache for Query:', old)
         if (!old) return old
 
         // Handle { tasks: [...] } structure
@@ -139,7 +137,6 @@ export const useCreateTask = () => {
       })
     },
     onError: (error: Error) => {
-      console.error('❌ Task Creation Failed:', error)
       toast.error(error.message || 'فشل إنشاء المهمة')
     },
   })
@@ -307,12 +304,10 @@ export const useDeleteTask = () => {
     // Optimistic update - remove task from list immediately
     // Update cache on success (Stable & Correct)
     onSuccess: (_, id) => {
-      console.log('✅ Task Deleted Successfully:', id)
       toast.success('تم حذف المهمة بنجاح')
 
       // Optimistically remove task from all lists
       queryClient.setQueriesData({ queryKey: ['tasks'] }, (old: any) => {
-        console.log('🔄 Updating Cache (Delete) for Query:', old)
         if (!old) return old
 
         // Handle { tasks: [...] } structure (Paginated response)
@@ -333,7 +328,6 @@ export const useDeleteTask = () => {
       })
     },
     onError: (error: Error) => {
-      console.error('❌ Task Deletion Failed:', error)
       toast.error(error.message || 'فشل حذف المهمة')
     },
   })
@@ -770,7 +764,6 @@ export const useUploadTaskAttachment = () => {
     onSettled: async (_, __, { id }) => {
       // Removed invalidation to prevent flickering (race condition)
       // The manual cache update in onSuccess is sufficient
-      console.log(`[${new Date().toISOString()}] 🛑 Upload Attachment Settled. Skipping invalidation.`)
     },
   })
 }
@@ -785,7 +778,6 @@ export const useDeleteTaskAttachment = () => {
       } catch (error: any) {
         // If 404, treat as success (already deleted)
         if (error?.response?.status === 404 || error?.status === 404) {
-          console.warn('⚠️ Attachment not found (404), treating as deleted')
           return { success: true }
         }
         throw error
@@ -814,7 +806,6 @@ export const useDeleteTaskAttachment = () => {
     onSettled: async (_, __, { taskId }) => {
       // Removed invalidation to prevent flickering (race condition)
       // The manual cache update in onSuccess is sufficient
-      console.log(`[${new Date().toISOString()}] 🛑 Delete Attachment Settled. Skipping invalidation.`)
     },
   })
 }
@@ -1224,9 +1215,7 @@ export const useDocuments = (taskId: string) => {
   return useQuery({
     queryKey: ['tasks', taskId, 'documents'],
     queryFn: async () => {
-      console.log(`[${new Date().toISOString()}] 📥 Fetching documents for task ${taskId}`)
       const res = await tasksService.getDocuments(taskId)
-      console.log(`[${new Date().toISOString()}] ✅ Fetched documents:`, res.documents.length)
       return res
     },
     enabled: !!taskId,
@@ -1253,7 +1242,6 @@ export const useCreateDocument = () => {
     }) => tasksService.createDocument(taskId, title, content, contentJson),
     // Update cache on success (Stable & Correct)
     onSuccess: (data, { taskId }) => {
-      console.log(`[${new Date().toISOString()}] 🟢 Create Document Success. Updating cache...`)
       toast.success('تم إنشاء المستند')
 
       // Manually update the cache
@@ -1265,7 +1253,6 @@ export const useCreateDocument = () => {
           // Check for duplicates
           const exists = old.documents.some((d: any) => d._id === data.document._id)
           if (exists) {
-            console.warn(`[${new Date().toISOString()}] ⚠️ Document already in cache, skipping append`)
             newState = old
           } else {
             // Ensure dates exist
@@ -1282,7 +1269,6 @@ export const useCreateDocument = () => {
         } else {
           newState = old
         }
-        console.log(`[${new Date().toISOString()}] 💾 Cache updated manually. New count:`, newState.documents?.length)
         return newState
       })
     },
@@ -1292,7 +1278,6 @@ export const useCreateDocument = () => {
     onSettled: (_, __, { taskId }) => {
       // Removed invalidation to prevent flickering (race condition)
       // The manual cache update in onSuccess is sufficient
-      console.log(`[${new Date().toISOString()}] 🛑 Create Document Settled. Skipping invalidation.`)
     },
   })
 }
@@ -1353,7 +1338,6 @@ export const useDeleteDocument = () => {
       } catch (error: any) {
         // If 404, treat as success (already deleted)
         if (error?.response?.status === 404 || error?.status === 404) {
-          console.warn('⚠️ Document not found (404), treating as deleted')
           return { success: true }
         }
         throw error
@@ -1361,7 +1345,6 @@ export const useDeleteDocument = () => {
     },
     // Update cache on success (Stable & Correct)
     onSuccess: (_, { taskId, documentId }) => {
-      console.log(`[${new Date().toISOString()}] 🔴 Delete Document Success. Removing ${documentId} from cache...`)
       toast.success('تم حذف المستند')
 
       // Manually update the cache
@@ -1375,7 +1358,6 @@ export const useDeleteDocument = () => {
             ...old,
             documents: old.documents.filter((d: any) => d._id !== documentId)
           }
-          console.log(`[${new Date().toISOString()}] 💾 Cache updated manually. New count:`, newState.documents.length)
           return newState
         }
         return old
@@ -1387,7 +1369,6 @@ export const useDeleteDocument = () => {
     onSettled: (_, __, { taskId }) => {
       // Removed invalidation to prevent flickering (race condition)
       // The manual cache update in onSuccess is sufficient
-      console.log(`[${new Date().toISOString()}] 🛑 Delete Document Settled. Skipping invalidation.`)
     },
   })
 }

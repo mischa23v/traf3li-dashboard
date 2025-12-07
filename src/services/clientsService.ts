@@ -92,7 +92,6 @@ const clientsService = {
       const response = await apiClient.get('/clients', { params: filters })
       return response.data
     } catch (error: any) {
-      console.error('Get clients error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -105,7 +104,6 @@ const clientsService = {
       const response = await apiClient.get(`/clients/${id}`)
       return response.data.data
     } catch (error: any) {
-      console.error('Get client error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -118,7 +116,6 @@ const clientsService = {
       const response = await apiClient.post('/clients', data)
       return response.data.client || response.data.data
     } catch (error: any) {
-      console.error('Create client error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -131,7 +128,6 @@ const clientsService = {
       const response = await apiClient.put(`/clients/${id}`, data)
       return response.data.client || response.data.data
     } catch (error: any) {
-      console.error('Update client error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -143,7 +139,6 @@ const clientsService = {
     try {
       await apiClient.delete(`/clients/${id}`)
     } catch (error: any) {
-      console.error('Delete client error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -158,7 +153,6 @@ const clientsService = {
       })
       return response.data
     } catch (error: any) {
-      console.error('Search clients error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -171,7 +165,6 @@ const clientsService = {
       const response = await apiClient.get('/clients/stats')
       return response.data.data
     } catch (error: any) {
-      console.error('Get client stats error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -186,7 +179,6 @@ const clientsService = {
       })
       return response.data.data
     } catch (error: any) {
-      console.error('Get top revenue clients error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -201,7 +193,6 @@ const clientsService = {
       })
       return response.data
     } catch (error: any) {
-      console.error('Bulk delete clients error:', error)
       throw new Error(handleApiError(error))
     }
   },

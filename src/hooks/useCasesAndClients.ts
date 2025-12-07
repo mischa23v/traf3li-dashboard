@@ -286,7 +286,6 @@ export const useAddCaseHearing = () => {
         })
       } catch (syncError) {
         // Log but don't fail the operation if event/reminder creation fails
-        console.warn('Failed to create calendar event/reminder for hearing:', syncError)
       }
 
       return result

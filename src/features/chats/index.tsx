@@ -107,7 +107,6 @@ export function Chats() {
       })
       setMessageInput('')
     } catch (error) {
-      console.error('Failed to send message:', error)
     }
   }
 

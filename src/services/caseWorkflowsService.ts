@@ -311,7 +311,6 @@ const caseWorkflowsService = {
         total: response.data.total || response.data.workflows?.length || 0,
       }
     } catch (error: any) {
-      console.error('Get workflows error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -325,7 +324,6 @@ const caseWorkflowsService = {
       const response = await apiClient.get<WorkflowResponse>(`/case-workflows/${id}`)
       return response.data.workflow
     } catch (error: any) {
-      console.error('Get workflow error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -340,7 +338,6 @@ const caseWorkflowsService = {
       return response.data.workflow
     } catch (error: any) {
       if (error.response?.status === 404) return null
-      console.error('Get workflow by category error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -354,7 +351,6 @@ const caseWorkflowsService = {
       const response = await apiClient.post<WorkflowResponse>('/case-workflows/', data)
       return response.data.workflow
     } catch (error: any) {
-      console.error('Create workflow error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -368,7 +364,6 @@ const caseWorkflowsService = {
       const response = await apiClient.patch<WorkflowResponse>(`/case-workflows/${id}`, data)
       return response.data.workflow
     } catch (error: any) {
-      console.error('Update workflow error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -381,7 +376,6 @@ const caseWorkflowsService = {
     try {
       await apiClient.delete(`/case-workflows/${id}`)
     } catch (error: any) {
-      console.error('Delete workflow error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -398,7 +392,6 @@ const caseWorkflowsService = {
       })
       return response.data.workflow
     } catch (error: any) {
-      console.error('Duplicate workflow error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -414,7 +407,6 @@ const caseWorkflowsService = {
       const response = await apiClient.post<WorkflowResponse>(`/case-workflows/${workflowId}/stages`, data)
       return response.data.workflow
     } catch (error: any) {
-      console.error('Add stage error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -428,7 +420,6 @@ const caseWorkflowsService = {
       const response = await apiClient.patch<WorkflowResponse>(`/case-workflows/${workflowId}/stages/${stageId}`, data)
       return response.data.workflow
     } catch (error: any) {
-      console.error('Update stage error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -442,7 +433,6 @@ const caseWorkflowsService = {
       const response = await apiClient.delete<WorkflowResponse>(`/case-workflows/${workflowId}/stages/${stageId}`)
       return response.data.workflow
     } catch (error: any) {
-      console.error('Delete stage error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -458,7 +448,6 @@ const caseWorkflowsService = {
       })
       return response.data.workflow
     } catch (error: any) {
-      console.error('Reorder stages error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -481,7 +470,6 @@ const caseWorkflowsService = {
       )
       return response.data.workflow
     } catch (error: any) {
-      console.error('Add requirement error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -503,7 +491,6 @@ const caseWorkflowsService = {
       )
       return response.data.workflow
     } catch (error: any) {
-      console.error('Update requirement error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -519,7 +506,6 @@ const caseWorkflowsService = {
       )
       return response.data.workflow
     } catch (error: any) {
-      console.error('Delete requirement error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -535,7 +521,6 @@ const caseWorkflowsService = {
       const response = await apiClient.post<WorkflowResponse>(`/case-workflows/${workflowId}/transitions`, data)
       return response.data.workflow
     } catch (error: any) {
-      console.error('Add transition error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -552,7 +537,6 @@ const caseWorkflowsService = {
       )
       return response.data.workflow
     } catch (error: any) {
-      console.error('Update transition error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -566,7 +550,6 @@ const caseWorkflowsService = {
       const response = await apiClient.delete<WorkflowResponse>(`/case-workflows/${workflowId}/transitions/${transitionId}`)
       return response.data.workflow
     } catch (error: any) {
-      console.error('Delete transition error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -584,7 +567,6 @@ const caseWorkflowsService = {
       })
       return response.data.progress
     } catch (error: any) {
-      console.error('Initialize workflow error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -599,7 +581,6 @@ const caseWorkflowsService = {
       return response.data.progress
     } catch (error: any) {
       if (error.response?.status === 404) return null
-      console.error('Get case progress error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -613,7 +594,6 @@ const caseWorkflowsService = {
       const response = await apiClient.post<ProgressResponse>(`/case-workflows/cases/${caseId}/move`, data)
       return response.data.progress
     } catch (error: any) {
-      console.error('Move case to stage error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -627,7 +607,6 @@ const caseWorkflowsService = {
       const response = await apiClient.post<ProgressResponse>(`/case-workflows/cases/${caseId}/requirements/complete`, data)
       return response.data.progress
     } catch (error: any) {
-      console.error('Complete requirement error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -643,7 +622,6 @@ const caseWorkflowsService = {
       const response = await apiClient.get<StatisticsResponse>('/case-workflows/statistics')
       return response.data.statistics
     } catch (error: any) {
-      console.error('Get workflow statistics error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -659,7 +637,6 @@ const caseWorkflowsService = {
       const response = await apiClient.get<WorkflowsResponse>('/case-workflows/presets')
       return response.data.workflows || []
     } catch (error: any) {
-      console.error('Get preset templates error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -673,7 +650,6 @@ const caseWorkflowsService = {
       const response = await apiClient.post<WorkflowResponse>(`/case-workflows/presets/${presetId}/import`)
       return response.data.workflow
     } catch (error: any) {
-      console.error('Import preset template error:', error)
       throw new Error(handleApiError(error))
     }
   },

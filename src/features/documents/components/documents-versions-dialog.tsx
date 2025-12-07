@@ -80,7 +80,6 @@ export function DocumentsVersionsDialog({
       try {
         url = await previewUrlMutation.mutateAsync(currentRow._id)
       } catch {
-        console.warn('Failed to get preview URL, using existing URL')
       }
       openSmartPreview({
         url,

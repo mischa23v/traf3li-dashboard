@@ -114,7 +114,6 @@ export default function LeadDetailsView() {
             await updateStageMutation.mutateAsync({ id: leadId, stage: newStage })
             setShowStageDialog(false)
         } catch (error) {
-            console.error('Error updating stage:', error)
         }
     }
 
@@ -137,7 +136,6 @@ export default function LeadDetailsView() {
                 date: new Date().toISOString().split('T')[0],
             })
         } catch (error) {
-            console.error('Error adding activity:', error)
         }
     }
 
@@ -147,7 +145,6 @@ export default function LeadDetailsView() {
             setShowConvertDialog(false)
             navigate({ to: '/dashboard/sales/leads' })
         } catch (error) {
-            console.error('Error converting lead:', error)
         }
     }
 

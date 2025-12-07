@@ -62,7 +62,6 @@ export function VoiceMemoRecorder({ taskId, onUploadSuccess }: VoiceMemoRecorder
       }, 1000)
 
     } catch (err) {
-      console.error('Error accessing microphone:', err)
       alert('لا يمكن الوصول إلى الميكروفون')
     }
   }, [])

@@ -79,7 +79,6 @@ export function DataTable<TData, TValue = unknown>({
   const table = externalTable || internalTable
 
   if (!table) {
-    console.error('DataTable: Either table or columns/data must be provided')
     return null
   }
 

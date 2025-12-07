@@ -50,7 +50,6 @@ export const leadService = {
       const response = await apiClient.get('/leads', { params: filters })
       return response.data
     } catch (error: any) {
-      console.error('Get leads error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -65,7 +64,6 @@ export const leadService = {
       const response = await apiClient.get(`/leads/${id}`)
       return response.data.data
     } catch (error: any) {
-      console.error('Get lead error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -78,7 +76,6 @@ export const leadService = {
       const response = await apiClient.post('/leads', data)
       return response.data.data || response.data.lead
     } catch (error: any) {
-      console.error('Create lead error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -91,7 +88,6 @@ export const leadService = {
       const response = await apiClient.put(`/leads/${id}`, data)
       return response.data.data || response.data.lead
     } catch (error: any) {
-      console.error('Update lead error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -103,7 +99,6 @@ export const leadService = {
     try {
       await apiClient.delete(`/leads/${id}`)
     } catch (error: any) {
-      console.error('Delete lead error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -119,7 +114,6 @@ export const leadService = {
       const response = await apiClient.post(`/leads/${id}/status`, data)
       return response.data.data || response.data.lead
     } catch (error: any) {
-      console.error('Update lead status error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -135,7 +129,6 @@ export const leadService = {
       const response = await apiClient.post(`/leads/${id}/move`, data)
       return response.data.data || response.data.lead
     } catch (error: any) {
-      console.error('Move lead to stage error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -150,7 +143,6 @@ export const leadService = {
       const response = await apiClient.post(`/leads/${id}/convert`)
       return response.data.data
     } catch (error: any) {
-      console.error('Convert lead to client error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -166,7 +158,6 @@ export const leadService = {
       const response = await apiClient.get('/leads/stats', { params })
       return response.data.data
     } catch (error: any) {
-      console.error('Get lead stats error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -182,7 +173,6 @@ export const leadService = {
       const response = await apiClient.get(url)
       return response.data.data
     } catch (error: any) {
-      console.error('Get leads by pipeline error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -197,7 +187,6 @@ export const leadService = {
       })
       return response.data.data
     } catch (error: any) {
-      console.error('Get leads needing follow-up error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -215,7 +204,6 @@ export const leadService = {
       })
       return response.data.data
     } catch (error: any) {
-      console.error('Get lead activities error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -231,7 +219,6 @@ export const leadService = {
       const response = await apiClient.post(`/leads/${id}/activities`, data)
       return response.data.data
     } catch (error: any) {
-      console.error('Log lead activity error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -247,7 +234,6 @@ export const leadService = {
       const response = await apiClient.post(`/leads/${id}/follow-up`, data)
       return response.data.data || response.data.lead
     } catch (error: any) {
-      console.error('Schedule follow-up error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -267,7 +253,6 @@ export const pipelineService = {
       const response = await apiClient.get('/crm-pipelines', { params })
       return response.data
     } catch (error: any) {
-      console.error('Get pipelines error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -282,7 +267,6 @@ export const pipelineService = {
       const response = await apiClient.get(`/crm-pipelines/${id}`)
       return response.data.data
     } catch (error: any) {
-      console.error('Get pipeline error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -295,7 +279,6 @@ export const pipelineService = {
       const response = await apiClient.post('/crm-pipelines', data)
       return response.data.data || response.data.pipeline
     } catch (error: any) {
-      console.error('Create pipeline error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -311,7 +294,6 @@ export const pipelineService = {
       const response = await apiClient.put(`/crm-pipelines/${id}`, data)
       return response.data.data || response.data.pipeline
     } catch (error: any) {
-      console.error('Update pipeline error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -323,7 +305,6 @@ export const pipelineService = {
     try {
       await apiClient.delete(`/crm-pipelines/${id}`)
     } catch (error: any) {
-      console.error('Delete pipeline error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -336,7 +317,6 @@ export const pipelineService = {
       const response = await apiClient.post(`/crm-pipelines/${id}/stages`, data)
       return response.data.data || response.data.pipeline
     } catch (error: any) {
-      console.error('Add stage error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -356,7 +336,6 @@ export const pipelineService = {
       )
       return response.data.data || response.data.pipeline
     } catch (error: any) {
-      console.error('Update stage error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -368,7 +347,6 @@ export const pipelineService = {
     try {
       await apiClient.delete(`/crm-pipelines/${id}/stages/${stageId}`)
     } catch (error: any) {
-      console.error('Remove stage error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -387,7 +365,6 @@ export const pipelineService = {
       )
       return response.data.data || response.data.pipeline
     } catch (error: any) {
-      console.error('Reorder stages error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -400,7 +377,6 @@ export const pipelineService = {
       const response = await apiClient.get(`/crm-pipelines/${id}/stats`)
       return response.data.data
     } catch (error: any) {
-      console.error('Get pipeline stats error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -413,7 +389,6 @@ export const pipelineService = {
       const response = await apiClient.post(`/crm-pipelines/${id}/default`)
       return response.data.data || response.data.pipeline
     } catch (error: any) {
-      console.error('Set default pipeline error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -432,7 +407,6 @@ export const pipelineService = {
       )
       return response.data.data || response.data.pipeline
     } catch (error: any) {
-      console.error('Duplicate pipeline error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -452,7 +426,6 @@ export const referralService = {
       const response = await apiClient.get('/referrals', { params: filters })
       return response.data
     } catch (error: any) {
-      console.error('Get referrals error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -465,7 +438,6 @@ export const referralService = {
       const response = await apiClient.get(`/referrals/${id}`)
       return response.data.data
     } catch (error: any) {
-      console.error('Get referral error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -478,7 +450,6 @@ export const referralService = {
       const response = await apiClient.post('/referrals', data)
       return response.data.data || response.data.referral
     } catch (error: any) {
-      console.error('Create referral error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -494,7 +465,6 @@ export const referralService = {
       const response = await apiClient.put(`/referrals/${id}`, data)
       return response.data.data || response.data.referral
     } catch (error: any) {
-      console.error('Update referral error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -506,7 +476,6 @@ export const referralService = {
     try {
       await apiClient.delete(`/referrals/${id}`)
     } catch (error: any) {
-      console.error('Delete referral error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -522,7 +491,6 @@ export const referralService = {
       const response = await apiClient.get('/referrals/stats', { params })
       return response.data.data
     } catch (error: any) {
-      console.error('Get referral stats error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -537,7 +505,6 @@ export const referralService = {
       })
       return response.data.data
     } catch (error: any) {
-      console.error('Get top referrers error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -553,7 +520,6 @@ export const referralService = {
       const response = await apiClient.post(`/referrals/${id}/leads`, data)
       return response.data.data || response.data.referral
     } catch (error: any) {
-      console.error('Add lead referral error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -573,7 +539,6 @@ export const referralService = {
       )
       return response.data.data || response.data.referral
     } catch (error: any) {
-      console.error('Mark converted error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -589,7 +554,6 @@ export const referralService = {
       const response = await apiClient.post(`/referrals/${id}/payments`, data)
       return response.data.data || response.data.referral
     } catch (error: any) {
-      console.error('Record payment error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -607,7 +571,6 @@ export const referralService = {
       })
       return response.data.data
     } catch (error: any) {
-      console.error('Calculate fee error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -627,7 +590,6 @@ export const crmActivityService = {
       const response = await apiClient.get('/crm-activities', { params })
       return response.data
     } catch (error: any) {
-      console.error('Get activities error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -640,7 +602,6 @@ export const crmActivityService = {
       const response = await apiClient.get(`/crm-activities/${id}`)
       return response.data.data
     } catch (error: any) {
-      console.error('Get activity error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -653,7 +614,6 @@ export const crmActivityService = {
       const response = await apiClient.post('/crm-activities', data)
       return response.data.data
     } catch (error: any) {
-      console.error('Create activity error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -669,7 +629,6 @@ export const crmActivityService = {
       const response = await apiClient.put(`/crm-activities/${id}`, data)
       return response.data.data
     } catch (error: any) {
-      console.error('Update activity error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -681,7 +640,6 @@ export const crmActivityService = {
     try {
       await apiClient.delete(`/crm-activities/${id}`)
     } catch (error: any) {
-      console.error('Delete activity error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -700,7 +658,6 @@ export const crmActivityService = {
       })
       return response.data.data
     } catch (error: any) {
-      console.error('Get timeline error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -716,7 +673,6 @@ export const crmActivityService = {
       const response = await apiClient.get('/crm-activities/stats', { params })
       return response.data.data
     } catch (error: any) {
-      console.error('Get activity stats error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -736,7 +692,6 @@ export const crmActivityService = {
       )
       return response.data.data
     } catch (error: any) {
-      console.error('Get entity activities error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -755,7 +710,6 @@ export const crmActivityService = {
       })
       return response.data.data
     } catch (error: any) {
-      console.error('Get upcoming tasks error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -773,7 +727,6 @@ export const crmActivityService = {
       })
       return response.data.data
     } catch (error: any) {
-      console.error('Complete task error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -786,7 +739,6 @@ export const crmActivityService = {
       const response = await apiClient.post('/crm-activities/log/call', data)
       return response.data.data
     } catch (error: any) {
-      console.error('Log call error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -799,7 +751,6 @@ export const crmActivityService = {
       const response = await apiClient.post('/crm-activities/log/email', data)
       return response.data.data
     } catch (error: any) {
-      console.error('Log email error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -812,7 +763,6 @@ export const crmActivityService = {
       const response = await apiClient.post('/crm-activities/log/meeting', data)
       return response.data.data
     } catch (error: any) {
-      console.error('Log meeting error:', error)
       throw new Error(handleApiError(error))
     }
   },
@@ -825,7 +775,6 @@ export const crmActivityService = {
       const response = await apiClient.post('/crm-activities/log/note', data)
       return response.data.data
     } catch (error: any) {
-      console.error('Add note error:', error)
       throw new Error(handleApiError(error))
     }
   },
