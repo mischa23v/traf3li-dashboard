@@ -3,7 +3,7 @@ import {
     Calendar, User, CreditCard, Receipt,
     AlertCircle, CheckCircle, Clock, Loader2,
     Mail, FileText, DollarSign, Building2, Phone,
-    MapPin, Hash, Trash2, Package
+    MapPin, Hash, Trash2, Package, Lock
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -115,7 +115,7 @@ export default function VendorDetailsView() {
                             </Link>
                         </Button>
                         <Card className="border-0 shadow-sm rounded-3xl p-12 text-center">
-                            <AlertCircle className="h-16 w-16 text-rose-400 mx-auto mb-4" />
+                            <AlertCircle className="h-16 w-16 text-rose-400 mx-auto mb-4" aria-hidden="true" />
                             <h3 className="text-xl font-bold text-navy mb-2">فشل تحميل المورد</h3>
                             <p className="text-slate-500">{error?.message || 'المورد غير موجود'}</p>
                         </Card>
@@ -152,7 +152,7 @@ export default function VendorDetailsView() {
                         <div className="flex gap-2">
                             <Button asChild variant="outline">
                                 <Link to="/dashboard/finance/vendors/$vendorId/edit" params={{ vendorId }}>
-                                    <Edit className="h-4 w-4 ms-2" />
+                                    <Edit className="h-4 w-4 ms-2" aria-hidden="true" />
                                     تعديل
                                 </Link>
                             </Button>
@@ -163,9 +163,9 @@ export default function VendorDetailsView() {
                                 disabled={deleteVendorMutation.isPending}
                             >
                                 {deleteVendorMutation.isPending ? (
-                                    <Loader2 className="h-4 w-4 ms-2 animate-spin" />
+                                    <Loader2 className="h-4 w-4 ms-2 animate-spin" aria-hidden="true" />
                                 ) : (
-                                    <Trash2 className="h-4 w-4 ms-2" />
+                                    <Trash2 className="h-4 w-4 ms-2" aria-hidden="true" />
                                 )}
                                 حذف
                             </Button>
@@ -239,7 +239,7 @@ export default function VendorDetailsView() {
                                             <div>
                                                 <p className="text-sm text-slate-500 mb-1 flex items-center gap-1">
                                                     <Mail className="h-4 w-4" />
-                                                    البريد الإلكتروني
+                                                    البريد الإلكتروني<Lock className="h-3 w-3 text-muted-foreground inline ms-1" />
                                                 </p>
                                                 <p className="font-medium text-navy">{vendor.email}</p>
                                             </div>
@@ -248,7 +248,7 @@ export default function VendorDetailsView() {
                                             <div>
                                                 <p className="text-sm text-slate-500 mb-1 flex items-center gap-1">
                                                     <Phone className="h-4 w-4" />
-                                                    رقم الهاتف
+                                                    رقم الهاتف<Lock className="h-3 w-3 text-muted-foreground inline ms-1" />
                                                 </p>
                                                 <p className="font-medium text-navy">{vendor.phone}</p>
                                             </div>
@@ -314,7 +314,7 @@ export default function VendorDetailsView() {
                                 <Card className="border-0 shadow-sm rounded-3xl">
                                     <CardHeader className="border-b border-slate-100">
                                         <CardTitle className="text-lg font-bold text-navy flex items-center gap-2">
-                                            <CreditCard className="h-5 w-5 text-brand-blue" />
+                                            <CreditCard className="h-5 w-5 text-brand-blue" aria-hidden="true" />
                                             المعلومات البنكية
                                         </CardTitle>
                                     </CardHeader>
@@ -328,13 +328,13 @@ export default function VendorDetailsView() {
                                             )}
                                             {vendor.bankAccountNumber && (
                                                 <div>
-                                                    <p className="text-sm text-slate-500 mb-1">رقم الحساب</p>
+                                                    <p className="text-sm text-slate-500 mb-1">رقم الحساب<Lock className="h-3 w-3 text-muted-foreground inline ms-1" /></p>
                                                     <p className="font-medium text-navy font-mono">{vendor.bankAccountNumber}</p>
                                                 </div>
                                             )}
                                             {vendor.iban && (
                                                 <div className="col-span-2">
-                                                    <p className="text-sm text-slate-500 mb-1">رقم الآيبان (IBAN)</p>
+                                                    <p className="text-sm text-slate-500 mb-1">رقم الآيبان (IBAN)<Lock className="h-3 w-3 text-muted-foreground inline ms-1" /></p>
                                                     <p className="font-medium text-navy font-mono">{vendor.iban}</p>
                                                 </div>
                                             )}
@@ -359,14 +359,14 @@ export default function VendorDetailsView() {
                             <Card className="border-0 shadow-sm rounded-3xl">
                                 <CardHeader className="border-b border-slate-100">
                                     <CardTitle className="text-lg font-bold text-navy flex items-center gap-2">
-                                        <FileText className="h-5 w-5 text-brand-blue" />
+                                        <FileText className="h-5 w-5 text-brand-blue" aria-hidden="true" />
                                         الفواتير المستلمة الأخيرة
                                     </CardTitle>
                                 </CardHeader>
                                 <CardContent className="p-6">
                                     {recentBills.length === 0 ? (
                                         <div className="text-center py-8 text-slate-500">
-                                            <FileText className="h-12 w-12 mx-auto mb-2 opacity-20" />
+                                            <FileText className="h-12 w-12 mx-auto mb-2 opacity-20" aria-hidden="true" />
                                             <p>لا توجد فواتير مستلمة من هذا المورد</p>
                                         </div>
                                     ) : (

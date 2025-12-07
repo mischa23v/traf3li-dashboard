@@ -143,7 +143,7 @@ export default function QuoteDetailsView() {
                             </Link>
                         </Button>
                         <Card className="border-0 shadow-sm rounded-3xl p-12 text-center">
-                            <AlertCircle className="h-16 w-16 text-rose-400 mx-auto mb-4" />
+                            <AlertCircle className="h-16 w-16 text-rose-400 mx-auto mb-4" aria-hidden="true" />
                             <h3 className="text-xl font-bold text-navy mb-2">فشل تحميل عرض السعر</h3>
                             <p className="text-slate-500">{error?.message || 'عرض السعر غير موجود'}</p>
                         </Card>
@@ -186,9 +186,9 @@ export default function QuoteDetailsView() {
                                     className="bg-blue-600 hover:bg-blue-700 text-white border-0"
                                 >
                                     {sendQuoteMutation.isPending ? (
-                                        <Loader2 className="h-4 w-4 ms-2 animate-spin" />
+                                        <Loader2 className="h-4 w-4 ms-2 animate-spin" aria-hidden="true" />
                                     ) : (
-                                        <Send className="h-4 w-4 ms-2" />
+                                        <Send className="h-4 w-4 ms-2" aria-hidden="true" />
                                     )}
                                     إرسال للعميل
                                 </Button>
@@ -200,7 +200,7 @@ export default function QuoteDetailsView() {
                                     className="bg-emerald-600 hover:bg-emerald-700 text-white border-0"
                                 >
                                     {convertMutation.isPending ? (
-                                        <Loader2 className="h-4 w-4 ms-2 animate-spin" />
+                                        <Loader2 className="h-4 w-4 ms-2 animate-spin" aria-hidden="true" />
                                     ) : (
                                         <ArrowRightLeft className="h-4 w-4 ms-2" />
                                     )}
@@ -209,12 +209,12 @@ export default function QuoteDetailsView() {
                             )}
                             <Button asChild variant="outline" className="bg-white/10 text-white hover:bg-white/20 border-0 backdrop-blur-sm">
                                 <Link to="/dashboard/finance/quotes/$quoteId/edit" params={{ quoteId: quote._id }}>
-                                    <Edit className="h-4 w-4 ms-2" />
+                                    <Edit className="h-4 w-4 ms-2" aria-hidden="true" />
                                     تعديل
                                 </Link>
                             </Button>
                             <Button variant="outline" className="bg-white/10 text-white hover:bg-white/20 border-0 backdrop-blur-sm">
-                                <Download className="h-4 w-4 ms-2" />
+                                <Download className="h-4 w-4 ms-2" aria-hidden="true" />
                                 تحميل PDF
                             </Button>
                             <Button
@@ -223,7 +223,7 @@ export default function QuoteDetailsView() {
                                 onClick={handleDelete}
                                 disabled={deleteMutation.isPending}
                             >
-                                <Trash2 className="h-4 w-4 ms-2" />
+                                <Trash2 className="h-4 w-4 ms-2" aria-hidden="true" />
                                 حذف
                             </Button>
                         </div>
@@ -268,7 +268,7 @@ export default function QuoteDetailsView() {
                             <Card className="border-0 shadow-sm rounded-3xl">
                                 <CardHeader className="border-b border-slate-100">
                                     <CardTitle className="text-lg font-bold text-navy flex items-center gap-2">
-                                        <FileText className="h-5 w-5 text-brand-blue" />
+                                        <FileText className="h-5 w-5 text-brand-blue" aria-hidden="true" />
                                         بنود عرض السعر
                                     </CardTitle>
                                 </CardHeader>
@@ -357,7 +357,7 @@ export default function QuoteDetailsView() {
                             <Card className="border-0 shadow-sm rounded-3xl">
                                 <CardHeader className="border-b border-slate-100">
                                     <CardTitle className="text-lg font-bold text-navy flex items-center gap-2">
-                                        <Calendar className="h-5 w-5 text-brand-blue" />
+                                        <Calendar className="h-5 w-5 text-brand-blue" aria-hidden="true" />
                                         التواريخ
                                     </CardTitle>
                                 </CardHeader>
@@ -399,7 +399,7 @@ export default function QuoteDetailsView() {
                                         إرسال بالبريد الإلكتروني
                                     </Button>
                                     <Button variant="outline" className="w-full justify-start">
-                                        <Copy className="h-4 w-4 ms-2" />
+                                        <Copy className="h-4 w-4 ms-2" aria-hidden="true" />
                                         نسخ عرض السعر
                                     </Button>
                                 </CardContent>

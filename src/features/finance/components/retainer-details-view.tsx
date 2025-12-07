@@ -181,7 +181,7 @@ export default function RetainerDetailsView() {
                             </Link>
                         </Button>
                         <Card className="border-0 shadow-sm rounded-3xl p-12 text-center">
-                            <AlertCircle className="h-16 w-16 text-rose-400 mx-auto mb-4" />
+                            <AlertCircle className="h-16 w-16 text-rose-400 mx-auto mb-4" aria-hidden="true" />
                             <h3 className="text-xl font-bold text-navy mb-2">فشل تحميل حساب الأمانة</h3>
                             <p className="text-slate-500">{error?.message || 'حساب الأمانة غير موجود'}</p>
                         </Card>
@@ -233,11 +233,11 @@ export default function RetainerDetailsView() {
                             </Button>
                             <div className="flex gap-2">
                                 <Button variant="outline">
-                                    <Download className="h-4 w-4 ms-2" />
+                                    <Download className="h-4 w-4 ms-2" aria-hidden="true" />
                                     تحميل كشف
                                 </Button>
                                 <Button variant="outline">
-                                    <Printer className="h-4 w-4 ms-2" />
+                                    <Printer className="h-4 w-4 ms-2" aria-hidden="true" />
                                     طباعة
                                 </Button>
                             </div>
@@ -295,7 +295,7 @@ export default function RetainerDetailsView() {
 
                                 {retainer.minimumBalance && retainer.currentBalance <= retainer.minimumBalance && (
                                     <div className="flex items-center gap-2 p-3 bg-amber-50 border border-amber-200 rounded-xl">
-                                        <AlertCircle className="h-5 w-5 text-amber-600" />
+                                        <AlertCircle className="h-5 w-5 text-amber-600" aria-hidden="true" />
                                         <p className="text-sm text-amber-800">
                                             الرصيد أقل من الحد الأدنى ({formatCurrency(retainer.minimumBalance)})
                                         </p>
@@ -340,18 +340,18 @@ export default function RetainerDetailsView() {
                         <Card className="border-0 shadow-sm rounded-3xl">
                             <CardHeader className="border-b border-slate-100">
                                 <CardTitle className="text-lg font-bold text-navy flex items-center gap-2">
-                                    <Receipt className="h-5 w-5 text-brand-blue" />
+                                    <Receipt className="h-5 w-5 text-brand-blue" aria-hidden="true" />
                                     سجل المعاملات
                                 </CardTitle>
                             </CardHeader>
                             <CardContent className="p-6">
                                 {isLoadingTransactions ? (
                                     <div className="flex items-center justify-center py-8">
-                                        <Loader2 className="h-6 w-6 animate-spin text-emerald-600" />
+                                        <Loader2 className="h-6 w-6 animate-spin text-emerald-600" aria-hidden="true" />
                                     </div>
                                 ) : transactions.length === 0 ? (
                                     <div className="text-center py-8 text-slate-400">
-                                        <Receipt className="h-12 w-12 mx-auto mb-2 opacity-20" />
+                                        <Receipt className="h-12 w-12 mx-auto mb-2 opacity-20" aria-hidden="true" />
                                         <p className="text-sm">لا توجد معاملات</p>
                                     </div>
                                 ) : (
@@ -397,7 +397,7 @@ export default function RetainerDetailsView() {
                             <Card className="border-0 shadow-sm rounded-3xl">
                                 <CardHeader className="border-b border-slate-100">
                                     <CardTitle className="text-lg font-bold text-navy flex items-center gap-2">
-                                        <FileText className="h-5 w-5 text-brand-blue" />
+                                        <FileText className="h-5 w-5 text-brand-blue" aria-hidden="true" />
                                         ملاحظات
                                     </CardTitle>
                                 </CardHeader>
@@ -421,7 +421,7 @@ export default function RetainerDetailsView() {
                                     className="w-full justify-start bg-emerald-500 hover:bg-emerald-600 text-white"
                                     disabled={retainer.status === 'closed'}
                                 >
-                                    <Plus className="h-4 w-4 ms-2" />
+                                    <Plus className="h-4 w-4 ms-2" aria-hidden="true" />
                                     إيداع مبلغ
                                 </Button>
                                 <Button
@@ -440,7 +440,7 @@ export default function RetainerDetailsView() {
                         <Card className="border-0 shadow-sm rounded-3xl">
                             <CardHeader className="border-b border-slate-100">
                                 <CardTitle className="text-lg font-bold text-navy flex items-center gap-2">
-                                    <Calendar className="h-5 w-5 text-brand-blue" />
+                                    <Calendar className="h-5 w-5 text-brand-blue" aria-hidden="true" />
                                     التواريخ
                                 </CardTitle>
                             </CardHeader>
@@ -526,7 +526,7 @@ export default function RetainerDetailsView() {
                             >
                                 {depositMutation.isPending ? (
                                     <span className="flex items-center gap-2">
-                                        <Loader2 className="h-4 w-4 animate-spin" />
+                                        <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
                                         جاري الإيداع...
                                     </span>
                                 ) : (
@@ -608,7 +608,7 @@ export default function RetainerDetailsView() {
                             >
                                 {consumeMutation.isPending ? (
                                     <span className="flex items-center gap-2">
-                                        <Loader2 className="h-4 w-4 animate-spin" />
+                                        <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
                                         جاري السحب...
                                     </span>
                                 ) : (

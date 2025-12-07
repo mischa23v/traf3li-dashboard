@@ -147,7 +147,7 @@ export function EditExpenseView() {
         <AlertDialog>
           <AlertDialogTrigger asChild>
             <Button variant="destructive" size="sm">
-              <Trash2 className="h-4 w-4 ms-2" />
+              <Trash2 className="h-4 w-4 ms-2" aria-hidden="true" />
               حذف
             </Button>
           </AlertDialogTrigger>
@@ -320,7 +320,7 @@ export function EditExpenseView() {
                   <p className="text-sm text-slate-600">المرفقات الحالية:</p>
                   {existingAttachments.map((attachment, index) => (
                     <div key={index} className="flex items-center gap-2 p-2 bg-muted rounded">
-                      <FileText className="h-4 w-4" />
+                      <FileText className="h-4 w-4" aria-hidden="true" />
                       <span className="flex-1 text-sm">{attachment}</span>
                       <Button
                         type="button"
@@ -354,7 +354,7 @@ export function EditExpenseView() {
                   <p className="text-sm text-slate-600">مرفقات جديدة:</p>
                   {attachments.map((file, index) => (
                     <div key={index} className="flex items-center gap-2 p-2 bg-muted rounded">
-                      <FileText className="h-4 w-4" />
+                      <FileText className="h-4 w-4" aria-hidden="true" />
                       <span className="flex-1 text-sm">{file.name}</span>
                       <Button
                         type="button"
@@ -372,7 +372,7 @@ export function EditExpenseView() {
 
             <div className="flex gap-4 pt-4">
               <Button type="submit" disabled={updateExpense.isPending}>
-                <Save className="h-4 w-4 ms-2" />
+                <Save className="h-4 w-4 ms-2" aria-hidden="true" />
                 {updateExpense.isPending ? 'جاري الحفظ...' : 'حفظ التعديلات'}
               </Button>
               <Button

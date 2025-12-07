@@ -145,7 +145,7 @@ export function EditAccountActivityView() {
         <AlertDialog>
           <AlertDialogTrigger asChild>
             <Button variant="destructive" size="sm">
-              <Trash2 className="h-4 w-4 ms-2" />
+              <Trash2 className="h-4 w-4 ms-2" aria-hidden="true" />
               حذف
             </Button>
           </AlertDialogTrigger>
@@ -320,7 +320,7 @@ export function EditAccountActivityView() {
 
                 <div className="flex gap-4 pt-4">
                   <Button type="submit" disabled={updateActivity.isPending}>
-                    <Save className="h-4 w-4 ms-2" />
+                    <Save className="h-4 w-4 ms-2" aria-hidden="true" />
                     {updateActivity.isPending ? 'جاري الحفظ...' : 'حفظ التعديلات'}
                   </Button>
                   <Button

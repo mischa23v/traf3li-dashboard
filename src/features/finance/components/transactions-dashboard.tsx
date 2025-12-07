@@ -349,7 +349,6 @@ export default function TransactionsDashboard() {
     // Export handlers (placeholder - would need backend implementation)
     const handleExport = (format: 'excel' | 'pdf' | 'csv') => {
         // TODO: Implement export functionality
-        console.log('Export to', format)
     }
 
     // Print handler
@@ -419,12 +418,12 @@ export default function TransactionsDashboard() {
                 <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8">
                     <div className="bg-white rounded-3xl p-12 text-center border border-slate-100 shadow-sm">
                         <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <AlertCircle className="h-8 w-8 text-red-500" />
+                            <AlertCircle className="h-8 w-8 text-red-500" aria-hidden="true" />
                         </div>
                         <h3 className="text-xl font-bold text-slate-900 mb-2">فشل تحميل المعاملات</h3>
                         <p className="text-slate-500 mb-6">{error?.message || 'حدث خطأ أثناء تحميل البيانات'}</p>
                         <Button onClick={() => refetch()} className="bg-emerald-500 hover:bg-emerald-600 text-white px-8">
-                            <RefreshCw className="ms-2 h-4 w-4" />
+                            <RefreshCw className="ms-2 h-4 w-4" aria-hidden="true" />
                             إعادة المحاولة
                         </Button>
                     </div>
@@ -442,8 +441,8 @@ export default function TransactionsDashboard() {
                     <DynamicIsland />
                 </div>
                 <div className='ms-auto flex items-center gap-4'>
-                    <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white">
-                        <Bell className="h-5 w-5" />
+                    <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white" aria-label="الإشعارات">
+                        <Bell className="h-5 w-5" aria-hidden="true" />
                     </Button>
                     <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white" />
                     <ThemeSwitch className="text-slate-300 hover:bg-white/10 hover:text-white" />
@@ -483,7 +482,7 @@ export default function TransactionsDashboard() {
                             <CardHeader className="pb-3">
                                 <div className="flex items-center justify-between">
                                     <CardTitle className="text-base font-bold text-slate-900 flex items-center gap-2">
-                                        <Filter className="h-4 w-4 text-slate-600" />
+                                        <Filter className="h-4 w-4 text-slate-600" aria-hidden="true" />
                                         تصفية المعاملات
                                     </CardTitle>
                                     <div className="flex gap-2">
@@ -572,7 +571,7 @@ export default function TransactionsDashboard() {
 
                                     {/* Search */}
                                     <div className="relative">
-                                        <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                                        <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" aria-hidden="true" />
                                         <Input
                                             placeholder="بحث في رقم القيد، الوصف، المرجع..."
                                             className="pe-10 rounded-xl border-slate-200 focus:ring-emerald-500 focus:border-emerald-500"
@@ -613,12 +612,12 @@ export default function TransactionsDashboard() {
                                     )}>
                                         {summary.isBalanced ? (
                                             <>
-                                                <CheckCircle className="h-5 w-5" />
+                                                <CheckCircle className="h-5 w-5" aria-hidden="true" />
                                                 <span>متوازن</span>
                                             </>
                                         ) : (
                                             <>
-                                                <AlertCircle className="h-5 w-5" />
+                                                <AlertCircle className="h-5 w-5" aria-hidden="true" />
                                                 <span>{formatSAR(halalasToSAR(summary.difference))}</span>
                                             </>
                                         )}
@@ -636,7 +635,7 @@ export default function TransactionsDashboard() {
                                         <DropdownMenu>
                                             <DropdownMenuTrigger asChild>
                                                 <Button variant="outline" size="sm" className="rounded-xl">
-                                                    <Download className="ms-2 h-4 w-4" />
+                                                    <Download className="ms-2 h-4 w-4" aria-hidden="true" />
                                                     تصدير
                                                 </Button>
                                             </DropdownMenuTrigger>
@@ -646,17 +645,17 @@ export default function TransactionsDashboard() {
                                                     Excel
                                                 </DropdownMenuItem>
                                                 <DropdownMenuItem onClick={() => handleExport('pdf')}>
-                                                    <FileText className="ms-2 h-4 w-4" />
+                                                    <FileText className="ms-2 h-4 w-4" aria-hidden="true" />
                                                     PDF
                                                 </DropdownMenuItem>
                                                 <DropdownMenuItem onClick={() => handleExport('csv')}>
-                                                    <FileText className="ms-2 h-4 w-4" />
+                                                    <FileText className="ms-2 h-4 w-4" aria-hidden="true" />
                                                     CSV
                                                 </DropdownMenuItem>
                                             </DropdownMenuContent>
                                         </DropdownMenu>
                                         <Button variant="outline" size="sm" className="rounded-xl" onClick={() => refetch()}>
-                                            <RefreshCw className="ms-2 h-4 w-4" />
+                                            <RefreshCw className="ms-2 h-4 w-4" aria-hidden="true" />
                                             تحديث
                                         </Button>
                                     </div>
@@ -666,7 +665,7 @@ export default function TransactionsDashboard() {
                                 {filteredEntries.length === 0 ? (
                                     <div className="bg-slate-50 rounded-xl p-12 text-center border border-slate-200">
                                         <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                                            <FileText className="h-8 w-8 text-slate-400" />
+                                            <FileText className="h-8 w-8 text-slate-400" aria-hidden="true" />
                                         </div>
                                         <h3 className="text-lg font-bold text-slate-900 mb-2">لا توجد معاملات</h3>
                                         <p className="text-slate-500">لم يتم العثور على قيود محاسبية في الفترة المحددة</p>
@@ -755,17 +754,17 @@ export default function TransactionsDashboard() {
                                                                         </DropdownMenuTrigger>
                                                                         <DropdownMenuContent align="end">
                                                                             <DropdownMenuItem onClick={(e) => { e.stopPropagation(); handleViewDetails(entry); }}>
-                                                                                <Eye className="ms-2 h-4 w-4" />
+                                                                                <Eye className="ms-2 h-4 w-4" aria-hidden="true" />
                                                                                 عرض التفاصيل
                                                                             </DropdownMenuItem>
                                                                             <DropdownMenuItem onClick={(e) => e.stopPropagation()}>
-                                                                                <Printer className="ms-2 h-4 w-4" />
+                                                                                <Printer className="ms-2 h-4 w-4" aria-hidden="true" />
                                                                                 طباعة
                                                                             </DropdownMenuItem>
                                                                             <DropdownMenuSeparator />
                                                                             <DropdownMenuItem asChild onClick={(e) => e.stopPropagation()}>
                                                                                 <Link to={getReferenceLink(entry.referenceModel, entry.referenceId)}>
-                                                                                    <FileText className="ms-2 h-4 w-4" />
+                                                                                    <FileText className="ms-2 h-4 w-4" aria-hidden="true" />
                                                                                     عرض المستند الأصلي
                                                                                 </Link>
                                                                             </DropdownMenuItem>
@@ -793,7 +792,7 @@ export default function TransactionsDashboard() {
                                                     disabled={filters.page === 1}
                                                     className="rounded-xl"
                                                 >
-                                                    <ChevronRight className="h-4 w-4" />
+                                                    <ChevronRight className="h-4 w-4" aria-hidden="true" />
                                                 </Button>
 
                                                 <span className="text-sm text-slate-600 px-2">
@@ -807,7 +806,7 @@ export default function TransactionsDashboard() {
                                                     disabled={filters.page >= totalPages}
                                                     className="rounded-xl"
                                                 >
-                                                    <ChevronLeft className="h-4 w-4" />
+                                                    <ChevronLeft className="h-4 w-4" aria-hidden="true" />
                                                 </Button>
                                             </div>
 
@@ -844,7 +843,7 @@ export default function TransactionsDashboard() {
                             <DialogHeader>
                                 <DialogTitle className="flex items-center justify-between">
                                     <div className="flex items-center gap-2">
-                                        <FileText className="h-5 w-5 text-slate-600" />
+                                        <FileText className="h-5 w-5 text-slate-600" aria-hidden="true" />
                                         تفاصيل القيد
                                         <Badge variant="outline" className={cn("text-xs", getStatusInfo(selectedEntry.status).color)}>
                                             {getStatusInfo(selectedEntry.status).label}
@@ -1013,12 +1012,12 @@ export default function TransactionsDashboard() {
 
                             <DialogFooter className="gap-2">
                                 <Button variant="outline" onClick={handlePrint} className="rounded-xl">
-                                    <Printer className="ms-2 h-4 w-4" />
+                                    <Printer className="ms-2 h-4 w-4" aria-hidden="true" />
                                     طباعة
                                 </Button>
                                 <Button asChild variant="outline" className="rounded-xl">
                                     <Link to={getReferenceLink(selectedEntry.referenceModel, selectedEntry.referenceId)}>
-                                        <FileText className="ms-2 h-4 w-4" />
+                                        <FileText className="ms-2 h-4 w-4" aria-hidden="true" />
                                         عرض المستند الأصلي
                                     </Link>
                                 </Button>

@@ -110,18 +110,18 @@ export function ExpenseDetailsView() {
                 <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8">
                     <div className="max-w-[1600px] mx-auto mb-6">
                         <Link to="/dashboard/finance/expenses" className="inline-flex items-center text-slate-500 hover:text-navy transition-colors">
-                            <ArrowLeft className="h-4 w-4 ms-2" />
+                            <ArrowLeft className="h-4 w-4 ms-2" aria-hidden="true" />
                             العودة إلى المصروفات
                         </Link>
                     </div>
                     <div className="bg-white rounded-3xl p-12 text-center border border-slate-100 shadow-sm">
                         <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <AlertCircle className="h-8 w-8 text-red-500" />
+                            <AlertCircle className="h-8 w-8 text-red-500" aria-hidden="true" />
                         </div>
                         <h3 className="text-xl font-bold text-slate-900 mb-2">فشل تحميل تفاصيل المصروف</h3>
                         <p className="text-slate-500 mb-6">{error?.message || 'حدث خطأ أثناء تحميل البيانات'}</p>
                         <Button onClick={() => refetch()} className="bg-emerald-500 hover:bg-emerald-600 text-white px-8">
-                            <Loader2 className="ms-2 h-4 w-4" />
+                            <Loader2 className="ms-2 h-4 w-4" aria-hidden="true" />
                             إعادة المحاولة
                         </Button>
                     </div>
@@ -150,19 +150,19 @@ export function ExpenseDetailsView() {
                 <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8">
                     <div className="max-w-[1600px] mx-auto mb-6">
                         <Link to="/dashboard/finance/expenses" className="inline-flex items-center text-slate-500 hover:text-navy transition-colors">
-                            <ArrowLeft className="h-4 w-4 ms-2" />
+                            <ArrowLeft className="h-4 w-4 ms-2" aria-hidden="true" />
                             العودة إلى المصروفات
                         </Link>
                     </div>
                     <div className="bg-white rounded-3xl p-12 text-center border border-slate-100 shadow-sm">
                         <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <Receipt className="h-8 w-8 text-slate-400" />
+                            <Receipt className="h-8 w-8 text-slate-400" aria-hidden="true" />
                         </div>
                         <h3 className="text-xl font-bold text-slate-900 mb-2">المصروف غير موجود</h3>
                         <p className="text-slate-500 mb-6">لم نتمكن من العثور على المصروف المطلوب</p>
                         <Button asChild className="bg-brand-blue hover:bg-blue-600 text-white px-8">
                             <Link to="/dashboard/finance/expenses">
-                                <ArrowLeft className="ms-2 h-4 w-4" />
+                                <ArrowLeft className="ms-2 h-4 w-4" aria-hidden="true" />
                                 العودة إلى قائمة المصروفات
                             </Link>
                         </Button>
@@ -182,11 +182,11 @@ export function ExpenseDetailsView() {
                 </div>
                 <div className='ms-auto flex items-center gap-4'>
                     <div className="relative hidden md:block">
-                        <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                        <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" aria-hidden="true" />
                         <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
                     </div>
-                    <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white">
-                        <Bell className="h-5 w-5" />
+                    <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white" aria-label="الإشعارات">
+                        <Bell className="h-5 w-5" aria-hidden="true" />
                         <span className="absolute top-2 right-2 h-2 w-2 bg-red-500 rounded-full border border-navy"></span>
                     </Button>
                     <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white" />
@@ -200,7 +200,7 @@ export function ExpenseDetailsView() {
             <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-r border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
                 <div className="max-w-[1600px] mx-auto mb-6">
                     <Link to="/dashboard/finance/expenses" className="inline-flex items-center text-slate-500 hover:text-navy transition-colors">
-                        <ArrowLeft className="h-4 w-4 ms-2" />
+                        <ArrowLeft className="h-4 w-4 ms-2" aria-hidden="true" />
                         العودة إلى المصروفات
                     </Link>
                 </div>

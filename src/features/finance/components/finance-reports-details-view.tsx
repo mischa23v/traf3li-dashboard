@@ -184,11 +184,11 @@ export function FinanceReportsDetailsView() {
         </div>
         <div className='ms-auto flex items-center gap-4'>
           <div className="relative hidden md:block">
-            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" aria-hidden="true" />
             <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
           </div>
-          <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white">
-            <Bell className="h-5 w-5" />
+          <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white" aria-label="الإشعارات">
+                        <Bell className="h-5 w-5" aria-hidden="true" />
             <span className="absolute top-2 right-2 h-2 w-2 bg-red-500 rounded-full border border-navy"></span>
           </Button>
           <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white" />
@@ -214,14 +214,14 @@ export function FinanceReportsDetailsView() {
             {isLoading ? (
               <Card className="rounded-2xl border-slate-100">
                 <CardContent className="p-8 text-center">
-                  <Loader2 className="w-8 h-8 animate-spin mx-auto text-emerald-500" />
+                  <Loader2 className="w-8 h-8 animate-spin mx-auto text-emerald-500" aria-hidden="true" />
                   <p className="mt-4 text-slate-500">جاري تحميل البيانات...</p>
                 </CardContent>
               </Card>
             ) : error || !report ? (
               <Card className="rounded-2xl border-slate-100">
                 <CardContent className="p-8 text-center">
-                  <AlertCircle className="w-12 h-12 mx-auto text-red-500 mb-4" />
+                  <AlertCircle className="w-12 h-12 mx-auto text-red-500 mb-4" aria-hidden="true" />
                   <p className="text-red-600">حدث خطأ في تحميل بيانات التقرير</p>
                   <Button
                     onClick={() => navigate({ to: '/dashboard/finance/reports' })}
@@ -274,7 +274,7 @@ export function FinanceReportsDetailsView() {
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button variant="outline" size="sm" className="rounded-xl">
-                          <Download className="w-4 h-4 ms-1" />
+                          <Download className="w-4 h-4 ms-1" aria-hidden="true" />
                           تصدير
                         </Button>
                       </DropdownMenuTrigger>
@@ -301,16 +301,16 @@ export function FinanceReportsDetailsView() {
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button variant="outline" size="icon" className="rounded-xl">
-                          <MoreHorizontal className="w-4 h-4" />
+                          <MoreHorizontal className="w-4 h-4" aria-hidden="true" />
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
                         <DropdownMenuItem onClick={() => navigate({ to: `/dashboard/finance/reports/new?editId=${reportId}` })}>
-                          <Edit className="w-4 h-4 ms-2" />
+                          <Edit className="w-4 h-4 ms-2" aria-hidden="true" />
                           تعديل
                         </DropdownMenuItem>
                         <DropdownMenuItem onClick={handleDuplicate}>
-                          <Copy className="w-4 h-4 ms-2" />
+                          <Copy className="w-4 h-4 ms-2" aria-hidden="true" />
                           نسخ
                         </DropdownMenuItem>
                         <DropdownMenuItem>
@@ -319,7 +319,7 @@ export function FinanceReportsDetailsView() {
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem className="text-red-600" onClick={handleDelete}>
-                          <Trash2 className="w-4 h-4 ms-2" />
+                          <Trash2 className="w-4 h-4 ms-2" aria-hidden="true" />
                           حذف
                         </DropdownMenuItem>
                       </DropdownMenuContent>
@@ -346,7 +346,7 @@ export function FinanceReportsDetailsView() {
                     <CardContent className="p-4">
                       <div className="flex items-center gap-3">
                         <div className="p-2 bg-emerald-100 rounded-xl">
-                          <CheckCircle className="w-5 h-5 text-emerald-600" />
+                          <CheckCircle className="w-5 h-5 text-emerald-600" aria-hidden="true" />
                         </div>
                         <div>
                           <p className="text-xs text-slate-500">نجاح</p>
@@ -406,7 +406,7 @@ export function FinanceReportsDetailsView() {
                     <Card className="rounded-2xl border-slate-100">
                       <CardHeader>
                         <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                          <FileText className="w-5 h-5 text-emerald-500" />
+                          <FileText className="w-5 h-5 text-emerald-500" aria-hidden="true" />
                           معلومات التقرير
                         </CardTitle>
                       </CardHeader>
@@ -538,7 +538,7 @@ export function FinanceReportsDetailsView() {
                           <div className="flex items-center gap-2">
                             <p className="text-xs text-slate-500">بيانات حساسة</p>
                             {report.accessControl.dataSecurity?.containsSensitiveData ? (
-                              <CheckCircle className="w-4 h-4 text-emerald-500" />
+                              <CheckCircle className="w-4 h-4 text-emerald-500" aria-hidden="true" />
                             ) : (
                               <XCircle className="w-4 h-4 text-slate-300" />
                             )}
@@ -546,7 +546,7 @@ export function FinanceReportsDetailsView() {
                           <div className="flex items-center gap-2">
                             <p className="text-xs text-slate-500">تشفير</p>
                             {report.accessControl.dataSecurity?.encryptionRequired ? (
-                              <CheckCircle className="w-4 h-4 text-emerald-500" />
+                              <CheckCircle className="w-4 h-4 text-emerald-500" aria-hidden="true" />
                             ) : (
                               <XCircle className="w-4 h-4 text-slate-300" />
                             )}
@@ -554,7 +554,7 @@ export function FinanceReportsDetailsView() {
                           <div className="flex items-center gap-2">
                             <p className="text-xs text-slate-500">تسجيل الوصول</p>
                             {report.accessControl.auditLogging?.logAccess ? (
-                              <CheckCircle className="w-4 h-4 text-emerald-500" />
+                              <CheckCircle className="w-4 h-4 text-emerald-500" aria-hidden="true" />
                             ) : (
                               <XCircle className="w-4 h-4 text-slate-300" />
                             )}
@@ -662,7 +662,7 @@ export function FinanceReportsDetailsView() {
                     <Card className="rounded-2xl border-slate-100">
                       <CardHeader>
                         <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                          <Download className="w-5 h-5 text-amber-500" />
+                          <Download className="w-5 h-5 text-amber-500" aria-hidden="true" />
                           صيغ الإخراج
                         </CardTitle>
                       </CardHeader>
@@ -693,7 +693,7 @@ export function FinanceReportsDetailsView() {
                           <CardHeader>
                             <div className="flex items-center justify-between">
                               <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                                <Clock className="w-5 h-5 text-cyan-500" />
+                                <Clock className="w-5 h-5 text-cyan-500" aria-hidden="true" />
                                 إعدادات الجدولة
                               </CardTitle>
                               <div className="flex items-center gap-2">
@@ -798,7 +798,7 @@ export function FinanceReportsDetailsView() {
                     ) : (
                       <Card className="rounded-2xl border-slate-100">
                         <CardContent className="p-8 text-center">
-                          <Clock className="w-12 h-12 mx-auto text-slate-300 mb-4" />
+                          <Clock className="w-12 h-12 mx-auto text-slate-300 mb-4" aria-hidden="true" />
                           <p className="text-slate-500">لم يتم تفعيل الجدولة لهذا التقرير</p>
                           <Button
                             variant="outline"
@@ -817,7 +817,7 @@ export function FinanceReportsDetailsView() {
                     <Card className="rounded-2xl border-slate-100">
                       <CardHeader>
                         <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                          <Eye className="w-5 h-5 text-indigo-500" />
+                          <Eye className="w-5 h-5 text-indigo-500" aria-hidden="true" />
                           سجل التشغيل
                         </CardTitle>
                       </CardHeader>
@@ -831,13 +831,13 @@ export function FinanceReportsDetailsView() {
                               >
                                 <div className="flex items-center gap-3">
                                   {execution.status === ExecutionStatus.COMPLETED ? (
-                                    <CheckCircle className="w-5 h-5 text-emerald-500" />
+                                    <CheckCircle className="w-5 h-5 text-emerald-500" aria-hidden="true" />
                                   ) : execution.status === ExecutionStatus.FAILED ? (
                                     <XCircle className="w-5 h-5 text-red-500" />
                                   ) : execution.status === ExecutionStatus.RUNNING ? (
-                                    <Loader2 className="w-5 h-5 text-amber-500 animate-spin" />
+                                    <Loader2 className="w-5 h-5 text-amber-500 animate-spin" aria-hidden="true" />
                                   ) : (
-                                    <Clock className="w-5 h-5 text-blue-500" />
+                                    <Clock className="w-5 h-5 text-blue-500" aria-hidden="true" />
                                   )}
                                   <div>
                                     <p className="font-medium">
@@ -874,11 +874,11 @@ export function FinanceReportsDetailsView() {
                               >
                                 <div className="flex items-center gap-3">
                                   {execution.status === ExecutionStatus.COMPLETED ? (
-                                    <CheckCircle className="w-5 h-5 text-emerald-500" />
+                                    <CheckCircle className="w-5 h-5 text-emerald-500" aria-hidden="true" />
                                   ) : execution.status === ExecutionStatus.FAILED ? (
                                     <XCircle className="w-5 h-5 text-red-500" />
                                   ) : (
-                                    <Clock className="w-5 h-5 text-blue-500" />
+                                    <Clock className="w-5 h-5 text-blue-500" aria-hidden="true" />
                                   )}
                                   <div>
                                     <p className="font-medium">

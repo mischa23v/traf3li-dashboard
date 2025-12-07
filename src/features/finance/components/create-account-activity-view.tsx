@@ -116,7 +116,7 @@ export function CreateAccountActivityView() {
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                         <div className="space-y-2">
                                             <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                                <FileText className="w-4 h-4 text-emerald-500" />
+                                                <FileText className="w-4 h-4 text-emerald-500" aria-hidden="true" />
                                                 عنوان النشاط <span className="text-red-500">*</span>
                                             </label>
                                             <Input
@@ -185,7 +185,7 @@ export function CreateAccountActivityView() {
 
                                     <div className="space-y-2">
                                         <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                            <FileText className="w-4 h-4 text-emerald-500" />
+                                            <FileText className="w-4 h-4 text-emerald-500" aria-hidden="true" />
                                             تفاصيل النشاط
                                         </label>
                                         <Textarea
@@ -231,12 +231,12 @@ export function CreateAccountActivityView() {
                                     >
                                         {isPending ? (
                                             <span className="flex items-center gap-2">
-                                                <Loader2 className="w-4 h-4 animate-spin" />
+                                                <Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" />
                                                 جاري الحفظ...
                                             </span>
                                         ) : (
                                             <span className="flex items-center gap-2">
-                                                <Save className="w-4 h-4" />
+                                                <Save className="w-4 h-4" aria-hidden="true" />
                                                 تسجيل النشاط
                                             </span>
                                         )}

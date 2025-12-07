@@ -239,7 +239,7 @@ export default function CreateQuoteView() {
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                         <div className="space-y-2">
                                             <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                                <Calendar className="w-4 h-4 text-blue-500" />
+                                                <Calendar className="w-4 h-4 text-blue-500" aria-hidden="true" />
                                                 فترة صلاحية العرض
                                             </label>
                                             <Select
@@ -283,7 +283,7 @@ export default function CreateQuoteView() {
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                         <div className="space-y-2">
                                             <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                                <Calendar className="w-4 h-4 text-blue-500" />
+                                                <Calendar className="w-4 h-4 text-blue-500" aria-hidden="true" />
                                                 تاريخ الإصدار
                                             </label>
                                             <Input
@@ -295,7 +295,7 @@ export default function CreateQuoteView() {
                                         </div>
                                         <div className="space-y-2">
                                             <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                                <Calendar className="w-4 h-4 text-blue-500" />
+                                                <Calendar className="w-4 h-4 text-blue-500" aria-hidden="true" />
                                                 تاريخ الانتهاء <span className="text-red-500">*</span>
                                             </label>
                                             <Input
@@ -312,11 +312,11 @@ export default function CreateQuoteView() {
                                     <div className="space-y-4">
                                         <div className="flex items-center justify-between">
                                             <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                                <FileText className="w-4 h-4 text-blue-500" />
+                                                <FileText className="w-4 h-4 text-blue-500" aria-hidden="true" />
                                                 بنود عرض السعر
                                             </label>
                                             <Button type="button" onClick={handleAddItem} variant="outline" size="sm" className="text-blue-600 border-blue-200 hover:bg-blue-50">
-                                                <Plus className="w-4 h-4 ms-2" />
+                                                <Plus className="w-4 h-4 ms-2" aria-hidden="true" />
                                                 إضافة بند
                                             </Button>
                                         </div>
@@ -365,7 +365,7 @@ export default function CreateQuoteView() {
                                                         {(item.quantity * item.price).toLocaleString('ar-SA')} ر.س
                                                     </div>
                                                     <Button type="button" onClick={() => handleRemoveItem(item.id)} variant="ghost" size="icon" className="text-red-500 hover:bg-red-50 rounded-xl">
-                                                        <Trash2 className="w-4 h-4" />
+                                                        <Trash2 className="w-4 h-4" aria-hidden="true" />
                                                     </Button>
                                                 </div>
                                             ))}
@@ -439,7 +439,7 @@ export default function CreateQuoteView() {
 
                                     <div className="space-y-2">
                                         <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                            <FileText className="w-4 h-4 text-blue-500" />
+                                            <FileText className="w-4 h-4 text-blue-500" aria-hidden="true" />
                                             ملاحظات
                                         </label>
                                         <Textarea
@@ -452,7 +452,7 @@ export default function CreateQuoteView() {
 
                                     <div className="space-y-2">
                                         <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                            <FileText className="w-4 h-4 text-blue-500" />
+                                            <FileText className="w-4 h-4 text-blue-500" aria-hidden="true" />
                                             الشروط والأحكام
                                         </label>
                                         <Textarea
@@ -473,7 +473,7 @@ export default function CreateQuoteView() {
                                             className="h-4 w-4 text-blue-600 rounded border-slate-300"
                                         />
                                         <label htmlFor="sendAfterCreate" className="text-sm font-medium text-blue-800 flex items-center gap-2">
-                                            <Send className="w-4 h-4" />
+                                            <Send className="w-4 h-4" aria-hidden="true" />
                                             إرسال عرض السعر للعميل بعد الإنشاء
                                         </label>
                                     </div>
@@ -492,12 +492,12 @@ export default function CreateQuoteView() {
                                     >
                                         {createQuoteMutation.isPending || sendQuoteMutation.isPending ? (
                                             <span className="flex items-center gap-2">
-                                                <Loader2 className="w-4 h-4 animate-spin" />
+                                                <Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" />
                                                 جاري الحفظ...
                                             </span>
                                         ) : (
                                             <span className="flex items-center gap-2">
-                                                <Save className="w-4 h-4" />
+                                                <Save className="w-4 h-4" aria-hidden="true" />
                                                 {sendAfterCreate ? 'حفظ وإرسال' : 'حفظ عرض السعر'}
                                             </span>
                                         )}

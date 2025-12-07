@@ -178,7 +178,7 @@ export function CreateRetainerView() {
                                         <div className="flex gap-3">
                                             <div className="shrink-0">
                                                 <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
-                                                    <FileText className="w-4 h-4 text-blue-600" />
+                                                    <FileText className="w-4 h-4 text-blue-600" aria-hidden="true" />
                                                 </div>
                                             </div>
                                             <div className="space-y-1">
@@ -193,7 +193,7 @@ export function CreateRetainerView() {
                                     {/* Notes */}
                                     <div className="space-y-2">
                                         <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                            <FileText className="w-4 h-4 text-emerald-500" />
+                                            <FileText className="w-4 h-4 text-emerald-500" aria-hidden="true" />
                                             ملاحظات
                                         </label>
                                         <Textarea
@@ -240,12 +240,12 @@ export function CreateRetainerView() {
                                     >
                                         {createRetainerMutation.isPending ? (
                                             <span className="flex items-center gap-2">
-                                                <Loader2 className="w-4 h-4 animate-spin" />
+                                                <Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" />
                                                 جاري الحفظ...
                                             </span>
                                         ) : (
                                             <span className="flex items-center gap-2">
-                                                <Save className="w-4 h-4" />
+                                                <Save className="w-4 h-4" aria-hidden="true" />
                                                 حفظ حساب الأمانة
                                             </span>
                                         )}

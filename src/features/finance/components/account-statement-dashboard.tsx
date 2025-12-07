@@ -173,11 +173,11 @@ export default function AccountStatementDashboard() {
 
                 <div className='ms-auto flex items-center gap-4'>
                     <div className="relative hidden md:block">
-                        <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                        <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" aria-hidden="true" />
                         <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
                     </div>
-                    <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white">
-                        <Bell className="h-5 w-5" />
+                    <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white" aria-label="الإشعارات">
+                        <Bell className="h-5 w-5" aria-hidden="true" />
                         <span className="absolute top-2 right-2 h-2 w-2 bg-red-500 rounded-full border border-navy"></span>
                     </Button>
                     <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white" />
@@ -217,11 +217,11 @@ export default function AccountStatementDashboard() {
                                 </div>
                                 <div className="flex gap-3">
                                     <Button variant="outline" className="bg-white/5 border-white/10 text-white hover:bg-white/10 rounded-xl">
-                                        <Download className="w-4 h-4 ms-2" />
+                                        <Download className="w-4 h-4 ms-2" aria-hidden="true" />
                                         تصدير الكشف
                                     </Button>
                                     <Button className="bg-brand-blue hover:bg-blue-600 text-white border-0 shadow-lg shadow-blue-500/20 rounded-xl">
-                                        <Plus className="w-4 h-4 ms-2" />
+                                        <Plus className="w-4 h-4 ms-2" aria-hidden="true" />
                                         معاملة جديدة
                                     </Button>
                                 </div>
@@ -289,7 +289,7 @@ export default function AccountStatementDashboard() {
 
                                 <div className="flex items-center gap-3 flex-1 justify-end">
                                     <div className="relative w-full max-w-xs">
-                                        <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                                        <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" aria-hidden="true" />
                                         <Input
                                             placeholder="بحث في المعاملات..."
                                             className="pe-10 rounded-xl border-slate-200 focus:ring-navy focus:border-navy"
@@ -298,7 +298,7 @@ export default function AccountStatementDashboard() {
                                         />
                                     </div>
                                     <Button variant="outline" size="icon" className="rounded-xl border-slate-200">
-                                        <Filter className="h-4 w-4 text-slate-500" />
+                                        <Filter className="h-4 w-4 text-slate-500" aria-hidden="true" />
                                     </Button>
                                 </div>
                             </div>
@@ -327,8 +327,8 @@ export default function AccountStatementDashboard() {
                                                 </div>
                                                 <DropdownMenu>
                                                     <DropdownMenuTrigger asChild>
-                                                        <Button variant="ghost" size="icon" className="text-slate-400 hover:text-navy">
-                                                            <MoreHorizontal className="h-5 w-5" />
+                                                        <Button variant="ghost" size="icon" className="text-slate-400 hover:text-navy" aria-label="تعديل">
+                                                            <MoreHorizontal className="h-5 w-5" aria-hidden="true" />
                                                         </Button>
                                                     </DropdownMenuTrigger>
                                                     <DropdownMenuContent align="end">
@@ -400,7 +400,7 @@ export default function AccountStatementDashboard() {
                             <Card className="border-none shadow-sm bg-white rounded-3xl overflow-hidden hover:shadow-md transition-all duration-300">
                                 <CardHeader className="border-b border-slate-100 pb-4">
                                     <CardTitle className="text-lg font-bold text-navy flex items-center gap-2">
-                                        <Calendar className="w-5 h-5 text-amber-500" />
+                                        <Calendar className="w-5 h-5 text-amber-500" aria-hidden="true" />
                                         ملخص النشاط
                                     </CardTitle>
                                 </CardHeader>

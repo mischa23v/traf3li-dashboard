@@ -74,11 +74,11 @@ export default function StatementsHistoryDashboard() {
 
                 <div className='ms-auto flex items-center gap-4'>
                     <div className="relative hidden md:block">
-                        <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                        <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" aria-hidden="true" />
                         <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
                     </div>
-                    <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white">
-                        <Bell className="h-5 w-5" />
+                    <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white" aria-label="الإشعارات">
+                        <Bell className="h-5 w-5" aria-hidden="true" />
                         <span className="absolute top-2 right-2 h-2 w-2 bg-red-500 rounded-full border border-navy"></span>
                     </Button>
                     <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white" />
@@ -110,12 +110,12 @@ export default function StatementsHistoryDashboard() {
                             <div className="flex gap-3">
                                 <Button asChild className="bg-emerald-500 hover:bg-emerald-600 text-white h-12 px-8 rounded-xl font-bold shadow-lg shadow-emerald-500/20 border-0">
                                     <Link to="/dashboard/finance/statements/new">
-                                        <Plus className="ms-2 h-5 w-5" />
+                                        <Plus className="ms-2 h-5 w-5" aria-hidden="true" />
                                         إنشاء كشف جديد
                                     </Link>
                                 </Button>
                                 <Button variant="ghost" className="bg-white/10 text-white hover:bg-white/20 h-12 px-8 rounded-xl font-bold border-0 backdrop-blur-sm">
-                                    <Download className="ms-2 h-5 w-5" />
+                                    <Download className="ms-2 h-5 w-5" aria-hidden="true" />
                                     تصدير السجل
                                 </Button>
                             </div>
@@ -169,7 +169,7 @@ export default function StatementsHistoryDashboard() {
 
                                 <div className="flex items-center gap-3 flex-1 justify-end">
                                     <div className="relative w-full max-w-xs">
-                                        <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                                        <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" aria-hidden="true" />
                                         <Input
                                             placeholder="بحث في الكشوفات..."
                                             className="pe-10 rounded-xl border-slate-200 focus:ring-[#022c22] focus:border-[#022c22]"
@@ -197,7 +197,7 @@ export default function StatementsHistoryDashboard() {
                                     ))
                                 ) : isError ? (
                                     <div className="bg-white rounded-2xl p-12 text-center border border-red-100">
-                                        <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
+                                        <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" aria-hidden="true" />
                                         <h3 className="text-xl font-bold mb-2 text-slate-900">فشل تحميل الكشوف</h3>
                                         <p className="text-slate-500 mb-4">{error?.message || 'حدث خطأ أثناء تحميل البيانات'}</p>
                                         <Button onClick={() => window.location.reload()} className="bg-[#022c22] hover:bg-[#033d2f]">
@@ -207,13 +207,13 @@ export default function StatementsHistoryDashboard() {
                                 ) : filteredStatements.length === 0 ? (
                                     <div className="bg-white rounded-3xl p-12 text-center border border-slate-100 shadow-sm">
                                         <div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                                            <FileText className="h-8 w-8 text-brand-blue" />
+                                            <FileText className="h-8 w-8 text-brand-blue" aria-hidden="true" />
                                         </div>
                                         <h3 className="text-xl font-bold text-slate-900 mb-2">لا توجد كشوف حساب</h3>
                                         <p className="text-slate-500 mb-6">ابدأ بإنشاء كشف حساب جديد للعملاء</p>
                                         <Button asChild className="bg-brand-blue hover:bg-blue-600 text-white px-8">
                                             <Link to="/dashboard/finance/statements/new">
-                                                <Plus className="ms-2 h-4 w-4" />
+                                                <Plus className="ms-2 h-4 w-4" aria-hidden="true" />
                                                 إنشاء كشف جديد
                                             </Link>
                                         </Button>
@@ -224,7 +224,7 @@ export default function StatementsHistoryDashboard() {
                                             <div className="flex justify-between items-start mb-4">
                                                 <div className="flex gap-4 items-start">
                                                     <div className="w-12 h-12 rounded-xl bg-blue-50 text-brand-blue flex items-center justify-center shadow-sm mt-1">
-                                                        <FileText className="h-6 w-6" />
+                                                        <FileText className="h-6 w-6" aria-hidden="true" />
                                                     </div>
                                                     <div>
                                                         <div className="flex items-center gap-2 mb-1">
@@ -240,15 +240,15 @@ export default function StatementsHistoryDashboard() {
                                                         <div className="flex items-center gap-2 text-slate-500 text-sm">
                                                             <span className="font-mono text-slate-400">{st.statementNumber}</span>
                                                             <span className="text-slate-300">•</span>
-                                                            <Calendar className="w-3 h-3" />
+                                                            <Calendar className="w-3 h-3" aria-hidden="true" />
                                                             {st.period}
                                                         </div>
                                                     </div>
                                                 </div>
                                                 <DropdownMenu>
                                                     <DropdownMenuTrigger asChild>
-                                                        <Button variant="ghost" size="icon" className="text-slate-400 hover:text-[#022c22]">
-                                                            <MoreHorizontal className="h-5 w-5" />
+                                                        <Button variant="ghost" size="icon" className="text-slate-400 hover:text-[#022c22]" aria-label="تعديل">
+                                                            <MoreHorizontal className="h-5 w-5" aria-hidden="true" />
                                                         </Button>
                                                     </DropdownMenuTrigger>
                                                     <DropdownMenuContent align="end">

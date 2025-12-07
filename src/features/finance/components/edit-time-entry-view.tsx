@@ -159,13 +159,13 @@ export function EditTimeEntryView() {
 
         <div className="flex gap-2">
           <Button variant="outline" size="sm" onClick={handleDuplicate}>
-            <Copy className="h-4 w-4 ms-2" />
+            <Copy className="h-4 w-4 ms-2" aria-hidden="true" />
             نسخ
           </Button>
           <AlertDialog>
             <AlertDialogTrigger asChild>
               <Button variant="destructive" size="sm">
-                <Trash2 className="h-4 w-4 ms-2" />
+                <Trash2 className="h-4 w-4 ms-2" aria-hidden="true" />
                 حذف
               </Button>
             </AlertDialogTrigger>
@@ -351,7 +351,7 @@ export function EditTimeEntryView() {
 
                 <div className="flex gap-4 pt-4">
                   <Button type="submit" disabled={updateTimeEntry.isPending}>
-                    <Save className="h-4 w-4 ms-2" />
+                    <Save className="h-4 w-4 ms-2" aria-hidden="true" />
                     {updateTimeEntry.isPending ? 'جاري الحفظ...' : 'حفظ التعديلات'}
                   </Button>
                   <Button
@@ -371,7 +371,7 @@ export function EditTimeEntryView() {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Clock className="h-5 w-5" />
+                <Clock className="h-5 w-5" aria-hidden="true" />
                 ملخص
               </CardTitle>
             </CardHeader>

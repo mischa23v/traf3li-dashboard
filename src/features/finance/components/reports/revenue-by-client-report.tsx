@@ -112,7 +112,7 @@ export function RevenueByClientReport() {
                 <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8">
                     <div className="bg-white rounded-3xl p-12 text-center border border-slate-100 shadow-sm">
                         <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <AlertCircle className="h-8 w-8 text-red-500" />
+                            <AlertCircle className="h-8 w-8 text-red-500" aria-hidden="true" />
                         </div>
                         <h3 className="text-xl font-bold text-slate-900 mb-2">فشل تحميل التقرير</h3>
                         <p className="text-slate-500 mb-6">{error?.message || 'حدث خطأ أثناء تحميل البيانات'}</p>
@@ -236,7 +236,7 @@ export function RevenueByClientReport() {
                                     onClick={() => handleExport('csv')}
                                     disabled={isExporting}
                                 >
-                                    <Download className="w-4 h-4 ms-2" />
+                                    <Download className="w-4 h-4 ms-2" aria-hidden="true" />
                                     تصدير CSV
                                 </Button>
                                 <Button
@@ -244,7 +244,7 @@ export function RevenueByClientReport() {
                                     onClick={() => handleExport('pdf')}
                                     disabled={isExporting}
                                 >
-                                    <Download className="w-4 h-4 ms-2" />
+                                    <Download className="w-4 h-4 ms-2" aria-hidden="true" />
                                     تصدير PDF
                                 </Button>
                             </div>
@@ -255,11 +255,11 @@ export function RevenueByClientReport() {
                     <div className="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex flex-wrap items-center justify-between gap-4">
                         <div className="flex items-center gap-4">
                             <div className="flex items-center gap-2">
-                                <Filter className="w-5 h-5 text-slate-400" />
+                                <Filter className="w-5 h-5 text-slate-400" aria-hidden="true" />
                                 <span className="text-sm font-medium text-slate-600">الفترة:</span>
                             </div>
                             <div className="flex items-center gap-2">
-                                <Calendar className="w-4 h-4 text-slate-400" />
+                                <Calendar className="w-4 h-4 text-slate-400" aria-hidden="true" />
                                 <Input
                                     type="date"
                                     value={startDate}
@@ -311,7 +311,7 @@ export function RevenueByClientReport() {
                             <CardContent className="p-5">
                                 <div className="flex items-center gap-3 mb-3">
                                     <div className="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center">
-                                        <CheckCircle className="w-5 h-5 text-blue-600" />
+                                        <CheckCircle className="w-5 h-5 text-blue-600" aria-hidden="true" />
                                     </div>
                                     <span className="text-sm text-slate-500">المبالغ المحصلة</span>
                                 </div>

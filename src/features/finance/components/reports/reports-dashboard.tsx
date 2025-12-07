@@ -27,7 +27,7 @@ const reports: ReportCard[] = [
         id: 'accounts-aging',
         title: 'تقرير أعمار الحسابات',
         description: 'تحليل المستحقات حسب فترات التأخير (0-30، 31-60، 61-90، +90 يوم)',
-        icon: <Clock className="w-6 h-6" />,
+        icon: <Clock className="w-6 h-6" aria-hidden="true" />,
         href: '/dashboard/finance/reports/accounts-aging',
         color: 'text-amber-600',
         bgColor: 'bg-amber-50',
@@ -47,7 +47,7 @@ const reports: ReportCard[] = [
         id: 'outstanding-invoices',
         title: 'الفواتير المستحقة',
         description: 'قائمة شاملة بجميع الفواتير المستحقة مع تفاصيل التأخير',
-        icon: <FileText className="w-6 h-6" />,
+        icon: <FileText className="w-6 h-6" aria-hidden="true" />,
         href: '/dashboard/finance/reports/outstanding-invoices',
         color: 'text-blue-600',
         bgColor: 'bg-blue-50',
@@ -57,7 +57,7 @@ const reports: ReportCard[] = [
         id: 'time-entries',
         title: 'تقرير الوقت',
         description: 'تحليل ساعات العمل القابلة للفوترة وغير القابلة',
-        icon: <Calendar className="w-6 h-6" />,
+        icon: <Calendar className="w-6 h-6" aria-hidden="true" />,
         href: '/dashboard/finance/reports/time-entries',
         color: 'text-purple-600',
         bgColor: 'bg-purple-50',
@@ -160,7 +160,7 @@ export function ReportsDashboard() {
                             <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
                                 <div className="text-center">
                                     <div className="w-12 h-12 rounded-full bg-amber-100 flex items-center justify-center mx-auto mb-3">
-                                        <Clock className="w-6 h-6 text-amber-600" />
+                                        <Clock className="w-6 h-6 text-amber-600" aria-hidden="true" />
                                     </div>
                                     <div className="text-2xl font-bold text-navy">12</div>
                                     <div className="text-sm text-slate-500">فاتورة متأخرة</div>
@@ -181,7 +181,7 @@ export function ReportsDashboard() {
                                 </div>
                                 <div className="text-center">
                                     <div className="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center mx-auto mb-3">
-                                        <Calendar className="w-6 h-6 text-purple-600" />
+                                        <Calendar className="w-6 h-6 text-purple-600" aria-hidden="true" />
                                     </div>
                                     <div className="text-2xl font-bold text-navy">156</div>
                                     <div className="text-sm text-slate-500">ساعة هذا الشهر</div>

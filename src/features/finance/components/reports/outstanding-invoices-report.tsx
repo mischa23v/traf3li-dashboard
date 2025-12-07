@@ -112,15 +112,15 @@ export function OutstandingInvoicesReport() {
         </div>
         <div className="flex gap-2">
           <Button variant="outline" size="sm" onClick={() => setShowFilters(!showFilters)}>
-            <Filter className="h-4 w-4 ms-2" />
+            <Filter className="h-4 w-4 ms-2" aria-hidden="true" />
             فلترة
           </Button>
           <Button variant="outline" size="sm" onClick={() => handleExport('csv')}>
-            <Download className="h-4 w-4 ms-2" />
+            <Download className="h-4 w-4 ms-2" aria-hidden="true" />
             CSV
           </Button>
           <Button variant="outline" size="sm" onClick={() => handleExport('pdf')}>
-            <FileText className="h-4 w-4 ms-2" />
+            <FileText className="h-4 w-4 ms-2" aria-hidden="true" />
             PDF
           </Button>
         </div>
@@ -185,7 +185,7 @@ export function OutstandingInvoicesReport() {
           <CardContent className="pt-6">
             <div className="flex items-center gap-4">
               <div className="p-3 bg-blue-100 rounded-lg">
-                <FileText className="h-6 w-6 text-blue-600" />
+                <FileText className="h-6 w-6 text-blue-600" aria-hidden="true" />
               </div>
               <div>
                 <p className="text-sm text-slate-600">إجمالي المستحق</p>
@@ -213,7 +213,7 @@ export function OutstandingInvoicesReport() {
           <CardContent className="pt-6">
             <div className="flex items-center gap-4">
               <div className="p-3 bg-yellow-100 rounded-lg">
-                <Clock className="h-6 w-6 text-yellow-600" />
+                <Clock className="h-6 w-6 text-yellow-600" aria-hidden="true" />
               </div>
               <div>
                 <p className="text-sm text-slate-600">قريبة الاستحقاق</p>
@@ -227,7 +227,7 @@ export function OutstandingInvoicesReport() {
           <CardContent className="pt-6">
             <div className="flex items-center gap-4">
               <div className="p-3 bg-gray-100 rounded-lg">
-                <FileText className="h-6 w-6 text-gray-600" />
+                <FileText className="h-6 w-6 text-gray-600" aria-hidden="true" />
               </div>
               <div>
                 <p className="text-sm text-slate-600">عدد الفواتير</p>
@@ -285,10 +285,10 @@ export function OutstandingInvoicesReport() {
                         size="sm"
                         onClick={() => navigate({ to: '/dashboard/finance/invoices/$invoiceId', params: { invoiceId: invoice.id } })}
                       >
-                        <Eye className="h-4 w-4" />
+                        <Eye className="h-4 w-4" aria-hidden="true" />
                       </Button>
                       <Button variant="ghost" size="sm">
-                        <Send className="h-4 w-4" />
+                        <Send className="h-4 w-4" aria-hidden="true" />
                       </Button>
                     </div>
                   </TableCell>

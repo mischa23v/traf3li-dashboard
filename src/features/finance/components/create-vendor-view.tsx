@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import {
     Save, Building2, User, Mail, Phone, MapPin,
-    Hash, CreditCard, FileText, Loader2, Package
+    Hash, CreditCard, FileText, Loader2, Package, Lock
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -193,7 +193,7 @@ export function CreateVendorView({ mode = 'create' }: CreateVendorViewProps) {
                                         <div className="space-y-2">
                                             <Label htmlFor="email" className="text-sm font-medium text-slate-700 flex items-center gap-2">
                                                 <Mail className="w-4 h-4 text-emerald-500" />
-                                                البريد الإلكتروني
+                                                البريد الإلكتروني<Lock className="h-3 w-3 text-muted-foreground inline ms-1" />
                                             </Label>
                                             <Input
                                                 id="email"
@@ -208,7 +208,7 @@ export function CreateVendorView({ mode = 'create' }: CreateVendorViewProps) {
                                         <div className="space-y-2">
                                             <Label htmlFor="phone" className="text-sm font-medium text-slate-700 flex items-center gap-2">
                                                 <Phone className="w-4 h-4 text-emerald-500" />
-                                                رقم الهاتف
+                                                رقم الهاتف<Lock className="h-3 w-3 text-muted-foreground inline ms-1" />
                                             </Label>
                                             <Input
                                                 id="phone"
@@ -301,7 +301,7 @@ export function CreateVendorView({ mode = 'create' }: CreateVendorViewProps) {
                                 {/* Banking Information */}
                                 <div className="space-y-6">
                                     <h3 className="text-lg font-bold text-navy flex items-center gap-2">
-                                        <CreditCard className="h-5 w-5 text-emerald-500" />
+                                        <CreditCard className="h-5 w-5 text-emerald-500" aria-hidden="true" />
                                         المعلومات البنكية
                                     </h3>
 
@@ -321,7 +321,7 @@ export function CreateVendorView({ mode = 'create' }: CreateVendorViewProps) {
 
                                         <div className="space-y-2">
                                             <Label htmlFor="bankAccountNumber" className="text-sm font-medium text-slate-700">
-                                                رقم الحساب البنكي
+                                                رقم الحساب البنكي<Lock className="h-3 w-3 text-muted-foreground inline ms-1" />
                                             </Label>
                                             <Input
                                                 id="bankAccountNumber"
@@ -334,7 +334,7 @@ export function CreateVendorView({ mode = 'create' }: CreateVendorViewProps) {
 
                                         <div className="space-y-2 col-span-2">
                                             <Label htmlFor="iban" className="text-sm font-medium text-slate-700">
-                                                رقم الآيبان (IBAN)
+                                                رقم الآيبان (IBAN)<Lock className="h-3 w-3 text-muted-foreground inline ms-1" />
                                             </Label>
                                             <Input
                                                 id="iban"
@@ -350,7 +350,7 @@ export function CreateVendorView({ mode = 'create' }: CreateVendorViewProps) {
                                 {/* Notes */}
                                 <div className="space-y-6">
                                     <h3 className="text-lg font-bold text-navy flex items-center gap-2">
-                                        <FileText className="h-5 w-5 text-emerald-500" />
+                                        <FileText className="h-5 w-5 text-emerald-500" aria-hidden="true" />
                                         ملاحظات
                                     </h3>
 
@@ -379,12 +379,12 @@ export function CreateVendorView({ mode = 'create' }: CreateVendorViewProps) {
                                     >
                                         {createVendorMutation.isPending || updateVendorMutation.isPending ? (
                                             <span className="flex items-center gap-2">
-                                                <Loader2 className="w-4 h-4 animate-spin" />
+                                                <Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" />
                                                 جاري الحفظ...
                                             </span>
                                         ) : (
                                             <span className="flex items-center gap-2">
-                                                <Save className="w-4 h-4" />
+                                                <Save className="w-4 h-4" aria-hidden="true" />
                                                 {mode === 'edit' ? 'تحديث المورد' : 'حفظ المورد'}
                                             </span>
                                         )}

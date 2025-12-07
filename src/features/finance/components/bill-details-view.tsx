@@ -138,18 +138,18 @@ export function BillDetailsView() {
                 <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8">
                     <div className="max-w-[1600px] mx-auto mb-6">
                         <Link to="/dashboard/finance/bills" className="inline-flex items-center text-slate-500 hover:text-navy transition-colors">
-                            <ArrowLeft className="h-4 w-4 ms-2" />
+                            <ArrowLeft className="h-4 w-4 ms-2" aria-hidden="true" />
                             العودة إلى الفواتير
                         </Link>
                     </div>
                     <div className="bg-white rounded-3xl p-12 text-center border border-slate-100 shadow-sm">
                         <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <AlertCircle className="h-8 w-8 text-red-500" />
+                            <AlertCircle className="h-8 w-8 text-red-500" aria-hidden="true" />
                         </div>
                         <h3 className="text-xl font-bold text-slate-900 mb-2">فشل تحميل تفاصيل الفاتورة</h3>
                         <p className="text-slate-500 mb-6">{(error as any)?.message || 'حدث خطأ أثناء تحميل البيانات'}</p>
                         <Button onClick={() => refetch()} className="bg-emerald-500 hover:bg-emerald-600 text-white px-8">
-                            <Loader2 className="ms-2 h-4 w-4" />
+                            <Loader2 className="ms-2 h-4 w-4" aria-hidden="true" />
                             إعادة المحاولة
                         </Button>
                     </div>
@@ -172,19 +172,19 @@ export function BillDetailsView() {
                 <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8">
                     <div className="max-w-[1600px] mx-auto mb-6">
                         <Link to="/dashboard/finance/bills" className="inline-flex items-center text-slate-500 hover:text-navy transition-colors">
-                            <ArrowLeft className="h-4 w-4 ms-2" />
+                            <ArrowLeft className="h-4 w-4 ms-2" aria-hidden="true" />
                             العودة إلى الفواتير
                         </Link>
                     </div>
                     <div className="bg-white rounded-3xl p-12 text-center border border-slate-100 shadow-sm">
                         <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <FileText className="h-8 w-8 text-slate-400" />
+                            <FileText className="h-8 w-8 text-slate-400" aria-hidden="true" />
                         </div>
                         <h3 className="text-xl font-bold text-slate-900 mb-2">الفاتورة غير موجودة</h3>
                         <p className="text-slate-500 mb-6">لم نتمكن من العثور على الفاتورة المطلوبة</p>
                         <Button asChild className="bg-brand-blue hover:bg-blue-600 text-white px-8">
                             <Link to="/dashboard/finance/bills">
-                                <ArrowLeft className="ms-2 h-4 w-4" />
+                                <ArrowLeft className="ms-2 h-4 w-4" aria-hidden="true" />
                                 العودة إلى قائمة الفواتير
                             </Link>
                         </Button>
@@ -210,7 +210,7 @@ export function BillDetailsView() {
             <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-r border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
                 <div className="max-w-[1600px] mx-auto mb-6">
                     <Link to="/dashboard/finance/bills" className="inline-flex items-center text-slate-500 hover:text-navy transition-colors">
-                        <ArrowLeft className="h-4 w-4 ms-2" />
+                        <ArrowLeft className="h-4 w-4 ms-2" aria-hidden="true" />
                         العودة إلى الفواتير
                     </Link>
                 </div>
@@ -231,8 +231,8 @@ export function BillDetailsView() {
                                     <CardTitle className="text-lg font-bold text-navy">معلومات الفاتورة</CardTitle>
                                     <div className="flex items-center gap-2">
                                         <Badge className={statusInfo.color}>{statusInfo.label}</Badge>
-                                        <Button variant="ghost" size="icon" className="rounded-full">
-                                            <MoreHorizontal className="h-5 w-5" />
+                                        <Button variant="ghost" size="icon" className="rounded-full" aria-label="خيارات">
+                                            <MoreHorizontal className="h-5 w-5" aria-hidden="true" />
                                         </Button>
                                     </div>
                                 </div>
@@ -340,12 +340,12 @@ export function BillDetailsView() {
                                     )}
                                     <Button asChild variant="outline">
                                         <Link to={`/dashboard/finance/bills/${billId}/edit`}>
-                                            <Edit className="ms-2 h-4 w-4" />
+                                            <Edit className="ms-2 h-4 w-4" aria-hidden="true" />
                                             تعديل
                                         </Link>
                                     </Button>
                                     <Button variant="outline" className="text-red-500 hover:bg-red-50 hover:text-red-600">
-                                        <Trash2 className="ms-2 h-4 w-4" />
+                                        <Trash2 className="ms-2 h-4 w-4" aria-hidden="true" />
                                         حذف
                                     </Button>
                                 </div>

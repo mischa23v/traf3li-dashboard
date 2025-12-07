@@ -24,7 +24,6 @@ import { ProductivityHero } from '@/components/productivity-hero'
 const useCreateBill = () => {
     return {
         mutate: (data: any, options?: any) => {
-            console.log('Create bill:', data)
             // Placeholder implementation
         },
         isPending: false
@@ -34,7 +33,6 @@ const useCreateBill = () => {
 const useUpdateBill = () => {
     return {
         mutate: (params: { id: string; data: any }, options?: any) => {
-            console.log('Update bill:', params)
             // Placeholder implementation
         },
         isPending: false
@@ -243,7 +241,7 @@ export function CreateBillView({ mode = 'create' }: CreateBillViewProps) {
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                         <div className="space-y-2">
                                             <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                                <Calendar className="w-4 h-4 text-emerald-500" />
+                                                <Calendar className="w-4 h-4 text-emerald-500" aria-hidden="true" />
                                                 تاريخ الفاتورة
                                             </label>
                                             <Input
@@ -255,7 +253,7 @@ export function CreateBillView({ mode = 'create' }: CreateBillViewProps) {
                                         </div>
                                         <div className="space-y-2">
                                             <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                                <Calendar className="w-4 h-4 text-emerald-500" />
+                                                <Calendar className="w-4 h-4 text-emerald-500" aria-hidden="true" />
                                                 شروط الدفع
                                             </label>
                                             <Select
@@ -281,7 +279,7 @@ export function CreateBillView({ mode = 'create' }: CreateBillViewProps) {
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                         <div className="space-y-2">
                                             <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                                <Calendar className="w-4 h-4 text-emerald-500" />
+                                                <Calendar className="w-4 h-4 text-emerald-500" aria-hidden="true" />
                                                 تاريخ الاستحقاق <span className="text-red-500">*</span>
                                             </label>
                                             <Input
@@ -298,11 +296,11 @@ export function CreateBillView({ mode = 'create' }: CreateBillViewProps) {
                                     <div className="space-y-4">
                                         <div className="flex items-center justify-between">
                                             <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                                <FileText className="w-4 h-4 text-emerald-500" />
+                                                <FileText className="w-4 h-4 text-emerald-500" aria-hidden="true" />
                                                 بنود الفاتورة
                                             </label>
                                             <Button type="button" onClick={handleAddItem} variant="outline" size="sm" className="text-emerald-600 border-emerald-200 hover:bg-emerald-50">
-                                                <Plus className="w-4 h-4 ms-2" />
+                                                <Plus className="w-4 h-4 ms-2" aria-hidden="true" />
                                                 إضافة بند
                                             </Button>
                                         </div>
@@ -350,8 +348,8 @@ export function CreateBillView({ mode = 'create' }: CreateBillViewProps) {
                                                     <div className="w-32 flex items-center justify-center h-10 bg-slate-50 rounded-xl text-sm font-medium">
                                                         {(item.quantity * item.price).toLocaleString('ar-SA')} ر.س
                                                     </div>
-                                                    <Button type="button" onClick={() => handleRemoveItem(item.id)} variant="ghost" size="icon" className="text-red-500 hover:bg-red-50 rounded-xl">
-                                                        <Trash2 className="w-4 h-4" />
+                                                    <Button type="button" onClick={() => handleRemoveItem(item.id)} variant="ghost" size="icon" className="text-red-500 hover:bg-red-50 rounded-xl" aria-label="حذف البند">
+                                                        <Trash2 className="w-4 h-4" aria-hidden="true" />
                                                     </Button>
                                                 </div>
                                             ))}
@@ -377,7 +375,7 @@ export function CreateBillView({ mode = 'create' }: CreateBillViewProps) {
 
                                     <div className="space-y-2">
                                         <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                            <FileText className="w-4 h-4 text-emerald-500" />
+                                            <FileText className="w-4 h-4 text-emerald-500" aria-hidden="true" />
                                             ملاحظات وشروط
                                         </label>
                                         <Textarea
@@ -402,12 +400,12 @@ export function CreateBillView({ mode = 'create' }: CreateBillViewProps) {
                                     >
                                         {createBillMutation.isPending || updateBillMutation.isPending ? (
                                             <span className="flex items-center gap-2">
-                                                <Loader2 className="w-4 h-4 animate-spin" />
+                                                <Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" />
                                                 جاري الحفظ...
                                             </span>
                                         ) : (
                                             <span className="flex items-center gap-2">
-                                                <Save className="w-4 h-4" />
+                                                <Save className="w-4 h-4" aria-hidden="true" />
                                                 {mode === 'edit' ? 'حفظ التعديلات' : 'حفظ الفاتورة'}
                                             </span>
                                         )}

@@ -263,7 +263,7 @@ export function GLTransactionsView({
         <CardContent className="py-12">
           <div className="text-center">
             <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4">
-              <AlertCircle className="h-8 w-8 text-red-500" />
+              <AlertCircle className="h-8 w-8 text-red-500" aria-hidden="true" />
             </div>
             <h3 className="text-xl font-bold text-slate-900 mb-2">فشل تحميل المعاملات</h3>
             <p className="text-slate-500">{error?.message || 'حدث خطأ أثناء تحميل البيانات'}</p>
@@ -277,7 +277,7 @@ export function GLTransactionsView({
     <Card className="border-slate-200">
       <CardHeader>
         <CardTitle className="text-lg font-bold text-slate-900 flex items-center gap-2">
-          <Calendar className="h-5 w-5 text-slate-600" />
+          <Calendar className="h-5 w-5 text-slate-600" aria-hidden="true" />
           سجل المعاملات
         </CardTitle>
       </CardHeader>
@@ -323,7 +323,7 @@ export function GLTransactionsView({
             {/* Search */}
             <div className="flex-1 min-w-[250px]">
               <div className="relative">
-                <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" aria-hidden="true" />
                 <Input
                   placeholder="بحث في الوصف..."
                   className="pe-10 rounded-xl border-slate-200 focus:ring-emerald-500 focus:border-emerald-500"
@@ -351,7 +351,7 @@ export function GLTransactionsView({
         {transactions.length === 0 ? (
           <div className="bg-slate-50 rounded-xl p-12 text-center border border-slate-200">
             <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <FileText className="h-8 w-8 text-slate-400" />
+              <FileText className="h-8 w-8 text-slate-400" aria-hidden="true" />
             </div>
             <h3 className="text-lg font-bold text-slate-900 mb-2">لا توجد معاملات</h3>
             <p className="text-slate-500">لم يتم العثور على معاملات في الفترة المحددة</p>

@@ -19,7 +19,7 @@ import { useSalarySlip, useDeleteSalarySlip, useApproveSalarySlip, useMarkAsPaid
 import {
     Search, Bell, AlertCircle, User, Wallet, Calendar, CreditCard, FileText,
     AlertTriangle, Trash2, Loader2, DollarSign, Clock, CheckCircle, XCircle,
-    Download, Send, Edit3, TrendingDown, TrendingUp, Building2, Printer
+    Download, Send, Edit3, TrendingDown, TrendingUp, Building2, Printer, Lock
 } from 'lucide-react'
 import { format } from 'date-fns'
 import { arSA } from 'date-fns/locale'
@@ -355,7 +355,7 @@ export function PayrollDetailsView() {
                                                     <CardHeader className="pb-3">
                                                         <CardTitle className="text-base font-bold text-navy flex items-center gap-2">
                                                             <DollarSign className="w-4 h-4 text-emerald-600" />
-                                                            الراتب الأساسي
+                                                            الراتب الأساسي<Lock className="h-3 w-3 text-muted-foreground inline ms-1" />
                                                         </CardTitle>
                                                     </CardHeader>
                                                     <CardContent>
@@ -527,7 +527,7 @@ export function PayrollDetailsView() {
                                                                     <span className="font-medium text-slate-900">{slipData.payment.bankName}</span>
                                                                 </div>
                                                                 <div>
-                                                                    <span className="text-sm text-slate-500 block">رقم الآيبان</span>
+                                                                    <span className="text-sm text-slate-500 block">رقم الآيبان<Lock className="h-3 w-3 text-muted-foreground inline ms-1" /></span>
                                                                     <span className="font-medium text-slate-900" dir="ltr">{slipData.payment.iban}</span>
                                                                 </div>
                                                             </div>
