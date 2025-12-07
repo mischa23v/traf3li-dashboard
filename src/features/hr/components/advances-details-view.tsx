@@ -223,10 +223,10 @@ export function AdvancesDetailsView() {
         <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
           <DynamicIsland />
         </div>
-        <div className='ms-auto flex items-center space-x-4'>
+        <div className='ms-auto flex items-center gap-4'>
           <div className="relative hidden md:block">
             <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-            <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pr-9 pl-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
+            <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
           </div>
           <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white">
             <Bell className="h-5 w-5" />
@@ -271,7 +271,7 @@ export function AdvancesDetailsView() {
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="outline" className="rounded-xl">
-                    <MoreHorizontal className="w-4 h-4 ml-2" />
+                    <MoreHorizontal className="w-4 h-4 ms-2" />
                     إجراءات
                   </Button>
                 </DropdownMenuTrigger>
@@ -279,49 +279,49 @@ export function AdvancesDetailsView() {
                   <DropdownMenuItem
                     onClick={() => navigate({ to: `/dashboard/hr/advances/new?editId=${advanceId}` })}
                   >
-                    <Edit className="w-4 h-4 ml-2" />
+                    <Edit className="w-4 h-4 ms-2" />
                     تعديل
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   {advance?.status === 'pending' && (
                     <>
                       <DropdownMenuItem onClick={() => setShowApproveDialog(true)}>
-                        <CheckCircle className="w-4 h-4 ml-2 text-emerald-500" />
+                        <CheckCircle className="w-4 h-4 ms-2 text-emerald-500" />
                         اعتماد السلفة
                       </DropdownMenuItem>
                       <DropdownMenuItem onClick={() => setShowRejectDialog(true)}>
-                        <XCircle className="w-4 h-4 ml-2 text-red-500" />
+                        <XCircle className="w-4 h-4 ms-2 text-red-500" />
                         رفض السلفة
                       </DropdownMenuItem>
                     </>
                   )}
                   {advance?.status === 'approved' && !advance?.disbursement?.disbursed && (
                     <DropdownMenuItem onClick={() => setShowDisburseDialog(true)}>
-                      <Banknote className="w-4 h-4 ml-2 text-blue-500" />
+                      <Banknote className="w-4 h-4 ms-2 text-blue-500" />
                       صرف السلفة
                     </DropdownMenuItem>
                   )}
                   {(advance?.status === 'disbursed' || advance?.status === 'recovering') && (
                     <>
                       <DropdownMenuItem onClick={() => setShowRecoveryDialog(true)}>
-                        <Receipt className="w-4 h-4 ml-2 text-emerald-500" />
+                        <Receipt className="w-4 h-4 ms-2 text-emerald-500" />
                         تسجيل استرداد
                       </DropdownMenuItem>
                       <DropdownMenuItem onClick={() => setShowEarlyRecoveryDialog(true)}>
-                        <DollarSign className="w-4 h-4 ml-2 text-purple-500" />
+                        <DollarSign className="w-4 h-4 ms-2 text-purple-500" />
                         استرداد مبكر
                       </DropdownMenuItem>
                     </>
                   )}
                   {advance?.status === 'completed' && !advance?.completion?.clearanceLetterIssued && (
                     <DropdownMenuItem onClick={() => clearanceMutation.mutate(advanceId)}>
-                      <FileCheck className="w-4 h-4 ml-2 text-emerald-500" />
+                      <FileCheck className="w-4 h-4 ms-2 text-emerald-500" />
                       إصدار خطاب إخلاء
                     </DropdownMenuItem>
                   )}
                   <DropdownMenuSeparator />
                   <DropdownMenuItem className="text-red-600" onClick={handleDelete}>
-                    <Trash2 className="w-4 h-4 ml-2" />
+                    <Trash2 className="w-4 h-4 ms-2" />
                     حذف
                   </DropdownMenuItem>
                 </DropdownMenuContent>
@@ -433,7 +433,7 @@ export function AdvancesDetailsView() {
                         </Badge>
                         {advance.isEmergency && (
                           <Badge className="bg-red-100 text-red-700">
-                            <Zap className="w-3 h-3 ml-1" />
+                            <Zap className="w-3 h-3 ms-1" />
                             طوارئ
                           </Badge>
                         )}
@@ -794,7 +794,7 @@ export function AdvancesDetailsView() {
               disabled={approveMutation.isPending}
               className="bg-emerald-500 hover:bg-emerald-600 rounded-xl"
             >
-              <CheckCircle className="w-4 h-4 ml-2" />
+              <CheckCircle className="w-4 h-4 ms-2" />
               اعتماد
             </Button>
           </DialogFooter>
@@ -827,7 +827,7 @@ export function AdvancesDetailsView() {
               disabled={!rejectReason || rejectMutation.isPending}
               className="bg-red-500 hover:bg-red-600 rounded-xl"
             >
-              <XCircle className="w-4 h-4 ml-2" />
+              <XCircle className="w-4 h-4 ms-2" />
               رفض
             </Button>
           </DialogFooter>
@@ -900,7 +900,7 @@ export function AdvancesDetailsView() {
               disabled={disburseMutation.isPending || (disbursementMethod === 'bank_transfer' && (!bankName || !iban))}
               className="bg-blue-500 hover:bg-blue-600 rounded-xl"
             >
-              <Banknote className="w-4 h-4 ml-2" />
+              <Banknote className="w-4 h-4 ms-2" />
               صرف
             </Button>
           </DialogFooter>
@@ -968,7 +968,7 @@ export function AdvancesDetailsView() {
               disabled={!recoveryAmount || !recoveryDate || recoveryMutation.isPending}
               className="bg-emerald-500 hover:bg-emerald-600 rounded-xl"
             >
-              <Receipt className="w-4 h-4 ml-2" />
+              <Receipt className="w-4 h-4 ms-2" />
               تسجيل
             </Button>
           </DialogFooter>
@@ -1031,7 +1031,7 @@ export function AdvancesDetailsView() {
               disabled={!earlyRecoveryAmount || earlyRecoveryMutation.isPending}
               className="bg-purple-500 hover:bg-purple-600 rounded-xl"
             >
-              <DollarSign className="w-4 h-4 ml-2" />
+              <DollarSign className="w-4 h-4 ms-2" />
               استرداد
             </Button>
           </DialogFooter>

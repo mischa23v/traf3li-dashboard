@@ -684,7 +684,7 @@ export function CreateReferralView() {
                     {formData.tags.map(tag => (
                       <Badge key={tag} variant="secondary" className="gap-1 px-3 py-1">
                         {tag}
-                        <button type="button" onClick={() => removeTag(tag)} className="hover:text-red-500 mr-1">
+                        <button type="button" onClick={() => removeTag(tag)} className="hover:text-red-500 me-1">
                           <X className="w-3 h-3" />
                         </button>
                       </Badge>
@@ -837,7 +837,7 @@ export function CreateReferralView() {
                               <div className="flex items-center justify-between">
                                 <label className="text-sm font-medium text-slate-700">شرائح العمولة</label>
                                 <Button type="button" variant="outline" size="sm" onClick={addTieredFee} className="rounded-xl">
-                                  <Plus className="w-4 h-4 ml-1" />
+                                  <Plus className="w-4 h-4 ms-1" />
                                   إضافة شريحة
                                 </Button>
                               </div>

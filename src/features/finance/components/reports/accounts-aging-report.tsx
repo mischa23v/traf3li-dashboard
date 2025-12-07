@@ -220,7 +220,7 @@ export function AccountsAgingReport() {
                             <div>
                                 <div className="flex items-center gap-3 mb-3">
                                     <Badge className="bg-white/20 hover:bg-white/30 text-white border-0 backdrop-blur-sm">
-                                        <Clock className="w-3 h-3 ml-2" />
+                                        <Clock className="w-3 h-3 ms-2" />
                                         تقرير الأعمار
                                     </Badge>
                                 </div>
@@ -236,7 +236,7 @@ export function AccountsAgingReport() {
                                     onClick={() => handleExport('csv')}
                                     disabled={isExporting}
                                 >
-                                    <Download className="w-4 h-4 ml-2" />
+                                    <Download className="w-4 h-4 ms-2" />
                                     تصدير CSV
                                 </Button>
                                 <Button
@@ -244,7 +244,7 @@ export function AccountsAgingReport() {
                                     onClick={() => handleExport('pdf')}
                                     disabled={isExporting}
                                 >
-                                    <Download className="w-4 h-4 ml-2" />
+                                    <Download className="w-4 h-4 ms-2" />
                                     تصدير PDF
                                 </Button>
                             </div>
@@ -411,7 +411,7 @@ export function AccountsAgingReport() {
                                                 <CollapsibleContent asChild>
                                                     <TableRow className="bg-slate-50/50">
                                                         <TableCell colSpan={7} className="p-0">
-                                                            <div className="p-4 pr-12">
+                                                            <div className="p-4 pe-12">
                                                                 <div className="text-sm font-medium text-slate-600 mb-3">الفواتير المستحقة:</div>
                                                                 <div className="space-y-2">
                                                                     {client.invoices.map((invoice) => (

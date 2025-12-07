@@ -261,7 +261,7 @@ export function OtpLogin({ purpose = 'login' }: OtpLoginProps) {
                         setEmail(e.target.value)
                         setError('')
                       }}
-                      className="w-full h-12 pl-11 pr-4 rounded-xl border border-slate-200 bg-slate-50 text-[#0f172a] outline-none transition-all focus:border-[#0f172a] text-left"
+                      className="w-full h-12 ps-11 pe-4 rounded-xl border border-slate-200 bg-slate-50 text-[#0f172a] outline-none transition-all focus:border-[#0f172a] text-left"
                       placeholder="name@example.com"
                       dir="ltr"
                       autoComplete="email"

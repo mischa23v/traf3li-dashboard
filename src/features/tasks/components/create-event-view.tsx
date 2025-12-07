@@ -686,7 +686,7 @@ export function CreateEventView() {
                                                         </SelectContent>
                                                     </Select>
                                                     <Button type="button" variant="outline" onClick={addAttendee} className="rounded-xl">
-                                                        <Plus className="w-4 h-4 ml-2" />
+                                                        <Plus className="w-4 h-4 ms-2" />
                                                         إضافة
                                                     </Button>
                                                 </div>
@@ -755,7 +755,7 @@ export function CreateEventView() {
                                                         onChange={(e) => setNewAgendaItem(prev => ({ ...prev, presenter: e.target.value }))}
                                                     />
                                                     <Button type="button" variant="outline" onClick={addAgendaItem} className="rounded-xl">
-                                                        <Plus className="w-4 h-4 ml-2" />
+                                                        <Plus className="w-4 h-4 ms-2" />
                                                         إضافة
                                                     </Button>
                                                 </div>

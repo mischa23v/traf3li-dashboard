@@ -154,7 +154,7 @@ export default function FinanceSettings() {
         return (
             <>
                 <Header>
-                    <div className='ms-auto flex items-center space-x-4'>
+                    <div className='ms-auto flex items-center gap-4'>
                         <LanguageSwitcher />
                         <ThemeSwitch />
                         <ProfileDropdown />
@@ -173,7 +173,7 @@ export default function FinanceSettings() {
     return (
         <>
             <Header>
-                <div className='ms-auto flex items-center space-x-4'>
+                <div className='ms-auto flex items-center gap-4'>
                     <LanguageSwitcher />
                     <ThemeSwitch />
                     <ProfileDropdown />
@@ -476,9 +476,9 @@ export default function FinanceSettings() {
                                 disabled={updateSettingsMutation.isPending}
                             >
                                 {updateSettingsMutation.isPending ? (
-                                    <Loader2 className="h-4 w-4 ml-2 animate-spin" />
+                                    <Loader2 className="h-4 w-4 ms-2 animate-spin" />
                                 ) : (
-                                    <Save className="h-4 w-4 ml-2" />
+                                    <Save className="h-4 w-4 ms-2" />
                                 )}
                                 حفظ التغييرات
                             </Button>
@@ -547,7 +547,7 @@ function AdvancedAccountingSettings() {
                     <div className="flex items-center gap-2">
                         <Building2 className="h-4 w-4 text-blue-600" />
                         <span>البنوك</span>
-                        <Badge variant="secondary" className="mr-2">
+                        <Badge variant="secondary" className="me-2">
                             {bankAccounts?.accounts?.length || 0}
                         </Badge>
                     </div>
@@ -570,7 +570,7 @@ function AdvancedAccountingSettings() {
                     <div className="flex items-center gap-2">
                         <TrendingUp className="h-4 w-4 text-green-600" />
                         <span>أنواع الدخل</span>
-                        <Badge variant="secondary" className="mr-2">
+                        <Badge variant="secondary" className="me-2">
                             {incomeAccounts?.accounts?.length || 0}
                         </Badge>
                     </div>
@@ -593,7 +593,7 @@ function AdvancedAccountingSettings() {
                     <div className="flex items-center gap-2">
                         <TrendingDown className="h-4 w-4 text-red-600" />
                         <span>أنواع المصروفات</span>
-                        <Badge variant="secondary" className="mr-2">
+                        <Badge variant="secondary" className="me-2">
                             {expenseAccounts?.accounts?.length || 0}
                         </Badge>
                     </div>
@@ -616,7 +616,7 @@ function AdvancedAccountingSettings() {
                     <div className="flex items-center gap-2">
                         <Wallet className="h-4 w-4 text-purple-600" />
                         <span>مستويات الأسعار</span>
-                        <Badge variant="secondary" className="mr-2">
+                        <Badge variant="secondary" className="me-2">
                             {priceLevels?.length || 0}
                         </Badge>
                     </div>
@@ -715,7 +715,7 @@ function AccountsList({ accounts, isLoading, accountType, defaultSubType, typeLa
                 <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                     <DialogTrigger asChild>
                         <Button size="sm" onClick={() => handleOpenDialog()}>
-                            <Plus className="h-4 w-4 ml-1" />
+                            <Plus className="h-4 w-4 ms-1" />
                             إضافة حساب
                         </Button>
                     </DialogTrigger>
@@ -798,7 +798,7 @@ function AccountsList({ accounts, isLoading, accountType, defaultSubType, typeLa
                                 disabled={createAccountMutation.isPending || updateAccountMutation.isPending}
                             >
                                 {(createAccountMutation.isPending || updateAccountMutation.isPending) && (
-                                    <Loader2 className="h-4 w-4 ml-1 animate-spin" />
+                                    <Loader2 className="h-4 w-4 ms-1 animate-spin" />
                                 )}
                                 {editingAccount ? 'تحديث' : 'إضافة'}
                             </Button>
@@ -968,7 +968,7 @@ function PriceLevelsList({ priceLevels, isLoading }: PriceLevelsListProps) {
                 <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                     <DialogTrigger asChild>
                         <Button size="sm" onClick={() => handleOpenDialog()}>
-                            <Plus className="h-4 w-4 ml-1" />
+                            <Plus className="h-4 w-4 ms-1" />
                             إضافة مستوى
                         </Button>
                     </DialogTrigger>
@@ -1088,7 +1088,7 @@ function PriceLevelsList({ priceLevels, isLoading }: PriceLevelsListProps) {
                                 disabled={createMutation.isPending || updateMutation.isPending}
                             >
                                 {(createMutation.isPending || updateMutation.isPending) && (
-                                    <Loader2 className="h-4 w-4 ml-1 animate-spin" />
+                                    <Loader2 className="h-4 w-4 ms-1 animate-spin" />
                                 )}
                                 {editingLevel ? 'تحديث' : 'إضافة'}
                             </Button>
@@ -1118,7 +1118,7 @@ function PriceLevelsList({ priceLevels, isLoading }: PriceLevelsListProps) {
                                 <TableCell className="font-mono" dir="ltr">
                                     {level.code}
                                     {level.isDefault && (
-                                        <Badge className="mr-2 bg-brand-blue">افتراضي</Badge>
+                                        <Badge className="me-2 bg-brand-blue">افتراضي</Badge>
                                     )}
                                 </TableCell>
                                 <TableCell>{level.nameAr || level.name}</TableCell>

@@ -172,7 +172,7 @@ export function SignIn() {
                     type="text"
                     value={formData.usernameOrEmail}
                     onChange={(e) => updateField('usernameOrEmail', e.target.value)}
-                    className={`w-full h-12 pl-11 pr-4 rounded-xl border bg-slate-50 text-[#0f172a] outline-none transition-all text-left ${
+                    className={`w-full h-12 ps-11 pe-4 rounded-xl border bg-slate-50 text-[#0f172a] outline-none transition-all text-left ${
                       errors.usernameOrEmail ? 'border-red-400' : 'border-slate-200 focus:border-[#0f172a]'
                     }`}
                     placeholder=""
@@ -207,7 +207,7 @@ export function SignIn() {
                     type={showPassword ? 'text' : 'password'}
                     value={formData.password}
                     onChange={(e) => updateField('password', e.target.value)}
-                    className={`w-full h-12 pl-11 pr-12 rounded-xl border bg-slate-50 text-[#0f172a] outline-none transition-all text-left ${
+                    className={`w-full h-12 ps-11 pe-12 rounded-xl border bg-slate-50 text-[#0f172a] outline-none transition-all text-left ${
                       errors.password ? 'border-red-400' : 'border-slate-200 focus:border-[#0f172a]'
                     }`}
                     placeholder=""

@@ -155,7 +155,7 @@ export function ApplicantsListView() {
           <DynamicIsland />
         </div>
 
-        <div className='ms-auto flex items-center space-x-4'>
+        <div className='ms-auto flex items-center gap-4'>
           <div className="relative hidden md:block">
             <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
             <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pr-9 pl-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
@@ -195,14 +195,14 @@ export function ApplicantsListView() {
                   onClick={() => navigate({ to: '/dashboard/hr/recruitment/jobs' })}
                   className="rounded-xl"
                 >
-                  <Briefcase className="w-4 h-4 ml-2" />
+                  <Briefcase className="w-4 h-4 ms-2" />
                   الوظائف
                 </Button>
                 <Button
                   onClick={() => navigate({ to: '/dashboard/hr/recruitment/applicants/new' })}
                   className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl"
                 >
-                  <Plus className="w-4 h-4 ml-2" />
+                  <Plus className="w-4 h-4 ms-2" />
                   متقدم جديد
                 </Button>
               </div>
@@ -227,7 +227,7 @@ export function ApplicantsListView() {
                 <div className="flex items-center gap-3 flex-wrap">
                   <Select value={statusFilter} onValueChange={(v) => setStatusFilter(v as ApplicantStatus | 'all')}>
                     <SelectTrigger className="w-40 rounded-xl">
-                      <Filter className="w-4 h-4 ml-2" />
+                      <Filter className="w-4 h-4 ms-2" />
                       <SelectValue placeholder="الحالة" />
                     </SelectTrigger>
                     <SelectContent>
@@ -241,7 +241,7 @@ export function ApplicantsListView() {
                   </Select>
                   <Select value={sourceFilter} onValueChange={(v) => setSourceFilter(v as ApplicationSource | 'all')}>
                     <SelectTrigger className="w-40 rounded-xl">
-                      <TrendingUp className="w-4 h-4 ml-2" />
+                      <TrendingUp className="w-4 h-4 ms-2" />
                       <SelectValue placeholder="المصدر" />
                     </SelectTrigger>
                     <SelectContent>
@@ -253,7 +253,7 @@ export function ApplicantsListView() {
                   </Select>
                   <Select value={jobFilter} onValueChange={setJobFilter}>
                     <SelectTrigger className="w-48 rounded-xl">
-                      <Briefcase className="w-4 h-4 ml-2" />
+                      <Briefcase className="w-4 h-4 ms-2" />
                       <SelectValue placeholder="الوظيفة" />
                     </SelectTrigger>
                     <SelectContent>
@@ -324,7 +324,7 @@ export function ApplicantsListView() {
                       onClick={() => navigate({ to: '/dashboard/hr/recruitment/applicants/new' })}
                       className="bg-emerald-500 hover:bg-emerald-600"
                     >
-                      <Plus className="w-4 h-4 ml-2" />
+                      <Plus className="w-4 h-4 ms-2" />
                       إضافة متقدم جديد
                     </Button>
                   </div>
@@ -378,16 +378,16 @@ export function ApplicantsListView() {
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="w-48">
                           <DropdownMenuItem onClick={() => navigate({ to: '/dashboard/hr/recruitment/applicants/$applicantId', params: { applicantId: applicant._id } })}>
-                            <Eye className="h-4 w-4 ml-2" />
+                            <Eye className="h-4 w-4 ms-2" />
                             عرض التفاصيل
                           </DropdownMenuItem>
                           <DropdownMenuItem>
-                            <Edit3 className="h-4 w-4 ml-2 text-blue-500" />
+                            <Edit3 className="h-4 w-4 ms-2 text-blue-500" />
                             تعديل البيانات
                           </DropdownMenuItem>
                           <DropdownMenuSeparator />
                           <DropdownMenuItem className="text-red-600 focus:text-red-600">
-                            <Trash2 className="h-4 w-4 ml-2" />
+                            <Trash2 className="h-4 w-4 ms-2" />
                             حذف المتقدم
                           </DropdownMenuItem>
                         </DropdownMenuContent>
@@ -437,7 +437,7 @@ export function ApplicantsListView() {
               <div className="p-4 pt-0 text-center">
                 <Button variant="ghost" className="text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 w-full rounded-xl py-6">
                   عرض جميع المتقدمين
-                  <ChevronLeft className="h-4 w-4 mr-2" />
+                  <ChevronLeft className="h-4 w-4 me-2" />
                 </Button>
               </div>
             </div>

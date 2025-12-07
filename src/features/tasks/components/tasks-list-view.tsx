@@ -258,10 +258,10 @@ export function TasksListView() {
                     <DynamicIsland />
                 </div>
 
-                <div className='ms-auto flex items-center space-x-4'>
+                <div className='ms-auto flex items-center gap-4'>
                     <div className="relative hidden md:block">
                         <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                        <input type="text" placeholder={t('tasks.list.search')} className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pr-9 pl-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
+                        <input type="text" placeholder={t('tasks.list.search')} className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
                     </div>
                     <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white">
                         <Bell className="h-5 w-5" />
@@ -300,7 +300,7 @@ export function TasksListView() {
                                             placeholder={t('tasks.list.searchPlaceholder')}
                                             value={searchQuery}
                                             onChange={(e) => setSearchQuery(e.target.value)}
-                                            className="pr-10 h-10 rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500/20"
+                                            className="pe-10 h-10 rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500/20"
                                         />
                                     </div>
 
@@ -352,7 +352,7 @@ export function TasksListView() {
                                     {/* Due Date Filter */}
                                     <Select value={dueDateFilter} onValueChange={setDueDateFilter}>
                                         <SelectTrigger className="w-[150px] h-10 rounded-xl border-slate-200">
-                                            <Calendar className="h-4 w-4 ml-2 text-slate-400" />
+                                            <Calendar className="h-4 w-4 ms-2 text-slate-400" />
                                             <SelectValue placeholder={t('tasks.list.dueDate')} />
                                         </SelectTrigger>
                                         <SelectContent>
@@ -368,7 +368,7 @@ export function TasksListView() {
                                     {/* Case Filter */}
                                     <Select value={caseFilter} onValueChange={setCaseFilter}>
                                         <SelectTrigger className="w-[180px] h-10 rounded-xl border-slate-200">
-                                            <Briefcase className="h-4 w-4 ml-2 text-slate-400" />
+                                            <Briefcase className="h-4 w-4 ms-2 text-slate-400" />
                                             <SelectValue placeholder={t('tasks.list.case')} />
                                         </SelectTrigger>
                                         <SelectContent>
@@ -384,7 +384,7 @@ export function TasksListView() {
                                     {/* Sort By */}
                                     <Select value={sortBy} onValueChange={setSortBy}>
                                         <SelectTrigger className="w-[160px] h-10 rounded-xl border-slate-200">
-                                            <SortAsc className="h-4 w-4 ml-2 text-slate-400" />
+                                            <SortAsc className="h-4 w-4 ms-2 text-slate-400" />
                                             <SelectValue placeholder={t('tasks.list.sortBy')} />
                                         </SelectTrigger>
                                         <SelectContent>
@@ -403,7 +403,7 @@ export function TasksListView() {
                                             onClick={clearFilters}
                                             className="h-10 px-4 text-red-500 hover:text-red-600 hover:bg-red-50 rounded-xl"
                                         >
-                                            <X className="h-4 w-4 ml-2" />
+                                            <X className="h-4 w-4 ms-2" />
                                             {t('tasks.list.clearFilters')}
                                         </Button>
                                     )}
@@ -469,7 +469,7 @@ export function TasksListView() {
                                         <p className="text-slate-500 mb-4">{t('tasks.list.noTasksDescription')}</p>
                                         <Button asChild className="bg-emerald-500 hover:bg-emerald-600">
                                             <Link to="/dashboard/tasks/new">
-                                                <Plus className="w-4 h-4 ml-2" />
+                                                <Plus className="w-4 h-4 ms-2" />
                                                 {t('tasks.list.newTask')}
                                             </Link>
                                         </Button>
@@ -509,22 +509,22 @@ export function TasksListView() {
                                                 </DropdownMenuTrigger>
                                                 <DropdownMenuContent align="end" className="w-48">
                                                     <DropdownMenuItem onClick={() => handleEditTask(task.id)}>
-                                                        <Edit3 className="h-4 w-4 ml-2 text-blue-500" />
+                                                        <Edit3 className="h-4 w-4 ms-2 text-blue-500" />
                                                         {t('tasks.list.editTask')}
                                                     </DropdownMenuItem>
                                                     <DropdownMenuItem onClick={() => handleViewTask(task.id)}>
-                                                        <Eye className="h-4 w-4 ml-2" />
+                                                        <Eye className="h-4 w-4 ms-2" />
                                                         {t('tasks.list.viewDetails')}
                                                     </DropdownMenuItem>
                                                     <DropdownMenuSeparator />
                                                     {task.status !== 'done' ? (
                                                         <DropdownMenuItem onClick={() => handleCompleteTask(task.id)}>
-                                                            <CheckCircle className="h-4 w-4 ml-2 text-emerald-500" />
+                                                            <CheckCircle className="h-4 w-4 ms-2 text-emerald-500" />
                                                             {t('tasks.list.completeTask')}
                                                         </DropdownMenuItem>
                                                     ) : (
                                                         <DropdownMenuItem onClick={() => handleReopenTask(task.id)}>
-                                                            <XCircle className="h-4 w-4 ml-2 text-amber-500" />
+                                                            <XCircle className="h-4 w-4 ms-2 text-amber-500" />
                                                             {t('tasks.list.reopenTask')}
                                                         </DropdownMenuItem>
                                                     )}
@@ -533,7 +533,7 @@ export function TasksListView() {
                                                         onClick={() => handleDeleteTask(task.id)}
                                                         className="text-red-600 focus:text-red-600"
                                                     >
-                                                        <Trash2 className="h-4 w-4 ml-2" />
+                                                        <Trash2 className="h-4 w-4 ms-2" />
                                                         {t('tasks.list.deleteTask')}
                                                     </DropdownMenuItem>
                                                 </DropdownMenuContent>
@@ -591,7 +591,7 @@ export function TasksListView() {
                             <div className="p-4 pt-0 text-center">
                                 <Button variant="ghost" className="text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 w-full rounded-xl py-6">
                                     {t('tasks.list.viewAllTasks')}
-                                    <ChevronLeft className="h-4 w-4 mr-2" />
+                                    <ChevronLeft className="h-4 w-4 me-2" />
                                 </Button>
                             </div>
                         </div>

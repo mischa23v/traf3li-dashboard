@@ -142,7 +142,7 @@ export function ExportDialog({
                   return (
                     <div
                       key={fmt.value}
-                      className={`flex items-start space-x-3 rtl:space-x-reverse p-3 rounded-lg border cursor-pointer transition-all ${
+                      className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-all ${
                         format === fmt.value
                           ? 'border-primary bg-primary/5'
                           : 'border-border hover:border-primary/50'

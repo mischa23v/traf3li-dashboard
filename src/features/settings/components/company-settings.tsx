@@ -96,7 +96,7 @@ export default function CompanySettings() {
         return (
             <>
                 <Header>
-                    <div className='ms-auto flex items-center space-x-4'>
+                    <div className='ms-auto flex items-center gap-4'>
                         <LanguageSwitcher />
                         <ThemeSwitch />
                         <ProfileDropdown />
@@ -115,7 +115,7 @@ export default function CompanySettings() {
     return (
         <>
             <Header>
-                <div className='ms-auto flex items-center space-x-4'>
+                <div className='ms-auto flex items-center gap-4'>
                     <LanguageSwitcher />
                     <ThemeSwitch />
                     <ProfileDropdown />
@@ -170,9 +170,9 @@ export default function CompanySettings() {
                                             disabled={updateLogoMutation.isPending}
                                         >
                                             {updateLogoMutation.isPending ? (
-                                                <Loader2 className="h-4 w-4 ml-2 animate-spin" />
+                                                <Loader2 className="h-4 w-4 ms-2 animate-spin" />
                                             ) : (
-                                                <Upload className="h-4 w-4 ml-2" />
+                                                <Upload className="h-4 w-4 ms-2" />
                                             )}
                                             رفع شعار جديد
                                         </Button>
@@ -451,9 +451,9 @@ export default function CompanySettings() {
                                 disabled={updateSettingsMutation.isPending}
                             >
                                 {updateSettingsMutation.isPending ? (
-                                    <Loader2 className="h-4 w-4 ml-2 animate-spin" />
+                                    <Loader2 className="h-4 w-4 ms-2 animate-spin" />
                                 ) : (
-                                    <Save className="h-4 w-4 ml-2" />
+                                    <Save className="h-4 w-4 ms-2" />
                                 )}
                                 حفظ التغييرات
                             </Button>

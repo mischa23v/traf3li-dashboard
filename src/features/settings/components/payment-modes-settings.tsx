@@ -149,7 +149,7 @@ export default function PaymentModesSettings() {
         return (
             <>
                 <Header>
-                    <div className='ms-auto flex items-center space-x-4'>
+                    <div className='ms-auto flex items-center gap-4'>
                         <LanguageSwitcher />
                         <ThemeSwitch />
                         <ProfileDropdown />
@@ -172,7 +172,7 @@ export default function PaymentModesSettings() {
     return (
         <>
             <Header>
-                <div className='ms-auto flex items-center space-x-4'>
+                <div className='ms-auto flex items-center gap-4'>
                     <LanguageSwitcher />
                     <ThemeSwitch />
                     <ProfileDropdown />
@@ -188,7 +188,7 @@ export default function PaymentModesSettings() {
                             <p className="text-slate-500">إدارة طرق الدفع المتاحة للعملاء</p>
                         </div>
                         <Button onClick={() => handleOpenDialog()} className="bg-brand-blue hover:bg-brand-blue/90">
-                            <Plus className="h-4 w-4 ml-2" />
+                            <Plus className="h-4 w-4 ms-2" />
                             إضافة طريقة دفع
                         </Button>
                     </div>
@@ -201,7 +201,7 @@ export default function PaymentModesSettings() {
                                 <h3 className="text-lg font-medium text-navy mb-2">لا توجد طرق دفع</h3>
                                 <p className="text-slate-500 mb-4">قم بإضافة طريقة دفع للبدء</p>
                                 <Button onClick={() => handleOpenDialog()} variant="outline">
-                                    <Plus className="h-4 w-4 ml-2" />
+                                    <Plus className="h-4 w-4 ms-2" />
                                     إضافة طريقة دفع
                                 </Button>
                             </CardContent>
@@ -232,7 +232,7 @@ export default function PaymentModesSettings() {
                                                             <h3 className="font-bold text-navy">{mode.nameAr}</h3>
                                                             {mode.isDefault && (
                                                                 <Badge className="bg-emerald-100 text-emerald-700 border-0 text-xs">
-                                                                    <Star className="h-3 w-3 ml-1 fill-current" />
+                                                                    <Star className="h-3 w-3 ms-1 fill-current" />
                                                                     افتراضي
                                                                 </Badge>
                                                             )}
@@ -257,12 +257,12 @@ export default function PaymentModesSettings() {
                                                         </DropdownMenuTrigger>
                                                         <DropdownMenuContent align="end">
                                                             <DropdownMenuItem onClick={() => handleOpenDialog(mode)}>
-                                                                <Edit className="h-4 w-4 ml-2" />
+                                                                <Edit className="h-4 w-4 ms-2" />
                                                                 تعديل
                                                             </DropdownMenuItem>
                                                             {!mode.isDefault && (
                                                                 <DropdownMenuItem onClick={() => handleSetDefault(mode._id)}>
-                                                                    <Star className="h-4 w-4 ml-2" />
+                                                                    <Star className="h-4 w-4 ms-2" />
                                                                     تعيين كافتراضي
                                                                 </DropdownMenuItem>
                                                             )}
@@ -271,7 +271,7 @@ export default function PaymentModesSettings() {
                                                                 className="text-red-600"
                                                                 disabled={mode.isDefault}
                                                             >
-                                                                <Trash2 className="h-4 w-4 ml-2" />
+                                                                <Trash2 className="h-4 w-4 ms-2" />
                                                                 حذف
                                                             </DropdownMenuItem>
                                                         </DropdownMenuContent>
@@ -420,7 +420,7 @@ export default function PaymentModesSettings() {
                                 disabled={createModeMutation.isPending || updateModeMutation.isPending}
                             >
                                 {(createModeMutation.isPending || updateModeMutation.isPending) ? (
-                                    <Loader2 className="h-4 w-4 ml-2 animate-spin" />
+                                    <Loader2 className="h-4 w-4 ms-2 animate-spin" />
                                 ) : null}
                                 {editingMode ? 'حفظ التغييرات' : 'إضافة'}
                             </Button>

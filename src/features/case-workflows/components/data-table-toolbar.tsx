@@ -29,7 +29,7 @@ export function DataTableToolbar({ table }: DataTableToolbarProps) {
 
   return (
     <div className="flex items-center justify-between">
-      <div className="flex flex-1 items-center space-x-2 rtl:space-x-reverse">
+      <div className="flex flex-1 items-center gap-2">
         <Input
           placeholder={t('caseWorkflows.searchPlaceholder')}
           value={(table.getColumn('name')?.getFilterValue() as string) ?? ''}

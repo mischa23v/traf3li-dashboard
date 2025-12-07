@@ -171,7 +171,7 @@ export function DocumentEditorDialog({
                         onClick={() => onOpenChange(false)}
                         disabled={isSaving}
                     >
-                        <X className="h-4 w-4 ml-2" />
+                        <X className="h-4 w-4 ms-2" />
                         إلغاء
                     </Button>
                     <Button
@@ -181,12 +181,12 @@ export function DocumentEditorDialog({
                     >
                         {isSaving ? (
                             <>
-                                <Loader2 className="h-4 w-4 ml-2 animate-spin" />
+                                <Loader2 className="h-4 w-4 ms-2 animate-spin" />
                                 جاري الحفظ...
                             </>
                         ) : (
                             <>
-                                <Save className="h-4 w-4 ml-2" />
+                                <Save className="h-4 w-4 ms-2" />
                                 {isEditMode ? 'حفظ التغييرات' : 'حفظ المستند'}
                             </>
                         )}

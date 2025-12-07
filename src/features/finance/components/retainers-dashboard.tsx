@@ -274,10 +274,10 @@ export default function RetainersDashboard() {
                     <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
                         <DynamicIsland />
                     </div>
-                    <div className='ms-auto flex items-center space-x-4'>
+                    <div className='ms-auto flex items-center gap-4'>
                         <div className="relative hidden md:block">
                             <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                            <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pr-9 pl-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
+                            <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
                         </div>
                         <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white">
                             <Bell className="h-5 w-5" />
@@ -316,10 +316,10 @@ export default function RetainersDashboard() {
                     <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
                         <DynamicIsland />
                     </div>
-                    <div className='ms-auto flex items-center space-x-4'>
+                    <div className='ms-auto flex items-center gap-4'>
                         <div className="relative hidden md:block">
                             <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                            <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pr-9 pl-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
+                            <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
                         </div>
                         <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white">
                             <Bell className="h-5 w-5" />
@@ -340,7 +340,7 @@ export default function RetainersDashboard() {
                         <h3 className="text-xl font-bold text-slate-900 mb-2">فشل تحميل حسابات الأمانات</h3>
                         <p className="text-slate-500 mb-6">{error?.message || 'حدث خطأ أثناء تحميل البيانات'}</p>
                         <Button onClick={() => refetch()} className="bg-emerald-500 hover:bg-emerald-600 text-white px-8">
-                            <Loader2 className="ml-2 h-4 w-4" />
+                            <Loader2 className="ms-2 h-4 w-4" />
                             إعادة المحاولة
                         </Button>
                     </div>
@@ -360,10 +360,10 @@ export default function RetainersDashboard() {
                     <DynamicIsland />
                 </div>
 
-                <div className='ms-auto flex items-center space-x-4'>
+                <div className='ms-auto flex items-center gap-4'>
                     <div className="relative hidden md:block">
                         <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                        <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pr-9 pl-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
+                        <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
                     </div>
                     <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white">
                         <Bell className="h-5 w-5" />
@@ -486,7 +486,7 @@ export default function RetainersDashboard() {
                                                 <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                                                 <Input
                                                     placeholder="بحث في حسابات الأمانة..."
-                                                    className="pr-10 rounded-xl border-slate-200 focus:ring-[#022c22] focus:border-[#022c22]"
+                                                    className="pe-10 rounded-xl border-slate-200 focus:ring-[#022c22] focus:border-[#022c22]"
                                                     value={searchQuery}
                                                     onChange={(e) => setSearchQuery(e.target.value)}
                                                 />
@@ -494,7 +494,7 @@ export default function RetainersDashboard() {
                                             <Popover open={showFilters} onOpenChange={setShowFilters}>
                                                 <PopoverTrigger asChild>
                                                     <Button variant="outline" className="rounded-xl border-slate-200 relative">
-                                                        <Filter className="w-4 h-4 ml-2" />
+                                                        <Filter className="w-4 h-4 ms-2" />
                                                         تصفية
                                                         {activeFilterCount > 0 && (
                                                             <Badge className="absolute -top-2 -left-2 h-5 w-5 p-0 flex items-center justify-center bg-emerald-600 text-white text-xs">
@@ -509,7 +509,7 @@ export default function RetainersDashboard() {
                                                             <h4 className="font-bold text-navy">تصفية متقدمة</h4>
                                                             {activeFilterCount > 0 && (
                                                                 <Button variant="ghost" size="sm" onClick={clearFilters} className="text-slate-500 hover:text-red-500">
-                                                                    <X className="w-4 h-4 ml-1" />
+                                                                    <X className="w-4 h-4 ms-1" />
                                                                     مسح
                                                                 </Button>
                                                             )}
@@ -589,7 +589,7 @@ export default function RetainersDashboard() {
                                                                 <div className="flex items-center gap-2 mb-1">
                                                                     <h4 className="font-bold text-navy text-lg">{retainer.retainerNumber}</h4>
                                                                     <Badge className={`${status.bgColor} ${status.color} border-0 px-2 py-0.5`}>
-                                                                        <StatusIcon className="w-3 h-3 ml-1" />
+                                                                        <StatusIcon className="w-3 h-3 ms-1" />
                                                                         {status.label}
                                                                     </Badge>
                                                                 </div>
@@ -614,7 +614,7 @@ export default function RetainersDashboard() {
                                                                         setTransactionDialogOpen(true)
                                                                     }}
                                                                 >
-                                                                    <Eye className="w-4 h-4 ml-2" />
+                                                                    <Eye className="w-4 h-4 ms-2" />
                                                                     عرض المعاملات
                                                                 </DropdownMenuItem>
                                                                 {retainer.status === 'active' && (
@@ -625,7 +625,7 @@ export default function RetainersDashboard() {
                                                                                 setDepositDialogOpen(true)
                                                                             }}
                                                                         >
-                                                                            <TrendingUp className="w-4 h-4 ml-2" />
+                                                                            <TrendingUp className="w-4 h-4 ms-2" />
                                                                             إيداع
                                                                         </DropdownMenuItem>
                                                                         <DropdownMenuItem
@@ -634,7 +634,7 @@ export default function RetainersDashboard() {
                                                                                 setConsumeDialogOpen(true)
                                                                             }}
                                                                         >
-                                                                            <TrendingDown className="w-4 h-4 ml-2" />
+                                                                            <TrendingDown className="w-4 h-4 ms-2" />
                                                                             سحب
                                                                         </DropdownMenuItem>
                                                                     </>
@@ -753,12 +753,12 @@ export default function RetainersDashboard() {
                         >
                             {depositMutation.isPending ? (
                                 <>
-                                    <Loader2 className="w-4 h-4 ml-2 animate-spin" />
+                                    <Loader2 className="w-4 h-4 ms-2 animate-spin" />
                                     جاري الإيداع...
                                 </>
                             ) : (
                                 <>
-                                    <TrendingUp className="w-4 h-4 ml-2" />
+                                    <TrendingUp className="w-4 h-4 ms-2" />
                                     إيداع
                                 </>
                             )}
@@ -826,12 +826,12 @@ export default function RetainersDashboard() {
                         >
                             {consumeMutation.isPending ? (
                                 <>
-                                    <Loader2 className="w-4 h-4 ml-2 animate-spin" />
+                                    <Loader2 className="w-4 h-4 ms-2 animate-spin" />
                                     جاري السحب...
                                 </>
                             ) : (
                                 <>
-                                    <TrendingDown className="w-4 h-4 ml-2" />
+                                    <TrendingDown className="w-4 h-4 ms-2" />
                                     سحب
                                 </>
                             )}

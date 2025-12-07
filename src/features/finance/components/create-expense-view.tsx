@@ -647,7 +647,7 @@ export function CreateExpenseView() {
                                             type="file"
                                             accept="image/*,.pdf"
                                             onChange={handleReceiptUpload}
-                                            className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 file:text-emerald-600 file:bg-emerald-50 file:border-0 file:rounded-lg file:mr-4 file:px-4 file:py-2 hover:file:bg-emerald-100"
+                                            className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 file:text-emerald-600 file:bg-emerald-50 file:border-0 file:rounded-lg file:me-4 file:px-4 file:py-2 hover:file:bg-emerald-100"
                                         />
                                         <p className="text-xs text-slate-500">اسحب وأفلت صورة الإيصال أو PDF</p>
 
@@ -1176,7 +1176,7 @@ export function CreateExpenseView() {
                                                 <Paperclip className="h-4 w-4 text-slate-500" />
                                                 <span className="font-medium">مرفقات إضافية</span>
                                                 {attachments.length > 0 && (
-                                                    <Badge variant="secondary" className="ml-2">{attachments.length}</Badge>
+                                                    <Badge variant="secondary" className="ms-2">{attachments.length}</Badge>
                                                 )}
                                             </div>
                                         </AccordionTrigger>
@@ -1190,7 +1190,7 @@ export function CreateExpenseView() {
                                                     accept="*"
                                                     multiple
                                                     onChange={handleAttachmentUpload}
-                                                    className="rounded-xl border-slate-200 file:text-slate-600 file:bg-slate-50 file:border-0 file:rounded-lg file:mr-4 file:px-4 file:py-2 hover:file:bg-slate-100"
+                                                    className="rounded-xl border-slate-200 file:text-slate-600 file:bg-slate-50 file:border-0 file:rounded-lg file:me-4 file:px-4 file:py-2 hover:file:bg-slate-100"
                                                 />
 
                                                 {attachments.length > 0 && (
@@ -1229,12 +1229,12 @@ export function CreateExpenseView() {
                                     <div className="flex gap-2">
                                         <Link to="/dashboard/finance/expenses">
                                             <Button type="button" variant="outline" className="rounded-xl">
-                                                <X className="ml-2 h-4 w-4" />
+                                                <X className="ms-2 h-4 w-4" />
                                                 إلغاء
                                             </Button>
                                         </Link>
                                         <Button type="button" variant="outline" className="rounded-xl">
-                                            <Save className="ml-2 h-4 w-4" />
+                                            <Save className="ms-2 h-4 w-4" />
                                             حفظ كمسودة
                                         </Button>
                                     </div>

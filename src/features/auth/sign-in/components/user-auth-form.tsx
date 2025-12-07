@@ -176,7 +176,7 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
               type='button'
               disabled={isLoading}
             >
-              <IconBrandGoogle className='mr-2 h-4 w-4' />
+              <IconBrandGoogle className='me-2 h-4 w-4' />
               {t('auth.signIn.google')}
             </Button>
           </div>

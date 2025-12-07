@@ -260,7 +260,7 @@ export function LeaveRequestsListView() {
                     <DynamicIsland />
                 </div>
 
-                <div className='ms-auto flex items-center space-x-4'>
+                <div className='ms-auto flex items-center gap-4'>
                     <div className="relative hidden md:block">
                         <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                         <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pr-9 pl-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
@@ -308,7 +308,7 @@ export function LeaveRequestsListView() {
                                     {/* Leave Type Filter */}
                                     <Select value={typeFilter} onValueChange={setTypeFilter}>
                                         <SelectTrigger className="w-[160px] h-10 rounded-xl border-slate-200">
-                                            <Palmtree className="h-4 w-4 ml-2 text-slate-400" />
+                                            <Palmtree className="h-4 w-4 ms-2 text-slate-400" />
                                             <SelectValue placeholder="نوع الإجازة" />
                                         </SelectTrigger>
                                         <SelectContent>
@@ -344,7 +344,7 @@ export function LeaveRequestsListView() {
                                     {/* Sort By */}
                                     <Select value={sortBy} onValueChange={setSortBy}>
                                         <SelectTrigger className="w-[160px] h-10 rounded-xl border-slate-200">
-                                            <SortAsc className="h-4 w-4 ml-2 text-slate-400" />
+                                            <SortAsc className="h-4 w-4 ms-2 text-slate-400" />
                                             <SelectValue placeholder="ترتيب حسب" />
                                         </SelectTrigger>
                                         <SelectContent>
@@ -363,7 +363,7 @@ export function LeaveRequestsListView() {
                                             onClick={clearFilters}
                                             className="h-10 px-4 text-red-500 hover:text-red-600 hover:bg-red-50 rounded-xl"
                                         >
-                                            <X className="h-4 w-4 ml-2" />
+                                            <X className="h-4 w-4 ms-2" />
                                             مسح الفلاتر
                                         </Button>
                                     )}
@@ -381,7 +381,7 @@ export function LeaveRequestsListView() {
                                     </Badge>
                                     <Button asChild className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl">
                                         <Link to="/dashboard/hr/leave/new">
-                                            <Plus className="w-4 h-4 ml-2" />
+                                            <Plus className="w-4 h-4 ms-2" />
                                             طلب إجازة
                                         </Link>
                                     </Button>
@@ -435,7 +435,7 @@ export function LeaveRequestsListView() {
                                         <p className="text-slate-500 mb-4">قدم طلب إجازة جديد للبدء</p>
                                         <Button asChild className="bg-emerald-500 hover:bg-emerald-600">
                                             <Link to="/dashboard/hr/leave/new">
-                                                <Plus className="w-4 h-4 ml-2" />
+                                                <Plus className="w-4 h-4 ms-2" />
                                                 طلب إجازة
                                             </Link>
                                         </Button>
@@ -476,12 +476,12 @@ export function LeaveRequestsListView() {
                                                 </DropdownMenuTrigger>
                                                 <DropdownMenuContent align="end" className="w-48">
                                                     <DropdownMenuItem onClick={() => handleViewRequest(request._id)}>
-                                                        <Eye className="h-4 w-4 ml-2" />
+                                                        <Eye className="h-4 w-4 ms-2" />
                                                         عرض التفاصيل
                                                     </DropdownMenuItem>
                                                     {request.status === 'draft' && (
                                                         <DropdownMenuItem onClick={() => handleEditRequest(request._id)}>
-                                                            <Edit3 className="h-4 w-4 ml-2 text-blue-500" />
+                                                            <Edit3 className="h-4 w-4 ms-2 text-blue-500" />
                                                             تعديل
                                                         </DropdownMenuItem>
                                                     )}
@@ -491,7 +491,7 @@ export function LeaveRequestsListView() {
                                                             onClick={() => handleDeleteRequest(request._id)}
                                                             className="text-red-600 focus:text-red-600"
                                                         >
-                                                            <Trash2 className="h-4 w-4 ml-2" />
+                                                            <Trash2 className="h-4 w-4 ms-2" />
                                                             حذف
                                                         </DropdownMenuItem>
                                                     )}
@@ -548,7 +548,7 @@ export function LeaveRequestsListView() {
                             <div className="p-4 pt-0 text-center">
                                 <Button variant="ghost" className="text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 w-full rounded-xl py-6">
                                     عرض جميع الطلبات
-                                    <ChevronLeft className="h-4 w-4 mr-2" />
+                                    <ChevronLeft className="h-4 w-4 me-2" />
                                 </Button>
                             </div>
                         </div>

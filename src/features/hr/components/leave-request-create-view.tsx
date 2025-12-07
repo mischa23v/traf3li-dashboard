@@ -428,8 +428,8 @@ export function LeaveRequestCreateView() {
         try {
             const result = await createRequestMutation.mutateAsync(data)
             navigate({ to: '/dashboard/hr/leave/$requestId', params: { requestId: result._id } })
-        } catch (error) {
-            console.error('Error creating leave request:', error)
+        } catch {
+            // Error is handled by mutation's onError callback
         }
     }
 

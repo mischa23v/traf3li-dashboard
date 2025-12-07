@@ -194,10 +194,10 @@ export function ReminderDetailsView() {
                     <DynamicIsland />
                 </div>
 
-                <div className='ms-auto flex items-center space-x-4'>
+                <div className='ms-auto flex items-center gap-4'>
                     <div className="relative hidden md:block">
                         <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                        <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pr-9 pl-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
+                        <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
                     </div>
                     <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white">
                         <Bell className="h-5 w-5" />
@@ -265,7 +265,7 @@ export function ReminderDetailsView() {
                             <p className="text-slate-500 mb-4">التذكير المطلوب غير موجود أو تم حذفه</p>
                             <Button asChild className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl">
                                 <Link to="/dashboard/tasks/reminders">
-                                    <ArrowLeft className="ml-2 h-4 w-4" />
+                                    <ArrowLeft className="ms-2 h-4 w-4" />
                                     العودة إلى التذكيرات
                                 </Link>
                             </Button>
@@ -292,9 +292,9 @@ export function ReminderDetailsView() {
                                         }
                                     >
                                         {(completeReminderMutation.isPending || reopenReminderMutation.isPending) ? (
-                                            <Loader2 className="h-4 w-4 ml-2 animate-spin" />
+                                            <Loader2 className="h-4 w-4 ms-2 animate-spin" />
                                         ) : (
-                                            <CheckCircle2 className="h-4 w-4 ml-2" />
+                                            <CheckCircle2 className="h-4 w-4 ms-2" />
                                         )}
                                         {reminder.status === 'completed' ? 'إعادة فتح' : 'إكمال'}
                                     </Button>
@@ -308,9 +308,9 @@ export function ReminderDetailsView() {
                                             className="border-slate-300 text-slate-700 hover:bg-slate-50 rounded-xl"
                                         >
                                             {dismissReminderMutation.isPending ? (
-                                                <Loader2 className="h-4 w-4 ml-2 animate-spin" />
+                                                <Loader2 className="h-4 w-4 ms-2 animate-spin" />
                                             ) : (
-                                                <XCircle className="h-4 w-4 ml-2" />
+                                                <XCircle className="h-4 w-4 ms-2" />
                                             )}
                                             تجاهل
                                         </Button>
@@ -326,9 +326,9 @@ export function ReminderDetailsView() {
                                                     className="border-slate-300 text-slate-700 hover:bg-slate-50 rounded-xl"
                                                 >
                                                     {snoozeReminderMutation.isPending ? (
-                                                        <Loader2 className="h-4 w-4 ml-2 animate-spin" />
+                                                        <Loader2 className="h-4 w-4 ms-2 animate-spin" />
                                                     ) : (
-                                                        <Clock className="h-4 w-4 ml-2" />
+                                                        <Clock className="h-4 w-4 ms-2" />
                                                     )}
                                                     تأجيل
                                                 </Button>
@@ -353,7 +353,7 @@ export function ReminderDetailsView() {
                                             variant="outline"
                                             className="border-purple-300 text-purple-700 hover:bg-purple-50 rounded-xl"
                                         >
-                                            <UserPlus className="h-4 w-4 ml-2" />
+                                            <UserPlus className="h-4 w-4 ms-2" />
                                             تفويض
                                         </Button>
                                     )}
@@ -376,9 +376,9 @@ export function ReminderDetailsView() {
                                                 className="bg-red-600 hover:bg-red-700 text-white rounded-xl"
                                             >
                                                 {deleteReminderMutation.isPending ? (
-                                                    <Loader2 className="h-4 w-4 ml-2 animate-spin" />
+                                                    <Loader2 className="h-4 w-4 ms-2 animate-spin" />
                                                 ) : (
-                                                    <Trash2 className="h-4 w-4 ml-2" />
+                                                    <Trash2 className="h-4 w-4 ms-2" />
                                                 )}
                                                 تأكيد الحذف
                                             </Button>
@@ -389,7 +389,7 @@ export function ReminderDetailsView() {
                                             variant="outline"
                                             className="border-red-200 text-red-600 hover:bg-red-50 rounded-xl"
                                         >
-                                            <Trash2 className="h-4 w-4 ml-2" />
+                                            <Trash2 className="h-4 w-4 ms-2" />
                                             حذف
                                         </Button>
                                     )}
@@ -491,7 +491,7 @@ export function ReminderDetailsView() {
                                                                     <AvatarFallback className="bg-navy text-white">أنا</AvatarFallback>
                                                                 </Avatar>
                                                                 <div className="flex-1 relative">
-                                                                    <Textarea placeholder="أضف ملاحظة..." className="min-h-[80px] rounded-xl resize-none pr-12 bg-slate-50 border-slate-200 focus:border-brand-blue" />
+                                                                    <Textarea placeholder="أضف ملاحظة..." className="min-h-[80px] rounded-xl resize-none pe-12 bg-slate-50 border-slate-200 focus:border-brand-blue" />
                                                                     <Button size="icon" className="absolute bottom-2 left-2 w-8 h-8 rounded-lg bg-brand-blue hover:bg-blue-600">
                                                                         <Send className="w-4 h-4" />
                                                                     </Button>
@@ -562,7 +562,7 @@ export function ReminderDetailsView() {
                         >
                             {delegateReminderMutation.isPending ? (
                                 <>
-                                    <Loader2 className="h-4 w-4 ml-2 animate-spin" />
+                                    <Loader2 className="h-4 w-4 ms-2 animate-spin" />
                                     جاري التفويض...
                                 </>
                             ) : (

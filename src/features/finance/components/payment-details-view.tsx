@@ -67,7 +67,7 @@ export default function PaymentDetailsView() {
                     <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
                         <DynamicIsland />
                     </div>
-                    <div className='ms-auto flex items-center space-x-4'>
+                    <div className='ms-auto flex items-center gap-4'>
                         <LanguageSwitcher className="text-slate-300" />
                         <ThemeSwitch className="text-slate-300" />
                         <ProfileDropdown className="text-slate-300" />
@@ -92,7 +92,7 @@ export default function PaymentDetailsView() {
                     <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
                         <DynamicIsland />
                     </div>
-                    <div className='ms-auto flex items-center space-x-4'>
+                    <div className='ms-auto flex items-center gap-4'>
                         <LanguageSwitcher className="text-slate-300" />
                         <ThemeSwitch className="text-slate-300" />
                         <ProfileDropdown className="text-slate-300" />
@@ -102,7 +102,7 @@ export default function PaymentDetailsView() {
                     <div className="max-w-4xl mx-auto">
                         <Button asChild variant="ghost" className="mb-6">
                             <Link to="/dashboard/finance/payments">
-                                <ArrowRight className="h-4 w-4 ml-2" />
+                                <ArrowRight className="h-4 w-4 ms-2" />
                                 العودة للمدفوعات
                             </Link>
                         </Button>
@@ -127,7 +127,7 @@ export default function PaymentDetailsView() {
                 <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
                     <DynamicIsland />
                 </div>
-                <div className='ms-auto flex items-center space-x-4'>
+                <div className='ms-auto flex items-center gap-4'>
                     <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white" />
                     <ThemeSwitch className="text-slate-300 hover:bg-white/10 hover:text-white" />
                     <ProfileDropdown className="text-slate-300 hover:bg-white/10 hover:text-white" />
@@ -140,21 +140,21 @@ export default function PaymentDetailsView() {
                     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
                         <Button asChild variant="ghost" className="text-slate-600 hover:text-navy">
                             <Link to="/dashboard/finance/payments">
-                                <ArrowRight className="h-4 w-4 ml-2" />
+                                <ArrowRight className="h-4 w-4 ms-2" />
                                 العودة للمدفوعات
                             </Link>
                         </Button>
                         <div className="flex gap-2">
                             <Button variant="outline">
-                                <Download className="h-4 w-4 ml-2" />
+                                <Download className="h-4 w-4 ms-2" />
                                 تحميل الإيصال
                             </Button>
                             <Button variant="outline">
-                                <Printer className="h-4 w-4 ml-2" />
+                                <Printer className="h-4 w-4 ms-2" />
                                 طباعة
                             </Button>
                             <Button variant="outline">
-                                <Mail className="h-4 w-4 ml-2" />
+                                <Mail className="h-4 w-4 ms-2" />
                                 إرسال للعميل
                             </Button>
                         </div>
@@ -298,11 +298,11 @@ export default function PaymentDetailsView() {
                                 </CardHeader>
                                 <CardContent className="p-6 space-y-3">
                                     <Button variant="outline" className="w-full justify-start">
-                                        <Mail className="h-4 w-4 ml-2" />
+                                        <Mail className="h-4 w-4 ms-2" />
                                         إرسال الإيصال بالبريد
                                     </Button>
                                     <Button variant="outline" className="w-full justify-start">
-                                        <Receipt className="h-4 w-4 ml-2" />
+                                        <Receipt className="h-4 w-4 ms-2" />
                                         تحميل إيصال PDF
                                     </Button>
                                 </CardContent>

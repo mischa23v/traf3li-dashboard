@@ -158,7 +158,7 @@ export function VoiceMemoRecorder({ taskId, onUploadSuccess }: VoiceMemoRecorder
               size="sm"
               className="border-red-200 text-red-600 hover:bg-red-50"
             >
-              <Mic className="h-4 w-4 ml-2" />
+              <Mic className="h-4 w-4 ms-2" />
               بدء التسجيل
             </Button>
           ) : (
@@ -225,9 +225,9 @@ export function VoiceMemoRecorder({ taskId, onUploadSuccess }: VoiceMemoRecorder
               className="bg-emerald-500 hover:bg-emerald-600"
             >
               {uploadMutation.isPending ? (
-                <Loader2 className="h-4 w-4 animate-spin ml-2" />
+                <Loader2 className="h-4 w-4 animate-spin ms-2" />
               ) : (
-                <Upload className="h-4 w-4 ml-2" />
+                <Upload className="h-4 w-4 ms-2" />
               )}
               رفع التسجيل
             </Button>
@@ -238,7 +238,7 @@ export function VoiceMemoRecorder({ taskId, onUploadSuccess }: VoiceMemoRecorder
               size="sm"
               className="text-red-600 hover:bg-red-50"
             >
-              <Trash2 className="h-4 w-4 ml-2" />
+              <Trash2 className="h-4 w-4 ms-2" />
               حذف
             </Button>
           </div>

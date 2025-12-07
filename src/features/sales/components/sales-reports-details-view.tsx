@@ -154,11 +154,11 @@ export function SalesReportsDetailsView() {
             className="rounded-xl"
             disabled={generateReport.isPending}
           >
-            <RefreshCw className={`h-4 w-4 ml-2 ${generateReport.isPending ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`h-4 w-4 ms-2 ${generateReport.isPending ? 'animate-spin' : ''}`} />
             {generateReport.isPending ? 'جارٍ الإنشاء...' : 'إعادة إنشاء'}
           </Button>
           <Button variant="outline" className="rounded-xl">
-            <Download className="h-4 w-4 ml-2" />
+            <Download className="h-4 w-4 ms-2" />
             تحميل
           </Button>
           <Button
@@ -166,7 +166,7 @@ export function SalesReportsDetailsView() {
             onClick={handleDelete}
             className="rounded-xl text-red-600 hover:text-red-700 hover:bg-red-50"
           >
-            <Trash2 className="h-4 w-4 ml-2" />
+            <Trash2 className="h-4 w-4 ms-2" />
             حذف
           </Button>
         </div>

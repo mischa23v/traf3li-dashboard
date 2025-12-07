@@ -100,7 +100,7 @@ export function ReportsDashboard() {
                             <div>
                                 <div className="flex items-center gap-3 mb-3">
                                     <Badge className="bg-white/20 hover:bg-white/30 text-white border-0 backdrop-blur-sm">
-                                        <BarChart3 className="w-3 h-3 ml-2" />
+                                        <BarChart3 className="w-3 h-3 ms-2" />
                                         التقارير المالية
                                     </Badge>
                                 </div>
@@ -139,7 +139,7 @@ export function ReportsDashboard() {
                                         <div className="mt-4 flex items-center justify-end">
                                             <Button variant="ghost" className={`${report.color} hover:bg-white/50 rounded-xl text-sm`}>
                                                 عرض التقرير
-                                                <TrendingUp className="w-4 h-4 mr-2" />
+                                                <TrendingUp className="w-4 h-4 me-2" />
                                             </Button>
                                         </div>
                                     </CardContent>

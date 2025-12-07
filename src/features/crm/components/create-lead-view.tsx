@@ -912,7 +912,7 @@ export function CreateLeadView() {
                   <CardTitle className="flex items-center gap-2">
                     <Shield className="w-5 h-5 text-yellow-500" />
                     فحص تعارض المصالح
-                    <Badge variant="outline" className="mr-2 text-yellow-600 border-yellow-300">
+                    <Badge variant="outline" className="me-2 text-yellow-600 border-yellow-300">
                       إلزامي
                     </Badge>
                   </CardTitle>
@@ -1087,7 +1087,7 @@ export function CreateLeadView() {
                     {formData.tags.map(tag => (
                       <Badge key={tag} variant="secondary" className="gap-1 px-3 py-1">
                         {tag}
-                        <button type="button" onClick={() => removeTag(tag)} className="hover:text-red-500 mr-1">
+                        <button type="button" onClick={() => removeTag(tag)} className="hover:text-red-500 me-1">
                           <X className="w-3 h-3" />
                         </button>
                       </Badge>
@@ -1140,7 +1140,7 @@ export function CreateLeadView() {
                               <SelectItem key={option.value} value={option.value}>
                                 <div className="flex items-center justify-between w-full">
                                   <span>{option.label}</span>
-                                  <Badge variant="outline" className="mr-2 text-xs">
+                                  <Badge variant="outline" className="me-2 text-xs">
                                     +{option.score}
                                   </Badge>
                                 </div>
@@ -1163,7 +1163,7 @@ export function CreateLeadView() {
                               <SelectItem key={option.value} value={option.value}>
                                 <div className="flex items-center justify-between w-full">
                                   <span>{option.label}</span>
-                                  <Badge variant="outline" className="mr-2 text-xs">
+                                  <Badge variant="outline" className="me-2 text-xs">
                                     +{option.score}
                                   </Badge>
                                 </div>
@@ -1186,7 +1186,7 @@ export function CreateLeadView() {
                               <SelectItem key={option.value} value={option.value}>
                                 <div className="flex items-center justify-between w-full">
                                   <span>{option.label}</span>
-                                  <Badge variant="outline" className="mr-2 text-xs">
+                                  <Badge variant="outline" className="me-2 text-xs">
                                     +{option.score}
                                   </Badge>
                                 </div>
@@ -1209,7 +1209,7 @@ export function CreateLeadView() {
                               <SelectItem key={option.value} value={option.value}>
                                 <div className="flex items-center justify-between w-full">
                                   <span>{option.label}</span>
-                                  <Badge variant="outline" className="mr-2 text-xs">
+                                  <Badge variant="outline" className="me-2 text-xs">
                                     +{option.score}
                                   </Badge>
                                 </div>
@@ -1254,7 +1254,7 @@ export function CreateLeadView() {
                           {formData.competitors.map(competitor => (
                             <Badge key={competitor} variant="outline" className="gap-1 px-3 py-1">
                               {competitor}
-                              <button type="button" onClick={() => removeCompetitor(competitor)} className="hover:text-red-500 mr-1">
+                              <button type="button" onClick={() => removeCompetitor(competitor)} className="hover:text-red-500 me-1">
                                 <X className="w-3 h-3" />
                               </button>
                             </Badge>

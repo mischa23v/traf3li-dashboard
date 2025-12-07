@@ -43,10 +43,10 @@ export function StatementDetailsView() {
                 <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
                     <DynamicIsland />
                 </div>
-                <div className='ms-auto flex items-center space-x-4'>
+                <div className='ms-auto flex items-center gap-4'>
                     <div className="relative hidden md:block">
                         <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                        <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pr-9 pl-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
+                        <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
                     </div>
                     <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white">
                         <Bell className="h-5 w-5" />
@@ -101,7 +101,7 @@ export function StatementDetailsView() {
                     <>
                 <div className="max-w-[1600px] mx-auto mb-6">
                     <Link to="/dashboard/finance/statements" className="inline-flex items-center text-slate-500 hover:text-navy transition-colors">
-                        <ArrowLeft className="h-4 w-4 ml-2" />
+                        <ArrowLeft className="h-4 w-4 ms-2" />
                         العودة إلى كشوف الحساب
                     </Link>
                 </div>
@@ -120,7 +120,7 @@ export function StatementDetailsView() {
                                 </div>
                                 <span className="text-emerald-100 font-medium">كشف حساب شهري</span>
                                 <span className="text-white/20">•</span>
-                                <Badge variant="outline" className="mr-2 border-emerald-500/30 text-emerald-300 bg-emerald-500/10">
+                                <Badge variant="outline" className="me-2 border-emerald-500/30 text-emerald-300 bg-emerald-500/10">
                                     {statement.status === 'sent' ? 'تم الإرسال' : statement.status === 'paid' ? 'مدفوع' : statement.status === 'archived' ? 'مؤرشف' : 'مسودة'}
                                 </Badge>
                             </div>
@@ -146,7 +146,7 @@ export function StatementDetailsView() {
                             </div>
                             <div className="flex gap-3">
                                 <Button variant="outline" className="flex-1 border-white/10 text-white hover:bg-white/10 hover:text-white backdrop-blur-sm">
-                                    <Download className="h-4 w-4 ml-2" />
+                                    <Download className="h-4 w-4 ms-2" />
                                     تحميل PDF
                                 </Button>
                             </div>

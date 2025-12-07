@@ -412,7 +412,7 @@ export function CreateTimeEntryView() {
                 <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
                     <DynamicIsland />
                 </div>
-                <div className='ms-auto flex items-center space-x-4'>
+                <div className='ms-auto flex items-center gap-4'>
                     <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white" />
                     <ThemeSwitch className="text-slate-300 hover:bg-white/10 hover:text-white" />
                     <ConfigDrawer className="text-slate-300 hover:bg-white/10 hover:text-white" />
@@ -603,15 +603,15 @@ export function CreateTimeEntryView() {
                                     <Tabs value={formData.entryMethod} onValueChange={(v: any) => setFormData({ ...formData, entryMethod: v })}>
                                         <TabsList className="grid grid-cols-3 w-full mb-6">
                                             <TabsTrigger value="duration" className="data-[state=active]:bg-emerald-500 data-[state=active]:text-white">
-                                                <Clock className="ml-2 h-4 w-4" />
+                                                <Clock className="ms-2 h-4 w-4" />
                                                 المدة المباشرة
                                             </TabsTrigger>
                                             <TabsTrigger value="start_end" className="data-[state=active]:bg-emerald-500 data-[state=active]:text-white">
-                                                <Calendar className="ml-2 h-4 w-4" />
+                                                <Calendar className="ms-2 h-4 w-4" />
                                                 وقت البدء/الانتهاء
                                             </TabsTrigger>
                                             <TabsTrigger value="timer" className="data-[state=active]:bg-emerald-500 data-[state=active]:text-white">
-                                                <Timer className="ml-2 h-4 w-4" />
+                                                <Timer className="ms-2 h-4 w-4" />
                                                 مؤقت
                                             </TabsTrigger>
                                         </TabsList>
@@ -754,7 +754,7 @@ export function CreateTimeEntryView() {
                                                             onClick={startTimer}
                                                             className="px-8 bg-emerald-500 hover:bg-emerald-600"
                                                         >
-                                                            <Play className="ml-2 h-5 w-5" />
+                                                            <Play className="ms-2 h-5 w-5" />
                                                             بدء المؤقت
                                                         </Button>
                                                     )}
@@ -767,7 +767,7 @@ export function CreateTimeEntryView() {
                                                                 variant="outline"
                                                                 onClick={pauseTimer}
                                                             >
-                                                                <Pause className="ml-2 h-5 w-5" />
+                                                                <Pause className="ms-2 h-5 w-5" />
                                                                 إيقاف مؤقت
                                                             </Button>
                                                             <Button
@@ -776,7 +776,7 @@ export function CreateTimeEntryView() {
                                                                 variant="destructive"
                                                                 onClick={stopTimer}
                                                             >
-                                                                <Square className="ml-2 h-5 w-5" />
+                                                                <Square className="ms-2 h-5 w-5" />
                                                                 إيقاف
                                                             </Button>
                                                         </>
@@ -790,7 +790,7 @@ export function CreateTimeEntryView() {
                                                                 onClick={resumeTimer}
                                                                 className="bg-emerald-500 hover:bg-emerald-600"
                                                             >
-                                                                <Play className="ml-2 h-5 w-5" />
+                                                                <Play className="ms-2 h-5 w-5" />
                                                                 استئناف
                                                             </Button>
                                                             <Button
@@ -799,7 +799,7 @@ export function CreateTimeEntryView() {
                                                                 variant="destructive"
                                                                 onClick={stopTimer}
                                                             >
-                                                                <Square className="ml-2 h-5 w-5" />
+                                                                <Square className="ms-2 h-5 w-5" />
                                                                 إيقاف
                                                             </Button>
                                                         </>
@@ -812,7 +812,7 @@ export function CreateTimeEntryView() {
                                                             variant="outline"
                                                             onClick={resetTimer}
                                                         >
-                                                            <RotateCcw className="ml-2 h-5 w-5" />
+                                                            <RotateCcw className="ms-2 h-5 w-5" />
                                                             إعادة تعيين
                                                         </Button>
                                                     )}
@@ -1099,11 +1099,11 @@ export function CreateTimeEntryView() {
                             <div className="flex justify-between items-center pt-6 border-t border-slate-200">
                                 <div className="flex gap-2">
                                     <Button type="button" variant="outline" onClick={() => navigate({ to: '/dashboard/finance/time-tracking' })} className="rounded-xl">
-                                        <X className="ml-2 h-4 w-4" />
+                                        <X className="ms-2 h-4 w-4" />
                                         إلغاء
                                     </Button>
                                     <Button type="button" variant="outline" onClick={(e) => handleSubmit(e as any, 'draft')} className="rounded-xl">
-                                        <Save className="ml-2 h-4 w-4" />
+                                        <Save className="ms-2 h-4 w-4" />
                                         حفظ كمسودة
                                     </Button>
                                 </div>
@@ -1117,16 +1117,16 @@ export function CreateTimeEntryView() {
                                         </DropdownMenuTrigger>
                                         <DropdownMenuContent align="end">
                                             <DropdownMenuItem>
-                                                <Copy className="ml-2 h-4 w-4" />
+                                                <Copy className="ms-2 h-4 w-4" />
                                                 نسخ القيد
                                             </DropdownMenuItem>
                                             <DropdownMenuItem>
-                                                <FileText className="ml-2 h-4 w-4" />
+                                                <FileText className="ms-2 h-4 w-4" />
                                                 حفظ كقالب
                                             </DropdownMenuItem>
                                             <DropdownMenuSeparator />
                                             <DropdownMenuItem>
-                                                <History className="ml-2 h-4 w-4" />
+                                                <History className="ms-2 h-4 w-4" />
                                                 سجل التعديلات
                                             </DropdownMenuItem>
                                         </DropdownMenuContent>

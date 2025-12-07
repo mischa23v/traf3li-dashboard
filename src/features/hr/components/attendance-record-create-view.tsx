@@ -177,8 +177,8 @@ export function AttendanceRecordCreateView() {
         })
       }
       navigate({ to: '/dashboard/hr/attendance' })
-    } catch (error) {
-      console.error('Failed to create attendance record:', error)
+    } catch {
+      // Error is handled by mutation's onError callback
     }
   }
 

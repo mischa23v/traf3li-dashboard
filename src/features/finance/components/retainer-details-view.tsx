@@ -141,7 +141,7 @@ export default function RetainerDetailsView() {
                     <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
                         <DynamicIsland />
                     </div>
-                    <div className='ms-auto flex items-center space-x-4'>
+                    <div className='ms-auto flex items-center gap-4'>
                         <LanguageSwitcher className="text-slate-300" />
                         <ThemeSwitch className="text-slate-300" />
                         <ProfileDropdown className="text-slate-300" />
@@ -166,7 +166,7 @@ export default function RetainerDetailsView() {
                     <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
                         <DynamicIsland />
                     </div>
-                    <div className='ms-auto flex items-center space-x-4'>
+                    <div className='ms-auto flex items-center gap-4'>
                         <LanguageSwitcher className="text-slate-300" />
                         <ThemeSwitch className="text-slate-300" />
                         <ProfileDropdown className="text-slate-300" />
@@ -176,7 +176,7 @@ export default function RetainerDetailsView() {
                     <div className="max-w-7xl mx-auto">
                         <Button asChild variant="ghost" className="mb-6">
                             <Link to="/dashboard/finance/retainers">
-                                <ArrowRight className="h-4 w-4 ml-2" />
+                                <ArrowRight className="h-4 w-4 ms-2" />
                                 العودة لحسابات الأمانة
                             </Link>
                         </Button>
@@ -204,7 +204,7 @@ export default function RetainerDetailsView() {
                 <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
                     <DynamicIsland />
                 </div>
-                <div className='ms-auto flex items-center space-x-4'>
+                <div className='ms-auto flex items-center gap-4'>
                     <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white" />
                     <ThemeSwitch className="text-slate-300 hover:bg-white/10 hover:text-white" />
                     <ProfileDropdown className="text-slate-300 hover:bg-white/10 hover:text-white" />
@@ -227,17 +227,17 @@ export default function RetainerDetailsView() {
                         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                             <Button asChild variant="ghost" className="text-slate-600 hover:text-navy">
                                 <Link to="/dashboard/finance/retainers">
-                                    <ArrowRight className="h-4 w-4 ml-2" />
+                                    <ArrowRight className="h-4 w-4 ms-2" />
                                     العودة لحسابات الأمانة
                                 </Link>
                             </Button>
                             <div className="flex gap-2">
                                 <Button variant="outline">
-                                    <Download className="h-4 w-4 ml-2" />
+                                    <Download className="h-4 w-4 ms-2" />
                                     تحميل كشف
                                 </Button>
                                 <Button variant="outline">
-                                    <Printer className="h-4 w-4 ml-2" />
+                                    <Printer className="h-4 w-4 ms-2" />
                                     طباعة
                                 </Button>
                             </div>
@@ -252,7 +252,7 @@ export default function RetainerDetailsView() {
                                         نظرة عامة على الرصيد
                                     </CardTitle>
                                     <Badge className={status.color}>
-                                        <StatusIcon className="h-3 w-3 ml-1" />
+                                        <StatusIcon className="h-3 w-3 ms-1" />
                                         {status.label}
                                     </Badge>
                                 </div>
@@ -421,7 +421,7 @@ export default function RetainerDetailsView() {
                                     className="w-full justify-start bg-emerald-500 hover:bg-emerald-600 text-white"
                                     disabled={retainer.status === 'closed'}
                                 >
-                                    <Plus className="h-4 w-4 ml-2" />
+                                    <Plus className="h-4 w-4 ms-2" />
                                     إيداع مبلغ
                                 </Button>
                                 <Button
@@ -430,7 +430,7 @@ export default function RetainerDetailsView() {
                                     className="w-full justify-start"
                                     disabled={retainer.status === 'closed' || retainer.currentBalance <= 0}
                                 >
-                                    <Minus className="h-4 w-4 ml-2" />
+                                    <Minus className="h-4 w-4 ms-2" />
                                     سحب مبلغ
                                 </Button>
                             </CardContent>

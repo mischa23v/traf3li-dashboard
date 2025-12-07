@@ -147,7 +147,7 @@ export function EditExpenseView() {
         <AlertDialog>
           <AlertDialogTrigger asChild>
             <Button variant="destructive" size="sm">
-              <Trash2 className="h-4 w-4 ml-2" />
+              <Trash2 className="h-4 w-4 ms-2" />
               حذف
             </Button>
           </AlertDialogTrigger>
@@ -372,7 +372,7 @@ export function EditExpenseView() {
 
             <div className="flex gap-4 pt-4">
               <Button type="submit" disabled={updateExpense.isPending}>
-                <Save className="h-4 w-4 ml-2" />
+                <Save className="h-4 w-4 ms-2" />
                 {updateExpense.isPending ? 'جاري الحفظ...' : 'حفظ التعديلات'}
               </Button>
               <Button

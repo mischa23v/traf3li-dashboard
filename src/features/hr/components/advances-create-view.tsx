@@ -238,10 +238,10 @@ export function AdvancesCreateView() {
         <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
           <DynamicIsland />
         </div>
-        <div className='ms-auto flex items-center space-x-4'>
+        <div className='ms-auto flex items-center gap-4'>
           <div className="relative hidden md:block">
             <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-            <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pr-9 pl-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
+            <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
           </div>
           <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white">
             <Bell className="h-5 w-5" />
@@ -534,7 +534,7 @@ export function AdvancesCreateView() {
                       disabled={checkEligibilityMutation.isPending}
                       className="rounded-xl"
                     >
-                      <Calculator className="w-4 h-4 ml-2" />
+                      <Calculator className="w-4 h-4 ms-2" />
                       {checkEligibilityMutation.isPending ? 'جاري الفحص...' : 'فحص الأهلية'}
                     </Button>
 
@@ -665,7 +665,7 @@ export function AdvancesCreateView() {
                     <Clock className="w-4 h-4 mt-0.5 flex-shrink-0" />
                     <div>
                       <p className="font-medium">شروط الأهلية:</p>
-                      <ul className="list-disc list-inside mr-4 mt-1 space-y-1">
+                      <ul className="list-disc list-inside me-4 mt-1 space-y-1">
                         <li>الحد الأدنى للخدمة: 3 أشهر</li>
                         <li>لا يوجد سلف نشطة أخرى</li>
                         <li>الحد الأقصى للسلفة: 50% من صافي الراتب</li>
@@ -677,7 +677,7 @@ export function AdvancesCreateView() {
                     <DollarSign className="w-4 h-4 mt-0.5 flex-shrink-0" />
                     <div>
                       <p className="font-medium">السداد:</p>
-                      <ul className="list-disc list-inside mr-4 mt-1 space-y-1">
+                      <ul className="list-disc list-inside me-4 mt-1 space-y-1">
                         <li>الخصم من الراتب شهرياً</li>
                         <li>الحد الأقصى للأقساط: 3-6 أشهر</li>
                         <li>بدون فوائد (متوافق مع الشريعة)</li>
@@ -689,7 +689,7 @@ export function AdvancesCreateView() {
                     <AlertTriangle className="w-4 h-4 mt-0.5 flex-shrink-0" />
                     <div>
                       <p className="font-medium">في حالة إنهاء الخدمة:</p>
-                      <ul className="list-disc list-inside mr-4 mt-1 space-y-1">
+                      <ul className="list-disc list-inside me-4 mt-1 space-y-1">
                         <li>يتم خصم الرصيد المتبقي من التسوية النهائية</li>
                       </ul>
                     </div>
@@ -716,7 +716,7 @@ export function AdvancesCreateView() {
                   <>جاري الحفظ...</>
                 ) : (
                   <>
-                    <CheckCircle className="w-4 h-4 ml-2" />
+                    <CheckCircle className="w-4 h-4 ms-2" />
                     {isEditMode ? 'حفظ التعديلات' : 'تقديم طلب السلفة'}
                   </>
                 )}

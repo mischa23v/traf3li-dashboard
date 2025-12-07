@@ -44,13 +44,13 @@ export default function CaseWorkflows() {
           <DynamicIsland />
         </div>
 
-        <div className="ms-auto flex items-center space-x-4">
+        <div className="ms-auto flex items-center gap-4">
           <div className="relative hidden md:block">
             <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
             <input
               type="text"
               placeholder={t('common.search', 'بحث...')}
-              className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pr-9 pl-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+              className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
             />
           </div>
           <Button
@@ -81,7 +81,7 @@ export default function CaseWorkflows() {
             <div>
               <div className="flex items-center gap-2 mb-2">
                 <Badge className="bg-blue-500/20 text-blue-100 hover:bg-blue-500/30 border-0 px-3 py-1">
-                  <Scale className="w-3 h-3 ml-2" />
+                  <Scale className="w-3 h-3 ms-2" />
                   {t('cases.management', 'إدارة القضايا')}
                 </Badge>
                 <span className="text-slate-400 text-sm">

@@ -103,7 +103,7 @@ export default function QuoteDetailsView() {
                     <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
                         <DynamicIsland />
                     </div>
-                    <div className='ms-auto flex items-center space-x-4'>
+                    <div className='ms-auto flex items-center gap-4'>
                         <LanguageSwitcher className="text-slate-300" />
                         <ThemeSwitch className="text-slate-300" />
                         <ProfileDropdown className="text-slate-300" />
@@ -128,7 +128,7 @@ export default function QuoteDetailsView() {
                     <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
                         <DynamicIsland />
                     </div>
-                    <div className='ms-auto flex items-center space-x-4'>
+                    <div className='ms-auto flex items-center gap-4'>
                         <LanguageSwitcher className="text-slate-300" />
                         <ThemeSwitch className="text-slate-300" />
                         <ProfileDropdown className="text-slate-300" />
@@ -138,7 +138,7 @@ export default function QuoteDetailsView() {
                     <div className="max-w-5xl mx-auto">
                         <Button asChild variant="ghost" className="mb-6">
                             <Link to="/dashboard/finance/quotes">
-                                <ArrowRight className="h-4 w-4 ml-2" />
+                                <ArrowRight className="h-4 w-4 ms-2" />
                                 العودة لعروض الأسعار
                             </Link>
                         </Button>
@@ -163,7 +163,7 @@ export default function QuoteDetailsView() {
                 <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
                     <DynamicIsland />
                 </div>
-                <div className='ms-auto flex items-center space-x-4'>
+                <div className='ms-auto flex items-center gap-4'>
                     <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white" />
                     <ThemeSwitch className="text-slate-300 hover:bg-white/10 hover:text-white" />
                     <ProfileDropdown className="text-slate-300 hover:bg-white/10 hover:text-white" />
@@ -186,9 +186,9 @@ export default function QuoteDetailsView() {
                                     className="bg-blue-600 hover:bg-blue-700 text-white border-0"
                                 >
                                     {sendQuoteMutation.isPending ? (
-                                        <Loader2 className="h-4 w-4 ml-2 animate-spin" />
+                                        <Loader2 className="h-4 w-4 ms-2 animate-spin" />
                                     ) : (
-                                        <Send className="h-4 w-4 ml-2" />
+                                        <Send className="h-4 w-4 ms-2" />
                                     )}
                                     إرسال للعميل
                                 </Button>
@@ -200,21 +200,21 @@ export default function QuoteDetailsView() {
                                     className="bg-emerald-600 hover:bg-emerald-700 text-white border-0"
                                 >
                                     {convertMutation.isPending ? (
-                                        <Loader2 className="h-4 w-4 ml-2 animate-spin" />
+                                        <Loader2 className="h-4 w-4 ms-2 animate-spin" />
                                     ) : (
-                                        <ArrowRightLeft className="h-4 w-4 ml-2" />
+                                        <ArrowRightLeft className="h-4 w-4 ms-2" />
                                     )}
                                     تحويل لفاتورة
                                 </Button>
                             )}
                             <Button asChild variant="outline" className="bg-white/10 text-white hover:bg-white/20 border-0 backdrop-blur-sm">
                                 <Link to="/dashboard/finance/quotes/$quoteId/edit" params={{ quoteId: quote._id }}>
-                                    <Edit className="h-4 w-4 ml-2" />
+                                    <Edit className="h-4 w-4 ms-2" />
                                     تعديل
                                 </Link>
                             </Button>
                             <Button variant="outline" className="bg-white/10 text-white hover:bg-white/20 border-0 backdrop-blur-sm">
-                                <Download className="h-4 w-4 ml-2" />
+                                <Download className="h-4 w-4 ms-2" />
                                 تحميل PDF
                             </Button>
                             <Button
@@ -223,7 +223,7 @@ export default function QuoteDetailsView() {
                                 onClick={handleDelete}
                                 disabled={deleteMutation.isPending}
                             >
-                                <Trash2 className="h-4 w-4 ml-2" />
+                                <Trash2 className="h-4 w-4 ms-2" />
                                 حذف
                             </Button>
                         </div>
@@ -395,11 +395,11 @@ export default function QuoteDetailsView() {
                                 </CardHeader>
                                 <CardContent className="p-6 space-y-3">
                                     <Button variant="outline" className="w-full justify-start">
-                                        <Mail className="h-4 w-4 ml-2" />
+                                        <Mail className="h-4 w-4 ms-2" />
                                         إرسال بالبريد الإلكتروني
                                     </Button>
                                     <Button variant="outline" className="w-full justify-start">
-                                        <Copy className="h-4 w-4 ml-2" />
+                                        <Copy className="h-4 w-4 ms-2" />
                                         نسخ عرض السعر
                                     </Button>
                                 </CardContent>

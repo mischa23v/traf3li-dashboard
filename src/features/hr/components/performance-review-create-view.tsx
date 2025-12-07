@@ -228,8 +228,8 @@ export function PerformanceReviewCreateView() {
         })) : undefined,
       })
       navigate({ to: '/dashboard/hr/performance' })
-    } catch (error) {
-      console.error('Failed to create performance review:', error)
+    } catch {
+      // Error is handled by mutation's onError callback
     }
   }
 

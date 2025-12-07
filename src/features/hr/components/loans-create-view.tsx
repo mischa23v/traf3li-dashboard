@@ -238,10 +238,10 @@ export function LoansCreateView() {
         <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
           <DynamicIsland />
         </div>
-        <div className='ms-auto flex items-center space-x-4'>
+        <div className='ms-auto flex items-center gap-4'>
           <div className="relative hidden md:block">
             <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-            <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pr-9 pl-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
+            <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
           </div>
           <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white">
             <Bell className="h-5 w-5" />
@@ -520,7 +520,7 @@ export function LoansCreateView() {
                       disabled={checkEligibilityMutation.isPending}
                       className="rounded-xl"
                     >
-                      <Calculator className="w-4 h-4 ml-2" />
+                      <Calculator className="w-4 h-4 ms-2" />
                       {checkEligibilityMutation.isPending ? 'جاري الفحص...' : 'فحص الأهلية'}
                     </Button>
 
@@ -651,7 +651,7 @@ export function LoansCreateView() {
                     <CreditCard className="w-4 h-4 mt-0.5 flex-shrink-0" />
                     <div>
                       <p className="font-medium">شروط الأهلية:</p>
-                      <ul className="list-disc list-inside mr-4 mt-1 space-y-1">
+                      <ul className="list-disc list-inside me-4 mt-1 space-y-1">
                         <li>اجتياز فترة التجربة (180 يوم)</li>
                         <li>عدم وجود إجراءات تأديبية نشطة</li>
                         <li>عدم تجاوز الحد الائتماني المسموح</li>
@@ -663,7 +663,7 @@ export function LoansCreateView() {
                     <Clock className="w-4 h-4 mt-0.5 flex-shrink-0" />
                     <div>
                       <p className="font-medium">آلية السداد:</p>
-                      <ul className="list-disc list-inside mr-4 mt-1 space-y-1">
+                      <ul className="list-disc list-inside me-4 mt-1 space-y-1">
                         <li>الخصم التلقائي من الراتب (الطريقة المفضلة)</li>
                         <li>يجب ألا يتجاوز القسط 30% من صافي الراتب</li>
                         <li>يمكن السداد المبكر بدون غرامة</li>
@@ -674,7 +674,7 @@ export function LoansCreateView() {
                     <AlertTriangle className="w-4 h-4 mt-0.5 flex-shrink-0" />
                     <div>
                       <p className="font-medium">في حالة إنهاء الخدمة:</p>
-                      <ul className="list-disc list-inside mr-4 mt-1 space-y-1">
+                      <ul className="list-disc list-inside me-4 mt-1 space-y-1">
                         <li>يتم خصم الرصيد المتبقي من مستحقات نهاية الخدمة</li>
                         <li>إذا لم تكف المستحقات، يتم ترتيب خطة سداد</li>
                       </ul>
@@ -702,7 +702,7 @@ export function LoansCreateView() {
                   <>جاري الحفظ...</>
                 ) : (
                   <>
-                    <CheckCircle className="w-4 h-4 ml-2" />
+                    <CheckCircle className="w-4 h-4 ms-2" />
                     {isEditMode ? 'حفظ التعديلات' : 'تقديم طلب القرض'}
                   </>
                 )}

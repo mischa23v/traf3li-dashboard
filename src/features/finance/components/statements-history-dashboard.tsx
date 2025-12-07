@@ -72,10 +72,10 @@ export default function StatementsHistoryDashboard() {
                     <DynamicIsland />
                 </div>
 
-                <div className='ms-auto flex items-center space-x-4'>
+                <div className='ms-auto flex items-center gap-4'>
                     <div className="relative hidden md:block">
                         <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                        <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pr-9 pl-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
+                        <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
                     </div>
                     <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white">
                         <Bell className="h-5 w-5" />
@@ -98,7 +98,7 @@ export default function StatementsHistoryDashboard() {
                         <div className="relative z-10 max-w-lg">
                             <div className="flex items-center gap-3 mb-3">
                                 <Badge className="bg-white/10 hover:bg-white/20 text-white border-0 backdrop-blur-sm">
-                                    <FileClock className="w-3 h-3 ml-2" />
+                                    <FileClock className="w-3 h-3 ms-2" />
                                     الأرشيف
                                 </Badge>
                                 <span className="text-emerald-200 text-sm">2025</span>
@@ -110,12 +110,12 @@ export default function StatementsHistoryDashboard() {
                             <div className="flex gap-3">
                                 <Button asChild className="bg-emerald-500 hover:bg-emerald-600 text-white h-12 px-8 rounded-xl font-bold shadow-lg shadow-emerald-500/20 border-0">
                                     <Link to="/dashboard/finance/statements/new">
-                                        <Plus className="ml-2 h-5 w-5" />
+                                        <Plus className="ms-2 h-5 w-5" />
                                         إنشاء كشف جديد
                                     </Link>
                                 </Button>
                                 <Button variant="ghost" className="bg-white/10 text-white hover:bg-white/20 h-12 px-8 rounded-xl font-bold border-0 backdrop-blur-sm">
-                                    <Download className="ml-2 h-5 w-5" />
+                                    <Download className="ms-2 h-5 w-5" />
                                     تصدير السجل
                                 </Button>
                             </div>
@@ -172,7 +172,7 @@ export default function StatementsHistoryDashboard() {
                                         <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                                         <Input
                                             placeholder="بحث في الكشوفات..."
-                                            className="pr-10 rounded-xl border-slate-200 focus:ring-[#022c22] focus:border-[#022c22]"
+                                            className="pe-10 rounded-xl border-slate-200 focus:ring-[#022c22] focus:border-[#022c22]"
                                             value={searchQuery}
                                             onChange={(e) => setSearchQuery(e.target.value)}
                                         />
@@ -213,7 +213,7 @@ export default function StatementsHistoryDashboard() {
                                         <p className="text-slate-500 mb-6">ابدأ بإنشاء كشف حساب جديد للعملاء</p>
                                         <Button asChild className="bg-brand-blue hover:bg-blue-600 text-white px-8">
                                             <Link to="/dashboard/finance/statements/new">
-                                                <Plus className="ml-2 h-4 w-4" />
+                                                <Plus className="ms-2 h-4 w-4" />
                                                 إنشاء كشف جديد
                                             </Link>
                                         </Button>
@@ -269,7 +269,7 @@ export default function StatementsHistoryDashboard() {
                                                         <div className="text-xs text-slate-400 mb-1">تاريخ الإصدار</div>
                                                         <div className="font-bold text-[#022c22]">{new Date(st.generatedDate).toLocaleDateString('ar-SA')}</div>
                                                     </div>
-                                                    <div className="text-center pl-4 border-l border-slate-100">
+                                                    <div className="text-center ps-4 border-l border-slate-100">
                                                         <div className="text-xs text-slate-400 mb-1">عدد البنود</div>
                                                         <div className="font-bold text-slate-700">{st.items?.length || 0}</div>
                                                     </div>

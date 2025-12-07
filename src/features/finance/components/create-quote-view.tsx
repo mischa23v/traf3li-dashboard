@@ -316,7 +316,7 @@ export default function CreateQuoteView() {
                                                 بنود عرض السعر
                                             </label>
                                             <Button type="button" onClick={handleAddItem} variant="outline" size="sm" className="text-blue-600 border-blue-200 hover:bg-blue-50">
-                                                <Plus className="w-4 h-4 ml-2" />
+                                                <Plus className="w-4 h-4 ms-2" />
                                                 إضافة بند
                                             </Button>
                                         </div>

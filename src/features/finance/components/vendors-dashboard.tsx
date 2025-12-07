@@ -120,7 +120,7 @@ export default function VendorsDashboard() {
                     <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
                         <DynamicIsland />
                     </div>
-                    <div className='ms-auto flex items-center space-x-4'>
+                    <div className='ms-auto flex items-center gap-4'>
                         <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white" />
                         <ThemeSwitch className="text-slate-300 hover:bg-white/10 hover:text-white" />
                         <ConfigDrawer className="text-slate-300 hover:bg-white/10 hover:text-white" />
@@ -154,7 +154,7 @@ export default function VendorsDashboard() {
                     <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
                         <DynamicIsland />
                     </div>
-                    <div className='ms-auto flex items-center space-x-4'>
+                    <div className='ms-auto flex items-center gap-4'>
                         <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white" />
                         <ThemeSwitch className="text-slate-300 hover:bg-white/10 hover:text-white" />
                         <ConfigDrawer className="text-slate-300 hover:bg-white/10 hover:text-white" />
@@ -170,7 +170,7 @@ export default function VendorsDashboard() {
                         <h3 className="text-xl font-bold text-slate-900 mb-2">فشل تحميل الموردين</h3>
                         <p className="text-slate-500 mb-6">{(error as Error)?.message || 'حدث خطأ أثناء تحميل البيانات'}</p>
                         <Button onClick={() => refetch()} className="bg-emerald-500 hover:bg-emerald-600 text-white px-8">
-                            <Loader2 className="ml-2 h-4 w-4" />
+                            <Loader2 className="ms-2 h-4 w-4" />
                             إعادة المحاولة
                         </Button>
                     </div>
@@ -190,10 +190,10 @@ export default function VendorsDashboard() {
                     <DynamicIsland />
                 </div>
 
-                <div className='ms-auto flex items-center space-x-4'>
+                <div className='ms-auto flex items-center gap-4'>
                     <div className="relative hidden md:block">
                         <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                        <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pr-9 pl-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
+                        <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
                     </div>
                     <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white">
                         <Bell className="h-5 w-5" />
@@ -271,7 +271,7 @@ export default function VendorsDashboard() {
                                 <h3 className="text-xl font-bold text-slate-900 mb-2">لا توجد موردين بعد</h3>
                                 <p className="text-slate-500 mb-6">ابدأ بإضافة أول مورد</p>
                                 <Button onClick={handleCreate} className="bg-brand-blue hover:bg-blue-600 text-white px-8">
-                                    <Plus className="ml-2 h-4 w-4" />
+                                    <Plus className="ms-2 h-4 w-4" />
                                     إضافة مورد جديد
                                 </Button>
                             </div>
@@ -307,13 +307,13 @@ export default function VendorsDashboard() {
                                             <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                                             <Input
                                                 placeholder="بحث في الموردين..."
-                                                className="pr-10 rounded-xl border-slate-200 focus:ring-[#022c22] focus:border-[#022c22]"
+                                                className="pe-10 rounded-xl border-slate-200 focus:ring-[#022c22] focus:border-[#022c22]"
                                                 value={searchQuery}
                                                 onChange={(e) => setSearchQuery(e.target.value)}
                                             />
                                         </div>
                                         <Button onClick={handleCreate} className="bg-[#022c22] hover:bg-[#033d2e] text-white rounded-xl px-4">
-                                            <Plus className="ml-2 h-4 w-4" />
+                                            <Plus className="ms-2 h-4 w-4" />
                                             إضافة مورد
                                         </Button>
                                     </div>
@@ -375,14 +375,14 @@ export default function VendorsDashboard() {
                                                         </DropdownMenuTrigger>
                                                         <DropdownMenuContent align="end">
                                                             <DropdownMenuItem onClick={() => handleEdit(vendor)}>
-                                                                <Edit className="ml-2 h-4 w-4" />
+                                                                <Edit className="ms-2 h-4 w-4" />
                                                                 تعديل
                                                             </DropdownMenuItem>
                                                             <DropdownMenuItem
                                                                 onClick={() => handleDelete(vendor)}
                                                                 className="text-red-600"
                                                             >
-                                                                <Trash2 className="ml-2 h-4 w-4" />
+                                                                <Trash2 className="ms-2 h-4 w-4" />
                                                                 حذف
                                                             </DropdownMenuItem>
                                                         </DropdownMenuContent>

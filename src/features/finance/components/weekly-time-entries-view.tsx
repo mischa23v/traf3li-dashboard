@@ -223,7 +223,7 @@ export function WeeklyTimeEntriesView() {
                             <div>
                                 <div className="flex items-center gap-3 mb-3">
                                     <Badge className="bg-white/20 hover:bg-white/30 text-white border-0 backdrop-blur-sm">
-                                        <Calendar className="w-3 h-3 ml-2" />
+                                        <Calendar className="w-3 h-3 ms-2" />
                                         عرض أسبوعي
                                     </Badge>
                                 </div>
@@ -237,12 +237,12 @@ export function WeeklyTimeEntriesView() {
                                     variant="outline"
                                     className="bg-white/10 border-white/20 text-white hover:bg-white/20 rounded-xl"
                                 >
-                                    <Download className="w-4 h-4 ml-2" />
+                                    <Download className="w-4 h-4 ms-2" />
                                     تصدير
                                 </Button>
                                 <Button asChild className="bg-white text-purple-700 hover:bg-purple-50 rounded-xl shadow-lg">
                                     <Link to="/dashboard/finance/time-tracking/new">
-                                        <Plus className="w-4 h-4 ml-2" />
+                                        <Plus className="w-4 h-4 ms-2" />
                                         إضافة سجل
                                     </Link>
                                 </Button>
@@ -308,7 +308,7 @@ export function WeeklyTimeEntriesView() {
                                     <p className="text-slate-500 mb-4">ابدأ بتسجيل وقتك</p>
                                     <Button asChild className="bg-purple-600 hover:bg-purple-700">
                                         <Link to="/dashboard/finance/time-tracking/new">
-                                            <Plus className="w-4 h-4 ml-2" />
+                                            <Plus className="w-4 h-4 ms-2" />
                                             إضافة سجل جديد
                                         </Link>
                                     </Button>

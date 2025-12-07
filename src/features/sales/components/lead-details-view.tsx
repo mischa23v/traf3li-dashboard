@@ -233,7 +233,7 @@ export default function LeadDetailsView() {
                     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
                         <Button asChild variant="ghost" className="text-slate-600 hover:text-navy">
                             <Link to="/dashboard/sales/leads">
-                                <ArrowRight className="h-4 w-4 ml-2" />
+                                <ArrowRight className="h-4 w-4 ms-2" />
                                 العودة للعملاء المحتملين
                             </Link>
                         </Button>
@@ -242,14 +242,14 @@ export default function LeadDetailsView() {
                                 variant="outline"
                                 onClick={() => setShowActivityDialog(true)}
                             >
-                                <Plus className="h-4 w-4 ml-2" />
+                                <Plus className="h-4 w-4 ms-2" />
                                 إضافة نشاط
                             </Button>
                             <Button
                                 variant="outline"
                                 onClick={() => setShowStageDialog(true)}
                             >
-                                <TrendingUp className="h-4 w-4 ml-2" />
+                                <TrendingUp className="h-4 w-4 ms-2" />
                                 تغيير المرحلة
                             </Button>
                             {lead.stage !== 'won' && lead.stage !== 'lost' && (
@@ -257,13 +257,13 @@ export default function LeadDetailsView() {
                                     onClick={() => setShowConvertDialog(true)}
                                     className="bg-emerald-600 hover:bg-emerald-700"
                                 >
-                                    <UserCheck className="h-4 w-4 ml-2" />
+                                    <UserCheck className="h-4 w-4 ms-2" />
                                     تحويل لعميل
                                 </Button>
                             )}
                             <Button asChild variant="outline">
                                 <Link to={`/dashboard/sales/leads/${leadId}/edit`}>
-                                    <Edit className="h-4 w-4 ml-2" />
+                                    <Edit className="h-4 w-4 ms-2" />
                                     تعديل
                                 </Link>
                             </Button>
@@ -331,7 +331,7 @@ export default function LeadDetailsView() {
                                         <div>
                                             <p className="text-sm text-slate-500 mb-1">المرحلة</p>
                                             <Badge className={cn("font-normal border", stageConfig.color)}>
-                                                <StageIcon className="h-3 w-3 ml-1" />
+                                                <StageIcon className="h-3 w-3 ms-1" />
                                                 {stageConfig.label}
                                             </Badge>
                                         </div>
@@ -425,7 +425,7 @@ export default function LeadDetailsView() {
                                     {lead.activities && lead.activities.length > 0 ? (
                                         <div className="space-y-4">
                                             {lead.activities.map((activity) => (
-                                                <div key={activity._id} className="flex gap-4 border-r-2 border-emerald-500 pr-4">
+                                                <div key={activity._id} className="flex gap-4 border-r-2 border-emerald-500 pe-4">
                                                     <div className="flex-1">
                                                         <div className="flex items-center gap-2 mb-1">
                                                             <Badge variant="outline" className="text-xs">
@@ -518,7 +518,7 @@ export default function LeadDetailsView() {
                             onClick={handleAddActivity}
                             disabled={!activityForm.description || addActivityMutation.isPending}
                         >
-                            {addActivityMutation.isPending && <Loader2 className="h-4 w-4 ml-2 animate-spin" />}
+                            {addActivityMutation.isPending && <Loader2 className="h-4 w-4 ms-2 animate-spin" />}
                             إضافة
                         </Button>
                     </DialogFooter>
@@ -587,7 +587,7 @@ export default function LeadDetailsView() {
                             disabled={convertLeadMutation.isPending}
                             className="bg-emerald-600 hover:bg-emerald-700"
                         >
-                            {convertLeadMutation.isPending && <Loader2 className="h-4 w-4 ml-2 animate-spin" />}
+                            {convertLeadMutation.isPending && <Loader2 className="h-4 w-4 ms-2 animate-spin" />}
                             تحويل لعميل
                         </Button>
                     </DialogFooter>

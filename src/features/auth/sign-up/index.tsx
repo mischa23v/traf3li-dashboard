@@ -523,7 +523,7 @@ export function SignUp() {
                       <div className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400"><Icons.User /></div>
                       <input type="text" value={formData.username}
                         onChange={(e) => updateField('username', e.target.value.replace(/[^a-zA-Z0-9_]/g, '').toLowerCase())}
-                        className={`w-full h-12 pr-12 pl-4 rounded-xl border bg-slate-50 text-[#0f172a] outline-none transition-all ${errors.username ? 'border-red-400' : 'border-slate-200 focus:border-[#0f172a]'}`}
+                        className={`w-full h-12 pe-12 ps-4 rounded-xl border bg-slate-50 text-[#0f172a] outline-none transition-all ${errors.username ? 'border-red-400' : 'border-slate-200 focus:border-[#0f172a]'}`}
                         dir="ltr" style={{ textAlign: 'left' }} maxLength={20} />
                     </div>
                     {errors.username && <p className="text-red-500 text-xs mt-1">{errors.username}</p>}
@@ -534,7 +534,7 @@ export function SignUp() {
                     <div className="relative">
                       <div className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400"><Icons.Mail /></div>
                       <input type="email" value={formData.email} onChange={(e) => updateField('email', e.target.value)}
-                        className={`w-full h-12 pr-12 pl-4 rounded-xl border bg-slate-50 text-[#0f172a] outline-none transition-all ${errors.email ? 'border-red-400' : 'border-slate-200 focus:border-[#0f172a]'}`}
+                        className={`w-full h-12 pe-12 ps-4 rounded-xl border bg-slate-50 text-[#0f172a] outline-none transition-all ${errors.email ? 'border-red-400' : 'border-slate-200 focus:border-[#0f172a]'}`}
                         dir="ltr" style={{ textAlign: 'left' }} />
                     </div>
                     {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
@@ -545,7 +545,7 @@ export function SignUp() {
                     <div className="relative">
                       <div className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400"><Icons.Lock /></div>
                       <input type={showPassword ? 'text' : 'password'} value={formData.password} onChange={(e) => updateField('password', e.target.value)}
-                        className={`w-full h-12 pr-12 pl-12 rounded-xl border bg-slate-50 text-[#0f172a] outline-none transition-all ${errors.password ? 'border-red-400' : 'border-slate-200 focus:border-[#0f172a]'}`}
+                        className={`w-full h-12 pe-12 ps-12 rounded-xl border bg-slate-50 text-[#0f172a] outline-none transition-all ${errors.password ? 'border-red-400' : 'border-slate-200 focus:border-[#0f172a]'}`}
                         dir="ltr" style={{ textAlign: 'left' }} />
                       <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
                         {showPassword ? <Icons.EyeOff /> : <Icons.Eye />}
@@ -559,7 +559,7 @@ export function SignUp() {
                     <div className="relative">
                       <div className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400"><Icons.Lock /></div>
                       <input type={showConfirmPassword ? 'text' : 'password'} value={formData.confirmPassword} onChange={(e) => updateField('confirmPassword', e.target.value)}
-                        className={`w-full h-12 pr-12 pl-12 rounded-xl border bg-slate-50 text-[#0f172a] outline-none transition-all ${errors.confirmPassword ? 'border-red-400' : 'border-slate-200 focus:border-[#0f172a]'}`}
+                        className={`w-full h-12 pe-12 ps-12 rounded-xl border bg-slate-50 text-[#0f172a] outline-none transition-all ${errors.confirmPassword ? 'border-red-400' : 'border-slate-200 focus:border-[#0f172a]'}`}
                         dir="ltr" style={{ textAlign: 'left' }} />
                       <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
                         {showConfirmPassword ? <Icons.EyeOff /> : <Icons.Eye />}
@@ -574,7 +574,7 @@ export function SignUp() {
                       <div className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400"><Icons.Phone /></div>
                       <input type="tel" value={formData.phone}
                         onChange={(e) => updateField('phone', e.target.value.replace(/\D/g, '').slice(0, 10))}
-                        className={`w-full h-12 pr-12 pl-4 rounded-xl border bg-slate-50 text-[#0f172a] outline-none transition-all ${errors.phone ? 'border-red-400' : 'border-slate-200 focus:border-[#0f172a]'}`}
+                        className={`w-full h-12 pe-12 ps-4 rounded-xl border bg-slate-50 text-[#0f172a] outline-none transition-all ${errors.phone ? 'border-red-400' : 'border-slate-200 focus:border-[#0f172a]'}`}
                         placeholder="05XXXXXXXX" dir="ltr" style={{ textAlign: 'left' }} maxLength={10} />
                     </div>
                     {errors.phone && <p className="text-red-500 text-xs mt-1">{errors.phone}</p>}
@@ -740,7 +740,7 @@ export function SignUp() {
                           className={`px-3 py-1.5 rounded-full border-2 text-sm font-medium transition-all ${
                             formData.specializations.includes(spec.id) ? 'border-emerald-500 bg-emerald-50 text-emerald-700' : 'border-slate-200 text-slate-600 hover:border-slate-300'
                           }`}>
-                          {formData.specializations.includes(spec.id) && <span className="ml-1">✓</span>}
+                          {formData.specializations.includes(spec.id) && <span className="ms-1">✓</span>}
                           {spec.name}
                         </button>
                       ))}
@@ -802,7 +802,7 @@ export function SignUp() {
                       {[{ v: 'consultation', l: 'استشارات' }, { v: 'litigation', l: 'ترافع' }, { v: 'both', l: 'كلاهما' }].map(opt => (
                         <button key={opt.v} type="button" onClick={() => updateField('serviceType', opt.v)}
                           className={`w-full p-3 rounded-xl border-2 text-right font-medium transition-all text-sm ${formData.serviceType === opt.v ? 'border-emerald-500 bg-emerald-50 text-emerald-700' : 'border-slate-200 text-slate-600'}`}>
-                          {formData.serviceType === opt.v && <span className="ml-2">✓</span>}{opt.l}
+                          {formData.serviceType === opt.v && <span className="ms-2">✓</span>}{opt.l}
                         </button>
                       ))}
                     </div>
@@ -815,7 +815,7 @@ export function SignUp() {
                       {[{ v: 'hourly', l: 'بالساعة' }, { v: 'fixed', l: 'مبلغ ثابت' }, { v: 'success', l: 'نسبة نجاح' }].map(opt => (
                         <button key={opt.v} type="button" onClick={() => toggleArrayItem('pricingModel', opt.v)}
                           className={`px-4 py-2 rounded-full border-2 text-sm font-medium transition-all ${formData.pricingModel.includes(opt.v) ? 'border-emerald-500 bg-emerald-50 text-emerald-700' : 'border-slate-200 text-slate-600'}`}>
-                          {formData.pricingModel.includes(opt.v) && <span className="ml-1">✓</span>}{opt.l}
+                          {formData.pricingModel.includes(opt.v) && <span className="ms-1">✓</span>}{opt.l}
                         </button>
                       ))}
                     </div>

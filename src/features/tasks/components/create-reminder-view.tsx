@@ -570,7 +570,7 @@ export function CreateReminderView() {
                                                                 onClick={() => toggleChannel(channel.value)}
                                                                 className="rounded-full"
                                                             >
-                                                                <Icon className="w-4 h-4 ml-1" />
+                                                                <Icon className="w-4 h-4 ms-1" />
                                                                 {channel.label}
                                                             </Button>
                                                         )

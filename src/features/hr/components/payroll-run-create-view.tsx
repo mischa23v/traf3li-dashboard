@@ -282,8 +282,8 @@ export function PayrollRunCreateView() {
         try {
             const result = await createRunMutation.mutateAsync(data)
             navigate({ to: '/dashboard/hr/payroll-runs/$runId', params: { runId: result._id } })
-        } catch (error) {
-            console.error('Error creating payroll run:', error)
+        } catch {
+            // Error is handled by mutation's onError callback
         }
     }
 
