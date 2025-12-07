@@ -304,11 +304,34 @@ export function useSidebarData(): SidebarData {
           icon: UserCog,
           module: 'hr',
           items: [
+            // Core HR
             {
               title: 'الموظفين',
               url: '/dashboard/hr/employees',
               module: 'hr',
             },
+            {
+              title: 'الهيكل التنظيمي',
+              url: '/dashboard/hr/organizational-structure',
+              module: 'hr',
+            },
+            {
+              title: 'الوصف الوظيفي والمناصب',
+              url: '/dashboard/hr/job-positions',
+              module: 'hr',
+            },
+            // Time & Attendance
+            {
+              title: 'الحضور والانصراف',
+              url: '/dashboard/hr/attendance',
+              module: 'hr',
+            },
+            {
+              title: 'الإجازات',
+              url: '/dashboard/hr/leave',
+              module: 'hr',
+            },
+            // Payroll & Compensation
             {
               title: 'قسائم الرواتب',
               url: '/dashboard/hr/payroll',
@@ -320,30 +343,16 @@ export function useSidebarData(): SidebarData {
               module: 'hr',
             },
             {
-              title: 'الإجازات',
-              url: '/dashboard/hr/leave',
+              title: 'التعويضات والمكافآت',
+              url: '/dashboard/hr/compensation',
               module: 'hr',
             },
             {
-              title: 'الحضور',
-              url: '/dashboard/hr/attendance',
+              title: 'المزايا',
+              url: '/dashboard/hr/benefits',
               module: 'hr',
             },
-            {
-              title: 'تقييم الأداء',
-              url: '/dashboard/hr/performance',
-              module: 'hr',
-            },
-            {
-              title: 'التوظيف',
-              url: '/dashboard/hr/recruitment/jobs',
-              module: 'hr',
-            },
-            {
-              title: 'المتقدمين',
-              url: '/dashboard/hr/recruitment/applicants',
-              module: 'hr',
-            },
+            // Financial
             {
               title: 'السلف',
               url: '/dashboard/hr/advances',
@@ -359,9 +368,10 @@ export function useSidebarData(): SidebarData {
               url: '/dashboard/hr/expense-claims',
               module: 'hr',
             },
+            // Performance & Development
             {
-              title: 'الأصول والمعدات',
-              url: '/dashboard/hr/asset-assignment',
+              title: 'تقييم الأداء',
+              url: '/dashboard/hr/performance',
               module: 'hr',
             },
             {
@@ -370,8 +380,19 @@ export function useSidebarData(): SidebarData {
               module: 'hr',
             },
             {
-              title: 'المزايا',
-              url: '/dashboard/hr/benefits',
+              title: 'تخطيط التعاقب الوظيفي',
+              url: '/dashboard/hr/succession-planning',
+              module: 'hr',
+            },
+            // Recruitment & Lifecycle
+            {
+              title: 'التوظيف',
+              url: '/dashboard/hr/recruitment/jobs',
+              module: 'hr',
+            },
+            {
+              title: 'المتقدمين',
+              url: '/dashboard/hr/recruitment/applicants',
               module: 'hr',
             },
             {
@@ -382,6 +403,40 @@ export function useSidebarData(): SidebarData {
             {
               title: 'إنهاء الخدمة',
               url: '/dashboard/hr/offboarding',
+              module: 'hr',
+            },
+            // Assets & Documents
+            {
+              title: 'الأصول والمعدات',
+              url: '/dashboard/hr/asset-assignment',
+              module: 'hr',
+            },
+            {
+              title: 'الوثائق والعقود',
+              url: '/dashboard/hr/documents',
+              module: 'hr',
+            },
+            // Communications
+            {
+              title: 'الإعلانات والتواصل',
+              url: '/dashboard/hr/announcements',
+              module: 'hr',
+            },
+            // Disciplinary & Grievances
+            {
+              title: 'المخالفات والإجراءات التأديبية',
+              url: '/dashboard/hr/violations',
+              module: 'hr',
+            },
+            {
+              title: 'الشكاوى والنزاعات',
+              url: '/dashboard/hr/grievances',
+              module: 'hr',
+            },
+            // Reports
+            {
+              title: 'التقارير والتحليلات',
+              url: '/dashboard/hr/reports',
               module: 'hr',
             },
           ],
