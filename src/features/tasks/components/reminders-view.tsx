@@ -156,12 +156,12 @@ export function RemindersView() {
     }
 
     const handleDeleteReminder = async (reminderId: string) => {
-        if (confirm('هل أنت متأكد من حذف هذا التذكير؟')) {
+        if (confirm(t('reminders.list.deleteConfirm'))) {
             try {
                 await deleteReminder(reminderId)
-                toast.success('تم حذف التذكير بنجاح')
+                toast.success(t('reminders.toast.deleteSingleSuccess'))
             } catch (error) {
-                toast.error('فشل حذف التذكير')
+                toast.error(t('reminders.toast.deleteFailed'))
             }
         }
     }
@@ -202,11 +202,12 @@ export function RemindersView() {
 
         return remindersData.data.map((reminder: any) => {
             const reminderDate = reminder.reminderDateTime || reminder.reminderDate
+            const dateLocale = i18n.language === 'ar' ? 'ar-SA' : 'en-US'
             return {
                 id: reminder._id,
-                title: reminder.title || reminder.description || 'تذكير بدون عنوان',
-                date: reminderDate ? new Date(reminderDate).toLocaleDateString('ar-SA', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) : 'غير محدد',
-                time: reminderDate ? new Date(reminderDate).toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' }) : 'غير محدد',
+                title: reminder.title || reminder.description || t('reminders.list.untitledReminder'),
+                date: reminderDate ? new Date(reminderDate).toLocaleDateString(dateLocale, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) : t('reminders.list.notSet'),
+                time: reminderDate ? new Date(reminderDate).toLocaleTimeString(dateLocale, { hour: '2-digit', minute: '2-digit' }) : t('reminders.list.notSet'),
                 priority: reminder.priority || 'medium',
                 status: reminder.status || 'pending',
                 reminderType: reminder.reminderType || reminder.type || 'general',
@@ -236,16 +237,16 @@ export function RemindersView() {
     const handleDeleteSelected = async () => {
         if (selectedReminderIds.length === 0) return
 
-        if (confirm(`هل أنت متأكد من حذف ${selectedReminderIds.length} تذكير؟`)) {
+        if (confirm(t('reminders.list.deleteMultipleConfirm', { count: selectedReminderIds.length }))) {
             try {
                 // Loop delete since no bulk API yet
                 await Promise.all(selectedReminderIds.map(id => deleteReminder(id)))
-                toast.success(`تم حذف ${selectedReminderIds.length} تذكير بنجاح`)
+                toast.success(t('reminders.toast.deleteSuccess', { count: selectedReminderIds.length }))
                 setIsSelectionMode(false)
                 setSelectedReminderIds([])
             } catch (error) {
                 console.error("Failed to delete reminders", error)
-                toast.error("حدث خطأ أثناء حذف بعض التذكيرات")
+                toast.error(t('reminders.toast.deleteError'))
             }
         }
     }
@@ -598,17 +599,17 @@ export function RemindersView() {
             <Dialog open={!!delegateReminderId} onOpenChange={(open) => !open && setDelegateReminderId(null)}>
                 <DialogContent className="sm:max-w-[425px]">
                     <DialogHeader>
-                        <DialogTitle>تفويض التذكير</DialogTitle>
+                        <DialogTitle>{t('reminders.delegate.title')}</DialogTitle>
                         <DialogDescription>
-                            اختر الشخص الذي تريد تفويض التذكير إليه
+                            {t('reminders.delegate.description')}
                         </DialogDescription>
                     </DialogHeader>
                     <div className="grid gap-4 py-4">
                         <div className="space-y-2">
-                            <label className="text-sm font-medium">تفويض إلى</label>
+                            <label className="text-sm font-medium">{t('reminders.delegate.delegateTo')}</label>
                             <Select value={delegateTo} onValueChange={setDelegateTo}>
                                 <SelectTrigger className="rounded-xl">
-                                    <SelectValue placeholder="اختر عضو الفريق" />
+                                    <SelectValue placeholder={t('reminders.delegate.selectTeamMember')} />
                                 </SelectTrigger>
                                 <SelectContent>
                                     {teamMembers && teamMembers.length > 0 ? (
@@ -619,16 +620,16 @@ export function RemindersView() {
                                         ))
                                     ) : (
                                         <div className="text-center py-4 text-slate-500 text-sm">
-                                            لا يوجد أعضاء فريق
+                                            {t('reminders.delegate.noTeamMembers')}
                                         </div>
                                     )}
                                 </SelectContent>
                             </Select>
                         </div>
                         <div className="space-y-2">
-                            <label className="text-sm font-medium">ملاحظة (اختياري)</label>
+                            <label className="text-sm font-medium">{t('reminders.delegate.note')}</label>
                             <Textarea
-                                placeholder="أضف ملاحظة للتفويض..."
+                                placeholder={t('reminders.delegate.notePlaceholder')}
                                 value={delegateNote}
                                 onChange={(e) => setDelegateNote(e.target.value)}
                                 className="rounded-xl"
@@ -637,7 +638,7 @@ export function RemindersView() {
                     </div>
                     <DialogFooter>
                         <Button variant="outline" onClick={() => setDelegateReminderId(null)}>
-                            إلغاء
+                            {t('reminders.delegate.cancel')}
                         </Button>
                         <Button
                             onClick={handleDelegateReminder}
@@ -647,10 +648,10 @@ export function RemindersView() {
                             {delegateReminderMutation.isPending ? (
                                 <>
                                     <Loader2 className="h-4 w-4 ml-2 animate-spin" />
-                                    جاري التفويض...
+                                    {t('reminders.delegate.delegating')}
                                 </>
                             ) : (
-                                'تفويض'
+                                t('reminders.delegate.delegate')
                             )}
                         </Button>
                     </DialogFooter>

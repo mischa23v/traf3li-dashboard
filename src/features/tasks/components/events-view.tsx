@@ -212,15 +212,15 @@ export function EventsView() {
     const handleDeleteSelected = async () => {
         if (selectedEventIds.length === 0) return
 
-        if (confirm(`هل أنت متأكد من حذف ${selectedEventIds.length} حدث؟`)) {
+        if (confirm(t('events.list.deleteMultipleConfirm', { count: selectedEventIds.length }))) {
             try {
                 await Promise.all(selectedEventIds.map(id => deleteEvent(id)))
-                toast.success(`تم حذف ${selectedEventIds.length} حدث بنجاح`)
+                toast.success(t('events.toast.deleteSuccess', { count: selectedEventIds.length }))
                 setIsSelectionMode(false)
                 setSelectedEventIds([])
             } catch (error) {
                 console.error("Failed to delete events", error)
-                toast.error("حدث خطأ أثناء حذف بعض الأحداث")
+                toast.error(t('events.toast.deleteError'))
             }
         }
     }
@@ -228,7 +228,7 @@ export function EventsView() {
     const handleRSVP = (id: string, status: 'accepted' | 'declined') => {
         rsvpEvent({ id, status }, {
             onSuccess: () => {
-                toast.success(status === 'accepted' ? 'تم تأكيد الحضور' : 'تم الاعتذار عن الحضور')
+                toast.success(status === 'accepted' ? t('events.toast.rsvpAccepted') : t('events.toast.rsvpDeclined'))
             }
         })
     }
@@ -601,14 +601,14 @@ export function EventsView() {
                     </div>
                     <DialogFooter>
                         <Button variant="outline" onClick={() => setPostponeEventId(null)}>
-                            إلغاء
+                            {t('events.postpone.cancel')}
                         </Button>
                         <Button
                             onClick={handlePostponeEvent}
                             disabled={!postponeDate || !postponeTime || postponeEventMutation.isPending}
                             className="bg-blue-500 hover:bg-blue-600"
                         >
-                            {postponeEventMutation.isPending ? 'جاري التأجيل...' : 'تأجيل'}
+                            {postponeEventMutation.isPending ? t('events.postpone.postponing') : t('events.postpone.postpone')}
                         </Button>
                     </DialogFooter>
                 </DialogContent>

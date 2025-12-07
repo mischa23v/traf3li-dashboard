@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, Link, useSearch } from '@tanstack/react-router';
+import { useTranslation } from 'react-i18next';
 import { useAuthStore } from '@/stores/auth-store';
 
 // ============================================
@@ -57,6 +58,7 @@ const Icons = {
 // MAIN COMPONENT
 // ============================================
 export function SignIn() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { login } = useAuthStore();
   const search = useSearch({ from: '/(auth)/sign-in' });
@@ -87,13 +89,13 @@ export function SignIn() {
     const newErrors: Record<string, string> = {};
 
     if (!formData.usernameOrEmail.trim()) {
-      newErrors.usernameOrEmail = 'الحقل مطلوب';
+      newErrors.usernameOrEmail = t('auth.signIn.validation.usernameOrEmailRequired');
     }
 
     if (!formData.password) {
-      newErrors.password = 'الحقل مطلوب';
+      newErrors.password = t('auth.signIn.validation.passwordRequired');
     } else if (formData.password.length < 6) {
-      newErrors.password = 'يجب أن تكون مكونة من 6 خانات على الأقل';
+      newErrors.password = t('auth.signIn.validation.passwordMinLength');
     }
 
     setErrors(newErrors);
@@ -121,7 +123,7 @@ export function SignIn() {
       const redirectTo = search.redirect || '/';
       navigate({ to: redirectTo });
     } catch (err: any) {
-      setApiError(err.message || 'حدث خطأ، يرجى المحاولة مرة أخرى');
+      setApiError(err.message || t('common.error'));
     } finally {
       setIsLoading(false);
     }
@@ -141,8 +143,8 @@ export function SignIn() {
             <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-[#F8F9FA] text-[#0f172a] mb-6">
               <Icons.TrafliLogo />
             </div>
-            <h1 className="text-3xl font-bold text-[#0f172a] mb-2">تسجيل الدخول</h1>
-            <p className="text-slate-500 text-lg">أدخل بياناتك للدخول إلى حسابك</p>
+            <h1 className="text-3xl font-bold text-[#0f172a] mb-2">{t('auth.signIn.title')}</h1>
+            <p className="text-slate-500 text-lg">{t('auth.signIn.subtitle')}</p>
           </div>
 
           {/* Card */}
@@ -160,7 +162,7 @@ export function SignIn() {
               {/* Username or Email Field */}
               <div>
                 <label className="block text-sm font-medium text-[#0f172a] mb-2">
-                  اسم المستخدم أو البريد الإلكتروني <span className="text-red-500">*</span>
+                  {t('auth.signIn.usernameOrEmail')} <span className="text-red-500">*</span>
                 </label>
                 <div className="relative" dir="ltr">
                   <div className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
@@ -188,13 +190,13 @@ export function SignIn() {
               <div>
                 <div className="flex items-center justify-between mb-2">
                   <label className="block text-sm font-medium text-[#0f172a]">
-                    كلمة المرور <span className="text-red-500">*</span>
+                    {t('auth.signIn.password')} <span className="text-red-500">*</span>
                   </label>
                   <a
                     href="/forgot-password"
                     className="text-sm text-emerald-600 hover:text-emerald-700 font-medium"
                   >
-                    نسيت كلمة المرور؟
+                    {t('auth.signIn.forgotPassword')}
                   </a>
                 </div>
                 <div className="relative" dir="ltr">
@@ -236,10 +238,10 @@ export function SignIn() {
                 {isLoading ? (
                   <>
                     <Icons.Spinner />
-                    جارٍ تسجيل الدخول...
+                    {t('auth.signIn.signingIn')}
                   </>
                 ) : (
-                  'تسجيل الدخول'
+                  t('auth.signIn.signInButton')
                 )}
               </button>
 
@@ -249,7 +251,7 @@ export function SignIn() {
                   <span className="w-full border-t border-slate-200" />
                 </div>
                 <div className="relative flex justify-center text-xs uppercase">
-                  <span className="bg-white px-4 text-slate-400">أو</span>
+                  <span className="bg-white px-4 text-slate-400">{t('auth.signIn.orContinueWith')}</span>
                 </div>
               </div>
 
@@ -261,20 +263,20 @@ export function SignIn() {
                 className="w-full h-12 rounded-xl border-2 border-slate-200 bg-white text-[#0f172a] font-medium hover:bg-slate-50 hover:border-slate-300 transition-all flex items-center justify-center gap-3 disabled:opacity-70 disabled:cursor-not-allowed"
               >
                 <Icons.Google />
-                المتابعة باستخدام Google
+                {t('auth.signIn.google')}
               </button>
             </form>
 
             {/* Footer */}
             <div className="px-6 py-4 bg-slate-50 border-t border-slate-100">
               <p className="text-center text-sm text-slate-500">
-                بتسجيل الدخول، أنت توافق على{' '}
+                {t('auth.signIn.termsPrefix')}{' '}
                 <Link to="/terms" className="text-emerald-600 hover:text-emerald-700 font-medium">
-                  الشروط والأحكام
+                  {t('auth.signIn.termsOfService')}
                 </Link>{' '}
-                و{' '}
+                {t('auth.signIn.and')}{' '}
                 <Link to="/privacy" className="text-emerald-600 hover:text-emerald-700 font-medium">
-                  سياسة الخصوصية
+                  {t('auth.signIn.privacyPolicy')}
                 </Link>
               </p>
             </div>
@@ -282,9 +284,9 @@ export function SignIn() {
 
           {/* Sign Up Link */}
           <p className="text-center text-slate-500 mt-6">
-            ليس لديك حساب؟{' '}
+            {t('auth.signIn.noAccount')}{' '}
             <Link to="/sign-up" className="text-emerald-600 hover:text-emerald-700 font-bold">
-              إنشاء حساب جديد
+              {t('auth.signIn.registerNow')}
             </Link>
           </p>
         </div>
