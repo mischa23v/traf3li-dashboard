@@ -581,7 +581,7 @@ export function GrievancesDetailsView() {
                     <Card className="rounded-2xl border-slate-100">
                       <CardHeader className="pb-4">
                         <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                          <User className="w-5 h-5 text-emerald-500" />
+                          <User className="w-5 h-5 text-emerald-500" aria-hidden="true" />
                           مقدم الشكوى
                         </CardTitle>
                       </CardHeader>

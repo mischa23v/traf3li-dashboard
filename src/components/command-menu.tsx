@@ -47,7 +47,7 @@ export function CommandMenu() {
                       }}
                     >
                       <div className='flex size-4 items-center justify-center'>
-                        <ArrowRight className='text-muted-foreground/80 size-2' />
+                        <ArrowRight className='text-muted-foreground/80 size-2' aria-hidden='true' />
                       </div>
                       {navItem.title}
                     </CommandItem>
@@ -62,9 +62,9 @@ export function CommandMenu() {
                     }}
                   >
                     <div className='flex size-4 items-center justify-center'>
-                      <ArrowRight className='text-muted-foreground/80 size-2' />
+                      <ArrowRight className='text-muted-foreground/80 size-2' aria-hidden='true' />
                     </div>
-                    {navItem.title} <ChevronRight /> {subItem.title}
+                    {navItem.title} <ChevronRight aria-hidden='true' /> {subItem.title}
                   </CommandItem>
                 ))
               })}
@@ -73,14 +73,14 @@ export function CommandMenu() {
           <CommandSeparator />
           <CommandGroup heading='Theme'>
             <CommandItem onSelect={() => runCommand(() => setTheme('light'))}>
-              <Sun /> <span>Light</span>
+              <Sun aria-hidden='true' /> <span>Light</span>
             </CommandItem>
             <CommandItem onSelect={() => runCommand(() => setTheme('dark'))}>
-              <Moon className='scale-90' />
+              <Moon className='scale-90' aria-hidden='true' />
               <span>Dark</span>
             </CommandItem>
             <CommandItem onSelect={() => runCommand(() => setTheme('system'))}>
-              <Laptop />
+              <Laptop aria-hidden='true' />
               <span>System</span>
             </CommandItem>
           </CommandGroup>

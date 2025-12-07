@@ -493,7 +493,7 @@ export function LeaveRequestCreateView() {
                             className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl px-6"
                             disabled={createRequestMutation.isPending}
                         >
-                            <Save className="w-4 h-4 ms-2" />
+                            <Save className="w-4 h-4 ms-2" aria-hidden="true" />
                             {createRequestMutation.isPending ? 'جاري الحفظ...' : 'تقديم الطلب'}
                         </Button>
                     </div>
@@ -642,7 +642,7 @@ export function LeaveRequestCreateView() {
                             {checkConflictsMutation.data?.hasConflicts && (
                                 <div className="bg-amber-50 rounded-xl p-4 border border-amber-200">
                                     <div className="flex items-center gap-2 mb-2">
-                                        <AlertTriangle className="w-5 h-5 text-amber-600" />
+                                        <AlertTriangle className="w-5 h-5 text-amber-600" aria-hidden="true" />
                                         <span className="font-medium text-amber-800">تحذير: يوجد تعارض</span>
                                     </div>
                                     {checkConflictsMutation.data.conflicts.map((conflict, idx) => (
@@ -673,7 +673,7 @@ export function LeaveRequestCreateView() {
                     <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden mb-6">
                         <CardHeader className="pb-4">
                             <CardTitle className="text-lg font-bold text-navy flex items-center gap-2">
-                                <FileText className="w-5 h-5 text-emerald-600" />
+                                <FileText className="w-5 h-5 text-emerald-600" aria-hidden="true" />
                                 سبب الإجازة
                             </CardTitle>
                         </CardHeader>
@@ -702,7 +702,7 @@ export function LeaveRequestCreateView() {
                             {/* Emergency Toggle */}
                             <div className="flex items-center justify-between p-3 bg-red-50 rounded-xl">
                                 <div className="flex items-center gap-2">
-                                    <AlertTriangle className="w-5 h-5 text-red-600" />
+                                    <AlertTriangle className="w-5 h-5 text-red-600" aria-hidden="true" />
                                     <div>
                                         <Label className="text-red-700">إجازة طارئة</Label>
                                         <p className="text-xs text-red-600">في حالة الطوارئ فقط</p>
@@ -979,7 +979,7 @@ export function LeaveRequestCreateView() {
                                         {selectedLeaveType.requiresDoc && (
                                             <div className="bg-amber-50 rounded-xl p-4 border border-amber-200">
                                                 <div className="flex items-center gap-2">
-                                                    <FileText className="w-5 h-5 text-amber-600" />
+                                                    <FileText className="w-5 h-5 text-amber-600" aria-hidden="true" />
                                                     <span className="font-medium text-amber-800">
                                                         مستند مطلوب: {selectedLeaveType.docType}
                                                     </span>
@@ -1102,7 +1102,7 @@ export function LeaveRequestCreateView() {
                                 <CardHeader className="cursor-pointer hover:bg-slate-50 transition-colors pb-4">
                                     <div className="flex items-center justify-between">
                                         <CardTitle className="text-lg font-bold text-navy flex items-center gap-2">
-                                            <FileText className="w-5 h-5 text-slate-600" />
+                                            <FileText className="w-5 h-5 text-slate-600" aria-hidden="true" />
                                             ملاحظات إضافية
                                         </CardTitle>
                                         <ChevronDown className={`w-5 h-5 text-slate-500 transition-transform ${openSections.notes ? 'rotate-180' : ''}`} />
@@ -1140,7 +1140,7 @@ export function LeaveRequestCreateView() {
                             className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl px-8"
                             disabled={createRequestMutation.isPending}
                         >
-                            <Save className="w-4 h-4 ms-2" />
+                            <Save className="w-4 h-4 ms-2" aria-hidden="true" />
                             {createRequestMutation.isPending ? 'جاري الحفظ...' : 'تقديم طلب الإجازة'}
                         </Button>
                     </div>

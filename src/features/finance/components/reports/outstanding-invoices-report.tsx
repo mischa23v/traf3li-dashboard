@@ -199,7 +199,7 @@ export function OutstandingInvoicesReport() {
           <CardContent className="pt-6">
             <div className="flex items-center gap-4">
               <div className="p-3 bg-red-100 rounded-lg">
-                <AlertTriangle className="h-6 w-6 text-red-600" />
+                <AlertTriangle className="h-6 w-6 text-red-600" aria-hidden="true" />
               </div>
               <div>
                 <p className="text-sm text-slate-600">إجمالي المتأخر</p>

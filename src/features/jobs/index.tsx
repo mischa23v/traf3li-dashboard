@@ -120,7 +120,7 @@ export function MyServices() {
       case 'active':
         return <Badge className="bg-emerald-100 text-emerald-700 hover:bg-emerald-100 border-0"><CheckCircle className="h-3 w-3 me-1" />{isRTL ? 'نشط' : 'Active'}</Badge>
       case 'paused':
-        return <Badge className="bg-amber-100 text-amber-700 hover:bg-amber-100 border-0"><AlertCircle className="h-3 w-3 me-1" />{isRTL ? 'متوقف' : 'Paused'}</Badge>
+        return <Badge className="bg-amber-100 text-amber-700 hover:bg-amber-100 border-0"><AlertCircle className="h-3 w-3 me-1" aria-hidden="true" />{isRTL ? 'متوقف' : 'Paused'}</Badge>
       case 'draft':
         return <Badge className="bg-slate-100 text-slate-700 hover:bg-slate-100 border-0"><XCircle className="h-3 w-3 me-1" />{isRTL ? 'مسودة' : 'Draft'}</Badge>
       default:
@@ -147,11 +147,11 @@ export function MyServices() {
 
         <div className="ms-auto flex items-center gap-4">
           <div className="relative hidden md:block">
-            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
             <input
               type="text"
               placeholder={t('common.search', 'بحث...')}
-              className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+              className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
             />
           </div>
           <Button
@@ -178,7 +178,7 @@ export function MyServices() {
         {/* HERO BANNER */}
         <ProductivityHero badge={isRTL ? 'الوظائف والخدمات' : 'Jobs & Services'} title={isRTL ? 'خدماتي' : 'My Services'} type="jobs" hideButtons={true}>
           <Button className="bg-emerald-500 hover:bg-emerald-600 text-white h-10 px-5 rounded-xl shadow-lg shadow-emerald-500/20 border-0">
-            <Plus className="h-5 w-5 me-2" />
+            <Plus className="h-5 w-5 me-2" aria-hidden="true" />
             {isRTL ? 'إضافة خدمة جديدة' : 'Add New Service'}
           </Button>
         </ProductivityHero>
@@ -240,7 +240,7 @@ export function MyServices() {
               <CardContent className="p-4">
                 <div className="flex flex-col sm:flex-row gap-4">
                   <div className="relative flex-1">
-                    <Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                    <Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
                     <Input
                       placeholder={isRTL ? 'بحث في الخدمات...' : 'Search services...'}
                       value={searchQuery}
@@ -292,7 +292,7 @@ export function MyServices() {
                       </div>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-navy">
+                          <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-500 hover:text-navy">
                             <MoreVertical className="h-4 w-4" />
                           </Button>
                         </DropdownMenuTrigger>
@@ -302,7 +302,7 @@ export function MyServices() {
                             {isRTL ? 'عرض' : 'View'}
                           </DropdownMenuItem>
                           <DropdownMenuItem>
-                            <Edit className="h-4 w-4 me-2" />
+                            <Edit className="h-4 w-4 me-2" aria-hidden="true" />
                             {isRTL ? 'تعديل' : 'Edit'}
                           </DropdownMenuItem>
                           <DropdownMenuItem className="text-red-600">
@@ -326,9 +326,9 @@ export function MyServices() {
                       <div className="flex items-center font-bold text-navy">
                         <DollarSign className="h-4 w-4 me-1 text-emerald-500" />
                         <span>{service.price} {isRTL ? 'ر.س' : 'SAR'}</span>
-                        <span className="ms-1 text-slate-400 font-normal text-xs">/ {service.priceType === 'hourly' ? (isRTL ? 'ساعة' : 'hour') : (isRTL ? 'ثابت' : 'fixed')}</span>
+                        <span className="ms-1 text-slate-500 font-normal text-xs">/ {service.priceType === 'hourly' ? (isRTL ? 'ساعة' : 'hour') : (isRTL ? 'ثابت' : 'fixed')}</span>
                       </div>
-                      <div className="flex items-center gap-3 text-slate-400">
+                      <div className="flex items-center gap-3 text-slate-500">
                         <span className="flex items-center text-xs">
                           <Eye className="h-3.5 w-3.5 me-1" />
                           {service.views}

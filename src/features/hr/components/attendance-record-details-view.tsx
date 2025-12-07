@@ -100,7 +100,7 @@ export function AttendanceRecordDetailsView() {
     const icons: Record<AttendanceStatus, React.ReactNode> = {
       present: <CheckCircle className="w-3 h-3" />,
       absent: <XCircle className="w-3 h-3" />,
-      late: <AlertTriangle className="w-3 h-3" />,
+      late: <AlertTriangle className="w-3 h-3" aria-hidden="true" />,
       early_departure: <LogOut className="w-3 h-3" />,
       on_leave: <Calendar className="w-3 h-3" aria-hidden="true" />,
       weekend: <Coffee className="w-3 h-3" />,
@@ -121,7 +121,7 @@ export function AttendanceRecordDetailsView() {
     const icons: Record<CheckMethod, React.ReactNode> = {
       biometric: <Fingerprint className="w-4 h-4 text-purple-600" />,
       mobile: <Smartphone className="w-4 h-4 text-blue-600" />,
-      manual: <Users className="w-4 h-4 text-slate-600" />,
+      manual: <Users className="w-4 h-4 text-slate-600" aria-hidden="true" />,
       web: <Monitor className="w-4 h-4 text-emerald-600" />,
       card_swipe: <CreditCard className="w-4 h-4 text-amber-600" />,
     }
@@ -438,7 +438,7 @@ export function AttendanceRecordDetailsView() {
               <Card className="border-none shadow-sm bg-white rounded-2xl">
                 <CardHeader className="pb-3">
                   <CardTitle className="text-base font-bold text-navy flex items-center gap-2">
-                    <User className="w-4 h-4 text-emerald-600" />
+                    <User className="w-4 h-4 text-emerald-600" aria-hidden="true" />
                     معلومات الموظف
                   </CardTitle>
                 </CardHeader>
@@ -542,7 +542,7 @@ export function AttendanceRecordDetailsView() {
                 <Card className={`border-none shadow-sm rounded-2xl ${record.lateArrival.excused ? 'bg-emerald-50' : 'bg-amber-50'}`}>
                   <CardHeader className="pb-3">
                     <CardTitle className={`text-base font-bold flex items-center gap-2 ${record.lateArrival.excused ? 'text-emerald-800' : 'text-amber-800'}`}>
-                      <AlertTriangle className="w-4 h-4" />
+                      <AlertTriangle className="w-4 h-4" aria-hidden="true" />
                       تفاصيل التأخير
                     </CardTitle>
                   </CardHeader>
@@ -767,7 +767,7 @@ export function AttendanceRecordDetailsView() {
                 <CardHeader className="pb-3">
                   <div className="flex items-center justify-between">
                     <CardTitle className="text-base font-bold text-navy flex items-center gap-2">
-                      <AlertTriangle className="w-4 h-4 text-red-600" />
+                      <AlertTriangle className="w-4 h-4 text-red-600" aria-hidden="true" />
                       المخالفات المكتشفة
                     </CardTitle>
                     <Badge className="bg-red-100 text-red-700 border-0">

@@ -33,7 +33,7 @@ import { cn } from '@/lib/utils'
 import {
   Search, Bell, ArrowRight, User, Building2, Calendar,
   CheckCircle, ChevronDown, Users, Clock, FileText,
-  AlertTriangle, Shield, UserMinus, Briefcase
+  AlertTriangle, Shield, UserMinus, Briefcase, Lock
 } from 'lucide-react'
 import { EXIT_TYPE_LABELS, type ExitType, type CreateOffboardingData } from '@/services/offboardingService'
 
@@ -292,7 +292,7 @@ export function OffboardingCreateView() {
             <Card className="rounded-3xl shadow-sm border-slate-100">
               <CardHeader className="pb-4">
                 <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                  <User className="w-5 h-5 text-emerald-500" />
+                  <User className="w-5 h-5 text-emerald-500" aria-hidden="true" />
                   بيانات الموظف
                 </CardTitle>
               </CardHeader>
@@ -329,7 +329,7 @@ export function OffboardingCreateView() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label className="text-navy font-medium">
-                      رقم الهوية <span className="text-red-500">*</span>
+                      رقم الهوية<Lock className="h-3 w-3 text-slate-500 inline ms-1" aria-hidden="true" /> <span className="text-red-500">*</span>
                     </Label>
                     <Input
                       value={nationalId}
@@ -455,7 +455,7 @@ export function OffboardingCreateView() {
             <Card className="rounded-3xl shadow-sm border-slate-100">
               <CardHeader className="pb-4">
                 <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                  <Clock className="w-5 h-5 text-emerald-500" />
+                  <Clock className="w-5 h-5 text-emerald-500" aria-hidden="true" />
                   فترة الإشعار (المادة 75)
                 </CardTitle>
               </CardHeader>
@@ -495,7 +495,7 @@ export function OffboardingCreateView() {
                   <CardHeader className="cursor-pointer hover:bg-slate-50 transition-colors rounded-t-3xl">
                     <div className="flex items-center justify-between">
                       <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                        <FileText className="w-5 h-5 text-blue-500" />
+                        <FileText className="w-5 h-5 text-blue-500" aria-hidden="true" />
                         الملاحظات
                       </CardTitle>
                       <ChevronDown className={cn("w-5 h-5 text-slate-500 transition-transform", openSections.includes('notes') && "rotate-180")} />
@@ -538,10 +538,10 @@ export function OffboardingCreateView() {
               <CardContent>
                 <div className="space-y-3 text-sm text-amber-700">
                   <div className="flex items-start gap-2">
-                    <AlertTriangle className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                    <AlertTriangle className="w-4 h-4 mt-0.5 flex-shrink-0" aria-hidden="true" />
                     <div>
                       <p className="font-medium">المادة 75 - فترة الإشعار:</p>
-                      <ul className="list-disc list-inside mr-4 mt-1 space-y-1">
+                      <ul className="list-disc list-inside me-4 mt-1 space-y-1">
                         <li>يجب على الطرف الراغب في إنهاء العقد إشعار الطرف الآخر كتابياً</li>
                         <li>فترة الإشعار 60 يوماً للموظفين بأجر شهري، 30 يوماً لغيرهم</li>
                         <li>يستحق العامل أجره عن فترة الإشعار</li>
@@ -549,10 +549,10 @@ export function OffboardingCreateView() {
                     </div>
                   </div>
                   <div className="flex items-start gap-2">
-                    <AlertTriangle className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                    <AlertTriangle className="w-4 h-4 mt-0.5 flex-shrink-0" aria-hidden="true" />
                     <div>
                       <p className="font-medium">المادة 84-87 - مكافأة نهاية الخدمة:</p>
-                      <ul className="list-disc list-inside mr-4 mt-1 space-y-1">
+                      <ul className="list-disc list-inside me-4 mt-1 space-y-1">
                         <li>نصف راتب شهر عن كل سنة من السنوات الخمس الأولى</li>
                         <li>راتب شهر كامل عن كل سنة تالية</li>
                         <li>تحسب المكافأة على أساس آخر راتب</li>
@@ -560,10 +560,10 @@ export function OffboardingCreateView() {
                     </div>
                   </div>
                   <div className="flex items-start gap-2">
-                    <AlertTriangle className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                    <AlertTriangle className="w-4 h-4 mt-0.5 flex-shrink-0" aria-hidden="true" />
                     <div>
                       <p className="font-medium">شهادة الخبرة:</p>
-                      <ul className="list-disc list-inside mr-4 mt-1 space-y-1">
+                      <ul className="list-disc list-inside me-4 mt-1 space-y-1">
                         <li>يلتزم صاحب العمل بإعطاء العامل شهادة خدمة مجاناً</li>
                         <li>يجب أن تتضمن تاريخ بداية ونهاية الخدمة</li>
                       </ul>

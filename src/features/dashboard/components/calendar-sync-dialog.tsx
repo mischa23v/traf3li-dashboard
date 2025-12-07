@@ -253,7 +253,7 @@ END:VCALENDAR`
           {/* External Calendar Providers */}
           <div>
             <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-              <Calendar className="h-5 w-5" />
+              <Calendar className="h-5 w-5" aria-hidden="true" />
               التقويمات الخارجية
             </h3>
 
@@ -275,7 +275,7 @@ END:VCALENDAR`
                       <p className="text-sm text-slate-500">
                         {provider.connected ? (
                           <span className="text-green-600 flex items-center gap-1">
-                            <Check className="h-3 w-3" />
+                            <Check className="h-3 w-3" aria-hidden="true" />
                             متصل - آخر مزامنة: {formatLastSync(provider.lastSync)}
                           </span>
                         ) : (
@@ -293,7 +293,7 @@ END:VCALENDAR`
                           size="sm"
                           onClick={() => handleSync(provider.id)}
                         >
-                          <RefreshCw className="h-4 w-4 ml-1" />
+                          <RefreshCw className="h-4 w-4 ms-1" />
                           مزامنة
                         </Button>
                         <Button
@@ -302,7 +302,7 @@ END:VCALENDAR`
                           className="text-red-600 hover:text-red-700 hover:bg-red-50"
                           onClick={() => handleDisconnect(provider.id)}
                         >
-                          <X className="h-4 w-4 ml-1" />
+                          <X className="h-4 w-4 ms-1" aria-hidden="true" />
                           قطع الاتصال
                         </Button>
                       </>
@@ -312,7 +312,7 @@ END:VCALENDAR`
                         size="sm"
                         onClick={() => handleConnect(provider.id)}
                       >
-                        <ExternalLink className="h-4 w-4 ml-1" />
+                        <ExternalLink className="h-4 w-4 ms-1" aria-hidden="true" />
                         اتصال
                       </Button>
                     )}
@@ -370,7 +370,7 @@ END:VCALENDAR`
           {/* Import/Export */}
           <div>
             <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-              <Download className="h-5 w-5" />
+              <Download className="h-5 w-5" aria-hidden="true" />
               استيراد / تصدير
             </h3>
 
@@ -378,7 +378,7 @@ END:VCALENDAR`
               {/* Export */}
               <div className="p-4 rounded-xl border border-slate-200 bg-slate-50/50">
                 <h4 className="font-medium mb-2 flex items-center gap-2">
-                  <Download className="h-4 w-4 text-green-600" />
+                  <Download className="h-4 w-4 text-green-600" aria-hidden="true" />
                   تصدير التقويم
                 </h4>
                 <p className="text-sm text-slate-500 mb-4">
@@ -391,9 +391,9 @@ END:VCALENDAR`
                   className="w-full"
                 >
                   {isExporting ? (
-                    <Loader2 className="h-4 w-4 ml-2 animate-spin" />
+                    <Loader2 className="h-4 w-4 ms-2 animate-spin" />
                   ) : (
-                    <Download className="h-4 w-4 ml-2" />
+                    <Download className="h-4 w-4 ms-2" aria-hidden="true" />
                   )}
                   تصدير إلى ICS
                 </Button>
@@ -402,7 +402,7 @@ END:VCALENDAR`
               {/* Import */}
               <div className="p-4 rounded-xl border border-slate-200 bg-slate-50/50">
                 <h4 className="font-medium mb-2 flex items-center gap-2">
-                  <Upload className="h-4 w-4 text-blue-600" />
+                  <Upload className="h-4 w-4 text-blue-600" aria-hidden="true" />
                   استيراد من ملف
                 </h4>
                 <p className="text-sm text-slate-500 mb-4">
@@ -422,9 +422,9 @@ END:VCALENDAR`
                     className="w-full"
                   >
                     {isImporting ? (
-                      <Loader2 className="h-4 w-4 ml-2 animate-spin" />
+                      <Loader2 className="h-4 w-4 ms-2 animate-spin" />
                     ) : (
-                      <Upload className="h-4 w-4 ml-2" />
+                      <Upload className="h-4 w-4 ms-2" aria-hidden="true" />
                     )}
                     استيراد
                   </Button>
@@ -435,7 +435,7 @@ END:VCALENDAR`
 
           {/* Info Alert */}
           <Alert>
-            <Info className="h-4 w-4" />
+            <Info className="h-4 w-4" aria-hidden="true" />
             <AlertDescription>
               ملاحظة: لربط التقويم مع Google أو Outlook، يجب تفعيل هذه الخاصية من إعدادات الخادم.
               تواصل مع مدير النظام لمزيد من المعلومات.

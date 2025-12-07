@@ -255,18 +255,18 @@ export function RevenueByClientReport() {
                     <div className="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex flex-wrap items-center justify-between gap-4">
                         <div className="flex items-center gap-4">
                             <div className="flex items-center gap-2">
-                                <Filter className="w-5 h-5 text-slate-400" aria-hidden="true" />
+                                <Filter className="w-5 h-5 text-slate-600" aria-hidden="true" />
                                 <span className="text-sm font-medium text-slate-600">الفترة:</span>
                             </div>
                             <div className="flex items-center gap-2">
-                                <Calendar className="w-4 h-4 text-slate-400" aria-hidden="true" />
+                                <Calendar className="w-4 h-4 text-slate-600" aria-hidden="true" />
                                 <Input
                                     type="date"
                                     value={startDate}
                                     onChange={(e) => setStartDate(e.target.value)}
                                     className="w-[150px] rounded-xl border-slate-200"
                                 />
-                                <span className="text-slate-400">إلى</span>
+                                <span className="text-slate-600">إلى</span>
                                 <Input
                                     type="date"
                                     value={endDate}
@@ -355,7 +355,7 @@ export function RevenueByClientReport() {
                             <CardContent className="p-5">
                                 <div className="flex items-center gap-3 mb-3">
                                     <div className="w-10 h-10 rounded-xl bg-purple-100 flex items-center justify-center">
-                                        <Users className="w-5 h-5 text-purple-600" />
+                                        <Users className="w-5 h-5 text-purple-600" aria-hidden="true" />
                                     </div>
                                     <span className="text-sm text-slate-500">عدد العملاء</span>
                                 </div>
@@ -402,7 +402,7 @@ export function RevenueByClientReport() {
                             <CardHeader className="border-b border-slate-100 pb-4">
                                 <div className="flex items-center justify-between">
                                     <CardTitle className="text-lg font-bold text-navy flex items-center gap-2">
-                                        <Users className="w-5 h-5 text-emerald-500" />
+                                        <Users className="w-5 h-5 text-emerald-500" aria-hidden="true" />
                                         تفاصيل العملاء
                                     </CardTitle>
                                     <Badge variant="outline" className="border-slate-200">
@@ -440,7 +440,7 @@ export function RevenueByClientReport() {
                                                     </span>
                                                 </TableCell>
                                                 <TableCell className="text-center">
-                                                    <span className={client.outstandingAmount > 0 ? 'text-amber-600 font-medium' : 'text-slate-400'}>
+                                                    <span className={client.outstandingAmount > 0 ? 'text-amber-600 font-medium' : 'text-slate-600'}>
                                                         {formatCurrency(client.outstandingAmount)}
                                                     </span>
                                                 </TableCell>

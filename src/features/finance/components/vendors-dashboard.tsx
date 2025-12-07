@@ -192,8 +192,8 @@ export default function VendorsDashboard() {
 
                 <div className='ms-auto flex items-center gap-4'>
                     <div className="relative hidden md:block">
-                        <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" aria-hidden="true" />
-                        <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
+                        <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-600" aria-hidden="true" />
+                        <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
                     </div>
                     <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white" aria-label="الإشعارات">
                         <Bell className="h-5 w-5" aria-hidden="true" />
@@ -266,7 +266,7 @@ export default function VendorsDashboard() {
                         {vendors.length === 0 && !searchQuery && activeTab === 'all' ? (
                             <div className="bg-white rounded-3xl p-12 text-center border border-slate-100 shadow-sm">
                                 <div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                                    <Building2 className="h-8 w-8 text-brand-blue" />
+                                    <Building2 className="h-8 w-8 text-brand-blue" aria-hidden="true" />
                                 </div>
                                 <h3 className="text-xl font-bold text-slate-900 mb-2">لا توجد موردين بعد</h3>
                                 <p className="text-slate-500 mb-6">ابدأ بإضافة أول مورد</p>
@@ -304,7 +304,7 @@ export default function VendorsDashboard() {
 
                                     <div className="flex items-center gap-3 flex-1 justify-end">
                                         <div className="relative w-full max-w-xs">
-                                            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" aria-hidden="true" />
+                                            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-600" aria-hidden="true" />
                                             <Input
                                                 placeholder="بحث في الموردين..."
                                                 className="pe-10 rounded-xl border-slate-200 focus:ring-[#022c22] focus:border-[#022c22]"
@@ -331,7 +331,7 @@ export default function VendorsDashboard() {
                                                 <div className="flex justify-between items-start mb-4">
                                                     <div className="flex gap-4 items-center flex-1">
                                                         <div className="w-12 h-12 rounded-xl bg-emerald-50 flex items-center justify-center shadow-sm text-emerald-600">
-                                                            <Building2 className="h-6 w-6" />
+                                                            <Building2 className="h-6 w-6" aria-hidden="true" />
                                                         </div>
                                                         <div className="flex-1">
                                                             <div className="flex items-center gap-2 mb-1">
@@ -348,19 +348,19 @@ export default function VendorsDashboard() {
                                                             <div className="flex items-center gap-4 text-sm text-slate-500">
                                                                 {vendor.category && (
                                                                     <span className="flex items-center gap-1">
-                                                                        <Building2 className="h-3 w-3" />
+                                                                        <Building2 className="h-3 w-3" aria-hidden="true" />
                                                                         {vendor.category}
                                                                     </span>
                                                                 )}
                                                                 {vendor.email && (
                                                                     <span className="flex items-center gap-1">
-                                                                        <Mail className="h-3 w-3" />
+                                                                        <Mail className="h-3 w-3" aria-hidden="true" />
                                                                         {vendor.email}
                                                                     </span>
                                                                 )}
                                                                 {vendor.phone && (
                                                                     <span className="flex items-center gap-1">
-                                                                        <Phone className="h-3 w-3" />
+                                                                        <Phone className="h-3 w-3" aria-hidden="true" />
                                                                         {vendor.phone}
                                                                     </span>
                                                                 )}
@@ -369,7 +369,7 @@ export default function VendorsDashboard() {
                                                     </div>
                                                     <DropdownMenu>
                                                         <DropdownMenuTrigger asChild>
-                                                            <Button variant="ghost" size="icon" className="text-slate-400 hover:text-[#022c22]">
+                                                            <Button variant="ghost" size="icon" className="text-slate-600 hover:text-[#022c22]">
                                                                 <MoreHorizontal className="h-5 w-5" aria-hidden="true" />
                                                             </Button>
                                                         </DropdownMenuTrigger>
@@ -392,21 +392,21 @@ export default function VendorsDashboard() {
                                                 <div className="flex items-center justify-between pt-4 border-t border-slate-200/50">
                                                     <div className="flex items-center gap-6">
                                                         <div className="text-center">
-                                                            <div className="text-xs text-slate-400 mb-1">إجمالي الفواتير</div>
+                                                            <div className="text-xs text-slate-600 mb-1">إجمالي الفواتير</div>
                                                             <div className="font-bold text-[#022c22] text-sm">{formatCurrency(vendor.totalBilled || 0)}</div>
                                                         </div>
                                                         <div className="text-center">
-                                                            <div className="text-xs text-slate-400 mb-1">المدفوع</div>
+                                                            <div className="text-xs text-slate-600 mb-1">المدفوع</div>
                                                             <div className="font-bold text-emerald-600 text-sm">{formatCurrency(vendor.totalPaid || 0)}</div>
                                                         </div>
                                                         <div className="text-center">
-                                                            <div className="text-xs text-slate-400 mb-1">المستحق للمورد</div>
+                                                            <div className="text-xs text-slate-600 mb-1">المستحق للمورد</div>
                                                             <div className="font-bold text-orange-600 text-sm">{formatCurrency(vendor.balance || 0)}</div>
                                                         </div>
                                                     </div>
                                                     {vendor.city && (
                                                         <div className="flex items-center gap-1 text-slate-500 text-sm">
-                                                            <MapPin className="h-4 w-4" />
+                                                            <MapPin className="h-4 w-4" aria-hidden="true" />
                                                             {vendor.city}
                                                             {vendor.country && `, ${vendor.country}`}
                                                         </div>

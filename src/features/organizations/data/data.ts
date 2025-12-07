@@ -10,7 +10,7 @@ import {
 // Organization status colors
 export const organizationStatusColors = new Map<string, string>([
   ['active', 'bg-green-100/50 text-green-700 border-green-200 dark:bg-green-900/20 dark:text-green-400 dark:border-green-800'],
-  ['inactive', 'bg-gray-100/50 text-gray-700 border-gray-200 dark:bg-gray-900/20 dark:text-gray-400 dark:border-gray-800'],
+  ['inactive', 'bg-gray-100/50 text-gray-700 border-gray-200 dark:bg-gray-900/20 dark:text-gray-500 dark:border-gray-800'],
   ['archived', 'bg-orange-100/50 text-orange-700 border-orange-200 dark:bg-orange-900/20 dark:text-orange-400 dark:border-orange-800'],
 ])
 

@@ -98,12 +98,12 @@ export function DataExportSidebar({ context }: DataExportSidebarProps) {
                 <div className="space-y-2">
                     <div className="flex justify-between text-xs font-medium">
                         <span className="text-slate-600">2.5 GB</span>
-                        <span className="text-slate-400">10 GB</span>
+                        <span className="text-slate-500">10 GB</span>
                     </div>
                     <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
                         <div className="h-full bg-blue-500 w-[25%] rounded-full" />
                     </div>
-                    <p className="text-xs text-slate-400 mt-2">
+                    <p className="text-xs text-slate-500 mt-2">
                         {isRTL ? 'تم استخدام 25% من المساحة المتاحة' : '25% of available space used'}
                     </p>
                 </div>

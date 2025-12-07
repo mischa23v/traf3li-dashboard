@@ -347,7 +347,7 @@ export function PerformanceReviewCreateView() {
         <Card className="border-none shadow-sm bg-white rounded-2xl">
           <CardHeader className="pb-2">
             <CardTitle className="text-base font-bold text-navy flex items-center gap-2">
-              <User className="w-4 h-4 text-emerald-600" />
+              <User className="w-4 h-4 text-emerald-600" aria-hidden="true" />
               معلومات الموظف وفترة التقييم
             </CardTitle>
           </CardHeader>
@@ -745,7 +745,7 @@ export function PerformanceReviewCreateView() {
                   {include360Feedback && (
                     <div className="mt-4 p-4 bg-blue-50 rounded-xl">
                       <p className="text-sm text-blue-700">
-                        <Info className="w-4 h-4 inline ms-1" />
+                        <Info className="w-4 h-4 inline ms-1" aria-hidden="true" />
                         يمكنك إضافة مقدمي التقييم بعد إنشاء التقييم
                       </p>
                     </div>
@@ -788,7 +788,7 @@ export function PerformanceReviewCreateView() {
                   {isAttorney && (
                     <div className="mt-4 p-4 bg-purple-50 rounded-xl">
                       <p className="text-sm text-purple-700">
-                        <Info className="w-4 h-4 inline ms-1" />
+                        <Info className="w-4 h-4 inline ms-1" aria-hidden="true" />
                         سيتم تضمين مقاييس: أداء القضايا، ساعات الفوترة، جودة العمل القانوني، تطوير الممارسة
                       </p>
                     </div>
@@ -803,7 +803,7 @@ export function PerformanceReviewCreateView() {
         <Card className="border-none shadow-sm bg-blue-50 rounded-2xl">
           <CardContent className="p-4">
             <div className="flex items-start gap-3">
-              <Info className="w-5 h-5 text-blue-600 mt-0.5" />
+              <Info className="w-5 h-5 text-blue-600 mt-0.5" aria-hidden="true" />
               <div>
                 <h4 className="font-bold text-blue-800 mb-1">نظام العمل السعودي - تقييم الأداء</h4>
                 <ul className="text-sm text-blue-700 space-y-1">

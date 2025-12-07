@@ -73,7 +73,7 @@ function DepartedWarning() {
   const { t } = useTranslation()
   return (
     <Alert className="my-4 border-yellow-500 bg-yellow-50 dark:bg-yellow-950/20">
-      <AlertTriangle className="h-4 w-4 text-yellow-600" />
+      <AlertTriangle className="h-4 w-4 text-yellow-600" aria-hidden="true" />
       <AlertTitle className="text-yellow-800 dark:text-yellow-200">
         {t('permissionGate.limitedAccount')}
       </AlertTitle>

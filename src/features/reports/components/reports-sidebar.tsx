@@ -98,14 +98,14 @@ export function ReportsSidebar({ context }: ReportsSidebarProps) {
                         variant="ghost"
                         className="w-full justify-start text-white hover:bg-white/10 hover:text-white border border-white/10 rounded-xl h-12"
                     >
-                        <Download className="h-4 w-4 me-2 text-emerald-400" />
+                        <Download className="h-4 w-4 me-2 text-emerald-400" aria-hidden="true" />
                         {isRTL ? 'تصدير التقرير الحالي' : 'Export Current Report'}
                     </Button>
                     <Button
                         variant="ghost"
                         className="w-full justify-start text-white hover:bg-white/10 hover:text-white border border-white/10 rounded-xl h-12"
                     >
-                        <Calendar className="h-4 w-4 me-2 text-blue-400" />
+                        <Calendar className="h-4 w-4 me-2 text-blue-400" aria-hidden="true" />
                         {isRTL ? 'جدولة تقرير' : 'Schedule Report'}
                     </Button>
                 </div>
@@ -117,7 +117,7 @@ export function ReportsSidebar({ context }: ReportsSidebarProps) {
                     <h3 className="font-bold text-navy text-lg">
                         {isRTL ? 'تصفية سريعة' : 'Quick Filter'}
                     </h3>
-                    <Filter className="h-4 w-4 text-slate-400" />
+                    <Filter className="h-4 w-4 text-slate-500" aria-hidden="true" />
                 </div>
                 <div className="space-y-2">
                     <Button variant="outline" className="w-full justify-start text-slate-600 border-slate-200 hover:bg-slate-50 hover:text-navy">

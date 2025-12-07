@@ -139,8 +139,8 @@ export function CrmReportsDetailsView() {
         </div>
         <div className='ms-auto flex items-center gap-4'>
           <div className="relative hidden md:block">
-            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-            <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pr-9 pl-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
+            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
+            <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
           </div>
           <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white">
             <Bell className="h-5 w-5" />
@@ -169,7 +169,7 @@ export function CrmReportsDetailsView() {
             ) : error || !report ? (
               <Card className="rounded-2xl border-slate-100">
                 <CardContent className="p-8 text-center">
-                  <AlertCircle className="w-12 h-12 mx-auto text-red-500 mb-4" />
+                  <AlertCircle className="w-12 h-12 mx-auto text-red-500 mb-4" aria-hidden="true" />
                   <p className="text-red-600">حدث خطأ في تحميل بيانات التقرير</p>
                   <Button onClick={() => navigate({ to: '/dashboard/crm/reports' })} className="mt-4">العودة للقائمة</Button>
                 </CardContent>
@@ -196,7 +196,7 @@ export function CrmReportsDetailsView() {
                     </Button>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button variant="outline" size="sm" className="rounded-xl"><Download className="w-4 h-4 ms-1" />تصدير</Button>
+                        <Button variant="outline" size="sm" className="rounded-xl"><Download className="w-4 h-4 ms-1" aria-hidden="true" />تصدير</Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
                         {report.outputFormats.map((format) => (
@@ -212,8 +212,8 @@ export function CrmReportsDetailsView() {
                         <Button variant="outline" size="icon" className="rounded-xl"><MoreHorizontal className="w-4 h-4" /></Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => navigate({ to: `/dashboard/crm/reports/new?editId=${reportId}` })}><Edit className="w-4 h-4 ms-2" />تعديل</DropdownMenuItem>
-                        <DropdownMenuItem onClick={handleDuplicate}><Copy className="w-4 h-4 ms-2" />نسخ</DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => navigate({ to: `/dashboard/crm/reports/new?editId=${reportId}` })}><Edit className="w-4 h-4 ms-2" aria-hidden="true" />تعديل</DropdownMenuItem>
+                        <DropdownMenuItem onClick={handleDuplicate}><Copy className="w-4 h-4 ms-2" aria-hidden="true" />نسخ</DropdownMenuItem>
                         <DropdownMenuItem><Share2 className="w-4 h-4 ms-2" />مشاركة</DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem className="text-red-600" onClick={handleDelete}><Trash2 className="w-4 h-4 ms-2" />حذف</DropdownMenuItem>
@@ -239,7 +239,7 @@ export function CrmReportsDetailsView() {
 
                   <TabsContent value="overview" className="space-y-6 mt-6">
                     <Card className="rounded-2xl border-slate-100">
-                      <CardHeader><CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2"><FileText className="w-5 h-5 text-emerald-500" />معلومات التقرير</CardTitle></CardHeader>
+                      <CardHeader><CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2"><FileText className="w-5 h-5 text-emerald-500" aria-hidden="true" />معلومات التقرير</CardTitle></CardHeader>
                       <CardContent className="space-y-4">
                         <div className="grid grid-cols-2 gap-4">
                           <div><p className="text-xs text-slate-500">الاسم (English)</p><p className="font-medium">{report.reportName}</p></div>
@@ -264,7 +264,7 @@ export function CrmReportsDetailsView() {
                     </Card>
 
                     <Card className="rounded-2xl border-slate-100">
-                      <CardHeader><CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2"><Users className="w-5 h-5 text-cyan-500" />المالك</CardTitle></CardHeader>
+                      <CardHeader><CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2"><Users className="w-5 h-5 text-cyan-500" aria-hidden="true" />المالك</CardTitle></CardHeader>
                       <CardContent>
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                           <div><p className="text-xs text-slate-500">الاسم</p><p className="font-medium">{report.reportOwner.ownerName}</p></div>
@@ -286,7 +286,7 @@ export function CrmReportsDetailsView() {
                       </CardContent>
                     </Card>
                     <Card className="rounded-2xl border-slate-100">
-                      <CardHeader><CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2"><Download className="w-5 h-5 text-amber-500" />صيغ الإخراج</CardTitle></CardHeader>
+                      <CardHeader><CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2"><Download className="w-5 h-5 text-amber-500" aria-hidden="true" />صيغ الإخراج</CardTitle></CardHeader>
                       <CardContent>
                         <div className="flex flex-wrap gap-2">{report.outputFormats.map((format) => (<Badge key={format} className={format === report.defaultOutputFormat ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-700'}>{outputFormatLabels[format]?.ar}{format === report.defaultOutputFormat && ' (افتراضي)'}</Badge>))}</div>
                       </CardContent>
@@ -299,7 +299,7 @@ export function CrmReportsDetailsView() {
                         <Card className="rounded-2xl border-slate-100">
                           <CardHeader>
                             <div className="flex items-center justify-between">
-                              <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2"><Clock className="w-5 h-5 text-cyan-500" />إعدادات الجدولة</CardTitle>
+                              <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2"><Clock className="w-5 h-5 text-cyan-500" aria-hidden="true" />إعدادات الجدولة</CardTitle>
                               <div className="flex items-center gap-2">
                                 <Badge className={getScheduleStatusColor(report.scheduling.scheduleStatus)}>{scheduleStatusLabels[report.scheduling.scheduleStatus]?.ar}</Badge>
                                 <Button variant="outline" size="sm" onClick={handleToggleSchedule} className="rounded-xl">
@@ -332,7 +332,7 @@ export function CrmReportsDetailsView() {
                     ) : (
                       <Card className="rounded-2xl border-slate-100">
                         <CardContent className="p-8 text-center">
-                          <Clock className="w-12 h-12 mx-auto text-slate-300 mb-4" />
+                          <Clock className="w-12 h-12 mx-auto text-slate-300 mb-4" aria-hidden="true" />
                           <p className="text-slate-500">لم يتم تفعيل الجدولة لهذا التقرير</p>
                           <Button variant="outline" className="mt-4 rounded-xl" onClick={() => navigate({ to: `/dashboard/crm/reports/new?editId=${reportId}` })}>تفعيل الجدولة</Button>
                         </CardContent>
@@ -345,7 +345,7 @@ export function CrmReportsDetailsView() {
                       <CardHeader><CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2"><Eye className="w-5 h-5 text-indigo-500" />سجل التشغيل</CardTitle></CardHeader>
                       <CardContent>
                         {executionHistory && executionHistory.length > 0 ? (
-                          <div className="space-y-3">{executionHistory.map((execution) => (<div key={execution.executionId} className="flex items-center justify-between p-4 bg-slate-50 rounded-xl"><div className="flex items-center gap-3">{execution.status === ExecutionStatus.COMPLETED ? <CheckCircle className="w-5 h-5 text-emerald-500" /> : execution.status === ExecutionStatus.FAILED ? <XCircle className="w-5 h-5 text-red-500" /> : execution.status === ExecutionStatus.RUNNING ? <Loader2 className="w-5 h-5 text-amber-500 animate-spin" /> : <Clock className="w-5 h-5 text-blue-500" />}<div><p className="font-medium">{execution.actualRunTime ? new Date(execution.actualRunTime).toLocaleString('ar-SA') : new Date(execution.scheduledTime).toLocaleString('ar-SA')}</p><p className="text-xs text-slate-500">{execution.recordsProcessed ? `${execution.recordsProcessed} سجل` : execution.errorMessage || '-'}</p></div></div><div className="flex items-center gap-2"><Badge className={getExecutionStatusColor(execution.status)}>{executionStatusLabels[execution.status]?.ar}</Badge>{execution.duration && <span className="text-xs text-slate-500">{(execution.duration / 1000).toFixed(1)}ث</span>}</div></div>))}</div>
+                          <div className="space-y-3">{executionHistory.map((execution) => (<div key={execution.executionId} className="flex items-center justify-between p-4 bg-slate-50 rounded-xl"><div className="flex items-center gap-3">{execution.status === ExecutionStatus.COMPLETED ? <CheckCircle className="w-5 h-5 text-emerald-500" /> : execution.status === ExecutionStatus.FAILED ? <XCircle className="w-5 h-5 text-red-500" /> : execution.status === ExecutionStatus.RUNNING ? <Loader2 className="w-5 h-5 text-amber-500 animate-spin" /> : <Clock className="w-5 h-5 text-blue-500" aria-hidden="true" />}<div><p className="font-medium">{execution.actualRunTime ? new Date(execution.actualRunTime).toLocaleString('ar-SA') : new Date(execution.scheduledTime).toLocaleString('ar-SA')}</p><p className="text-xs text-slate-500">{execution.recordsProcessed ? `${execution.recordsProcessed} سجل` : execution.errorMessage || '-'}</p></div></div><div className="flex items-center gap-2"><Badge className={getExecutionStatusColor(execution.status)}>{executionStatusLabels[execution.status]?.ar}</Badge>{execution.duration && <span className="text-xs text-slate-500">{(execution.duration / 1000).toFixed(1)}ث</span>}</div></div>))}</div>
                         ) : <p className="text-center text-slate-500 py-8">لا يوجد سجل تشغيل</p>}
                       </CardContent>
                     </Card>

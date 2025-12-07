@@ -122,8 +122,8 @@ export function ChatView() {
 
                 <div className='ms-auto flex items-center gap-4'>
                     <div className="relative hidden md:block">
-                        <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                        <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
+                        <Search className="absolute end-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
+                        <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
                     </div>
                     <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white">
                         <Bell className="h-5 w-5" />
@@ -154,11 +154,11 @@ export function ChatView() {
                                 )}
                             </div>
                             <div className="relative">
-                                <Search className="absolute right-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                                <Search className="absolute end-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
                                 <input
                                     type="text"
                                     placeholder="بحث في المحادثات..."
-                                    className="h-12 w-full rounded-xl border border-slate-200 bg-slate-50 pr-12 pl-4 text-sm focus:outline-none focus:border-navy focus:ring-1 focus:ring-navy transition-all"
+                                    className="h-12 w-full rounded-xl border border-slate-200 bg-slate-50 pe-12 ps-4 text-sm focus:outline-none focus:border-navy focus:ring-1 focus:ring-navy transition-all"
                                 />
                             </div>
                         </div>
@@ -174,7 +174,7 @@ export function ChatView() {
                                     فشل تحميل المحادثات
                                 </div>
                             ) : !conversations || conversations.length === 0 ? (
-                                <div className="text-center text-slate-400 p-8">
+                                <div className="text-center text-slate-500 p-8">
                                     <p className="text-sm">لا توجد محادثات</p>
                                 </div>
                             ) : (
@@ -210,7 +210,7 @@ export function ChatView() {
                                                 <div className="flex-1 min-w-0">
                                                     <div className="flex justify-between items-center mb-1">
                                                         <h4 className="font-bold truncate">{otherParty.username}</h4>
-                                                        <span className={`text-xs ${activeChat === conversation.conversationID ? 'text-blue-200' : 'text-slate-400'}`}>
+                                                        <span className={`text-xs ${activeChat === conversation.conversationID ? 'text-blue-200' : 'text-slate-500'}`}>
                                                             {formatTime(conversation.updatedAt)}
                                                         </span>
                                                     </div>
@@ -262,19 +262,19 @@ export function ChatView() {
                                         </div>
                                     </div>
                                     <div className="flex items-center gap-2">
-                                        <Button variant="ghost" size="icon" className="text-slate-400 hover:text-navy rounded-full">
-                                            <Phone className="h-5 w-5" />
+                                        <Button variant="ghost" size="icon" className="text-slate-500 hover:text-navy rounded-full">
+                                            <Phone className="h-5 w-5" aria-hidden="true" />
                                         </Button>
-                                        <Button variant="ghost" size="icon" className="text-slate-400 hover:text-navy rounded-full">
+                                        <Button variant="ghost" size="icon" className="text-slate-500 hover:text-navy rounded-full">
                                             <Video className="h-5 w-5" />
                                         </Button>
-                                        <Button variant="ghost" size="icon" className="text-slate-400 hover:text-navy rounded-full">
+                                        <Button variant="ghost" size="icon" className="text-slate-500 hover:text-navy rounded-full">
                                             <MoreVertical className="h-5 w-5" />
                                         </Button>
                                     </div>
                                 </>
                             ) : (
-                                <div className="text-slate-400">حدد محادثة</div>
+                                <div className="text-slate-500">حدد محادثة</div>
                             )}
                         </div>
 
@@ -285,11 +285,11 @@ export function ChatView() {
                                     <Loader2 className="h-8 w-8 animate-spin text-navy" />
                                 </div>
                             ) : !activeChat ? (
-                                <div className="flex items-center justify-center h-full text-slate-400">
+                                <div className="flex items-center justify-center h-full text-slate-500">
                                     <p>حدد محادثة للبدء</p>
                                 </div>
                             ) : !messages || messages.length === 0 ? (
-                                <div className="flex items-center justify-center h-full text-slate-400">
+                                <div className="flex items-center justify-center h-full text-slate-500">
                                     <p>لا توجد رسائل. ابدأ المحادثة!</p>
                                 </div>
                             ) : (
@@ -321,7 +321,7 @@ export function ChatView() {
                                                                 >
                                                                     <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${isMyMessage ? 'bg-white/10' : 'bg-slate-100'
                                                                         }`}>
-                                                                        <FileText className="h-5 w-5" />
+                                                                        <FileText className="h-5 w-5" aria-hidden="true" />
                                                                     </div>
                                                                     <div className="flex-1">
                                                                         <div className="font-bold text-sm truncate">{attachment.originalName}</div>
@@ -333,7 +333,7 @@ export function ChatView() {
                                                                         className={`${isMyMessage ? 'text-white hover:bg-white/20' : 'text-navy hover:bg-slate-100'} rounded-full`}
                                                                         onClick={() => window.open(attachment.url, '_blank')}
                                                                     >
-                                                                        <Download className="h-4 w-4" />
+                                                                        <Download className="h-4 w-4" aria-hidden="true" />
                                                                     </Button>
                                                                 </div>
                                                             ))}
@@ -345,14 +345,14 @@ export function ChatView() {
                                                             }`}>
                                                             {msg.description}
                                                             {msg.isEdited && (
-                                                                <span className="text-xs opacity-70 ml-2">(معدلة)</span>
+                                                                <span className="text-xs opacity-70 ms-2">(معدلة)</span>
                                                             )}
                                                         </div>
                                                     )}
-                                                    <div className={`flex items-center gap-1 mt-1 text-[10px] text-slate-400 ${isMyMessage ? 'justify-end' : 'justify-start'}`}>
+                                                    <div className={`flex items-center gap-1 mt-1 text-[10px] text-slate-500 ${isMyMessage ? 'justify-end' : 'justify-start'}`}>
                                                         <span>{formatTime(msg.createdAt)}</span>
                                                         {isMyMessage && (
-                                                            isRead ? <Check className="h-3 w-3 text-emerald-500" /> : <Check className="h-3 w-3" />
+                                                            isRead ? <Check className="h-3 w-3 text-emerald-500" aria-hidden="true" /> : <Check className="h-3 w-3" aria-hidden="true" />
                                                         )}
                                                     </div>
                                                 </div>
@@ -370,11 +370,11 @@ export function ChatView() {
                                 <div className="mb-2 flex flex-wrap gap-2">
                                     {selectedFiles.map((file, idx) => (
                                         <div key={idx} className="bg-slate-100 rounded-lg px-3 py-2 flex items-center gap-2 text-sm">
-                                            <FileText className="h-4 w-4" />
+                                            <FileText className="h-4 w-4" aria-hidden="true" />
                                             <span className="truncate max-w-[200px]">{file.name}</span>
                                             <button
                                                 onClick={() => setSelectedFiles(files => files.filter((_, i) => i !== idx))}
-                                                className="text-slate-400 hover:text-red-500"
+                                                className="text-slate-500 hover:text-red-500"
                                             >
                                                 ×
                                             </button>
@@ -393,7 +393,7 @@ export function ChatView() {
                                 <Button
                                     variant="ghost"
                                     size="icon"
-                                    className="text-slate-400 hover:text-navy rounded-full h-10 w-10 shrink-0"
+                                    className="text-slate-500 hover:text-navy rounded-full h-10 w-10 shrink-0"
                                     onClick={() => fileInputRef.current?.click()}
                                     disabled={!activeChat}
                                 >
@@ -414,7 +414,7 @@ export function ChatView() {
                                     disabled={!activeChat}
                                 />
                                 <div className="flex items-center gap-1 shrink-0">
-                                    <Button variant="ghost" size="icon" className="text-slate-400 hover:text-navy rounded-full h-10 w-10">
+                                    <Button variant="ghost" size="icon" className="text-slate-500 hover:text-navy rounded-full h-10 w-10">
                                         <Mic className="h-5 w-5" />
                                     </Button>
                                     <Button
@@ -425,7 +425,7 @@ export function ChatView() {
                                         {sendMessageMutation.isPending ? (
                                             <Loader2 className="h-4 w-4 animate-spin" />
                                         ) : (
-                                            <Send className="h-4 w-4 ml-0.5" />
+                                            <Send className="h-4 w-4 ms-0.5" aria-hidden="true" />
                                         )}
                                     </Button>
                                 </div>

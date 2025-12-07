@@ -476,7 +476,7 @@ export const TipTapEditor = ({
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="start" className="min-w-[160px]">
                             <DropdownMenuItem onClick={insertTable} className="flex items-center gap-2">
-                                <Plus className="h-4 w-4" />
+                                <Plus className="h-4 w-4" aria-hidden="true" />
                                 <span>{t('editor.toolbar.insertTable')}</span>
                             </DropdownMenuItem>
                             {editor.isActive('table') && (

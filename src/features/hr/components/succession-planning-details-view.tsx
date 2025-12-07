@@ -153,7 +153,7 @@ export function SuccessionPlanningDetailsView() {
         <div className='ms-auto flex items-center gap-4'>
           <div className="relative hidden md:block">
             <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
-            <input type="text" placeholder="بحث..." aria-label="بحث" className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pr-9 pl-4 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
+            <input type="text" placeholder="بحث..." aria-label="بحث" className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
           </div>
           <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white" aria-label="الإشعارات">
             <Bell className="h-5 w-5" aria-hidden="true" />
@@ -235,7 +235,7 @@ export function SuccessionPlanningDetailsView() {
                         disabled={submitMutation.isPending}
                         className="rounded-xl"
                       >
-                        <Send className="w-4 h-4 ms-1" />
+                        <Send className="w-4 h-4 ms-1" aria-hidden="true" />
                         تقديم للموافقة
                       </Button>
                     )}
@@ -277,7 +277,7 @@ export function SuccessionPlanningDetailsView() {
                     <CardContent className="p-4">
                       <div className="flex items-center gap-3">
                         <div className="p-2 bg-red-100 rounded-xl">
-                          <AlertTriangle className="w-5 h-5 text-red-600" />
+                          <AlertTriangle className="w-5 h-5 text-red-600" aria-hidden="true" />
                         </div>
                         <div>
                           <p className="text-xs text-slate-500">أهمية المنصب</p>
@@ -307,7 +307,7 @@ export function SuccessionPlanningDetailsView() {
                     <CardContent className="p-4">
                       <div className="flex items-center gap-3">
                         <div className="p-2 bg-indigo-100 rounded-xl">
-                          <Users className="w-5 h-5 text-indigo-600" />
+                          <Users className="w-5 h-5 text-indigo-600" aria-hidden="true" />
                         </div>
                         <div>
                           <p className="text-xs text-slate-500">الخلفاء</p>
@@ -523,7 +523,7 @@ export function SuccessionPlanningDetailsView() {
                     ) : (
                       <Card className="rounded-2xl border-slate-100">
                         <CardContent className="p-8 text-center">
-                          <Users className="w-12 h-12 mx-auto text-slate-300 mb-4" />
+                          <Users className="w-12 h-12 mx-auto text-slate-300 mb-4" aria-hidden="true" />
                           <p className="text-slate-500">لم تتم إضافة خلفاء بعد</p>
                           <Button
                             onClick={() => navigate({ to: `/dashboard/hr/succession-planning/new?editId=${planId}` })}
@@ -541,14 +541,14 @@ export function SuccessionPlanningDetailsView() {
                     <Card className="rounded-2xl border-slate-100">
                       <CardHeader className="pb-4">
                         <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                          <User className="w-5 h-5 text-orange-500" />
+                          <User className="w-5 h-5 text-orange-500" aria-hidden="true" />
                           معلومات الشاغل الحالي
                         </CardTitle>
                       </CardHeader>
                       <CardContent>
                         <div className="flex items-center gap-4 mb-6">
                           <div className="w-16 h-16 rounded-full bg-orange-100 flex items-center justify-center">
-                            <User className="w-8 h-8 text-orange-600" />
+                            <User className="w-8 h-8 text-orange-600" aria-hidden="true" />
                           </div>
                           <div>
                             <h3 className="text-xl font-bold text-navy">{plan.incumbentName}</h3>

@@ -152,11 +152,11 @@ export function LawsView() {
 
         <div className="ms-auto flex items-center gap-4">
           <div className="relative hidden md:block">
-            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+            <Search className="absolute end-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
             <input
               type="text"
               placeholder={t('common.search', 'بحث...')}
-              className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+              className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
             />
           </div>
           <Button
@@ -196,7 +196,7 @@ export function LawsView() {
               <CardContent className="p-4">
                 <div className="flex flex-col sm:flex-row gap-4">
                   <div className="relative flex-1">
-                    <Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                    <Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
                     <Input
                       placeholder={isRTL ? 'بحث في الأنظمة...' : 'Search laws...'}
                       value={searchQuery}
@@ -257,15 +257,15 @@ export function LawsView() {
 
                         <div className="flex flex-wrap items-center gap-4 mt-4 text-sm text-slate-500">
                           <span className="flex items-center bg-slate-50 px-2 py-1 rounded-lg">
-                            <Calendar className="h-3.5 w-3.5 me-1 text-slate-400" />
+                            <Calendar className="h-3.5 w-3.5 me-1 text-slate-500" aria-hidden="true" />
                             {isRTL ? 'تاريخ الإصدار:' : 'Issued:'} {law.issueDate}
                           </span>
                           <span className="flex items-center bg-slate-50 px-2 py-1 rounded-lg">
-                            <Clock className="h-3.5 w-3.5 me-1 text-slate-400" />
+                            <Clock className="h-3.5 w-3.5 me-1 text-slate-500" aria-hidden="true" />
                             {isRTL ? 'آخر تحديث:' : 'Updated:'} {law.lastUpdate}
                           </span>
                           <span className="flex items-center bg-slate-50 px-2 py-1 rounded-lg">
-                            <FileText className="h-3.5 w-3.5 me-1 text-slate-400" />
+                            <FileText className="h-3.5 w-3.5 me-1 text-slate-500" aria-hidden="true" />
                             {law.articles} {isRTL ? 'مادة' : 'articles'}
                           </span>
                         </div>
@@ -277,17 +277,17 @@ export function LawsView() {
                               {law.views.toLocaleString()}
                             </span>
                             <span className="flex items-center text-xs">
-                              <Download className="h-3.5 w-3.5 me-1" />
+                              <Download className="h-3.5 w-3.5 me-1" aria-hidden="true" />
                               {law.downloads.toLocaleString()}
                             </span>
                           </div>
                           <div className="flex items-center gap-2">
                             <Button variant="outline" size="sm" className="h-9 rounded-lg border-slate-200">
-                              <Download className="h-4 w-4 me-1" />
+                              <Download className="h-4 w-4 me-1" aria-hidden="true" />
                               {isRTL ? 'تحميل' : 'Download'}
                             </Button>
                             <Button size="sm" className="bg-emerald-500 hover:bg-emerald-600 h-9 rounded-lg shadow-lg shadow-emerald-500/20">
-                              <ExternalLink className="h-4 w-4 me-1" />
+                              <ExternalLink className="h-4 w-4 me-1" aria-hidden="true" />
                               {isRTL ? 'عرض' : 'View'}
                             </Button>
                           </div>

@@ -157,14 +157,14 @@ function LeadCard({
     >
       <div className="flex items-start justify-between mb-3">
         <div className="flex items-center gap-2 flex-1">
-          {draggable && <GripVertical className="h-4 w-4 text-slate-400" />}
+          {draggable && <GripVertical className="h-4 w-4 text-slate-500" />}
           <div className="flex-1">
             <h4 className="font-semibold text-navy text-sm">
               {lead.firstName} {lead.lastName}
             </h4>
             {lead.company && (
               <p className="text-xs text-slate-500 flex items-center gap-1 mt-1">
-                <Building className="h-3 w-3" />
+                <Building className="h-3 w-3" aria-hidden="true" />
                 {lead.company}
               </p>
             )}
@@ -200,13 +200,13 @@ function LeadCard({
       <div className="space-y-2 text-xs text-slate-600">
         {lead.phone && (
           <div className="flex items-center gap-2">
-            <Phone className="h-3 w-3" />
+            <Phone className="h-3 w-3" aria-hidden="true" />
             <span dir="ltr">{lead.phone}</span>
           </div>
         )}
         {lead.email && (
           <div className="flex items-center gap-2">
-            <Mail className="h-3 w-3" />
+            <Mail className="h-3 w-3" aria-hidden="true" />
             <span dir="ltr">{lead.email}</span>
           </div>
         )}
@@ -225,7 +225,7 @@ function LeadCard({
 
       {lead.expectedCloseDate && (
         <div className="mt-2 flex items-center gap-1 text-xs text-slate-500">
-          <Calendar className="h-3 w-3" />
+          <Calendar className="h-3 w-3" aria-hidden="true" />
           <span>
             {formatDistanceToNow(new Date(lead.expectedCloseDate), {
               addSuffix: true,
@@ -282,20 +282,20 @@ function ConvertLeadDialog({
           <div className="space-y-4">
             <div className="bg-slate-50 p-4 rounded-lg space-y-2">
               <div className="flex items-center gap-2">
-                <Users className="h-4 w-4 text-slate-500" />
+                <Users className="h-4 w-4 text-slate-500" aria-hidden="true" />
                 <span className="font-medium">
                   {lead.firstName} {lead.lastName}
                 </span>
               </div>
               {lead.email && (
                 <div className="flex items-center gap-2 text-sm text-slate-600">
-                  <Mail className="h-3 w-3" />
+                  <Mail className="h-3 w-3" aria-hidden="true" />
                   <span dir="ltr">{lead.email}</span>
                 </div>
               )}
               {lead.phone && (
                 <div className="flex items-center gap-2 text-sm text-slate-600">
-                  <Phone className="h-3 w-3" />
+                  <Phone className="h-3 w-3" aria-hidden="true" />
                   <span dir="ltr">{lead.phone}</span>
                 </div>
               )}
@@ -602,7 +602,7 @@ function LeadFormDialog({
               type="submit"
               className="bg-emerald-500 hover:bg-emerald-600 rounded-xl"
             >
-              <Plus className="h-4 w-4 ms-2" />
+              <Plus className="h-4 w-4 ms-2" aria-hidden="true" />
               حفظ
             </Button>
           </DialogFooter>
@@ -889,7 +889,7 @@ export function LeadsDashboard() {
               <p className="text-2xl font-bold text-navy">{stats.totalLeads}</p>
             </div>
             <div className="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center">
-              <Users className="h-6 w-6 text-blue-500" />
+              <Users className="h-6 w-6 text-blue-500" aria-hidden="true" />
             </div>
           </div>
         </Card>
@@ -959,12 +959,12 @@ export function LeadsDashboard() {
 
           <div className="flex items-center gap-2 flex-1 max-w-md">
             <div className="relative flex-1">
-              <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+              <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
               <Input
                 placeholder="بحث عن عملاء محتملين..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pr-10 rounded-xl"
+                className="pe-10 rounded-xl"
               />
             </div>
           </div>
@@ -973,7 +973,7 @@ export function LeadsDashboard() {
             onClick={() => setShowLeadForm(true)}
             className="bg-emerald-500 hover:bg-emerald-600 rounded-xl"
           >
-            <Plus className="h-4 w-4 ms-2" />
+            <Plus className="h-4 w-4 ms-2" aria-hidden="true" />
             عميل محتمل جديد
           </Button>
         </div>
@@ -1050,7 +1050,7 @@ export function LeadsDashboard() {
                     )}
                   >
                     {stageLeads.length === 0 ? (
-                      <div className="h-full flex items-center justify-center text-slate-400 text-sm">
+                      <div className="h-full flex items-center justify-center text-slate-500 text-sm">
                         لا يوجد عملاء
                       </div>
                     ) : (
@@ -1080,7 +1080,7 @@ export function LeadsDashboard() {
           <div className="space-y-3">
             {filteredLeads.length === 0 ? (
               <div className="text-center py-12">
-                <Users className="h-12 w-12 text-slate-300 mx-auto mb-4" />
+                <Users className="h-12 w-12 text-slate-300 mx-auto mb-4" aria-hidden="true" />
                 <p className="text-slate-500">لا يوجد عملاء محتملين</p>
               </div>
             ) : (

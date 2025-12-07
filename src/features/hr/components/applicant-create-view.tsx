@@ -289,7 +289,7 @@ export function ApplicantCreateView() {
         <div className='ms-auto flex items-center gap-4'>
           <div className="relative hidden md:block">
             <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
-            <input type="text" placeholder="بحث..." aria-label="بحث" className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pr-9 pl-4 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
+            <input type="text" placeholder="بحث..." aria-label="بحث" className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
           </div>
           <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white" aria-label="الإشعارات">
             <Bell className="h-5 w-5" aria-hidden="true" />
@@ -420,7 +420,7 @@ export function ApplicantCreateView() {
         <Card className="border-none shadow-sm bg-white rounded-2xl">
           <CardHeader className="pb-2">
             <CardTitle className="text-base font-bold text-navy flex items-center gap-2">
-              <User className="w-4 h-4 text-emerald-600" />
+              <User className="w-4 h-4 text-emerald-600" aria-hidden="true" />
               المعلومات الشخصية
             </CardTitle>
           </CardHeader>
@@ -458,7 +458,7 @@ export function ApplicantCreateView() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="email@example.com"
-                    className="rounded-xl pr-10"
+                    className="rounded-xl pe-10"
                   />
                 </div>
               </div>
@@ -472,7 +472,7 @@ export function ApplicantCreateView() {
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
                     placeholder="+966 5X XXX XXXX"
-                    className="rounded-xl pr-10"
+                    className="rounded-xl pe-10"
                   />
                 </div>
               </div>
@@ -502,7 +502,7 @@ export function ApplicantCreateView() {
                     value={currentLocation}
                     onChange={(e) => setCurrentLocation(e.target.value)}
                     placeholder="المدينة"
-                    className="rounded-xl pr-10"
+                    className="rounded-xl pe-10"
                   />
                 </div>
               </div>
@@ -761,7 +761,7 @@ export function ApplicantCreateView() {
                       <div className="flex flex-wrap gap-2">
                         {languages.map((lang, index) => (
                           <div key={index} className="flex items-center gap-2 bg-blue-100 rounded-lg px-3 py-1.5">
-                            <Globe className="w-3 h-3 text-blue-600" />
+                            <Globe className="w-3 h-3 text-blue-600" aria-hidden="true" />
                             <span className="text-sm font-medium text-blue-700">{lang.language}</span>
                             <span className="text-xs text-blue-500">({lang.level})</span>
                             {index > 0 && (
@@ -942,7 +942,7 @@ export function ApplicantCreateView() {
         <Card className="border-none shadow-sm bg-blue-50 rounded-2xl">
           <CardContent className="p-4">
             <div className="flex items-start gap-3">
-              <Info className="w-5 h-5 text-blue-600 mt-0.5" />
+              <Info className="w-5 h-5 text-blue-600 mt-0.5" aria-hidden="true" />
               <div>
                 <h4 className="font-bold text-blue-800 mb-1">نظام العمل السعودي - التوظيف</h4>
                 <ul className="text-sm text-blue-700 space-y-1">

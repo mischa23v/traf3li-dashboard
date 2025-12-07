@@ -407,7 +407,7 @@ export default function FinanceSettings() {
                         <Card className="border-0 shadow-sm rounded-3xl">
                             <CardHeader>
                                 <CardTitle className="flex items-center gap-2">
-                                    <FileText className="h-5 w-5 text-brand-blue" />
+                                    <FileText className="h-5 w-5 text-brand-blue" aria-hidden="true" />
                                     نصوص تذييل المستندات
                                 </CardTitle>
                                 <CardDescription>
@@ -478,7 +478,7 @@ export default function FinanceSettings() {
                                 {updateSettingsMutation.isPending ? (
                                     <Loader2 className="h-4 w-4 ms-2 animate-spin" />
                                 ) : (
-                                    <Save className="h-4 w-4 ms-2" />
+                                    <Save className="h-4 w-4 ms-2" aria-hidden="true" />
                                 )}
                                 حفظ التغييرات
                             </Button>
@@ -489,7 +489,7 @@ export default function FinanceSettings() {
                     <Card className="border-0 shadow-sm rounded-3xl mt-6">
                         <CardHeader>
                             <CardTitle className="flex items-center gap-2">
-                                <Settings2 className="h-5 w-5 text-brand-blue" />
+                                <Settings2 className="h-5 w-5 text-brand-blue" aria-hidden="true" />
                                 الإعدادات المتقدمة
                             </CardTitle>
                             <CardDescription>
@@ -545,7 +545,7 @@ function AdvancedAccountingSettings() {
             <AccordionItem value="banks">
                 <AccordionTrigger className="hover:no-underline">
                     <div className="flex items-center gap-2">
-                        <Building2 className="h-4 w-4 text-blue-600" />
+                        <Building2 className="h-4 w-4 text-blue-600" aria-hidden="true" />
                         <span>البنوك</span>
                         <Badge variant="secondary" className="me-2">
                             {bankAccounts?.accounts?.length || 0}
@@ -715,7 +715,7 @@ function AccountsList({ accounts, isLoading, accountType, defaultSubType, typeLa
                 <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                     <DialogTrigger asChild>
                         <Button size="sm" onClick={() => handleOpenDialog()}>
-                            <Plus className="h-4 w-4 ms-1" />
+                            <Plus className="h-4 w-4 ms-1" aria-hidden="true" />
                             إضافة حساب
                         </Button>
                     </DialogTrigger>
@@ -968,7 +968,7 @@ function PriceLevelsList({ priceLevels, isLoading }: PriceLevelsListProps) {
                 <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                     <DialogTrigger asChild>
                         <Button size="sm" onClick={() => handleOpenDialog()}>
-                            <Plus className="h-4 w-4 ms-1" />
+                            <Plus className="h-4 w-4 ms-1" aria-hidden="true" />
                             إضافة مستوى
                         </Button>
                     </DialogTrigger>

@@ -344,7 +344,7 @@ export function LoansDetailsView() {
             ) : !loan ? (
               <Card className="rounded-2xl border-slate-100">
                 <CardContent className="p-8 text-center">
-                  <FileText className="w-12 h-12 mx-auto text-slate-300" />
+                  <FileText className="w-12 h-12 mx-auto text-slate-300" aria-hidden="true" />
                   <p className="mt-4 text-slate-500">لم يتم العثور على القرض</p>
                 </CardContent>
               </Card>
@@ -470,7 +470,7 @@ export function LoansDetailsView() {
                         {/* Employee Info */}
                         <div className="space-y-4">
                           <h4 className="font-bold text-navy flex items-center gap-2">
-                            <User className="w-4 h-4" />
+                            <User className="w-4 h-4" aria-hidden="true" />
                             بيانات الموظف
                           </h4>
                           <div className="space-y-3">
@@ -568,7 +568,7 @@ export function LoansDetailsView() {
                       {(loan.purpose || loan.purposeAr) && (
                         <div className="pt-4 border-t border-slate-100">
                           <h4 className="font-bold text-navy flex items-center gap-2 mb-2">
-                            <FileText className="w-4 h-4" />
+                            <FileText className="w-4 h-4" aria-hidden="true" />
                             الغرض من القرض
                           </h4>
                           <p className="text-slate-600">{loan.purposeAr || loan.purpose}</p>
@@ -609,7 +609,7 @@ export function LoansDetailsView() {
                                 </div>
                                 {installment.lateDays && installment.lateDays > 0 && (
                                   <div className="mt-2 flex items-center gap-2 text-sm text-red-600">
-                                    <AlertTriangle className="w-4 h-4" />
+                                    <AlertTriangle className="w-4 h-4" aria-hidden="true" />
                                     متأخر {installment.lateDays} يوم
                                     {installment.lateFee && (
                                       <span className="text-red-500">
@@ -742,7 +742,7 @@ export function LoansDetailsView() {
                           {loan.paymentPerformance.totalLateFees > 0 && (
                             <div className="p-4 bg-red-50 rounded-xl border border-red-200">
                               <div className="flex items-center gap-2 text-red-700">
-                                <AlertTriangle className="w-5 h-5" />
+                                <AlertTriangle className="w-5 h-5" aria-hidden="true" />
                                 <span>إجمالي غرامات التأخير: </span>
                                 <span className="font-bold">{loan.paymentPerformance.totalLateFees.toLocaleString('ar-SA')} ر.س</span>
                               </div>

@@ -103,9 +103,9 @@ export function PayrollDetailsView() {
             cancelled: 'ملغي',
         }
         const icons: Record<PaymentStatus, React.ReactNode> = {
-            draft: <FileText className="w-4 h-4" />,
+            draft: <FileText className="w-4 h-4" aria-hidden="true" />,
             approved: <CheckCircle className="w-4 h-4" />,
-            processing: <Clock className="w-4 h-4" />,
+            processing: <Clock className="w-4 h-4" aria-hidden="true" />,
             paid: <CheckCircle className="w-4 h-4" />,
             failed: <XCircle className="w-4 h-4" />,
             cancelled: <XCircle className="w-4 h-4" />,
@@ -355,7 +355,7 @@ export function PayrollDetailsView() {
                                                     <CardHeader className="pb-3">
                                                         <CardTitle className="text-base font-bold text-navy flex items-center gap-2">
                                                             <DollarSign className="w-4 h-4 text-emerald-600" />
-                                                            الراتب الأساسي<Lock className="h-3 w-3 text-muted-foreground inline ms-1" />
+                                                            الراتب الأساسي<Lock className="h-3 w-3 text-foreground/70 inline ms-1" />
                                                         </CardTitle>
                                                     </CardHeader>
                                                     <CardContent>
@@ -393,7 +393,7 @@ export function PayrollDetailsView() {
                                                     <Card className="border-none shadow-sm bg-purple-50 rounded-2xl overflow-hidden border border-purple-100">
                                                         <CardHeader className="pb-3">
                                                             <CardTitle className="text-base font-bold text-purple-800 flex items-center gap-2">
-                                                                <Clock className="w-4 h-4" />
+                                                                <Clock className="w-4 h-4" aria-hidden="true" />
                                                                 العمل الإضافي
                                                             </CardTitle>
                                                         </CardHeader>
@@ -527,7 +527,7 @@ export function PayrollDetailsView() {
                                                                     <span className="font-medium text-slate-900">{slipData.payment.bankName}</span>
                                                                 </div>
                                                                 <div>
-                                                                    <span className="text-sm text-slate-500 block">رقم الآيبان<Lock className="h-3 w-3 text-muted-foreground inline ms-1" /></span>
+                                                                    <span className="text-sm text-slate-500 block">رقم الآيبان<Lock className="h-3 w-3 text-foreground/70 inline ms-1" /></span>
                                                                     <span className="font-medium text-slate-900" dir="ltr">{slipData.payment.iban}</span>
                                                                 </div>
                                                             </div>
@@ -609,7 +609,7 @@ export function PayrollDetailsView() {
                     <div className="bg-white rounded-2xl p-6 max-w-md w-full shadow-xl">
                         <div className="flex justify-center mb-4">
                             <div className="w-16 h-16 rounded-full bg-red-50 flex items-center justify-center">
-                                <AlertTriangle className="w-8 h-8 text-red-500" />
+                                <AlertTriangle className="w-8 h-8 text-red-500" aria-hidden="true" />
                             </div>
                         </div>
                         <h3 className="text-lg font-bold text-slate-900 text-center mb-2">

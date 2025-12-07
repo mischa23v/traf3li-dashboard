@@ -55,11 +55,11 @@ export default function Followups() {
 
         <div className="ms-auto flex items-center gap-4">
           <div className="relative hidden md:block">
-            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+            <Search className="absolute end-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
             <input
               type="text"
               placeholder={t('common.search', 'بحث...')}
-              className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+              className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
             />
           </div>
           <Button
@@ -93,7 +93,7 @@ export default function Followups() {
                   <Scale className="w-3 h-3 ms-2" />
                   {t('cases.management', 'إدارة القضايا')}
                 </Badge>
-                <span className="text-slate-400 text-sm">
+                <span className="text-slate-500 text-sm">
                   {new Date().toLocaleDateString('ar-SA', { month: 'long', year: 'numeric' })}
                 </span>
               </div>
@@ -122,7 +122,7 @@ export default function Followups() {
                     <CardTitle className="text-sm font-medium text-slate-500">
                       {t('followups.pending')}
                     </CardTitle>
-                    <Clock className="h-4 w-4 text-amber-600" />
+                    <Clock className="h-4 w-4 text-amber-600" aria-hidden="true" />
                   </CardHeader>
                   <CardContent>
                     <div className="text-2xl font-bold text-navy">{stats.pending}</div>
@@ -146,7 +146,7 @@ export default function Followups() {
                     <CardTitle className="text-sm font-medium text-slate-500">
                       {t('followups.overdue')}
                     </CardTitle>
-                    <AlertTriangle className="h-4 w-4 text-red-600" />
+                    <AlertTriangle className="h-4 w-4 text-red-600" aria-hidden="true" />
                   </CardHeader>
                   <CardContent>
                     <div className="text-2xl font-bold text-navy">{stats.overdue}</div>
@@ -158,7 +158,7 @@ export default function Followups() {
                     <CardTitle className="text-sm font-medium text-slate-500">
                       {t('followups.dueToday')}
                     </CardTitle>
-                    <Calendar className="h-4 w-4 text-blue-600" />
+                    <Calendar className="h-4 w-4 text-blue-600" aria-hidden="true" />
                   </CardHeader>
                   <CardContent>
                     <div className="text-2xl font-bold text-navy">{stats.dueToday}</div>

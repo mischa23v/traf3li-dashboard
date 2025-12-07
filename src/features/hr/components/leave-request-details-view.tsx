@@ -123,9 +123,9 @@ export function LeaveRequestDetailsView() {
             completed: 'مكتمل',
         }
         const icons: Record<LeaveStatus, React.ReactNode> = {
-            draft: <FileText className="w-3 h-3" />,
-            submitted: <Send className="w-3 h-3" />,
-            pending_approval: <Clock className="w-3 h-3" />,
+            draft: <FileText className="w-3 h-3" aria-hidden="true" />,
+            submitted: <Send className="w-3 h-3" aria-hidden="true" />,
+            pending_approval: <Clock className="w-3 h-3" aria-hidden="true" />,
             approved: <CheckCircle className="w-3 h-3" />,
             rejected: <XCircle className="w-3 h-3" />,
             cancelled: <Ban className="w-3 h-3" />,
@@ -356,7 +356,7 @@ export function LeaveRequestDetailsView() {
                                     تصدير PDF
                                 </DropdownMenuItem>
                                 <DropdownMenuItem>
-                                    <Send className="h-4 w-4 ms-2" />
+                                    <Send className="h-4 w-4 ms-2" aria-hidden="true" />
                                     إرسال للموظف
                                 </DropdownMenuItem>
                                 <DropdownMenuSeparator />
@@ -406,7 +406,7 @@ export function LeaveRequestDetailsView() {
                         <CardContent className="p-4">
                             <div className="flex items-center gap-3">
                                 <div className="w-12 h-12 rounded-xl bg-emerald-50 flex items-center justify-center">
-                                    <Clock className="w-6 h-6 text-emerald-600" />
+                                    <Clock className="w-6 h-6 text-emerald-600" aria-hidden="true" />
                                 </div>
                                 <div>
                                     <p className="text-sm text-slate-500">تاريخ البدء</p>
@@ -452,7 +452,7 @@ export function LeaveRequestDetailsView() {
                             <Card className="border-none shadow-sm bg-white rounded-2xl">
                                 <CardHeader className="pb-3">
                                     <CardTitle className="text-base font-bold text-navy flex items-center gap-2">
-                                        <User className="w-4 h-4 text-emerald-600" />
+                                        <User className="w-4 h-4 text-emerald-600" aria-hidden="true" />
                                         معلومات الموظف
                                     </CardTitle>
                                 </CardHeader>
@@ -528,7 +528,7 @@ export function LeaveRequestDetailsView() {
                             <Card className="border-none shadow-sm bg-white rounded-2xl md:col-span-2">
                                 <CardHeader className="pb-3">
                                     <CardTitle className="text-base font-bold text-navy flex items-center gap-2">
-                                        <FileText className="w-4 h-4 text-emerald-600" />
+                                        <FileText className="w-4 h-4 text-emerald-600" aria-hidden="true" />
                                         سبب الإجازة
                                     </CardTitle>
                                 </CardHeader>
@@ -537,7 +537,7 @@ export function LeaveRequestDetailsView() {
                                     {request.leaveDetails?.isEmergency && (
                                         <div className="mt-4 p-4 bg-red-50 rounded-xl">
                                             <div className="flex items-center gap-2 mb-2">
-                                                <AlertTriangle className="w-5 h-5 text-red-600" />
+                                                <AlertTriangle className="w-5 h-5 text-red-600" aria-hidden="true" />
                                                 <span className="font-bold text-red-700">إجازة طارئة</span>
                                             </div>
                                             {request.leaveDetails.emergencyReason && (
@@ -793,7 +793,7 @@ export function LeaveRequestDetailsView() {
                                     {/* Request Submitted */}
                                     <div className="flex items-start gap-4">
                                         <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
-                                            <Send className="w-5 h-5 text-blue-600" />
+                                            <Send className="w-5 h-5 text-blue-600" aria-hidden="true" />
                                         </div>
                                         <div className="flex-1">
                                             <div className="flex items-center justify-between">
@@ -815,7 +815,7 @@ export function LeaveRequestDetailsView() {
                                             }`}>
                                                 {step.status === 'approved' ? <CheckCircle className="w-5 h-5 text-emerald-600" /> :
                                                  step.status === 'rejected' ? <XCircle className="w-5 h-5 text-red-600" /> :
-                                                 step.status === 'pending' ? <Clock className="w-5 h-5 text-amber-600" /> :
+                                                 step.status === 'pending' ? <Clock className="w-5 h-5 text-amber-600" aria-hidden="true" /> :
                                                  <RefreshCw className="w-5 h-5 text-slate-600" aria-hidden="true" />}
                                             </div>
                                             <div className="flex-1">
@@ -887,7 +887,7 @@ export function LeaveRequestDetailsView() {
                             <Card className="border-none shadow-sm bg-amber-50 rounded-2xl">
                                 <CardHeader className="pb-3">
                                     <CardTitle className="text-base font-bold text-amber-800 flex items-center gap-2">
-                                        <AlertTriangle className="w-4 h-4 text-amber-600" />
+                                        <AlertTriangle className="w-4 h-4 text-amber-600" aria-hidden="true" />
                                         تعارضات
                                     </CardTitle>
                                 </CardHeader>
@@ -920,7 +920,7 @@ export function LeaveRequestDetailsView() {
                             <Card className="border-none shadow-sm bg-white rounded-2xl">
                                 <CardHeader className="pb-3">
                                     <CardTitle className="text-base font-bold text-navy flex items-center gap-2">
-                                        <FileText className="w-4 h-4 text-emerald-600" />
+                                        <FileText className="w-4 h-4 text-emerald-600" aria-hidden="true" />
                                         المستندات المرفقة
                                     </CardTitle>
                                 </CardHeader>
@@ -930,7 +930,7 @@ export function LeaveRequestDetailsView() {
                                             <div key={idx} className="flex items-center justify-between p-4 bg-slate-50 rounded-xl">
                                                 <div className="flex items-center gap-3">
                                                     <div className="w-10 h-10 rounded-lg bg-white flex items-center justify-center">
-                                                        <FileText className="w-5 h-5 text-slate-600" />
+                                                        <FileText className="w-5 h-5 text-slate-600" aria-hidden="true" />
                                                     </div>
                                                     <div>
                                                         <p className="font-medium text-navy">{doc.documentNameAr || doc.documentName}</p>
@@ -969,7 +969,7 @@ export function LeaveRequestDetailsView() {
                                 <CardHeader className="pb-3">
                                     <div className="flex items-center justify-between">
                                         <CardTitle className="text-base font-bold text-navy flex items-center gap-2">
-                                            <Building className="w-4 h-4 text-emerald-600" />
+                                            <Building className="w-4 h-4 text-emerald-600" aria-hidden="true" />
                                             تسليم العمل
                                         </CardTitle>
                                         {!request.workHandover.handoverCompleted && request.status === 'approved' && (
@@ -992,7 +992,7 @@ export function LeaveRequestDetailsView() {
                                             <p className="text-sm text-blue-600 mb-2">تفويض العمل إلى:</p>
                                             <div className="flex items-center gap-3">
                                                 <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center">
-                                                    <User className="w-5 h-5 text-blue-600" />
+                                                    <User className="w-5 h-5 text-blue-600" aria-hidden="true" />
                                                 </div>
                                                 <div>
                                                     <p className="font-medium text-navy">{request.workHandover.delegateTo.employeeName}</p>
@@ -1064,7 +1064,7 @@ export function LeaveRequestDetailsView() {
                         <Card className="border-none shadow-sm bg-white rounded-2xl">
                             <CardHeader className="pb-3">
                                 <CardTitle className="text-base font-bold text-navy flex items-center gap-2">
-                                    <FileText className="w-4 h-4 text-emerald-600" />
+                                    <FileText className="w-4 h-4 text-emerald-600" aria-hidden="true" />
                                     الملاحظات
                                 </CardTitle>
                             </CardHeader>
@@ -1089,7 +1089,7 @@ export function LeaveRequestDetailsView() {
                                 )}
                                 {!request.notes?.employeeNotes && !request.notes?.managerNotes && !request.notes?.hrNotes && (
                                     <div className="text-center py-8">
-                                        <FileText className="w-12 h-12 text-slate-300 mx-auto mb-3" />
+                                        <FileText className="w-12 h-12 text-slate-300 mx-auto mb-3" aria-hidden="true" />
                                         <p className="text-slate-500">لا توجد ملاحظات</p>
                                     </div>
                                 )}

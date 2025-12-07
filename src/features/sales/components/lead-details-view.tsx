@@ -157,7 +157,7 @@ export default function LeadDetailsView() {
                     <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
                         <DynamicIsland />
                     </div>
-                    <div className='ms-auto flex items-center space-x-4'>
+                    <div className='ms-auto flex items-center gap-4'>
                         <LanguageSwitcher className="text-slate-300" />
                         <ThemeSwitch className="text-slate-300" />
                         <ProfileDropdown className="text-slate-300" />
@@ -182,7 +182,7 @@ export default function LeadDetailsView() {
                     <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
                         <DynamicIsland />
                     </div>
-                    <div className='ms-auto flex items-center space-x-4'>
+                    <div className='ms-auto flex items-center gap-4'>
                         <LanguageSwitcher className="text-slate-300" />
                         <ThemeSwitch className="text-slate-300" />
                         <ProfileDropdown className="text-slate-300" />
@@ -192,12 +192,12 @@ export default function LeadDetailsView() {
                     <div className="max-w-7xl mx-auto">
                         <Button asChild variant="ghost" className="mb-6">
                             <Link to="/dashboard/sales/leads">
-                                <ArrowRight className="h-4 w-4 ml-2" />
+                                <ArrowRight className="h-4 w-4 ms-2" />
                                 العودة للعملاء المحتملين
                             </Link>
                         </Button>
                         <Card className="border-0 shadow-sm rounded-3xl p-12 text-center">
-                            <AlertCircle className="h-16 w-16 text-rose-400 mx-auto mb-4" />
+                            <AlertCircle className="h-16 w-16 text-rose-400 mx-auto mb-4" aria-hidden="true" />
                             <h3 className="text-xl font-bold text-navy mb-2">فشل تحميل العميل المحتمل</h3>
                             <p className="text-slate-500">العميل المحتمل غير موجود</p>
                         </Card>
@@ -217,7 +217,7 @@ export default function LeadDetailsView() {
                 <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
                     <DynamicIsland />
                 </div>
-                <div className='ms-auto flex items-center space-x-4'>
+                <div className='ms-auto flex items-center gap-4'>
                     <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white" />
                     <ThemeSwitch className="text-slate-300 hover:bg-white/10 hover:text-white" />
                     <ProfileDropdown className="text-slate-300 hover:bg-white/10 hover:text-white" />
@@ -239,7 +239,7 @@ export default function LeadDetailsView() {
                                 variant="outline"
                                 onClick={() => setShowActivityDialog(true)}
                             >
-                                <Plus className="h-4 w-4 ms-2" />
+                                <Plus className="h-4 w-4 ms-2" aria-hidden="true" />
                                 إضافة نشاط
                             </Button>
                             <Button
@@ -260,7 +260,7 @@ export default function LeadDetailsView() {
                             )}
                             <Button asChild variant="outline">
                                 <Link to={`/dashboard/sales/leads/${leadId}/edit`}>
-                                    <Edit className="h-4 w-4 ms-2" />
+                                    <Edit className="h-4 w-4 ms-2" aria-hidden="true" />
                                     تعديل
                                 </Link>
                             </Button>
@@ -282,7 +282,7 @@ export default function LeadDetailsView() {
                             <Card className="border-0 shadow-sm rounded-3xl">
                                 <CardHeader className="border-b border-slate-100">
                                     <CardTitle className="text-lg font-bold text-navy flex items-center gap-2">
-                                        <User className="h-5 w-5 text-brand-blue" />
+                                        <User className="h-5 w-5 text-brand-blue" aria-hidden="true" />
                                         معلومات العميل المحتمل
                                     </CardTitle>
                                 </CardHeader>
@@ -296,7 +296,7 @@ export default function LeadDetailsView() {
                                             <div>
                                                 <p className="text-sm text-slate-500 mb-1">البريد الإلكتروني</p>
                                                 <p className="font-medium text-navy flex items-center gap-2">
-                                                    <Mail className="h-4 w-4 text-slate-400" />
+                                                    <Mail className="h-4 w-4 text-slate-500" aria-hidden="true" />
                                                     {lead.email}
                                                 </p>
                                             </div>
@@ -305,7 +305,7 @@ export default function LeadDetailsView() {
                                             <div>
                                                 <p className="text-sm text-slate-500 mb-1">رقم الهاتف</p>
                                                 <p className="font-medium text-navy flex items-center gap-2">
-                                                    <Phone className="h-4 w-4 text-slate-400" />
+                                                    <Phone className="h-4 w-4 text-slate-500" aria-hidden="true" />
                                                     {lead.phone}
                                                 </p>
                                             </div>
@@ -314,7 +314,7 @@ export default function LeadDetailsView() {
                                             <div>
                                                 <p className="text-sm text-slate-500 mb-1">الشركة</p>
                                                 <p className="font-medium text-navy flex items-center gap-2">
-                                                    <Building className="h-4 w-4 text-slate-400" />
+                                                    <Building className="h-4 w-4 text-slate-500" aria-hidden="true" />
                                                     {lead.company}
                                                 </p>
                                             </div>
@@ -359,7 +359,7 @@ export default function LeadDetailsView() {
                                                 <div>
                                                     <p className="text-sm text-slate-500 mb-1">تاريخ الإغلاق المتوقع</p>
                                                     <p className="font-medium text-navy flex items-center gap-2">
-                                                        <Calendar className="h-4 w-4 text-slate-400" />
+                                                        <Calendar className="h-4 w-4 text-slate-500" aria-hidden="true" />
                                                         {formatDate(lead.expectedCloseDate)}
                                                     </p>
                                                 </div>
@@ -441,7 +441,7 @@ export default function LeadDetailsView() {
                                             ))}
                                         </div>
                                     ) : (
-                                        <p className="text-center text-slate-400 py-8">لا توجد أنشطة بعد</p>
+                                        <p className="text-center text-slate-500 py-8">لا توجد أنشطة بعد</p>
                                     )}
                                 </CardContent>
                             </Card>

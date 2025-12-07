@@ -35,7 +35,7 @@ export function TemplatesRowActions({ row }: TemplatesRowActionsProps) {
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-[180px]">
         <DropdownMenuItem onClick={() => handleAction('view')}>
-          <Eye className="me-2 h-4 w-4" />
+          <Eye className="me-2 h-4 w-4" aria-hidden="true" />
           {t('common.view')}
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => handleAction('preview')}>
@@ -43,11 +43,11 @@ export function TemplatesRowActions({ row }: TemplatesRowActionsProps) {
           {t('invoiceTemplates.preview')}
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => handleAction('edit')}>
-          <Pencil className="me-2 h-4 w-4" />
+          <Pencil className="me-2 h-4 w-4" aria-hidden="true" />
           {t('common.edit')}
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => handleAction('duplicate')}>
-          <Copy className="me-2 h-4 w-4" />
+          <Copy className="me-2 h-4 w-4" aria-hidden="true" />
           {t('invoiceTemplates.duplicate')}
         </DropdownMenuItem>
         {!row.original.isDefault && (
@@ -67,7 +67,7 @@ export function TemplatesRowActions({ row }: TemplatesRowActionsProps) {
           className="text-destructive focus:text-destructive"
           disabled={row.original.isDefault}
         >
-          <Trash2 className="me-2 h-4 w-4" />
+          <Trash2 className="me-2 h-4 w-4" aria-hidden="true" />
           {t('common.delete')}
         </DropdownMenuItem>
       </DropdownMenuContent>

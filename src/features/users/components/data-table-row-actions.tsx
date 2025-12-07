@@ -40,7 +40,7 @@ export function DataTableRowActions({ row }: DataTableRowActionsProps) {
           >
             Edit
             <DropdownMenuShortcut>
-              <UserPen size={16} />
+              <UserPen size={16} aria-hidden='true' />
             </DropdownMenuShortcut>
           </DropdownMenuItem>
           <DropdownMenuSeparator />
@@ -53,7 +53,7 @@ export function DataTableRowActions({ row }: DataTableRowActionsProps) {
           >
             Delete
             <DropdownMenuShortcut>
-              <Trash2 size={16} />
+              <Trash2 size={16} aria-hidden='true' />
             </DropdownMenuShortcut>
           </DropdownMenuItem>
         </DropdownMenuContent>

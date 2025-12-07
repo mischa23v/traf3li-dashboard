@@ -348,7 +348,7 @@ export function ProfilePage() {
 
                   <div className="flex justify-end">
                     <Button type="submit" className="bg-emerald-500 hover:bg-emerald-600">
-                      <Save className="h-4 w-4 me-2" />
+                      <Save className="h-4 w-4 me-2" aria-hidden="true" />
                       {isRTL ? 'حفظ التغييرات' : 'Save Changes'}
                     </Button>
                   </div>

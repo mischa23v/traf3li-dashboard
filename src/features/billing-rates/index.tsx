@@ -78,11 +78,11 @@ function BillingRatesContent() {
 
         <div className="ms-auto flex items-center gap-4">
           <div className="relative hidden md:block">
-            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+            <Search className="absolute end-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
             <input
               type="text"
               placeholder={t('common.search', 'بحث...')}
-              className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+              className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
             />
           </div>
           <Button
@@ -113,10 +113,10 @@ function BillingRatesContent() {
             <div>
               <div className="flex items-center gap-2 mb-2">
                 <Badge className="bg-blue-500/20 text-blue-100 hover:bg-blue-500/30 border-0 px-3 py-1">
-                  <Scale className="w-3 h-3 ml-2" />
+                  <Scale className="w-3 h-3 ms-2" />
                   {t('settings.title', 'الإعدادات')}
                 </Badge>
-                <span className="text-slate-400 text-sm">
+                <span className="text-slate-500 text-sm">
                   {new Date().toLocaleDateString('ar-SA', { month: 'long', year: 'numeric' })}
                 </span>
               </div>
@@ -133,7 +133,7 @@ function BillingRatesContent() {
                   onClick={handleAddRate}
                   className="bg-brand-blue hover:bg-blue-600 text-white rounded-xl h-12 px-8 font-bold shadow-lg shadow-blue-600/30 hover:scale-105 transition-all duration-300 border-0 text-base"
                 >
-                  <Plus className="ml-2 h-5 w-5" />
+                  <Plus className="ms-2 h-5 w-5" aria-hidden="true" />
                   {t('billingRates.addRate', 'إضافة سعر')}
                 </Button>
               ) : (
@@ -141,7 +141,7 @@ function BillingRatesContent() {
                   onClick={handleAddGroup}
                   className="bg-brand-blue hover:bg-blue-600 text-white rounded-xl h-12 px-8 font-bold shadow-lg shadow-blue-600/30 hover:scale-105 transition-all duration-300 border-0 text-base"
                 >
-                  <Plus className="ml-2 h-5 w-5" />
+                  <Plus className="ms-2 h-5 w-5" aria-hidden="true" />
                   {t('billingRates.addGroup', 'إضافة مجموعة')}
                 </Button>
               )}
@@ -158,14 +158,14 @@ function BillingRatesContent() {
                   value="rates"
                   className="rounded-xl px-6 py-2 data-[state=active]:bg-navy data-[state=active]:text-white transition-all"
                 >
-                  <DollarSign className="h-4 w-4 ml-2" />
+                  <DollarSign className="h-4 w-4 ms-2" />
                   {t('billingRates.rates', 'الأسعار')}
                 </TabsTrigger>
                 <TabsTrigger
                   value="groups"
                   className="rounded-xl px-6 py-2 data-[state=active]:bg-navy data-[state=active]:text-white transition-all"
                 >
-                  <Layers className="h-4 w-4 ml-2" />
+                  <Layers className="h-4 w-4 ms-2" />
                   {t('billingRates.groups', 'المجموعات')}
                 </TabsTrigger>
               </TabsList>

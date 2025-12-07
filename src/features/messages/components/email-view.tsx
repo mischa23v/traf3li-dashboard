@@ -156,7 +156,7 @@ export function EmailView() {
           {/* Sidebar */}
           <div className="w-64 bg-white border-e border-slate-200 p-4 flex flex-col">
             <Button className="w-full bg-emerald-500 hover:bg-emerald-600 mb-6">
-              <Plus className="h-4 w-4 me-2" />
+              <Plus className="h-4 w-4 me-2" aria-hidden="true" />
               {isRTL ? 'إنشاء رسالة' : 'Compose'}
             </Button>
 
@@ -191,7 +191,7 @@ export function EmailView() {
             <div className="bg-white border-b border-slate-200 p-4">
               <div className="flex items-center gap-4">
                 <div className="relative flex-1">
-                  <Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                  <Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
                   <Input
                     placeholder={isRTL ? 'بحث في البريد...' : 'Search emails...'}
                     value={searchQuery}
@@ -253,7 +253,7 @@ export function EmailView() {
                       <span className={`text-sm ${!email.isRead ? 'font-medium text-slate-800' : 'text-slate-600'}`}>
                         {isRTL ? email.subject : email.subjectEn}
                       </span>
-                      {email.hasAttachment && <Paperclip className="h-3 w-3 text-slate-400" />}
+                      {email.hasAttachment && <Paperclip className="h-3 w-3 text-slate-500" />}
                     </div>
                     <p className="text-xs text-slate-500 truncate">
                       {isRTL ? email.preview : email.previewEn}
@@ -275,10 +275,10 @@ export function EmailView() {
               </span>
               <div className="flex items-center gap-2">
                 <Button variant="outline" size="icon" disabled>
-                  {isRTL ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
+                  {isRTL ? <ChevronRight className="h-4 w-4" aria-hidden="true" /> : <ChevronLeft className="h-4 w-4" aria-hidden="true" />}
                 </Button>
                 <Button variant="outline" size="icon">
-                  {isRTL ? <ChevronLeft className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+                  {isRTL ? <ChevronLeft className="h-4 w-4" aria-hidden="true" /> : <ChevronRight className="h-4 w-4" aria-hidden="true" />}
                 </Button>
               </div>
             </div>
@@ -296,7 +296,7 @@ export function EmailView() {
                     className="md:hidden"
                     onClick={() => setSelectedEmail(null)}
                   >
-                    {isRTL ? <ChevronRight className="h-4 w-4 me-1" /> : <ChevronLeft className="h-4 w-4 me-1" />}
+                    {isRTL ? <ChevronRight className="h-4 w-4 me-1" aria-hidden="true" /> : <ChevronLeft className="h-4 w-4 me-1" aria-hidden="true" />}
                     {isRTL ? 'رجوع' : 'Back'}
                   </Button>
                   <div className="flex items-center gap-2">
@@ -347,7 +347,7 @@ export function EmailView() {
                     </div>
                   </div>
                   <div className="text-sm text-slate-500 flex items-center">
-                    <Clock className="h-4 w-4 me-1" />
+                    <Clock className="h-4 w-4 me-1" aria-hidden="true" />
                     {isRTL ? selectedEmailData.date : selectedEmailData.dateEn}
                   </div>
                 </div>
@@ -370,7 +370,7 @@ export function EmailView() {
                     </h4>
                     <div className="flex gap-3">
                       <div className="flex items-center gap-2 p-3 bg-slate-50 rounded-lg border border-slate-200">
-                        <FileText className="h-8 w-8 text-blue-600" />
+                        <FileText className="h-8 w-8 text-blue-600" aria-hidden="true" />
                         <div>
                           <div className="text-sm font-medium">document.pdf</div>
                           <div className="text-xs text-slate-500">245 KB</div>
@@ -395,7 +395,7 @@ export function EmailView() {
           {!selectedEmail && (
             <div className="hidden md:flex flex-1 items-center justify-center bg-white border-s border-slate-200">
               <div className="text-center">
-                <Mail className="h-16 w-16 mx-auto text-slate-300 mb-4" />
+                <Mail className="h-16 w-16 mx-auto text-slate-300 mb-4" aria-hidden="true" />
                 <h3 className="text-lg font-medium text-slate-900">
                   {isRTL ? 'اختر رسالة لعرضها' : 'Select an email to view'}
                 </h3>

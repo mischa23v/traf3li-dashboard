@@ -50,7 +50,7 @@ export default function CasesDashboard() {
             timeValue: 1030,
             lawyer: 'sara',
             actionRequired: 'لا يوجد إجراء',
-            actionColor: 'text-slate-400'
+            actionColor: 'text-slate-500'
         },
         {
             id: '411',
@@ -77,14 +77,14 @@ export default function CasesDashboard() {
         <div className="min-h-screen bg-[#f8f9fa] font-sans pb-20" dir="rtl">
 
             {/* Top Blue Line */}
-            <div className="fixed top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-blue-600 via-blue-500 to-blue-600 z-[60] shadow-sm"></div>
+            <div className="fixed top-0 start-0 end-0 h-1.5 bg-gradient-to-r from-blue-600 via-blue-500 to-blue-600 z-[60] shadow-sm"></div>
 
             <div className="p-6 lg:p-8 space-y-8 pt-10 max-w-[1600px] mx-auto">
 
                 {/* HERO BANNER */}
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     <div className="lg:col-span-2 bg-navy rounded-3xl p-8 relative overflow-hidden text-white flex flex-col justify-between min-h-[280px] shadow-xl shadow-navy/20 group">
-                        <div className="absolute -bottom-32 -left-32 w-96 h-96 bg-brand-blue rounded-full blur-[120px] opacity-40 group-hover:opacity-50 transition-opacity duration-700"></div>
+                        <div className="absolute -bottom-32 -start-32 w-96 h-96 bg-brand-blue rounded-full blur-[120px] opacity-40 group-hover:opacity-50 transition-opacity duration-700"></div>
                         <div className="relative z-10">
                             <h1 className="text-3xl lg:text-4xl font-bold mb-3 leading-tight">صباح الخير، مشاري 👋</h1>
                             <p className="text-slate-300 text-lg font-medium">لديك <span className="text-white font-bold">3 جلسات مرافعة</span> و <span className="text-white font-bold">5 مهام</span> تتطلب انتباهك اليوم.</p>
@@ -100,9 +100,9 @@ export default function CasesDashboard() {
                         <div className="flex justify-between items-start mb-6">
                             <div>
                                 <h3 className="font-bold text-navy text-xl">المهام العاجلة</h3>
-                                <p className="text-slate-400 text-sm mt-1">تستحق الانتباه</p>
+                                <p className="text-slate-500 text-sm mt-1">تستحق الانتباه</p>
                             </div>
-                            <div className="h-12 w-12 rounded-2xl bg-red-50 flex items-center justify-center shadow-sm"><AlertCircle className="h-6 w-6 text-red-500" /></div>
+                            <div className="h-12 w-12 rounded-2xl bg-red-50 flex items-center justify-center shadow-sm"><AlertCircle className="h-6 w-6 text-red-500" aria-hidden="true" /></div>
                         </div>
                         <div className="space-y-4">
                             <div className="flex items-center gap-4 p-4 bg-slate-50 rounded-2xl border border-slate-100 hover:bg-white hover:shadow-md transition-all duration-300 cursor-pointer group">
@@ -119,7 +119,7 @@ export default function CasesDashboard() {
                 {/* FILTERS SECTION */}
                 <div className="bg-white rounded-3xl border border-slate-200 shadow-sm p-6 lg:p-8">
                     <div className="flex items-center gap-3 mb-6 text-navy">
-                        <div className="p-2 bg-blue-50 rounded-xl"><Filter className="h-5 w-5 text-brand-blue" /></div>
+                        <div className="p-2 bg-blue-50 rounded-xl"><Filter className="h-5 w-5 text-brand-blue" aria-hidden="true" /></div>
                         <span className="font-bold text-lg">تصفية القضايا</span>
                     </div>
 
@@ -186,7 +186,7 @@ export default function CasesDashboard() {
                     <div className="flex items-center gap-3 mt-8 pt-6 border-t border-slate-100">
                         <Button className="bg-brand-blue hover:bg-blue-700 text-white rounded-xl px-8 h-11 font-bold shadow-lg shadow-blue-600/20 transition-all hover:-translate-y-0.5">تطبيق التصفية</Button>
                         <Button variant="ghost" className="text-slate-500 hover:text-red-500 hover:bg-red-50 rounded-xl px-6 h-11 font-medium transition-colors">
-                            <X className="h-4 w-4 ms-2" />
+                            <X className="h-4 w-4 ms-2" aria-hidden="true" />
                             مسح الكل
                         </Button>
                     </div>
@@ -199,7 +199,7 @@ export default function CasesDashboard() {
                         <span className="px-3 py-1 bg-blue-50 text-brand-blue text-xs font-bold rounded-full border border-blue-100">{cases.length} جلسات</span>
                     </div>
                     <div className="text-sm font-medium text-slate-500 flex items-center gap-2 bg-white px-4 py-2 rounded-full shadow-sm border border-slate-100">
-                        <Clock className="h-4 w-4 text-brand-blue" />
+                        <Clock className="h-4 w-4 text-brand-blue" aria-hidden="true" />
                         <span>مرتبة حسب الوقت</span>
                     </div>
                 </div>
@@ -211,7 +211,7 @@ export default function CasesDashboard() {
                         <div key={caseItem.id} className="bg-white rounded-3xl border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-blue-900/5 hover:-translate-y-1 transition-all duration-300 overflow-hidden flex flex-col group">
                             <div className="p-6 flex-1 relative">
                                 {/* Hover Accent Line */}
-                                <div className="absolute top-0 right-0 w-1.5 h-full bg-brand-blue opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                                <div className="absolute top-0 end-0 w-1.5 h-full bg-brand-blue opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
 
                                 <div className="flex justify-between items-start mb-6">
                                     <div className="flex items-center gap-4">
@@ -220,7 +220,7 @@ export default function CasesDashboard() {
                                         </div>
                                         <div>
                                             <div className="font-bold text-xl text-navy mb-1">قضية #{caseItem.id}</div>
-                                            <div className="text-xs font-bold text-slate-400 uppercase tracking-wider">{caseItem.typeLabel}</div>
+                                            <div className="text-xs font-bold text-slate-500 uppercase tracking-wider">{caseItem.typeLabel}</div>
                                         </div>
                                     </div>
                                     <span className={`px-3 py-1.5 rounded-xl text-xs font-bold border ${caseItem.statusColor}`}>{caseItem.statusLabel}</span>
@@ -242,7 +242,7 @@ export default function CasesDashboard() {
                                     {/* Location */}
                                     <div className="flex justify-between items-center text-sm pb-3 border-b border-slate-50 border-dashed">
                                         <span className="text-slate-500 font-medium flex items-center gap-1.5">
-                                            <MapPin className="h-4 w-4 text-slate-400" />
+                                            <MapPin className="h-4 w-4 text-slate-500" aria-hidden="true" />
                                             الموقع
                                         </span>
                                         <span className="font-bold text-slate-800 text-xs bg-slate-50 px-2 py-1 rounded-lg">{typeof caseItem.location === 'string' ? caseItem.location : (caseItem.location?.name || caseItem.location?.address || 'عن بعد')}</span>
@@ -252,7 +252,7 @@ export default function CasesDashboard() {
                                     <div className="flex justify-between items-center text-sm pt-1">
                                         <span className="text-slate-500 font-medium">الوقت</span>
                                         <span className="font-bold text-brand-blue flex items-center gap-1.5 bg-blue-50 px-3 py-1.5 rounded-lg border border-blue-100">
-                                            <Clock className="h-4 w-4" />
+                                            <Clock className="h-4 w-4" aria-hidden="true" />
                                             {caseItem.time}
                                         </span>
                                     </div>
@@ -263,8 +263,8 @@ export default function CasesDashboard() {
                                     <div className={`w-2 h-2 rounded-full ${caseItem.actionColor === 'text-brand-blue' ? 'bg-brand-blue animate-pulse' : 'bg-slate-300'}`}></div>
                                     {caseItem.actionRequired}
                                 </span>
-                                <button className="h-9 w-9 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-400 hover:bg-brand-blue hover:text-white hover:border-transparent transition-all duration-300 shadow-sm">
-                                    <ChevronLeft className="h-5 w-5" />
+                                <button className="h-9 w-9 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-500 hover:bg-brand-blue hover:text-white hover:border-transparent transition-all duration-300 shadow-sm">
+                                    <ChevronLeft className="h-5 w-5" aria-hidden="true" />
                                 </button>
                             </div>
                         </div>

@@ -415,9 +415,9 @@ export function FullCalendarView() {
           {eventType === 'hearing' || eventType === 'court_session' ? (
             <Gavel className="h-3 w-3 flex-shrink-0" />
           ) : eventType === 'meeting' ? (
-            <Users className="h-3 w-3 flex-shrink-0" />
+            <Users className="h-3 w-3 flex-shrink-0" aria-hidden="true" />
           ) : eventType === 'deadline' || eventType === 'task' ? (
-            <AlertTriangle className="h-3 w-3 flex-shrink-0" />
+            <AlertTriangle className="h-3 w-3 flex-shrink-0" aria-hidden="true" />
           ) : (
             <CalendarIcon className="h-3 w-3 flex-shrink-0" />
           )}
@@ -436,7 +436,7 @@ export function FullCalendarView() {
           <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
             <DynamicIsland />
           </div>
-          <div className="ms-auto flex items-center space-x-4">
+          <div className="ms-auto flex items-center gap-4">
             <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white">
               <Bell className="h-5 w-5" />
             </Button>
@@ -463,7 +463,7 @@ export function FullCalendarView() {
           <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
             <DynamicIsland />
           </div>
-          <div className="ms-auto flex items-center space-x-4">
+          <div className="ms-auto flex items-center gap-4">
             <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white" />
             <ThemeSwitch className="text-slate-300 hover:bg-white/10 hover:text-white" />
             <ProfileDropdown className="text-slate-300 hover:bg-white/10 hover:text-white" />
@@ -473,12 +473,12 @@ export function FullCalendarView() {
           <Card className="rounded-3xl border-0 shadow-lg">
             <CardContent className="p-12 text-center">
               <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                <AlertCircle className="h-8 w-8 text-red-500" />
+                <AlertCircle className="h-8 w-8 text-red-500" aria-hidden="true" />
               </div>
               <h3 className="text-xl font-bold text-slate-900 mb-2">فشل تحميل التقويم</h3>
               <p className="text-slate-500 mb-6">{(error as Error)?.message || 'حدث خطأ أثناء تحميل البيانات'}</p>
               <Button onClick={() => refetch()} className="bg-emerald-500 hover:bg-emerald-600 text-white px-8">
-                <RefreshCw className="ml-2 h-4 w-4" />
+                <RefreshCw className="ms-2 h-4 w-4" />
                 إعادة المحاولة
               </Button>
             </CardContent>
@@ -495,13 +495,13 @@ export function FullCalendarView() {
         <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
           <DynamicIsland />
         </div>
-        <div className="ms-auto flex items-center space-x-4">
+        <div className="ms-auto flex items-center gap-4">
           <div className="relative hidden md:block">
-            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
             <input
               type="text"
               placeholder="بحث..."
-              className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pr-9 pl-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+              className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
             />
           </div>
           <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white">
@@ -524,10 +524,10 @@ export function FullCalendarView() {
             <div>
               <div className="flex items-center gap-2 mb-2">
                 <Badge className="bg-blue-500/20 text-blue-100 hover:bg-blue-500/30 border-0 px-3 py-1">
-                  <Briefcase className="w-3 h-3 ml-2" />
+                  <Briefcase className="w-3 h-3 ms-2" />
                   مكتب المحاماة
                 </Badge>
-                <span className="text-slate-400 text-sm">
+                <span className="text-slate-500 text-sm">
                   {new Date().toLocaleDateString('ar-SA', { month: 'long', year: 'numeric' })}
                 </span>
               </div>
@@ -552,23 +552,23 @@ export function FullCalendarView() {
                 onClick={() => setIsCreateDialogOpen(true)}
                 className="bg-brand-blue hover:bg-blue-600 text-white rounded-xl h-12 px-8 font-bold shadow-lg shadow-blue-600/30 hover:scale-105 transition-all duration-300 border-0 text-base"
               >
-                <Plus className="ml-2 h-5 w-5" />
+                <Plus className="ms-2 h-5 w-5" aria-hidden="true" />
                 حدث جديد
               </Button>
               <Button
                 onClick={() => setIsSyncDialogOpen(true)}
                 className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl h-12 px-6 font-bold shadow-lg shadow-emerald-600/30 hover:scale-105 transition-all duration-300 border-0"
               >
-                <Settings className="ml-2 h-5 w-5" />
+                <Settings className="ms-2 h-5 w-5" aria-hidden="true" />
                 مزامنة
               </Button>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button className="bg-white/10 hover:bg-white/20 text-white rounded-xl h-12 px-6 font-bold backdrop-blur-md border border-white/10 transition-all duration-300">
-                    <Filter className="ml-2 h-5 w-5" />
+                    <Filter className="ms-2 h-5 w-5" aria-hidden="true" />
                     تصفية
                     {filterTypes.length > 0 && (
-                      <Badge className="mr-2 bg-brand-blue text-white">{filterTypes.length}</Badge>
+                      <Badge className="me-2 bg-brand-blue text-white">{filterTypes.length}</Badge>
                     )}
                   </Button>
                 </DropdownMenuTrigger>
@@ -583,7 +583,7 @@ export function FullCalendarView() {
                       }
                     }}
                   >
-                    <Gavel className="ml-2 h-4 w-4 text-red-500" />
+                    <Gavel className="ms-2 h-4 w-4 text-red-500" />
                     جلسات المحكمة
                   </DropdownMenuCheckboxItem>
                   <DropdownMenuCheckboxItem
@@ -596,7 +596,7 @@ export function FullCalendarView() {
                       }
                     }}
                   >
-                    <Users className="ml-2 h-4 w-4 text-blue-500" />
+                    <Users className="ms-2 h-4 w-4 text-blue-500" aria-hidden="true" />
                     اجتماعات
                   </DropdownMenuCheckboxItem>
                   <DropdownMenuCheckboxItem
@@ -609,7 +609,7 @@ export function FullCalendarView() {
                       }
                     }}
                   >
-                    <AlertTriangle className="ml-2 h-4 w-4 text-purple-500" />
+                    <AlertTriangle className="ms-2 h-4 w-4 text-purple-500" aria-hidden="true" />
                     مهام
                   </DropdownMenuCheckboxItem>
                   <DropdownMenuCheckboxItem
@@ -622,12 +622,12 @@ export function FullCalendarView() {
                       }
                     }}
                   >
-                    <Bell className="ml-2 h-4 w-4 text-orange-500" />
+                    <Bell className="ms-2 h-4 w-4 text-orange-500" />
                     تذكيرات
                   </DropdownMenuCheckboxItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={() => setFilterTypes([])}>
-                    <X className="ml-2 h-4 w-4" />
+                    <X className="ms-2 h-4 w-4" aria-hidden="true" />
                     إزالة الفلاتر
                   </DropdownMenuItem>
                 </DropdownMenuContent>
@@ -694,7 +694,7 @@ export function FullCalendarView() {
               selectedEvent?.extendedProps.eventType === 'court_session' ? (
                 <Gavel className="h-5 w-5 text-red-500" />
               ) : selectedEvent?.extendedProps.eventType === 'meeting' ? (
-                <Users className="h-5 w-5 text-blue-500" />
+                <Users className="h-5 w-5 text-blue-500" aria-hidden="true" />
               ) : (
                 <CalendarIcon className="h-5 w-5 text-purple-500" />
               )}
@@ -709,7 +709,7 @@ export function FullCalendarView() {
           {selectedEvent && (
             <div className="space-y-4">
               <div className="flex items-center gap-2 text-sm text-slate-600">
-                <Clock className="h-4 w-4" />
+                <Clock className="h-4 w-4" aria-hidden="true" />
                 <span>
                   {new Date(selectedEvent.start).toLocaleDateString('ar-SA', {
                     weekday: 'long',
@@ -722,7 +722,7 @@ export function FullCalendarView() {
 
               {selectedEvent.extendedProps.location && (
                 <div className="flex items-center gap-2 text-sm text-slate-600">
-                  <MapPin className="h-4 w-4" />
+                  <MapPin className="h-4 w-4" aria-hidden="true" />
                   <span>{selectedEvent.extendedProps.location}</span>
                 </div>
               )}
@@ -770,7 +770,7 @@ export function FullCalendarView() {
               إغلاق
             </Button>
             <Button onClick={handleViewEventDetails}>
-              <ExternalLink className="ml-2 h-4 w-4" />
+              <ExternalLink className="ms-2 h-4 w-4" aria-hidden="true" />
               عرض التفاصيل
             </Button>
           </DialogFooter>
@@ -909,9 +909,9 @@ export function FullCalendarView() {
               className="bg-brand-blue hover:bg-blue-600"
             >
               {createEventMutation.isPending ? (
-                <Loader2 className="ml-2 h-4 w-4 animate-spin" />
+                <Loader2 className="ms-2 h-4 w-4 animate-spin" />
               ) : (
-                <Check className="ml-2 h-4 w-4" />
+                <Check className="ms-2 h-4 w-4" aria-hidden="true" />
               )}
               إنشاء الحدث
             </Button>

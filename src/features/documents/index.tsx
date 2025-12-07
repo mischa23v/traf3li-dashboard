@@ -57,11 +57,11 @@ export default function Documents() {
 
         <div className="ms-auto flex items-center gap-4">
           <div className="relative hidden md:block">
-            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+            <Search className="absolute end-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
             <input
               type="text"
               placeholder={t('common.search', 'بحث...')}
-              className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+              className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
             />
           </div>
           <Button
@@ -102,7 +102,7 @@ export default function Documents() {
                     <CardTitle className="text-sm font-medium text-slate-500">
                       {t('documents.totalDocuments')}
                     </CardTitle>
-                    <FileText className="h-4 w-4 text-primary" />
+                    <FileText className="h-4 w-4 text-primary" aria-hidden="true" />
                   </CardHeader>
                   <CardContent>
                     <div className="text-2xl font-bold text-navy">{stats.totalDocuments}</div>
@@ -138,7 +138,7 @@ export default function Documents() {
                     <CardTitle className="text-sm font-medium text-slate-500">
                       {t('documents.thisMonth')}
                     </CardTitle>
-                    <Calendar className="h-4 w-4 text-green-500" />
+                    <Calendar className="h-4 w-4 text-green-500" aria-hidden="true" />
                   </CardHeader>
                   <CardContent>
                     <div className="text-2xl font-bold text-navy">{stats.documentsThisMonth}</div>

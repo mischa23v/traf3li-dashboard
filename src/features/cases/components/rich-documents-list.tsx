@@ -155,7 +155,7 @@ export function RichDocumentsList({
         <CardContent className="p-4">
           <div className="flex flex-col md:flex-row gap-4">
             <div className="relative flex-1">
-              <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" aria-hidden="true" />
+              <Search className="absolute end-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
               <Input
                 placeholder={isArabic ? 'بحث في المستندات...' : 'Search documents...'}
                 value={filters.search}
@@ -174,7 +174,7 @@ export function RichDocumentsList({
               }
             >
               <SelectTrigger className="w-[180px] rounded-xl">
-                <Filter className="h-4 w-4 me-2 text-slate-400" aria-hidden="true" />
+                <Filter className="h-4 w-4 me-2 text-slate-500" aria-hidden="true" />
                 <SelectValue placeholder={isArabic ? 'نوع المستند' : 'Document Type'} />
               </SelectTrigger>
               <SelectContent>
@@ -294,7 +294,7 @@ export function RichDocumentsList({
                   </CardTitle>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-navy" aria-label="خيارات">
+                      <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-500 hover:text-navy" aria-label="خيارات">
                         <MoreHorizontal className="h-4 w-4" aria-hidden="true" />
                       </Button>
                     </DropdownMenuTrigger>
@@ -386,7 +386,7 @@ export function RichDocumentsList({
                 </div>
 
                 {/* Date */}
-                <div className="text-xs text-slate-400">
+                <div className="text-xs text-slate-500">
                   {isArabic ? 'آخر تعديل: ' : 'Updated: '}
                   {new Date(doc.updatedAt).toLocaleDateString(isArabic ? 'ar-SA' : 'en-US')}
                 </div>

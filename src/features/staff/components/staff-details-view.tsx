@@ -159,11 +159,11 @@ export function StaffDetailsView() {
 
         <div className="ms-auto flex items-center gap-4">
           <div className="relative hidden md:block">
-            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
             <input
               type="text"
               placeholder="بحث..."
-              className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pr-9 pl-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+              className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
             />
           </div>
           <Button
@@ -217,7 +217,7 @@ export function StaffDetailsView() {
           <div className="bg-white rounded-2xl p-12 border border-slate-100 text-center">
             <div className="flex justify-center mb-4">
               <div className="w-16 h-16 rounded-full bg-red-50 flex items-center justify-center">
-                <AlertCircle className="w-8 h-8 text-red-500" />
+                <AlertCircle className="w-8 h-8 text-red-500" aria-hidden="true" />
               </div>
             </div>
             <h3 className="text-lg font-bold text-slate-900 mb-2">
@@ -240,7 +240,7 @@ export function StaffDetailsView() {
           <div className="bg-white rounded-2xl p-12 border border-slate-100 text-center">
             <div className="flex justify-center mb-4">
               <div className="w-16 h-16 rounded-full bg-emerald-50 flex items-center justify-center">
-                <User className="w-8 h-8 text-emerald-500" />
+                <User className="w-8 h-8 text-emerald-500" aria-hidden="true" />
               </div>
             </div>
             <h3 className="text-lg font-bold text-slate-900 mb-2">
@@ -272,7 +272,7 @@ export function StaffDetailsView() {
                     variant="outline"
                     className="border-white/10 text-white hover:bg-white/10 hover:text-white backdrop-blur-sm"
                   >
-                    <Edit3 className="h-4 w-4 ms-2" />
+                    <Edit3 className="h-4 w-4 ms-2" aria-hidden="true" />
                     تعديل
                   </Button>
                 </Link>
@@ -394,14 +394,14 @@ export function StaffDetailsView() {
                         <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
                           <CardHeader>
                             <CardTitle className="text-lg font-bold text-navy flex items-center gap-2">
-                              <Phone className="h-5 w-5 text-blue-500" />
+                              <Phone className="h-5 w-5 text-blue-500" aria-hidden="true" />
                               معلومات الاتصال
                             </CardTitle>
                           </CardHeader>
                           <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div className="space-y-4">
                               <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-xl">
-                                <Mail className="h-5 w-5 text-blue-500" />
+                                <Mail className="h-5 w-5 text-blue-500" aria-hidden="true" />
                                 <div>
                                   <p className="text-xs text-slate-500">البريد الإلكتروني</p>
                                   <p className="font-medium text-navy" dir="ltr">
@@ -411,7 +411,7 @@ export function StaffDetailsView() {
                               </div>
                               {staff.workEmail && staff.workEmail !== staff.email && (
                                 <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-xl">
-                                  <Mail className="h-5 w-5 text-slate-400" />
+                                  <Mail className="h-5 w-5 text-slate-500" aria-hidden="true" />
                                   <div>
                                     <p className="text-xs text-slate-500">البريد الرسمي</p>
                                     <p className="font-medium text-navy" dir="ltr">{staff.workEmail}</p>
@@ -421,7 +421,7 @@ export function StaffDetailsView() {
                             </div>
                             <div className="space-y-4">
                               <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-xl">
-                                <Phone className="h-5 w-5 text-emerald-500" />
+                                <Phone className="h-5 w-5 text-emerald-500" aria-hidden="true" />
                                 <div>
                                   <p className="text-xs text-slate-500">الهاتف</p>
                                   <p className="font-medium text-navy" dir="ltr">
@@ -431,11 +431,11 @@ export function StaffDetailsView() {
                               </div>
                               {staff.officePhone && (
                                 <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-xl">
-                                  <Phone className="h-5 w-5 text-slate-400" />
+                                  <Phone className="h-5 w-5 text-slate-500" aria-hidden="true" />
                                   <div>
                                     <p className="text-xs text-slate-500">هاتف المكتب</p>
                                     <p className="font-medium text-navy" dir="ltr">{staff.officePhone}</p>
-                                    {staff.extension && <span className="text-xs text-slate-400"> تحويلة: {staff.extension}</span>}
+                                    {staff.extension && <span className="text-xs text-slate-500"> تحويلة: {staff.extension}</span>}
                                   </div>
                                 </div>
                               )}
@@ -447,7 +447,7 @@ export function StaffDetailsView() {
                         <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
                           <CardHeader>
                             <CardTitle className="text-lg font-bold text-navy flex items-center gap-2">
-                              <Calendar className="h-5 w-5 text-orange-500" />
+                              <Calendar className="h-5 w-5 text-orange-500" aria-hidden="true" />
                               بيانات التوظيف
                             </CardTitle>
                           </CardHeader>
@@ -564,7 +564,7 @@ export function StaffDetailsView() {
                                 ))}
                               </div>
                             ) : (
-                              <p className="text-slate-400 text-center py-8">لا توجد تراخيص مسجلة</p>
+                              <p className="text-slate-500 text-center py-8">لا توجد تراخيص مسجلة</p>
                             )}
                           </CardContent>
                         </Card>
@@ -635,7 +635,7 @@ export function StaffDetailsView() {
                           <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
                             <CardHeader>
                               <CardTitle className="text-lg font-bold text-navy flex items-center gap-2">
-                                <Globe className="h-5 w-5 text-indigo-500" />
+                                <Globe className="h-5 w-5 text-indigo-500" aria-hidden="true" />
                                 اللغات
                               </CardTitle>
                             </CardHeader>
@@ -802,7 +802,7 @@ export function StaffDetailsView() {
                         <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
                           <CardHeader>
                             <CardTitle className="text-lg font-bold text-navy flex items-center gap-2">
-                              <FileText className="h-5 w-5 text-slate-500" />
+                              <FileText className="h-5 w-5 text-slate-500" aria-hidden="true" />
                               الملاحظات
                             </CardTitle>
                           </CardHeader>
@@ -818,7 +818,7 @@ export function StaffDetailsView() {
                           <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
                             <CardHeader>
                               <CardTitle className="text-lg font-bold text-navy flex items-center gap-2">
-                                <User className="h-5 w-5 text-blue-500" />
+                                <User className="h-5 w-5 text-blue-500" aria-hidden="true" />
                                 السيرة الذاتية
                               </CardTitle>
                             </CardHeader>

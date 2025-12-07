@@ -35,9 +35,9 @@ export function TemplateViewDialog({
 
   const BooleanIcon = ({ value }: { value: boolean }) =>
     value ? (
-      <Check className="h-4 w-4 text-green-500" />
+      <Check className="h-4 w-4 text-green-500" aria-hidden="true" />
     ) : (
-      <X className="h-4 w-4 text-muted-foreground" />
+      <X className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
     )
 
   return (

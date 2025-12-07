@@ -417,7 +417,7 @@ export function PayrollCreateView() {
                             <Card className="rounded-3xl shadow-sm border-slate-100">
                                 <CardHeader className="pb-4">
                                     <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                                        <User className="w-5 h-5 text-emerald-500" />
+                                        <User className="w-5 h-5 text-emerald-500" aria-hidden="true" />
                                         اختيار الموظف
                                     </CardTitle>
                                 </CardHeader>
@@ -778,7 +778,7 @@ export function PayrollCreateView() {
                                         <CardHeader className="cursor-pointer hover:bg-slate-50 transition-colors rounded-t-3xl">
                                             <div className="flex items-center justify-between">
                                                 <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                                                    <Clock className="w-5 h-5 text-purple-500" />
+                                                    <Clock className="w-5 h-5 text-purple-500" aria-hidden="true" />
                                                     العمل الإضافي
                                                 </CardTitle>
                                                 <ChevronDown className={cn("w-5 h-5 text-slate-500 transition-transform", openSections.includes('overtime') && "rotate-180")} />
@@ -897,7 +897,7 @@ export function PayrollCreateView() {
                                         <CardHeader className="cursor-pointer hover:bg-slate-50 transition-colors rounded-t-3xl">
                                             <div className="flex items-center justify-between">
                                                 <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                                                    <FileText className="w-5 h-5 text-amber-500" />
+                                                    <FileText className="w-5 h-5 text-amber-500" aria-hidden="true" />
                                                     ملاحظات
                                                 </CardTitle>
                                                 <ChevronDown className={cn("w-5 h-5 text-slate-500 transition-transform", openSections.includes('notes') && "rotate-180")} />

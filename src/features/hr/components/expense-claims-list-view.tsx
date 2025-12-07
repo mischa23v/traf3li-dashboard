@@ -112,17 +112,17 @@ export function ExpenseClaimsListView() {
       accommodation: <Hotel className="w-4 h-4" />,
       transportation: <Car className="w-4 h-4" />,
       office_supplies: <Paperclip className="w-4 h-4" />,
-      communication: <FileText className="w-4 h-4" />,
-      professional_services: <FileText className="w-4 h-4" />,
-      training: <FileText className="w-4 h-4" />,
-      entertainment: <FileText className="w-4 h-4" />,
-      court_fees: <FileText className="w-4 h-4" />,
-      legal_research: <FileText className="w-4 h-4" />,
-      client_expenses: <FileText className="w-4 h-4" />,
+      communication: <FileText className="w-4 h-4" aria-hidden="true" />,
+      professional_services: <FileText className="w-4 h-4" aria-hidden="true" />,
+      training: <FileText className="w-4 h-4" aria-hidden="true" />,
+      entertainment: <FileText className="w-4 h-4" aria-hidden="true" />,
+      court_fees: <FileText className="w-4 h-4" aria-hidden="true" />,
+      legal_research: <FileText className="w-4 h-4" aria-hidden="true" />,
+      client_expenses: <FileText className="w-4 h-4" aria-hidden="true" />,
       mileage: <Car className="w-4 h-4" />,
       parking: <Car className="w-4 h-4" />,
       tolls: <Car className="w-4 h-4" />,
-      other: <FileText className="w-4 h-4" />,
+      other: <FileText className="w-4 h-4" aria-hidden="true" />,
     }
     return icons[category]
   }
@@ -186,7 +186,7 @@ export function ExpenseClaimsListView() {
                 <CardContent className="p-4">
                   <div className="flex items-center gap-3">
                     <div className="p-2 bg-amber-100 rounded-xl">
-                      <Clock className="w-5 h-5 text-amber-600" />
+                      <Clock className="w-5 h-5 text-amber-600" aria-hidden="true" />
                     </div>
                     <div>
                       <p className="text-xs text-slate-500">قيد الاعتماد</p>
@@ -236,7 +236,7 @@ export function ExpenseClaimsListView() {
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         placeholder="بحث عن مطالبة..."
-                        className="pr-9 rounded-xl"
+                        className="pe-9 rounded-xl"
                       />
                     </div>
                     <Select value={statusFilter} onValueChange={(v) => setStatusFilter(v as ClaimStatus | 'all')}>

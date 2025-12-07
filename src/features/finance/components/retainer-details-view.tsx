@@ -308,7 +308,7 @@ export default function RetainerDetailsView() {
                         <Card className="border-0 shadow-sm rounded-3xl">
                             <CardHeader className="border-b border-slate-100">
                                 <CardTitle className="text-lg font-bold text-navy flex items-center gap-2">
-                                    <User className="h-5 w-5 text-brand-blue" />
+                                    <User className="h-5 w-5 text-brand-blue" aria-hidden="true" />
                                     معلومات العميل والقضية
                                 </CardTitle>
                             </CardHeader>
@@ -350,7 +350,7 @@ export default function RetainerDetailsView() {
                                         <Loader2 className="h-6 w-6 animate-spin text-emerald-600" aria-hidden="true" />
                                     </div>
                                 ) : transactions.length === 0 ? (
-                                    <div className="text-center py-8 text-slate-400">
+                                    <div className="text-center py-8 text-slate-600">
                                         <Receipt className="h-12 w-12 mx-auto mb-2 opacity-20" aria-hidden="true" />
                                         <p className="text-sm">لا توجد معاملات</p>
                                     </div>

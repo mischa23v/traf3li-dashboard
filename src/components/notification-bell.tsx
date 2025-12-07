@@ -94,9 +94,9 @@ function NotificationItem({ notification, onRead, onClick }: NotificationItemPro
           </div>
           <p className="text-sm text-slate-500 line-clamp-2 mt-0.5">{message}</p>
           <div className="flex items-center gap-2 mt-1">
-            <span className="text-xs text-slate-400">{timeAgo}</span>
+            <span className="text-xs text-slate-500">{timeAgo}</span>
             {notification.link && (
-              <ExternalLink className="w-3 h-3 text-slate-400" />
+              <ExternalLink className="w-3 h-3 text-slate-500" aria-hidden="true" />
             )}
           </div>
         </div>
@@ -133,7 +133,7 @@ export function NotificationBell() {
           {unreadCount > 0 && (
             <Badge
               variant="destructive"
-              className="absolute -top-1 -right-1 h-5 min-w-5 px-1.5 text-xs flex items-center justify-center"
+              className="absolute -top-1 -end-1 h-5 min-w-5 px-1.5 text-xs flex items-center justify-center"
             >
               {unreadCount > 99 ? '99+' : unreadCount}
             </Badge>

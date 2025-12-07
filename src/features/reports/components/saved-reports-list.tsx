@@ -84,7 +84,7 @@ export function SavedReportsList({ onRunReport, onEditReport }: SavedReportsList
       {reports.length === 0 ? (
         <Card>
           <CardContent className="py-12 text-center">
-            <FileText className="h-12 w-12 mx-auto mb-4 text-muted-foreground opacity-50" />
+            <FileText className="h-12 w-12 mx-auto mb-4 text-muted-foreground opacity-50" aria-hidden="true" />
             <h3 className="text-lg font-medium mb-2">{t('reports.noSavedReports')}</h3>
             <p className="text-muted-foreground">
               {t('reports.noSavedReportsDescription')}
@@ -124,7 +124,7 @@ export function SavedReportsList({ onRunReport, onEditReport }: SavedReportsList
                           {t('reports.run')}
                         </DropdownMenuItem>
                         <DropdownMenuItem onClick={() => onEditReport(report)}>
-                          <Edit className="me-2 h-4 w-4" />
+                          <Edit className="me-2 h-4 w-4" aria-hidden="true" />
                           {t('reports.edit')}
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
@@ -155,7 +155,7 @@ export function SavedReportsList({ onRunReport, onEditReport }: SavedReportsList
                     </Badge>
                     {report.config.isScheduled && (
                       <Badge variant="secondary" className="text-xs">
-                        <Clock className="me-1 h-3 w-3" />
+                        <Clock className="me-1 h-3 w-3" aria-hidden="true" />
                         {t('reports.scheduled')}
                       </Badge>
                     )}
@@ -163,7 +163,7 @@ export function SavedReportsList({ onRunReport, onEditReport }: SavedReportsList
 
                   <div className="flex items-center justify-between text-xs text-muted-foreground">
                     <div className="flex items-center gap-1">
-                      <Calendar className="h-3 w-3" />
+                      <Calendar className="h-3 w-3" aria-hidden="true" />
                       {report.lastRun
                         ? format(new Date(report.lastRun), 'MMM d, yyyy')
                         : t('reports.neverRun')}

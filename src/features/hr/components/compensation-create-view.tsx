@@ -35,7 +35,7 @@ import {
   Search, Bell, ArrowRight, User, Building2, CheckCircle,
   ChevronDown, Briefcase, Calendar, DollarSign, Wallet,
   Percent, Receipt, Award, TrendingUp, Clock, Shield,
-  FileText, MessageSquare, Scale, Users, Plus, Trash2
+  FileText, MessageSquare, Scale, Users, Plus, Trash2, Lock
 } from 'lucide-react'
 import {
   compensationStatusLabels,
@@ -618,7 +618,7 @@ export function CompensationCreateView() {
             <Card className="rounded-3xl shadow-sm border-slate-100">
               <CardHeader className="pb-4">
                 <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                  <User className="w-5 h-5 text-emerald-500" />
+                  <User className="w-5 h-5 text-emerald-500" aria-hidden="true" />
                   بيانات الموظف
                 </CardTitle>
               </CardHeader>
@@ -677,7 +677,7 @@ export function CompensationCreateView() {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div className="space-y-2">
                     <Label className="text-navy font-medium">
-                      الراتب الأساسي <span className="text-red-500">*</span>
+                      الراتب الأساسي<Lock className="h-3 w-3 text-slate-500 inline ms-1" aria-hidden="true" /> <span className="text-red-500">*</span>
                     </Label>
                     <Input
                       type="number"
@@ -1328,7 +1328,7 @@ export function CompensationCreateView() {
                   <CardHeader className="cursor-pointer hover:bg-slate-50 transition-colors rounded-t-3xl">
                     <div className="flex items-center justify-between">
                       <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                        <Clock className="w-5 h-5 text-cyan-500" />
+                        <Clock className="w-5 h-5 text-cyan-500" aria-hidden="true" />
                         مراجعة الراتب
                       </CardTitle>
                       <ChevronDown className={cn("w-5 h-5 text-slate-500 transition-transform", openSections.includes('review') && "rotate-180")} />

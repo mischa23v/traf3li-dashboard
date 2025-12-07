@@ -425,7 +425,7 @@ export function CreateContactView() {
                             <Card className="border-slate-200 mb-6">
                                 <CardHeader>
                                     <CardTitle className="text-lg font-bold text-slate-900 flex items-center gap-2">
-                                        <User className="w-5 h-5 text-emerald-500" />
+                                        <User className="w-5 h-5 text-emerald-500" aria-hidden="true" />
                                         المعلومات الأساسية
                                     </CardTitle>
                                 </CardHeader>
@@ -600,7 +600,7 @@ export function CreateContactView() {
                             <Card className="border-slate-200 mb-6">
                                 <CardHeader>
                                     <CardTitle className="text-lg font-bold text-slate-900 flex items-center gap-2">
-                                        <Phone className="w-5 h-5 text-emerald-500" />
+                                        <Phone className="w-5 h-5 text-emerald-500" aria-hidden="true" />
                                         معلومات الاتصال
                                     </CardTitle>
                                 </CardHeader>
@@ -608,9 +608,9 @@ export function CreateContactView() {
                                     {/* Emails */}
                                     <div className="space-y-3">
                                         <div className="flex items-center justify-between">
-                                            <Label className="text-sm font-medium text-slate-700">البريد الإلكتروني</Label>
+                                            <Label className="text-sm font-medium text-slate-700">البريد الإلكتروني<Lock className="h-3 w-3 text-slate-500 inline ms-1" aria-hidden="true" /></Label>
                                             <Button type="button" variant="ghost" size="sm" onClick={addEmail} className="text-emerald-600">
-                                                <Plus className="w-4 h-4 ms-1" /> إضافة
+                                                <Plus className="w-4 h-4 ms-1" aria-hidden="true" /> إضافة
                                             </Button>
                                         </div>
                                         {formData.emails.map((email, index) => (
@@ -646,7 +646,7 @@ export function CreateContactView() {
                                                 </div>
                                                 {formData.emails.length > 1 && (
                                                     <Button type="button" variant="ghost" size="icon" onClick={() => removeEmail(index)} className="text-red-500">
-                                                        <X className="w-4 h-4" />
+                                                        <X className="w-4 h-4" aria-hidden="true" />
                                                     </Button>
                                                 )}
                                             </div>
@@ -658,9 +658,9 @@ export function CreateContactView() {
                                     {/* Phones */}
                                     <div className="space-y-3">
                                         <div className="flex items-center justify-between">
-                                            <Label className="text-sm font-medium text-slate-700">رقم الهاتف</Label>
+                                            <Label className="text-sm font-medium text-slate-700">رقم الهاتف<Lock className="h-3 w-3 text-slate-500 inline ms-1" aria-hidden="true" /></Label>
                                             <Button type="button" variant="ghost" size="sm" onClick={addPhone} className="text-emerald-600">
-                                                <Plus className="w-4 h-4 ms-1" /> إضافة
+                                                <Plus className="w-4 h-4 ms-1" aria-hidden="true" /> إضافة
                                             </Button>
                                         </div>
                                         {formData.phones.map((phone, index) => (
@@ -705,7 +705,7 @@ export function CreateContactView() {
                                                     </div>
                                                     {formData.phones.length > 1 && (
                                                         <Button type="button" variant="ghost" size="icon" onClick={() => removePhone(index)} className="text-red-500">
-                                                            <X className="w-4 h-4" />
+                                                            <X className="w-4 h-4" aria-hidden="true" />
                                                         </Button>
                                                     )}
                                                 </div>
@@ -786,7 +786,7 @@ export function CreateContactView() {
                                     <AccordionContent className="space-y-4 pb-4">
                                         <div className="grid grid-cols-2 gap-4">
                                             <div className="space-y-2">
-                                                <Label>رقم الهوية الوطنية</Label>
+                                                <Label>رقم الهوية الوطنية<Lock className="h-3 w-3 text-slate-500 inline ms-1" aria-hidden="true" /></Label>
                                                 <Input
                                                     placeholder="10 أرقام"
                                                     dir="ltr"
@@ -809,7 +809,7 @@ export function CreateContactView() {
                                         </div>
                                         <div className="grid grid-cols-2 gap-4">
                                             <div className="space-y-2">
-                                                <Label>رقم جواز السفر</Label>
+                                                <Label>رقم جواز السفر<Lock className="h-3 w-3 text-slate-500 inline ms-1" aria-hidden="true" /></Label>
                                                 <Input
                                                     placeholder="رقم الجواز"
                                                     dir="ltr"
@@ -855,7 +855,7 @@ export function CreateContactView() {
                                 <AccordionItem value="address" className="border rounded-xl mb-2 px-4">
                                     <AccordionTrigger className="hover:no-underline">
                                         <div className="flex items-center gap-2">
-                                            <MapPin className="h-4 w-4 text-slate-500" />
+                                            <MapPin className="h-4 w-4 text-slate-500" aria-hidden="true" />
                                             <span className="font-semibold">العنوان</span>
                                         </div>
                                     </AccordionTrigger>
@@ -1009,7 +1009,7 @@ export function CreateContactView() {
                                     </AccordionTrigger>
                                     <AccordionContent className="space-y-4 pb-4">
                                         <Alert className="bg-orange-50 border-orange-200">
-                                            <AlertTriangle className="h-4 w-4 text-orange-500" />
+                                            <AlertTriangle className="h-4 w-4 text-orange-500" aria-hidden="true" />
                                             <AlertDescription className="text-orange-700">
                                                 يجب فحص تعارض المصالح قبل قبول أي قضية جديدة
                                             </AlertDescription>
@@ -1062,7 +1062,7 @@ export function CreateContactView() {
                             <Card className="border-slate-200 mb-6">
                                 <CardHeader>
                                     <CardTitle className="text-lg font-bold text-slate-900 flex items-center gap-2">
-                                        <FileText className="w-5 h-5 text-emerald-500" />
+                                        <FileText className="w-5 h-5 text-emerald-500" aria-hidden="true" />
                                         الحالة والوسوم
                                     </CardTitle>
                                 </CardHeader>
@@ -1108,7 +1108,7 @@ export function CreateContactView() {
                                                 <Badge key={tag} variant="secondary" className="gap-1">
                                                     {tag}
                                                     <button type="button" onClick={() => removeTag(tag)} className="hover:text-red-500">
-                                                        <X className="w-3 h-3" />
+                                                        <X className="w-3 h-3" aria-hidden="true" />
                                                     </button>
                                                 </Badge>
                                             ))}
@@ -1127,7 +1127,7 @@ export function CreateContactView() {
                                                 }}
                                             />
                                             <Button type="button" variant="outline" onClick={addTag} className="rounded-xl">
-                                                <Plus className="w-4 h-4" />
+                                                <Plus className="w-4 h-4" aria-hidden="true" />
                                             </Button>
                                         </div>
                                     </div>
@@ -1149,7 +1149,7 @@ export function CreateContactView() {
                             <div className="flex items-center justify-between pt-6 border-t border-slate-200">
                                 <Link to="/dashboard/contacts">
                                     <Button type="button" variant="ghost" className="text-slate-500 hover:text-navy">
-                                        <X className="ms-2 h-4 w-4" />
+                                        <X className="ms-2 h-4 w-4" aria-hidden="true" />
                                         إلغاء
                                     </Button>
                                 </Link>
@@ -1165,7 +1165,7 @@ export function CreateContactView() {
                                         </span>
                                     ) : (
                                         <span className="flex items-center gap-2">
-                                            <Save className="w-4 h-4" />
+                                            <Save className="w-4 h-4" aria-hidden="true" />
                                             حفظ جهة الاتصال
                                         </span>
                                     )}

@@ -23,7 +23,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
-import { ArrowRight, Save, Trash2, Send, Download, FileText } from 'lucide-react'
+import { ArrowRight, Save, Trash2, Send, Download, FileText, Lock } from 'lucide-react'
 import { useStatement, useUpdateStatement, useDeleteStatement, useSendStatement, useDownloadStatement } from '@/hooks/useFinance'
 import { useCasesAndClients } from '@/hooks/useCasesAndClients'
 
@@ -346,13 +346,13 @@ export function EditStatementView() {
                   </div>
                   {selectedClient.email && (
                     <div>
-                      <p className="text-sm text-slate-600">البريد الإلكتروني</p>
+                      <p className="text-sm text-slate-600">البريد الإلكتروني<Lock className="h-3 w-3 text-slate-500 inline ms-1" aria-hidden="true" /></p>
                       <p className="font-medium">{selectedClient.email}</p>
                     </div>
                   )}
                   {selectedClient.phone && (
                     <div>
-                      <p className="text-sm text-slate-600">الهاتف</p>
+                      <p className="text-sm text-slate-600">الهاتف<Lock className="h-3 w-3 text-slate-500 inline ms-1" aria-hidden="true" /></p>
                       <p className="font-medium">{selectedClient.phone}</p>
                     </div>
                   )}

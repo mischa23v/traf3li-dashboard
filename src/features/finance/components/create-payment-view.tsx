@@ -589,7 +589,7 @@ export function CreatePaymentView() {
                                     {paymentType === 'customer_payment' && (
                                         <div className="space-y-2">
                                             <Label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                                <User className="w-4 h-4 text-emerald-500" />
+                                                <User className="w-4 h-4 text-emerald-500" aria-hidden="true" />
                                                 العميل <span className="text-red-500">*</span>
                                             </Label>
                                             <Select value={customerId} onValueChange={setCustomerId} disabled={loadingClients}>
@@ -610,7 +610,7 @@ export function CreatePaymentView() {
                                     {paymentType === 'vendor_payment' && (
                                         <div className="space-y-2">
                                             <Label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                                <Building2 className="w-4 h-4 text-emerald-500" />
+                                                <Building2 className="w-4 h-4 text-emerald-500" aria-hidden="true" />
                                                 المورد <span className="text-red-500">*</span>
                                             </Label>
                                             <Select value={vendorId} onValueChange={setVendorId}>
@@ -655,7 +655,7 @@ export function CreatePaymentView() {
                                                 >
                                                     <Icon className={cn(
                                                         "w-5 h-5 mx-auto mb-1",
-                                                        paymentMethod === key ? "text-emerald-600" : "text-slate-400"
+                                                        paymentMethod === key ? "text-emerald-600" : "text-slate-600"
                                                     )} />
                                                     <span className={cn(
                                                         "text-xs font-medium",
@@ -990,7 +990,7 @@ export function CreatePaymentView() {
                                         {/* Overpayment Alert */}
                                         {calculations.isOverpayment && (
                                             <Alert className="mt-4 rounded-xl bg-amber-50 border-amber-200">
-                                                <Info className="h-4 w-4 text-amber-600" />
+                                                <Info className="h-4 w-4 text-amber-600" aria-hidden="true" />
                                                 <AlertDescription className="text-amber-700">
                                                     يوجد مبلغ غير مطبق ({formatCurrency(calculations.unapplied)}). اختر كيفية التعامل معه:
                                                 </AlertDescription>
@@ -1294,7 +1294,7 @@ export function CreatePaymentView() {
                                 <AccordionItem value="organization" className="border rounded-3xl shadow-sm border-slate-100 overflow-hidden">
                                     <AccordionTrigger className="px-6 py-4 hover:bg-slate-50">
                                         <div className="flex items-center gap-2">
-                                            <Building className="h-5 w-5 text-purple-500" />
+                                            <Building className="h-5 w-5 text-purple-500" aria-hidden="true" />
                                             <span className="font-bold text-slate-800">تفاصيل تنظيمية</span>
                                         </div>
                                     </AccordionTrigger>
@@ -1364,9 +1364,9 @@ export function CreatePaymentView() {
                                     <AccordionContent className="px-6 pb-6">
                                         <div className="space-y-4">
                                             <div className="border-2 border-dashed border-slate-200 rounded-xl p-8 text-center hover:border-emerald-300 transition-colors cursor-pointer">
-                                                <Paperclip className="w-10 h-10 mx-auto mb-3 text-slate-400" />
+                                                <Paperclip className="w-10 h-10 mx-auto mb-3 text-slate-600" />
                                                 <p className="text-sm text-slate-600 mb-1">اسحب الملفات هنا أو اضغط للاختيار</p>
-                                                <p className="text-xs text-slate-400">PDF, JPG, PNG (حد أقصى 10 ميغابايت)</p>
+                                                <p className="text-xs text-slate-600">PDF, JPG, PNG (حد أقصى 10 ميغابايت)</p>
                                                 <input
                                                     type="file"
                                                     multiple
@@ -1385,9 +1385,9 @@ export function CreatePaymentView() {
                                                     {attachments.map((file, index) => (
                                                         <div key={index} className="flex items-center justify-between p-3 bg-slate-50 rounded-xl">
                                                             <div className="flex items-center gap-3">
-                                                                <FileText className="w-5 h-5 text-slate-400" aria-hidden="true" />
+                                                                <FileText className="w-5 h-5 text-slate-600" aria-hidden="true" />
                                                                 <span className="text-sm font-medium">{file.name}</span>
-                                                                <span className="text-xs text-slate-400">
+                                                                <span className="text-xs text-slate-600">
                                                                     ({(file.size / 1024).toFixed(1)} KB)
                                                                 </span>
                                                             </div>
@@ -1412,7 +1412,7 @@ export function CreatePaymentView() {
                                 <AccordionItem value="email" className="border rounded-3xl shadow-sm border-slate-100 overflow-hidden">
                                     <AccordionTrigger className="px-6 py-4 hover:bg-slate-50">
                                         <div className="flex items-center gap-2">
-                                            <Mail className="h-5 w-5 text-blue-500" />
+                                            <Mail className="h-5 w-5 text-blue-500" aria-hidden="true" />
                                             <span className="font-bold text-slate-800">إعدادات الإيصال الإلكتروني</span>
                                         </div>
                                     </AccordionTrigger>
@@ -1460,7 +1460,7 @@ export function CreatePaymentView() {
                                     className="h-4 w-4 text-blue-600 rounded border-slate-300"
                                 />
                                 <label htmlFor="sendReceipt" className="text-sm font-medium text-blue-800 flex items-center gap-2">
-                                    <Mail className="w-4 h-4" />
+                                    <Mail className="w-4 h-4" aria-hidden="true" />
                                     إرسال إيصال للعميل بعد الحفظ
                                 </label>
                             </div>
@@ -1470,7 +1470,7 @@ export function CreatePaymentView() {
                                 <div className="flex gap-2">
                                     <Link to="/dashboard/finance/payments">
                                         <Button type="button" variant="ghost" className="text-slate-500 hover:text-slate-700 rounded-xl">
-                                            <X className="ms-2 h-4 w-4" />
+                                            <X className="ms-2 h-4 w-4" aria-hidden="true" />
                                             إلغاء
                                         </Button>
                                     </Link>
@@ -1501,14 +1501,14 @@ export function CreatePaymentView() {
                                                 ) : (
                                                     <span className="flex items-center gap-2">
                                                         حفظ الدفعة
-                                                        <ChevronDown className="w-4 h-4" />
+                                                        <ChevronDown className="w-4 h-4" aria-hidden="true" />
                                                     </span>
                                                 )}
                                             </Button>
                                         </DropdownMenuTrigger>
                                         <DropdownMenuContent align="end" className="w-48">
                                             <DropdownMenuItem onClick={(e) => { setSendReceipt(true); handleSubmit(e as any) }}>
-                                                <Mail className="ms-2 h-4 w-4" />
+                                                <Mail className="ms-2 h-4 w-4" aria-hidden="true" />
                                                 حفظ و إرسال الإيصال
                                             </DropdownMenuItem>
                                             <DropdownMenuItem>

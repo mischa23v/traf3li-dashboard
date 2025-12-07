@@ -178,7 +178,7 @@ export function ReportsListView() {
         <div className='ms-auto flex items-center gap-2 sm:gap-4 overflow-x-auto min-w-0'>
           <div className="relative hidden md:block min-w-0">
             <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
-            <input type="text" placeholder="بحث..." aria-label="بحث" className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pr-9 pl-4 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
+            <input type="text" placeholder="بحث..." aria-label="بحث" className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
           </div>
           <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white flex-shrink-0" aria-label="الإشعارات">
             <Bell className="h-5 w-5" aria-hidden="true" />
@@ -208,7 +208,7 @@ export function ReportsListView() {
                 <CardContent className="p-4">
                   <div className="flex items-center gap-3">
                     <div className="p-2 bg-blue-100 rounded-xl">
-                      <FileText className="w-5 h-5 text-blue-600" />
+                      <FileText className="w-5 h-5 text-blue-600" aria-hidden="true" />
                     </div>
                     <div>
                       <p className="text-xs text-slate-500">إجمالي التقارير</p>
@@ -234,7 +234,7 @@ export function ReportsListView() {
                 <CardContent className="p-4">
                   <div className="flex items-center gap-3">
                     <div className="p-2 bg-purple-100 rounded-xl">
-                      <Clock className="w-5 h-5 text-purple-600" />
+                      <Clock className="w-5 h-5 text-purple-600" aria-hidden="true" />
                     </div>
                     <div>
                       <p className="text-xs text-slate-500">تقارير مجدولة</p>
@@ -294,7 +294,7 @@ export function ReportsListView() {
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         placeholder="بحث عن تقرير..."
-                        className="pr-9 rounded-xl"
+                        className="pe-9 rounded-xl"
                       />
                     </div>
                     <Select value={statusFilter} onValueChange={(v) => setStatusFilter(v as ReportStatus | 'all')}>
@@ -399,7 +399,7 @@ export function ReportsListView() {
             ) : reports.length === 0 ? (
               <Card className="rounded-2xl border-slate-100">
                 <CardContent className="p-8 text-center">
-                  <FileText className="w-12 h-12 mx-auto text-slate-300" />
+                  <FileText className="w-12 h-12 mx-auto text-slate-300" aria-hidden="true" />
                   <p className="mt-4 text-slate-500">لا توجد تقارير</p>
                   <Button
                     onClick={() => navigate({ to: '/dashboard/hr/reports/new' })}
@@ -490,7 +490,7 @@ export function ReportsListView() {
                                       مشاركة
                                     </DropdownMenuItem>
                                     <DropdownMenuItem>
-                                      <Copy className="w-4 h-4 ms-2" />
+                                      <Copy className="w-4 h-4 ms-2" aria-hidden="true" />
                                       نسخ
                                     </DropdownMenuItem>
                                     <DropdownMenuSeparator />
@@ -532,7 +532,7 @@ export function ReportsListView() {
                               <div>
                                 <p className="text-xs text-slate-500">التكرار</p>
                                 <p className="font-medium text-sm flex items-center gap-1">
-                                  <Clock className="w-3 h-3 text-slate-500" />
+                                  <Clock className="w-3 h-3 text-slate-500" aria-hidden="true" />
                                   {usageFrequencyLabels[report.usageFrequency]?.ar}
                                 </p>
                               </div>
@@ -550,7 +550,7 @@ export function ReportsListView() {
                               <div className="mt-4 pt-3 border-t border-slate-100">
                                 <div className="flex items-center gap-4 text-sm">
                                   <div className="flex items-center gap-2 px-3 py-1 bg-purple-50 rounded-lg">
-                                    <Clock className="w-4 h-4 text-purple-600" />
+                                    <Clock className="w-4 h-4 text-purple-600" aria-hidden="true" />
                                     <span className="text-purple-700">مجدول</span>
                                   </div>
                                   {report.scheduling.nextRunDate && (
@@ -569,7 +569,7 @@ export function ReportsListView() {
                             <div className="flex items-center justify-between mt-4 pt-3 border-t border-slate-100">
                               <div className="flex items-center gap-4 text-xs text-slate-500">
                                 <span className="flex items-center gap-1">
-                                  <Users className="w-3 h-3" />
+                                  <Users className="w-3 h-3" aria-hidden="true" />
                                   {report.reportOwner.ownerName}
                                 </span>
                                 {report.lastRunDate && (

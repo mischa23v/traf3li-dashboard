@@ -132,8 +132,8 @@ export function DocumentEditorDialog({
 
                 {isLoading ? (
                     <div className="flex items-center justify-center py-12">
-                        <Loader2 className="h-8 w-8 animate-spin text-slate-400" />
-                        <span className="mr-3 text-slate-500">جاري تحميل المستند...</span>
+                        <Loader2 className="h-8 w-8 animate-spin text-slate-500" />
+                        <span className="me-3 text-slate-500">جاري تحميل المستند...</span>
                     </div>
                 ) : (
                     <div className="flex-1 overflow-auto space-y-4">
@@ -170,7 +170,7 @@ export function DocumentEditorDialog({
                         onClick={() => onOpenChange(false)}
                         disabled={isSaving}
                     >
-                        <X className="h-4 w-4 ms-2" />
+                        <X className="h-4 w-4 ms-2" aria-hidden="true" />
                         إلغاء
                     </Button>
                     <Button
@@ -185,7 +185,7 @@ export function DocumentEditorDialog({
                             </>
                         ) : (
                             <>
-                                <Save className="h-4 w-4 ms-2" />
+                                <Save className="h-4 w-4 ms-2" aria-hidden="true" />
                                 {isEditMode ? 'حفظ التغييرات' : 'حفظ المستند'}
                             </>
                         )}

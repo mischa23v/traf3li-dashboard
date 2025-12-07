@@ -138,11 +138,11 @@ export function ReferralDetailsView() {
 
         <div className="ms-auto flex items-center gap-4">
           <div className="relative hidden md:block">
-            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
             <input
               type="text"
               placeholder="بحث..."
-              className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pr-9 pl-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+              className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
             />
           </div>
           <Button
@@ -197,7 +197,7 @@ export function ReferralDetailsView() {
             <div className="bg-white rounded-2xl p-12 border border-slate-100 text-center">
               <div className="flex justify-center mb-4">
                 <div className="w-16 h-16 rounded-full bg-red-50 flex items-center justify-center">
-                  <AlertCircle className="w-8 h-8 text-red-500" />
+                  <AlertCircle className="w-8 h-8 text-red-500" aria-hidden="true" />
                 </div>
               </div>
               <h3 className="text-lg font-bold text-slate-900 mb-2">
@@ -249,7 +249,7 @@ export function ReferralDetailsView() {
                     variant="outline"
                     className="border-white/10 text-white hover:bg-white/10 hover:text-white backdrop-blur-sm"
                   >
-                    <Edit3 className="h-4 w-4 ms-2" />
+                    <Edit3 className="h-4 w-4 ms-2" aria-hidden="true" />
                     تعديل
                   </Button>
                 </Link>
@@ -354,7 +354,7 @@ export function ReferralDetailsView() {
                               <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 {referral.externalSource.name && (
                                   <div className="p-4 bg-slate-50 rounded-xl flex items-center gap-3">
-                                    <User className="h-5 w-5 text-purple-500" />
+                                    <User className="h-5 w-5 text-purple-500" aria-hidden="true" />
                                     <div>
                                       <p className="text-xs text-slate-500">الاسم</p>
                                       <p className="font-medium text-navy">{referral.externalSource.name}</p>
@@ -363,7 +363,7 @@ export function ReferralDetailsView() {
                                 )}
                                 {referral.externalSource.phone && (
                                   <div className="p-4 bg-slate-50 rounded-xl flex items-center gap-3">
-                                    <Phone className="h-5 w-5 text-green-500" />
+                                    <Phone className="h-5 w-5 text-green-500" aria-hidden="true" />
                                     <div>
                                       <p className="text-xs text-slate-500">الهاتف</p>
                                       <p className="font-medium text-navy" dir="ltr">{referral.externalSource.phone}</p>
@@ -372,7 +372,7 @@ export function ReferralDetailsView() {
                                 )}
                                 {referral.externalSource.email && (
                                   <div className="p-4 bg-slate-50 rounded-xl flex items-center gap-3">
-                                    <Mail className="h-5 w-5 text-blue-500" />
+                                    <Mail className="h-5 w-5 text-blue-500" aria-hidden="true" />
                                     <div>
                                       <p className="text-xs text-slate-500">البريد</p>
                                       <p className="font-medium text-navy">{referral.externalSource.email}</p>
@@ -381,7 +381,7 @@ export function ReferralDetailsView() {
                                 )}
                                 {referral.externalSource.company && (
                                   <div className="p-4 bg-slate-50 rounded-xl flex items-center gap-3">
-                                    <Building className="h-5 w-5 text-orange-500" />
+                                    <Building className="h-5 w-5 text-orange-500" aria-hidden="true" />
                                     <div>
                                       <p className="text-xs text-slate-500">الشركة</p>
                                       <p className="font-medium text-navy">{referral.externalSource.company}</p>
@@ -440,7 +440,7 @@ export function ReferralDetailsView() {
                                 <div className="flex justify-between items-center">
                                   <div className="flex items-center gap-3">
                                     <div className="w-10 h-10 rounded-xl bg-purple-100 flex items-center justify-center">
-                                      <Users className="h-5 w-5 text-purple-600" />
+                                      <Users className="h-5 w-5 text-purple-600" aria-hidden="true" />
                                     </div>
                                     <div>
                                       <p className="font-medium text-navy">عميل محتمل #{index + 1}</p>
@@ -470,7 +470,7 @@ export function ReferralDetailsView() {
                             ))
                           ) : (
                             <div className="text-center py-12">
-                              <Users className="h-12 w-12 text-slate-300 mx-auto mb-4" />
+                              <Users className="h-12 w-12 text-slate-300 mx-auto mb-4" aria-hidden="true" />
                               <p className="text-slate-500">لا توجد إحالات بعد</p>
                             </div>
                           )}
@@ -499,7 +499,7 @@ export function ReferralDetailsView() {
                                   )}
                                 </div>
                                 {payment.notes && (
-                                  <p className="mt-3 text-sm text-slate-600 pr-13">{payment.notes}</p>
+                                  <p className="mt-3 text-sm text-slate-600 pe-13">{payment.notes}</p>
                                 )}
                               </Card>
                             ))

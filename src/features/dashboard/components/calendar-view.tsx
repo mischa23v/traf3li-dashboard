@@ -215,7 +215,7 @@ export function CalendarView() {
                     <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
                         <DynamicIsland />
                     </div>
-                    <div className='ms-auto flex items-center space-x-4'>
+                    <div className='ms-auto flex items-center gap-4'>
                         <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white">
                             <Bell className="h-5 w-5" />
                         </Button>
@@ -251,7 +251,7 @@ export function CalendarView() {
                     <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
                         <DynamicIsland />
                     </div>
-                    <div className='ms-auto flex items-center space-x-4'>
+                    <div className='ms-auto flex items-center gap-4'>
                         <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white">
                             <Bell className="h-5 w-5" />
                         </Button>
@@ -265,12 +265,12 @@ export function CalendarView() {
                 <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8">
                     <div className="bg-white rounded-3xl p-12 text-center border border-slate-100 shadow-sm">
                         <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <AlertCircle className="h-8 w-8 text-red-500" />
+                            <AlertCircle className="h-8 w-8 text-red-500" aria-hidden="true" />
                         </div>
                         <h3 className="text-xl font-bold text-slate-900 mb-2">فشل تحميل التقويم</h3>
                         <p className="text-slate-500 mb-6">{error?.message || 'حدث خطأ أثناء تحميل البيانات'}</p>
                         <Button onClick={() => refetch()} className="bg-emerald-500 hover:bg-emerald-600 text-white px-8">
-                            <Loader2 className="ml-2 h-4 w-4" />
+                            <Loader2 className="ms-2 h-4 w-4" />
                             إعادة المحاولة
                         </Button>
                     </div>
@@ -290,10 +290,10 @@ export function CalendarView() {
                     <DynamicIsland />
                 </div>
 
-                <div className='ms-auto flex items-center space-x-4'>
+                <div className='ms-auto flex items-center gap-4'>
                     <div className="relative hidden md:block">
-                        <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                        <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pr-9 pl-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
+                        <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
+                        <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
                     </div>
                     <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white">
                         <Bell className="h-5 w-5" />
@@ -317,10 +317,10 @@ export function CalendarView() {
                         <div>
                             <div className="flex items-center gap-2 mb-2">
                                 <Badge className="bg-blue-500/20 text-blue-100 hover:bg-blue-500/30 border-0 px-3 py-1">
-                                    <Briefcase className="w-3 h-3 ml-2" />
+                                    <Briefcase className="w-3 h-3 ms-2" />
                                     مكتب المحاماة
                                 </Badge>
-                                <span className="text-slate-400 text-sm">نوفمبر 2025</span>
+                                <span className="text-slate-500 text-sm">نوفمبر 2025</span>
                             </div>
                             <h1 className="text-4xl font-bold leading-tight mb-2">جدول القضايا والجلسات</h1>
                             <p className="text-slate-300 text-lg max-w-xl">
@@ -341,11 +341,11 @@ export function CalendarView() {
                         </div>
                         <div className="flex gap-3">
                             <Button className="bg-brand-blue hover:bg-blue-600 text-white rounded-xl h-12 px-8 font-bold shadow-lg shadow-blue-600/30 hover:scale-105 transition-all duration-300 border-0 text-base">
-                                <Plus className="ml-2 h-5 w-5" />
+                                <Plus className="ms-2 h-5 w-5" aria-hidden="true" />
                                 جلسة جديدة
                             </Button>
                             <Button className="bg-white/10 hover:bg-white/20 text-white rounded-xl h-12 px-6 font-bold backdrop-blur-md border border-white/10 transition-all duration-300">
-                                <Filter className="ml-2 h-5 w-5" />
+                                <Filter className="ms-2 h-5 w-5" aria-hidden="true" />
                                 تصفية
                             </Button>
                         </div>
@@ -383,7 +383,7 @@ export function CalendarView() {
                                                                 item.type === 'deadline' ? 'موعد نهائي' :
                                                                     item.type === 'meeting' ? 'اجتماع' : 'إيداع'}
                                                         </Badge>
-                                                        <span className="text-xs font-bold text-slate-400">{item.time}</span>
+                                                        <span className="text-xs font-bold text-slate-500">{item.time}</span>
                                                     </div>
 
                                                     <h4 className="text-sm font-bold text-navy mb-1 leading-snug group-hover:text-brand-blue transition-colors">
@@ -400,13 +400,13 @@ export function CalendarView() {
                                                     {(item.location || item.judge) && (
                                                         <div className="pt-2 mt-2 border-t border-slate-50 flex flex-col gap-1">
                                                             {item.location && (
-                                                                <div className="flex items-center gap-1.5 text-[11px] text-slate-400">
-                                                                    <MapPin className="h-3 w-3" />
+                                                                <div className="flex items-center gap-1.5 text-[11px] text-slate-500">
+                                                                    <MapPin className="h-3 w-3" aria-hidden="true" />
                                                                     <span>{typeof item.location === 'string' ? item.location : (item.location?.name || item.location?.address || 'عن بعد')}</span>
                                                                 </div>
                                                             )}
                                                             {item.judge && (
-                                                                <div className="flex items-center gap-1.5 text-[11px] text-slate-400">
+                                                                <div className="flex items-center gap-1.5 text-[11px] text-slate-500">
                                                                     <Gavel className="h-3 w-3" />
                                                                     <span>{item.judge}</span>
                                                                 </div>
@@ -417,14 +417,14 @@ export function CalendarView() {
                                             ))}
                                         </div>
                                     ) : (
-                                        <div className="flex flex-col items-center justify-center h-64 text-center text-slate-400">
+                                        <div className="flex flex-col items-center justify-center h-64 text-center text-slate-500">
                                             <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mb-4">
-                                                <Clock className="h-8 w-8 text-slate-300" />
+                                                <Clock className="h-8 w-8 text-slate-300" aria-hidden="true" />
                                             </div>
                                             <p className="font-bold text-navy">لا توجد مواعيد</p>
                                             <p className="text-xs mt-1">لا توجد جلسات أو مهام مسجلة لهذا اليوم.</p>
                                             <Button variant="link" className="text-brand-blue mt-2">
-                                                <Plus className="h-4 w-4 ml-1" />
+                                                <Plus className="h-4 w-4 ms-1" aria-hidden="true" />
                                                 إضافة موعد
                                             </Button>
                                         </div>
@@ -438,20 +438,20 @@ export function CalendarView() {
                     <div className="lg:col-span-9 flex flex-col h-full gap-6">
 
                         {/* Toolbar */}
-                        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-white p-2 pr-4 rounded-[20px] border border-slate-100 shadow-sm">
+                        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-white p-2 pe-4 rounded-[20px] border border-slate-100 shadow-sm">
                             <div className="flex items-center gap-4">
                                 <h2 className="text-2xl font-bold text-navy flex items-center gap-2">
-                                    {monthNames[currentDate.getMonth()]} <span className="text-slate-400 font-medium text-xl">{currentDate.getFullYear()}</span>
+                                    {monthNames[currentDate.getMonth()]} <span className="text-slate-500 font-medium text-xl">{currentDate.getFullYear()}</span>
                                 </h2>
                                 <div className="flex bg-slate-50 rounded-xl p-1 border border-slate-100">
                                     <Button variant="ghost" size="icon" className="h-9 w-9 rounded-lg hover:bg-white hover:shadow-sm text-slate-600" onClick={() => setCurrentDate(new Date(currentDate.setMonth(currentDate.getMonth() - 1)))}>
-                                        <ChevronRight className="h-5 w-5" />
+                                        <ChevronRight className="h-5 w-5" aria-hidden="true" />
                                     </Button>
                                     <Button variant="ghost" className="h-9 px-4 rounded-lg hover:bg-white hover:shadow-sm text-slate-600 font-bold text-sm" onClick={() => setCurrentDate(new Date())}>
                                         اليوم
                                     </Button>
                                     <Button variant="ghost" size="icon" className="h-9 w-9 rounded-lg hover:bg-white hover:shadow-sm text-slate-600" onClick={() => setCurrentDate(new Date(currentDate.setMonth(currentDate.getMonth() + 1)))}>
-                                        <ChevronLeft className="h-5 w-5" />
+                                        <ChevronLeft className="h-5 w-5" aria-hidden="true" />
                                     </Button>
                                 </div>
                             </div>
@@ -527,14 +527,14 @@ export function CalendarView() {
                                                              `}
                                                                     >
                                                                         {item.type === 'court' && <Gavel className="h-3 w-3 flex-shrink-0" />}
-                                                                        {item.type === 'deadline' && <AlertTriangle className="h-3 w-3 flex-shrink-0" />}
-                                                                        {item.type === 'meeting' && <Users className="h-3 w-3 flex-shrink-0" />}
-                                                                        {item.type === 'filing' && <FileText className="h-3 w-3 flex-shrink-0" />}
+                                                                        {item.type === 'deadline' && <AlertTriangle className="h-3 w-3 flex-shrink-0" aria-hidden="true" />}
+                                                                        {item.type === 'meeting' && <Users className="h-3 w-3 flex-shrink-0" aria-hidden="true" />}
+                                                                        {item.type === 'filing' && <FileText className="h-3 w-3 flex-shrink-0" aria-hidden="true" />}
                                                                         <span className="truncate">{item.title}</span>
                                                                     </div>
                                                                 ))}
                                                                 {items.length > 4 && (
-                                                                    <div className="text-[10px] text-center text-slate-400 font-bold mt-auto pt-1 hover:text-brand-blue">
+                                                                    <div className="text-[10px] text-center text-slate-500 font-bold mt-auto pt-1 hover:text-brand-blue">
                                                                         +{items.length - 4} المزيد
                                                                     </div>
                                                                 )}
@@ -618,8 +618,8 @@ export function CalendarView() {
                                                     ))}
                                                     {items.length === 0 && (
                                                         <div className="h-full flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
-                                                            <Button variant="ghost" size="sm" className="h-8 w-8 rounded-full border border-dashed border-slate-300 text-slate-400">
-                                                                <Plus className="h-4 w-4" />
+                                                            <Button variant="ghost" size="sm" className="h-8 w-8 rounded-full border border-dashed border-slate-300 text-slate-500">
+                                                                <Plus className="h-4 w-4" aria-hidden="true" />
                                                             </Button>
                                                         </div>
                                                     )}

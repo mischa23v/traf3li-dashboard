@@ -220,11 +220,11 @@ export function CasesListView() {
 
         <div className="ms-auto flex items-center gap-2 sm:gap-4 overflow-x-auto min-w-0">
           <div className="relative hidden md:block min-w-0">
-            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+            <Search className="absolute end-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
             <input
               type="text"
               placeholder={t('common.search', 'بحث...')}
-              className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+              className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
             />
           </div>
           <Button
@@ -254,7 +254,7 @@ export function CasesListView() {
             <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
               <DialogTrigger asChild>
                 <Button className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl h-10 px-5 font-bold shadow-lg shadow-emerald-500/20 border-0 text-sm">
-                  <Plus className="ms-2 h-4 w-4" />
+                  <Plus className="ms-2 h-4 w-4" aria-hidden="true" />
                   {t('cases.newCase', 'قضية جديدة')}
                 </Button>
               </DialogTrigger>
@@ -277,12 +277,12 @@ export function CasesListView() {
             {/* Filters Toolbar */}
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-white p-2 pe-4 rounded-[20px] border border-slate-100 shadow-sm">
               <div className="flex items-center gap-2 w-full sm:w-auto">
-                <Search className="w-5 h-5 text-slate-400" />
+                <Search className="w-5 h-5 text-slate-500" aria-hidden="true" />
                 <Input
                   placeholder={t('cases.searchPlaceholder', 'بحث في القضايا...')}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="border-0 focus-visible:ring-0 text-navy placeholder:text-slate-400 h-9 w-full sm:w-64"
+                  className="border-0 focus-visible:ring-0 text-navy placeholder:text-slate-500 h-9 w-full sm:w-64"
                 />
               </div>
               <div className="flex items-center gap-3">
@@ -344,7 +344,7 @@ export function CasesListView() {
               {/* Error State */}
               {isError && !isLoading && (
                 <Alert className="border-red-200 bg-red-50">
-                  <AlertCircle className="h-4 w-4 text-red-600" />
+                  <AlertCircle className="h-4 w-4 text-red-600" aria-hidden="true" />
                   <AlertDescription className="text-red-800">
                     <div className="flex items-center justify-between">
                       <span>
@@ -375,7 +375,7 @@ export function CasesListView() {
                     onClick={() => setIsCreateDialogOpen(true)}
                     className="bg-blue-500 hover:bg-blue-600 text-white rounded-xl"
                   >
-                    <Plus className="ms-2 h-4 w-4" />
+                    <Plus className="ms-2 h-4 w-4" aria-hidden="true" />
                     {t('cases.createNewCase', 'إنشاء قضية جديدة')}
                   </Button>
                 </div>
@@ -396,7 +396,7 @@ export function CasesListView() {
                           className={`w-12 h-12 rounded-xl flex items-center justify-center shadow-sm border ${getPriorityColor(caseItem.priority)}`}
                         >
                           {caseItem.priority === 'critical' ? (
-                            <AlertCircle className="h-6 w-6" />
+                            <AlertCircle className="h-6 w-6" aria-hidden="true" />
                           ) : (
                             <Scale className="h-6 w-6" />
                           )}
@@ -425,13 +425,13 @@ export function CasesListView() {
                           </div>
                           <div className="space-y-2 text-sm">
                             <div className="flex items-center gap-2 text-slate-600">
-                              <Users className="h-4 w-4 text-slate-400" />
+                              <Users className="h-4 w-4 text-slate-500" aria-hidden="true" />
                               <span className="text-green-600 font-medium">{t('cases.plaintiff', 'المدعي')}:</span>
                               <span>{getClientName(caseItem)}</span>
                             </div>
                             {getDefendantName(caseItem) !== 'غير محدد' && (
                               <div className="flex items-center gap-2 text-slate-600">
-                                <Users className="h-4 w-4 text-slate-400" />
+                                <Users className="h-4 w-4 text-slate-500" aria-hidden="true" />
                                 <span className="text-amber-600 font-medium">{t('cases.defendant', 'المدعى عليه')}:</span>
                                 <span>{getDefendantName(caseItem)}</span>
                               </div>
@@ -439,12 +439,12 @@ export function CasesListView() {
                             <div className="flex items-center gap-4 flex-wrap">
                               {caseItem.court && (
                                 <div className="flex items-center gap-2 text-slate-600">
-                                  <MapPin className="h-4 w-4 text-slate-400" />
+                                  <MapPin className="h-4 w-4 text-slate-500" aria-hidden="true" />
                                   <span>{caseItem.court}</span>
                                 </div>
                               )}
                               <div className="flex items-center gap-2 text-slate-600">
-                                <User className="h-4 w-4 text-slate-400" />
+                                <User className="h-4 w-4 text-slate-500" aria-hidden="true" />
                                 <span>{getLawyerName(caseItem)}</span>
                               </div>
                             </div>
@@ -454,7 +454,7 @@ export function CasesListView() {
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="text-slate-400 hover:text-slate-900 hover:bg-slate-50 rounded-lg"
+                        className="text-slate-500 hover:text-slate-900 hover:bg-slate-50 rounded-lg"
                       >
                         <MoreHorizontal className="h-5 w-5" />
                       </Button>
@@ -477,11 +477,11 @@ export function CasesListView() {
                     <div className="flex items-center justify-between pt-4 border-t border-slate-100">
                       <div className="flex items-center gap-6 flex-wrap">
                         <div className="text-center">
-                          <div className="text-xs text-slate-400 mb-1">{t('cases.type', 'النوع')}</div>
+                          <div className="text-xs text-slate-500 mb-1">{t('cases.type', 'النوع')}</div>
                           <div className="font-bold text-slate-900">{getCategoryLabel(caseItem.category)}</div>
                         </div>
                         <div className="text-center">
-                          <div className="text-xs text-slate-400 mb-1">{t('cases.nextHearing', 'الجلسة القادمة')}</div>
+                          <div className="text-xs text-slate-500 mb-1">{t('cases.nextHearing', 'الجلسة القادمة')}</div>
                           <div
                             className={`font-bold ${caseItem.priority === 'critical' ? 'text-red-600' : 'text-slate-900'}`}
                           >
@@ -489,14 +489,14 @@ export function CasesListView() {
                           </div>
                         </div>
                         <div className="text-center">
-                          <div className="text-xs text-slate-400 mb-1">{t('cases.claimAmount', 'قيمة المطالبة')}</div>
+                          <div className="text-xs text-slate-500 mb-1">{t('cases.claimAmount', 'قيمة المطالبة')}</div>
                           <div className="font-bold text-green-600">
                             {formatCurrency(caseItem.claimAmount)} {t('common.sar', 'ر.س')}
                           </div>
                         </div>
                         {caseItem.caseNumber && (
                           <div className="text-center">
-                            <div className="text-xs text-slate-400 mb-1">{t('cases.caseNumber', 'رقم القضية')}</div>
+                            <div className="text-xs text-slate-500 mb-1">{t('cases.caseNumber', 'رقم القضية')}</div>
                             <div className="text-xs text-slate-600">{caseItem.caseNumber}</div>
                           </div>
                         )}
@@ -528,7 +528,7 @@ export function CasesListView() {
                   className="text-blue-600 hover:text-blue-700 hover:bg-blue-50 w-full rounded-xl py-6 font-medium transition-colors flex items-center justify-center gap-2"
                 >
                   {t('cases.viewAll', 'عرض جميع القضايا')}
-                  <ChevronLeft className="h-4 w-4" />
+                  <ChevronLeft className="h-4 w-4" aria-hidden="true" />
                 </Button>
               </div>
             )}

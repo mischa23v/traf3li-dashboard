@@ -169,11 +169,11 @@ export function ActivityDetailsView() {
 
         <div className="ms-auto flex items-center gap-4">
           <div className="relative hidden md:block">
-            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
             <input
               type="text"
               placeholder="بحث..."
-              className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pr-9 pl-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+              className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
             />
           </div>
           <Button
@@ -228,7 +228,7 @@ export function ActivityDetailsView() {
             <div className="bg-white rounded-2xl p-12 border border-slate-100 text-center">
               <div className="flex justify-center mb-4">
                 <div className="w-16 h-16 rounded-full bg-red-50 flex items-center justify-center">
-                  <AlertCircle className="w-8 h-8 text-red-500" />
+                  <AlertCircle className="w-8 h-8 text-red-500" aria-hidden="true" />
                 </div>
               </div>
               <h3 className="text-lg font-bold text-slate-900 mb-2">
@@ -253,7 +253,7 @@ export function ActivityDetailsView() {
             <div className="bg-white rounded-2xl p-12 border border-slate-100 text-center">
               <div className="flex justify-center mb-4">
                 <div className="w-16 h-16 rounded-full bg-blue-50 flex items-center justify-center">
-                  <Calendar className="w-8 h-8 text-blue-500" />
+                  <Calendar className="w-8 h-8 text-blue-500" aria-hidden="true" />
                 </div>
               </div>
               <h3 className="text-lg font-bold text-slate-900 mb-2">
@@ -337,7 +337,7 @@ export function ActivityDetailsView() {
                     <Card className="border border-slate-100 shadow-sm rounded-2xl">
                       <CardHeader>
                         <CardTitle className="text-lg font-bold text-navy flex items-center gap-2">
-                          <FileText className="h-5 w-5 text-blue-500" />
+                          <FileText className="h-5 w-5 text-blue-500" aria-hidden="true" />
                           الوصف
                         </CardTitle>
                       </CardHeader>
@@ -354,7 +354,7 @@ export function ActivityDetailsView() {
                     <Card className="border border-slate-100 shadow-sm rounded-2xl">
                       <CardHeader>
                         <CardTitle className="text-lg font-bold text-navy flex items-center gap-2">
-                          <Phone className="h-5 w-5 text-green-500" />
+                          <Phone className="h-5 w-5 text-green-500" aria-hidden="true" />
                           تفاصيل المكالمة
                         </CardTitle>
                       </CardHeader>
@@ -458,7 +458,7 @@ export function ActivityDetailsView() {
                     <Card className="border border-slate-100 shadow-sm rounded-2xl">
                       <CardHeader>
                         <CardTitle className="text-lg font-bold text-navy flex items-center gap-2">
-                          <Mail className="h-5 w-5 text-blue-500" />
+                          <Mail className="h-5 w-5 text-blue-500" aria-hidden="true" />
                           تفاصيل البريد
                         </CardTitle>
                       </CardHeader>

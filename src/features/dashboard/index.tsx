@@ -91,8 +91,8 @@ export function Dashboard() {
         <div className='ms-auto flex items-center gap-2 md:gap-4'>
           {/* Search - Visible on all screens */}
           <div className="relative">
-            <Search className="absolute end-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-            <input type="text" placeholder={t('common.search')} className="h-9 w-32 md:w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
+            <Search className="absolute end-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
+            <input type="text" placeholder={t('common.search')} className="h-9 w-32 md:w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
           </div>
           {/* Bell - Hidden on mobile */}
           <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white hidden md:flex">
@@ -138,11 +138,11 @@ export function Dashboard() {
             </div>
             <div className="flex flex-wrap gap-3">
               <Button className="bg-brand-blue hover:bg-blue-600 text-white rounded-xl h-11 px-6 font-bold shadow-lg shadow-blue-600/30 hover:scale-105 transition-all duration-300 border-0">
-                <Plus className="ml-2 h-5 w-5" />
+                <Plus className="ms-2 h-5 w-5" aria-hidden="true" />
                 {t('dashboard.hero.newCase')}
               </Button>
               <Button className="bg-white/10 hover:bg-white/20 text-white rounded-xl h-11 px-6 font-bold backdrop-blur-md border border-white/10 transition-all duration-300">
-                <FileText className="ml-2 h-5 w-5" />
+                <FileText className="ms-2 h-5 w-5" aria-hidden="true" />
                 {t('dashboard.hero.newInvoice')}
               </Button>
             </div>
@@ -157,9 +157,9 @@ export function Dashboard() {
             </div>
           ) : statsError ? (
             <div className="col-span-full flex flex-col items-center justify-center py-12 text-slate-500">
-              <AlertCircle className="h-10 w-10 mb-3 text-slate-300" />
+              <AlertCircle className="h-10 w-10 mb-3 text-slate-300" aria-hidden="true" />
               <span className="text-sm font-medium">{t('dashboard.stats.noDataAvailable')}</span>
-              <span className="text-xs text-slate-400 mt-1">
+              <span className="text-xs text-slate-500 mt-1">
                 {(statsError as any)?.status === 404
                   ? t('dashboard.stats.statsNotFound')
                   : (statsError as any)?.message || t('dashboard.stats.tryLater')}
@@ -167,7 +167,7 @@ export function Dashboard() {
             </div>
           ) : !stats ? (
             <div className="col-span-full flex flex-col items-center justify-center py-12 text-slate-500">
-              <AlertCircle className="h-10 w-10 mb-3 text-slate-300" />
+              <AlertCircle className="h-10 w-10 mb-3 text-slate-300" aria-hidden="true" />
               <span className="text-sm font-medium">{t('dashboard.stats.noData')}</span>
             </div>
           ) : (
@@ -182,7 +182,7 @@ export function Dashboard() {
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold text-navy">{stats?.cases?.total || 0} {t('dashboard.stats.cases.unit')}</div>
-                  <p className="text-xs text-slate-400 mt-1 font-medium">
+                  <p className="text-xs text-slate-500 mt-1 font-medium">
                     {stats?.cases?.active || 0} {t('dashboard.stats.active')} · {stats?.cases?.closed || 0} {t('dashboard.stats.closed')}
                   </p>
                 </CardContent>
@@ -193,13 +193,13 @@ export function Dashboard() {
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-sm font-bold text-slate-500">{t('dashboard.stats.tasks.title')}</CardTitle>
                   <div className="h-10 w-10 rounded-xl bg-purple-50 flex items-center justify-center group-hover:bg-purple-100 transition-colors">
-                    <Users className="h-5 w-5 text-purple-600" />
+                    <Users className="h-5 w-5 text-purple-600" aria-hidden="true" />
                   </div>
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold text-navy">{stats?.tasks?.total || 0} {t('dashboard.stats.tasks.unit')}</div>
                   <p className="text-xs text-purple-600 flex items-center mt-1 font-bold">
-                    <ArrowUpRight className="h-3 w-3 ml-1" />
+                    <ArrowUpRight className="h-3 w-3 ms-1" />
                     {stats?.tasks?.active || 0} {t('dashboard.stats.active')}
                   </p>
                 </CardContent>
@@ -215,7 +215,7 @@ export function Dashboard() {
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold text-navy">{stats?.invoices?.total || 0} {t('dashboard.stats.invoices.unit')}</div>
-                  <p className="text-xs text-slate-400 mt-1 font-medium">
+                  <p className="text-xs text-slate-500 mt-1 font-medium">
                     {stats?.invoices?.paid || 0} {t('dashboard.stats.paid')} · {stats?.invoices?.pending || 0} {t('dashboard.stats.pending')}
                   </p>
                 </CardContent>
@@ -231,7 +231,7 @@ export function Dashboard() {
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold text-navy">{stats?.orders?.total || 0} {t('dashboard.stats.orders.unit')}</div>
-                  <p className="text-xs text-slate-400 mt-1 font-medium">
+                  <p className="text-xs text-slate-500 mt-1 font-medium">
                     {stats?.orders?.completed || 0} {t('dashboard.stats.completed')} · {stats?.orders?.active || 0} {t('dashboard.stats.active')}
                   </p>
                 </CardContent>
@@ -263,7 +263,7 @@ export function Dashboard() {
                     <Loader2 className="h-6 w-6 animate-spin text-navy" />
                   </div>
                 ) : !todayEvents || todayEvents.length === 0 ? (
-                  <div className="flex flex-col items-center justify-center py-12 text-slate-400">
+                  <div className="flex flex-col items-center justify-center py-12 text-slate-500">
                     <Scale className="h-12 w-12 mb-3 opacity-30" />
                     <p className="text-sm font-medium">{t('dashboard.schedule.noAppointments')}</p>
                   </div>
@@ -281,7 +281,7 @@ export function Dashboard() {
                           className="flex items-center p-6 hover:bg-slate-50/80 transition-colors group cursor-pointer block"
                         >
                           <div className="w-20 font-bold text-slate-600 text-sm">{eventTime}</div>
-                          <div className={`w-1.5 h-12 rounded-full bg-${eventColor}-500 mr-4 ml-2`}></div>
+                          <div className={`w-1.5 h-12 rounded-full bg-${eventColor}-500 me-4 ms-2`}></div>
                           <div className="flex-1">
                             <h4 className="font-bold text-navy text-lg group-hover:text-brand-blue transition-colors">{event.title}</h4>
                             <div className="flex items-center gap-4 mt-1 text-xs font-medium text-slate-500">
@@ -292,7 +292,7 @@ export function Dashboard() {
                             </div>
                           </div>
                           <Button variant="ghost" size="icon" className="text-slate-300 group-hover:text-brand-blue">
-                            <ChevronLeft className="h-5 w-5" />
+                            <ChevronLeft className="h-5 w-5" aria-hidden="true" />
                           </Button>
                         </Link>
                       )
@@ -373,7 +373,7 @@ export function Dashboard() {
                     <Loader2 className="h-6 w-6 animate-spin text-navy" />
                   </div>
                 ) : !financialSummary ? (
-                  <div className="flex flex-col items-center justify-center py-8 text-slate-400">
+                  <div className="flex flex-col items-center justify-center py-8 text-slate-500">
                     <DollarSign className="h-12 w-12 mb-3 opacity-30" />
                     <p className="text-sm font-medium">{t('dashboard.finance.noData')}</p>
                   </div>
@@ -430,7 +430,7 @@ export function Dashboard() {
                     <Loader2 className="h-6 w-6 animate-spin text-navy" />
                   </div>
                 ) : !recentMessages || recentMessages.length === 0 ? (
-                  <div className="flex flex-col items-center justify-center py-8 text-slate-400">
+                  <div className="flex flex-col items-center justify-center py-8 text-slate-500">
                     <MessageSquare className="h-12 w-12 mb-3 opacity-30" />
                     <p className="text-sm font-medium">{t('dashboard.messages.noMessages')}</p>
                   </div>
@@ -450,7 +450,7 @@ export function Dashboard() {
                           <div className="flex-1 overflow-hidden">
                             <div className="flex justify-between items-center">
                               <h5 className="font-bold text-sm text-navy truncate">{username}</h5>
-                              <span className="text-[10px] text-slate-400">{timestamp}</span>
+                              <span className="text-[10px] text-slate-500">{timestamp}</span>
                             </div>
                             <p className="text-xs text-slate-500 truncate">{chat.text}</p>
                           </div>

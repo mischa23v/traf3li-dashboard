@@ -370,7 +370,7 @@ export function CreateReferralView() {
               <Card className="border-0 shadow-sm">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
-                    <User className="w-5 h-5 text-purple-500" />
+                    <User className="w-5 h-5 text-purple-500" aria-hidden="true" />
                     المعلومات الأساسية
                   </CardTitle>
                 </CardHeader>
@@ -501,7 +501,7 @@ export function CreateReferralView() {
               <Card className="border-0 shadow-sm">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
-                    <Phone className="w-5 h-5 text-purple-500" />
+                    <Phone className="w-5 h-5 text-purple-500" aria-hidden="true" />
                     معلومات الاتصال
                   </CardTitle>
                 </CardHeader>
@@ -556,7 +556,7 @@ export function CreateReferralView() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                        <Mail className="w-4 h-4 text-blue-500" />
+                        <Mail className="w-4 h-4 text-blue-500" aria-hidden="true" />
                         البريد الإلكتروني
                       </label>
                       <Input
@@ -590,7 +590,7 @@ export function CreateReferralView() {
               <Card className="border-0 shadow-sm">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
-                    <Building className="w-5 h-5 text-purple-500" />
+                    <Building className="w-5 h-5 text-purple-500" aria-hidden="true" />
                     معلومات المنظمة
                   </CardTitle>
                 </CardHeader>
@@ -607,7 +607,7 @@ export function CreateReferralView() {
                     </div>
                     <div className="space-y-2">
                       <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                        <Globe className="w-4 h-4 text-blue-500" />
+                        <Globe className="w-4 h-4 text-blue-500" aria-hidden="true" />
                         الموقع الإلكتروني
                       </label>
                       <Input
@@ -685,7 +685,7 @@ export function CreateReferralView() {
                       <Badge key={tag} variant="secondary" className="gap-1 px-3 py-1">
                         {tag}
                         <button type="button" onClick={() => removeTag(tag)} className="hover:text-red-500 me-1">
-                          <X className="w-3 h-3" />
+                          <X className="w-3 h-3" aria-hidden="true" />
                         </button>
                       </Badge>
                     ))}
@@ -704,7 +704,7 @@ export function CreateReferralView() {
                       }}
                     />
                     <Button type="button" variant="outline" onClick={addTag} className="rounded-xl">
-                      <Plus className="w-4 h-4" />
+                      <Plus className="w-4 h-4" aria-hidden="true" />
                     </Button>
                   </div>
                 </CardContent>
@@ -747,7 +747,7 @@ export function CreateReferralView() {
                                     <SelectItem key={option.value} value={option.value}>
                                       <div>
                                         <div>{option.label}</div>
-                                        <div className="text-xs text-slate-400">{option.description}</div>
+                                        <div className="text-xs text-slate-500">{option.description}</div>
                                       </div>
                                     </SelectItem>
                                   ))}
@@ -837,7 +837,7 @@ export function CreateReferralView() {
                               <div className="flex items-center justify-between">
                                 <label className="text-sm font-medium text-slate-700">شرائح العمولة</label>
                                 <Button type="button" variant="outline" size="sm" onClick={addTieredFee} className="rounded-xl">
-                                  <Plus className="w-4 h-4 ms-1" />
+                                  <Plus className="w-4 h-4 ms-1" aria-hidden="true" />
                                   إضافة شريحة
                                 </Button>
                               </div>
@@ -881,7 +881,7 @@ export function CreateReferralView() {
                                     className="h-9 text-red-500 hover:text-red-700"
                                     onClick={() => removeTieredFee(index)}
                                   >
-                                    <X className="w-4 h-4" />
+                                    <X className="w-4 h-4" aria-hidden="true" />
                                   </Button>
                                 </div>
                               ))}
@@ -902,7 +902,7 @@ export function CreateReferralView() {
                 <AccordionItem value="agreement" className="border rounded-2xl bg-white shadow-sm">
                   <AccordionTrigger className="px-6 hover:no-underline">
                     <span className="flex items-center gap-2 text-lg font-semibold">
-                      <FileText className="w-5 h-5 text-purple-500" />
+                      <FileText className="w-5 h-5 text-purple-500" aria-hidden="true" />
                       تفاصيل الاتفاقية
                     </span>
                   </AccordionTrigger>
@@ -929,7 +929,7 @@ export function CreateReferralView() {
                         </div>
                         <div className="space-y-2">
                           <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                            <Calendar className="w-4 h-4 text-purple-500" />
+                            <Calendar className="w-4 h-4 text-purple-500" aria-hidden="true" />
                             تاريخ البداية
                           </label>
                           <Input
@@ -941,7 +941,7 @@ export function CreateReferralView() {
                         </div>
                         <div className="space-y-2">
                           <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                            <Calendar className="w-4 h-4 text-red-500" />
+                            <Calendar className="w-4 h-4 text-red-500" aria-hidden="true" />
                             تاريخ الانتهاء
                           </label>
                           <Input
@@ -1073,7 +1073,7 @@ export function CreateReferralView() {
               <Card className="border-0 shadow-sm">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
-                    <FileText className="w-5 h-5 text-purple-500" />
+                    <FileText className="w-5 h-5 text-purple-500" aria-hidden="true" />
                     ملاحظات
                   </CardTitle>
                 </CardHeader>
@@ -1121,7 +1121,7 @@ export function CreateReferralView() {
                     </span>
                   ) : (
                     <span className="flex items-center gap-2">
-                      <Save className="w-4 h-4" />
+                      <Save className="w-4 h-4" aria-hidden="true" />
                       حفظ مصدر الإحالة
                     </span>
                   )}

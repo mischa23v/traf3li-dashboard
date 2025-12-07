@@ -677,7 +677,7 @@ export function ReportViewer({
                 }
               >
                 <SelectTrigger className="w-[140px]">
-                  <Calendar className="me-2 h-4 w-4" />
+                  <Calendar className="me-2 h-4 w-4" aria-hidden="true" />
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -690,7 +690,7 @@ export function ReportViewer({
               </Select>
               <Select onValueChange={handleExport}>
                 <SelectTrigger className="w-[120px]">
-                  <Download className="me-2 h-4 w-4" />
+                  <Download className="me-2 h-4 w-4" aria-hidden="true" />
                   <SelectValue placeholder={t('reports.export')} />
                 </SelectTrigger>
                 <SelectContent>
@@ -762,7 +762,7 @@ export function ReportViewer({
               </Button>
             </div>
             <Button variant="ghost" size="sm">
-              <Filter className="h-4 w-4 me-1" />
+              <Filter className="h-4 w-4 me-1" aria-hidden="true" />
               {t('reports.filters')}
             </Button>
           </div>

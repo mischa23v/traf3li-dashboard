@@ -414,7 +414,7 @@ export function TrainingCreateView() {
             <Card className="rounded-3xl shadow-sm border-slate-100">
               <CardHeader className="pb-4">
                 <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                  <User className="w-5 h-5 text-emerald-500" />
+                  <User className="w-5 h-5 text-emerald-500" aria-hidden="true" />
                   بيانات الموظف
                 </CardTitle>
               </CardHeader>
@@ -978,7 +978,7 @@ export function TrainingCreateView() {
                   <CardHeader className="cursor-pointer hover:bg-slate-50 transition-colors rounded-t-3xl">
                     <div className="flex items-center justify-between">
                       <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                        <AlertTriangle className="w-5 h-5 text-red-500" />
+                        <AlertTriangle className="w-5 h-5 text-red-500" aria-hidden="true" />
                         الامتثال والتدريب الإلزامي
                       </CardTitle>
                       <div className="flex items-center gap-2">
@@ -994,7 +994,7 @@ export function TrainingCreateView() {
                   <CardContent className="space-y-4">
                     <div className="flex items-center justify-between p-4 bg-red-50 rounded-xl border border-red-100">
                       <div className="flex items-center gap-3">
-                        <AlertTriangle className="w-5 h-5 text-red-500" />
+                        <AlertTriangle className="w-5 h-5 text-red-500" aria-hidden="true" />
                         <div>
                           <p className="font-medium text-red-700">تدريب إلزامي</p>
                           <p className="text-xs text-red-600">يجب إكماله قبل الموعد المحدد</p>
@@ -1040,7 +1040,7 @@ export function TrainingCreateView() {
                   <CardHeader className="cursor-pointer hover:bg-slate-50 transition-colors rounded-t-3xl">
                     <div className="flex items-center justify-between">
                       <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                        <FileText className="w-5 h-5 text-purple-500" />
+                        <FileText className="w-5 h-5 text-purple-500" aria-hidden="true" />
                         المبررات والملاحظات
                       </CardTitle>
                       <ChevronDown className={cn("w-5 h-5 text-slate-500 transition-transform", openSections.includes('notes') && "rotate-180")} />

@@ -604,7 +604,7 @@ function TermsPage() {
                     <div className="bg-white rounded-lg p-3 border-2 border-slate-300">
                       <p className="text-xs text-slate-600">مبلغ الخدمة المتنازع عليها</p>
                     </div>
-                    <span className="text-2xl text-slate-400">أو</span>
+                    <span className="text-2xl text-slate-500">أو</span>
                     <div className="bg-emerald-50 rounded-lg p-3 border-2 border-emerald-300">
                       <p className="text-lg font-bold text-emerald-600">١٠٠٠ ريال سعودي</p>
                     </div>
@@ -910,7 +910,7 @@ function TermsPage() {
           <p className="text-slate-500 text-sm">
             آخر تحديث: ٢٥ نوفمبر ٢٠٢٥ | الإصدار 1.0
           </p>
-          <p className="text-slate-400 text-xs">
+          <p className="text-slate-500 text-xs">
             © ٢٠٢٥ ترافعلي (TRAF3LI) - جميع الحقوق محفوظة
           </p>
         </div>

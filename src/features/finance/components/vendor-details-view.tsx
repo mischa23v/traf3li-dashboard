@@ -219,7 +219,7 @@ export default function VendorDetailsView() {
                             <Card className="border-0 shadow-sm rounded-3xl">
                                 <CardHeader className="border-b border-slate-100">
                                     <CardTitle className="text-lg font-bold text-navy flex items-center gap-2">
-                                        <Building2 className="h-5 w-5 text-brand-blue" />
+                                        <Building2 className="h-5 w-5 text-brand-blue" aria-hidden="true" />
                                         معلومات المورد
                                     </CardTitle>
                                 </CardHeader>
@@ -238,7 +238,7 @@ export default function VendorDetailsView() {
                                         {vendor.email && (
                                             <div>
                                                 <p className="text-sm text-slate-500 mb-1 flex items-center gap-1">
-                                                    <Mail className="h-4 w-4" />
+                                                    <Mail className="h-4 w-4" aria-hidden="true" />
                                                     البريد الإلكتروني<Lock className="h-3 w-3 text-muted-foreground inline ms-1" />
                                                 </p>
                                                 <p className="font-medium text-navy">{vendor.email}</p>
@@ -247,7 +247,7 @@ export default function VendorDetailsView() {
                                         {vendor.phone && (
                                             <div>
                                                 <p className="text-sm text-slate-500 mb-1 flex items-center gap-1">
-                                                    <Phone className="h-4 w-4" />
+                                                    <Phone className="h-4 w-4" aria-hidden="true" />
                                                     رقم الهاتف<Lock className="h-3 w-3 text-muted-foreground inline ms-1" />
                                                 </p>
                                                 <p className="font-medium text-navy">{vendor.phone}</p>
@@ -280,7 +280,7 @@ export default function VendorDetailsView() {
                                 <Card className="border-0 shadow-sm rounded-3xl">
                                     <CardHeader className="border-b border-slate-100">
                                         <CardTitle className="text-lg font-bold text-navy flex items-center gap-2">
-                                            <MapPin className="h-5 w-5 text-brand-blue" />
+                                            <MapPin className="h-5 w-5 text-brand-blue" aria-hidden="true" />
                                             معلومات العنوان
                                         </CardTitle>
                                     </CardHeader>

@@ -131,8 +131,8 @@ export function ProductivityHero({ badge, title, type = 'tasks', hideButtons = f
                     className="w-full h-full object-cover opacity-40 mix-blend-overlay"
                 />
             </div>
-            <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl -mr-48 -mt-48 pointer-events-none"></div>
-            <div className="absolute bottom-0 left-0 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl -ml-48 -mb-48 pointer-events-none"></div>
+            <div className="absolute top-0 end-0 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl -me-48 -mt-48 pointer-events-none"></div>
+            <div className="absolute bottom-0 start-0 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl -ms-48 -mb-48 pointer-events-none"></div>
 
             <div className="relative z-10">
                 <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 items-center">
@@ -176,7 +176,7 @@ export function ProductivityHero({ badge, title, type = 'tasks', hideButtons = f
                                     // Default mode: Show "Create New" button
                                     <Button asChild className="bg-emerald-500 hover:bg-emerald-600 text-white h-10 px-5 rounded-xl font-bold shadow-lg shadow-emerald-500/20 border-0 text-sm">
                                         <Link to={currentButtonConfig.href}>
-                                            <Plus className="ms-2 h-4 w-4" />
+                                            <Plus className="ms-2 h-4 w-4" aria-hidden="true" />
                                             {currentButtonConfig.label}
                                         </Link>
                                     </Button>

@@ -174,7 +174,7 @@ export function ReportsDashboard() {
                                 </div>
                                 <div className="text-center">
                                     <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center mx-auto mb-3">
-                                        <Users className="w-6 h-6 text-blue-600" />
+                                        <Users className="w-6 h-6 text-blue-600" aria-hidden="true" />
                                     </div>
                                     <div className="text-2xl font-bold text-navy">24</div>
                                     <div className="text-sm text-slate-500">عميل نشط</div>

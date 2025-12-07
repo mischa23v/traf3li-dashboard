@@ -328,7 +328,7 @@ export function EditExpenseView() {
                         size="sm"
                         onClick={() => removeExistingAttachment(index)}
                       >
-                        <X className="h-4 w-4" />
+                        <X className="h-4 w-4" aria-hidden="true" />
                       </Button>
                     </div>
                   ))}
@@ -337,7 +337,7 @@ export function EditExpenseView() {
 
               <div className="border-2 border-dashed rounded-lg p-4">
                 <label className="flex flex-col items-center cursor-pointer">
-                  <Upload className="h-8 w-8 text-slate-500 mb-2" />
+                  <Upload className="h-8 w-8 text-slate-500 mb-2" aria-hidden="true" />
                   <span className="text-sm text-slate-600">اضغط لإضافة مرفقات جديدة</span>
                   <input
                     type="file"
@@ -362,7 +362,7 @@ export function EditExpenseView() {
                         size="sm"
                         onClick={() => removeAttachment(index)}
                       >
-                        <X className="h-4 w-4" />
+                        <X className="h-4 w-4" aria-hidden="true" />
                       </Button>
                     </div>
                   ))}

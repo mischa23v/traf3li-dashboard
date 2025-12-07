@@ -406,7 +406,7 @@ export function ForgotPassword() {
                     {t('forgotPassword.newPassword.newPasswordLabel')} <span className="text-red-500">*</span>
                   </label>
                   <div className="relative">
-                    <div className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400">
+                    <div className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500">
                       <Icons.Lock />
                     </div>
                     <input
@@ -424,7 +424,7 @@ export function ForgotPassword() {
                     <button
                       type="button"
                       onClick={() => setShowNewPassword(!showNewPassword)}
-                      className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                      className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-600"
                     >
                       {showNewPassword ? <Icons.EyeOff /> : <Icons.Eye />}
                     </button>
@@ -440,7 +440,7 @@ export function ForgotPassword() {
                     {t('forgotPassword.newPassword.confirmLabel')} <span className="text-red-500">*</span>
                   </label>
                   <div className="relative">
-                    <div className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400">
+                    <div className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500">
                       <Icons.Lock />
                     </div>
                     <input
@@ -458,7 +458,7 @@ export function ForgotPassword() {
                     <button
                       type="button"
                       onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                      className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                      className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-600"
                     >
                       {showConfirmPassword ? <Icons.EyeOff /> : <Icons.Eye />}
                     </button>
@@ -636,7 +636,7 @@ export function ForgotPassword() {
                   {t('forgotPassword.email.emailLabel')} <span className="text-red-500">*</span>
                 </label>
                 <div className="relative">
-                  <div className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400">
+                  <div className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500">
                     <Icons.Mail />
                   </div>
                   <input

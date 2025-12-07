@@ -241,7 +241,7 @@ export function GroupActionDialog({
                         control={form.control}
                         name="applicableTo"
                         render={({ field }) => (
-                          <FormItem className="flex flex-row items-center space-x-3 space-y-0 rtl:space-x-reverse">
+                          <FormItem className="flex flex-row items-center gap-3 space-y-0 rtl:gap-reverse">
                             <FormControl>
                               <Checkbox
                                 checked={field.value?.includes(option.value)}

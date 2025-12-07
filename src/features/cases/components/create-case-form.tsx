@@ -206,7 +206,7 @@ export function CreateCaseForm({ onSuccess }: CreateCaseFormProps) {
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
             <Label htmlFor="clientName">
-              <User className="inline h-4 w-4 ms-1" />
+              <User className="inline h-4 w-4 ms-1" aria-hidden="true" />
               {t('cases.form.clientName', 'اسم العميل')} *
             </Label>
             <Input
@@ -220,7 +220,7 @@ export function CreateCaseForm({ onSuccess }: CreateCaseFormProps) {
 
           <div className="space-y-2">
             <Label htmlFor="clientPhone">
-              <Phone className="inline h-4 w-4 ms-1" />
+              <Phone className="inline h-4 w-4 ms-1" aria-hidden="true" />
               {t('cases.form.clientPhone', 'رقم الهاتف')}
             </Label>
             <Input
@@ -239,7 +239,7 @@ export function CreateCaseForm({ onSuccess }: CreateCaseFormProps) {
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
             <Label htmlFor="caseNumber">
-              <FileText className="inline h-4 w-4 ms-1" />
+              <FileText className="inline h-4 w-4 ms-1" aria-hidden="true" />
               {t('cases.form.caseNumber', 'رقم القضية')}
             </Label>
             <Input
@@ -251,7 +251,7 @@ export function CreateCaseForm({ onSuccess }: CreateCaseFormProps) {
 
           <div className="space-y-2">
             <Label htmlFor="court">
-              <MapPin className="inline h-4 w-4 ms-1" />
+              <MapPin className="inline h-4 w-4 ms-1" aria-hidden="true" />
               {t('cases.form.court', 'المحكمة')}
             </Label>
             <Input
@@ -264,7 +264,7 @@ export function CreateCaseForm({ onSuccess }: CreateCaseFormProps) {
 
         <div className="space-y-2">
           <Label htmlFor="startDate">
-            <Calendar className="inline h-4 w-4 ms-1" />
+            <Calendar className="inline h-4 w-4 ms-1" aria-hidden="true" />
             {t('cases.form.startDate', 'تاريخ البدء')}
           </Label>
           <Input
@@ -290,7 +290,7 @@ export function CreateCaseForm({ onSuccess }: CreateCaseFormProps) {
             {/* Plaintiff Details */}
             <div className="space-y-4 mb-6">
               <h4 className="font-medium text-blue-700 flex items-center gap-2">
-                <User className="h-4 w-4" />
+                <User className="h-4 w-4" aria-hidden="true" />
                 {t('cases.form.plaintiffDetails', 'بيانات المدعي (العامل)')}
               </h4>
               <div className="grid grid-cols-2 gap-4">
@@ -320,7 +320,7 @@ export function CreateCaseForm({ onSuccess }: CreateCaseFormProps) {
             {/* Company Details */}
             <div className="space-y-4">
               <h4 className="font-medium text-amber-700 flex items-center gap-2">
-                <Building className="h-4 w-4" />
+                <Building className="h-4 w-4" aria-hidden="true" />
                 {t('cases.form.companyDetails', 'بيانات الشركة (المدعى عليه)')}
               </h4>
               <div className="grid grid-cols-2 gap-4">

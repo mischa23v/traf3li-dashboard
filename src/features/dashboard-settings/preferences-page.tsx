@@ -136,7 +136,7 @@ export function PreferencesPage() {
 
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <Globe className="h-5 w-5 text-slate-500" />
+                  <Globe className="h-5 w-5 text-slate-500" aria-hidden="true" />
                   <div>
                     <Label>{isRTL ? 'اللغة' : 'Language'}</Label>
                     <p className="text-sm text-slate-500">{isRTL ? 'اختر لغة الواجهة' : 'Choose interface language'}</p>
@@ -173,7 +173,7 @@ export function PreferencesPage() {
             <CardContent className="space-y-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <Mail className="h-5 w-5 text-slate-500" />
+                  <Mail className="h-5 w-5 text-slate-500" aria-hidden="true" />
                   <div>
                     <Label>{isRTL ? 'إشعارات البريد الإلكتروني' : 'Email Notifications'}</Label>
                     <p className="text-sm text-slate-500">{isRTL ? 'استلام الإشعارات عبر البريد' : 'Receive notifications via email'}</p>
@@ -228,7 +228,7 @@ export function PreferencesPage() {
             <CardHeader>
               <div className="flex items-center gap-3">
                 <div className="h-10 w-10 bg-amber-100 rounded-lg flex items-center justify-center">
-                  <Clock className="h-5 w-5 text-amber-600" />
+                  <Clock className="h-5 w-5 text-amber-600" aria-hidden="true" />
                 </div>
                 <div>
                   <CardTitle>{isRTL ? 'التذكيرات' : 'Reminders'}</CardTitle>
@@ -264,7 +264,7 @@ export function PreferencesPage() {
             <CardHeader>
               <div className="flex items-center gap-3">
                 <div className="h-10 w-10 bg-emerald-100 rounded-lg flex items-center justify-center">
-                  <Calendar className="h-5 w-5 text-emerald-600" />
+                  <Calendar className="h-5 w-5 text-emerald-600" aria-hidden="true" />
                 </div>
                 <div>
                   <CardTitle>{isRTL ? 'التاريخ والوقت' : 'Date & Time'}</CardTitle>

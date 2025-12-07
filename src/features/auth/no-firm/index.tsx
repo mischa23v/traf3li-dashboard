@@ -32,7 +32,7 @@ export function NoFirmPage() {
       <Card className="w-full max-w-lg shadow-lg">
         <CardHeader className="text-center pb-2">
           <div className="mx-auto w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center mb-4">
-            <Building2 className="w-8 h-8 text-amber-600" />
+            <Building2 className="w-8 h-8 text-amber-600" aria-hidden="true" />
           </div>
           <CardTitle className="text-2xl font-bold text-slate-900">
             {t('noFirm.title')}
@@ -47,7 +47,7 @@ export function NoFirmPage() {
             <div className="p-4 bg-slate-50 rounded-lg border border-slate-200">
               <div className="flex items-start gap-3">
                 <div className="w-10 h-10 bg-emerald-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <Plus className="w-5 h-5 text-emerald-600" />
+                  <Plus className="w-5 h-5 text-emerald-600" aria-hidden="true" />
                 </div>
                 <div>
                   <h3 className="font-semibold text-slate-900">{t('noFirm.createFirm.title')}</h3>
@@ -61,7 +61,7 @@ export function NoFirmPage() {
             <div className="p-4 bg-slate-50 rounded-lg border border-slate-200">
               <div className="flex items-start gap-3">
                 <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <Users className="w-5 h-5 text-blue-600" />
+                  <Users className="w-5 h-5 text-blue-600" aria-hidden="true" />
                 </div>
                 <div>
                   <h3 className="font-semibold text-slate-900">{t('noFirm.joinFirm.title')}</h3>
@@ -99,7 +99,7 @@ export function NoFirmPage() {
           </div>
 
           {/* Help text */}
-          <p className="text-xs text-center text-slate-400">
+          <p className="text-xs text-center text-slate-500">
             {t('noFirm.helpText')}
           </p>
         </CardContent>

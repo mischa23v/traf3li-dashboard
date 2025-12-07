@@ -10,6 +10,7 @@ import {
   Building2,
   MapPin,
   Tag,
+  Lock,
 } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
@@ -102,7 +103,7 @@ export function ContactsViewDialog({
                   <Mail className='h-4 w-4 text-muted-foreground' />
                   <div>
                     <p className='text-sm text-muted-foreground'>
-                      {t('contacts.form.email')}
+                      {t('contacts.form.email')}<Lock className="h-3 w-3 text-muted-foreground inline ms-1" aria-hidden="true" />
                     </p>
                     <p className='font-medium' dir='ltr'>
                       {currentRow.email}
@@ -115,7 +116,7 @@ export function ContactsViewDialog({
                   <Phone className='h-4 w-4 text-muted-foreground' />
                   <div>
                     <p className='text-sm text-muted-foreground'>
-                      {t('contacts.form.phone')}
+                      {t('contacts.form.phone')}<Lock className="h-3 w-3 text-muted-foreground inline ms-1" aria-hidden="true" />
                     </p>
                     <p className='font-medium' dir='ltr'>
                       {currentRow.phone}
@@ -129,7 +130,7 @@ export function ContactsViewDialog({
                 <Phone className='h-4 w-4 text-muted-foreground' />
                 <div>
                   <p className='text-sm text-muted-foreground'>
-                    {t('contacts.form.alternatePhone')}
+                    {t('contacts.form.alternatePhone')}<Lock className="h-3 w-3 text-muted-foreground inline ms-1" aria-hidden="true" />
                   </p>
                   <p className='font-medium' dir='ltr'>
                     {currentRow.alternatePhone}

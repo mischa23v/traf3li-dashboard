@@ -269,8 +269,8 @@ export function RemindersView() {
 
                 <div className='ms-auto flex items-center gap-4'>
                     <div className="relative hidden md:block">
-                        <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                        <input type="text" placeholder={t('tasks.list.search')} className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
+                        <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
+                        <input type="text" placeholder={t('tasks.list.search')} className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
                     </div>
                     <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white">
                         <Bell className="h-5 w-5" />
@@ -301,7 +301,7 @@ export function RemindersView() {
                             <div className="flex flex-wrap items-center gap-3">
                                 {/* Search Input */}
                                 <div className="relative flex-1 min-w-[200px] max-w-md">
-                                    <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                                    <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
                                     <Input
                                         type="text"
                                         placeholder={t('reminders.list.searchPlaceholder')}
@@ -354,7 +354,7 @@ export function RemindersView() {
                                 {/* Sort By */}
                                 <Select value={sortBy} onValueChange={setSortBy}>
                                     <SelectTrigger className="w-[160px] h-10 rounded-xl border-slate-200">
-                                        <SortAsc className="h-4 w-4 ms-2 text-slate-400" />
+                                        <SortAsc className="h-4 w-4 ms-2 text-slate-500" />
                                         <SelectValue placeholder={t('reminders.list.sortBy')} />
                                     </SelectTrigger>
                                     <SelectContent>
@@ -372,7 +372,7 @@ export function RemindersView() {
                                         onClick={clearFilters}
                                         className="h-10 px-4 text-red-500 hover:text-red-600 hover:bg-red-50 rounded-xl"
                                     >
-                                        <X className="h-4 w-4 ms-2" />
+                                        <X className="h-4 w-4 ms-2" aria-hidden="true" />
                                         {t('reminders.list.clearFilters')}
                                     </Button>
                                 )}
@@ -412,7 +412,7 @@ export function RemindersView() {
                                 {/* Error State */}
                                 {isError && (
                                     <Alert className="border-red-200 bg-red-50">
-                                        <AlertCircle className="h-4 w-4 text-red-600" />
+                                        <AlertCircle className="h-4 w-4 text-red-600" aria-hidden="true" />
                                         <AlertDescription className="text-red-800">
                                             <div className="flex items-center justify-between">
                                                 <span>حدث خطأ أثناء تحميل التذكيرات: {error?.message || 'خطأ غير معروف'}</span>
@@ -434,7 +434,7 @@ export function RemindersView() {
                                         <p className="text-slate-500 mb-4">أنت جاهز تماماً! لا توجد تذكيرات في الوقت الحالي.</p>
                                         <Button asChild className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl">
                                             <Link to="/dashboard/tasks/reminders/new">
-                                                <Plus className="ms-2 h-4 w-4" />
+                                                <Plus className="ms-2 h-4 w-4" aria-hidden="true" />
                                                 إضافة تذكير جديد
                                             </Link>
                                         </Button>
@@ -461,14 +461,14 @@ export function RemindersView() {
                                                         <h4 className="font-bold text-navy text-lg">{reminder.title}</h4>
                                                     </div>
                                                     <p className="text-slate-500 text-sm flex items-center gap-2">
-                                                        <Clock className="h-3 w-3" />
+                                                        <Clock className="h-3 w-3" aria-hidden="true" />
                                                         {reminder.time}
                                                     </p>
                                                 </div>
                                             </div>
                                             <DropdownMenu>
                                                 <DropdownMenuTrigger asChild>
-                                                    <Button variant="ghost" size="icon" className="text-slate-400 hover:text-navy">
+                                                    <Button variant="ghost" size="icon" className="text-slate-500 hover:text-navy">
                                                         <MoreHorizontal className="h-5 w-5" />
                                                     </Button>
                                                 </DropdownMenuTrigger>
@@ -493,7 +493,7 @@ export function RemindersView() {
                                                     {reminder.status !== 'completed' && reminder.status !== 'dismissed' && (
                                                         <DropdownMenuSub>
                                                             <DropdownMenuSubTrigger>
-                                                                <Clock className="h-4 w-4 ms-2" />
+                                                                <Clock className="h-4 w-4 ms-2" aria-hidden="true" />
                                                                 تأجيل
                                                             </DropdownMenuSubTrigger>
                                                             <DropdownMenuSubContent>
@@ -530,7 +530,7 @@ export function RemindersView() {
                                             <div className="flex items-center gap-4">
                                                 {/* Priority Dropdown */}
                                                 <div>
-                                                    <div className="text-xs text-slate-400 mb-1">الأولوية</div>
+                                                    <div className="text-xs text-slate-500 mb-1">الأولوية</div>
                                                     <Select
                                                         value={reminder.priority}
                                                         onValueChange={(value) => handlePriorityChange(reminder.id, value)}
@@ -553,15 +553,15 @@ export function RemindersView() {
                                                 </div>
                                                 {/* Reminder Date - Dual Language */}
                                                 <div className="text-center">
-                                                    <div className="text-xs text-slate-400 mb-1">موعد التذكير</div>
+                                                    <div className="text-xs text-slate-500 mb-1">موعد التذكير</div>
                                                     <div className="font-bold text-navy text-sm">{reminder.reminderDateFormatted.arabic}</div>
-                                                    <div className="text-xs text-slate-400">{reminder.reminderDateFormatted.english}</div>
+                                                    <div className="text-xs text-slate-500">{reminder.reminderDateFormatted.english}</div>
                                                 </div>
                                                 {/* Creation Date - Dual Language */}
                                                 <div className="text-center">
-                                                    <div className="text-xs text-slate-400 mb-1">تاريخ الإنشاء</div>
+                                                    <div className="text-xs text-slate-500 mb-1">تاريخ الإنشاء</div>
                                                     <div className="font-bold text-slate-600 text-sm">{reminder.createdAtFormatted.arabic}</div>
-                                                    <div className="text-xs text-slate-400">{reminder.createdAtFormatted.english}</div>
+                                                    <div className="text-xs text-slate-500">{reminder.createdAtFormatted.english}</div>
                                                 </div>
                                             </div>
                                             <Link to={`/dashboard/tasks/reminders/${reminder.id}` as any}>
@@ -577,7 +577,7 @@ export function RemindersView() {
                             <div className="p-4 pt-0 text-center">
                                 <Button variant="ghost" className="text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 w-full rounded-xl py-6">
                                     عرض جميع التذكيرات
-                                    <ChevronLeft className="h-4 w-4 me-2" />
+                                    <ChevronLeft className="h-4 w-4 me-2" aria-hidden="true" />
                                 </Button>
                             </div>
                         </div>

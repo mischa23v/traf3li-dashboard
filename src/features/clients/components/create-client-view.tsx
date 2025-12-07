@@ -8,7 +8,7 @@ import {
     CheckCircle, Search, Briefcase, CreditCard, Users, Shield,
     Clock, Bell, AlertTriangle, Tag, Paperclip, ChevronDown,
     Scale, UserCheck, BadgePercent, Receipt, Globe, Home,
-    Calendar, DollarSign, FileCheck, X, Plus, Trash2
+    Calendar, DollarSign, FileCheck, X, Plus, Trash2, Lock
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -694,7 +694,7 @@ export function CreateClientView() {
                             <Card className="rounded-3xl shadow-sm border-slate-100">
                                 <CardHeader className="pb-4">
                                     <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                                        <User className="w-5 h-5 text-emerald-500" />
+                                        <User className="w-5 h-5 text-emerald-500" aria-hidden="true" />
                                         نوع العميل <span className="text-red-500">*</span>
                                     </CardTitle>
                                 </CardHeader>
@@ -710,7 +710,7 @@ export function CreateClientView() {
                                                     : "border-slate-200 hover:border-slate-300"
                                             )}
                                         >
-                                            <User className={cn("w-8 h-8 mx-auto mb-2", clientType === 'individual' ? "text-emerald-600" : "text-slate-400")} />
+                                            <User className={cn("w-8 h-8 mx-auto mb-2", clientType === 'individual' ? "text-emerald-600" : "text-slate-500")} />
                                             <span className={cn("text-lg font-medium", clientType === 'individual' ? "text-emerald-700" : "text-slate-600")}>
                                                 فرد
                                             </span>
@@ -726,7 +726,7 @@ export function CreateClientView() {
                                                     : "border-slate-200 hover:border-slate-300"
                                             )}
                                         >
-                                            <Building2 className={cn("w-8 h-8 mx-auto mb-2", clientType === 'company' ? "text-emerald-600" : "text-slate-400")} />
+                                            <Building2 className={cn("w-8 h-8 mx-auto mb-2", clientType === 'company' ? "text-emerald-600" : "text-slate-500")} />
                                             <span className={cn("text-lg font-medium", clientType === 'company' ? "text-emerald-700" : "text-slate-600")}>
                                                 شركة
                                             </span>
@@ -742,7 +742,7 @@ export function CreateClientView() {
                                     <CardHeader className="pb-4">
                                         <div className="flex items-center justify-between">
                                             <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                                                <User className="w-5 h-5 text-emerald-500" />
+                                                <User className="w-5 h-5 text-emerald-500" aria-hidden="true" />
                                                 المعلومات الشخصية
                                             </CardTitle>
                                             <VerificationBadge service="يقين" status={yakeenStatus} />
@@ -752,7 +752,7 @@ export function CreateClientView() {
                                         {/* National ID with verification */}
                                         <div className="space-y-2">
                                             <Label className="text-sm font-medium text-slate-700">
-                                                رقم الهوية الوطنية / الإقامة <span className="text-red-500">*</span>
+                                                رقم الهوية الوطنية / الإقامة<Lock className="h-3 w-3 text-slate-500 inline ms-1" aria-hidden="true" /> <span className="text-red-500">*</span>
                                             </Label>
                                             <div className="flex gap-2">
                                                 <Input
@@ -773,7 +773,7 @@ export function CreateClientView() {
                                                         <Loader2 className="w-4 h-4 animate-spin" />
                                                     ) : (
                                                         <>
-                                                            <Search className="w-4 h-4 ms-2" />
+                                                            <Search className="w-4 h-4 ms-2" aria-hidden="true" />
                                                             تحقق عبر يقين
                                                         </>
                                                     )}
@@ -869,7 +869,7 @@ export function CreateClientView() {
                                     <CardHeader className="pb-4">
                                         <div className="flex items-center justify-between">
                                             <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                                                <Building2 className="w-5 h-5 text-emerald-500" />
+                                                <Building2 className="w-5 h-5 text-emerald-500" aria-hidden="true" />
                                                 معلومات الشركة
                                             </CardTitle>
                                             <VerificationBadge service="وثق" status={wathqStatus} />
@@ -899,7 +899,7 @@ export function CreateClientView() {
                                                         <Loader2 className="w-4 h-4 animate-spin" />
                                                     ) : (
                                                         <>
-                                                            <Search className="w-4 h-4 ms-2" />
+                                                            <Search className="w-4 h-4 ms-2" aria-hidden="true" />
                                                             تحقق عبر وثق
                                                         </>
                                                     )}
@@ -1025,7 +1025,7 @@ export function CreateClientView() {
                                                 />
                                             </div>
                                             <div className="space-y-2">
-                                                <Label className="text-sm font-medium text-slate-700">رقم الهوية</Label>
+                                                <Label className="text-sm font-medium text-slate-700">رقم الهوية<Lock className="h-3 w-3 text-slate-500 inline ms-1" aria-hidden="true" /></Label>
                                                 <Input
                                                     value={legalRepId}
                                                     onChange={(e) => setLegalRepId(e.target.value)}
@@ -1044,7 +1044,7 @@ export function CreateClientView() {
                                                 />
                                             </div>
                                             <div className="space-y-2">
-                                                <Label className="text-sm font-medium text-slate-700">رقم الهاتف</Label>
+                                                <Label className="text-sm font-medium text-slate-700">رقم الهاتف<Lock className="h-3 w-3 text-slate-500 inline ms-1" aria-hidden="true" /></Label>
                                                 <Input
                                                     value={legalRepPhone}
                                                     onChange={(e) => setLegalRepPhone(e.target.value)}
@@ -1062,7 +1062,7 @@ export function CreateClientView() {
                             <Card className="rounded-3xl shadow-sm border-slate-100">
                                 <CardHeader className="pb-4">
                                     <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                                        <Phone className="w-5 h-5 text-emerald-500" />
+                                        <Phone className="w-5 h-5 text-emerald-500" aria-hidden="true" />
                                         معلومات الاتصال
                                     </CardTitle>
                                 </CardHeader>
@@ -1070,7 +1070,7 @@ export function CreateClientView() {
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         <div className="space-y-2">
                                             <Label className="text-sm font-medium text-slate-700">
-                                                رقم الهاتف <span className="text-red-500">*</span>
+                                                رقم الهاتف<Lock className="h-3 w-3 text-slate-500 inline ms-1" aria-hidden="true" /> <span className="text-red-500">*</span>
                                             </Label>
                                             <Input
                                                 value={phone}
@@ -1117,7 +1117,7 @@ export function CreateClientView() {
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         <div className="space-y-2">
                                             <Label className="text-sm font-medium text-slate-700">
-                                                البريد الإلكتروني <span className="text-red-500">*</span>
+                                                البريد الإلكتروني<Lock className="h-3 w-3 text-slate-500 inline ms-1" aria-hidden="true" /> <span className="text-red-500">*</span>
                                             </Label>
                                             <Input
                                                 type="email"
@@ -1190,7 +1190,7 @@ export function CreateClientView() {
                             <Card className="rounded-3xl shadow-sm border-slate-100">
                                 <CardHeader className="pb-4">
                                     <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                                        <MapPin className="w-5 h-5 text-emerald-500" />
+                                        <MapPin className="w-5 h-5 text-emerald-500" aria-hidden="true" />
                                         العنوان
                                     </CardTitle>
                                 </CardHeader>
@@ -1613,7 +1613,7 @@ export function CreateClientView() {
                                                                     <Loader2 className="w-4 h-4 animate-spin" />
                                                                 ) : (
                                                                     <>
-                                                                        <Search className="w-4 h-4 ms-2" />
+                                                                        <Search className="w-4 h-4 ms-2" aria-hidden="true" />
                                                                         تحقق
                                                                     </>
                                                                 )}
@@ -1744,7 +1744,7 @@ export function CreateClientView() {
                                 <AccordionItem value="flags" className="border rounded-3xl shadow-sm border-slate-100 overflow-hidden">
                                     <AccordionTrigger className="px-6 py-4 hover:bg-slate-50">
                                         <div className="flex items-center gap-2">
-                                            <AlertTriangle className="h-5 w-5 text-amber-500" />
+                                            <AlertTriangle className="h-5 w-5 text-amber-500" aria-hidden="true" />
                                             <span className="font-bold text-slate-800">حالة ومؤشرات</span>
                                         </div>
                                     </AccordionTrigger>
@@ -1821,7 +1821,7 @@ export function CreateClientView() {
                                                         onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addTag())}
                                                     />
                                                     <Button type="button" onClick={addTag} variant="outline" className="rounded-xl">
-                                                        <Plus className="w-4 h-4" />
+                                                        <Plus className="w-4 h-4" aria-hidden="true" />
                                                     </Button>
                                                 </div>
                                                 {tags.length > 0 && (
@@ -1830,7 +1830,7 @@ export function CreateClientView() {
                                                             <Badge key={tag} variant="secondary" className="rounded-full">
                                                                 {tag}
                                                                 <button onClick={() => removeTag(tag)} className="ms-1 hover:text-red-500">
-                                                                    <X className="w-3 h-3" />
+                                                                    <X className="w-3 h-3" aria-hidden="true" />
                                                                 </button>
                                                             </Badge>
                                                         ))}
@@ -1846,14 +1846,14 @@ export function CreateClientView() {
                             <div className="flex justify-between items-center pt-6 border-t border-slate-100">
                                 <Link to="/dashboard/clients">
                                     <Button type="button" variant="ghost" className="text-slate-500 hover:text-slate-700 rounded-xl">
-                                        <X className="ms-2 h-4 w-4" />
+                                        <X className="ms-2 h-4 w-4" aria-hidden="true" />
                                         إلغاء
                                     </Button>
                                 </Link>
 
                                 <div className="flex gap-2">
                                     <Button type="button" variant="outline" className="rounded-xl">
-                                        <Save className="ms-2 h-4 w-4" />
+                                        <Save className="ms-2 h-4 w-4" aria-hidden="true" />
                                         حفظ كمسودة
                                     </Button>
 
@@ -1872,14 +1872,14 @@ export function CreateClientView() {
                                                 ) : (
                                                     <span className="flex items-center gap-2">
                                                         حفظ العميل
-                                                        <ChevronDown className="w-4 h-4" />
+                                                        <ChevronDown className="w-4 h-4" aria-hidden="true" />
                                                     </span>
                                                 )}
                                             </Button>
                                         </DropdownMenuTrigger>
                                         <DropdownMenuContent align="end" className="w-48">
                                             <DropdownMenuItem onClick={handleSubmit}>
-                                                <Save className="ms-2 h-4 w-4" />
+                                                <Save className="ms-2 h-4 w-4" aria-hidden="true" />
                                                 حفظ فقط
                                             </DropdownMenuItem>
                                             <DropdownMenuItem>
@@ -1887,7 +1887,7 @@ export function CreateClientView() {
                                                 حفظ وإنشاء قضية
                                             </DropdownMenuItem>
                                             <DropdownMenuItem>
-                                                <Mail className="ms-2 h-4 w-4" />
+                                                <Mail className="ms-2 h-4 w-4" aria-hidden="true" />
                                                 حفظ وإرسال ترحيب
                                             </DropdownMenuItem>
                                         </DropdownMenuContent>

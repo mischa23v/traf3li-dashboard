@@ -102,11 +102,11 @@ const sourceLabels: Record<string, string> = {
 }
 
 const activityIcons: Record<string, React.ReactNode> = {
-  call: <Phone className="h-4 w-4" />,
-  email: <Mail className="h-4 w-4" />,
-  meeting: <Calendar className="h-4 w-4" />,
-  note: <FileText className="h-4 w-4" />,
-  status_change: <Clock className="h-4 w-4" />,
+  call: <Phone className="h-4 w-4" aria-hidden="true" />,
+  email: <Mail className="h-4 w-4" aria-hidden="true" />,
+  meeting: <Calendar className="h-4 w-4" aria-hidden="true" />,
+  note: <FileText className="h-4 w-4" aria-hidden="true" />,
+  status_change: <Clock className="h-4 w-4" aria-hidden="true" />,
   stage_change: <TrendingUp className="h-4 w-4" />,
 }
 
@@ -186,12 +186,12 @@ export function LeadDetailsView() {
 
         <div className="ms-auto flex items-center gap-4">
           <div className="relative hidden md:block">
-            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" aria-hidden="true" />
+            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
             <input
               type="text"
               placeholder="بحث..."
               aria-label="بحث"
-              className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pr-9 pl-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+              className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
             />
           </div>
           <Button
@@ -247,7 +247,7 @@ export function LeadDetailsView() {
             <div className="bg-white rounded-2xl p-12 border border-slate-100 text-center">
               <div className="flex justify-center mb-4">
                 <div className="w-16 h-16 rounded-full bg-red-50 flex items-center justify-center">
-                  <AlertCircle className="w-8 h-8 text-red-500" />
+                  <AlertCircle className="w-8 h-8 text-red-500" aria-hidden="true" />
                 </div>
               </div>
               <h3 className="text-lg font-bold text-slate-900 mb-2">
@@ -272,7 +272,7 @@ export function LeadDetailsView() {
             <div className="bg-white rounded-2xl p-12 border border-slate-100 text-center">
               <div className="flex justify-center mb-4">
                 <div className="w-16 h-16 rounded-full bg-emerald-50 flex items-center justify-center">
-                  <Users className="w-8 h-8 text-emerald-500" />
+                  <Users className="w-8 h-8 text-emerald-500" aria-hidden="true" />
                 </div>
               </div>
               <h3 className="text-lg font-bold text-slate-900 mb-2">
@@ -435,7 +435,7 @@ export function LeadDetailsView() {
                                 </div>
                                 {lead.alternatePhone && (
                                   <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-xl">
-                                    <Phone className="h-5 w-5 text-slate-400" aria-hidden="true" />
+                                    <Phone className="h-5 w-5 text-slate-500" aria-hidden="true" />
                                     <div>
                                       <p className="text-xs text-slate-500">
                                         هاتف بديل

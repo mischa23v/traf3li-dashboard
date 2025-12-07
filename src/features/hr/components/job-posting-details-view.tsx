@@ -188,7 +188,7 @@ export function JobPostingDetailsView() {
         <div className='ms-auto flex items-center gap-4'>
           <div className="relative hidden md:block">
             <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
-            <input type="text" placeholder="بحث..." aria-label="بحث" className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pr-9 pl-4 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
+            <input type="text" placeholder="بحث..." aria-label="بحث" className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
           </div>
           <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white" aria-label="الإشعارات">
             <Bell className="h-5 w-5" aria-hidden="true" />
@@ -238,7 +238,7 @@ export function JobPostingDetailsView() {
                 disabled={publishMutation.isPending}
                 className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl"
               >
-                <Globe className="w-4 h-4 ms-2" />
+                <Globe className="w-4 h-4 ms-2" aria-hidden="true" />
                 نشر الوظيفة
               </Button>
             )}
@@ -265,7 +265,7 @@ export function JobPostingDetailsView() {
                   تعديل
                 </DropdownMenuItem>
                 <DropdownMenuItem>
-                  <Copy className="w-4 h-4 ms-2" />
+                  <Copy className="w-4 h-4 ms-2" aria-hidden="true" />
                   نسخ
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
@@ -297,7 +297,7 @@ export function JobPostingDetailsView() {
             <CardContent className="p-4">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center">
-                  <Users className="w-5 h-5 text-emerald-600" />
+                  <Users className="w-5 h-5 text-emerald-600" aria-hidden="true" />
                 </div>
                 <div>
                   <p className="text-xs text-slate-500">الشواغر</p>
@@ -346,7 +346,7 @@ export function JobPostingDetailsView() {
             <CardContent className="p-4">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center">
-                  <Clock className="w-5 h-5 text-amber-600" />
+                  <Clock className="w-5 h-5 text-amber-600" aria-hidden="true" />
                 </div>
                 <div>
                   <p className="text-xs text-slate-500">تاريخ الإغلاق</p>
@@ -389,7 +389,7 @@ export function JobPostingDetailsView() {
               <Card className="border-none shadow-sm bg-white rounded-2xl lg:col-span-2">
                 <CardHeader className="pb-2">
                   <CardTitle className="text-base font-bold text-navy flex items-center gap-2">
-                    <FileText className="w-4 h-4 text-emerald-600" />
+                    <FileText className="w-4 h-4 text-emerald-600" aria-hidden="true" />
                     وصف الوظيفة
                   </CardTitle>
                 </CardHeader>
@@ -455,7 +455,7 @@ export function JobPostingDetailsView() {
                   </div>
                   <div className="flex items-center justify-between py-2 border-b border-slate-100">
                     <span className="text-slate-500 flex items-center gap-2">
-                      <Globe className="w-4 h-4" />
+                      <Globe className="w-4 h-4" aria-hidden="true" />
                       مكان العمل
                     </span>
                     <span className="font-medium text-navy">{WORK_LOCATION_LABELS[job.workLocation]}</span>
@@ -696,7 +696,7 @@ export function JobPostingDetailsView() {
                     <div className="absolute right-4 top-0 bottom-0 w-0.5 bg-emerald-200"></div>
                     <div className="space-y-6">
                       {job.hiringStages.map((stage, index) => (
-                        <div key={index} className="relative flex items-start gap-4 pr-4">
+                        <div key={index} className="relative flex items-start gap-4 pe-4">
                           <div className="w-8 h-8 rounded-full bg-emerald-500 text-white flex items-center justify-center font-bold text-sm z-10">
                             {stage.stageNumber || index + 1}
                           </div>
@@ -732,7 +732,7 @@ export function JobPostingDetailsView() {
               <CardHeader className="pb-2">
                 <div className="flex items-center justify-between">
                   <CardTitle className="text-base font-bold text-navy flex items-center gap-2">
-                    <Users className="w-4 h-4 text-emerald-600" />
+                    <Users className="w-4 h-4 text-emerald-600" aria-hidden="true" />
                     المتقدمين للوظيفة
                   </CardTitle>
                   <Button
@@ -797,7 +797,7 @@ export function JobPostingDetailsView() {
                   </div>
                 ) : (
                   <div className="text-center py-12">
-                    <Users className="w-16 h-16 text-slate-300 mx-auto mb-4" />
+                    <Users className="w-16 h-16 text-slate-300 mx-auto mb-4" aria-hidden="true" />
                     <h3 className="text-lg font-bold text-slate-700 mb-2">لا يوجد متقدمين</h3>
                     <p className="text-slate-500 mb-4">لم يتقدم أحد لهذه الوظيفة بعد</p>
                     <Button

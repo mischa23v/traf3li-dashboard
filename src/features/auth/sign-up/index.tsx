@@ -342,7 +342,7 @@ export function SignUp() {
                 تسجيل الدخول
               </button>
 
-              <p className="text-sm text-slate-400 mt-4">
+              <p className="text-sm text-slate-500 mt-4">
                 سيتم إرسال رسالة تأكيد على البريد الإلكتروني
               </p>
             </div>
@@ -519,7 +519,7 @@ export function SignUp() {
                   <div>
                     <label className="block text-sm font-medium text-[#0f172a] mb-2">اسم المستخدم <span className="text-red-500">*</span></label>
                     <div className="relative">
-                      <div className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400"><Icons.User /></div>
+                      <div className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500"><Icons.User /></div>
                       <input type="text" value={formData.username}
                         onChange={(e) => updateField('username', e.target.value.replace(/[^a-zA-Z0-9_]/g, '').toLowerCase())}
                         className={`w-full h-12 pe-12 ps-4 rounded-xl border bg-slate-50 text-[#0f172a] outline-none transition-all ${errors.username ? 'border-red-400' : 'border-slate-200 focus:border-[#0f172a]'}`}
@@ -531,7 +531,7 @@ export function SignUp() {
                   <div>
                     <label className="block text-sm font-medium text-[#0f172a] mb-2">البريد الإلكتروني <span className="text-red-500">*</span></label>
                     <div className="relative">
-                      <div className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400"><Icons.Mail /></div>
+                      <div className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500"><Icons.Mail /></div>
                       <input type="email" value={formData.email} onChange={(e) => updateField('email', e.target.value)}
                         className={`w-full h-12 pe-12 ps-4 rounded-xl border bg-slate-50 text-[#0f172a] outline-none transition-all ${errors.email ? 'border-red-400' : 'border-slate-200 focus:border-[#0f172a]'}`}
                         dir="ltr" style={{ textAlign: 'left' }} />
@@ -542,11 +542,11 @@ export function SignUp() {
                   <div>
                     <label className="block text-sm font-medium text-[#0f172a] mb-2">كلمة المرور <span className="text-red-500">*</span></label>
                     <div className="relative">
-                      <div className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400"><Icons.Lock /></div>
+                      <div className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500"><Icons.Lock /></div>
                       <input type={showPassword ? 'text' : 'password'} value={formData.password} onChange={(e) => updateField('password', e.target.value)}
                         className={`w-full h-12 pe-12 ps-12 rounded-xl border bg-slate-50 text-[#0f172a] outline-none transition-all ${errors.password ? 'border-red-400' : 'border-slate-200 focus:border-[#0f172a]'}`}
                         dir="ltr" style={{ textAlign: 'left' }} />
-                      <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
+                      <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-600">
                         {showPassword ? <Icons.EyeOff /> : <Icons.Eye />}
                       </button>
                     </div>
@@ -556,11 +556,11 @@ export function SignUp() {
                   <div>
                     <label className="block text-sm font-medium text-[#0f172a] mb-2">تأكيد كلمة المرور <span className="text-red-500">*</span></label>
                     <div className="relative">
-                      <div className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400"><Icons.Lock /></div>
+                      <div className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500"><Icons.Lock /></div>
                       <input type={showConfirmPassword ? 'text' : 'password'} value={formData.confirmPassword} onChange={(e) => updateField('confirmPassword', e.target.value)}
                         className={`w-full h-12 pe-12 ps-12 rounded-xl border bg-slate-50 text-[#0f172a] outline-none transition-all ${errors.confirmPassword ? 'border-red-400' : 'border-slate-200 focus:border-[#0f172a]'}`}
                         dir="ltr" style={{ textAlign: 'left' }} />
-                      <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
+                      <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-600">
                         {showConfirmPassword ? <Icons.EyeOff /> : <Icons.Eye />}
                       </button>
                     </div>
@@ -570,7 +570,7 @@ export function SignUp() {
                   <div>
                     <label className="block text-sm font-medium text-[#0f172a] mb-2">رقم الجوال <span className="text-red-500">*</span></label>
                     <div className="relative">
-                      <div className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400"><Icons.Phone /></div>
+                      <div className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500"><Icons.Phone /></div>
                       <input type="tel" value={formData.phone}
                         onChange={(e) => updateField('phone', e.target.value.replace(/\D/g, '').slice(0, 10))}
                         className={`w-full h-12 pe-12 ps-4 rounded-xl border bg-slate-50 text-[#0f172a] outline-none transition-all ${errors.phone ? 'border-red-400' : 'border-slate-200 focus:border-[#0f172a]'}`}
@@ -631,7 +631,7 @@ export function SignUp() {
 
                   {formData.isLicensed && (
                     <div className="mt-4 animate-fadeIn">
-                      <label className="block text-sm font-medium text-[#0f172a] mb-2">رقم الترخيص <span className="text-slate-400 text-xs">(اختياري)</span></label>
+                      <label className="block text-sm font-medium text-[#0f172a] mb-2">رقم الترخيص <span className="text-slate-500 text-xs">(اختياري)</span></label>
                       <input type="text" value={formData.licenseNumber} onChange={(e) => updateField('licenseNumber', e.target.value)}
                         className="w-full h-12 px-4 rounded-xl border border-slate-200 bg-white text-[#0f172a] outline-none focus:border-[#0f172a]" />
                     </div>
@@ -724,7 +724,7 @@ export function SignUp() {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-[#0f172a] mb-2">اسم جهة العمل <span className="text-slate-400 text-xs">(اختياري)</span></label>
+                    <label className="block text-sm font-medium text-[#0f172a] mb-2">اسم جهة العمل <span className="text-slate-500 text-xs">(اختياري)</span></label>
                     <input type="text" value={formData.firmName} onChange={(e) => updateField('firmName', e.target.value)}
                       placeholder="المكتب أو الشركة"
                       className="w-full h-12 px-4 rounded-xl border border-slate-200 bg-slate-50 text-[#0f172a] placeholder-slate-400 outline-none focus:border-[#0f172a]" />
@@ -760,15 +760,15 @@ export function SignUp() {
                     >
                       {LANGUAGES.map(lang => <option key={lang} value={lang}>{lang}</option>)}
                     </select>
-                    <p className="text-xs text-slate-400 mt-1">اضغط مع الاستمرار لاختيار أكثر من لغة</p>
+                    <p className="text-xs text-slate-500 mt-1">اضغط مع الاستمرار لاختيار أكثر من لغة</p>
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-[#0f172a] mb-2">نبذة عنك <span className="text-slate-400 text-xs">(اختياري)</span></label>
+                    <label className="block text-sm font-medium text-[#0f172a] mb-2">نبذة عنك <span className="text-slate-500 text-xs">(اختياري)</span></label>
                     <textarea value={formData.bio} onChange={(e) => updateField('bio', e.target.value)} rows={3}
                       className="w-full p-4 rounded-xl border border-slate-200 bg-slate-50 text-[#0f172a] outline-none focus:border-[#0f172a] resize-none"
                       maxLength={500} />
-                    <p className="text-xs text-slate-400 mt-1">{formData.bio.length}/500</p>
+                    <p className="text-xs text-slate-500 mt-1">{formData.bio.length}/500</p>
                   </div>
                 </>
               )}

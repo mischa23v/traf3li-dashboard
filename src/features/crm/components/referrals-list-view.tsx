@@ -140,11 +140,11 @@ export function ReferralsListView() {
 
         <div className="ms-auto flex items-center gap-4">
           <div className="relative hidden md:block min-w-0">
-            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
             <input
               type="text"
               placeholder="بحث..."
-              className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pr-9 pl-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+              className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
             />
           </div>
           <Button
@@ -174,7 +174,7 @@ export function ReferralsListView() {
             className="bg-emerald-500 hover:bg-emerald-600 text-white h-12 px-8 rounded-xl font-bold shadow-lg shadow-emerald-500/20 border-0"
           >
             <Link to="/dashboard/crm/referrals/new">
-              <Plus className="ms-2 h-5 w-5" />
+              <Plus className="ms-2 h-5 w-5" aria-hidden="true" />
               مصدر إحالة جديد
             </Link>
           </Button>
@@ -186,7 +186,7 @@ export function ReferralsListView() {
             <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
               <div className="flex items-center gap-3 mb-2">
                 <div className="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center">
-                  <Users className="h-5 w-5 text-blue-600" />
+                  <Users className="h-5 w-5 text-blue-600" aria-hidden="true" />
                 </div>
                 <span className="text-slate-600">مصادر الإحالة</span>
               </div>
@@ -280,7 +280,7 @@ export function ReferralsListView() {
                   <div className="bg-white rounded-2xl p-12 border border-slate-100 text-center">
                     <div className="flex justify-center mb-4">
                       <div className="w-16 h-16 rounded-full bg-red-50 flex items-center justify-center">
-                        <AlertCircle className="w-8 h-8 text-red-500" />
+                        <AlertCircle className="w-8 h-8 text-red-500" aria-hidden="true" />
                       </div>
                     </div>
                     <h3 className="text-lg font-bold text-slate-900 mb-2">
@@ -312,7 +312,7 @@ export function ReferralsListView() {
                     <p className="text-slate-500 mb-4">ابدأ بإضافة مصدر إحالة جديد</p>
                     <Button asChild className="bg-emerald-500 hover:bg-emerald-600">
                       <Link to="/dashboard/crm/referrals/new">
-                        <Plus className="w-4 h-4 ms-2" />
+                        <Plus className="w-4 h-4 ms-2" aria-hidden="true" />
                         مصدر إحالة جديد
                       </Link>
                     </Button>
@@ -366,7 +366,7 @@ export function ReferralsListView() {
                             <Button
                               variant="ghost"
                               size="icon"
-                              className="text-slate-400 hover:text-navy"
+                              className="text-slate-500 hover:text-navy"
                             >
                               <MoreHorizontal className="h-5 w-5" />
                             </Button>
@@ -390,7 +390,7 @@ export function ReferralsListView() {
                       <div className="flex items-center justify-between pt-4 border-t border-slate-200/50">
                         <div className="flex items-center gap-6">
                           <div className="text-center">
-                            <div className="text-xs text-slate-400 mb-1">
+                            <div className="text-xs text-slate-500 mb-1">
                               الإحالات
                             </div>
                             <div className="font-bold text-navy">
@@ -398,13 +398,13 @@ export function ReferralsListView() {
                             </div>
                           </div>
                           <div className="text-center">
-                            <div className="text-xs text-slate-400 mb-1">ناجحة</div>
+                            <div className="text-xs text-slate-500 mb-1">ناجحة</div>
                             <div className="font-bold text-emerald-600">
                               {referral.successfulReferrals}
                             </div>
                           </div>
                           <div className="text-center">
-                            <div className="text-xs text-slate-400 mb-1">
+                            <div className="text-xs text-slate-500 mb-1">
                               معدل التحويل
                             </div>
                             <div className="font-bold text-blue-600">
@@ -413,7 +413,7 @@ export function ReferralsListView() {
                           </div>
                           {referral.outstandingFees > 0 && (
                             <div className="text-center">
-                              <div className="text-xs text-slate-400 mb-1">
+                              <div className="text-xs text-slate-500 mb-1">
                                 مستحق
                               </div>
                               <div className="font-bold text-orange-600">
@@ -438,7 +438,7 @@ export function ReferralsListView() {
                   className="text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 w-full rounded-xl py-6"
                 >
                   عرض جميع مصادر الإحالة
-                  <ChevronLeft className="h-4 w-4 me-2" />
+                  <ChevronLeft className="h-4 w-4 me-2" aria-hidden="true" />
                 </Button>
               </div>
             </div>

@@ -188,7 +188,7 @@ export default function PaymentModesSettings() {
                             <p className="text-slate-500">إدارة طرق الدفع المتاحة للعملاء</p>
                         </div>
                         <Button onClick={() => handleOpenDialog()} className="bg-brand-blue hover:bg-brand-blue/90">
-                            <Plus className="h-4 w-4 ms-2" />
+                            <Plus className="h-4 w-4 ms-2" aria-hidden="true" />
                             إضافة طريقة دفع
                         </Button>
                     </div>
@@ -201,7 +201,7 @@ export default function PaymentModesSettings() {
                                 <h3 className="text-lg font-medium text-navy mb-2">لا توجد طرق دفع</h3>
                                 <p className="text-slate-500 mb-4">قم بإضافة طريقة دفع للبدء</p>
                                 <Button onClick={() => handleOpenDialog()} variant="outline">
-                                    <Plus className="h-4 w-4 ms-2" />
+                                    <Plus className="h-4 w-4 ms-2" aria-hidden="true" />
                                     إضافة طريقة دفع
                                 </Button>
                             </CardContent>
@@ -239,7 +239,7 @@ export default function PaymentModesSettings() {
                                                         </div>
                                                         <p className="text-sm text-slate-500" dir="ltr">{mode.name}</p>
                                                         {mode.descriptionAr && (
-                                                            <p className="text-sm text-slate-400 mt-1">{mode.descriptionAr}</p>
+                                                            <p className="text-sm text-slate-500 mt-1">{mode.descriptionAr}</p>
                                                         )}
                                                     </div>
                                                 </div>
@@ -257,7 +257,7 @@ export default function PaymentModesSettings() {
                                                         </DropdownMenuTrigger>
                                                         <DropdownMenuContent align="end">
                                                             <DropdownMenuItem onClick={() => handleOpenDialog(mode)}>
-                                                                <Edit className="h-4 w-4 ms-2" />
+                                                                <Edit className="h-4 w-4 ms-2" aria-hidden="true" />
                                                                 تعديل
                                                             </DropdownMenuItem>
                                                             {!mode.isDefault && (
@@ -297,7 +297,7 @@ export default function PaymentModesSettings() {
                                     <span>نقدي</span>
                                 </div>
                                 <div className="flex items-center gap-2 text-slate-600">
-                                    <Building2 className="h-4 w-4" />
+                                    <Building2 className="h-4 w-4" aria-hidden="true" />
                                     <span>تحويل بنكي</span>
                                 </div>
                                 <div className="flex items-center gap-2 text-slate-600">

@@ -90,7 +90,7 @@ export function OffboardingListView() {
 
   const getStatusIcon = (status: OffboardingStatus) => {
     switch (status) {
-      case 'initiated': return <Clock className="w-4 h-4" />
+      case 'initiated': return <Clock className="w-4 h-4" aria-hidden="true" />
       case 'in_progress': return <Loader2 className="w-4 h-4 animate-spin" />
       case 'clearance_pending': return <AlertCircle className="w-4 h-4" aria-hidden="true" />
       case 'completed': return <CheckCircle className="w-4 h-4" />
@@ -184,7 +184,7 @@ export function OffboardingListView() {
                 <CardContent className="p-4">
                   <div className="flex items-center gap-3">
                     <div className="p-2 bg-amber-100 rounded-xl">
-                      <Clock className="w-5 h-5 text-amber-600" />
+                      <Clock className="w-5 h-5 text-amber-600" aria-hidden="true" />
                     </div>
                     <div>
                       <p className="text-2xl font-bold text-navy">{stats?.pendingClearances || 0}</p>
@@ -384,7 +384,7 @@ export function OffboardingListView() {
                             </div>
                             {offboarding.noticePeriod && (
                               <div className="flex items-center gap-2 text-slate-500">
-                                <Clock className="w-4 h-4" />
+                                <Clock className="w-4 h-4" aria-hidden="true" />
                                 <span>فترة الإشعار: {offboarding.noticePeriod.noticeDaysServed}/{offboarding.noticePeriod.requiredDays} يوم</span>
                               </div>
                             )}

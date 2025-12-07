@@ -116,7 +116,7 @@ export function HelpSidebar({ context }: HelpSidebarProps) {
                     </div>
                     <div className="flex items-center gap-3 p-3 rounded-xl bg-slate-50 hover:bg-slate-100 transition-colors cursor-pointer group">
                         <div className="h-10 w-10 bg-purple-100 rounded-lg flex items-center justify-center text-purple-600 group-hover:scale-110 transition-transform">
-                            <FileText className="h-5 w-5" />
+                            <FileText className="h-5 w-5" aria-hidden="true" />
                         </div>
                         <div>
                             <div className="font-bold text-navy text-sm">{isRTL ? 'دليل المستخدم' : 'User Guide'}</div>

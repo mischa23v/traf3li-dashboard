@@ -139,7 +139,7 @@ function ActivityItem({ activity }: ActivityItemProps) {
             </Avatar>
           )}
         </div>
-        <p className="text-xs text-slate-400 mt-1">
+        <p className="text-xs text-slate-500 mt-1">
           {formatDistanceToNow(new Date(activity.createdAt), {
             addSuffix: true,
             locale: dateLocale,
@@ -201,7 +201,7 @@ export function ActivityFeed({
     <div className={cn('', className)}>
       {showTitle && (
         <h3 className="text-base font-semibold text-slate-800 mb-3 flex items-center gap-2">
-          <Clock className="w-4 h-4 text-emerald-500" />
+          <Clock className="w-4 h-4 text-emerald-500" aria-hidden="true" />
           {getTitle()}
         </h3>
       )}

@@ -196,8 +196,8 @@ export function ReminderDetailsView() {
 
                 <div className='ms-auto flex items-center gap-4'>
                     <div className="relative hidden md:block">
-                        <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                        <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
+                        <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
+                        <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
                     </div>
                     <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white">
                         <Bell className="h-5 w-5" />
@@ -241,7 +241,7 @@ export function ReminderDetailsView() {
                 {isError && !isLoading && (
                     <div className="max-w-[1600px] mx-auto">
                         <Alert className="border-red-200 bg-red-50">
-                            <AlertCircle className="h-4 w-4 text-red-600" />
+                            <AlertCircle className="h-4 w-4 text-red-600" aria-hidden="true" />
                             <AlertDescription className="text-red-800">
                                 <div className="flex items-center justify-between">
                                     <span>حدث خطأ أثناء تحميل تفاصيل التذكير: {error?.message || 'خطأ غير معروف'}</span>
@@ -259,7 +259,7 @@ export function ReminderDetailsView() {
                     <div className="max-w-[1600px] mx-auto">
                         <div className="text-center py-12 bg-white rounded-3xl">
                             <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-slate-100 mb-4">
-                                <Bell className="h-8 w-8 text-slate-400" />
+                                <Bell className="h-8 w-8 text-slate-500" />
                             </div>
                             <h4 className="text-lg font-bold text-navy mb-2">لم يتم العثور على التذكير</h4>
                             <p className="text-slate-500 mb-4">التذكير المطلوب غير موجود أو تم حذفه</p>
@@ -328,7 +328,7 @@ export function ReminderDetailsView() {
                                                     {snoozeReminderMutation.isPending ? (
                                                         <Loader2 className="h-4 w-4 ms-2 animate-spin" />
                                                     ) : (
-                                                        <Clock className="h-4 w-4 ms-2" />
+                                                        <Clock className="h-4 w-4 ms-2" aria-hidden="true" />
                                                     )}
                                                     تأجيل
                                                 </Button>
@@ -493,7 +493,7 @@ export function ReminderDetailsView() {
                                                                 <div className="flex-1 relative">
                                                                     <Textarea placeholder="أضف ملاحظة..." className="min-h-[80px] rounded-xl resize-none pe-12 bg-slate-50 border-slate-200 focus:border-brand-blue" />
                                                                     <Button size="icon" className="absolute bottom-2 left-2 w-8 h-8 rounded-lg bg-brand-blue hover:bg-blue-600">
-                                                                        <Send className="w-4 h-4" />
+                                                                        <Send className="w-4 h-4" aria-hidden="true" />
                                                                     </Button>
                                                                 </div>
                                                             </div>

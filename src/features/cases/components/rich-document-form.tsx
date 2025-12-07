@@ -199,7 +199,7 @@ export function RichDocumentForm({
     <Card className="border border-slate-100 shadow-sm rounded-2xl">
       <CardHeader className="bg-white border-b border-slate-50 pb-4">
         <CardTitle className="text-lg font-bold text-navy flex items-center gap-2">
-          <FileText className="h-5 w-5 text-emerald-500" />
+          <FileText className="h-5 w-5 text-emerald-500" aria-hidden="true" />
           {isEditMode
             ? (isArabic ? 'تعديل المستند' : 'Edit Document')
             : (isArabic ? 'إنشاء مستند جديد' : 'Create New Document')}
@@ -209,7 +209,7 @@ export function RichDocumentForm({
         <form onSubmit={handleSubmit} className="space-y-6">
           {error && (
             <Alert className="border-red-200 bg-red-50">
-              <AlertCircle className="h-4 w-4 text-red-600" />
+              <AlertCircle className="h-4 w-4 text-red-600" aria-hidden="true" />
               <AlertDescription className="text-red-800">{error}</AlertDescription>
             </Alert>
           )}
@@ -333,7 +333,7 @@ export function RichDocumentForm({
           {/* Content Editor */}
           <div className="space-y-2">
             <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-              <FileText className="w-4 h-4 text-emerald-500" />
+              <FileText className="w-4 h-4 text-emerald-500" aria-hidden="true" />
               {isArabic ? 'المحتوى *' : 'Content *'}
             </label>
             <Suspense fallback={<Skeleton className="min-h-[300px] w-full rounded-xl" />}>
@@ -352,10 +352,10 @@ export function RichDocumentForm({
               <CollapsibleTrigger asChild>
                 <Button variant="ghost" className="w-full justify-between p-0 h-auto hover:bg-transparent">
                   <h3 className="text-lg font-semibold text-slate-800 flex items-center gap-2">
-                    <Calendar className="w-5 h-5 text-emerald-500" />
+                    <Calendar className="w-5 h-5 text-emerald-500" aria-hidden="true" />
                     {isArabic ? 'إعدادات التقويم' : 'Calendar Settings'}
                   </h3>
-                  {showCalendarSettings ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
+                  {showCalendarSettings ? <ChevronUp className="w-5 h-5" aria-hidden="true" /> : <ChevronDown className="w-5 h-5" aria-hidden="true" />}
                 </Button>
               </CollapsibleTrigger>
               <CollapsibleContent className="mt-4">
@@ -393,7 +393,7 @@ export function RichDocumentForm({
                         <div className="space-y-2">
                           <label className="text-sm font-medium text-slate-700">
                             {isArabic ? 'تاريخ الانتهاء' : 'End Date'}{' '}
-                            <span className="text-slate-400">({isArabic ? 'اختياري' : 'optional'})</span>
+                            <span className="text-slate-500">({isArabic ? 'اختياري' : 'optional'})</span>
                           </label>
                           <Input
                             type="datetime-local"
@@ -449,7 +449,7 @@ export function RichDocumentForm({
                 className="rounded-xl"
                 disabled={isLoading}
               >
-                <X className="w-4 h-4 me-2" />
+                <X className="w-4 h-4 me-2" aria-hidden="true" />
                 {isArabic ? 'إلغاء' : 'Cancel'}
               </Button>
             )}
@@ -461,7 +461,7 @@ export function RichDocumentForm({
               {isLoading ? (
                 <Loader2 className="w-4 h-4 me-2 animate-spin" />
               ) : (
-                <Save className="w-4 h-4 me-2" />
+                <Save className="w-4 h-4 me-2" aria-hidden="true" />
               )}
               {isLoading
                 ? (isArabic ? 'جاري الحفظ...' : 'Saving...')

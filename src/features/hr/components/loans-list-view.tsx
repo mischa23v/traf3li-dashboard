@@ -91,7 +91,7 @@ export function LoansListView() {
 
   const getStatusIcon = (status: LoanStatus) => {
     switch (status) {
-      case 'pending': return <Clock className="w-4 h-4" />
+      case 'pending': return <Clock className="w-4 h-4" aria-hidden="true" />
       case 'approved': return <CheckCircle className="w-4 h-4" />
       case 'rejected': return <XCircle className="w-4 h-4" />
       case 'active': return <TrendingUp className="w-4 h-4" aria-hidden="true" />
@@ -249,7 +249,7 @@ export function LoansListView() {
                       placeholder="البحث باسم الموظف أو الرقم..."
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      className="pr-10 rounded-xl h-11"
+                      className="pe-10 rounded-xl h-11"
                     />
                   </div>
                   <Select value={statusFilter} onValueChange={(v) => setStatusFilter(v as LoanStatus | 'all')}>
@@ -422,7 +422,7 @@ export function LoansListView() {
                             </div>
                             {loan.repayment && (
                               <div className="flex items-center gap-2 text-slate-500">
-                                <Clock className="w-4 h-4" />
+                                <Clock className="w-4 h-4" aria-hidden="true" />
                                 <span>الأقساط: {loan.repayment.installments} قسط</span>
                               </div>
                             )}

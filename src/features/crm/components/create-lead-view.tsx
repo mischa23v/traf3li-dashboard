@@ -318,7 +318,7 @@ export function CreateLeadView() {
     if (score >= 100) return 'text-emerald-600'
     if (score >= 70) return 'text-blue-600'
     if (score >= 40) return 'text-yellow-600'
-    return 'text-slate-400'
+    return 'text-slate-600'
   }
 
   const getScoreLabel = (score: number) => {
@@ -529,7 +529,7 @@ export function CreateLeadView() {
               <Card className="border-0 shadow-sm">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
-                    <User className="w-5 h-5 text-emerald-500" />
+                    <User className="w-5 h-5 text-emerald-500" aria-hidden="true" />
                     المعلومات الأساسية
                   </CardTitle>
                 </CardHeader>
@@ -604,7 +604,7 @@ export function CreateLeadView() {
               <Card className="border-0 shadow-sm">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
-                    <Phone className="w-5 h-5 text-emerald-500" />
+                    <Phone className="w-5 h-5 text-emerald-500" aria-hidden="true" />
                     معلومات الاتصال
                   </CardTitle>
                 </CardHeader>
@@ -668,7 +668,7 @@ export function CreateLeadView() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                        <Mail className="w-4 h-4 text-emerald-500" />
+                        <Mail className="w-4 h-4 text-emerald-500" aria-hidden="true" />
                         البريد الإلكتروني
                       </label>
                       <Input
@@ -699,7 +699,7 @@ export function CreateLeadView() {
               <Card className="border-0 shadow-sm">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
-                    <Building className="w-5 h-5 text-emerald-500" />
+                    <Building className="w-5 h-5 text-emerald-500" aria-hidden="true" />
                     معلومات الشركة
                   </CardTitle>
                 </CardHeader>
@@ -892,7 +892,7 @@ export function CreateLeadView() {
                     </div>
                     <div className="space-y-2">
                       <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                        <Calendar className="w-4 h-4 text-emerald-500" />
+                        <Calendar className="w-4 h-4 text-emerald-500" aria-hidden="true" />
                         تاريخ الإغلاق المتوقع
                       </label>
                       <Input
@@ -1038,7 +1038,7 @@ export function CreateLeadView() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                        <Clock className="w-4 h-4 text-red-500" />
+                        <Clock className="w-4 h-4 text-red-500" aria-hidden="true" />
                         موعد المحكمة
                       </label>
                       <Input
@@ -1088,7 +1088,7 @@ export function CreateLeadView() {
                       <Badge key={tag} variant="secondary" className="gap-1 px-3 py-1">
                         {tag}
                         <button type="button" onClick={() => removeTag(tag)} className="hover:text-red-500 me-1">
-                          <X className="w-3 h-3" />
+                          <X className="w-3 h-3" aria-hidden="true" />
                         </button>
                       </Badge>
                     ))}
@@ -1107,7 +1107,7 @@ export function CreateLeadView() {
                       }}
                     />
                     <Button type="button" variant="outline" onClick={addTag} className="rounded-xl">
-                      <Plus className="w-4 h-4" />
+                      <Plus className="w-4 h-4" aria-hidden="true" />
                     </Button>
                   </div>
                 </CardContent>
@@ -1226,7 +1226,7 @@ export function CreateLeadView() {
                 <AccordionItem value="competition" className="border rounded-2xl bg-white shadow-sm">
                   <AccordionTrigger className="px-6 hover:no-underline">
                     <span className="flex items-center gap-2 text-lg font-semibold">
-                      <Users className="w-5 h-5 text-emerald-500" />
+                      <Users className="w-5 h-5 text-emerald-500" aria-hidden="true" />
                       تتبع المنافسة
                     </span>
                   </AccordionTrigger>
@@ -1255,7 +1255,7 @@ export function CreateLeadView() {
                             <Badge key={competitor} variant="outline" className="gap-1 px-3 py-1">
                               {competitor}
                               <button type="button" onClick={() => removeCompetitor(competitor)} className="hover:text-red-500 me-1">
-                                <X className="w-3 h-3" />
+                                <X className="w-3 h-3" aria-hidden="true" />
                               </button>
                             </Badge>
                           ))}
@@ -1274,7 +1274,7 @@ export function CreateLeadView() {
                             }}
                           />
                           <Button type="button" variant="outline" onClick={addCompetitor} className="rounded-xl">
-                            <Plus className="w-4 h-4" />
+                            <Plus className="w-4 h-4" aria-hidden="true" />
                           </Button>
                         </div>
                       </div>
@@ -1296,7 +1296,7 @@ export function CreateLeadView() {
                 <AccordionItem value="proposal" className="border rounded-2xl bg-white shadow-sm">
                   <AccordionTrigger className="px-6 hover:no-underline">
                     <span className="flex items-center gap-2 text-lg font-semibold">
-                      <FileText className="w-5 h-5 text-emerald-500" />
+                      <FileText className="w-5 h-5 text-emerald-500" aria-hidden="true" />
                       تتبع العرض
                     </span>
                   </AccordionTrigger>
@@ -1354,7 +1354,7 @@ export function CreateLeadView() {
                 <AccordionItem value="followup" className="border rounded-2xl bg-white shadow-sm">
                   <AccordionTrigger className="px-6 hover:no-underline">
                     <span className="flex items-center gap-2 text-lg font-semibold">
-                      <Clock className="w-5 h-5 text-emerald-500" />
+                      <Clock className="w-5 h-5 text-emerald-500" aria-hidden="true" />
                       المتابعة
                     </span>
                   </AccordionTrigger>
@@ -1395,7 +1395,7 @@ export function CreateLeadView() {
                 <AccordionItem value="address" className="border rounded-2xl bg-white shadow-sm">
                   <AccordionTrigger className="px-6 hover:no-underline">
                     <span className="flex items-center gap-2 text-lg font-semibold">
-                      <MapPin className="w-5 h-5 text-emerald-500" />
+                      <MapPin className="w-5 h-5 text-emerald-500" aria-hidden="true" />
                       العنوان
                     </span>
                   </AccordionTrigger>
@@ -1447,7 +1447,7 @@ export function CreateLeadView() {
                 <AccordionItem value="lost" className="border rounded-2xl bg-white shadow-sm">
                   <AccordionTrigger className="px-6 hover:no-underline">
                     <span className="flex items-center gap-2 text-lg font-semibold">
-                      <AlertTriangle className="w-5 h-5 text-red-500" />
+                      <AlertTriangle className="w-5 h-5 text-red-500" aria-hidden="true" />
                       تتبع الفرص المفقودة
                     </span>
                   </AccordionTrigger>
@@ -1495,7 +1495,7 @@ export function CreateLeadView() {
               <Card className="border-0 shadow-sm">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
-                    <FileText className="w-5 h-5 text-emerald-500" />
+                    <FileText className="w-5 h-5 text-emerald-500" aria-hidden="true" />
                     ملاحظات
                   </CardTitle>
                 </CardHeader>
@@ -1543,7 +1543,7 @@ export function CreateLeadView() {
                     </span>
                   ) : (
                     <span className="flex items-center gap-2">
-                      <Save className="w-4 h-4" />
+                      <Save className="w-4 h-4" aria-hidden="true" />
                       حفظ العميل المحتمل
                     </span>
                   )}

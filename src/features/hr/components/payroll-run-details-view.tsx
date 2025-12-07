@@ -114,11 +114,11 @@ export function PayrollRunDetailsView() {
             cancelled: 'ملغي',
         }
         const icons: Record<PayrollRunStatus, React.ReactNode> = {
-            draft: <FileText className="w-3 h-3" />,
+            draft: <FileText className="w-3 h-3" aria-hidden="true" />,
             calculating: <RefreshCw className="w-3 h-3 animate-spin" aria-hidden="true" />,
             calculated: <CheckCircle className="w-3 h-3" />,
             approved: <CheckCircle className="w-3 h-3" />,
-            processing_payment: <Clock className="w-3 h-3" />,
+            processing_payment: <Clock className="w-3 h-3" aria-hidden="true" />,
             paid: <CreditCard className="w-3 h-3" />,
             cancelled: <XCircle className="w-3 h-3" />,
         }
@@ -376,7 +376,7 @@ export function PayrollRunDetailsView() {
                                 className="bg-blue-500 hover:bg-blue-600 text-white rounded-xl"
                                 disabled={sendNotificationsMutation.isPending}
                             >
-                                <Send className="w-4 h-4 ms-2" />
+                                <Send className="w-4 h-4 ms-2" aria-hidden="true" />
                                 {sendNotificationsMutation.isPending ? 'جاري الإرسال...' : 'إرسال القسائم'}
                             </Button>
                         )}
@@ -418,7 +418,7 @@ export function PayrollRunDetailsView() {
                         <CardContent className="p-4">
                             <div className="flex items-center gap-3">
                                 <div className="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center">
-                                    <Users className="w-6 h-6 text-blue-600" />
+                                    <Users className="w-6 h-6 text-blue-600" aria-hidden="true" />
                                 </div>
                                 <div>
                                     <p className="text-sm text-slate-500">الموظفين</p>
@@ -565,7 +565,7 @@ export function PayrollRunDetailsView() {
                             <Card className="border-none shadow-sm bg-white rounded-2xl">
                                 <CardHeader className="pb-3">
                                     <CardTitle className="text-base font-bold text-navy flex items-center gap-2">
-                                        <Users className="w-4 h-4 text-emerald-600" />
+                                        <Users className="w-4 h-4 text-emerald-600" aria-hidden="true" />
                                         ملخص الموظفين
                                     </CardTitle>
                                 </CardHeader>
@@ -583,7 +583,7 @@ export function PayrollRunDetailsView() {
                                     </div>
                                     <div className="flex justify-between py-2 border-b">
                                         <span className="text-slate-500 flex items-center gap-2">
-                                            <Clock className="w-4 h-4 text-amber-500" />
+                                            <Clock className="w-4 h-4 text-amber-500" aria-hidden="true" />
                                             معلق
                                         </span>
                                         <span className="font-medium text-amber-600">{run.employees.pendingEmployees}</span>
@@ -700,7 +700,7 @@ export function PayrollRunDetailsView() {
                             <CardHeader className="pb-3">
                                 <div className="flex items-center justify-between">
                                     <CardTitle className="text-base font-bold text-navy flex items-center gap-2">
-                                        <Users className="w-4 h-4 text-emerald-600" />
+                                        <Users className="w-4 h-4 text-emerald-600" aria-hidden="true" />
                                         قائمة الموظفين
                                     </CardTitle>
                                     <Badge className="bg-slate-100 text-slate-600 border-0">
@@ -711,7 +711,7 @@ export function PayrollRunDetailsView() {
                             <CardContent>
                                 {!run.employeeList || run.employeeList.length === 0 ? (
                                     <div className="text-center py-12">
-                                        <Users className="w-16 h-16 text-slate-300 mx-auto mb-4" />
+                                        <Users className="w-16 h-16 text-slate-300 mx-auto mb-4" aria-hidden="true" />
                                         <h3 className="text-lg font-bold text-slate-700 mb-2">لا يوجد موظفين بعد</h3>
                                         <p className="text-slate-500">قم بحساب الرواتب لعرض قائمة الموظفين</p>
                                     </div>
@@ -889,7 +889,7 @@ export function PayrollRunDetailsView() {
                                 <Card className="border-none shadow-sm bg-amber-50 rounded-2xl">
                                     <CardHeader className="pb-3">
                                         <CardTitle className="text-base font-bold text-amber-800 flex items-center gap-2">
-                                            <Building className="w-4 h-4 text-amber-600" />
+                                            <Building className="w-4 h-4 text-amber-600" aria-hidden="true" />
                                             التكلفة على الشركة
                                         </CardTitle>
                                     </CardHeader>
@@ -999,7 +999,7 @@ export function PayrollRunDetailsView() {
                                                             ) : method.paymentMethod === 'cash' ? (
                                                                 <Wallet className="w-5 h-5 text-emerald-600" />
                                                             ) : (
-                                                                <FileText className="w-5 h-5 text-purple-600" />
+                                                                <FileText className="w-5 h-5 text-purple-600" aria-hidden="true" />
                                                             )}
                                                         </div>
                                                         <div className="text-sm text-slate-500">
@@ -1147,7 +1147,7 @@ export function PayrollRunDetailsView() {
                                         </div>
                                         <div className="p-4 bg-slate-50 rounded-xl">
                                             <div className="flex items-center gap-2 mb-2">
-                                                <FileText className="w-4 h-4 text-purple-600" />
+                                                <FileText className="w-4 h-4 text-purple-600" aria-hidden="true" />
                                                 <span className="font-medium">شيك</span>
                                             </div>
                                             <div className="text-sm text-slate-500">{run.paymentProcessing.check.employeeCount} موظف</div>

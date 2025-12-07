@@ -140,7 +140,7 @@ export function JobPositionsListView() {
         <div className='ms-auto flex items-center gap-2 sm:gap-4 overflow-x-auto min-w-0'>
           <div className="relative hidden md:block min-w-0">
             <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
-            <input type="text" placeholder="بحث..." aria-label="بحث" className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pr-9 pl-4 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
+            <input type="text" placeholder="بحث..." aria-label="بحث" className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
           </div>
           <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white flex-shrink-0" aria-label="الإشعارات">
             <Bell className="h-5 w-5" aria-hidden="true" />
@@ -227,7 +227,7 @@ export function JobPositionsListView() {
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <div className="p-2 bg-indigo-100 rounded-xl">
-                        <Users className="w-5 h-5 text-indigo-600" />
+                        <Users className="w-5 h-5 text-indigo-600" aria-hidden="true" />
                       </div>
                       <div>
                         <p className="text-sm font-medium text-indigo-800">العدد الوظيفي</p>
@@ -256,7 +256,7 @@ export function JobPositionsListView() {
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         placeholder="بحث عن منصب..."
-                        className="pr-9 rounded-xl"
+                        className="pe-9 rounded-xl"
                       />
                     </div>
                     <Select value={statusFilter} onValueChange={(v) => setStatusFilter(v as PositionStatus | 'all')}>
@@ -466,7 +466,7 @@ export function JobPositionsListView() {
                                 <p className="text-xs text-slate-500 mb-2">شاغل المنصب الحالي</p>
                                 <div className="flex items-center gap-2">
                                   <div className="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center">
-                                    <Users className="w-4 h-4 text-emerald-600" />
+                                    <Users className="w-4 h-4 text-emerald-600" aria-hidden="true" />
                                   </div>
                                   <div>
                                     <p className="font-medium text-sm">{position.incumbent.employeeNameAr || position.incumbent.employeeName}</p>
@@ -486,7 +486,7 @@ export function JobPositionsListView() {
                                 )}
                                 {position.directReportsCount > 0 && (
                                   <span className="flex items-center gap-1 text-purple-600">
-                                    <Users className="w-3 h-3" />
+                                    <Users className="w-3 h-3" aria-hidden="true" />
                                     {position.directReportsCount} تقارير مباشرة
                                   </span>
                                 )}

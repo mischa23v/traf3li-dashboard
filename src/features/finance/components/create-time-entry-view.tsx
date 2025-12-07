@@ -456,7 +456,7 @@ export function CreateTimeEntryView() {
 
                                         <div className="space-y-2">
                                             <Label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                                <User className="w-4 h-4 text-emerald-500" />
+                                                <User className="w-4 h-4 text-emerald-500" aria-hidden="true" />
                                                 المحامي <span className="text-red-500">*</span>
                                             </Label>
                                             <Select
@@ -483,7 +483,7 @@ export function CreateTimeEntryView() {
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         <div className="space-y-2">
                                             <Label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                                <User className="w-4 h-4 text-emerald-500" />
+                                                <User className="w-4 h-4 text-emerald-500" aria-hidden="true" />
                                                 العميل <span className="text-red-500">*</span>
                                             </Label>
                                             <Select
@@ -580,7 +580,7 @@ export function CreateTimeEntryView() {
                                                                 <SelectItem key={code.code} value={code.code}>
                                                                     <div className="flex items-center gap-2">
                                                                         <Icon className="h-4 w-4 text-slate-500" />
-                                                                        <span className="font-mono text-xs text-slate-400">{code.code}</span>
+                                                                        <span className="font-mono text-xs text-slate-600">{code.code}</span>
                                                                         <span>{code.descriptionAr}</span>
                                                                     </div>
                                                                 </SelectItem>
@@ -661,7 +661,7 @@ export function CreateTimeEntryView() {
 
                                             {totalMinutes > 0 && (
                                                 <Alert className="bg-emerald-50 border-emerald-200">
-                                                    <Info className="h-4 w-4 text-emerald-600" />
+                                                    <Info className="h-4 w-4 text-emerald-600" aria-hidden="true" />
                                                     <AlertDescription className="flex justify-between items-center">
                                                         <span className="text-emerald-700">إجمالي الوقت:</span>
                                                         <span className="text-lg font-bold text-emerald-800">{formatDuration(totalMinutes)}</span>
@@ -966,7 +966,7 @@ export function CreateTimeEntryView() {
                                                                 />
                                                             </div>
                                                             <Alert className="bg-blue-50 border-blue-200">
-                                                                <Info className="h-4 w-4 text-blue-600" />
+                                                                <Info className="h-4 w-4 text-blue-600" aria-hidden="true" />
                                                                 <AlertDescription className="flex justify-between items-center">
                                                                     <span className="text-blue-700">المبلغ بعد التخفيض:</span>
                                                                     <span className="text-lg font-bold text-blue-800">{formatCurrency(billableAmount)}</span>
@@ -988,7 +988,7 @@ export function CreateTimeEntryView() {
                                 <AccordionItem value="organization" className="border rounded-xl mb-2 px-4">
                                     <AccordionTrigger className="hover:no-underline">
                                         <div className="flex items-center gap-2">
-                                            <Building2 className="h-4 w-4 text-slate-500" />
+                                            <Building2 className="h-4 w-4 text-slate-500" aria-hidden="true" />
                                             <span className="font-semibold">معلومات تنظيمية</span>
                                         </div>
                                     </AccordionTrigger>
@@ -1099,7 +1099,7 @@ export function CreateTimeEntryView() {
                             <div className="flex justify-between items-center pt-6 border-t border-slate-200">
                                 <div className="flex gap-2">
                                     <Button type="button" variant="outline" onClick={() => navigate({ to: '/dashboard/finance/time-tracking' })} className="rounded-xl">
-                                        <X className="ms-2 h-4 w-4" />
+                                        <X className="ms-2 h-4 w-4" aria-hidden="true" />
                                         إلغاء
                                     </Button>
                                     <Button type="button" variant="outline" onClick={(e) => handleSubmit(e as any, 'draft')} className="rounded-xl">

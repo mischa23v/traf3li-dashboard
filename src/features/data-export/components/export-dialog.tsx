@@ -92,7 +92,7 @@ export function ExportDialog({
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-hidden flex flex-col">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <Download className="h-5 w-5" />
+            <Download className="h-5 w-5" aria-hidden="true" />
             {t('dataExport.exportData')}
           </DialogTitle>
           <DialogDescription>
@@ -183,7 +183,7 @@ export function ExportDialog({
             <ScrollArea className="h-40 rounded-md border p-3">
               <div className="grid grid-cols-2 gap-2">
                 {columns.map((column) => (
-                  <div key={column.field} className="flex items-center space-x-2 rtl:space-x-reverse">
+                  <div key={column.field} className="flex items-center gap-2 rtl:gap-reverse">
                     <Checkbox
                       id={column.field}
                       checked={
@@ -210,7 +210,7 @@ export function ExportDialog({
           {/* Additional Options */}
           <div className="space-y-3">
             <Label>{t('dataExport.additionalOptions')}</Label>
-            <div className="flex items-center space-x-2 rtl:space-x-reverse">
+            <div className="flex items-center gap-2 rtl:gap-reverse">
               <Checkbox
                 id="includeRelated"
                 checked={includeRelated}
@@ -235,7 +235,7 @@ export function ExportDialog({
               </>
             ) : (
               <>
-                <Download className="h-4 w-4 me-2" />
+                <Download className="h-4 w-4 me-2" aria-hidden="true" />
                 {t('dataExport.startExport')}
               </>
             )}

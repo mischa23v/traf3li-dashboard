@@ -389,7 +389,7 @@ export function CreateStaffView() {
                             <Card className="border-slate-200 mb-6">
                                 <CardHeader>
                                     <CardTitle className="text-lg font-bold text-slate-900 flex items-center gap-2">
-                                        <User className="w-5 h-5 text-emerald-500" />
+                                        <User className="w-5 h-5 text-emerald-500" aria-hidden="true" />
                                         المعلومات الشخصية
                                     </CardTitle>
                                 </CardHeader>
@@ -462,7 +462,7 @@ export function CreateStaffView() {
                             <Card className="border-slate-200 mb-6">
                                 <CardHeader>
                                     <CardTitle className="text-lg font-bold text-slate-900 flex items-center gap-2">
-                                        <Phone className="w-5 h-5 text-emerald-500" />
+                                        <Phone className="w-5 h-5 text-emerald-500" aria-hidden="true" />
                                         معلومات الاتصال
                                     </CardTitle>
                                 </CardHeader>
@@ -470,7 +470,7 @@ export function CreateStaffView() {
                                     <div className="grid grid-cols-2 gap-4">
                                         <div className="space-y-2">
                                             <Label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                                <Mail className="w-4 h-4 text-emerald-500" />
+                                                <Mail className="w-4 h-4 text-emerald-500" aria-hidden="true" />
                                                 البريد الإلكتروني (العمل) <span className="text-red-500">*</span>
                                             </Label>
                                             <Input
@@ -944,7 +944,7 @@ export function CreateStaffView() {
                                                     <Badge key={cert} variant="secondary" className="gap-1">
                                                         {cert}
                                                         <button type="button" onClick={() => removeCertification(cert)} className="hover:text-red-500">
-                                                            <X className="w-3 h-3" />
+                                                            <X className="w-3 h-3" aria-hidden="true" />
                                                         </button>
                                                     </Badge>
                                                 ))}
@@ -963,7 +963,7 @@ export function CreateStaffView() {
                                                     }}
                                                 />
                                                 <Button type="button" variant="outline" onClick={addCertification} className="rounded-xl">
-                                                    <Plus className="w-4 h-4" />
+                                                    <Plus className="w-4 h-4" aria-hidden="true" />
                                                 </Button>
                                             </div>
                                         </div>
@@ -974,7 +974,7 @@ export function CreateStaffView() {
                                 <AccordionItem value="emergency" className="border rounded-xl mb-2 px-4">
                                     <AccordionTrigger className="hover:no-underline">
                                         <div className="flex items-center gap-2">
-                                            <AlertTriangle className="h-4 w-4 text-red-500" />
+                                            <AlertTriangle className="h-4 w-4 text-red-500" aria-hidden="true" />
                                             <span className="font-semibold">جهة اتصال الطوارئ</span>
                                         </div>
                                     </AccordionTrigger>
@@ -1059,7 +1059,7 @@ export function CreateStaffView() {
                             <Card className="border-slate-200 mb-6">
                                 <CardHeader>
                                     <CardTitle className="text-lg font-bold text-slate-900 flex items-center gap-2">
-                                        <FileText className="w-5 h-5 text-emerald-500" />
+                                        <FileText className="w-5 h-5 text-emerald-500" aria-hidden="true" />
                                         الحالة والملاحظات
                                     </CardTitle>
                                 </CardHeader>
@@ -1098,7 +1098,7 @@ export function CreateStaffView() {
                             <div className="flex items-center justify-between pt-6 border-t border-slate-200">
                                 <Link to="/dashboard/staff">
                                     <Button type="button" variant="ghost" className="text-slate-500 hover:text-navy">
-                                        <X className="ms-2 h-4 w-4" />
+                                        <X className="ms-2 h-4 w-4" aria-hidden="true" />
                                         إلغاء
                                     </Button>
                                 </Link>
@@ -1114,7 +1114,7 @@ export function CreateStaffView() {
                                         </span>
                                     ) : (
                                         <span className="flex items-center gap-2">
-                                            <Save className="w-4 h-4" />
+                                            <Save className="w-4 h-4" aria-hidden="true" />
                                             حفظ الموظف
                                         </span>
                                     )}

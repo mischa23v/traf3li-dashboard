@@ -158,7 +158,7 @@ export function SalesReportsDetailsView() {
             {generateReport.isPending ? 'جارٍ الإنشاء...' : 'إعادة إنشاء'}
           </Button>
           <Button variant="outline" className="rounded-xl">
-            <Download className="h-4 w-4 ms-2" />
+            <Download className="h-4 w-4 ms-2" aria-hidden="true" />
             تحميل
           </Button>
           <Button
@@ -177,7 +177,7 @@ export function SalesReportsDetailsView() {
         <div className="bg-white rounded-2xl p-4 border border-slate-100 shadow-sm">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center">
-              <Calendar className="h-5 w-5 text-blue-600" />
+              <Calendar className="h-5 w-5 text-blue-600" aria-hidden="true" />
             </div>
             <div>
               <p className="text-sm text-slate-500">تاريخ الإنشاء</p>
@@ -190,7 +190,7 @@ export function SalesReportsDetailsView() {
         <div className="bg-white rounded-2xl p-4 border border-slate-100 shadow-sm">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-green-50 flex items-center justify-center">
-              <Clock className="h-5 w-5 text-green-600" />
+              <Clock className="h-5 w-5 text-green-600" aria-hidden="true" />
             </div>
             <div>
               <p className="text-sm text-slate-500">آخر تحديث</p>
@@ -203,7 +203,7 @@ export function SalesReportsDetailsView() {
         <div className="bg-white rounded-2xl p-4 border border-slate-100 shadow-sm">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-purple-50 flex items-center justify-center">
-              <User className="h-5 w-5 text-purple-600" />
+              <User className="h-5 w-5 text-purple-600" aria-hidden="true" />
             </div>
             <div>
               <p className="text-sm text-slate-500">أنشأه</p>
@@ -239,7 +239,7 @@ export function SalesReportsDetailsView() {
             {report.description ? (
               <p className="text-slate-600">{report.description}</p>
             ) : (
-              <p className="text-slate-400 italic">لا يوجد وصف متاح</p>
+              <p className="text-slate-500 italic">لا يوجد وصف متاح</p>
             )}
 
             {report.status === ReportStatus.COMPLETED && (
@@ -254,7 +254,7 @@ export function SalesReportsDetailsView() {
                 </div>
                 <div className="bg-blue-50 rounded-xl p-4">
                   <div className="flex items-center gap-2 text-blue-700 mb-2">
-                    <Users className="h-5 w-5" />
+                    <Users className="h-5 w-5" aria-hidden="true" />
                     <span className="font-medium">عدد الصفقات</span>
                   </div>
                   <p className="text-2xl font-bold text-blue-800">--</p>
@@ -284,7 +284,7 @@ export function SalesReportsDetailsView() {
                     <h4 className="font-medium text-navy">المبيعات حسب الشهر</h4>
                   </div>
                   <div className="h-48 bg-slate-50 rounded-lg flex items-center justify-center">
-                    <span className="text-slate-400">الرسم البياني سيظهر هنا</span>
+                    <span className="text-slate-500">الرسم البياني سيظهر هنا</span>
                   </div>
                 </div>
                 <div className="border border-slate-200 rounded-xl p-4">
@@ -293,7 +293,7 @@ export function SalesReportsDetailsView() {
                     <h4 className="font-medium text-navy">توزيع المبيعات حسب المنتج</h4>
                   </div>
                   <div className="h-48 bg-slate-50 rounded-lg flex items-center justify-center">
-                    <span className="text-slate-400">الرسم البياني سيظهر هنا</span>
+                    <span className="text-slate-500">الرسم البياني سيظهر هنا</span>
                   </div>
                 </div>
                 <div className="border border-slate-200 rounded-xl p-4">
@@ -302,7 +302,7 @@ export function SalesReportsDetailsView() {
                     <h4 className="font-medium text-navy">اتجاه الإيرادات</h4>
                   </div>
                   <div className="h-48 bg-slate-50 rounded-lg flex items-center justify-center">
-                    <span className="text-slate-400">الرسم البياني سيظهر هنا</span>
+                    <span className="text-slate-500">الرسم البياني سيظهر هنا</span>
                   </div>
                 </div>
                 <div className="border border-slate-200 rounded-xl p-4">
@@ -311,7 +311,7 @@ export function SalesReportsDetailsView() {
                     <h4 className="font-medium text-navy">أداء مندوبي المبيعات</h4>
                   </div>
                   <div className="h-48 bg-slate-50 rounded-lg flex items-center justify-center">
-                    <span className="text-slate-400">الرسم البياني سيظهر هنا</span>
+                    <span className="text-slate-500">الرسم البياني سيظهر هنا</span>
                   </div>
                 </div>
               </div>
@@ -341,7 +341,7 @@ export function SalesReportsDetailsView() {
                   <tbody>
                     <tr className="border-b border-slate-100">
                       <td className="p-3 text-slate-600" colSpan={4}>
-                        <div className="text-center py-8 text-slate-400">
+                        <div className="text-center py-8 text-slate-500">
                           لا توجد بيانات متاحة
                         </div>
                       </td>

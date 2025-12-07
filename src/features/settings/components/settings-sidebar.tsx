@@ -168,7 +168,7 @@ export function SettingsSidebar({
                                 <div className="flex gap-4 relative group">
                                     <div className="w-14 text-center shrink-0 pt-1">
                                         <div className="text-sm font-bold text-slate-700 group-hover:text-emerald-600 transition-colors">09:00</div>
-                                        <div className="text-[10px] text-slate-400">صباحاً</div>
+                                        <div className="text-[10px] text-slate-500">صباحاً</div>
                                     </div>
                                     <div className="absolute right-[3.25rem] top-2 w-3 h-3 bg-emerald-500 rounded-full border-2 border-white shadow-sm z-10"></div>
                                     <div className="flex-1 bg-white rounded-xl p-3 border-r-4 border-emerald-500 shadow-sm hover:shadow-md transition-all">
@@ -184,7 +184,7 @@ export function SettingsSidebar({
                                 <div className="flex gap-4 relative group">
                                     <div className="w-14 text-center shrink-0 pt-1">
                                         <div className="text-sm font-bold text-slate-700 group-hover:text-purple-600 transition-colors">02:00</div>
-                                        <div className="text-[10px] text-slate-400">مساءً</div>
+                                        <div className="text-[10px] text-slate-500">مساءً</div>
                                     </div>
                                     <div className="absolute right-[3.25rem] top-2 w-3 h-3 bg-purple-500 rounded-full border-2 border-white shadow-sm z-10"></div>
                                     <div className="flex-1 bg-white rounded-xl p-3 border-r-4 border-purple-500 shadow-sm hover:shadow-md transition-all">
@@ -200,7 +200,7 @@ export function SettingsSidebar({
                                 <div className="flex gap-4 relative group">
                                     <div className="w-14 text-center shrink-0 pt-1">
                                         <div className="text-sm font-bold text-slate-700 group-hover:text-blue-600 transition-colors">04:30</div>
-                                        <div className="text-[10px] text-slate-400">مساءً</div>
+                                        <div className="text-[10px] text-slate-500">مساءً</div>
                                     </div>
                                     <div className="absolute right-[3.25rem] top-2 w-3 h-3 bg-blue-500 rounded-full border-2 border-white shadow-sm z-10"></div>
                                     <div className="flex-1 bg-white rounded-xl p-3 border-r-4 border-blue-500 shadow-sm hover:shadow-md transition-all">
@@ -231,7 +231,7 @@ export function SettingsSidebar({
                                     </div>
                                 </div>
                             ))}
-                            <Button variant="ghost" className="w-full text-xs text-slate-400 hover:text-emerald-600 hover:bg-emerald-50">
+                            <Button variant="ghost" className="w-full text-xs text-slate-500 hover:text-emerald-600 hover:bg-emerald-50">
                                 عرض كل التنبيهات
                             </Button>
                         </div>

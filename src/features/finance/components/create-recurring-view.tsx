@@ -412,7 +412,7 @@ export function CreateRecurringView({ mode = 'create' }: CreateRecurringViewProp
                                         {formData.transactionType === 'invoice' && (
                                             <div className="space-y-2">
                                                 <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                                    <User className="w-4 h-4 text-emerald-500" />
+                                                    <User className="w-4 h-4 text-emerald-500" aria-hidden="true" />
                                                     العميل
                                                 </label>
                                                 <Select
@@ -439,7 +439,7 @@ export function CreateRecurringView({ mode = 'create' }: CreateRecurringViewProp
                                         {(formData.transactionType === 'bill' || formData.transactionType === 'expense') && (
                                             <div className="space-y-2">
                                                 <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                                    <Building className="w-4 h-4 text-emerald-500" />
+                                                    <Building className="w-4 h-4 text-emerald-500" aria-hidden="true" />
                                                     المورد
                                                 </label>
                                                 <Select
@@ -548,7 +548,7 @@ export function CreateRecurringView({ mode = 'create' }: CreateRecurringViewProp
                                                                     onClick={() => handleRemoveItem(index)}
                                                                     className="text-red-500 hover:bg-red-50"
                                                                 >
-                                                                    <X className="h-4 w-4" />
+                                                                    <X className="h-4 w-4" aria-hidden="true" />
                                                                 </Button>
                                                             </div>
                                                         </div>

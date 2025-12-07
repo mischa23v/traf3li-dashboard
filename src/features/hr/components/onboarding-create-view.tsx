@@ -276,7 +276,7 @@ export function OnboardingCreateView() {
             <Card className="rounded-3xl shadow-sm border-slate-100">
               <CardHeader className="pb-4">
                 <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                  <User className="w-5 h-5 text-emerald-500" />
+                  <User className="w-5 h-5 text-emerald-500" aria-hidden="true" />
                   بيانات الموظف
                 </CardTitle>
               </CardHeader>
@@ -400,7 +400,7 @@ export function OnboardingCreateView() {
             <Card className="rounded-3xl shadow-sm border-slate-100">
               <CardHeader className="pb-4">
                 <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                  <Clock className="w-5 h-5 text-emerald-500" />
+                  <Clock className="w-5 h-5 text-emerald-500" aria-hidden="true" />
                   فترة التجربة
                 </CardTitle>
               </CardHeader>
@@ -442,7 +442,7 @@ export function OnboardingCreateView() {
                   <CardHeader className="cursor-pointer hover:bg-slate-50 transition-colors rounded-t-3xl">
                     <div className="flex items-center justify-between">
                       <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                        <FileText className="w-5 h-5 text-blue-500" />
+                        <FileText className="w-5 h-5 text-blue-500" aria-hidden="true" />
                         الملاحظات
                       </CardTitle>
                       <ChevronDown className={cn("w-5 h-5 text-slate-500 transition-transform", openSections.includes('notes') && "rotate-180")} />
@@ -485,7 +485,7 @@ export function OnboardingCreateView() {
               <CardContent>
                 <div className="space-y-3 text-sm text-amber-700">
                   <div className="flex items-start gap-2">
-                    <AlertTriangle className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                    <AlertTriangle className="w-4 h-4 mt-0.5 flex-shrink-0" aria-hidden="true" />
                     <div>
                       <p className="font-medium">المادة 53 - فترة التجربة:</p>
                       <ul className="list-disc list-inside me-4 mt-1 space-y-1">
@@ -496,10 +496,10 @@ export function OnboardingCreateView() {
                     </div>
                   </div>
                   <div className="flex items-start gap-2">
-                    <AlertTriangle className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                    <AlertTriangle className="w-4 h-4 mt-0.5 flex-shrink-0" aria-hidden="true" />
                     <div>
                       <p className="font-medium">المتطلبات الأساسية:</p>
-                      <ul className="list-disc list-inside mr-4 mt-1 space-y-1">
+                      <ul className="list-disc list-inside me-4 mt-1 space-y-1">
                         <li>يجب توقيع عقد العمل قبل بدء فترة التأهيل</li>
                         <li>التدريب على أنظمة العمل إلزامي</li>
                         <li>مراجعة أداء دورية كل 30 يوم</li>

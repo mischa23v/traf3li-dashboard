@@ -155,7 +155,7 @@ export function PracticeSidebar({
                     {/* Create Button - White + Green Text + Glow */}
                     <Button asChild className="bg-white hover:bg-emerald-50 text-emerald-600 h-auto py-6 flex flex-col items-center justify-center gap-2 rounded-3xl shadow-lg shadow-white/10 transition-all duration-300 hover:scale-[1.02] border-0">
                         <Link to={currentLinks.create}>
-                            <Plus className="h-7 w-7" />
+                            <Plus className="h-7 w-7" aria-hidden="true" />
                             <span className="text-sm font-bold">{t('sidebar.quickActions.create')}</span>
                         </Link>
                     </Button>
@@ -171,7 +171,7 @@ export function PracticeSidebar({
                         )}
                         onClick={onToggleSelectionMode}
                     >
-                        {isSelectionMode ? <X className="h-6 w-6" /> : <CheckSquare className="h-6 w-6" />}
+                        {isSelectionMode ? <X className="h-6 w-6" aria-hidden="true" /> : <CheckSquare className="h-6 w-6" />}
                         <span className="text-sm font-bold">{isSelectionMode ? t('common.cancel') : t('sidebar.quickActions.select')}</span>
                     </Button>
 
@@ -279,7 +279,7 @@ export function PracticeSidebar({
                                         <Loader2 className="h-6 w-6 animate-spin text-emerald-600" />
                                     </div>
                                 ) : selectedDateEvents.length === 0 ? (
-                                    <div className="flex flex-col items-center justify-center py-8 text-slate-400">
+                                    <div className="flex flex-col items-center justify-center py-8 text-slate-500">
                                         <CalendarIcon className="h-10 w-10 mb-2 opacity-20" />
                                         <p className="text-xs font-medium">{t('sidebar.calendar.noEvents')}</p>
                                     </div>
@@ -300,14 +300,14 @@ export function PracticeSidebar({
                                                         <div className={cn("text-sm font-bold text-slate-700 transition-colors", `group-hover:text-${colorClass}-600`)}>
                                                             {eventTime}
                                                         </div>
-                                                        <div className="text-[10px] text-slate-400">{timePeriod}</div>
+                                                        <div className="text-[10px] text-slate-500">{timePeriod}</div>
                                                     </div>
                                                     <div className={cn("absolute right-[3.25rem] top-2 w-3 h-3 rounded-full border-2 border-white shadow-sm z-10", `bg-${colorClass}-500`)}></div>
                                                     <div className={cn("flex-1 bg-white rounded-xl p-3 shadow-sm hover:shadow-md transition-all", `border-r-4 border-${colorClass}-500`)}>
                                                         <div className="font-bold text-slate-800 text-sm mb-1">{event.title}</div>
                                                         {event.location && (
                                                             <div className="text-xs text-slate-500 flex items-center gap-1">
-                                                                <MapPin className="h-3 w-3" />
+                                                                <MapPin className="h-3 w-3" aria-hidden="true" />
                                                                 {typeof event.location === 'string' ? event.location : (event.location?.name || event.location?.address || t('sidebar.calendar.remote'))}
                                                             </div>
                                                         )}
@@ -322,7 +322,7 @@ export function PracticeSidebar({
                             <Button asChild variant="ghost" className="w-full mt-6 text-slate-500 hover:text-emerald-700 hover:bg-emerald-50 group cursor-pointer">
                                 <Link to="/dashboard/calendar">
                                     <span>{t('sidebar.calendar.viewFullSchedule')}</span>
-                                    <ChevronRight className="w-4 h-4 me-2 transition-transform group-hover:-translate-x-1 rtl:group-hover:translate-x-1 rtl:rotate-180" />
+                                    <ChevronRight className="w-4 h-4 me-2 transition-transform group-hover:-translate-x-1 rtl:group-hover:translate-x-1 rtl:rotate-180" aria-hidden="true" />
                                 </Link>
                             </Button>
                         </div>
@@ -333,7 +333,7 @@ export function PracticeSidebar({
                                     <Loader2 className="h-6 w-6 animate-spin text-emerald-600" />
                                 </div>
                             ) : upcomingReminders.length === 0 ? (
-                                <div className="flex flex-col items-center justify-center py-8 text-slate-400">
+                                <div className="flex flex-col items-center justify-center py-8 text-slate-500">
                                     <Bell className="h-10 w-10 mb-2 opacity-20" />
                                     <p className="text-xs font-medium">{t('sidebar.notifications.noReminders')}</p>
                                 </div>
@@ -356,7 +356,7 @@ export function PracticeSidebar({
                                                         ? "bg-red-50 text-red-500 group-hover:bg-red-500 group-hover:text-white"
                                                         : `bg-${priorityColor}-50 text-${priorityColor}-500 group-hover:bg-${priorityColor}-500 group-hover:text-white`
                                                 )}>
-                                                    {isOverdue ? <AlertCircle className="w-5 h-5" /> : <Bell className="w-5 h-5" />}
+                                                    {isOverdue ? <AlertCircle className="w-5 h-5" aria-hidden="true" /> : <Bell className="w-5 h-5" />}
                                                 </div>
                                                 <div className="flex-1 min-w-0">
                                                     <p className={cn(
@@ -385,7 +385,7 @@ export function PracticeSidebar({
                                     })}
                                 </>
                             )}
-                            <Button asChild variant="ghost" className="w-full text-xs text-slate-400 hover:text-emerald-600 hover:bg-emerald-50">
+                            <Button asChild variant="ghost" className="w-full text-xs text-slate-500 hover:text-emerald-600 hover:bg-emerald-50">
                                 <Link to="/dashboard/tasks/reminders">
                                     {t('sidebar.notifications.viewAll')}
                                 </Link>

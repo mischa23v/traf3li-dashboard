@@ -477,7 +477,7 @@ export function AssetAssignmentCreateView() {
             <Card className="rounded-3xl shadow-sm border-slate-100">
               <CardHeader className="pb-4">
                 <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                  <User className="w-5 h-5 text-emerald-500" />
+                  <User className="w-5 h-5 text-emerald-500" aria-hidden="true" />
                   بيانات الموظف
                 </CardTitle>
               </CardHeader>
@@ -754,7 +754,7 @@ export function AssetAssignmentCreateView() {
                   <CardHeader className="cursor-pointer hover:bg-slate-50 transition-colors rounded-t-3xl">
                     <div className="flex items-center justify-between">
                       <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                        <Settings className="w-5 h-5 text-blue-500" />
+                        <Settings className="w-5 h-5 text-blue-500" aria-hidden="true" />
                         المواصفات الفنية
                       </CardTitle>
                       <div className="flex items-center gap-2">
@@ -1017,7 +1017,7 @@ export function AssetAssignmentCreateView() {
                   <CardHeader className="cursor-pointer hover:bg-slate-50 transition-colors rounded-t-3xl">
                     <div className="flex items-center justify-between">
                       <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                        <FileText className="w-5 h-5 text-amber-500" />
+                        <FileText className="w-5 h-5 text-amber-500" aria-hidden="true" />
                         الملاحظات
                       </CardTitle>
                       <ChevronDown className={cn("w-5 h-5 text-slate-500 transition-transform", openSections.includes('notes') && "rotate-180")} />

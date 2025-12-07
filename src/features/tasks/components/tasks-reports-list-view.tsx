@@ -167,8 +167,8 @@ export function TasksReportsListView() {
         </div>
         <div className='ms-auto flex items-center gap-2 sm:gap-4 overflow-x-auto min-w-0'>
           <div className="relative hidden md:block min-w-0">
-            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-            <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
+            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
+            <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
           </div>
           <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white flex-shrink-0">
             <Bell className="h-5 w-5" />
@@ -198,7 +198,7 @@ export function TasksReportsListView() {
                 <CardContent className="p-4">
                   <div className="flex items-center gap-3">
                     <div className="p-2 bg-blue-100 rounded-xl">
-                      <FileText className="w-5 h-5 text-blue-600" />
+                      <FileText className="w-5 h-5 text-blue-600" aria-hidden="true" />
                     </div>
                     <div>
                       <p className="text-xs text-slate-500">إجمالي التقارير</p>
@@ -224,7 +224,7 @@ export function TasksReportsListView() {
                 <CardContent className="p-4">
                   <div className="flex items-center gap-3">
                     <div className="p-2 bg-purple-100 rounded-xl">
-                      <Clock className="w-5 h-5 text-purple-600" />
+                      <Clock className="w-5 h-5 text-purple-600" aria-hidden="true" />
                     </div>
                     <div>
                       <p className="text-xs text-slate-500">تقارير مجدولة</p>
@@ -254,7 +254,7 @@ export function TasksReportsListView() {
                 <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
                   <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
                     <div className="relative flex-1 md:w-48">
-                      <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                      <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
                       <Input
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
@@ -314,7 +314,7 @@ export function TasksReportsListView() {
                       onClick={() => navigate({ to: '/dashboard/tasks/reports/new' })}
                       className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl shadow-lg shadow-emerald-500/20"
                     >
-                      <Plus className="w-4 h-4 ms-1" />
+                      <Plus className="w-4 h-4 ms-1" aria-hidden="true" />
                       تقرير جديد
                     </Button>
                   </div>
@@ -346,20 +346,20 @@ export function TasksReportsListView() {
             ) : error ? (
               <Card className="rounded-2xl border-slate-100">
                 <CardContent className="p-8 text-center">
-                  <AlertCircle className="w-8 h-8 mx-auto text-red-500" />
+                  <AlertCircle className="w-8 h-8 mx-auto text-red-500" aria-hidden="true" />
                   <p className="mt-4 text-red-600">حدث خطأ في تحميل البيانات</p>
                 </CardContent>
               </Card>
             ) : reports.length === 0 ? (
               <Card className="rounded-2xl border-slate-100">
                 <CardContent className="p-8 text-center">
-                  <FileText className="w-12 h-12 mx-auto text-slate-300" />
+                  <FileText className="w-12 h-12 mx-auto text-slate-300" aria-hidden="true" />
                   <p className="mt-4 text-slate-500">لا توجد تقارير للإنتاجية</p>
                   <Button
                     onClick={() => navigate({ to: '/dashboard/tasks/reports/new' })}
                     className="mt-4 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl"
                   >
-                    <Plus className="w-4 h-4 ms-1" />
+                    <Plus className="w-4 h-4 ms-1" aria-hidden="true" />
                     إنشاء تقرير جديد
                   </Button>
                 </CardContent>
@@ -416,7 +416,7 @@ export function TasksReportsListView() {
                                   {report.isFavorite ? (
                                     <Star className="w-4 h-4 text-amber-500 fill-amber-500" />
                                   ) : (
-                                    <StarOff className="w-4 h-4 text-slate-400" />
+                                    <StarOff className="w-4 h-4 text-slate-500" />
                                   )}
                                 </Button>
                                 <DropdownMenu>
@@ -435,12 +435,12 @@ export function TasksReportsListView() {
                                       تشغيل التقرير
                                     </DropdownMenuItem>
                                     <DropdownMenuItem>
-                                      <Download className="w-4 h-4 ms-2" />
+                                      <Download className="w-4 h-4 ms-2" aria-hidden="true" />
                                       تصدير
                                     </DropdownMenuItem>
                                     <DropdownMenuSeparator />
                                     <DropdownMenuItem onClick={() => navigate({ to: `/dashboard/tasks/reports/new?editId=${report.reportId}` })}>
-                                      <Edit className="w-4 h-4 ms-2" />
+                                      <Edit className="w-4 h-4 ms-2" aria-hidden="true" />
                                       تعديل
                                     </DropdownMenuItem>
                                     <DropdownMenuItem className="text-red-600">
@@ -484,7 +484,7 @@ export function TasksReportsListView() {
                                 <span>{report.reportOwner.ownerName}</span>
                                 {report.lastRunDate && (
                                   <span className="flex items-center gap-1">
-                                    <Calendar className="w-3 h-3" />
+                                    <Calendar className="w-3 h-3" aria-hidden="true" />
                                     آخر تشغيل: {new Date(report.lastRunDate).toLocaleDateString('ar-SA')}
                                   </span>
                                 )}
@@ -496,7 +496,7 @@ export function TasksReportsListView() {
                                 className="text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 rounded-xl"
                               >
                                 عرض التفاصيل
-                                <ChevronLeft className="w-4 h-4 me-1" />
+                                <ChevronLeft className="w-4 h-4 me-1" aria-hidden="true" />
                               </Button>
                             </div>
                           </div>
