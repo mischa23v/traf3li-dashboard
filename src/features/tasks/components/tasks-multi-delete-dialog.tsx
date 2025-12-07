@@ -16,7 +16,7 @@ type TaskMultiDeleteDialogProps<TData> = {
   table: Table<TData>
 }
 
-const CONFIRM_WORD = 'DELETE'
+const CONFIRM_WORD = 'حذف'
 
 export function TasksMultiDeleteDialog<TData>({
   open,
@@ -29,21 +29,21 @@ export function TasksMultiDeleteDialog<TData>({
 
   const handleDelete = () => {
     if (value.trim() !== CONFIRM_WORD) {
-      toast.error(`Please type "${CONFIRM_WORD}" to confirm.`)
+      toast.error(`يرجى كتابة "${CONFIRM_WORD}" للتأكيد.`)
       return
     }
 
     onOpenChange(false)
 
     toast.promise(sleep(2000), {
-      loading: 'Deleting tasks...',
+      loading: 'جاري حذف المهام...',
       success: () => {
         table.resetRowSelection()
-        return `Deleted ${selectedRows.length} ${
-          selectedRows.length > 1 ? 'tasks' : 'task'
+        return `تم حذف ${selectedRows.length} ${
+          selectedRows.length > 1 ? 'مهام' : 'مهمة'
         }`
       },
-      error: 'Error',
+      error: 'خطأ',
     })
   }
 
@@ -59,35 +59,35 @@ export function TasksMultiDeleteDialog<TData>({
             className='stroke-destructive me-1 inline-block'
             size={18}
           />{' '}
-          Delete {selectedRows.length}{' '}
-          {selectedRows.length > 1 ? 'tasks' : 'task'}
+          حذف {selectedRows.length}{' '}
+          {selectedRows.length > 1 ? 'مهام' : 'مهمة'}
         </span>
       }
       desc={
         <div className='space-y-4'>
           <p className='mb-2'>
-            Are you sure you want to delete the selected tasks? <br />
-            This action cannot be undone.
+            هل أنت متأكد من حذف المهام المحددة؟ <br />
+            لا يمكن التراجع عن هذا الإجراء.
           </p>
 
           <Label className='my-4 flex flex-col items-start gap-1.5'>
-            <span className=''>Confirm by typing "{CONFIRM_WORD}":</span>
+            <span className=''>أكد بكتابة "{CONFIRM_WORD}":</span>
             <Input
               value={value}
               onChange={(e) => setValue(e.target.value)}
-              placeholder={`Type "${CONFIRM_WORD}" to confirm.`}
+              placeholder={`اكتب "${CONFIRM_WORD}" للتأكيد.`}
             />
           </Label>
 
           <Alert variant='destructive'>
-            <AlertTitle>Warning!</AlertTitle>
+            <AlertTitle>تحذير!</AlertTitle>
             <AlertDescription>
-              Please be careful, this operation can not be rolled back.
+              يرجى الانتباه، لا يمكن التراجع عن هذه العملية.
             </AlertDescription>
           </Alert>
         </div>
       }
-      confirmText='Delete'
+      confirmText='حذف'
       destructive
     />
   )

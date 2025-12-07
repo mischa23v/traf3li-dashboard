@@ -113,16 +113,16 @@ export function TasksTable({ data }: DataTableProps) {
     >
       <DataTableToolbar
         table={table}
-        searchPlaceholder='Filter by title or ID...'
+        searchPlaceholder='البحث بالعنوان أو المعرف...'
         filters={[
           {
             columnId: 'status',
-            title: 'Status',
+            title: 'الحالة',
             options: statuses,
           },
           {
             columnId: 'priority',
-            title: 'Priority',
+            title: 'الأولوية',
             options: priorities,
           },
         ]}
@@ -183,7 +183,7 @@ export function TasksTable({ data }: DataTableProps) {
                   colSpan={columns.length}
                   className='h-24 text-center'
                 >
-                  No results.
+                  لا توجد نتائج.
                 </TableCell>
               </TableRow>
             )}
