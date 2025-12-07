@@ -351,10 +351,10 @@ export function PayrollCreateView() {
                 <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
                     <DynamicIsland />
                 </div>
-                <div className='ms-auto flex items-center space-x-4'>
+                <div className='ms-auto flex items-center gap-4'>
                     <div className="relative hidden md:block">
                         <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                        <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pr-9 pl-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
+                        <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
                     </div>
                     <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white">
                         <Bell className="h-5 w-5" />
@@ -560,7 +560,7 @@ export function PayrollCreateView() {
                                         <div className="flex items-center justify-between mb-4">
                                             <h4 className="font-semibold text-navy">البدلات والإضافات</h4>
                                             <Button type="button" variant="outline" size="sm" onClick={addAllowance} className="rounded-xl">
-                                                <Plus className="w-4 h-4 ml-1" />
+                                                <Plus className="w-4 h-4 ms-1" />
                                                 إضافة
                                             </Button>
                                         </div>
@@ -681,7 +681,7 @@ export function PayrollCreateView() {
                                         <div className="flex items-center justify-between mb-4">
                                             <h4 className="font-semibold text-navy">خصومات أخرى</h4>
                                             <Button type="button" variant="outline" size="sm" onClick={addDeduction} className="rounded-xl">
-                                                <Minus className="w-4 h-4 ml-1" />
+                                                <Minus className="w-4 h-4 ms-1" />
                                                 إضافة خصم
                                             </Button>
                                         </div>
@@ -763,7 +763,7 @@ export function PayrollCreateView() {
                                             <span className="text-4xl font-bold text-emerald-600">
                                                 {netPay.toLocaleString('ar-SA')}
                                             </span>
-                                            <span className="text-lg text-emerald-600 mr-2">ر.س</span>
+                                            <span className="text-lg text-emerald-600 me-2">ر.س</span>
                                         </div>
                                     </div>
                                 </CardContent>
@@ -934,12 +934,12 @@ export function PayrollCreateView() {
                                 >
                                     {isPending ? (
                                         <>
-                                            <Loader2 className="h-5 w-5 ml-2 animate-spin" />
+                                            <Loader2 className="h-5 w-5 ms-2 animate-spin" />
                                             جاري الحفظ...
                                         </>
                                     ) : (
                                         <>
-                                            <CheckCircle className="h-5 w-5 ml-2" />
+                                            <CheckCircle className="h-5 w-5 ms-2" />
                                             {isEditMode ? 'حفظ التغييرات' : 'إنشاء القسيمة'}
                                         </>
                                     )}

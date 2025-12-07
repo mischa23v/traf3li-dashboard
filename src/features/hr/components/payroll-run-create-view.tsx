@@ -308,10 +308,10 @@ export function PayrollRunCreateView() {
                     <DynamicIsland />
                 </div>
 
-                <div className='ms-auto flex items-center space-x-4'>
+                <div className='ms-auto flex items-center gap-4'>
                     <div className="relative hidden md:block">
                         <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                        <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pr-9 pl-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
+                        <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
                     </div>
                     <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white">
                         <Bell className="h-5 w-5" />
@@ -349,7 +349,7 @@ export function PayrollRunCreateView() {
                             className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl px-6"
                             disabled={createRunMutation.isPending}
                         >
-                            <Save className="w-4 h-4 ml-2" />
+                            <Save className="w-4 h-4 ms-2" />
                             {createRunMutation.isPending ? 'جاري الحفظ...' : 'حفظ الدورة'}
                         </Button>
                     </div>
@@ -498,20 +498,20 @@ export function PayrollRunCreateView() {
                                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                                     <div>
                                         <span className="text-slate-500">بداية الفترة:</span>
-                                        <span className="font-medium text-navy mr-2">{periodDates.periodStart}</span>
+                                        <span className="font-medium text-navy me-2">{periodDates.periodStart}</span>
                                     </div>
                                     <div>
                                         <span className="text-slate-500">نهاية الفترة:</span>
-                                        <span className="font-medium text-navy mr-2">{periodDates.periodEnd}</span>
+                                        <span className="font-medium text-navy me-2">{periodDates.periodEnd}</span>
                                     </div>
                                     <div>
                                         <span className="text-slate-500">تاريخ الدفع:</span>
-                                        <span className="font-medium text-emerald-600 mr-2">{paymentDate || periodDates.defaultPaymentDate}</span>
+                                        <span className="font-medium text-emerald-600 me-2">{paymentDate || periodDates.defaultPaymentDate}</span>
                                     </div>
                                     {cutoffDate && (
                                         <div>
                                             <span className="text-slate-500">تاريخ القطع:</span>
-                                            <span className="font-medium text-navy mr-2">{cutoffDate}</span>
+                                            <span className="font-medium text-navy me-2">{cutoffDate}</span>
                                         </div>
                                     )}
                                 </div>
@@ -547,19 +547,19 @@ export function PayrollRunCreateView() {
                                     <div className="grid grid-cols-2 gap-4 text-sm">
                                         <div>
                                             <span className="text-blue-600">الموظف السعودي:</span>
-                                            <span className="font-bold text-blue-800 mr-2">9.75%</span>
+                                            <span className="font-bold text-blue-800 me-2">9.75%</span>
                                         </div>
                                         <div>
                                             <span className="text-blue-600">صاحب العمل (سعودي):</span>
-                                            <span className="font-bold text-blue-800 mr-2">12.75%</span>
+                                            <span className="font-bold text-blue-800 me-2">12.75%</span>
                                         </div>
                                         <div>
                                             <span className="text-blue-600">الموظف غير السعودي:</span>
-                                            <span className="font-bold text-blue-800 mr-2">0%</span>
+                                            <span className="font-bold text-blue-800 me-2">0%</span>
                                         </div>
                                         <div>
                                             <span className="text-blue-600">صاحب العمل (غير سعودي):</span>
-                                            <span className="font-bold text-blue-800 mr-2">2%</span>
+                                            <span className="font-bold text-blue-800 me-2">2%</span>
                                         </div>
                                     </div>
                                 </div>
@@ -989,7 +989,7 @@ export function PayrollRunCreateView() {
                             className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl px-8"
                             disabled={createRunMutation.isPending}
                         >
-                            <Save className="w-4 h-4 ml-2" />
+                            <Save className="w-4 h-4 ms-2" />
                             {createRunMutation.isPending ? 'جاري الحفظ...' : 'حفظ وإنشاء الدورة'}
                         </Button>
                     </div>
