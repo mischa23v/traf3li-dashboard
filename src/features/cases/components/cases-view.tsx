@@ -179,10 +179,10 @@ export function CasesView() {
                     <DynamicIsland />
                 </div>
 
-                <div className='ms-auto flex items-center space-x-4'>
+                <div className='ms-auto flex items-center gap-4'>
                     <div className="relative hidden md:block">
                         <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                        <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pr-9 pl-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
+                        <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
                     </div>
                     <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white">
                         <Bell className="h-5 w-5" />
@@ -213,7 +213,7 @@ export function CasesView() {
                                 <div>
                                     <div className="flex items-center gap-3 mb-3">
                                         <Badge className="bg-white/10 hover:bg-white/20 text-white border-0 backdrop-blur-sm">
-                                            <Scale className="w-3 h-3 ml-2" />
+                                            <Scale className="w-3 h-3 ms-2" />
                                             قضية عمالية
                                         </Badge>
                                         <span className="text-blue-200 text-sm">{caseData.court}</span>
@@ -228,11 +228,11 @@ export function CasesView() {
                                 </div>
                                 <div className="flex gap-3">
                                     <Button className="bg-emerald-500 hover:bg-emerald-600 text-white border-0 shadow-lg shadow-emerald-500/20">
-                                        <Plus className="w-4 h-4 ml-2" />
+                                        <Plus className="w-4 h-4 ms-2" />
                                         إجراء جديد
                                     </Button>
                                     <Button variant="outline" className="bg-white/5 border-white/10 text-white hover:bg-white/10">
-                                        <Upload className="w-4 h-4 ml-2" />
+                                        <Upload className="w-4 h-4 ms-2" />
                                         مشاركة
                                     </Button>
                                 </div>
@@ -246,13 +246,13 @@ export function CasesView() {
                                     </div>
                                     <Progress value={caseData.progress} className="h-2 bg-white/10" indicatorClassName="bg-emerald-500" />
                                 </div>
-                                <div className="flex justify-between items-center border-r border-white/10 pr-6">
+                                <div className="flex justify-between items-center border-r border-white/10 pe-6">
                                     <div>
                                         <div className="text-blue-200 text-sm mb-1">قيمة المطالبة</div>
                                         <div className="text-2xl font-bold">{caseData.claimAmount.toLocaleString()} ر.س</div>
                                     </div>
                                 </div>
-                                <div className="flex justify-between items-center border-r border-white/10 pr-6">
+                                <div className="flex justify-between items-center border-r border-white/10 pe-6">
                                     <div>
                                         <div className="text-blue-200 text-sm mb-1">الربح المتوقع</div>
                                         <div className="text-2xl font-bold text-emerald-400">{caseData.expectedProfit.toLocaleString()} ر.س</div>
@@ -289,7 +289,7 @@ export function CasesView() {
                                 </CardHeader>
                                 <CardContent className="p-0">
                                     <ScrollArea className="h-[600px] p-6">
-                                        <div className="relative border-r-2 border-slate-100 pr-6 space-y-8">
+                                        <div className="relative border-r-2 border-slate-100 pe-6 space-y-8">
                                             {hearings.map((event, index) => (
                                                 <div key={index} className="relative">
                                                     <div className={`absolute -right-[31px] top-1 w-4 h-4 rounded-full border-2 border-white ${index === 0 ? 'bg-brand-blue' : 'bg-slate-300'}`}></div>

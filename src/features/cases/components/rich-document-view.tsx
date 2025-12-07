@@ -326,7 +326,7 @@ export function RichDocumentView({
               {isArabic ? 'سجل الإصدارات' : 'Version History'}
             </DialogTitle>
           </DialogHeader>
-          <ScrollArea className="max-h-[60vh] pr-4">
+          <ScrollArea className="max-h-[60vh] pe-4">
             {isLoadingVersions ? (
               <div className="space-y-4">
                 {[1, 2, 3].map((i) => (
