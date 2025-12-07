@@ -104,20 +104,21 @@ export function useSidebarData(): SidebarData {
   }
 
   // Define all navigation groups with module permissions
+  // All titles use translation keys (format: sidebar.nav.key)
   const allNavGroups: NavGroup[] = [
     {
-      title: 'الرئيسية',
+      title: 'sidebar.nav.homeGroup',
       items: [
         {
-          title: 'الرئيسية',
+          title: 'sidebar.nav.home',
           icon: LayoutDashboard,
           items: [
             {
-              title: 'نظرة عامة',
+              title: 'sidebar.nav.overview',
               url: '/',
             },
             {
-              title: 'التقويم',
+              title: 'sidebar.nav.calendar',
               url: '/dashboard/calendar',
               module: 'events',
             },
@@ -126,25 +127,25 @@ export function useSidebarData(): SidebarData {
       ],
     },
     {
-      title: 'الإنتاجية',
+      title: 'sidebar.nav.productivityGroup',
       items: [
         {
-          title: 'الإنتاجية',
+          title: 'sidebar.nav.productivity',
           icon: CheckSquare,
           module: 'tasks',
           items: [
             {
-              title: 'المهام',
+              title: 'sidebar.nav.tasks',
               url: '/dashboard/tasks/list',
               module: 'tasks',
             },
             {
-              title: 'التذكيرات',
+              title: 'sidebar.nav.reminders',
               url: '/dashboard/tasks/reminders',
               module: 'tasks',
             },
             {
-              title: 'الأحداث',
+              title: 'sidebar.nav.events',
               url: '/dashboard/tasks/events',
               module: 'events',
             },
@@ -153,39 +154,39 @@ export function useSidebarData(): SidebarData {
       ],
     },
     {
-      title: 'الرسائل',
+      title: 'sidebar.nav.messagesGroup',
       items: [
         {
-          title: 'الرسائل',
+          title: 'sidebar.nav.messages',
           url: '/dashboard/messages/chat',
           icon: MessageSquare,
         },
       ],
     },
     {
-      title: 'العملاء والتواصل',
+      title: 'sidebar.nav.clientsGroup',
       items: [
         {
-          title: 'العملاء والتواصل',
+          title: 'sidebar.nav.clientsCommunication',
           icon: Users,
           items: [
             {
-              title: 'العملاء',
+              title: 'sidebar.nav.clients',
               url: '/dashboard/clients',
               module: 'clients',
             },
             {
-              title: 'جهات الاتصال',
+              title: 'sidebar.nav.contacts',
               url: '/dashboard/contacts',
               module: 'clients',
             },
             {
-              title: 'المنظمات',
+              title: 'sidebar.nav.organizations',
               url: '/dashboard/organizations',
               module: 'clients',
             },
             {
-              title: 'فريق العمل',
+              title: 'sidebar.nav.staff',
               url: '/dashboard/staff',
               module: 'team',
             },
@@ -194,30 +195,30 @@ export function useSidebarData(): SidebarData {
       ],
     },
     {
-      title: 'المبيعات',
+      title: 'sidebar.nav.salesGroup',
       items: [
         {
-          title: 'المبيعات',
+          title: 'sidebar.nav.sales',
           icon: TrendingUp,
           module: 'leads',
           items: [
             {
-              title: 'العملاء المحتملين',
+              title: 'sidebar.nav.leads',
               url: '/dashboard/crm/leads',
               module: 'leads',
             },
             {
-              title: 'مسار المبيعات',
+              title: 'sidebar.nav.pipeline',
               url: '/dashboard/crm/pipeline',
               module: 'leads',
             },
             {
-              title: 'الإحالات',
+              title: 'sidebar.nav.referrals',
               url: '/dashboard/crm/referrals',
               module: 'leads',
             },
             {
-              title: 'سجل الأنشطة',
+              title: 'sidebar.nav.activities',
               url: '/dashboard/crm/activities',
               module: 'leads',
             },
@@ -226,28 +227,28 @@ export function useSidebarData(): SidebarData {
       ],
     },
     {
-      title: 'الأعمال',
+      title: 'sidebar.nav.businessGroup',
       items: [
         {
-          title: 'الأعمال',
+          title: 'sidebar.nav.business',
           icon: Scale,
           items: [
             {
-              title: 'القضايا',
+              title: 'sidebar.nav.cases',
               url: '/dashboard/cases',
               module: 'cases',
             },
             {
-              title: 'المستندات',
+              title: 'sidebar.nav.documents',
               url: '/dashboard/documents',
               module: 'documents',
             },
             {
-              title: 'خدماتي',
+              title: 'sidebar.nav.myServices',
               url: '/dashboard/jobs/my-services',
             },
             {
-              title: 'تصفح الوظائف',
+              title: 'sidebar.nav.browseJobs',
               url: '/dashboard/jobs/browse',
             },
           ],
@@ -255,40 +256,40 @@ export function useSidebarData(): SidebarData {
       ],
     },
     {
-      title: 'المالية',
+      title: 'sidebar.nav.financeGroup',
       items: [
         {
-          title: 'المالية',
+          title: 'sidebar.nav.finance',
           icon: DollarSign,
           module: 'invoices',
           items: [
             {
-              title: 'لوحة الحسابات',
+              title: 'sidebar.nav.financeOverview',
               url: '/dashboard/finance/overview',
               module: 'invoices',
             },
             {
-              title: 'الفواتير',
+              title: 'sidebar.nav.invoices',
               url: '/dashboard/finance/invoices',
               module: 'invoices',
             },
             {
-              title: 'المدفوعات',
+              title: 'sidebar.nav.payments',
               url: '/dashboard/finance/payments',
               module: 'payments',
             },
             {
-              title: 'المصروفات',
+              title: 'sidebar.nav.expenses',
               url: '/dashboard/finance/expenses',
               module: 'expenses',
             },
             {
-              title: 'المعاملات',
+              title: 'sidebar.nav.transactions',
               url: '/dashboard/finance/transactions',
               module: 'payments',
             },
             {
-              title: 'تتبع الوقت',
+              title: 'sidebar.nav.timeTracking',
               url: '/dashboard/finance/time-tracking',
               module: 'timeTracking',
             },
@@ -297,145 +298,145 @@ export function useSidebarData(): SidebarData {
       ],
     },
     {
-      title: 'الموارد البشرية',
+      title: 'sidebar.nav.hrGroup',
       items: [
         {
-          title: 'الموارد البشرية',
+          title: 'sidebar.nav.hr',
           icon: UserCog,
           module: 'hr',
           items: [
             // Core HR
             {
-              title: 'الموظفين',
+              title: 'sidebar.nav.employees',
               url: '/dashboard/hr/employees',
               module: 'hr',
             },
             {
-              title: 'الهيكل التنظيمي',
+              title: 'sidebar.nav.orgStructure',
               url: '/dashboard/hr/organizational-structure',
               module: 'hr',
             },
             {
-              title: 'الوصف الوظيفي والمناصب',
+              title: 'sidebar.nav.jobPositions',
               url: '/dashboard/hr/job-positions',
               module: 'hr',
             },
             // Time & Attendance
             {
-              title: 'الحضور والانصراف',
+              title: 'sidebar.nav.attendance',
               url: '/dashboard/hr/attendance',
               module: 'hr',
             },
             {
-              title: 'الإجازات',
+              title: 'sidebar.nav.leave',
               url: '/dashboard/hr/leave',
               module: 'hr',
             },
             // Payroll & Compensation
             {
-              title: 'قسائم الرواتب',
+              title: 'sidebar.nav.payroll',
               url: '/dashboard/hr/payroll',
               module: 'hr',
             },
             {
-              title: 'دورات الرواتب',
+              title: 'sidebar.nav.payrollRuns',
               url: '/dashboard/hr/payroll-runs',
               module: 'hr',
             },
             {
-              title: 'التعويضات والمكافآت',
+              title: 'sidebar.nav.compensation',
               url: '/dashboard/hr/compensation',
               module: 'hr',
             },
             {
-              title: 'المزايا',
+              title: 'sidebar.nav.benefits',
               url: '/dashboard/hr/benefits',
               module: 'hr',
             },
             // Financial
             {
-              title: 'السلف',
+              title: 'sidebar.nav.advances',
               url: '/dashboard/hr/advances',
               module: 'hr',
             },
             {
-              title: 'القروض',
+              title: 'sidebar.nav.loans',
               url: '/dashboard/hr/loans',
               module: 'hr',
             },
             {
-              title: 'طلبات المصروفات',
+              title: 'sidebar.nav.expenseClaims',
               url: '/dashboard/hr/expense-claims',
               module: 'hr',
             },
             // Performance & Development
             {
-              title: 'تقييم الأداء',
+              title: 'sidebar.nav.performance',
               url: '/dashboard/hr/performance',
               module: 'hr',
             },
             {
-              title: 'التدريب والتطوير',
+              title: 'sidebar.nav.training',
               url: '/dashboard/hr/training',
               module: 'hr',
             },
             {
-              title: 'تخطيط التعاقب الوظيفي',
+              title: 'sidebar.nav.successionPlanning',
               url: '/dashboard/hr/succession-planning',
               module: 'hr',
             },
             // Recruitment & Lifecycle
             {
-              title: 'التوظيف',
+              title: 'sidebar.nav.recruitment',
               url: '/dashboard/hr/recruitment/jobs',
               module: 'hr',
             },
             {
-              title: 'المتقدمين',
+              title: 'sidebar.nav.applicants',
               url: '/dashboard/hr/recruitment/applicants',
               module: 'hr',
             },
             {
-              title: 'التهيئة',
+              title: 'sidebar.nav.onboarding',
               url: '/dashboard/hr/onboarding',
               module: 'hr',
             },
             {
-              title: 'إنهاء الخدمة',
+              title: 'sidebar.nav.offboarding',
               url: '/dashboard/hr/offboarding',
               module: 'hr',
             },
             // Assets & Documents
             {
-              title: 'الأصول والمعدات',
+              title: 'sidebar.nav.assetAssignment',
               url: '/dashboard/hr/asset-assignment',
               module: 'hr',
             },
             {
-              title: 'الوثائق والعقود',
+              title: 'sidebar.nav.hrDocuments',
               url: '/dashboard/hr/documents',
               module: 'hr',
             },
             // Communications
             {
-              title: 'الإعلانات والتواصل',
+              title: 'sidebar.nav.announcements',
               url: '/dashboard/hr/announcements',
               module: 'hr',
             },
             // Disciplinary & Grievances
             {
-              title: 'المخالفات والإجراءات التأديبية',
+              title: 'sidebar.nav.violations',
               url: '/dashboard/hr/violations',
               module: 'hr',
             },
             {
-              title: 'الشكاوى والنزاعات',
+              title: 'sidebar.nav.grievances',
               url: '/dashboard/hr/grievances',
               module: 'hr',
             },
             // Reports
             {
-              title: 'التقارير والتحليلات',
+              title: 'sidebar.nav.hrReports',
               url: '/dashboard/hr/reports',
               module: 'hr',
             },
@@ -444,22 +445,22 @@ export function useSidebarData(): SidebarData {
       ],
     },
     {
-      title: 'المكتبة',
+      title: 'sidebar.nav.libraryGroup',
       items: [
         {
-          title: 'المكتبة',
+          title: 'sidebar.nav.library',
           icon: BookOpen,
           items: [
             {
-              title: 'القوانين',
+              title: 'sidebar.nav.laws',
               url: '/dashboard/knowledge/laws',
             },
             {
-              title: 'الأحكام',
+              title: 'sidebar.nav.judgments',
               url: '/dashboard/knowledge/judgments',
             },
             {
-              title: 'النماذج',
+              title: 'sidebar.nav.forms',
               url: '/dashboard/knowledge/forms',
             },
           ],
@@ -467,18 +468,18 @@ export function useSidebarData(): SidebarData {
       ],
     },
     {
-      title: 'التميز المهني',
+      title: 'sidebar.nav.excellenceGroup',
       items: [
         {
-          title: 'التميز المهني',
+          title: 'sidebar.nav.excellence',
           icon: Star,
           items: [
             {
-              title: 'نظرة عامة',
+              title: 'sidebar.nav.excellenceOverview',
               url: '/dashboard/reputation/overview',
             },
             {
-              title: 'شاراتي',
+              title: 'sidebar.nav.badges',
               url: '/dashboard/reputation/badges',
             },
           ],
@@ -486,36 +487,36 @@ export function useSidebarData(): SidebarData {
       ],
     },
     {
-      title: 'الإعدادات',
+      title: 'sidebar.nav.settingsGroup',
       items: [
         {
-          title: 'الإعدادات',
+          title: 'sidebar.nav.settings',
           icon: Settings,
           module: 'settings',
           items: [
             {
-              title: 'الملف الشخصي',
+              title: 'sidebar.nav.profile',
               url: '/dashboard/settings/profile',
             },
             {
-              title: 'الأمان',
+              title: 'sidebar.nav.security',
               url: '/dashboard/settings/security',
             },
             {
-              title: 'التفضيلات',
+              title: 'sidebar.nav.preferences',
               url: '/dashboard/settings/preferences',
             },
             {
-              title: 'التطبيقات',
+              title: 'sidebar.nav.apps',
               url: '/dashboard/apps',
             },
             {
-              title: 'استيراد/تصدير',
+              title: 'sidebar.nav.importExport',
               url: '/dashboard/data-export',
               module: 'reports',
             },
             {
-              title: 'مركز المساعدة',
+              title: 'sidebar.nav.helpCenter',
               url: '/dashboard/help',
             },
           ],
@@ -532,9 +533,9 @@ export function useSidebarData(): SidebarData {
     },
     teams: [
       {
-        name: 'مكتب مشاري للمحاماة',
+        name: 'sidebar.team.firmName',
         logo: Scale,
-        plan: 'محامي مرخص',
+        plan: 'sidebar.team.firmPlan',
       },
     ],
     navGroups: filterNavGroups(allNavGroups),
