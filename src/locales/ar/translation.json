@@ -1369,10 +1369,16 @@
     "download": "تحميل",
     "warning": "تحذير",
     "openInNewTab": "فتح في علامة تبويب جديدة",
-    "selectFile": "اختر ملف"
+    "selectFile": "اختر ملف",
+    "all": "الكل",
+    "viewDetails": "عرض التفاصيل",
+    "serverError": "تعذر الاتصال بالخادم"
   },
   "clients": {
     "title": "إدارة العملاء",
+    "management": "إدارة العملاء",
+    "startAddingClient": "ابدأ بإضافة عميل جديد للنظام",
+    "addNewClient": "إضافة عميل جديد",
     "description": "إدارة بيانات العملاء والتعامل معهم",
     "searchPlaceholder": "البحث عن عميل...",
     "addClient": "إضافة عميل",
@@ -1463,6 +1469,7 @@
   },
   "staff": {
     "title": "إدارة فريق العمل",
+    "management": "فريق العمل",
     "description": "إدارة أعضاء الفريق وأدوارهم",
     "searchPlaceholder": "البحث عن موظف...",
     "addStaff": "إضافة موظف",
@@ -1534,6 +1541,7 @@
   },
   "contacts": {
     "title": "إدارة جهات الاتصال",
+    "management": "إدارة العلاقات",
     "description": "إدارة جهات الاتصال والعلاقات",
     "searchPlaceholder": "البحث عن جهة اتصال...",
     "addContact": "إضافة جهة اتصال",
@@ -1624,6 +1632,9 @@
   },
   "organizations": {
     "title": "إدارة المنظمات",
+    "management": "إدارة المنظمات",
+    "startAddingOrganization": "ابدأ بإضافة منظمة جديدة للنظام",
+    "addNewOrganization": "إضافة منظمة جديدة",
     "description": "إدارة المنظمات والشركات",
     "searchPlaceholder": "البحث عن منظمة...",
     "addOrganization": "إضافة منظمة",
@@ -2842,6 +2853,29 @@
       "sendFailed": "فشل في إرسال رمز التحقق",
       "verifyFailed": "فشل في التحقق من الرمز",
       "resendFailed": "فشل في إعادة إرسال الرمز"
+    }
+  },
+  "leads": {
+    "title": "إدارة العملاء المحتملين",
+    "management": "إدارة العملاء المحتملين",
+    "newLead": "عميل محتمل جديد",
+    "noLeads": "لا يوجد عملاء محتملين",
+    "startAddingLead": "ابدأ بإضافة عميل محتمل جديد",
+    "loadError": "حدث خطأ أثناء تحميل العملاء المحتملين",
+    "viewAllLeads": "عرض جميع العملاء المحتملين",
+    "convertToClient": "تحويل لعميل",
+    "estimatedValue": "القيمة المتوقعة",
+    "caseType": "نوع القضية",
+    "source": "المصدر",
+    "status": {
+      "new": "جديد",
+      "contacted": "تم التواصل",
+      "qualified": "مؤهل",
+      "proposal": "عرض سعر",
+      "negotiation": "تفاوض",
+      "won": "تم الكسب",
+      "lost": "خسارة",
+      "dormant": "خامل"
     }
   },
   "editor": {

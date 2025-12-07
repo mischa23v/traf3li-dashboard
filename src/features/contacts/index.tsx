@@ -36,8 +36,8 @@ export function Contacts() {
   })
 
   const topNav = [
-    { title: isRTL ? 'جهات الاتصال' : 'Contacts', href: '/dashboard/contacts', isActive: true },
-    { title: isRTL ? 'العملاء' : 'Clients', href: '/dashboard/clients', isActive: false },
+    { title: t('sidebar.nav.contacts'), href: '/dashboard/contacts', isActive: true },
+    { title: t('sidebar.nav.clients'), href: '/dashboard/clients', isActive: false },
   ]
 
   return (
@@ -81,7 +81,7 @@ export function Contacts() {
         className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-r border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']"
       >
         {/* HERO BANNER */}
-        <ProductivityHero badge={isRTL ? 'إدارة العلاقات' : 'Relationship Management'} title={t('contacts.title')} type="contacts" hideButtons={true}>
+        <ProductivityHero badge={t('contacts.management')} title={t('contacts.title')} type="contacts" hideButtons={true}>
           <ContactsPrimaryButtons />
         </ProductivityHero>
 

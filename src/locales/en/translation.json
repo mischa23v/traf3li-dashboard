@@ -1369,10 +1369,16 @@
     "download": "Download",
     "warning": "Warning",
     "openInNewTab": "Open in New Tab",
-    "selectFile": "Select File"
+    "selectFile": "Select File",
+    "all": "All",
+    "viewDetails": "View Details",
+    "serverError": "Unable to connect to server"
   },
   "clients": {
     "title": "Client Management",
+    "management": "Client Management",
+    "startAddingClient": "Start by adding a new client to the system",
+    "addNewClient": "Add New Client",
     "description": "Manage your clients and their information",
     "searchPlaceholder": "Search for a client...",
     "addClient": "Add Client",
@@ -1463,6 +1469,7 @@
   },
   "staff": {
     "title": "Staff Management",
+    "management": "Team Management",
     "description": "Manage your team members and their roles",
     "searchPlaceholder": "Search for a staff member...",
     "addStaff": "Add Staff",
@@ -1534,6 +1541,7 @@
   },
   "contacts": {
     "title": "Contacts Management",
+    "management": "Relationship Management",
     "description": "Manage your contacts and relationships",
     "searchPlaceholder": "Search for a contact...",
     "addContact": "Add Contact",
@@ -1624,6 +1632,9 @@
   },
   "organizations": {
     "title": "Organizations Management",
+    "management": "Organizations Management",
+    "startAddingOrganization": "Start by adding a new organization to the system",
+    "addNewOrganization": "Add New Organization",
     "description": "Manage organizations and companies",
     "searchPlaceholder": "Search for an organization...",
     "addOrganization": "Add Organization",
@@ -2842,6 +2853,29 @@
       "sendFailed": "Failed to send verification code",
       "verifyFailed": "Failed to verify code",
       "resendFailed": "Failed to resend code"
+    }
+  },
+  "leads": {
+    "title": "Lead Management",
+    "management": "Lead Management",
+    "newLead": "New Lead",
+    "noLeads": "No leads found",
+    "startAddingLead": "Start by adding a new lead",
+    "loadError": "Error loading leads",
+    "viewAllLeads": "View All Leads",
+    "convertToClient": "Convert to Client",
+    "estimatedValue": "Estimated Value",
+    "caseType": "Case Type",
+    "source": "Source",
+    "status": {
+      "new": "New",
+      "contacted": "Contacted",
+      "qualified": "Qualified",
+      "proposal": "Proposal",
+      "negotiation": "Negotiation",
+      "won": "Won",
+      "lost": "Lost",
+      "dormant": "Dormant"
     }
   },
   "editor": {
