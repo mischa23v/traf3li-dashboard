@@ -1,16 +1,17 @@
+import { HRSidebar } from './hr-sidebar'
 import { useState } from 'react'
 import { Main } from '@/components/layout/main'
 import { LanguageSwitcher } from '@/components/language-switcher'
 import { ThemeSwitch } from '@/components/theme-switch'
 import { ConfigDrawer } from '@/components/config-drawer'
 import { ProfileDropdown } from '@/components/profile-dropdown'
+import { ProductivityHero } from '@/components/productivity-hero'
 import { useNavigate } from '@tanstack/react-router'
 import { useCreateAttendanceRecord, useCheckIn, useCheckOut } from '@/hooks/useAttendance'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Header } from '@/components/layout/header'
 import { TopNav } from '@/components/layout/top-nav'
 import { DynamicIsland } from '@/components/dynamic-island'
@@ -23,10 +24,10 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import {
-  Search, Bell, ArrowRight, User, Building, Users, Briefcase,
+  Search, Bell, User, Building, Users, Briefcase,
   Clock, Calendar, MapPin, LogIn, LogOut, ChevronDown,
   Fingerprint, Smartphone, Monitor, CreditCard, FileText, Settings,
-  Info, AlertCircle, CheckCircle
+  Info, CheckCircle
 } from 'lucide-react'
 import type { CheckMethod, LocationType, AttendanceStatus } from '@/services/attendanceService'
 
@@ -97,7 +98,6 @@ export function AttendanceRecordCreateView() {
 
   // Basic fields
   const [employeeId, setEmployeeId] = useState('')
-  const [employeeName, setEmployeeName] = useState('')
   const [workDate, setWorkDate] = useState(new Date().toISOString().split('T')[0])
 
   // Check-in
@@ -186,6 +186,7 @@ export function AttendanceRecordCreateView() {
     { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
     { title: 'الموظفين', href: '/dashboard/hr/employees', isActive: false },
     { title: 'الحضور', href: '/dashboard/hr/attendance', isActive: true },
+    { title: 'الإجازات', href: '/dashboard/hr/leaves', isActive: false },
   ]
 
   const isPending = createMutation.isPending || checkInMutation.isPending || checkOutMutation.isPending
@@ -216,519 +217,490 @@ export function AttendanceRecordCreateView() {
         <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-emerald-500/50 to-transparent"></div>
       </Header>
 
-      <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-6 rounded-tr-3xl shadow-inner border-r border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
-        {/* Page Header */}
-        <div className="flex items-center gap-4">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="rounded-xl hover:bg-white"
-            onClick={() => navigate({ to: '/dashboard/hr/attendance' })}
-          >
-            <ArrowRight className="h-5 w-5" />
-          </Button>
-          <div>
-            <h1 className="text-2xl font-bold text-navy">تسجيل حضور جديد</h1>
-            <p className="text-slate-500">تسجيل حضور وانصراف موظف</p>
-          </div>
-        </div>
+      <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-r border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
 
-        {/* Office Type Selector */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {OFFICE_TYPES.map((type) => {
-            const Icon = type.icon
-            const isSelected = officeType === type.id
-            return (
-              <Card
-                key={type.id}
-                className={`cursor-pointer transition-all border-2 ${
-                  isSelected
-                    ? 'border-emerald-500 bg-emerald-50'
-                    : 'border-transparent bg-white hover:border-emerald-200'
-                } rounded-2xl`}
-                onClick={() => setOfficeType(type.id)}
-              >
-                <CardContent className="p-4 text-center">
-                  <div className={`w-12 h-12 rounded-xl mx-auto mb-3 flex items-center justify-center ${
-                    isSelected ? 'bg-emerald-500 text-white' : 'bg-slate-100 text-slate-600'
-                  }`}>
-                    <Icon className="w-6 h-6" />
-                  </div>
-                  <h3 className={`font-bold ${isSelected ? 'text-emerald-700' : 'text-navy'}`}>
-                    {type.title}
-                  </h3>
-                  <p className="text-sm text-slate-500">{type.description}</p>
-                </CardContent>
-              </Card>
-            )
-          })}
-        </div>
+        {/* HERO CARD */}
+        <ProductivityHero badge="الموارد البشرية" title="تسجيل حضور جديد" type="attendance" />
 
-        {/* Record Type */}
-        <Card className="border-none shadow-sm bg-white rounded-2xl">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-base font-bold text-navy flex items-center gap-2">
-              <Clock className="w-4 h-4 text-emerald-600" />
-              نوع التسجيل
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-3 gap-4">
-              <button
-                onClick={() => setRecordType('full')}
-                className={`p-4 rounded-xl border-2 transition-all ${
-                  recordType === 'full'
-                    ? 'border-emerald-500 bg-emerald-50'
-                    : 'border-slate-200 hover:border-emerald-200'
-                }`}
-              >
-                <div className="flex items-center gap-2 mb-2">
-                  <Clock className={`w-5 h-5 ${recordType === 'full' ? 'text-emerald-600' : 'text-slate-400'}`} />
-                  <span className={`font-bold ${recordType === 'full' ? 'text-emerald-700' : 'text-slate-700'}`}>
-                    تسجيل كامل
-                  </span>
-                </div>
-                <p className="text-sm text-slate-500">تسجيل وقت الحضور والانصراف معاً</p>
-              </button>
-              <button
-                onClick={() => setRecordType('check_in')}
-                className={`p-4 rounded-xl border-2 transition-all ${
-                  recordType === 'check_in'
-                    ? 'border-emerald-500 bg-emerald-50'
-                    : 'border-slate-200 hover:border-emerald-200'
-                }`}
-              >
-                <div className="flex items-center gap-2 mb-2">
-                  <LogIn className={`w-5 h-5 ${recordType === 'check_in' ? 'text-emerald-600' : 'text-slate-400'}`} />
-                  <span className={`font-bold ${recordType === 'check_in' ? 'text-emerald-700' : 'text-slate-700'}`}>
-                    تسجيل حضور
-                  </span>
-                </div>
-                <p className="text-sm text-slate-500">تسجيل وقت الحضور فقط</p>
-              </button>
-              <button
-                onClick={() => setRecordType('check_out')}
-                className={`p-4 rounded-xl border-2 transition-all ${
-                  recordType === 'check_out'
-                    ? 'border-red-500 bg-red-50'
-                    : 'border-slate-200 hover:border-red-200'
-                }`}
-              >
-                <div className="flex items-center gap-2 mb-2">
-                  <LogOut className={`w-5 h-5 ${recordType === 'check_out' ? 'text-red-600' : 'text-slate-400'}`} />
-                  <span className={`font-bold ${recordType === 'check_out' ? 'text-red-700' : 'text-slate-700'}`}>
-                    تسجيل انصراف
-                  </span>
-                </div>
-                <p className="text-sm text-slate-500">تسجيل وقت الانصراف فقط</p>
-              </button>
-            </div>
-          </CardContent>
-        </Card>
+        {/* MAIN GRID LAYOUT */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
-        {/* Employee & Date */}
-        <Card className="border-none shadow-sm bg-white rounded-2xl">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-base font-bold text-navy flex items-center gap-2">
-              <User className="w-4 h-4 text-emerald-600" />
-              معلومات الموظف
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="employeeId">الموظف *</Label>
-                <Select value={employeeId} onValueChange={setEmployeeId}>
-                  <SelectTrigger className="rounded-xl">
-                    <SelectValue placeholder="اختر الموظف" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="emp-001">أحمد محمد العلي</SelectItem>
-                    <SelectItem value="emp-002">فاطمة عبدالله السعيد</SelectItem>
-                    <SelectItem value="emp-003">خالد إبراهيم الشمري</SelectItem>
-                    <SelectItem value="emp-004">نورة سعد القحطاني</SelectItem>
-                  </SelectContent>
-                </Select>
+          {/* RIGHT COLUMN (Main Content) */}
+          <div className="lg:col-span-2 space-y-6">
+
+            {/* MAIN FORM CARD */}
+            <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-100 space-y-6">
+
+              {/* Office Type Selector */}
+              <div className="space-y-4">
+                <h3 className="font-bold text-navy text-lg flex items-center gap-2">
+                  <Building className="w-5 h-5 text-emerald-600" />
+                  نوع المكتب
+                </h3>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                  {OFFICE_TYPES.map((type) => {
+                    const Icon = type.icon
+                    const isSelected = officeType === type.id
+                    return (
+                      <button
+                        key={type.id}
+                        className={`p-4 rounded-2xl border-2 transition-all text-center ${
+                          isSelected
+                            ? 'border-emerald-500 bg-emerald-50'
+                            : 'border-slate-200 bg-white hover:border-emerald-200'
+                        }`}
+                        onClick={() => setOfficeType(type.id)}
+                      >
+                        <div className={`w-10 h-10 rounded-xl mx-auto mb-2 flex items-center justify-center ${
+                          isSelected ? 'bg-emerald-500 text-white' : 'bg-slate-100 text-slate-600'
+                        }`}>
+                          <Icon className="w-5 h-5" />
+                        </div>
+                        <h4 className={`font-bold text-sm ${isSelected ? 'text-emerald-700' : 'text-navy'}`}>
+                          {type.title}
+                        </h4>
+                        <p className="text-xs text-slate-500">{type.description}</p>
+                      </button>
+                    )
+                  })}
+                </div>
               </div>
-              {recordType === 'full' && (
-                <div className="space-y-2">
-                  <Label htmlFor="workDate">تاريخ العمل *</Label>
-                  <Input
-                    id="workDate"
-                    type="date"
-                    value={workDate}
-                    onChange={(e) => setWorkDate(e.target.value)}
-                    className="rounded-xl"
-                  />
-                </div>
-              )}
-              {recordType === 'full' && (
-                <div className="space-y-2">
-                  <Label htmlFor="status">الحالة</Label>
-                  <Select value={status} onValueChange={(v) => setStatus(v as AttendanceStatus)}>
-                    <SelectTrigger className="rounded-xl">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="present">حاضر</SelectItem>
-                      <SelectItem value="late">متأخر</SelectItem>
-                      <SelectItem value="half_day">نصف يوم</SelectItem>
-                      <SelectItem value="absent">غائب</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              )}
-            </div>
-          </CardContent>
-        </Card>
 
-        {/* Check-in Section */}
-        {(recordType === 'full' || recordType === 'check_in') && (
-          <Card className="border-none shadow-sm bg-white rounded-2xl">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-base font-bold text-navy flex items-center gap-2">
-                <LogIn className="w-4 h-4 text-emerald-600" />
-                تسجيل الحضور
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="checkInTime">وقت الحضور *</Label>
-                  <Input
-                    id="checkInTime"
-                    type="time"
-                    value={checkInTime}
-                    onChange={(e) => setCheckInTime(e.target.value)}
-                    className="rounded-xl"
-                  />
+              {/* Record Type */}
+              <div className="space-y-4">
+                <h3 className="font-bold text-navy text-lg flex items-center gap-2">
+                  <Clock className="w-5 h-5 text-emerald-600" />
+                  نوع التسجيل
+                </h3>
+                <div className="grid grid-cols-3 gap-3">
+                  <button
+                    onClick={() => setRecordType('full')}
+                    className={`p-4 rounded-xl border-2 transition-all ${
+                      recordType === 'full'
+                        ? 'border-emerald-500 bg-emerald-50'
+                        : 'border-slate-200 hover:border-emerald-200'
+                    }`}
+                  >
+                    <div className="flex items-center gap-2 mb-2">
+                      <Clock className={`w-5 h-5 ${recordType === 'full' ? 'text-emerald-600' : 'text-slate-400'}`} />
+                      <span className={`font-bold ${recordType === 'full' ? 'text-emerald-700' : 'text-slate-700'}`}>
+                        تسجيل كامل
+                      </span>
+                    </div>
+                    <p className="text-sm text-slate-500">تسجيل وقت الحضور والانصراف معاً</p>
+                  </button>
+                  <button
+                    onClick={() => setRecordType('check_in')}
+                    className={`p-4 rounded-xl border-2 transition-all ${
+                      recordType === 'check_in'
+                        ? 'border-emerald-500 bg-emerald-50'
+                        : 'border-slate-200 hover:border-emerald-200'
+                    }`}
+                  >
+                    <div className="flex items-center gap-2 mb-2">
+                      <LogIn className={`w-5 h-5 ${recordType === 'check_in' ? 'text-emerald-600' : 'text-slate-400'}`} />
+                      <span className={`font-bold ${recordType === 'check_in' ? 'text-emerald-700' : 'text-slate-700'}`}>
+                        تسجيل حضور
+                      </span>
+                    </div>
+                    <p className="text-sm text-slate-500">تسجيل وقت الحضور فقط</p>
+                  </button>
+                  <button
+                    onClick={() => setRecordType('check_out')}
+                    className={`p-4 rounded-xl border-2 transition-all ${
+                      recordType === 'check_out'
+                        ? 'border-red-500 bg-red-50'
+                        : 'border-slate-200 hover:border-red-200'
+                    }`}
+                  >
+                    <div className="flex items-center gap-2 mb-2">
+                      <LogOut className={`w-5 h-5 ${recordType === 'check_out' ? 'text-red-600' : 'text-slate-400'}`} />
+                      <span className={`font-bold ${recordType === 'check_out' ? 'text-red-700' : 'text-slate-700'}`}>
+                        تسجيل انصراف
+                      </span>
+                    </div>
+                    <p className="text-sm text-slate-500">تسجيل وقت الانصراف فقط</p>
+                  </button>
                 </div>
-                <div className="space-y-2">
-                  <Label>طريقة التسجيل</Label>
-                  <div className="flex gap-2 flex-wrap">
-                    {CHECK_METHODS.map((method) => {
-                      const Icon = method.icon
-                      const isSelected = checkInMethod === method.value
-                      return (
-                        <button
-                          key={method.value}
-                          onClick={() => setCheckInMethod(method.value)}
-                          className={`flex items-center gap-1 px-3 py-2 rounded-lg border-2 transition-all ${
-                            isSelected
-                              ? 'border-emerald-500 bg-emerald-50 text-emerald-700'
-                              : 'border-slate-200 hover:border-emerald-200 text-slate-600'
-                          }`}
-                        >
-                          <Icon className="w-4 h-4" />
-                          <span className="text-sm">{method.label}</span>
-                        </button>
-                      )
-                    })}
-                  </div>
-                </div>
-                {hasField('location') && (
+              </div>
+
+              {/* Employee & Date */}
+              <div className="space-y-4">
+                <h3 className="font-bold text-navy text-lg flex items-center gap-2">
+                  <User className="w-5 h-5 text-emerald-600" />
+                  معلومات الموظف
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div className="space-y-2">
-                    <Label>موقع الحضور</Label>
-                    <Select value={checkInLocation} onValueChange={(v) => setCheckInLocation(v as LocationType)}>
+                    <Label htmlFor="employeeId">الموظف *</Label>
+                    <Select value={employeeId} onValueChange={setEmployeeId}>
                       <SelectTrigger className="rounded-xl">
-                        <MapPin className="w-4 h-4 ml-2" />
-                        <SelectValue />
+                        <SelectValue placeholder="اختر الموظف" />
                       </SelectTrigger>
                       <SelectContent>
-                        {LOCATION_TYPES.map((loc) => (
-                          <SelectItem key={loc.value} value={loc.value}>{loc.label}</SelectItem>
-                        ))}
+                        <SelectItem value="emp-001">أحمد محمد العلي</SelectItem>
+                        <SelectItem value="emp-002">فاطمة عبدالله السعيد</SelectItem>
+                        <SelectItem value="emp-003">خالد إبراهيم الشمري</SelectItem>
+                        <SelectItem value="emp-004">نورة سعد القحطاني</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
-                )}
-              </div>
-              {recordType === 'check_in' && (
-                <div className="mt-4 space-y-2">
-                  <Label htmlFor="checkInNotes">ملاحظات</Label>
-                  <Textarea
-                    id="checkInNotes"
-                    value={checkInNotes}
-                    onChange={(e) => setCheckInNotes(e.target.value)}
-                    placeholder="أي ملاحظات على الحضور..."
-                    className="rounded-xl"
-                  />
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        )}
-
-        {/* Check-out Section */}
-        {(recordType === 'full' || recordType === 'check_out') && (
-          <Card className="border-none shadow-sm bg-white rounded-2xl">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-base font-bold text-navy flex items-center gap-2">
-                <LogOut className="w-4 h-4 text-red-600" />
-                تسجيل الانصراف
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="checkOutTime">وقت الانصراف *</Label>
-                  <Input
-                    id="checkOutTime"
-                    type="time"
-                    value={checkOutTime}
-                    onChange={(e) => setCheckOutTime(e.target.value)}
-                    className="rounded-xl"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label>طريقة التسجيل</Label>
-                  <div className="flex gap-2 flex-wrap">
-                    {CHECK_METHODS.map((method) => {
-                      const Icon = method.icon
-                      const isSelected = checkOutMethod === method.value
-                      return (
-                        <button
-                          key={method.value}
-                          onClick={() => setCheckOutMethod(method.value)}
-                          className={`flex items-center gap-1 px-3 py-2 rounded-lg border-2 transition-all ${
-                            isSelected
-                              ? 'border-red-500 bg-red-50 text-red-700'
-                              : 'border-slate-200 hover:border-red-200 text-slate-600'
-                          }`}
-                        >
-                          <Icon className="w-4 h-4" />
-                          <span className="text-sm">{method.label}</span>
-                        </button>
-                      )
-                    })}
-                  </div>
-                </div>
-                {hasField('location') && (
-                  <div className="space-y-2">
-                    <Label>موقع الانصراف</Label>
-                    <Select value={checkOutLocation} onValueChange={(v) => setCheckOutLocation(v as LocationType)}>
-                      <SelectTrigger className="rounded-xl">
-                        <MapPin className="w-4 h-4 ml-2" />
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {LOCATION_TYPES.map((loc) => (
-                          <SelectItem key={loc.value} value={loc.value}>{loc.label}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                )}
-              </div>
-              {recordType === 'check_out' && (
-                <div className="mt-4 space-y-2">
-                  <Label htmlFor="checkOutNotes">ملاحظات</Label>
-                  <Textarea
-                    id="checkOutNotes"
-                    value={checkOutNotes}
-                    onChange={(e) => setCheckOutNotes(e.target.value)}
-                    placeholder="أي ملاحظات على الانصراف..."
-                    className="rounded-xl"
-                  />
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        )}
-
-        {/* Location Details (Collapsible) */}
-        {hasField('location') && recordType === 'full' && (
-          <Collapsible open={isLocationOpen} onOpenChange={setIsLocationOpen}>
-            <Card className="border-none shadow-sm bg-white rounded-2xl">
-              <CollapsibleTrigger className="w-full">
-                <CardHeader className="pb-2">
-                  <div className="flex items-center justify-between">
-                    <CardTitle className="text-base font-bold text-navy flex items-center gap-2">
-                      <MapPin className="w-4 h-4 text-emerald-600" />
-                      تفاصيل الموقع
-                    </CardTitle>
-                    <ChevronDown className={`w-5 h-5 text-slate-400 transition-transform ${isLocationOpen ? 'rotate-180' : ''}`} />
-                  </div>
-                </CardHeader>
-              </CollapsibleTrigger>
-              <CollapsibleContent>
-                <CardContent>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {recordType === 'full' && (
                     <div className="space-y-2">
-                      <Label htmlFor="officeName">اسم المكتب/الموقع</Label>
+                      <Label htmlFor="workDate">تاريخ العمل *</Label>
                       <Input
-                        id="officeName"
-                        value={officeName}
-                        onChange={(e) => setOfficeName(e.target.value)}
-                        placeholder="المكتب الرئيسي"
+                        id="workDate"
+                        type="date"
+                        value={workDate}
+                        onChange={(e) => setWorkDate(e.target.value)}
                         className="rounded-xl"
                       />
                     </div>
+                  )}
+                  {recordType === 'full' && (
                     <div className="space-y-2">
-                      <Label htmlFor="officeAddress">العنوان</Label>
-                      <Input
-                        id="officeAddress"
-                        value={officeAddress}
-                        onChange={(e) => setOfficeAddress(e.target.value)}
-                        placeholder="الرياض، حي العليا"
-                        className="rounded-xl"
-                      />
-                    </div>
-                  </div>
-                </CardContent>
-              </CollapsibleContent>
-            </Card>
-          </Collapsible>
-        )}
-
-        {/* Shift Details (Collapsible) */}
-        {hasField('shifts') && recordType === 'full' && (
-          <Collapsible open={isShiftOpen} onOpenChange={setIsShiftOpen}>
-            <Card className="border-none shadow-sm bg-white rounded-2xl">
-              <CollapsibleTrigger className="w-full">
-                <CardHeader className="pb-2">
-                  <div className="flex items-center justify-between">
-                    <CardTitle className="text-base font-bold text-navy flex items-center gap-2">
-                      <Settings className="w-4 h-4 text-emerald-600" />
-                      تفاصيل الدوام
-                    </CardTitle>
-                    <ChevronDown className={`w-5 h-5 text-slate-400 transition-transform ${isShiftOpen ? 'rotate-180' : ''}`} />
-                  </div>
-                </CardHeader>
-              </CollapsibleTrigger>
-              <CollapsibleContent>
-                <CardContent>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="shiftName">اسم الوردية</Label>
-                      <Select value={shiftName} onValueChange={setShiftName}>
+                      <Label htmlFor="status">الحالة</Label>
+                      <Select value={status} onValueChange={(v) => setStatus(v as AttendanceStatus)}>
                         <SelectTrigger className="rounded-xl">
-                          <SelectValue placeholder="اختر الوردية" />
+                          <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="regular">دوام عادي</SelectItem>
-                          <SelectItem value="morning">الفترة الصباحية</SelectItem>
-                          <SelectItem value="evening">الفترة المسائية</SelectItem>
-                          <SelectItem value="flexible">مرن</SelectItem>
+                          <SelectItem value="present">حاضر</SelectItem>
+                          <SelectItem value="late">متأخر</SelectItem>
+                          <SelectItem value="half_day">نصف يوم</SelectItem>
+                          <SelectItem value="absent">غائب</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="scheduledCheckIn">وقت الحضور المجدول</Label>
-                      <Input
-                        id="scheduledCheckIn"
-                        type="time"
-                        value={scheduledCheckIn}
-                        onChange={(e) => setScheduledCheckIn(e.target.value)}
-                        className="rounded-xl"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="scheduledCheckOut">وقت الانصراف المجدول</Label>
-                      <Input
-                        id="scheduledCheckOut"
-                        type="time"
-                        value={scheduledCheckOut}
-                        onChange={(e) => setScheduledCheckOut(e.target.value)}
-                        className="rounded-xl"
-                      />
-                    </div>
-                  </div>
-                </CardContent>
-              </CollapsibleContent>
-            </Card>
-          </Collapsible>
-        )}
-
-        {/* Notes (Collapsible) */}
-        {recordType === 'full' && (
-          <Collapsible open={isNotesOpen} onOpenChange={setIsNotesOpen}>
-            <Card className="border-none shadow-sm bg-white rounded-2xl">
-              <CollapsibleTrigger className="w-full">
-                <CardHeader className="pb-2">
-                  <div className="flex items-center justify-between">
-                    <CardTitle className="text-base font-bold text-navy flex items-center gap-2">
-                      <FileText className="w-4 h-4 text-emerald-600" />
-                      الملاحظات
-                    </CardTitle>
-                    <ChevronDown className={`w-5 h-5 text-slate-400 transition-transform ${isNotesOpen ? 'rotate-180' : ''}`} />
-                  </div>
-                </CardHeader>
-              </CollapsibleTrigger>
-              <CollapsibleContent>
-                <CardContent>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="employeeNotes">ملاحظات الموظف</Label>
-                      <Textarea
-                        id="employeeNotes"
-                        value={employeeNotes}
-                        onChange={(e) => setEmployeeNotes(e.target.value)}
-                        placeholder="ملاحظات من الموظف..."
-                        className="rounded-xl"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="managerNotes">ملاحظات المدير</Label>
-                      <Textarea
-                        id="managerNotes"
-                        value={managerNotes}
-                        onChange={(e) => setManagerNotes(e.target.value)}
-                        placeholder="ملاحظات من المدير..."
-                        className="rounded-xl"
-                      />
-                    </div>
-                  </div>
-                </CardContent>
-              </CollapsibleContent>
-            </Card>
-          </Collapsible>
-        )}
-
-        {/* Labor Law Info */}
-        {hasField('compliance') && (
-          <Card className="border-none shadow-sm bg-blue-50 rounded-2xl">
-            <CardContent className="p-4">
-              <div className="flex items-start gap-3">
-                <Info className="w-5 h-5 text-blue-600 mt-0.5" />
-                <div>
-                  <h4 className="font-bold text-blue-800 mb-1">نظام العمل السعودي - ساعات العمل</h4>
-                  <ul className="text-sm text-blue-700 space-y-1">
-                    <li>• المادة 98: لا تزيد ساعات العمل عن 8 ساعات يومياً أو 48 ساعة أسبوعياً (6 ساعات في رمضان)</li>
-                    <li>• المادة 101: فترة راحة لا تقل عن 30 دقيقة بعد 5 ساعات عمل متواصلة</li>
-                    <li>• المادة 106: لا يجوز تشغيل العامل أكثر من 12 ساعة عمل إضافي أسبوعياً</li>
-                    <li>• المادة 107: أجر الساعة الإضافية = الأجر العادي + 50%</li>
-                  </ul>
+                  )}
                 </div>
               </div>
-            </CardContent>
-          </Card>
-        )}
 
-        {/* Submit Button */}
-        <div className="flex items-center justify-end gap-4">
-          <Button
-            variant="outline"
-            onClick={() => navigate({ to: '/dashboard/hr/attendance' })}
-            className="rounded-xl"
-          >
-            إلغاء
-          </Button>
-          <Button
-            onClick={handleSubmit}
-            disabled={!employeeId || isPending}
-            className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl px-8"
-          >
-            {isPending ? (
-              <>جاري الحفظ...</>
-            ) : (
-              <>
-                <CheckCircle className="w-4 h-4 ml-2" />
-                {recordType === 'check_in' ? 'تسجيل الحضور' :
-                 recordType === 'check_out' ? 'تسجيل الانصراف' : 'حفظ السجل'}
-              </>
-            )}
-          </Button>
+              {/* Check-in Section */}
+              {(recordType === 'full' || recordType === 'check_in') && (
+                <div className="space-y-4">
+                  <h3 className="font-bold text-navy text-lg flex items-center gap-2">
+                    <LogIn className="w-5 h-5 text-emerald-600" />
+                    تسجيل الحضور
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="checkInTime">وقت الحضور *</Label>
+                      <Input
+                        id="checkInTime"
+                        type="time"
+                        value={checkInTime}
+                        onChange={(e) => setCheckInTime(e.target.value)}
+                        className="rounded-xl"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>طريقة التسجيل</Label>
+                      <div className="flex gap-2 flex-wrap">
+                        {CHECK_METHODS.map((method) => {
+                          const Icon = method.icon
+                          const isSelected = checkInMethod === method.value
+                          return (
+                            <button
+                              key={method.value}
+                              onClick={() => setCheckInMethod(method.value)}
+                              className={`flex items-center gap-1 px-3 py-2 rounded-lg border-2 transition-all ${
+                                isSelected
+                                  ? 'border-emerald-500 bg-emerald-50 text-emerald-700'
+                                  : 'border-slate-200 hover:border-emerald-200 text-slate-600'
+                              }`}
+                            >
+                              <Icon className="w-4 h-4" />
+                              <span className="text-sm">{method.label}</span>
+                            </button>
+                          )
+                        })}
+                      </div>
+                    </div>
+                    {hasField('location') && (
+                      <div className="space-y-2">
+                        <Label>موقع الحضور</Label>
+                        <Select value={checkInLocation} onValueChange={(v) => setCheckInLocation(v as LocationType)}>
+                          <SelectTrigger className="rounded-xl">
+                            <MapPin className="w-4 h-4 ml-2" />
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {LOCATION_TYPES.map((loc) => (
+                              <SelectItem key={loc.value} value={loc.value}>{loc.label}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    )}
+                  </div>
+                  {recordType === 'check_in' && (
+                    <div className="space-y-2">
+                      <Label htmlFor="checkInNotes">ملاحظات</Label>
+                      <Textarea
+                        id="checkInNotes"
+                        value={checkInNotes}
+                        onChange={(e) => setCheckInNotes(e.target.value)}
+                        placeholder="أي ملاحظات على الحضور..."
+                        className="rounded-xl"
+                      />
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Check-out Section */}
+              {(recordType === 'full' || recordType === 'check_out') && (
+                <div className="space-y-4">
+                  <h3 className="font-bold text-navy text-lg flex items-center gap-2">
+                    <LogOut className="w-5 h-5 text-red-600" />
+                    تسجيل الانصراف
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="checkOutTime">وقت الانصراف *</Label>
+                      <Input
+                        id="checkOutTime"
+                        type="time"
+                        value={checkOutTime}
+                        onChange={(e) => setCheckOutTime(e.target.value)}
+                        className="rounded-xl"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>طريقة التسجيل</Label>
+                      <div className="flex gap-2 flex-wrap">
+                        {CHECK_METHODS.map((method) => {
+                          const Icon = method.icon
+                          const isSelected = checkOutMethod === method.value
+                          return (
+                            <button
+                              key={method.value}
+                              onClick={() => setCheckOutMethod(method.value)}
+                              className={`flex items-center gap-1 px-3 py-2 rounded-lg border-2 transition-all ${
+                                isSelected
+                                  ? 'border-red-500 bg-red-50 text-red-700'
+                                  : 'border-slate-200 hover:border-red-200 text-slate-600'
+                              }`}
+                            >
+                              <Icon className="w-4 h-4" />
+                              <span className="text-sm">{method.label}</span>
+                            </button>
+                          )
+                        })}
+                      </div>
+                    </div>
+                    {hasField('location') && (
+                      <div className="space-y-2">
+                        <Label>موقع الانصراف</Label>
+                        <Select value={checkOutLocation} onValueChange={(v) => setCheckOutLocation(v as LocationType)}>
+                          <SelectTrigger className="rounded-xl">
+                            <MapPin className="w-4 h-4 ml-2" />
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {LOCATION_TYPES.map((loc) => (
+                              <SelectItem key={loc.value} value={loc.value}>{loc.label}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    )}
+                  </div>
+                  {recordType === 'check_out' && (
+                    <div className="space-y-2">
+                      <Label htmlFor="checkOutNotes">ملاحظات</Label>
+                      <Textarea
+                        id="checkOutNotes"
+                        value={checkOutNotes}
+                        onChange={(e) => setCheckOutNotes(e.target.value)}
+                        placeholder="أي ملاحظات على الانصراف..."
+                        className="rounded-xl"
+                      />
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Location Details (Collapsible) */}
+              {hasField('location') && recordType === 'full' && (
+                <Collapsible open={isLocationOpen} onOpenChange={setIsLocationOpen}>
+                  <CollapsibleTrigger className="w-full">
+                    <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl hover:bg-slate-100 transition-colors">
+                      <div className="flex items-center gap-2">
+                        <MapPin className="w-5 h-5 text-emerald-600" />
+                        <span className="font-bold text-navy">تفاصيل الموقع</span>
+                      </div>
+                      <ChevronDown className={`w-5 h-5 text-slate-400 transition-transform ${isLocationOpen ? 'rotate-180' : ''}`} />
+                    </div>
+                  </CollapsibleTrigger>
+                  <CollapsibleContent className="pt-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="officeName">اسم المكتب/الموقع</Label>
+                        <Input
+                          id="officeName"
+                          value={officeName}
+                          onChange={(e) => setOfficeName(e.target.value)}
+                          placeholder="المكتب الرئيسي"
+                          className="rounded-xl"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="officeAddress">العنوان</Label>
+                        <Input
+                          id="officeAddress"
+                          value={officeAddress}
+                          onChange={(e) => setOfficeAddress(e.target.value)}
+                          placeholder="الرياض، حي العليا"
+                          className="rounded-xl"
+                        />
+                      </div>
+                    </div>
+                  </CollapsibleContent>
+                </Collapsible>
+              )}
+
+              {/* Shift Details (Collapsible) */}
+              {hasField('shifts') && recordType === 'full' && (
+                <Collapsible open={isShiftOpen} onOpenChange={setIsShiftOpen}>
+                  <CollapsibleTrigger className="w-full">
+                    <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl hover:bg-slate-100 transition-colors">
+                      <div className="flex items-center gap-2">
+                        <Settings className="w-5 h-5 text-emerald-600" />
+                        <span className="font-bold text-navy">تفاصيل الدوام</span>
+                      </div>
+                      <ChevronDown className={`w-5 h-5 text-slate-400 transition-transform ${isShiftOpen ? 'rotate-180' : ''}`} />
+                    </div>
+                  </CollapsibleTrigger>
+                  <CollapsibleContent className="pt-4">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="shiftName">اسم الوردية</Label>
+                        <Select value={shiftName} onValueChange={setShiftName}>
+                          <SelectTrigger className="rounded-xl">
+                            <SelectValue placeholder="اختر الوردية" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="regular">دوام عادي</SelectItem>
+                            <SelectItem value="morning">الفترة الصباحية</SelectItem>
+                            <SelectItem value="evening">الفترة المسائية</SelectItem>
+                            <SelectItem value="flexible">مرن</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="scheduledCheckIn">وقت الحضور المجدول</Label>
+                        <Input
+                          id="scheduledCheckIn"
+                          type="time"
+                          value={scheduledCheckIn}
+                          onChange={(e) => setScheduledCheckIn(e.target.value)}
+                          className="rounded-xl"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="scheduledCheckOut">وقت الانصراف المجدول</Label>
+                        <Input
+                          id="scheduledCheckOut"
+                          type="time"
+                          value={scheduledCheckOut}
+                          onChange={(e) => setScheduledCheckOut(e.target.value)}
+                          className="rounded-xl"
+                        />
+                      </div>
+                    </div>
+                  </CollapsibleContent>
+                </Collapsible>
+              )}
+
+              {/* Notes (Collapsible) */}
+              {recordType === 'full' && (
+                <Collapsible open={isNotesOpen} onOpenChange={setIsNotesOpen}>
+                  <CollapsibleTrigger className="w-full">
+                    <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl hover:bg-slate-100 transition-colors">
+                      <div className="flex items-center gap-2">
+                        <FileText className="w-5 h-5 text-emerald-600" />
+                        <span className="font-bold text-navy">الملاحظات</span>
+                      </div>
+                      <ChevronDown className={`w-5 h-5 text-slate-400 transition-transform ${isNotesOpen ? 'rotate-180' : ''}`} />
+                    </div>
+                  </CollapsibleTrigger>
+                  <CollapsibleContent className="pt-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="employeeNotes">ملاحظات الموظف</Label>
+                        <Textarea
+                          id="employeeNotes"
+                          value={employeeNotes}
+                          onChange={(e) => setEmployeeNotes(e.target.value)}
+                          placeholder="ملاحظات من الموظف..."
+                          className="rounded-xl"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="managerNotes">ملاحظات المدير</Label>
+                        <Textarea
+                          id="managerNotes"
+                          value={managerNotes}
+                          onChange={(e) => setManagerNotes(e.target.value)}
+                          placeholder="ملاحظات من المدير..."
+                          className="rounded-xl"
+                        />
+                      </div>
+                    </div>
+                  </CollapsibleContent>
+                </Collapsible>
+              )}
+
+              {/* Labor Law Info */}
+              {hasField('compliance') && (
+                <div className="bg-blue-50 rounded-2xl p-4">
+                  <div className="flex items-start gap-3">
+                    <Info className="w-5 h-5 text-blue-600 mt-0.5" />
+                    <div>
+                      <h4 className="font-bold text-blue-800 mb-1">نظام العمل السعودي - ساعات العمل</h4>
+                      <ul className="text-sm text-blue-700 space-y-1">
+                        <li>• المادة 98: لا تزيد ساعات العمل عن 8 ساعات يومياً أو 48 ساعة أسبوعياً (6 ساعات في رمضان)</li>
+                        <li>• المادة 101: فترة راحة لا تقل عن 30 دقيقة بعد 5 ساعات عمل متواصلة</li>
+                        <li>• المادة 106: لا يجوز تشغيل العامل أكثر من 12 ساعة عمل إضافي أسبوعياً</li>
+                        <li>• المادة 107: أجر الساعة الإضافية = الأجر العادي + 50%</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Submit Buttons */}
+              <div className="flex items-center justify-end gap-4 pt-4 border-t border-slate-100">
+                <Button
+                  variant="outline"
+                  onClick={() => navigate({ to: '/dashboard/hr/attendance' })}
+                  className="rounded-xl"
+                >
+                  إلغاء
+                </Button>
+                <Button
+                  onClick={handleSubmit}
+                  disabled={!employeeId || isPending}
+                  className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl px-8 shadow-lg shadow-emerald-500/20"
+                >
+                  {isPending ? (
+                    <>جاري الحفظ...</>
+                  ) : (
+                    <>
+                      <CheckCircle className="w-4 h-4 ml-2" />
+                      {recordType === 'check_in' ? 'تسجيل الحضور' :
+                       recordType === 'check_out' ? 'تسجيل الانصراف' : 'حفظ السجل'}
+                    </>
+                  )}
+                </Button>
+              </div>
+            </div>
+          </div>
+
+          {/* LEFT COLUMN (Widgets) */}
+          <HRSidebar context="attendance" />
         </div>
       </Main>
     </>

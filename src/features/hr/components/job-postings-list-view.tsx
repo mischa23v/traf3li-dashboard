@@ -1,14 +1,16 @@
+import { HRSidebar } from './hr-sidebar'
 import { useState, useMemo } from 'react'
 import { Main } from '@/components/layout/main'
 import { LanguageSwitcher } from '@/components/language-switcher'
 import { ThemeSwitch } from '@/components/theme-switch'
 import { ConfigDrawer } from '@/components/config-drawer'
 import { ProfileDropdown } from '@/components/profile-dropdown'
-import { useNavigate } from '@tanstack/react-router'
+import { ProductivityHero } from '@/components/productivity-hero'
+import { Link, useNavigate } from '@tanstack/react-router'
+import { Checkbox } from '@/components/ui/checkbox'
 import { useJobPostings, useJobPostingStats } from '@/hooks/useRecruitment'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Header } from '@/components/layout/header'
@@ -22,19 +24,24 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import {
-  Search, Bell, Plus, Filter, Users, AlertCircle, Eye,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+import {
+  Search, Bell, Plus, Users, AlertCircle, Eye,
   Briefcase, MapPin, Clock, CheckCircle, FileText, Building2,
   UserPlus, Globe, PauseCircle, XCircle, TrendingUp, Calendar,
-  DollarSign, Zap
+  DollarSign, Zap, MoreHorizontal, Edit3, Trash2, X
 } from 'lucide-react'
 import {
   type JobPostingStatus,
   type EmploymentType,
-  type SeniorityLevel,
   type Urgency,
   JOB_STATUS_LABELS,
   EMPLOYMENT_TYPE_LABELS,
-  SENIORITY_LABELS,
 } from '@/services/recruitmentService'
 
 // Urgency labels
@@ -47,11 +54,25 @@ const URGENCY_LABELS: Record<Urgency, { ar: string; en: string; color: string }>
 
 export function JobPostingsListView() {
   const navigate = useNavigate()
+  const [isSelectionMode, setIsSelectionMode] = useState(false)
+  const [selectedIds, setSelectedIds] = useState<string[]>([])
   const [searchQuery, setSearchQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState<JobPostingStatus | 'all'>('all')
   const [employmentTypeFilter, setEmploymentTypeFilter] = useState<EmploymentType | 'all'>('all')
   const [urgencyFilter, setUrgencyFilter] = useState<Urgency | 'all'>('all')
   const [departmentFilter, setDepartmentFilter] = useState<string>('all')
+
+  // Check if any filter is active
+  const hasActiveFilters = searchQuery || statusFilter !== 'all' || employmentTypeFilter !== 'all' || urgencyFilter !== 'all' || departmentFilter !== 'all'
+
+  // Clear all filters
+  const clearFilters = () => {
+    setSearchQuery('')
+    setStatusFilter('all')
+    setEmploymentTypeFilter('all')
+    setUrgencyFilter('all')
+    setDepartmentFilter('all')
+  }
 
   // Fetch job postings
   const { data: jobsData, isLoading, isError } = useJobPostings({
@@ -77,6 +98,44 @@ export function JobPostingsListView() {
       return matchesSearch
     })
   }, [jobsData?.data, searchQuery])
+
+  // Selection Handlers
+  const handleToggleSelectionMode = () => {
+    setIsSelectionMode(!isSelectionMode)
+    setSelectedIds([])
+  }
+
+  const handleSelectJob = (jobId: string) => {
+    if (selectedIds.includes(jobId)) {
+      setSelectedIds(selectedIds.filter(id => id !== jobId))
+    } else {
+      setSelectedIds([...selectedIds, jobId])
+    }
+  }
+
+  const handleDeleteSelected = () => {
+    if (selectedIds.length === 0) return
+    if (confirm(`هل أنت متأكد من حذف ${selectedIds.length} وظيفة؟`)) {
+      // TODO: Implement bulk delete
+      setIsSelectionMode(false)
+      setSelectedIds([])
+    }
+  }
+
+  // Single job actions
+  const handleViewJob = (jobId: string) => {
+    navigate({ to: '/dashboard/hr/recruitment/jobs/$jobId', params: { jobId } })
+  }
+
+  const handleEditJob = (jobId: string) => {
+    navigate({ to: '/dashboard/hr/recruitment/jobs/new', search: { editId: jobId } })
+  }
+
+  const handleDeleteJob = (jobId: string) => {
+    if (confirm('هل أنت متأكد من حذف هذه الوظيفة؟')) {
+      // TODO: Implement delete
+    }
+  }
 
   // Status badge
   const getStatusBadge = (status: JobPostingStatus) => {
@@ -138,10 +197,22 @@ export function JobPostingsListView() {
     return 'غير محدد'
   }
 
+  // Stats for hero
+  const heroStats = useMemo(() => {
+    if (!statsData) return undefined
+    return [
+      { label: 'إجمالي الوظائف', value: statsData.totalJobs || 0, icon: Briefcase, status: 'normal' as const },
+      { label: 'منشورة', value: statsData.byStatus?.find(s => s.status === 'published')?.count || 0, icon: Globe, status: 'normal' as const },
+      { label: 'إجمالي الطلبات', value: statsData.totalApplications || 0, icon: UserPlus, status: 'normal' as const },
+      { label: 'متوسط وقت التعيين', value: statsData.avgTimeToFill || 0, icon: Clock, status: 'normal' as const },
+    ]
+  }, [statsData])
+
   const topNav = [
     { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
     { title: 'الموظفين', href: '/dashboard/hr/employees', isActive: false },
     { title: 'التوظيف', href: '/dashboard/hr/recruitment/jobs', isActive: true },
+    { title: 'المتقدمين', href: '/dashboard/hr/recruitment/applicants', isActive: false },
   ]
 
   return (
@@ -171,353 +242,292 @@ export function JobPostingsListView() {
         <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-emerald-500/50 to-transparent"></div>
       </Header>
 
-      <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-6 rounded-tr-3xl shadow-inner border-r border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
-        {/* Page Header */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-navy">الوظائف الشاغرة</h1>
-            <p className="text-slate-500">إدارة إعلانات الوظائف ومتابعة المتقدمين</p>
-          </div>
-          <div className="flex items-center gap-3">
-            <Button
-              variant="outline"
-              onClick={() => navigate({ to: '/dashboard/hr/recruitment/applicants' })}
-              className="rounded-xl"
-            >
-              <Users className="w-4 h-4 ml-2" />
-              المتقدمين
-            </Button>
-            <Button
-              onClick={() => navigate({ to: '/dashboard/hr/recruitment/jobs/new' })}
-              className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl"
-            >
-              <Plus className="w-4 h-4 ml-2" />
-              وظيفة جديدة
-            </Button>
-          </div>
-        </div>
+      <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-r border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
 
-        {/* Summary Cards */}
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-          <Card className="border-none shadow-sm bg-white rounded-2xl">
-            <CardContent className="p-4">
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center">
-                  <Briefcase className="w-6 h-6 text-blue-600" />
-                </div>
-                <div>
-                  <p className="text-sm text-slate-500">إجمالي الوظائف</p>
-                  <p className="text-2xl font-bold text-navy">{statsData?.totalJobs || 0}</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-          <Card className="border-none shadow-sm bg-white rounded-2xl">
-            <CardContent className="p-4">
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-xl bg-emerald-50 flex items-center justify-center">
-                  <Globe className="w-6 h-6 text-emerald-600" />
-                </div>
-                <div>
-                  <p className="text-sm text-slate-500">منشورة</p>
-                  <p className="text-2xl font-bold text-emerald-600">
-                    {statsData?.byStatus?.find(s => s.status === 'published')?.count || 0}
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-          <Card className="border-none shadow-sm bg-white rounded-2xl">
-            <CardContent className="p-4">
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-xl bg-purple-50 flex items-center justify-center">
-                  <UserPlus className="w-6 h-6 text-purple-600" />
-                </div>
-                <div>
-                  <p className="text-sm text-slate-500">إجمالي الطلبات</p>
-                  <p className="text-2xl font-bold text-purple-600">{statsData?.totalApplications || 0}</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-          <Card className="border-none shadow-sm bg-white rounded-2xl">
-            <CardContent className="p-4">
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-xl bg-amber-50 flex items-center justify-center">
-                  <Clock className="w-6 h-6 text-amber-600" />
-                </div>
-                <div>
-                  <p className="text-sm text-slate-500">متوسط وقت التعيين</p>
-                  <p className="text-2xl font-bold text-amber-600">
-                    {statsData?.avgTimeToFill ? `${statsData.avgTimeToFill} يوم` : '-'}
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-          <Card className="border-none shadow-sm bg-white rounded-2xl">
-            <CardContent className="p-4">
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-xl bg-red-50 flex items-center justify-center">
-                  <TrendingUp className="w-6 h-6 text-red-600" />
-                </div>
-                <div>
-                  <p className="text-sm text-slate-500">تكلفة التعيين</p>
-                  <p className="text-2xl font-bold text-red-600">
-                    {statsData?.avgCostPerHire ? `${statsData.avgCostPerHire.toLocaleString()} ر.س` : '-'}
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+        {/* HERO CARD & STATS */}
+        <ProductivityHero badge="الموارد البشرية" title="الوظائف الشاغرة" type="recruitment" stats={heroStats} />
 
-        {/* Filters */}
-        <Card className="border-none shadow-sm bg-white rounded-2xl">
-          <CardContent className="p-4">
-            <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
-              {/* Search */}
-              <div className="relative flex-1 max-w-md">
-                <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                <Input
-                  type="text"
-                  placeholder="بحث بالمسمى الوظيفي أو القسم..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pr-10 rounded-xl"
-                />
-              </div>
+        {/* MAIN GRID LAYOUT */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
-              {/* Filters */}
-              <div className="flex items-center gap-3 flex-wrap">
-                <Select value={statusFilter} onValueChange={(v) => setStatusFilter(v as JobPostingStatus | 'all')}>
-                  <SelectTrigger className="w-40 rounded-xl">
-                    <Filter className="w-4 h-4 ml-2" />
-                    <SelectValue placeholder="الحالة" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">جميع الحالات</SelectItem>
-                    <SelectItem value="draft">مسودة</SelectItem>
-                    <SelectItem value="published">منشور</SelectItem>
-                    <SelectItem value="on_hold">معلق</SelectItem>
-                    <SelectItem value="closed">مغلق</SelectItem>
-                    <SelectItem value="filled">تم التعيين</SelectItem>
-                  </SelectContent>
-                </Select>
-                <Select value={employmentTypeFilter} onValueChange={(v) => setEmploymentTypeFilter(v as EmploymentType | 'all')}>
-                  <SelectTrigger className="w-40 rounded-xl">
-                    <Briefcase className="w-4 h-4 ml-2" />
-                    <SelectValue placeholder="نوع العمل" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">جميع الأنواع</SelectItem>
-                    <SelectItem value="full_time">دوام كامل</SelectItem>
-                    <SelectItem value="part_time">دوام جزئي</SelectItem>
-                    <SelectItem value="contract">عقد</SelectItem>
-                    <SelectItem value="temporary">مؤقت</SelectItem>
-                    <SelectItem value="internship">تدريب</SelectItem>
-                  </SelectContent>
-                </Select>
-                <Select value={urgencyFilter} onValueChange={(v) => setUrgencyFilter(v as Urgency | 'all')}>
-                  <SelectTrigger className="w-36 rounded-xl">
-                    <Zap className="w-4 h-4 ml-2" />
-                    <SelectValue placeholder="الأولوية" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">الكل</SelectItem>
-                    <SelectItem value="low">منخفضة</SelectItem>
-                    <SelectItem value="medium">متوسطة</SelectItem>
-                    <SelectItem value="high">عالية</SelectItem>
-                    <SelectItem value="critical">حرجة</SelectItem>
-                  </SelectContent>
-                </Select>
-                <Select value={departmentFilter} onValueChange={setDepartmentFilter}>
-                  <SelectTrigger className="w-40 rounded-xl">
-                    <Building2 className="w-4 h-4 ml-2" />
-                    <SelectValue placeholder="القسم" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">جميع الأقسام</SelectItem>
-                    <SelectItem value="legal">القانونية</SelectItem>
-                    <SelectItem value="hr">الموارد البشرية</SelectItem>
-                    <SelectItem value="finance">المالية</SelectItem>
-                    <SelectItem value="admin">الإدارة</SelectItem>
-                  </SelectContent>
-                </Select>
+          {/* RIGHT COLUMN (Main Content) */}
+          <div className="lg:col-span-2 space-y-6">
+
+            {/* FILTERS BAR */}
+            <div className="bg-white rounded-2xl p-4 shadow-sm border border-slate-100">
+              <div className="flex flex-col gap-4">
+                {/* Row 1: Search */}
+                <div className="flex flex-wrap items-center gap-3">
+                  <div className="relative flex-1 min-w-[200px] max-w-md">
+                    <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                    <Input
+                      type="text"
+                      placeholder="بحث بالمسمى الوظيفي أو القسم..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="pr-10 h-10 rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500/20"
+                    />
+                  </div>
+                </div>
+
+                {/* Row 2: Filters */}
+                <div className="flex flex-wrap items-center gap-3">
+                  <Select value={statusFilter} onValueChange={(v) => setStatusFilter(v as JobPostingStatus | 'all')}>
+                    <SelectTrigger className="w-[130px] h-10 rounded-xl border-slate-200">
+                      <SelectValue placeholder="الحالة" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">جميع الحالات</SelectItem>
+                      <SelectItem value="draft">مسودة</SelectItem>
+                      <SelectItem value="published">منشور</SelectItem>
+                      <SelectItem value="on_hold">معلق</SelectItem>
+                      <SelectItem value="closed">مغلق</SelectItem>
+                      <SelectItem value="filled">تم التعيين</SelectItem>
+                    </SelectContent>
+                  </Select>
+
+                  <Select value={employmentTypeFilter} onValueChange={(v) => setEmploymentTypeFilter(v as EmploymentType | 'all')}>
+                    <SelectTrigger className="w-[130px] h-10 rounded-xl border-slate-200">
+                      <Briefcase className="h-4 w-4 ml-2 text-slate-400" />
+                      <SelectValue placeholder="النوع" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">جميع الأنواع</SelectItem>
+                      <SelectItem value="full_time">دوام كامل</SelectItem>
+                      <SelectItem value="part_time">دوام جزئي</SelectItem>
+                      <SelectItem value="contract">عقد</SelectItem>
+                      <SelectItem value="temporary">مؤقت</SelectItem>
+                      <SelectItem value="internship">تدريب</SelectItem>
+                    </SelectContent>
+                  </Select>
+
+                  <Select value={urgencyFilter} onValueChange={(v) => setUrgencyFilter(v as Urgency | 'all')}>
+                    <SelectTrigger className="w-[130px] h-10 rounded-xl border-slate-200">
+                      <Zap className="h-4 w-4 ml-2 text-slate-400" />
+                      <SelectValue placeholder="الأولوية" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">الكل</SelectItem>
+                      <SelectItem value="low">منخفضة</SelectItem>
+                      <SelectItem value="medium">متوسطة</SelectItem>
+                      <SelectItem value="high">عالية</SelectItem>
+                      <SelectItem value="critical">حرجة</SelectItem>
+                    </SelectContent>
+                  </Select>
+
+                  <Select value={departmentFilter} onValueChange={setDepartmentFilter}>
+                    <SelectTrigger className="w-[130px] h-10 rounded-xl border-slate-200">
+                      <Building2 className="h-4 w-4 ml-2 text-slate-400" />
+                      <SelectValue placeholder="القسم" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">جميع الأقسام</SelectItem>
+                      <SelectItem value="legal">القانونية</SelectItem>
+                      <SelectItem value="hr">الموارد البشرية</SelectItem>
+                      <SelectItem value="finance">المالية</SelectItem>
+                      <SelectItem value="admin">الإدارة</SelectItem>
+                    </SelectContent>
+                  </Select>
+
+                  {/* Clear Filters Button */}
+                  {hasActiveFilters && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={clearFilters}
+                      className="h-10 px-4 text-red-500 hover:text-red-600 hover:bg-red-50 rounded-xl"
+                    >
+                      <X className="h-4 w-4 ml-2" />
+                      مسح الفلاتر
+                    </Button>
+                  )}
+                </div>
               </div>
             </div>
-          </CardContent>
-        </Card>
 
-        {/* Job Postings List */}
-        <Card className="border-none shadow-sm bg-white rounded-2xl">
-          <CardHeader className="pb-2">
-            <div className="flex items-center justify-between">
-              <CardTitle className="text-lg font-bold text-navy flex items-center gap-2">
-                <Briefcase className="w-5 h-5 text-emerald-600" />
-                الوظائف الشاغرة
-              </CardTitle>
-              <Badge className="bg-slate-100 text-slate-600 border-0">
-                {filteredJobs.length} وظيفة
-              </Badge>
-            </div>
-          </CardHeader>
-          <CardContent>
-            {isLoading ? (
-              <div className="space-y-4">
-                {[1, 2, 3, 4, 5].map((i) => (
-                  <Skeleton key={i} className="h-28 rounded-xl" />
-                ))}
+            {/* MAIN JOBS LIST */}
+            <div className="bg-white rounded-3xl p-1 shadow-sm border border-slate-100">
+              <div className="p-6 pb-2 flex justify-between items-center">
+                <h3 className="font-bold text-navy text-xl flex items-center gap-2">
+                  <Briefcase className="w-5 h-5 text-emerald-600" />
+                  الوظائف الشاغرة
+                </h3>
+                <Badge className="bg-slate-100 text-slate-600 border-0 rounded-full px-4 py-1">
+                  {filteredJobs.length} وظيفة
+                </Badge>
               </div>
-            ) : isError ? (
-              <div className="text-center py-12">
-                <AlertCircle className="w-16 h-16 text-red-300 mx-auto mb-4" />
-                <h3 className="text-lg font-bold text-slate-700 mb-2">حدث خطأ</h3>
-                <p className="text-slate-500">فشل في تحميل الوظائف</p>
-              </div>
-            ) : filteredJobs.length === 0 ? (
-              <div className="text-center py-12">
-                <Briefcase className="w-16 h-16 text-slate-300 mx-auto mb-4" />
-                <h3 className="text-lg font-bold text-slate-700 mb-2">لا توجد وظائف</h3>
-                <p className="text-slate-500 mb-4">لا توجد وظائف مطابقة للبحث</p>
-                <Button
-                  onClick={() => navigate({ to: '/dashboard/hr/recruitment/jobs/new' })}
-                  className="bg-emerald-500 hover:bg-emerald-600"
-                >
-                  <Plus className="w-4 h-4 ml-2" />
-                  إضافة وظيفة جديدة
-                </Button>
-              </div>
-            ) : (
-              <div className="space-y-3">
-                {filteredJobs.map((job) => (
-                  <div
-                    key={job._id}
-                    className="flex items-center justify-between p-4 bg-slate-50 rounded-xl hover:bg-slate-100 transition-colors cursor-pointer"
-                    onClick={() => navigate({ to: '/dashboard/hr/recruitment/jobs/$jobId', params: { jobId: job._id } })}
-                  >
-                    <div className="flex items-center gap-4">
-                      {/* Icon */}
-                      <div className="w-14 h-14 rounded-xl bg-emerald-100 flex items-center justify-center">
-                        <Briefcase className="w-7 h-7 text-emerald-700" />
+
+              <div className="p-4 space-y-4">
+                {/* Loading State */}
+                {isLoading && (
+                  <>
+                    {[1, 2, 3].map((i) => (
+                      <div key={i} className="bg-[#F8F9FA] rounded-2xl p-6 border border-slate-100">
+                        <div className="flex gap-4 mb-4">
+                          <Skeleton className="w-14 h-14 rounded-xl" />
+                          <div className="flex-1 space-y-2">
+                            <Skeleton className="h-6 w-3/4" />
+                            <Skeleton className="h-4 w-1/2" />
+                          </div>
+                        </div>
+                        <Skeleton className="h-16 w-full" />
                       </div>
+                    ))}
+                  </>
+                )}
 
-                      {/* Job Info */}
-                      <div>
-                        <div className="flex items-center gap-2 flex-wrap mb-1">
-                          <span className="font-bold text-navy text-lg">
-                            {job.jobTitleAr || job.jobTitle}
-                          </span>
-                          {getStatusBadge(job.status)}
-                          {getUrgencyBadge(job.urgency)}
-                        </div>
-                        <div className="flex items-center gap-4 text-sm text-slate-500">
-                          <span className="flex items-center gap-1">
-                            <Building2 className="w-4 h-4" />
-                            {job.departmentNameAr || job.departmentName || job.department}
-                          </span>
-                          <span className="flex items-center gap-1">
-                            <MapPin className="w-4 h-4" />
-                            {job.location}
-                          </span>
-                          <span className="flex items-center gap-1">
-                            <Briefcase className="w-4 h-4" />
-                            {EMPLOYMENT_TYPE_LABELS[job.employmentType]?.ar}
-                          </span>
-                        </div>
+                {/* Error State */}
+                {isError && (
+                  <div className="bg-white rounded-2xl p-12 border border-slate-100 text-center">
+                    <div className="flex justify-center mb-4">
+                      <div className="w-16 h-16 rounded-full bg-red-50 flex items-center justify-center">
+                        <AlertCircle className="w-8 h-8 text-red-500" />
                       </div>
                     </div>
+                    <h3 className="text-lg font-bold text-slate-900 mb-2">حدث خطأ</h3>
+                    <p className="text-slate-500 mb-4">فشل في تحميل الوظائف</p>
+                    <Button className="bg-emerald-500 hover:bg-emerald-600">
+                      إعادة المحاولة
+                    </Button>
+                  </div>
+                )}
 
-                    {/* Job Stats */}
-                    <div className="flex items-center gap-6">
-                      {/* Positions */}
-                      <div className="text-center">
-                        <p className="text-xs text-slate-500 mb-1">الشواغر</p>
-                        <p className="text-xl font-bold text-navy">{job.positions}</p>
+                {/* Empty State */}
+                {!isLoading && !isError && filteredJobs.length === 0 && (
+                  <div className="bg-white rounded-2xl p-12 border border-slate-100 text-center">
+                    <div className="flex justify-center mb-4">
+                      <div className="w-16 h-16 rounded-full bg-emerald-50 flex items-center justify-center">
+                        <Briefcase className="w-8 h-8 text-emerald-500" />
                       </div>
+                    </div>
+                    <h3 className="text-lg font-bold text-slate-900 mb-2">لا توجد وظائف</h3>
+                    <p className="text-slate-500 mb-4">لا توجد وظائف مطابقة للبحث</p>
+                    <Button asChild className="bg-emerald-500 hover:bg-emerald-600">
+                      <Link to="/dashboard/hr/recruitment/jobs/new">
+                        <Plus className="w-4 h-4 ml-2" />
+                        إضافة وظيفة جديدة
+                      </Link>
+                    </Button>
+                  </div>
+                )}
 
-                      {/* Applications */}
-                      <div className="text-center">
-                        <p className="text-xs text-slate-500 mb-1">المتقدمين</p>
-                        <p className="text-xl font-bold text-purple-600">{job.applicationsCount || 0}</p>
+                {/* Success State - Jobs List */}
+                {!isLoading && !isError && filteredJobs.map((job) => (
+                  <div key={job._id} className={`bg-[#F8F9FA] rounded-2xl p-6 border transition-all group ${selectedIds.includes(job._id) ? 'border-emerald-500 bg-emerald-50/30' : 'border-slate-100 hover:border-emerald-200'}`}>
+                    <div className="flex justify-between items-start mb-4">
+                      <div className="flex gap-4 items-center">
+                        {isSelectionMode && (
+                          <Checkbox
+                            checked={selectedIds.includes(job._id)}
+                            onCheckedChange={() => handleSelectJob(job._id)}
+                            className="h-6 w-6 rounded-md border-slate-300 data-[state=checked]:bg-emerald-500 data-[state=checked]:border-emerald-500"
+                          />
+                        )}
+                        <div className="w-14 h-14 rounded-xl bg-white flex items-center justify-center shadow-sm text-emerald-600">
+                          <Briefcase className="w-7 h-7" />
+                        </div>
+                        <div>
+                          <div className="flex items-center gap-2 mb-1 flex-wrap">
+                            <h4 className="font-bold text-navy text-lg">{job.jobTitleAr || job.jobTitle}</h4>
+                            {getStatusBadge(job.status)}
+                            {getUrgencyBadge(job.urgency)}
+                          </div>
+                          <div className="flex items-center gap-4 text-sm text-slate-500">
+                            <span className="flex items-center gap-1">
+                              <Building2 className="w-4 h-4" />
+                              {job.departmentNameAr || job.departmentName || job.department}
+                            </span>
+                            <span className="flex items-center gap-1">
+                              <MapPin className="w-4 h-4" />
+                              {job.location}
+                            </span>
+                            <span className="flex items-center gap-1">
+                              <Briefcase className="w-4 h-4" />
+                              {EMPLOYMENT_TYPE_LABELS[job.employmentType]?.ar}
+                            </span>
+                          </div>
+                        </div>
                       </div>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="icon" className="text-slate-400 hover:text-navy">
+                            <MoreHorizontal className="h-5 w-5" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="w-48">
+                          <DropdownMenuItem onClick={() => handleViewJob(job._id)}>
+                            <Eye className="h-4 w-4 ml-2" />
+                            عرض التفاصيل
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleEditJob(job._id)}>
+                            <Edit3 className="h-4 w-4 ml-2 text-blue-500" />
+                            تعديل الوظيفة
+                          </DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem
+                            onClick={() => handleDeleteJob(job._id)}
+                            className="text-red-600 focus:text-red-600"
+                          >
+                            <Trash2 className="h-4 w-4 ml-2" />
+                            حذف الوظيفة
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
 
-                      {/* Salary */}
-                      <div className="text-center min-w-[120px]">
-                        <p className="text-xs text-slate-500 mb-1">الراتب</p>
-                        <p className="text-sm font-medium text-navy flex items-center justify-center gap-1">
-                          <DollarSign className="w-4 h-4" />
-                          {formatSalary(job.salary)}
-                        </p>
+                    <div className="flex items-center justify-between pt-4 border-t border-slate-200/50">
+                      <div className="flex items-center gap-6">
+                        {/* Positions */}
+                        <div className="text-center">
+                          <p className="text-xs text-slate-500 mb-1">الشواغر</p>
+                          <p className="text-xl font-bold text-navy">{job.positions}</p>
+                        </div>
+
+                        {/* Applications */}
+                        <div className="text-center">
+                          <p className="text-xs text-slate-500 mb-1">المتقدمين</p>
+                          <p className="text-xl font-bold text-purple-600">{job.applicationsCount || 0}</p>
+                        </div>
+
+                        {/* Salary */}
+                        <div className="text-center min-w-[100px]">
+                          <p className="text-xs text-slate-500 mb-1">الراتب</p>
+                          <p className="text-sm font-medium text-navy flex items-center justify-center gap-1">
+                            <DollarSign className="w-4 h-4" />
+                            {formatSalary(job.salary)}
+                          </p>
+                        </div>
+
+                        {/* Posted Date */}
+                        <div className="text-center">
+                          <p className="text-xs text-slate-500 mb-1">تاريخ النشر</p>
+                          <p className="text-sm font-medium text-navy flex items-center gap-1">
+                            <Calendar className="w-4 h-4" />
+                            {formatDate(job.postedDate)}
+                          </p>
+                        </div>
                       </div>
-
-                      {/* Posted Date */}
-                      <div className="text-center">
-                        <p className="text-xs text-slate-500 mb-1">تاريخ النشر</p>
-                        <p className="text-sm font-medium text-navy flex items-center gap-1">
-                          <Calendar className="w-4 h-4" />
-                          {formatDate(job.postedDate)}
-                        </p>
-                      </div>
-
-                      {/* View Button */}
-                      <Button variant="ghost" size="icon" className="rounded-xl">
-                        <Eye className="w-4 h-4" />
-                      </Button>
+                      <Link to={`/dashboard/hr/recruitment/jobs/${job._id}` as any}>
+                        <Button className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg px-6 shadow-lg shadow-emerald-500/20">
+                          عرض الوظيفة
+                        </Button>
+                      </Link>
                     </div>
                   </div>
                 ))}
               </div>
-            )}
-          </CardContent>
-        </Card>
+            </div>
+          </div>
 
-        {/* Status Distribution */}
-        {statsData?.byStatus && statsData.byStatus.length > 0 && (
-          <Card className="border-none shadow-sm bg-white rounded-2xl">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-lg font-bold text-navy flex items-center gap-2">
-                <TrendingUp className="w-5 h-5 text-purple-600" />
-                توزيع حالات الوظائف
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-5 gap-4">
-                {Object.entries(JOB_STATUS_LABELS).map(([status, config]) => {
-                  const statusData = statsData.byStatus?.find(s => s.status === status)
-                  const count = statusData?.count || 0
-                  return (
-                    <div key={status} className="text-center p-4 bg-slate-50 rounded-xl">
-                      <div className={`w-12 h-12 mx-auto mb-2 rounded-xl flex items-center justify-center ${
-                        config.color === 'emerald' ? 'bg-emerald-100' :
-                        config.color === 'blue' ? 'bg-blue-100' :
-                        config.color === 'amber' ? 'bg-amber-100' :
-                        config.color === 'red' ? 'bg-red-100' :
-                        'bg-slate-100'
-                      }`}>
-                        <span className={`${
-                          config.color === 'emerald' ? 'text-emerald-600' :
-                          config.color === 'blue' ? 'text-blue-600' :
-                          config.color === 'amber' ? 'text-amber-600' :
-                          config.color === 'red' ? 'text-red-600' :
-                          'text-slate-600'
-                        }`}>
-                          {status === 'draft' && <FileText className="w-5 h-5" />}
-                          {status === 'published' && <Globe className="w-5 h-5" />}
-                          {status === 'on_hold' && <PauseCircle className="w-5 h-5" />}
-                          {status === 'closed' && <XCircle className="w-5 h-5" />}
-                          {status === 'filled' && <CheckCircle className="w-5 h-5" />}
-                        </span>
-                      </div>
-                      <p className="text-sm font-medium text-navy">{config.ar}</p>
-                      <p className="text-2xl font-bold text-navy">{count}</p>
-                    </div>
-                  )
-                })}
-              </div>
-            </CardContent>
-          </Card>
-        )}
+          {/* LEFT COLUMN (Widgets) */}
+          <HRSidebar
+            context="employees"
+            isSelectionMode={isSelectionMode}
+            onToggleSelectionMode={handleToggleSelectionMode}
+            selectedCount={selectedIds.length}
+            onDeleteSelected={handleDeleteSelected}
+          />
+        </div>
       </Main>
     </>
   )

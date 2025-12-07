@@ -1,9 +1,11 @@
+import { HRSidebar } from './hr-sidebar'
 import { useState } from 'react'
 import { Main } from '@/components/layout/main'
 import { LanguageSwitcher } from '@/components/language-switcher'
 import { ThemeSwitch } from '@/components/theme-switch'
 import { ConfigDrawer } from '@/components/config-drawer'
 import { ProfileDropdown } from '@/components/profile-dropdown'
+import { ProductivityHero } from '@/components/productivity-hero'
 import { useNavigate, useParams } from '@tanstack/react-router'
 import {
   usePerformanceReview,
@@ -215,78 +217,18 @@ export function PerformanceReviewDetailsView() {
     { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
     { title: 'الموظفين', href: '/dashboard/hr/employees', isActive: false },
     { title: 'تقييم الأداء', href: '/dashboard/hr/performance', isActive: true },
+    { title: 'الحضور', href: '/dashboard/hr/attendance', isActive: false },
   ]
 
-  // Loading state
-  if (isLoading) {
-    return (
-      <>
-        <Header className="bg-navy shadow-none relative">
-          <TopNav links={topNav} className="[&>a]:text-slate-300 [&>a:hover]:text-white [&>a[aria-current='page']]:text-white" />
-          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
-            <DynamicIsland />
-          </div>
-          <div className='ms-auto flex items-center space-x-4'>
-            <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white" />
-            <ThemeSwitch className="text-slate-300 hover:bg-white/10 hover:text-white" />
-            <ConfigDrawer className="text-slate-300 hover:bg-white/10 hover:text-white" />
-            <ProfileDropdown className="text-slate-300 hover:bg-white/10 hover:text-white" />
-          </div>
-        </Header>
-        <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8">
-          <div className="space-y-6">
-            <Skeleton className="h-12 w-64" />
-            <div className="grid grid-cols-4 gap-4">
-              {[1, 2, 3, 4].map((i) => (
-                <Skeleton key={i} className="h-32 rounded-2xl" />
-              ))}
-            </div>
-            <Skeleton className="h-96 rounded-2xl" />
-          </div>
-        </Main>
-      </>
-    )
-  }
-
-  // Error state
-  if (isError || !review) {
-    return (
-      <>
-        <Header className="bg-navy shadow-none relative">
-          <TopNav links={topNav} className="[&>a]:text-slate-300 [&>a:hover]:text-white [&>a[aria-current='page']]:text-white" />
-          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
-            <DynamicIsland />
-          </div>
-          <div className='ms-auto flex items-center space-x-4'>
-            <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white" />
-            <ThemeSwitch className="text-slate-300 hover:bg-white/10 hover:text-white" />
-            <ConfigDrawer className="text-slate-300 hover:bg-white/10 hover:text-white" />
-            <ProfileDropdown className="text-slate-300 hover:bg-white/10 hover:text-white" />
-          </div>
-        </Header>
-        <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8">
-          <div className="bg-white rounded-2xl p-12 text-center">
-            <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
-            <h2 className="text-xl font-bold text-slate-900 mb-2">لم يتم العثور على التقييم</h2>
-            <p className="text-slate-500 mb-4">{error?.message || 'حدث خطأ أثناء تحميل بيانات التقييم'}</p>
-            <Button onClick={() => navigate({ to: '/dashboard/hr/performance' })} className="bg-emerald-500 hover:bg-emerald-600">
-              العودة للقائمة
-            </Button>
-          </div>
-        </Main>
-      </>
-    )
-  }
-
   // Calculate completion percentage
-  const completionSteps = [
+  const completionSteps = review ? [
     { done: !!review.selfAssessment?.completedAt, label: 'التقييم الذاتي' },
     { done: review.competencies?.every(c => c.selfRating && c.managerRating), label: 'الكفاءات' },
     { done: review.goals?.every(g => g.status !== 'not_started'), label: 'الأهداف' },
     { done: !!review.managerAssessment?.completedAt, label: 'تقييم المدير' },
     { done: review.status === 'completed' || review.status === 'acknowledged', label: 'الإكمال' },
-  ]
-  const completionPercentage = (completionSteps.filter(s => s.done).length / completionSteps.length) * 100
+  ] : []
+  const completionPercentage = completionSteps.length > 0 ? (completionSteps.filter(s => s.done).length / completionSteps.length) * 100 : 0
 
   return (
     <>
@@ -314,27 +256,65 @@ export function PerformanceReviewDetailsView() {
         <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-emerald-500/50 to-transparent"></div>
       </Header>
 
-      <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-6 rounded-tr-3xl shadow-inner border-r border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
-        {/* Page Header */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <Button
-              variant="ghost"
-              size="icon"
-              className="rounded-xl hover:bg-white"
-              onClick={() => navigate({ to: '/dashboard/hr/performance' })}
-            >
-              <ArrowRight className="h-5 w-5" />
-            </Button>
-            <div>
-              <div className="flex items-center gap-3 mb-1">
-                <h1 className="text-2xl font-bold text-navy">تقييم الأداء</h1>
-                {getStatusBadge(review.status)}
-                {review.finalRating && getRatingBadge(review.finalRating)}
+      <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-r border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
+
+        {/* HERO CARD - Always visible */}
+        <ProductivityHero badge="الموارد البشرية" title="تفاصيل تقييم الأداء" type="performance" />
+
+        {/* MAIN GRID LAYOUT */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+          {/* RIGHT COLUMN (Main Content) */}
+          <div className="lg:col-span-2 space-y-6">
+
+            {/* Loading State */}
+            {isLoading && (
+              <div className="space-y-6">
+                <Skeleton className="h-12 w-64" />
+                <div className="grid grid-cols-4 gap-4">
+                  {[1, 2, 3, 4].map((i) => (
+                    <Skeleton key={i} className="h-32 rounded-2xl" />
+                  ))}
+                </div>
+                <Skeleton className="h-96 rounded-2xl" />
               </div>
-              <p className="text-slate-500">
-                {review.reviewId} • {review.employeeNameAr || review.employeeName}
-              </p>
+            )}
+
+            {/* Error State */}
+            {!isLoading && (isError || !review) && (
+              <div className="bg-white rounded-2xl p-12 text-center">
+                <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
+                <h2 className="text-xl font-bold text-slate-900 mb-2">لم يتم العثور على التقييم</h2>
+                <p className="text-slate-500 mb-4">{error?.message || 'حدث خطأ أثناء تحميل بيانات التقييم'}</p>
+                <Button onClick={() => navigate({ to: '/dashboard/hr/performance' })} className="bg-emerald-500 hover:bg-emerald-600">
+                  العودة للقائمة
+                </Button>
+              </div>
+            )}
+
+            {/* Success State */}
+            {!isLoading && !isError && review && (
+              <>
+                {/* Page Header */}
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="rounded-xl hover:bg-white"
+                      onClick={() => navigate({ to: '/dashboard/hr/performance' })}
+                    >
+                      <ArrowRight className="h-5 w-5" />
+                    </Button>
+                    <div>
+                      <div className="flex items-center gap-3 mb-1">
+                        <h1 className="text-2xl font-bold text-navy">تقييم الأداء</h1>
+                        {getStatusBadge(review.status)}
+                        {review.finalRating && getRatingBadge(review.finalRating)}
+                      </div>
+                      <p className="text-slate-500">
+                        {review.reviewId} • {review.employeeNameAr || review.employeeName}
+                      </p>
             </div>
           </div>
           <div className="flex items-center gap-3">
@@ -1151,6 +1131,13 @@ export function PerformanceReviewDetailsView() {
             </TabsContent>
           )}
         </Tabs>
+              </>
+            )}
+          </div>
+
+          {/* LEFT COLUMN (Widgets) */}
+          <HRSidebar context="evaluations" />
+        </div>
       </Main>
 
       {/* Acknowledge Dialog */}
