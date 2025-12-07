@@ -36,6 +36,9 @@ const Reminder = require('./reminder.model');
 const Client = require('./client.model');
 const Report = require('./report.model');
 
+// Dashboard HR Models
+const EmployeeBenefit = require('./employeeBenefit.model');
+
 module.exports = {
     // Marketplace
     User,
@@ -73,5 +76,8 @@ module.exports = {
     // Dashboard Organization
     Reminder,
     Client,
-    Report
+    Report,
+
+    // Dashboard HR
+    EmployeeBenefit
 };

@@ -43,7 +43,10 @@ const {
     // Dashboard Organization
     reminderRoute,
     clientRoute,
-    calendarRoute
+    calendarRoute,
+
+    // Dashboard HR
+    benefitRoute
 } = require('./routes');
 
 const app = express();
@@ -187,6 +190,9 @@ app.use('/api/reports', reportRoute);
 app.use('/api/reminders', reminderRoute);
 app.use('/api/clients', clientRoute);
 app.use('/api/calendar', calendarRoute);
+
+// Dashboard HR Routes
+app.use('/api/benefits', benefitRoute);
 
 // Health check endpoint (useful for monitoring)
 app.get('/health', (req, res) => {

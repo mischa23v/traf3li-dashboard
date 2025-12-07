@@ -35,6 +35,9 @@ const reminderRoute = require('./reminder.route');
 const clientRoute = require('./client.route');
 const calendarRoute = require('./calendar.route');
 
+// Dashboard HR Routes
+const benefitRoute = require('./benefit.route');
+
 module.exports = {
     // Marketplace
     gigRoute,
@@ -71,5 +74,8 @@ module.exports = {
     // Dashboard Organization
     reminderRoute,
     clientRoute,
-    calendarRoute
+    calendarRoute,
+
+    // Dashboard HR
+    benefitRoute
 };
