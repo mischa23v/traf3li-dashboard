@@ -218,14 +218,14 @@ export function AttendanceRecordDetailsView() {
       <Header className="bg-navy shadow-none relative">
         <TopNav links={topNav} className="[&>a]:text-slate-300 [&>a:hover]:text-white [&>a[aria-current='page']]:text-white" />
 
-        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
+        <div className="absolute start-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
           <DynamicIsland />
         </div>
 
-        <div className='ms-auto flex items-center space-x-4'>
+        <div className='ms-auto flex items-center gap-4'>
           <div className="relative hidden md:block">
-            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-            <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pr-9 pl-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
+            <Search className="absolute end-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+            <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
           </div>
           <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white">
             <Bell className="h-5 w-5" />
@@ -311,7 +311,7 @@ export function AttendanceRecordDetailsView() {
                 variant="outline"
                 className="rounded-xl border-amber-200 text-amber-600 hover:bg-amber-50"
               >
-                <CheckCircle className="w-4 h-4 ml-2" />
+                <CheckCircle className="w-4 h-4 ms-2" />
                 قبول التأخير
               </Button>
             )}
@@ -322,7 +322,7 @@ export function AttendanceRecordDetailsView() {
                   variant="outline"
                   className="rounded-xl border-red-200 text-red-600 hover:bg-red-50"
                 >
-                  <XCircle className="w-4 h-4 ml-2" />
+                  <XCircle className="w-4 h-4 ms-2" />
                   رفض
                 </Button>
                 <Button
@@ -330,7 +330,7 @@ export function AttendanceRecordDetailsView() {
                   className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl"
                   disabled={approveTimesheetMutation.isPending}
                 >
-                  <CheckCircle className="w-4 h-4 ml-2" />
+                  <CheckCircle className="w-4 h-4 ms-2" />
                   اعتماد
                 </Button>
               </>
@@ -345,17 +345,17 @@ export function AttendanceRecordDetailsView() {
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48">
                 <DropdownMenuItem onClick={() => setShowCorrectionDialog(true)}>
-                  <Edit className="h-4 w-4 ml-2" />
+                  <Edit className="h-4 w-4 ms-2" />
                   طلب تصحيح
                 </DropdownMenuItem>
                 <DropdownMenuItem>
-                  <Download className="h-4 w-4 ml-2" />
+                  <Download className="h-4 w-4 ms-2" />
                   تصدير PDF
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 {record.overtimeHours > 0 && !record.approvals?.overtimeApproval?.status && (
                   <DropdownMenuItem onClick={() => setShowOvertimeDialog(true)}>
-                    <Timer className="h-4 w-4 ml-2" />
+                    <Timer className="h-4 w-4 ms-2" />
                     اعتماد الوقت الإضافي
                   </DropdownMenuItem>
                 )}
@@ -713,15 +713,15 @@ export function AttendanceRecordDetailsView() {
                       <div className="grid grid-cols-3 gap-4 text-sm">
                         <div>
                           <span className="text-amber-600">البدء:</span>
-                          <span className="font-medium mr-2">{formatTime(record.breaks.lunchBreak.startTime)}</span>
+                          <span className="font-medium me-2">{formatTime(record.breaks.lunchBreak.startTime)}</span>
                         </div>
                         <div>
                           <span className="text-amber-600">الانتهاء:</span>
-                          <span className="font-medium mr-2">{formatTime(record.breaks.lunchBreak.endTime)}</span>
+                          <span className="font-medium me-2">{formatTime(record.breaks.lunchBreak.endTime)}</span>
                         </div>
                         <div>
                           <span className="text-amber-600">المدة:</span>
-                          <span className="font-medium mr-2">{record.breaks.lunchBreak.duration} دقيقة</span>
+                          <span className="font-medium me-2">{record.breaks.lunchBreak.duration} دقيقة</span>
                         </div>
                       </div>
                     </div>

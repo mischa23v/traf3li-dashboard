@@ -114,18 +114,18 @@ export function OnboardingDetailsView() {
       <Header className="bg-navy shadow-none relative">
         <TopNav links={topNav} className="[&>a]:text-slate-300 [&>a:hover]:text-white [&>a[aria-current='page']]:text-white" />
 
-        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
+        <div className="absolute start-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
           <DynamicIsland />
         </div>
 
-        <div className='ms-auto flex items-center space-x-4'>
+        <div className='ms-auto flex items-center gap-4'>
           <div className="relative hidden md:block">
-            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-            <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pr-9 pl-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
+            <Search className="absolute end-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+            <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
           </div>
           <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white">
             <Bell className="h-5 w-5" />
-            <span className="absolute top-2 right-2 h-2 w-2 bg-red-500 rounded-full border border-navy"></span>
+            <span className="absolute top-2 end-2 h-2 w-2 bg-red-500 rounded-full border border-navy"></span>
           </Button>
           <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white" />
           <ThemeSwitch className="text-slate-300 hover:bg-white/10 hover:text-white" />
@@ -238,7 +238,7 @@ export function OnboardingDetailsView() {
                         disabled={completeOnboardingMutation.isPending}
                         className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl"
                       >
-                        <CheckCircle className="w-4 h-4 ml-2" />
+                        <CheckCircle className="w-4 h-4 ms-2" />
                         إكمال التأهيل
                       </Button>
                     )}
@@ -250,24 +250,24 @@ export function OnboardingDetailsView() {
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
                         <DropdownMenuItem onClick={() => navigate({ to: '/dashboard/hr/onboarding/new', search: { editId: onboarding._id } })}>
-                          <Edit className="w-4 h-4 ml-2" />
+                          <Edit className="w-4 h-4 ms-2" />
                           تعديل
                         </DropdownMenuItem>
                         {onboarding.status === 'pending' && (
                           <DropdownMenuItem onClick={() => handleStatusChange('in_progress')}>
-                            <PlayCircle className="w-4 h-4 ml-2" />
+                            <PlayCircle className="w-4 h-4 ms-2" />
                             بدء التأهيل
                           </DropdownMenuItem>
                         )}
                         {onboarding.status === 'in_progress' && (
                           <DropdownMenuItem onClick={() => handleStatusChange('on_hold')}>
-                            <PauseCircle className="w-4 h-4 ml-2" />
+                            <PauseCircle className="w-4 h-4 ms-2" />
                             تعليق
                           </DropdownMenuItem>
                         )}
                         <DropdownMenuSeparator />
                         <DropdownMenuItem onClick={handleDelete} className="text-red-600">
-                          <Trash2 className="w-4 h-4 ml-2" />
+                          <Trash2 className="w-4 h-4 ms-2" />
                           حذف
                         </DropdownMenuItem>
                       </DropdownMenuContent>
@@ -447,7 +447,7 @@ export function OnboardingDetailsView() {
                                 disabled={completeFirstDayMutation.isPending}
                                 className="bg-blue-500 hover:bg-blue-600 text-white rounded-lg"
                               >
-                                <Check className="w-4 h-4 ml-1" />
+                                <Check className="w-4 h-4 ms-1" />
                                 إكمال
                               </Button>
                             )}
@@ -508,7 +508,7 @@ export function OnboardingDetailsView() {
                                 disabled={completeFirstWeekMutation.isPending || !onboarding.firstDay?.firstDayComplete}
                                 className="bg-purple-500 hover:bg-purple-600 text-white rounded-lg"
                               >
-                                <Check className="w-4 h-4 ml-1" />
+                                <Check className="w-4 h-4 ms-1" />
                                 إكمال
                               </Button>
                             )}
@@ -561,7 +561,7 @@ export function OnboardingDetailsView() {
                                 disabled={completeFirstMonthMutation.isPending || !onboarding.firstWeek?.firstWeekComplete}
                                 className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg"
                               >
-                                <Check className="w-4 h-4 ml-1" />
+                                <Check className="w-4 h-4 ms-1" />
                                 إكمال
                               </Button>
                             )}
