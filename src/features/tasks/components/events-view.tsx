@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react'
+import { useTranslation } from 'react-i18next'
 import { TasksSidebar } from './tasks-sidebar'
 import {
     Calendar as CalendarIcon, MoreHorizontal, Plus,
@@ -49,9 +50,10 @@ import {
 } from '@/components/ui/dialog'
 import { toast } from 'sonner'
 import { format } from 'date-fns'
-import { arSA } from 'date-fns/locale'
+import { arSA, enUS } from 'date-fns/locale'
 
 export function EventsView() {
+    const { t, i18n } = useTranslation()
     const navigate = useNavigate()
     const [activeTab, setActiveTab] = useState('upcoming')
     const [isSelectionMode, setIsSelectionMode] = useState(false)
@@ -100,14 +102,14 @@ export function EventsView() {
         setTypeFilter('all')
     }
 
-    // Helper function to format dates in both languages
+    // Helper function to format dates based on current locale
     const formatDualDate = (dateString: string | null | undefined) => {
-        if (!dateString) return { arabic: 'غير محدد', english: 'Not set' }
+        if (!dateString) return { arabic: t('events.list.notSet'), english: t('events.list.notSet') }
         const date = new Date(dateString)
-        if (isNaN(date.getTime())) return { arabic: 'غير محدد', english: 'Not set' }
+        if (isNaN(date.getTime())) return { arabic: t('events.list.notSet'), english: t('events.list.notSet') }
         return {
             arabic: format(date, 'd MMMM', { locale: arSA }),
-            english: format(date, 'MMM d, yyyy')
+            english: format(date, 'MMM d, yyyy', { locale: enUS })
         }
     }
 
@@ -232,10 +234,10 @@ export function EventsView() {
     }
 
     const topNav = [
-        { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
-        { title: 'المهام', href: '/dashboard/tasks/list', isActive: false },
-        { title: 'التذكيرات', href: '/dashboard/tasks/reminders', isActive: false },
-        { title: 'الأحداث', href: '/dashboard/tasks/events', isActive: true },
+        { title: t('events.nav.overview'), href: '/dashboard/overview', isActive: false },
+        { title: t('events.nav.tasks'), href: '/dashboard/tasks/list', isActive: false },
+        { title: t('events.nav.reminders'), href: '/dashboard/tasks/reminders', isActive: false },
+        { title: t('events.nav.events'), href: '/dashboard/tasks/events', isActive: true },
     ]
 
     return (
@@ -251,7 +253,7 @@ export function EventsView() {
                 <div className='ms-auto flex items-center space-x-4'>
                     <div className="relative hidden md:block">
                         <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                        <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pr-9 pl-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
+                        <input type="text" placeholder={t('tasks.list.search')} className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pr-9 pl-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
                     </div>
                     <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white">
                         <Bell className="h-5 w-5" />
@@ -269,7 +271,7 @@ export function EventsView() {
             <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-r border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
 
                 {/* HERO CARD & STATS */}
-                <ProductivityHero badge="الأحداث" title="الأحداث" type="events" />
+                <ProductivityHero badge={t('events.management')} title={t('events.title')} type="events" />
 
                 {/* MAIN GRID LAYOUT */}
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -285,7 +287,7 @@ export function EventsView() {
                                     <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                                     <Input
                                         type="text"
-                                        placeholder="بحث في الأحداث..."
+                                        placeholder={t('events.list.searchPlaceholder')}
                                         value={searchQuery}
                                         onChange={(e) => setSearchQuery(e.target.value)}
                                         className="pr-10 h-10 rounded-xl border-slate-200 focus:border-blue-500 focus:ring-blue-500/20"
@@ -295,26 +297,26 @@ export function EventsView() {
                                 {/* Status Filter */}
                                 <Select value={activeTab} onValueChange={setActiveTab}>
                                     <SelectTrigger className="w-[130px] h-10 rounded-xl border-slate-200">
-                                        <SelectValue placeholder="الحالة" />
+                                        <SelectValue placeholder={t('events.list.status')} />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="upcoming">القادمة</SelectItem>
-                                        <SelectItem value="past">السابقة</SelectItem>
+                                        <SelectItem value="upcoming">{t('events.list.upcoming')}</SelectItem>
+                                        <SelectItem value="past">{t('events.list.past')}</SelectItem>
                                     </SelectContent>
                                 </Select>
 
                                 {/* Type Filter */}
                                 <Select value={typeFilter} onValueChange={setTypeFilter}>
                                     <SelectTrigger className="w-[150px] h-10 rounded-xl border-slate-200">
-                                        <SelectValue placeholder="النوع" />
+                                        <SelectValue placeholder={t('events.list.type')} />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="all">كل الأنواع</SelectItem>
-                                        <SelectItem value="meeting">اجتماع</SelectItem>
-                                        <SelectItem value="court_hearing">جلسة محكمة</SelectItem>
-                                        <SelectItem value="conference">مؤتمر</SelectItem>
-                                        <SelectItem value="webinar">ندوة إلكترونية</SelectItem>
-                                        <SelectItem value="workshop">ورشة عمل</SelectItem>
+                                        <SelectItem value="all">{t('events.list.allTypes')}</SelectItem>
+                                        <SelectItem value="meeting">{t('events.list.meeting')}</SelectItem>
+                                        <SelectItem value="court_hearing">{t('events.list.courtHearing')}</SelectItem>
+                                        <SelectItem value="conference">{t('events.list.conference')}</SelectItem>
+                                        <SelectItem value="webinar">{t('events.list.webinar')}</SelectItem>
+                                        <SelectItem value="workshop">{t('events.list.workshop')}</SelectItem>
                                     </SelectContent>
                                 </Select>
 
@@ -322,12 +324,12 @@ export function EventsView() {
                                 <Select value={sortBy} onValueChange={setSortBy}>
                                     <SelectTrigger className="w-[160px] h-10 rounded-xl border-slate-200">
                                         <SortAsc className="h-4 w-4 ml-2 text-slate-400" />
-                                        <SelectValue placeholder="ترتيب حسب" />
+                                        <SelectValue placeholder={t('events.list.sortBy')} />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="startDate">تاريخ الحدث</SelectItem>
-                                        <SelectItem value="createdAt">تاريخ الإنشاء</SelectItem>
-                                        <SelectItem value="title">الاسم</SelectItem>
+                                        <SelectItem value="startDate">{t('events.list.eventDate')}</SelectItem>
+                                        <SelectItem value="createdAt">{t('events.list.creationDate')}</SelectItem>
+                                        <SelectItem value="title">{t('events.list.name')}</SelectItem>
                                     </SelectContent>
                                 </Select>
 
@@ -340,7 +342,7 @@ export function EventsView() {
                                         className="h-10 px-4 text-red-500 hover:text-red-600 hover:bg-red-50 rounded-xl"
                                     >
                                         <X className="h-4 w-4 ml-2" />
-                                        مسح الفلاتر
+                                        {t('events.list.clearFilters')}
                                     </Button>
                                 )}
                             </div>
@@ -350,10 +352,10 @@ export function EventsView() {
                         <div className="bg-white rounded-3xl p-1 shadow-sm border border-slate-100">
                             <div className="p-6 pb-2 flex justify-between items-center">
                                 <h3 className="font-bold text-navy text-xl">
-                                    {activeTab === 'upcoming' ? 'الأحداث القادمة' : 'الأحداث السابقة'}
+                                    {activeTab === 'upcoming' ? t('events.list.upcomingEvents') : t('events.list.pastEvents')}
                                 </h3>
                                 <Badge className="bg-slate-100 text-slate-600 border-0 rounded-full px-4 py-1">
-                                    {events.length} حدث
+                                    {t('events.list.eventCount', { count: events.length })}
                                 </Badge>
                             </div>
 
@@ -382,9 +384,9 @@ export function EventsView() {
                                         <AlertCircle className="h-4 w-4 text-red-600" />
                                         <AlertDescription className="text-red-800">
                                             <div className="flex items-center justify-between">
-                                                <span>حدث خطأ أثناء تحميل الأحداث: {error?.message || 'خطأ غير معروف'}</span>
+                                                <span>{t('events.list.errorLoading')}: {error?.message || t('events.list.unknownError')}</span>
                                                 <Button onClick={() => refetch()} variant="outline" size="sm" className="border-red-300 text-red-700 hover:bg-red-100">
-                                                    إعادة المحاولة
+                                                    {t('events.list.retry')}
                                                 </Button>
                                             </div>
                                         </AlertDescription>

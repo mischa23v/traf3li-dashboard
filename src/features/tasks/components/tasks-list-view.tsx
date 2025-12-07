@@ -1,5 +1,6 @@
 import { TasksSidebar } from './tasks-sidebar'
 import { useState, useMemo } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Main } from '@/components/layout/main'
 import { LanguageSwitcher } from '@/components/language-switcher'
 import { ThemeSwitch } from '@/components/theme-switch'
@@ -20,7 +21,7 @@ import { Search, Bell, AlertCircle, Briefcase, Plus, MoreHorizontal, ChevronLeft
 import { useNavigate } from '@tanstack/react-router'
 import { useDeleteTask, useCompleteTask, useReopenTask, useUpdateTask } from '@/hooks/useTasks'
 import { format } from 'date-fns'
-import { arSA } from 'date-fns/locale'
+import { arSA, enUS } from 'date-fns/locale'
 import { Input } from '@/components/ui/input'
 import {
     Select,
@@ -40,6 +41,7 @@ import { useCases } from '@/hooks/useCasesAndClients'
 import { useTeamMembers } from '@/hooks/useStaff'
 
 export function TasksListView() {
+    const { t, i18n } = useTranslation()
     const navigate = useNavigate()
     const [activeStatusTab, setActiveStatusTab] = useState('active')
     const [isSelectionMode, setIsSelectionMode] = useState(false)
@@ -155,13 +157,14 @@ export function TasksListView() {
     const { data: stats } = useTaskStats()
     const { mutate: bulkDeleteTasks } = useBulkDeleteTasks()
 
-    // Helper function to format dates in both languages
+    // Helper function to format dates based on current locale
     const formatDualDate = (dateString: string | null | undefined) => {
-        if (!dateString) return { arabic: 'غير محدد', english: 'Not set' }
+        if (!dateString) return { arabic: t('tasks.list.notSet'), english: t('tasks.list.notSet') }
         const date = new Date(dateString)
+        const locale = i18n.language === 'ar' ? arSA : enUS
         return {
             arabic: format(date, 'd MMMM', { locale: arSA }),
-            english: format(date, 'MMM d, yyyy')
+            english: format(date, 'MMM d, yyyy', { locale: enUS })
         }
     }
 
@@ -171,8 +174,8 @@ export function TasksListView() {
 
         return tasksData.tasks.map((task: any) => ({
             id: task._id,
-            title: task.title || task.description || 'مهمة غير محددة',
-            client: task.caseId?.clientId?.name || task.clientId?.name || 'غير محدد',
+            title: task.title || task.description || t('tasks.list.notSet'),
+            client: task.caseId?.clientId?.name || task.clientId?.name || t('tasks.list.notSet'),
             dueDate: task.dueDate,
             createdAt: task.createdAt,
             dueDateFormatted: formatDualDate(task.dueDate),
@@ -181,7 +184,7 @@ export function TasksListView() {
             status: task.status || 'pending',
             _id: task._id,
         }))
-    }, [tasksData])
+    }, [tasksData, t, i18n.language])
 
     // Selection Handlers
     const handleToggleSelectionMode = () => {
@@ -200,7 +203,7 @@ export function TasksListView() {
     const handleDeleteSelected = () => {
         if (selectedTaskIds.length === 0) return
 
-        if (confirm(`هل أنت متأكد من حذف ${selectedTaskIds.length} مهمة؟`)) {
+        if (confirm(t('tasks.list.deleteMultipleConfirm', { count: selectedTaskIds.length }))) {
             bulkDeleteTasks(selectedTaskIds, {
                 onSuccess: () => {
                     setIsSelectionMode(false)
@@ -220,7 +223,7 @@ export function TasksListView() {
     }
 
     const handleDeleteTask = (taskId: string) => {
-        if (confirm('هل أنت متأكد من حذف هذه المهمة؟')) {
+        if (confirm(t('tasks.list.deleteConfirm'))) {
             deleteTaskMutation.mutate(taskId)
         }
     }
@@ -238,10 +241,10 @@ export function TasksListView() {
     }
 
     const topNav = [
-        { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
-        { title: 'المهام', href: '/dashboard/tasks/list', isActive: true },
-        { title: 'القضايا', href: '/dashboard/cases', isActive: false },
-        { title: 'العملاء', href: '/dashboard/clients', isActive: false },
+        { title: t('tasks.nav.overview'), href: '/dashboard/overview', isActive: false },
+        { title: t('tasks.nav.tasks'), href: '/dashboard/tasks/list', isActive: true },
+        { title: t('tasks.nav.cases'), href: '/dashboard/cases', isActive: false },
+        { title: t('tasks.nav.clients'), href: '/dashboard/clients', isActive: false },
     ]
 
     return (
@@ -258,7 +261,7 @@ export function TasksListView() {
                 <div className='ms-auto flex items-center space-x-4'>
                     <div className="relative hidden md:block">
                         <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                        <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pr-9 pl-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
+                        <input type="text" placeholder={t('tasks.list.search')} className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pr-9 pl-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
                     </div>
                     <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white">
                         <Bell className="h-5 w-5" />
@@ -276,7 +279,7 @@ export function TasksListView() {
             <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-r border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
 
                 {/* HERO CARD & STATS */}
-                <ProductivityHero badge="إدارة المهام" title="المهام" type="tasks" />
+                <ProductivityHero badge={t('tasks.management')} title={t('tasks.title')} type="tasks" />
 
                 {/* MAIN GRID LAYOUT */}
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -294,7 +297,7 @@ export function TasksListView() {
                                         <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                                         <Input
                                             type="text"
-                                            placeholder="بحث في المهام..."
+                                            placeholder={t('tasks.list.searchPlaceholder')}
                                             value={searchQuery}
                                             onChange={(e) => setSearchQuery(e.target.value)}
                                             className="pr-10 h-10 rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500/20"
@@ -304,37 +307,37 @@ export function TasksListView() {
                                     {/* Status Filter (already exists as tabs, keep it simple) */}
                                     <Select value={activeStatusTab} onValueChange={setActiveStatusTab}>
                                         <SelectTrigger className="w-[130px] h-10 rounded-xl border-slate-200">
-                                            <SelectValue placeholder="الحالة" />
+                                            <SelectValue placeholder={t('tasks.list.status')} />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            <SelectItem value="active">النشطة</SelectItem>
-                                            <SelectItem value="completed">المكتملة</SelectItem>
+                                            <SelectItem value="active">{t('tasks.list.active')}</SelectItem>
+                                            <SelectItem value="completed">{t('tasks.list.completed')}</SelectItem>
                                         </SelectContent>
                                     </Select>
 
                                     {/* Priority Filter */}
                                     <Select value={priorityFilter} onValueChange={setPriorityFilter}>
                                         <SelectTrigger className="w-[130px] h-10 rounded-xl border-slate-200">
-                                            <SelectValue placeholder="الأولوية" />
+                                            <SelectValue placeholder={t('tasks.list.priorityLabel')} />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            <SelectItem value="all">كل الأولويات</SelectItem>
-                                            <SelectItem value="urgent">عاجلة</SelectItem>
-                                            <SelectItem value="high">عالية</SelectItem>
-                                            <SelectItem value="medium">متوسطة</SelectItem>
-                                            <SelectItem value="low">منخفضة</SelectItem>
+                                            <SelectItem value="all">{t('tasks.list.allPriorities')}</SelectItem>
+                                            <SelectItem value="urgent">{t('tasks.priorities.urgent')}</SelectItem>
+                                            <SelectItem value="high">{t('tasks.priorities.high')}</SelectItem>
+                                            <SelectItem value="medium">{t('tasks.priorities.medium')}</SelectItem>
+                                            <SelectItem value="low">{t('tasks.priorities.low')}</SelectItem>
                                         </SelectContent>
                                     </Select>
 
                                     {/* Assigned To Filter */}
                                     <Select value={assignedFilter} onValueChange={setAssignedFilter}>
                                         <SelectTrigger className="w-[150px] h-10 rounded-xl border-slate-200">
-                                            <SelectValue placeholder="المسؤول" />
+                                            <SelectValue placeholder={t('tasks.list.responsible')} />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            <SelectItem value="all">الكل</SelectItem>
-                                            <SelectItem value="me">مهامي</SelectItem>
-                                            <SelectItem value="unassigned">غير معينة</SelectItem>
+                                            <SelectItem value="all">{t('tasks.list.all')}</SelectItem>
+                                            <SelectItem value="me">{t('tasks.list.myTasks')}</SelectItem>
+                                            <SelectItem value="unassigned">{t('tasks.list.unassigned')}</SelectItem>
                                             {teamMembers?.map((member: any) => (
                                                 <SelectItem key={member._id} value={member._id}>
                                                     {member.name || member.email}
@@ -350,15 +353,15 @@ export function TasksListView() {
                                     <Select value={dueDateFilter} onValueChange={setDueDateFilter}>
                                         <SelectTrigger className="w-[150px] h-10 rounded-xl border-slate-200">
                                             <Calendar className="h-4 w-4 ml-2 text-slate-400" />
-                                            <SelectValue placeholder="تاريخ الاستحقاق" />
+                                            <SelectValue placeholder={t('tasks.list.dueDate')} />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            <SelectItem value="all">كل التواريخ</SelectItem>
-                                            <SelectItem value="today">اليوم</SelectItem>
-                                            <SelectItem value="thisWeek">هذا الأسبوع</SelectItem>
-                                            <SelectItem value="thisMonth">هذا الشهر</SelectItem>
-                                            <SelectItem value="overdue">متأخرة</SelectItem>
-                                            <SelectItem value="noDueDate">بدون موعد</SelectItem>
+                                            <SelectItem value="all">{t('tasks.list.allDates')}</SelectItem>
+                                            <SelectItem value="today">{t('tasks.list.today')}</SelectItem>
+                                            <SelectItem value="thisWeek">{t('tasks.list.thisWeek')}</SelectItem>
+                                            <SelectItem value="thisMonth">{t('tasks.list.thisMonth')}</SelectItem>
+                                            <SelectItem value="overdue">{t('tasks.list.overdue')}</SelectItem>
+                                            <SelectItem value="noDueDate">{t('tasks.list.noDueDate')}</SelectItem>
                                         </SelectContent>
                                     </Select>
 
@@ -366,10 +369,10 @@ export function TasksListView() {
                                     <Select value={caseFilter} onValueChange={setCaseFilter}>
                                         <SelectTrigger className="w-[180px] h-10 rounded-xl border-slate-200">
                                             <Briefcase className="h-4 w-4 ml-2 text-slate-400" />
-                                            <SelectValue placeholder="القضية" />
+                                            <SelectValue placeholder={t('tasks.list.case')} />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            <SelectItem value="all">كل القضايا</SelectItem>
+                                            <SelectItem value="all">{t('tasks.list.allCases')}</SelectItem>
                                             {casesData?.cases?.map((caseItem: any) => (
                                                 <SelectItem key={caseItem._id} value={caseItem._id}>
                                                     {caseItem.title || caseItem.caseNumber}
@@ -382,13 +385,13 @@ export function TasksListView() {
                                     <Select value={sortBy} onValueChange={setSortBy}>
                                         <SelectTrigger className="w-[160px] h-10 rounded-xl border-slate-200">
                                             <SortAsc className="h-4 w-4 ml-2 text-slate-400" />
-                                            <SelectValue placeholder="ترتيب حسب" />
+                                            <SelectValue placeholder={t('tasks.list.sortBy')} />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            <SelectItem value="dueDate">تاريخ الاستحقاق</SelectItem>
-                                            <SelectItem value="priority">الأولوية</SelectItem>
-                                            <SelectItem value="createdAt">تاريخ الإنشاء</SelectItem>
-                                            <SelectItem value="title">الاسم</SelectItem>
+                                            <SelectItem value="dueDate">{t('tasks.list.dueDate')}</SelectItem>
+                                            <SelectItem value="priority">{t('tasks.list.priorityLabel')}</SelectItem>
+                                            <SelectItem value="createdAt">{t('tasks.list.creationDate')}</SelectItem>
+                                            <SelectItem value="title">{t('tasks.list.name')}</SelectItem>
                                         </SelectContent>
                                     </Select>
 
@@ -401,7 +404,7 @@ export function TasksListView() {
                                             className="h-10 px-4 text-red-500 hover:text-red-600 hover:bg-red-50 rounded-xl"
                                         >
                                             <X className="h-4 w-4 ml-2" />
-                                            مسح الفلاتر
+                                            {t('tasks.list.clearFilters')}
                                         </Button>
                                     )}
                                 </div>
@@ -412,10 +415,10 @@ export function TasksListView() {
                         <div className="bg-white rounded-3xl p-1 shadow-sm border border-slate-100">
                             <div className="p-6 pb-2 flex justify-between items-center">
                                 <h3 className="font-bold text-navy text-xl">
-                                    {activeStatusTab === 'active' ? 'المهام النشطة' : 'المهام المكتملة'}
+                                    {activeStatusTab === 'active' ? t('tasks.list.activeTasks') : t('tasks.list.completedTasks')}
                                 </h3>
                                 <Badge className="bg-slate-100 text-slate-600 border-0 rounded-full px-4 py-1">
-                                    {tasks.length} مهمة
+                                    {t('tasks.list.taskCount', { count: tasks.length })}
                                 </Badge>
                             </div>
 
@@ -446,10 +449,10 @@ export function TasksListView() {
                                                 <AlertCircle className="w-8 h-8 text-red-500" />
                                             </div>
                                         </div>
-                                        <h3 className="text-lg font-bold text-slate-900 mb-2">حدث خطأ أثناء تحميل المهام</h3>
-                                        <p className="text-slate-500 mb-4">{error?.message || 'تعذر الاتصال بالخادم'}</p>
+                                        <h3 className="text-lg font-bold text-slate-900 mb-2">{t('tasks.list.errorLoading')}</h3>
+                                        <p className="text-slate-500 mb-4">{error?.message || t('tasks.list.connectionError')}</p>
                                         <Button onClick={() => refetch()} className="bg-emerald-500 hover:bg-emerald-600">
-                                            إعادة المحاولة
+                                            {t('tasks.list.retry')}
                                         </Button>
                                     </div>
                                 )}
@@ -462,12 +465,12 @@ export function TasksListView() {
                                                 <Briefcase className="w-8 h-8 text-emerald-500" />
                                             </div>
                                         </div>
-                                        <h3 className="text-lg font-bold text-slate-900 mb-2">لا توجد مهام</h3>
-                                        <p className="text-slate-500 mb-4">ابدأ بإضافة مهمة جديدة</p>
+                                        <h3 className="text-lg font-bold text-slate-900 mb-2">{t('tasks.list.noTasks')}</h3>
+                                        <p className="text-slate-500 mb-4">{t('tasks.list.noTasksDescription')}</p>
                                         <Button asChild className="bg-emerald-500 hover:bg-emerald-600">
                                             <Link to="/dashboard/tasks/new">
                                                 <Plus className="w-4 h-4 ml-2" />
-                                                مهمة جديدة
+                                                {t('tasks.list.newTask')}
                                             </Link>
                                         </Button>
                                     </div>
@@ -492,10 +495,10 @@ export function TasksListView() {
                                                     <div className="flex items-center gap-2 mb-1">
                                                         <h4 className="font-bold text-navy text-lg">{task.title}</h4>
                                                         {task.status === 'active' && (
-                                                            <Badge className="bg-blue-100 text-blue-700 hover:bg-blue-200 border-0 rounded-md px-2">نشط</Badge>
+                                                            <Badge className="bg-blue-100 text-blue-700 hover:bg-blue-200 border-0 rounded-md px-2">{t('tasks.list.active')}</Badge>
                                                         )}
                                                     </div>
-                                                    <p className="text-slate-500 text-sm">العميل: {task.client}</p>
+                                                    <p className="text-slate-500 text-sm">{t('tasks.list.taskClient', { name: task.client })}</p>
                                                 </div>
                                             </div>
                                             <DropdownMenu>
@@ -507,22 +510,22 @@ export function TasksListView() {
                                                 <DropdownMenuContent align="end" className="w-48">
                                                     <DropdownMenuItem onClick={() => handleEditTask(task.id)}>
                                                         <Edit3 className="h-4 w-4 ml-2 text-blue-500" />
-                                                        تعديل المهمة
+                                                        {t('tasks.list.editTask')}
                                                     </DropdownMenuItem>
                                                     <DropdownMenuItem onClick={() => handleViewTask(task.id)}>
                                                         <Eye className="h-4 w-4 ml-2" />
-                                                        عرض التفاصيل
+                                                        {t('tasks.list.viewDetails')}
                                                     </DropdownMenuItem>
                                                     <DropdownMenuSeparator />
                                                     {task.status !== 'done' ? (
                                                         <DropdownMenuItem onClick={() => handleCompleteTask(task.id)}>
                                                             <CheckCircle className="h-4 w-4 ml-2 text-emerald-500" />
-                                                            إكمال المهمة
+                                                            {t('tasks.list.completeTask')}
                                                         </DropdownMenuItem>
                                                     ) : (
                                                         <DropdownMenuItem onClick={() => handleReopenTask(task.id)}>
                                                             <XCircle className="h-4 w-4 ml-2 text-amber-500" />
-                                                            إعادة فتح المهمة
+                                                            {t('tasks.list.reopenTask')}
                                                         </DropdownMenuItem>
                                                     )}
                                                     <DropdownMenuSeparator />
@@ -531,7 +534,7 @@ export function TasksListView() {
                                                         className="text-red-600 focus:text-red-600"
                                                     >
                                                         <Trash2 className="h-4 w-4 ml-2" />
-                                                        حذف المهمة
+                                                        {t('tasks.list.deleteTask')}
                                                     </DropdownMenuItem>
                                                 </DropdownMenuContent>
                                             </DropdownMenu>
@@ -541,7 +544,7 @@ export function TasksListView() {
                                             <div className="flex items-center gap-4">
                                                 {/* Priority Dropdown */}
                                                 <div>
-                                                    <div className="text-xs text-slate-400 mb-1">الأولوية</div>
+                                                    <div className="text-xs text-slate-400 mb-1">{t('tasks.list.priorityLabel')}</div>
                                                     <Select
                                                         value={task.priority}
                                                         onValueChange={(value) => handlePriorityChange(task.id, value)}
@@ -555,29 +558,29 @@ export function TasksListView() {
                                                             <SelectValue />
                                                         </SelectTrigger>
                                                         <SelectContent>
-                                                            <SelectItem value="urgent">عاجلة</SelectItem>
-                                                            <SelectItem value="high">عالية</SelectItem>
-                                                            <SelectItem value="medium">متوسطة</SelectItem>
-                                                            <SelectItem value="low">منخفضة</SelectItem>
+                                                            <SelectItem value="urgent">{t('tasks.priorities.urgent')}</SelectItem>
+                                                            <SelectItem value="high">{t('tasks.priorities.high')}</SelectItem>
+                                                            <SelectItem value="medium">{t('tasks.priorities.medium')}</SelectItem>
+                                                            <SelectItem value="low">{t('tasks.priorities.low')}</SelectItem>
                                                         </SelectContent>
                                                     </Select>
                                                 </div>
                                                 {/* Due Date - Dual Language */}
                                                 <div className="text-center">
-                                                    <div className="text-xs text-slate-400 mb-1">تاريخ الاستحقاق</div>
+                                                    <div className="text-xs text-slate-400 mb-1">{t('tasks.list.dueDate')}</div>
                                                     <div className="font-bold text-navy text-sm">{task.dueDateFormatted.arabic}</div>
                                                     <div className="text-xs text-slate-400">{task.dueDateFormatted.english}</div>
                                                 </div>
                                                 {/* Creation Date - Dual Language */}
                                                 <div className="text-center">
-                                                    <div className="text-xs text-slate-400 mb-1">تاريخ الإنشاء</div>
+                                                    <div className="text-xs text-slate-400 mb-1">{t('tasks.list.createdAt')}</div>
                                                     <div className="font-bold text-slate-600 text-sm">{task.createdAtFormatted.arabic}</div>
                                                     <div className="text-xs text-slate-400">{task.createdAtFormatted.english}</div>
                                                 </div>
                                             </div>
                                             <Link to={`/dashboard/tasks/${task.id}` as any}>
                                                 <Button className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg px-6 shadow-lg shadow-emerald-500/20">
-                                                    عرض التفاصيل
+                                                    {t('tasks.list.viewDetails')}
                                                 </Button>
                                             </Link>
                                         </div>
@@ -587,7 +590,7 @@ export function TasksListView() {
 
                             <div className="p-4 pt-0 text-center">
                                 <Button variant="ghost" className="text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 w-full rounded-xl py-6">
-                                    عرض جميع المهام
+                                    {t('tasks.list.viewAllTasks')}
                                     <ChevronLeft className="h-4 w-4 mr-2" />
                                 </Button>
                             </div>
