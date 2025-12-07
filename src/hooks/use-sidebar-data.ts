@@ -344,6 +344,46 @@ export function useSidebarData(): SidebarData {
               url: '/dashboard/hr/recruitment/applicants',
               module: 'hr',
             },
+            {
+              title: 'السلف',
+              url: '/dashboard/hr/advances',
+              module: 'hr',
+            },
+            {
+              title: 'القروض',
+              url: '/dashboard/hr/loans',
+              module: 'hr',
+            },
+            {
+              title: 'طلبات المصروفات',
+              url: '/dashboard/hr/expense-claims',
+              module: 'hr',
+            },
+            {
+              title: 'الأصول والمعدات',
+              url: '/dashboard/hr/asset-assignment',
+              module: 'hr',
+            },
+            {
+              title: 'التدريب والتطوير',
+              url: '/dashboard/hr/training',
+              module: 'hr',
+            },
+            {
+              title: 'المزايا',
+              url: '/dashboard/hr/benefits',
+              module: 'hr',
+            },
+            {
+              title: 'التهيئة',
+              url: '/dashboard/hr/onboarding',
+              module: 'hr',
+            },
+            {
+              title: 'إنهاء الخدمة',
+              url: '/dashboard/hr/offboarding',
+              module: 'hr',
+            },
           ],
         },
       ],
