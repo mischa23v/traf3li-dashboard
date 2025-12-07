@@ -51,19 +51,19 @@ export function TasksDialogs() {
               }, 500)
               showSubmittedData(
                 currentRow,
-                'The following task has been deleted:'
+                'تم حذف المهمة التالية:'
               )
             }}
             className='max-w-md'
-            title={`Delete this task: ${currentRow.id} ?`}
+            title={`حذف المهمة: ${currentRow.id}؟`}
             desc={
               <>
-                You are about to delete a task with the ID{' '}
+                أنت على وشك حذف المهمة ذات المعرف{' '}
                 <strong>{currentRow.id}</strong>. <br />
-                This action cannot be undone.
+                لا يمكن التراجع عن هذا الإجراء.
               </>
             }
-            confirmText='Delete'
+            confirmText='حذف'
           />
         </>
       )}

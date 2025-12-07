@@ -293,7 +293,7 @@ export function ReputationSidebar({
                             <Button asChild variant="ghost" className="w-full mt-6 text-slate-500 hover:text-emerald-700 hover:bg-emerald-50 group cursor-pointer">
                                 <Link to="/dashboard/calendar">
                                     <span>عرض الجدول الكامل</span>
-                                    <ChevronRight className="w-4 h-4 mr-2 transition-transform group-hover:-translate-x-1" />
+                                    <ChevronRight className="w-4 h-4 me-2 transition-transform group-hover:-translate-x-1 rtl:group-hover:translate-x-1 rtl:rotate-180" />
                                 </Link>
                             </Button>
                         </div>

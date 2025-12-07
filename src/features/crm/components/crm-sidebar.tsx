@@ -72,7 +72,7 @@ export function CrmSidebar({
             className="w-full bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl h-12 justify-start"
           >
             <Link to="/dashboard/crm/leads/new">
-              <UserPlus className="ml-3 h-5 w-5" />
+              <UserPlus className="ms-3 h-5 w-5" />
               إضافة عميل محتمل
             </Link>
           </Button>
@@ -82,7 +82,7 @@ export function CrmSidebar({
             className="w-full rounded-xl h-12 justify-start border-slate-200 hover:bg-slate-50"
           >
             <Link to="/dashboard/crm/pipeline">
-              <TrendingUp className="ml-3 h-5 w-5 text-emerald-600" />
+              <TrendingUp className="ms-3 h-5 w-5 text-emerald-600" />
               عرض مسار المبيعات
             </Link>
           </Button>
@@ -92,7 +92,7 @@ export function CrmSidebar({
             className="w-full rounded-xl h-12 justify-start border-slate-200 hover:bg-slate-50"
           >
             <Link to="/dashboard/crm/activities">
-              <Clock className="ml-3 h-5 w-5 text-blue-600" />
+              <Clock className="ms-3 h-5 w-5 text-blue-600" />
               سجل الأنشطة
             </Link>
           </Button>
@@ -102,7 +102,7 @@ export function CrmSidebar({
             className="w-full rounded-xl h-12 justify-start border-slate-200 hover:bg-slate-50"
           >
             <Link to={links.reports.viewAll}>
-              <BarChart3 className="ml-3 h-5 w-5 text-purple-600" />
+              <BarChart3 className="ms-3 h-5 w-5 text-purple-600" />
               التقارير والتحليلات
             </Link>
           </Button>
@@ -112,7 +112,7 @@ export function CrmSidebar({
               className="w-full bg-purple-500 hover:bg-purple-600 text-white rounded-xl h-12 justify-start"
             >
               <Link to={links.reports.create}>
-                <FileBarChart className="ml-3 h-5 w-5" />
+                <FileBarChart className="ms-3 h-5 w-5" />
                 إنشاء تقرير جديد
               </Link>
             </Button>
@@ -125,7 +125,7 @@ export function CrmSidebar({
               variant="destructive"
               className="w-full rounded-xl h-12 justify-start"
             >
-              <Trash2 className="ml-3 h-5 w-5" />
+              <Trash2 className="ms-3 h-5 w-5" />
               حذف المحدد ({selectedCount})
             </Button>
           )}
