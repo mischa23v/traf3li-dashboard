@@ -69,7 +69,7 @@ export function NavUser({ user }: NavUserProps) {
                   <span className='truncate font-semibold'>{user.name}</span>
                   <span className='truncate text-xs'>{user.email}</span>
                 </div>
-                <ChevronsUpDown className='ms-auto size-4' />
+                <ChevronsUpDown className='ms-auto size-4' aria-hidden='true' />
               </SidebarMenuButton>
             </DropdownMenuTrigger>
             <DropdownMenuContent
@@ -94,19 +94,19 @@ export function NavUser({ user }: NavUserProps) {
               <DropdownMenuGroup>
                 <DropdownMenuItem asChild>
                   <Link to='/settings/account'>
-                    <BadgeCheck />
+                    <BadgeCheck aria-hidden='true' />
                     {t('profile.dropdown.account')}
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link to='/settings'>
-                    <CreditCard />
+                    <CreditCard aria-hidden='true' />
                     {t('profile.dropdown.billing')}
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link to='/settings/notifications'>
-                    <Bell />
+                    <Bell aria-hidden='true' />
                     {t('profile.dropdown.notifications')}
                   </Link>
                 </DropdownMenuItem>
@@ -116,7 +116,7 @@ export function NavUser({ user }: NavUserProps) {
                 variant='destructive'
                 onClick={() => setOpen(true)}
               >
-                <LogOut />
+                <LogOut aria-hidden='true' />
                 {t('profile.dropdown.signOut')}
               </DropdownMenuItem>
             </DropdownMenuContent>

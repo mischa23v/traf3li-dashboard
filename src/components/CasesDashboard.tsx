@@ -77,14 +77,14 @@ export default function CasesDashboard() {
         <div className="min-h-screen bg-[#f8f9fa] font-sans pb-20" dir="rtl">
 
             {/* Top Blue Line */}
-            <div className="fixed top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-blue-600 via-blue-500 to-blue-600 z-[60] shadow-sm"></div>
+            <div className="fixed top-0 start-0 end-0 h-1.5 bg-gradient-to-r from-blue-600 via-blue-500 to-blue-600 z-[60] shadow-sm"></div>
 
             <div className="p-6 lg:p-8 space-y-8 pt-10 max-w-[1600px] mx-auto">
 
                 {/* HERO BANNER */}
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     <div className="lg:col-span-2 bg-navy rounded-3xl p-8 relative overflow-hidden text-white flex flex-col justify-between min-h-[280px] shadow-xl shadow-navy/20 group">
-                        <div className="absolute -bottom-32 -left-32 w-96 h-96 bg-brand-blue rounded-full blur-[120px] opacity-40 group-hover:opacity-50 transition-opacity duration-700"></div>
+                        <div className="absolute -bottom-32 -start-32 w-96 h-96 bg-brand-blue rounded-full blur-[120px] opacity-40 group-hover:opacity-50 transition-opacity duration-700"></div>
                         <div className="relative z-10">
                             <h1 className="text-3xl lg:text-4xl font-bold mb-3 leading-tight">صباح الخير، مشاري 👋</h1>
                             <p className="text-slate-300 text-lg font-medium">لديك <span className="text-white font-bold">3 جلسات مرافعة</span> و <span className="text-white font-bold">5 مهام</span> تتطلب انتباهك اليوم.</p>
@@ -211,7 +211,7 @@ export default function CasesDashboard() {
                         <div key={caseItem.id} className="bg-white rounded-3xl border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-blue-900/5 hover:-translate-y-1 transition-all duration-300 overflow-hidden flex flex-col group">
                             <div className="p-6 flex-1 relative">
                                 {/* Hover Accent Line */}
-                                <div className="absolute top-0 right-0 w-1.5 h-full bg-brand-blue opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                                <div className="absolute top-0 end-0 w-1.5 h-full bg-brand-blue opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
 
                                 <div className="flex justify-between items-start mb-6">
                                     <div className="flex items-center gap-4">
