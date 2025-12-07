@@ -208,7 +208,7 @@ export function LeaveRequestDetailsView() {
                     <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
                         <DynamicIsland />
                     </div>
-                    <div className='ms-auto flex items-center space-x-4'>
+                    <div className='ms-auto flex items-center gap-4'>
                         <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white" />
                         <ThemeSwitch className="text-slate-300 hover:bg-white/10 hover:text-white" />
                         <ConfigDrawer className="text-slate-300 hover:bg-white/10 hover:text-white" />
@@ -239,7 +239,7 @@ export function LeaveRequestDetailsView() {
                     <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
                         <DynamicIsland />
                     </div>
-                    <div className='ms-auto flex items-center space-x-4'>
+                    <div className='ms-auto flex items-center gap-4'>
                         <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white" />
                         <ThemeSwitch className="text-slate-300 hover:bg-white/10 hover:text-white" />
                         <ConfigDrawer className="text-slate-300 hover:bg-white/10 hover:text-white" />
@@ -273,10 +273,10 @@ export function LeaveRequestDetailsView() {
                     <DynamicIsland />
                 </div>
 
-                <div className='ms-auto flex items-center space-x-4'>
+                <div className='ms-auto flex items-center gap-4'>
                     <div className="relative hidden md:block">
-                        <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                        <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pr-9 pl-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
+                        <Search className="absolute end-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                        <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
                     </div>
                     <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white">
                         <Bell className="h-5 w-5" />
@@ -321,14 +321,14 @@ export function LeaveRequestDetailsView() {
                                     variant="outline"
                                     className="rounded-xl border-red-200 text-red-600 hover:bg-red-50"
                                 >
-                                    <XCircle className="w-4 h-4 ml-2" />
+                                    <XCircle className="w-4 h-4 ms-2" />
                                     رفض
                                 </Button>
                                 <Button
                                     onClick={() => setShowApproveDialog(true)}
                                     className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl"
                                 >
-                                    <CheckCircle className="w-4 h-4 ml-2" />
+                                    <CheckCircle className="w-4 h-4 ms-2" />
                                     موافقة
                                 </Button>
                             </>
@@ -338,7 +338,7 @@ export function LeaveRequestDetailsView() {
                                 onClick={() => setShowReturnDialog(true)}
                                 className="bg-blue-500 hover:bg-blue-600 text-white rounded-xl"
                             >
-                                <UserCheck className="w-4 h-4 ml-2" />
+                                <UserCheck className="w-4 h-4 ms-2" />
                                 تأكيد العودة
                             </Button>
                         )}
@@ -352,11 +352,11 @@ export function LeaveRequestDetailsView() {
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end" className="w-48">
                                 <DropdownMenuItem>
-                                    <Download className="h-4 w-4 ml-2" />
+                                    <Download className="h-4 w-4 ms-2" />
                                     تصدير PDF
                                 </DropdownMenuItem>
                                 <DropdownMenuItem>
-                                    <Send className="h-4 w-4 ml-2" />
+                                    <Send className="h-4 w-4 ms-2" />
                                     إرسال للموظف
                                 </DropdownMenuItem>
                                 <DropdownMenuSeparator />
@@ -365,7 +365,7 @@ export function LeaveRequestDetailsView() {
                                         onClick={() => setShowCancelDialog(true)}
                                         className="text-red-600 focus:text-red-600"
                                     >
-                                        <Ban className="h-4 w-4 ml-2" />
+                                        <Ban className="h-4 w-4 ms-2" />
                                         إلغاء الطلب
                                     </DropdownMenuItem>
                                 )}
@@ -942,7 +942,7 @@ export function LeaveRequestDetailsView() {
                                                 <div className="flex items-center gap-2">
                                                     {doc.verified ? (
                                                         <Badge className="bg-emerald-100 text-emerald-700 border-0">
-                                                            <CheckCircle className="w-3 h-3 ml-1" />
+                                                            <CheckCircle className="w-3 h-3 ms-1" />
                                                             تم التحقق
                                                         </Badge>
                                                     ) : doc.required ? (
@@ -979,7 +979,7 @@ export function LeaveRequestDetailsView() {
                                                 className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg"
                                                 disabled={completeHandoverMutation.isPending}
                                             >
-                                                <CheckCircle className="w-4 h-4 ml-2" />
+                                                <CheckCircle className="w-4 h-4 ms-2" />
                                                 {completeHandoverMutation.isPending ? 'جاري...' : 'إتمام التسليم'}
                                             </Button>
                                         )}
@@ -998,7 +998,7 @@ export function LeaveRequestDetailsView() {
                                                     <p className="font-medium text-navy">{request.workHandover.delegateTo.employeeName}</p>
                                                     <p className="text-sm text-slate-500">{request.workHandover.delegateTo.jobTitle}</p>
                                                 </div>
-                                                <Badge className={`mr-auto border-0 ${request.workHandover.delegateTo.accepted ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}`}>
+                                                <Badge className={`ms-auto border-0 ${request.workHandover.delegateTo.accepted ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}`}>
                                                     {request.workHandover.delegateTo.accepted ? 'مقبول' : 'في الانتظار'}
                                                 </Badge>
                                             </div>
@@ -1027,7 +1027,7 @@ export function LeaveRequestDetailsView() {
                                                                 </Badge>
                                                                 {task.handedOver && (
                                                                     <Badge className="bg-emerald-100 text-emerald-700 border-0">
-                                                                        <CheckCircle className="w-3 h-3 ml-1" />
+                                                                        <CheckCircle className="w-3 h-3 ms-1" />
                                                                         تم التسليم
                                                                     </Badge>
                                                                 )}
@@ -1113,11 +1113,11 @@ export function LeaveRequestDetailsView() {
                             <div className="grid grid-cols-2 gap-4 text-sm">
                                 <div>
                                     <span className="text-emerald-600">الموظف:</span>
-                                    <span className="font-bold text-emerald-800 mr-2">{request.employeeNameAr || request.employeeName}</span>
+                                    <span className="font-bold text-emerald-800 ms-2">{request.employeeNameAr || request.employeeName}</span>
                                 </div>
                                 <div>
                                     <span className="text-emerald-600">عدد الأيام:</span>
-                                    <span className="font-bold text-emerald-800 mr-2">{request.dates.totalDays} يوم</span>
+                                    <span className="font-bold text-emerald-800 ms-2">{request.dates.totalDays} يوم</span>
                                 </div>
                             </div>
                         </div>

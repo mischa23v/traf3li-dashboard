@@ -118,14 +118,14 @@ export function EmployeeDetailsView() {
                     <DynamicIsland />
                 </div>
 
-                <div className='ms-auto flex items-center space-x-4'>
+                <div className='ms-auto flex items-center gap-4'>
                     <div className="relative hidden md:block">
-                        <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                        <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pr-9 pl-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
+                        <Search className="absolute end-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                        <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
                     </div>
                     <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white">
                         <Bell className="h-5 w-5" />
-                        <span className="absolute top-2 right-2 h-2 w-2 bg-red-500 rounded-full border border-navy"></span>
+                        <span className="absolute top-2 end-2 h-2 w-2 bg-red-500 rounded-full border border-navy"></span>
                     </Button>
                     <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white" />
                     <ThemeSwitch className="text-slate-300 hover:bg-white/10 hover:text-white" />
@@ -281,7 +281,7 @@ export function EmployeeDetailsView() {
                                                                 <span className="font-medium text-slate-900">
                                                                     {employee.personalInfo?.nationality || 'غير محدد'}
                                                                     {employee.personalInfo?.isSaudi && (
-                                                                        <Badge className="mr-2 bg-green-100 text-green-700 text-xs">سعودي</Badge>
+                                                                        <Badge className="ms-2 bg-green-100 text-green-700 text-xs">سعودي</Badge>
                                                                     )}
                                                                 </span>
                                                             </div>
@@ -591,12 +591,12 @@ export function EmployeeDetailsView() {
                                                                     <Clock className="w-5 h-5 text-blue-600" />
                                                                     <div>
                                                                         <span className="text-sm text-blue-700">سنوات الخدمة</span>
-                                                                        <span className="font-bold text-blue-800 text-lg mr-2">{(employee as any).yearsOfService} سنة</span>
+                                                                        <span className="font-bold text-blue-800 text-lg ms-2">{(employee as any).yearsOfService} سنة</span>
                                                                     </div>
                                                                 </div>
-                                                                <div className="text-left">
+                                                                <div className="text-start">
                                                                     <span className="text-sm text-blue-600">الحد الأدنى للإجازة</span>
-                                                                    <span className="font-bold text-blue-800 text-lg mr-2">{(employee as any).minAnnualLeave || 21} يوم</span>
+                                                                    <span className="font-bold text-blue-800 text-lg ms-2">{(employee as any).minAnnualLeave || 21} يوم</span>
                                                                 </div>
                                                             </div>
                                                         </CardContent>
@@ -767,9 +767,9 @@ export function EmployeeDetailsView() {
                                 className="px-6 rounded-xl bg-red-500 hover:bg-red-600 text-white"
                             >
                                 {deleteEmployeeMutation.isPending ? (
-                                    <Loader2 className="h-4 w-4 animate-spin ml-2" />
+                                    <Loader2 className="h-4 w-4 animate-spin ms-2" />
                                 ) : (
-                                    <Trash2 className="h-4 w-4 ml-2" />
+                                    <Trash2 className="h-4 w-4 ms-2" />
                                 )}
                                 حذف الموظف
                             </Button>

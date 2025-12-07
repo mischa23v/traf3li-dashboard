@@ -240,10 +240,10 @@ export function PerformanceReviewDetailsView() {
           <DynamicIsland />
         </div>
 
-        <div className='ms-auto flex items-center space-x-4'>
+        <div className='ms-auto flex items-center gap-4'>
           <div className="relative hidden md:block">
-            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-            <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pr-9 pl-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
+            <Search className="absolute end-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+            <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
           </div>
           <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white">
             <Bell className="h-5 w-5" />
@@ -325,7 +325,7 @@ export function PerformanceReviewDetailsView() {
                 disabled={completeMutation.isPending}
                 className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl"
               >
-                <CheckCircle className="w-4 h-4 ml-2" />
+                <CheckCircle className="w-4 h-4 ms-2" />
                 إكمال التقييم
               </Button>
             )}
@@ -334,7 +334,7 @@ export function PerformanceReviewDetailsView() {
                 onClick={() => setShowAcknowledgeDialog(true)}
                 className="bg-blue-500 hover:bg-blue-600 text-white rounded-xl"
               >
-                <Award className="w-4 h-4 ml-2" />
+                <Award className="w-4 h-4 ms-2" />
                 اعتماد التقييم
               </Button>
             )}
@@ -348,16 +348,16 @@ export function PerformanceReviewDetailsView() {
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48">
                 <DropdownMenuItem onClick={() => handleSendReminder('self_assessment')}>
-                  <Send className="h-4 w-4 ml-2" />
+                  <Send className="h-4 w-4 ms-2" />
                   تذكير بالتقييم الذاتي
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => handleSendReminder('manager_review')}>
-                  <Send className="h-4 w-4 ml-2" />
+                  <Send className="h-4 w-4 ms-2" />
                   تذكير المدير
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem>
-                  <Download className="h-4 w-4 ml-2" />
+                  <Download className="h-4 w-4 ms-2" />
                   تصدير PDF
                 </DropdownMenuItem>
               </DropdownMenuContent>
@@ -677,7 +677,7 @@ export function PerformanceReviewDetailsView() {
                     className="rounded-xl"
                     disabled={reminderMutation.isPending}
                   >
-                    <Send className="w-4 h-4 ml-2" />
+                    <Send className="w-4 h-4 ms-2" />
                     إرسال تذكير
                   </Button>
                 </CardContent>
@@ -702,13 +702,13 @@ export function PerformanceReviewDetailsView() {
                         <div className="flex items-center justify-between mb-3">
                           <div>
                             <span className="font-bold text-navy">{comp.competencyNameAr || comp.competencyName}</span>
-                            <Badge className="mr-2 bg-slate-200 text-slate-600 border-0 text-xs">
+                            <Badge className="me-2 bg-slate-200 text-slate-600 border-0 text-xs">
                               {comp.category === 'core' ? 'أساسية' :
                                comp.category === 'leadership' ? 'قيادية' :
                                comp.category === 'technical' ? 'تقنية' :
                                comp.category === 'legal' ? 'قانونية' : 'خدمة العملاء'}
                             </Badge>
-                            <span className="text-sm text-slate-500 mr-2">الوزن: {comp.weight}%</span>
+                            <span className="text-sm text-slate-500 me-2">الوزن: {comp.weight}%</span>
                           </div>
                         </div>
                         <div className="grid grid-cols-2 gap-4">
@@ -763,7 +763,7 @@ export function PerformanceReviewDetailsView() {
                         <div key={idx} className="p-4 bg-slate-50 rounded-xl">
                           <div className="flex items-start justify-between mb-3">
                             <div className="flex-1">
-                              <div className="flex items-center gap-2 mb-1">
+                              <div className="flex items-center gap-2 mb-1 flex-wrap">
                                 <span className="font-bold text-navy">{goal.titleAr || goal.title}</span>
                                 <Badge className={`${colorClasses[statusConfig.color]} border-0`}>
                                   {statusConfig.ar}
@@ -819,7 +819,7 @@ export function PerformanceReviewDetailsView() {
                         <div className="flex items-center justify-between mb-3">
                           <div>
                             <span className="font-bold text-navy">{kpi.nameAr || kpi.name}</span>
-                            <span className="text-sm text-slate-500 mr-2">الوزن: {kpi.weight}%</span>
+                            <span className="text-sm text-slate-500 ms-2">الوزن: {kpi.weight}%</span>
                           </div>
                           {getRatingScaleBadge(kpi.rating)}
                         </div>
@@ -1052,7 +1052,7 @@ export function PerformanceReviewDetailsView() {
                     className="rounded-xl"
                     disabled={reminderMutation.isPending}
                   >
-                    <Send className="w-4 h-4 ml-2" />
+                    <Send className="w-4 h-4 ms-2" />
                     إرسال تذكير للمدير
                   </Button>
                 </CardContent>
@@ -1078,7 +1078,7 @@ export function PerformanceReviewDetailsView() {
                           <div className="flex items-start justify-between mb-3">
                             <div>
                               <span className="font-bold text-navy">{item.objectiveAr || item.objective}</span>
-                              <Badge className={`mr-2 border-0 ${
+                              <Badge className={`ms-2 border-0 ${
                                 item.status === 'completed' ? 'bg-emerald-100 text-emerald-700' :
                                 item.status === 'in_progress' ? 'bg-blue-100 text-blue-700' :
                                 item.status === 'deferred' ? 'bg-amber-100 text-amber-700' :
@@ -1095,7 +1095,7 @@ export function PerformanceReviewDetailsView() {
                           </div>
                           <p className="text-sm text-slate-600 mb-3">{item.developmentArea}</p>
                           <Progress value={item.progress} className="h-2 mb-2" />
-                          <p className="text-xs text-slate-500 text-left">{item.progress}% مكتمل</p>
+                          <p className="text-xs text-slate-500 text-start">{item.progress}% مكتمل</p>
                         </div>
                       ))}
                     </div>
