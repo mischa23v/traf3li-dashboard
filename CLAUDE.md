@@ -34,3 +34,26 @@ This will:
 
 **Quick Check**: Every small UI change
 **Full Review**: Before PRs, major features, production deployment
+
+---
+
+## 🔀 Git & Pull Request Rules
+
+### After Every Push
+
+**MANDATORY: After pushing changes, you MUST:**
+
+1. Create a pull request using the GitHub PR creation URL
+2. Provide the PR link to the user
+
+Since `gh` CLI may not be available, use the push output URL format:
+```
+https://github.com/mischa23v/traf3li-dashboard/pull/new/{branch-name}
+```
+
+### Example Workflow
+```
+git push -u origin claude/feature-branch-xyz
+# Then immediately provide:
+# "PR can be created here: https://github.com/mischa23v/traf3li-dashboard/pull/new/claude/feature-branch-xyz"
+```

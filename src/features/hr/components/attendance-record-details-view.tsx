@@ -1,9 +1,11 @@
+import { HRSidebar } from './hr-sidebar'
 import { useState } from 'react'
 import { Main } from '@/components/layout/main'
 import { LanguageSwitcher } from '@/components/language-switcher'
 import { ThemeSwitch } from '@/components/theme-switch'
 import { ConfigDrawer } from '@/components/config-drawer'
 import { ProfileDropdown } from '@/components/profile-dropdown'
+import { ProductivityHero } from '@/components/productivity-hero'
 import { useNavigate, useParams } from '@tanstack/react-router'
 import {
   useAttendanceRecord,
@@ -204,71 +206,11 @@ export function AttendanceRecordDetailsView() {
     { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
     { title: 'الموظفين', href: '/dashboard/hr/employees', isActive: false },
     { title: 'الحضور', href: '/dashboard/hr/attendance', isActive: true },
+    { title: 'الإجازات', href: '/dashboard/hr/leaves', isActive: false },
   ]
 
-  // Loading state
-  if (isLoading) {
-    return (
-      <>
-        <Header className="bg-navy shadow-none relative">
-          <TopNav links={topNav} className="[&>a]:text-slate-300 [&>a:hover]:text-white [&>a[aria-current='page']]:text-white" />
-          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
-            <DynamicIsland />
-          </div>
-          <div className='ms-auto flex items-center space-x-4'>
-            <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white" />
-            <ThemeSwitch className="text-slate-300 hover:bg-white/10 hover:text-white" />
-            <ConfigDrawer className="text-slate-300 hover:bg-white/10 hover:text-white" />
-            <ProfileDropdown className="text-slate-300 hover:bg-white/10 hover:text-white" />
-          </div>
-        </Header>
-        <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8">
-          <div className="space-y-6">
-            <Skeleton className="h-12 w-64" />
-            <div className="grid grid-cols-4 gap-4">
-              {[1, 2, 3, 4].map((i) => (
-                <Skeleton key={i} className="h-32 rounded-2xl" />
-              ))}
-            </div>
-            <Skeleton className="h-96 rounded-2xl" />
-          </div>
-        </Main>
-      </>
-    )
-  }
-
-  // Error state
-  if (isError || !record) {
-    return (
-      <>
-        <Header className="bg-navy shadow-none relative">
-          <TopNav links={topNav} className="[&>a]:text-slate-300 [&>a:hover]:text-white [&>a[aria-current='page']]:text-white" />
-          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
-            <DynamicIsland />
-          </div>
-          <div className='ms-auto flex items-center space-x-4'>
-            <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white" />
-            <ThemeSwitch className="text-slate-300 hover:bg-white/10 hover:text-white" />
-            <ConfigDrawer className="text-slate-300 hover:bg-white/10 hover:text-white" />
-            <ProfileDropdown className="text-slate-300 hover:bg-white/10 hover:text-white" />
-          </div>
-        </Header>
-        <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8">
-          <div className="bg-white rounded-2xl p-12 text-center">
-            <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
-            <h2 className="text-xl font-bold text-slate-900 mb-2">لم يتم العثور على السجل</h2>
-            <p className="text-slate-500 mb-4">{error?.message || 'حدث خطأ أثناء تحميل بيانات السجل'}</p>
-            <Button onClick={() => navigate({ to: '/dashboard/hr/attendance' })} className="bg-emerald-500 hover:bg-emerald-600">
-              العودة للقائمة
-            </Button>
-          </div>
-        </Main>
-      </>
-    )
-  }
-
-  const checkInDisplay = getCheckMethodDisplay(record.checkIn?.method)
-  const checkOutDisplay = getCheckMethodDisplay(record.checkOut?.method)
+  const checkInDisplay = getCheckMethodDisplay(record?.checkIn?.method)
+  const checkOutDisplay = getCheckMethodDisplay(record?.checkOut?.method)
 
   return (
     <>
@@ -296,9 +238,47 @@ export function AttendanceRecordDetailsView() {
         <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-emerald-500/50 to-transparent"></div>
       </Header>
 
-      <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-6 rounded-tr-3xl shadow-inner border-r border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
-        {/* Page Header */}
-        <div className="flex items-center justify-between">
+      <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-r border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
+
+        {/* HERO CARD - Always visible */}
+        <ProductivityHero badge="الموارد البشرية" title="تفاصيل سجل الحضور" type="attendance" />
+
+        {/* MAIN GRID LAYOUT */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+          {/* RIGHT COLUMN (Main Content) */}
+          <div className="lg:col-span-2 space-y-6">
+
+            {/* Loading State */}
+            {isLoading && (
+              <div className="space-y-6">
+                <Skeleton className="h-12 w-64" />
+                <div className="grid grid-cols-4 gap-4">
+                  {[1, 2, 3, 4].map((i) => (
+                    <Skeleton key={i} className="h-32 rounded-2xl" />
+                  ))}
+                </div>
+                <Skeleton className="h-96 rounded-2xl" />
+              </div>
+            )}
+
+            {/* Error State */}
+            {!isLoading && (isError || !record) && (
+              <div className="bg-white rounded-2xl p-12 text-center">
+                <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
+                <h2 className="text-xl font-bold text-slate-900 mb-2">لم يتم العثور على السجل</h2>
+                <p className="text-slate-500 mb-4">{error?.message || 'حدث خطأ أثناء تحميل بيانات السجل'}</p>
+                <Button onClick={() => navigate({ to: '/dashboard/hr/attendance' })} className="bg-emerald-500 hover:bg-emerald-600">
+                  العودة للقائمة
+                </Button>
+              </div>
+            )}
+
+            {/* Success State */}
+            {!isLoading && !isError && record && (
+              <>
+                {/* Page Header */}
+                <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Button
               variant="ghost"
@@ -999,6 +979,13 @@ export function AttendanceRecordDetailsView() {
             </Card>
           </TabsContent>
         </Tabs>
+              </>
+            )}
+          </div>
+
+          {/* LEFT COLUMN (Widgets) */}
+          <HRSidebar context="attendance" />
+        </div>
       </Main>
 
       {/* Excuse Late Dialog */}

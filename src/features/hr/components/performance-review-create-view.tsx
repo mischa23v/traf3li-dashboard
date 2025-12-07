@@ -1,9 +1,11 @@
+import { HRSidebar } from './hr-sidebar'
 import { useState } from 'react'
 import { Main } from '@/components/layout/main'
 import { LanguageSwitcher } from '@/components/language-switcher'
 import { ThemeSwitch } from '@/components/theme-switch'
 import { ConfigDrawer } from '@/components/config-drawer'
 import { ProfileDropdown } from '@/components/profile-dropdown'
+import { ProductivityHero } from '@/components/productivity-hero'
 import { useNavigate } from '@tanstack/react-router'
 import { useCreatePerformanceReview, useReviewTemplates } from '@/hooks/usePerformanceReviews'
 import { Button } from '@/components/ui/button'
@@ -263,24 +265,21 @@ export function PerformanceReviewCreateView() {
         <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-emerald-500/50 to-transparent"></div>
       </Header>
 
-      <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-6 rounded-tr-3xl shadow-inner border-r border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
-        {/* Page Header */}
-        <div className="flex items-center gap-4">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="rounded-xl hover:bg-white"
-            onClick={() => navigate({ to: '/dashboard/hr/performance' })}
-          >
-            <ArrowRight className="h-5 w-5" />
-          </Button>
-          <div>
-            <h1 className="text-2xl font-bold text-navy">تقييم أداء جديد</h1>
-            <p className="text-slate-500">إنشاء تقييم أداء جديد لموظف</p>
-          </div>
-        </div>
+      <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-r border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
 
-        {/* Office Type Selector */}
+        {/* HERO CARD */}
+        <ProductivityHero badge="الموارد البشرية" title="تقييم أداء جديد" type="performance" />
+
+        {/* MAIN GRID LAYOUT */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+          {/* RIGHT COLUMN (Main Content) */}
+          <div className="lg:col-span-2 space-y-6">
+
+            {/* MAIN FORM CARD */}
+            <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-100 space-y-6">
+
+              {/* Office Type Selector */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {OFFICE_TYPES.map((type) => {
             const Icon = type.icon
@@ -818,29 +817,35 @@ export function PerformanceReviewCreateView() {
           </CardContent>
         </Card>
 
-        {/* Submit Button */}
-        <div className="flex items-center justify-end gap-4">
-          <Button
-            variant="outline"
-            onClick={() => navigate({ to: '/dashboard/hr/performance' })}
-            className="rounded-xl"
-          >
-            إلغاء
-          </Button>
-          <Button
-            onClick={handleSubmit}
-            disabled={!employeeId || !endDate || !dueDate || createMutation.isPending}
-            className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl px-8"
-          >
-            {createMutation.isPending ? (
-              <>جاري الإنشاء...</>
-            ) : (
-              <>
-                <CheckCircle className="w-4 h-4 ml-2" />
-                إنشاء التقييم
-              </>
-            )}
-          </Button>
+              {/* Submit Buttons */}
+              <div className="flex items-center justify-end gap-4 pt-4 border-t border-slate-100">
+                <Button
+                  variant="outline"
+                  onClick={() => navigate({ to: '/dashboard/hr/performance' })}
+                  className="rounded-xl"
+                >
+                  إلغاء
+                </Button>
+                <Button
+                  onClick={handleSubmit}
+                  disabled={!employeeId || !endDate || !dueDate || createMutation.isPending}
+                  className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl px-8 shadow-lg shadow-emerald-500/20"
+                >
+                  {createMutation.isPending ? (
+                    <>جاري الإنشاء...</>
+                  ) : (
+                    <>
+                      <CheckCircle className="w-4 h-4 ml-2" />
+                      إنشاء التقييم
+                    </>
+                  )}
+                </Button>
+              </div>
+            </div>
+          </div>
+
+          {/* LEFT COLUMN (Widgets) */}
+          <HRSidebar context="evaluations" />
         </div>
       </Main>
     </>
