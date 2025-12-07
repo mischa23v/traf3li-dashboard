@@ -365,3 +365,113 @@ export function useShareReport() {
     }
   })
 }
+
+// ==================== SAVED REPORTS QUERY HOOKS ====================
+
+// Get saved reports
+export function useSavedReports(filters?: { search?: string }) {
+  return useQuery({
+    queryKey: [...reportKeys.all, 'saved', filters],
+    queryFn: async () => {
+      // Mock API call - in production this would call the actual API
+      return {
+        data: [] as any[],
+        total: 0
+      }
+    }
+  })
+}
+
+// Delete saved report
+export function useDeleteSavedReport() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async (id: string) => {
+      // Mock API call - in production this would call the actual API
+      await Promise.resolve()
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: reportKeys.all })
+      toast.success('تم حذف التقرير المحفوظ بنجاح')
+    },
+    onError: (error: Error) => {
+      toast.error(`فشل حذف التقرير المحفوظ: ${error.message}`)
+    }
+  })
+}
+
+// ==================== GENERATE REPORT HOOK ====================
+
+// Generate report
+export function useGenerateReport() {
+  return useMutation({
+    mutationFn: async ({ type, config }: { type: string; config: any }) => {
+      // Mock API call - in production this would call the actual API
+      const response = await Promise.resolve({
+        data: [],
+        metadata: {
+          executionTime: 100,
+          recordCount: 0,
+          generatedAt: new Date().toISOString(),
+        }
+      })
+      return response
+    },
+    onError: (error: Error) => {
+      toast.error(`فشل إنشاء التقرير: ${error.message}`)
+    }
+  })
+}
+
+// ==================== SAVED REPORT MUTATION HOOKS ====================
+
+// Create saved report
+export function useCreateSavedReport() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async (data: any) => {
+      // Mock API call - in production this would call the actual API
+      const response = await Promise.resolve({
+        _id: crypto.randomUUID(),
+        ...data,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      })
+      return response
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: reportKeys.all })
+      toast.success('تم إنشاء التقرير المحفوظ بنجاح')
+    },
+    onError: (error: Error) => {
+      toast.error(`فشل إنشاء التقرير المحفوظ: ${error.message}`)
+    }
+  })
+}
+
+// Update saved report
+export function useUpdateSavedReport() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async ({ id, data }: { id: string; data: any }) => {
+      // Mock API call - in production this would call the actual API
+      const response = await Promise.resolve({
+        _id: id,
+        ...data,
+        updatedAt: new Date().toISOString(),
+      })
+      return response
+    },
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: reportKeys.all })
+      queryClient.invalidateQueries({ queryKey: reportKeys.detail(variables.id) })
+      toast.success('تم تحديث التقرير المحفوظ بنجاح')
+    },
+    onError: (error: Error) => {
+      toast.error(`فشل تحديث التقرير المحفوظ: ${error.message}`)
+    }
+  })
+}

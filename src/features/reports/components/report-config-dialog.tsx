@@ -44,7 +44,7 @@ import {
   reportColumns,
   quickDateRanges,
 } from '../data/data'
-import type { SavedReport, ReportType } from '@/services/reportsService'
+import type { SavedReport, ReportType } from '../data/schema'
 import { cn } from '@/lib/utils'
 
 const reportConfigSchema = z.object({

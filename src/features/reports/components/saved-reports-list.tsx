@@ -33,7 +33,7 @@ import { Input } from '@/components/ui/input'
 import { useTranslation } from 'react-i18next'
 import { useSavedReports, useDeleteSavedReport } from '@/hooks/useReports'
 import { reportTypes } from '../data/data'
-import type { SavedReport, ReportType } from '@/services/reportsService'
+import type { SavedReport, ReportType } from '../data/schema'
 
 interface SavedReportsListProps {
   onRunReport: (report: SavedReport) => void
