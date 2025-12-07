@@ -14,7 +14,7 @@ import { format, addDays, startOfDay, endOfDay, isSameDay } from 'date-fns'
 import { arSA } from 'date-fns/locale'
 
 interface HRSidebarProps {
-    context?: 'employees' | 'salaries' | 'payroll' | 'leaves' | 'attendance' | 'evaluations' | 'grievances' | 'organizational-structure' | 'job-positions'
+    context?: 'employees' | 'salaries' | 'payroll' | 'leaves' | 'attendance' | 'evaluations' | 'grievances' | 'organizational-structure' | 'job-positions' | 'succession-planning'
     isSelectionMode?: boolean
     onToggleSelectionMode?: () => void
     selectedCount?: number
@@ -104,6 +104,10 @@ export function HRSidebar({
         'job-positions': {
             create: '/dashboard/hr/job-positions/new',
             viewAll: '/dashboard/hr/job-positions'
+        },
+        'succession-planning': {
+            create: '/dashboard/hr/succession-planning/new',
+            viewAll: '/dashboard/hr/succession-planning'
         }
     }
 
