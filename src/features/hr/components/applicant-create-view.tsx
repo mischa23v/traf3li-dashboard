@@ -302,24 +302,36 @@ export function ApplicantCreateView() {
         <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-emerald-500/50 to-transparent"></div>
       </Header>
 
-      <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-6 rounded-tr-3xl shadow-inner border-r border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
-        {/* Page Header */}
-        <div className="flex items-center gap-4">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="rounded-xl hover:bg-white"
-            onClick={() => navigate({ to: '/dashboard/hr/recruitment/applicants' })}
-          >
-            <ArrowRight className="h-5 w-5" />
-          </Button>
-          <div>
-            <h1 className="text-2xl font-bold text-navy">متقدم جديد</h1>
-            <p className="text-slate-500">إضافة متقدم جديد للوظيفة</p>
-          </div>
-        </div>
+      <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-r border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
+        {/* ProductivityHero */}
+        <ProductivityHero
+          badge="التوظيف"
+          title="إضافة متقدم جديد"
+          type="recruitment"
+          listMode={true}
+        />
 
-        {/* Office Type Selector */}
+        {/* 3-Column Grid Layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Main Content - 2 columns */}
+          <div className="lg:col-span-2 space-y-6">
+            {/* Page Header */}
+            <div className="flex items-center gap-4">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="rounded-xl hover:bg-white"
+                onClick={() => navigate({ to: '/dashboard/hr/recruitment/applicants' })}
+              >
+                <ArrowRight className="h-5 w-5" />
+              </Button>
+              <div>
+                <h1 className="text-2xl font-bold text-navy">متقدم جديد</h1>
+                <p className="text-slate-500">إضافة متقدم جديد للوظيفة</p>
+              </div>
+            </div>
+
+            {/* Office Type Selector */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {OFFICE_TYPES.map((type) => {
             const Icon = type.icon
@@ -944,29 +956,34 @@ export function ApplicantCreateView() {
           </CardContent>
         </Card>
 
-        {/* Submit Button */}
-        <div className="flex items-center justify-end gap-4">
-          <Button
-            variant="outline"
-            onClick={() => navigate({ to: '/dashboard/hr/recruitment/applicants' })}
-            className="rounded-xl"
-          >
-            إلغاء
-          </Button>
-          <Button
-            onClick={handleSubmit}
-            disabled={!fullName || !fullNameAr || !email || !phone || !jobPostingId || createMutation.isPending}
-            className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl px-8"
-          >
-            {createMutation.isPending ? (
-              <>جاري الإضافة...</>
-            ) : (
-              <>
-                <CheckCircle className="w-4 h-4 ml-2" />
-                إضافة المتقدم
-              </>
-            )}
-          </Button>
+            {/* Submit Button */}
+            <div className="flex items-center justify-end gap-4">
+              <Button
+                variant="outline"
+                onClick={() => navigate({ to: '/dashboard/hr/recruitment/applicants' })}
+                className="rounded-xl"
+              >
+                إلغاء
+              </Button>
+              <Button
+                onClick={handleSubmit}
+                disabled={!fullName || !fullNameAr || !email || !phone || !jobPostingId || createMutation.isPending}
+                className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl px-8"
+              >
+                {createMutation.isPending ? (
+                  <>جاري الإضافة...</>
+                ) : (
+                  <>
+                    <CheckCircle className="w-4 h-4 ml-2" />
+                    إضافة المتقدم
+                  </>
+                )}
+              </Button>
+            </div>
+          </div>
+
+          {/* RIGHT COLUMN (Widgets) */}
+          <HRSidebar context="employees" />
         </div>
       </Main>
     </>
