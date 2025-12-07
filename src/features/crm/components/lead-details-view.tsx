@@ -102,11 +102,11 @@ const sourceLabels: Record<string, string> = {
 }
 
 const activityIcons: Record<string, React.ReactNode> = {
-  call: <Phone className="h-4 w-4" />,
-  email: <Mail className="h-4 w-4" />,
-  meeting: <Calendar className="h-4 w-4" />,
-  note: <FileText className="h-4 w-4" />,
-  status_change: <Clock className="h-4 w-4" />,
+  call: <Phone className="h-4 w-4" aria-hidden="true" />,
+  email: <Mail className="h-4 w-4" aria-hidden="true" />,
+  meeting: <Calendar className="h-4 w-4" aria-hidden="true" />,
+  note: <FileText className="h-4 w-4" aria-hidden="true" />,
+  status_change: <Clock className="h-4 w-4" aria-hidden="true" />,
   stage_change: <TrendingUp className="h-4 w-4" />,
 }
 
@@ -247,7 +247,7 @@ export function LeadDetailsView() {
             <div className="bg-white rounded-2xl p-12 border border-slate-100 text-center">
               <div className="flex justify-center mb-4">
                 <div className="w-16 h-16 rounded-full bg-red-50 flex items-center justify-center">
-                  <AlertCircle className="w-8 h-8 text-red-500" />
+                  <AlertCircle className="w-8 h-8 text-red-500" aria-hidden="true" />
                 </div>
               </div>
               <h3 className="text-lg font-bold text-slate-900 mb-2">
@@ -272,7 +272,7 @@ export function LeadDetailsView() {
             <div className="bg-white rounded-2xl p-12 border border-slate-100 text-center">
               <div className="flex justify-center mb-4">
                 <div className="w-16 h-16 rounded-full bg-emerald-50 flex items-center justify-center">
-                  <Users className="w-8 h-8 text-emerald-500" />
+                  <Users className="w-8 h-8 text-emerald-500" aria-hidden="true" />
                 </div>
               </div>
               <h3 className="text-lg font-bold text-slate-900 mb-2">

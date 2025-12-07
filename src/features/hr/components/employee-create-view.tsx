@@ -448,7 +448,7 @@ export function EmployeeCreateView() {
                             <Card className="rounded-3xl shadow-sm border-slate-100">
                                 <CardHeader className="pb-4">
                                     <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                                        <User className="w-5 h-5 text-emerald-500" />
+                                        <User className="w-5 h-5 text-emerald-500" aria-hidden="true" />
                                         البيانات الشخصية
                                     </CardTitle>
                                 </CardHeader>
@@ -752,7 +752,7 @@ export function EmployeeCreateView() {
                                         <CardHeader className="cursor-pointer hover:bg-slate-50 transition-colors rounded-t-3xl">
                                             <div className="flex items-center justify-between">
                                                 <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                                                    <User className="w-5 h-5 text-purple-500" />
+                                                    <User className="w-5 h-5 text-purple-500" aria-hidden="true" />
                                                     معلومات شخصية إضافية
                                                 </CardTitle>
                                                 <ChevronDown className={cn("w-5 h-5 text-slate-500 transition-transform", openSections.includes('personal_advanced') && "rotate-180")} />
@@ -949,7 +949,7 @@ export function EmployeeCreateView() {
                                         <CardHeader className="cursor-pointer hover:bg-slate-50 transition-colors rounded-t-3xl">
                                             <div className="flex items-center justify-between">
                                                 <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                                                    <FileText className="w-5 h-5 text-blue-500" />
+                                                    <FileText className="w-5 h-5 text-blue-500" aria-hidden="true" />
                                                     تفاصيل العقد
                                                 </CardTitle>
                                                 <ChevronDown className={cn("w-5 h-5 text-slate-500 transition-transform", openSections.includes('contract') && "rotate-180")} />
@@ -1026,7 +1026,7 @@ export function EmployeeCreateView() {
                                         <CardHeader className="cursor-pointer hover:bg-slate-50 transition-colors rounded-t-3xl">
                                             <div className="flex items-center justify-between">
                                                 <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                                                    <Clock className="w-5 h-5 text-indigo-500" />
+                                                    <Clock className="w-5 h-5 text-indigo-500" aria-hidden="true" />
                                                     جدول العمل
                                                 </CardTitle>
                                                 <ChevronDown className={cn("w-5 h-5 text-slate-500 transition-transform", openSections.includes('schedule') && "rotate-180")} />
@@ -1323,7 +1323,7 @@ export function EmployeeCreateView() {
                                             {hireDate && (
                                                 <div className="bg-blue-50 rounded-xl p-4 border border-blue-100">
                                                     <div className="flex items-center gap-3">
-                                                        <Clock className="w-5 h-5 text-blue-500" />
+                                                        <Clock className="w-5 h-5 text-blue-500" aria-hidden="true" />
                                                         <div>
                                                             <span className="text-sm text-blue-700">سنوات الخدمة: </span>
                                                             <span className="font-bold text-blue-800">{yearsOfService} سنة</span>

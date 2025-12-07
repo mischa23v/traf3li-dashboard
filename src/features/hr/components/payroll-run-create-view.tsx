@@ -349,7 +349,7 @@ export function PayrollRunCreateView() {
                             className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl px-6"
                             disabled={createRunMutation.isPending}
                         >
-                            <Save className="w-4 h-4 ms-2" />
+                            <Save className="w-4 h-4 ms-2" aria-hidden="true" />
                             {createRunMutation.isPending ? 'جاري الحفظ...' : 'حفظ الدورة'}
                         </Button>
                     </div>
@@ -397,7 +397,7 @@ export function PayrollRunCreateView() {
                     <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden mb-6">
                         <CardHeader className="pb-4">
                             <CardTitle className="text-lg font-bold text-navy flex items-center gap-2">
-                                <FileText className="w-5 h-5 text-emerald-600" />
+                                <FileText className="w-5 h-5 text-emerald-600" aria-hidden="true" />
                                 بيانات الدورة الأساسية
                             </CardTitle>
                         </CardHeader>
@@ -541,7 +541,7 @@ export function PayrollRunCreateView() {
                             {calculateGOSI && (
                                 <div className="bg-blue-50 rounded-xl p-4">
                                     <div className="flex items-center gap-2 mb-2">
-                                        <AlertTriangle className="w-4 h-4 text-blue-600" />
+                                        <AlertTriangle className="w-4 h-4 text-blue-600" aria-hidden="true" />
                                         <span className="text-sm font-medium text-blue-800">معدلات التأمينات حسب نظام العمل السعودي</span>
                                     </div>
                                     <div className="grid grid-cols-2 gap-4 text-sm">
@@ -581,7 +581,7 @@ export function PayrollRunCreateView() {
                                         <CardHeader className="cursor-pointer hover:bg-slate-50 transition-colors pb-4">
                                             <div className="flex items-center justify-between">
                                                 <CardTitle className="text-lg font-bold text-navy flex items-center gap-2">
-                                                    <Users className="w-5 h-5 text-purple-600" />
+                                                    <Users className="w-5 h-5 text-purple-600" aria-hidden="true" />
                                                     إعدادات شمول الموظفين
                                                 </CardTitle>
                                                 <ChevronDown className={`w-5 h-5 text-slate-500 transition-transform ${openSections.employeeInclusion ? 'rotate-180' : ''}`} />
@@ -653,7 +653,7 @@ export function PayrollRunCreateView() {
                                         <CardHeader className="cursor-pointer hover:bg-slate-50 transition-colors pb-4">
                                             <div className="flex items-center justify-between">
                                                 <CardTitle className="text-lg font-bold text-navy flex items-center gap-2">
-                                                    <Settings className="w-5 h-5 text-blue-600" />
+                                                    <Settings className="w-5 h-5 text-blue-600" aria-hidden="true" />
                                                     خيارات المعالجة
                                                 </CardTitle>
                                                 <ChevronDown className={`w-5 h-5 text-slate-500 transition-transform ${openSections.processingOptions ? 'rotate-180' : ''}`} />
@@ -799,7 +799,7 @@ export function PayrollRunCreateView() {
                                         <CardHeader className="cursor-pointer hover:bg-slate-50 transition-colors pb-4">
                                             <div className="flex items-center justify-between">
                                                 <CardTitle className="text-lg font-bold text-navy flex items-center gap-2">
-                                                    <AlertTriangle className="w-5 h-5 text-red-600" />
+                                                    <AlertTriangle className="w-5 h-5 text-red-600" aria-hidden="true" />
                                                     الخصومات
                                                 </CardTitle>
                                                 <ChevronDown className={`w-5 h-5 text-slate-500 transition-transform ${openSections.deductions ? 'rotate-180' : ''}`} />
@@ -930,7 +930,7 @@ export function PayrollRunCreateView() {
                                 <CardHeader className="cursor-pointer hover:bg-slate-50 transition-colors pb-4">
                                     <div className="flex items-center justify-between">
                                         <CardTitle className="text-lg font-bold text-navy flex items-center gap-2">
-                                            <FileText className="w-5 h-5 text-slate-600" />
+                                            <FileText className="w-5 h-5 text-slate-600" aria-hidden="true" />
                                             الملاحظات والرسائل
                                         </CardTitle>
                                         <ChevronDown className={`w-5 h-5 text-slate-500 transition-transform ${openSections.notes ? 'rotate-180' : ''}`} />
@@ -989,7 +989,7 @@ export function PayrollRunCreateView() {
                             className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl px-8"
                             disabled={createRunMutation.isPending}
                         >
-                            <Save className="w-4 h-4 ms-2" />
+                            <Save className="w-4 h-4 ms-2" aria-hidden="true" />
                             {createRunMutation.isPending ? 'جاري الحفظ...' : 'حفظ وإنشاء الدورة'}
                         </Button>
                     </div>

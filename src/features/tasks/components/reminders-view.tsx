@@ -269,7 +269,7 @@ export function RemindersView() {
 
                 <div className='ms-auto flex items-center gap-4'>
                     <div className="relative hidden md:block">
-                        <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                        <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" aria-hidden="true" />
                         <input type="text" placeholder={t('tasks.list.search')} className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
                     </div>
                     <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white">
@@ -301,7 +301,7 @@ export function RemindersView() {
                             <div className="flex flex-wrap items-center gap-3">
                                 {/* Search Input */}
                                 <div className="relative flex-1 min-w-[200px] max-w-md">
-                                    <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                                    <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" aria-hidden="true" />
                                     <Input
                                         type="text"
                                         placeholder={t('reminders.list.searchPlaceholder')}
@@ -372,7 +372,7 @@ export function RemindersView() {
                                         onClick={clearFilters}
                                         className="h-10 px-4 text-red-500 hover:text-red-600 hover:bg-red-50 rounded-xl"
                                     >
-                                        <X className="h-4 w-4 ms-2" />
+                                        <X className="h-4 w-4 ms-2" aria-hidden="true" />
                                         {t('reminders.list.clearFilters')}
                                     </Button>
                                 )}
@@ -412,7 +412,7 @@ export function RemindersView() {
                                 {/* Error State */}
                                 {isError && (
                                     <Alert className="border-red-200 bg-red-50">
-                                        <AlertCircle className="h-4 w-4 text-red-600" />
+                                        <AlertCircle className="h-4 w-4 text-red-600" aria-hidden="true" />
                                         <AlertDescription className="text-red-800">
                                             <div className="flex items-center justify-between">
                                                 <span>حدث خطأ أثناء تحميل التذكيرات: {error?.message || 'خطأ غير معروف'}</span>
@@ -434,7 +434,7 @@ export function RemindersView() {
                                         <p className="text-slate-500 mb-4">أنت جاهز تماماً! لا توجد تذكيرات في الوقت الحالي.</p>
                                         <Button asChild className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl">
                                             <Link to="/dashboard/tasks/reminders/new">
-                                                <Plus className="ms-2 h-4 w-4" />
+                                                <Plus className="ms-2 h-4 w-4" aria-hidden="true" />
                                                 إضافة تذكير جديد
                                             </Link>
                                         </Button>
@@ -461,7 +461,7 @@ export function RemindersView() {
                                                         <h4 className="font-bold text-navy text-lg">{reminder.title}</h4>
                                                     </div>
                                                     <p className="text-slate-500 text-sm flex items-center gap-2">
-                                                        <Clock className="h-3 w-3" />
+                                                        <Clock className="h-3 w-3" aria-hidden="true" />
                                                         {reminder.time}
                                                     </p>
                                                 </div>
@@ -493,7 +493,7 @@ export function RemindersView() {
                                                     {reminder.status !== 'completed' && reminder.status !== 'dismissed' && (
                                                         <DropdownMenuSub>
                                                             <DropdownMenuSubTrigger>
-                                                                <Clock className="h-4 w-4 ms-2" />
+                                                                <Clock className="h-4 w-4 ms-2" aria-hidden="true" />
                                                                 تأجيل
                                                             </DropdownMenuSubTrigger>
                                                             <DropdownMenuSubContent>
@@ -577,7 +577,7 @@ export function RemindersView() {
                             <div className="p-4 pt-0 text-center">
                                 <Button variant="ghost" className="text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 w-full rounded-xl py-6">
                                     عرض جميع التذكيرات
-                                    <ChevronLeft className="h-4 w-4 me-2" />
+                                    <ChevronLeft className="h-4 w-4 me-2" aria-hidden="true" />
                                 </Button>
                             </div>
                         </div>

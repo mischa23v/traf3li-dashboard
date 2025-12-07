@@ -163,9 +163,9 @@ export function LeaveRequestsListView() {
             completed: 'مكتمل',
         }
         const icons: Record<LeaveStatus, React.ReactNode> = {
-            draft: <FileText className="w-3 h-3" />,
-            submitted: <Clock className="w-3 h-3" />,
-            pending_approval: <Clock className="w-3 h-3" />,
+            draft: <FileText className="w-3 h-3" aria-hidden="true" />,
+            submitted: <Clock className="w-3 h-3" aria-hidden="true" />,
+            pending_approval: <Clock className="w-3 h-3" aria-hidden="true" />,
             approved: <CheckCircle className="w-3 h-3" />,
             rejected: <XCircle className="w-3 h-3" />,
             cancelled: <XCircle className="w-3 h-3" />,

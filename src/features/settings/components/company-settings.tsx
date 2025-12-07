@@ -152,7 +152,7 @@ export default function CompanySettings() {
                                                 className="w-full h-full object-contain"
                                             />
                                         ) : (
-                                            <Building2 className="h-12 w-12 text-slate-500" />
+                                            <Building2 className="h-12 w-12 text-slate-500" aria-hidden="true" />
                                         )}
                                     </div>
                                     <div>
@@ -188,7 +188,7 @@ export default function CompanySettings() {
                         <Card className="border-0 shadow-sm rounded-3xl">
                             <CardHeader>
                                 <CardTitle className="flex items-center gap-2">
-                                    <Building2 className="h-5 w-5 text-brand-blue" />
+                                    <Building2 className="h-5 w-5 text-brand-blue" aria-hidden="true" />
                                     المعلومات الأساسية
                                 </CardTitle>
                             </CardHeader>
@@ -223,7 +223,7 @@ export default function CompanySettings() {
                         <Card className="border-0 shadow-sm rounded-3xl">
                             <CardHeader>
                                 <CardTitle className="flex items-center gap-2">
-                                    <Phone className="h-5 w-5 text-brand-blue" />
+                                    <Phone className="h-5 w-5 text-brand-blue" aria-hidden="true" />
                                     معلومات الاتصال
                                 </CardTitle>
                             </CardHeader>
@@ -282,7 +282,7 @@ export default function CompanySettings() {
                         <Card className="border-0 shadow-sm rounded-3xl">
                             <CardHeader>
                                 <CardTitle className="flex items-center gap-2">
-                                    <MapPin className="h-5 w-5 text-brand-blue" />
+                                    <MapPin className="h-5 w-5 text-brand-blue" aria-hidden="true" />
                                     العنوان
                                 </CardTitle>
                             </CardHeader>
@@ -340,7 +340,7 @@ export default function CompanySettings() {
                         <Card className="border-0 shadow-sm rounded-3xl">
                             <CardHeader>
                                 <CardTitle className="flex items-center gap-2">
-                                    <FileText className="h-5 w-5 text-brand-blue" />
+                                    <FileText className="h-5 w-5 text-brand-blue" aria-hidden="true" />
                                     الأرقام الضريبية والتسجيل
                                 </CardTitle>
                             </CardHeader>

@@ -63,7 +63,7 @@ const RATING_LABELS: Record<OverallRating, { ar: string; en: string; color: stri
   exceptional: { ar: 'استثنائي', en: 'Exceptional', color: 'emerald', icon: <TrendingUp className="w-4 h-4" aria-hidden="true" /> },
   exceeds_expectations: { ar: 'يتجاوز التوقعات', en: 'Exceeds Expectations', color: 'blue', icon: <Star className="w-4 h-4" /> },
   meets_expectations: { ar: 'يلبي التوقعات', en: 'Meets Expectations', color: 'amber', icon: <Target className="w-4 h-4" /> },
-  needs_improvement: { ar: 'يحتاج تحسين', en: 'Needs Improvement', color: 'orange', icon: <AlertTriangle className="w-4 h-4" /> },
+  needs_improvement: { ar: 'يحتاج تحسين', en: 'Needs Improvement', color: 'orange', icon: <AlertTriangle className="w-4 h-4" aria-hidden="true" /> },
   unsatisfactory: { ar: 'غير مرضي', en: 'Unsatisfactory', color: 'red', icon: <TrendingDown className="w-4 h-4" /> },
 }
 
@@ -162,9 +162,9 @@ export function PerformanceReviewsListView() {
       blue: 'bg-blue-100 text-blue-700',
     }
     const icons: Record<ReviewStatus, React.ReactNode> = {
-      draft: <FileText className="w-3 h-3" />,
+      draft: <FileText className="w-3 h-3" aria-hidden="true" />,
       self_assessment: <UserCheck className="w-3 h-3" />,
-      manager_review: <Users className="w-3 h-3" />,
+      manager_review: <Users className="w-3 h-3" aria-hidden="true" />,
       calibration: <BarChart3 className="w-3 h-3" />,
       completed: <CheckCircle className="w-3 h-3" />,
       acknowledged: <Award className="w-3 h-3" />,

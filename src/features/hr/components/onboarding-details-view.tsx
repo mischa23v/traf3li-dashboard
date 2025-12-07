@@ -325,7 +325,7 @@ export function OnboardingDetailsView() {
                     <CardContent className="p-4">
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center">
-                          <Clock className="w-5 h-5 text-emerald-600" />
+                          <Clock className="w-5 h-5 text-emerald-600" aria-hidden="true" />
                         </div>
                         <div>
                           <p className="text-xs text-slate-500">فترة التجربة</p>
@@ -373,7 +373,7 @@ export function OnboardingDetailsView() {
                       <Card className="border-none shadow-sm bg-white rounded-2xl">
                         <CardHeader className="pb-2">
                           <CardTitle className="text-base font-bold text-navy flex items-center gap-2">
-                            <User className="w-4 h-4 text-emerald-600" />
+                            <User className="w-4 h-4 text-emerald-600" aria-hidden="true" />
                             معلومات الموظف
                           </CardTitle>
                         </CardHeader>
@@ -401,7 +401,7 @@ export function OnboardingDetailsView() {
                       <Card className="border-none shadow-sm bg-white rounded-2xl">
                         <CardHeader className="pb-2">
                           <CardTitle className="text-base font-bold text-navy flex items-center gap-2">
-                            <Clock className="w-4 h-4 text-emerald-600" />
+                            <Clock className="w-4 h-4 text-emerald-600" aria-hidden="true" />
                             فترة التجربة
                           </CardTitle>
                         </CardHeader>
@@ -447,7 +447,7 @@ export function OnboardingDetailsView() {
                                 disabled={completeFirstDayMutation.isPending}
                                 className="bg-blue-500 hover:bg-blue-600 text-white rounded-lg"
                               >
-                                <Check className="w-4 h-4 ms-1" />
+                                <Check className="w-4 h-4 ms-1" aria-hidden="true" />
                                 إكمال
                               </Button>
                             )}
@@ -508,7 +508,7 @@ export function OnboardingDetailsView() {
                                 disabled={completeFirstWeekMutation.isPending || !onboarding.firstDay?.firstDayComplete}
                                 className="bg-purple-500 hover:bg-purple-600 text-white rounded-lg"
                               >
-                                <Check className="w-4 h-4 ms-1" />
+                                <Check className="w-4 h-4 ms-1" aria-hidden="true" />
                                 إكمال
                               </Button>
                             )}
@@ -561,7 +561,7 @@ export function OnboardingDetailsView() {
                                 disabled={completeFirstMonthMutation.isPending || !onboarding.firstWeek?.firstWeekComplete}
                                 className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg"
                               >
-                                <Check className="w-4 h-4 ms-1" />
+                                <Check className="w-4 h-4 ms-1" aria-hidden="true" />
                                 إكمال
                               </Button>
                             )}
@@ -644,7 +644,7 @@ export function OnboardingDetailsView() {
                     <Card className="border-none shadow-sm bg-white rounded-2xl">
                       <CardHeader className="pb-2">
                         <CardTitle className="text-base font-bold text-navy flex items-center gap-2">
-                          <FileText className="w-4 h-4 text-emerald-600" />
+                          <FileText className="w-4 h-4 text-emerald-600" aria-hidden="true" />
                           المستندات المطلوبة
                         </CardTitle>
                       </CardHeader>
@@ -655,7 +655,7 @@ export function OnboardingDetailsView() {
                             {onboarding.preBoarding.documentsCollection.documentsRequired.map((doc, index) => (
                               <div key={index} className="flex items-center justify-between p-3 bg-slate-50 rounded-xl">
                                 <div className="flex items-center gap-3">
-                                  <FileText className="w-5 h-5 text-slate-500" />
+                                  <FileText className="w-5 h-5 text-slate-500" aria-hidden="true" />
                                   <div>
                                     <p className="font-medium text-navy">{doc.documentNameAr || doc.documentName}</p>
                                     {doc.required && <span className="text-xs text-red-500">مطلوب</span>}
@@ -676,7 +676,7 @@ export function OnboardingDetailsView() {
                           </div>
                         ) : (
                           <div className="text-center py-8">
-                            <FileText className="w-16 h-16 text-slate-300 mx-auto mb-4" />
+                            <FileText className="w-16 h-16 text-slate-300 mx-auto mb-4" aria-hidden="true" />
                             <h3 className="text-lg font-bold text-slate-700 mb-2">لا توجد مستندات</h3>
                             <p className="text-slate-500">لم يتم تحديد أي مستندات مطلوبة</p>
                           </div>

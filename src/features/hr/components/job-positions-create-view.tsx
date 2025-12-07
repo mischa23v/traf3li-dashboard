@@ -584,7 +584,7 @@ export function JobPositionsCreateView() {
             <Card className="rounded-3xl shadow-sm border-slate-100">
               <CardHeader className="pb-4">
                 <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                  <Settings className="w-5 h-5 text-emerald-500" />
+                  <Settings className="w-5 h-5 text-emerald-500" aria-hidden="true" />
                   نوع المنصب والتوظيف
                 </CardTitle>
               </CardHeader>
@@ -788,7 +788,7 @@ export function JobPositionsCreateView() {
                   <CardHeader className="cursor-pointer hover:bg-slate-50 transition-colors rounded-t-3xl">
                     <div className="flex items-center justify-between">
                       <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                        <FileText className="w-5 h-5 text-blue-500" />
+                        <FileText className="w-5 h-5 text-blue-500" aria-hidden="true" />
                         الوصف الوظيفي
                       </CardTitle>
                       <ChevronDown className={cn("w-5 h-5 text-slate-500 transition-transform", openSections.includes('description') && "rotate-180")} />
@@ -1002,7 +1002,7 @@ export function JobPositionsCreateView() {
                   <CardHeader className="cursor-pointer hover:bg-slate-50 transition-colors rounded-t-3xl">
                     <div className="flex items-center justify-between">
                       <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                        <Clock className="w-5 h-5 text-cyan-500" />
+                        <Clock className="w-5 h-5 text-cyan-500" aria-hidden="true" />
                         ظروف العمل
                       </CardTitle>
                       <ChevronDown className={cn("w-5 h-5 text-slate-500 transition-transform", openSections.includes('workConditions') && "rotate-180")} />
@@ -1090,7 +1090,7 @@ export function JobPositionsCreateView() {
                   <CardHeader className="cursor-pointer hover:bg-slate-50 transition-colors rounded-t-3xl">
                     <div className="flex items-center justify-between">
                       <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                        <FileText className="w-5 h-5 text-gray-500" />
+                        <FileText className="w-5 h-5 text-gray-500" aria-hidden="true" />
                         الملاحظات
                       </CardTitle>
                       <ChevronDown className={cn("w-5 h-5 text-slate-500 transition-transform", openSections.includes('notes') && "rotate-180")} />

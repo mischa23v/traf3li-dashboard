@@ -198,7 +198,7 @@ function LeadCard({
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger>
-                  <AlertTriangle className="w-4 h-4 text-red-500" />
+                  <AlertTriangle className="w-4 h-4 text-red-500" aria-hidden="true" />
                 </TooltipTrigger>
                 <TooltipContent>عاجل</TooltipContent>
               </Tooltip>
@@ -208,7 +208,7 @@ function LeadCard({
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger>
-                  <Clock className="w-4 h-4 text-orange-500" />
+                  <Clock className="w-4 h-4 text-orange-500" aria-hidden="true" />
                 </TooltipTrigger>
                 <TooltipContent>{daysInStage} يوم في هذه المرحلة</TooltipContent>
               </Tooltip>
@@ -245,13 +245,13 @@ function LeadCard({
       <div className="space-y-1 text-sm text-slate-500">
         {lead.phone && (
           <div className="flex items-center gap-2">
-            <Phone className="h-3 w-3" />
+            <Phone className="h-3 w-3" aria-hidden="true" />
             <span dir="ltr">{lead.phone}</span>
           </div>
         )}
         {lead.email && (
           <div className="flex items-center gap-2 truncate">
-            <Mail className="h-3 w-3 flex-shrink-0" />
+            <Mail className="h-3 w-3 flex-shrink-0" aria-hidden="true" />
             <span className="truncate" dir="ltr">{lead.email}</span>
           </div>
         )}
@@ -468,7 +468,7 @@ export function PipelineView() {
 
         <div className="ms-auto flex items-center gap-4">
           <div className="relative hidden md:block">
-            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" aria-hidden="true" />
             <input
               type="text"
               placeholder="بحث..."
@@ -518,7 +518,7 @@ export function PipelineView() {
               className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl shadow-lg border-0"
             >
               <Link to="/dashboard/crm/leads/new">
-                <Plus className="ms-2 h-4 w-4" />
+                <Plus className="ms-2 h-4 w-4" aria-hidden="true" />
                 إضافة عميل
               </Link>
             </Button>
@@ -603,7 +603,7 @@ export function PipelineView() {
         {pipeline && (
           <div className="flex items-center gap-4 flex-wrap">
             <div className="flex items-center gap-2">
-              <Filter className="w-4 h-4 text-slate-500" />
+              <Filter className="w-4 h-4 text-slate-500" aria-hidden="true" />
               <span className="text-sm text-slate-600">تصفية:</span>
             </div>
             <Select value={filterSource} onValueChange={setFilterSource}>
@@ -658,7 +658,7 @@ export function PipelineView() {
               <div className="bg-white rounded-2xl p-12 border border-slate-100 text-center">
                 <div className="flex justify-center mb-4">
                   <div className="w-16 h-16 rounded-full bg-red-50 flex items-center justify-center">
-                    <AlertCircle className="w-8 h-8 text-red-500" />
+                    <AlertCircle className="w-8 h-8 text-red-500" aria-hidden="true" />
                   </div>
                 </div>
                 <h3 className="text-lg font-bold text-slate-900 mb-2">

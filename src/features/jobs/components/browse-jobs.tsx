@@ -328,7 +328,7 @@ export function BrowseJobs() {
                     <div className="flex flex-col md:flex-row md:items-start gap-4">
                       {/* Company Logo Placeholder */}
                       <div className="h-16 w-16 bg-slate-50 rounded-xl flex items-center justify-center shrink-0 border border-slate-100">
-                        <Building2 className="h-8 w-8 text-slate-500" />
+                        <Building2 className="h-8 w-8 text-slate-500" aria-hidden="true" />
                       </div>
 
                       {/* Job Details */}
@@ -361,11 +361,11 @@ export function BrowseJobs() {
 
                         <div className="flex flex-wrap items-center gap-3 mt-3 text-sm text-slate-500">
                           <span className="flex items-center bg-slate-50 px-2 py-1 rounded-lg">
-                            <MapPin className="h-3.5 w-3.5 me-1 text-slate-500" />
+                            <MapPin className="h-3.5 w-3.5 me-1 text-slate-500" aria-hidden="true" />
                             {isRTL ? job.location : job.locationEn}
                           </span>
                           <span className="flex items-center bg-slate-50 px-2 py-1 rounded-lg">
-                            <Clock className="h-3.5 w-3.5 me-1 text-slate-500" />
+                            <Clock className="h-3.5 w-3.5 me-1 text-slate-500" aria-hidden="true" />
                             {isRTL ? job.experience : job.experienceEn}
                           </span>
                           <span className="flex items-center bg-slate-50 px-2 py-1 rounded-lg">
@@ -382,11 +382,11 @@ export function BrowseJobs() {
                           <div className="flex items-center gap-4 text-sm text-slate-500">
                             {getJobTypeBadge(job.type)}
                             <span className="flex items-center text-xs">
-                              <Calendar className="h-3.5 w-3.5 me-1" />
+                              <Calendar className="h-3.5 w-3.5 me-1" aria-hidden="true" />
                               {formatDate(job.postedAt)}
                             </span>
                             <span className="flex items-center text-xs">
-                              <Users className="h-3.5 w-3.5 me-1" />
+                              <Users className="h-3.5 w-3.5 me-1" aria-hidden="true" />
                               {job.applicants} {isRTL ? 'متقدم' : 'applicants'}
                             </span>
                             <span className="flex items-center text-xs">
@@ -429,13 +429,13 @@ export function BrowseJobs() {
             {filteredJobs.length > 0 && (
               <div className="flex items-center justify-center gap-2 pt-4">
                 <Button variant="outline" size="icon" disabled className="rounded-lg border-slate-200">
-                  {isRTL ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
+                  {isRTL ? <ChevronRight className="h-4 w-4" aria-hidden="true" /> : <ChevronLeft className="h-4 w-4" aria-hidden="true" />}
                 </Button>
                 <Button variant="outline" className="bg-navy text-white hover:bg-navy/90 border-navy rounded-lg">1</Button>
                 <Button variant="outline" className="rounded-lg border-slate-200">2</Button>
                 <Button variant="outline" className="rounded-lg border-slate-200">3</Button>
                 <Button variant="outline" size="icon" className="rounded-lg border-slate-200">
-                  {isRTL ? <ChevronLeft className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+                  {isRTL ? <ChevronLeft className="h-4 w-4" aria-hidden="true" /> : <ChevronRight className="h-4 w-4" aria-hidden="true" />}
                 </Button>
               </div>
             )}

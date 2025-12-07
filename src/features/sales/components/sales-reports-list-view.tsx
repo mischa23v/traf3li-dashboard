@@ -180,7 +180,7 @@ export function SalesReportsListView() {
         <div className="bg-white rounded-2xl p-4 border border-slate-100 shadow-sm">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center">
-              <Calendar className="h-5 w-5 text-blue-600" />
+              <Calendar className="h-5 w-5 text-blue-600" aria-hidden="true" />
             </div>
             <div>
               <p className="text-sm text-slate-500">تقارير مجدولة</p>

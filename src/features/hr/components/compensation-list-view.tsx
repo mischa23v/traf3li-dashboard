@@ -166,7 +166,7 @@ export function CompensationListView() {
                 <CardContent className="p-4">
                   <div className="flex items-center gap-3">
                     <div className="p-2 bg-blue-100 rounded-xl">
-                      <Users className="w-5 h-5 text-blue-600" />
+                      <Users className="w-5 h-5 text-blue-600" aria-hidden="true" />
                     </div>
                     <div>
                       <p className="text-xs text-slate-500">إجمالي السجلات</p>
@@ -209,7 +209,7 @@ export function CompensationListView() {
                 <CardContent className="p-4">
                   <div className="flex items-center gap-3">
                     <div className="p-2 bg-amber-100 rounded-xl">
-                      <Clock className="w-5 h-5 text-amber-600" />
+                      <Clock className="w-5 h-5 text-amber-600" aria-hidden="true" />
                     </div>
                     <div>
                       <p className="text-xs text-slate-500">مراجعات معلقة</p>
@@ -517,7 +517,7 @@ export function CompensationListView() {
                               )}
                               {record.nextReviewDate && (
                                 <span className="flex items-center gap-1">
-                                  <Clock className="w-3 h-3" />
+                                  <Clock className="w-3 h-3" aria-hidden="true" />
                                   المراجعة: {new Date(record.nextReviewDate).toLocaleDateString('ar-SA')}
                                 </span>
                               )}

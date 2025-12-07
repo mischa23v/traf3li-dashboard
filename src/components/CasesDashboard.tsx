@@ -102,7 +102,7 @@ export default function CasesDashboard() {
                                 <h3 className="font-bold text-navy text-xl">المهام العاجلة</h3>
                                 <p className="text-slate-400 text-sm mt-1">تستحق الانتباه</p>
                             </div>
-                            <div className="h-12 w-12 rounded-2xl bg-red-50 flex items-center justify-center shadow-sm"><AlertCircle className="h-6 w-6 text-red-500" /></div>
+                            <div className="h-12 w-12 rounded-2xl bg-red-50 flex items-center justify-center shadow-sm"><AlertCircle className="h-6 w-6 text-red-500" aria-hidden="true" /></div>
                         </div>
                         <div className="space-y-4">
                             <div className="flex items-center gap-4 p-4 bg-slate-50 rounded-2xl border border-slate-100 hover:bg-white hover:shadow-md transition-all duration-300 cursor-pointer group">
@@ -119,7 +119,7 @@ export default function CasesDashboard() {
                 {/* FILTERS SECTION */}
                 <div className="bg-white rounded-3xl border border-slate-200 shadow-sm p-6 lg:p-8">
                     <div className="flex items-center gap-3 mb-6 text-navy">
-                        <div className="p-2 bg-blue-50 rounded-xl"><Filter className="h-5 w-5 text-brand-blue" /></div>
+                        <div className="p-2 bg-blue-50 rounded-xl"><Filter className="h-5 w-5 text-brand-blue" aria-hidden="true" /></div>
                         <span className="font-bold text-lg">تصفية القضايا</span>
                     </div>
 
@@ -186,7 +186,7 @@ export default function CasesDashboard() {
                     <div className="flex items-center gap-3 mt-8 pt-6 border-t border-slate-100">
                         <Button className="bg-brand-blue hover:bg-blue-700 text-white rounded-xl px-8 h-11 font-bold shadow-lg shadow-blue-600/20 transition-all hover:-translate-y-0.5">تطبيق التصفية</Button>
                         <Button variant="ghost" className="text-slate-500 hover:text-red-500 hover:bg-red-50 rounded-xl px-6 h-11 font-medium transition-colors">
-                            <X className="h-4 w-4 ms-2" />
+                            <X className="h-4 w-4 ms-2" aria-hidden="true" />
                             مسح الكل
                         </Button>
                     </div>
@@ -199,7 +199,7 @@ export default function CasesDashboard() {
                         <span className="px-3 py-1 bg-blue-50 text-brand-blue text-xs font-bold rounded-full border border-blue-100">{cases.length} جلسات</span>
                     </div>
                     <div className="text-sm font-medium text-slate-500 flex items-center gap-2 bg-white px-4 py-2 rounded-full shadow-sm border border-slate-100">
-                        <Clock className="h-4 w-4 text-brand-blue" />
+                        <Clock className="h-4 w-4 text-brand-blue" aria-hidden="true" />
                         <span>مرتبة حسب الوقت</span>
                     </div>
                 </div>
@@ -242,7 +242,7 @@ export default function CasesDashboard() {
                                     {/* Location */}
                                     <div className="flex justify-between items-center text-sm pb-3 border-b border-slate-50 border-dashed">
                                         <span className="text-slate-500 font-medium flex items-center gap-1.5">
-                                            <MapPin className="h-4 w-4 text-slate-400" />
+                                            <MapPin className="h-4 w-4 text-slate-400" aria-hidden="true" />
                                             الموقع
                                         </span>
                                         <span className="font-bold text-slate-800 text-xs bg-slate-50 px-2 py-1 rounded-lg">{typeof caseItem.location === 'string' ? caseItem.location : (caseItem.location?.name || caseItem.location?.address || 'عن بعد')}</span>
@@ -252,7 +252,7 @@ export default function CasesDashboard() {
                                     <div className="flex justify-between items-center text-sm pt-1">
                                         <span className="text-slate-500 font-medium">الوقت</span>
                                         <span className="font-bold text-brand-blue flex items-center gap-1.5 bg-blue-50 px-3 py-1.5 rounded-lg border border-blue-100">
-                                            <Clock className="h-4 w-4" />
+                                            <Clock className="h-4 w-4" aria-hidden="true" />
                                             {caseItem.time}
                                         </span>
                                     </div>
@@ -264,7 +264,7 @@ export default function CasesDashboard() {
                                     {caseItem.actionRequired}
                                 </span>
                                 <button className="h-9 w-9 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-400 hover:bg-brand-blue hover:text-white hover:border-transparent transition-all duration-300 shadow-sm">
-                                    <ChevronLeft className="h-5 w-5" />
+                                    <ChevronLeft className="h-5 w-5" aria-hidden="true" />
                                 </button>
                             </div>
                         </div>

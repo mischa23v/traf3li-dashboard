@@ -222,7 +222,7 @@ export function SecurityPage() {
                 </div>
               ) : (
                 <div className="flex items-center gap-2 text-amber-600 bg-amber-50 p-3 rounded-lg">
-                  <AlertTriangle className="h-5 w-5" />
+                  <AlertTriangle className="h-5 w-5" aria-hidden="true" />
                   <span>{isRTL ? 'المصادقة الثنائية غير مفعلة' : 'Two-factor authentication is not enabled'}</span>
                 </div>
               )}
@@ -293,11 +293,11 @@ export function SecurityPage() {
                         </div>
                         <div className="flex items-center gap-4 text-sm text-slate-500 mt-1">
                           <span className="flex items-center">
-                            <MapPin className="h-3 w-3 me-1" />
+                            <MapPin className="h-3 w-3 me-1" aria-hidden="true" />
                             {isRTL ? session.location : session.locationEn}
                           </span>
                           <span className="flex items-center">
-                            <Clock className="h-3 w-3 me-1" />
+                            <Clock className="h-3 w-3 me-1" aria-hidden="true" />
                             {isRTL ? session.lastActive : session.lastActiveEn}
                           </span>
                         </div>

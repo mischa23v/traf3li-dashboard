@@ -171,9 +171,9 @@ export function PayrollListView() {
             cancelled: 'ملغي',
         }
         const icons: Record<PaymentStatus, React.ReactNode> = {
-            draft: <FileText className="w-3 h-3" />,
+            draft: <FileText className="w-3 h-3" aria-hidden="true" />,
             approved: <CheckCircle className="w-3 h-3" />,
-            processing: <Clock className="w-3 h-3" />,
+            processing: <Clock className="w-3 h-3" aria-hidden="true" />,
             paid: <CheckCircle className="w-3 h-3" />,
             failed: <XCircle className="w-3 h-3" />,
             cancelled: <XCircle className="w-3 h-3" />,

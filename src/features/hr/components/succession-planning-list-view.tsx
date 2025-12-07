@@ -185,7 +185,7 @@ export function SuccessionPlanningListView() {
                 <CardContent className="p-4">
                   <div className="flex items-center gap-3">
                     <div className="p-2 bg-red-100 rounded-xl">
-                      <AlertTriangle className="w-5 h-5 text-red-600" />
+                      <AlertTriangle className="w-5 h-5 text-red-600" aria-hidden="true" />
                     </div>
                     <div>
                       <p className="text-xs text-slate-500">مناصب حرجة</p>
@@ -211,7 +211,7 @@ export function SuccessionPlanningListView() {
                 <CardContent className="p-4">
                   <div className="flex items-center gap-3">
                     <div className="p-2 bg-amber-100 rounded-xl">
-                      <Clock className="w-5 h-5 text-amber-600" />
+                      <Clock className="w-5 h-5 text-amber-600" aria-hidden="true" />
                     </div>
                     <div>
                       <p className="text-xs text-slate-500">تحتاج مراجعة</p>
@@ -441,7 +441,7 @@ export function SuccessionPlanningListView() {
                             <div>
                               <p className="text-xs text-slate-500">عدد الخلفاء</p>
                               <p className="font-medium text-sm flex items-center gap-1">
-                                <Users className="w-3 h-3 text-slate-500" />
+                                <Users className="w-3 h-3 text-slate-500" aria-hidden="true" />
                                 {plan.successorsCount}
                               </p>
                             </div>
@@ -462,7 +462,7 @@ export function SuccessionPlanningListView() {
                             <div>
                               <p className="text-xs text-slate-500">تاريخ المراجعة</p>
                               <p className="font-medium text-sm flex items-center gap-1">
-                                <Clock className="w-3 h-3 text-slate-500" />
+                                <Clock className="w-3 h-3 text-slate-500" aria-hidden="true" />
                                 {plan.reviewDate ? new Date(plan.reviewDate).toLocaleDateString('ar-SA') : '-'}
                               </p>
                             </div>

@@ -174,7 +174,7 @@ export function EmployeeDetailsView() {
                     <div className="bg-white rounded-2xl p-12 border border-slate-100 text-center">
                         <div className="flex justify-center mb-4">
                             <div className="w-16 h-16 rounded-full bg-emerald-50 flex items-center justify-center">
-                                <User className="w-8 h-8 text-emerald-500" />
+                                <User className="w-8 h-8 text-emerald-500" aria-hidden="true" />
                             </div>
                         </div>
                         <h3 className="text-lg font-bold text-slate-900 mb-2">الموظف غير موجود</h3>
@@ -267,7 +267,7 @@ export function EmployeeDetailsView() {
                                                     <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
                                                         <CardHeader className="pb-3">
                                                             <CardTitle className="text-base font-bold text-navy flex items-center gap-2">
-                                                                <User className="w-4 h-4 text-emerald-600" />
+                                                                <User className="w-4 h-4 text-emerald-600" aria-hidden="true" />
                                                                 البيانات الشخصية
                                                             </CardTitle>
                                                         </CardHeader>
@@ -410,7 +410,7 @@ export function EmployeeDetailsView() {
                                                     <Card className="border-none shadow-sm bg-amber-50 rounded-2xl overflow-hidden border border-amber-200">
                                                         <CardContent className="p-4">
                                                             <div className="flex items-center gap-3">
-                                                                <AlertTriangle className="w-5 h-5 text-amber-600" />
+                                                                <AlertTriangle className="w-5 h-5 text-amber-600" aria-hidden="true" />
                                                                 <div>
                                                                     <span className="font-bold text-amber-800">فترة التجربة</span>
                                                                     <p className="text-sm text-amber-700">
@@ -426,7 +426,7 @@ export function EmployeeDetailsView() {
                                                 <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
                                                     <CardHeader className="pb-3">
                                                         <CardTitle className="text-base font-bold text-navy flex items-center gap-2">
-                                                            <Clock className="w-4 h-4 text-purple-600" />
+                                                            <Clock className="w-4 h-4 text-purple-600" aria-hidden="true" />
                                                             جدول العمل
                                                         </CardTitle>
                                                     </CardHeader>
@@ -588,7 +588,7 @@ export function EmployeeDetailsView() {
                                                         <CardContent className="p-4">
                                                             <div className="flex items-center justify-between">
                                                                 <div className="flex items-center gap-3">
-                                                                    <Clock className="w-5 h-5 text-blue-600" />
+                                                                    <Clock className="w-5 h-5 text-blue-600" aria-hidden="true" />
                                                                     <div>
                                                                         <span className="text-sm text-blue-700">سنوات الخدمة</span>
                                                                         <span className="font-bold text-blue-800 text-lg ms-2">{(employee as any).yearsOfService} سنة</span>
@@ -696,7 +696,7 @@ export function EmployeeDetailsView() {
                                                                     <div key={doc._id || idx} className="bg-slate-50 rounded-xl p-4 border border-slate-100">
                                                                         <div className="flex items-center gap-3">
                                                                             <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center">
-                                                                                <FileText className="w-5 h-5 text-slate-500" />
+                                                                                <FileText className="w-5 h-5 text-slate-500" aria-hidden="true" />
                                                                             </div>
                                                                             <div className="flex-1 min-w-0">
                                                                                 <div className="font-medium text-navy text-sm truncate">{doc.documentName}</div>
@@ -711,7 +711,7 @@ export function EmployeeDetailsView() {
                                                             </div>
                                                         ) : (
                                                             <div className="text-center py-8 text-slate-500">
-                                                                <FileText className="w-12 h-12 mx-auto mb-3 opacity-30" />
+                                                                <FileText className="w-12 h-12 mx-auto mb-3 opacity-30" aria-hidden="true" />
                                                                 <p>لا توجد مستندات</p>
                                                             </div>
                                                         )}
@@ -741,7 +741,7 @@ export function EmployeeDetailsView() {
                     <div className="bg-white rounded-2xl p-6 max-w-md w-full shadow-xl">
                         <div className="flex justify-center mb-4">
                             <div className="w-16 h-16 rounded-full bg-red-50 flex items-center justify-center">
-                                <AlertTriangle className="w-8 h-8 text-red-500" />
+                                <AlertTriangle className="w-8 h-8 text-red-500" aria-hidden="true" />
                             </div>
                         </div>
                         <h3 className="text-lg font-bold text-slate-900 text-center mb-2">

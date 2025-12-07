@@ -148,8 +148,8 @@ export function JobPostingsListView() {
       slate: 'bg-slate-100 text-slate-600',
     }
     const icons: Record<JobPostingStatus, React.ReactNode> = {
-      draft: <FileText className="w-3 h-3" />,
-      published: <Globe className="w-3 h-3" />,
+      draft: <FileText className="w-3 h-3" aria-hidden="true" />,
+      published: <Globe className="w-3 h-3" aria-hidden="true" />,
       closed: <XCircle className="w-3 h-3" />,
       on_hold: <PauseCircle className="w-3 h-3" />,
       filled: <CheckCircle className="w-3 h-3" />,

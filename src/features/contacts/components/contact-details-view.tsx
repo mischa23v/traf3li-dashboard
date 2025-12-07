@@ -204,7 +204,7 @@ export function ContactDetailsView() {
           <div className="bg-white rounded-2xl p-12 border border-slate-100 text-center">
             <div className="flex justify-center mb-4">
               <div className="w-16 h-16 rounded-full bg-red-50 flex items-center justify-center">
-                <AlertCircle className="w-8 h-8 text-red-500" />
+                <AlertCircle className="w-8 h-8 text-red-500" aria-hidden="true" />
               </div>
             </div>
             <h3 className="text-lg font-bold text-slate-900 mb-2">
@@ -227,7 +227,7 @@ export function ContactDetailsView() {
           <div className="bg-white rounded-2xl p-12 border border-slate-100 text-center">
             <div className="flex justify-center mb-4">
               <div className="w-16 h-16 rounded-full bg-emerald-50 flex items-center justify-center">
-                <User className="w-8 h-8 text-emerald-500" />
+                <User className="w-8 h-8 text-emerald-500" aria-hidden="true" />
               </div>
             </div>
             <h3 className="text-lg font-bold text-slate-900 mb-2">
@@ -259,7 +259,7 @@ export function ContactDetailsView() {
                     variant="outline"
                     className="border-white/10 text-white hover:bg-white/10 hover:text-white backdrop-blur-sm"
                   >
-                    <Edit3 className="h-4 w-4 ms-2" />
+                    <Edit3 className="h-4 w-4 ms-2" aria-hidden="true" />
                     تعديل
                   </Button>
                 </Link>
@@ -343,7 +343,7 @@ export function ContactDetailsView() {
                         <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
                           <CardHeader>
                             <CardTitle className="text-lg font-bold text-navy flex items-center gap-2">
-                              <Phone className="h-5 w-5 text-emerald-500" />
+                              <Phone className="h-5 w-5 text-emerald-500" aria-hidden="true" />
                               معلومات الاتصال
                             </CardTitle>
                           </CardHeader>
@@ -351,7 +351,7 @@ export function ContactDetailsView() {
                             <div className="space-y-4">
                               {/* Primary Phone */}
                               <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-xl">
-                                <Phone className="h-5 w-5 text-emerald-500" />
+                                <Phone className="h-5 w-5 text-emerald-500" aria-hidden="true" />
                                 <div>
                                   <p className="text-xs text-slate-500">الهاتف الرئيسي</p>
                                   <p className="font-medium text-navy" dir="ltr">
@@ -362,7 +362,7 @@ export function ContactDetailsView() {
                               {/* Additional Phones */}
                               {contact.phones?.slice(1).map((phone: any, idx: number) => (
                                 <div key={idx} className="flex items-center gap-3 p-3 bg-slate-50 rounded-xl">
-                                  <Phone className="h-5 w-5 text-slate-500" />
+                                  <Phone className="h-5 w-5 text-slate-500" aria-hidden="true" />
                                   <div>
                                     <p className="text-xs text-slate-500">{phone.type === 'mobile' ? 'جوال' : phone.type === 'work' ? 'عمل' : phone.type}</p>
                                     <p className="font-medium text-navy" dir="ltr">{phone.number}</p>
@@ -373,7 +373,7 @@ export function ContactDetailsView() {
                             <div className="space-y-4">
                               {/* Primary Email */}
                               <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-xl">
-                                <Mail className="h-5 w-5 text-blue-500" />
+                                <Mail className="h-5 w-5 text-blue-500" aria-hidden="true" />
                                 <div>
                                   <p className="text-xs text-slate-500">البريد الإلكتروني</p>
                                   <p className="font-medium text-navy" dir="ltr">
@@ -384,7 +384,7 @@ export function ContactDetailsView() {
                               {/* Additional Emails */}
                               {contact.emails?.slice(1).map((email: any, idx: number) => (
                                 <div key={idx} className="flex items-center gap-3 p-3 bg-slate-50 rounded-xl">
-                                  <Mail className="h-5 w-5 text-slate-500" />
+                                  <Mail className="h-5 w-5 text-slate-500" aria-hidden="true" />
                                   <div>
                                     <p className="text-xs text-slate-500">{email.type === 'work' ? 'عمل' : email.type === 'personal' ? 'شخصي' : email.type}</p>
                                     <p className="font-medium text-navy" dir="ltr">{email.email}</p>
@@ -477,7 +477,7 @@ export function ContactDetailsView() {
                           <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
                             <CardHeader>
                               <CardTitle className="text-lg font-bold text-navy flex items-center gap-2">
-                                <MapPin className="h-5 w-5 text-red-500" />
+                                <MapPin className="h-5 w-5 text-red-500" aria-hidden="true" />
                                 العنوان
                               </CardTitle>
                             </CardHeader>
@@ -626,7 +626,7 @@ export function ContactDetailsView() {
                             <div className="flex flex-wrap gap-3 pt-4">
                               {contact.doNotContact && (
                                 <Badge className="bg-red-100 text-red-700">
-                                  <AlertTriangle className="h-3 w-3 ms-1" />
+                                  <AlertTriangle className="h-3 w-3 ms-1" aria-hidden="true" />
                                   عدم التواصل نهائياً
                                 </Badge>
                               )}
@@ -655,7 +655,7 @@ export function ContactDetailsView() {
                         <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
                           <CardHeader>
                             <CardTitle className="text-lg font-bold text-navy flex items-center gap-2">
-                              <FileText className="h-5 w-5 text-slate-500" />
+                              <FileText className="h-5 w-5 text-slate-500" aria-hidden="true" />
                               الملاحظات
                             </CardTitle>
                           </CardHeader>

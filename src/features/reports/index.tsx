@@ -84,7 +84,7 @@ export default function Reports() {
 
         <div className="ms-auto flex items-center gap-4">
           <div className="relative hidden md:block">
-            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" aria-hidden="true" />
             <input
               type="text"
               placeholder={t('common.search', 'بحث...')}
@@ -134,7 +134,7 @@ export default function Reports() {
               </p>
             </div>
             <Button onClick={handleCreateNew} className="bg-emerald-500 hover:bg-emerald-600 text-white h-12 px-6 rounded-xl shadow-lg shadow-emerald-500/20 border-0">
-              <Plus className="me-2 h-5 w-5" />
+              <Plus className="me-2 h-5 w-5" aria-hidden="true" />
               {t('reports.createReport')}
             </Button>
           </div>

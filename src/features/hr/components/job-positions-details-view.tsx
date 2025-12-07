@@ -243,7 +243,7 @@ export function JobPositionsDetailsView() {
                           تعديل
                         </DropdownMenuItem>
                         <DropdownMenuItem onClick={handleClone}>
-                          <Copy className="w-4 h-4 ms-2" />
+                          <Copy className="w-4 h-4 ms-2" aria-hidden="true" />
                           نسخ المنصب
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
@@ -466,7 +466,7 @@ export function JobPositionsDetailsView() {
                       <Card className="rounded-2xl border-emerald-200 bg-emerald-50/50">
                         <CardHeader className="pb-4">
                           <CardTitle className="text-lg font-bold text-emerald-800 flex items-center gap-2">
-                            <User className="w-5 h-5 text-emerald-600" />
+                            <User className="w-5 h-5 text-emerald-600" aria-hidden="true" />
                             شاغل المنصب الحالي
                           </CardTitle>
                         </CardHeader>
@@ -582,7 +582,7 @@ export function JobPositionsDetailsView() {
                       <Card className="rounded-2xl border-slate-100">
                         <CardHeader className="pb-4">
                           <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                            <FileText className="w-5 h-5 text-emerald-500" />
+                            <FileText className="w-5 h-5 text-emerald-500" aria-hidden="true" />
                             ملخص الوظيفة
                           </CardTitle>
                         </CardHeader>
@@ -653,7 +653,7 @@ export function JobPositionsDetailsView() {
                     <Card className="rounded-2xl border-slate-100">
                       <CardHeader className="pb-4">
                         <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                          <Clock className="w-5 h-5 text-emerald-500" />
+                          <Clock className="w-5 h-5 text-emerald-500" aria-hidden="true" />
                           ظروف العمل
                         </CardTitle>
                       </CardHeader>

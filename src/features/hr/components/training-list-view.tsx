@@ -111,12 +111,12 @@ export function TrainingListView() {
   const getTypeIcon = (type: TrainingType) => {
     const icons: Record<TrainingType, React.ReactNode> = {
       internal: <Building2 className="w-4 h-4" aria-hidden="true" />,
-      external: <Users className="w-4 h-4" />,
+      external: <Users className="w-4 h-4" aria-hidden="true" />,
       online: <Monitor className="w-4 h-4" />,
       certification: <Award className="w-4 h-4" />,
-      conference: <Users className="w-4 h-4" />,
+      conference: <Users className="w-4 h-4" aria-hidden="true" />,
       workshop: <BookOpen className="w-4 h-4" />,
-      mentoring: <Users className="w-4 h-4" />,
+      mentoring: <Users className="w-4 h-4" aria-hidden="true" />,
       on_the_job: <Building2 className="w-4 h-4" aria-hidden="true" />,
     }
     return icons[type]
@@ -181,7 +181,7 @@ export function TrainingListView() {
                 <CardContent className="p-4">
                   <div className="flex items-center gap-3">
                     <div className="p-2 bg-amber-100 rounded-xl">
-                      <Clock className="w-5 h-5 text-amber-600" />
+                      <Clock className="w-5 h-5 text-amber-600" aria-hidden="true" />
                     </div>
                     <div>
                       <p className="text-xs text-slate-500">قيد التنفيذ</p>

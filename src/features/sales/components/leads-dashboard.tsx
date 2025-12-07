@@ -164,7 +164,7 @@ function LeadCard({
             </h4>
             {lead.company && (
               <p className="text-xs text-slate-500 flex items-center gap-1 mt-1">
-                <Building className="h-3 w-3" />
+                <Building className="h-3 w-3" aria-hidden="true" />
                 {lead.company}
               </p>
             )}
@@ -200,13 +200,13 @@ function LeadCard({
       <div className="space-y-2 text-xs text-slate-600">
         {lead.phone && (
           <div className="flex items-center gap-2">
-            <Phone className="h-3 w-3" />
+            <Phone className="h-3 w-3" aria-hidden="true" />
             <span dir="ltr">{lead.phone}</span>
           </div>
         )}
         {lead.email && (
           <div className="flex items-center gap-2">
-            <Mail className="h-3 w-3" />
+            <Mail className="h-3 w-3" aria-hidden="true" />
             <span dir="ltr">{lead.email}</span>
           </div>
         )}
@@ -225,7 +225,7 @@ function LeadCard({
 
       {lead.expectedCloseDate && (
         <div className="mt-2 flex items-center gap-1 text-xs text-slate-500">
-          <Calendar className="h-3 w-3" />
+          <Calendar className="h-3 w-3" aria-hidden="true" />
           <span>
             {formatDistanceToNow(new Date(lead.expectedCloseDate), {
               addSuffix: true,
@@ -282,20 +282,20 @@ function ConvertLeadDialog({
           <div className="space-y-4">
             <div className="bg-slate-50 p-4 rounded-lg space-y-2">
               <div className="flex items-center gap-2">
-                <Users className="h-4 w-4 text-slate-500" />
+                <Users className="h-4 w-4 text-slate-500" aria-hidden="true" />
                 <span className="font-medium">
                   {lead.firstName} {lead.lastName}
                 </span>
               </div>
               {lead.email && (
                 <div className="flex items-center gap-2 text-sm text-slate-600">
-                  <Mail className="h-3 w-3" />
+                  <Mail className="h-3 w-3" aria-hidden="true" />
                   <span dir="ltr">{lead.email}</span>
                 </div>
               )}
               {lead.phone && (
                 <div className="flex items-center gap-2 text-sm text-slate-600">
-                  <Phone className="h-3 w-3" />
+                  <Phone className="h-3 w-3" aria-hidden="true" />
                   <span dir="ltr">{lead.phone}</span>
                 </div>
               )}
@@ -889,7 +889,7 @@ export function LeadsDashboard() {
               <p className="text-2xl font-bold text-navy">{stats.totalLeads}</p>
             </div>
             <div className="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center">
-              <Users className="h-6 w-6 text-blue-500" />
+              <Users className="h-6 w-6 text-blue-500" aria-hidden="true" />
             </div>
           </div>
         </Card>
@@ -1080,7 +1080,7 @@ export function LeadsDashboard() {
           <div className="space-y-3">
             {filteredLeads.length === 0 ? (
               <div className="text-center py-12">
-                <Users className="h-12 w-12 text-slate-300 mx-auto mb-4" />
+                <Users className="h-12 w-12 text-slate-300 mx-auto mb-4" aria-hidden="true" />
                 <p className="text-slate-500">لا يوجد عملاء محتملين</p>
               </div>
             ) : (

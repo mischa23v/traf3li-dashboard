@@ -517,7 +517,7 @@ export function TaskDetailsView() {
                     <div className="bg-white rounded-2xl p-12 border border-slate-100 text-center">
                         <div className="flex justify-center mb-4">
                             <div className="w-16 h-16 rounded-full bg-red-50 flex items-center justify-center">
-                                <AlertCircle className="w-8 h-8 text-red-500" />
+                                <AlertCircle className="w-8 h-8 text-red-500" aria-hidden="true" />
                             </div>
                         </div>
                         <h3 className="text-lg font-bold text-slate-900 mb-2">حدث خطأ أثناء تحميل المهمة</h3>
@@ -664,7 +664,7 @@ export function TaskDetailsView() {
                                                                         }}
                                                                         className="h-8 w-8 p-0"
                                                                     >
-                                                                        <X className="w-4 h-4" />
+                                                                        <X className="w-4 h-4" aria-hidden="true" />
                                                                     </Button>
                                                                 </div>
                                                             ) : (
@@ -673,7 +673,7 @@ export function TaskDetailsView() {
                                                                     onClick={() => setIsAddingSubtask(true)}
                                                                     className="w-full justify-start text-slate-500 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl"
                                                                 >
-                                                                    <Plus className="w-5 h-5 ms-2" /> إضافة مهمة فرعية
+                                                                    <Plus className="w-5 h-5 ms-2" aria-hidden="true" /> إضافة مهمة فرعية
                                                                 </Button>
                                                             )}
                                                         </CardContent>
@@ -714,7 +714,7 @@ export function TaskDetailsView() {
                                                         <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
                                                             <CardHeader className="pb-3">
                                                                 <CardTitle className="text-base font-bold text-navy flex items-center gap-2">
-                                                                    <User className="w-4 h-4 text-amber-600" />
+                                                                    <User className="w-4 h-4 text-amber-600" aria-hidden="true" />
                                                                     بيانات العميل
                                                                 </CardTitle>
                                                             </CardHeader>
@@ -899,7 +899,7 @@ export function TaskDetailsView() {
                                                             ) : (
                                                                 <>
                                                                     <div className="w-12 h-12 rounded-full bg-slate-100 group-hover:bg-blue-100 flex items-center justify-center text-slate-400 group-hover:text-brand-blue mb-3 transition-colors">
-                                                                        <Upload className="h-6 w-6" />
+                                                                        <Upload className="h-6 w-6" aria-hidden="true" />
                                                                     </div>
                                                                     <span className="font-bold text-slate-600 group-hover:text-brand-blue">رفع مستند جديد</span>
                                                                     <span className="text-xs text-slate-500 mt-1">PDF, DOCX, Excel, صور</span>
@@ -913,7 +913,7 @@ export function TaskDetailsView() {
                                                             className="border-2 border-dashed border-emerald-200 rounded-2xl flex flex-col items-center justify-center p-6 cursor-pointer hover:border-emerald-500 hover:bg-emerald-50 transition-all group h-[180px]"
                                                         >
                                                             <div className="w-12 h-12 rounded-full bg-emerald-100 group-hover:bg-emerald-200 flex items-center justify-center text-emerald-500 group-hover:text-emerald-600 mb-3 transition-colors">
-                                                                <Edit3 className="h-6 w-6" />
+                                                                <Edit3 className="h-6 w-6" aria-hidden="true" />
                                                             </div>
                                                             <span className="font-bold text-slate-600 group-hover:text-emerald-600">إنشاء مستند</span>
                                                             <span className="text-xs text-slate-500 mt-1">محرر نصوص متقدم</span>
@@ -922,7 +922,7 @@ export function TaskDetailsView() {
                                                         {/* Empty State - Only show if no documents (excluding voice memos) */}
                                                         {task.attachments.filter(a => !a.isVoiceMemo).length === 0 && (
                                                             <div className="col-span-2 flex flex-col items-center justify-center p-8 text-slate-400">
-                                                                <FileText className="w-12 h-12 mb-3 opacity-30" />
+                                                                <FileText className="w-12 h-12 mb-3 opacity-30" aria-hidden="true" />
                                                                 <p>لا توجد مرفقات</p>
                                                                 <p className="text-xs mt-1">اضغط على رفع مستند لإضافة ملفات</p>
                                                             </div>
@@ -999,7 +999,7 @@ export function TaskDetailsView() {
                                                                         className="h-8 w-8 text-slate-500 hover:text-brand-blue"
                                                                         onClick={() => handleDownloadAttachment(doc._id, doc.name, doc.url, doc.storageType)}
                                                                     >
-                                                                        <Download className="h-4 w-4" />
+                                                                        <Download className="h-4 w-4" aria-hidden="true" />
                                                                     </Button>
                                                                 </div>
                                                             </div>
@@ -1051,7 +1051,7 @@ export function TaskDetailsView() {
                                                                                 className="flex-1 h-8 text-xs border-emerald-200 text-emerald-700 hover:bg-emerald-50"
                                                                                 onClick={() => handleOpenDocumentEditor(doc._id)}
                                                                             >
-                                                                                <Edit3 className="h-3 w-3 ms-1" />
+                                                                                <Edit3 className="h-3 w-3 ms-1" aria-hidden="true" />
                                                                                 تحرير
                                                                             </Button>
                                                                         </div>
@@ -1068,7 +1068,7 @@ export function TaskDetailsView() {
                                                             <div className="space-y-6 mb-6">
                                                                 {task.comments.length === 0 && (
                                                                     <div className="text-center py-8 text-slate-500">
-                                                                        <Send className="w-12 h-12 mx-auto mb-3 opacity-30" />
+                                                                        <Send className="w-12 h-12 mx-auto mb-3 opacity-30" aria-hidden="true" />
                                                                         <p>لا توجد تعليقات</p>
                                                                         <p className="text-xs mt-1">كن أول من يعلق على هذه المهمة</p>
                                                                     </div>
@@ -1115,7 +1115,7 @@ export function TaskDetailsView() {
                                                                         {addCommentMutation.isPending ? (
                                                                             <Loader2 className="w-4 h-4 animate-spin" />
                                                                         ) : (
-                                                                            <Send className="w-4 h-4" />
+                                                                            <Send className="w-4 h-4" aria-hidden="true" />
                                                                         )}
                                                                     </Button>
                                                                 </div>
@@ -1149,7 +1149,7 @@ export function TaskDetailsView() {
                     <div className="bg-white rounded-2xl p-6 max-w-md w-full shadow-xl">
                         <div className="flex justify-center mb-4">
                             <div className="w-16 h-16 rounded-full bg-red-50 flex items-center justify-center">
-                                <AlertTriangle className="w-8 h-8 text-red-500" />
+                                <AlertTriangle className="w-8 h-8 text-red-500" aria-hidden="true" />
                             </div>
                         </div>
                         <h3 className="text-lg font-bold text-slate-900 text-center mb-2">

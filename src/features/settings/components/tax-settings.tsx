@@ -266,7 +266,7 @@ export default function TaxSettings() {
                                                         </DropdownMenuTrigger>
                                                         <DropdownMenuContent align="end">
                                                             <DropdownMenuItem onClick={() => handleOpenDialog(tax)}>
-                                                                <Edit className="h-4 w-4 ms-2" />
+                                                                <Edit className="h-4 w-4 ms-2" aria-hidden="true" />
                                                                 تعديل
                                                             </DropdownMenuItem>
                                                             <DropdownMenuItem

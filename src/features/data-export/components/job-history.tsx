@@ -63,11 +63,11 @@ export function JobHistory() {
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList>
           <TabsTrigger value="exports" className="flex items-center gap-2">
-            <Download className="h-4 w-4" />
+            <Download className="h-4 w-4" aria-hidden="true" />
             {t('dataExport.exports')}
           </TabsTrigger>
           <TabsTrigger value="imports" className="flex items-center gap-2">
-            <Upload className="h-4 w-4" />
+            <Upload className="h-4 w-4" aria-hidden="true" />
             {t('dataExport.imports')}
           </TabsTrigger>
         </TabsList>
@@ -116,7 +116,7 @@ export function JobHistory() {
                               }
                               disabled={downloadExport.isPending}
                             >
-                              <Download className="h-4 w-4" />
+                              <Download className="h-4 w-4" aria-hidden="true" />
                             </Button>
                           )}
                         </TableCell>

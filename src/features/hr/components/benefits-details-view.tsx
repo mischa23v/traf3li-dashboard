@@ -404,7 +404,7 @@ export function BenefitsDetailsView() {
                 <Card className="rounded-2xl border-slate-100">
                   <CardHeader className="pb-4">
                     <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                      <User className="w-5 h-5 text-emerald-500" />
+                      <User className="w-5 h-5 text-emerald-500" aria-hidden="true" />
                       بيانات الموظف
                     </CardTitle>
                   </CardHeader>
@@ -736,7 +736,7 @@ export function BenefitsDetailsView() {
                   <Card className="rounded-2xl border-slate-100">
                     <CardHeader className="pb-4">
                       <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                        <Users className="w-5 h-5 text-emerald-500" />
+                        <Users className="w-5 h-5 text-emerald-500" aria-hidden="true" />
                         المعالين المشمولين
                       </CardTitle>
                     </CardHeader>
@@ -746,7 +746,7 @@ export function BenefitsDetailsView() {
                           <div key={dependent.memberId} className="p-4 border border-slate-200 rounded-xl flex items-center justify-between">
                             <div className="flex items-center gap-4">
                               <div className="w-10 h-10 bg-slate-100 rounded-xl flex items-center justify-center">
-                                <User className="w-5 h-5 text-slate-500" />
+                                <User className="w-5 h-5 text-slate-500" aria-hidden="true" />
                               </div>
                               <div>
                                 <p className="font-medium text-navy">{dependent.nameAr || dependent.name}</p>
@@ -773,7 +773,7 @@ export function BenefitsDetailsView() {
                 ) : (
                   <Card className="rounded-2xl border-slate-100">
                     <CardContent className="p-8 text-center">
-                      <Users className="w-12 h-12 mx-auto text-slate-300 mb-4" />
+                      <Users className="w-12 h-12 mx-auto text-slate-300 mb-4" aria-hidden="true" />
                       <p className="text-slate-500">لا يوجد معالين مشمولين</p>
                     </CardContent>
                   </Card>

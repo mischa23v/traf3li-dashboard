@@ -133,7 +133,7 @@ export function LeadsListView() {
 
         <div className="ms-auto flex items-center gap-2 sm:gap-4 overflow-x-auto min-w-0">
           <div className="relative hidden md:block min-w-0">
-            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" aria-hidden="true" />
             <input
               type="text"
               placeholder={t('common.search')}
@@ -167,7 +167,7 @@ export function LeadsListView() {
             className="bg-emerald-500 hover:bg-emerald-600 text-white h-12 px-8 rounded-xl font-bold shadow-lg shadow-emerald-500/20 border-0"
           >
             <Link to="/dashboard/crm/leads/new">
-              <Plus className="ms-2 h-5 w-5" />
+              <Plus className="ms-2 h-5 w-5" aria-hidden="true" />
               {t('leads.newLead')}
             </Link>
           </Button>
@@ -235,7 +235,7 @@ export function LeadsListView() {
                   <div className="bg-white rounded-2xl p-12 border border-slate-100 text-center">
                     <div className="flex justify-center mb-4">
                       <div className="w-16 h-16 rounded-full bg-red-50 flex items-center justify-center">
-                        <AlertCircle className="w-8 h-8 text-red-500" />
+                        <AlertCircle className="w-8 h-8 text-red-500" aria-hidden="true" />
                       </div>
                     </div>
                     <h3 className="text-lg font-bold text-slate-900 mb-2">
@@ -258,7 +258,7 @@ export function LeadsListView() {
                   <div className="bg-white rounded-2xl p-12 border border-slate-100 text-center">
                     <div className="flex justify-center mb-4">
                       <div className="w-16 h-16 rounded-full bg-emerald-50 flex items-center justify-center">
-                        <Users className="w-8 h-8 text-emerald-500" />
+                        <Users className="w-8 h-8 text-emerald-500" aria-hidden="true" />
                       </div>
                     </div>
                     <h3 className="text-lg font-bold text-slate-900 mb-2">
@@ -267,7 +267,7 @@ export function LeadsListView() {
                     <p className="text-slate-500 mb-4">{t('leads.startAddingLead')}</p>
                     <Button asChild className="bg-emerald-500 hover:bg-emerald-600">
                       <Link to="/dashboard/crm/leads/new">
-                        <Plus className="w-4 h-4 ms-2" />
+                        <Plus className="w-4 h-4 ms-2" aria-hidden="true" />
                         {t('leads.newLead')}
                       </Link>
                     </Button>
@@ -295,7 +295,7 @@ export function LeadsListView() {
                             />
                           )}
                           <div className="w-12 h-12 rounded-xl bg-white flex items-center justify-center shadow-sm text-emerald-600">
-                            <Users className="h-6 w-6" />
+                            <Users className="h-6 w-6" aria-hidden="true" />
                           </div>
                           <div>
                             <div className="flex items-center gap-2 mb-1">
@@ -311,13 +311,13 @@ export function LeadsListView() {
                             <div className="flex items-center gap-4 text-slate-500 text-sm">
                               {lead.phone && (
                                 <span className="flex items-center gap-1">
-                                  <Phone className="h-3 w-3" />
+                                  <Phone className="h-3 w-3" aria-hidden="true" />
                                   {lead.phone}
                                 </span>
                               )}
                               {lead.email && (
                                 <span className="flex items-center gap-1">
-                                  <Mail className="h-3 w-3" />
+                                  <Mail className="h-3 w-3" aria-hidden="true" />
                                   {lead.email}
                                 </span>
                               )}
@@ -404,7 +404,7 @@ export function LeadsListView() {
                   className="text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 w-full rounded-xl py-6"
                 >
                   {t('leads.viewAllLeads')}
-                  <ChevronLeft className="h-4 w-4 me-2" />
+                  <ChevronLeft className="h-4 w-4 me-2" aria-hidden="true" />
                 </Button>
               </div>
             </div>

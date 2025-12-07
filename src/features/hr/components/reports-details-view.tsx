@@ -294,7 +294,7 @@ export function ReportsDetailsView() {
                           تعديل
                         </DropdownMenuItem>
                         <DropdownMenuItem onClick={handleDuplicate}>
-                          <Copy className="w-4 h-4 ms-2" />
+                          <Copy className="w-4 h-4 ms-2" aria-hidden="true" />
                           نسخ
                         </DropdownMenuItem>
                         <DropdownMenuItem>
@@ -390,7 +390,7 @@ export function ReportsDetailsView() {
                     <Card className="rounded-2xl border-slate-100">
                       <CardHeader>
                         <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                          <FileText className="w-5 h-5 text-emerald-500" />
+                          <FileText className="w-5 h-5 text-emerald-500" aria-hidden="true" />
                           معلومات التقرير
                         </CardTitle>
                       </CardHeader>
@@ -551,7 +551,7 @@ export function ReportsDetailsView() {
                     <Card className="rounded-2xl border-slate-100">
                       <CardHeader>
                         <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                          <Users className="w-5 h-5 text-cyan-500" />
+                          <Users className="w-5 h-5 text-cyan-500" aria-hidden="true" />
                           المالك
                         </CardTitle>
                       </CardHeader>
@@ -677,7 +677,7 @@ export function ReportsDetailsView() {
                           <CardHeader>
                             <div className="flex items-center justify-between">
                               <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                                <Clock className="w-5 h-5 text-cyan-500" />
+                                <Clock className="w-5 h-5 text-cyan-500" aria-hidden="true" />
                                 إعدادات الجدولة
                               </CardTitle>
                               <div className="flex items-center gap-2">
@@ -782,7 +782,7 @@ export function ReportsDetailsView() {
                     ) : (
                       <Card className="rounded-2xl border-slate-100">
                         <CardContent className="p-8 text-center">
-                          <Clock className="w-12 h-12 mx-auto text-slate-300 mb-4" />
+                          <Clock className="w-12 h-12 mx-auto text-slate-300 mb-4" aria-hidden="true" />
                           <p className="text-slate-500">لم يتم تفعيل الجدولة لهذا التقرير</p>
                           <Button
                             variant="outline"
@@ -821,7 +821,7 @@ export function ReportsDetailsView() {
                                   ) : execution.status === ExecutionStatus.RUNNING ? (
                                     <Loader2 className="w-5 h-5 text-amber-500 animate-spin" />
                                   ) : (
-                                    <Clock className="w-5 h-5 text-blue-500" />
+                                    <Clock className="w-5 h-5 text-blue-500" aria-hidden="true" />
                                   )}
                                   <div>
                                     <p className="font-medium">
@@ -862,7 +862,7 @@ export function ReportsDetailsView() {
                                   ) : execution.status === ExecutionStatus.FAILED ? (
                                     <XCircle className="w-5 h-5 text-red-500" />
                                   ) : (
-                                    <Clock className="w-5 h-5 text-blue-500" />
+                                    <Clock className="w-5 h-5 text-blue-500" aria-hidden="true" />
                                   )}
                                   <div>
                                     <p className="font-medium">

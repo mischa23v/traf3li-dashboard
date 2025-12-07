@@ -315,7 +315,7 @@ export function ApplicantsListView() {
                   <div className="bg-white rounded-2xl p-12 border border-slate-100 text-center">
                     <div className="flex justify-center mb-4">
                       <div className="w-16 h-16 rounded-full bg-emerald-50 flex items-center justify-center">
-                        <Users className="w-8 h-8 text-emerald-500" />
+                        <Users className="w-8 h-8 text-emerald-500" aria-hidden="true" />
                       </div>
                     </div>
                     <h3 className="text-lg font-bold text-slate-900 mb-2">لا يوجد متقدمين</h3>

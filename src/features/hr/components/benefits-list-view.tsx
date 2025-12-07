@@ -112,9 +112,9 @@ export function BenefitsListView() {
       vision_insurance: <Eye className="w-4 h-4" aria-hidden="true" />,
       pension: <Wallet className="w-4 h-4" />,
       savings_plan: <Wallet className="w-4 h-4" />,
-      education_allowance: <Users className="w-4 h-4" />,
+      education_allowance: <Users className="w-4 h-4" aria-hidden="true" />,
       transportation: <Car className="w-4 h-4" />,
-      housing: <Home className="w-4 h-4" />,
+      housing: <Home className="w-4 h-4" aria-hidden="true" />,
       meal_allowance: <Heart className="w-4 h-4" />,
       mobile_allowance: <Heart className="w-4 h-4" />,
       gym_membership: <Heart className="w-4 h-4" />,
@@ -196,7 +196,7 @@ export function BenefitsListView() {
                 <CardContent className="p-4">
                   <div className="flex items-center gap-3">
                     <div className="p-2 bg-amber-100 rounded-xl">
-                      <Clock className="w-5 h-5 text-amber-600" />
+                      <Clock className="w-5 h-5 text-amber-600" aria-hidden="true" />
                     </div>
                     <div>
                       <p className="text-xs text-slate-500">قيد الانتظار</p>

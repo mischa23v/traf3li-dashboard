@@ -170,7 +170,7 @@ export function CreateLeadView({ editMode = false }: CreateLeadViewProps) {
                                 {/* Basic Info */}
                                 <div className="space-y-6">
                                     <h3 className="text-lg font-bold text-navy flex items-center gap-2">
-                                        <User className="w-5 h-5 text-emerald-500" />
+                                        <User className="w-5 h-5 text-emerald-500" aria-hidden="true" />
                                         المعلومات الأساسية
                                     </h3>
 
@@ -204,7 +204,7 @@ export function CreateLeadView({ editMode = false }: CreateLeadViewProps) {
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                         <div className="space-y-2">
                                             <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                                <Phone className="w-4 h-4 text-emerald-500" />
+                                                <Phone className="w-4 h-4 text-emerald-500" aria-hidden="true" />
                                                 رقم الهاتف
                                             </label>
                                             <Input
@@ -217,7 +217,7 @@ export function CreateLeadView({ editMode = false }: CreateLeadViewProps) {
                                         </div>
                                         <div className="space-y-2">
                                             <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                                <Mail className="w-4 h-4 text-emerald-500" />
+                                                <Mail className="w-4 h-4 text-emerald-500" aria-hidden="true" />
                                                 البريد الإلكتروني
                                             </label>
                                             <Input
@@ -233,7 +233,7 @@ export function CreateLeadView({ editMode = false }: CreateLeadViewProps) {
 
                                     <div className="space-y-2">
                                         <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                            <Building className="w-4 h-4 text-emerald-500" />
+                                            <Building className="w-4 h-4 text-emerald-500" aria-hidden="true" />
                                             الشركة
                                         </label>
                                         <Input
@@ -323,7 +323,7 @@ export function CreateLeadView({ editMode = false }: CreateLeadViewProps) {
 
                                         <div className="space-y-2">
                                             <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                                <Calendar className="w-4 h-4 text-emerald-500" />
+                                                <Calendar className="w-4 h-4 text-emerald-500" aria-hidden="true" />
                                                 تاريخ الإغلاق المتوقع
                                             </label>
                                             <Input
@@ -340,7 +340,7 @@ export function CreateLeadView({ editMode = false }: CreateLeadViewProps) {
                                 {/* Case Details */}
                                 <div className="border-t border-slate-100 pt-6 space-y-6">
                                     <h3 className="text-lg font-bold text-navy flex items-center gap-2">
-                                        <FileText className="w-5 h-5 text-emerald-500" />
+                                        <FileText className="w-5 h-5 text-emerald-500" aria-hidden="true" />
                                         تفاصيل القضية
                                     </h3>
 

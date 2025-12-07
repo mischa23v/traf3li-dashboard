@@ -420,7 +420,7 @@ export function ApplicantCreateView() {
         <Card className="border-none shadow-sm bg-white rounded-2xl">
           <CardHeader className="pb-2">
             <CardTitle className="text-base font-bold text-navy flex items-center gap-2">
-              <User className="w-4 h-4 text-emerald-600" />
+              <User className="w-4 h-4 text-emerald-600" aria-hidden="true" />
               المعلومات الشخصية
             </CardTitle>
           </CardHeader>
@@ -761,7 +761,7 @@ export function ApplicantCreateView() {
                       <div className="flex flex-wrap gap-2">
                         {languages.map((lang, index) => (
                           <div key={index} className="flex items-center gap-2 bg-blue-100 rounded-lg px-3 py-1.5">
-                            <Globe className="w-3 h-3 text-blue-600" />
+                            <Globe className="w-3 h-3 text-blue-600" aria-hidden="true" />
                             <span className="text-sm font-medium text-blue-700">{lang.language}</span>
                             <span className="text-xs text-blue-500">({lang.level})</span>
                             {index > 0 && (
@@ -942,7 +942,7 @@ export function ApplicantCreateView() {
         <Card className="border-none shadow-sm bg-blue-50 rounded-2xl">
           <CardContent className="p-4">
             <div className="flex items-start gap-3">
-              <Info className="w-5 h-5 text-blue-600 mt-0.5" />
+              <Info className="w-5 h-5 text-blue-600 mt-0.5" aria-hidden="true" />
               <div>
                 <h4 className="font-bold text-blue-800 mb-1">نظام العمل السعودي - التوظيف</h4>
                 <ul className="text-sm text-blue-700 space-y-1">

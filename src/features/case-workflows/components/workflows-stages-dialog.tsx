@@ -229,7 +229,7 @@ export function WorkflowsStagesDialog({
                 }}
                 disabled={showAddForm}
               >
-                <Plus className="h-4 w-4 me-1" />
+                <Plus className="h-4 w-4 me-1" aria-hidden="true" />
                 {t('caseWorkflows.addStage')}
               </Button>
             </div>
@@ -289,9 +289,9 @@ export function WorkflowsStagesDialog({
                             <CollapsibleTrigger asChild>
                               <Button variant="ghost" size="icon" className="h-8 w-8">
                                 {expandedStages.has(stage._id || String(index)) ? (
-                                  <ChevronUp className="h-4 w-4" />
+                                  <ChevronUp className="h-4 w-4" aria-hidden="true" />
                                 ) : (
-                                  <ChevronDown className="h-4 w-4" />
+                                  <ChevronDown className="h-4 w-4" aria-hidden="true" />
                                 )}
                               </Button>
                             </CollapsibleTrigger>
@@ -360,7 +360,7 @@ export function WorkflowsStagesDialog({
                   {editingStage ? t('caseWorkflows.editStage') : t('caseWorkflows.addStage')}
                 </h4>
                 <Button variant="ghost" size="icon" onClick={resetForm}>
-                  <X className="h-4 w-4" />
+                  <X className="h-4 w-4" aria-hidden="true" />
                 </Button>
               </div>
 

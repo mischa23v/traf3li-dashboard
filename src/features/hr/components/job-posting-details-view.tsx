@@ -238,7 +238,7 @@ export function JobPostingDetailsView() {
                 disabled={publishMutation.isPending}
                 className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl"
               >
-                <Globe className="w-4 h-4 ms-2" />
+                <Globe className="w-4 h-4 ms-2" aria-hidden="true" />
                 نشر الوظيفة
               </Button>
             )}
@@ -265,7 +265,7 @@ export function JobPostingDetailsView() {
                   تعديل
                 </DropdownMenuItem>
                 <DropdownMenuItem>
-                  <Copy className="w-4 h-4 ms-2" />
+                  <Copy className="w-4 h-4 ms-2" aria-hidden="true" />
                   نسخ
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
@@ -297,7 +297,7 @@ export function JobPostingDetailsView() {
             <CardContent className="p-4">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center">
-                  <Users className="w-5 h-5 text-emerald-600" />
+                  <Users className="w-5 h-5 text-emerald-600" aria-hidden="true" />
                 </div>
                 <div>
                   <p className="text-xs text-slate-500">الشواغر</p>
@@ -346,7 +346,7 @@ export function JobPostingDetailsView() {
             <CardContent className="p-4">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center">
-                  <Clock className="w-5 h-5 text-amber-600" />
+                  <Clock className="w-5 h-5 text-amber-600" aria-hidden="true" />
                 </div>
                 <div>
                   <p className="text-xs text-slate-500">تاريخ الإغلاق</p>
@@ -389,7 +389,7 @@ export function JobPostingDetailsView() {
               <Card className="border-none shadow-sm bg-white rounded-2xl lg:col-span-2">
                 <CardHeader className="pb-2">
                   <CardTitle className="text-base font-bold text-navy flex items-center gap-2">
-                    <FileText className="w-4 h-4 text-emerald-600" />
+                    <FileText className="w-4 h-4 text-emerald-600" aria-hidden="true" />
                     وصف الوظيفة
                   </CardTitle>
                 </CardHeader>
@@ -455,7 +455,7 @@ export function JobPostingDetailsView() {
                   </div>
                   <div className="flex items-center justify-between py-2 border-b border-slate-100">
                     <span className="text-slate-500 flex items-center gap-2">
-                      <Globe className="w-4 h-4" />
+                      <Globe className="w-4 h-4" aria-hidden="true" />
                       مكان العمل
                     </span>
                     <span className="font-medium text-navy">{WORK_LOCATION_LABELS[job.workLocation]}</span>
@@ -732,7 +732,7 @@ export function JobPostingDetailsView() {
               <CardHeader className="pb-2">
                 <div className="flex items-center justify-between">
                   <CardTitle className="text-base font-bold text-navy flex items-center gap-2">
-                    <Users className="w-4 h-4 text-emerald-600" />
+                    <Users className="w-4 h-4 text-emerald-600" aria-hidden="true" />
                     المتقدمين للوظيفة
                   </CardTitle>
                   <Button
@@ -797,7 +797,7 @@ export function JobPostingDetailsView() {
                   </div>
                 ) : (
                   <div className="text-center py-12">
-                    <Users className="w-16 h-16 text-slate-300 mx-auto mb-4" />
+                    <Users className="w-16 h-16 text-slate-300 mx-auto mb-4" aria-hidden="true" />
                     <h3 className="text-lg font-bold text-slate-700 mb-2">لا يوجد متقدمين</h3>
                     <p className="text-slate-500 mb-4">لم يتقدم أحد لهذه الوظيفة بعد</p>
                     <Button

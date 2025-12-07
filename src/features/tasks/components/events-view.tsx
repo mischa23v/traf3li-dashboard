@@ -251,7 +251,7 @@ export function EventsView() {
 
                 <div className='ms-auto flex items-center gap-4'>
                     <div className="relative hidden md:block">
-                        <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                        <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" aria-hidden="true" />
                         <input type="text" placeholder={t('tasks.list.search')} className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
                     </div>
                     <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white">
@@ -283,7 +283,7 @@ export function EventsView() {
                             <div className="flex flex-wrap items-center gap-3">
                                 {/* Search Input */}
                                 <div className="relative flex-1 min-w-[200px] max-w-md">
-                                    <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                                    <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" aria-hidden="true" />
                                     <Input
                                         type="text"
                                         placeholder={t('events.list.searchPlaceholder')}
@@ -340,7 +340,7 @@ export function EventsView() {
                                         onClick={clearFilters}
                                         className="h-10 px-4 text-red-500 hover:text-red-600 hover:bg-red-50 rounded-xl"
                                     >
-                                        <X className="h-4 w-4 ms-2" />
+                                        <X className="h-4 w-4 ms-2" aria-hidden="true" />
                                         {t('events.list.clearFilters')}
                                     </Button>
                                 )}
@@ -380,7 +380,7 @@ export function EventsView() {
                                 {/* Error State */}
                                 {isError && (
                                     <Alert className="border-red-200 bg-red-50">
-                                        <AlertCircle className="h-4 w-4 text-red-600" />
+                                        <AlertCircle className="h-4 w-4 text-red-600" aria-hidden="true" />
                                         <AlertDescription className="text-red-800">
                                             <div className="flex items-center justify-between">
                                                 <span>{t('events.list.errorLoading')}: {error?.message || t('events.list.unknownError')}</span>
@@ -402,7 +402,7 @@ export function EventsView() {
                                         <p className="text-slate-500 mb-4">جدولك خالٍ حالياً. ابدأ بإضافة أحداث جديدة.</p>
                                         <Button asChild className="bg-blue-500 hover:bg-blue-600 text-white rounded-xl">
                                             <Link to="/dashboard/tasks/events/new">
-                                                <Plus className="ms-2 h-4 w-4" />
+                                                <Plus className="ms-2 h-4 w-4" aria-hidden="true" />
                                                 إضافة حدث جديد
                                             </Link>
                                         </Button>
@@ -438,11 +438,11 @@ export function EventsView() {
                                                     </div>
                                                     <div className="flex items-center gap-4 text-slate-500 text-sm">
                                                         <span className="flex items-center gap-1">
-                                                            <Clock className="h-3 w-3" />
+                                                            <Clock className="h-3 w-3" aria-hidden="true" />
                                                             {event.time}
                                                         </span>
                                                         <span className="flex items-center gap-1">
-                                                            <MapPin className="h-3 w-3" />
+                                                            <MapPin className="h-3 w-3" aria-hidden="true" />
                                                             {event.location}
                                                         </span>
                                                     </div>
@@ -497,7 +497,7 @@ export function EventsView() {
                                                     <div className="flex -gap-2">
                                                         {[...Array(Math.min(3, event.attendees))].map((_, i) => (
                                                             <div key={i} className="w-8 h-8 rounded-full bg-slate-200 border-2 border-white flex items-center justify-center text-xs font-bold text-slate-500">
-                                                                <Users className="w-4 h-4" />
+                                                                <Users className="w-4 h-4" aria-hidden="true" />
                                                             </div>
                                                         ))}
                                                         {event.attendees > 3 && (
@@ -541,7 +541,7 @@ export function EventsView() {
                             <div className="p-4 pt-0 text-center">
                                 <Button variant="ghost" className="text-blue-600 hover:text-blue-700 hover:bg-blue-50 w-full rounded-xl py-6">
                                     عرض جميع الفعاليات
-                                    <ChevronLeft className="h-4 w-4 me-2" />
+                                    <ChevronLeft className="h-4 w-4 me-2" aria-hidden="true" />
                                 </Button>
                             </div>
                         </div>

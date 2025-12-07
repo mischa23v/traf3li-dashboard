@@ -11,6 +11,7 @@ import {
   Calendar,
   MessageCircle,
   FileText,
+  Lock,
 } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import {
@@ -87,8 +88,7 @@ export function ClientsViewDialog({
               <div className='flex items-center gap-3'>
                 <Phone className='h-4 w-4 text-muted-foreground' />
                 <div>
-                  <p className='text-sm text-muted-foreground'>
-                    {t('clients.form.phone')}
+                  {t('clients.form.phone')}<Lock className="h-3 w-3 text-muted-foreground inline ms-1" aria-hidden="true" /><Lock className="h-3 w-3 text-muted-foreground inline ms-1" aria-hidden="true" />
                   </p>
                   <p className='font-medium' dir='ltr'>
                     {currentRow.phone}
@@ -100,7 +100,7 @@ export function ClientsViewDialog({
                   <Phone className='h-4 w-4 text-muted-foreground' />
                   <div>
                     <p className='text-sm text-muted-foreground'>
-                      {t('clients.form.alternatePhone')}
+                      {t('clients.form.alternatePhone')}<Lock className="h-3 w-3 text-muted-foreground inline ms-1" aria-hidden="true" />
                     </p>
                     <p className='font-medium' dir='ltr'>
                       {currentRow.alternatePhone}
@@ -113,7 +113,7 @@ export function ClientsViewDialog({
                   <Mail className='h-4 w-4 text-muted-foreground' />
                   <div>
                     <p className='text-sm text-muted-foreground'>
-                      {t('clients.form.email')}
+                      {t('clients.form.email')}<Lock className="h-3 w-3 text-muted-foreground inline ms-1" aria-hidden="true" />
                     </p>
                     <p className='font-medium' dir='ltr'>
                       {currentRow.email}
@@ -147,7 +147,7 @@ export function ClientsViewDialog({
                   <FileText className='h-4 w-4 text-muted-foreground' />
                   <div>
                     <p className='text-sm text-muted-foreground'>
-                      {t('clients.form.nationalId')}
+                      {t('clients.form.nationalId')}<Lock className="h-3 w-3 text-muted-foreground inline ms-1" aria-hidden="true" />
                     </p>
                     <p className='font-medium'>{currentRow.nationalId}</p>
                   </div>

@@ -176,7 +176,7 @@ export function ProductivityHero({ badge, title, type = 'tasks', hideButtons = f
                                     // Default mode: Show "Create New" button
                                     <Button asChild className="bg-emerald-500 hover:bg-emerald-600 text-white h-10 px-5 rounded-xl font-bold shadow-lg shadow-emerald-500/20 border-0 text-sm">
                                         <Link to={currentButtonConfig.href}>
-                                            <Plus className="ms-2 h-4 w-4" />
+                                            <Plus className="ms-2 h-4 w-4" aria-hidden="true" />
                                             {currentButtonConfig.label}
                                         </Link>
                                     </Button>

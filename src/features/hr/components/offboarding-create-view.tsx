@@ -292,7 +292,7 @@ export function OffboardingCreateView() {
             <Card className="rounded-3xl shadow-sm border-slate-100">
               <CardHeader className="pb-4">
                 <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                  <User className="w-5 h-5 text-emerald-500" />
+                  <User className="w-5 h-5 text-emerald-500" aria-hidden="true" />
                   بيانات الموظف
                 </CardTitle>
               </CardHeader>
@@ -455,7 +455,7 @@ export function OffboardingCreateView() {
             <Card className="rounded-3xl shadow-sm border-slate-100">
               <CardHeader className="pb-4">
                 <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                  <Clock className="w-5 h-5 text-emerald-500" />
+                  <Clock className="w-5 h-5 text-emerald-500" aria-hidden="true" />
                   فترة الإشعار (المادة 75)
                 </CardTitle>
               </CardHeader>
@@ -495,7 +495,7 @@ export function OffboardingCreateView() {
                   <CardHeader className="cursor-pointer hover:bg-slate-50 transition-colors rounded-t-3xl">
                     <div className="flex items-center justify-between">
                       <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                        <FileText className="w-5 h-5 text-blue-500" />
+                        <FileText className="w-5 h-5 text-blue-500" aria-hidden="true" />
                         الملاحظات
                       </CardTitle>
                       <ChevronDown className={cn("w-5 h-5 text-slate-500 transition-transform", openSections.includes('notes') && "rotate-180")} />
@@ -538,7 +538,7 @@ export function OffboardingCreateView() {
               <CardContent>
                 <div className="space-y-3 text-sm text-amber-700">
                   <div className="flex items-start gap-2">
-                    <AlertTriangle className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                    <AlertTriangle className="w-4 h-4 mt-0.5 flex-shrink-0" aria-hidden="true" />
                     <div>
                       <p className="font-medium">المادة 75 - فترة الإشعار:</p>
                       <ul className="list-disc list-inside me-4 mt-1 space-y-1">
@@ -549,7 +549,7 @@ export function OffboardingCreateView() {
                     </div>
                   </div>
                   <div className="flex items-start gap-2">
-                    <AlertTriangle className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                    <AlertTriangle className="w-4 h-4 mt-0.5 flex-shrink-0" aria-hidden="true" />
                     <div>
                       <p className="font-medium">المادة 84-87 - مكافأة نهاية الخدمة:</p>
                       <ul className="list-disc list-inside me-4 mt-1 space-y-1">
@@ -560,7 +560,7 @@ export function OffboardingCreateView() {
                     </div>
                   </div>
                   <div className="flex items-start gap-2">
-                    <AlertTriangle className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                    <AlertTriangle className="w-4 h-4 mt-0.5 flex-shrink-0" aria-hidden="true" />
                     <div>
                       <p className="font-medium">شهادة الخبرة:</p>
                       <ul className="list-disc list-inside me-4 mt-1 space-y-1">

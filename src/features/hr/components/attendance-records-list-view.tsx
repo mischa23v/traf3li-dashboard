@@ -149,7 +149,7 @@ export function AttendanceRecordsListView() {
     const icons: Record<AttendanceStatus, React.ReactNode> = {
       present: <CheckCircle className="w-3 h-3" />,
       absent: <XCircle className="w-3 h-3" />,
-      late: <AlertTriangle className="w-3 h-3" />,
+      late: <AlertTriangle className="w-3 h-3" aria-hidden="true" />,
       early_departure: <LogOut className="w-3 h-3" />,
       on_leave: <Calendar className="w-3 h-3" aria-hidden="true" />,
       weekend: <Coffee className="w-3 h-3" />,
@@ -170,7 +170,7 @@ export function AttendanceRecordsListView() {
     const icons: Record<CheckMethod, React.ReactNode> = {
       biometric: <Fingerprint className="w-4 h-4 text-purple-600" />,
       mobile: <Smartphone className="w-4 h-4 text-blue-600" />,
-      manual: <Users className="w-4 h-4 text-slate-600" />,
+      manual: <Users className="w-4 h-4 text-slate-600" aria-hidden="true" />,
       web: <Monitor className="w-4 h-4 text-emerald-600" />,
       card_swipe: <CreditCard className="w-4 h-4 text-amber-600" />,
     }
@@ -374,7 +374,7 @@ export function AttendanceRecordsListView() {
             <div className="bg-white rounded-3xl p-1 shadow-sm border border-slate-100">
               <div className="p-6 pb-2 flex justify-between items-center">
                 <h3 className="font-bold text-navy text-xl flex items-center gap-2">
-                  <Clock className="w-5 h-5 text-emerald-600" />
+                  <Clock className="w-5 h-5 text-emerald-600" aria-hidden="true" />
                   سجل الحضور
                 </h3>
                 <Badge className="bg-slate-100 text-slate-600 border-0 rounded-full px-4 py-1">
@@ -422,7 +422,7 @@ export function AttendanceRecordsListView() {
                   <div className="bg-white rounded-2xl p-12 border border-slate-100 text-center">
                     <div className="flex justify-center mb-4">
                       <div className="w-16 h-16 rounded-full bg-emerald-50 flex items-center justify-center">
-                        <Clock className="w-8 h-8 text-emerald-500" />
+                        <Clock className="w-8 h-8 text-emerald-500" aria-hidden="true" />
                       </div>
                     </div>
                     <h3 className="text-lg font-bold text-slate-900 mb-2">لا توجد سجلات</h3>

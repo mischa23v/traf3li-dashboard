@@ -425,7 +425,7 @@ export function CreateContactView() {
                             <Card className="border-slate-200 mb-6">
                                 <CardHeader>
                                     <CardTitle className="text-lg font-bold text-slate-900 flex items-center gap-2">
-                                        <User className="w-5 h-5 text-emerald-500" />
+                                        <User className="w-5 h-5 text-emerald-500" aria-hidden="true" />
                                         المعلومات الأساسية
                                     </CardTitle>
                                 </CardHeader>
@@ -600,7 +600,7 @@ export function CreateContactView() {
                             <Card className="border-slate-200 mb-6">
                                 <CardHeader>
                                     <CardTitle className="text-lg font-bold text-slate-900 flex items-center gap-2">
-                                        <Phone className="w-5 h-5 text-emerald-500" />
+                                        <Phone className="w-5 h-5 text-emerald-500" aria-hidden="true" />
                                         معلومات الاتصال
                                     </CardTitle>
                                 </CardHeader>
@@ -855,7 +855,7 @@ export function CreateContactView() {
                                 <AccordionItem value="address" className="border rounded-xl mb-2 px-4">
                                     <AccordionTrigger className="hover:no-underline">
                                         <div className="flex items-center gap-2">
-                                            <MapPin className="h-4 w-4 text-slate-500" />
+                                            <MapPin className="h-4 w-4 text-slate-500" aria-hidden="true" />
                                             <span className="font-semibold">العنوان</span>
                                         </div>
                                     </AccordionTrigger>
@@ -1009,7 +1009,7 @@ export function CreateContactView() {
                                     </AccordionTrigger>
                                     <AccordionContent className="space-y-4 pb-4">
                                         <Alert className="bg-orange-50 border-orange-200">
-                                            <AlertTriangle className="h-4 w-4 text-orange-500" />
+                                            <AlertTriangle className="h-4 w-4 text-orange-500" aria-hidden="true" />
                                             <AlertDescription className="text-orange-700">
                                                 يجب فحص تعارض المصالح قبل قبول أي قضية جديدة
                                             </AlertDescription>
@@ -1062,7 +1062,7 @@ export function CreateContactView() {
                             <Card className="border-slate-200 mb-6">
                                 <CardHeader>
                                     <CardTitle className="text-lg font-bold text-slate-900 flex items-center gap-2">
-                                        <FileText className="w-5 h-5 text-emerald-500" />
+                                        <FileText className="w-5 h-5 text-emerald-500" aria-hidden="true" />
                                         الحالة والوسوم
                                     </CardTitle>
                                 </CardHeader>

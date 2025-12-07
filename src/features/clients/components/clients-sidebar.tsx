@@ -295,7 +295,7 @@ export function ClientsSidebar({
                                                         <div className="font-bold text-slate-800 text-sm mb-1">{event.title}</div>
                                                         {event.location && (
                                                             <div className="text-xs text-slate-500 flex items-center gap-1">
-                                                                <MapPin className="h-3 w-3" />
+                                                                <MapPin className="h-3 w-3" aria-hidden="true" />
                                                                 {typeof event.location === 'string' ? event.location : (event.location?.name || event.location?.address || t('sidebar.calendar.remote'))}
                                                             </div>
                                                         )}
@@ -310,7 +310,7 @@ export function ClientsSidebar({
                             <Button asChild variant="ghost" className="w-full mt-6 text-slate-500 hover:text-emerald-700 hover:bg-emerald-50 group cursor-pointer">
                                 <Link to="/dashboard/calendar">
                                     <span>{t('sidebar.calendar.viewFullSchedule')}</span>
-                                    <ChevronRight className="w-4 h-4 me-2 transition-transform group-hover:-translate-x-1 rtl:group-hover:translate-x-1 rtl:rotate-180" />
+                                    <ChevronRight className="w-4 h-4 me-2 transition-transform group-hover:-translate-x-1 rtl:group-hover:translate-x-1 rtl:rotate-180" aria-hidden="true" />
                                 </Link>
                             </Button>
                         </div>
@@ -344,7 +344,7 @@ export function ClientsSidebar({
                                                         ? "bg-red-50 text-red-500 group-hover:bg-red-500 group-hover:text-white"
                                                         : `bg-${priorityColor}-50 text-${priorityColor}-500 group-hover:bg-${priorityColor}-500 group-hover:text-white`
                                                 )}>
-                                                    {isOverdue ? <AlertCircle className="w-5 h-5" /> : <Bell className="w-5 h-5" />}
+                                                    {isOverdue ? <AlertCircle className="w-5 h-5" aria-hidden="true" /> : <Bell className="w-5 h-5" />}
                                                 </div>
                                                 <div className="flex-1 min-w-0">
                                                     <p className={cn(

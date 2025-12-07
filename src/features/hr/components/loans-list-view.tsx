@@ -91,7 +91,7 @@ export function LoansListView() {
 
   const getStatusIcon = (status: LoanStatus) => {
     switch (status) {
-      case 'pending': return <Clock className="w-4 h-4" />
+      case 'pending': return <Clock className="w-4 h-4" aria-hidden="true" />
       case 'approved': return <CheckCircle className="w-4 h-4" />
       case 'rejected': return <XCircle className="w-4 h-4" />
       case 'active': return <TrendingUp className="w-4 h-4" aria-hidden="true" />
@@ -422,7 +422,7 @@ export function LoansListView() {
                             </div>
                             {loan.repayment && (
                               <div className="flex items-center gap-2 text-slate-500">
-                                <Clock className="w-4 h-4" />
+                                <Clock className="w-4 h-4" aria-hidden="true" />
                                 <span>الأقساط: {loan.repayment.installments} قسط</span>
                               </div>
                             )}

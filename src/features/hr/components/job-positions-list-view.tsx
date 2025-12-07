@@ -227,7 +227,7 @@ export function JobPositionsListView() {
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <div className="p-2 bg-indigo-100 rounded-xl">
-                        <Users className="w-5 h-5 text-indigo-600" />
+                        <Users className="w-5 h-5 text-indigo-600" aria-hidden="true" />
                       </div>
                       <div>
                         <p className="text-sm font-medium text-indigo-800">العدد الوظيفي</p>
@@ -466,7 +466,7 @@ export function JobPositionsListView() {
                                 <p className="text-xs text-slate-500 mb-2">شاغل المنصب الحالي</p>
                                 <div className="flex items-center gap-2">
                                   <div className="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center">
-                                    <Users className="w-4 h-4 text-emerald-600" />
+                                    <Users className="w-4 h-4 text-emerald-600" aria-hidden="true" />
                                   </div>
                                   <div>
                                     <p className="font-medium text-sm">{position.incumbent.employeeNameAr || position.incumbent.employeeName}</p>
@@ -486,7 +486,7 @@ export function JobPositionsListView() {
                                 )}
                                 {position.directReportsCount > 0 && (
                                   <span className="flex items-center gap-1 text-purple-600">
-                                    <Users className="w-3 h-3" />
+                                    <Users className="w-3 h-3" aria-hidden="true" />
                                     {position.directReportsCount} تقارير مباشرة
                                   </span>
                                 )}

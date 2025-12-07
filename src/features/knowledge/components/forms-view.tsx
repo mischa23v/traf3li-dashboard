@@ -171,13 +171,13 @@ export function FormsView() {
   const getFormatIcon = (format: string) => {
     switch (format) {
       case 'docx':
-        return <FileText className="h-6 w-6 text-blue-600" />
+        return <FileText className="h-6 w-6 text-blue-600" aria-hidden="true" />
       case 'pdf':
-        return <File className="h-6 w-6 text-red-600" />
+        return <File className="h-6 w-6 text-red-600" aria-hidden="true" />
       case 'xlsx':
         return <FileSpreadsheet className="h-6 w-6 text-emerald-600" />
       default:
-        return <FileText className="h-6 w-6 text-slate-600" />
+        return <FileText className="h-6 w-6 text-slate-600" aria-hidden="true" />
     }
   }
 
@@ -211,7 +211,7 @@ export function FormsView() {
 
         <div className="ms-auto flex items-center gap-4">
           <div className="relative hidden md:block">
-            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" aria-hidden="true" />
             <input
               type="text"
               placeholder={t('common.search', 'بحث...')}
@@ -255,7 +255,7 @@ export function FormsView() {
               <CardContent className="p-4">
                 <div className="flex flex-col gap-4">
                   <div className="relative">
-                    <Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                    <Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" aria-hidden="true" />
                     <Input
                       placeholder={isRTL ? 'بحث في النماذج...' : 'Search forms...'}
                       value={searchQuery}
@@ -331,22 +331,22 @@ export function FormsView() {
                         {form.views.toLocaleString()}
                       </span>
                       <span className="flex items-center">
-                        <Download className="h-3.5 w-3.5 me-1" />
+                        <Download className="h-3.5 w-3.5 me-1" aria-hidden="true" />
                         {form.downloads.toLocaleString()}
                       </span>
                       <span className="flex items-center">
-                        <Calendar className="h-3.5 w-3.5 me-1" />
+                        <Calendar className="h-3.5 w-3.5 me-1" aria-hidden="true" />
                         {form.lastUpdate}
                       </span>
                     </div>
 
                     <div className="flex gap-2">
                       <Button variant="outline" size="sm" className="flex-1 border-slate-200">
-                        <ExternalLink className="h-4 w-4 me-1" />
+                        <ExternalLink className="h-4 w-4 me-1" aria-hidden="true" />
                         {isRTL ? 'معاينة' : 'Preview'}
                       </Button>
                       <Button size="sm" className="flex-1 bg-emerald-500 hover:bg-emerald-600 shadow-lg shadow-emerald-500/20">
-                        <Download className="h-4 w-4 me-1" />
+                        <Download className="h-4 w-4 me-1" aria-hidden="true" />
                         {isRTL ? 'تحميل' : 'Download'}
                       </Button>
                     </div>
@@ -359,7 +359,7 @@ export function FormsView() {
               <Card className="border-dashed border-2 border-slate-200 bg-slate-50/50">
                 <CardContent className="p-12 text-center">
                   <div className="h-16 w-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <FileText className="h-8 w-8 text-slate-300" />
+                    <FileText className="h-8 w-8 text-slate-300" aria-hidden="true" />
                   </div>
                   <h3 className="text-lg font-bold text-navy">
                     {isRTL ? 'لا توجد نماذج مطابقة' : 'No matching forms found'}

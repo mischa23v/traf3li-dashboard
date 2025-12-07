@@ -191,7 +191,7 @@ export function OrganizationalStructureListView() {
                 <CardContent className="p-4">
                   <div className="flex items-center gap-3">
                     <div className="p-2 bg-purple-100 rounded-xl">
-                      <Users className="w-5 h-5 text-purple-600" />
+                      <Users className="w-5 h-5 text-purple-600" aria-hidden="true" />
                     </div>
                     <div>
                       <p className="text-xs text-slate-500">إجمالي الموظفين</p>
@@ -222,7 +222,7 @@ export function OrganizationalStructureListView() {
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <div className="p-2 bg-blue-100 rounded-xl">
-                        <Users className="w-5 h-5 text-blue-600" />
+                        <Users className="w-5 h-5 text-blue-600" aria-hidden="true" />
                       </div>
                       <div>
                         <p className="text-sm font-medium text-blue-800">معدل الشواغر</p>

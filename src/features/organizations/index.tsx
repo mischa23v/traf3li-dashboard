@@ -92,7 +92,7 @@ function OrganizationsContent() {
               ) : isEmpty ? (
                 <div className="bg-white rounded-3xl p-12 text-center border border-slate-100 shadow-sm">
                   <div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <Building2 className="h-8 w-8 text-brand-blue" />
+                    <Building2 className="h-8 w-8 text-brand-blue" aria-hidden="true" />
                   </div>
                   <h3 className="text-xl font-bold text-slate-900 mb-2">{t('organizations.noOrganizations')}</h3>
                   <p className="text-slate-500 mb-6">{t('organizations.startAddingOrganization')}</p>

@@ -265,7 +265,7 @@ export function CalendarView() {
                 <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8">
                     <div className="bg-white rounded-3xl p-12 text-center border border-slate-100 shadow-sm">
                         <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <AlertCircle className="h-8 w-8 text-red-500" />
+                            <AlertCircle className="h-8 w-8 text-red-500" aria-hidden="true" />
                         </div>
                         <h3 className="text-xl font-bold text-slate-900 mb-2">فشل تحميل التقويم</h3>
                         <p className="text-slate-500 mb-6">{error?.message || 'حدث خطأ أثناء تحميل البيانات'}</p>
@@ -401,7 +401,7 @@ export function CalendarView() {
                                                         <div className="pt-2 mt-2 border-t border-slate-50 flex flex-col gap-1">
                                                             {item.location && (
                                                                 <div className="flex items-center gap-1.5 text-[11px] text-slate-500">
-                                                                    <MapPin className="h-3 w-3" />
+                                                                    <MapPin className="h-3 w-3" aria-hidden="true" />
                                                                     <span>{typeof item.location === 'string' ? item.location : (item.location?.name || item.location?.address || 'عن بعد')}</span>
                                                                 </div>
                                                             )}
@@ -419,7 +419,7 @@ export function CalendarView() {
                                     ) : (
                                         <div className="flex flex-col items-center justify-center h-64 text-center text-slate-500">
                                             <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mb-4">
-                                                <Clock className="h-8 w-8 text-slate-300" />
+                                                <Clock className="h-8 w-8 text-slate-300" aria-hidden="true" />
                                             </div>
                                             <p className="font-bold text-navy">لا توجد مواعيد</p>
                                             <p className="text-xs mt-1">لا توجد جلسات أو مهام مسجلة لهذا اليوم.</p>
@@ -445,13 +445,13 @@ export function CalendarView() {
                                 </h2>
                                 <div className="flex bg-slate-50 rounded-xl p-1 border border-slate-100">
                                     <Button variant="ghost" size="icon" className="h-9 w-9 rounded-lg hover:bg-white hover:shadow-sm text-slate-600" onClick={() => setCurrentDate(new Date(currentDate.setMonth(currentDate.getMonth() - 1)))}>
-                                        <ChevronRight className="h-5 w-5" />
+                                        <ChevronRight className="h-5 w-5" aria-hidden="true" />
                                     </Button>
                                     <Button variant="ghost" className="h-9 px-4 rounded-lg hover:bg-white hover:shadow-sm text-slate-600 font-bold text-sm" onClick={() => setCurrentDate(new Date())}>
                                         اليوم
                                     </Button>
                                     <Button variant="ghost" size="icon" className="h-9 w-9 rounded-lg hover:bg-white hover:shadow-sm text-slate-600" onClick={() => setCurrentDate(new Date(currentDate.setMonth(currentDate.getMonth() + 1)))}>
-                                        <ChevronLeft className="h-5 w-5" />
+                                        <ChevronLeft className="h-5 w-5" aria-hidden="true" />
                                     </Button>
                                 </div>
                             </div>
@@ -527,9 +527,9 @@ export function CalendarView() {
                                                              `}
                                                                     >
                                                                         {item.type === 'court' && <Gavel className="h-3 w-3 flex-shrink-0" />}
-                                                                        {item.type === 'deadline' && <AlertTriangle className="h-3 w-3 flex-shrink-0" />}
-                                                                        {item.type === 'meeting' && <Users className="h-3 w-3 flex-shrink-0" />}
-                                                                        {item.type === 'filing' && <FileText className="h-3 w-3 flex-shrink-0" />}
+                                                                        {item.type === 'deadline' && <AlertTriangle className="h-3 w-3 flex-shrink-0" aria-hidden="true" />}
+                                                                        {item.type === 'meeting' && <Users className="h-3 w-3 flex-shrink-0" aria-hidden="true" />}
+                                                                        {item.type === 'filing' && <FileText className="h-3 w-3 flex-shrink-0" aria-hidden="true" />}
                                                                         <span className="truncate">{item.title}</span>
                                                                     </div>
                                                                 ))}

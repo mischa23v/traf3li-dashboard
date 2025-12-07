@@ -188,7 +188,7 @@ export function CreateActivityView() {
                 {/* Activity Type Selection */}
                 <div className="space-y-6">
                   <h3 className="text-lg font-bold text-navy flex items-center gap-2">
-                    <Clock className="w-5 h-5 text-blue-500" />
+                    <Clock className="w-5 h-5 text-blue-500" aria-hidden="true" />
                     نوع النشاط
                   </h3>
 
@@ -217,7 +217,7 @@ export function CreateActivityView() {
                 {/* Entity Selection */}
                 <div className="border-t border-slate-100 pt-6 space-y-6">
                   <h3 className="text-lg font-bold text-navy flex items-center gap-2">
-                    <Users className="w-5 h-5 text-blue-500" />
+                    <Users className="w-5 h-5 text-blue-500" aria-hidden="true" />
                     مرتبط بـ
                   </h3>
 
@@ -319,7 +319,7 @@ export function CreateActivityView() {
                           <TypeIcon className="w-5 h-5 text-blue-500" />
                           تفاصيل {selectedType?.label}
                         </h3>
-                        {showTypeSpecific ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
+                        {showTypeSpecific ? <ChevronUp className="w-5 h-5" aria-hidden="true" /> : <ChevronDown className="w-5 h-5" aria-hidden="true" />}
                       </Button>
                     </CollapsibleTrigger>
                     <CollapsibleContent className="mt-4">
@@ -400,7 +400,7 @@ export function CreateActivityView() {
                               </div>
                               <div className="space-y-2">
                                 <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                  <MapPin className="w-4 h-4 text-blue-500" />
+                                  <MapPin className="w-4 h-4 text-blue-500" aria-hidden="true" />
                                   الموقع
                                 </label>
                                 <Input
@@ -499,7 +499,7 @@ export function CreateActivityView() {
                       </span>
                     ) : (
                       <span className="flex items-center gap-2">
-                        <Save className="w-4 h-4" />
+                        <Save className="w-4 h-4" aria-hidden="true" />
                         حفظ النشاط
                       </span>
                     )}

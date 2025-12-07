@@ -231,7 +231,7 @@ export function OffboardingDetailsView() {
             ) : !offboarding ? (
               <Card className="rounded-2xl border-slate-100">
                 <CardContent className="p-8 text-center">
-                  <FileText className="w-12 h-12 mx-auto text-slate-300" />
+                  <FileText className="w-12 h-12 mx-auto text-slate-300" aria-hidden="true" />
                   <p className="mt-4 text-slate-500">لم يتم العثور على السجل</p>
                 </CardContent>
               </Card>
@@ -292,7 +292,7 @@ export function OffboardingDetailsView() {
                     <CardContent className="p-4">
                       <div className="flex items-center gap-3">
                         <div className="p-2 bg-amber-100 rounded-xl">
-                          <Clock className="w-5 h-5 text-amber-600" />
+                          <Clock className="w-5 h-5 text-amber-600" aria-hidden="true" />
                         </div>
                         <div>
                           <p className="text-xs text-slate-500">فترة الإشعار</p>
@@ -365,7 +365,7 @@ export function OffboardingDetailsView() {
                         {/* Employee Info */}
                         <div className="space-y-4">
                           <h4 className="font-bold text-navy flex items-center gap-2">
-                            <User className="w-4 h-4" />
+                            <User className="w-4 h-4" aria-hidden="true" />
                             بيانات الموظف
                           </h4>
                           <div className="space-y-3">
@@ -395,7 +395,7 @@ export function OffboardingDetailsView() {
                         {/* Exit Info */}
                         <div className="space-y-4">
                           <h4 className="font-bold text-navy flex items-center gap-2">
-                            <FileText className="w-4 h-4" />
+                            <FileText className="w-4 h-4" aria-hidden="true" />
                             تفاصيل الخروج
                           </h4>
                           <div className="space-y-3">
@@ -528,7 +528,7 @@ export function OffboardingDetailsView() {
                           <CardHeader className="pb-3">
                             <CardTitle className="text-sm font-medium flex items-center justify-between">
                               <span className="flex items-center gap-2">
-                                <Users className="w-4 h-4 text-purple-500" />
+                                <Users className="w-4 h-4 text-purple-500" aria-hidden="true" />
                                 الموارد البشرية
                               </span>
                               <Badge className={offboarding.clearance?.hrClearance?.cleared ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}>
@@ -556,7 +556,7 @@ export function OffboardingDetailsView() {
                           <CardHeader className="pb-3">
                             <CardTitle className="text-sm font-medium flex items-center justify-between">
                               <span className="flex items-center gap-2">
-                                <User className="w-4 h-4 text-amber-500" />
+                                <User className="w-4 h-4 text-amber-500" aria-hidden="true" />
                                 المدير المباشر
                               </span>
                               <Badge className={offboarding.clearance?.managerClearance?.cleared ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}>
@@ -705,7 +705,7 @@ export function OffboardingDetailsView() {
                           <CardHeader className="pb-3">
                             <CardTitle className="text-sm font-medium flex items-center justify-between">
                               <span className="flex items-center gap-2">
-                                <FileText className="w-4 h-4 text-blue-500" />
+                                <FileText className="w-4 h-4 text-blue-500" aria-hidden="true" />
                                 خطاب التوصية
                               </span>
                               <Badge className={offboarding.finalDocuments?.referenceLetter?.issued ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-700'}>

@@ -323,7 +323,7 @@ export function CreateReminderView() {
                                         </div>
                                         <div className="space-y-2">
                                             <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                                <AlertCircle className="w-4 h-4 text-emerald-500" />
+                                                <AlertCircle className="w-4 h-4 text-emerald-500" aria-hidden="true" />
                                                 نوع التذكير <span className="text-red-500">*</span>
                                             </label>
                                             <Select value={formData.type} onValueChange={(value) => handleChange('type', value)}>
@@ -344,7 +344,7 @@ export function CreateReminderView() {
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                         <div className="space-y-2">
                                             <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                                <Calendar className="w-4 h-4 text-emerald-500" />
+                                                <Calendar className="w-4 h-4 text-emerald-500" aria-hidden="true" />
                                                 التاريخ <span className="text-red-500">*</span>
                                             </label>
                                             <Input
@@ -363,7 +363,7 @@ export function CreateReminderView() {
                                         </div>
                                         <div className="space-y-2">
                                             <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                                <Clock className="w-4 h-4 text-emerald-500" />
+                                                <Clock className="w-4 h-4 text-emerald-500" aria-hidden="true" />
                                                 الوقت <span className="text-red-500">*</span>
                                             </label>
                                             <Input
@@ -385,7 +385,7 @@ export function CreateReminderView() {
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                         <div className="space-y-2">
                                             <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                                <AlertCircle className="w-4 h-4 text-emerald-500" />
+                                                <AlertCircle className="w-4 h-4 text-emerald-500" aria-hidden="true" />
                                                 الأهمية
                                             </label>
                                             <Select value={formData.priority} onValueChange={(value) => handleChange('priority', value)}>
@@ -406,7 +406,7 @@ export function CreateReminderView() {
                                         </div>
                                         <div className="space-y-2">
                                             <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                                <Users className="w-4 h-4 text-emerald-500" />
+                                                <Users className="w-4 h-4 text-emerald-500" aria-hidden="true" />
                                                 تعيين إلى
                                             </label>
                                             <Select value={formData.assignedTo} onValueChange={(value) => handleChange('assignedTo', value)}>
@@ -466,7 +466,7 @@ export function CreateReminderView() {
                                         </div>
                                         <div className="space-y-2">
                                             <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                                <User className="w-4 h-4 text-emerald-500" />
+                                                <User className="w-4 h-4 text-emerald-500" aria-hidden="true" />
                                                 العميل المرتبط
                                             </label>
                                             <Select value={formData.relatedClient} onValueChange={(value) => handleChange('relatedClient', value)}>
@@ -505,7 +505,7 @@ export function CreateReminderView() {
                                                 <Badge key={tag} variant="secondary" className="gap-1">
                                                     {tag}
                                                     <button type="button" onClick={() => removeTag(tag)} className="hover:text-red-500">
-                                                        <X className="w-3 h-3" />
+                                                        <X className="w-3 h-3" aria-hidden="true" />
                                                     </button>
                                                 </Badge>
                                             ))}
@@ -524,14 +524,14 @@ export function CreateReminderView() {
                                                 }}
                                             />
                                             <Button type="button" variant="outline" onClick={addTag} className="rounded-xl">
-                                                <Plus className="w-4 h-4" />
+                                                <Plus className="w-4 h-4" aria-hidden="true" />
                                             </Button>
                                         </div>
                                     </div>
 
                                     <div className="space-y-2">
                                         <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                            <FileText className="w-4 h-4 text-emerald-500" />
+                                            <FileText className="w-4 h-4 text-emerald-500" aria-hidden="true" />
                                             ملاحظات إضافية
                                         </label>
                                         <Textarea
@@ -552,7 +552,7 @@ export function CreateReminderView() {
                                                     <Bell className="w-5 h-5 text-emerald-500" />
                                                     قنوات الإشعارات
                                                 </h3>
-                                                {showNotifications ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
+                                                {showNotifications ? <ChevronUp className="w-5 h-5" aria-hidden="true" /> : <ChevronDown className="w-5 h-5" aria-hidden="true" />}
                                             </Button>
                                         </CollapsibleTrigger>
                                         <CollapsibleContent className="mt-4">
@@ -629,7 +629,7 @@ export function CreateReminderView() {
                                                     <Repeat className="w-5 h-5 text-emerald-500" />
                                                     تذكير متكرر
                                                 </h3>
-                                                {showRecurring ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
+                                                {showRecurring ? <ChevronUp className="w-5 h-5" aria-hidden="true" /> : <ChevronDown className="w-5 h-5" aria-hidden="true" />}
                                             </Button>
                                         </CollapsibleTrigger>
                                         <CollapsibleContent className="mt-4">
@@ -793,7 +793,7 @@ export function CreateReminderView() {
                                                     <Briefcase className="w-5 h-5 text-emerald-500" />
                                                     إعدادات متقدمة
                                                 </h3>
-                                                {showAdvanced ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
+                                                {showAdvanced ? <ChevronUp className="w-5 h-5" aria-hidden="true" /> : <ChevronDown className="w-5 h-5" aria-hidden="true" />}
                                             </Button>
                                         </CollapsibleTrigger>
                                         <CollapsibleContent className="mt-4">
@@ -834,7 +834,7 @@ export function CreateReminderView() {
                                             </span>
                                         ) : (
                                             <span className="flex items-center gap-2">
-                                                <Save className="w-4 h-4" />
+                                                <Save className="w-4 h-4" aria-hidden="true" />
                                                 حفظ التذكير
                                             </span>
                                         )}

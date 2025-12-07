@@ -334,7 +334,7 @@ export function CreateTaskView() {
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                         <div className="space-y-2">
                                             <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                                <FileText className="w-4 h-4 text-emerald-500" />
+                                                <FileText className="w-4 h-4 text-emerald-500" aria-hidden="true" />
                                                 عنوان المهمة <span className="text-red-500">*</span>
                                                 <FieldTooltip content={FIELD_TOOLTIPS.title} />
                                             </label>
@@ -434,7 +434,7 @@ export function CreateTaskView() {
                                                 <Badge key={tag} variant="secondary" className="gap-1">
                                                     {tag}
                                                     <button type="button" onClick={() => removeTag(tag)} className="hover:text-red-500">
-                                                        <X className="w-3 h-3" />
+                                                        <X className="w-3 h-3" aria-hidden="true" />
                                                     </button>
                                                 </Badge>
                                             ))}
@@ -453,7 +453,7 @@ export function CreateTaskView() {
                                                 }}
                                             />
                                             <Button type="button" variant="outline" onClick={addTag} className="rounded-xl">
-                                                <Plus className="w-4 h-4" />
+                                                <Plus className="w-4 h-4" aria-hidden="true" />
                                             </Button>
                                         </div>
                                     </div>
@@ -461,7 +461,7 @@ export function CreateTaskView() {
                                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                                         <div className="space-y-2">
                                             <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                                <Calendar className="w-4 h-4 text-emerald-500" />
+                                                <Calendar className="w-4 h-4 text-emerald-500" aria-hidden="true" />
                                                 تاريخ الاستحقاق <span className="text-red-500">*</span>
                                                 <FieldTooltip content={FIELD_TOOLTIPS.dueDate} />
                                             </label>
@@ -481,7 +481,7 @@ export function CreateTaskView() {
                                         </div>
                                         <div className="space-y-2">
                                             <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                                <Clock className="w-4 h-4 text-emerald-500" />
+                                                <Clock className="w-4 h-4 text-emerald-500" aria-hidden="true" />
                                                 الوقت
                                                 <FieldTooltip content={FIELD_TOOLTIPS.dueTime} />
                                             </label>
@@ -494,7 +494,7 @@ export function CreateTaskView() {
                                         </div>
                                         <div className="space-y-2">
                                             <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                                <Clock className="w-4 h-4 text-emerald-500" />
+                                                <Clock className="w-4 h-4 text-emerald-500" aria-hidden="true" />
                                                 الوقت المقدر (دقائق)
                                                 <FieldTooltip content={FIELD_TOOLTIPS.estimatedMinutes} />
                                             </label>
@@ -512,7 +512,7 @@ export function CreateTaskView() {
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                         <div className="space-y-2">
                                             <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                                <User className="w-4 h-4 text-emerald-500" />
+                                                <User className="w-4 h-4 text-emerald-500" aria-hidden="true" />
                                                 {t('tasks.client', 'العميل')}
                                                 <FieldTooltip content={FIELD_TOOLTIPS.client} />
                                             </label>
@@ -574,7 +574,7 @@ export function CreateTaskView() {
 
                                     <div className="space-y-2">
                                         <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                            <Users className="w-4 h-4 text-emerald-500" />
+                                            <Users className="w-4 h-4 text-emerald-500" aria-hidden="true" />
                                             {t('tasks.assignedTo', 'تعيين إلى')}
                                             <FieldTooltip content={FIELD_TOOLTIPS.assignedTo} />
                                         </label>
@@ -605,7 +605,7 @@ export function CreateTaskView() {
 
                                     <div className="space-y-2">
                                         <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                            <FileText className="w-4 h-4 text-emerald-500" />
+                                            <FileText className="w-4 h-4 text-emerald-500" aria-hidden="true" />
                                             وصف المهمة
                                             <FieldTooltip content={FIELD_TOOLTIPS.description} />
                                         </label>
@@ -645,7 +645,7 @@ export function CreateTaskView() {
                                                     onClick={() => removeSubtask(subtask.id)}
                                                     className="text-red-500 hover:text-red-600 hover:bg-red-50"
                                                 >
-                                                    <X className="w-4 h-4" />
+                                                    <X className="w-4 h-4" aria-hidden="true" />
                                                 </Button>
                                             </div>
                                         ))}
@@ -663,7 +663,7 @@ export function CreateTaskView() {
                                                 }}
                                             />
                                             <Button type="button" variant="outline" onClick={addSubtask} className="rounded-xl">
-                                                <Plus className="w-4 h-4 ms-2" />
+                                                <Plus className="w-4 h-4 ms-2" aria-hidden="true" />
                                                 إضافة
                                             </Button>
                                         </div>
@@ -686,7 +686,7 @@ export function CreateTaskView() {
                                                 <FieldTooltip content={FIELD_TOOLTIPS.recurring} />
                                                 <CollapsibleTrigger asChild>
                                                     <Button variant="ghost" size="sm" className="p-0 h-auto hover:bg-transparent">
-                                                        {showRecurring ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
+                                                        {showRecurring ? <ChevronUp className="w-5 h-5" aria-hidden="true" /> : <ChevronDown className="w-5 h-5" aria-hidden="true" />}
                                                     </Button>
                                                 </CollapsibleTrigger>
                                             </div>
@@ -833,7 +833,7 @@ export function CreateTaskView() {
                                             <CollapsibleTrigger asChild>
                                                 <Button variant="ghost" className="flex-1 justify-start p-0 h-auto hover:bg-transparent">
                                                     <h3 className="text-lg font-semibold text-slate-800 flex items-center gap-2">
-                                                        <Clock className="w-5 h-5 text-emerald-500" />
+                                                        <Clock className="w-5 h-5 text-emerald-500" aria-hidden="true" />
                                                         التذكيرات
                                                     </h3>
                                                 </Button>
@@ -842,7 +842,7 @@ export function CreateTaskView() {
                                                 <FieldTooltip content={FIELD_TOOLTIPS.reminders} />
                                                 <CollapsibleTrigger asChild>
                                                     <Button variant="ghost" size="sm" className="p-0 h-auto hover:bg-transparent">
-                                                        {showAdvanced ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
+                                                        {showAdvanced ? <ChevronUp className="w-5 h-5" aria-hidden="true" /> : <ChevronDown className="w-5 h-5" aria-hidden="true" />}
                                                     </Button>
                                                 </CollapsibleTrigger>
                                             </div>
@@ -882,12 +882,12 @@ export function CreateTaskView() {
                                                             onClick={() => removeReminder(index)}
                                                             className="text-red-500 hover:text-red-600"
                                                         >
-                                                            <X className="w-4 h-4" />
+                                                            <X className="w-4 h-4" aria-hidden="true" />
                                                         </Button>
                                                     </div>
                                                 ))}
                                                 <Button type="button" variant="outline" onClick={addReminder} className="rounded-xl">
-                                                    <Plus className="w-4 h-4 ms-2" />
+                                                    <Plus className="w-4 h-4 ms-2" aria-hidden="true" />
                                                     إضافة تذكير
                                                 </Button>
                                             </div>
@@ -914,7 +914,7 @@ export function CreateTaskView() {
                                             </span>
                                         ) : (
                                             <span className="flex items-center gap-2">
-                                                <Save className="w-4 h-4" />
+                                                <Save className="w-4 h-4" aria-hidden="true" />
                                                 حفظ المهمة
                                             </span>
                                         )}

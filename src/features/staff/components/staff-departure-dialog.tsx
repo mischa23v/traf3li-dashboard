@@ -138,7 +138,7 @@ export function StaffDepartureDialog() {
             />
 
             <Alert className="border-amber-500 bg-amber-50 dark:bg-amber-950/20">
-              <AlertTriangle className="h-4 w-4 text-amber-600" />
+              <AlertTriangle className="h-4 w-4 text-amber-600" aria-hidden="true" />
               <AlertTitle className="text-amber-800 dark:text-amber-200">
                 تنبيه مهم
               </AlertTitle>

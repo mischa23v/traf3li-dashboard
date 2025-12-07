@@ -193,7 +193,7 @@ export function AssetAssignmentListView() {
                 <CardContent className="p-4">
                   <div className="flex items-center gap-3">
                     <div className="p-2 bg-amber-100 rounded-xl">
-                      <Clock className="w-5 h-5 text-amber-600" />
+                      <Clock className="w-5 h-5 text-amber-600" aria-hidden="true" />
                     </div>
                     <div>
                       <p className="text-xs text-slate-500">متأخرة الإرجاع</p>
@@ -224,7 +224,7 @@ export function AssetAssignmentListView() {
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <div className="p-2 bg-amber-100 rounded-xl">
-                        <AlertTriangle className="w-5 h-5 text-amber-600" />
+                        <AlertTriangle className="w-5 h-5 text-amber-600" aria-hidden="true" />
                       </div>
                       <div>
                         <p className="text-sm font-medium text-amber-800">تخصيصات متأخرة الإرجاع</p>
@@ -427,7 +427,7 @@ export function AssetAssignmentListView() {
                             <div>
                               <p className="text-xs text-slate-500">الموظف</p>
                               <div className="flex items-center gap-1 mt-1">
-                                <User className="w-3 h-3 text-slate-500" />
+                                <User className="w-3 h-3 text-slate-500" aria-hidden="true" />
                                 <span className="text-sm font-medium">
                                   {assignment.employeeNameAr || assignment.employeeName}
                                 </span>
@@ -459,7 +459,7 @@ export function AssetAssignmentListView() {
                               </span>
                               {assignment.expectedReturnDate && (
                                 <span className="flex items-center gap-1">
-                                  <Clock className="w-3 h-3" />
+                                  <Clock className="w-3 h-3" aria-hidden="true" />
                                   الإرجاع: {new Date(assignment.expectedReturnDate).toLocaleDateString('ar-SA')}
                                 </span>
                               )}

@@ -11,10 +11,10 @@ export function TasksPrimaryButtons() {
         className='gap-x-1'
         onClick={() => setOpen('import')}
       >
-        <span>استيراد</span> <Download size={18} />
+        <span>استيراد</span> <Download size={18} aria-hidden="true" />
       </Button>
       <Button className='gap-x-1' onClick={() => setOpen('create')}>
-        <span>إنشاء</span> <Plus size={18} />
+        <span>إنشاء</span> <Plus size={18} aria-hidden="true" />
       </Button>
     </div>
   )

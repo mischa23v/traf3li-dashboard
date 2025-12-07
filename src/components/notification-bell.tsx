@@ -96,7 +96,7 @@ function NotificationItem({ notification, onRead, onClick }: NotificationItemPro
           <div className="flex items-center gap-2 mt-1">
             <span className="text-xs text-slate-400">{timeAgo}</span>
             {notification.link && (
-              <ExternalLink className="w-3 h-3 text-slate-400" />
+              <ExternalLink className="w-3 h-3 text-slate-400" aria-hidden="true" />
             )}
           </div>
         </div>

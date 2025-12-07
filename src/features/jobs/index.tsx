@@ -120,7 +120,7 @@ export function MyServices() {
       case 'active':
         return <Badge className="bg-emerald-100 text-emerald-700 hover:bg-emerald-100 border-0"><CheckCircle className="h-3 w-3 me-1" />{isRTL ? 'نشط' : 'Active'}</Badge>
       case 'paused':
-        return <Badge className="bg-amber-100 text-amber-700 hover:bg-amber-100 border-0"><AlertCircle className="h-3 w-3 me-1" />{isRTL ? 'متوقف' : 'Paused'}</Badge>
+        return <Badge className="bg-amber-100 text-amber-700 hover:bg-amber-100 border-0"><AlertCircle className="h-3 w-3 me-1" aria-hidden="true" />{isRTL ? 'متوقف' : 'Paused'}</Badge>
       case 'draft':
         return <Badge className="bg-slate-100 text-slate-700 hover:bg-slate-100 border-0"><XCircle className="h-3 w-3 me-1" />{isRTL ? 'مسودة' : 'Draft'}</Badge>
       default:
@@ -302,7 +302,7 @@ export function MyServices() {
                             {isRTL ? 'عرض' : 'View'}
                           </DropdownMenuItem>
                           <DropdownMenuItem>
-                            <Edit className="h-4 w-4 me-2" />
+                            <Edit className="h-4 w-4 me-2" aria-hidden="true" />
                             {isRTL ? 'تعديل' : 'Edit'}
                           </DropdownMenuItem>
                           <DropdownMenuItem className="text-red-600">

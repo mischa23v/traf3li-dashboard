@@ -66,7 +66,7 @@ const RATING_LABELS: Record<OverallRating, { ar: string; color: string; icon: Re
   exceptional: { ar: 'استثنائي', color: 'emerald', icon: <TrendingUp className="w-4 h-4" aria-hidden="true" /> },
   exceeds_expectations: { ar: 'يتجاوز التوقعات', color: 'blue', icon: <Star className="w-4 h-4" /> },
   meets_expectations: { ar: 'يلبي التوقعات', color: 'amber', icon: <Target className="w-4 h-4" /> },
-  needs_improvement: { ar: 'يحتاج تحسين', color: 'orange', icon: <AlertTriangle className="w-4 h-4" /> },
+  needs_improvement: { ar: 'يحتاج تحسين', color: 'orange', icon: <AlertTriangle className="w-4 h-4" aria-hidden="true" /> },
   unsatisfactory: { ar: 'غير مرضي', color: 'red', icon: <TrendingDown className="w-4 h-4" /> },
 }
 
@@ -118,9 +118,9 @@ export function PerformanceReviewDetailsView() {
       blue: 'bg-blue-100 text-blue-700',
     }
     const icons: Record<ReviewStatus, React.ReactNode> = {
-      draft: <FileText className="w-3 h-3" />,
-      self_assessment: <User className="w-3 h-3" />,
-      manager_review: <Users className="w-3 h-3" />,
+      draft: <FileText className="w-3 h-3" aria-hidden="true" />,
+      self_assessment: <User className="w-3 h-3" aria-hidden="true" />,
+      manager_review: <Users className="w-3 h-3" aria-hidden="true" />,
       calibration: <BarChart3 className="w-3 h-3" />,
       completed: <CheckCircle className="w-3 h-3" />,
       acknowledged: <Award className="w-3 h-3" />,
@@ -348,11 +348,11 @@ export function PerformanceReviewDetailsView() {
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48">
                 <DropdownMenuItem onClick={() => handleSendReminder('self_assessment')}>
-                  <Send className="h-4 w-4 ms-2" />
+                  <Send className="h-4 w-4 ms-2" aria-hidden="true" />
                   تذكير بالتقييم الذاتي
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => handleSendReminder('manager_review')}>
-                  <Send className="h-4 w-4 ms-2" />
+                  <Send className="h-4 w-4 ms-2" aria-hidden="true" />
                   تذكير المدير
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
@@ -476,7 +476,7 @@ export function PerformanceReviewDetailsView() {
               <Card className="border-none shadow-sm bg-white rounded-2xl">
                 <CardHeader className="pb-3">
                   <CardTitle className="text-base font-bold text-navy flex items-center gap-2">
-                    <User className="w-4 h-4 text-emerald-600" />
+                    <User className="w-4 h-4 text-emerald-600" aria-hidden="true" />
                     معلومات الموظف
                   </CardTitle>
                 </CardHeader>
@@ -579,7 +579,7 @@ export function PerformanceReviewDetailsView() {
                   <CardHeader className="pb-3">
                     <div className="flex items-center justify-between">
                       <CardTitle className="text-base font-bold text-navy flex items-center gap-2">
-                        <User className="w-4 h-4 text-emerald-600" />
+                        <User className="w-4 h-4 text-emerald-600" aria-hidden="true" />
                         التقييم الذاتي
                       </CardTitle>
                       <Badge className="bg-emerald-100 text-emerald-700 border-0">
@@ -616,7 +616,7 @@ export function PerformanceReviewDetailsView() {
                     {review.selfAssessment.challenges?.length > 0 && (
                       <div>
                         <h4 className="font-medium text-navy mb-3 flex items-center gap-2">
-                          <AlertTriangle className="w-4 h-4 text-amber-600" />
+                          <AlertTriangle className="w-4 h-4 text-amber-600" aria-hidden="true" />
                           التحديات
                         </h4>
                         <ul className="space-y-2">
@@ -666,7 +666,7 @@ export function PerformanceReviewDetailsView() {
             ) : (
               <Card className="border-none shadow-sm bg-white rounded-2xl">
                 <CardContent className="p-12 text-center">
-                  <User className="w-16 h-16 text-slate-300 mx-auto mb-4" />
+                  <User className="w-16 h-16 text-slate-300 mx-auto mb-4" aria-hidden="true" />
                   <h3 className="text-lg font-bold text-slate-700 mb-2">لم يكتمل التقييم الذاتي</h3>
                   <p className="text-slate-500 mb-4">
                     موعد التسليم: {formatDate(review.reviewPeriod?.selfAssessmentDueDate)}
@@ -677,7 +677,7 @@ export function PerformanceReviewDetailsView() {
                     className="rounded-xl"
                     disabled={reminderMutation.isPending}
                   >
-                    <Send className="w-4 h-4 ms-2" />
+                    <Send className="w-4 h-4 ms-2" aria-hidden="true" />
                     إرسال تذكير
                   </Button>
                 </CardContent>
@@ -982,7 +982,7 @@ export function PerformanceReviewDetailsView() {
                     {review.managerAssessment.areasForImprovement?.length > 0 && (
                       <div>
                         <h4 className="font-medium text-navy mb-3 flex items-center gap-2">
-                          <AlertTriangle className="w-4 h-4 text-amber-600" />
+                          <AlertTriangle className="w-4 h-4 text-amber-600" aria-hidden="true" />
                           مجالات التحسين
                         </h4>
                         <ul className="space-y-2">
@@ -1052,7 +1052,7 @@ export function PerformanceReviewDetailsView() {
                     className="rounded-xl"
                     disabled={reminderMutation.isPending}
                   >
-                    <Send className="w-4 h-4 ms-2" />
+                    <Send className="w-4 h-4 ms-2" aria-hidden="true" />
                     إرسال تذكير للمدير
                   </Button>
                 </CardContent>

@@ -206,7 +206,7 @@ export function SalesReportsCreateView() {
           {/* Date Range */}
           <div className="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm">
             <div className="flex items-center gap-2 mb-4">
-              <Calendar className="h-5 w-5 text-emerald-600" />
+              <Calendar className="h-5 w-5 text-emerald-600" aria-hidden="true" />
               <h2 className="text-lg font-bold text-navy">الفترة الزمنية</h2>
             </div>
             <div className="space-y-4">
@@ -254,7 +254,7 @@ export function SalesReportsCreateView() {
           {/* Data Modules */}
           <div className="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm">
             <div className="flex items-center gap-2 mb-4">
-              <Settings className="h-5 w-5 text-emerald-600" />
+              <Settings className="h-5 w-5 text-emerald-600" aria-hidden="true" />
               <h2 className="text-lg font-bold text-navy">وحدات البيانات</h2>
             </div>
             <p className="text-slate-500 text-sm mb-4">اختر البيانات التي تريد تضمينها في التقرير</p>

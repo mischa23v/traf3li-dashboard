@@ -406,7 +406,7 @@ export function OrganizationalStructureDetailsView() {
                     <Card className="rounded-2xl border-slate-100">
                       <CardHeader className="pb-4">
                         <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                          <User className="w-5 h-5 text-emerald-500" />
+                          <User className="w-5 h-5 text-emerald-500" aria-hidden="true" />
                           القيادة
                         </CardTitle>
                       </CardHeader>
@@ -587,7 +587,7 @@ export function OrganizationalStructureDetailsView() {
                         <Card className="rounded-2xl border-slate-100">
                           <CardHeader className="pb-4">
                             <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                              <Users className="w-5 h-5 text-emerald-500" />
+                              <Users className="w-5 h-5 text-emerald-500" aria-hidden="true" />
                               العدد الوظيفي
                             </CardTitle>
                           </CardHeader>
@@ -688,7 +688,7 @@ export function OrganizationalStructureDetailsView() {
                     ) : (
                       <Card className="rounded-2xl border-slate-100">
                         <CardContent className="p-8 text-center">
-                          <Users className="w-12 h-12 mx-auto text-slate-300 mb-4" />
+                          <Users className="w-12 h-12 mx-auto text-slate-300 mb-4" aria-hidden="true" />
                           <p className="text-slate-500">لا توجد بيانات للعدد الوظيفي</p>
                         </CardContent>
                       </Card>

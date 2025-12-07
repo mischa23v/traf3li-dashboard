@@ -321,7 +321,7 @@ export function LoansCreateView() {
             <Card className="rounded-3xl shadow-sm border-slate-100">
               <CardHeader className="pb-4">
                 <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                  <User className="w-5 h-5 text-emerald-500" />
+                  <User className="w-5 h-5 text-emerald-500" aria-hidden="true" />
                   بيانات الموظف
                 </CardTitle>
               </CardHeader>
@@ -535,7 +535,7 @@ export function LoansCreateView() {
                           {eligibilityResult.eligible ? (
                             <CheckCircle className="w-5 h-5 text-emerald-600" />
                           ) : (
-                            <AlertTriangle className="w-5 h-5 text-red-600" />
+                            <AlertTriangle className="w-5 h-5 text-red-600" aria-hidden="true" />
                           )}
                           <span className={cn(
                             "font-bold",
@@ -569,7 +569,7 @@ export function LoansCreateView() {
             <Card className="rounded-3xl shadow-sm border-slate-100">
               <CardHeader className="pb-4">
                 <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                  <FileText className="w-5 h-5 text-emerald-500" />
+                  <FileText className="w-5 h-5 text-emerald-500" aria-hidden="true" />
                   الغرض من القرض
                 </CardTitle>
               </CardHeader>
@@ -605,7 +605,7 @@ export function LoansCreateView() {
                   <CardHeader className="cursor-pointer hover:bg-slate-50 transition-colors rounded-t-3xl">
                     <div className="flex items-center justify-between">
                       <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                        <FileText className="w-5 h-5 text-blue-500" />
+                        <FileText className="w-5 h-5 text-blue-500" aria-hidden="true" />
                         الملاحظات
                       </CardTitle>
                       <ChevronDown className={cn("w-5 h-5 text-slate-500 transition-transform", openSections.includes('notes') && "rotate-180")} />
@@ -660,7 +660,7 @@ export function LoansCreateView() {
                     </div>
                   </div>
                   <div className="flex items-start gap-2">
-                    <Clock className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                    <Clock className="w-4 h-4 mt-0.5 flex-shrink-0" aria-hidden="true" />
                     <div>
                       <p className="font-medium">آلية السداد:</p>
                       <ul className="list-disc list-inside me-4 mt-1 space-y-1">
@@ -671,7 +671,7 @@ export function LoansCreateView() {
                     </div>
                   </div>
                   <div className="flex items-start gap-2">
-                    <AlertTriangle className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                    <AlertTriangle className="w-4 h-4 mt-0.5 flex-shrink-0" aria-hidden="true" />
                     <div>
                       <p className="font-medium">في حالة إنهاء الخدمة:</p>
                       <ul className="list-disc list-inside me-4 mt-1 space-y-1">

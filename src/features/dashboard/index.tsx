@@ -142,7 +142,7 @@ export function Dashboard() {
                 {t('dashboard.hero.newCase')}
               </Button>
               <Button className="bg-white/10 hover:bg-white/20 text-white rounded-xl h-11 px-6 font-bold backdrop-blur-md border border-white/10 transition-all duration-300">
-                <FileText className="ms-2 h-5 w-5" />
+                <FileText className="ms-2 h-5 w-5" aria-hidden="true" />
                 {t('dashboard.hero.newInvoice')}
               </Button>
             </div>
@@ -157,7 +157,7 @@ export function Dashboard() {
             </div>
           ) : statsError ? (
             <div className="col-span-full flex flex-col items-center justify-center py-12 text-slate-500">
-              <AlertCircle className="h-10 w-10 mb-3 text-slate-300" />
+              <AlertCircle className="h-10 w-10 mb-3 text-slate-300" aria-hidden="true" />
               <span className="text-sm font-medium">{t('dashboard.stats.noDataAvailable')}</span>
               <span className="text-xs text-slate-500 mt-1">
                 {(statsError as any)?.status === 404
@@ -167,7 +167,7 @@ export function Dashboard() {
             </div>
           ) : !stats ? (
             <div className="col-span-full flex flex-col items-center justify-center py-12 text-slate-500">
-              <AlertCircle className="h-10 w-10 mb-3 text-slate-300" />
+              <AlertCircle className="h-10 w-10 mb-3 text-slate-300" aria-hidden="true" />
               <span className="text-sm font-medium">{t('dashboard.stats.noData')}</span>
             </div>
           ) : (
@@ -193,7 +193,7 @@ export function Dashboard() {
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-sm font-bold text-slate-500">{t('dashboard.stats.tasks.title')}</CardTitle>
                   <div className="h-10 w-10 rounded-xl bg-purple-50 flex items-center justify-center group-hover:bg-purple-100 transition-colors">
-                    <Users className="h-5 w-5 text-purple-600" />
+                    <Users className="h-5 w-5 text-purple-600" aria-hidden="true" />
                   </div>
                 </CardHeader>
                 <CardContent>
@@ -292,7 +292,7 @@ export function Dashboard() {
                             </div>
                           </div>
                           <Button variant="ghost" size="icon" className="text-slate-300 group-hover:text-brand-blue">
-                            <ChevronLeft className="h-5 w-5" />
+                            <ChevronLeft className="h-5 w-5" aria-hidden="true" />
                           </Button>
                         </Link>
                       )

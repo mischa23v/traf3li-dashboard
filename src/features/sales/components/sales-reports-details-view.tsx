@@ -177,7 +177,7 @@ export function SalesReportsDetailsView() {
         <div className="bg-white rounded-2xl p-4 border border-slate-100 shadow-sm">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center">
-              <Calendar className="h-5 w-5 text-blue-600" />
+              <Calendar className="h-5 w-5 text-blue-600" aria-hidden="true" />
             </div>
             <div>
               <p className="text-sm text-slate-500">تاريخ الإنشاء</p>
@@ -190,7 +190,7 @@ export function SalesReportsDetailsView() {
         <div className="bg-white rounded-2xl p-4 border border-slate-100 shadow-sm">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-green-50 flex items-center justify-center">
-              <Clock className="h-5 w-5 text-green-600" />
+              <Clock className="h-5 w-5 text-green-600" aria-hidden="true" />
             </div>
             <div>
               <p className="text-sm text-slate-500">آخر تحديث</p>
@@ -203,7 +203,7 @@ export function SalesReportsDetailsView() {
         <div className="bg-white rounded-2xl p-4 border border-slate-100 shadow-sm">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-purple-50 flex items-center justify-center">
-              <User className="h-5 w-5 text-purple-600" />
+              <User className="h-5 w-5 text-purple-600" aria-hidden="true" />
             </div>
             <div>
               <p className="text-sm text-slate-500">أنشأه</p>
@@ -254,7 +254,7 @@ export function SalesReportsDetailsView() {
                 </div>
                 <div className="bg-blue-50 rounded-xl p-4">
                   <div className="flex items-center gap-2 text-blue-700 mb-2">
-                    <Users className="h-5 w-5" />
+                    <Users className="h-5 w-5" aria-hidden="true" />
                     <span className="font-medium">عدد الصفقات</span>
                   </div>
                   <p className="text-2xl font-bold text-blue-800">--</p>

@@ -1066,7 +1066,7 @@ export function JobPostingCreateView() {
                       </div>
                       <div className="p-4 bg-purple-50 rounded-xl">
                         <p className="text-sm text-purple-700">
-                          <Info className="w-4 h-4 inline ms-1" />
+                          <Info className="w-4 h-4 inline ms-1" aria-hidden="true" />
                           سيتم التحقق من ترخيص المحامي من الهيئة السعودية للمحامين
                         </p>
                       </div>
@@ -1082,7 +1082,7 @@ export function JobPostingCreateView() {
         <Card className="border-none shadow-sm bg-blue-50 rounded-2xl">
           <CardContent className="p-4">
             <div className="flex items-start gap-3">
-              <Info className="w-5 h-5 text-blue-600 mt-0.5" />
+              <Info className="w-5 h-5 text-blue-600 mt-0.5" aria-hidden="true" />
               <div>
                 <h4 className="font-bold text-blue-800 mb-1">نظام العمل السعودي - التوظيف</h4>
                 <ul className="text-sm text-blue-700 space-y-1">

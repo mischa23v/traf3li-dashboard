@@ -235,7 +235,7 @@ export function SuccessionPlanningDetailsView() {
                         disabled={submitMutation.isPending}
                         className="rounded-xl"
                       >
-                        <Send className="w-4 h-4 ms-1" />
+                        <Send className="w-4 h-4 ms-1" aria-hidden="true" />
                         تقديم للموافقة
                       </Button>
                     )}
@@ -277,7 +277,7 @@ export function SuccessionPlanningDetailsView() {
                     <CardContent className="p-4">
                       <div className="flex items-center gap-3">
                         <div className="p-2 bg-red-100 rounded-xl">
-                          <AlertTriangle className="w-5 h-5 text-red-600" />
+                          <AlertTriangle className="w-5 h-5 text-red-600" aria-hidden="true" />
                         </div>
                         <div>
                           <p className="text-xs text-slate-500">أهمية المنصب</p>
@@ -307,7 +307,7 @@ export function SuccessionPlanningDetailsView() {
                     <CardContent className="p-4">
                       <div className="flex items-center gap-3">
                         <div className="p-2 bg-indigo-100 rounded-xl">
-                          <Users className="w-5 h-5 text-indigo-600" />
+                          <Users className="w-5 h-5 text-indigo-600" aria-hidden="true" />
                         </div>
                         <div>
                           <p className="text-xs text-slate-500">الخلفاء</p>
@@ -523,7 +523,7 @@ export function SuccessionPlanningDetailsView() {
                     ) : (
                       <Card className="rounded-2xl border-slate-100">
                         <CardContent className="p-8 text-center">
-                          <Users className="w-12 h-12 mx-auto text-slate-300 mb-4" />
+                          <Users className="w-12 h-12 mx-auto text-slate-300 mb-4" aria-hidden="true" />
                           <p className="text-slate-500">لم تتم إضافة خلفاء بعد</p>
                           <Button
                             onClick={() => navigate({ to: `/dashboard/hr/succession-planning/new?editId=${planId}` })}
@@ -541,14 +541,14 @@ export function SuccessionPlanningDetailsView() {
                     <Card className="rounded-2xl border-slate-100">
                       <CardHeader className="pb-4">
                         <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                          <User className="w-5 h-5 text-orange-500" />
+                          <User className="w-5 h-5 text-orange-500" aria-hidden="true" />
                           معلومات الشاغل الحالي
                         </CardTitle>
                       </CardHeader>
                       <CardContent>
                         <div className="flex items-center gap-4 mb-6">
                           <div className="w-16 h-16 rounded-full bg-orange-100 flex items-center justify-center">
-                            <User className="w-8 h-8 text-orange-600" />
+                            <User className="w-8 h-8 text-orange-600" aria-hidden="true" />
                           </div>
                           <div>
                             <h3 className="text-xl font-bold text-navy">{plan.incumbentName}</h3>

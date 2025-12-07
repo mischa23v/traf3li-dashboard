@@ -253,7 +253,7 @@ END:VCALENDAR`
           {/* External Calendar Providers */}
           <div>
             <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-              <Calendar className="h-5 w-5" />
+              <Calendar className="h-5 w-5" aria-hidden="true" />
               التقويمات الخارجية
             </h3>
 
@@ -312,7 +312,7 @@ END:VCALENDAR`
                         size="sm"
                         onClick={() => handleConnect(provider.id)}
                       >
-                        <ExternalLink className="h-4 w-4 ms-1" />
+                        <ExternalLink className="h-4 w-4 ms-1" aria-hidden="true" />
                         اتصال
                       </Button>
                     )}
@@ -435,7 +435,7 @@ END:VCALENDAR`
 
           {/* Info Alert */}
           <Alert>
-            <Info className="h-4 w-4" />
+            <Info className="h-4 w-4" aria-hidden="true" />
             <AlertDescription>
               ملاحظة: لربط التقويم مع Google أو Outlook، يجب تفعيل هذه الخاصية من إعدادات الخادم.
               تواصل مع مدير النظام لمزيد من المعلومات.

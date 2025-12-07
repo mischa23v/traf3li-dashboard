@@ -460,7 +460,7 @@ export function ExpenseClaimsCreateView() {
             <Card className="rounded-3xl shadow-sm border-slate-100">
               <CardHeader className="pb-4">
                 <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                  <User className="w-5 h-5 text-emerald-500" />
+                  <User className="w-5 h-5 text-emerald-500" aria-hidden="true" />
                   بيانات الموظف
                 </CardTitle>
               </CardHeader>
@@ -582,7 +582,7 @@ export function ExpenseClaimsCreateView() {
               <CardHeader className="pb-4">
                 <div className="flex items-center justify-between">
                   <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                    <FileText className="w-5 h-5 text-emerald-500" />
+                    <FileText className="w-5 h-5 text-emerald-500" aria-hidden="true" />
                     بنود المصروفات
                   </CardTitle>
                   <Button
@@ -1028,7 +1028,7 @@ export function ExpenseClaimsCreateView() {
                   <CardHeader className="cursor-pointer hover:bg-slate-50 transition-colors rounded-t-3xl">
                     <div className="flex items-center justify-between">
                       <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                        <FileText className="w-5 h-5 text-purple-500" />
+                        <FileText className="w-5 h-5 text-purple-500" aria-hidden="true" />
                         الملاحظات
                       </CardTitle>
                       <ChevronDown className={cn("w-5 h-5 text-slate-500 transition-transform", openSections.includes('notes') && "rotate-180")} />
@@ -1092,7 +1092,7 @@ export function ExpenseClaimsCreateView() {
                     </div>
                   </div>
                   <div className="flex items-start gap-2">
-                    <Clock className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                    <Clock className="w-4 h-4 mt-0.5 flex-shrink-0" aria-hidden="true" />
                     <div>
                       <p className="font-medium">مدة التقديم:</p>
                       <ul className="list-disc list-inside me-4 mt-1 space-y-1">

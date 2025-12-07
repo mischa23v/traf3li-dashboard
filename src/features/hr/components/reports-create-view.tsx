@@ -610,7 +610,7 @@ export function ReportsCreateView() {
             <Card className="rounded-3xl shadow-sm border-slate-100">
               <CardHeader className="pb-4">
                 <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                  <FileText className="w-5 h-5 text-emerald-500" />
+                  <FileText className="w-5 h-5 text-emerald-500" aria-hidden="true" />
                   المعلومات الأساسية
                 </CardTitle>
               </CardHeader>
@@ -1105,7 +1105,7 @@ export function ReportsCreateView() {
                   <CardHeader className="cursor-pointer hover:bg-slate-50 transition-colors rounded-t-3xl">
                     <div className="flex items-center justify-between">
                       <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                        <Clock className="w-5 h-5 text-cyan-500" />
+                        <Clock className="w-5 h-5 text-cyan-500" aria-hidden="true" />
                         الجدولة
                       </CardTitle>
                       <ChevronDown className={cn("w-5 h-5 text-slate-500 transition-transform", openSections.includes('scheduling') && "rotate-180")} />
@@ -1183,7 +1183,7 @@ export function ReportsCreateView() {
                   <CardHeader className="cursor-pointer hover:bg-slate-50 transition-colors rounded-t-3xl">
                     <div className="flex items-center justify-between">
                       <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                        <Settings className="w-5 h-5 text-gray-500" />
+                        <Settings className="w-5 h-5 text-gray-500" aria-hidden="true" />
                         خيارات التصدير
                       </CardTitle>
                       <ChevronDown className={cn("w-5 h-5 text-slate-500 transition-transform", openSections.includes('export') && "rotate-180")} />

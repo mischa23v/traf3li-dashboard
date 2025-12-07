@@ -17,6 +17,7 @@ import {
   DollarSign,
   Edit,
   Trash2,
+  Lock,
 } from 'lucide-react'
 import { ConfigDrawer } from '@/components/config-drawer'
 import { Header } from '@/components/layout/header'
@@ -224,7 +225,7 @@ export function ClientDetails() {
                       <Phone className='h-4 w-4 text-muted-foreground' />
                       <div>
                         <p className='text-sm text-muted-foreground'>
-                          {t('clients.form.phone')}
+                          {t('clients.form.phone')}<Lock className="h-3 w-3 text-muted-foreground inline ms-1" aria-hidden="true" />
                         </p>
                         <p className='font-medium' dir='ltr'>
                           {client.phone}
@@ -236,7 +237,7 @@ export function ClientDetails() {
                         <Phone className='h-4 w-4 text-muted-foreground' />
                         <div>
                           <p className='text-sm text-muted-foreground'>
-                            {t('clients.form.alternatePhone')}
+                            {t('clients.form.alternatePhone')}<Lock className="h-3 w-3 text-muted-foreground inline ms-1" aria-hidden="true" />
                           </p>
                           <p className='font-medium' dir='ltr'>
                             {client.alternatePhone}
@@ -249,7 +250,7 @@ export function ClientDetails() {
                         <Mail className='h-4 w-4 text-muted-foreground' />
                         <div>
                           <p className='text-sm text-muted-foreground'>
-                            {t('clients.form.email')}
+                            {t('clients.form.email')}<Lock className="h-3 w-3 text-muted-foreground inline ms-1" aria-hidden="true" />
                           </p>
                           <p className='font-medium' dir='ltr'>
                             {client.email}
@@ -283,7 +284,7 @@ export function ClientDetails() {
                         <FileText className='h-4 w-4 text-muted-foreground' />
                         <div>
                           <p className='text-sm text-muted-foreground'>
-                            {t('clients.form.nationalId')}
+                            {t('clients.form.nationalId')}<Lock className="h-3 w-3 text-muted-foreground inline ms-1" aria-hidden="true" />
                           </p>
                           <p className='font-medium'>{client.nationalId}</p>
                         </div>

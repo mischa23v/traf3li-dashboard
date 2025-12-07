@@ -57,7 +57,7 @@ export function DataTableToolbar({ table }: DataTableToolbarProps) {
             className="h-8 px-2 lg:px-3"
           >
             {t('common.reset')}
-            <X className="ms-2 h-4 w-4" />
+            <X className="ms-2 h-4 w-4" aria-hidden="true" />
           </Button>
         )}
       </div>

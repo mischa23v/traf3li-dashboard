@@ -415,9 +415,9 @@ export function FullCalendarView() {
           {eventType === 'hearing' || eventType === 'court_session' ? (
             <Gavel className="h-3 w-3 flex-shrink-0" />
           ) : eventType === 'meeting' ? (
-            <Users className="h-3 w-3 flex-shrink-0" />
+            <Users className="h-3 w-3 flex-shrink-0" aria-hidden="true" />
           ) : eventType === 'deadline' || eventType === 'task' ? (
-            <AlertTriangle className="h-3 w-3 flex-shrink-0" />
+            <AlertTriangle className="h-3 w-3 flex-shrink-0" aria-hidden="true" />
           ) : (
             <CalendarIcon className="h-3 w-3 flex-shrink-0" />
           )}
@@ -473,7 +473,7 @@ export function FullCalendarView() {
           <Card className="rounded-3xl border-0 shadow-lg">
             <CardContent className="p-12 text-center">
               <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                <AlertCircle className="h-8 w-8 text-red-500" />
+                <AlertCircle className="h-8 w-8 text-red-500" aria-hidden="true" />
               </div>
               <h3 className="text-xl font-bold text-slate-900 mb-2">فشل تحميل التقويم</h3>
               <p className="text-slate-500 mb-6">{(error as Error)?.message || 'حدث خطأ أثناء تحميل البيانات'}</p>
@@ -559,7 +559,7 @@ export function FullCalendarView() {
                 onClick={() => setIsSyncDialogOpen(true)}
                 className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl h-12 px-6 font-bold shadow-lg shadow-emerald-600/30 hover:scale-105 transition-all duration-300 border-0"
               >
-                <Settings className="ms-2 h-5 w-5" />
+                <Settings className="ms-2 h-5 w-5" aria-hidden="true" />
                 مزامنة
               </Button>
               <DropdownMenu>
@@ -596,7 +596,7 @@ export function FullCalendarView() {
                       }
                     }}
                   >
-                    <Users className="ms-2 h-4 w-4 text-blue-500" />
+                    <Users className="ms-2 h-4 w-4 text-blue-500" aria-hidden="true" />
                     اجتماعات
                   </DropdownMenuCheckboxItem>
                   <DropdownMenuCheckboxItem
@@ -609,7 +609,7 @@ export function FullCalendarView() {
                       }
                     }}
                   >
-                    <AlertTriangle className="ms-2 h-4 w-4 text-purple-500" />
+                    <AlertTriangle className="ms-2 h-4 w-4 text-purple-500" aria-hidden="true" />
                     مهام
                   </DropdownMenuCheckboxItem>
                   <DropdownMenuCheckboxItem
@@ -694,7 +694,7 @@ export function FullCalendarView() {
               selectedEvent?.extendedProps.eventType === 'court_session' ? (
                 <Gavel className="h-5 w-5 text-red-500" />
               ) : selectedEvent?.extendedProps.eventType === 'meeting' ? (
-                <Users className="h-5 w-5 text-blue-500" />
+                <Users className="h-5 w-5 text-blue-500" aria-hidden="true" />
               ) : (
                 <CalendarIcon className="h-5 w-5 text-purple-500" />
               )}
@@ -709,7 +709,7 @@ export function FullCalendarView() {
           {selectedEvent && (
             <div className="space-y-4">
               <div className="flex items-center gap-2 text-sm text-slate-600">
-                <Clock className="h-4 w-4" />
+                <Clock className="h-4 w-4" aria-hidden="true" />
                 <span>
                   {new Date(selectedEvent.start).toLocaleDateString('ar-SA', {
                     weekday: 'long',
@@ -722,7 +722,7 @@ export function FullCalendarView() {
 
               {selectedEvent.extendedProps.location && (
                 <div className="flex items-center gap-2 text-sm text-slate-600">
-                  <MapPin className="h-4 w-4" />
+                  <MapPin className="h-4 w-4" aria-hidden="true" />
                   <span>{selectedEvent.extendedProps.location}</span>
                 </div>
               )}
@@ -770,7 +770,7 @@ export function FullCalendarView() {
               إغلاق
             </Button>
             <Button onClick={handleViewEventDetails}>
-              <ExternalLink className="ms-2 h-4 w-4" />
+              <ExternalLink className="ms-2 h-4 w-4" aria-hidden="true" />
               عرض التفاصيل
             </Button>
           </DialogFooter>

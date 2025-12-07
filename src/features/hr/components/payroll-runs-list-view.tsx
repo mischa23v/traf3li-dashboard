@@ -173,11 +173,11 @@ export function PayrollRunsListView() {
             cancelled: 'ملغي',
         }
         const icons: Record<PayrollRunStatus, React.ReactNode> = {
-            draft: <FileText className="w-3 h-3" />,
+            draft: <FileText className="w-3 h-3" aria-hidden="true" />,
             calculating: <RefreshCw className="w-3 h-3 animate-spin" aria-hidden="true" />,
             calculated: <CheckCircle className="w-3 h-3" />,
             approved: <CheckCircle className="w-3 h-3" />,
-            processing_payment: <Clock className="w-3 h-3" />,
+            processing_payment: <Clock className="w-3 h-3" aria-hidden="true" />,
             paid: <CreditCard className="w-3 h-3" />,
             cancelled: <XCircle className="w-3 h-3" />,
         }
@@ -478,7 +478,7 @@ export function PayrollRunsListView() {
                                             <div className="text-center">
                                                 <div className="text-xs text-slate-600 mb-1">الموظفين</div>
                                                 <div className="flex items-center justify-center gap-1">
-                                                    <Users className="w-4 h-4 text-slate-500" />
+                                                    <Users className="w-4 h-4 text-slate-500" aria-hidden="true" />
                                                     <span className="font-medium text-navy text-sm">{run.employees.totalEmployees}</span>
                                                 </div>
                                             </div>

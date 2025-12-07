@@ -428,7 +428,7 @@ export function CreateEventView() {
                                 <div className="space-y-6">
                                     <div className="space-y-2">
                                         <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                            <FileText className="w-4 h-4 text-blue-500" />
+                                            <FileText className="w-4 h-4 text-blue-500" aria-hidden="true" />
                                             عنوان الحدث <span className="text-red-500">*</span>
                                         </label>
                                         <Input
@@ -550,10 +550,10 @@ export function CreateEventView() {
                                         <CollapsibleTrigger asChild>
                                             <Button variant="ghost" className="w-full justify-between p-0 h-auto hover:bg-transparent">
                                                 <h3 className="text-lg font-semibold text-slate-800 flex items-center gap-2">
-                                                    <MapPin className="w-5 h-5 text-blue-500" />
+                                                    <MapPin className="w-5 h-5 text-blue-500" aria-hidden="true" />
                                                     الموقع
                                                 </h3>
-                                                {showLocation ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
+                                                {showLocation ? <ChevronUp className="w-5 h-5" aria-hidden="true" /> : <ChevronDown className="w-5 h-5" aria-hidden="true" />}
                                             </Button>
                                         </CollapsibleTrigger>
                                         <CollapsibleContent className="mt-4">
@@ -627,10 +627,10 @@ export function CreateEventView() {
                                         <CollapsibleTrigger asChild>
                                             <Button variant="ghost" className="w-full justify-between p-0 h-auto hover:bg-transparent">
                                                 <h3 className="text-lg font-semibold text-slate-800 flex items-center gap-2">
-                                                    <Users className="w-5 h-5 text-blue-500" />
+                                                    <Users className="w-5 h-5 text-blue-500" aria-hidden="true" />
                                                     المشاركون
                                                 </h3>
-                                                {showAttendees ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
+                                                {showAttendees ? <ChevronUp className="w-5 h-5" aria-hidden="true" /> : <ChevronDown className="w-5 h-5" aria-hidden="true" />}
                                             </Button>
                                         </CollapsibleTrigger>
                                         <CollapsibleContent className="mt-4">
@@ -652,7 +652,7 @@ export function CreateEventView() {
                                                             onClick={() => removeAttendee(attendee.id)}
                                                             className="text-red-500 hover:text-red-600 hover:bg-red-50"
                                                         >
-                                                            <X className="w-4 h-4" />
+                                                            <X className="w-4 h-4" aria-hidden="true" />
                                                         </Button>
                                                     </div>
                                                 ))}
@@ -686,7 +686,7 @@ export function CreateEventView() {
                                                         </SelectContent>
                                                     </Select>
                                                     <Button type="button" variant="outline" onClick={addAttendee} className="rounded-xl">
-                                                        <Plus className="w-4 h-4 ms-2" />
+                                                        <Plus className="w-4 h-4 ms-2" aria-hidden="true" />
                                                         إضافة
                                                     </Button>
                                                 </div>
@@ -704,7 +704,7 @@ export function CreateEventView() {
                                                     <ListOrdered className="w-5 h-5 text-blue-500" />
                                                     جدول الأعمال
                                                 </h3>
-                                                {showAgenda ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
+                                                {showAgenda ? <ChevronUp className="w-5 h-5" aria-hidden="true" /> : <ChevronDown className="w-5 h-5" aria-hidden="true" />}
                                             </Button>
                                         </CollapsibleTrigger>
                                         <CollapsibleContent className="mt-4">
@@ -728,7 +728,7 @@ export function CreateEventView() {
                                                             onClick={() => removeAgendaItem(item.id)}
                                                             className="text-red-500 hover:text-red-600 hover:bg-red-50"
                                                         >
-                                                            <X className="w-4 h-4" />
+                                                            <X className="w-4 h-4" aria-hidden="true" />
                                                         </Button>
                                                     </div>
                                                 ))}
@@ -755,7 +755,7 @@ export function CreateEventView() {
                                                         onChange={(e) => setNewAgendaItem(prev => ({ ...prev, presenter: e.target.value }))}
                                                     />
                                                     <Button type="button" variant="outline" onClick={addAgendaItem} className="rounded-xl">
-                                                        <Plus className="w-4 h-4 ms-2" />
+                                                        <Plus className="w-4 h-4 ms-2" aria-hidden="true" />
                                                         إضافة
                                                     </Button>
                                                 </div>
@@ -773,7 +773,7 @@ export function CreateEventView() {
                                                     <Bell className="w-5 h-5 text-blue-500" />
                                                     التذكيرات
                                                 </h3>
-                                                {showReminders ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
+                                                {showReminders ? <ChevronUp className="w-5 h-5" aria-hidden="true" /> : <ChevronDown className="w-5 h-5" aria-hidden="true" />}
                                             </Button>
                                         </CollapsibleTrigger>
                                         <CollapsibleContent className="mt-4">
@@ -807,7 +807,7 @@ export function CreateEventView() {
                                                     <Repeat className="w-5 h-5 text-blue-500" />
                                                     فعالية متكررة
                                                 </h3>
-                                                {showRecurring ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
+                                                {showRecurring ? <ChevronUp className="w-5 h-5" aria-hidden="true" /> : <ChevronDown className="w-5 h-5" aria-hidden="true" />}
                                             </Button>
                                         </CollapsibleTrigger>
                                         <CollapsibleContent className="mt-4">
@@ -911,7 +911,7 @@ export function CreateEventView() {
                                                     <DollarSign className="w-5 h-5 text-blue-500" />
                                                     الفوترة
                                                 </h3>
-                                                {showBilling ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
+                                                {showBilling ? <ChevronUp className="w-5 h-5" aria-hidden="true" /> : <ChevronDown className="w-5 h-5" aria-hidden="true" />}
                                             </Button>
                                         </CollapsibleTrigger>
                                         <CollapsibleContent className="mt-4">
@@ -963,7 +963,7 @@ export function CreateEventView() {
                                             </span>
                                         ) : (
                                             <span className="flex items-center gap-2">
-                                                <Save className="w-4 h-4" />
+                                                <Save className="w-4 h-4" aria-hidden="true" />
                                                 حفظ الفعالية
                                             </span>
                                         )}

@@ -344,7 +344,7 @@ export function CasesListView() {
               {/* Error State */}
               {isError && !isLoading && (
                 <Alert className="border-red-200 bg-red-50">
-                  <AlertCircle className="h-4 w-4 text-red-600" />
+                  <AlertCircle className="h-4 w-4 text-red-600" aria-hidden="true" />
                   <AlertDescription className="text-red-800">
                     <div className="flex items-center justify-between">
                       <span>
@@ -396,7 +396,7 @@ export function CasesListView() {
                           className={`w-12 h-12 rounded-xl flex items-center justify-center shadow-sm border ${getPriorityColor(caseItem.priority)}`}
                         >
                           {caseItem.priority === 'critical' ? (
-                            <AlertCircle className="h-6 w-6" />
+                            <AlertCircle className="h-6 w-6" aria-hidden="true" />
                           ) : (
                             <Scale className="h-6 w-6" />
                           )}
@@ -425,13 +425,13 @@ export function CasesListView() {
                           </div>
                           <div className="space-y-2 text-sm">
                             <div className="flex items-center gap-2 text-slate-600">
-                              <Users className="h-4 w-4 text-slate-400" />
+                              <Users className="h-4 w-4 text-slate-400" aria-hidden="true" />
                               <span className="text-green-600 font-medium">{t('cases.plaintiff', 'المدعي')}:</span>
                               <span>{getClientName(caseItem)}</span>
                             </div>
                             {getDefendantName(caseItem) !== 'غير محدد' && (
                               <div className="flex items-center gap-2 text-slate-600">
-                                <Users className="h-4 w-4 text-slate-400" />
+                                <Users className="h-4 w-4 text-slate-400" aria-hidden="true" />
                                 <span className="text-amber-600 font-medium">{t('cases.defendant', 'المدعى عليه')}:</span>
                                 <span>{getDefendantName(caseItem)}</span>
                               </div>
@@ -439,12 +439,12 @@ export function CasesListView() {
                             <div className="flex items-center gap-4 flex-wrap">
                               {caseItem.court && (
                                 <div className="flex items-center gap-2 text-slate-600">
-                                  <MapPin className="h-4 w-4 text-slate-400" />
+                                  <MapPin className="h-4 w-4 text-slate-400" aria-hidden="true" />
                                   <span>{caseItem.court}</span>
                                 </div>
                               )}
                               <div className="flex items-center gap-2 text-slate-600">
-                                <User className="h-4 w-4 text-slate-400" />
+                                <User className="h-4 w-4 text-slate-400" aria-hidden="true" />
                                 <span>{getLawyerName(caseItem)}</span>
                               </div>
                             </div>
@@ -528,7 +528,7 @@ export function CasesListView() {
                   className="text-blue-600 hover:text-blue-700 hover:bg-blue-50 w-full rounded-xl py-6 font-medium transition-colors flex items-center justify-center gap-2"
                 >
                   {t('cases.viewAll', 'عرض جميع القضايا')}
-                  <ChevronLeft className="h-4 w-4" />
+                  <ChevronLeft className="h-4 w-4" aria-hidden="true" />
                 </Button>
               </div>
             )}

@@ -234,7 +234,7 @@ export function AttendanceRecordCreateView() {
               {/* Office Type Selector */}
               <div className="space-y-4">
                 <h3 className="font-bold text-navy text-lg flex items-center gap-2">
-                  <Building className="w-5 h-5 text-emerald-600" />
+                  <Building className="w-5 h-5 text-emerald-600" aria-hidden="true" />
                   نوع المكتب
                 </h3>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
@@ -269,7 +269,7 @@ export function AttendanceRecordCreateView() {
               {/* Record Type */}
               <div className="space-y-4">
                 <h3 className="font-bold text-navy text-lg flex items-center gap-2">
-                  <Clock className="w-5 h-5 text-emerald-600" />
+                  <Clock className="w-5 h-5 text-emerald-600" aria-hidden="true" />
                   نوع التسجيل
                 </h3>
                 <div className="grid grid-cols-3 gap-3">
@@ -327,7 +327,7 @@ export function AttendanceRecordCreateView() {
               {/* Employee & Date */}
               <div className="space-y-4">
                 <h3 className="font-bold text-navy text-lg flex items-center gap-2">
-                  <User className="w-5 h-5 text-emerald-600" />
+                  <User className="w-5 h-5 text-emerald-600" aria-hidden="true" />
                   معلومات الموظف
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -567,7 +567,7 @@ export function AttendanceRecordCreateView() {
                   <CollapsibleTrigger className="w-full">
                     <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl hover:bg-slate-100 transition-colors">
                       <div className="flex items-center gap-2">
-                        <Settings className="w-5 h-5 text-emerald-600" />
+                        <Settings className="w-5 h-5 text-emerald-600" aria-hidden="true" />
                         <span className="font-bold text-navy">تفاصيل الدوام</span>
                       </div>
                       <ChevronDown className={`w-5 h-5 text-slate-500 transition-transform ${isShiftOpen ? 'rotate-180' : ''}`} />
@@ -620,7 +620,7 @@ export function AttendanceRecordCreateView() {
                   <CollapsibleTrigger className="w-full">
                     <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl hover:bg-slate-100 transition-colors">
                       <div className="flex items-center gap-2">
-                        <FileText className="w-5 h-5 text-emerald-600" />
+                        <FileText className="w-5 h-5 text-emerald-600" aria-hidden="true" />
                         <span className="font-bold text-navy">الملاحظات</span>
                       </div>
                       <ChevronDown className={`w-5 h-5 text-slate-500 transition-transform ${isNotesOpen ? 'rotate-180' : ''}`} />
@@ -657,7 +657,7 @@ export function AttendanceRecordCreateView() {
               {hasField('compliance') && (
                 <div className="bg-blue-50 rounded-2xl p-4">
                   <div className="flex items-start gap-3">
-                    <Info className="w-5 h-5 text-blue-600 mt-0.5" />
+                    <Info className="w-5 h-5 text-blue-600 mt-0.5" aria-hidden="true" />
                     <div>
                       <h4 className="font-bold text-blue-800 mb-1">نظام العمل السعودي - ساعات العمل</h4>
                       <ul className="text-sm text-blue-700 space-y-1">

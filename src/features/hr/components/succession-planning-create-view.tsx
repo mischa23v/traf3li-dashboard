@@ -582,7 +582,7 @@ export function SuccessionPlanningCreateView() {
             <Card className="rounded-3xl shadow-sm border-slate-100">
               <CardHeader className="pb-4">
                 <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                  <AlertTriangle className="w-5 h-5 text-red-500" />
+                  <AlertTriangle className="w-5 h-5 text-red-500" aria-hidden="true" />
                   تقييم الأهمية والمخاطر
                 </CardTitle>
               </CardHeader>
@@ -758,7 +758,7 @@ export function SuccessionPlanningCreateView() {
               <CardHeader className="pb-4">
                 <div className="flex items-center justify-between">
                   <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                    <Users className="w-5 h-5 text-indigo-500" />
+                    <Users className="w-5 h-5 text-indigo-500" aria-hidden="true" />
                     الخلفاء المحتملون
                   </CardTitle>
                   <Button
@@ -775,7 +775,7 @@ export function SuccessionPlanningCreateView() {
               <CardContent className="space-y-4">
                 {successors.length === 0 ? (
                   <div className="text-center py-8 text-slate-500">
-                    <Users className="w-12 h-12 mx-auto mb-2 opacity-70" />
+                    <Users className="w-12 h-12 mx-auto mb-2 opacity-70" aria-hidden="true" />
                     <p>لم تتم إضافة خلفاء بعد</p>
                     <Button
                       variant="outline"
@@ -858,7 +858,7 @@ export function SuccessionPlanningCreateView() {
                   <CardHeader className="cursor-pointer hover:bg-slate-50 transition-colors rounded-t-3xl">
                     <div className="flex items-center justify-between">
                       <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                        <User className="w-5 h-5 text-orange-500" />
+                        <User className="w-5 h-5 text-orange-500" aria-hidden="true" />
                         تفاصيل الشاغل الحالي
                       </CardTitle>
                       <ChevronDown className={cn("w-5 h-5 text-slate-500 transition-transform", openSections.includes('incumbent') && "rotate-180")} />

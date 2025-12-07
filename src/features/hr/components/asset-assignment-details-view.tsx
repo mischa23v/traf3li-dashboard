@@ -401,7 +401,7 @@ export function AssetAssignmentDetailsView() {
                 onClick={() => setShowIncidentDialog(true)}
                 className="rounded-xl border-red-300 text-red-700 hover:bg-red-50"
               >
-                <AlertTriangle className="w-4 h-4 ms-2" />
+                <AlertTriangle className="w-4 h-4 ms-2" aria-hidden="true" />
                 الإبلاغ عن حادث
               </Button>
               <Button
@@ -476,7 +476,7 @@ export function AssetAssignmentDetailsView() {
                     {/* Employee Info */}
                     <div>
                       <h3 className="text-lg font-bold text-navy mb-4 flex items-center gap-2">
-                        <User className="w-5 h-5 text-emerald-500" />
+                        <User className="w-5 h-5 text-emerald-500" aria-hidden="true" />
                         معلومات الموظف
                       </h3>
                       <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
@@ -622,7 +622,7 @@ export function AssetAssignmentDetailsView() {
                     {assignment.specifications && (
                       <div className="border-t pt-6">
                         <h3 className="text-lg font-bold text-navy mb-4 flex items-center gap-2">
-                          <Settings className="w-5 h-5 text-emerald-500" />
+                          <Settings className="w-5 h-5 text-emerald-500" aria-hidden="true" />
                           المواصفات
                         </h3>
                         <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
@@ -792,7 +792,7 @@ export function AssetAssignmentDetailsView() {
                       </div>
                     ) : (
                       <div className="text-center py-8">
-                        <AlertTriangle className="w-12 h-12 mx-auto text-slate-300" />
+                        <AlertTriangle className="w-12 h-12 mx-auto text-slate-300" aria-hidden="true" />
                         <p className="mt-4 text-slate-500">لا توجد حوادث مسجلة</p>
                       </div>
                     )}
@@ -808,7 +808,7 @@ export function AssetAssignmentDetailsView() {
                               <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-3">
                                   <div className="p-2 bg-blue-100 rounded-lg">
-                                    <FileText className="w-4 h-4 text-blue-600" />
+                                    <FileText className="w-4 h-4 text-blue-600" aria-hidden="true" />
                                   </div>
                                   <div>
                                     <p className="font-medium text-navy">{doc.documentNameAr || doc.documentName}</p>
@@ -825,7 +825,7 @@ export function AssetAssignmentDetailsView() {
                       </div>
                     ) : (
                       <div className="text-center py-8">
-                        <FileText className="w-12 h-12 mx-auto text-slate-300" />
+                        <FileText className="w-12 h-12 mx-auto text-slate-300" aria-hidden="true" />
                         <p className="mt-4 text-slate-500">لا توجد مستندات</p>
                       </div>
                     )}
@@ -1090,7 +1090,7 @@ export function AssetAssignmentDetailsView() {
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <AlertTriangle className="w-5 h-5 text-red-500" />
+              <AlertTriangle className="w-5 h-5 text-red-500" aria-hidden="true" />
               الإبلاغ عن حادث
             </DialogTitle>
             <DialogDescription>

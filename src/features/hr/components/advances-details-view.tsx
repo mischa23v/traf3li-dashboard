@@ -346,7 +346,7 @@ export function AdvancesDetailsView() {
             ) : !advance ? (
               <Card className="rounded-2xl border-slate-100">
                 <CardContent className="p-8 text-center">
-                  <FileText className="w-12 h-12 mx-auto text-slate-300" />
+                  <FileText className="w-12 h-12 mx-auto text-slate-300" aria-hidden="true" />
                   <p className="mt-4 text-slate-500">لم يتم العثور على السلفة</p>
                 </CardContent>
               </Card>
@@ -478,7 +478,7 @@ export function AdvancesDetailsView() {
                         {/* Employee Info */}
                         <div className="space-y-4">
                           <h4 className="font-bold text-navy flex items-center gap-2">
-                            <User className="w-4 h-4" />
+                            <User className="w-4 h-4" aria-hidden="true" />
                             بيانات الموظف
                           </h4>
                           <div className="space-y-3">
@@ -553,7 +553,7 @@ export function AdvancesDetailsView() {
                       {/* Repayment Info */}
                       <div className="pt-4 border-t border-slate-100">
                         <h4 className="font-bold text-navy flex items-center gap-2 mb-4">
-                          <Clock className="w-4 h-4" />
+                          <Clock className="w-4 h-4" aria-hidden="true" />
                           بيانات السداد
                         </h4>
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -584,7 +584,7 @@ export function AdvancesDetailsView() {
                       {(advance.reason || advance.reasonAr) && (
                         <div className="pt-4 border-t border-slate-100">
                           <h4 className="font-bold text-navy flex items-center gap-2 mb-2">
-                            <FileText className="w-4 h-4" />
+                            <FileText className="w-4 h-4" aria-hidden="true" />
                             سبب السلفة
                           </h4>
                           <p className="text-slate-600">{advance.reasonAr || advance.reason}</p>
@@ -625,7 +625,7 @@ export function AdvancesDetailsView() {
                                 </div>
                                 {installment.daysMissed && installment.daysMissed > 0 && (
                                   <div className="mt-2 flex items-center gap-2 text-sm text-red-600">
-                                    <AlertTriangle className="w-4 h-4" />
+                                    <AlertTriangle className="w-4 h-4" aria-hidden="true" />
                                     متأخر {installment.daysMissed} يوم
                                   </div>
                                 )}

@@ -126,7 +126,7 @@ export function ImportDialog({
       <DialogContent className="max-w-3xl max-h-[90vh] overflow-hidden flex flex-col">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <Upload className="h-5 w-5" />
+            <Upload className="h-5 w-5" aria-hidden="true" />
             {t('dataExport.importData')}
           </DialogTitle>
           <DialogDescription>
@@ -197,7 +197,7 @@ export function ImportDialog({
                     setFile(null)
                   }}
                 >
-                  <X className="h-4 w-4 me-1" />
+                  <X className="h-4 w-4 me-1" aria-hidden="true" />
                   {t('common.change')}
                 </Button>
               </div>
@@ -303,7 +303,7 @@ export function ImportDialog({
                 {importStatus.status === 'completed' ? (
                   <CheckCircle2 className="h-8 w-8" />
                 ) : (
-                  <AlertCircle className="h-8 w-8" />
+                  <AlertCircle className="h-8 w-8" aria-hidden="true" />
                 )}
               </div>
               <div>

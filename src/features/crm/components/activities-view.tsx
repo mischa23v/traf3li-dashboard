@@ -81,18 +81,18 @@ import { ProductivityHero } from '@/components/productivity-hero'
 import { cn } from '@/lib/utils'
 
 const activityIcons: Record<ActivityType, React.ReactNode> = {
-  call: <Phone className="h-5 w-5" />,
-  email: <Mail className="h-5 w-5" />,
+  call: <Phone className="h-5 w-5" aria-hidden="true" />,
+  email: <Mail className="h-5 w-5" aria-hidden="true" />,
   sms: <MessageSquare className="h-5 w-5" />,
   whatsapp: <MessageSquare className="h-5 w-5" />,
-  meeting: <Calendar className="h-5 w-5" />,
-  note: <FileText className="h-5 w-5" />,
+  meeting: <Calendar className="h-5 w-5" aria-hidden="true" />,
+  note: <FileText className="h-5 w-5" aria-hidden="true" />,
   task: <CheckCircle2 className="h-5 w-5" />,
-  document: <FileText className="h-5 w-5" />,
-  proposal: <FileText className="h-5 w-5" />,
-  status_change: <Clock className="h-5 w-5" />,
+  document: <FileText className="h-5 w-5" aria-hidden="true" />,
+  proposal: <FileText className="h-5 w-5" aria-hidden="true" />,
+  status_change: <Clock className="h-5 w-5" aria-hidden="true" />,
   stage_change: <TrendingUp className="h-5 w-5" />,
-  lead_created: <Plus className="h-5 w-5" />,
+  lead_created: <Plus className="h-5 w-5" aria-hidden="true" />,
   lead_converted: <CheckCircle2 className="h-5 w-5" />,
 }
 
@@ -231,7 +231,7 @@ function QuickLogDialog({ trigger }: { trigger: React.ReactNode }) {
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <Plus className="w-5 h-5 text-emerald-500" />
+            <Plus className="w-5 h-5 text-emerald-500" aria-hidden="true" />
             تسجيل نشاط جديد
           </DialogTitle>
         </DialogHeader>
@@ -321,7 +321,7 @@ function QuickLogDialog({ trigger }: { trigger: React.ReactNode }) {
               onClick={handleSubmit}
               className="bg-emerald-500 hover:bg-emerald-600 rounded-xl"
             >
-              <Plus className="w-4 h-4 ms-1" />
+              <Plus className="w-4 h-4 ms-1" aria-hidden="true" />
               تسجيل النشاط
             </Button>
           </div>
@@ -371,9 +371,9 @@ function ActivityCard({ activity, isLast }: { activity: CrmActivity; isLast: boo
                 to={`/dashboard/crm/leads/${activity.entityId}`}
                 className="text-sm text-emerald-600 hover:underline flex items-center gap-1 mt-1"
               >
-                {activity.entityType === 'lead' && <User className="w-3 h-3" />}
-                {activity.entityType === 'contact' && <Users className="w-3 h-3" />}
-                {activity.entityType === 'organization' && <Building className="w-3 h-3" />}
+                {activity.entityType === 'lead' && <User className="w-3 h-3" aria-hidden="true" />}
+                {activity.entityType === 'contact' && <Users className="w-3 h-3" aria-hidden="true" />}
+                {activity.entityType === 'organization' && <Building className="w-3 h-3" aria-hidden="true" />}
                 {activity.entityName}
               </Link>
             )}
@@ -428,7 +428,7 @@ function ActivityCard({ activity, isLast }: { activity: CrmActivity; isLast: boo
           <div className="flex flex-wrap gap-3 mb-3">
             {activity.meetingData.location && (
               <Badge variant="outline" className="text-xs gap-1">
-                <MapPin className="w-3 h-3" />
+                <MapPin className="w-3 h-3" aria-hidden="true" />
                 {activity.meetingData.location}
               </Badge>
             )}
@@ -451,12 +451,12 @@ function ActivityCard({ activity, isLast }: { activity: CrmActivity; isLast: boo
         <div className="flex items-center justify-between text-xs text-slate-500 pt-2 border-t border-slate-100">
           <div className="flex items-center gap-4">
             <span className="flex items-center gap-1">
-              <Clock className="w-3 h-3" />
+              <Clock className="w-3 h-3" aria-hidden="true" />
               {format(new Date(activity.createdAt), 'h:mm a', { locale: ar })}
             </span>
             {activity.performedBy && (
               <span className="flex items-center gap-1">
-                <User className="w-3 h-3" />
+                <User className="w-3 h-3" aria-hidden="true" />
                 {activity.performedBy.firstName} {activity.performedBy.lastName}
               </span>
             )}
@@ -580,7 +580,7 @@ export function ActivitiesView() {
 
         <div className="ms-auto flex items-center gap-4">
           <div className="relative hidden md:block">
-            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" aria-hidden="true" />
             <input
               type="text"
               placeholder="بحث..."
@@ -627,7 +627,7 @@ export function ActivitiesView() {
             <QuickLogDialog
               trigger={
                 <Button className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl shadow-lg border-0">
-                  <Plus className="ms-2 h-4 w-4" />
+                  <Plus className="ms-2 h-4 w-4" aria-hidden="true" />
                   تسجيل نشاط
                 </Button>
               }
@@ -766,7 +766,7 @@ export function ActivitiesView() {
                 <div className="text-center py-12">
                   <div className="flex justify-center mb-4">
                     <div className="w-16 h-16 rounded-full bg-red-50 flex items-center justify-center">
-                      <AlertCircle className="w-8 h-8 text-red-500" />
+                      <AlertCircle className="w-8 h-8 text-red-500" aria-hidden="true" />
                     </div>
                   </div>
                   <h3 className="text-lg font-bold text-slate-900 mb-2">
@@ -801,7 +801,7 @@ export function ActivitiesView() {
                   <QuickLogDialog
                     trigger={
                       <Button className="bg-emerald-500 hover:bg-emerald-600 rounded-xl">
-                        <Plus className="ms-2 h-4 w-4" />
+                        <Plus className="ms-2 h-4 w-4" aria-hidden="true" />
                         تسجيل أول نشاط
                       </Button>
                     }
@@ -814,7 +814,7 @@ export function ActivitiesView() {
                 <div key={date} className="mb-8 last:mb-0">
                   {/* Date Header */}
                   <div className="sticky top-0 bg-gradient-to-l from-emerald-50 to-white px-4 py-2 rounded-xl font-semibold text-slate-700 mb-6 z-10 flex items-center gap-2">
-                    <Calendar className="w-4 h-4 text-emerald-500" />
+                    <Calendar className="w-4 h-4 text-emerald-500" aria-hidden="true" />
                     {group.label}
                     <Badge variant="secondary" className="me-auto">
                       {group.activities.length} نشاط

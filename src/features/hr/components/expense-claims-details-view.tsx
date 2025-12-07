@@ -274,7 +274,7 @@ export function ExpenseClaimsDetailsView() {
                   <DropdownMenuSeparator />
                   {claim?.status === 'draft' && (
                     <DropdownMenuItem onClick={handleSubmit}>
-                      <Send className="w-4 h-4 ms-2 text-blue-500" />
+                      <Send className="w-4 h-4 ms-2 text-blue-500" aria-hidden="true" />
                       تقديم المطالبة
                     </DropdownMenuItem>
                   )}
@@ -289,7 +289,7 @@ export function ExpenseClaimsDetailsView() {
                         رفض المطالبة
                       </DropdownMenuItem>
                       <DropdownMenuItem onClick={() => setShowChangesDialog(true)}>
-                        <FileText className="w-4 h-4 ms-2 text-amber-500" />
+                        <FileText className="w-4 h-4 ms-2 text-amber-500" aria-hidden="true" />
                         طلب تعديلات
                       </DropdownMenuItem>
                     </>
@@ -327,7 +327,7 @@ export function ExpenseClaimsDetailsView() {
             ) : !claim ? (
               <Card className="rounded-2xl border-slate-100">
                 <CardContent className="p-8 text-center">
-                  <FileText className="w-12 h-12 mx-auto text-slate-300" />
+                  <FileText className="w-12 h-12 mx-auto text-slate-300" aria-hidden="true" />
                   <p className="mt-4 text-slate-500">لم يتم العثور على المطالبة</p>
                 </CardContent>
               </Card>
@@ -354,7 +354,7 @@ export function ExpenseClaimsDetailsView() {
                     <CardContent className="p-4">
                       <div className="flex items-center gap-3">
                         <div className="p-2 bg-amber-100 rounded-xl">
-                          <FileText className="w-5 h-5 text-amber-600" />
+                          <FileText className="w-5 h-5 text-amber-600" aria-hidden="true" />
                         </div>
                         <div>
                           <p className="text-xs text-slate-500">عدد البنود</p>
@@ -400,7 +400,7 @@ export function ExpenseClaimsDetailsView() {
                   <Card className="rounded-2xl border-amber-200 bg-amber-50">
                     <CardContent className="p-4">
                       <div className="flex items-start gap-3">
-                        <AlertTriangle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
+                        <AlertTriangle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" aria-hidden="true" />
                         <div>
                           <p className="font-bold text-amber-800">مخالفات السياسة</p>
                           <ul className="mt-2 space-y-1 text-sm text-amber-700">
@@ -450,7 +450,7 @@ export function ExpenseClaimsDetailsView() {
                         {/* Employee Info */}
                         <div className="space-y-4">
                           <h4 className="font-bold text-navy flex items-center gap-2">
-                            <User className="w-4 h-4" />
+                            <User className="w-4 h-4" aria-hidden="true" />
                             بيانات الموظف
                           </h4>
                           <div className="space-y-3">
@@ -630,7 +630,7 @@ export function ExpenseClaimsDetailsView() {
                                 </div>
                                 {item.receiptStatus !== 'attached' && (
                                   <div className="mt-2 flex items-center gap-2 text-xs text-amber-600">
-                                    <AlertTriangle className="w-3 h-3" />
+                                    <AlertTriangle className="w-3 h-3" aria-hidden="true" />
                                     إيصال مفقود
                                   </div>
                                 )}
@@ -640,7 +640,7 @@ export function ExpenseClaimsDetailsView() {
                         </div>
                       ) : (
                         <div className="text-center py-8">
-                          <FileText className="w-12 h-12 mx-auto text-slate-300" />
+                          <FileText className="w-12 h-12 mx-auto text-slate-300" aria-hidden="true" />
                           <p className="mt-4 text-slate-500">لا توجد بنود</p>
                         </div>
                       )}
@@ -708,7 +708,7 @@ export function ExpenseClaimsDetailsView() {
                                         ) : step.status === 'rejected' ? (
                                           <XCircle className="w-5 h-5 text-red-600" />
                                         ) : (
-                                          <Clock className="w-5 h-5 text-amber-600" />
+                                          <Clock className="w-5 h-5 text-amber-600" aria-hidden="true" />
                                         )}
                                       </div>
                                       <div>
@@ -911,7 +911,7 @@ export function ExpenseClaimsDetailsView() {
               disabled={!changesRequested || changesMutation.isPending}
               className="bg-amber-500 hover:bg-amber-600 rounded-xl"
             >
-              <FileText className="w-4 h-4 ms-2" />
+              <FileText className="w-4 h-4 ms-2" aria-hidden="true" />
               إرسال
             </Button>
           </DialogFooter>

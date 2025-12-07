@@ -162,7 +162,7 @@ export function ApplicantDetailsView() {
           <div className="bg-white rounded-2xl p-12 border border-slate-100 text-center">
             <div className="flex justify-center mb-4">
               <div className="w-16 h-16 rounded-full bg-emerald-50 flex items-center justify-center">
-                <User className="w-8 h-8 text-emerald-500" />
+                <User className="w-8 h-8 text-emerald-500" aria-hidden="true" />
               </div>
             </div>
             <h3 className="text-lg font-bold text-slate-900 mb-2">المتقدم غير موجود</h3>
@@ -271,7 +271,7 @@ export function ApplicantDetailsView() {
                           تعديل
                         </DropdownMenuItem>
                         <DropdownMenuItem>
-                          <Send className="w-4 h-4 ms-2" />
+                          <Send className="w-4 h-4 ms-2" aria-hidden="true" />
                           إرسال بريد
                         </DropdownMenuItem>
                         <DropdownMenuItem>
@@ -379,7 +379,7 @@ export function ApplicantDetailsView() {
                       <Card className="border-none shadow-sm bg-white rounded-2xl">
                         <CardHeader className="pb-2">
                           <CardTitle className="text-base font-bold text-navy flex items-center gap-2">
-                            <User className="w-4 h-4 text-emerald-600" />
+                            <User className="w-4 h-4 text-emerald-600" aria-hidden="true" />
                             معلومات التواصل
                           </CardTitle>
                         </CardHeader>

@@ -8,7 +8,7 @@ import {
     CheckCircle, Search, Briefcase, CreditCard, Users, Shield,
     Clock, Bell, AlertTriangle, Tag, Paperclip, ChevronDown,
     Scale, UserCheck, BadgePercent, Receipt, Globe, Home,
-    Calendar, DollarSign, FileCheck, X, Plus, Trash2
+    Calendar, DollarSign, FileCheck, X, Plus, Trash2, Lock
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -694,7 +694,7 @@ export function CreateClientView() {
                             <Card className="rounded-3xl shadow-sm border-slate-100">
                                 <CardHeader className="pb-4">
                                     <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                                        <User className="w-5 h-5 text-emerald-500" />
+                                        <User className="w-5 h-5 text-emerald-500" aria-hidden="true" />
                                         نوع العميل <span className="text-red-500">*</span>
                                     </CardTitle>
                                 </CardHeader>
@@ -742,7 +742,7 @@ export function CreateClientView() {
                                     <CardHeader className="pb-4">
                                         <div className="flex items-center justify-between">
                                             <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                                                <User className="w-5 h-5 text-emerald-500" />
+                                                <User className="w-5 h-5 text-emerald-500" aria-hidden="true" />
                                                 المعلومات الشخصية
                                             </CardTitle>
                                             <VerificationBadge service="يقين" status={yakeenStatus} />
@@ -869,7 +869,7 @@ export function CreateClientView() {
                                     <CardHeader className="pb-4">
                                         <div className="flex items-center justify-between">
                                             <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                                                <Building2 className="w-5 h-5 text-emerald-500" />
+                                                <Building2 className="w-5 h-5 text-emerald-500" aria-hidden="true" />
                                                 معلومات الشركة
                                             </CardTitle>
                                             <VerificationBadge service="وثق" status={wathqStatus} />
@@ -1062,7 +1062,7 @@ export function CreateClientView() {
                             <Card className="rounded-3xl shadow-sm border-slate-100">
                                 <CardHeader className="pb-4">
                                     <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                                        <Phone className="w-5 h-5 text-emerald-500" />
+                                        <Phone className="w-5 h-5 text-emerald-500" aria-hidden="true" />
                                         معلومات الاتصال
                                     </CardTitle>
                                 </CardHeader>
@@ -1190,7 +1190,7 @@ export function CreateClientView() {
                             <Card className="rounded-3xl shadow-sm border-slate-100">
                                 <CardHeader className="pb-4">
                                     <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                                        <MapPin className="w-5 h-5 text-emerald-500" />
+                                        <MapPin className="w-5 h-5 text-emerald-500" aria-hidden="true" />
                                         العنوان
                                     </CardTitle>
                                 </CardHeader>
@@ -1744,7 +1744,7 @@ export function CreateClientView() {
                                 <AccordionItem value="flags" className="border rounded-3xl shadow-sm border-slate-100 overflow-hidden">
                                     <AccordionTrigger className="px-6 py-4 hover:bg-slate-50">
                                         <div className="flex items-center gap-2">
-                                            <AlertTriangle className="h-5 w-5 text-amber-500" />
+                                            <AlertTriangle className="h-5 w-5 text-amber-500" aria-hidden="true" />
                                             <span className="font-bold text-slate-800">حالة ومؤشرات</span>
                                         </div>
                                     </AccordionTrigger>
@@ -1872,7 +1872,7 @@ export function CreateClientView() {
                                                 ) : (
                                                     <span className="flex items-center gap-2">
                                                         حفظ العميل
-                                                        <ChevronDown className="w-4 h-4" />
+                                                        <ChevronDown className="w-4 h-4" aria-hidden="true" />
                                                     </span>
                                                 )}
                                             </Button>
@@ -1887,7 +1887,7 @@ export function CreateClientView() {
                                                 حفظ وإنشاء قضية
                                             </DropdownMenuItem>
                                             <DropdownMenuItem>
-                                                <Mail className="ms-2 h-4 w-4" />
+                                                <Mail className="ms-2 h-4 w-4" aria-hidden="true" />
                                                 حفظ وإرسال ترحيب
                                             </DropdownMenuItem>
                                         </DropdownMenuContent>

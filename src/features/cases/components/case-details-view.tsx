@@ -611,7 +611,7 @@ export function CaseDetailsView() {
         {/* Error State */}
         {isError && !isLoading && (
           <Alert className="border-red-200 bg-red-50">
-            <AlertCircle className="h-4 w-4 text-red-600" />
+            <AlertCircle className="h-4 w-4 text-red-600" aria-hidden="true" />
             <AlertDescription className="text-red-800">
               <div className="flex items-center justify-between">
                 <span>
@@ -720,7 +720,7 @@ export function CaseDetailsView() {
                                       </DropdownMenuTrigger>
                                       <DropdownMenuContent align="end">
                                         <DropdownMenuItem onClick={() => handleEditTimeline(event)}>
-                                          <Edit className="h-4 w-4 ms-2" /> {t('common.edit', 'تعديل')}
+                                          <Edit className="h-4 w-4 ms-2" aria-hidden="true" /> {t('common.edit', 'تعديل')}
                                         </DropdownMenuItem>
                                         <DropdownMenuItem
                                           className="text-red-600"
@@ -748,7 +748,7 @@ export function CaseDetailsView() {
                             ))
                           ) : (
                             <div className="text-center py-8 text-slate-500">
-                              <Clock className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                              <Clock className="h-8 w-8 mx-auto mb-2 opacity-50" aria-hidden="true" />
                               <p className="text-sm">{t('cases.noTimeline', 'لا توجد أحداث')}</p>
                             </div>
                           )}
@@ -774,7 +774,7 @@ export function CaseDetailsView() {
                         <div className="text-xs text-green-600 font-medium">{t('cases.plaintiff', 'المدعي')} ({t('cases.ourClient', 'موكلنا')})</div>
                         {caseData.clientPhone && (
                           <div className="flex items-center gap-1 text-xs text-slate-500 mt-1">
-                            <Phone className="h-3 w-3" />
+                            <Phone className="h-3 w-3" aria-hidden="true" />
                             {caseData.clientPhone}
                           </div>
                         )}
@@ -792,7 +792,7 @@ export function CaseDetailsView() {
                           <div className="text-xs text-amber-600 font-medium">{t('cases.defendant', 'المدعى عليه')}</div>
                           {caseData.laborCaseDetails?.company?.registrationNumber && (
                             <div className="flex items-center gap-1 text-xs text-slate-500 mt-1">
-                              <Building className="h-3 w-3" />
+                              <Building className="h-3 w-3" aria-hidden="true" />
                               {t('cases.crNumber', 'س.ت')}: {caseData.laborCaseDetails.company.registrationNumber}
                             </div>
                           )}
@@ -922,7 +922,7 @@ export function CaseDetailsView() {
                         </div>
                         <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100 flex items-center gap-4">
                           <div className="w-12 h-12 rounded-full bg-orange-100 flex items-center justify-center text-orange-600">
-                            <AlertTriangle className="h-6 w-6" />
+                            <AlertTriangle className="h-6 w-6" aria-hidden="true" />
                           </div>
                           <div>
                             <div className="text-sm text-slate-500">{t('cases.nextHearing', 'الجلسة القادمة')}</div>
@@ -1059,11 +1059,11 @@ export function CaseDetailsView() {
                                 <h4 className="text-lg font-bold text-navy mb-1">{typeof hearing.location === 'string' ? hearing.location : (hearing.location?.name || hearing.location?.address || 'عن بعد')}</h4>
                                 <div className="flex items-center gap-4 text-sm text-slate-600">
                                   <div className="flex items-center gap-1">
-                                    <Calendar className="h-4 w-4 text-blue-500" />
+                                    <Calendar className="h-4 w-4 text-blue-500" aria-hidden="true" />
                                     <span>{formatDate(hearing.date)}</span>
                                   </div>
                                   <div className="flex items-center gap-1">
-                                    <Clock className="h-4 w-4 text-blue-500" />
+                                    <Clock className="h-4 w-4 text-blue-500" aria-hidden="true" />
                                     <span>
                                       {hearing.date ? new Date(hearing.date).toLocaleTimeString('ar-SA', {
                                         hour: '2-digit',
@@ -1084,7 +1084,7 @@ export function CaseDetailsView() {
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="end">
                                   <DropdownMenuItem onClick={() => handleEditHearing(hearing)}>
-                                    <Edit className="h-4 w-4 ms-2" /> {t('common.edit', 'تعديل')}
+                                    <Edit className="h-4 w-4 ms-2" aria-hidden="true" /> {t('common.edit', 'تعديل')}
                                   </DropdownMenuItem>
                                   <DropdownMenuItem
                                     className="text-red-600"
@@ -1099,7 +1099,7 @@ export function CaseDetailsView() {
                         ))
                       ) : (
                         <div className="text-center py-12 text-slate-500">
-                          <Calendar className="h-12 w-12 mx-auto mb-3 opacity-50" />
+                          <Calendar className="h-12 w-12 mx-auto mb-3 opacity-50" aria-hidden="true" />
                           <p>{t('cases.noHearings', 'لا توجد جلسات مسجلة')}</p>
                         </div>
                       )}
@@ -1119,7 +1119,7 @@ export function CaseDetailsView() {
                               : 'text-slate-500 hover:text-navy'
                               }`}
                           >
-                            <FileText className="h-4 w-4 inline-block ms-2" />
+                            <FileText className="h-4 w-4 inline-block ms-2" aria-hidden="true" />
                             {t('cases.documents.general', 'مستندات عامة')}
                           </button>
                           <button
@@ -1265,7 +1265,7 @@ export function CaseDetailsView() {
                                   </>
                                 ) : (
                                   <>
-                                    <FileText className="h-12 w-12 mx-auto mb-3 opacity-50" />
+                                    <FileText className="h-12 w-12 mx-auto mb-3 opacity-50" aria-hidden="true" />
                                     <p>{t('cases.noDocuments', 'لا توجد مستندات')}</p>
                                   </>
                                 )}
@@ -1450,7 +1450,7 @@ export function CaseDetailsView() {
                                     </DropdownMenuTrigger>
                                     <DropdownMenuContent align="end">
                                       <DropdownMenuItem onClick={() => handleEditClaim(claim)}>
-                                        <Edit className="h-4 w-4 ms-2" /> {t('common.edit', 'تعديل')}
+                                        <Edit className="h-4 w-4 ms-2" aria-hidden="true" /> {t('common.edit', 'تعديل')}
                                       </DropdownMenuItem>
                                       <DropdownMenuItem
                                         className="text-red-600"
@@ -1534,7 +1534,7 @@ export function CaseDetailsView() {
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="end">
                                   <DropdownMenuItem onClick={() => handleEditNote(note)}>
-                                    <Edit className="h-4 w-4 ms-2" /> {t('common.edit', 'تعديل')}
+                                    <Edit className="h-4 w-4 ms-2" aria-hidden="true" /> {t('common.edit', 'تعديل')}
                                   </DropdownMenuItem>
                                   <DropdownMenuItem
                                     className="text-red-600"
@@ -1589,7 +1589,7 @@ export function CaseDetailsView() {
                                   case 'view':
                                     return <Eye className="h-4 w-4" />
                                   default:
-                                    return <Settings className="h-4 w-4" />
+                                    return <Settings className="h-4 w-4" aria-hidden="true" />
                                 }
                               }
 
@@ -1671,7 +1671,7 @@ export function CaseDetailsView() {
                                         </Badge>
                                       </div>
                                       <span className="text-xs text-slate-500 flex items-center gap-1">
-                                        <Clock className="h-3 w-3" />
+                                        <Clock className="h-3 w-3" aria-hidden="true" />
                                         {new Date(log.timestamp).toLocaleDateString('ar-SA', {
                                           day: 'numeric',
                                           month: 'short',
