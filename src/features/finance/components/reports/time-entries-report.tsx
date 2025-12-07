@@ -98,7 +98,7 @@ export function TimeEntriesReport() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+        <div className="flex items-center gap-2 text-sm text-foreground/70">
           <span>المالية</span>
           <ArrowRight className="h-4 w-4 rotate-180" />
           <span>التقارير</span>
@@ -207,7 +207,7 @@ export function TimeEntriesReport() {
                 <Clock className="h-6 w-6 text-blue-600" />
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">إجمالي الساعات</p>
+                <p className="text-sm text-slate-600">إجمالي الساعات</p>
                 <p className="text-2xl font-bold">{data.summary.totalHours}</p>
               </div>
             </div>
@@ -221,7 +221,7 @@ export function TimeEntriesReport() {
                 <Clock className="h-6 w-6 text-green-600" />
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">ساعات قابلة للفوترة</p>
+                <p className="text-sm text-slate-600">ساعات قابلة للفوترة</p>
                 <p className="text-2xl font-bold text-green-600">{data.summary.billableHours}</p>
               </div>
             </div>
@@ -235,7 +235,7 @@ export function TimeEntriesReport() {
                 <Clock className="h-6 w-6 text-gray-600" />
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">ساعات غير قابلة للفوترة</p>
+                <p className="text-sm text-slate-600">ساعات غير قابلة للفوترة</p>
                 <p className="text-2xl font-bold text-gray-600">{data.summary.nonBillableHours}</p>
               </div>
             </div>
@@ -249,7 +249,7 @@ export function TimeEntriesReport() {
                 <DollarSign className="h-6 w-6 text-purple-600" />
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">الإيرادات المتوقعة</p>
+                <p className="text-sm text-slate-600">الإيرادات المتوقعة</p>
                 <p className="text-2xl font-bold">{data.summary.totalRevenue.toLocaleString('ar-SA')} ر.س</p>
               </div>
             </div>
@@ -263,7 +263,7 @@ export function TimeEntriesReport() {
                 <DollarSign className="h-6 w-6 text-orange-600" />
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">متوسط السعر</p>
+                <p className="text-sm text-slate-600">متوسط السعر</p>
                 <p className="text-2xl font-bold">{data.summary.averageRate.toLocaleString('ar-SA')} ر.س/ساعة</p>
               </div>
             </div>
@@ -304,7 +304,7 @@ export function TimeEntriesReport() {
                   <TableCell>
                     <div className="flex items-center gap-2">
                       {item.billableHours} ساعة
-                      <span className="text-xs text-muted-foreground">
+                      <span className="text-xs text-slate-600">
                         ({Math.round((item.billableHours / item.hours) * 100)}%)
                       </span>
                     </div>
