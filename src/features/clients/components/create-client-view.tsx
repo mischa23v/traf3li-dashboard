@@ -695,8 +695,7 @@ export function CreateClientView() {
                                 <CardHeader className="pb-4">
                                     <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
                                         <User className="w-5 h-5 text-emerald-500" aria-hidden="true" />
-                                        نوع العميل <span className="text-red-500">*</span>
-                                    </CardTitle>
+                                        نوع العميل                                     </CardTitle>
                                 </CardHeader>
                                 <CardContent>
                                     <div className="grid grid-cols-2 gap-4">
@@ -752,8 +751,7 @@ export function CreateClientView() {
                                         {/* National ID with verification */}
                                         <div className="space-y-2">
                                             <Label className="text-sm font-medium text-slate-700">
-                                                رقم الهوية الوطنية / الإقامة<Lock className="h-3 w-3 text-slate-500 inline ms-1" aria-hidden="true" /> <span className="text-red-500">*</span>
-                                            </Label>
+                                                رقم الهوية الوطنية / الإقامة<Lock className="h-3 w-3 text-slate-500 inline ms-1" aria-hidden="true" />                                             </Label>
                                             <div className="flex gap-2">
                                                 <Input
                                                     value={nationalId}
@@ -836,8 +834,7 @@ export function CreateClientView() {
                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                                 <div className="space-y-2">
                                                     <Label className="text-sm font-medium text-slate-700">
-                                                        الاسم الكامل <span className="text-red-500">*</span>
-                                                    </Label>
+                                                        الاسم الكامل                                                     </Label>
                                                     <Input
                                                         value={fullNameArabic}
                                                         onChange={(e) => setFullNameArabic(e.target.value)}
@@ -879,8 +876,7 @@ export function CreateClientView() {
                                         {/* CR Number with verification */}
                                         <div className="space-y-2">
                                             <Label className="text-sm font-medium text-slate-700">
-                                                رقم السجل التجاري <span className="text-red-500">*</span>
-                                            </Label>
+                                                رقم السجل التجاري                                             </Label>
                                             <div className="flex gap-2">
                                                 <Input
                                                     value={crNumber}
@@ -1015,8 +1011,7 @@ export function CreateClientView() {
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                             <div className="space-y-2">
                                                 <Label className="text-sm font-medium text-slate-700">
-                                                    اسم الممثل القانوني <span className="text-red-500">*</span>
-                                                </Label>
+                                                    اسم الممثل القانوني                                                 </Label>
                                                 <Input
                                                     value={legalRepName}
                                                     onChange={(e) => setLegalRepName(e.target.value)}
@@ -1070,8 +1065,7 @@ export function CreateClientView() {
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         <div className="space-y-2">
                                             <Label className="text-sm font-medium text-slate-700">
-                                                رقم الهاتف<Lock className="h-3 w-3 text-slate-500 inline ms-1" aria-hidden="true" /> <span className="text-red-500">*</span>
-                                            </Label>
+                                                رقم الهاتف<Lock className="h-3 w-3 text-slate-500 inline ms-1" aria-hidden="true" />                                             </Label>
                                             <Input
                                                 value={phone}
                                                 onChange={(e) => setPhone(e.target.value)}
@@ -1117,8 +1111,7 @@ export function CreateClientView() {
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         <div className="space-y-2">
                                             <Label className="text-sm font-medium text-slate-700">
-                                                البريد الإلكتروني<Lock className="h-3 w-3 text-slate-500 inline ms-1" aria-hidden="true" /> <span className="text-red-500">*</span>
-                                            </Label>
+                                                البريد الإلكتروني<Lock className="h-3 w-3 text-slate-500 inline ms-1" aria-hidden="true" />                                             </Label>
                                             <Input
                                                 type="email"
                                                 value={email}
@@ -1330,8 +1323,7 @@ export function CreateClientView() {
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         <div className="space-y-2">
                                             <Label className="text-sm font-medium text-slate-700">
-                                                المحامي المسؤول <span className="text-red-500">*</span>
-                                            </Label>
+                                                المحامي المسؤول                                             </Label>
                                             <Select value={responsibleLawyerId} onValueChange={setResponsibleLawyerId} disabled={loadingLawyers}>
                                                 <SelectTrigger className="rounded-xl border-slate-200">
                                                     <SelectValue placeholder="اختر المحامي" />
@@ -1489,8 +1481,7 @@ export function CreateClientView() {
                                         {isVatRegistered && (
                                             <div className="space-y-2">
                                                 <Label className="text-sm font-medium text-slate-700">
-                                                    الرقم الضريبي <span className="text-red-500">*</span>
-                                                </Label>
+                                                    الرقم الضريبي                                                 </Label>
                                                 <Input
                                                     value={vatNumber}
                                                     onChange={(e) => setVatNumber(e.target.value)}

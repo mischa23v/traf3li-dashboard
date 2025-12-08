@@ -447,12 +447,11 @@ export function CreateContactView() {
                                         </div>
                                         <div className="col-span-2 space-y-2">
                                             <Label className="text-sm font-medium text-slate-700">
-                                                الاسم الأول <span className="text-red-500">*</span>
+                                                الاسم الأول
                                             </Label>
                                             <Input
                                                 placeholder="أحمد"
                                                 className="rounded-xl border-slate-200"
-                                                required
                                                 value={formData.firstName}
                                                 onChange={(e) => handleChange('firstName', e.target.value)}
                                             />
@@ -468,12 +467,11 @@ export function CreateContactView() {
                                         </div>
                                         <div className="col-span-2 space-y-2">
                                             <Label className="text-sm font-medium text-slate-700">
-                                                الاسم الأخير <span className="text-red-500">*</span>
+                                                الاسم الأخير
                                             </Label>
                                             <Input
                                                 placeholder="الشمري"
                                                 className="rounded-xl border-slate-200"
-                                                required
                                                 value={formData.lastName}
                                                 onChange={(e) => handleChange('lastName', e.target.value)}
                                             />
@@ -516,7 +514,7 @@ export function CreateContactView() {
                                 <CardContent className="space-y-6">
                                     {/* Contact Type */}
                                     <div className="space-y-3">
-                                        <Label className="text-sm font-medium text-slate-700">نوع جهة الاتصال <span className="text-red-500">*</span></Label>
+                                        <Label className="text-sm font-medium text-slate-700">نوع جهة الاتصال </Label>
                                         <div className="grid grid-cols-4 md:grid-cols-7 gap-2">
                                             {CONTACT_TYPES.map((type) => {
                                                 const Icon = type.icon

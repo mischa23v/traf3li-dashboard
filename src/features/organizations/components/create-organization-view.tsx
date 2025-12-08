@@ -415,13 +415,12 @@ export function CreateOrganizationView() {
                                     <div className="grid grid-cols-2 gap-4">
                                         <div className="space-y-2">
                                             <Label className="text-sm font-medium text-slate-700">
-                                                الاسم القانوني (إنجليزي) <span className="text-red-500">*</span>
+                                                الاسم القانوني (إنجليزي)
                                             </Label>
                                             <Input
                                                 placeholder="Legal Company Name LLC"
                                                 dir="ltr"
                                                 className="rounded-xl border-slate-200"
-                                                required
                                                 value={formData.name}
                                                 onChange={(e) => handleChange('name', e.target.value)}
                                             />
@@ -473,7 +472,7 @@ export function CreateOrganizationView() {
                                 <CardContent className="space-y-6">
                                     {/* Organization Type */}
                                     <div className="space-y-3">
-                                        <Label className="text-sm font-medium text-slate-700">نوع المنظمة <span className="text-red-500">*</span></Label>
+                                        <Label className="text-sm font-medium text-slate-700">نوع المنظمة </Label>
                                         <div className="grid grid-cols-4 gap-2">
                                             {ORGANIZATION_TYPES.map((type) => {
                                                 const Icon = type.icon
