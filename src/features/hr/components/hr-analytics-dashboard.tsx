@@ -30,7 +30,7 @@ import { ConfigDrawer } from '@/components/config-drawer'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { Skeleton } from '@/components/ui/skeleton'
 import { ProductivityHero } from '@/components/productivity-hero'
-import { HrSidebar } from './hr-sidebar'
+import { HRSidebar } from './hr-sidebar'
 import {
   useWorkforceOverview,
   useHeadcountTrends,

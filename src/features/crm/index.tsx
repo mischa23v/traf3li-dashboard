@@ -18,5 +18,14 @@ export { ActivitiesView } from './components/activities-view'
 export { ActivityDetailsView } from './components/activity-details-view'
 export { CreateActivityView } from './components/create-activity-view'
 
+// WhatsApp
+export { WhatsAppListView } from './components/whatsapp-list-view'
+export { WhatsAppConversationView } from './components/whatsapp-conversation-view'
+
+// Email Marketing
+export { EmailMarketingListView } from './components/email-marketing-list-view'
+export { EmailCampaignCreateView } from './components/email-campaign-create-view'
+export { EmailCampaignDetailsView } from './components/email-campaign-details-view'
+
 // Shared
 export { CrmSidebar } from './components/crm-sidebar'
