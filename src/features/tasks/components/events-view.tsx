@@ -5,7 +5,7 @@ import {
     Calendar as CalendarIcon, MoreHorizontal, Plus,
     MapPin, Clock, Search, AlertCircle, ChevronLeft, Bell, Users,
     CalendarCheck, CalendarPlus, CalendarRange, Eye, Trash2, CheckCircle, XCircle, CalendarClock,
-    SortAsc, X
+    SortAsc, X, CheckSquare
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -150,6 +150,7 @@ export function EventsView() {
                 createdAt: event.createdAt,
                 eventDateFormatted: formatDualDate(eventDate),
                 createdAtFormatted: formatDualDate(event.createdAt),
+                taskId: event.taskId, // Event ↔ Task sync
                 _id: event._id,
             }
         })
@@ -435,6 +436,13 @@ export function EventsView() {
                                                         <Badge variant="outline" className="bg-slate-100 text-slate-600 border-slate-200">
                                                             {event.type}
                                                         </Badge>
+                                                        {/* Event ↔ Task Sync Badge */}
+                                                        {event.taskId && (
+                                                            <Badge className="bg-emerald-100 text-emerald-700 hover:bg-emerald-200 border-0 rounded-md px-2 flex items-center gap-1">
+                                                                <CheckSquare className="h-3 w-3" />
+                                                                مرتبط بمهمة
+                                                            </Badge>
+                                                        )}
                                                     </div>
                                                     <div className="flex items-center gap-4 text-slate-500 text-sm">
                                                         <span className="flex items-center gap-1">

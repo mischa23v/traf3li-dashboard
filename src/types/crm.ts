@@ -99,6 +99,19 @@ export interface Lead {
   // Assignment
   assignedTo?: string
 
+  // Organization/Contact Links (NEW)
+  organizationId?: string | {
+    _id: string
+    legalName: string
+    email?: string
+  }
+  contactId?: string | {
+    _id: string
+    firstName: string
+    lastName?: string
+    title?: string
+  }
+
   // Activity
   lastContactedAt?: string
   lastActivityAt?: string
@@ -133,6 +146,8 @@ export interface CreateLeadData {
   estimatedValue?: number
   pipelineId?: string
   assignedTo?: string
+  organizationId?: string
+  contactId?: string
   tags?: string[]
   notes?: string
 }
@@ -164,6 +179,39 @@ export interface LeadStats {
 // ═══════════════════════════════════════════════════════════════
 // PIPELINE TYPES
 // ═══════════════════════════════════════════════════════════════
+
+// Pipeline Automation Types (NEW)
+export type AutoActionTrigger = 'enter' | 'exit' | 'stay'
+export type AutoActionType = 'send_email' | 'create_task' | 'notify_user' | 'update_field' | 'webhook'
+
+export interface AutoActionConfig {
+  // For send_email
+  to?: 'lead_owner' | 'lead_email' | string
+  subject?: string
+  message?: string
+  templateId?: string
+  // For create_task
+  title?: string
+  assignedTo?: 'lead_owner' | string
+  dueInDays?: number
+  priority?: 'low' | 'normal' | 'high' | 'urgent'
+  // For notify_user
+  userId?: 'lead_owner' | string
+  // For update_field
+  field?: string
+  value?: string | string[]
+  operation?: 'set' | 'append' | 'remove'
+  // For webhook
+  url?: string
+  method?: 'GET' | 'POST'
+}
+
+export interface PipelineAutoAction {
+  trigger: AutoActionTrigger
+  action: AutoActionType
+  config: AutoActionConfig
+}
+
 export interface PipelineStage {
   stageId: string
   name: string
@@ -173,6 +221,7 @@ export interface PipelineStage {
   probability: number
   isWonStage?: boolean
   isLostStage?: boolean
+  autoActions?: PipelineAutoAction[]
 }
 
 export interface Pipeline {

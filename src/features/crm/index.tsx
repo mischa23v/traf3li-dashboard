@@ -12,6 +12,7 @@ export { CreateReferralView } from './components/create-referral-view'
 
 // Pipeline
 export { PipelineView } from './components/pipeline-view'
+export { PipelineAutomationDialog } from './components/pipeline-automation-dialog'
 
 // Activities
 export { ActivitiesView } from './components/activities-view'

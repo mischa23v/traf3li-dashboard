@@ -182,6 +182,8 @@ export function TasksListView() {
             createdAtFormatted: formatDualDate(task.createdAt),
             priority: task.priority || 'medium',
             status: task.status || 'pending',
+            linkedEventId: task.linkedEventId, // Task ↔ Event sync
+            eventId: task.eventId, // Manual event link
             _id: task._id,
         }))
     }, [tasksData, t, i18n.language])
@@ -496,6 +498,13 @@ export function TasksListView() {
                                                         <h4 className="font-bold text-navy text-lg">{task.title}</h4>
                                                         {task.status === 'active' && (
                                                             <Badge className="bg-blue-100 text-blue-700 hover:bg-blue-200 border-0 rounded-md px-2">{t('tasks.list.active')}</Badge>
+                                                        )}
+                                                        {/* Task ↔ Event Sync Badge */}
+                                                        {(task.linkedEventId || task.eventId) && (
+                                                            <Badge className="bg-purple-100 text-purple-700 hover:bg-purple-200 border-0 rounded-md px-2 flex items-center gap-1">
+                                                                <Calendar className="h-3 w-3" />
+                                                                {t('tasks.list.linkedEvent', 'مرتبط بحدث')}
+                                                            </Badge>
                                                         )}
                                                     </div>
                                                     <p className="text-slate-500 text-sm">{t('tasks.list.taskClient', { name: task.client })}</p>

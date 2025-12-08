@@ -284,13 +284,22 @@ export interface ScoreFactor {
   source: string
 }
 
+export interface PopulatedLead {
+  _id: string
+  firstName?: string
+  lastName?: string
+  email?: string
+  status?: string
+}
+
 export interface LeadScore {
   _id: string
   firmId: string
-  leadId: string
+  leadId: string | PopulatedLead
   leadName?: string
   totalScore: number
   grade: LeadGrade
+  conversionProbability?: number // NEW: 0-1 probability
   dimensions: {
     demographic: ScoreDimension
     bant: ScoreDimension
