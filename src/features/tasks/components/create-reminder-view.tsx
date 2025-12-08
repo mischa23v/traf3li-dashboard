@@ -156,22 +156,9 @@ export function CreateReminderView() {
     const [errors, setErrors] = useState<Record<string, string>>({})
     const [touched, setTouched] = useState<Record<string, boolean>>({})
 
-    // Validate a single field
-    const validateField = (field: string, value: any): string => {
-        switch (field) {
-            case 'title':
-                if (!value || !value.trim()) return 'عنوان التذكير مطلوب'
-                if (value.length < 3) return 'يجب أن يكون العنوان 3 أحرف على الأقل'
-                return ''
-            case 'reminderDate':
-                if (!value) return 'تاريخ التذكير مطلوب'
-                return ''
-            case 'reminderTime':
-                if (!value) return 'وقت التذكير مطلوب'
-                return ''
-            default:
-                return ''
-        }
+    // Validate a single field (validation disabled for testing)
+    const validateField = (_field: string, _value: any): string => {
+        return ''
     }
 
     // Handle field blur for validation
@@ -181,19 +168,9 @@ export function CreateReminderView() {
         setErrors(prev => ({ ...prev, [field]: error }))
     }
 
-    // Validate all required fields
+    // Validate all required fields (validation disabled for testing)
     const validateForm = (): boolean => {
-        const newErrors: Record<string, string> = {}
-        const requiredFields = ['title', 'reminderDate', 'reminderTime']
-
-        requiredFields.forEach(field => {
-            const error = validateField(field, formData[field as keyof typeof formData])
-            if (error) newErrors[field] = error
-        })
-
-        setErrors(newErrors)
-        setTouched(requiredFields.reduce((acc, field) => ({ ...acc, [field]: true }), {}))
-        return Object.keys(newErrors).length === 0
+        return true
     }
 
     const handleChange = (field: string, value: any) => {
@@ -305,7 +282,7 @@ export function CreateReminderView() {
                                         <div className="space-y-2">
                                             <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
                                                 <Bell className="w-4 h-4 text-emerald-500" />
-                                                عنوان التذكير <span className="text-red-500">*</span>
+                                                عنوان التذكير
                                             </label>
                                             <Input
                                                 placeholder="مثال: انتهاء مهلة الاستئناف"
@@ -324,7 +301,7 @@ export function CreateReminderView() {
                                         <div className="space-y-2">
                                             <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
                                                 <AlertCircle className="w-4 h-4 text-emerald-500" aria-hidden="true" />
-                                                نوع التذكير <span className="text-red-500">*</span>
+                                                نوع التذكير
                                             </label>
                                             <Select value={formData.type} onValueChange={(value) => handleChange('type', value)}>
                                                 <SelectTrigger className="rounded-xl border-slate-200 focus:ring-emerald-500">
@@ -345,7 +322,7 @@ export function CreateReminderView() {
                                         <div className="space-y-2">
                                             <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
                                                 <Calendar className="w-4 h-4 text-emerald-500" aria-hidden="true" />
-                                                التاريخ <span className="text-red-500">*</span>
+                                                التاريخ
                                             </label>
                                             <Input
                                                 type="date"
@@ -364,7 +341,7 @@ export function CreateReminderView() {
                                         <div className="space-y-2">
                                             <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
                                                 <Clock className="w-4 h-4 text-emerald-500" aria-hidden="true" />
-                                                الوقت <span className="text-red-500">*</span>
+                                                الوقت
                                             </label>
                                             <Input
                                                 type="time"
