@@ -61,18 +61,25 @@ const firmService = {
   /**
    * Get team members
    * GET /api/firms/:id/team
+   * Response format: { success, data: FirmMember[], meta: { total, activeCount, departedCount } }
    */
   getTeamMembers: async (
     firmId: string,
     options?: { showDeparted?: boolean }
-  ): Promise<{ members: FirmMember[]; total: number }> => {
+  ): Promise<{ members: FirmMember[]; total: number; activeCount?: number; departedCount?: number }> => {
     try {
       const params = options?.showDeparted ? { showDeparted: true } : {}
       const response = await apiClient.get<TeamResponse>(
         `/firms/${firmId}/team`,
         { params }
       )
-      return response.data.data
+      // data is the array of members directly, meta contains the counts
+      return {
+        members: response.data.data || [],
+        total: response.data.meta?.total || 0,
+        activeCount: response.data.meta?.activeCount,
+        departedCount: response.data.meta?.departedCount,
+      }
     } catch (error: any) {
       throw new Error(handleApiError(error))
     }
