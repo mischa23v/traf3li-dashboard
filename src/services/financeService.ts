@@ -676,7 +676,17 @@ const financeService = {
       const response = await apiClient.get('/time-tracking/entries', {
         params: filters,
       })
-      return response.data
+      // Backend returns { success: true, data: { entries: [...], total, page, totalPages, summary } }
+      const responseData = response.data.data || response.data
+      return {
+        data: responseData?.entries || responseData || [],
+        pagination: {
+          total: responseData?.total || 0,
+          page: responseData?.page || 1,
+          totalPages: responseData?.totalPages || 1,
+        },
+        summary: responseData?.summary || null,
+      }
     } catch (error: any) {
       throw new Error(handleApiError(error))
     }

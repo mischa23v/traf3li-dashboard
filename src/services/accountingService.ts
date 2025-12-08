@@ -679,7 +679,11 @@ export const accountingService = {
 
   getGLEntries: async (filters?: GLEntryFilters): Promise<{ entries: GLEntry[]; total: number }> => {
     const response = await apiClient.get('/general-ledger/entries', { params: filters })
-    return response.data.data
+    // Backend returns { success: true, data: [array of entries], total: X }
+    return {
+      entries: response.data.data || [],
+      total: response.data.total || 0
+    }
   },
 
   getGLEntry: async (id: string): Promise<GLEntry> => {
