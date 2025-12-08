@@ -64,6 +64,9 @@ import { useCreateInvoice, useSendInvoice } from '@/hooks/useFinance'
 import { useClients, useCases, useLawyers } from '@/hooks/useCasesAndClients'
 import { ProductivityHero } from '@/components/productivity-hero'
 import { cn } from '@/lib/utils'
+import { useApiError } from '@/hooks/useApiError'
+import { ValidationErrors } from '@/components/validation-errors'
+import { isValidVatNumber, errorMessages } from '@/utils/validation-patterns'
 
 // Types
 type FirmSize = 'solo' | 'small' | 'medium' | 'large'
@@ -109,6 +112,9 @@ export function CreateInvoiceView() {
     const navigate = useNavigate()
     const createInvoiceMutation = useCreateInvoice()
     const sendInvoiceMutation = useSendInvoice()
+
+    // API Error handling
+    const { handleApiError, validationErrors, clearError } = useApiError()
 
     // Load data from API
     const { data: clientsData, isLoading: loadingClients } = useClients()
@@ -359,9 +365,88 @@ export function CreateInvoiceView() {
         return schedule
     }, [enablePaymentPlan, installments, installmentFrequency, calculations.balanceDue, dueDate, issueDate])
 
+    // Validation function
+    const validateForm = () => {
+        clearError()
+        const errors: Array<{ field: string; message: string }> = []
+
+        // Validate client selection
+        if (!clientId) {
+            errors.push({
+                field: 'العميل',
+                message: 'يرجى اختيار العميل'
+            })
+        }
+
+        // Validate invoice items - at least one item required
+        if (lineItems.length === 0) {
+            errors.push({
+                field: 'بنود الفاتورة',
+                message: 'يجب إضافة بند واحد على الأقل'
+            })
+        }
+
+        // Validate line items have description and positive amounts
+        lineItems.forEach((item, index) => {
+            if (!item.description.trim()) {
+                errors.push({
+                    field: `البند ${index + 1}`,
+                    message: 'يرجى إدخال وصف للبند'
+                })
+            }
+            if (item.quantity <= 0) {
+                errors.push({
+                    field: `البند ${index + 1} - الكمية`,
+                    message: 'الكمية يجب أن تكون أكبر من صفر'
+                })
+            }
+            if (item.unitPrice < 0) {
+                errors.push({
+                    field: `البند ${index + 1} - السعر`,
+                    message: 'السعر يجب أن يكون موجباً'
+                })
+            }
+        })
+
+        // Validate VAT number if B2B invoice (invoiceSubtype === '0100000')
+        if (invoiceSubtype === '0100000' && clientType !== 'individual') {
+            if (!clientVATNumber) {
+                errors.push({
+                    field: 'الرقم الضريبي للعميل',
+                    message: 'الرقم الضريبي مطلوب للفواتير بين المنشآت (B2B)'
+                })
+            } else if (!isValidVatNumber(clientVATNumber)) {
+                errors.push({
+                    field: 'الرقم الضريبي للعميل',
+                    message: errorMessages.vatNumber.ar
+                })
+            }
+        }
+
+        // Return validation result
+        if (errors.length > 0) {
+            handleApiError({
+                status: 400,
+                message: 'يرجى تصحيح الأخطاء التالية',
+                error: true,
+                errors
+            })
+            return false
+        }
+
+        return true
+    }
+
     // Submit handler
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
+
+        // Validate form before submission
+        if (!validateForm()) {
+            // Scroll to top to show validation errors
+            window.scrollTo({ top: 0, behavior: 'smooth' })
+            return
+        }
 
         const invoiceData = {
             invoiceNumber,
@@ -427,14 +512,23 @@ export function CreateInvoiceView() {
 
         createInvoiceMutation.mutate(invoiceData, {
             onSuccess: (data) => {
+                clearError()
                 if (sendAfterCreate && data?._id) {
                     sendInvoiceMutation.mutate(data._id, {
                         onSuccess: () => navigate({ to: '/dashboard/finance/invoices' }),
-                        onError: () => navigate({ to: '/dashboard/finance/invoices' })
+                        onError: (error) => {
+                            handleApiError(error)
+                            navigate({ to: '/dashboard/finance/invoices' })
+                        }
                     })
                 } else {
                     navigate({ to: '/dashboard/finance/invoices' })
                 }
+            },
+            onError: (error) => {
+                handleApiError(error)
+                // Scroll to top to show error
+                window.scrollTo({ top: 0, behavior: 'smooth' })
             },
         })
     }
@@ -489,6 +583,11 @@ export function CreateInvoiceView() {
                     {/* MAIN CONTENT */}
                     <div className="lg:col-span-2 space-y-6">
                         <form onSubmit={handleSubmit} className="space-y-6">
+
+                            {/* VALIDATION ERRORS */}
+                            {validationErrors && validationErrors.length > 0 && (
+                                <ValidationErrors errors={validationErrors} />
+                            )}
 
                             {/* FIRM SIZE SELECTOR */}
                             <Card className="rounded-3xl shadow-sm border-slate-100">
@@ -1215,10 +1314,18 @@ export function CreateInvoiceView() {
                                                             value={clientVATNumber}
                                                             onChange={(e) => setClientVATNumber(e.target.value)}
                                                             placeholder="300000000000003"
-                                                            className="rounded-lg text-xs font-mono"
+                                                            className={cn(
+                                                                "rounded-lg text-xs font-mono",
+                                                                clientVATNumber && !isValidVatNumber(clientVATNumber) && "border-red-500"
+                                                            )}
                                                             dir="ltr"
                                                             pattern="[0-9]{15}"
+                                                            maxLength={15}
                                                         />
+                                                        {clientVATNumber && !isValidVatNumber(clientVATNumber) && (
+                                                            <p className="text-xs text-red-600">{errorMessages.vatNumber.ar}</p>
+                                                        )}
+                                                        <p className="text-xs text-slate-600">15 رقماً يبدأ بـ 3</p>
                                                     </div>
                                                     <div className="space-y-2">
                                                         <Label className="text-xs text-slate-500">السجل التجاري للعميل</Label>

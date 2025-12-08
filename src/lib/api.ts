@@ -19,6 +19,15 @@ const requestCache = new Map<string, { data: any; timestamp: number }>()
 const CACHE_DURATION = 2 * 60 * 1000 // 2 minutes
 
 /**
+ * Extract CSRF token from cookies
+ * The token is set by the backend as an HttpOnly cookie
+ */
+const getCsrfToken = (): string => {
+  const match = document.cookie.match(/csrf-token=([^;]+)/)
+  return match ? match[1] : ''
+}
+
+/**
  * Main API client instance
  * Configured with credentials for HttpOnly cookie handling
  */
@@ -34,10 +43,19 @@ export const apiClient = axios.create({
 
 /**
  * Request Interceptor
- * Adds caching for GET requests and logging
+ * Adds caching for GET requests, CSRF token for mutating requests, and logging
  */
 apiClient.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
+    // Add CSRF token to mutating requests
+    const method = config.method?.toLowerCase()
+    if (method && ['post', 'put', 'patch', 'delete'].includes(method)) {
+      const csrfToken = getCsrfToken()
+      if (csrfToken) {
+        config.headers.set('X-CSRF-Token', csrfToken)
+      }
+    }
+
     // Check cache for GET requests
     if (config.method === 'get' && config.url) {
       const cacheKey = `${config.url}${JSON.stringify(config.params || {})}`
@@ -146,9 +164,32 @@ apiClient.interceptors.response.use(
       }
     }
 
-    // Handle 403 Forbidden - Permission denied (including departed users)
+    // Handle 403 Forbidden - Permission denied (including departed users) and CSRF errors
     if (error.response?.status === 403) {
       const message = error.response?.data?.message
+      const errorCode = error.response?.data?.code
+
+      // Check for CSRF token errors - reload page to get new token
+      if (errorCode === 'CSRF_TOKEN_INVALID' || errorCode === 'CSRF_TOKEN_MISSING') {
+        import('sonner').then(({ toast }) => {
+          toast.error('انتهت صلاحية الجلسة', {
+            description: 'جارٍ إعادة تحميل الصفحة...',
+            duration: 2000,
+          })
+        })
+
+        // Reload page after a short delay to get new CSRF token
+        setTimeout(() => {
+          window.location.reload()
+        }, 2000)
+
+        return Promise.reject({
+          status: 403,
+          message: 'CSRF token invalid',
+          error: true,
+          requestId: error.response?.data?.requestId,
+        })
+      }
 
       // Check for Arabic permission messages from departed user blocking
       // These messages indicate the user doesn't have permission to access a resource
@@ -158,6 +199,30 @@ apiClient.interceptors.response.use(
           toast.error(message, {
             description: 'قد تكون صلاحياتك محدودة. تواصل مع إدارة المكتب للمزيد من المعلومات.',
             duration: 5000,
+          })
+        })
+      }
+    }
+
+    // Handle 400 Bad Request - Validation errors
+    if (error.response?.status === 400) {
+      const errors = error.response?.data?.errors
+      const message = error.response?.data?.message
+
+      // Show validation errors as toast messages
+      if (errors && Array.isArray(errors)) {
+        import('sonner').then(({ toast }) => {
+          errors.forEach((err: { field: string; message: string }) => {
+            toast.error(`${err.field}: ${err.message}`, {
+              duration: 4000,
+            })
+          })
+        })
+      } else if (message) {
+        // Show generic validation message
+        import('sonner').then(({ toast }) => {
+          toast.error(message, {
+            duration: 4000,
           })
         })
       }

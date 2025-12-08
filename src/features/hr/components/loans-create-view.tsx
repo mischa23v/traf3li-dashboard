@@ -41,6 +41,7 @@ import {
   type CreateLoanData,
   type PaymentMethod
 } from '@/services/loansService'
+import { useApiError } from '@/hooks/useApiError'
 
 type OfficeType = 'solo' | 'small' | 'medium' | 'firm'
 
@@ -68,6 +69,9 @@ export function LoansCreateView() {
   const createMutation = useCreateLoan()
   const updateMutation = useUpdateLoan()
   const checkEligibilityMutation = useCheckEligibility()
+
+  // API Error handling
+  const { handleApiError, ErrorDisplay, clearError } = useApiError()
 
   // Fetch employees for selection
   const { data: employeesData } = useEmployees({ status: 'active' })
@@ -178,6 +182,65 @@ export function LoansCreateView() {
 
   // Handle submit
   const handleSubmit = async () => {
+    clearError()
+
+    // Validation
+    const errors: Array<{ field: string; message: string }> = []
+
+    // Validate employee selection
+    if (!employeeId) {
+      errors.push({
+        field: 'الموظف',
+        message: 'يرجى اختيار الموظف'
+      })
+    }
+
+    // Validate loan amount is positive
+    if (loanAmount <= 0) {
+      errors.push({
+        field: 'مبلغ القرض',
+        message: 'يجب أن يكون مبلغ القرض أكبر من صفر'
+      })
+    }
+
+    // Validate installments is positive
+    if (installments <= 0) {
+      errors.push({
+        field: 'عدد الأقساط',
+        message: 'يجب أن يكون عدد الأقساط أكبر من صفر'
+      })
+    }
+
+    // Validate first installment date
+    if (!firstInstallmentDate) {
+      errors.push({
+        field: 'تاريخ أول قسط',
+        message: 'يرجى تحديد تاريخ أول قسط'
+      })
+    } else {
+      const firstDate = new Date(firstInstallmentDate)
+      const today = new Date()
+      today.setHours(0, 0, 0, 0)
+
+      if (firstDate < today) {
+        errors.push({
+          field: 'تاريخ أول قسط',
+          message: 'يجب أن يكون تاريخ أول قسط في المستقبل'
+        })
+      }
+    }
+
+    // If there are validation errors, display them
+    if (errors.length > 0) {
+      handleApiError({
+        status: 400,
+        message: 'يرجى تصحيح الأخطاء التالية',
+        error: true,
+        errors
+      })
+      return
+    }
+
     const data: CreateLoanData = {
       employeeId,
       employeeName,
@@ -200,27 +263,31 @@ export function LoansCreateView() {
       },
     }
 
-    if (isEditMode && editId) {
-      await updateMutation.mutateAsync({
-        loanId: editId,
-        data: {
-          loanType,
-          loanAmount,
-          purpose,
-          purposeAr,
-          repayment: {
-            installments,
-            installmentAmount,
-            deductionMethod,
+    try {
+      if (isEditMode && editId) {
+        await updateMutation.mutateAsync({
+          loanId: editId,
+          data: {
+            loanType,
+            loanAmount,
+            purpose,
+            purposeAr,
+            repayment: {
+              installments,
+              installmentAmount,
+              deductionMethod,
+            },
+            notes: { employeeNotes, hrNotes },
           },
-          notes: { employeeNotes, hrNotes },
-        },
-      })
-    } else {
-      await createMutation.mutateAsync(data)
-    }
+        })
+      } else {
+        await createMutation.mutateAsync(data)
+      }
 
-    navigate({ to: '/dashboard/hr/loans' })
+      navigate({ to: '/dashboard/hr/loans' })
+    } catch (error) {
+      handleApiError(error)
+    }
   }
 
   const topNav = [
@@ -285,6 +352,9 @@ export function LoansCreateView() {
                 </p>
               </div>
             </div>
+
+            {/* Error Display */}
+            <ErrorDisplay />
 
             {/* OFFICE TYPE SELECTOR */}
             <Card className="rounded-3xl shadow-sm border-slate-100">

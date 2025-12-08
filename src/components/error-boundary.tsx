@@ -38,6 +38,9 @@ export class ErrorBoundary extends Component<Props, State> {
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+    // Log error to console for debugging
+    console.error('Error Boundary caught an error:', error, errorInfo)
+
     this.setState({
       error,
       errorInfo,
@@ -75,6 +78,18 @@ export class ErrorBoundary extends Component<Props, State> {
                 <p className="text-slate-600 mb-6">
                   {t('errorBoundary.description')}
                 </p>
+
+                {/* Show request ID if available */}
+                {this.state.error && 'requestId' in this.state.error && (
+                  <div className="bg-slate-50 border border-slate-200 rounded-lg p-3 mb-4">
+                    <p className="text-xs text-slate-500 mb-1">
+                      {t('errorBoundary.requestId')}
+                    </p>
+                    <p className="text-sm font-mono text-slate-700">
+                      {(this.state.error as any).requestId}
+                    </p>
+                  </div>
+                )}
 
                 {import.meta.env.DEV && this.state.error && (
                   <div className="bg-red-50 border border-red-200 rounded-xl p-4 mb-6 text-left">
@@ -120,4 +135,34 @@ export const useErrorHandler = () => {
   }, [error])
 
   return setError
+}
+
+/**
+ * Higher-Order Component (HOC) to wrap components with ErrorBoundary
+ * @param Component - The component to wrap
+ * @param fallback - Optional fallback UI to display on error
+ * @returns A component wrapped with ErrorBoundary
+ *
+ * @example
+ * const ProtectedComponent = withErrorBoundary(MyComponent)
+ *
+ * @example
+ * const ProtectedComponent = withErrorBoundary(MyComponent, <CustomErrorPage />)
+ */
+export const withErrorBoundary = <P extends object>(
+  WrappedComponent: React.ComponentType<P>,
+  fallback?: ReactNode
+) => {
+  const ComponentWithErrorBoundary = (props: P) => (
+    <ErrorBoundary fallback={fallback}>
+      <WrappedComponent {...props} />
+    </ErrorBoundary>
+  )
+
+  // Set display name for better debugging
+  ComponentWithErrorBoundary.displayName = `withErrorBoundary(${
+    WrappedComponent.displayName || WrappedComponent.name || 'Component'
+  })`
+
+  return ComponentWithErrorBoundary
 }

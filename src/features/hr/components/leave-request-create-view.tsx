@@ -30,6 +30,8 @@ import {
 } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import type { LeaveType, CreateLeaveRequestData } from '@/services/leaveService'
+import { useApiError } from '@/hooks/useApiError'
+import { isValidPhone, isValidEmail, errorMessages } from '@/utils/validation-patterns'
 
 // Leave type configuration
 interface LeaveTypeConfig {
@@ -228,6 +230,9 @@ export function LeaveRequestCreateView() {
     const createRequestMutation = useCreateLeaveRequest()
     const checkConflictsMutation = useCheckConflicts()
 
+    // API Error handling
+    const { handleApiError, ErrorDisplay, clearError } = useApiError()
+
     // Office type selection
     const [officeType, setOfficeType] = useState<OfficeType>('small')
 
@@ -362,6 +367,88 @@ export function LeaveRequestCreateView() {
     // Handle form submission
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
+        clearError()
+
+        // Validation
+        const errors: Array<{ field: string; message: string }> = []
+
+        // Validate employee selection
+        if (!employeeId) {
+            errors.push({
+                field: 'الموظف',
+                message: 'يرجى اختيار الموظف'
+            })
+        }
+
+        // Validate dates are provided
+        if (!startDate) {
+            errors.push({
+                field: 'تاريخ البداية',
+                message: 'يرجى تحديد تاريخ بداية الإجازة'
+            })
+        }
+
+        if (!endDate) {
+            errors.push({
+                field: 'تاريخ النهاية',
+                message: 'يرجى تحديد تاريخ نهاية الإجازة'
+            })
+        }
+
+        // Validate start date is before or equal to end date
+        if (startDate && endDate) {
+            const start = new Date(startDate)
+            const end = new Date(endDate)
+            if (start > end) {
+                errors.push({
+                    field: 'تواريخ الإجازة',
+                    message: 'تاريخ البداية يجب أن يكون قبل أو يساوي تاريخ النهاية'
+                })
+            }
+        }
+
+        // Validate contact phone if provided
+        if (contactNumber && !isValidPhone(contactNumber)) {
+            errors.push({
+                field: 'رقم الاتصال',
+                message: errorMessages.phone.ar
+            })
+        }
+
+        // Validate contact email if provided
+        if (contactEmail && !isValidEmail(contactEmail)) {
+            errors.push({
+                field: 'البريد الإلكتروني للاتصال',
+                message: errorMessages.email.ar
+            })
+        }
+
+        // Validate emergency contact phone if provided
+        if (emergencyContactPhone && !isValidPhone(emergencyContactPhone)) {
+            errors.push({
+                field: 'هاتف جهة الاتصال للطوارئ',
+                message: errorMessages.phone.ar
+            })
+        }
+
+        // Validate reason is provided
+        if (!reason && !reasonAr) {
+            errors.push({
+                field: 'السبب',
+                message: 'يرجى إدخال سبب الإجازة'
+            })
+        }
+
+        // If there are validation errors, display them
+        if (errors.length > 0) {
+            handleApiError({
+                status: 400,
+                message: 'يرجى تصحيح الأخطاء التالية',
+                error: true,
+                errors
+            })
+            return
+        }
 
         const data: CreateLeaveRequestData = {
             employeeId,
@@ -428,8 +515,8 @@ export function LeaveRequestCreateView() {
         try {
             const result = await createRequestMutation.mutateAsync(data)
             navigate({ to: '/dashboard/hr/leave/$requestId', params: { requestId: result._id } })
-        } catch {
-            // Error is handled by mutation's onError callback
+        } catch (error) {
+            handleApiError(error)
         }
     }
 
@@ -471,6 +558,9 @@ export function LeaveRequestCreateView() {
 
             <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-r border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
                 <form onSubmit={handleSubmit}>
+                    {/* Error Display */}
+                    <ErrorDisplay />
+
                     {/* Page Header */}
                     <div className="flex items-center justify-between mb-8">
                         <div className="flex items-center gap-4">

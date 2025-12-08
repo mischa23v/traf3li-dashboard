@@ -58,6 +58,17 @@ import { ProductivityHero } from '@/components/productivity-hero'
 import { useCreateClient } from '@/hooks/useClients'
 import { useLawyers } from '@/hooks/useCasesAndClients'
 import { cn } from '@/lib/utils'
+import { ValidationErrors, type ValidationError } from '@/components/validation-errors'
+import { useApiError } from '@/hooks/useApiError'
+import {
+    isValidNationalId,
+    isValidIban,
+    isValidPhone,
+    isValidCrNumber,
+    isValidEmail,
+    isValidVatNumber,
+    getErrorMessage,
+} from '@/utils/validation-patterns'
 
 // Types
 type ClientType = 'individual' | 'company'
@@ -120,6 +131,12 @@ export function CreateClientView() {
     const navigate = useNavigate()
     const { mutate: createClient, isPending } = useCreateClient()
     const { data: lawyersData, isLoading: loadingLawyers } = useLawyers()
+
+    // API error handling
+    const { handleApiError, validationErrors, clearError } = useApiError()
+
+    // Client-side validation errors
+    const [clientValidationErrors, setClientValidationErrors] = useState<ValidationError[]>([])
 
     // Client type
     const [clientType, setClientType] = useState<ClientType>('individual')
@@ -428,8 +445,131 @@ export function CreateClientView() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
 
+        // Clear previous errors
+        setClientValidationErrors([])
+        clearError()
+
+        // Validate consents
         if (!consentDataProcessing || !consentPrivacyPolicy) {
             alert('يجب الموافقة على معالجة البيانات وسياسة الخصوصية')
+            return
+        }
+
+        // Client-side validation
+        const errors: ValidationError[] = []
+
+        // Validate based on client type
+        if (clientType === 'individual') {
+            // National ID validation
+            if (nationalId && !isValidNationalId(nationalId)) {
+                errors.push({
+                    field: isArabic ? 'رقم الهوية الوطنية' : 'National ID',
+                    message: getErrorMessage('nationalId', isArabic ? 'ar' : 'en')
+                })
+            }
+        } else if (clientType === 'company') {
+            // Commercial Registration validation
+            if (crNumber && !isValidCrNumber(crNumber)) {
+                errors.push({
+                    field: isArabic ? 'رقم السجل التجاري' : 'Commercial Registration',
+                    message: getErrorMessage('crNumber', isArabic ? 'ar' : 'en')
+                })
+            }
+
+            // Legal representative phone validation
+            if (legalRepPhone && !isValidPhone(legalRepPhone)) {
+                errors.push({
+                    field: isArabic ? 'هاتف الممثل القانوني' : 'Legal Rep. Phone',
+                    message: getErrorMessage('phone', isArabic ? 'ar' : 'en')
+                })
+            }
+        }
+
+        // Phone validation (common for both types)
+        if (phone && !isValidPhone(phone)) {
+            errors.push({
+                field: isArabic ? 'رقم الهاتف' : 'Phone',
+                message: getErrorMessage('phone', isArabic ? 'ar' : 'en')
+            })
+        }
+
+        // Alternate phone validation
+        if (alternatePhone && !isValidPhone(alternatePhone)) {
+            errors.push({
+                field: isArabic ? 'رقم الهاتف البديل' : 'Alternate Phone',
+                message: getErrorMessage('phone', isArabic ? 'ar' : 'en')
+            })
+        }
+
+        // WhatsApp validation (if different from phone)
+        if (!sameAsPhone && whatsapp && !isValidPhone(whatsapp)) {
+            errors.push({
+                field: isArabic ? 'رقم الواتساب' : 'WhatsApp',
+                message: getErrorMessage('phone', isArabic ? 'ar' : 'en')
+            })
+        }
+
+        // Email validation
+        if (email && !isValidEmail(email)) {
+            errors.push({
+                field: isArabic ? 'البريد الإلكتروني' : 'Email',
+                message: getErrorMessage('email', isArabic ? 'ar' : 'en')
+            })
+        }
+
+        // Secondary email validation
+        if (secondaryEmail && !isValidEmail(secondaryEmail)) {
+            errors.push({
+                field: isArabic ? 'البريد الإلكتروني الثانوي' : 'Secondary Email',
+                message: getErrorMessage('email', isArabic ? 'ar' : 'en')
+            })
+        }
+
+        // VAT number validation (if registered)
+        if (isVatRegistered && vatNumber && !isValidVatNumber(vatNumber)) {
+            errors.push({
+                field: isArabic ? 'رقم الضريبة' : 'VAT Number',
+                message: getErrorMessage('vatNumber', isArabic ? 'ar' : 'en')
+            })
+        }
+
+        // Attorney phone validation
+        if (hasPowerOfAttorney && attorneyPhone && !isValidPhone(attorneyPhone)) {
+            errors.push({
+                field: isArabic ? 'هاتف الوكيل' : 'Attorney Phone',
+                message: getErrorMessage('phone', isArabic ? 'ar' : 'en')
+            })
+        }
+
+        // Attorney email validation
+        if (hasPowerOfAttorney && attorneyEmail && !isValidEmail(attorneyEmail)) {
+            errors.push({
+                field: isArabic ? 'بريد الوكيل' : 'Attorney Email',
+                message: getErrorMessage('email', isArabic ? 'ar' : 'en')
+            })
+        }
+
+        // Emergency contact phone validation
+        if (emergencyPhone && !isValidPhone(emergencyPhone)) {
+            errors.push({
+                field: isArabic ? 'هاتف جهة الاتصال الطارئة' : 'Emergency Contact Phone',
+                message: getErrorMessage('phone', isArabic ? 'ar' : 'en')
+            })
+        }
+
+        // Emergency contact email validation
+        if (emergencyEmail && !isValidEmail(emergencyEmail)) {
+            errors.push({
+                field: isArabic ? 'بريد جهة الاتصال الطارئة' : 'Emergency Contact Email',
+                message: getErrorMessage('email', isArabic ? 'ar' : 'en')
+            })
+        }
+
+        // If there are validation errors, show them and stop submission
+        if (errors.length > 0) {
+            setClientValidationErrors(errors)
+            // Scroll to top to show errors
+            window.scrollTo({ top: 0, behavior: 'smooth' })
             return
         }
 
@@ -650,6 +790,9 @@ export function CreateClientView() {
             onSuccess: () => {
                 navigate({ to: '/dashboard/clients' })
             },
+            onError: (error) => {
+                handleApiError(error)
+            },
         })
     }
 
@@ -689,6 +832,13 @@ export function CreateClientView() {
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     <div className="lg:col-span-2 space-y-6">
                         <form onSubmit={handleSubmit} className="space-y-6">
+
+                            {/* Validation Errors Display */}
+                            {(clientValidationErrors.length > 0 || validationErrors.length > 0) && (
+                                <ValidationErrors
+                                    errors={clientValidationErrors.length > 0 ? clientValidationErrors : validationErrors}
+                                />
+                            )}
 
                             {/* CLIENT TYPE SELECTOR */}
                             <Card className="rounded-3xl shadow-sm border-slate-100">
@@ -757,7 +907,10 @@ export function CreateClientView() {
                                                     value={nationalId}
                                                     onChange={(e) => setNationalId(e.target.value)}
                                                     placeholder="1234567890"
-                                                    className="flex-1 rounded-xl border-slate-200"
+                                                    className={cn(
+                                                        "flex-1 rounded-xl border-slate-200",
+                                                        nationalId && !isValidNationalId(nationalId) && "border-red-500"
+                                                    )}
                                                     dir="ltr"
                                                     maxLength={10}
                                                 />
@@ -777,6 +930,11 @@ export function CreateClientView() {
                                                     )}
                                                 </Button>
                                             </div>
+                                            {nationalId && !isValidNationalId(nationalId) && (
+                                                <p className="text-sm text-red-600">
+                                                    {getErrorMessage('nationalId', isArabic ? 'ar' : 'en')}
+                                                </p>
+                                            )}
                                         </div>
 
                                         {/* Auto-filled fields */}
@@ -882,7 +1040,10 @@ export function CreateClientView() {
                                                     value={crNumber}
                                                     onChange={(e) => setCrNumber(e.target.value)}
                                                     placeholder="2050012516"
-                                                    className="flex-1 rounded-xl border-slate-200"
+                                                    className={cn(
+                                                        "flex-1 rounded-xl border-slate-200",
+                                                        crNumber && !isValidCrNumber(crNumber) && "border-red-500"
+                                                    )}
                                                     dir="ltr"
                                                 />
                                                 <Button
@@ -901,6 +1062,11 @@ export function CreateClientView() {
                                                     )}
                                                 </Button>
                                             </div>
+                                            {crNumber && !isValidCrNumber(crNumber) && (
+                                                <p className="text-sm text-red-600">
+                                                    {getErrorMessage('crNumber', isArabic ? 'ar' : 'en')}
+                                                </p>
+                                            )}
                                         </div>
 
                                         {/* Auto-filled company fields */}
@@ -1070,9 +1236,17 @@ export function CreateClientView() {
                                                 value={phone}
                                                 onChange={(e) => setPhone(e.target.value)}
                                                 placeholder="+966 5XX XXX XXXX"
-                                                className="rounded-xl border-slate-200"
+                                                className={cn(
+                                                    "rounded-xl border-slate-200",
+                                                    phone && !isValidPhone(phone) && "border-red-500"
+                                                )}
                                                 dir="ltr"
                                             />
+                                            {phone && !isValidPhone(phone) && (
+                                                <p className="text-xs text-red-600">
+                                                    {getErrorMessage('phone', isArabic ? 'ar' : 'en')}
+                                                </p>
+                                            )}
                                         </div>
                                         <div className="space-y-2">
                                             <Label className="text-sm font-medium text-slate-700">رقم هاتف بديل</Label>
@@ -1080,9 +1254,17 @@ export function CreateClientView() {
                                                 value={alternatePhone}
                                                 onChange={(e) => setAlternatePhone(e.target.value)}
                                                 placeholder="+966 5XX XXX XXXX"
-                                                className="rounded-xl border-slate-200"
+                                                className={cn(
+                                                    "rounded-xl border-slate-200",
+                                                    alternatePhone && !isValidPhone(alternatePhone) && "border-red-500"
+                                                )}
                                                 dir="ltr"
                                             />
+                                            {alternatePhone && !isValidPhone(alternatePhone) && (
+                                                <p className="text-xs text-red-600">
+                                                    {getErrorMessage('phone', isArabic ? 'ar' : 'en')}
+                                                </p>
+                                            )}
                                         </div>
                                     </div>
 
@@ -1098,13 +1280,23 @@ export function CreateClientView() {
                                             </div>
                                         </div>
                                         {!sameAsPhone && (
-                                            <Input
-                                                value={whatsapp}
-                                                onChange={(e) => setWhatsapp(e.target.value)}
-                                                placeholder="+966 5XX XXX XXXX"
-                                                className="rounded-xl border-slate-200"
-                                                dir="ltr"
-                                            />
+                                            <div className="space-y-2">
+                                                <Input
+                                                    value={whatsapp}
+                                                    onChange={(e) => setWhatsapp(e.target.value)}
+                                                    placeholder="+966 5XX XXX XXXX"
+                                                    className={cn(
+                                                        "rounded-xl border-slate-200",
+                                                        whatsapp && !isValidPhone(whatsapp) && "border-red-500"
+                                                    )}
+                                                    dir="ltr"
+                                                />
+                                                {whatsapp && !isValidPhone(whatsapp) && (
+                                                    <p className="text-xs text-red-600">
+                                                        {getErrorMessage('phone', isArabic ? 'ar' : 'en')}
+                                                    </p>
+                                                )}
+                                            </div>
                                         )}
                                     </div>
 
@@ -1117,9 +1309,17 @@ export function CreateClientView() {
                                                 value={email}
                                                 onChange={(e) => setEmail(e.target.value)}
                                                 placeholder="example@email.com"
-                                                className="rounded-xl border-slate-200"
+                                                className={cn(
+                                                    "rounded-xl border-slate-200",
+                                                    email && !isValidEmail(email) && "border-red-500"
+                                                )}
                                                 dir="ltr"
                                             />
+                                            {email && !isValidEmail(email) && (
+                                                <p className="text-xs text-red-600">
+                                                    {getErrorMessage('email', isArabic ? 'ar' : 'en')}
+                                                </p>
+                                            )}
                                         </div>
                                         <div className="space-y-2">
                                             <Label className="text-sm font-medium text-slate-700">بريد إلكتروني ثانوي</Label>
@@ -1128,9 +1328,17 @@ export function CreateClientView() {
                                                 value={secondaryEmail}
                                                 onChange={(e) => setSecondaryEmail(e.target.value)}
                                                 placeholder="secondary@email.com"
-                                                className="rounded-xl border-slate-200"
+                                                className={cn(
+                                                    "rounded-xl border-slate-200",
+                                                    secondaryEmail && !isValidEmail(secondaryEmail) && "border-red-500"
+                                                )}
                                                 dir="ltr"
                                             />
+                                            {secondaryEmail && !isValidEmail(secondaryEmail) && (
+                                                <p className="text-xs text-red-600">
+                                                    {getErrorMessage('email', isArabic ? 'ar' : 'en')}
+                                                </p>
+                                            )}
                                         </div>
                                     </div>
 
@@ -1486,11 +1694,20 @@ export function CreateClientView() {
                                                     value={vatNumber}
                                                     onChange={(e) => setVatNumber(e.target.value)}
                                                     placeholder="300000000000003"
-                                                    className="rounded-xl border-slate-200"
+                                                    className={cn(
+                                                        "rounded-xl border-slate-200",
+                                                        vatNumber && !isValidVatNumber(vatNumber) && "border-red-500"
+                                                    )}
                                                     dir="ltr"
                                                     maxLength={15}
                                                 />
-                                                <p className="text-xs text-slate-500">سيستخدم هذا الرقم في الفواتير الضريبية (ZATCA)</p>
+                                                {vatNumber && !isValidVatNumber(vatNumber) ? (
+                                                    <p className="text-xs text-red-600">
+                                                        {getErrorMessage('vatNumber', isArabic ? 'ar' : 'en')}
+                                                    </p>
+                                                ) : (
+                                                    <p className="text-xs text-slate-500">سيستخدم هذا الرقم في الفواتير الضريبية (ZATCA)</p>
+                                                )}
                                             </div>
                                         )}
                                     </div>

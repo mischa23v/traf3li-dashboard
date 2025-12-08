@@ -2808,7 +2808,8 @@
   "errorBoundary": {
     "title": "Sorry, something went wrong",
     "description": "An unexpected error occurred in the application. Please reload the page or contact technical support.",
-    "reload": "Reload"
+    "reload": "Reload",
+    "requestId": "Request ID"
   },
   "permissionGate": {
     "unauthorized": "Unauthorized",
