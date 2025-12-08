@@ -5,7 +5,7 @@
 
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import * as Sentry from '@sentry/react'
+import { setUser as setSentryUser } from '@/lib/sentry'
 import authService, { User, LoginCredentials } from '@/services/authService'
 import { usePermissionsStore } from './permissions-store'
 
@@ -49,7 +49,7 @@ export const useAuthStore = create<AuthState>()(
           })
 
           // Set Sentry user context
-          Sentry.setUser({
+          setSentryUser({
             id: user._id,
             username: user.username,
             email: user.email,
@@ -98,7 +98,7 @@ export const useAuthStore = create<AuthState>()(
             error: null,
           })
           // Clear Sentry user context
-          Sentry.setUser(null)
+          setSentryUser(null)
           // Clear permissions on logout
           usePermissionsStore.getState().clearPermissions()
         } catch (error: any) {
@@ -110,7 +110,7 @@ export const useAuthStore = create<AuthState>()(
             error: null,
           })
           // Clear Sentry user context
-          Sentry.setUser(null)
+          setSentryUser(null)
           // Also clear permissions
           usePermissionsStore.getState().clearPermissions()
         }
@@ -151,7 +151,7 @@ export const useAuthStore = create<AuthState>()(
 
           // Set Sentry user context if user is authenticated
           if (user) {
-            Sentry.setUser({
+            setSentryUser({
               id: user._id,
               username: user.username,
               email: user.email,
@@ -159,7 +159,7 @@ export const useAuthStore = create<AuthState>()(
               firmId: user.firmId,
             })
           } else {
-            Sentry.setUser(null)
+            setSentryUser(null)
           }
 
           // Handle permissions based on user type
@@ -185,7 +185,7 @@ export const useAuthStore = create<AuthState>()(
             error: null, // Don't show error on initial auth check
           })
           // Clear Sentry user context
-          Sentry.setUser(null)
+          setSentryUser(null)
           // Clear permissions if auth failed
           usePermissionsStore.getState().clearPermissions()
         }
