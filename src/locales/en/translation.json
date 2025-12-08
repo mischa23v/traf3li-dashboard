@@ -1541,6 +1541,17 @@
       "administrative": "Administrative Law",
       "general": "General Practice"
     },
+    "stats": {
+      "total": "Total Staff",
+      "active": "Active",
+      "departed": "Departed",
+      "pending": "Pending"
+    },
+    "tabs": {
+      "members": "Members",
+      "permissions": "Permissions",
+      "overrides": "Overrides"
+    },
     "form": {
       "basicInfo": "Basic Information",
       "contactInfo": "Contact Information",
