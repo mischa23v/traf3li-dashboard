@@ -40,6 +40,7 @@ export function DynamicIsland({ className }: DynamicIslandProps) {
                 <button
                     onClick={() => setIsVisible(false)}
                     className="flex-shrink-0 h-6 w-6 rounded-full hover:bg-white/10 flex items-center justify-center text-slate-500 hover:text-white transition-colors"
+                    aria-label={t('dynamicIsland.close', 'Close notification')}
                 >
                     <X className="h-3 w-3" aria-hidden="true" />
                 </button>

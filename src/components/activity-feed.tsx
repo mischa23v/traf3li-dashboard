@@ -3,6 +3,7 @@
  * Displays a list of activities for tasks, events, reminders, etc.
  */
 
+import { memo } from 'react'
 import { formatDistanceToNow } from 'date-fns'
 import { ar, enUS } from 'date-fns/locale'
 import { useTranslation } from 'react-i18next'
@@ -111,7 +112,7 @@ interface ActivityItemProps {
   activity: Activity
 }
 
-function ActivityItem({ activity }: ActivityItemProps) {
+const ActivityItem = memo(function ActivityItem({ activity }: ActivityItemProps) {
   const { i18n } = useTranslation()
   const Icon = activityIcons[activity.type] || Circle
   const colorClass = activityColors[activity.type] || 'text-gray-500 bg-gray-50'
@@ -148,7 +149,7 @@ function ActivityItem({ activity }: ActivityItemProps) {
       </div>
     </div>
   )
-}
+})
 
 // ==================== LOADING SKELETON ====================
 

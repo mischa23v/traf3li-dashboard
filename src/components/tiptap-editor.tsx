@@ -241,6 +241,7 @@ export const TipTapEditor = ({
             variant="ghost"
             size="icon"
             onClick={onClick}
+            aria-label={title}
             title={title}
             disabled={disabled}
             className={cn(
@@ -318,7 +319,7 @@ export const TipTapEditor = ({
                     {/* Text Color */}
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon" className="h-8 w-8" title={t('editor.toolbar.textColor')}>
+                            <Button variant="ghost" size="icon" className="h-8 w-8" aria-label={t('editor.toolbar.textColor')} title={t('editor.toolbar.textColor')}>
                                 <Palette className="h-4 w-4" />
                             </Button>
                         </DropdownMenuTrigger>
@@ -343,7 +344,7 @@ export const TipTapEditor = ({
                     {/* Highlight Color */}
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon" className="h-8 w-8" title={t('editor.toolbar.highlight')}>
+                            <Button variant="ghost" size="icon" className="h-8 w-8" aria-label={t('editor.toolbar.highlight')} title={t('editor.toolbar.highlight')}>
                                 <Highlighter className="h-4 w-4" />
                             </Button>
                         </DropdownMenuTrigger>
@@ -469,6 +470,7 @@ export const TipTapEditor = ({
                                 variant="ghost"
                                 size="icon"
                                 className={cn('h-8 w-8', editor.isActive('table') && 'bg-slate-200')}
+                                aria-label={t('editor.toolbar.table')}
                                 title={t('editor.toolbar.table')}
                             >
                                 <TableIcon className="h-4 w-4" />
