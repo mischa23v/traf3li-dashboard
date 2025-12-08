@@ -741,7 +741,7 @@ export function CreateContactView() {
                                                     <SelectValue placeholder="اختر منظمة" />
                                                 </SelectTrigger>
                                                 <SelectContent>
-                                                    {organizationsData?.data?.map((org: any) => (
+                                                    {organizationsData?.data?.filter((org: any) => org._id)?.map((org: any) => (
                                                         <SelectItem key={org._id} value={org._id}>
                                                             {org.nameAr || org.name}
                                                         </SelectItem>
