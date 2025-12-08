@@ -163,6 +163,23 @@ const TEST_USER: User = {
 }
 
 /**
+ * Helper to normalize user data from backend
+ * Extracts firmId from firm.id or tenant.id if not directly provided
+ */
+const normalizeUser = (user: User): User => {
+  // If firmId is already set, return as-is
+  if (user.firmId) return user
+
+  // Extract firmId from firm.id or tenant.id
+  const firmId = user.firm?.id || user.tenant?.id
+  if (firmId) {
+    return { ...user, firmId }
+  }
+
+  return user
+}
+
+/**
  * Auth Service Object
  */
 const authService = {
@@ -182,12 +199,15 @@ const authService = {
         throw new Error(response.data.message || 'فشل تسجيل الدخول')
       }
 
+      // Normalize user data to ensure firmId is set
+      const user = normalizeUser(response.data.user)
+
       // Store minimal user data in localStorage for persistence
       // SECURITY NOTE: Role stored here is for UI display only
       // All authorization must be enforced on the backend
-      localStorage.setItem('user', JSON.stringify(response.data.user))
+      localStorage.setItem('user', JSON.stringify(user))
 
-      return response.data.user
+      return user
     } catch (error: any) {
       throw new Error(handleApiError(error))
     }
@@ -237,10 +257,13 @@ const authService = {
         return null
       }
 
-      // Update localStorage with fresh user data
-      localStorage.setItem('user', JSON.stringify(response.data.user))
+      // Normalize user data to ensure firmId is set
+      const user = normalizeUser(response.data.user)
 
-      return response.data.user
+      // Update localStorage with fresh user data
+      localStorage.setItem('user', JSON.stringify(user))
+
+      return user
     } catch (error: any) {
       // If unauthorized, clear localStorage
       if (error?.status === 401) {

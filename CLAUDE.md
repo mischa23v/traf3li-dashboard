@@ -1,5 +1,28 @@
 ---
 
+## ⚠️ MOST IMPORTANT RULE - ASK BEFORE ASSUMING
+
+**THIS RULE MUST NEVER BE BROKEN:**
+
+If you need more information about:
+- Backend API structure, endpoints, or responses
+- Frontend component behavior or data flow
+- Database schema or data relationships
+- How existing features work
+- What the user expects from a feature
+
+**YOU MUST ASK THE USER BEFORE PROCEEDING.**
+
+Do NOT:
+- Assume how the backend works
+- Guess API response structures
+- Make up endpoints that may not exist
+- Implement features based on assumptions
+
+This prevents wasted effort and bugs caused by incorrect assumptions. When in doubt, ASK FIRST.
+
+---
+
 ## 🎨 Visual Development & Testing
 
 ### Design Principles
