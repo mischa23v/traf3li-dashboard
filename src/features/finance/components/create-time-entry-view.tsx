@@ -442,7 +442,7 @@ export function CreateTimeEntryView() {
                                         <div className="space-y-2">
                                             <Label className="text-sm font-medium text-slate-700 flex items-center gap-2">
                                                 <Calendar className="w-4 h-4 text-emerald-500" aria-hidden="true" />
-                                                التاريخ <span className="text-red-500">*</span>
+                                                التاريخ
                                             </Label>
                                             <Input
                                                 type="date"
@@ -450,14 +450,13 @@ export function CreateTimeEntryView() {
                                                 max={new Date().toISOString().split('T')[0]}
                                                 onChange={(e) => setFormData({ ...formData, date: e.target.value })}
                                                 className="rounded-xl border-slate-200"
-                                                required
                                             />
                                         </div>
 
                                         <div className="space-y-2">
                                             <Label className="text-sm font-medium text-slate-700 flex items-center gap-2">
                                                 <User className="w-4 h-4 text-emerald-500" aria-hidden="true" />
-                                                المحامي <span className="text-red-500">*</span>
+                                                المحامي
                                             </Label>
                                             <Select
                                                 value={formData.attorneyId}
@@ -484,7 +483,7 @@ export function CreateTimeEntryView() {
                                         <div className="space-y-2">
                                             <Label className="text-sm font-medium text-slate-700 flex items-center gap-2">
                                                 <User className="w-4 h-4 text-emerald-500" aria-hidden="true" />
-                                                العميل <span className="text-red-500">*</span>
+                                                العميل
                                             </Label>
                                             <Select
                                                 value={formData.clientId}
@@ -532,7 +531,7 @@ export function CreateTimeEntryView() {
 
                                     {/* Time Type */}
                                     <div className="space-y-3">
-                                        <Label className="text-sm font-medium text-slate-700">نوع الوقت <span className="text-red-500">*</span></Label>
+                                        <Label className="text-sm font-medium text-slate-700">نوع الوقت</Label>
                                         <RadioGroup
                                             value={formData.timeType}
                                             onValueChange={(value: any) => setFormData({ ...formData, timeType: value, billable: value === 'billable' })}
@@ -562,7 +561,7 @@ export function CreateTimeEntryView() {
 
                                     {/* Activity Code */}
                                     <div className="space-y-2">
-                                        <Label className="text-sm font-medium text-slate-700">نوع النشاط (UTBMS) <span className="text-red-500">*</span></Label>
+                                        <Label className="text-sm font-medium text-slate-700">نوع النشاط (UTBMS)</Label>
                                         <Select
                                             value={formData.activityCode}
                                             onValueChange={handleActivityCodeChange}
@@ -674,7 +673,7 @@ export function CreateTimeEntryView() {
                                         <TabsContent value="start_end" className="space-y-4">
                                             <div className="grid grid-cols-2 gap-4">
                                                 <div className="space-y-2">
-                                                    <Label>وقت البدء <span className="text-red-500">*</span></Label>
+                                                    <Label>وقت البدء</Label>
                                                     <Input
                                                         type="time"
                                                         value={formData.startTime}
@@ -683,7 +682,7 @@ export function CreateTimeEntryView() {
                                                     />
                                                 </div>
                                                 <div className="space-y-2">
-                                                    <Label>وقت الانتهاء <span className="text-red-500">*</span></Label>
+                                                    <Label>وقت الانتهاء</Label>
                                                     <Input
                                                         type="time"
                                                         value={formData.endTime}
@@ -849,15 +848,13 @@ export function CreateTimeEntryView() {
                                 </CardHeader>
                                 <CardContent className="space-y-4">
                                     <div className="space-y-2">
-                                        <Label>وصف العمل <span className="text-red-500">*</span></Label>
+                                        <Label>وصف العمل</Label>
                                         <Textarea
                                             value={formData.description}
                                             onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                                             rows={4}
-                                            minLength={10}
                                             placeholder="اكتب وصفاً تفصيلياً للعمل الذي قمت به..."
                                             className="rounded-xl border-slate-200"
-                                            required
                                         />
                                         <p className="text-xs text-slate-500">{formData.description.length}/1000 حرف (الحد الأدنى: 10 أحرف)</p>
                                     </div>
@@ -919,7 +916,7 @@ export function CreateTimeEntryView() {
 
                                             {formData.writeOff && (
                                                 <div className="space-y-2">
-                                                    <Label>سبب الشطب <span className="text-red-500">*</span></Label>
+                                                    <Label>سبب الشطب</Label>
                                                     <Textarea
                                                         value={formData.writeOffReason}
                                                         onChange={(e) => setFormData({ ...formData, writeOffReason: e.target.value })}
@@ -957,7 +954,7 @@ export function CreateTimeEntryView() {
                                                                 />
                                                             </div>
                                                             <div className="space-y-2">
-                                                                <Label>سبب التخفيض <span className="text-red-500">*</span></Label>
+                                                                <Label>سبب التخفيض</Label>
                                                                 <Textarea
                                                                     value={formData.writeDownReason}
                                                                     onChange={(e) => setFormData({ ...formData, writeDownReason: e.target.value })}
