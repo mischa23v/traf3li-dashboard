@@ -10,7 +10,21 @@ const CACHE_NAME = 'traf3li-cache-v1';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
+  '/manifest.json',
+  '/images/logo-192.png',
+  '/images/logo-512.png',
+  '/images/badge-72.png',
 ];
+
+// Cache patterns for dynamic assets
+const CACHE_PATTERNS = {
+  // Cache fonts for 1 year
+  fonts: /\.(woff2?|ttf|otf|eot)$/i,
+  // Cache images for 1 month
+  images: /\.(png|jpg|jpeg|gif|webp|svg|ico)$/i,
+  // Cache CSS and JS for 1 week
+  assets: /\.(css|js)$/i,
+};
 
 // Install event - cache static assets
 self.addEventListener('install', (event) => {
@@ -158,49 +172,105 @@ self.addEventListener('notificationclose', (event) => {
 
 // Fetch event - serve from cache with network fallback
 self.addEventListener('fetch', (event) => {
+  const { request } = event;
+  const url = new URL(request.url);
+
   // Skip non-GET requests
-  if (event.request.method !== 'GET') {
+  if (request.method !== 'GET') {
     return;
   }
 
-  // Skip API requests
-  if (event.request.url.includes('/api/')) {
+  // Skip API requests - always go to network
+  if (url.pathname.startsWith('/api/')) {
     return;
   }
 
-  event.respondWith(
-    caches.match(event.request)
-      .then((cachedResponse) => {
-        if (cachedResponse) {
-          return cachedResponse;
-        }
+  // Skip WebSocket connections
+  if (url.protocol === 'ws:' || url.protocol === 'wss:') {
+    return;
+  }
 
-        return fetch(event.request)
-          .then((response) => {
-            // Don't cache non-successful responses
-            if (!response || response.status !== 200 || response.type !== 'basic') {
-              return response;
-            }
+  // Handle different asset types with appropriate strategies
+  if (CACHE_PATTERNS.fonts.test(url.pathname)) {
+    // Cache-first for fonts (they rarely change)
+    event.respondWith(cacheFirst(request));
+    return;
+  }
 
-            // Clone the response
-            const responseToCache = response.clone();
+  if (CACHE_PATTERNS.images.test(url.pathname)) {
+    // Cache-first for images
+    event.respondWith(cacheFirst(request));
+    return;
+  }
 
-            caches.open(CACHE_NAME)
-              .then((cache) => {
-                cache.put(event.request, responseToCache);
-              });
+  if (CACHE_PATTERNS.assets.test(url.pathname)) {
+    // Stale-while-revalidate for CSS/JS
+    event.respondWith(staleWhileRevalidate(request));
+    return;
+  }
 
-            return response;
-          })
-          .catch(() => {
-            // Return offline page for navigation requests
-            if (event.request.mode === 'navigate') {
-              return caches.match('/');
-            }
-          });
-      })
-  );
+  // Default: Network first with cache fallback for HTML pages
+  event.respondWith(networkFirst(request));
 });
+
+// Cache-first strategy
+async function cacheFirst(request) {
+  const cachedResponse = await caches.match(request);
+  if (cachedResponse) {
+    return cachedResponse;
+  }
+
+  try {
+    const networkResponse = await fetch(request);
+    if (networkResponse.ok) {
+      const cache = await caches.open(CACHE_NAME);
+      cache.put(request, networkResponse.clone());
+    }
+    return networkResponse;
+  } catch (error) {
+    // Return offline fallback if available
+    return caches.match('/');
+  }
+}
+
+// Network-first strategy
+async function networkFirst(request) {
+  try {
+    const networkResponse = await fetch(request);
+    if (networkResponse.ok) {
+      const cache = await caches.open(CACHE_NAME);
+      cache.put(request, networkResponse.clone());
+    }
+    return networkResponse;
+  } catch (error) {
+    const cachedResponse = await caches.match(request);
+    if (cachedResponse) {
+      return cachedResponse;
+    }
+    // Return offline page for navigation requests
+    if (request.mode === 'navigate') {
+      return caches.match('/');
+    }
+    throw error;
+  }
+}
+
+// Stale-while-revalidate strategy
+async function staleWhileRevalidate(request) {
+  const cache = await caches.open(CACHE_NAME);
+  const cachedResponse = await cache.match(request);
+
+  // Fetch in background
+  const fetchPromise = fetch(request).then((networkResponse) => {
+    if (networkResponse.ok) {
+      cache.put(request, networkResponse.clone());
+    }
+    return networkResponse;
+  }).catch(() => cachedResponse);
+
+  // Return cached response immediately, or wait for network
+  return cachedResponse || fetchPromise;
+}
 
 // Message event - handle messages from main thread
 self.addEventListener('message', (event) => {

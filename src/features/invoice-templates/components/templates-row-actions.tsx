@@ -1,3 +1,4 @@
+import { memo } from 'react'
 import { type Row } from '@tanstack/react-table'
 import { MoreHorizontal, Eye, Pencil, Trash2, Copy, Star, FileSearch } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -16,7 +17,7 @@ interface TemplatesRowActionsProps {
   row: Row<InvoiceTemplate>
 }
 
-export function TemplatesRowActions({ row }: TemplatesRowActionsProps) {
+export const TemplatesRowActions = memo(function TemplatesRowActions({ row }: TemplatesRowActionsProps) {
   const { t } = useTranslation()
   const { setOpen, setCurrentTemplate } = useTemplatesContext()
 
@@ -73,4 +74,4 @@ export function TemplatesRowActions({ row }: TemplatesRowActionsProps) {
       </DropdownMenuContent>
     </DropdownMenu>
   )
-}
+})

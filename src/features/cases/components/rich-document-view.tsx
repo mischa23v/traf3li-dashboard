@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { sanitizeHtml } from '@/utils/sanitize'
 import {
   FileText,
   ArrowLeft,
@@ -311,7 +312,7 @@ export function RichDocumentView({
                 ? "'Amiri', 'Cairo', serif"
                 : 'inherit'
             }}
-            dangerouslySetInnerHTML={{ __html: document.content }}
+            dangerouslySetInnerHTML={{ __html: sanitizeHtml(document.content) }}
           />
         </CardContent>
       </Card>

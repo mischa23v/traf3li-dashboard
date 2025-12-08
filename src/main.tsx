@@ -15,6 +15,8 @@ import { DirectionProvider } from './context/direction-provider'
 import { FontProvider } from './context/font-provider'
 import { ThemeProvider } from './context/theme-provider'
 import { initSentry } from '@/lib/sentry'
+import { initAnalytics } from '@/lib/analytics'
+import { initWebVitals } from '@/lib/web-vitals'
 // Import i18n configuration
 import './i18n'
 // Generated Routes
@@ -24,6 +26,12 @@ import './styles/index.css'
 
 // Initialize Sentry before app renders
 initSentry()
+
+// Initialize Google Analytics
+initAnalytics()
+
+// Initialize Web Vitals monitoring
+initWebVitals()
 
 const queryClient = new QueryClient({
   defaultOptions: {

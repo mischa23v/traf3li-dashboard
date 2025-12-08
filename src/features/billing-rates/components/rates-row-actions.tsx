@@ -1,3 +1,4 @@
+import { memo } from 'react'
 import { type Row } from '@tanstack/react-table'
 import { MoreHorizontal, Eye, Pencil, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -16,7 +17,7 @@ interface RatesRowActionsProps {
   row: Row<BillingRate>
 }
 
-export function RatesRowActions({ row }: RatesRowActionsProps) {
+export const RatesRowActions = memo(function RatesRowActions({ row }: RatesRowActionsProps) {
   const { t } = useTranslation()
   const { setOpen, setCurrentRate } = useRatesContext()
 
@@ -53,4 +54,4 @@ export function RatesRowActions({ row }: RatesRowActionsProps) {
       </DropdownMenuContent>
     </DropdownMenu>
   )
-}
+})

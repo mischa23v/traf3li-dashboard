@@ -1,3 +1,4 @@
+import { memo } from 'react'
 import { type Row } from '@tanstack/react-table'
 import { MoreHorizontal, Eye, Pencil, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -16,7 +17,7 @@ interface GroupsRowActionsProps {
   row: Row<RateGroup>
 }
 
-export function GroupsRowActions({ row }: GroupsRowActionsProps) {
+export const GroupsRowActions = memo(function GroupsRowActions({ row }: GroupsRowActionsProps) {
   const { t } = useTranslation()
   const { setOpen, setCurrentGroup } = useRatesContext()
 
@@ -53,4 +54,4 @@ export function GroupsRowActions({ row }: GroupsRowActionsProps) {
       </DropdownMenuContent>
     </DropdownMenu>
   )
-}
+})

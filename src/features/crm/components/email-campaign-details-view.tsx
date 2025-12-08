@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { sanitizeHtml } from '@/utils/sanitize'
 import {
   Mail,
   Calendar,
@@ -514,7 +515,7 @@ export function EmailCampaignDetailsView() {
                                 <p className="text-xs text-slate-500 mb-2">معاينة HTML</p>
                                 <div
                                   className="prose max-w-none bg-white p-4 rounded-lg border border-slate-200"
-                                  dangerouslySetInnerHTML={{ __html: campaign.htmlContent }}
+                                  dangerouslySetInnerHTML={{ __html: sanitizeHtml(campaign.htmlContent) }}
                                 />
                               </div>
                             )}

@@ -60,16 +60,28 @@ const NotificationItem = memo(function NotificationItem({ notification, onRead, 
     locale,
   })
 
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault()
+      if (!notification.read) onRead()
+      onClick?.()
+    }
+  }
+
   return (
     <div
+      role="button"
+      tabIndex={0}
+      aria-label={`${title} - ${message}`}
       className={cn(
-        'p-3 hover:bg-slate-50 transition-colors cursor-pointer',
+        'p-3 hover:bg-slate-50 transition-colors cursor-pointer focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-inset',
         !notification.read && 'bg-blue-50/50'
       )}
       onClick={() => {
         if (!notification.read) onRead()
         onClick?.()
       }}
+      onKeyDown={handleKeyDown}
     >
       <div className="flex gap-3">
         {/* Icon */}
