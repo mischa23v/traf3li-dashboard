@@ -351,7 +351,7 @@ export function CreateExpenseView() {
                             <form onSubmit={handleSubmit} className="space-y-8">
                                 {/* ========== EXPENSE TYPE SELECTION ========== */}
                                 <div className="space-y-4">
-                                    <Label className="text-sm font-medium text-slate-700">نوع المصروف <span className="text-red-500">*</span></Label>
+                                    <Label className="text-sm font-medium text-slate-700">نوع المصروف</Label>
                                     <RadioGroup
                                         value={formData.expenseType}
                                         onValueChange={(value) => updateField('expenseType', value)}
@@ -394,7 +394,7 @@ export function CreateExpenseView() {
                                     <div className="space-y-2 p-4 bg-blue-50 rounded-xl border border-blue-100">
                                         <Label className="text-sm font-medium text-slate-700 flex items-center gap-2">
                                             <User className="w-4 h-4 text-blue-500" aria-hidden="true" />
-                                            الموظف <span className="text-red-500">*</span>
+                                            الموظف
                                         </Label>
                                         <Select value={formData.employeeId} onValueChange={(value) => updateField('employeeId', value)}>
                                             <SelectTrigger className="rounded-xl border-slate-200 focus:ring-blue-500 bg-white">
@@ -415,22 +415,20 @@ export function CreateExpenseView() {
                                         <div className="space-y-2">
                                             <Label className="text-sm font-medium text-slate-700 flex items-center gap-2">
                                                 <FileText className="w-4 h-4 text-emerald-500" aria-hidden="true" />
-                                                وصف المصروف <span className="text-red-500">*</span>
+                                                وصف المصروف
                                             </Label>
                                             <Textarea
                                                 placeholder="اكتب وصفاً تفصيلياً للمصروف..."
                                                 value={formData.description}
                                                 onChange={(e) => updateField('description', e.target.value)}
                                                 className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 min-h-[80px]"
-                                                required
-                                                minLength={10}
                                             />
                                             <p className="text-xs text-slate-500">{formData.description.length}/500 حرف (الحد الأدنى: 10 أحرف)</p>
                                         </div>
                                         <div className="space-y-2">
                                             <Label className="text-sm font-medium text-slate-700 flex items-center gap-2">
                                                 <Calendar className="w-4 h-4 text-emerald-500" aria-hidden="true" />
-                                                تاريخ المصروف <span className="text-red-500">*</span>
+                                                تاريخ المصروف
                                             </Label>
                                             <Input
                                                 type="date"
@@ -438,7 +436,6 @@ export function CreateExpenseView() {
                                                 onChange={(e) => updateField('date', e.target.value)}
                                                 max={new Date().toISOString().split('T')[0]}
                                                 className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500"
-                                                required
                                             />
                                         </div>
                                     </div>
@@ -447,7 +444,7 @@ export function CreateExpenseView() {
                                         <div className="space-y-2">
                                             <Label className="text-sm font-medium text-slate-700 flex items-center gap-2">
                                                 <DollarSign className="w-4 h-4 text-emerald-500" />
-                                                المبلغ (ر.س) <span className="text-red-500">*</span>
+                                                المبلغ (ر.س)
                                             </Label>
                                             <Input
                                                 type="number"
@@ -457,7 +454,6 @@ export function CreateExpenseView() {
                                                 value={formData.amount}
                                                 onChange={(e) => updateField('amount', e.target.value)}
                                                 className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 text-lg font-semibold"
-                                                required
                                             />
                                         </div>
                                         <div className="space-y-2">
@@ -495,7 +491,7 @@ export function CreateExpenseView() {
                                     <div className="space-y-2">
                                         <Label className="text-sm font-medium text-slate-700 flex items-center gap-2">
                                             <Tag className="w-4 h-4 text-emerald-500" />
-                                            التصنيف <span className="text-red-500">*</span>
+                                            التصنيف
                                         </Label>
                                         <Select value={formData.category} onValueChange={(value) => updateField('category', value)}>
                                             <SelectTrigger className="rounded-xl border-slate-200 focus:ring-emerald-500">
@@ -591,7 +587,7 @@ export function CreateExpenseView() {
                                     <div className="space-y-2">
                                         <Label className="text-sm font-medium text-slate-700 flex items-center gap-2">
                                             <CreditCard className="w-4 h-4 text-emerald-500" aria-hidden="true" />
-                                            طريقة الدفع <span className="text-red-500">*</span>
+                                            طريقة الدفع
                                         </Label>
                                         <Select value={formData.paymentMethod} onValueChange={(value) => updateField('paymentMethod', value)}>
                                             <SelectTrigger className="rounded-xl border-slate-200 focus:ring-emerald-500">
@@ -699,7 +695,7 @@ export function CreateExpenseView() {
                                             <div className="space-y-2">
                                                 <Label className="text-sm font-medium text-slate-700 flex items-center gap-2">
                                                     <User className="w-4 h-4 text-amber-500" aria-hidden="true" />
-                                                    العميل <span className="text-red-500">*</span>
+                                                    العميل
                                                 </Label>
                                                 <Select
                                                     value={formData.clientId}
@@ -801,7 +797,7 @@ export function CreateExpenseView() {
                                             <AccordionContent className="px-4 pb-4">
                                                 <div className="space-y-6">
                                                     <div className="space-y-2">
-                                                        <Label className="text-sm font-medium text-slate-700">غرض الرحلة <span className="text-red-500">*</span></Label>
+                                                        <Label className="text-sm font-medium text-slate-700">غرض الرحلة</Label>
                                                         <Select value={formData.travelPurpose} onValueChange={(value) => updateField('travelPurpose', value)}>
                                                             <SelectTrigger className="rounded-xl border-slate-200 focus:ring-blue-500">
                                                                 <SelectValue placeholder="اختر غرض الرحلة..." />

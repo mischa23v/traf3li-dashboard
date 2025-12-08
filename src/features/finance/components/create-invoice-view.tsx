@@ -562,7 +562,7 @@ export function CreateInvoiceView() {
                                         <div className="space-y-2">
                                             <Label className="text-sm font-medium text-slate-700 flex items-center gap-2">
                                                 <User className="w-4 h-4 text-emerald-500" aria-hidden="true" />
-                                                العميل <span className="text-red-500">*</span>
+                                                العميل
                                             </Label>
                                             <Select value={clientId} onValueChange={setClientId} disabled={loadingClients}>
                                                 <SelectTrigger className="rounded-xl border-slate-200">
@@ -632,7 +632,7 @@ export function CreateInvoiceView() {
                                         <div className="space-y-2">
                                             <Label className="text-sm font-medium text-slate-700 flex items-center gap-2">
                                                 <Calendar className="w-4 h-4 text-emerald-500" aria-hidden="true" />
-                                                تاريخ الإصدار <span className="text-red-500">*</span>
+                                                تاريخ الإصدار
                                             </Label>
                                             <Input
                                                 type="date"
@@ -645,7 +645,7 @@ export function CreateInvoiceView() {
                                         <div className="space-y-2">
                                             <Label className="text-sm font-medium text-slate-700 flex items-center gap-2">
                                                 <Calendar className="w-4 h-4 text-emerald-500" aria-hidden="true" />
-                                                شروط الدفع <span className="text-red-500">*</span>
+                                                شروط الدفع
                                             </Label>
                                             <Select value={paymentTerms} onValueChange={(v) => handlePaymentTermsChange(v as PaymentTerms)}>
                                                 <SelectTrigger className="rounded-xl border-slate-200">
@@ -668,7 +668,7 @@ export function CreateInvoiceView() {
                                         <div className="space-y-2">
                                             <Label className="text-sm font-medium text-slate-700 flex items-center gap-2">
                                                 <Calendar className="w-4 h-4 text-emerald-500" aria-hidden="true" />
-                                                تاريخ الاستحقاق <span className="text-red-500">*</span>
+                                                تاريخ الاستحقاق
                                             </Label>
                                             <Input
                                                 type="date"
@@ -676,7 +676,6 @@ export function CreateInvoiceView() {
                                                 onChange={(e) => setDueDate(e.target.value)}
                                                 min={issueDate}
                                                 className="rounded-xl border-slate-200"
-                                                required
                                             />
                                         </div>
                                     </div>
@@ -737,7 +736,7 @@ export function CreateInvoiceView() {
 
                                                     <div className="space-y-2">
                                                         <Label className="text-sm font-medium text-slate-700">
-                                                            المحامي المسؤول <span className="text-red-500">*</span>
+                                                            المحامي المسؤول
                                                         </Label>
                                                         <Select value={responsibleAttorneyId} onValueChange={setResponsibleAttorneyId} disabled={loadingLawyers}>
                                                             <SelectTrigger className="rounded-xl border-slate-200">

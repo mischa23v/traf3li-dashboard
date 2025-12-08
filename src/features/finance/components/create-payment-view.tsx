@@ -507,7 +507,7 @@ export function CreatePaymentView() {
                                         <div className="space-y-2 md:col-span-2">
                                             <Label className="text-sm font-medium text-slate-700 flex items-center gap-2">
                                                 <Wallet className="w-4 h-4 text-emerald-500" />
-                                                المبلغ <span className="text-red-500">*</span>
+                                                المبلغ
                                             </Label>
                                             <Input
                                                 type="number"
@@ -517,7 +517,6 @@ export function CreatePaymentView() {
                                                 onChange={(e) => setAmount(parseFloat(e.target.value) || 0)}
                                                 className="rounded-xl border-slate-200 text-xl font-bold"
                                                 placeholder="0.00"
-                                                required
                                             />
                                         </div>
 
@@ -560,14 +559,13 @@ export function CreatePaymentView() {
                                         <div className="space-y-2">
                                             <Label className="text-sm font-medium text-slate-700 flex items-center gap-2">
                                                 <Calendar className="w-4 h-4 text-emerald-500" aria-hidden="true" />
-                                                تاريخ الدفع <span className="text-red-500">*</span>
+                                                تاريخ الدفع
                                             </Label>
                                             <Input
                                                 type="date"
                                                 value={paymentDate}
                                                 onChange={(e) => setPaymentDate(e.target.value)}
                                                 className="rounded-xl border-slate-200"
-                                                required
                                             />
                                         </div>
 
@@ -590,7 +588,7 @@ export function CreatePaymentView() {
                                         <div className="space-y-2">
                                             <Label className="text-sm font-medium text-slate-700 flex items-center gap-2">
                                                 <User className="w-4 h-4 text-emerald-500" aria-hidden="true" />
-                                                العميل <span className="text-red-500">*</span>
+                                                العميل
                                             </Label>
                                             <Select value={customerId} onValueChange={setCustomerId} disabled={loadingClients}>
                                                 <SelectTrigger className="rounded-xl border-slate-200">
@@ -611,7 +609,7 @@ export function CreatePaymentView() {
                                         <div className="space-y-2">
                                             <Label className="text-sm font-medium text-slate-700 flex items-center gap-2">
                                                 <Building2 className="w-4 h-4 text-emerald-500" aria-hidden="true" />
-                                                المورد <span className="text-red-500">*</span>
+                                                المورد
                                             </Label>
                                             <Select value={vendorId} onValueChange={setVendorId}>
                                                 <SelectTrigger className="rounded-xl border-slate-200">
@@ -673,7 +671,7 @@ export function CreatePaymentView() {
                                         <div className="space-y-2">
                                             <Label className="text-sm font-medium text-slate-700 flex items-center gap-2">
                                                 <Landmark className="w-4 h-4 text-emerald-500" />
-                                                الحساب البنكي <span className="text-red-500">*</span>
+                                                الحساب البنكي
                                             </Label>
                                             <Select value={bankAccountId} onValueChange={setBankAccountId}>
                                                 <SelectTrigger className="rounded-xl border-slate-200">
@@ -703,7 +701,7 @@ export function CreatePaymentView() {
                                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                             <div className="space-y-2">
                                                 <Label className="text-sm font-medium text-slate-700">
-                                                    رقم الشيك <span className="text-red-500">*</span>
+                                                    رقم الشيك
                                                 </Label>
                                                 <Input
                                                     value={checkNumber}
@@ -711,20 +709,18 @@ export function CreatePaymentView() {
                                                     placeholder="123456"
                                                     className="rounded-xl border-slate-200"
                                                     dir="ltr"
-                                                    required
                                                 />
                                             </div>
 
                                             <div className="space-y-2">
                                                 <Label className="text-sm font-medium text-slate-700">
-                                                    تاريخ الشيك <span className="text-red-500">*</span>
+                                                    تاريخ الشيك
                                                 </Label>
                                                 <Input
                                                     type="date"
                                                     value={checkDate}
                                                     onChange={(e) => setCheckDate(e.target.value)}
                                                     className="rounded-xl border-slate-200"
-                                                    required
                                                 />
                                             </div>
 
@@ -748,7 +744,7 @@ export function CreatePaymentView() {
                                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                             <div className="space-y-2">
                                                 <Label className="text-sm font-medium text-slate-700">
-                                                    البنك الساحب <span className="text-red-500">*</span>
+                                                    البنك الساحب
                                                 </Label>
                                                 <Select value={checkBank} onValueChange={setCheckBank}>
                                                     <SelectTrigger className="rounded-xl border-slate-200">
@@ -811,7 +807,7 @@ export function CreatePaymentView() {
                                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                             <div className="space-y-2">
                                                 <Label className="text-sm font-medium text-slate-700">
-                                                    آخر 4 أرقام <span className="text-red-500">*</span>
+                                                    آخر 4 أرقام
                                                 </Label>
                                                 <Input
                                                     value={cardLastFour}
@@ -1162,7 +1158,7 @@ export function CreatePaymentView() {
                                             <div className="space-y-4">
                                                 <div className="space-y-2">
                                                     <Label className="text-sm font-medium text-slate-700">
-                                                        الدفعة الأصلية <span className="text-red-500">*</span>
+                                                        الدفعة الأصلية
                                                     </Label>
                                                     <Select value={originalPaymentId} onValueChange={setOriginalPaymentId}>
                                                         <SelectTrigger className="rounded-xl border-slate-200">
@@ -1177,7 +1173,7 @@ export function CreatePaymentView() {
 
                                                 <div className="space-y-2">
                                                     <Label className="text-sm font-medium text-slate-700">
-                                                        سبب الاسترداد <span className="text-red-500">*</span>
+                                                        سبب الاسترداد
                                                     </Label>
                                                     <Select value={refundReason} onValueChange={setRefundReason}>
                                                         <SelectTrigger className="rounded-xl border-slate-200">
