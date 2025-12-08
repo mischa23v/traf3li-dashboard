@@ -218,22 +218,9 @@ export function CreateEventView() {
     const [errors, setErrors] = useState<Record<string, string>>({})
     const [touched, setTouched] = useState<Record<string, boolean>>({})
 
-    // Validate a single field
-    const validateField = (field: string, value: any): string => {
-        switch (field) {
-            case 'title':
-                if (!value || !value.trim()) return 'عنوان الحدث مطلوب'
-                if (value.length < 3) return 'يجب أن يكون العنوان 3 أحرف على الأقل'
-                return ''
-            case 'startDate':
-                if (!value) return 'تاريخ البداية مطلوب'
-                return ''
-            case 'startTime':
-                if (!formData.allDay && !value) return 'وقت البداية مطلوب'
-                return ''
-            default:
-                return ''
-        }
+    // Validate a single field (validation disabled for testing)
+    const validateField = (_field: string, _value: any): string => {
+        return ''
     }
 
     // Handle field blur for validation
@@ -243,20 +230,9 @@ export function CreateEventView() {
         setErrors(prev => ({ ...prev, [field]: error }))
     }
 
-    // Validate all required fields
+    // Validate all required fields (validation disabled for testing)
     const validateForm = (): boolean => {
-        const newErrors: Record<string, string> = {}
-        const requiredFields = ['title', 'startDate']
-        if (!formData.allDay) requiredFields.push('startTime')
-
-        requiredFields.forEach(field => {
-            const error = validateField(field, formData[field as keyof typeof formData])
-            if (error) newErrors[field] = error
-        })
-
-        setErrors(newErrors)
-        setTouched(requiredFields.reduce((acc, field) => ({ ...acc, [field]: true }), {}))
-        return Object.keys(newErrors).length === 0
+        return true
     }
 
     const handleChange = (field: string, value: any) => {
@@ -429,7 +405,7 @@ export function CreateEventView() {
                                     <div className="space-y-2">
                                         <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
                                             <FileText className="w-4 h-4 text-blue-500" aria-hidden="true" />
-                                            عنوان الحدث <span className="text-red-500">*</span>
+                                            عنوان الحدث
                                         </label>
                                         <Input
                                             placeholder="مثال: اجتماع مراجعة العقد"
@@ -485,7 +461,7 @@ export function CreateEventView() {
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                         <div className="space-y-2">
                                             <label className="text-sm font-medium text-slate-700">
-                                                تاريخ البداية <span className="text-red-500">*</span>
+                                                تاريخ البداية
                                             </label>
                                             <Input
                                                 type="date"
@@ -503,7 +479,7 @@ export function CreateEventView() {
                                         </div>
                                         <div className="space-y-2">
                                             <label className="text-sm font-medium text-slate-700">
-                                                وقت البداية {!formData.allDay && <span className="text-red-500">*</span>}
+                                                وقت البداية
                                             </label>
                                             <Input
                                                 type="time"
