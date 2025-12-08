@@ -79,6 +79,8 @@ export function ProductivityHero({ badge, title, type = 'tasks', hideButtons = f
         'crm-reports': { label: t('hero.list.crmReports'), href: '/dashboard/crm/reports' },
         'sales-reports': { label: t('hero.list.salesReports'), href: '/dashboard/sales/reports' },
         'email-marketing': { label: t('hero.list.campaigns'), href: '/dashboard/crm/email-marketing' },
+        'lead-scoring': { label: t('hero.list.leads'), href: '/dashboard/crm/leads' },
+        'whatsapp': { label: t('hero.list.leads'), href: '/dashboard/crm/leads' },
     }
 
     const buttonConfig: Record<string, { label: string; href: string }> = {
@@ -94,6 +96,8 @@ export function ProductivityHero({ badge, title, type = 'tasks', hideButtons = f
         referrals: { label: t('hero.new.referral'), href: '/dashboard/crm/referrals/new' },
         activities: { label: t('hero.new.activity'), href: '/dashboard/crm/activities/new' },
         'email-marketing': { label: t('hero.new.campaign'), href: '/dashboard/crm/email-marketing/new' },
+        'lead-scoring': { label: t('hero.new.lead'), href: '/dashboard/crm/leads/new' },
+        'whatsapp': { label: t('hero.new.lead'), href: '/dashboard/crm/leads/new' },
         cases: { label: t('hero.new.case'), href: '/dashboard/cases/new' },
         documents: { label: t('hero.new.document'), href: '/dashboard/documents/new' },
         invoices: { label: t('hero.new.invoice'), href: '/dashboard/finance/invoices/new' },
