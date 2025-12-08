@@ -18,6 +18,8 @@ import type {
   AddDependencyData,
   AutoScheduleOptions,
   AutoScheduleResult,
+  ProductivityResponse,
+  ProductivityFilters,
 } from '@/types/gantt'
 
 // ═══════════════════════════════════════════════════════════════
@@ -46,6 +48,22 @@ export const ganttService = {
   getDHtmlxData: async (caseId: string): Promise<GanttData> => {
     try {
       const response = await apiClient.get(`/gantt/case/${caseId}/dhtmlx`)
+      return response.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Get productivity Gantt data (tasks + reminders + events)
+   */
+  getProductivityData: async (filters?: ProductivityFilters): Promise<ProductivityResponse> => {
+    try {
+      const params = new URLSearchParams()
+      if (filters?.startDate) params.set('startDate', filters.startDate)
+      if (filters?.endDate) params.set('endDate', filters.endDate)
+
+      const response = await apiClient.get(`/gantt/productivity?${params}`)
       return response.data
     } catch (error: any) {
       throw new Error(handleApiError(error))

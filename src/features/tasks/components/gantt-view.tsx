@@ -5,18 +5,13 @@ import {
   ZoomOut,
   Calendar,
   Flag,
-  Users,
-  Download,
   Filter,
-  ChevronDown,
   RotateCcw,
-  Milestone,
   Bell,
   AlertCircle,
   Briefcase,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
 import { Header } from '@/components/layout/header'
 import { TopNav } from '@/components/layout/top-nav'
 import { DynamicIsland } from '@/components/dynamic-island'
@@ -36,44 +31,40 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-  DropdownMenuSeparator,
-} from '@/components/ui/dropdown-menu'
-import {
-  useDHtmlxGanttData,
+  useProductivityGanttData,
   useUpdateTaskSchedule,
   useUpdateTaskProgress,
-  useCriticalPath,
-  useMilestones,
-  useExportGanttPDF,
-  useExportGanttExcel,
 } from '@/hooks/useGantt'
-import type { TimeScale } from '@/types/gantt'
+import type { TimeScale, SourceType } from '@/types/gantt'
 
 // Gantt will be loaded dynamically
 let gantt: any = null
 
-export function GanttView({ caseId }: { caseId: string }) {
+export function GanttView() {
   const { t, i18n } = useTranslation()
   const isRTL = i18n.language === 'ar'
   const containerRef = useRef<HTMLDivElement>(null)
   const [isGanttLoaded, setIsGanttLoaded] = useState(false)
   const [timeScale, setTimeScale] = useState<TimeScale>('day')
   const [showCriticalPath, setShowCriticalPath] = useState(false)
+  const [filterType, setFilterType] = useState<SourceType | 'all'>('all')
 
-  // Fetch data
-  const { data: ganttData, isLoading, isError, error, refetch } = useDHtmlxGanttData(caseId)
-  const { data: criticalPathData } = useCriticalPath(caseId)
-  const { data: milestones } = useMilestones(caseId)
+  // Fetch productivity data (tasks + reminders + events)
+  const { data: productivityData, isLoading, isError, error, refetch } = useProductivityGanttData()
+
+  // Derived data for DHTMLX Gantt
+  const ganttData = productivityData ? {
+    data: filterType === 'all'
+      ? productivityData.data
+      : productivityData.data.filter(item => item.sourceType === filterType),
+    links: productivityData.links
+  } : null
+
+  const summary = productivityData?.summary
 
   // Mutations
   const { mutate: updateSchedule } = useUpdateTaskSchedule()
   const { mutate: updateProgress } = useUpdateTaskProgress()
-  const { mutate: exportPDF, isPending: exportingPDF } = useExportGanttPDF()
-  const { mutate: exportExcel, isPending: exportingExcel } = useExportGanttExcel()
 
   const topNav = [
     { title: t('tasks.nav.overview'), href: '/dashboard/overview', isActive: false },
@@ -163,14 +154,20 @@ export function GanttView({ caseId }: { caseId: string }) {
     // Enable critical path highlighting
     gantt.config.highlight_critical_path = showCriticalPath
 
-    // Task templates
+    // Task templates - Color by source type and priority
     gantt.templates.task_class = (start: Date, end: Date, task: any) => {
       let classes = []
-      if (task.priority === 'urgent') classes.push('gantt-task-urgent')
-      if (task.priority === 'high') classes.push('gantt-task-high')
-      if (task.isCritical || criticalPathData?.criticalTasks?.includes(task.id)) {
-        classes.push('gantt-task-critical')
+      // Source type styling
+      if (task.sourceType === 'reminder') classes.push('gantt-task-reminder')
+      if (task.sourceType === 'event') classes.push('gantt-task-event')
+      // Priority styling for tasks
+      if (task.sourceType === 'task') {
+        if (task.priority === 'urgent' || task.priority === 'critical') classes.push('gantt-task-urgent')
+        if (task.priority === 'high') classes.push('gantt-task-high')
       }
+      // Overdue tasks
+      if (task.isOverdue) classes.push('gantt-task-critical')
+      // Milestones
       if (task.type === 'milestone') classes.push('gantt-milestone')
       return classes.join(' ')
     }
@@ -178,28 +175,34 @@ export function GanttView({ caseId }: { caseId: string }) {
     // Initialize
     gantt.init(containerRef.current)
 
-    // Event handlers
+    // Event handlers - only allow editing tasks (not reminders/events through Gantt drag)
     gantt.attachEvent('onAfterTaskDrag', (id: string, mode: any) => {
       const task = gantt.getTask(id)
-      updateSchedule({
-        taskId: id,
-        data: {
-          startDate: task.start_date,
-          endDate: task.end_date,
-          duration: task.duration,
-        },
-      })
+      // Only update if it's a task (not reminder or event)
+      if (task.sourceType === 'task' && task.sourceId) {
+        updateSchedule({
+          taskId: task.sourceId,
+          data: {
+            startDate: task.start_date,
+            endDate: task.end_date,
+            duration: task.duration,
+          },
+        })
+      }
     })
 
     gantt.attachEvent('onAfterProgressDrag', (id: string, progress: number) => {
-      updateProgress({ taskId: id, progress })
+      const task = gantt.getTask(id)
+      if (task.sourceType === 'task' && task.sourceId) {
+        updateProgress({ taskId: task.sourceId, progress })
+      }
     })
 
     // Cleanup
     return () => {
       gantt.clearAll()
     }
-  }, [isGanttLoaded, isRTL, timeScale, showCriticalPath, t, criticalPathData])
+  }, [isGanttLoaded, isRTL, timeScale, showCriticalPath, t, updateSchedule, updateProgress])
 
   // Load data into Gantt
   useEffect(() => {
@@ -274,21 +277,6 @@ export function GanttView({ caseId }: { caseId: string }) {
       gantt.config.highlight_critical_path = !showCriticalPath
       gantt.render()
     }
-  }
-
-  const handleExportPDF = () => {
-    exportPDF({
-      caseId,
-      options: {
-        showCriticalPath,
-        pageSize: 'A3',
-        orientation: 'landscape',
-      },
-    })
-  }
-
-  const handleExportExcel = () => {
-    exportExcel(caseId)
   }
 
   const handleFitToView = () => {
@@ -397,60 +385,42 @@ export function GanttView({ caseId }: { caseId: string }) {
                     {t('ganttTasks.criticalPath')}
                   </Button>
 
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="outline" className="h-9 rounded-xl">
-                        <Filter className="h-4 w-4 me-2" />
-                        {t('common.filter')}
-                        <ChevronDown className="h-4 w-4 ms-2" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem>{t('ganttTasks.filterByAssignee')}</DropdownMenuItem>
-                      <DropdownMenuItem>{t('ganttTasks.filterByStatus')}</DropdownMenuItem>
-                      <DropdownMenuItem>{t('ganttTasks.filterByPriority')}</DropdownMenuItem>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem>{t('common.clearFilters')}</DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+                  {/* Filter by Type */}
+                  <Select value={filterType} onValueChange={(v) => setFilterType(v as SourceType | 'all')}>
+                    <SelectTrigger className="w-36 rounded-xl">
+                      <Filter className="h-4 w-4 me-2" />
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">{t('ganttTasks.filterAll')}</SelectItem>
+                      <SelectItem value="task">{t('ganttTasks.filterTasks')}</SelectItem>
+                      <SelectItem value="reminder">{t('ganttTasks.filterReminders')}</SelectItem>
+                      <SelectItem value="event">{t('ganttTasks.filterEvents')}</SelectItem>
+                    </SelectContent>
+                  </Select>
 
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="outline" className="h-9 rounded-xl">
-                        <Download className="h-4 w-4 me-2" />
-                        {t('common.export')}
-                        <ChevronDown className="h-4 w-4 ms-2" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem onClick={handleExportPDF} disabled={exportingPDF}>
-                        {t('common.exportPDF')}
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={handleExportExcel} disabled={exportingExcel}>
-                        {t('common.exportExcel')}
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
                 </div>
               </div>
             </div>
 
             {/* Stats Cards */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {/* Total Tasks */}
               <div className="bg-white rounded-2xl p-4 shadow-sm border border-slate-100">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center">
-                    <Calendar className="h-5 w-5 text-blue-600" />
+                  <div className="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center">
+                    <Calendar className="h-5 w-5 text-emerald-600" />
                   </div>
                   <div>
                     <div className="text-xl font-bold text-navy">
-                      {ganttData?.data?.length || 0}
+                      {summary?.tasks.total || 0}
                     </div>
                     <div className="text-xs text-slate-500">{t('ganttTasks.totalTasks')}</div>
                   </div>
                 </div>
               </div>
 
+              {/* Overdue/Critical Tasks */}
               <div className="bg-white rounded-2xl p-4 shadow-sm border border-slate-100">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-xl bg-red-50 flex items-center justify-center">
@@ -458,37 +428,39 @@ export function GanttView({ caseId }: { caseId: string }) {
                   </div>
                   <div>
                     <div className="text-xl font-bold text-navy">
-                      {criticalPathData?.criticalTasks?.length || 0}
+                      {summary?.tasks.overdue || 0}
                     </div>
-                    <div className="text-xs text-slate-500">{t('ganttTasks.criticalTasks')}</div>
+                    <div className="text-xs text-slate-500">{t('ganttTasks.overdueTasks')}</div>
                   </div>
                 </div>
               </div>
 
+              {/* Reminders */}
               <div className="bg-white rounded-2xl p-4 shadow-sm border border-slate-100">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-purple-50 flex items-center justify-center">
-                    <Milestone className="h-5 w-5 text-purple-600" />
+                  <div className="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center">
+                    <Bell className="h-5 w-5 text-amber-600" />
                   </div>
                   <div>
                     <div className="text-xl font-bold text-navy">
-                      {milestones?.length || 0}
+                      {summary?.reminders.pending || 0}
                     </div>
-                    <div className="text-xs text-slate-500">{t('ganttTasks.milestones')}</div>
+                    <div className="text-xs text-slate-500">{t('ganttTasks.pendingReminders')}</div>
                   </div>
                 </div>
               </div>
 
+              {/* Events */}
               <div className="bg-white rounded-2xl p-4 shadow-sm border border-slate-100">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center">
-                    <Users className="h-5 w-5 text-emerald-600" />
+                  <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center">
+                    <Calendar className="h-5 w-5 text-blue-600" />
                   </div>
                   <div>
                     <div className="text-xl font-bold text-navy">
-                      {criticalPathData?.totalDuration || 0}
+                      {summary?.events.upcoming || 0}
                     </div>
-                    <div className="text-xs text-slate-500">{t('ganttTasks.projectDuration')}</div>
+                    <div className="text-xs text-slate-500">{t('ganttTasks.upcomingEvents')}</div>
                   </div>
                 </div>
               </div>
@@ -556,26 +528,41 @@ export function GanttView({ caseId }: { caseId: string }) {
           .gantt-container {
             font-family: 'IBM Plex Sans Arabic', sans-serif;
           }
-          .gantt_task_line.gantt-task-critical {
-            background-color: #ef4444 !important;
-            border-color: #dc2626 !important;
-          }
-          .gantt_task_line.gantt-task-urgent {
-            background-color: #f59e0b !important;
-            border-color: #d97706 !important;
-          }
-          .gantt_task_line.gantt-task-high {
-            background-color: #3b82f6 !important;
-            border-color: #2563eb !important;
-          }
+          /* Default task style (emerald) */
           .gantt_task_line {
             background-color: #10b981;
             border-color: #059669;
             border-radius: 4px;
           }
+          /* Reminder tasks (amber) */
+          .gantt_task_line.gantt-task-reminder {
+            background-color: #f59e0b !important;
+            border-color: #d97706 !important;
+          }
+          /* Event tasks (blue) */
+          .gantt_task_line.gantt-task-event {
+            background-color: #3b82f6 !important;
+            border-color: #2563eb !important;
+          }
+          /* Critical/Overdue tasks (red) */
+          .gantt_task_line.gantt-task-critical {
+            background-color: #ef4444 !important;
+            border-color: #dc2626 !important;
+          }
+          /* Urgent priority tasks (orange) */
+          .gantt_task_line.gantt-task-urgent {
+            background-color: #f97316 !important;
+            border-color: #ea580c !important;
+          }
+          /* High priority tasks (blue) */
+          .gantt_task_line.gantt-task-high {
+            background-color: #3b82f6 !important;
+            border-color: #2563eb !important;
+          }
           .gantt_task_progress {
             background-color: rgba(0, 0, 0, 0.2);
           }
+          /* Milestones (purple) */
           .gantt_milestone {
             background-color: #8b5cf6 !important;
           }
