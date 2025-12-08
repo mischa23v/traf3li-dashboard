@@ -168,17 +168,7 @@ export function ReferralsListView() {
         className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-r border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']"
       >
         {/* HERO CARD */}
-        <ProductivityHero badge="إدارة مصادر الإحالة" title="إدارة مصادر الإحالة" type="referrals" hideButtons={true}>
-          <Button
-            asChild
-            className="bg-emerald-500 hover:bg-emerald-600 text-white h-12 px-8 rounded-xl font-bold shadow-lg shadow-emerald-500/20 border-0"
-          >
-            <Link to="/dashboard/crm/referrals/new">
-              <Plus className="ms-2 h-5 w-5" aria-hidden="true" />
-              مصدر إحالة جديد
-            </Link>
-          </Button>
-        </ProductivityHero>
+        <ProductivityHero badge="إدارة مصادر الإحالة" title="الإحالات" type="referrals" />
 
         {/* Stats Cards */}
         {stats && (

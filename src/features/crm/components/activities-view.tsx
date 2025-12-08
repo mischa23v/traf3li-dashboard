@@ -610,30 +610,7 @@ export function ActivitiesView() {
         className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-6 rounded-tr-3xl shadow-inner border-r border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']"
       >
         {/* Header */}
-        <ProductivityHero badge="سجل الأنشطة" title="سجل الأنشطة" type="activities" hideButtons={true}>
-          <div className="flex items-center gap-3">
-            <Select value={dateRange} onValueChange={setDateRange}>
-              <SelectTrigger className="w-[140px] rounded-xl bg-white/10 border-white/10 text-white">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {DATE_RANGES.map((range) => (
-                  <SelectItem key={range.value} value={range.value}>
-                    {range.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <QuickLogDialog
-              trigger={
-                <Button className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl shadow-lg border-0">
-                  <Plus className="ms-2 h-4 w-4" aria-hidden="true" />
-                  تسجيل نشاط
-                </Button>
-              }
-            />
-          </div>
-        </ProductivityHero>
+        <ProductivityHero badge="سجل الأنشطة" title="سجل الأنشطة" type="activities" />
 
         {/* Stats Cards */}
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
