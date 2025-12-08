@@ -3,7 +3,7 @@
  * Displays notification icon with unread count and dropdown
  */
 
-import { useState } from 'react'
+import { useState, memo } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 import { Bell, Check, CheckCheck, Trash2, ExternalLink } from 'lucide-react'
@@ -47,7 +47,7 @@ interface NotificationItemProps {
   onClick?: () => void
 }
 
-function NotificationItem({ notification, onRead, onClick }: NotificationItemProps) {
+const NotificationItem = memo(function NotificationItem({ notification, onRead, onClick }: NotificationItemProps) {
   const { i18n } = useTranslation()
   const isRtl = i18n.language === 'ar'
   const locale = isRtl ? ar : enUS
@@ -103,7 +103,7 @@ function NotificationItem({ notification, onRead, onClick }: NotificationItemPro
       </div>
     </div>
   )
-}
+})
 
 export function NotificationBell() {
   const navigate = useNavigate()

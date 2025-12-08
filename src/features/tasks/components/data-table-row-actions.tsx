@@ -1,3 +1,4 @@
+import { memo } from 'react'
 import { DotsHorizontalIcon } from '@radix-ui/react-icons'
 import { type Row } from '@tanstack/react-table'
 import { Trash2 } from 'lucide-react'
@@ -23,7 +24,7 @@ type DataTableRowActionsProps<TData> = {
   row: Row<TData>
 }
 
-export function DataTableRowActions<TData>({
+function DataTableRowActionsInner<TData>({
   row,
 }: DataTableRowActionsProps<TData>) {
   const task = taskSchema.parse(row.original)
@@ -81,3 +82,6 @@ export function DataTableRowActions<TData>({
     </DropdownMenu>
   )
 }
+
+// Memoized for performance in large lists
+export const DataTableRowActions = memo(DataTableRowActionsInner) as typeof DataTableRowActionsInner

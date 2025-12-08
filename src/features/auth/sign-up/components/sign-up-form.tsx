@@ -653,7 +653,7 @@ export function SignUpForm() {
                     <div className="relative">
                       <div className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500"><Icons.Lock /></div>
                       <input type={showPassword ? 'text' : 'password'} value={formData.password} onChange={(e) => updateField('password', e.target.value)} className={`w-full h-12 pe-12 ps-12 rounded-xl border bg-slate-50 text-[#0f172a] outline-none transition-all ${errors.password ? 'border-red-400' : 'border-slate-200 focus:border-[#0f172a]'}`} dir="ltr" style={{ textAlign: 'left' }} />
-                      <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-600">{showPassword ? <Icons.EyeOff /> : <Icons.Eye />}</button>
+                      <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-600" aria-label={showPassword ? 'إخفاء كلمة المرور' : 'إظهار كلمة المرور'}>{showPassword ? <Icons.EyeOff /> : <Icons.Eye />}</button>
                     </div>
                     {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password}</p>}
                   </div>
@@ -662,7 +662,7 @@ export function SignUpForm() {
                     <div className="relative">
                       <div className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500"><Icons.Lock /></div>
                       <input type={showConfirmPassword ? 'text' : 'password'} value={formData.confirmPassword} onChange={(e) => updateField('confirmPassword', e.target.value)} className={`w-full h-12 pe-12 ps-12 rounded-xl border bg-slate-50 text-[#0f172a] outline-none transition-all ${errors.confirmPassword ? 'border-red-400' : 'border-slate-200 focus:border-[#0f172a]'}`} dir="ltr" style={{ textAlign: 'left' }} />
-                      <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-600">{showConfirmPassword ? <Icons.EyeOff /> : <Icons.Eye />}</button>
+                      <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-600" aria-label={showConfirmPassword ? 'إخفاء تأكيد كلمة المرور' : 'إظهار تأكيد كلمة المرور'}>{showConfirmPassword ? <Icons.EyeOff /> : <Icons.Eye />}</button>
                     </div>
                     {errors.confirmPassword && <p className="text-red-500 text-xs mt-1">{errors.confirmPassword}</p>}
                   </div>
@@ -743,16 +743,16 @@ export function SignUpForm() {
                 (currentStep === 4 && formData.lawyerWorkMode === 'create_firm')) && (
                 <div className="space-y-3">
                   <div className={`flex items-start gap-3 p-4 rounded-xl border ${errors.agreedTerms ? 'border-red-300' : formData.agreedTerms ? 'border-emerald-200 bg-emerald-50/50' : 'border-slate-200'}`}>
-                    <button type="button" onClick={() => updateField('agreedTerms', !formData.agreedTerms)} className={`w-6 h-6 rounded-lg border-2 flex items-center justify-center shrink-0 ${formData.agreedTerms ? 'bg-emerald-500 border-emerald-500 text-white' : 'border-slate-300'}`}>{formData.agreedTerms && <Icons.Check />}</button>
+                    <button type="button" role="checkbox" aria-checked={formData.agreedTerms} aria-label="الموافقة على الشروط والأحكام" onClick={() => updateField('agreedTerms', !formData.agreedTerms)} className={`w-6 h-6 rounded-lg border-2 flex items-center justify-center shrink-0 ${formData.agreedTerms ? 'bg-emerald-500 border-emerald-500 text-white' : 'border-slate-300'}`}>{formData.agreedTerms && <Icons.Check />}</button>
                     <span className="text-[#0f172a]">أقر بموافقتي على <a href="/terms" target="_blank" rel="noopener noreferrer" className="text-emerald-600 font-medium hover:underline">الشروط والأحكام</a></span>
                   </div>
                   <div className={`flex items-start gap-3 p-4 rounded-xl border ${errors.agreedPrivacy ? 'border-red-300' : formData.agreedPrivacy ? 'border-emerald-200 bg-emerald-50/50' : 'border-slate-200'}`}>
-                    <button type="button" onClick={() => updateField('agreedPrivacy', !formData.agreedPrivacy)} className={`w-6 h-6 rounded-lg border-2 flex items-center justify-center shrink-0 ${formData.agreedPrivacy ? 'bg-emerald-500 border-emerald-500 text-white' : 'border-slate-300'}`}>{formData.agreedPrivacy && <Icons.Check />}</button>
+                    <button type="button" role="checkbox" aria-checked={formData.agreedPrivacy} aria-label="الموافقة على سياسة الخصوصية" onClick={() => updateField('agreedPrivacy', !formData.agreedPrivacy)} className={`w-6 h-6 rounded-lg border-2 flex items-center justify-center shrink-0 ${formData.agreedPrivacy ? 'bg-emerald-500 border-emerald-500 text-white' : 'border-slate-300'}`}>{formData.agreedPrivacy && <Icons.Check />}</button>
                     <span className="text-[#0f172a]">أقر بموافقتي على <a href="/privacy" target="_blank" rel="noopener noreferrer" className="text-emerald-600 font-medium hover:underline">سياسة الخصوصية</a></span>
                   </div>
                   {formData.userType === 'lawyer' && (
                     <div className={`flex items-start gap-3 p-4 rounded-xl border ${errors.agreedConflict ? 'border-red-300' : formData.agreedConflict ? 'border-emerald-200 bg-emerald-50/50' : 'border-slate-200'}`}>
-                      <button type="button" onClick={() => updateField('agreedConflict', !formData.agreedConflict)} className={`w-6 h-6 rounded-lg border-2 flex items-center justify-center shrink-0 ${formData.agreedConflict ? 'bg-emerald-500 border-emerald-500 text-white' : 'border-slate-300'}`}>{formData.agreedConflict && <Icons.Check />}</button>
+                      <button type="button" role="checkbox" aria-checked={formData.agreedConflict} aria-label="الموافقة على سياسة تعارض المصالح" onClick={() => updateField('agreedConflict', !formData.agreedConflict)} className={`w-6 h-6 rounded-lg border-2 flex items-center justify-center shrink-0 ${formData.agreedConflict ? 'bg-emerald-500 border-emerald-500 text-white' : 'border-slate-300'}`}>{formData.agreedConflict && <Icons.Check />}</button>
                       <span className="text-[#0f172a]">أقر بموافقتي على <a href="/conflict-policy" target="_blank" rel="noopener noreferrer" className="text-emerald-600 font-medium hover:underline">سياسة تعارض المصالح</a></span>
                     </div>
                   )}
@@ -770,7 +770,7 @@ export function SignUpForm() {
                         <div className="relative">
                           <div className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500"><Icons.Lock /></div>
                           <input type={showPassword ? 'text' : 'password'} value={formData.password} onChange={(e) => updateField('password', e.target.value)} className={`w-full h-12 pe-12 ps-12 rounded-xl border bg-slate-50 text-[#0f172a] outline-none transition-all ${errors.password ? 'border-red-400' : 'border-slate-200 focus:border-[#0f172a]'}`} dir="ltr" style={{ textAlign: 'left' }} />
-                          <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-600">{showPassword ? <Icons.EyeOff /> : <Icons.Eye />}</button>
+                          <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-600" aria-label={showPassword ? 'إخفاء كلمة المرور' : 'إظهار كلمة المرور'}>{showPassword ? <Icons.EyeOff /> : <Icons.Eye />}</button>
                         </div>
                         {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password}</p>}
                       </div>
@@ -779,7 +779,7 @@ export function SignUpForm() {
                         <div className="relative">
                           <div className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500"><Icons.Lock /></div>
                           <input type={showConfirmPassword ? 'text' : 'password'} value={formData.confirmPassword} onChange={(e) => updateField('confirmPassword', e.target.value)} className={`w-full h-12 pe-12 ps-12 rounded-xl border bg-slate-50 text-[#0f172a] outline-none transition-all ${errors.confirmPassword ? 'border-red-400' : 'border-slate-200 focus:border-[#0f172a]'}`} dir="ltr" style={{ textAlign: 'left' }} />
-                          <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-600">{showConfirmPassword ? <Icons.EyeOff /> : <Icons.Eye />}</button>
+                          <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-600" aria-label={showConfirmPassword ? 'إخفاء تأكيد كلمة المرور' : 'إظهار تأكيد كلمة المرور'}>{showConfirmPassword ? <Icons.EyeOff /> : <Icons.Eye />}</button>
                         </div>
                         {errors.confirmPassword && <p className="text-red-500 text-xs mt-1">{errors.confirmPassword}</p>}
                       </div>
@@ -984,15 +984,15 @@ export function SignUpForm() {
                   {currentStep === 9 && (
                     <div className="space-y-3">
                       <div className={`flex items-start gap-3 p-4 rounded-xl border ${errors.agreedTerms ? 'border-red-300' : formData.agreedTerms ? 'border-emerald-200 bg-emerald-50/50' : 'border-slate-200'}`}>
-                        <button type="button" onClick={() => updateField('agreedTerms', !formData.agreedTerms)} className={`w-6 h-6 rounded-lg border-2 flex items-center justify-center shrink-0 ${formData.agreedTerms ? 'bg-emerald-500 border-emerald-500 text-white' : 'border-slate-300'}`}>{formData.agreedTerms && <Icons.Check />}</button>
+                        <button type="button" role="checkbox" aria-checked={formData.agreedTerms} aria-label="الموافقة على الشروط والأحكام" onClick={() => updateField('agreedTerms', !formData.agreedTerms)} className={`w-6 h-6 rounded-lg border-2 flex items-center justify-center shrink-0 ${formData.agreedTerms ? 'bg-emerald-500 border-emerald-500 text-white' : 'border-slate-300'}`}>{formData.agreedTerms && <Icons.Check />}</button>
                         <span className="text-[#0f172a]">أقر بموافقتي على <a href="/terms" target="_blank" rel="noopener noreferrer" className="text-emerald-600 font-medium hover:underline">الشروط والأحكام</a></span>
                       </div>
                       <div className={`flex items-start gap-3 p-4 rounded-xl border ${errors.agreedPrivacy ? 'border-red-300' : formData.agreedPrivacy ? 'border-emerald-200 bg-emerald-50/50' : 'border-slate-200'}`}>
-                        <button type="button" onClick={() => updateField('agreedPrivacy', !formData.agreedPrivacy)} className={`w-6 h-6 rounded-lg border-2 flex items-center justify-center shrink-0 ${formData.agreedPrivacy ? 'bg-emerald-500 border-emerald-500 text-white' : 'border-slate-300'}`}>{formData.agreedPrivacy && <Icons.Check />}</button>
+                        <button type="button" role="checkbox" aria-checked={formData.agreedPrivacy} aria-label="الموافقة على سياسة الخصوصية" onClick={() => updateField('agreedPrivacy', !formData.agreedPrivacy)} className={`w-6 h-6 rounded-lg border-2 flex items-center justify-center shrink-0 ${formData.agreedPrivacy ? 'bg-emerald-500 border-emerald-500 text-white' : 'border-slate-300'}`}>{formData.agreedPrivacy && <Icons.Check />}</button>
                         <span className="text-[#0f172a]">أقر بموافقتي على <a href="/privacy" target="_blank" rel="noopener noreferrer" className="text-emerald-600 font-medium hover:underline">سياسة الخصوصية</a></span>
                       </div>
                       <div className={`flex items-start gap-3 p-4 rounded-xl border ${errors.agreedConflict ? 'border-red-300' : formData.agreedConflict ? 'border-emerald-200 bg-emerald-50/50' : 'border-slate-200'}`}>
-                        <button type="button" onClick={() => updateField('agreedConflict', !formData.agreedConflict)} className={`w-6 h-6 rounded-lg border-2 flex items-center justify-center shrink-0 ${formData.agreedConflict ? 'bg-emerald-500 border-emerald-500 text-white' : 'border-slate-300'}`}>{formData.agreedConflict && <Icons.Check />}</button>
+                        <button type="button" role="checkbox" aria-checked={formData.agreedConflict} aria-label="الموافقة على سياسة تعارض المصالح" onClick={() => updateField('agreedConflict', !formData.agreedConflict)} className={`w-6 h-6 rounded-lg border-2 flex items-center justify-center shrink-0 ${formData.agreedConflict ? 'bg-emerald-500 border-emerald-500 text-white' : 'border-slate-300'}`}>{formData.agreedConflict && <Icons.Check />}</button>
                         <span className="text-[#0f172a]">أقر بموافقتي على <a href="/conflict-policy" target="_blank" rel="noopener noreferrer" className="text-emerald-600 font-medium hover:underline">سياسة تعارض المصالح</a></span>
                       </div>
                     </div>
