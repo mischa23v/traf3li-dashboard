@@ -1029,7 +1029,12 @@
       "goToPage": "الانتقال إلى الصفحة {{page}}"
     },
     "selectAll": "تحديد الكل",
-    "selectRow": "تحديد الصف"
+    "selectRow": "تحديد الصف",
+    "noResults": "لا توجد نتائج.",
+    "viewOptions": {
+      "view": "عرض",
+      "toggleColumns": "تبديل الأعمدة"
+    }
   },
   "errors": {
     "404": {

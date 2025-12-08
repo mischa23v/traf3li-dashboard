@@ -1022,7 +1022,12 @@
       "goToPage": "Go to page {{page}}"
     },
     "selectAll": "Select all",
-    "selectRow": "Select row"
+    "selectRow": "Select row",
+    "noResults": "No results.",
+    "viewOptions": {
+      "view": "View",
+      "toggleColumns": "Toggle columns"
+    }
   },
   "errors": {
     "404": {

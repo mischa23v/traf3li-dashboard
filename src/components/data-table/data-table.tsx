@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import {
   flexRender,
   getCoreRowModel,
@@ -48,6 +49,7 @@ export function DataTable<TData, TValue = unknown>({
   toolbar,
   showPagination = true,
 }: DataTableProps<TData, TValue>) {
+  const { t } = useTranslation()
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
@@ -158,7 +160,7 @@ export function DataTable<TData, TValue = unknown>({
                   colSpan={table.getAllColumns().length}
                   className='h-24 text-center'
                 >
-                  No results.
+                  {t('dataTable.noResults')}
                 </TableCell>
               </TableRow>
             )}
