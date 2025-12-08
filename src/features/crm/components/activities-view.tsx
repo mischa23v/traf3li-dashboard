@@ -775,14 +775,12 @@ export function ActivitiesView() {
                   <p className="text-slate-500 mb-4">
                     {searchQuery ? 'لا توجد نتائج مطابقة للبحث' : 'سيتم عرض الأنشطة هنا عند إضافتها'}
                   </p>
-                  <QuickLogDialog
-                    trigger={
-                      <Button className="bg-emerald-500 hover:bg-emerald-600 rounded-xl">
-                        <Plus className="ms-2 h-4 w-4" aria-hidden="true" />
-                        تسجيل أول نشاط
-                      </Button>
-                    }
-                  />
+                  <Button asChild className="bg-emerald-500 hover:bg-emerald-600 rounded-xl">
+                    <Link to="/dashboard/crm/activities/new">
+                      <Plus className="ms-2 h-4 w-4" aria-hidden="true" />
+                      تسجيل أول نشاط
+                    </Link>
+                  </Button>
                 </div>
               )}
 
