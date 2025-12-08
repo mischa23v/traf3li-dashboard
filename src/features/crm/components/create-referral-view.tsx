@@ -378,13 +378,12 @@ export function CreateReferralView() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <label className="text-sm font-medium text-slate-700">
-                        الاسم (بالإنجليزية) <span className="text-red-500">*</span>
+                        الاسم (بالإنجليزية)
                       </label>
                       <Input
                         placeholder="Ahmed Law Firm"
                         className="rounded-xl"
                         dir="ltr"
-                        required
                         value={formData.name}
                         onChange={(e) => handleChange('name', e.target.value)}
                       />
@@ -405,7 +404,7 @@ export function CreateReferralView() {
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div className="space-y-2">
                       <label className="text-sm font-medium text-slate-700">
-                        النوع <span className="text-red-500">*</span>
+                        النوع
                       </label>
                       <Select value={formData.type} onValueChange={(value) => handleChange('type', value)}>
                         <SelectTrigger className="rounded-xl">
