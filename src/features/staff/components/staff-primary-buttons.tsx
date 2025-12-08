@@ -1,57 +1,28 @@
-import { Plus, Download, Upload, UserMinus, Users } from 'lucide-react'
+import { Plus, Calendar } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Link } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
-import { usePermissions } from '@/hooks/use-permissions'
-import { useStaffContext } from './staff-provider'
-import { EditGate, AdminGate } from '@/components/permission-gate'
+import { EditGate } from '@/components/permission-gate'
 
 export function StaffPrimaryButtons() {
   const { t } = useTranslation()
-  const { isAdminOrOwner, canEdit } = usePermissions()
-  const { showDeparted, setShowDeparted } = useStaffContext()
 
   return (
-    <div className='flex gap-2'>
-      {/* Toggle Departed Employees - Admin Only */}
-      <AdminGate>
-        <Button
-          variant={showDeparted ? 'default' : 'outline'}
-          size='sm'
-          className='hidden sm:flex'
-          onClick={() => setShowDeparted(!showDeparted)}
-        >
-          {showDeparted ? (
-            <>
-              <Users className='me-2 h-4 w-4' />
-              الفريق النشط
-            </>
-          ) : (
-            <>
-              <UserMinus className='me-2 h-4 w-4' />
-              الموظفين المغادرين
-            </>
-          )}
-        </Button>
-      </AdminGate>
-
-      <Button variant='outline' size='sm' className='hidden sm:flex'>
-        <Download className='me-2 h-4 w-4' />
-        {t('common.export')}
-      </Button>
-      <Button variant='outline' size='sm' className='hidden sm:flex'>
-        <Upload className='me-2 h-4 w-4' />
-        {t('common.import')}
-      </Button>
-
+    <>
       <EditGate module="team">
-        <Button asChild size='sm'>
+        <Button asChild className="bg-emerald-500 hover:bg-emerald-600 text-white h-10 px-5 rounded-xl font-bold shadow-lg shadow-emerald-500/20 border-0 text-sm">
           <Link to='/dashboard/staff/new'>
-            <Plus className='me-2 h-4 w-4' />
+            <Plus className='ms-2 h-4 w-4' aria-hidden='true' />
             {t('staff.addStaff')}
           </Link>
         </Button>
       </EditGate>
-    </div>
+      <Button asChild variant="outline" className="h-10 px-5 rounded-xl font-bold border-white/10 text-white hover:bg-white/10 hover:text-white bg-transparent text-sm">
+        <Link to="/dashboard/tasks/events">
+          <Calendar className="ms-2 h-4 w-4" />
+          {t('hero.calendar')}
+        </Link>
+      </Button>
+    </>
   )
 }
