@@ -872,7 +872,9 @@
         "law": "New Law",
         "judgment": "New Judgment",
         "form": "New Form",
-        "service": "New Service"
+        "service": "New Service",
+        "campaign": "New Campaign",
+        "device": "New Device"
       },
       "list": {
         "tasks": "Tasks List",
@@ -898,7 +900,9 @@
         "financeReports": "Finance Reports",
         "tasksReports": "Productivity Reports",
         "crmReports": "CRM Reports",
-        "salesReports": "Sales Reports"
+        "salesReports": "Sales Reports",
+        "campaigns": "Campaigns",
+        "biometric": "Biometric Devices"
       },
       "stats": {
         "todaysTasks": "Today's Tasks",

@@ -866,7 +866,9 @@
         "law": "قانون جديد",
         "judgment": "حكم جديد",
         "form": "نموذج جديد",
-        "service": "خدمة جديدة"
+        "service": "خدمة جديدة",
+        "campaign": "حملة جديدة",
+        "device": "جهاز جديد"
       },
       "list": {
         "tasks": "قائمة المهام",
@@ -892,7 +894,9 @@
         "financeReports": "التقارير المالية",
         "tasksReports": "تقارير المهام",
         "crmReports": "تقارير العملاء",
-        "salesReports": "تقارير المبيعات"
+        "salesReports": "تقارير المبيعات",
+        "campaigns": "الحملات",
+        "biometric": "أجهزة البصمة"
       },
       "stats": {
         "todaysTasks": "مهام اليوم",
