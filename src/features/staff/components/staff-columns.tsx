@@ -140,11 +140,13 @@ export const useStaffColumns = (): ColumnDef<Staff>[] => {
       ),
       cell: ({ row }) => {
         const status = row.getValue('status') as string
-        const badgeColor = staffStatusColors.get(status as any)
+        // Default to 'active' if status is undefined/null
+        const normalizedStatus = status || 'active'
+        const badgeColor = staffStatusColors.get(normalizedStatus as any) || staffStatusColors.get('active')
         return (
           <div className='flex gap-2'>
             <Badge variant='outline' className={cn('capitalize', badgeColor)}>
-              {t(`staff.statuses.${status}`)}
+              {t(`staff.statuses.${normalizedStatus}`)}
             </Badge>
           </div>
         )

@@ -66,10 +66,38 @@ const staffService = {
   },
 }
 
-export const useStaff = (filters?: LawyerFilters) => {
+export const useStaff = (filters?: LawyerFilters & { showDeparted?: boolean }) => {
+  const firmId = useAuthStore(selectFirmId)
+
   return useQuery({
-    queryKey: ['staff', filters],
-    queryFn: () => lawyersService.getAll(filters),
+    queryKey: ['staff', firmId, filters],
+    queryFn: async () => {
+      if (!firmId) {
+        console.warn('No firmId found, falling back to lawyers endpoint')
+        return lawyersService.getAll(filters)
+      }
+      // Use firm team endpoint to get only firm members
+      const result = await firmService.getTeamMembers(firmId, { showDeparted: filters?.showDeparted })
+      let members = result.members || []
+
+      // Apply filters if provided
+      if (filters?.role) {
+        members = members.filter((m: any) => m.role === filters.role)
+      }
+      if (filters?.status) {
+        members = members.filter((m: any) => m.status === filters.status)
+      }
+      if (filters?.search) {
+        const search = filters.search.toLowerCase()
+        members = members.filter((m: any) =>
+          m.email?.toLowerCase().includes(search) ||
+          m.firstName?.toLowerCase().includes(search) ||
+          m.lastName?.toLowerCase().includes(search)
+        )
+      }
+      return members
+    },
+    enabled: !!firmId,
     staleTime: 2 * 60 * 1000,
   })
 }
