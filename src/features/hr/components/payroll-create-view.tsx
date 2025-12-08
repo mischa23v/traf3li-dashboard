@@ -36,6 +36,8 @@ import {
     Building2, Calculator, Minus, TrendingDown, Lock
 } from 'lucide-react'
 import type { CreateSalarySlipData, PaymentMethod } from '@/services/payrollService'
+import { useApiError } from '@/hooks/useApiError'
+import { isValidIban, errorMessages } from '@/utils/validation-patterns'
 
 type OfficeType = 'solo' | 'small' | 'medium' | 'firm'
 
@@ -105,6 +107,9 @@ export function PayrollCreateView() {
     const { data: existingSlip, isLoading: isLoadingSlip } = useSalarySlip(editId || '')
     const createMutation = useCreateSalarySlip()
     const updateMutation = useUpdateSalarySlip()
+
+    // API Error handling
+    const { handleApiError, ErrorDisplay, clearError } = useApiError()
 
     // Fetch employees for selection
     const { data: employeesData } = useEmployees({ status: 'active' })
@@ -289,6 +294,53 @@ export function PayrollCreateView() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
+        clearError()
+
+        // Validation
+        const errors: Array<{ field: string; message: string }> = []
+
+        // Validate employee selection
+        if (!selectedEmployeeId) {
+            errors.push({
+                field: 'الموظف',
+                message: 'يرجى اختيار الموظف'
+            })
+        }
+
+        // Validate IBAN if bank transfer is selected and IBAN is provided
+        if (paymentMethod === 'bank_transfer' && iban && !isValidIban(iban)) {
+            errors.push({
+                field: 'رقم الآيبان',
+                message: errorMessages.iban.ar
+            })
+        }
+
+        // Validate basic salary is positive
+        if (basicSalary <= 0) {
+            errors.push({
+                field: 'الراتب الأساسي',
+                message: 'يجب أن يكون الراتب الأساسي أكبر من صفر'
+            })
+        }
+
+        // Validate days worked
+        if (daysWorked > workingDays) {
+            errors.push({
+                field: 'أيام العمل',
+                message: 'لا يمكن أن تكون أيام العمل أكبر من أيام العمل الإجمالية'
+            })
+        }
+
+        // If there are validation errors, display them
+        if (errors.length > 0) {
+            handleApiError({
+                status: 400,
+                message: 'يرجى تصحيح الأخطاء التالية',
+                error: true,
+                errors
+            })
+            return
+        }
 
         const slipData: CreateSalarySlipData = {
             employeeId: selectedEmployeeId,
@@ -325,6 +377,9 @@ export function PayrollCreateView() {
                 {
                     onSuccess: () => {
                         navigate({ to: '/dashboard/hr/payroll/$slipId', params: { slipId: editId } })
+                    },
+                    onError: (error) => {
+                        handleApiError(error)
                     }
                 }
             )
@@ -332,6 +387,9 @@ export function PayrollCreateView() {
             createMutation.mutate(slipData, {
                 onSuccess: (data) => {
                     navigate({ to: '/dashboard/hr/payroll/$slipId', params: { slipId: data._id } })
+                },
+                onError: (error) => {
+                    handleApiError(error)
                 }
             })
         }
@@ -379,6 +437,9 @@ export function PayrollCreateView() {
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     <div className="lg:col-span-2 space-y-6">
                         <form onSubmit={handleSubmit} className="space-y-6">
+
+                            {/* Error Display */}
+                            <ErrorDisplay />
 
                             {/* OFFICE TYPE SELECTOR */}
                             <Card className="rounded-3xl shadow-sm border-slate-100">

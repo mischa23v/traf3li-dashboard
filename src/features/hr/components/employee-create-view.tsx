@@ -35,6 +35,8 @@ import {
     Building, Users, ChevronDown, Plus, Trash2, AlertCircle, Shield, Lock
 } from 'lucide-react'
 import type { CreateEmployeeData, NationalIdType, Gender, EmploymentType, ContractType, PaymentFrequency, PaymentMethod } from '@/services/hrService'
+import { useApiError } from '@/hooks/useApiError'
+import { isValidNationalId, isValidPhone, isValidEmail, isValidIban, errorMessages } from '@/utils/validation-patterns'
 
 type OfficeType = 'solo' | 'small' | 'medium' | 'firm'
 
@@ -72,6 +74,9 @@ export function EmployeeCreateView() {
     const { data: existingEmployee, isLoading: isLoadingEmployee } = useEmployee(editId || '')
     const createMutation = useCreateEmployee()
     const updateMutation = useUpdateEmployee()
+
+    // API Error handling
+    const { handleApiError, ErrorDisplay, clearError } = useApiError()
 
     // Office Type
     const [officeType, setOfficeType] = useState<OfficeType>('solo')
@@ -265,6 +270,77 @@ export function EmployeeCreateView() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
+        clearError()
+
+        // Validation
+        const errors: Array<{ field: string; message: string }> = []
+
+        // Validate National ID for Saudi nationals
+        if (nationalIdType === 'saudi_id' && !isValidNationalId(nationalId)) {
+            errors.push({
+                field: 'رقم الهوية الوطنية',
+                message: errorMessages.nationalId.ar
+            })
+        }
+
+        // Validate mobile phone number
+        if (!isValidPhone(mobile)) {
+            errors.push({
+                field: 'رقم الجوال',
+                message: errorMessages.phone.ar
+            })
+        }
+
+        // Validate email
+        if (!isValidEmail(email)) {
+            errors.push({
+                field: 'البريد الإلكتروني',
+                message: errorMessages.email.ar
+            })
+        }
+
+        // Validate personal email if provided
+        if (personalEmail && !isValidEmail(personalEmail)) {
+            errors.push({
+                field: 'البريد الإلكتروني الشخصي',
+                message: errorMessages.email.ar
+            })
+        }
+
+        // Validate IBAN if provided
+        if (iban && !isValidIban(iban)) {
+            errors.push({
+                field: 'رقم الآيبان',
+                message: errorMessages.iban.ar
+            })
+        }
+
+        // Validate emergency contact phone if provided
+        if (emergencyPhone && !isValidPhone(emergencyPhone)) {
+            errors.push({
+                field: 'هاتف جهة الاتصال للطوارئ',
+                message: errorMessages.phone.ar
+            })
+        }
+
+        // Validate basic salary is positive
+        if (basicSalary <= 0) {
+            errors.push({
+                field: 'الراتب الأساسي',
+                message: 'يجب أن يكون الراتب الأساسي أكبر من صفر'
+            })
+        }
+
+        // If there are validation errors, display them
+        if (errors.length > 0) {
+            handleApiError({
+                status: 400,
+                message: 'يرجى تصحيح الأخطاء التالية',
+                error: true,
+                errors
+            })
+            return
+        }
 
         const employeeData: CreateEmployeeData = {
             employeeNumber: employeeNumber || undefined,
@@ -356,6 +432,9 @@ export function EmployeeCreateView() {
                 {
                     onSuccess: () => {
                         navigate({ to: '/dashboard/hr/employees/$employeeId', params: { employeeId: editId } })
+                    },
+                    onError: (error) => {
+                        handleApiError(error)
                     }
                 }
             )
@@ -363,6 +442,9 @@ export function EmployeeCreateView() {
             createMutation.mutate(employeeData, {
                 onSuccess: (data) => {
                     navigate({ to: '/dashboard/hr/employees/$employeeId', params: { employeeId: data._id } })
+                },
+                onError: (error) => {
+                    handleApiError(error)
                 }
             })
         }
@@ -410,6 +492,9 @@ export function EmployeeCreateView() {
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     <div className="lg:col-span-2 space-y-6">
                         <form onSubmit={handleSubmit} className="space-y-6">
+
+                            {/* Error Display */}
+                            <ErrorDisplay />
 
                             {/* OFFICE TYPE SELECTOR */}
                             <Card className="rounded-3xl shadow-sm border-slate-100">

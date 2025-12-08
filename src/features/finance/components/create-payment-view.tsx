@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import {
     Save, Calendar, User, FileText, Plus, Trash2, Loader2, ChevronDown, Hash,
     Building2, Users, Receipt, MoreVertical, AlertCircle, Send, Download,
@@ -73,6 +73,10 @@ import { useCreatePayment, useInvoices } from '@/hooks/useFinance'
 import { useClients, useLawyers } from '@/hooks/useCasesAndClients'
 import { ProductivityHero } from '@/components/productivity-hero'
 import { cn } from '@/lib/utils'
+import { validateAmount, validateSaudiIBAN, validateReferenceNumber } from '@/lib/validation'
+import { ValidationErrors, type ValidationError } from '@/components/validation-errors'
+import { useApiError } from '@/hooks/useApiError'
+import { RateLimitBadge } from '@/components/rate-limit-badge'
 
 // Types
 type PaymentType = 'customer_payment' | 'vendor_payment' | 'refund' | 'transfer' | 'advance' | 'retainer'
@@ -126,11 +130,16 @@ const paymentMethodConfig: Record<PaymentMethod, { label: string; icon: React.El
 export function CreatePaymentView() {
     const navigate = useNavigate()
     const createPaymentMutation = useCreatePayment()
+    const { validationErrors, handleApiError, clearError, ErrorDisplay } = useApiError()
 
     // Load data from API
     const { data: clientsData, isLoading: loadingClients } = useClients()
     const { data: invoicesData, isLoading: loadingInvoices } = useInvoices()
     const { data: lawyersData, isLoading: loadingLawyers } = useLawyers()
+
+    // Validation state
+    const [fieldErrors, setFieldErrors] = useState<ValidationError[]>([])
+    const [responseHeaders, setResponseHeaders] = useState<any>(null)
 
     // Payment Type Selection
     const [paymentType, setPaymentType] = useState<PaymentType>('customer_payment')
@@ -155,6 +164,7 @@ export function CreatePaymentView() {
     // Payment Method
     const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('bank_transfer')
     const [bankAccountId, setBankAccountId] = useState('')
+    const [bankIBAN, setBankIBAN] = useState('')
 
     // Check Details (when method = check)
     const [checkNumber, setCheckNumber] = useState('')
@@ -218,6 +228,35 @@ export function CreatePaymentView() {
         if (!lawyersData) return []
         return Array.isArray(lawyersData) ? lawyersData : (lawyersData as any)?.data || []
     }, [lawyersData])
+
+    // Validate form fields in real-time
+    useEffect(() => {
+        const errors: ValidationError[] = []
+
+        // Validate amount
+        const amountValidation = validateAmount(amount)
+        if (!amountValidation.valid && amount > 0) {
+            errors.push({ field: 'المبلغ', message: amountValidation.error || '' })
+        }
+
+        // Validate IBAN for bank transfer or sarie
+        if (['bank_transfer', 'sarie'].includes(paymentMethod) && bankIBAN) {
+            const ibanValidation = validateSaudiIBAN(bankIBAN)
+            if (!ibanValidation.valid) {
+                errors.push({ field: 'رقم الآيبان', message: ibanValidation.error || '' })
+            }
+        }
+
+        // Validate reference number
+        if (referenceNumber) {
+            const refValidation = validateReferenceNumber(referenceNumber)
+            if (!refValidation.valid) {
+                errors.push({ field: 'رقم المرجع', message: refValidation.error || '' })
+            }
+        }
+
+        setFieldErrors(errors)
+    }, [amount, bankIBAN, referenceNumber, paymentMethod])
 
     // Update base currency amount when amount or exchange rate changes
     useMemo(() => {
@@ -299,6 +338,40 @@ export function CreatePaymentView() {
     // Submit handler
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
+
+        // Clear previous errors
+        clearError()
+
+        // Validate form before submission
+        const errors: ValidationError[] = []
+
+        // Validate amount
+        const amountValidation = validateAmount(amount)
+        if (!amountValidation.valid) {
+            errors.push({ field: 'المبلغ', message: amountValidation.error || '' })
+        }
+
+        // Validate IBAN for bank transfer or sarie
+        if (['bank_transfer', 'sarie'].includes(paymentMethod) && bankIBAN) {
+            const ibanValidation = validateSaudiIBAN(bankIBAN)
+            if (!ibanValidation.valid) {
+                errors.push({ field: 'رقم الآيبان', message: ibanValidation.error || '' })
+            }
+        }
+
+        // Validate reference number
+        if (referenceNumber) {
+            const refValidation = validateReferenceNumber(referenceNumber)
+            if (!refValidation.valid) {
+                errors.push({ field: 'رقم المرجع', message: refValidation.error || '' })
+            }
+        }
+
+        // If there are validation errors, stop submission
+        if (errors.length > 0) {
+            setFieldErrors(errors)
+            return
+        }
 
         const paymentData = {
             paymentNumber,
@@ -386,8 +459,15 @@ export function CreatePaymentView() {
         }
 
         createPaymentMutation.mutate(paymentData, {
-            onSuccess: () => {
+            onSuccess: (response) => {
+                // Store response headers for rate limit badge
+                if (response?.headers) {
+                    setResponseHeaders(response.headers)
+                }
                 navigate({ to: '/dashboard/finance/payments' })
+            },
+            onError: (error) => {
+                handleApiError(error)
             },
         })
     }
@@ -438,6 +518,21 @@ export function CreatePaymentView() {
                     {/* MAIN CONTENT */}
                     <div className="lg:col-span-2 space-y-6">
                         <form onSubmit={handleSubmit} className="space-y-6">
+
+                            {/* VALIDATION ERRORS */}
+                            {(fieldErrors.length > 0 || validationErrors.length > 0) && (
+                                <ValidationErrors errors={[...fieldErrors, ...validationErrors]} />
+                            )}
+
+                            {/* API ERROR DISPLAY */}
+                            <ErrorDisplay />
+
+                            {/* RATE LIMIT BADGE */}
+                            {responseHeaders && (
+                                <div className="flex justify-end">
+                                    <RateLimitBadge headers={responseHeaders} />
+                                </div>
+                            )}
 
                             {/* PAYMENT TYPE SELECTOR */}
                             <Card className="rounded-3xl shadow-sm border-slate-100">
@@ -507,17 +602,29 @@ export function CreatePaymentView() {
                                         <div className="space-y-2 md:col-span-2">
                                             <Label className="text-sm font-medium text-slate-700 flex items-center gap-2">
                                                 <Wallet className="w-4 h-4 text-emerald-500" />
-                                                المبلغ
+                                                المبلغ <span className="text-red-500">*</span>
                                             </Label>
                                             <Input
                                                 type="number"
                                                 min="0"
                                                 step="0.01"
                                                 value={amount}
-                                                onChange={(e) => setAmount(parseFloat(e.target.value) || 0)}
-                                                className="rounded-xl border-slate-200 text-xl font-bold"
+                                                onChange={(e) => {
+                                                    const value = e.target.value
+                                                    setAmount(parseFloat(value) || 0)
+                                                }}
+                                                className={cn(
+                                                    "rounded-xl border-slate-200 text-xl font-bold",
+                                                    fieldErrors.some(err => err.field === 'المبلغ') && "border-red-300 bg-red-50"
+                                                )}
                                                 placeholder="0.00"
+                                                required
                                             />
+                                            {fieldErrors.find(err => err.field === 'المبلغ') && (
+                                                <p className="text-xs text-red-600">
+                                                    {fieldErrors.find(err => err.field === 'المبلغ')?.message}
+                                                </p>
+                                            )}
                                         </div>
 
                                         <div className="space-y-2">
@@ -578,8 +685,16 @@ export function CreatePaymentView() {
                                                 value={referenceNumber}
                                                 onChange={(e) => setReferenceNumber(e.target.value)}
                                                 placeholder="رقم الحوالة / الإيصال..."
-                                                className="rounded-xl border-slate-200"
+                                                className={cn(
+                                                    "rounded-xl border-slate-200",
+                                                    fieldErrors.some(err => err.field === 'رقم المرجع') && "border-red-300 bg-red-50"
+                                                )}
                                             />
+                                            {fieldErrors.find(err => err.field === 'رقم المرجع') && (
+                                                <p className="text-xs text-red-600">
+                                                    {fieldErrors.find(err => err.field === 'رقم المرجع')?.message}
+                                                </p>
+                                            )}
                                         </div>
                                     </div>
 
@@ -668,21 +783,53 @@ export function CreatePaymentView() {
 
                                     {/* Bank Account (for bank transfer, check, card) */}
                                     {['bank_transfer', 'sarie', 'check', 'credit_card', 'mada'].includes(paymentMethod) && (
-                                        <div className="space-y-2">
-                                            <Label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                                <Landmark className="w-4 h-4 text-emerald-500" />
-                                                الحساب البنكي
-                                            </Label>
-                                            <Select value={bankAccountId} onValueChange={setBankAccountId}>
-                                                <SelectTrigger className="rounded-xl border-slate-200">
-                                                    <SelectValue placeholder="اختر الحساب البنكي" />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    <SelectItem value="bank1">البنك الأهلي - جاري - ****1234</SelectItem>
-                                                    <SelectItem value="bank2">مصرف الراجحي - جاري - ****5678</SelectItem>
-                                                    <SelectItem value="bank3">بنك الرياض - جاري - ****9012</SelectItem>
-                                                </SelectContent>
-                                            </Select>
+                                        <div className="space-y-4">
+                                            <div className="space-y-2">
+                                                <Label className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                                                    <Landmark className="w-4 h-4 text-emerald-500" />
+                                                    الحساب البنكي
+                                                </Label>
+                                                <Select value={bankAccountId} onValueChange={setBankAccountId}>
+                                                    <SelectTrigger className="rounded-xl border-slate-200">
+                                                        <SelectValue placeholder="اختر الحساب البنكي" />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                        <SelectItem value="bank1">البنك الأهلي - جاري - ****1234</SelectItem>
+                                                        <SelectItem value="bank2">مصرف الراجحي - جاري - ****5678</SelectItem>
+                                                        <SelectItem value="bank3">بنك الرياض - جاري - ****9012</SelectItem>
+                                                    </SelectContent>
+                                                </Select>
+                                            </div>
+
+                                            {/* IBAN Field for bank transfer or sarie */}
+                                            {['bank_transfer', 'sarie'].includes(paymentMethod) && (
+                                                <div className="space-y-2">
+                                                    <Label className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                                                        <Landmark className="w-4 h-4 text-emerald-500" />
+                                                        رقم الآيبان (IBAN) <span className="text-red-500">*</span>
+                                                    </Label>
+                                                    <Input
+                                                        value={bankIBAN}
+                                                        onChange={(e) => setBankIBAN(e.target.value.toUpperCase())}
+                                                        placeholder="SA0000000000000000000000"
+                                                        className={cn(
+                                                            "rounded-xl border-slate-200 font-mono",
+                                                            fieldErrors.some(err => err.field === 'رقم الآيبان') && "border-red-300 bg-red-50"
+                                                        )}
+                                                        dir="ltr"
+                                                        maxLength={24}
+                                                        required
+                                                    />
+                                                    {fieldErrors.find(err => err.field === 'رقم الآيبان') && (
+                                                        <p className="text-xs text-red-600">
+                                                            {fieldErrors.find(err => err.field === 'رقم الآيبان')?.message}
+                                                        </p>
+                                                    )}
+                                                    <p className="text-xs text-slate-500">
+                                                        الصيغة: SA متبوعة بـ 22 رقماً (24 حرفاً إجمالاً)
+                                                    </p>
+                                                </div>
+                                            )}
                                         </div>
                                     )}
                                 </CardContent>

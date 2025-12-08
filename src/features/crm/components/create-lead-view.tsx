@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useCallback } from 'react'
 import {
   ArrowRight, Save, Calendar, User,
   Flag, FileText, Briefcase, Users, Loader2,
@@ -44,8 +44,16 @@ import { useCreateLead, usePipelines } from '@/hooks/useCrm'
 import { useStaff } from '@/hooks/useStaff'
 import { useOrganizations } from '@/hooks/useOrganizations'
 import { useContacts } from '@/hooks/useContacts'
+import { useApiError } from '@/hooks/useApiError'
 import { cn } from '@/lib/utils'
 import type { LeadStatus, LeadSource } from '@/types/crm'
+import {
+  isValidPhone,
+  isValidEmail,
+  isValidNationalId,
+  getErrorMessage
+} from '@/utils/validation-patterns'
+import { ValidationErrors } from '@/components/error-display'
 
 // Lead Status Options
 const STATUS_OPTIONS: { value: LeadStatus; label: string; color: string; icon: any }[] = [
@@ -187,6 +195,7 @@ export function CreateLeadView() {
   const { data: staffData } = useStaff()
   const { data: organizationsData } = useOrganizations({})
   const { data: contactsData } = useContacts({})
+  const { handleApiError, validationErrors, ErrorDisplay } = useApiError()
 
   // Form state
   const [formData, setFormData] = useState({
@@ -300,6 +309,109 @@ export function CreateLeadView() {
   const [tagInput, setTagInput] = useState('')
   const [competitorInput, setCompetitorInput] = useState('')
 
+  // Client-side validation errors
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
+
+  // Validate phone number
+  const validatePhone = useCallback((phone: string, fieldName: string) => {
+    if (!phone) {
+      // Clear error if field is empty (optional field)
+      setFieldErrors(prev => {
+        const newErrors = { ...prev }
+        delete newErrors[fieldName]
+        return newErrors
+      })
+      return true
+    }
+
+    if (!isValidPhone(phone)) {
+      setFieldErrors(prev => ({
+        ...prev,
+        [fieldName]: getErrorMessage('phone', 'ar')
+      }))
+      return false
+    }
+
+    // Clear error if valid
+    setFieldErrors(prev => {
+      const newErrors = { ...prev }
+      delete newErrors[fieldName]
+      return newErrors
+    })
+    return true
+  }, [])
+
+  // Validate email
+  const validateEmail = useCallback((email: string, fieldName: string) => {
+    if (!email) {
+      // Clear error if field is empty (optional field)
+      setFieldErrors(prev => {
+        const newErrors = { ...prev }
+        delete newErrors[fieldName]
+        return newErrors
+      })
+      return true
+    }
+
+    if (!isValidEmail(email)) {
+      setFieldErrors(prev => ({
+        ...prev,
+        [fieldName]: getErrorMessage('email', 'ar')
+      }))
+      return false
+    }
+
+    // Clear error if valid
+    setFieldErrors(prev => {
+      const newErrors = { ...prev }
+      delete newErrors[fieldName]
+      return newErrors
+    })
+    return true
+  }, [])
+
+  // Validate all required fields before submission
+  const validateForm = useCallback(() => {
+    let isValid = true
+    const errors: Record<string, string> = {}
+
+    // Validate phone (required)
+    if (!formData.phone) {
+      errors.phone = 'رقم الهاتف مطلوب'
+      isValid = false
+    } else if (!isValidPhone(formData.phone)) {
+      errors.phone = getErrorMessage('phone', 'ar')
+      isValid = false
+    }
+
+    // Validate alternate phone (optional, but must be valid if provided)
+    if (formData.alternatePhone && !isValidPhone(formData.alternatePhone)) {
+      errors.alternatePhone = getErrorMessage('phone', 'ar')
+      isValid = false
+    }
+
+    // Validate whatsapp (optional, but must be valid if provided)
+    if (formData.whatsapp && !isValidPhone(formData.whatsapp)) {
+      errors.whatsapp = getErrorMessage('phone', 'ar')
+      isValid = false
+    }
+
+    // Validate email (optional, but must be valid if provided)
+    if (formData.email && !isValidEmail(formData.email)) {
+      errors.email = getErrorMessage('email', 'ar')
+      isValid = false
+    }
+
+    // Validate alternate email (optional, but must be valid if provided)
+    if (formData.alternateEmail && !isValidEmail(formData.alternateEmail)) {
+      errors.alternateEmail = getErrorMessage('email', 'ar')
+      isValid = false
+    }
+
+    setFieldErrors(errors)
+    return isValid
+  }, [formData])
+
   // Calculate lead score
   const leadScore = useMemo(() => {
     let score = 0
@@ -364,6 +476,11 @@ export function CreateLeadView() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+
+    // Validate form before submission
+    if (!validateForm()) {
+      return
+    }
 
     const leadData = {
       firstName: formData.firstName,
@@ -477,6 +594,9 @@ export function CreateLeadView() {
     createLeadMutation.mutate(leadData, {
       onSuccess: () => {
         navigate({ to: '/dashboard/crm/leads' })
+      },
+      onError: (error) => {
+        handleApiError(error)
       }
     })
   }
@@ -512,6 +632,9 @@ export function CreateLeadView() {
           {/* RIGHT COLUMN (Main Content) */}
           <div className="lg:col-span-2 space-y-6">
             <form onSubmit={handleSubmit} className="space-y-6">
+
+              {/* API Validation Errors */}
+              <ErrorDisplay />
 
               {/* Lead Score Card */}
               <Card className="border-0 shadow-sm">
@@ -619,24 +742,33 @@ export function CreateLeadView() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <label className="text-sm font-medium text-slate-700">
-                        رقم الهاتف                       </label>
+                        رقم الهاتف <span className="text-red-500">*</span>
+                      </label>
                       <Input
                         placeholder="+966 5x xxx xxxx"
-                        className="rounded-xl"
+                        className={cn("rounded-xl", fieldErrors.phone && "border-red-500")}
                         dir="ltr"
                         value={formData.phone}
                         onChange={(e) => handleChange('phone', e.target.value)}
+                        onBlur={(e) => validatePhone(e.target.value, 'phone')}
                       />
+                      {fieldErrors.phone && (
+                        <p className="text-sm text-red-500">{fieldErrors.phone}</p>
+                      )}
                     </div>
                     <div className="space-y-2">
                       <label className="text-sm font-medium text-slate-700">هاتف بديل</label>
                       <Input
                         placeholder="+966 5x xxx xxxx"
-                        className="rounded-xl"
+                        className={cn("rounded-xl", fieldErrors.alternatePhone && "border-red-500")}
                         dir="ltr"
                         value={formData.alternatePhone}
                         onChange={(e) => handleChange('alternatePhone', e.target.value)}
+                        onBlur={(e) => validatePhone(e.target.value, 'alternatePhone')}
                       />
+                      {fieldErrors.alternatePhone && (
+                        <p className="text-sm text-red-500">{fieldErrors.alternatePhone}</p>
+                      )}
                     </div>
                   </div>
 
@@ -648,11 +780,15 @@ export function CreateLeadView() {
                       </label>
                       <Input
                         placeholder="+966 5x xxx xxxx"
-                        className="rounded-xl"
+                        className={cn("rounded-xl", fieldErrors.whatsapp && "border-red-500")}
                         dir="ltr"
                         value={formData.whatsapp}
                         onChange={(e) => handleChange('whatsapp', e.target.value)}
+                        onBlur={(e) => validatePhone(e.target.value, 'whatsapp')}
                       />
+                      {fieldErrors.whatsapp && (
+                        <p className="text-sm text-red-500">{fieldErrors.whatsapp}</p>
+                      )}
                     </div>
                     <div className="space-y-2">
                       <label className="text-sm font-medium text-slate-700">طريقة الاتصال المفضلة</label>
@@ -679,22 +815,30 @@ export function CreateLeadView() {
                       <Input
                         type="email"
                         placeholder="email@example.com"
-                        className="rounded-xl"
+                        className={cn("rounded-xl", fieldErrors.email && "border-red-500")}
                         dir="ltr"
                         value={formData.email}
                         onChange={(e) => handleChange('email', e.target.value)}
+                        onBlur={(e) => validateEmail(e.target.value, 'email')}
                       />
+                      {fieldErrors.email && (
+                        <p className="text-sm text-red-500">{fieldErrors.email}</p>
+                      )}
                     </div>
                     <div className="space-y-2">
                       <label className="text-sm font-medium text-slate-700">بريد إلكتروني بديل</label>
                       <Input
                         type="email"
                         placeholder="alternate@example.com"
-                        className="rounded-xl"
+                        className={cn("rounded-xl", fieldErrors.alternateEmail && "border-red-500")}
                         dir="ltr"
                         value={formData.alternateEmail}
                         onChange={(e) => handleChange('alternateEmail', e.target.value)}
+                        onBlur={(e) => validateEmail(e.target.value, 'alternateEmail')}
                       />
+                      {fieldErrors.alternateEmail && (
+                        <p className="text-sm text-red-500">{fieldErrors.alternateEmail}</p>
+                      )}
                     </div>
                   </div>
                 </CardContent>
