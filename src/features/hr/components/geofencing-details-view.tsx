@@ -18,7 +18,7 @@ import { DynamicIsland } from '@/components/dynamic-island'
 import { useGeofence, useDeleteGeofence, useToggleGeofence } from '@/hooks/useBiometric'
 import {
     Search, Bell, AlertCircle, MapPin, Loader2, AlertTriangle, Trash2,
-    Clock, Circle, Polygon, Users, Edit3, Power, CheckCircle, XCircle
+    Clock, Circle, Hexagon, Users, Edit3, Power, CheckCircle, XCircle
 } from 'lucide-react'
 import { format } from 'date-fns'
 import { arSA } from 'date-fns/locale'
@@ -80,7 +80,7 @@ export function GeofencingDetailsView() {
     const getTypeBadge = (type: GeofenceType) => {
         const labels: Record<GeofenceType, { arabic: string; icon: any; color: string }> = {
             circle: { arabic: 'دائري', icon: Circle, color: 'text-blue-600' },
-            polygon: { arabic: 'متعدد الأضلاع', icon: Polygon, color: 'text-purple-600' },
+            polygon: { arabic: 'متعدد الأضلاع', icon: Hexagon, color: 'text-purple-600' },
         }
         const IconComponent = labels[type].icon
         return (
@@ -337,7 +337,7 @@ export function GeofencingDetailsView() {
                                                     <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
                                                         <CardHeader className="pb-3">
                                                             <CardTitle className="text-base font-bold text-navy flex items-center gap-2">
-                                                                {zone.type === 'circle' ? <Circle className="w-4 h-4 text-blue-600" /> : <Polygon className="w-4 h-4 text-purple-600" />}
+                                                                {zone.type === 'circle' ? <Circle className="w-4 h-4 text-blue-600" /> : <Hexagon className="w-4 h-4 text-purple-600" />}
                                                                 تفاصيل النطاق
                                                             </CardTitle>
                                                         </CardHeader>

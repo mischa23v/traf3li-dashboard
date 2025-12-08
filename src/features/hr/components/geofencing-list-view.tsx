@@ -15,7 +15,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { Header } from '@/components/layout/header'
 import { TopNav } from '@/components/layout/top-nav'
 import { DynamicIsland } from '@/components/dynamic-island'
-import { Search, Bell, AlertCircle, MapPin, Plus, MoreHorizontal, ChevronLeft, Eye, Trash2, Edit3, SortAsc, Filter, X, Users, Circle, Polygon, Clock } from 'lucide-react'
+import { Search, Bell, AlertCircle, MapPin, Plus, MoreHorizontal, ChevronLeft, Eye, Trash2, Edit3, SortAsc, Filter, X, Users, Circle, Hexagon, Clock } from 'lucide-react'
 import { useNavigate } from '@tanstack/react-router'
 import { format } from 'date-fns'
 import { arSA } from 'date-fns/locale'
@@ -181,7 +181,7 @@ export function GeofencingListView() {
     const getTypeBadge = (type: GeofenceType) => {
         const labels: Record<GeofenceType, { arabic: string; icon: any }> = {
             circle: { arabic: 'دائري', icon: Circle },
-            polygon: { arabic: 'متعدد الأضلاع', icon: Polygon },
+            polygon: { arabic: 'متعدد الأضلاع', icon: Hexagon },
         }
         const IconComponent = labels[type].icon
         return (
@@ -204,7 +204,7 @@ export function GeofencingListView() {
             { label: 'إجمالي النطاقات', value: totalZones || 0, icon: MapPin, status: 'normal' as const },
             { label: 'نشطة', value: activeZones || 0, icon: Circle, status: 'normal' as const },
             { label: 'دائرية', value: circleZones || 0, icon: Circle, status: 'normal' as const },
-            { label: 'متعددة الأضلاع', value: polygonZones || 0, icon: Polygon, status: 'normal' as const },
+            { label: 'متعددة الأضلاع', value: polygonZones || 0, icon: Hexagon, status: 'normal' as const },
         ]
     }, [geofencesData])
 
