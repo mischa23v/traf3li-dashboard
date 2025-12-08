@@ -1,4 +1,4 @@
-import { Plus, Download, Upload } from 'lucide-react'
+import { Plus, Calendar } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Link } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
@@ -7,21 +7,19 @@ export function OrganizationsPrimaryButtons() {
   const { t } = useTranslation()
 
   return (
-    <div className='flex gap-2'>
-      <Button variant='outline' size='sm' className='hidden sm:flex'>
-        <Download className='me-2 h-4 w-4' />
-        {t('common.export')}
-      </Button>
-      <Button variant='outline' size='sm' className='hidden sm:flex'>
-        <Upload className='me-2 h-4 w-4' />
-        {t('common.import')}
-      </Button>
-      <Button asChild size='sm'>
+    <>
+      <Button asChild className="bg-emerald-500 hover:bg-emerald-600 text-white h-10 px-5 rounded-xl font-bold shadow-lg shadow-emerald-500/20 border-0 text-sm">
         <Link to='/dashboard/organizations/new'>
-          <Plus className='me-2 h-4 w-4' />
+          <Plus className='ms-2 h-4 w-4' aria-hidden='true' />
           {t('organizations.addOrganization')}
         </Link>
       </Button>
-    </div>
+      <Button asChild variant="outline" className="h-10 px-5 rounded-xl font-bold border-white/10 text-white hover:bg-white/10 hover:text-white bg-transparent text-sm">
+        <Link to="/dashboard/tasks/events">
+          <Calendar className="ms-2 h-4 w-4" />
+          {t('hero.calendar')}
+        </Link>
+      </Button>
+    </>
   )
 }
