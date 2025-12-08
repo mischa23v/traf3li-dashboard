@@ -1,3 +1,4 @@
+import { memo } from 'react'
 import { type Row } from '@tanstack/react-table'
 import { MoreHorizontal, Eye, Pencil, Trash2, UserMinus, UserPlus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -17,7 +18,7 @@ type DataTableRowActionsProps = {
   row: Row<Staff>
 }
 
-export function DataTableRowActions({ row }: DataTableRowActionsProps) {
+export const DataTableRowActions = memo(function DataTableRowActions({ row }: DataTableRowActionsProps) {
   const { t } = useTranslation()
   const { setOpen, setCurrentRow } = useStaffContext()
   const { isAdminOrOwner, canEdit, canDelete } = usePermissions()
@@ -113,4 +114,4 @@ export function DataTableRowActions({ row }: DataTableRowActionsProps) {
       </DropdownMenuContent>
     </DropdownMenu>
   )
-}
+})

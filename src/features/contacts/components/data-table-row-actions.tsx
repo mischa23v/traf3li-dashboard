@@ -1,5 +1,6 @@
 'use client'
 
+import { memo } from 'react'
 import type { Row } from '@tanstack/react-table'
 import { MoreHorizontal, Eye, Pencil, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -19,7 +20,7 @@ interface ContactsRowActionsProps {
   row: Row<Contact>
 }
 
-export function ContactsRowActions({ row }: ContactsRowActionsProps) {
+export const ContactsRowActions = memo(function ContactsRowActions({ row }: ContactsRowActionsProps) {
   const { t } = useTranslation()
   const { setOpen, setCurrentRow } = useContactsContext()
 
@@ -68,4 +69,4 @@ export function ContactsRowActions({ row }: ContactsRowActionsProps) {
       </DropdownMenuContent>
     </DropdownMenu>
   )
-}
+})

@@ -1,3 +1,4 @@
+import { memo } from 'react'
 import { type Row } from '@tanstack/react-table'
 import { MoreHorizontal, Eye, Pencil, Trash2, Copy, GitBranch } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -16,7 +17,7 @@ interface DataTableRowActionsProps {
   row: Row<WorkflowTemplate>
 }
 
-export function DataTableRowActions({ row }: DataTableRowActionsProps) {
+export const DataTableRowActions = memo(function DataTableRowActions({ row }: DataTableRowActionsProps) {
   const { t } = useTranslation()
   const { setOpen, setCurrentRow } = useWorkflowsContext()
 
@@ -61,4 +62,4 @@ export function DataTableRowActions({ row }: DataTableRowActionsProps) {
       </DropdownMenuContent>
     </DropdownMenu>
   )
-}
+})
