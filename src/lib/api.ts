@@ -113,6 +113,28 @@ apiClient.interceptors.response.use(
       }
     }
 
+    // Handle 429 Rate Limited
+    if (error.response?.status === 429) {
+      const retryAfter = parseInt(error.response.headers['retry-after'] || '60', 10)
+      const message = error.response?.data?.message || `طلبات كثيرة جداً. يرجى الانتظار ${formatRetryAfter(retryAfter)}.`
+
+      // Import toast dynamically to avoid circular dependencies
+      import('sonner').then(({ toast }) => {
+        toast.error(message, {
+          description: 'حاول مرة أخرى لاحقاً',
+          duration: 5000,
+        })
+      })
+
+      return Promise.reject({
+        status: 429,
+        message,
+        error: true,
+        requestId: error.response?.data?.requestId,
+        retryAfter,
+      })
+    }
+
     // Handle 401 Unauthorized - User needs to login
     if (error.response?.status === 401) {
       // Clear any stored auth state
@@ -150,11 +172,13 @@ apiClient.interceptors.response.use(
       })
     }
 
-    // Return formatted error
+    // Return formatted error with requestId and validation errors
     return Promise.reject({
       status: error.response?.status || 500,
       message: error.response?.data?.message || 'حدث خطأ غير متوقع',
       error: true,
+      requestId: error.response?.data?.requestId,
+      errors: error.response?.data?.errors, // Validation errors array
     })
   }
 )
@@ -166,6 +190,50 @@ export interface ApiError {
   status: number
   message: string
   error: boolean
+  requestId?: string
+  errors?: Array<{ field: string; message: string }>
+}
+
+/**
+ * Rate Limit Info Type
+ */
+export interface RateLimitInfo {
+  limit: number
+  remaining: number
+  reset: number // Unix timestamp
+}
+
+/**
+ * Get rate limit info from response headers
+ */
+export const getRateLimitInfo = (headers: any): RateLimitInfo | null => {
+  const limit = headers['x-ratelimit-limit']
+  const remaining = headers['x-ratelimit-remaining']
+  const reset = headers['x-ratelimit-reset']
+
+  if (limit && remaining && reset) {
+    return {
+      limit: parseInt(limit, 10),
+      remaining: parseInt(remaining, 10),
+      reset: parseInt(reset, 10),
+    }
+  }
+  return null
+}
+
+/**
+ * Format seconds to human-readable time
+ */
+export const formatRetryAfter = (seconds: number): string => {
+  if (seconds < 60) {
+    return `${seconds} ثانية`
+  }
+  const minutes = Math.ceil(seconds / 60)
+  if (minutes < 60) {
+    return `${minutes} دقيقة`
+  }
+  const hours = Math.ceil(minutes / 60)
+  return `${hours} ساعة`
 }
 
 /**

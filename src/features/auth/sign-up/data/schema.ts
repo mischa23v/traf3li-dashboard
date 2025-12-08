@@ -12,10 +12,18 @@ export const registrationSchema = z.object({
     firstName: z.string().min(2, 'الاسم الأول مطلوب'),
     lastName: z.string().min(2, 'اسم العائلة مطلوب'),
     email: z.string().email('البريد الإلكتروني غير صالح'),
-    password: z.string().min(8, 'كلمة المرور يجب أن تكون 8 أحرف على الأقل'),
+    password: z.string()
+        .min(8, 'كلمة المرور يجب أن تكون 8 أحرف على الأقل')
+        .max(128, 'كلمة المرور طويلة جداً')
+        .regex(/[a-z]/, 'يجب أن تحتوي على حرف صغير')
+        .regex(/[A-Z]/, 'يجب أن تحتوي على حرف كبير')
+        .regex(/\d/, 'يجب أن تحتوي على رقم'),
     confirmPassword: z.string(),
     profilePicture: z.any().optional(), // File
-    phone: z.string().min(10, 'رقم الهاتف يجب أن يكون 10 أرقام على الأقل'),
+    phone: z.string()
+        .min(10, 'رقم الهاتف يجب أن يكون 10 أرقام على الأقل')
+        .max(15, 'رقم الهاتف طويل جداً')
+        .regex(/^\+?[0-9]{10,15}$/, 'صيغة رقم الهاتف غير صحيحة (مثال: +966501234567)'),
     gender: z.enum(['ذكر', 'أنثى']),
     nationality: z.string().min(2, 'الجنسية مطلوبة'),
     country: z.string().default('السعودية'),
