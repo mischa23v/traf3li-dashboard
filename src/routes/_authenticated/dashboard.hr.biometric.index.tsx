@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { BiometricDashboard } from '@/features/hr/components/biometric-dashboard'
+import { BiometricListView } from '@/features/hr/components/biometric-list-view'
 
 export const Route = createFileRoute('/_authenticated/dashboard/hr/biometric/')({
-  component: BiometricDashboard,
+  component: BiometricListView,
 })

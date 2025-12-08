@@ -149,6 +149,12 @@ export function useSidebarData(): SidebarData {
               url: '/dashboard/tasks/events',
               module: 'events',
             },
+            // Gantt View
+            {
+              title: 'sidebar.nav.gantt',
+              url: '/dashboard/tasks/gantt',
+              module: 'tasks',
+            },
           ],
         },
       ],
@@ -222,6 +228,24 @@ export function useSidebarData(): SidebarData {
               url: '/dashboard/crm/activities',
               module: 'leads',
             },
+            // Email Marketing
+            {
+              title: 'sidebar.nav.emailMarketing',
+              url: '/dashboard/crm/email-marketing',
+              module: 'leads',
+            },
+            // Lead Scoring
+            {
+              title: 'sidebar.nav.leadScoring',
+              url: '/dashboard/crm/lead-scoring',
+              module: 'leads',
+            },
+            // WhatsApp Integration
+            {
+              title: 'sidebar.nav.whatsapp',
+              url: '/dashboard/crm/whatsapp',
+              module: 'leads',
+            },
           ],
         },
       ],
@@ -292,6 +316,18 @@ export function useSidebarData(): SidebarData {
               title: 'sidebar.nav.timeTracking',
               url: '/dashboard/finance/time-tracking',
               module: 'timeTracking',
+            },
+            // Bank Reconciliation
+            {
+              title: 'sidebar.nav.bankReconciliation',
+              url: '/dashboard/finance/reconciliation',
+              module: 'payments',
+            },
+            // Multi-Currency
+            {
+              title: 'sidebar.nav.multiCurrency',
+              url: '/dashboard/finance/currency',
+              module: 'payments',
             },
           ],
         },
@@ -422,6 +458,28 @@ export function useSidebarData(): SidebarData {
             {
               title: 'sidebar.nav.hrReports',
               url: '/dashboard/hr/reports',
+              module: 'hr',
+            },
+            // Biometric & Geofencing
+            {
+              title: 'sidebar.nav.biometric',
+              url: '/dashboard/hr/biometric',
+              module: 'hr',
+            },
+            {
+              title: 'sidebar.nav.geofencing',
+              url: '/dashboard/hr/geofencing',
+              module: 'hr',
+            },
+            // Analytics & Predictions
+            {
+              title: 'sidebar.nav.hrAnalytics',
+              url: '/dashboard/hr/analytics',
+              module: 'hr',
+            },
+            {
+              title: 'sidebar.nav.aiPredictions',
+              url: '/dashboard/hr/predictions',
               module: 'hr',
             },
           ],

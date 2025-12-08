@@ -14,7 +14,7 @@ import { format, addDays, startOfDay, endOfDay, isSameDay } from 'date-fns'
 import { arSA, enUS } from 'date-fns/locale'
 
 interface SalesSidebarProps {
-    context?: 'leads' | 'pipeline' | 'referrals' | 'activities'
+    context?: 'leads' | 'pipeline' | 'referrals' | 'activities' | 'email-marketing' | 'lead-scoring' | 'whatsapp'
     isSelectionMode?: boolean
     onToggleSelectionMode?: () => void
     selectedCount?: number
@@ -77,6 +77,18 @@ export function SalesSidebar({
         activities: {
             create: '/dashboard/crm/activities/new',
             viewAll: '/dashboard/crm/activities'
+        },
+        'email-marketing': {
+            create: '/dashboard/crm/email-marketing/new',
+            viewAll: '/dashboard/crm/email-marketing'
+        },
+        'lead-scoring': {
+            create: '',
+            viewAll: '/dashboard/crm/lead-scoring'
+        },
+        'whatsapp': {
+            create: '/dashboard/crm/whatsapp/new',
+            viewAll: '/dashboard/crm/whatsapp'
         }
     }
 
