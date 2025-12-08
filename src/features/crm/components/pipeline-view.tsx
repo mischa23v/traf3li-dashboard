@@ -28,6 +28,7 @@ import {
   ArrowDown,
   Activity,
   Percent,
+  Settings,
 } from 'lucide-react'
 import { Skeleton } from '@/components/ui/skeleton'
 import {
@@ -35,6 +36,7 @@ import {
   usePipelines,
   useMoveLeadToStage,
   useConvertLead,
+  useUpdatePipelineStage,
 } from '@/hooks/useCrm'
 import { ProductivityHero } from '@/components/productivity-hero'
 import { Button } from '@/components/ui/button'
@@ -79,7 +81,9 @@ import type { Lead, Pipeline, PipelineStage } from '@/types/crm'
 import { formatDistanceToNow, differenceInDays } from 'date-fns'
 import { ar } from 'date-fns/locale'
 import { SalesSidebar } from './sales-sidebar'
+import { PipelineAutomationDialog } from './pipeline-automation-dialog'
 import { cn } from '@/lib/utils'
+import type { PipelineAutoAction } from '@/types/crm'
 
 // Analytics metric card component
 function MetricCard({
@@ -313,6 +317,8 @@ export function PipelineView() {
   const [draggedLeadId, setDraggedLeadId] = useState<string | null>(null)
   const [filterSource, setFilterSource] = useState<string>('all')
   const [filterUrgency, setFilterUrgency] = useState<string>('all')
+  const [automationDialogOpen, setAutomationDialogOpen] = useState(false)
+  const [selectedStageForAutomation, setSelectedStageForAutomation] = useState<PipelineStage | null>(null)
 
   // Fetch pipelines
   const { data: pipelinesData } = usePipelines()
@@ -329,6 +335,7 @@ export function PipelineView() {
 
   const { mutate: moveToStage } = useMoveLeadToStage()
   const { mutate: convertLead } = useConvertLead()
+  const { mutate: updateStage, isPending: isUpdatingStage } = useUpdatePipelineStage()
 
   const pipeline = pipelineData?.pipeline
   const leadsByStage = pipelineData?.leadsByStage || {}
@@ -418,6 +425,36 @@ export function PipelineView() {
 
   const handleDragEnd = () => {
     setDraggedLeadId(null)
+  }
+
+  // Handle opening automation dialog for a stage
+  const handleOpenAutomation = (stage: PipelineStage) => {
+    setSelectedStageForAutomation(stage)
+    setAutomationDialogOpen(true)
+  }
+
+  // Handle saving automation settings
+  const handleSaveAutomation = async (autoActions: PipelineAutoAction[]) => {
+    if (!pipeline || !selectedStageForAutomation) return
+
+    return new Promise<void>((resolve, reject) => {
+      updateStage(
+        {
+          pipelineId: pipeline._id,
+          stageId: selectedStageForAutomation.stageId,
+          data: { autoActions },
+        },
+        {
+          onSuccess: () => {
+            refetch()
+            resolve()
+          },
+          onError: (error) => {
+            reject(error)
+          },
+        }
+      )
+    })
   }
 
   const topNav = [
@@ -681,10 +718,43 @@ export function PipelineView() {
                         style={{ backgroundColor: stage.color }}
                       >
                         <div className="flex justify-between items-center mb-2">
-                          <span>{stage.nameAr || stage.name}</span>
-                          <Badge className="bg-white/20 text-white border-0">
-                            {totals.count}
-                          </Badge>
+                          <div className="flex items-center gap-2">
+                            <span>{stage.nameAr || stage.name}</span>
+                            {stage.autoActions && stage.autoActions.length > 0 && (
+                              <TooltipProvider>
+                                <Tooltip>
+                                  <TooltipTrigger>
+                                    <Zap className="w-4 h-4 text-yellow-300" />
+                                  </TooltipTrigger>
+                                  <TooltipContent>
+                                    {stage.autoActions.length} إجراء تلقائي
+                                  </TooltipContent>
+                                </Tooltip>
+                              </TooltipProvider>
+                            )}
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Badge className="bg-white/20 text-white border-0">
+                              {totals.count}
+                            </Badge>
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-6 w-6 text-white/80 hover:text-white hover:bg-white/20"
+                                >
+                                  <Settings className="h-4 w-4" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end">
+                                <DropdownMenuItem onClick={() => handleOpenAutomation(stage)}>
+                                  <Zap className="h-4 w-4 ms-2 text-emerald-500" />
+                                  تكوين الأتمتة
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </div>
                         </div>
                         {/* Stage progress bar */}
                         <Progress
@@ -753,6 +823,17 @@ export function PipelineView() {
           <SalesSidebar context="pipeline" />
         </div>
       </Main>
+
+      {/* Pipeline Automation Dialog */}
+      {selectedStageForAutomation && (
+        <PipelineAutomationDialog
+          open={automationDialogOpen}
+          onOpenChange={setAutomationDialogOpen}
+          stage={selectedStageForAutomation}
+          onSave={handleSaveAutomation}
+          isLoading={isUpdatingStage}
+        />
+      )}
     </>
   )
 }
