@@ -18,6 +18,7 @@ import type {
   CreateMilestoneData,
   CreateBaselineData,
   AutoScheduleOptions,
+  ProductivityFilters,
 } from '@/types/gantt'
 
 // ═══════════════════════════════════════════════════════════════
@@ -38,6 +39,18 @@ export const useDHtmlxGanttData = (caseId: string) => {
     queryKey: ['gantt-dhtmlx', caseId],
     queryFn: () => ganttService.getDHtmlxData(caseId),
     enabled: !!caseId,
+    staleTime: 30 * 1000,
+  })
+}
+
+/**
+ * Hook to fetch productivity Gantt data (tasks + reminders + events)
+ * This aggregates all productivity items into a single Gantt view
+ */
+export const useProductivityGanttData = (filters?: ProductivityFilters) => {
+  return useQuery({
+    queryKey: ['gantt', 'productivity', filters],
+    queryFn: () => ganttService.getProductivityData(filters),
     staleTime: 30 * 1000,
   })
 }

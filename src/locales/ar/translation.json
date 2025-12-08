@@ -3083,7 +3083,7 @@
     }
   },
   "ganttTasks": {
-    "title": "الجدول الزمني للمشروع",
+    "title": "الجدول الزمني للإنتاجية",
     "list": "قائمة المهام",
     "kanban": "كانبان",
     "gantt": "مخطط جانت",
@@ -3093,6 +3093,7 @@
     "assignee": "المسؤول",
     "totalTasks": "إجمالي المهام",
     "criticalTasks": "المهام الحرجة",
+    "overdueTasks": "متأخرة",
     "milestones": "المعالم",
     "projectDuration": "مدة المشروع (أيام)",
     "criticalPath": "المسار الحرج",
@@ -3102,17 +3103,23 @@
     "month": "شهر",
     "quarter": "ربع سنة",
     "year": "سنة",
+    "filterAll": "جميع العناصر",
+    "filterTasks": "المهام",
+    "filterReminders": "التذكيرات",
+    "filterEvents": "الأحداث",
     "filterByAssignee": "تصفية حسب المسؤول",
     "filterByStatus": "تصفية حسب الحالة",
     "filterByPriority": "تصفية حسب الأولوية",
+    "pendingReminders": "تذكيرات معلقة",
+    "upcomingEvents": "أحداث قادمة",
     "errors": {
       "loadFailed": "فشل في تحميل مخطط جانت",
       "loadError": "خطأ في تحميل البيانات",
       "connectionError": "تعذر الاتصال بالخادم. يرجى المحاولة مرة أخرى."
     },
     "empty": {
-      "title": "لا توجد مهام",
-      "description": "لا توجد مهام لعرضها في مخطط جانت."
+      "title": "لا توجد عناصر",
+      "description": "لا توجد مهام أو تذكيرات أو أحداث لعرضها."
     }
   }
 }

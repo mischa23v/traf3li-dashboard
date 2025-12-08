@@ -10,6 +10,7 @@
 export type GanttTaskType = 'task' | 'project' | 'milestone'
 export type TaskPriority = 'low' | 'medium' | 'high' | 'urgent'
 export type DependencyType = '0' | '1' | '2' | '3' // 0=FS, 1=SS, 2=FF, 3=SF
+export type SourceType = 'task' | 'reminder' | 'event'
 
 // DHTMLX Gantt compatible format
 export interface GanttTask {
@@ -19,7 +20,7 @@ export interface GanttTask {
   end_date?: string
   duration: number // in days
   progress: number // 0-1
-  parent: string // '0' for root tasks
+  parent?: string // '0' for root tasks
   type: GanttTaskType
   assignee?: string
   assigneeName?: string
@@ -35,6 +36,9 @@ export interface GanttTask {
   originalTaskId?: string
   status?: string
   notes?: string
+  // Productivity endpoint fields
+  sourceType?: SourceType
+  sourceId?: string
 }
 
 export interface GanttLink {
@@ -313,3 +317,46 @@ export type SocketEvent =
   | 'gantt:task:deleted'
   | 'gantt:link:added'
   | 'gantt:link:removed'
+
+// ═══════════════════════════════════════════════════════════════
+// PRODUCTIVITY GANTT TYPES
+// ═══════════════════════════════════════════════════════════════
+
+export interface ProductivitySummary {
+  totalItems: number
+  tasks: {
+    total: number
+    completed: number
+    inProgress: number
+    overdue: number
+  }
+  reminders: {
+    total: number
+    pending: number
+    completed: number
+  }
+  events: {
+    total: number
+    upcoming: number
+    completed: number
+  }
+}
+
+export interface ProductivityCollections {
+  priorities: string[]
+  types: string[]
+  statuses: Record<string, string[]>
+}
+
+export interface ProductivityResponse {
+  success: boolean
+  data: GanttTask[]
+  links: GanttLink[]
+  collections: ProductivityCollections
+  summary: ProductivitySummary
+}
+
+export interface ProductivityFilters {
+  startDate?: string
+  endDate?: string
+}

@@ -3175,7 +3175,7 @@
     "topCandidates": "Top Candidates"
   },
   "ganttTasks": {
-    "title": "Project Timeline",
+    "title": "Productivity Timeline",
     "list": "Task List",
     "kanban": "Kanban",
     "gantt": "Gantt Chart",
@@ -3185,6 +3185,7 @@
     "assignee": "Assignee",
     "totalTasks": "Total Tasks",
     "criticalTasks": "Critical Tasks",
+    "overdueTasks": "Overdue",
     "milestones": "Milestones",
     "projectDuration": "Project Duration (Days)",
     "criticalPath": "Critical Path",
@@ -3194,17 +3195,23 @@
     "month": "Month",
     "quarter": "Quarter",
     "year": "Year",
+    "filterAll": "All Items",
+    "filterTasks": "Tasks",
+    "filterReminders": "Reminders",
+    "filterEvents": "Events",
     "filterByAssignee": "Filter by Assignee",
     "filterByStatus": "Filter by Status",
     "filterByPriority": "Filter by Priority",
+    "pendingReminders": "Pending Reminders",
+    "upcomingEvents": "Upcoming Events",
     "errors": {
       "loadFailed": "Failed to load Gantt chart",
       "loadError": "Error Loading Data",
       "connectionError": "Could not connect to the server. Please try again."
     },
     "empty": {
-      "title": "No Tasks Found",
-      "description": "There are no tasks to display in the Gantt chart."
+      "title": "No Items Found",
+      "description": "There are no tasks, reminders, or events to display."
     }
   }
 }
