@@ -1,3 +1,4 @@
+import { memo } from 'react'
 import { Row } from '@tanstack/react-table'
 import {
   MoreHorizontal,
@@ -24,7 +25,7 @@ interface DataTableRowActionsProps {
   row: Row<Followup>
 }
 
-export function DataTableRowActions({ row }: DataTableRowActionsProps) {
+export const DataTableRowActions = memo(function DataTableRowActions({ row }: DataTableRowActionsProps) {
   const { t } = useTranslation()
   const { setOpen, setCurrentRow } = useFollowupsContext()
   const followup = row.original
@@ -96,4 +97,4 @@ export function DataTableRowActions({ row }: DataTableRowActionsProps) {
       </DropdownMenuContent>
     </DropdownMenu>
   )
-}
+})

@@ -1,3 +1,4 @@
+import { memo } from 'react'
 import { Row } from '@tanstack/react-table'
 import {
   MoreHorizontal,
@@ -27,7 +28,7 @@ interface DataTableRowActionsProps {
   row: Row<Document>
 }
 
-export function DataTableRowActions({ row }: DataTableRowActionsProps) {
+export const DataTableRowActions = memo(function DataTableRowActions({ row }: DataTableRowActionsProps) {
   const { t } = useTranslation()
   const { setOpen, setCurrentRow } = useDocumentsContext()
   const downloadDocument = useDownloadDocument()
@@ -106,4 +107,4 @@ export function DataTableRowActions({ row }: DataTableRowActionsProps) {
       </DropdownMenuContent>
     </DropdownMenu>
   )
-}
+})

@@ -1,3 +1,4 @@
+import { memo } from 'react'
 import { DotsHorizontalIcon } from '@radix-ui/react-icons'
 import { type Row } from '@tanstack/react-table'
 import { Trash2, UserPen } from 'lucide-react'
@@ -17,7 +18,7 @@ type DataTableRowActionsProps = {
   row: Row<User>
 }
 
-export function DataTableRowActions({ row }: DataTableRowActionsProps) {
+export const DataTableRowActions = memo(function DataTableRowActions({ row }: DataTableRowActionsProps) {
   const { setOpen, setCurrentRow } = useUsers()
   return (
     <>
@@ -60,4 +61,4 @@ export function DataTableRowActions({ row }: DataTableRowActionsProps) {
       </DropdownMenu>
     </>
   )
-}
+})

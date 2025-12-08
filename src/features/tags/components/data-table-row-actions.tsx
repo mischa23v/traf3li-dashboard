@@ -1,3 +1,4 @@
+import { memo } from 'react'
 import { Row } from '@tanstack/react-table'
 import { MoreHorizontal, Eye, Pencil, Trash } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -16,7 +17,7 @@ interface DataTableRowActionsProps {
   row: Row<Tag>
 }
 
-export function DataTableRowActions({ row }: DataTableRowActionsProps) {
+export const DataTableRowActions = memo(function DataTableRowActions({ row }: DataTableRowActionsProps) {
   const { t } = useTranslation()
   const { setOpen, setCurrentRow } = useTagsContext()
 
@@ -64,4 +65,4 @@ export function DataTableRowActions({ row }: DataTableRowActionsProps) {
       </DropdownMenuContent>
     </DropdownMenu>
   )
-}
+})

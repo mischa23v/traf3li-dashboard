@@ -1,5 +1,6 @@
 'use client'
 
+import { memo } from 'react'
 import type { Row } from '@tanstack/react-table'
 import { MoreHorizontal, Eye, Pencil, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -19,7 +20,7 @@ interface OrganizationsRowActionsProps {
   row: Row<Organization>
 }
 
-export function OrganizationsRowActions({ row }: OrganizationsRowActionsProps) {
+export const OrganizationsRowActions = memo(function OrganizationsRowActions({ row }: OrganizationsRowActionsProps) {
   const { t } = useTranslation()
   const { setOpen, setCurrentRow } = useOrganizationsContext()
 
@@ -68,4 +69,4 @@ export function OrganizationsRowActions({ row }: OrganizationsRowActionsProps) {
       </DropdownMenuContent>
     </DropdownMenu>
   )
-}
+})
