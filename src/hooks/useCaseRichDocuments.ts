@@ -232,14 +232,14 @@ export const useExportCaseRichDocument = () => {
       // Handle the response based on format
       if (format === 'preview' && response.html) {
         // Open HTML preview in new tab
-        const newWindow = window.open()
+        const newWindow = window.open('', '_blank', 'noopener,noreferrer')
         if (newWindow) {
           newWindow.document.write(response.html)
           newWindow.document.close()
         }
       } else if (response.downloadUrl) {
         // Trigger download for PDF
-        window.open(response.downloadUrl, '_blank')
+        window.open(response.downloadUrl, '_blank', 'noopener,noreferrer')
       } else if (response.latex || response.markdown) {
         // Download as file for LaTeX/Markdown
         const content = response.latex || response.markdown || ''

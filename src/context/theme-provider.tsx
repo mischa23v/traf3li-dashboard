@@ -41,9 +41,11 @@ export function ThemeProvider({
   const [theme, _setTheme] = useState<Theme>(
     () => {
       const savedTheme = getCookie(storageKey) as Theme
-      // Always use light theme, ignore dark preference
-      if (savedTheme === 'dark') return 'light'
-      return savedTheme || defaultTheme
+      // Respect user's theme preference including dark mode
+      if (savedTheme && ['light', 'dark', 'system'].includes(savedTheme)) {
+        return savedTheme
+      }
+      return defaultTheme
     }
   )
 
@@ -81,10 +83,9 @@ export function ThemeProvider({
   }, [theme, resolvedTheme])
 
   const setTheme = (newTheme: Theme) => {
-    // Force light theme, ignore dark preference
-    const themeToSet = newTheme === 'dark' ? 'light' : newTheme
-    setCookie(storageKey, themeToSet, THEME_COOKIE_MAX_AGE)
-    _setTheme(themeToSet)
+    // Allow all theme options including dark mode
+    setCookie(storageKey, newTheme, THEME_COOKIE_MAX_AGE)
+    _setTheme(newTheme)
   }
 
   const resetTheme = () => {
