@@ -15,7 +15,7 @@ import { format, addDays, startOfDay, endOfDay, isSameDay } from 'date-fns'
 import { arSA, enUS } from 'date-fns/locale'
 
 interface HRSidebarProps {
-    context?: 'employees' | 'salaries' | 'payroll' | 'leaves' | 'attendance' | 'evaluations' | 'grievances' | 'organizational-structure' | 'job-positions' | 'succession-planning' | 'compensation' | 'reports'
+    context?: 'employees' | 'salaries' | 'payroll' | 'leaves' | 'attendance' | 'evaluations' | 'grievances' | 'organizational-structure' | 'job-positions' | 'succession-planning' | 'compensation' | 'reports' | 'biometric' | 'geofencing' | 'analytics' | 'predictions'
     isSelectionMode?: boolean
     onToggleSelectionMode?: () => void
     selectedCount?: number
@@ -120,6 +120,22 @@ export function HRSidebar({
         'reports': {
             create: '/dashboard/hr/reports/new',
             viewAll: '/dashboard/hr/reports'
+        },
+        'biometric': {
+            create: '/dashboard/hr/biometric/new',
+            viewAll: '/dashboard/hr/biometric'
+        },
+        'geofencing': {
+            create: '/dashboard/hr/geofencing/new',
+            viewAll: '/dashboard/hr/geofencing'
+        },
+        'analytics': {
+            create: '',
+            viewAll: '/dashboard/hr/analytics'
+        },
+        'predictions': {
+            create: '',
+            viewAll: '/dashboard/hr/predictions'
         }
     }
 

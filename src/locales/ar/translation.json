@@ -996,6 +996,22 @@
       "salesThisMonth": "لقد قمت بـ 265 عملية بيع هذا الشهر."
     }
   },
+  "hrPredictions": {
+    "title": "التنبؤات الذكية",
+    "aiPowered": "مدعوم بالذكاء الاصطناعي",
+    "lastUpdated": "آخر تحديث",
+    "highRiskEmployees": "موظفون عالي الخطورة",
+    "hiringNeeds": "احتياجات التوظيف",
+    "promotionReady": "جاهز للترقية",
+    "attritionRisk": "مخاطر الاستنزاف",
+    "highRiskEmployeesList": "قائمة الموظفين عالي الخطورة",
+    "riskScore": "درجة الخطر",
+    "hiringForecast": "توقعات احتياجات التوظيف",
+    "workforceForecast": "توقعات القوى العاملة",
+    "promotionReadiness": "الاستعداد للترقية",
+    "readinessScore": "درجة الاستعداد",
+    "topCandidates": "أفضل المرشحين"
+  },
   "dataTable": {
     "toolbar": {
       "filterPlaceholder": "تصفية...",

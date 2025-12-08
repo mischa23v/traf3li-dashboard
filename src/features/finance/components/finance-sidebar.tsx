@@ -14,7 +14,7 @@ import { format, addDays, startOfDay, endOfDay, isSameDay } from 'date-fns'
 import { arSA, enUS } from 'date-fns/locale'
 
 interface FinanceSidebarProps {
-    context?: 'invoices' | 'quotes' | 'payments' | 'expenses' | 'statements' | 'transactions' | 'activity' | 'time-tracking' | 'bills' | 'vendors' | 'retainers' | 'recurring' | 'reports' | 'fiscal-periods'
+    context?: 'invoices' | 'quotes' | 'payments' | 'expenses' | 'statements' | 'transactions' | 'activity' | 'time-tracking' | 'bills' | 'vendors' | 'retainers' | 'recurring' | 'reports' | 'fiscal-periods' | 'reconciliation' | 'currency'
     isSelectionMode?: boolean
     onToggleSelectionMode?: () => void
     selectedCount?: number
@@ -117,6 +117,14 @@ export function FinanceSidebar({
         'fiscal-periods': {
             create: '',
             viewAll: '/dashboard/finance/fiscal-periods'
+        },
+        'reconciliation': {
+            create: '/dashboard/finance/reconciliation/new',
+            viewAll: '/dashboard/finance/reconciliation'
+        },
+        'currency': {
+            create: '/dashboard/finance/currency/new',
+            viewAll: '/dashboard/finance/currency'
         }
     }
 

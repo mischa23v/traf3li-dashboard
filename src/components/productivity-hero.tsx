@@ -72,11 +72,13 @@ export function ProductivityHero({ badge, title, type = 'tasks', hideButtons = f
         'succession-planning': { label: t('hero.list.successionPlanning'), href: '/dashboard/hr/succession-planning' },
         'compensation': { label: t('hero.list.compensation'), href: '/dashboard/hr/compensation' },
         'reports': { label: t('hero.list.reports'), href: '/dashboard/hr/reports' },
+        'biometric': { label: t('hero.list.biometric'), href: '/dashboard/hr/biometric' },
         'hr-reports': { label: t('hero.list.hrReports'), href: '/dashboard/hr/reports' },
         'finance-reports': { label: t('hero.list.financeReports'), href: '/dashboard/finance/reports' },
         'tasks-reports': { label: t('hero.list.tasksReports'), href: '/dashboard/tasks/reports' },
         'crm-reports': { label: t('hero.list.crmReports'), href: '/dashboard/crm/reports' },
         'sales-reports': { label: t('hero.list.salesReports'), href: '/dashboard/sales/reports' },
+        'email-marketing': { label: t('hero.list.campaigns'), href: '/dashboard/crm/email-marketing' },
     }
 
     const buttonConfig: Record<string, { label: string; href: string }> = {
@@ -91,6 +93,7 @@ export function ProductivityHero({ badge, title, type = 'tasks', hideButtons = f
         pipeline: { label: t('hero.new.deal'), href: '/dashboard/crm/pipeline/new' },
         referrals: { label: t('hero.new.referral'), href: '/dashboard/crm/referrals/new' },
         activities: { label: t('hero.new.activity'), href: '/dashboard/crm/activities/new' },
+        'email-marketing': { label: t('hero.new.campaign'), href: '/dashboard/crm/email-marketing/new' },
         cases: { label: t('hero.new.case'), href: '/dashboard/cases/new' },
         documents: { label: t('hero.new.document'), href: '/dashboard/documents/new' },
         invoices: { label: t('hero.new.invoice'), href: '/dashboard/finance/invoices/new' },
@@ -111,6 +114,7 @@ export function ProductivityHero({ badge, title, type = 'tasks', hideButtons = f
         'succession-planning': { label: t('hero.new.successionPlan'), href: '/dashboard/hr/succession-planning/new' },
         'compensation': { label: t('hero.new.compensationRecord'), href: '/dashboard/hr/compensation/new' },
         'reports': { label: t('hero.new.report'), href: '/dashboard/hr/reports/new' },
+        'biometric': { label: t('hero.new.device'), href: '/dashboard/hr/biometric/new' },
         'hr-reports': { label: t('hero.new.hrReport'), href: '/dashboard/hr/reports/new' },
         'finance-reports': { label: t('hero.new.financeReport'), href: '/dashboard/finance/reports/new' },
         'tasks-reports': { label: t('hero.new.productivityReport'), href: '/dashboard/tasks/reports/new' },
