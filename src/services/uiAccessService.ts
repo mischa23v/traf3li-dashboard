@@ -68,13 +68,20 @@ const uiAccessService = {
   /**
    * Check if current user has access to a page
    * Called on route navigation
+   * Returns allowed: true by default if the API fails or is not available
    */
   checkPageAccess: async (routePath: string): Promise<PageAccessResult> => {
     try {
       const response = await apiClient.post('/permissions/ui/check-page', { path: routePath })
       return response.data.data || response.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      // Return allowed: true by default when API is unavailable or returns an error
+      // This prevents blocking legitimate users when the permission API is not fully configured
+      console.warn('Page access check failed, allowing access by default:', error?.message || error)
+      return {
+        allowed: true,
+        reason: 'Access check unavailable - defaulting to allowed',
+      }
     }
   },
 
