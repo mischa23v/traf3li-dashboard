@@ -1572,6 +1572,11 @@
       "resend": "Resend invitation",
       "cancel": "Cancel invitation"
     },
+    "soloLawyer": {
+      "title": "Team Management",
+      "message": "Create a firm to manage your team and add staff members",
+      "createFirm": "Create Firm"
+    },
     "form": {
       "basicInfo": "Basic Information",
       "contactInfo": "Contact Information",

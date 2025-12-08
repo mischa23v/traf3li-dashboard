@@ -21,11 +21,12 @@ import { ClientsSidebar } from '@/features/clients/components/clients-sidebar'
 import { TopNav } from '@/components/layout/top-nav'
 import { DynamicIsland } from '@/components/dynamic-island'
 import { LanguageSwitcher } from '@/components/language-switcher'
-import { PageAccessGuard } from '@/components/auth/PageAccessGuard'
+import { SoloLawyerLockScreen } from '@/components/auth/SoloLawyerLockScreen'
 import { AccessMatrixManager } from '@/components/admin/AccessMatrixManager'
 import { UserOverrideManager } from '@/components/admin/UserOverrideManager'
 import { AdminGate, ViewGate } from '@/components/permission-gate'
 import { usePermissions } from '@/hooks/use-permissions'
+import { useAuthStore, selectFirmId } from '@/stores/auth-store'
 import { Bell, Search as SearchIcon, Users, Shield, UserCog, UserCheck, UserX } from 'lucide-react'
 
 const route = getRouteApi('/_authenticated/dashboard/staff/')
@@ -36,6 +37,12 @@ export function Staff() {
   const navigate = route.useNavigate()
   const [activeTab, setActiveTab] = useState('staff')
   const { isAdminOrOwner, isLoading: permissionsLoading } = usePermissions()
+  const firmId = useAuthStore(selectFirmId)
+
+  // Show lock screen for solo lawyers (no firm)
+  if (!firmId) {
+    return <SoloLawyerLockScreen />
+  }
 
   // Fetch staff data from API
   const { data, isLoading } = useStaff({
@@ -62,8 +69,7 @@ export function Staff() {
   const isAdmin = !permissionsLoading && isAdminOrOwner()
 
   return (
-    <PageAccessGuard>
-      <StaffProvider>
+    <StaffProvider>
         <Header className="bg-navy shadow-none relative">
           <TopNav links={topNav} className="[&>a]:text-slate-300 [&>a:hover]:text-white [&>a[aria-current='page']]:text-white" />
           <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
@@ -217,6 +223,5 @@ export function Staff() {
 
         <StaffDialogs />
       </StaffProvider>
-    </PageAccessGuard>
   )
 }
