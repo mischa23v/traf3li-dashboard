@@ -3081,5 +3081,38 @@
       "undo": "تراجع (Ctrl+Z)",
       "redo": "إعادة (Ctrl+Y)"
     }
+  },
+  "ganttTasks": {
+    "title": "الجدول الزمني للمشروع",
+    "list": "قائمة المهام",
+    "kanban": "كانبان",
+    "gantt": "مخطط جانت",
+    "taskName": "اسم المهمة",
+    "startDate": "تاريخ البدء",
+    "duration": "المدة",
+    "assignee": "المسؤول",
+    "totalTasks": "إجمالي المهام",
+    "criticalTasks": "المهام الحرجة",
+    "milestones": "المعالم",
+    "projectDuration": "مدة المشروع (أيام)",
+    "criticalPath": "المسار الحرج",
+    "fitToView": "ملائمة العرض",
+    "day": "يوم",
+    "week": "أسبوع",
+    "month": "شهر",
+    "quarter": "ربع سنة",
+    "year": "سنة",
+    "filterByAssignee": "تصفية حسب المسؤول",
+    "filterByStatus": "تصفية حسب الحالة",
+    "filterByPriority": "تصفية حسب الأولوية",
+    "errors": {
+      "loadFailed": "فشل في تحميل مخطط جانت",
+      "loadError": "خطأ في تحميل البيانات",
+      "connectionError": "تعذر الاتصال بالخادم. يرجى المحاولة مرة أخرى."
+    },
+    "empty": {
+      "title": "لا توجد مهام",
+      "description": "لا توجد مهام لعرضها في مخطط جانت."
+    }
   }
 }
