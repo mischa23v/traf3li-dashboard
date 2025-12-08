@@ -93,7 +93,7 @@ const RELATIONSHIP_TYPES = [
 ]
 
 const SALUTATIONS = [
-    { value: '', label: 'بدون' },
+    { value: 'none', label: 'بدون' },
     { value: 'mr', label: 'السيد' },
     { value: 'mrs', label: 'السيدة' },
     { value: 'ms', label: 'الآنسة' },
@@ -163,7 +163,7 @@ export function CreateContactView() {
     // Form state
     const [formData, setFormData] = useState({
         // Basic Info
-        salutation: '',
+        salutation: 'none',
         firstName: '',
         middleName: '',
         lastName: '',
@@ -315,7 +315,7 @@ export function CreateContactView() {
 
         const contactData = {
             // Basic
-            salutation: formData.salutation || undefined,
+            salutation: formData.salutation === 'none' ? undefined : formData.salutation,
             firstName: formData.firstName,
             middleName: formData.middleName || undefined,
             lastName: formData.lastName,
