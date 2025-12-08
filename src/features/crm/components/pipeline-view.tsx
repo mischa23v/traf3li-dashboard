@@ -496,34 +496,7 @@ export function PipelineView() {
         className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-6 rounded-tr-3xl shadow-inner border-r border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']"
       >
         {/* Header with Pipeline Selector */}
-        <ProductivityHero badge="مسار المبيعات" title="مسار المبيعات" type="pipeline" hideButtons={true}>
-          <div className="flex items-center gap-4">
-            <Select
-              value={selectedPipelineId}
-              onValueChange={setSelectedPipelineId}
-            >
-              <SelectTrigger className="w-[200px] rounded-xl bg-white/10 border-white/10 text-white">
-                <SelectValue placeholder="اختر مسار المبيعات" />
-              </SelectTrigger>
-              <SelectContent>
-                {pipelines.map((p: Pipeline) => (
-                  <SelectItem key={p._id} value={p._id}>
-                    {p.nameAr || p.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <Button
-              asChild
-              className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl shadow-lg border-0"
-            >
-              <Link to="/dashboard/crm/leads/new">
-                <Plus className="ms-2 h-4 w-4" aria-hidden="true" />
-                إضافة عميل
-              </Link>
-            </Button>
-          </div>
-        </ProductivityHero>
+        <ProductivityHero badge="مسار المبيعات" title="مسار المبيعات" type="pipeline" />
 
         {/* Analytics Cards */}
         {pipeline && (

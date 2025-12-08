@@ -161,26 +161,7 @@ export function LeadsListView() {
         className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-r border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']"
       >
         {/* HERO CARD */}
-        <ProductivityHero badge={t('leads.management')} title={t('leads.title')} type="leads" hideButtons={true}>
-          <Button
-            asChild
-            className="bg-emerald-500 hover:bg-emerald-600 text-white h-12 px-8 rounded-xl font-bold shadow-lg shadow-emerald-500/20 border-0"
-          >
-            <Link to="/dashboard/crm/leads/new">
-              <Plus className="ms-2 h-5 w-5" aria-hidden="true" />
-              {t('leads.newLead')}
-            </Link>
-          </Button>
-          <Button
-            asChild
-            className="bg-white text-slate-900 hover:bg-slate-100 h-12 px-8 rounded-xl font-bold shadow-lg border-0 transition-all hover:scale-105"
-          >
-            <Link to="/dashboard/crm/pipeline">
-              <TrendingUp className="ms-2 h-5 w-5" />
-              {t('sidebar.nav.pipeline')}
-            </Link>
-          </Button>
-        </ProductivityHero>
+        <ProductivityHero badge={t('leads.management')} title={t('leads.title')} type="leads" />
 
         {/* MAIN GRID LAYOUT */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
