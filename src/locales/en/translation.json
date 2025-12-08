@@ -1522,14 +1522,23 @@
     "statuses": {
       "active": "Active",
       "inactive": "Inactive",
-      "suspended": "Suspended"
+      "suspended": "Suspended",
+      "departed": "Departed",
+      "pending": "Pending"
     },
     "roles": {
+      "owner": "Owner",
+      "admin": "Admin",
+      "partner": "Partner",
       "lawyer": "Lawyer",
       "paralegal": "Paralegal",
       "secretary": "Secretary",
       "accountant": "Accountant",
-      "admin": "Admin",
+      "sales": "Sales",
+      "sales_manager": "Sales Manager",
+      "hr": "HR",
+      "hr_manager": "HR Manager",
+      "departed": "Departed",
       "intern": "Intern"
     },
     "specializations": {
