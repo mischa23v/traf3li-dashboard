@@ -1,13 +1,16 @@
 /**
  * Enterprise Permission Context Provider
  * Provides permission checking capabilities throughout the application
+ * Integrates RBAC, enterprise policies, and UI access control
  */
 
 import React, { createContext, useContext, useCallback, useMemo } from 'react'
 import { usePermissions } from '@/hooks/use-permissions'
 import { useCheckPermission, useCheckRelation } from '@/hooks/useEnterprisePermissions'
+import { useVisibleSidebar, usePageAccess } from '@/hooks/useUIAccess'
 import type { ModuleKey, PermissionLevel } from '@/types/rbac'
-import type { CheckPermissionRequest, PolicyResource, RelationCheck } from '@/types/permissions'
+import type { CheckPermissionRequest, RelationCheck } from '@/types/permissions'
+import type { SidebarItem, PageAccessResult } from '@/types/uiAccess'
 
 // ==================== TYPES ====================
 
@@ -33,11 +36,18 @@ interface PermissionContextValue {
   checkPermission: (request: CheckPermissionRequest) => Promise<{ allowed: boolean; reason: string }>
   checkRelation: (check: RelationCheck) => Promise<{ allowed: boolean; path?: string[] }>
 
+  // UI Access Control
+  sidebarItems: SidebarItem[]
+  sidebarLoading: boolean
+  checkPageAccess: (path: string) => Promise<PageAccessResult>
+  refetchSidebar: () => void
+
   // Utility
   canAccessResource: (resourceType: string, resourceId: string, action: string) => Promise<boolean>
   canManageTeam: boolean
   canViewFinances: boolean
   accessibleModules: ModuleKey[]
+  refetchPermissions: () => void
 }
 
 // ==================== CONTEXT ====================
@@ -66,10 +76,18 @@ export function PermissionProvider({ children }: PermissionProviderProps) {
     canManageTeam,
     canViewFinances,
     accessibleModules,
+    fetchPermissions,
   } = usePermissions()
 
   const checkPermissionMutation = useCheckPermission()
   const checkRelationMutation = useCheckRelation()
+
+  // UI Access Control
+  const {
+    data: sidebarItems,
+    isLoading: sidebarLoading,
+    refetch: refetchSidebar,
+  } = useVisibleSidebar()
 
   // Wrap module-level checks to ensure they return boolean
   const canView = useCallback(
@@ -140,6 +158,26 @@ export function PermissionProvider({ children }: PermissionProviderProps) {
     [checkPermission]
   )
 
+  // Check page access (UI access control)
+  const checkPageAccess = useCallback(
+    async (path: string): Promise<PageAccessResult> => {
+      try {
+        const { default: uiAccessService } = await import('@/services/uiAccessService')
+        return await uiAccessService.checkPageAccess(path)
+      } catch (error) {
+        console.error('Page access check failed:', error)
+        return { allowed: true } // Fail-safe: allow on error
+      }
+    },
+    []
+  )
+
+  // Refetch all permissions
+  const refetchPermissions = useCallback(() => {
+    fetchPermissions()
+    refetchSidebar()
+  }, [fetchPermissions, refetchSidebar])
+
   const value = useMemo<PermissionContextValue>(
     () => ({
       permissions,
@@ -155,10 +193,15 @@ export function PermissionProvider({ children }: PermissionProviderProps) {
       hasPermission,
       checkPermission,
       checkRelation,
+      sidebarItems: sidebarItems || [],
+      sidebarLoading,
+      checkPageAccess,
+      refetchSidebar,
       canAccessResource,
       canManageTeam: canManageTeam(),
       canViewFinances: canViewFinances(),
       accessibleModules,
+      refetchPermissions,
     }),
     [
       permissions,
@@ -174,10 +217,15 @@ export function PermissionProvider({ children }: PermissionProviderProps) {
       hasPermission,
       checkPermission,
       checkRelation,
+      sidebarItems,
+      sidebarLoading,
+      checkPageAccess,
+      refetchSidebar,
       canAccessResource,
       canManageTeam,
       canViewFinances,
       accessibleModules,
+      refetchPermissions,
     ]
   )
 
