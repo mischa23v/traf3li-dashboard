@@ -1552,6 +1552,17 @@
       "permissions": "Permissions",
       "overrides": "Overrides"
     },
+    "invite": {
+      "title": "Invite New Staff",
+      "description": "Send an invitation email to join the firm",
+      "send": "Send Invitation",
+      "info": "An email will be sent to the staff member with an invitation code. They can use this code during registration to join the firm.",
+      "success": "Invitation sent successfully",
+      "error": "Failed to send invitation",
+      "pending": "Pending acceptance",
+      "resend": "Resend invitation",
+      "cancel": "Cancel invitation"
+    },
     "form": {
       "basicInfo": "Basic Information",
       "contactInfo": "Contact Information",

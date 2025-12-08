@@ -2,6 +2,8 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import lawyersService, { type LawyerFilters } from '@/services/lawyersService'
 import apiClient, { handleApiError } from '@/lib/api'
 import { toast } from 'sonner'
+import { useAuthStore, selectFirmId } from '@/stores/auth-store'
+import firmService from '@/services/firmService'
 
 // Extended Staff interfaces for CRUD operations
 export interface CreateStaffData {
@@ -12,6 +14,14 @@ export interface CreateStaffData {
   role: 'admin' | 'lawyer' | 'paralegal' | 'assistant'
   specialization?: string
   status?: 'active' | 'inactive'
+}
+
+// Invitation data interface
+export interface InviteStaffData {
+  email: string
+  firstName: string
+  lastName: string
+  role: string
 }
 
 export interface UpdateStaffData extends Partial<CreateStaffData> { }
@@ -184,6 +194,34 @@ export const useBulkDeleteStaff = () => {
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل حذف أعضاء الفريق')
+    },
+    onSettled: async () => {
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      await queryClient.invalidateQueries({ queryKey: ['staff'], refetchType: 'all' })
+    },
+  })
+}
+
+/**
+ * Hook to invite a new staff member to the firm
+ * Sends invitation email with code that they use during sign up
+ */
+export const useInviteStaff = () => {
+  const queryClient = useQueryClient()
+  const firmId = useAuthStore(selectFirmId)
+
+  return useMutation({
+    mutationFn: async (data: InviteStaffData) => {
+      if (!firmId) {
+        throw new Error('لم يتم العثور على معرف المكتب')
+      }
+      return firmService.inviteTeamMember(firmId, data)
+    },
+    onSuccess: () => {
+      toast.success('تم إرسال الدعوة بنجاح')
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'فشل إرسال الدعوة')
     },
     onSettled: async () => {
       await new Promise(resolve => setTimeout(resolve, 1000))
