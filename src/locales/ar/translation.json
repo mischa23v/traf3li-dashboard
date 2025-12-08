@@ -1541,6 +1541,17 @@
       "administrative": "القانون الإداري",
       "general": "ممارسة عامة"
     },
+    "stats": {
+      "total": "إجمالي الموظفين",
+      "active": "نشطين",
+      "departed": "مغادرين",
+      "pending": "معلقين"
+    },
+    "tabs": {
+      "members": "الأعضاء",
+      "permissions": "الصلاحيات",
+      "overrides": "الاستثناءات"
+    },
     "form": {
       "basicInfo": "المعلومات الأساسية",
       "contactInfo": "معلومات التواصل",
