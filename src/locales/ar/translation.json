@@ -1522,14 +1522,23 @@
     "statuses": {
       "active": "نشط",
       "inactive": "غير نشط",
-      "suspended": "موقوف"
+      "suspended": "موقوف",
+      "departed": "مغادر",
+      "pending": "قيد الانتظار"
     },
     "roles": {
+      "owner": "المالك",
+      "admin": "مدير النظام",
+      "partner": "شريك",
       "lawyer": "محامي",
       "paralegal": "مساعد قانوني",
       "secretary": "سكرتير",
       "accountant": "محاسب",
-      "admin": "مدير",
+      "sales": "موظف مبيعات",
+      "sales_manager": "مدير المبيعات",
+      "hr": "موظف موارد بشرية",
+      "hr_manager": "مدير الموارد البشرية",
+      "departed": "موظف مغادر",
       "intern": "متدرب"
     },
     "specializations": {

@@ -12,6 +12,8 @@ import {
   UserMinus,
   Clock,
   Ban,
+  TrendingUp,
+  HeartHandshake,
 } from 'lucide-react'
 import { type StaffStatus, type StaffRole, type DepartureReason } from './schema'
 
@@ -43,13 +45,13 @@ export const staffStatuses = [
     icon: UserMinus,
   },
   {
-    label: 'معلق',
+    label: 'موقوف',
     labelEn: 'Suspended',
     value: 'suspended' as const,
     icon: Ban,
   },
   {
-    label: 'معلق',
+    label: 'قيد الانتظار',
     labelEn: 'Pending',
     value: 'pending' as const,
     icon: Clock,
@@ -98,6 +100,30 @@ export const staffRoles = [
     labelEn: 'Accountant',
     value: 'accountant' as StaffRole,
     icon: Calculator,
+  },
+  {
+    label: 'موظف مبيعات',
+    labelEn: 'Sales',
+    value: 'sales' as StaffRole,
+    icon: TrendingUp,
+  },
+  {
+    label: 'مدير المبيعات',
+    labelEn: 'Sales Manager',
+    value: 'sales_manager' as StaffRole,
+    icon: TrendingUp,
+  },
+  {
+    label: 'موظف موارد بشرية',
+    labelEn: 'HR',
+    value: 'hr' as StaffRole,
+    icon: HeartHandshake,
+  },
+  {
+    label: 'مدير الموارد البشرية',
+    labelEn: 'HR Manager',
+    value: 'hr_manager' as StaffRole,
+    icon: HeartHandshake,
   },
   {
     label: 'موظف مغادر',

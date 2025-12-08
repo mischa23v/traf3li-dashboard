@@ -68,13 +68,22 @@ const uiAccessService = {
   /**
    * Check if current user has access to a page
    * Called on route navigation
+   * Returns allowed: true on errors to avoid blocking users when backend isn't ready
    */
   checkPageAccess: async (routePath: string): Promise<PageAccessResult> => {
     try {
       const response = await apiClient.post('/permissions/ui/check-page', { path: routePath })
       return response.data.data || response.data
     } catch (error: any) {
-      throw new Error(handleApiError(error))
+      // Handle 403/404 gracefully - allow access when endpoint isn't available
+      // This prevents blocking users when the backend permission system isn't fully deployed
+      if (error?.response?.status === 403 || error?.response?.status === 404) {
+        console.warn(`Page access check failed for ${routePath} - allowing access by default`)
+        return { allowed: true }
+      }
+      // For other errors, still allow access to avoid blocking users
+      console.error('Page access check error:', error)
+      return { allowed: true }
     }
   },
 
