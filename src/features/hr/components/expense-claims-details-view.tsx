@@ -670,7 +670,7 @@ export function ExpenseClaimsDetailsView() {
                                     variant="ghost"
                                     size="sm"
                                     className="w-full mt-2 rounded-xl"
-                                    onClick={() => window.open(receipt.fileUrl, '_blank')}
+                                    onClick={() => window.open(receipt.fileUrl, '_blank', 'noopener,noreferrer')}
                                   >
                                     <Eye className="w-4 h-4 ms-1" aria-hidden="true" />
                                     عرض

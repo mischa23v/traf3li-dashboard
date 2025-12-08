@@ -141,15 +141,15 @@ interface AuthResponse {
 
 /**
  * DEVELOPMENT ONLY: Test credentials
- * Remove this in production!
+ * Only available in development mode - automatically stripped in production builds
  */
-const TEST_CREDENTIALS = {
+const TEST_CREDENTIALS = import.meta.env.DEV ? {
   username: 'test',
   email: 'test@example.com',
   password: 'test123',
-}
+} : null
 
-const TEST_USER: User = {
+const TEST_USER: User | null = import.meta.env.DEV ? {
   _id: 'test-user-id',
   username: 'test',
   email: 'test@example.com',
@@ -160,7 +160,7 @@ const TEST_USER: User = {
   isSeller: false,
   createdAt: new Date().toISOString(),
   updatedAt: new Date().toISOString(),
-}
+} : null
 
 /**
  * Helper to normalize user data from backend

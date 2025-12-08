@@ -81,7 +81,7 @@ export function openSmartPreview(options: SmartPreviewOptions): SmartPreviewResu
     // Office Online Viewer works best with URLs under 2000 characters
     if (url.length < 2000) {
       const officeViewerUrl = getOfficeViewerUrl(url)
-      const newWindow = window.open(officeViewerUrl, '_blank')
+      const newWindow = window.open(officeViewerUrl, '_blank', 'noopener,noreferrer')
 
       if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') {
         toast.warning(isArabic
@@ -110,7 +110,7 @@ export function openSmartPreview(options: SmartPreviewOptions): SmartPreviewResu
 
   // Native viewable files - open directly in browser
   if (NATIVE_EXTENSIONS.has(ext) || ext === 'pdf') {
-    const newWindow = window.open(url, '_blank')
+    const newWindow = window.open(url, '_blank', 'noopener,noreferrer')
 
     if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') {
       toast.warning(isArabic
@@ -124,7 +124,7 @@ export function openSmartPreview(options: SmartPreviewOptions): SmartPreviewResu
   }
 
   // Unknown file type - attempt to open, browser will handle
-  const newWindow = window.open(url, '_blank')
+  const newWindow = window.open(url, '_blank', 'noopener,noreferrer')
 
   if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') {
     toast.warning(isArabic

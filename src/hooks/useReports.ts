@@ -200,7 +200,7 @@ export function useExportReport() {
       toast.success('تم تصدير التقرير بنجاح')
       // Optionally trigger download
       if (data.fileUrl) {
-        window.open(data.fileUrl, '_blank')
+        window.open(data.fileUrl, '_blank', 'noopener,noreferrer')
       }
     },
     onError: (error: Error) => {

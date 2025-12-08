@@ -331,7 +331,7 @@ export function ChatView() {
                                                                         variant="ghost"
                                                                         size="icon"
                                                                         className={`${isMyMessage ? 'text-white hover:bg-white/20' : 'text-navy hover:bg-slate-100'} rounded-full`}
-                                                                        onClick={() => window.open(attachment.url, '_blank')}
+                                                                        onClick={() => window.open(attachment.url, '_blank', 'noopener,noreferrer')}
                                                                     >
                                                                         <Download className="h-4 w-4" aria-hidden="true" />
                                                                     </Button>

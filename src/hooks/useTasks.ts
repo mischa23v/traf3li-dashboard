@@ -852,7 +852,7 @@ export const useAttachmentVersionDownload = () => {
       )
 
       if (disposition === 'inline') {
-        window.open(downloadUrl, '_blank')
+        window.open(downloadUrl, '_blank', 'noopener,noreferrer')
       } else {
         const link = document.createElement('a')
         link.href = downloadUrl

@@ -234,7 +234,7 @@ export function TaskDetailsView() {
 
     const handlePreviewAttachment = (attachmentId: string, fileName: string, url: string, storageType?: string) => {
         const fullUrl = getFullDocumentUrl(url)
-        window.open(fullUrl, '_blank')
+        window.open(fullUrl, '_blank', 'noopener,noreferrer')
     }
 
     const handleDownloadAttachment = (attachmentId: string, fileName: string, url: string, storageType?: string) => {
