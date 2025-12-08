@@ -329,6 +329,12 @@ export function useSidebarData(): SidebarData {
               url: '/dashboard/finance/currency',
               module: 'payments',
             },
+            // Saudi Banking
+            {
+              title: 'sidebar.nav.saudiBanking',
+              url: '/dashboard/finance/saudi-banking',
+              module: 'payments',
+            },
           ],
         },
       ],

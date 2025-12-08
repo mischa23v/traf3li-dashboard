@@ -140,6 +140,7 @@ import { Route as AuthenticatedDashboardFinanceTransactionsIndexRouteImport } fr
 import { Route as AuthenticatedDashboardFinanceTransactionsHistoryIndexRouteImport } from './routes/_authenticated/dashboard.finance.transactions-history.index'
 import { Route as AuthenticatedDashboardFinanceTimeTrackingIndexRouteImport } from './routes/_authenticated/dashboard.finance.time-tracking.index'
 import { Route as AuthenticatedDashboardFinanceStatementsIndexRouteImport } from './routes/_authenticated/dashboard.finance.statements.index'
+import { Route as AuthenticatedDashboardFinanceSaudiBankingIndexRouteImport } from './routes/_authenticated/dashboard.finance.saudi-banking.index'
 import { Route as AuthenticatedDashboardFinanceRetainersIndexRouteImport } from './routes/_authenticated/dashboard.finance.retainers.index'
 import { Route as AuthenticatedDashboardFinanceReportsIndexRouteImport } from './routes/_authenticated/dashboard.finance.reports.index'
 import { Route as AuthenticatedDashboardFinanceRecurringIndexRouteImport } from './routes/_authenticated/dashboard.finance.recurring.index'
@@ -218,6 +219,8 @@ import { Route as AuthenticatedDashboardFinanceTimeTrackingMonthlyRouteImport } 
 import { Route as AuthenticatedDashboardFinanceTimeTrackingEntryIdRouteImport } from './routes/_authenticated/dashboard.finance.time-tracking.$entryId'
 import { Route as AuthenticatedDashboardFinanceStatementsNewRouteImport } from './routes/_authenticated/dashboard.finance.statements.new'
 import { Route as AuthenticatedDashboardFinanceStatementsStatementIdRouteImport } from './routes/_authenticated/dashboard.finance.statements.$statementId'
+import { Route as AuthenticatedDashboardFinanceSaudiBankingMudadRouteImport } from './routes/_authenticated/dashboard.finance.saudi-banking.mudad'
+import { Route as AuthenticatedDashboardFinanceSaudiBankingLeanRouteImport } from './routes/_authenticated/dashboard.finance.saudi-banking.lean'
 import { Route as AuthenticatedDashboardFinanceRetainersNewRouteImport } from './routes/_authenticated/dashboard.finance.retainers.new'
 import { Route as AuthenticatedDashboardFinanceRetainersRetainerIdRouteImport } from './routes/_authenticated/dashboard.finance.retainers.$retainerId'
 import { Route as AuthenticatedDashboardFinanceReportsTimeEntriesRouteImport } from './routes/_authenticated/dashboard.finance.reports.time-entries'
@@ -256,6 +259,8 @@ import { Route as AuthenticatedDashboardCrmActivitiesNewRouteImport } from './ro
 import { Route as AuthenticatedDashboardCrmActivitiesActivityIdRouteImport } from './routes/_authenticated/dashboard.crm.activities.$activityId'
 import { Route as AuthenticatedDashboardHrRecruitmentJobsIndexRouteImport } from './routes/_authenticated/dashboard.hr.recruitment.jobs.index'
 import { Route as AuthenticatedDashboardHrRecruitmentApplicantsIndexRouteImport } from './routes/_authenticated/dashboard.hr.recruitment.applicants.index'
+import { Route as AuthenticatedDashboardFinanceSaudiBankingWpsIndexRouteImport } from './routes/_authenticated/dashboard.finance.saudi-banking.wps.index'
+import { Route as AuthenticatedDashboardFinanceSaudiBankingSadadIndexRouteImport } from './routes/_authenticated/dashboard.finance.saudi-banking.sadad.index'
 import { Route as AuthenticatedDashboardHrRecruitmentJobsNewRouteImport } from './routes/_authenticated/dashboard.hr.recruitment.jobs.new'
 import { Route as AuthenticatedDashboardHrRecruitmentJobsJobIdRouteImport } from './routes/_authenticated/dashboard.hr.recruitment.jobs.$jobId'
 import { Route as AuthenticatedDashboardHrRecruitmentApplicantsNewRouteImport } from './routes/_authenticated/dashboard.hr.recruitment.applicants.new'
@@ -263,6 +268,8 @@ import { Route as AuthenticatedDashboardHrRecruitmentApplicantsApplicantIdRouteI
 import { Route as AuthenticatedDashboardFinanceVendorsVendorIdEditRouteImport } from './routes/_authenticated/dashboard.finance.vendors.$vendorId.edit'
 import { Route as AuthenticatedDashboardFinanceTimeTrackingEntryIdEditRouteImport } from './routes/_authenticated/dashboard.finance.time-tracking.$entryId.edit'
 import { Route as AuthenticatedDashboardFinanceStatementsStatementIdEditRouteImport } from './routes/_authenticated/dashboard.finance.statements.$statementId.edit'
+import { Route as AuthenticatedDashboardFinanceSaudiBankingWpsNewRouteImport } from './routes/_authenticated/dashboard.finance.saudi-banking.wps.new'
+import { Route as AuthenticatedDashboardFinanceSaudiBankingSadadPayRouteImport } from './routes/_authenticated/dashboard.finance.saudi-banking.sadad.pay'
 import { Route as AuthenticatedDashboardFinanceInvoicesInvoiceIdEditRouteImport } from './routes/_authenticated/dashboard.finance.invoices.$invoiceId.edit'
 import { Route as AuthenticatedDashboardFinanceExpensesExpenseIdEditRouteImport } from './routes/_authenticated/dashboard.finance.expenses.$expenseId.edit'
 import { Route as AuthenticatedDashboardFinanceBillsBillIdEditRouteImport } from './routes/_authenticated/dashboard.finance.bills.$billId.edit'
@@ -1008,6 +1015,12 @@ const AuthenticatedDashboardFinanceStatementsIndexRoute =
     path: '/dashboard/finance/statements/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedDashboardFinanceSaudiBankingIndexRoute =
+  AuthenticatedDashboardFinanceSaudiBankingIndexRouteImport.update({
+    id: '/dashboard/finance/saudi-banking/',
+    path: '/dashboard/finance/saudi-banking/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedDashboardFinanceRetainersIndexRoute =
   AuthenticatedDashboardFinanceRetainersIndexRouteImport.update({
     id: '/dashboard/finance/retainers/',
@@ -1476,6 +1489,18 @@ const AuthenticatedDashboardFinanceStatementsStatementIdRoute =
     path: '/dashboard/finance/statements/$statementId',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedDashboardFinanceSaudiBankingMudadRoute =
+  AuthenticatedDashboardFinanceSaudiBankingMudadRouteImport.update({
+    id: '/dashboard/finance/saudi-banking/mudad',
+    path: '/dashboard/finance/saudi-banking/mudad',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedDashboardFinanceSaudiBankingLeanRoute =
+  AuthenticatedDashboardFinanceSaudiBankingLeanRouteImport.update({
+    id: '/dashboard/finance/saudi-banking/lean',
+    path: '/dashboard/finance/saudi-banking/lean',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedDashboardFinanceRetainersNewRoute =
   AuthenticatedDashboardFinanceRetainersNewRouteImport.update({
     id: '/dashboard/finance/retainers/new',
@@ -1704,6 +1729,18 @@ const AuthenticatedDashboardHrRecruitmentApplicantsIndexRoute =
     path: '/dashboard/hr/recruitment/applicants/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedDashboardFinanceSaudiBankingWpsIndexRoute =
+  AuthenticatedDashboardFinanceSaudiBankingWpsIndexRouteImport.update({
+    id: '/dashboard/finance/saudi-banking/wps/',
+    path: '/dashboard/finance/saudi-banking/wps/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedDashboardFinanceSaudiBankingSadadIndexRoute =
+  AuthenticatedDashboardFinanceSaudiBankingSadadIndexRouteImport.update({
+    id: '/dashboard/finance/saudi-banking/sadad/',
+    path: '/dashboard/finance/saudi-banking/sadad/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedDashboardHrRecruitmentJobsNewRoute =
   AuthenticatedDashboardHrRecruitmentJobsNewRouteImport.update({
     id: '/dashboard/hr/recruitment/jobs/new',
@@ -1746,6 +1783,18 @@ const AuthenticatedDashboardFinanceStatementsStatementIdEditRoute =
     path: '/edit',
     getParentRoute: () =>
       AuthenticatedDashboardFinanceStatementsStatementIdRoute,
+  } as any)
+const AuthenticatedDashboardFinanceSaudiBankingWpsNewRoute =
+  AuthenticatedDashboardFinanceSaudiBankingWpsNewRouteImport.update({
+    id: '/dashboard/finance/saudi-banking/wps/new',
+    path: '/dashboard/finance/saudi-banking/wps/new',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedDashboardFinanceSaudiBankingSadadPayRoute =
+  AuthenticatedDashboardFinanceSaudiBankingSadadPayRouteImport.update({
+    id: '/dashboard/finance/saudi-banking/sadad/pay',
+    path: '/dashboard/finance/saudi-banking/sadad/pay',
+    getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedDashboardFinanceInvoicesInvoiceIdEditRoute =
   AuthenticatedDashboardFinanceInvoicesInvoiceIdEditRouteImport.update({
@@ -1903,6 +1952,8 @@ export interface FileRoutesByFullPath {
   '/dashboard/finance/reports/time-entries': typeof AuthenticatedDashboardFinanceReportsTimeEntriesRoute
   '/dashboard/finance/retainers/$retainerId': typeof AuthenticatedDashboardFinanceRetainersRetainerIdRoute
   '/dashboard/finance/retainers/new': typeof AuthenticatedDashboardFinanceRetainersNewRoute
+  '/dashboard/finance/saudi-banking/lean': typeof AuthenticatedDashboardFinanceSaudiBankingLeanRoute
+  '/dashboard/finance/saudi-banking/mudad': typeof AuthenticatedDashboardFinanceSaudiBankingMudadRoute
   '/dashboard/finance/statements/$statementId': typeof AuthenticatedDashboardFinanceStatementsStatementIdRouteWithChildren
   '/dashboard/finance/statements/new': typeof AuthenticatedDashboardFinanceStatementsNewRoute
   '/dashboard/finance/time-tracking/$entryId': typeof AuthenticatedDashboardFinanceTimeTrackingEntryIdRouteWithChildren
@@ -1981,6 +2032,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/finance/recurring': typeof AuthenticatedDashboardFinanceRecurringIndexRoute
   '/dashboard/finance/reports': typeof AuthenticatedDashboardFinanceReportsIndexRoute
   '/dashboard/finance/retainers': typeof AuthenticatedDashboardFinanceRetainersIndexRoute
+  '/dashboard/finance/saudi-banking': typeof AuthenticatedDashboardFinanceSaudiBankingIndexRoute
   '/dashboard/finance/statements': typeof AuthenticatedDashboardFinanceStatementsIndexRoute
   '/dashboard/finance/time-tracking': typeof AuthenticatedDashboardFinanceTimeTrackingIndexRoute
   '/dashboard/finance/transactions-history': typeof AuthenticatedDashboardFinanceTransactionsHistoryIndexRoute
@@ -2019,6 +2071,8 @@ export interface FileRoutesByFullPath {
   '/dashboard/finance/bills/$billId/edit': typeof AuthenticatedDashboardFinanceBillsBillIdEditRoute
   '/dashboard/finance/expenses/$expenseId/edit': typeof AuthenticatedDashboardFinanceExpensesExpenseIdEditRoute
   '/dashboard/finance/invoices/$invoiceId/edit': typeof AuthenticatedDashboardFinanceInvoicesInvoiceIdEditRoute
+  '/dashboard/finance/saudi-banking/sadad/pay': typeof AuthenticatedDashboardFinanceSaudiBankingSadadPayRoute
+  '/dashboard/finance/saudi-banking/wps/new': typeof AuthenticatedDashboardFinanceSaudiBankingWpsNewRoute
   '/dashboard/finance/statements/$statementId/edit': typeof AuthenticatedDashboardFinanceStatementsStatementIdEditRoute
   '/dashboard/finance/time-tracking/$entryId/edit': typeof AuthenticatedDashboardFinanceTimeTrackingEntryIdEditRoute
   '/dashboard/finance/vendors/$vendorId/edit': typeof AuthenticatedDashboardFinanceVendorsVendorIdEditRoute
@@ -2026,6 +2080,8 @@ export interface FileRoutesByFullPath {
   '/dashboard/hr/recruitment/applicants/new': typeof AuthenticatedDashboardHrRecruitmentApplicantsNewRoute
   '/dashboard/hr/recruitment/jobs/$jobId': typeof AuthenticatedDashboardHrRecruitmentJobsJobIdRoute
   '/dashboard/hr/recruitment/jobs/new': typeof AuthenticatedDashboardHrRecruitmentJobsNewRoute
+  '/dashboard/finance/saudi-banking/sadad': typeof AuthenticatedDashboardFinanceSaudiBankingSadadIndexRoute
+  '/dashboard/finance/saudi-banking/wps': typeof AuthenticatedDashboardFinanceSaudiBankingWpsIndexRoute
   '/dashboard/hr/recruitment/applicants': typeof AuthenticatedDashboardHrRecruitmentApplicantsIndexRoute
   '/dashboard/hr/recruitment/jobs': typeof AuthenticatedDashboardHrRecruitmentJobsIndexRoute
 }
@@ -2159,6 +2215,8 @@ export interface FileRoutesByTo {
   '/dashboard/finance/reports/time-entries': typeof AuthenticatedDashboardFinanceReportsTimeEntriesRoute
   '/dashboard/finance/retainers/$retainerId': typeof AuthenticatedDashboardFinanceRetainersRetainerIdRoute
   '/dashboard/finance/retainers/new': typeof AuthenticatedDashboardFinanceRetainersNewRoute
+  '/dashboard/finance/saudi-banking/lean': typeof AuthenticatedDashboardFinanceSaudiBankingLeanRoute
+  '/dashboard/finance/saudi-banking/mudad': typeof AuthenticatedDashboardFinanceSaudiBankingMudadRoute
   '/dashboard/finance/statements/$statementId': typeof AuthenticatedDashboardFinanceStatementsStatementIdRouteWithChildren
   '/dashboard/finance/statements/new': typeof AuthenticatedDashboardFinanceStatementsNewRoute
   '/dashboard/finance/time-tracking/$entryId': typeof AuthenticatedDashboardFinanceTimeTrackingEntryIdRouteWithChildren
@@ -2237,6 +2295,7 @@ export interface FileRoutesByTo {
   '/dashboard/finance/recurring': typeof AuthenticatedDashboardFinanceRecurringIndexRoute
   '/dashboard/finance/reports': typeof AuthenticatedDashboardFinanceReportsIndexRoute
   '/dashboard/finance/retainers': typeof AuthenticatedDashboardFinanceRetainersIndexRoute
+  '/dashboard/finance/saudi-banking': typeof AuthenticatedDashboardFinanceSaudiBankingIndexRoute
   '/dashboard/finance/statements': typeof AuthenticatedDashboardFinanceStatementsIndexRoute
   '/dashboard/finance/time-tracking': typeof AuthenticatedDashboardFinanceTimeTrackingIndexRoute
   '/dashboard/finance/transactions-history': typeof AuthenticatedDashboardFinanceTransactionsHistoryIndexRoute
@@ -2275,6 +2334,8 @@ export interface FileRoutesByTo {
   '/dashboard/finance/bills/$billId/edit': typeof AuthenticatedDashboardFinanceBillsBillIdEditRoute
   '/dashboard/finance/expenses/$expenseId/edit': typeof AuthenticatedDashboardFinanceExpensesExpenseIdEditRoute
   '/dashboard/finance/invoices/$invoiceId/edit': typeof AuthenticatedDashboardFinanceInvoicesInvoiceIdEditRoute
+  '/dashboard/finance/saudi-banking/sadad/pay': typeof AuthenticatedDashboardFinanceSaudiBankingSadadPayRoute
+  '/dashboard/finance/saudi-banking/wps/new': typeof AuthenticatedDashboardFinanceSaudiBankingWpsNewRoute
   '/dashboard/finance/statements/$statementId/edit': typeof AuthenticatedDashboardFinanceStatementsStatementIdEditRoute
   '/dashboard/finance/time-tracking/$entryId/edit': typeof AuthenticatedDashboardFinanceTimeTrackingEntryIdEditRoute
   '/dashboard/finance/vendors/$vendorId/edit': typeof AuthenticatedDashboardFinanceVendorsVendorIdEditRoute
@@ -2282,6 +2343,8 @@ export interface FileRoutesByTo {
   '/dashboard/hr/recruitment/applicants/new': typeof AuthenticatedDashboardHrRecruitmentApplicantsNewRoute
   '/dashboard/hr/recruitment/jobs/$jobId': typeof AuthenticatedDashboardHrRecruitmentJobsJobIdRoute
   '/dashboard/hr/recruitment/jobs/new': typeof AuthenticatedDashboardHrRecruitmentJobsNewRoute
+  '/dashboard/finance/saudi-banking/sadad': typeof AuthenticatedDashboardFinanceSaudiBankingSadadIndexRoute
+  '/dashboard/finance/saudi-banking/wps': typeof AuthenticatedDashboardFinanceSaudiBankingWpsIndexRoute
   '/dashboard/hr/recruitment/applicants': typeof AuthenticatedDashboardHrRecruitmentApplicantsIndexRoute
   '/dashboard/hr/recruitment/jobs': typeof AuthenticatedDashboardHrRecruitmentJobsIndexRoute
 }
@@ -2420,6 +2483,8 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/finance/reports/time-entries': typeof AuthenticatedDashboardFinanceReportsTimeEntriesRoute
   '/_authenticated/dashboard/finance/retainers/$retainerId': typeof AuthenticatedDashboardFinanceRetainersRetainerIdRoute
   '/_authenticated/dashboard/finance/retainers/new': typeof AuthenticatedDashboardFinanceRetainersNewRoute
+  '/_authenticated/dashboard/finance/saudi-banking/lean': typeof AuthenticatedDashboardFinanceSaudiBankingLeanRoute
+  '/_authenticated/dashboard/finance/saudi-banking/mudad': typeof AuthenticatedDashboardFinanceSaudiBankingMudadRoute
   '/_authenticated/dashboard/finance/statements/$statementId': typeof AuthenticatedDashboardFinanceStatementsStatementIdRouteWithChildren
   '/_authenticated/dashboard/finance/statements/new': typeof AuthenticatedDashboardFinanceStatementsNewRoute
   '/_authenticated/dashboard/finance/time-tracking/$entryId': typeof AuthenticatedDashboardFinanceTimeTrackingEntryIdRouteWithChildren
@@ -2498,6 +2563,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/finance/recurring/': typeof AuthenticatedDashboardFinanceRecurringIndexRoute
   '/_authenticated/dashboard/finance/reports/': typeof AuthenticatedDashboardFinanceReportsIndexRoute
   '/_authenticated/dashboard/finance/retainers/': typeof AuthenticatedDashboardFinanceRetainersIndexRoute
+  '/_authenticated/dashboard/finance/saudi-banking/': typeof AuthenticatedDashboardFinanceSaudiBankingIndexRoute
   '/_authenticated/dashboard/finance/statements/': typeof AuthenticatedDashboardFinanceStatementsIndexRoute
   '/_authenticated/dashboard/finance/time-tracking/': typeof AuthenticatedDashboardFinanceTimeTrackingIndexRoute
   '/_authenticated/dashboard/finance/transactions-history/': typeof AuthenticatedDashboardFinanceTransactionsHistoryIndexRoute
@@ -2536,6 +2602,8 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/finance/bills/$billId/edit': typeof AuthenticatedDashboardFinanceBillsBillIdEditRoute
   '/_authenticated/dashboard/finance/expenses/$expenseId/edit': typeof AuthenticatedDashboardFinanceExpensesExpenseIdEditRoute
   '/_authenticated/dashboard/finance/invoices/$invoiceId/edit': typeof AuthenticatedDashboardFinanceInvoicesInvoiceIdEditRoute
+  '/_authenticated/dashboard/finance/saudi-banking/sadad/pay': typeof AuthenticatedDashboardFinanceSaudiBankingSadadPayRoute
+  '/_authenticated/dashboard/finance/saudi-banking/wps/new': typeof AuthenticatedDashboardFinanceSaudiBankingWpsNewRoute
   '/_authenticated/dashboard/finance/statements/$statementId/edit': typeof AuthenticatedDashboardFinanceStatementsStatementIdEditRoute
   '/_authenticated/dashboard/finance/time-tracking/$entryId/edit': typeof AuthenticatedDashboardFinanceTimeTrackingEntryIdEditRoute
   '/_authenticated/dashboard/finance/vendors/$vendorId/edit': typeof AuthenticatedDashboardFinanceVendorsVendorIdEditRoute
@@ -2543,6 +2611,8 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/hr/recruitment/applicants/new': typeof AuthenticatedDashboardHrRecruitmentApplicantsNewRoute
   '/_authenticated/dashboard/hr/recruitment/jobs/$jobId': typeof AuthenticatedDashboardHrRecruitmentJobsJobIdRoute
   '/_authenticated/dashboard/hr/recruitment/jobs/new': typeof AuthenticatedDashboardHrRecruitmentJobsNewRoute
+  '/_authenticated/dashboard/finance/saudi-banking/sadad/': typeof AuthenticatedDashboardFinanceSaudiBankingSadadIndexRoute
+  '/_authenticated/dashboard/finance/saudi-banking/wps/': typeof AuthenticatedDashboardFinanceSaudiBankingWpsIndexRoute
   '/_authenticated/dashboard/hr/recruitment/applicants/': typeof AuthenticatedDashboardHrRecruitmentApplicantsIndexRoute
   '/_authenticated/dashboard/hr/recruitment/jobs/': typeof AuthenticatedDashboardHrRecruitmentJobsIndexRoute
 }
@@ -2679,6 +2749,8 @@ export interface FileRouteTypes {
     | '/dashboard/finance/reports/time-entries'
     | '/dashboard/finance/retainers/$retainerId'
     | '/dashboard/finance/retainers/new'
+    | '/dashboard/finance/saudi-banking/lean'
+    | '/dashboard/finance/saudi-banking/mudad'
     | '/dashboard/finance/statements/$statementId'
     | '/dashboard/finance/statements/new'
     | '/dashboard/finance/time-tracking/$entryId'
@@ -2757,6 +2829,7 @@ export interface FileRouteTypes {
     | '/dashboard/finance/recurring'
     | '/dashboard/finance/reports'
     | '/dashboard/finance/retainers'
+    | '/dashboard/finance/saudi-banking'
     | '/dashboard/finance/statements'
     | '/dashboard/finance/time-tracking'
     | '/dashboard/finance/transactions-history'
@@ -2795,6 +2868,8 @@ export interface FileRouteTypes {
     | '/dashboard/finance/bills/$billId/edit'
     | '/dashboard/finance/expenses/$expenseId/edit'
     | '/dashboard/finance/invoices/$invoiceId/edit'
+    | '/dashboard/finance/saudi-banking/sadad/pay'
+    | '/dashboard/finance/saudi-banking/wps/new'
     | '/dashboard/finance/statements/$statementId/edit'
     | '/dashboard/finance/time-tracking/$entryId/edit'
     | '/dashboard/finance/vendors/$vendorId/edit'
@@ -2802,6 +2877,8 @@ export interface FileRouteTypes {
     | '/dashboard/hr/recruitment/applicants/new'
     | '/dashboard/hr/recruitment/jobs/$jobId'
     | '/dashboard/hr/recruitment/jobs/new'
+    | '/dashboard/finance/saudi-banking/sadad'
+    | '/dashboard/finance/saudi-banking/wps'
     | '/dashboard/hr/recruitment/applicants'
     | '/dashboard/hr/recruitment/jobs'
   fileRoutesByTo: FileRoutesByTo
@@ -2935,6 +3012,8 @@ export interface FileRouteTypes {
     | '/dashboard/finance/reports/time-entries'
     | '/dashboard/finance/retainers/$retainerId'
     | '/dashboard/finance/retainers/new'
+    | '/dashboard/finance/saudi-banking/lean'
+    | '/dashboard/finance/saudi-banking/mudad'
     | '/dashboard/finance/statements/$statementId'
     | '/dashboard/finance/statements/new'
     | '/dashboard/finance/time-tracking/$entryId'
@@ -3013,6 +3092,7 @@ export interface FileRouteTypes {
     | '/dashboard/finance/recurring'
     | '/dashboard/finance/reports'
     | '/dashboard/finance/retainers'
+    | '/dashboard/finance/saudi-banking'
     | '/dashboard/finance/statements'
     | '/dashboard/finance/time-tracking'
     | '/dashboard/finance/transactions-history'
@@ -3051,6 +3131,8 @@ export interface FileRouteTypes {
     | '/dashboard/finance/bills/$billId/edit'
     | '/dashboard/finance/expenses/$expenseId/edit'
     | '/dashboard/finance/invoices/$invoiceId/edit'
+    | '/dashboard/finance/saudi-banking/sadad/pay'
+    | '/dashboard/finance/saudi-banking/wps/new'
     | '/dashboard/finance/statements/$statementId/edit'
     | '/dashboard/finance/time-tracking/$entryId/edit'
     | '/dashboard/finance/vendors/$vendorId/edit'
@@ -3058,6 +3140,8 @@ export interface FileRouteTypes {
     | '/dashboard/hr/recruitment/applicants/new'
     | '/dashboard/hr/recruitment/jobs/$jobId'
     | '/dashboard/hr/recruitment/jobs/new'
+    | '/dashboard/finance/saudi-banking/sadad'
+    | '/dashboard/finance/saudi-banking/wps'
     | '/dashboard/hr/recruitment/applicants'
     | '/dashboard/hr/recruitment/jobs'
   id:
@@ -3195,6 +3279,8 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/finance/reports/time-entries'
     | '/_authenticated/dashboard/finance/retainers/$retainerId'
     | '/_authenticated/dashboard/finance/retainers/new'
+    | '/_authenticated/dashboard/finance/saudi-banking/lean'
+    | '/_authenticated/dashboard/finance/saudi-banking/mudad'
     | '/_authenticated/dashboard/finance/statements/$statementId'
     | '/_authenticated/dashboard/finance/statements/new'
     | '/_authenticated/dashboard/finance/time-tracking/$entryId'
@@ -3273,6 +3359,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/finance/recurring/'
     | '/_authenticated/dashboard/finance/reports/'
     | '/_authenticated/dashboard/finance/retainers/'
+    | '/_authenticated/dashboard/finance/saudi-banking/'
     | '/_authenticated/dashboard/finance/statements/'
     | '/_authenticated/dashboard/finance/time-tracking/'
     | '/_authenticated/dashboard/finance/transactions-history/'
@@ -3311,6 +3398,8 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/finance/bills/$billId/edit'
     | '/_authenticated/dashboard/finance/expenses/$expenseId/edit'
     | '/_authenticated/dashboard/finance/invoices/$invoiceId/edit'
+    | '/_authenticated/dashboard/finance/saudi-banking/sadad/pay'
+    | '/_authenticated/dashboard/finance/saudi-banking/wps/new'
     | '/_authenticated/dashboard/finance/statements/$statementId/edit'
     | '/_authenticated/dashboard/finance/time-tracking/$entryId/edit'
     | '/_authenticated/dashboard/finance/vendors/$vendorId/edit'
@@ -3318,6 +3407,8 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/hr/recruitment/applicants/new'
     | '/_authenticated/dashboard/hr/recruitment/jobs/$jobId'
     | '/_authenticated/dashboard/hr/recruitment/jobs/new'
+    | '/_authenticated/dashboard/finance/saudi-banking/sadad/'
+    | '/_authenticated/dashboard/finance/saudi-banking/wps/'
     | '/_authenticated/dashboard/hr/recruitment/applicants/'
     | '/_authenticated/dashboard/hr/recruitment/jobs/'
   fileRoutesById: FileRoutesById
@@ -4279,6 +4370,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardFinanceStatementsIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/dashboard/finance/saudi-banking/': {
+      id: '/_authenticated/dashboard/finance/saudi-banking/'
+      path: '/dashboard/finance/saudi-banking'
+      fullPath: '/dashboard/finance/saudi-banking'
+      preLoaderRoute: typeof AuthenticatedDashboardFinanceSaudiBankingIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/dashboard/finance/retainers/': {
       id: '/_authenticated/dashboard/finance/retainers/'
       path: '/dashboard/finance/retainers'
@@ -4825,6 +4923,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardFinanceStatementsStatementIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/dashboard/finance/saudi-banking/mudad': {
+      id: '/_authenticated/dashboard/finance/saudi-banking/mudad'
+      path: '/dashboard/finance/saudi-banking/mudad'
+      fullPath: '/dashboard/finance/saudi-banking/mudad'
+      preLoaderRoute: typeof AuthenticatedDashboardFinanceSaudiBankingMudadRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dashboard/finance/saudi-banking/lean': {
+      id: '/_authenticated/dashboard/finance/saudi-banking/lean'
+      path: '/dashboard/finance/saudi-banking/lean'
+      fullPath: '/dashboard/finance/saudi-banking/lean'
+      preLoaderRoute: typeof AuthenticatedDashboardFinanceSaudiBankingLeanRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/dashboard/finance/retainers/new': {
       id: '/_authenticated/dashboard/finance/retainers/new'
       path: '/dashboard/finance/retainers/new'
@@ -5091,6 +5203,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardHrRecruitmentApplicantsIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/dashboard/finance/saudi-banking/wps/': {
+      id: '/_authenticated/dashboard/finance/saudi-banking/wps/'
+      path: '/dashboard/finance/saudi-banking/wps'
+      fullPath: '/dashboard/finance/saudi-banking/wps'
+      preLoaderRoute: typeof AuthenticatedDashboardFinanceSaudiBankingWpsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dashboard/finance/saudi-banking/sadad/': {
+      id: '/_authenticated/dashboard/finance/saudi-banking/sadad/'
+      path: '/dashboard/finance/saudi-banking/sadad'
+      fullPath: '/dashboard/finance/saudi-banking/sadad'
+      preLoaderRoute: typeof AuthenticatedDashboardFinanceSaudiBankingSadadIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/dashboard/hr/recruitment/jobs/new': {
       id: '/_authenticated/dashboard/hr/recruitment/jobs/new'
       path: '/dashboard/hr/recruitment/jobs/new'
@@ -5139,6 +5265,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/dashboard/finance/statements/$statementId/edit'
       preLoaderRoute: typeof AuthenticatedDashboardFinanceStatementsStatementIdEditRouteImport
       parentRoute: typeof AuthenticatedDashboardFinanceStatementsStatementIdRoute
+    }
+    '/_authenticated/dashboard/finance/saudi-banking/wps/new': {
+      id: '/_authenticated/dashboard/finance/saudi-banking/wps/new'
+      path: '/dashboard/finance/saudi-banking/wps/new'
+      fullPath: '/dashboard/finance/saudi-banking/wps/new'
+      preLoaderRoute: typeof AuthenticatedDashboardFinanceSaudiBankingWpsNewRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dashboard/finance/saudi-banking/sadad/pay': {
+      id: '/_authenticated/dashboard/finance/saudi-banking/sadad/pay'
+      path: '/dashboard/finance/saudi-banking/sadad/pay'
+      fullPath: '/dashboard/finance/saudi-banking/sadad/pay'
+      preLoaderRoute: typeof AuthenticatedDashboardFinanceSaudiBankingSadadPayRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/dashboard/finance/invoices/$invoiceId/edit': {
       id: '/_authenticated/dashboard/finance/invoices/$invoiceId/edit'
@@ -5404,6 +5544,8 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardFinanceReportsTimeEntriesRoute: typeof AuthenticatedDashboardFinanceReportsTimeEntriesRoute
   AuthenticatedDashboardFinanceRetainersRetainerIdRoute: typeof AuthenticatedDashboardFinanceRetainersRetainerIdRoute
   AuthenticatedDashboardFinanceRetainersNewRoute: typeof AuthenticatedDashboardFinanceRetainersNewRoute
+  AuthenticatedDashboardFinanceSaudiBankingLeanRoute: typeof AuthenticatedDashboardFinanceSaudiBankingLeanRoute
+  AuthenticatedDashboardFinanceSaudiBankingMudadRoute: typeof AuthenticatedDashboardFinanceSaudiBankingMudadRoute
   AuthenticatedDashboardFinanceStatementsStatementIdRoute: typeof AuthenticatedDashboardFinanceStatementsStatementIdRouteWithChildren
   AuthenticatedDashboardFinanceStatementsNewRoute: typeof AuthenticatedDashboardFinanceStatementsNewRoute
   AuthenticatedDashboardFinanceTimeTrackingEntryIdRoute: typeof AuthenticatedDashboardFinanceTimeTrackingEntryIdRouteWithChildren
@@ -5482,6 +5624,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardFinanceRecurringIndexRoute: typeof AuthenticatedDashboardFinanceRecurringIndexRoute
   AuthenticatedDashboardFinanceReportsIndexRoute: typeof AuthenticatedDashboardFinanceReportsIndexRoute
   AuthenticatedDashboardFinanceRetainersIndexRoute: typeof AuthenticatedDashboardFinanceRetainersIndexRoute
+  AuthenticatedDashboardFinanceSaudiBankingIndexRoute: typeof AuthenticatedDashboardFinanceSaudiBankingIndexRoute
   AuthenticatedDashboardFinanceStatementsIndexRoute: typeof AuthenticatedDashboardFinanceStatementsIndexRoute
   AuthenticatedDashboardFinanceTimeTrackingIndexRoute: typeof AuthenticatedDashboardFinanceTimeTrackingIndexRoute
   AuthenticatedDashboardFinanceTransactionsHistoryIndexRoute: typeof AuthenticatedDashboardFinanceTransactionsHistoryIndexRoute
@@ -5516,10 +5659,14 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardTasksEventsIndexRoute: typeof AuthenticatedDashboardTasksEventsIndexRoute
   AuthenticatedDashboardTasksRemindersIndexRoute: typeof AuthenticatedDashboardTasksRemindersIndexRoute
   AuthenticatedDashboardTasksReportsIndexRoute: typeof AuthenticatedDashboardTasksReportsIndexRoute
+  AuthenticatedDashboardFinanceSaudiBankingSadadPayRoute: typeof AuthenticatedDashboardFinanceSaudiBankingSadadPayRoute
+  AuthenticatedDashboardFinanceSaudiBankingWpsNewRoute: typeof AuthenticatedDashboardFinanceSaudiBankingWpsNewRoute
   AuthenticatedDashboardHrRecruitmentApplicantsApplicantIdRoute: typeof AuthenticatedDashboardHrRecruitmentApplicantsApplicantIdRoute
   AuthenticatedDashboardHrRecruitmentApplicantsNewRoute: typeof AuthenticatedDashboardHrRecruitmentApplicantsNewRoute
   AuthenticatedDashboardHrRecruitmentJobsJobIdRoute: typeof AuthenticatedDashboardHrRecruitmentJobsJobIdRoute
   AuthenticatedDashboardHrRecruitmentJobsNewRoute: typeof AuthenticatedDashboardHrRecruitmentJobsNewRoute
+  AuthenticatedDashboardFinanceSaudiBankingSadadIndexRoute: typeof AuthenticatedDashboardFinanceSaudiBankingSadadIndexRoute
+  AuthenticatedDashboardFinanceSaudiBankingWpsIndexRoute: typeof AuthenticatedDashboardFinanceSaudiBankingWpsIndexRoute
   AuthenticatedDashboardHrRecruitmentApplicantsIndexRoute: typeof AuthenticatedDashboardHrRecruitmentApplicantsIndexRoute
   AuthenticatedDashboardHrRecruitmentJobsIndexRoute: typeof AuthenticatedDashboardHrRecruitmentJobsIndexRoute
 }
@@ -5678,6 +5825,10 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
     AuthenticatedDashboardFinanceRetainersRetainerIdRoute,
   AuthenticatedDashboardFinanceRetainersNewRoute:
     AuthenticatedDashboardFinanceRetainersNewRoute,
+  AuthenticatedDashboardFinanceSaudiBankingLeanRoute:
+    AuthenticatedDashboardFinanceSaudiBankingLeanRoute,
+  AuthenticatedDashboardFinanceSaudiBankingMudadRoute:
+    AuthenticatedDashboardFinanceSaudiBankingMudadRoute,
   AuthenticatedDashboardFinanceStatementsStatementIdRoute:
     AuthenticatedDashboardFinanceStatementsStatementIdRouteWithChildren,
   AuthenticatedDashboardFinanceStatementsNewRoute:
@@ -5832,6 +5983,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
     AuthenticatedDashboardFinanceReportsIndexRoute,
   AuthenticatedDashboardFinanceRetainersIndexRoute:
     AuthenticatedDashboardFinanceRetainersIndexRoute,
+  AuthenticatedDashboardFinanceSaudiBankingIndexRoute:
+    AuthenticatedDashboardFinanceSaudiBankingIndexRoute,
   AuthenticatedDashboardFinanceStatementsIndexRoute:
     AuthenticatedDashboardFinanceStatementsIndexRoute,
   AuthenticatedDashboardFinanceTimeTrackingIndexRoute:
@@ -5900,6 +6053,10 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
     AuthenticatedDashboardTasksRemindersIndexRoute,
   AuthenticatedDashboardTasksReportsIndexRoute:
     AuthenticatedDashboardTasksReportsIndexRoute,
+  AuthenticatedDashboardFinanceSaudiBankingSadadPayRoute:
+    AuthenticatedDashboardFinanceSaudiBankingSadadPayRoute,
+  AuthenticatedDashboardFinanceSaudiBankingWpsNewRoute:
+    AuthenticatedDashboardFinanceSaudiBankingWpsNewRoute,
   AuthenticatedDashboardHrRecruitmentApplicantsApplicantIdRoute:
     AuthenticatedDashboardHrRecruitmentApplicantsApplicantIdRoute,
   AuthenticatedDashboardHrRecruitmentApplicantsNewRoute:
@@ -5908,6 +6065,10 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
     AuthenticatedDashboardHrRecruitmentJobsJobIdRoute,
   AuthenticatedDashboardHrRecruitmentJobsNewRoute:
     AuthenticatedDashboardHrRecruitmentJobsNewRoute,
+  AuthenticatedDashboardFinanceSaudiBankingSadadIndexRoute:
+    AuthenticatedDashboardFinanceSaudiBankingSadadIndexRoute,
+  AuthenticatedDashboardFinanceSaudiBankingWpsIndexRoute:
+    AuthenticatedDashboardFinanceSaudiBankingWpsIndexRoute,
   AuthenticatedDashboardHrRecruitmentApplicantsIndexRoute:
     AuthenticatedDashboardHrRecruitmentApplicantsIndexRoute,
   AuthenticatedDashboardHrRecruitmentJobsIndexRoute:
