@@ -7,15 +7,13 @@ import {
   Flag,
   Users,
   Download,
-  Settings,
   Filter,
   ChevronDown,
   RotateCcw,
   Milestone,
-  Search,
   Bell,
-  Play,
-  Pause,
+  AlertCircle,
+  Briefcase,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -27,6 +25,8 @@ import { LanguageSwitcher } from '@/components/language-switcher'
 import { ThemeSwitch } from '@/components/theme-switch'
 import { ConfigDrawer } from '@/components/config-drawer'
 import { ProfileDropdown } from '@/components/profile-dropdown'
+import { ProductivityHero } from '@/components/productivity-hero'
+import { TasksSidebar } from './tasks-sidebar'
 import { Skeleton } from '@/components/ui/skeleton'
 import {
   Select,
@@ -65,7 +65,7 @@ export function GanttView({ caseId }: { caseId: string }) {
   const [showCriticalPath, setShowCriticalPath] = useState(false)
 
   // Fetch data
-  const { data: ganttData, isLoading } = useDHtmlxGanttData(caseId)
+  const { data: ganttData, isLoading, isError, error, refetch } = useDHtmlxGanttData(caseId)
   const { data: criticalPathData } = useCriticalPath(caseId)
   const { data: milestones } = useMilestones(caseId)
 
@@ -76,10 +76,10 @@ export function GanttView({ caseId }: { caseId: string }) {
   const { mutate: exportExcel, isPending: exportingExcel } = useExportGanttExcel()
 
   const topNav = [
-    { title: t('tasks.list'), href: '/dashboard/tasks', isActive: false },
-    { title: t('tasks.kanban'), href: '/dashboard/tasks/kanban', isActive: false },
-    { title: t('tasks.gantt'), href: '/dashboard/tasks/gantt', isActive: true },
-    { title: t('tasks.calendar'), href: '/dashboard/calendar', isActive: false },
+    { title: t('tasks.nav.overview'), href: '/dashboard/overview', isActive: false },
+    { title: t('tasks.nav.tasks'), href: '/dashboard/tasks/list', isActive: false },
+    { title: t('tasks.nav.cases'), href: '/dashboard/cases', isActive: false },
+    { title: t('tasks.nav.clients'), href: '/dashboard/clients', isActive: false },
   ]
 
   // Load DHTMLX Gantt
@@ -94,12 +94,12 @@ export function GanttView({ caseId }: { caseId: string }) {
         await import('dhtmlx-gantt/codebase/dhtmlxgantt.css')
 
         setIsGanttLoaded(true)
-      } catch (error) {
-        console.error('Failed to load DHTMLX Gantt:', error)
+      } catch (err) {
+        console.error(t('ganttTasks.errors.loadFailed'), err)
       }
     }
     loadGantt()
-  }, [])
+  }, [t])
 
   // Initialize Gantt when loaded
   useEffect(() => {
@@ -125,26 +125,26 @@ export function GanttView({ caseId }: { caseId: string }) {
     gantt.config.columns = [
       {
         name: 'text',
-        label: t('tasks.taskName'),
+        label: t('ganttTasks.taskName'),
         tree: true,
         width: 200,
         resize: true,
       },
       {
         name: 'start_date',
-        label: t('tasks.startDate'),
+        label: t('ganttTasks.startDate'),
         align: 'center',
         width: 100,
       },
       {
         name: 'duration',
-        label: t('tasks.duration'),
+        label: t('ganttTasks.duration'),
         align: 'center',
         width: 60,
       },
       {
         name: 'assignee',
-        label: t('tasks.assignee'),
+        label: t('ganttTasks.assignee'),
         align: 'center',
         width: 100,
       },
@@ -195,16 +195,11 @@ export function GanttView({ caseId }: { caseId: string }) {
       updateProgress({ taskId: id, progress })
     })
 
-    gantt.attachEvent('onAfterLinkAdd', (id: string, link: any) => {
-      // Handle link creation
-      console.log('Link added:', link)
-    })
-
     // Cleanup
     return () => {
       gantt.clearAll()
     }
-  }, [isGanttLoaded, isRTL, timeScale, showCriticalPath, t])
+  }, [isGanttLoaded, isRTL, timeScale, showCriticalPath, t, criticalPathData])
 
   // Load data into Gantt
   useEffect(() => {
@@ -228,7 +223,7 @@ export function GanttView({ caseId }: { caseId: string }) {
       case 'week':
         gantt.config.scales = [
           { unit: 'month', step: 1, format: '%F %Y' },
-          { unit: 'week', step: 1, format: t('tasks.week') + ' %W' },
+          { unit: 'week', step: 1, format: t('ganttTasks.week') + ' %W' },
         ]
         break
       case 'month':
@@ -304,12 +299,14 @@ export function GanttView({ caseId }: { caseId: string }) {
 
   return (
     <>
+      {/* Header */}
       <Header className="bg-navy shadow-none relative">
         <TopNav
           links={topNav}
           className="[&>a]:text-slate-300 [&>a:hover]:text-white [&>a[aria-current='page']]:text-white"
         />
 
+        {/* Dynamic Island - Centered */}
         <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
           <DynamicIsland />
         </div>
@@ -327,6 +324,7 @@ export function GanttView({ caseId }: { caseId: string }) {
           <ConfigDrawer className="text-slate-300 hover:bg-white/10 hover:text-white hidden lg:flex flex-shrink-0" />
           <ProfileDropdown className="text-slate-300 hover:bg-white/10 hover:text-white flex-shrink-0" />
         </div>
+        {/* Bottom Gradient Line */}
         <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-emerald-500/50 to-transparent"></div>
       </Header>
 
@@ -334,181 +332,223 @@ export function GanttView({ caseId }: { caseId: string }) {
         fluid={true}
         className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-6 rounded-tr-3xl shadow-inner border-r border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']"
       >
-        {/* Toolbar */}
-        <div className="bg-white rounded-2xl p-4 shadow-sm border border-slate-100">
-          <div className="flex flex-wrap items-center justify-between gap-4">
-            {/* Left Controls */}
-            <div className="flex items-center gap-2">
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={handleZoomOut}
-                className="h-9 w-9"
-              >
-                <ZoomOut className="h-4 w-4" />
-              </Button>
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={handleZoomIn}
-                className="h-9 w-9"
-              >
-                <ZoomIn className="h-4 w-4" />
-              </Button>
+        {/* ProductivityHero - Always visible */}
+        <ProductivityHero
+          badge={t('ganttTasks.gantt')}
+          title={t('ganttTasks.title')}
+          type="tasks"
+        />
 
-              <Select value={timeScale} onValueChange={(v) => handleTimeScaleChange(v as TimeScale)}>
-                <SelectTrigger className="w-32">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="day">{t('tasks.day')}</SelectItem>
-                  <SelectItem value="week">{t('tasks.week')}</SelectItem>
-                  <SelectItem value="month">{t('tasks.month')}</SelectItem>
-                  <SelectItem value="quarter">{t('tasks.quarter')}</SelectItem>
-                  <SelectItem value="year">{t('tasks.year')}</SelectItem>
-                </SelectContent>
-              </Select>
+        {/* 3-Column Grid Layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
-              <Button variant="outline" onClick={handleFitToView} className="h-9">
-                <RotateCcw className="h-4 w-4 me-2" />
-                {t('tasks.fitToView')}
-              </Button>
+          {/* Main Content - col-span-2 */}
+          <div className="lg:col-span-2 space-y-6">
+
+            {/* Toolbar */}
+            <div className="bg-white rounded-2xl p-4 shadow-sm border border-slate-100">
+              <div className="flex flex-wrap items-center justify-between gap-4">
+                {/* Left Controls */}
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={handleZoomOut}
+                    className="h-9 w-9 rounded-xl"
+                  >
+                    <ZoomOut className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={handleZoomIn}
+                    className="h-9 w-9 rounded-xl"
+                  >
+                    <ZoomIn className="h-4 w-4" />
+                  </Button>
+
+                  <Select value={timeScale} onValueChange={(v) => handleTimeScaleChange(v as TimeScale)}>
+                    <SelectTrigger className="w-32 rounded-xl">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="day">{t('ganttTasks.day')}</SelectItem>
+                      <SelectItem value="week">{t('ganttTasks.week')}</SelectItem>
+                      <SelectItem value="month">{t('ganttTasks.month')}</SelectItem>
+                      <SelectItem value="quarter">{t('ganttTasks.quarter')}</SelectItem>
+                      <SelectItem value="year">{t('ganttTasks.year')}</SelectItem>
+                    </SelectContent>
+                  </Select>
+
+                  <Button variant="outline" onClick={handleFitToView} className="h-9 rounded-xl">
+                    <RotateCcw className="h-4 w-4 me-2" />
+                    {t('ganttTasks.fitToView')}
+                  </Button>
+                </div>
+
+                {/* Right Controls */}
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant={showCriticalPath ? 'default' : 'outline'}
+                    onClick={handleToggleCriticalPath}
+                    className={`h-9 rounded-xl ${showCriticalPath ? 'bg-red-500 hover:bg-red-600' : ''}`}
+                  >
+                    <Flag className="h-4 w-4 me-2" />
+                    {t('ganttTasks.criticalPath')}
+                  </Button>
+
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="outline" className="h-9 rounded-xl">
+                        <Filter className="h-4 w-4 me-2" />
+                        {t('common.filter')}
+                        <ChevronDown className="h-4 w-4 ms-2" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem>{t('ganttTasks.filterByAssignee')}</DropdownMenuItem>
+                      <DropdownMenuItem>{t('ganttTasks.filterByStatus')}</DropdownMenuItem>
+                      <DropdownMenuItem>{t('ganttTasks.filterByPriority')}</DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem>{t('common.clearFilters')}</DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="outline" className="h-9 rounded-xl">
+                        <Download className="h-4 w-4 me-2" />
+                        {t('common.export')}
+                        <ChevronDown className="h-4 w-4 ms-2" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem onClick={handleExportPDF} disabled={exportingPDF}>
+                        {t('common.exportPDF')}
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={handleExportExcel} disabled={exportingExcel}>
+                        {t('common.exportExcel')}
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
+              </div>
             </div>
 
-            {/* Center - Critical Path Toggle */}
-            <div className="flex items-center gap-2">
-              <Button
-                variant={showCriticalPath ? 'default' : 'outline'}
-                onClick={handleToggleCriticalPath}
-                className={showCriticalPath ? 'bg-red-500 hover:bg-red-600' : ''}
-              >
-                <Flag className="h-4 w-4 me-2" />
-                {t('tasks.criticalPath')}
-              </Button>
+            {/* Stats Cards */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="bg-white rounded-2xl p-4 shadow-sm border border-slate-100">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center">
+                    <Calendar className="h-5 w-5 text-blue-600" />
+                  </div>
+                  <div>
+                    <div className="text-xl font-bold text-navy">
+                      {ganttData?.data?.length || 0}
+                    </div>
+                    <div className="text-xs text-slate-500">{t('ganttTasks.totalTasks')}</div>
+                  </div>
+                </div>
+              </div>
 
-              {criticalPathData && (
-                <Badge className="bg-slate-100 text-slate-700">
-                  {criticalPathData.criticalTasks?.length || 0} {t('tasks.criticalTasks')}
-                </Badge>
+              <div className="bg-white rounded-2xl p-4 shadow-sm border border-slate-100">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-red-50 flex items-center justify-center">
+                    <Flag className="h-5 w-5 text-red-600" />
+                  </div>
+                  <div>
+                    <div className="text-xl font-bold text-navy">
+                      {criticalPathData?.criticalTasks?.length || 0}
+                    </div>
+                    <div className="text-xs text-slate-500">{t('ganttTasks.criticalTasks')}</div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-white rounded-2xl p-4 shadow-sm border border-slate-100">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-purple-50 flex items-center justify-center">
+                    <Milestone className="h-5 w-5 text-purple-600" />
+                  </div>
+                  <div>
+                    <div className="text-xl font-bold text-navy">
+                      {milestones?.length || 0}
+                    </div>
+                    <div className="text-xs text-slate-500">{t('ganttTasks.milestones')}</div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-white rounded-2xl p-4 shadow-sm border border-slate-100">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center">
+                    <Users className="h-5 w-5 text-emerald-600" />
+                  </div>
+                  <div>
+                    <div className="text-xl font-bold text-navy">
+                      {criticalPathData?.totalDuration || 0}
+                    </div>
+                    <div className="text-xs text-slate-500">{t('ganttTasks.projectDuration')}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Gantt Chart Container */}
+            <div className="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden">
+              {/* Loading State */}
+              {(isLoading || !isGanttLoaded) && (
+                <div className="h-[500px] flex items-center justify-center">
+                  <div className="text-center">
+                    <Skeleton className="h-12 w-12 rounded-full mx-auto mb-4" />
+                    <Skeleton className="h-4 w-32 mx-auto mb-2" />
+                    <Skeleton className="h-3 w-24 mx-auto" />
+                  </div>
+                </div>
+              )}
+
+              {/* Error State */}
+              {isError && !isLoading && (
+                <div className="h-[500px] flex items-center justify-center">
+                  <div className="text-center">
+                    <div className="w-16 h-16 rounded-full bg-red-50 flex items-center justify-center mx-auto mb-4">
+                      <AlertCircle className="w-8 h-8 text-red-500" />
+                    </div>
+                    <h3 className="text-lg font-bold text-slate-900 mb-2">{t('ganttTasks.errors.loadError')}</h3>
+                    <p className="text-slate-500 mb-4">{error?.message || t('ganttTasks.errors.connectionError')}</p>
+                    <Button onClick={() => refetch()} className="bg-emerald-500 hover:bg-emerald-600 rounded-xl">
+                      {t('common.retry')}
+                    </Button>
+                  </div>
+                </div>
+              )}
+
+              {/* Empty State */}
+              {!isLoading && !isError && isGanttLoaded && (!ganttData?.data || ganttData.data.length === 0) && (
+                <div className="h-[500px] flex items-center justify-center">
+                  <div className="text-center">
+                    <div className="w-16 h-16 rounded-full bg-emerald-50 flex items-center justify-center mx-auto mb-4">
+                      <Briefcase className="w-8 h-8 text-emerald-500" />
+                    </div>
+                    <h3 className="text-lg font-bold text-slate-900 mb-2">{t('ganttTasks.empty.title')}</h3>
+                    <p className="text-slate-500 mb-4">{t('ganttTasks.empty.description')}</p>
+                  </div>
+                </div>
+              )}
+
+              {/* Gantt Chart */}
+              {!isLoading && !isError && isGanttLoaded && ganttData?.data?.length > 0 && (
+                <div
+                  ref={containerRef}
+                  className="gantt-container"
+                  style={{ width: '100%', height: '500px' }}
+                />
               )}
             </div>
-
-            {/* Right Controls */}
-            <div className="flex items-center gap-2">
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="outline" className="h-9">
-                    <Filter className="h-4 w-4 me-2" />
-                    {t('common.filter')}
-                    <ChevronDown className="h-4 w-4 ms-2" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem>{t('tasks.filterByAssignee')}</DropdownMenuItem>
-                  <DropdownMenuItem>{t('tasks.filterByStatus')}</DropdownMenuItem>
-                  <DropdownMenuItem>{t('tasks.filterByPriority')}</DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem>{t('common.clearFilters')}</DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="outline" className="h-9">
-                    <Download className="h-4 w-4 me-2" />
-                    {t('common.export')}
-                    <ChevronDown className="h-4 w-4 ms-2" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem onClick={handleExportPDF} disabled={exportingPDF}>
-                    {t('common.exportPDF')}
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={handleExportExcel} disabled={exportingExcel}>
-                    {t('common.exportExcel')}
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
-          </div>
-        </div>
-
-        {/* Stats Bar */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div className="bg-white rounded-xl p-4 shadow-sm border border-slate-100">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center">
-                <Calendar className="h-5 w-5 text-blue-600" />
-              </div>
-              <div>
-                <div className="text-xl font-bold text-navy">
-                  {ganttData?.data?.length || 0}
-                </div>
-                <div className="text-xs text-slate-500">{t('tasks.totalTasks')}</div>
-              </div>
-            </div>
           </div>
 
-          <div className="bg-white rounded-xl p-4 shadow-sm border border-slate-100">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-red-50 flex items-center justify-center">
-                <Flag className="h-5 w-5 text-red-600" />
-              </div>
-              <div>
-                <div className="text-xl font-bold text-navy">
-                  {criticalPathData?.criticalTasks?.length || 0}
-                </div>
-                <div className="text-xs text-slate-500">{t('tasks.criticalTasks')}</div>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-xl p-4 shadow-sm border border-slate-100">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-purple-50 flex items-center justify-center">
-                <Milestone className="h-5 w-5 text-purple-600" />
-              </div>
-              <div>
-                <div className="text-xl font-bold text-navy">
-                  {milestones?.length || 0}
-                </div>
-                <div className="text-xs text-slate-500">{t('tasks.milestones')}</div>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-xl p-4 shadow-sm border border-slate-100">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-emerald-50 flex items-center justify-center">
-                <Users className="h-5 w-5 text-emerald-600" />
-              </div>
-              <div>
-                <div className="text-xl font-bold text-navy">
-                  {criticalPathData?.totalDuration || 0}
-                </div>
-                <div className="text-xs text-slate-500">{t('tasks.projectDuration')}</div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Gantt Chart Container */}
-        <div className="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden">
-          {isLoading || !isGanttLoaded ? (
-            <div className="h-[600px] flex items-center justify-center">
-              <div className="text-center">
-                <Skeleton className="h-12 w-12 rounded-full mx-auto mb-4" />
-                <Skeleton className="h-4 w-32 mx-auto mb-2" />
-                <Skeleton className="h-3 w-24 mx-auto" />
-              </div>
-            </div>
-          ) : (
-            <div
-              ref={containerRef}
-              className="gantt-container"
-              style={{ width: '100%', height: '600px' }}
-            />
-          )}
+          {/* Sidebar - col-span-1 */}
+          <TasksSidebar context="tasks" />
         </div>
 
         {/* Custom styles for Gantt */}

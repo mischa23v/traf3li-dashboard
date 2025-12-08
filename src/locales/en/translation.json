@@ -3175,6 +3175,7 @@
     "topCandidates": "Top Candidates"
   },
   "ganttTasks": {
+    "title": "Project Timeline",
     "list": "Task List",
     "kanban": "Kanban",
     "gantt": "Gantt Chart",
@@ -3195,6 +3196,15 @@
     "year": "Year",
     "filterByAssignee": "Filter by Assignee",
     "filterByStatus": "Filter by Status",
-    "filterByPriority": "Filter by Priority"
+    "filterByPriority": "Filter by Priority",
+    "errors": {
+      "loadFailed": "Failed to load Gantt chart",
+      "loadError": "Error Loading Data",
+      "connectionError": "Could not connect to the server. Please try again."
+    },
+    "empty": {
+      "title": "No Tasks Found",
+      "description": "There are no tasks to display in the Gantt chart."
+    }
   }
 }
