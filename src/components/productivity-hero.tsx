@@ -90,7 +90,7 @@ export function ProductivityHero({ badge, title, type = 'tasks', hideButtons = f
         organizations: { label: t('hero.new.organization'), href: '/dashboard/organizations/new' },
         staff: { label: t('hero.new.employee'), href: '/dashboard/staff/new' },
         leads: { label: t('hero.new.lead'), href: '/dashboard/crm/leads/new' },
-        pipeline: { label: t('hero.new.deal'), href: '/dashboard/crm/pipeline/new' },
+        pipeline: { label: t('hero.new.lead'), href: '/dashboard/crm/leads/new' },
         referrals: { label: t('hero.new.referral'), href: '/dashboard/crm/referrals/new' },
         activities: { label: t('hero.new.activity'), href: '/dashboard/crm/activities/new' },
         'email-marketing': { label: t('hero.new.campaign'), href: '/dashboard/crm/email-marketing/new' },
