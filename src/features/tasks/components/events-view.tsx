@@ -438,7 +438,14 @@ export function EventsView() {
                                                         </Badge>
                                                         {/* Event ↔ Task Sync Badge */}
                                                         {event.taskId && (
-                                                            <Badge className="bg-emerald-100 text-emerald-700 hover:bg-emerald-200 border-0 rounded-md px-2 flex items-center gap-1">
+                                                            <Badge
+                                                                className="bg-emerald-100 text-emerald-700 hover:bg-emerald-200 border-0 rounded-md px-2 flex items-center gap-1 cursor-pointer transition-all"
+                                                                onClick={(e) => {
+                                                                    e.stopPropagation()
+                                                                    const taskId = typeof event.taskId === 'string' ? event.taskId : event.taskId._id
+                                                                    navigate({ to: '/dashboard/tasks/$taskId', params: { taskId } })
+                                                                }}
+                                                            >
                                                                 <CheckSquare className="h-3 w-3" />
                                                                 مرتبط بمهمة
                                                             </Badge>

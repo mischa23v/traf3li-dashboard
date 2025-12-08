@@ -638,7 +638,11 @@ export const leadScoringService = {
   }): Promise<{ data: LeadScore[]; pagination: any }> => {
     try {
       const response = await apiClient.get('/lead-scoring/scores', { params })
-      return response.data
+      // API returns: { success: true, data: { scores: [...], pagination: {...} } }
+      return {
+        data: response.data.data.scores,
+        pagination: response.data.data.pagination
+      }
     } catch (error: any) {
       throw new Error(handleApiError(error))
     }

@@ -139,7 +139,8 @@ export function EventDetailsView() {
                 title: h.description || h.action || 'تحديث',
                 type: h.type || 'update',
                 status: 'completed'
-            }))
+            })),
+            taskId: e.taskId // Event ↔ Task sync
         }
     }, [eventData])
 
@@ -243,6 +244,24 @@ export function EventDetailsView() {
                 {!isLoading && !isError && event && (
                     <>
                         <ProductivityHero badge="الأحداث" title={event.title} type="events" listMode={true} />
+
+                        {/* Event ↔ Task Sync Badge */}
+                        {event.taskId && (
+                            <div className="flex items-center justify-center gap-2 max-w-[1600px] mx-auto">
+                                <Button
+                                    onClick={() => {
+                                        const taskId = typeof event.taskId === 'string' ? event.taskId : event.taskId._id
+                                        navigate({ to: '/dashboard/tasks/$taskId', params: { taskId } })
+                                    }}
+                                    variant="outline"
+                                    className="bg-emerald-50 border-emerald-200 text-emerald-700 hover:bg-emerald-100 hover:border-emerald-300 rounded-xl px-4 py-2 flex items-center gap-2"
+                                >
+                                    <CheckCircle2 className="h-4 w-4" />
+                                    <span className="font-medium">مرتبط بمهمة</span>
+                                    <span className="text-xs opacity-75">(انقر للعرض)</span>
+                                </Button>
+                            </div>
+                        )}
 
                         {/* ACTION BUTTONS */}
                         <div className="max-w-[1600px] mx-auto">

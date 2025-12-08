@@ -14,6 +14,8 @@ import {
   UserPlus,
   Filter,
   ArrowUpRight,
+  Building2,
+  User,
 } from 'lucide-react'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useLeads, useDeleteLead, useConvertLead } from '@/hooks/useCrm'
@@ -300,6 +302,18 @@ export function LeadsListView() {
                                 <span className="flex items-center gap-1">
                                   <Mail className="h-3 w-3" aria-hidden="true" />
                                   {lead.email}
+                                </span>
+                              )}
+                              {lead.organizationId && typeof lead.organizationId === 'object' && (
+                                <span className="flex items-center gap-1 text-emerald-600">
+                                  <Building2 className="h-3 w-3" aria-hidden="true" />
+                                  {lead.organizationId.legalName}
+                                </span>
+                              )}
+                              {lead.contactId && typeof lead.contactId === 'object' && (
+                                <span className="flex items-center gap-1 text-blue-600">
+                                  <User className="h-3 w-3" aria-hidden="true" />
+                                  {lead.contactId.firstName} {lead.contactId.lastName || ''}
                                 </span>
                               )}
                             </div>

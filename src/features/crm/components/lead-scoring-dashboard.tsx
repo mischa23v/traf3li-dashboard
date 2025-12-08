@@ -510,17 +510,45 @@ export function LeadScoringDashboard() {
                                                             </Badge>
                                                         )}
                                                     </div>
-                                                    <div className="flex items-center gap-4 text-slate-500 text-sm">
+                                                    <div className="flex items-center gap-4 text-slate-500 text-sm mb-2">
                                                         {score.leadEmail && (
                                                             <span className="flex items-center gap-1">
                                                                 <Mail className="h-3 w-3" />
                                                                 {score.leadEmail}
                                                             </span>
                                                         )}
+                                                        {score.leadStatus && (
+                                                            <span className="flex items-center gap-1">
+                                                                <Badge variant="outline" className="text-xs px-2 py-0.5">
+                                                                    {score.leadStatus}
+                                                                </Badge>
+                                                            </span>
+                                                        )}
                                                         <span>
                                                             آخر نشاط: {score.lastActivity ? format(new Date(score.lastActivity), 'd MMMM yyyy', { locale: arSA }) : 'لا يوجد'}
                                                         </span>
                                                     </div>
+                                                    {/* Conversion Probability Progress Bar */}
+                                                    {score.conversionProbability !== undefined && (
+                                                        <div className="mt-2">
+                                                            <div className="flex items-center justify-between mb-1">
+                                                                <span className="text-xs text-slate-600 font-medium">احتمالية التحويل</span>
+                                                                <span className="text-xs font-bold text-navy">
+                                                                    {Math.round(score.conversionProbability * 100)}%
+                                                                </span>
+                                                            </div>
+                                                            <div className="w-full bg-slate-200 rounded-full h-2">
+                                                                <div
+                                                                    className={`h-2 rounded-full transition-all ${
+                                                                        score.conversionProbability >= 0.7 ? 'bg-emerald-500' :
+                                                                        score.conversionProbability >= 0.4 ? 'bg-amber-500' :
+                                                                        'bg-slate-400'
+                                                                    }`}
+                                                                    style={{ width: `${score.conversionProbability * 100}%` }}
+                                                                />
+                                                            </div>
+                                                        </div>
+                                                    )}
                                                 </div>
                                             </div>
                                             <DropdownMenu>

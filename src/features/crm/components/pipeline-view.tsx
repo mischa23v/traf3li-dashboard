@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import {
   Plus,
   Users,
@@ -12,6 +12,8 @@ import {
   MoreHorizontal,
   ArrowUpRight,
   DollarSign,
+  Building2,
+  User,
   Clock,
   Target,
   BarChart3,
@@ -259,6 +261,18 @@ function LeadCard({
             <span className="truncate" dir="ltr">{lead.email}</span>
           </div>
         )}
+        {lead.organizationId && typeof lead.organizationId === 'object' && (
+          <div className="flex items-center gap-2 truncate">
+            <Building2 className="h-3 w-3 flex-shrink-0 text-emerald-600" aria-hidden="true" />
+            <span className="truncate text-emerald-600">{lead.organizationId.legalName}</span>
+          </div>
+        )}
+        {lead.contactId && typeof lead.contactId === 'object' && (
+          <div className="flex items-center gap-2 truncate">
+            <User className="h-3 w-3 flex-shrink-0 text-blue-600" aria-hidden="true" />
+            <span className="truncate text-blue-600">{lead.contactId.firstName} {lead.contactId.lastName || ''}</span>
+          </div>
+        )}
       </div>
 
       {/* Practice area and value */}
@@ -339,6 +353,14 @@ export function PipelineView() {
 
   const pipeline = pipelineData?.pipeline
   const leadsByStage = pipelineData?.leadsByStage || {}
+
+  // Auto-select default pipeline on load
+  useEffect(() => {
+    if (!selectedPipelineId && pipelines.length > 0) {
+      const defaultPipeline = pipelines.find((p: Pipeline) => p.isDefault)
+      setSelectedPipelineId(defaultPipeline?._id || pipelines[0]._id)
+    }
+  }, [pipelines, selectedPipelineId])
 
   // Calculate analytics
   const analytics = useMemo(() => {
@@ -534,6 +556,40 @@ export function PipelineView() {
       >
         {/* Header with Pipeline Selector */}
         <ProductivityHero badge="مسار المبيعات" title="مسار المبيعات" type="pipeline" />
+
+        {/* Pipeline Selector */}
+        <div className="flex items-center gap-4">
+          <label className="text-sm font-medium text-slate-700">اختر مسار المبيعات:</label>
+          <Select value={selectedPipelineId} onValueChange={setSelectedPipelineId}>
+            <SelectTrigger className="w-[300px] rounded-xl h-10">
+              <SelectValue placeholder="اختر مسار المبيعات" />
+            </SelectTrigger>
+            <SelectContent>
+              {pipelines.length === 0 ? (
+                <SelectItem value="" disabled>
+                  لا توجد مسارات متاحة
+                </SelectItem>
+              ) : (
+                pipelines.map((p: Pipeline) => (
+                  <SelectItem key={p._id} value={p._id}>
+                    <div className="flex items-center gap-2">
+                      <div
+                        className="w-3 h-3 rounded-full"
+                        style={{ backgroundColor: p.color }}
+                      />
+                      <span>{p.nameAr || p.name}</span>
+                      {p.isDefault && (
+                        <Badge variant="outline" className="text-xs">
+                          افتراضي
+                        </Badge>
+                      )}
+                    </div>
+                  </SelectItem>
+                ))
+              )}
+            </SelectContent>
+          </Select>
+        </div>
 
         {/* Analytics Cards */}
         {pipeline && (
