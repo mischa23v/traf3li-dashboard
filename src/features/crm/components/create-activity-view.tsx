@@ -243,7 +243,7 @@ export function CreateActivityView() {
                     {formData.entityType === 'lead' && (
                       <div className="space-y-2">
                         <label className="text-sm font-medium text-slate-700">
-                          العميل المحتمل <span className="text-red-500">*</span>
+                          العميل المحتمل
                         </label>
                         <Select value={formData.entityId} onValueChange={(value) => handleChange('entityId', value)}>
                           <SelectTrigger className="rounded-xl border-slate-200 focus:ring-blue-500">
@@ -266,12 +266,11 @@ export function CreateActivityView() {
                 <div className="border-t border-slate-100 pt-6 space-y-6">
                   <div className="space-y-2">
                     <label className="text-sm font-medium text-slate-700">
-                      العنوان <span className="text-red-500">*</span>
+                      العنوان
                     </label>
                     <Input
                       placeholder="عنوان النشاط..."
                       className="rounded-xl border-slate-200 focus:border-blue-500 focus:ring-blue-500"
-                      required
                       value={formData.title}
                       onChange={(e) => handleChange('title', e.target.value)}
                     />

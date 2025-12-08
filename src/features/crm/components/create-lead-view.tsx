@@ -552,24 +552,20 @@ export function CreateLeadView() {
                     </div>
                     <div className="space-y-2">
                       <label className="text-sm font-medium text-slate-700">
-                        الاسم الأول <span className="text-red-500">*</span>
-                      </label>
+                        الاسم الأول                       </label>
                       <Input
                         placeholder="أحمد"
                         className="rounded-xl"
-                        required
                         value={formData.firstName}
                         onChange={(e) => handleChange('firstName', e.target.value)}
                       />
                     </div>
                     <div className="space-y-2">
                       <label className="text-sm font-medium text-slate-700">
-                        اسم العائلة <span className="text-red-500">*</span>
-                      </label>
+                        اسم العائلة                       </label>
                       <Input
                         placeholder="الشمري"
                         className="rounded-xl"
-                        required
                         value={formData.lastName}
                         onChange={(e) => handleChange('lastName', e.target.value)}
                       />
@@ -612,13 +608,11 @@ export function CreateLeadView() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <label className="text-sm font-medium text-slate-700">
-                        رقم الهاتف <span className="text-red-500">*</span>
-                      </label>
+                        رقم الهاتف                       </label>
                       <Input
                         placeholder="+966 5x xxx xxxx"
                         className="rounded-xl"
                         dir="ltr"
-                        required
                         value={formData.phone}
                         onChange={(e) => handleChange('phone', e.target.value)}
                       />
@@ -782,8 +776,7 @@ export function CreateLeadView() {
                     </div>
                     <div className="space-y-2">
                       <label className="text-sm font-medium text-slate-700">
-                        مصدر العميل <span className="text-red-500">*</span>
-                      </label>
+                        مصدر العميل                       </label>
                       <Select value={formData.sourceType} onValueChange={(value) => handleChange('sourceType', value)}>
                         <SelectTrigger className="rounded-xl">
                           <SelectValue placeholder="كيف وصل إلينا؟" />
