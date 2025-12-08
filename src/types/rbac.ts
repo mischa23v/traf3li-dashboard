@@ -151,15 +151,24 @@ export interface FirmMember {
 }
 
 /**
+ * Team Response Meta
+ * Metadata returned with team members
+ */
+export interface TeamResponseMeta {
+  total: number
+  activeCount: number
+  departedCount: number
+}
+
+/**
  * Team Response
  * Returned from GET /api/firms/:id/team
+ * data is the array of members directly, meta contains counts
  */
 export interface TeamResponse {
   success: boolean
-  data: {
-    members: FirmMember[]
-    total: number
-  }
+  data: FirmMember[]
+  meta: TeamResponseMeta
 }
 
 /**
