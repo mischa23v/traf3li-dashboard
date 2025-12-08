@@ -42,6 +42,8 @@ import { SalesSidebar } from './sales-sidebar'
 import { ProductivityHero } from '@/components/productivity-hero'
 import { useCreateLead, usePipelines } from '@/hooks/useCrm'
 import { useStaff } from '@/hooks/useStaff'
+import { useOrganizations } from '@/hooks/useOrganizations'
+import { useContacts } from '@/hooks/useContacts'
 import { cn } from '@/lib/utils'
 import type { LeadStatus, LeadSource } from '@/types/crm'
 
@@ -183,6 +185,8 @@ export function CreateLeadView() {
   const createLeadMutation = useCreateLead()
   const { data: pipelinesData } = usePipelines()
   const { data: staffData } = useStaff()
+  const { data: organizationsData } = useOrganizations({})
+  const { data: contactsData } = useContacts({})
 
   // Form state
   const [formData, setFormData] = useState({
@@ -282,6 +286,10 @@ export function CreateLeadView() {
     lostReason: '',
     lostReasonDetails: '',
     lostDate: '',
+
+    // Organization & Contact Linking (NEW)
+    organizationId: '',
+    contactId: '',
 
     // Notes
     notes: '',
@@ -431,6 +439,9 @@ export function CreateLeadView() {
       // Assignment
       assignedTo: formData.assignedTo || undefined,
       assignedTeam: formData.assignedTeam || undefined,
+      // Organization & Contact Linking
+      organizationId: formData.organizationId || undefined,
+      contactId: formData.contactId || undefined,
       // Follow-up
       followUp: {
         nextDate: formData.nextFollowUpDate || undefined,
@@ -737,6 +748,50 @@ export function CreateLeadView() {
                         value={formData.website}
                         onChange={(e) => handleChange('website', e.target.value)}
                       />
+                    </div>
+                  </div>
+
+                  {/* Organization & Contact Linking */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t border-slate-100">
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-slate-700">ربط بمنظمة</label>
+                      <Select
+                        value={formData.organizationId}
+                        onValueChange={(value) => handleChange('organizationId', value)}
+                      >
+                        <SelectTrigger className="rounded-xl">
+                          <SelectValue placeholder="اختر منظمة (اختياري)" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="">بدون ربط</SelectItem>
+                          {organizationsData?.data?.map((org: any) => (
+                            <SelectItem key={org._id} value={org._id}>
+                              {org.legalName || org.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <p className="text-xs text-slate-500">ربط هذا العميل المحتمل بمنظمة موجودة</p>
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-slate-700">ربط بجهة اتصال</label>
+                      <Select
+                        value={formData.contactId}
+                        onValueChange={(value) => handleChange('contactId', value)}
+                      >
+                        <SelectTrigger className="rounded-xl">
+                          <SelectValue placeholder="اختر جهة اتصال (اختياري)" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="">بدون ربط</SelectItem>
+                          {contactsData?.data?.map((contact: any) => (
+                            <SelectItem key={contact._id} value={contact._id}>
+                              {contact.firstName} {contact.lastName} {contact.title ? `(${contact.title})` : ''}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <p className="text-xs text-slate-500">ربط هذا العميل المحتمل بجهة اتصال موجودة</p>
                     </div>
                   </div>
                 </CardContent>

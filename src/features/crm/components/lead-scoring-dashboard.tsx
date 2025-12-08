@@ -35,7 +35,9 @@ import {
     Activity,
     Users,
     Zap,
-    RefreshCw
+    RefreshCw,
+    Percent,
+    Mail
 } from 'lucide-react'
 import { useNavigate } from '@tanstack/react-router'
 import { format } from 'date-fns'
@@ -109,10 +111,13 @@ export function LeadScoringDashboard() {
 
         let scores = leadScoresData.data.map((score: LeadScore) => ({
             id: score._id,
-            leadId: score.leadId,
-            leadName: score.leadName || 'غير محدد',
+            leadId: typeof score.leadId === 'string' ? score.leadId : score.leadId._id,
+            leadName: score.leadName || (typeof score.leadId === 'object' ? `${score.leadId.firstName || ''} ${score.leadId.lastName || ''}`.trim() : 'غير محدد') || 'غير محدد',
+            leadEmail: typeof score.leadId === 'object' ? score.leadId.email : undefined,
+            leadStatus: typeof score.leadId === 'object' ? score.leadId.status : undefined,
             totalScore: score.totalScore,
             grade: score.grade,
+            conversionProbability: score.conversionProbability, // NEW
             trend: score.trend,
             lastActivity: score.lastActivity,
             dimensions: score.dimensions,
@@ -493,10 +498,29 @@ export function LeadScoringDashboard() {
                                                         <h4 className="font-bold text-navy text-lg">{score.leadName}</h4>
                                                         {getGradeBadge(score.grade)}
                                                         {getTrendIcon(score.trend)}
+                                                        {/* Conversion Probability Badge */}
+                                                        {score.conversionProbability !== undefined && (
+                                                            <Badge className={`border-0 rounded-full px-3 py-1 text-xs font-medium ${
+                                                                score.conversionProbability >= 0.7 ? 'bg-emerald-100 text-emerald-700' :
+                                                                score.conversionProbability >= 0.4 ? 'bg-amber-100 text-amber-700' :
+                                                                'bg-slate-100 text-slate-600'
+                                                            }`}>
+                                                                <Percent className="h-3 w-3 me-1 inline" />
+                                                                {Math.round(score.conversionProbability * 100)}%
+                                                            </Badge>
+                                                        )}
                                                     </div>
-                                                    <p className="text-slate-500 text-sm">
-                                                        آخر نشاط: {score.lastActivity ? format(new Date(score.lastActivity), 'd MMMM yyyy', { locale: arSA }) : 'لا يوجد'}
-                                                    </p>
+                                                    <div className="flex items-center gap-4 text-slate-500 text-sm">
+                                                        {score.leadEmail && (
+                                                            <span className="flex items-center gap-1">
+                                                                <Mail className="h-3 w-3" />
+                                                                {score.leadEmail}
+                                                            </span>
+                                                        )}
+                                                        <span>
+                                                            آخر نشاط: {score.lastActivity ? format(new Date(score.lastActivity), 'd MMMM yyyy', { locale: arSA }) : 'لا يوجد'}
+                                                        </span>
+                                                    </div>
                                                 </div>
                                             </div>
                                             <DropdownMenu>

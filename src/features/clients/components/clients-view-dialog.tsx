@@ -12,6 +12,10 @@ import {
   MessageCircle,
   FileText,
   Lock,
+  Wallet,
+  CreditCard,
+  DollarSign,
+  ArrowRightCircle,
 } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import {
@@ -215,6 +219,82 @@ export function ClientsViewDialog({
                         .join('، ')}
                     </p>
                   </div>
+                </div>
+              </div>
+            </>
+          )}
+
+          {/* Billing & Balance (NEW) */}
+          {(currentRow.billing?.creditBalance !== undefined ||
+            currentRow.totalPaid !== undefined ||
+            currentRow.totalOutstanding !== undefined) && (
+            <>
+              <Separator />
+              <div className='space-y-4'>
+                <h4 className='text-sm font-medium flex items-center gap-2'>
+                  <Wallet className='h-4 w-4 text-emerald-500' />
+                  {isArabic ? 'الرصيد المالي' : 'Financial Balance'}
+                </h4>
+                <div className='grid grid-cols-1 gap-4 sm:grid-cols-3'>
+                  {currentRow.billing?.creditBalance !== undefined && (
+                    <div className='flex items-center gap-3 p-3 bg-emerald-50 rounded-xl'>
+                      <CreditCard className='h-5 w-5 text-emerald-600' />
+                      <div>
+                        <p className='text-xs text-emerald-600'>
+                          {isArabic ? 'الرصيد الائتماني' : 'Credit Balance'}
+                        </p>
+                        <p className='font-bold text-emerald-700 text-lg'>
+                          {currentRow.billing.creditBalance.toLocaleString()} {currentRow.billing.currency || 'ر.س'}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                  {currentRow.totalPaid !== undefined && (
+                    <div className='flex items-center gap-3 p-3 bg-blue-50 rounded-xl'>
+                      <DollarSign className='h-5 w-5 text-blue-600' />
+                      <div>
+                        <p className='text-xs text-blue-600'>
+                          {isArabic ? 'إجمالي المدفوع' : 'Total Paid'}
+                        </p>
+                        <p className='font-bold text-blue-700 text-lg'>
+                          {currentRow.totalPaid.toLocaleString()} ر.س
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                  {currentRow.totalOutstanding !== undefined && (
+                    <div className='flex items-center gap-3 p-3 bg-amber-50 rounded-xl'>
+                      <DollarSign className='h-5 w-5 text-amber-600' />
+                      <div>
+                        <p className='text-xs text-amber-600'>
+                          {isArabic ? 'المبلغ المستحق' : 'Outstanding'}
+                        </p>
+                        <p className='font-bold text-amber-700 text-lg'>
+                          {currentRow.totalOutstanding.toLocaleString()} ر.س
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </>
+          )}
+
+          {/* Conversion Info (NEW) */}
+          {currentRow.convertedFromLead && (
+            <>
+              <Separator />
+              <div className='flex items-center gap-3 p-3 bg-purple-50 rounded-xl'>
+                <ArrowRightCircle className='h-5 w-5 text-purple-600' />
+                <div>
+                  <p className='text-xs text-purple-600'>
+                    {isArabic ? 'تم التحويل من عميل محتمل' : 'Converted from Lead'}
+                  </p>
+                  {currentRow.convertedAt && (
+                    <p className='font-medium text-purple-700'>
+                      {format(new Date(currentRow.convertedAt), 'PPP', { locale: dateLocale })}
+                    </p>
+                  )}
                 </div>
               </div>
             </>

@@ -388,6 +388,7 @@ export interface Task {
   }
   parentTaskId?: string // For sub-task hierarchy
   eventId?: string // Linked calendar event
+  linkedEventId?: string // Auto-linked calendar event (created when task has dueDate)
   reminderId?: string // Linked reminder
   invoiceId?: string // Linked invoice
   // Court Info (Saudi Legal-specific)

@@ -26,6 +26,16 @@ export interface Client {
   preferredContactMethod: 'email' | 'phone' | 'sms' | 'whatsapp'
   language: string
   status: 'active' | 'inactive' | 'archived'
+  // Billing & Balance (NEW)
+  billing?: {
+    creditBalance: number
+    currency?: string
+  }
+  totalPaid?: number
+  totalOutstanding?: number
+  // Conversion tracking (NEW)
+  convertedFromLead?: boolean
+  convertedAt?: string
   createdAt: string
   updatedAt: string
 }
