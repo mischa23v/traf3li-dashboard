@@ -25,7 +25,7 @@ import { DynamicIsland } from '@/components/dynamic-island'
 import { useCreateGeofence, useUpdateGeofence, useGeofence } from '@/hooks/useBiometric'
 import { cn } from '@/lib/utils'
 import {
-    Search, Bell, MapPin, Loader2, CheckCircle, Circle, Polygon, Plus, Trash2, AlertCircle, Clock
+    Search, Bell, MapPin, Loader2, CheckCircle, Circle, Hexagon, Plus, Trash2, AlertCircle, Clock
 } from 'lucide-react'
 import type { CreateGeofenceData, GeofenceType } from '@/types/biometric'
 import { MapContainer, TileLayer, Circle as LeafletCircle, Polygon as LeafletPolygon, Marker, useMapEvents } from 'react-leaflet'
@@ -278,7 +278,7 @@ export function GeofencingCreateView() {
                                                 </SelectItem>
                                                 <SelectItem value="polygon">
                                                     <div className="flex items-center gap-2">
-                                                        <Polygon className="h-4 w-4" />
+                                                        <Hexagon className="h-4 w-4" />
                                                         متعدد الأضلاع (نقاط متعددة)
                                                     </div>
                                                 </SelectItem>
@@ -300,7 +300,7 @@ export function GeofencingCreateView() {
                             <Card className="rounded-3xl shadow-sm border-slate-100">
                                 <CardHeader className="pb-4">
                                     <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                                        {type === 'circle' ? <Circle className="w-5 h-5 text-blue-500" /> : <Polygon className="w-5 h-5 text-purple-500" />}
+                                        {type === 'circle' ? <Circle className="w-5 h-5 text-blue-500" /> : <Hexagon className="w-5 h-5 text-purple-500" />}
                                         {type === 'circle' ? 'الموقع ونصف القطر' : 'نقاط الحدود'}
                                     </CardTitle>
                                 </CardHeader>
