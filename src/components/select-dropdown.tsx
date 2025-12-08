@@ -50,7 +50,7 @@ export function SelectDropdown({
             </div>
           </SelectItem>
         ) : (
-          items?.map(({ label, value }) => (
+          items?.filter(item => item.value)?.map(({ label, value }) => (
             <SelectItem key={value} value={value}>
               {label}
             </SelectItem>
