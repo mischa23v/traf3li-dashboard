@@ -6,10 +6,9 @@
 import { createContext, useContext, useEffect, useState, useCallback, ReactNode } from 'react'
 import { io, Socket } from 'socket.io-client'
 import { useAuthStore } from '@/stores/auth-store'
+import { getWsUrl } from '@/config/api'
 
-const SOCKET_URL =
-  import.meta.env.VITE_API_URL?.replace('/api', '') ||
-  'https://api.traf3li.com'
+const SOCKET_URL = getWsUrl()
 
 // Notification types
 export interface Notification {
