@@ -101,7 +101,6 @@ import { Route as AuthenticatedDashboardJobsMyServicesRouteImport } from './rout
 import { Route as AuthenticatedDashboardJobsBrowseRouteImport } from './routes/_authenticated/dashboard.jobs.browse'
 import { Route as AuthenticatedDashboardFinanceOverviewRouteImport } from './routes/_authenticated/dashboard.finance.overview'
 import { Route as AuthenticatedDashboardCrmPipelineRouteImport } from './routes/_authenticated/dashboard.crm.pipeline'
-import { Route as AuthenticatedDashboardCrmActivitiesRouteImport } from './routes/_authenticated/dashboard.crm.activities'
 import { Route as AuthenticatedDashboardContactsNewRouteImport } from './routes/_authenticated/dashboard.contacts.new'
 import { Route as AuthenticatedDashboardClientsNewRouteImport } from './routes/_authenticated/dashboard.clients.new'
 import { Route as AuthenticatedDashboardClientsClientIdRouteImport } from './routes/_authenticated/dashboard.clients.$clientId'
@@ -159,6 +158,7 @@ import { Route as AuthenticatedDashboardCrmReferralsIndexRouteImport } from './r
 import { Route as AuthenticatedDashboardCrmLeadsIndexRouteImport } from './routes/_authenticated/dashboard.crm.leads.index'
 import { Route as AuthenticatedDashboardCrmLeadScoringIndexRouteImport } from './routes/_authenticated/dashboard.crm.lead-scoring.index'
 import { Route as AuthenticatedDashboardCrmEmailMarketingIndexRouteImport } from './routes/_authenticated/dashboard.crm.email-marketing.index'
+import { Route as AuthenticatedDashboardCrmActivitiesIndexRouteImport } from './routes/_authenticated/dashboard.crm.activities.index'
 import { Route as AuthenticatedDashboardTasksReportsNewRouteImport } from './routes/_authenticated/dashboard.tasks.reports.new'
 import { Route as AuthenticatedDashboardTasksReportsReportIdRouteImport } from './routes/_authenticated/dashboard.tasks.reports.$reportId'
 import { Route as AuthenticatedDashboardTasksRemindersNewRouteImport } from './routes/_authenticated/dashboard.tasks.reminders.new'
@@ -781,12 +781,6 @@ const AuthenticatedDashboardCrmPipelineRoute =
     path: '/dashboard/crm/pipeline',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
-const AuthenticatedDashboardCrmActivitiesRoute =
-  AuthenticatedDashboardCrmActivitiesRouteImport.update({
-    id: '/dashboard/crm/activities',
-    path: '/dashboard/crm/activities',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
 const AuthenticatedDashboardContactsNewRoute =
   AuthenticatedDashboardContactsNewRouteImport.update({
     id: '/dashboard/contacts/new',
@@ -1127,6 +1121,12 @@ const AuthenticatedDashboardCrmEmailMarketingIndexRoute =
   AuthenticatedDashboardCrmEmailMarketingIndexRouteImport.update({
     id: '/dashboard/crm/email-marketing/',
     path: '/dashboard/crm/email-marketing/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedDashboardCrmActivitiesIndexRoute =
+  AuthenticatedDashboardCrmActivitiesIndexRouteImport.update({
+    id: '/dashboard/crm/activities/',
+    path: '/dashboard/crm/activities/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedDashboardTasksReportsNewRoute =
@@ -1707,15 +1707,15 @@ const AuthenticatedDashboardCrmEmailMarketingCampaignIdRoute =
   } as any)
 const AuthenticatedDashboardCrmActivitiesNewRoute =
   AuthenticatedDashboardCrmActivitiesNewRouteImport.update({
-    id: '/new',
-    path: '/new',
-    getParentRoute: () => AuthenticatedDashboardCrmActivitiesRoute,
+    id: '/dashboard/crm/activities/new',
+    path: '/dashboard/crm/activities/new',
+    getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedDashboardCrmActivitiesActivityIdRoute =
   AuthenticatedDashboardCrmActivitiesActivityIdRouteImport.update({
-    id: '/$activityId',
-    path: '/$activityId',
-    getParentRoute: () => AuthenticatedDashboardCrmActivitiesRoute,
+    id: '/dashboard/crm/activities/$activityId',
+    path: '/dashboard/crm/activities/$activityId',
+    getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedDashboardHrRecruitmentJobsIndexRoute =
   AuthenticatedDashboardHrRecruitmentJobsIndexRouteImport.update({
@@ -1877,7 +1877,6 @@ export interface FileRoutesByFullPath {
   '/dashboard/clients/$clientId': typeof AuthenticatedDashboardClientsClientIdRoute
   '/dashboard/clients/new': typeof AuthenticatedDashboardClientsNewRoute
   '/dashboard/contacts/new': typeof AuthenticatedDashboardContactsNewRoute
-  '/dashboard/crm/activities': typeof AuthenticatedDashboardCrmActivitiesRouteWithChildren
   '/dashboard/crm/pipeline': typeof AuthenticatedDashboardCrmPipelineRoute
   '/dashboard/finance/overview': typeof AuthenticatedDashboardFinanceOverviewRoute
   '/dashboard/jobs/browse': typeof AuthenticatedDashboardJobsBrowseRoute
@@ -2014,6 +2013,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/tasks/reminders/new': typeof AuthenticatedDashboardTasksRemindersNewRoute
   '/dashboard/tasks/reports/$reportId': typeof AuthenticatedDashboardTasksReportsReportIdRoute
   '/dashboard/tasks/reports/new': typeof AuthenticatedDashboardTasksReportsNewRoute
+  '/dashboard/crm/activities': typeof AuthenticatedDashboardCrmActivitiesIndexRoute
   '/dashboard/crm/email-marketing': typeof AuthenticatedDashboardCrmEmailMarketingIndexRoute
   '/dashboard/crm/lead-scoring': typeof AuthenticatedDashboardCrmLeadScoringIndexRoute
   '/dashboard/crm/leads': typeof AuthenticatedDashboardCrmLeadsIndexRoute
@@ -2140,7 +2140,6 @@ export interface FileRoutesByTo {
   '/dashboard/clients/$clientId': typeof AuthenticatedDashboardClientsClientIdRoute
   '/dashboard/clients/new': typeof AuthenticatedDashboardClientsNewRoute
   '/dashboard/contacts/new': typeof AuthenticatedDashboardContactsNewRoute
-  '/dashboard/crm/activities': typeof AuthenticatedDashboardCrmActivitiesRouteWithChildren
   '/dashboard/crm/pipeline': typeof AuthenticatedDashboardCrmPipelineRoute
   '/dashboard/finance/overview': typeof AuthenticatedDashboardFinanceOverviewRoute
   '/dashboard/jobs/browse': typeof AuthenticatedDashboardJobsBrowseRoute
@@ -2277,6 +2276,7 @@ export interface FileRoutesByTo {
   '/dashboard/tasks/reminders/new': typeof AuthenticatedDashboardTasksRemindersNewRoute
   '/dashboard/tasks/reports/$reportId': typeof AuthenticatedDashboardTasksReportsReportIdRoute
   '/dashboard/tasks/reports/new': typeof AuthenticatedDashboardTasksReportsNewRoute
+  '/dashboard/crm/activities': typeof AuthenticatedDashboardCrmActivitiesIndexRoute
   '/dashboard/crm/email-marketing': typeof AuthenticatedDashboardCrmEmailMarketingIndexRoute
   '/dashboard/crm/lead-scoring': typeof AuthenticatedDashboardCrmLeadScoringIndexRoute
   '/dashboard/crm/leads': typeof AuthenticatedDashboardCrmLeadsIndexRoute
@@ -2408,7 +2408,6 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/clients/$clientId': typeof AuthenticatedDashboardClientsClientIdRoute
   '/_authenticated/dashboard/clients/new': typeof AuthenticatedDashboardClientsNewRoute
   '/_authenticated/dashboard/contacts/new': typeof AuthenticatedDashboardContactsNewRoute
-  '/_authenticated/dashboard/crm/activities': typeof AuthenticatedDashboardCrmActivitiesRouteWithChildren
   '/_authenticated/dashboard/crm/pipeline': typeof AuthenticatedDashboardCrmPipelineRoute
   '/_authenticated/dashboard/finance/overview': typeof AuthenticatedDashboardFinanceOverviewRoute
   '/_authenticated/dashboard/jobs/browse': typeof AuthenticatedDashboardJobsBrowseRoute
@@ -2545,6 +2544,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/tasks/reminders/new': typeof AuthenticatedDashboardTasksRemindersNewRoute
   '/_authenticated/dashboard/tasks/reports/$reportId': typeof AuthenticatedDashboardTasksReportsReportIdRoute
   '/_authenticated/dashboard/tasks/reports/new': typeof AuthenticatedDashboardTasksReportsNewRoute
+  '/_authenticated/dashboard/crm/activities/': typeof AuthenticatedDashboardCrmActivitiesIndexRoute
   '/_authenticated/dashboard/crm/email-marketing/': typeof AuthenticatedDashboardCrmEmailMarketingIndexRoute
   '/_authenticated/dashboard/crm/lead-scoring/': typeof AuthenticatedDashboardCrmLeadScoringIndexRoute
   '/_authenticated/dashboard/crm/leads/': typeof AuthenticatedDashboardCrmLeadsIndexRoute
@@ -2674,7 +2674,6 @@ export interface FileRouteTypes {
     | '/dashboard/clients/$clientId'
     | '/dashboard/clients/new'
     | '/dashboard/contacts/new'
-    | '/dashboard/crm/activities'
     | '/dashboard/crm/pipeline'
     | '/dashboard/finance/overview'
     | '/dashboard/jobs/browse'
@@ -2811,6 +2810,7 @@ export interface FileRouteTypes {
     | '/dashboard/tasks/reminders/new'
     | '/dashboard/tasks/reports/$reportId'
     | '/dashboard/tasks/reports/new'
+    | '/dashboard/crm/activities'
     | '/dashboard/crm/email-marketing'
     | '/dashboard/crm/lead-scoring'
     | '/dashboard/crm/leads'
@@ -2937,7 +2937,6 @@ export interface FileRouteTypes {
     | '/dashboard/clients/$clientId'
     | '/dashboard/clients/new'
     | '/dashboard/contacts/new'
-    | '/dashboard/crm/activities'
     | '/dashboard/crm/pipeline'
     | '/dashboard/finance/overview'
     | '/dashboard/jobs/browse'
@@ -3074,6 +3073,7 @@ export interface FileRouteTypes {
     | '/dashboard/tasks/reminders/new'
     | '/dashboard/tasks/reports/$reportId'
     | '/dashboard/tasks/reports/new'
+    | '/dashboard/crm/activities'
     | '/dashboard/crm/email-marketing'
     | '/dashboard/crm/lead-scoring'
     | '/dashboard/crm/leads'
@@ -3204,7 +3204,6 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/clients/$clientId'
     | '/_authenticated/dashboard/clients/new'
     | '/_authenticated/dashboard/contacts/new'
-    | '/_authenticated/dashboard/crm/activities'
     | '/_authenticated/dashboard/crm/pipeline'
     | '/_authenticated/dashboard/finance/overview'
     | '/_authenticated/dashboard/jobs/browse'
@@ -3341,6 +3340,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/tasks/reminders/new'
     | '/_authenticated/dashboard/tasks/reports/$reportId'
     | '/_authenticated/dashboard/tasks/reports/new'
+    | '/_authenticated/dashboard/crm/activities/'
     | '/_authenticated/dashboard/crm/email-marketing/'
     | '/_authenticated/dashboard/crm/lead-scoring/'
     | '/_authenticated/dashboard/crm/leads/'
@@ -4097,13 +4097,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardCrmPipelineRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/dashboard/crm/activities': {
-      id: '/_authenticated/dashboard/crm/activities'
-      path: '/dashboard/crm/activities'
-      fullPath: '/dashboard/crm/activities'
-      preLoaderRoute: typeof AuthenticatedDashboardCrmActivitiesRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
     '/_authenticated/dashboard/contacts/new': {
       id: '/_authenticated/dashboard/contacts/new'
       path: '/dashboard/contacts/new'
@@ -4501,6 +4494,13 @@ declare module '@tanstack/react-router' {
       path: '/dashboard/crm/email-marketing'
       fullPath: '/dashboard/crm/email-marketing'
       preLoaderRoute: typeof AuthenticatedDashboardCrmEmailMarketingIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dashboard/crm/activities/': {
+      id: '/_authenticated/dashboard/crm/activities/'
+      path: '/dashboard/crm/activities'
+      fullPath: '/dashboard/crm/activities'
+      preLoaderRoute: typeof AuthenticatedDashboardCrmActivitiesIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/dashboard/tasks/reports/new': {
@@ -5177,17 +5177,17 @@ declare module '@tanstack/react-router' {
     }
     '/_authenticated/dashboard/crm/activities/new': {
       id: '/_authenticated/dashboard/crm/activities/new'
-      path: '/new'
+      path: '/dashboard/crm/activities/new'
       fullPath: '/dashboard/crm/activities/new'
       preLoaderRoute: typeof AuthenticatedDashboardCrmActivitiesNewRouteImport
-      parentRoute: typeof AuthenticatedDashboardCrmActivitiesRoute
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/dashboard/crm/activities/$activityId': {
       id: '/_authenticated/dashboard/crm/activities/$activityId'
-      path: '/$activityId'
+      path: '/dashboard/crm/activities/$activityId'
       fullPath: '/dashboard/crm/activities/$activityId'
       preLoaderRoute: typeof AuthenticatedDashboardCrmActivitiesActivityIdRouteImport
-      parentRoute: typeof AuthenticatedDashboardCrmActivitiesRoute
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/dashboard/hr/recruitment/jobs/': {
       id: '/_authenticated/dashboard/hr/recruitment/jobs/'
@@ -5334,24 +5334,6 @@ const AuthenticatedSettingsRouteRouteWithChildren =
     AuthenticatedSettingsRouteRouteChildren,
   )
 
-interface AuthenticatedDashboardCrmActivitiesRouteChildren {
-  AuthenticatedDashboardCrmActivitiesActivityIdRoute: typeof AuthenticatedDashboardCrmActivitiesActivityIdRoute
-  AuthenticatedDashboardCrmActivitiesNewRoute: typeof AuthenticatedDashboardCrmActivitiesNewRoute
-}
-
-const AuthenticatedDashboardCrmActivitiesRouteChildren: AuthenticatedDashboardCrmActivitiesRouteChildren =
-  {
-    AuthenticatedDashboardCrmActivitiesActivityIdRoute:
-      AuthenticatedDashboardCrmActivitiesActivityIdRoute,
-    AuthenticatedDashboardCrmActivitiesNewRoute:
-      AuthenticatedDashboardCrmActivitiesNewRoute,
-  }
-
-const AuthenticatedDashboardCrmActivitiesRouteWithChildren =
-  AuthenticatedDashboardCrmActivitiesRoute._addFileChildren(
-    AuthenticatedDashboardCrmActivitiesRouteChildren,
-  )
-
 interface AuthenticatedDashboardFinanceActivityActivityIdRouteChildren {
   AuthenticatedDashboardFinanceActivityActivityIdEditRoute: typeof AuthenticatedDashboardFinanceActivityActivityIdEditRoute
 }
@@ -5471,7 +5453,6 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardClientsClientIdRoute: typeof AuthenticatedDashboardClientsClientIdRoute
   AuthenticatedDashboardClientsNewRoute: typeof AuthenticatedDashboardClientsNewRoute
   AuthenticatedDashboardContactsNewRoute: typeof AuthenticatedDashboardContactsNewRoute
-  AuthenticatedDashboardCrmActivitiesRoute: typeof AuthenticatedDashboardCrmActivitiesRouteWithChildren
   AuthenticatedDashboardCrmPipelineRoute: typeof AuthenticatedDashboardCrmPipelineRoute
   AuthenticatedDashboardFinanceOverviewRoute: typeof AuthenticatedDashboardFinanceOverviewRoute
   AuthenticatedDashboardJobsBrowseRoute: typeof AuthenticatedDashboardJobsBrowseRoute
@@ -5510,6 +5491,8 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardReportsIndexRoute: typeof AuthenticatedDashboardReportsIndexRoute
   AuthenticatedDashboardStaffIndexRoute: typeof AuthenticatedDashboardStaffIndexRoute
   AuthenticatedDashboardTagsIndexRoute: typeof AuthenticatedDashboardTagsIndexRoute
+  AuthenticatedDashboardCrmActivitiesActivityIdRoute: typeof AuthenticatedDashboardCrmActivitiesActivityIdRoute
+  AuthenticatedDashboardCrmActivitiesNewRoute: typeof AuthenticatedDashboardCrmActivitiesNewRoute
   AuthenticatedDashboardCrmEmailMarketingCampaignIdRoute: typeof AuthenticatedDashboardCrmEmailMarketingCampaignIdRoute
   AuthenticatedDashboardCrmEmailMarketingNewRoute: typeof AuthenticatedDashboardCrmEmailMarketingNewRoute
   AuthenticatedDashboardCrmLeadsLeadIdRoute: typeof AuthenticatedDashboardCrmLeadsLeadIdRoute
@@ -5606,6 +5589,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardTasksRemindersNewRoute: typeof AuthenticatedDashboardTasksRemindersNewRoute
   AuthenticatedDashboardTasksReportsReportIdRoute: typeof AuthenticatedDashboardTasksReportsReportIdRoute
   AuthenticatedDashboardTasksReportsNewRoute: typeof AuthenticatedDashboardTasksReportsNewRoute
+  AuthenticatedDashboardCrmActivitiesIndexRoute: typeof AuthenticatedDashboardCrmActivitiesIndexRoute
   AuthenticatedDashboardCrmEmailMarketingIndexRoute: typeof AuthenticatedDashboardCrmEmailMarketingIndexRoute
   AuthenticatedDashboardCrmLeadScoringIndexRoute: typeof AuthenticatedDashboardCrmLeadScoringIndexRoute
   AuthenticatedDashboardCrmLeadsIndexRoute: typeof AuthenticatedDashboardCrmLeadsIndexRoute
@@ -5688,8 +5672,6 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDashboardClientsNewRoute: AuthenticatedDashboardClientsNewRoute,
   AuthenticatedDashboardContactsNewRoute:
     AuthenticatedDashboardContactsNewRoute,
-  AuthenticatedDashboardCrmActivitiesRoute:
-    AuthenticatedDashboardCrmActivitiesRouteWithChildren,
   AuthenticatedDashboardCrmPipelineRoute:
     AuthenticatedDashboardCrmPipelineRoute,
   AuthenticatedDashboardFinanceOverviewRoute:
@@ -5757,6 +5739,10 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
     AuthenticatedDashboardReportsIndexRoute,
   AuthenticatedDashboardStaffIndexRoute: AuthenticatedDashboardStaffIndexRoute,
   AuthenticatedDashboardTagsIndexRoute: AuthenticatedDashboardTagsIndexRoute,
+  AuthenticatedDashboardCrmActivitiesActivityIdRoute:
+    AuthenticatedDashboardCrmActivitiesActivityIdRoute,
+  AuthenticatedDashboardCrmActivitiesNewRoute:
+    AuthenticatedDashboardCrmActivitiesNewRoute,
   AuthenticatedDashboardCrmEmailMarketingCampaignIdRoute:
     AuthenticatedDashboardCrmEmailMarketingCampaignIdRoute,
   AuthenticatedDashboardCrmEmailMarketingNewRoute:
@@ -5947,6 +5933,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
     AuthenticatedDashboardTasksReportsReportIdRoute,
   AuthenticatedDashboardTasksReportsNewRoute:
     AuthenticatedDashboardTasksReportsNewRoute,
+  AuthenticatedDashboardCrmActivitiesIndexRoute:
+    AuthenticatedDashboardCrmActivitiesIndexRoute,
   AuthenticatedDashboardCrmEmailMarketingIndexRoute:
     AuthenticatedDashboardCrmEmailMarketingIndexRoute,
   AuthenticatedDashboardCrmLeadScoringIndexRoute:
