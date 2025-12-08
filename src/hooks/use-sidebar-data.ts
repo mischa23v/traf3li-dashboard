@@ -406,29 +406,13 @@ export function useSidebarData(): SidebarData {
               url: '/dashboard/hr/offboarding',
               module: 'hr',
             },
-            // Assets & Documents
+            // Assets
             {
               title: 'sidebar.nav.assetAssignment',
               url: '/dashboard/hr/asset-assignment',
               module: 'hr',
             },
-            {
-              title: 'sidebar.nav.hrDocuments',
-              url: '/dashboard/hr/documents',
-              module: 'hr',
-            },
-            // Communications
-            {
-              title: 'sidebar.nav.announcements',
-              url: '/dashboard/hr/announcements',
-              module: 'hr',
-            },
-            // Disciplinary & Grievances
-            {
-              title: 'sidebar.nav.violations',
-              url: '/dashboard/hr/violations',
-              module: 'hr',
-            },
+            // Grievances
             {
               title: 'sidebar.nav.grievances',
               url: '/dashboard/hr/grievances',
