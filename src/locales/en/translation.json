@@ -1576,7 +1576,9 @@
       "totalCases": "Total Cases",
       "totalInvoices": "Total Invoices",
       "totalPaid": "Total Paid",
-      "outstanding": "Outstanding Balance"
+      "outstanding": "Outstanding Balance",
+      "creditBalance": "Credit Balance",
+      "balanceDescription": "Current financial status for this client"
     },
     "casesDescription": "{{count}} case(s) associated with this client",
     "invoicesDescription": "{{count}} invoice(s) for this client",
