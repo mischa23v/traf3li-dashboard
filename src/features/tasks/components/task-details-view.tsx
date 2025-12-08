@@ -456,7 +456,9 @@ export function TaskDetailsView() {
             timeline: mappedTimeline,
             dependencies: mappedDependencies,
             outcome: mappedOutcome,
-            timeTracking: timeTrackingInfo
+            timeTracking: timeTrackingInfo,
+            linkedEventId: t.linkedEventId, // Task ↔ Event sync
+            eventId: t.eventId // Manual event link
         }
     }, [taskData])
 
@@ -551,6 +553,21 @@ export function TaskDetailsView() {
                     <>
                         {/* HERO CARD - Same as task list/create */}
                         <ProductivityHero badge="إدارة المهام" title={task.title} type="tasks" listMode={true} />
+
+                        {/* Task ↔ Event Sync Badge */}
+                        {(task.linkedEventId || task.eventId) && (
+                            <div className="flex items-center justify-center gap-2">
+                                <Button
+                                    onClick={() => navigate({ to: '/dashboard/tasks/events/$eventId', params: { eventId: task.linkedEventId || task.eventId } })}
+                                    variant="outline"
+                                    className="bg-purple-50 border-purple-200 text-purple-700 hover:bg-purple-100 hover:border-purple-300 rounded-xl px-4 py-2 flex items-center gap-2"
+                                >
+                                    <Calendar className="h-4 w-4" />
+                                    <span className="font-medium">مرتبط بحدث في التقويم</span>
+                                    <span className="text-xs opacity-75">(انقر للعرض)</span>
+                                </Button>
+                            </div>
+                        )}
 
                         {/* MAIN GRID LAYOUT - Same as task list/create */}
                         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">

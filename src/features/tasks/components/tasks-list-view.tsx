@@ -501,7 +501,13 @@ export function TasksListView() {
                                                         )}
                                                         {/* Task ↔ Event Sync Badge */}
                                                         {(task.linkedEventId || task.eventId) && (
-                                                            <Badge className="bg-purple-100 text-purple-700 hover:bg-purple-200 border-0 rounded-md px-2 flex items-center gap-1">
+                                                            <Badge
+                                                                className="bg-purple-100 text-purple-700 hover:bg-purple-200 border-0 rounded-md px-2 flex items-center gap-1 cursor-pointer transition-all"
+                                                                onClick={(e) => {
+                                                                    e.stopPropagation()
+                                                                    navigate({ to: '/dashboard/tasks/events/$eventId', params: { eventId: task.linkedEventId || task.eventId } })
+                                                                }}
+                                                            >
                                                                 <Calendar className="h-3 w-3" />
                                                                 {t('tasks.list.linkedEvent', 'مرتبط بحدث')}
                                                             </Badge>

@@ -5,6 +5,7 @@ import { DataTableColumnHeader } from '@/components/data-table'
 import { labels, priorities, statuses } from '../data/data'
 import { type Task } from '../data/schema'
 import { DataTableRowActions } from './data-table-row-actions'
+import { Calendar } from 'lucide-react'
 
 export const tasksColumns: ColumnDef<Task>[] = [
   {
@@ -48,13 +49,26 @@ export const tasksColumns: ColumnDef<Task>[] = [
     meta: { className: 'ps-1', tdClassName: 'ps-4' },
     cell: ({ row }) => {
       const label = labels.find((label) => label.value === row.original.label)
+      const linkedEventId = row.original.linkedEventId || row.original.eventId
 
       return (
-        <div className='flex gap-2'>
+        <div className='flex gap-2 items-center'>
           {label && <Badge variant='outline'>{label.label}</Badge>}
           <span className='max-w-32 truncate font-medium sm:max-w-72 md:max-w-[31rem]'>
             {row.getValue('title')}
           </span>
+          {linkedEventId && (
+            <Badge
+              className='bg-purple-100 text-purple-700 hover:bg-purple-200 border-0 rounded-md px-2 flex items-center gap-1 cursor-pointer transition-all'
+              onClick={(e) => {
+                e.stopPropagation()
+                window.location.href = `/dashboard/tasks/events/${linkedEventId}`
+              }}
+            >
+              <Calendar className='h-3 w-3' />
+              حدث
+            </Badge>
+          )}
         </div>
       )
     },

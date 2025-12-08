@@ -149,6 +149,36 @@ export function ClientDetails() {
           </div>
         </div>
 
+        {/* Balance Summary Card */}
+        <Card>
+          <CardHeader>
+            <CardTitle>{t('clients.summary.creditBalance')}</CardTitle>
+            <CardDescription>{t('clients.summary.balanceDescription')}</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className='grid grid-cols-1 gap-4 sm:grid-cols-3'>
+              <div className='space-y-2'>
+                <p className='text-sm text-muted-foreground'>{t('clients.summary.creditBalance')}</p>
+                <p className={cn('text-2xl font-bold', (client.billing?.creditBalance ?? 0) > 0 ? 'text-green-600' : '')}>
+                  {(client.billing?.creditBalance ?? 0).toLocaleString()} {t('common.sar')}
+                </p>
+              </div>
+              <div className='space-y-2'>
+                <p className='text-sm text-muted-foreground'>{t('clients.summary.totalPaid')}</p>
+                <p className='text-2xl font-bold'>
+                  {(client.totalPaid ?? 0).toLocaleString()} {t('common.sar')}
+                </p>
+              </div>
+              <div className='space-y-2'>
+                <p className='text-sm text-muted-foreground'>{t('clients.summary.outstanding')}</p>
+                <p className={cn('text-2xl font-bold', (client.totalOutstanding ?? 0) > 0 ? 'text-destructive' : '')}>
+                  {(client.totalOutstanding ?? 0).toLocaleString()} {t('common.sar')}
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
         {/* Summary Cards */}
         <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4'>
           <Card>

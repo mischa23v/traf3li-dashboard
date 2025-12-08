@@ -33,6 +33,16 @@ const clientSchema = z.object({
   preferredContactMethod: preferredContactMethodSchema,
   language: z.string(),
   status: clientStatusSchema,
+  // Billing & Balance
+  billing: z.object({
+    creditBalance: z.number(),
+    currency: z.string().optional(),
+  }).optional(),
+  totalPaid: z.number().optional(),
+  totalOutstanding: z.number().optional(),
+  // Conversion tracking
+  convertedFromLead: z.boolean().optional(),
+  convertedAt: z.string().optional(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
 })

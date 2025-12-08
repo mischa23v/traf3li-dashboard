@@ -349,6 +349,7 @@ export const taskSchema = z.object({
   clientId: z.union([z.string(), clientReferenceSchema]).optional(),
   parentTaskId: z.string().optional(),
   eventId: z.string().optional(),
+  linkedEventId: z.string().optional(), // Task ↔ Event sync
   reminderId: z.string().optional(),
   invoiceId: z.string().optional(),
 

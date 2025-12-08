@@ -482,6 +482,65 @@ export function LeadDetailsView() {
                             </CardContent>
                           </Card>
 
+                          {/* Organization & Contact Links */}
+                          {(lead.organizationId || lead.contactId) && (
+                            <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
+                              <CardHeader>
+                                <CardTitle className="text-lg font-bold text-navy flex items-center gap-2">
+                                  <LinkIcon className="h-5 w-5 text-emerald-500" aria-hidden="true" />
+                                  الروابط
+                                </CardTitle>
+                              </CardHeader>
+                              <CardContent className="space-y-4">
+                                {lead.organizationId && typeof lead.organizationId === 'object' && (
+                                  <div className="p-4 bg-emerald-50 rounded-xl border border-emerald-100">
+                                    <div className="flex items-start gap-3">
+                                      <div className="w-10 h-10 bg-emerald-100 rounded-full flex items-center justify-center flex-shrink-0">
+                                        <Users className="h-5 w-5 text-emerald-600" aria-hidden="true" />
+                                      </div>
+                                      <div className="flex-1 min-w-0">
+                                        <p className="text-xs text-emerald-600 font-medium mb-1">
+                                          مرتبط بمنظمة
+                                        </p>
+                                        <p className="font-bold text-navy text-base">
+                                          {lead.organizationId.legalName}
+                                        </p>
+                                        {lead.organizationId.email && (
+                                          <p className="text-sm text-slate-600 mt-1 flex items-center gap-1">
+                                            <Mail className="h-3 w-3" aria-hidden="true" />
+                                            {lead.organizationId.email}
+                                          </p>
+                                        )}
+                                      </div>
+                                    </div>
+                                  </div>
+                                )}
+                                {lead.contactId && typeof lead.contactId === 'object' && (
+                                  <div className="p-4 bg-blue-50 rounded-xl border border-blue-100">
+                                    <div className="flex items-start gap-3">
+                                      <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+                                        <User className="h-5 w-5 text-blue-600" aria-hidden="true" />
+                                      </div>
+                                      <div className="flex-1 min-w-0">
+                                        <p className="text-xs text-blue-600 font-medium mb-1">
+                                          مرتبط بجهة اتصال
+                                        </p>
+                                        <p className="font-bold text-navy text-base">
+                                          {lead.contactId.firstName} {lead.contactId.lastName || ''}
+                                        </p>
+                                        {lead.contactId.title && (
+                                          <p className="text-sm text-slate-600 mt-1">
+                                            {lead.contactId.title}
+                                          </p>
+                                        )}
+                                      </div>
+                                    </div>
+                                  </div>
+                                )}
+                              </CardContent>
+                            </Card>
+                          )}
+
                           {/* Address */}
                           {lead.address && (
                             <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
