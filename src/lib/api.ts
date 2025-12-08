@@ -5,14 +5,14 @@
  */
 
 import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios'
+import { API_CONFIG, getApiUrl } from '@/config/api'
 
 // API Base URL - Change based on environment
-const API_BASE_URL =
-  import.meta.env.VITE_API_URL || 'https://api.traf3li.com/api'
+const API_BASE_URL = getApiUrl()
 
 // Export the base URL for use in other components (e.g., file downloads)
 export const API_URL = API_BASE_URL
-export const API_DOMAIN = API_BASE_URL.replace('/api', '')
+export const API_DOMAIN = API_CONFIG.baseUrl
 
 // Cache for GET requests (simple in-memory cache)
 const requestCache = new Map<string, { data: any; timestamp: number }>()
@@ -37,8 +37,9 @@ export const apiClient = axios.create({
   headers: {
     'Content-Type': 'application/json',
     'Accept': 'application/json',
+    'API-Version': API_CONFIG.version, // API version header as fallback
   },
-  timeout: 15000, // 15 seconds (reduced from 30)
+  timeout: API_CONFIG.timeout,
 })
 
 /**
@@ -119,8 +120,8 @@ apiClient.interceptors.response.use(
       originalRequest._retry = true
       originalRequest._retryCount = (originalRequest._retryCount || 0) + 1
 
-      // Max 2 retries with exponential backoff
-      if (originalRequest._retryCount <= 2) {
+      // Max retries with exponential backoff
+      if (originalRequest._retryCount <= API_CONFIG.retryAttempts) {
         const delay = Math.min(1000 * Math.pow(2, originalRequest._retryCount - 1), 4000)
 
         if (import.meta.env.DEV) {

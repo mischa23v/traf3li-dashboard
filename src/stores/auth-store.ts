@@ -5,6 +5,7 @@
 
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
+import * as Sentry from '@sentry/react'
 import authService, { User, LoginCredentials } from '@/services/authService'
 import { usePermissionsStore } from './permissions-store'
 
@@ -47,6 +48,15 @@ export const useAuthStore = create<AuthState>()(
             error: null,
           })
 
+          // Set Sentry user context
+          Sentry.setUser({
+            id: user._id,
+            username: user.username,
+            email: user.email,
+            role: user.role,
+            firmId: user.firmId,
+          })
+
           // Handle permissions based on user type
           if (user.role === 'lawyer') {
             if (user.firmId) {
@@ -87,6 +97,8 @@ export const useAuthStore = create<AuthState>()(
             isLoading: false,
             error: null,
           })
+          // Clear Sentry user context
+          Sentry.setUser(null)
           // Clear permissions on logout
           usePermissionsStore.getState().clearPermissions()
         } catch (error: any) {
@@ -97,6 +109,8 @@ export const useAuthStore = create<AuthState>()(
             isLoading: false,
             error: null,
           })
+          // Clear Sentry user context
+          Sentry.setUser(null)
           // Also clear permissions
           usePermissionsStore.getState().clearPermissions()
         }
@@ -135,6 +149,19 @@ export const useAuthStore = create<AuthState>()(
             error: null,
           })
 
+          // Set Sentry user context if user is authenticated
+          if (user) {
+            Sentry.setUser({
+              id: user._id,
+              username: user.username,
+              email: user.email,
+              role: user.role,
+              firmId: user.firmId,
+            })
+          } else {
+            Sentry.setUser(null)
+          }
+
           // Handle permissions based on user type
           if (user && user.role === 'lawyer') {
             if (user.firmId) {
@@ -157,6 +184,8 @@ export const useAuthStore = create<AuthState>()(
             isLoading: false,
             error: null, // Don't show error on initial auth check
           })
+          // Clear Sentry user context
+          Sentry.setUser(null)
           // Clear permissions if auth failed
           usePermissionsStore.getState().clearPermissions()
         }
