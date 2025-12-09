@@ -22,9 +22,21 @@ export const contactsKeys = {
 
 // Get all contacts
 export const useContacts = (filters?: ContactFilters) => {
+  // ============ DEBUG LOGGING ============
+  const queryKey = contactsKeys.list(filters || {})
+  console.log('%c[useContacts] Hook called with:', 'color: #0a0; font-weight: bold;', {
+    filters,
+    queryKey,
+    filtersStringified: JSON.stringify(filters),
+  })
+  // ============ DEBUG END ============
+
   return useQuery({
-    queryKey: contactsKeys.list(filters || {}),
-    queryFn: () => contactsService.getContacts(filters),
+    queryKey,
+    queryFn: () => {
+      console.log('%c[useContacts] queryFn EXECUTING', 'background: #0ff; color: #000;', { filters })
+      return contactsService.getContacts(filters)
+    },
     staleTime: 2 * 60 * 1000, // 2 minutes
   })
 }

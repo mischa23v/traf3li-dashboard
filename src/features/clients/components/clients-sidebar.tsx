@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useRef, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
     Clock, Bell, MapPin, Calendar as CalendarIcon,
@@ -28,6 +28,12 @@ export function ClientsSidebar({
     selectedCount = 0,
     onDeleteSelected
 }: ClientsSidebarProps) {
+    // ============ DEBUG LOGGING START ============
+    const renderCount = useRef(0)
+    renderCount.current++
+    console.log(`%c[SIDEBAR] Render #${renderCount.current} (context: ${context})`, 'background: #0ff; color: #000; font-weight: bold;')
+    // ============ DEBUG LOGGING END ============
+
     const { t, i18n } = useTranslation()
     const isRTL = i18n.language === 'ar'
     const dateLocale = isRTL ? arSA : enUS
