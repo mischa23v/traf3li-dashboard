@@ -2,6 +2,10 @@ import z from 'zod'
 import { createFileRoute } from '@tanstack/react-router'
 import { Staff } from '@/features/staff'
 
+// Stable fallback arrays to prevent infinite re-renders
+const EMPTY_STATUS_ARRAY: ('active' | 'inactive' | 'suspended')[] = []
+const EMPTY_ROLE_ARRAY: ('lawyer' | 'paralegal' | 'secretary' | 'accountant' | 'admin' | 'intern')[] = []
+
 const staffSearchSchema = z.object({
   page: z.number().optional().catch(1),
   pageSize: z.number().optional().catch(10),
@@ -15,7 +19,7 @@ const staffSearchSchema = z.object({
       ])
     )
     .optional()
-    .catch([]),
+    .catch(EMPTY_STATUS_ARRAY),
   role: z
     .array(
       z.union([
@@ -28,7 +32,7 @@ const staffSearchSchema = z.object({
       ])
     )
     .optional()
-    .catch([]),
+    .catch(EMPTY_ROLE_ARRAY),
   // Per-column text filter
   email: z.string().optional().catch(''),
 })
