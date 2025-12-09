@@ -80,11 +80,17 @@ const conversationsService = {
   },
 
   /**
-   * Get single conversation
+   * Get single conversation by seller and buyer IDs
+   * GET /api/conversations/single/:sellerID/:buyerID
    */
-  getConversation: async (id: string): Promise<Conversation> => {
+  getSingleConversation: async (
+    sellerID: string,
+    buyerID: string
+  ): Promise<Conversation> => {
     try {
-      const response = await apiClient.get(`/conversations/${id}`)
+      const response = await apiClient.get(
+        `/conversations/single/${sellerID}/${buyerID}`
+      )
       return response.data.conversation || response.data.data
     } catch (error: any) {
       throw new Error(handleApiError(error))
@@ -160,18 +166,19 @@ const conversationsService = {
   },
 
   /**
-   * Send message (legacy method - kept for backward compatibility)
+   * Update conversation
+   * PATCH /api/conversations/:conversationID
    */
-  sendMessage: async (
+  updateConversation: async (
     conversationId: string,
-    data: SendMessageData
-  ): Promise<Message> => {
+    data: Partial<Conversation>
+  ): Promise<Conversation> => {
     try {
-      const response = await apiClient.post(
-        `/conversations/${conversationId}/messages`,
+      const response = await apiClient.patch(
+        `/conversations/${conversationId}`,
         data
       )
-      return response.data.message || response.data.data
+      return response.data.conversation || response.data.data
     } catch (error: any) {
       throw new Error(handleApiError(error))
     }
@@ -189,27 +196,6 @@ const conversationsService = {
     }
   },
 
-  /**
-   * Mark conversation as read (legacy method - kept for backward compatibility)
-   */
-  markAsRead: async (conversationId: string): Promise<void> => {
-    try {
-      await apiClient.post(`/conversations/${conversationId}/read`)
-    } catch (error: any) {
-      throw new Error(handleApiError(error))
-    }
-  },
-
-  /**
-   * Delete conversation
-   */
-  deleteConversation: async (id: string): Promise<void> => {
-    try {
-      await apiClient.delete(`/conversations/${id}`)
-    } catch (error: any) {
-      throw new Error(handleApiError(error))
-    }
-  },
 }
 
 export default conversationsService

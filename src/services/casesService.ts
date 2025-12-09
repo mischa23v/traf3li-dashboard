@@ -931,6 +931,166 @@ const casesService = {
       throw new Error(handleApiError(error))
     }
   },
+
+  // ==================== RICH DOCUMENTS (CKEditor) ====================
+
+  /**
+   * Create rich document (CKEditor content)
+   * POST /api/cases/:id/rich-documents
+   */
+  createRichDocument: async (caseId: string, data: {
+    title: string
+    content: string
+    category?: string
+    tags?: string[]
+  }): Promise<any> => {
+    try {
+      const response = await apiClient.post(`/cases/${caseId}/rich-documents`, data)
+      return response.data.document || response.data.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Get all rich documents for a case
+   * GET /api/cases/:id/rich-documents
+   */
+  getRichDocuments: async (caseId: string): Promise<any[]> => {
+    try {
+      const response = await apiClient.get(`/cases/${caseId}/rich-documents`)
+      return response.data.documents || response.data.data || []
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Get single rich document
+   * GET /api/cases/:id/rich-documents/:docId
+   */
+  getRichDocument: async (caseId: string, docId: string): Promise<any> => {
+    try {
+      const response = await apiClient.get(`/cases/${caseId}/rich-documents/${docId}`)
+      return response.data.document || response.data.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Update rich document
+   * PATCH /api/cases/:id/rich-documents/:docId
+   */
+  updateRichDocument: async (caseId: string, docId: string, data: {
+    title?: string
+    content?: string
+    category?: string
+    tags?: string[]
+  }): Promise<any> => {
+    try {
+      const response = await apiClient.patch(`/cases/${caseId}/rich-documents/${docId}`, data)
+      return response.data.document || response.data.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Delete rich document
+   * DELETE /api/cases/:id/rich-documents/:docId
+   */
+  deleteRichDocument: async (caseId: string, docId: string): Promise<void> => {
+    try {
+      await apiClient.delete(`/cases/${caseId}/rich-documents/${docId}`)
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Get rich document version history
+   * GET /api/cases/:id/rich-documents/:docId/versions
+   */
+  getRichDocumentVersions: async (caseId: string, docId: string): Promise<any[]> => {
+    try {
+      const response = await apiClient.get(`/cases/${caseId}/rich-documents/${docId}/versions`)
+      return response.data.versions || response.data.data || []
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Restore rich document to a previous version
+   * POST /api/cases/:id/rich-documents/:docId/versions/:versionNumber/restore
+   */
+  restoreRichDocumentVersion: async (caseId: string, docId: string, versionNumber: number): Promise<any> => {
+    try {
+      const response = await apiClient.post(`/cases/${caseId}/rich-documents/${docId}/versions/${versionNumber}/restore`)
+      return response.data.document || response.data.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Export rich document to PDF
+   * GET /api/cases/:id/rich-documents/:docId/export/pdf
+   */
+  exportRichDocumentToPdf: async (caseId: string, docId: string): Promise<Blob> => {
+    try {
+      const response = await apiClient.get(`/cases/${caseId}/rich-documents/${docId}/export/pdf`, {
+        responseType: 'blob'
+      })
+      return response.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Export rich document to LaTeX
+   * GET /api/cases/:id/rich-documents/:docId/export/latex
+   */
+  exportRichDocumentToLatex: async (caseId: string, docId: string): Promise<Blob> => {
+    try {
+      const response = await apiClient.get(`/cases/${caseId}/rich-documents/${docId}/export/latex`, {
+        responseType: 'blob'
+      })
+      return response.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Export rich document to Markdown
+   * GET /api/cases/:id/rich-documents/:docId/export/markdown
+   */
+  exportRichDocumentToMarkdown: async (caseId: string, docId: string): Promise<Blob> => {
+    try {
+      const response = await apiClient.get(`/cases/${caseId}/rich-documents/${docId}/export/markdown`, {
+        responseType: 'blob'
+      })
+      return response.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Get rich document HTML preview
+   * GET /api/cases/:id/rich-documents/:docId/preview
+   */
+  getRichDocumentPreview: async (caseId: string, docId: string): Promise<{ html: string }> => {
+    try {
+      const response = await apiClient.get(`/cases/${caseId}/rich-documents/${docId}/preview`)
+      return response.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
 }
 
 export default casesService

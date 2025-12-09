@@ -310,7 +310,7 @@ const hrService = {
   },
 
   updateEmployee: async (id: string, data: UpdateEmployeeData): Promise<Employee> => {
-    const response = await apiClient.patch(`/hr/employees/${id}`, data)
+    const response = await apiClient.put(`/hr/employees/${id}`, data)
     return response.data
   },
 
