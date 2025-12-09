@@ -37,14 +37,16 @@ import {
 } from '@/hooks/useGantt'
 import type { TimeScale, SourceType } from '@/types/gantt'
 
-// Gantt will be loaded dynamically
-let gantt: any = null
+// Gantt will be loaded dynamically - use ref to ensure stable reference
+let ganttInstance: any = null
 
 export function GanttView() {
   const { t, i18n } = useTranslation()
   const isRTL = i18n.language === 'ar'
   const containerRef = useRef<HTMLDivElement>(null)
+  const ganttRef = useRef<any>(null)
   const [isGanttLoaded, setIsGanttLoaded] = useState(false)
+  const [isGanttInitialized, setIsGanttInitialized] = useState(false)
   const [timeScale, setTimeScale] = useState<TimeScale>('day')
   const [showCriticalPath, setShowCriticalPath] = useState(false)
   const [filterType, setFilterType] = useState<SourceType | 'all'>('all')
@@ -79,12 +81,20 @@ export function GanttView() {
       try {
         // Dynamic import of dhtmlx-gantt
         const module = await import('dhtmlx-gantt')
-        gantt = module.gantt || module.default?.gantt || (window as any).gantt
+        ganttInstance = module.gantt || module.default?.gantt || (window as any).gantt
+        ganttRef.current = ganttInstance
 
         // Import CSS
         await import('dhtmlx-gantt/codebase/dhtmlxgantt.css')
 
-        setIsGanttLoaded(true)
+        // Verify gantt is properly loaded with required methods
+        if (ganttInstance && typeof ganttInstance.init === 'function' && typeof ganttInstance.parse === 'function') {
+          setIsGanttLoaded(true)
+        } else {
+          if (import.meta.env.DEV) {
+            console.warn('[Gantt] Library loaded but missing required methods')
+          }
+        }
       } catch (err) {
         // Silently handle gantt load errors - will show in UI error state
         if (import.meta.env.DEV) {
@@ -93,10 +103,11 @@ export function GanttView() {
       }
     }
     loadGantt()
-  }, [t])
+  }, [])
 
   // Initialize Gantt when loaded
   useEffect(() => {
+    const gantt = ganttRef.current
     if (!isGanttLoaded || !containerRef.current || !gantt) return
 
     // Configure Gantt date format to match backend API
@@ -138,7 +149,8 @@ export function GanttView() {
         width: 100,
         template: (obj: any) => {
           if (!obj.start_date) return ''
-          const date = new Date(obj.start_date)
+          // Handle both Date objects and strings
+          const date = obj.start_date instanceof Date ? obj.start_date : new Date(obj.start_date)
           if (isNaN(date.getTime())) return ''
           const year = date.getFullYear()
           const month = String(date.getMonth() + 1).padStart(2, '0')
@@ -163,7 +175,7 @@ export function GanttView() {
         label: '%',
         align: 'center',
         width: 50,
-        template: (obj: any) => `${Math.round(obj.progress * 100)}%`,
+        template: (obj: any) => `${Math.round((obj.progress || 0) * 100)}%`,
       },
     ]
 
@@ -174,8 +186,8 @@ export function GanttView() {
     gantt.config.highlight_critical_path = showCriticalPath
 
     // Task templates - Color by source type and priority
-    gantt.templates.task_class = (start: Date, end: Date, task: any) => {
-      let classes = []
+    gantt.templates.task_class = (_start: Date, _end: Date, task: any) => {
+      const classes = []
       // Source type styling
       if (task.sourceType === 'reminder') classes.push('gantt-task-reminder')
       if (task.sourceType === 'event') classes.push('gantt-task-event')
@@ -193,12 +205,13 @@ export function GanttView() {
 
     // Initialize
     gantt.init(containerRef.current)
+    setIsGanttInitialized(true)
 
     // Helper to format dates for API (YYYY-MM-DD HH:mm)
     const formatDateForAPI = gantt.date.date_to_str('%Y-%m-%d %H:%i')
 
     // Event handlers - only allow editing tasks (not reminders/events through Gantt drag)
-    gantt.attachEvent('onAfterTaskDrag', (id: string, mode: any) => {
+    gantt.attachEvent('onAfterTaskDrag', (id: string, _mode: any) => {
       const task = gantt.getTask(id)
       // Only update if it's a task (not reminder or event)
       if (task.sourceType === 'task' && task.sourceId) {
@@ -224,25 +237,44 @@ export function GanttView() {
 
     // Cleanup
     return () => {
-      gantt.clearAll()
+      if (gantt) {
+        gantt.clearAll()
+        setIsGanttInitialized(false)
+      }
     }
   }, [isGanttLoaded, isRTL, timeScale, showCriticalPath, t, updateSchedule, updateProgress])
 
   // Load data into Gantt
   useEffect(() => {
-    if (!isGanttLoaded || !ganttData || !gantt) return
+    const gantt = ganttRef.current
+    if (!isGanttLoaded || !isGanttInitialized || !ganttData || !gantt) return
 
-    // Pass data directly to gantt.parse() - it handles the format automatically
-    // Backend sends dates as "YYYY-MM-DD HH:mm" which matches our gantt.config.date_format
-    gantt.clearAll()
-    gantt.parse({
-      data: ganttData.data.filter(item => item.start_date), // Skip items without start_date
-      links: ganttData.links || []
-    })
-  }, [isGanttLoaded, ganttData])
+    try {
+      // Filter out items without valid start_date
+      const validData = ganttData.data.filter(item => {
+        if (!item.start_date) return false
+        // Validate the date string format
+        if (typeof item.start_date === 'string' && item.start_date.trim() === '') return false
+        return true
+      })
+
+      // Pass data directly to gantt.parse() - it handles the format automatically
+      // Backend sends dates as "YYYY-MM-DD HH:mm" which matches our gantt.config.date_format
+      gantt.clearAll()
+      gantt.parse({
+        data: validData,
+        links: ganttData.links || []
+      })
+    } catch (err) {
+      if (import.meta.env.DEV) {
+        console.warn('[Gantt] Error parsing data:', err)
+      }
+    }
+  }, [isGanttLoaded, isGanttInitialized, ganttData])
 
   // Update time scale
   const updateTimeScale = (scale: TimeScale) => {
+    const gantt = ganttRef.current
     if (!gantt) return
 
     switch (scale) {
@@ -302,6 +334,7 @@ export function GanttView() {
 
   const handleToggleCriticalPath = () => {
     setShowCriticalPath(!showCriticalPath)
+    const gantt = ganttRef.current
     if (gantt) {
       gantt.config.highlight_critical_path = !showCriticalPath
       gantt.render()
@@ -309,6 +342,7 @@ export function GanttView() {
   }
 
   const handleFitToView = () => {
+    const gantt = ganttRef.current
     if (gantt) {
       gantt.render()
     }
