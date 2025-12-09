@@ -2,6 +2,10 @@ import z from 'zod'
 import { createFileRoute } from '@tanstack/react-router'
 import { Contacts } from '@/features/contacts'
 
+// ============ DEBUG LOGGING ============
+let validationCount = 0
+// ============ DEBUG END ============
+
 // Stable fallback arrays to prevent infinite re-renders
 // Using .catch([]) creates new array references on every validation,
 // causing TanStack Router to detect "changes" and trigger re-validation loops
@@ -55,7 +59,29 @@ const contactsSearchSchema = z.object({
   name: z.string().optional().catch(''),
 })
 
+// ============ DEBUG: Wrap validateSearch to log calls ============
+const debugValidateSearch = (search: unknown) => {
+  validationCount++
+  console.log(`%c[ROUTE] validateSearch called #${validationCount}`, 'background: #f0f; color: #fff; font-weight: bold;', {
+    input: search,
+    inputStringified: JSON.stringify(search),
+  })
+  const result = contactsSearchSchema.parse(search)
+  console.log(`%c[ROUTE] validateSearch result #${validationCount}`, 'background: #f0f; color: #fff;', {
+    result,
+    resultStringified: JSON.stringify(result),
+    statusRef: result.status,
+    typeRef: result.type,
+    categoryRef: result.category,
+    statusIsEmptyArray: result.status === EMPTY_STATUS_ARRAY,
+    typeIsEmptyArray: result.type === EMPTY_TYPE_ARRAY,
+    categoryIsEmptyArray: result.category === EMPTY_CATEGORY_ARRAY,
+  })
+  return result
+}
+// ============ DEBUG END ============
+
 export const Route = createFileRoute('/_authenticated/dashboard/contacts/')({
-  validateSearch: contactsSearchSchema,
+  validateSearch: debugValidateSearch,
   component: Contacts,
 })
