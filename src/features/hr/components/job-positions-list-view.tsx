@@ -464,7 +464,7 @@ const getBgClasses = (color: string) => {
                             <div className="flex items-start justify-between">
                               <div className="flex items-center gap-3">
                                 <div className={`p-2 ${getBgClasses(JOB_FAMILY_LABELS[position.jobFamily]?.color || 'slate')} rounded-xl`}>
-                                  <FamilyIcon className={`w-5 h-5 ${getTextColorClass(JOB_FAMILY_LABELS[position.jobFamily]?.color || \'slate\')}`} />
+                                  <FamilyIcon className={`w-5 h-5 ${getTextColorClass(JOB_FAMILY_LABELS[position.jobFamily]?.color || 'slate')}`} />
                                 </div>
                                 <div>
                                   <div className="flex items-center gap-2 mb-1">
