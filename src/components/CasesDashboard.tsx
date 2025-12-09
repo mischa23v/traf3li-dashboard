@@ -128,7 +128,7 @@ export default function CasesDashboard() {
                         <div className="space-y-2">
                             <label className="text-xs font-bold text-slate-500 block px-1">نوع القضية</label>
                             <Select>
-                                <SelectTrigger className="w-full h-12 text-right rounded-2xl bg-slate-50 border-slate-200 focus:ring-2 focus:ring-brand-blue/20 font-medium text-slate-700" dir="rtl">
+                                <SelectTrigger className="w-full h-12 text-start rounded-2xl bg-slate-50 border-slate-200 focus:ring-2 focus:ring-brand-blue/20 font-medium text-slate-700" dir="rtl">
                                     <SelectValue placeholder="الكل" />
                                 </SelectTrigger>
                                 <SelectContent dir="rtl" className="rounded-2xl border-slate-100 shadow-lg">
@@ -142,7 +142,7 @@ export default function CasesDashboard() {
                         <div className="space-y-2">
                             <label className="text-xs font-bold text-slate-500 block px-1">المحامي المسؤول</label>
                             <Select>
-                                <SelectTrigger className="w-full h-12 text-right rounded-2xl bg-slate-50 border-slate-200 focus:ring-2 focus:ring-brand-blue/20 font-medium text-slate-700" dir="rtl">
+                                <SelectTrigger className="w-full h-12 text-start rounded-2xl bg-slate-50 border-slate-200 focus:ring-2 focus:ring-brand-blue/20 font-medium text-slate-700" dir="rtl">
                                     <SelectValue placeholder="الكل" />
                                 </SelectTrigger>
                                 <SelectContent dir="rtl" className="rounded-2xl border-slate-100 shadow-lg">
@@ -156,7 +156,7 @@ export default function CasesDashboard() {
                         <div className="space-y-2">
                             <label className="text-xs font-bold text-slate-500 block px-1">الحالة</label>
                             <Select>
-                                <SelectTrigger className="w-full h-12 text-right rounded-2xl bg-slate-50 border-slate-200 focus:ring-2 focus:ring-brand-blue/20 font-medium text-slate-700" dir="rtl">
+                                <SelectTrigger className="w-full h-12 text-start rounded-2xl bg-slate-50 border-slate-200 focus:ring-2 focus:ring-brand-blue/20 font-medium text-slate-700" dir="rtl">
                                     <SelectValue placeholder="الكل" />
                                 </SelectTrigger>
                                 <SelectContent dir="rtl" className="rounded-2xl border-slate-100 shadow-lg">

@@ -607,7 +607,7 @@ export function LeaveRequestCreateView() {
                                             key={type.id}
                                             type="button"
                                             onClick={() => setOfficeType(type.id)}
-                                            className={`p-4 rounded-xl border-2 transition-all text-right ${
+                                            className={`p-4 rounded-xl border-2 transition-all text-start ${
                                                 isSelected
                                                     ? `${type.borderColor} ${type.bgColor}`
                                                     : 'border-slate-200 hover:border-slate-300 bg-white'
@@ -749,7 +749,7 @@ export function LeaveRequestCreateView() {
                                             <CheckCircle className="w-5 h-5 text-emerald-600" />
                                             <span className="text-sm text-emerald-700">رصيد الإجازة السنوية</span>
                                         </div>
-                                        <div className="text-left">
+                                        <div className="text-start">
                                             <span className="font-bold text-emerald-800 text-lg">{leaveBalance.annualLeave.remaining}</span>
                                             <span className="text-emerald-600 me-1">يوم متبقي</span>
                                         </div>

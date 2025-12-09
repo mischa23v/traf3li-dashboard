@@ -616,7 +616,7 @@ export function ExpenseClaimsDetailsView() {
                                       </div>
                                     </div>
                                   </div>
-                                  <div className="text-left">
+                                  <div className="text-start">
                                     <p className="font-bold text-navy">{item.amount.toLocaleString('ar-SA')} ر.س</p>
                                     {item.vatAmount && item.vatAmount > 0 && (
                                       <p className="text-xs text-slate-500">+ضريبة {item.vatAmount.toLocaleString('ar-SA')}</p>
@@ -718,7 +718,7 @@ export function ExpenseClaimsDetailsView() {
                                         </p>
                                       </div>
                                     </div>
-                                    <div className="text-left">
+                                    <div className="text-start">
                                       <Badge className={`${
                                         step.status === 'approved' ? 'bg-emerald-100 text-emerald-700' :
                                         step.status === 'rejected' ? 'bg-red-100 text-red-700' :

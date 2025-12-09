@@ -15,6 +15,8 @@ import { DirectionProvider } from './context/direction-provider'
 import { FontProvider } from './context/font-provider'
 import { ThemeProvider } from './context/theme-provider'
 import { initSentry } from '@/lib/sentry'
+import { initAnalytics, trackPageView } from '@/lib/analytics'
+import { initWebVitals } from '@/lib/web-vitals'
 // Import i18n configuration
 import './i18n'
 // Generated Routes
@@ -24,6 +26,12 @@ import './styles/index.css'
 
 // Initialize Sentry before app renders
 initSentry()
+
+// Initialize analytics
+initAnalytics()
+
+// Initialize Web Vitals monitoring
+initWebVitals()
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -82,6 +90,11 @@ const router = createRouter({
   context: { queryClient },
   defaultPreload: 'intent',
   defaultPreloadStaleTime: 0,
+})
+
+// Track page views on route changes
+router.subscribe('onResolved', ({ toLocation }) => {
+  trackPageView(toLocation.pathname, document.title)
 })
 
 // Register the router instance for type safety

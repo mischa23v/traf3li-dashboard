@@ -1,5 +1,6 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { apiClient } from '@/lib/api';
+import { PasswordStrength } from '@/components/password-strength';
 
 // Debounce hook for real-time validation
 function useDebounce<T>(value: T, delay: number): T {
@@ -656,6 +657,7 @@ export function SignUpForm() {
                       <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-600" aria-label={showPassword ? 'إخفاء كلمة المرور' : 'إظهار كلمة المرور'}>{showPassword ? <Icons.EyeOff /> : <Icons.Eye />}</button>
                     </div>
                     {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password}</p>}
+                    <PasswordStrength password={formData.password} className="mt-3" />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-[#0f172a] mb-2">تأكيد كلمة المرور <span className="text-red-500">*</span></label>
@@ -773,6 +775,7 @@ export function SignUpForm() {
                           <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-600" aria-label={showPassword ? 'إخفاء كلمة المرور' : 'إظهار كلمة المرور'}>{showPassword ? <Icons.EyeOff /> : <Icons.Eye />}</button>
                         </div>
                         {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password}</p>}
+                        <PasswordStrength password={formData.password} className="mt-3" />
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-[#0f172a] mb-2">تأكيد كلمة المرور <span className="text-red-500">*</span></label>

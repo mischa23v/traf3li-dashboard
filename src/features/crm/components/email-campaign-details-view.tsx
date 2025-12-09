@@ -22,6 +22,7 @@ import {
   MessageSquare,
   FileText,
 } from 'lucide-react'
+import { sanitizeHtml } from '@/utils/sanitize'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useEmailCampaign, useCampaignAnalytics, useSendCampaign, usePauseCampaign, useResumeCampaign } from '@/hooks/useCrmAdvanced'
 import { ProductivityHero } from '@/components/productivity-hero'
@@ -514,7 +515,7 @@ export function EmailCampaignDetailsView() {
                                 <p className="text-xs text-slate-500 mb-2">معاينة HTML</p>
                                 <div
                                   className="prose max-w-none bg-white p-4 rounded-lg border border-slate-200"
-                                  dangerouslySetInnerHTML={{ __html: campaign.htmlContent }}
+                                  dangerouslySetInnerHTML={{ __html: sanitizeHtml(campaign.htmlContent) }}
                                 />
                               </div>
                             )}

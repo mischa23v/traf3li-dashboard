@@ -140,7 +140,7 @@ export function StatementDetailsView() {
                         </div>
 
                         <div className="flex flex-col gap-4 min-w-[250px]">
-                            <div className="text-left lg:text-left">
+                            <div className="text-start lg:text-start">
                                 <div className="text-slate-300 text-sm mb-1">المبلغ الإجمالي</div>
                                 <div className="text-3xl font-bold text-white">{statement.totalAmount.toLocaleString('ar-SA')} <span className="text-lg text-emerald-400">ر.س</span></div>
                             </div>
@@ -163,14 +163,14 @@ export function StatementDetailsView() {
                                 </CardHeader>
                                 <CardContent className="p-0">
                                     <div className="overflow-x-auto">
-                                        <table className="w-full text-right">
+                                        <table className="w-full text-start">
                                             <thead className="bg-slate-50 text-slate-500 text-sm font-medium">
                                                 <tr>
                                                     <th className="px-6 py-4">التاريخ</th>
                                                     <th className="px-6 py-4">النوع</th>
                                                     <th className="px-6 py-4">الوصف</th>
                                                     <th className="px-6 py-4">المرجع</th>
-                                                    <th className="px-6 py-4 text-left">المبلغ</th>
+                                                    <th className="px-6 py-4 text-start">المبلغ</th>
                                                 </tr>
                                             </thead>
                                             <tbody className="divide-y divide-slate-100">
@@ -185,7 +185,7 @@ export function StatementDetailsView() {
                                                             </td>
                                                             <td className="px-6 py-4 font-medium text-navy">{item.description}</td>
                                                             <td className="px-6 py-4 text-slate-500 text-sm">{item.reference}</td>
-                                                            <td className="px-6 py-4 text-left font-bold text-navy">
+                                                            <td className="px-6 py-4 text-start font-bold text-navy">
                                                                 {item.amount.toLocaleString('ar-SA')} ر.س
                                                             </td>
                                                         </tr>

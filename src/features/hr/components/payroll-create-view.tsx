@@ -820,7 +820,7 @@ export function PayrollCreateView() {
                                                 {totalEarnings.toLocaleString('ar-SA')} - {totalDeductions.toLocaleString('ar-SA')}
                                             </div>
                                         </div>
-                                        <div className="text-left">
+                                        <div className="text-start">
                                             <span className="text-4xl font-bold text-emerald-600">
                                                 {netPay.toLocaleString('ar-SA')}
                                             </span>

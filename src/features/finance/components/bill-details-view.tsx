@@ -275,13 +275,13 @@ export function BillDetailsView() {
                             </CardHeader>
                             <CardContent className="p-0">
                                 <div className="overflow-x-auto">
-                                    <table className="w-full text-right">
+                                    <table className="w-full text-start">
                                         <thead className="bg-slate-50 text-slate-500 text-sm font-medium">
                                             <tr>
                                                 <th className="px-6 py-4">الوصف</th>
                                                 <th className="px-6 py-4 text-center">الكمية</th>
                                                 <th className="px-6 py-4 text-center">السعر</th>
-                                                <th className="px-6 py-4 text-left">المجموع</th>
+                                                <th className="px-6 py-4 text-start">المجموع</th>
                                             </tr>
                                         </thead>
                                         <tbody className="divide-y divide-slate-100">
@@ -290,22 +290,22 @@ export function BillDetailsView() {
                                                     <td className="px-6 py-4 font-medium text-navy">{item.description}</td>
                                                     <td className="px-6 py-4 text-center text-slate-600">{item.quantity}</td>
                                                     <td className="px-6 py-4 text-center text-slate-600">{item.rate}</td>
-                                                    <td className="px-6 py-4 text-left font-bold text-navy">{item.amount}</td>
+                                                    <td className="px-6 py-4 text-start font-bold text-navy">{item.amount}</td>
                                                 </tr>
                                             ))}
                                         </tbody>
                                         <tfoot className="bg-slate-50">
                                             <tr>
                                                 <td colSpan={2} className="px-6 py-3 text-slate-600">المجموع الفرعي</td>
-                                                <td colSpan={2} className="px-6 py-3 text-left font-bold text-navy">{bill.subtotal} {bill.currency}</td>
+                                                <td colSpan={2} className="px-6 py-3 text-start font-bold text-navy">{bill.subtotal} {bill.currency}</td>
                                             </tr>
                                             <tr>
                                                 <td colSpan={2} className="px-6 py-3 text-slate-600">ضريبة القيمة المضافة ({(bill.vatRate * 100).toFixed(0)}%)</td>
-                                                <td colSpan={2} className="px-6 py-3 text-left font-bold text-navy">{bill.vatAmount} {bill.currency}</td>
+                                                <td colSpan={2} className="px-6 py-3 text-start font-bold text-navy">{bill.vatAmount} {bill.currency}</td>
                                             </tr>
                                             <tr className="bg-emerald-50">
                                                 <td colSpan={2} className="px-6 py-4 font-bold text-emerald-800">الإجمالي</td>
-                                                <td colSpan={2} className="px-6 py-4 text-left font-bold text-emerald-600 text-lg">{bill.amount} {bill.currency}</td>
+                                                <td colSpan={2} className="px-6 py-4 text-start font-bold text-emerald-600 text-lg">{bill.amount} {bill.currency}</td>
                                             </tr>
                                         </tfoot>
                                     </table>

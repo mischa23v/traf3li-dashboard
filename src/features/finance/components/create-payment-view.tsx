@@ -584,12 +584,12 @@ export function CreatePaymentView() {
                                                 {statusInfo.label}
                                             </Badge>
                                         </div>
-                                        <div className="text-left space-y-1">
+                                        <div className="text-start space-y-1">
                                             <Label className="text-xs text-slate-500">رقم الدفعة</Label>
                                             <Input
                                                 value={paymentNumber}
                                                 onChange={(e) => setPaymentNumber(e.target.value)}
-                                                className="w-48 rounded-xl border-slate-200 text-left font-mono"
+                                                className="w-48 rounded-xl border-slate-200 text-start font-mono"
                                                 dir="ltr"
                                             />
                                         </div>
@@ -1069,11 +1069,11 @@ export function CreatePaymentView() {
                                                 <Table>
                                                     <TableHeader>
                                                         <TableRow className="bg-slate-50">
-                                                            <TableHead className="w-12 text-right"></TableHead>
-                                                            <TableHead className="text-right">رقم الفاتورة</TableHead>
-                                                            <TableHead className="text-right">المبلغ الإجمالي</TableHead>
-                                                            <TableHead className="text-right">المتبقي</TableHead>
-                                                            <TableHead className="text-right">المبلغ المطبق</TableHead>
+                                                            <TableHead className="w-12 text-start"></TableHead>
+                                                            <TableHead className="text-start">رقم الفاتورة</TableHead>
+                                                            <TableHead className="text-start">المبلغ الإجمالي</TableHead>
+                                                            <TableHead className="text-start">المتبقي</TableHead>
+                                                            <TableHead className="text-start">المبلغ المطبق</TableHead>
                                                         </TableRow>
                                                     </TableHeader>
                                                     <TableBody>

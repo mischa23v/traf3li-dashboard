@@ -277,10 +277,10 @@ export default function QuoteDetailsView() {
                                         <table className="w-full">
                                             <thead className="bg-slate-50">
                                                 <tr>
-                                                    <th className="text-right p-4 text-sm font-medium text-slate-600">البند</th>
+                                                    <th className="text-start p-4 text-sm font-medium text-slate-600">البند</th>
                                                     <th className="text-center p-4 text-sm font-medium text-slate-600">الكمية</th>
                                                     <th className="text-center p-4 text-sm font-medium text-slate-600">السعر</th>
-                                                    <th className="text-left p-4 text-sm font-medium text-slate-600">الإجمالي</th>
+                                                    <th className="text-start p-4 text-sm font-medium text-slate-600">الإجمالي</th>
                                                 </tr>
                                             </thead>
                                             <tbody className="divide-y divide-slate-100">
@@ -296,7 +296,7 @@ export default function QuoteDetailsView() {
                                                         <td className="p-4 text-center text-slate-600">
                                                             {formatCurrency(item.price, quote.currency)}
                                                         </td>
-                                                        <td className="p-4 text-left font-medium text-navy">
+                                                        <td className="p-4 text-start font-medium text-navy">
                                                             {formatCurrency(item.total, quote.currency)}
                                                         </td>
                                                     </tr>

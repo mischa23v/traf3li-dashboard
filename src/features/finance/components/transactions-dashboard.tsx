@@ -681,7 +681,7 @@ export default function TransactionsDashboard() {
                                                         <TableHead className="font-bold text-slate-900 w-24">النوع</TableHead>
                                                         <TableHead className="font-bold text-slate-900">الوصف</TableHead>
                                                         <TableHead className="font-bold text-slate-900 w-24">القضية</TableHead>
-                                                        <TableHead className="font-bold text-slate-900 text-left w-28">المبلغ</TableHead>
+                                                        <TableHead className="font-bold text-slate-900 text-start w-28">المبلغ</TableHead>
                                                         <TableHead className="font-bold text-slate-900 w-20">الحالة</TableHead>
                                                         <TableHead className="w-12"></TableHead>
                                                     </TableRow>
@@ -929,8 +929,8 @@ export default function TransactionsDashboard() {
                                                     <TableRow className="bg-slate-50">
                                                         <TableHead className="font-bold text-slate-900">الحساب</TableHead>
                                                         <TableHead className="font-bold text-slate-900">الوصف</TableHead>
-                                                        <TableHead className="font-bold text-slate-900 text-left w-32">مدين</TableHead>
-                                                        <TableHead className="font-bold text-slate-900 text-left w-32">دائن</TableHead>
+                                                        <TableHead className="font-bold text-slate-900 text-start w-32">مدين</TableHead>
+                                                        <TableHead className="font-bold text-slate-900 text-start w-32">دائن</TableHead>
                                                     </TableRow>
                                                 </TableHeader>
                                                 <TableBody>
@@ -949,14 +949,14 @@ export default function TransactionsDashboard() {
                                                             <TableCell className="text-slate-600">
                                                                 {line.description || '-'}
                                                             </TableCell>
-                                                            <TableCell className="text-left">
+                                                            <TableCell className="text-start">
                                                                 {line.debit > 0 && (
                                                                     <span className="font-bold text-blue-600">
                                                                         {formatSAR(halalasToSAR(line.debit))}
                                                                     </span>
                                                                 )}
                                                             </TableCell>
-                                                            <TableCell className="text-left">
+                                                            <TableCell className="text-start">
                                                                 {line.credit > 0 && (
                                                                     <span className="font-bold text-emerald-600">
                                                                         {formatSAR(halalasToSAR(line.credit))}
@@ -968,13 +968,13 @@ export default function TransactionsDashboard() {
                                                 </TableBody>
                                                 <TableFooter>
                                                     <TableRow className="font-bold bg-slate-50">
-                                                        <TableCell colSpan={2} className="text-left">الإجمالي</TableCell>
-                                                        <TableCell className="text-left text-blue-600">
+                                                        <TableCell colSpan={2} className="text-start">الإجمالي</TableCell>
+                                                        <TableCell className="text-start text-blue-600">
                                                             {formatSAR(halalasToSAR(
                                                                 selectedEntry.lines?.reduce((sum: number, line: GLEntryLine) => sum + (line.debit || 0), 0) || 0
                                                             ))}
                                                         </TableCell>
-                                                        <TableCell className="text-left text-emerald-600">
+                                                        <TableCell className="text-start text-emerald-600">
                                                             {formatSAR(halalasToSAR(
                                                                 selectedEntry.lines?.reduce((sum: number, line: GLEntryLine) => sum + (line.credit || 0), 0) || 0
                                                             ))}

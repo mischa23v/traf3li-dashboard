@@ -4,6 +4,12 @@
     "description": "Are you sure you want to sign out? You will need to sign in again to access your account.",
     "confirm": "Sign out"
   },
+  "session": {
+    "extended": "Session extended successfully",
+    "warning": "Your session will expire in 5 minutes due to inactivity.",
+    "timeout": "Your session has expired due to inactivity. Please log in again.",
+    "extend": "Extend Session"
+  },
   "offline": {
     "noConnection": "No internet connection",
     "backOnline": "Back online",
@@ -3242,6 +3248,22 @@
     "empty": {
       "title": "No Items Found",
       "description": "There are no tasks, reminders, or events to display."
+    }
+  },
+  "passwordStrength": {
+    "label": "Password Strength",
+    "levels": {
+      "weak": "Weak",
+      "fair": "Fair",
+      "good": "Good",
+      "strong": "Strong"
+    },
+    "requirements": {
+      "minLength": "At least 8 characters",
+      "hasUppercase": "At least 1 uppercase letter",
+      "hasLowercase": "At least 1 lowercase letter",
+      "hasNumber": "At least 1 number",
+      "hasSpecialChar": "At least 1 special character (!@#$%^&*)"
     }
   }
 }
