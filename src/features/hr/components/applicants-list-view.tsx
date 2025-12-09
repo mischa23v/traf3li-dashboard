@@ -82,6 +82,14 @@ export function ApplicantsListView() {
   // Status badge
   const getStatusBadge = (status: ApplicantStatus) => {
     const config = APPLICANT_STATUS_LABELS[status]
+    // Handle unknown status gracefully
+    if (!config) {
+      return (
+        <Badge className="bg-slate-100 text-slate-600 border-0 rounded-lg px-2 py-0.5">
+          {status || 'غير محدد'}
+        </Badge>
+      )
+    }
     const colorClasses: Record<string, string> = {
       emerald: 'bg-emerald-100 text-emerald-700',
       red: 'bg-red-100 text-red-700',
@@ -93,7 +101,7 @@ export function ApplicantsListView() {
       slate: 'bg-slate-100 text-slate-600',
     }
     return (
-      <Badge className={`${colorClasses[config.color]} border-0 rounded-lg px-2 py-0.5`}>
+      <Badge className={`${colorClasses[config.color] || 'bg-slate-100 text-slate-600'} border-0 rounded-lg px-2 py-0.5`}>
         {config.ar}
       </Badge>
     )
