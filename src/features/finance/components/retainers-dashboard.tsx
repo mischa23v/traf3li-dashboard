@@ -798,12 +798,12 @@ export default function RetainersDashboard() {
                         </div>
                         <div className="space-y-2">
                             <Label htmlFor="consumeCaseId">القضية (اختياري)</Label>
-                            <Select value={consumeCaseId} onValueChange={setConsumeCaseId}>
+                            <Select value={consumeCaseId || '__none__'} onValueChange={(value) => setConsumeCaseId(value === '__none__' ? '' : value)}>
                                 <SelectTrigger id="consumeCaseId">
                                     <SelectValue placeholder="اختر قضية" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="">بدون قضية</SelectItem>
+                                    <SelectItem value="__none__">بدون قضية</SelectItem>
                                     {casesData?.data?.map((caseItem: any) => (
                                         <SelectItem key={caseItem._id} value={caseItem._id}>
                                             {caseItem.caseNumber} - {caseItem.title}

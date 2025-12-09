@@ -442,12 +442,12 @@ export function OrganizationalStructureCreateView() {
                     <Label className="text-navy font-medium">
                       الوحدة الأب
                     </Label>
-                    <Select value={parentUnitId} onValueChange={setParentUnitId}>
+                    <Select value={parentUnitId || '__none__'} onValueChange={(value) => setParentUnitId(value === '__none__' ? '' : value)}>
                       <SelectTrigger className="h-11 rounded-xl">
                         <SelectValue placeholder="اختر الوحدة الأب (اختياري)" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="">لا يوجد (وحدة رئيسية)</SelectItem>
+                        <SelectItem value="__none__">لا يوجد (وحدة رئيسية)</SelectItem>
                         {unitsData?.data?.filter(u => u._id !== editId).map((unit) => (
                           <SelectItem key={unit._id} value={unit._id}>
                             {unit.unitNameAr || unit.unitName} ({unit.unitCode})

@@ -567,7 +567,7 @@ export function PipelineView() {
             </SelectTrigger>
             <SelectContent>
               {pipelines.length === 0 ? (
-                <SelectItem value="" disabled>
+                <SelectItem value="__no_pipelines__" disabled>
                   لا توجد مسارات متاحة
                 </SelectItem>
               ) : (
