@@ -20,10 +20,10 @@ export const contactsKeys = {
   search: (query: string) => [...contactsKeys.all, 'search', query] as const,
 }
 
-// Get all contacts
+// Get all contacts - match useClients pattern exactly (simple queryKey)
 export const useContacts = (filters?: ContactFilters) => {
   return useQuery({
-    queryKey: contactsKeys.list(filters || {}),
+    queryKey: ['contacts', filters],  // Simple key like useClients uses
     queryFn: () => contactsService.getContacts(filters),
     staleTime: 2 * 60 * 1000, // 2 minutes
   })
