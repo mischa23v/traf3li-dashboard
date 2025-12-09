@@ -230,7 +230,6 @@ export function SaudiBankingWPSCreateView() {
 
     const handleImport = () => {
         // TODO: Implement Excel import
-        console.log('Opening import dialog...')
     }
 
     const formatCurrency = (amount: number) => {

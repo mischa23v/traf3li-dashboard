@@ -71,8 +71,7 @@ export function BiometricCreateView() {
             notes,
         }
 
-        console.log('Creating/Updating biometric device:', deviceData)
-
+        // TODO: Replace with actual API call
         // Simulate API call
         setTimeout(() => {
             setIsPending(false)

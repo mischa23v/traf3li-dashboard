@@ -98,8 +98,7 @@ export function BiometricDetailsView() {
 
     // Handle delete
     const handleDelete = () => {
-        console.log('Deleting device:', deviceId)
-        // Placeholder: In real app, this would call the API
+        // TODO: Replace with actual API call
         setTimeout(() => {
             navigate({ to: '/dashboard/hr/biometric' })
         }, 1000)
