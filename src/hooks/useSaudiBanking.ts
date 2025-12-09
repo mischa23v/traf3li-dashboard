@@ -190,6 +190,8 @@ export function useLeanBanks() {
       const response = await api.get('/saudi-banking/lean/banks')
       return response.data
     },
+    staleTime: 5 * 60 * 1000,
+    retry: 1,
   })
 }
 
@@ -201,6 +203,8 @@ export function useLeanCustomers() {
       const response = await api.get('/saudi-banking/lean/customers')
       return response.data
     },
+    staleTime: 5 * 60 * 1000,
+    retry: 1,
   })
 }
 
@@ -213,6 +217,8 @@ export function useLeanCustomer(customerId: string) {
       return response.data
     },
     enabled: !!customerId,
+    staleTime: 5 * 60 * 1000,
+    retry: 1,
   })
 }
 
@@ -243,6 +249,8 @@ export function useLeanCustomerToken(customerId: string) {
       return response.data
     },
     enabled: !!customerId,
+    staleTime: 5 * 60 * 1000,
+    retry: 1,
   })
 }
 
@@ -255,6 +263,8 @@ export function useLeanEntities(customerId: string) {
       return response.data
     },
     enabled: !!customerId,
+    staleTime: 5 * 60 * 1000,
+    retry: 1,
   })
 }
 
@@ -267,6 +277,8 @@ export function useLeanTransactions(accountId: string, params?: { page?: number;
       return response.data
     },
     enabled: !!accountId,
+    staleTime: 5 * 60 * 1000,
+    retry: 1,
   })
 }
 
@@ -279,6 +291,8 @@ export function useLeanBalance(accountId: string) {
       return response.data
     },
     enabled: !!accountId,
+    staleTime: 5 * 60 * 1000,
+    retry: 1,
   })
 }
 
@@ -312,6 +326,8 @@ export function useWPSFiles(params?: { page?: number; limit?: number; status?: s
       const response = await api.get('/saudi-banking/wps/files', { params })
       return response.data
     },
+    staleTime: 5 * 60 * 1000,
+    retry: 1,
   })
 }
 
@@ -324,6 +340,8 @@ export function useWPSFile(fileId: string) {
       return response.data
     },
     enabled: !!fileId,
+    staleTime: 5 * 60 * 1000,
+    retry: 1,
   })
 }
 
@@ -335,6 +353,8 @@ export function useSARIEBanks() {
       const response = await api.get('/saudi-banking/wps/sarie-banks')
       return response.data
     },
+    staleTime: 5 * 60 * 1000,
+    retry: 1,
   })
 }
 
@@ -408,6 +428,8 @@ export function useSADADBillers(category?: string) {
       const response = await api.get('/saudi-banking/sadad/billers', { params: { category } })
       return response.data
     },
+    staleTime: 5 * 60 * 1000,
+    retry: 1,
   })
 }
 
@@ -420,6 +442,8 @@ export function useSearchSADADBillers(query: string) {
       return response.data
     },
     enabled: query.length > 2,
+    staleTime: 5 * 60 * 1000,
+    retry: 1,
   })
 }
 
@@ -466,6 +490,8 @@ export function useSADADPayments(params?: { fromDate?: string; toDate?: string; 
       const response = await api.get('/saudi-banking/sadad/payments/history', { params })
       return response.data
     },
+    staleTime: 5 * 60 * 1000,
+    retry: 1,
   })
 }
 
@@ -478,6 +504,8 @@ export function useSADADPayment(paymentId: string) {
       return response.data
     },
     enabled: !!paymentId,
+    staleTime: 5 * 60 * 1000,
+    retry: 1,
   })
 }
 
@@ -549,6 +577,8 @@ export function useMudadPayrolls(params?: { page?: number; limit?: number; month
       const response = await api.get('/saudi-banking/mudad/payrolls', { params })
       return response.data
     },
+    staleTime: 5 * 60 * 1000,
+    retry: 1,
   })
 }
 
@@ -560,5 +590,7 @@ export function useMudadCompliance() {
       const response = await api.get('/saudi-banking/mudad/compliance')
       return response.data
     },
+    staleTime: 5 * 60 * 1000,
+    retry: 1,
   })
 }

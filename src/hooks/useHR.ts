@@ -13,6 +13,8 @@ export const useEmployees = (filters?: EmployeeFilters) => {
   return useQuery({
     queryKey: ['employees', filters],
     queryFn: () => hrService.getEmployees(filters),
+    staleTime: 5 * 60 * 1000,
+    retry: 1,
   })
 }
 
@@ -21,6 +23,8 @@ export const useEmployee = (id: string) => {
     queryKey: ['employees', id],
     queryFn: () => hrService.getEmployee(id),
     enabled: !!id,
+    staleTime: 5 * 60 * 1000,
+    retry: 1,
   })
 }
 
@@ -28,6 +32,8 @@ export const useEmployeeStats = () => {
   return useQuery({
     queryKey: ['employees', 'stats'],
     queryFn: () => hrService.getEmployeeStats(),
+    staleTime: 5 * 60 * 1000,
+    retry: 1,
   })
 }
 

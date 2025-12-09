@@ -101,7 +101,7 @@ export default function InvoicesDashboard() {
         const invoiceArray = invoicesData.invoices ?? invoicesData.data ?? []
         return invoiceArray.map((inv: any) => ({
             id: inv.invoiceNumber || inv._id,
-            client: inv.clientId?.name || inv.clientId?.firstName + ' ' + inv.clientId?.lastName || 'عميل غير محدد',
+            client: inv.clientId?.name || (inv.clientId?.firstName && inv.clientId?.lastName ? `${inv.clientId.firstName} ${inv.clientId.lastName}` : 'عميل غير محدد'),
             amount: inv.totalAmount || 0,
             date: new Date(inv.issueDate).toLocaleDateString('ar-SA'),
             status: inv.status,

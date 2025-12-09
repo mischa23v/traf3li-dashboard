@@ -77,7 +77,9 @@ const uiAccessService = {
     } catch (error: any) {
       // Return allowed: true by default when API is unavailable or returns an error
       // This prevents blocking legitimate users when the permission API is not fully configured
-      console.warn(`Page access check failed for ${routePath}, allowing access by default:`, error?.message || error)
+      if (import.meta.env.DEV) {
+        console.warn(`[UIAccess] Page access check failed for ${routePath}, allowing access by default:`, error?.message || error)
+      }
       return {
         allowed: true,
         reason: 'Access check unavailable - defaulting to allowed',

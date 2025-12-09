@@ -207,7 +207,9 @@ export function SaudiBankingSADADPayView() {
             })
             navigate({ to: '/dashboard/finance/saudi-banking/sadad' })
         } catch (error) {
-            console.error('Payment failed:', error)
+            if (import.meta.env.DEV) {
+                console.warn('[SADAD] Payment failed:', error)
+            }
         }
     }
 

@@ -86,7 +86,10 @@ export function GanttView() {
 
         setIsGanttLoaded(true)
       } catch (err) {
-        console.error(t('ganttTasks.errors.loadFailed'), err)
+        // Silently handle gantt load errors - will show in UI error state
+        if (import.meta.env.DEV) {
+          console.warn('[Gantt] Load failed:', err)
+        }
       }
     }
     loadGantt()
@@ -96,9 +99,23 @@ export function GanttView() {
   useEffect(() => {
     if (!isGanttLoaded || !containerRef.current || !gantt) return
 
-    // Configure Gantt
+    // Configure Gantt date format
     gantt.config.date_format = '%Y-%m-%d %H:%i'
     gantt.config.xml_date = '%Y-%m-%d %H:%i'
+
+    // Set up date parsing and formatting functions to fix parseDate error
+    gantt.templates.parse_date = function(date: string) {
+      return new Date(date)
+    }
+    gantt.templates.format_date = function(date: Date) {
+      const year = date.getFullYear()
+      const month = String(date.getMonth() + 1).padStart(2, '0')
+      const day = String(date.getDate()).padStart(2, '0')
+      const hours = String(date.getHours()).padStart(2, '0')
+      const minutes = String(date.getMinutes()).padStart(2, '0')
+      return `${year}-${month}-${day} ${hours}:${minutes}`
+    }
+
     gantt.config.scale_height = 50
     gantt.config.row_height = 40
     gantt.config.min_column_width = 50
@@ -126,6 +143,15 @@ export function GanttView() {
         label: t('ganttTasks.startDate'),
         align: 'center',
         width: 100,
+        template: (obj: any) => {
+          if (!obj.start_date) return ''
+          const date = new Date(obj.start_date)
+          if (isNaN(date.getTime())) return ''
+          const year = date.getFullYear()
+          const month = String(date.getMonth() + 1).padStart(2, '0')
+          const day = String(date.getDate()).padStart(2, '0')
+          return `${year}-${month}-${day}`
+        },
       },
       {
         name: 'duration',

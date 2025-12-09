@@ -15,6 +15,7 @@ export const useCalendar = (filters: CalendarFilters) => {
     queryFn: () => calendarService.getCalendar(filters),
     staleTime: 2 * 60 * 1000, // 2 minutes
     enabled: !!(filters.startDate && filters.endDate),
+    retry: 1,
   })
 }
 
@@ -27,6 +28,7 @@ export const useCalendarByDate = (date: string) => {
     queryFn: () => calendarService.getCalendarByDate(date),
     staleTime: 2 * 60 * 1000,
     enabled: !!date,
+    retry: 1,
   })
 }
 
@@ -39,6 +41,7 @@ export const useCalendarByMonth = (year: number, month: number) => {
     queryFn: () => calendarService.getCalendarByMonth(year, month),
     staleTime: 2 * 60 * 1000,
     enabled: !!(year && month),
+    retry: 1,
   })
 }
 
@@ -50,6 +53,7 @@ export const useUpcomingCalendar = (days: number = 7) => {
     queryKey: ['calendar', 'upcoming', days],
     queryFn: () => calendarService.getUpcoming(days),
     staleTime: 1 * 60 * 1000, // 1 minute
+    retry: 1,
   })
 }
 
@@ -61,6 +65,7 @@ export const useOverdueCalendar = () => {
     queryKey: ['calendar', 'overdue'],
     queryFn: () => calendarService.getOverdue(),
     staleTime: 1 * 60 * 1000,
+    retry: 1,
   })
 }
 
@@ -75,5 +80,6 @@ export const useCalendarStats = (filters?: {
     queryKey: ['calendar', 'stats', filters],
     queryFn: () => calendarService.getStats(filters),
     staleTime: 5 * 60 * 1000, // 5 minutes
+    retry: 1,
   })
 }

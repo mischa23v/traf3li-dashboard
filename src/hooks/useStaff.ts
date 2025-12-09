@@ -73,7 +73,9 @@ export const useStaff = (filters?: LawyerFilters & { showDeparted?: boolean }) =
     queryKey: ['staff', firmId, filters],
     queryFn: async () => {
       if (!firmId) {
-        console.warn('No firmId found, falling back to lawyers endpoint')
+        if (import.meta.env.DEV) {
+          console.warn('[useStaff] No firmId found, falling back to lawyers endpoint')
+        }
         return lawyersService.getAll(filters)
       }
       // Use firm team endpoint to get only firm members

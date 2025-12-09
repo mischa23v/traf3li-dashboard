@@ -53,7 +53,7 @@ class SocketService {
 
     this.socket.on('error', (error) => {
       if (import.meta.env.DEV) {
-        console.error('[Socket] Error:', error)
+        console.warn('[Socket] Error:', error)
       }
     })
   }

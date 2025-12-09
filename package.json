@@ -17,7 +17,10 @@
     "test:ui": "vitest --ui",
     "test:coverage": "vitest run --coverage",
     "test:e2e": "playwright test",
-    "test:all": "npm run test:run && npm run test:e2e"
+    "test:all": "npm run test:run && npm run test:e2e",
+    "test:console": "node check-console.mjs",
+    "test:console-playwright": "playwright test console-check.spec.ts --reporter=list",
+    "audit:console": "node scripts/console-audit.js"
   },
   "dependencies": {
     "@ckeditor/ckeditor5-build-classic": "^39.0.2",

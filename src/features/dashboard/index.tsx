@@ -271,26 +271,13 @@ export function Dashboard() {
                   <div className="divide-y divide-slate-100">
                     {todayEvents.map((event) => {
                       const eventTime = event.startDate ? new Date(event.startDate).toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' }) : t('dashboard.schedule.notSpecified')
-                      const colorMap = { meeting: 'blue', session: 'green', deadline: 'amber' }
-                      const eventColor = colorMap[event.type] || 'blue'
-
-                      // Static color class mappings
-                      const lineColorClasses = {
-                        blue: 'bg-blue-500',
-                        green: 'bg-green-500',
-                        amber: 'bg-amber-500',
-                        red: 'bg-red-500',
-                        emerald: 'bg-emerald-500'
+                      // Use static Tailwind classes instead of dynamic interpolation
+                      const colorClasses = {
+                        meeting: { bar: 'bg-blue-500', badge: 'bg-blue-50 text-blue-700' },
+                        session: { bar: 'bg-green-500', badge: 'bg-green-50 text-green-700' },
+                        deadline: { bar: 'bg-amber-500', badge: 'bg-amber-50 text-amber-700' }
                       }
-
-                      const badgeColorClasses = {
-                        blue: 'bg-blue-50 text-blue-700',
-                        green: 'bg-green-50 text-green-700',
-                        amber: 'bg-amber-50 text-amber-700',
-                        red: 'bg-red-50 text-red-700',
-                        emerald: 'bg-emerald-50 text-emerald-700'
-                      }
-
+                      const colors = colorClasses[event.type as keyof typeof colorClasses] || colorClasses.meeting
                       return (
                         <Link
                           key={event._id}
@@ -299,12 +286,12 @@ export function Dashboard() {
                           className="flex items-center p-6 hover:bg-slate-50/80 transition-colors group cursor-pointer block"
                         >
                           <div className="w-20 font-bold text-slate-600 text-sm">{eventTime}</div>
-                          <div className={`w-1.5 h-12 rounded-full ${lineColorClasses[eventColor] || lineColorClasses.blue} me-4 ms-2`}></div>
+                          <div className={`w-1.5 h-12 rounded-full ${colors.bar} me-4 ms-2`}></div>
                           <div className="flex-1">
                             <h4 className="font-bold text-navy text-lg group-hover:text-brand-blue transition-colors">{event.title}</h4>
                             <div className="flex items-center gap-4 mt-1 text-xs font-medium text-slate-500">
                               <span className="flex items-center gap-1"><MapPinIcon className="h-3 w-3" /> {typeof event.location === 'string' ? event.location : (event.location?.name || event.location?.address || t('dashboard.schedule.remote'))}</span>
-                              <span className={`${badgeColorClasses[eventColor] || badgeColorClasses.blue} px-2 py-0.5 rounded-md font-bold`}>
+                              <span className={`${colors.badge} px-2 py-0.5 rounded-md font-bold`}>
                                 {event.type === 'session' ? t('dashboard.schedule.eventTypes.session') : event.type === 'meeting' ? t('dashboard.schedule.eventTypes.meeting') : t('dashboard.schedule.eventTypes.deadline')}
                               </span>
                             </div>

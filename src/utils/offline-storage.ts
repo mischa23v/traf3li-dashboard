@@ -16,7 +16,9 @@ export function saveOffline<T>(key: string, data: T): void {
     const storageKey = `${OFFLINE_PREFIX}${key}`
     localStorage.setItem(storageKey, JSON.stringify(data))
   } catch (error) {
-    console.error('Failed to save offline data:', error)
+    if (import.meta.env.DEV) {
+      console.warn('[OfflineStorage] Failed to save offline data:', error)
+    }
   }
 }
 
@@ -31,7 +33,9 @@ export function getOffline<T>(key: string): T | null {
     const data = localStorage.getItem(storageKey)
     return data ? JSON.parse(data) : null
   } catch (error) {
-    console.error('Failed to retrieve offline data:', error)
+    if (import.meta.env.DEV) {
+      console.warn('[OfflineStorage] Failed to retrieve offline data:', error)
+    }
     return null
   }
 }
@@ -45,7 +49,9 @@ export function clearOfflineData(key: string): void {
     const storageKey = `${OFFLINE_PREFIX}${key}`
     localStorage.removeItem(storageKey)
   } catch (error) {
-    console.error('Failed to clear offline data:', error)
+    if (import.meta.env.DEV) {
+      console.warn('[OfflineStorage] Failed to clear offline data:', error)
+    }
   }
 }
 
@@ -72,7 +78,9 @@ export function syncWhenOnline(
       JSON.stringify(pendingOps)
     )
   } catch (error) {
-    console.error('Failed to queue sync operation:', error)
+    if (import.meta.env.DEV) {
+      console.warn('[OfflineStorage] Failed to queue sync operation:', error)
+    }
   }
 
   // Set up listener for online event
@@ -83,7 +91,9 @@ export function syncWhenOnline(
         // Remove from pending operations
         removePendingSyncOperation(key)
       } catch (error) {
-        console.error('Sync operation failed:', error)
+        if (import.meta.env.DEV) {
+          console.warn('[OfflineStorage] Sync operation failed:', error)
+        }
       }
     }
   }
@@ -124,7 +134,9 @@ function removePendingSyncOperation(key: string): void {
       JSON.stringify(pendingOps)
     )
   } catch (error) {
-    console.error('Failed to remove pending sync operation:', error)
+    if (import.meta.env.DEV) {
+      console.warn('[OfflineStorage] Failed to remove pending sync operation:', error)
+    }
   }
 }
 
@@ -141,7 +153,9 @@ export function getAllOfflineKeys(): string[] {
       }
     }
   } catch (error) {
-    console.error('Failed to get offline keys:', error)
+    if (import.meta.env.DEV) {
+      console.warn('[OfflineStorage] Failed to get offline keys:', error)
+    }
   }
   return keys
 }
@@ -154,6 +168,8 @@ export function clearAllOfflineData(): void {
     const keys = getAllOfflineKeys()
     keys.forEach((key) => clearOfflineData(key))
   } catch (error) {
-    console.error('Failed to clear all offline data:', error)
+    if (import.meta.env.DEV) {
+      console.warn('[OfflineStorage] Failed to clear all offline data:', error)
+    }
   }
 }

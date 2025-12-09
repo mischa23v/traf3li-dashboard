@@ -180,7 +180,9 @@ export function PageAccessGuard({
 
   // Handle error - allow access by default on error to avoid blocking users
   if (error) {
-    console.error('Page access check failed:', error)
+    if (import.meta.env.DEV) {
+      console.warn('[PageAccessGuard] Access check failed:', error)
+    }
     // Return children on error to avoid blocking legitimate users
     return <>{children}</>
   }

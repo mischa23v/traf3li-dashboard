@@ -86,7 +86,9 @@ class SimpleObfuscator {
       // Base64 encode
       return btoa(obfuscated)
     } catch (error) {
-      console.error('[SecureStorage] Obfuscation failed:', error)
+      if (import.meta.env.DEV) {
+        console.warn('[SecureStorage] Obfuscation failed:', error)
+      }
       return data // Return plain data if obfuscation fails
     }
   }
@@ -109,7 +111,9 @@ class SimpleObfuscator {
         })
         .join('')
     } catch (error) {
-      console.error('[SecureStorage] De-obfuscation failed:', error)
+      if (import.meta.env.DEV) {
+        console.warn('[SecureStorage] De-obfuscation failed:', error)
+      }
       return data // Return as-is if de-obfuscation fails
     }
   }
@@ -202,7 +206,9 @@ export class SecureStorage {
 
       storage.setItem(storageKey, serialized)
     } catch (error) {
-      console.error(`[SecureStorage] Failed to set item "${key}":`, error)
+      if (import.meta.env.DEV) {
+        console.warn(`[SecureStorage] Failed to set item "${key}":`, error)
+      }
       throw new Error(`Failed to store item: ${error}`)
     }
   }
@@ -248,7 +254,9 @@ export class SecureStorage {
 
       return item.value
     } catch (error) {
-      console.error(`[SecureStorage] Failed to get item "${key}":`, error)
+      if (import.meta.env.DEV) {
+        console.warn(`[SecureStorage] Failed to get item "${key}":`, error)
+      }
       // Clean up corrupted data
       this.removeItem(key, useSessionStorage)
       return null
@@ -267,7 +275,9 @@ export class SecureStorage {
       const storageKey = this.getKey(key)
       storage.removeItem(storageKey)
     } catch (error) {
-      console.error(`[SecureStorage] Failed to remove item "${key}":`, error)
+      if (import.meta.env.DEV) {
+        console.warn(`[SecureStorage] Failed to remove item "${key}":`, error)
+      }
     }
   }
 
@@ -297,7 +307,9 @@ export class SecureStorage {
         keysToRemove.forEach(key => storage.removeItem(key))
       })
     } catch (error) {
-      console.error('[SecureStorage] Failed to clear storage:', error)
+      if (import.meta.env.DEV) {
+        console.warn('[SecureStorage] Failed to clear storage:', error)
+      }
     }
   }
 
@@ -320,7 +332,9 @@ export class SecureStorage {
 
       return keys
     } catch (error) {
-      console.error('[SecureStorage] Failed to get all keys:', error)
+      if (import.meta.env.DEV) {
+        console.warn('[SecureStorage] Failed to get all keys:', error)
+      }
       return []
     }
   }
@@ -408,7 +422,9 @@ export function useSecureStorage<T>(
       const item = storage.getItem<T>(key, options.useSessionStorage)
       return item !== null ? item : initialValue
     } catch (error) {
-      console.error(`[useSecureStorage] Error reading "${key}":`, error)
+      if (import.meta.env.DEV) {
+        console.warn(`[useSecureStorage] Error reading "${key}":`, error)
+      }
       return initialValue
     }
   })
@@ -421,7 +437,9 @@ export function useSecureStorage<T>(
       // Save to storage
       storage.setItem(key, value, options)
     } catch (error) {
-      console.error(`[useSecureStorage] Error setting "${key}":`, error)
+      if (import.meta.env.DEV) {
+        console.warn(`[useSecureStorage] Error setting "${key}":`, error)
+      }
     }
   }, [key, options])
 
@@ -431,7 +449,9 @@ export function useSecureStorage<T>(
       setStoredValue(initialValue)
       storage.removeItem(key, options.useSessionStorage)
     } catch (error) {
-      console.error(`[useSecureStorage] Error removing "${key}":`, error)
+      if (import.meta.env.DEV) {
+        console.warn(`[useSecureStorage] Error removing "${key}":`, error)
+      }
     }
   }, [key, initialValue, options.useSessionStorage])
 
@@ -471,10 +491,14 @@ export function migrateToSecureStorage(
     // Remove old key
     localStorage.removeItem(oldKey)
 
-    console.log(`[Migration] Migrated "${oldKey}" → "${newKey}"`)
+    if (import.meta.env.DEV) {
+      console.log(`[Migration] Migrated "${oldKey}" → "${newKey}"`)
+    }
     return true
   } catch (error) {
-    console.error(`[Migration] Failed to migrate "${oldKey}":`, error)
+    if (import.meta.env.DEV) {
+      console.warn(`[Migration] Failed to migrate "${oldKey}":`, error)
+    }
     return false
   }
 }

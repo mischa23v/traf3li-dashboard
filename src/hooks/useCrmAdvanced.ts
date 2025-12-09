@@ -428,6 +428,7 @@ export const useLeadScoringConfig = () => {
     queryKey: ['lead-scoring-config'],
     queryFn: () => leadScoringService.getConfig(),
     staleTime: 10 * 60 * 1000,
+    retry: 1,
   })
 }
 

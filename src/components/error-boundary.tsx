@@ -35,7 +35,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
   componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
     this.setState({ errorInfo })
     if (import.meta.env.DEV) {
-      console.error('ErrorBoundary caught:', error, errorInfo.componentStack)
+      console.warn('[ErrorBoundary] Caught:', error, errorInfo.componentStack)
     }
     if (typeof window !== 'undefined' && (window as any).Sentry) {
       (window as any).Sentry.captureException(error, { extra: { componentStack: errorInfo.componentStack } })

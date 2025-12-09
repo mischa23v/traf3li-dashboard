@@ -32,6 +32,7 @@ export const useBankFeeds = (filters?: BankFeedFilters) => {
     queryKey: ['bank-feeds', filters],
     queryFn: () => bankFeedService.getFeeds(filters),
     staleTime: 2 * 60 * 1000,
+    retry: 1,
   })
 }
 
@@ -437,6 +438,7 @@ export const useCurrencySettings = () => {
     queryKey: ['currency-settings'],
     queryFn: () => currencyService.getSettings(),
     staleTime: 10 * 60 * 1000,
+    retry: 1,
   })
 }
 

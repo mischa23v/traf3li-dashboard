@@ -179,7 +179,9 @@ export class CacheManager {
         this.persistToStorage(key, entry)
       }
     } catch (error) {
-      console.error(`[CacheManager] Failed to set key "${key}":`, error)
+      if (import.meta.env.DEV) {
+        console.warn(`[CacheManager] Failed to set key "${key}":`, error)
+      }
     }
   }
 
@@ -217,7 +219,9 @@ export class CacheManager {
 
       return entry.value as T
     } catch (error) {
-      console.error(`[CacheManager] Failed to get key "${key}":`, error)
+      if (import.meta.env.DEV) {
+        console.warn(`[CacheManager] Failed to get key "${key}":`, error)
+      }
       return null
     }
   }
@@ -263,7 +267,9 @@ export class CacheManager {
         )
       }
     } catch (error) {
-      console.error(`[CacheManager] Failed to delete key "${key}":`, error)
+      if (import.meta.env.DEV) {
+        console.warn(`[CacheManager] Failed to delete key "${key}":`, error)
+      }
     }
   }
 
@@ -301,12 +307,16 @@ export class CacheManager {
         invalidated++
       })
 
-      console.log(
-        `[CacheManager] Invalidated ${invalidated} entries matching pattern:`,
-        pattern
-      )
+      if (import.meta.env.DEV) {
+        console.log(
+          `[CacheManager] Invalidated ${invalidated} entries matching pattern:`,
+          pattern
+        )
+      }
     } catch (error) {
-      console.error('[CacheManager] Failed to invalidate pattern:', error)
+      if (import.meta.env.DEV) {
+        console.warn('[CacheManager] Failed to invalidate pattern:', error)
+      }
     }
 
     return invalidated
@@ -336,9 +346,13 @@ export class CacheManager {
         storage.clear()
       }
 
-      console.log('[CacheManager] Cache cleared')
+      if (import.meta.env.DEV) {
+        console.log('[CacheManager] Cache cleared')
+      }
     } catch (error) {
-      console.error('[CacheManager] Failed to clear cache:', error)
+      if (import.meta.env.DEV) {
+        console.warn('[CacheManager] Failed to clear cache:', error)
+      }
     }
   }
 
@@ -387,10 +401,14 @@ export class CacheManager {
 
       if (cleaned > 0) {
         this.stats.expiredCleared += cleaned
-        console.log(`[CacheManager] Cleaned up ${cleaned} expired entries`)
+        if (import.meta.env.DEV) {
+          console.log(`[CacheManager] Cleaned up ${cleaned} expired entries`)
+        }
       }
     } catch (error) {
-      console.error('[CacheManager] Failed to cleanup expired entries:', error)
+      if (import.meta.env.DEV) {
+        console.warn('[CacheManager] Failed to cleanup expired entries:', error)
+      }
     }
 
     return cleaned
@@ -450,11 +468,15 @@ export class CacheManager {
         this.stats.evictions++
       }
 
-      console.log(
-        `[CacheManager] Evicted ${this.stats.evictions} entries to free ${freedSize} bytes`
-      )
+      if (import.meta.env.DEV) {
+        console.log(
+          `[CacheManager] Evicted ${this.stats.evictions} entries to free ${freedSize} bytes`
+        )
+      }
     } catch (error) {
-      console.error('[CacheManager] Failed to evict LRU entries:', error)
+      if (import.meta.env.DEV) {
+        console.warn('[CacheManager] Failed to evict LRU entries:', error)
+      }
     }
   }
 
@@ -482,10 +504,12 @@ export class CacheManager {
         }
       )
     } catch (error) {
-      console.error(
-        `[CacheManager] Failed to persist key "${key}" to storage:`,
-        error
-      )
+      if (import.meta.env.DEV) {
+        console.warn(
+          `[CacheManager] Failed to persist key "${key}" to storage:`,
+          error
+        )
+      }
     }
   }
 
@@ -512,11 +536,13 @@ export class CacheManager {
         }
       }
 
-      if (loaded > 0) {
+      if (loaded > 0 && import.meta.env.DEV) {
         console.log(`[CacheManager] Loaded ${loaded} entries from storage`)
       }
     } catch (error) {
-      console.error('[CacheManager] Failed to load from storage:', error)
+      if (import.meta.env.DEV) {
+        console.warn('[CacheManager] Failed to load from storage:', error)
+      }
     }
   }
 }

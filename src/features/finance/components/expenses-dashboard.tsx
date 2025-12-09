@@ -67,7 +67,7 @@ export default function ExpensesDashboard() {
             amount: exp.amount,
             date: formattedDate,
             caseNumber: exp.caseId?.caseNumber || null,
-            caseName: exp.caseId ? `قضية ${exp.caseId.title || ''}` : 'مصروف عام',
+            caseName: exp.caseId?.title ? `قضية ${exp.caseId.title}` : 'مصروف عام',
             paymentMethod: exp.paymentMethod,
             status: exp.status === 'approved' ? 'مدفوع' : exp.status === 'pending' ? 'معلق' : exp.status,
             statusColor: exp.status === 'approved'

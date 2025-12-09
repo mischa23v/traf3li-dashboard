@@ -17,6 +17,7 @@ import { ThemeProvider } from './context/theme-provider'
 import { initSentry } from '@/lib/sentry'
 import { initAnalytics, trackPageView } from '@/lib/analytics'
 import { initWebVitals } from '@/lib/web-vitals'
+import { consoleLogger } from '@/utils/console-logger'
 // Import i18n configuration
 import './i18n'
 // Generated Routes
@@ -26,6 +27,11 @@ import './styles/index.css'
 
 // Initialize Sentry before app renders
 initSentry()
+
+// Initialize console logger in development
+if (import.meta.env.DEV) {
+  consoleLogger.init()
+}
 
 // Initialize analytics
 initAnalytics()

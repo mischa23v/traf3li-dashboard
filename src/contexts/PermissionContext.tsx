@@ -120,7 +120,9 @@ export function PermissionProvider({ children }: PermissionProviderProps) {
           reason: result.reason || 'permission_check',
         }
       } catch (error) {
-        console.error('Permission check failed:', error)
+        if (import.meta.env.DEV) {
+          console.warn('[Permission] Check failed:', error)
+        }
         return { allowed: false, reason: 'system_error' }
       }
     },
@@ -134,7 +136,9 @@ export function PermissionProvider({ children }: PermissionProviderProps) {
         const result = await checkRelationMutation.mutateAsync(check)
         return result
       } catch (error) {
-        console.error('Relation check failed:', error)
+        if (import.meta.env.DEV) {
+          console.warn('[Permission] Relation check failed:', error)
+        }
         return { allowed: false }
       }
     },
@@ -165,7 +169,9 @@ export function PermissionProvider({ children }: PermissionProviderProps) {
         const { default: uiAccessService } = await import('@/services/uiAccessService')
         return await uiAccessService.checkPageAccess(path)
       } catch (error) {
-        console.error('Page access check failed:', error)
+        if (import.meta.env.DEV) {
+          console.warn('[Permission] Page access check failed:', error)
+        }
         return { allowed: true } // Fail-safe: allow on error
       }
     },
