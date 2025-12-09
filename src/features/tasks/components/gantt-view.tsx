@@ -99,51 +99,15 @@ export function GanttView() {
   useEffect(() => {
     if (!isGanttLoaded || !containerRef.current || !gantt) return
 
-    // Configure Gantt date format - use default format that gantt knows how to parse
-    gantt.config.date_format = '%d-%m-%Y'
-    gantt.config.xml_date = '%d-%m-%Y'
-
-    // Override the internal date parsing/formatting to handle backend format
+    // Configure Gantt date format to match backend API
     // Backend sends: "YYYY-MM-DD HH:mm" (e.g., "2025-01-15 00:00")
-    // This fixes "s is not a function at Object.parseDate" error
-    gantt.date.str_to_date = function(format: string) {
-      return function(str: string) {
-        if (!str) return new Date()
+    // IMPORTANT: Set this BEFORE gantt.init() and let gantt.parse() handle it natively
+    gantt.config.date_format = '%Y-%m-%d %H:%i'
+    gantt.config.xml_date = '%Y-%m-%d %H:%i'
 
-        // Parse "YYYY-MM-DD HH:mm" format from backend
-        // Example: "2025-01-15 00:00"
-        const match = str.match(/^(\d{4})-(\d{2})-(\d{2})\s+(\d{2}):(\d{2})/)
-        if (match) {
-          const [, year, month, day, hours, minutes] = match
-          return new Date(
-            parseInt(year, 10),
-            parseInt(month, 10) - 1, // Month is 0-indexed
-            parseInt(day, 10),
-            parseInt(hours, 10),
-            parseInt(minutes, 10)
-          )
-        }
-
-        // Fallback: try ISO format or other formats
-        const date = new Date(str)
-        return isNaN(date.getTime()) ? new Date() : date
-      }
-    }
-
-    gantt.date.date_to_str = function(format: string) {
-      return function(date: Date) {
-        if (!date || !(date instanceof Date) || isNaN(date.getTime())) {
-          return ''
-        }
-        // Output in "YYYY-MM-DD HH:mm" format to match backend
-        const year = date.getFullYear()
-        const month = String(date.getMonth() + 1).padStart(2, '0')
-        const day = String(date.getDate()).padStart(2, '0')
-        const hours = String(date.getHours()).padStart(2, '0')
-        const minutes = String(date.getMinutes()).padStart(2, '0')
-        return `${year}-${month}-${day} ${hours}:${minutes}`
-      }
-    }
+    // Duration settings
+    gantt.config.scale_unit = 'day'
+    gantt.config.duration_unit = 'day'
 
     gantt.config.scale_height = 50
     gantt.config.row_height = 40
@@ -230,6 +194,9 @@ export function GanttView() {
     // Initialize
     gantt.init(containerRef.current)
 
+    // Helper to format dates for API (YYYY-MM-DD HH:mm)
+    const formatDateForAPI = gantt.date.date_to_str('%Y-%m-%d %H:%i')
+
     // Event handlers - only allow editing tasks (not reminders/events through Gantt drag)
     gantt.attachEvent('onAfterTaskDrag', (id: string, mode: any) => {
       const task = gantt.getTask(id)
@@ -238,8 +205,9 @@ export function GanttView() {
         updateSchedule({
           taskId: task.sourceId,
           data: {
-            startDate: task.start_date,
-            endDate: task.end_date,
+            // Format dates for API
+            startDate: formatDateForAPI(task.start_date),
+            endDate: formatDateForAPI(task.end_date),
             duration: task.duration,
           },
         })
@@ -249,7 +217,8 @@ export function GanttView() {
     gantt.attachEvent('onAfterProgressDrag', (id: string, progress: number) => {
       const task = gantt.getTask(id)
       if (task.sourceType === 'task' && task.sourceId) {
-        updateProgress({ taskId: task.sourceId, progress })
+        // API expects 0-100, Gantt uses 0-1
+        updateProgress({ taskId: task.sourceId, progress: Math.round(progress * 100) })
       }
     })
 
@@ -263,30 +232,13 @@ export function GanttView() {
   useEffect(() => {
     if (!isGanttLoaded || !ganttData || !gantt) return
 
-    // Sanitize data - validate required fields, pass through backend date format
-    // Backend sends dates as "YYYY-MM-DD HH:mm" (e.g., "2025-01-15 00:00")
-    const sanitizedData = {
-      data: ganttData.data
-        .map(item => {
-          // Validate start_date exists and is a string
-          if (!item.start_date || typeof item.start_date !== 'string') {
-            return null // Skip items without valid start date
-          }
-
-          return {
-            ...item,
-            // Pass through backend date format - our str_to_date parser handles it
-            start_date: item.start_date,
-            end_date: item.end_date || undefined,
-            duration: item.duration || 1,
-          }
-        })
-        .filter(Boolean),
-      links: ganttData.links || []
-    }
-
+    // Pass data directly to gantt.parse() - it handles the format automatically
+    // Backend sends dates as "YYYY-MM-DD HH:mm" which matches our gantt.config.date_format
     gantt.clearAll()
-    gantt.parse(sanitizedData)
+    gantt.parse({
+      data: ganttData.data.filter(item => item.start_date), // Skip items without start_date
+      links: ganttData.links || []
+    })
   }, [isGanttLoaded, ganttData])
 
   // Update time scale
