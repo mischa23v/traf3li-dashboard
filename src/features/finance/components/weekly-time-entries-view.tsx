@@ -209,7 +209,7 @@ export function WeeklyTimeEntriesView() {
                 <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-emerald-500/50 to-transparent"></div>
             </Header>
 
-            <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-6 rounded-tr-3xl shadow-inner border-r border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
+            <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-6 rounded-tr-3xl shadow-inner border-e border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
                 <div className="max-w-7xl mx-auto space-y-6">
 
                     {/* Hero Header */}
@@ -280,13 +280,13 @@ export function WeeklyTimeEntriesView() {
                         <CardContent className="p-0">
                             {/* Header Row - Days */}
                             <div className="grid grid-cols-8 border-b border-slate-100">
-                                <div className="p-4 bg-slate-50 text-sm font-bold text-slate-600 border-l border-slate-100">
+                                <div className="p-4 bg-slate-50 text-sm font-bold text-slate-600 border-s border-slate-100">
                                     المشروع / العميل
                                 </div>
                                 {weekDates.map((date, idx) => (
                                     <div
                                         key={idx}
-                                        className={`p-4 text-center border-l border-slate-100 ${isToday(date) ? 'bg-purple-50' : 'bg-slate-50'}`}
+                                        className={`p-4 text-center border-s border-slate-100 ${isToday(date) ? 'bg-purple-50' : 'bg-slate-50'}`}
                                     >
                                         <div className={`text-sm font-bold ${isToday(date) ? 'text-purple-600' : 'text-slate-600'}`}>
                                             {formatDate(date, 'day')}
@@ -317,7 +317,7 @@ export function WeeklyTimeEntriesView() {
                                 <>
                                     {projects.map((project) => (
                                         <div key={project.id} className="grid grid-cols-8 border-b border-slate-100 hover:bg-slate-50/50">
-                                            <div className="p-4 border-l border-slate-100">
+                                            <div className="p-4 border-s border-slate-100">
                                                 <div className="font-medium text-navy truncate">{project.name}</div>
                                                 <div className="text-sm text-slate-500 truncate">{project.client}</div>
                                             </div>
@@ -329,7 +329,7 @@ export function WeeklyTimeEntriesView() {
                                                 return (
                                                     <div
                                                         key={idx}
-                                                        className={`p-4 border-l border-slate-100 text-center ${isToday(date) ? 'bg-purple-50/50' : ''}`}
+                                                        className={`p-4 border-s border-slate-100 text-center ${isToday(date) ? 'bg-purple-50/50' : ''}`}
                                                     >
                                                         {totalMinutes > 0 ? (
                                                             <div className="bg-purple-100 text-purple-700 rounded-xl py-2 px-3 font-bold text-sm">
@@ -346,7 +346,7 @@ export function WeeklyTimeEntriesView() {
 
                                     {/* Totals Row */}
                                     <div className="grid grid-cols-8 bg-slate-50">
-                                        <div className="p-4 border-l border-slate-100 font-bold text-navy">
+                                        <div className="p-4 border-s border-slate-100 font-bold text-navy">
                                             الإجمالي اليومي
                                         </div>
                                         {weekDates.map((date, idx) => {
@@ -356,7 +356,7 @@ export function WeeklyTimeEntriesView() {
                                             return (
                                                 <div
                                                     key={idx}
-                                                    className={`p-4 border-l border-slate-100 text-center ${isToday(date) ? 'bg-purple-100/50' : ''}`}
+                                                    className={`p-4 border-s border-slate-100 text-center ${isToday(date) ? 'bg-purple-100/50' : ''}`}
                                                 >
                                                     <div className="font-bold text-navy text-lg">
                                                         {formatMinutesToTime(total)}

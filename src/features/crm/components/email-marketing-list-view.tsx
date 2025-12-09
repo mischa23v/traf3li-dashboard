@@ -235,12 +235,12 @@ export function EmailMarketingListView() {
 
                 <div className='ms-auto flex items-center gap-2 sm:gap-4 overflow-x-auto min-w-0'>
                     <div className="relative hidden md:block min-w-0">
-                        <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
+                        <Search className="absolute end-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
                         <input type="text" placeholder="بحث..." aria-label="بحث" className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
                     </div>
                     <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white flex-shrink-0" aria-label="الإشعارات">
                         <Bell className="h-5 w-5" aria-hidden="true" />
-                        <span className="absolute top-2 right-2 h-2 w-2 bg-red-500 rounded-full border border-navy"></span>
+                        <span className="absolute top-2 end-2 h-2 w-2 bg-red-500 rounded-full border border-navy"></span>
                     </Button>
                     <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white flex-shrink-0" />
                     <ThemeSwitch className="text-slate-300 hover:bg-white/10 hover:text-white hidden sm:flex flex-shrink-0" />
@@ -251,7 +251,7 @@ export function EmailMarketingListView() {
                 <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-emerald-500/50 to-transparent"></div>
             </Header>
 
-            <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-r border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
+            <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-e border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
 
                 {/* HERO CARD & STATS */}
                 <ProductivityHero badge="CRM" title="التسويق عبر البريد الإلكتروني" type="email-marketing" stats={heroStats} />
@@ -269,7 +269,7 @@ export function EmailMarketingListView() {
                                 <div className="flex flex-wrap items-center gap-3">
                                     {/* Search Input */}
                                     <div className="relative flex-1 min-w-[200px] max-w-md">
-                                        <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
+                                        <Search className="absolute end-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
                                         <Input
                                             type="text"
                                             placeholder="بحث بالاسم أو الموضوع..." aria-label="بحث بالاسم أو الموضوع"
@@ -504,7 +504,7 @@ export function EmailMarketingListView() {
                                                     </div>
                                                 )}
                                             </div>
-                                            <Link to={`/dashboard/crm/email-marketing/${campaign.id}` as any}>
+                                            <Link to={`/dashboard/crm/email-marketing/${campaign.id}`}>
                                                 <Button className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg px-6 shadow-lg shadow-emerald-500/20">
                                                     عرض التفاصيل
                                                 </Button>

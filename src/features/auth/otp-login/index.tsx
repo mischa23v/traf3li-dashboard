@@ -251,7 +251,7 @@ export function OtpLogin({ purpose = 'login' }: OtpLoginProps) {
                     {t('otpLogin.email', 'البريد الإلكتروني')} <span className="text-red-500">*</span>
                   </label>
                   <div className="relative" dir="ltr">
-                    <div className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500">
+                    <div className="absolute start-3 top-1/2 -translate-y-1/2 text-slate-500">
                       <Icons.Mail />
                     </div>
                     <input
@@ -261,7 +261,7 @@ export function OtpLogin({ purpose = 'login' }: OtpLoginProps) {
                         setEmail(e.target.value)
                         setError('')
                       }}
-                      className="w-full h-12 ps-11 pe-4 rounded-xl border border-slate-200 bg-slate-50 text-[#0f172a] outline-none transition-all focus:border-[#0f172a] text-left"
+                      className="w-full h-12 ps-11 pe-4 rounded-xl border border-slate-200 bg-slate-50 text-[#0f172a] outline-none transition-all focus:border-[#0f172a] text-start"
                       placeholder="name@example.com"
                       dir="ltr"
                       autoComplete="email"

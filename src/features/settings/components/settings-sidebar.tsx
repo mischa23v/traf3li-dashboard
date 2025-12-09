@@ -171,7 +171,7 @@ export function SettingsSidebar({
                                         <div className="text-[10px] text-slate-500">صباحاً</div>
                                     </div>
                                     <div className="absolute right-[3.25rem] top-2 w-3 h-3 bg-emerald-500 rounded-full border-2 border-white shadow-sm z-10"></div>
-                                    <div className="flex-1 bg-white rounded-xl p-3 border-r-4 border-emerald-500 shadow-sm hover:shadow-md transition-all">
+                                    <div className="flex-1 bg-white rounded-xl p-3 border-e-4 border-emerald-500 shadow-sm hover:shadow-md transition-all">
                                         <div className="font-bold text-slate-800 text-sm mb-1">جلسة مرافعة</div>
                                         <div className="text-xs text-slate-500 flex items-center gap-1">
                                             <MapPin className="h-3 w-3" aria-hidden="true" />
@@ -187,7 +187,7 @@ export function SettingsSidebar({
                                         <div className="text-[10px] text-slate-500">مساءً</div>
                                     </div>
                                     <div className="absolute right-[3.25rem] top-2 w-3 h-3 bg-purple-500 rounded-full border-2 border-white shadow-sm z-10"></div>
-                                    <div className="flex-1 bg-white rounded-xl p-3 border-r-4 border-purple-500 shadow-sm hover:shadow-md transition-all">
+                                    <div className="flex-1 bg-white rounded-xl p-3 border-e-4 border-purple-500 shadow-sm hover:shadow-md transition-all">
                                         <div className="font-bold text-slate-800 text-sm mb-1">غداء عمل</div>
                                         <div className="text-xs text-slate-500 flex items-center gap-1">
                                             <MapPin className="h-3 w-3" aria-hidden="true" />
@@ -203,7 +203,7 @@ export function SettingsSidebar({
                                         <div className="text-[10px] text-slate-500">مساءً</div>
                                     </div>
                                     <div className="absolute right-[3.25rem] top-2 w-3 h-3 bg-blue-500 rounded-full border-2 border-white shadow-sm z-10"></div>
-                                    <div className="flex-1 bg-white rounded-xl p-3 border-r-4 border-blue-500 shadow-sm hover:shadow-md transition-all">
+                                    <div className="flex-1 bg-white rounded-xl p-3 border-e-4 border-blue-500 shadow-sm hover:shadow-md transition-all">
                                         <div className="font-bold text-slate-800 text-sm mb-1">مراجعة العقود</div>
                                         <div className="text-xs text-slate-500 flex items-center gap-1">
                                             <Clock className="h-3 w-3" aria-hidden="true" />

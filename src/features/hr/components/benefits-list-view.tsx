@@ -45,6 +45,64 @@ import {
 } from '@/services/benefitsService'
 
 export function BenefitsListView() {
+  const getColorClasses = (color: string) => {
+    const colorMap = {
+        blue: 'bg-blue-100 text-blue-700 border-blue-200',
+        green: 'bg-green-100 text-green-700 border-green-200',
+        emerald: 'bg-emerald-100 text-emerald-700 border-emerald-200',
+        red: 'bg-red-100 text-red-700 border-red-200',
+        amber: 'bg-amber-100 text-amber-700 border-amber-200',
+        yellow: 'bg-yellow-100 text-yellow-700 border-yellow-200',
+        orange: 'bg-orange-100 text-orange-700 border-orange-200',
+        purple: 'bg-purple-100 text-purple-700 border-purple-200',
+        pink: 'bg-pink-100 text-pink-700 border-pink-200',
+        indigo: 'bg-indigo-100 text-indigo-700 border-indigo-200',
+        violet: 'bg-violet-100 text-violet-700 border-violet-200',
+        slate: 'bg-slate-100 text-slate-700 border-slate-200',
+        gray: 'bg-gray-100 text-gray-700 border-gray-200',
+        teal: 'bg-teal-100 text-teal-700 border-teal-200',
+        cyan: 'bg-cyan-100 text-cyan-700 border-cyan-200',
+    }
+    return colorMap[color] || 'bg-gray-100 text-gray-700 border-gray-200'
+}
+
+const getBorderBgTextClasses = (color: string) => {
+    const colorMap = {
+        blue: 'border-blue-500 bg-blue-50 text-blue-700',
+        green: 'border-green-500 bg-green-50 text-green-700',
+        emerald: 'border-emerald-500 bg-emerald-50 text-emerald-700',
+        red: 'border-red-500 bg-red-50 text-red-700',
+        amber: 'border-amber-500 bg-amber-50 text-amber-700',
+        yellow: 'border-yellow-500 bg-yellow-50 text-yellow-700',
+        orange: 'border-orange-500 bg-orange-50 text-orange-700',
+        purple: 'border-purple-500 bg-purple-50 text-purple-700',
+        pink: 'border-pink-500 bg-pink-50 text-pink-700',
+        indigo: 'border-indigo-500 bg-indigo-50 text-indigo-700',
+        slate: 'border-slate-500 bg-slate-50 text-slate-700',
+        gray: 'border-gray-500 bg-gray-50 text-gray-700',
+    }
+    return colorMap[color] || 'border-gray-500 bg-gray-50 text-gray-700'
+}
+
+const getBgClasses = (color: string) => {
+    const colorMap = {
+        blue: 'bg-blue-100',
+        green: 'bg-green-100',
+        emerald: 'bg-emerald-100',
+        red: 'bg-red-100',
+        amber: 'bg-amber-100',
+        yellow: 'bg-yellow-100',
+        orange: 'bg-orange-100',
+        purple: 'bg-purple-100',
+        pink: 'bg-pink-100',
+        indigo: 'bg-indigo-100',
+        slate: 'bg-slate-100',
+        gray: 'bg-gray-100',
+        teal: 'bg-teal-100',
+    }
+    return colorMap[color] || 'bg-gray-100'
+}
+
   const navigate = useNavigate()
   const [searchQuery, setSearchQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState<BenefitStatus | 'all'>('all')
@@ -139,12 +197,12 @@ export function BenefitsListView() {
         </div>
         <div className='ms-auto flex items-center gap-2 sm:gap-4 overflow-x-auto min-w-0'>
           <div className="relative hidden md:block min-w-0">
-            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
+            <Search className="absolute end-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
             <input type="text" placeholder="بحث..." aria-label="بحث" className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
           </div>
           <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white flex-shrink-0" aria-label="الإشعارات">
             <Bell className="h-5 w-5" aria-hidden="true" />
-            <span className="absolute top-2 right-2 h-2 w-2 bg-red-500 rounded-full border border-navy"></span>
+            <span className="absolute top-2 end-2 h-2 w-2 bg-red-500 rounded-full border border-navy"></span>
           </Button>
           <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white flex-shrink-0" />
           <ThemeSwitch className="text-slate-300 hover:bg-white/10 hover:text-white hidden sm:flex flex-shrink-0" />
@@ -154,7 +212,7 @@ export function BenefitsListView() {
         <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-emerald-500/50 to-transparent"></div>
       </Header>
 
-      <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-r border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
+      <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-e border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
         <ProductivityHero
           badge="الموارد البشرية"
           title="إدارة المزايا"
@@ -234,7 +292,7 @@ export function BenefitsListView() {
                         <p className="text-xs text-emerald-600">صاحب العمل + الموظف</p>
                       </div>
                     </div>
-                    <div className="text-left">
+                    <div className="text-start">
                       <p className="text-xs text-emerald-600">تكلفة صاحب العمل</p>
                       <p className="text-lg font-bold text-emerald-700">{(stats?.totalEmployerCost || 0).toLocaleString('ar-SA')} ر.س</p>
                     </div>
@@ -249,7 +307,7 @@ export function BenefitsListView() {
                 <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
                   <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
                     <div className="relative flex-1 md:w-56">
-                      <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
+                      <Search className="absolute end-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
                       <Input
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
@@ -425,7 +483,7 @@ export function BenefitsListView() {
                             </div>
                             <div>
                               <p className="text-xs text-slate-500">التصنيف</p>
-                              <Badge className={`mt-1 bg-${BENEFIT_CATEGORY_LABELS[benefit.benefitCategory]?.color}-100 text-${BENEFIT_CATEGORY_LABELS[benefit.benefitCategory]?.color}-700`}>
+                              <Badge className={`mt-1 ${getColorClasses(BENEFIT_CATEGORY_LABELS[benefit.benefitCategory]?.color)}`}>
                                 {BENEFIT_CATEGORY_LABELS[benefit.benefitCategory]?.ar}
                               </Badge>
                             </div>

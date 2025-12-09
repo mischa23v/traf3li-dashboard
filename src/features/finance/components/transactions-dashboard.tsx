@@ -452,7 +452,7 @@ export default function TransactionsDashboard() {
                 <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-emerald-500/50 to-transparent"></div>
             </Header>
 
-            <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-r border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
+            <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-e border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
 
                 {/* HERO CARD - Read-Only Notice */}
                 <ProductivityHero
@@ -571,7 +571,7 @@ export default function TransactionsDashboard() {
 
                                     {/* Search */}
                                     <div className="relative">
-                                        <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-600" aria-hidden="true" />
+                                        <Search className="absolute end-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-600" aria-hidden="true" />
                                         <Input
                                             placeholder="بحث في رقم القيد، الوصف، المرجع..."
                                             className="pe-10 rounded-xl border-slate-200 focus:ring-emerald-500 focus:border-emerald-500"
@@ -737,7 +737,7 @@ export default function TransactionsDashboard() {
                                                                         <span className="text-slate-600 text-sm">-</span>
                                                                     )}
                                                                 </TableCell>
-                                                                <TableCell className="text-left font-bold text-emerald-600 whitespace-nowrap">
+                                                                <TableCell className="text-start font-bold text-emerald-600 whitespace-nowrap">
                                                                     {formatSAR(halalasToSAR(entry.amount))}
                                                                 </TableCell>
                                                                 <TableCell>

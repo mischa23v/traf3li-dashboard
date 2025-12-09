@@ -159,7 +159,7 @@ export function StaffDetailsView() {
 
         <div className="ms-auto flex items-center gap-4">
           <div className="relative hidden md:block">
-            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
+            <Search className="absolute end-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
             <input
               type="text"
               placeholder="بحث..."
@@ -172,7 +172,7 @@ export function StaffDetailsView() {
             className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white"
           >
             <Bell className="h-5 w-5" />
-            <span className="absolute top-2 right-2 h-2 w-2 bg-red-500 rounded-full border border-navy"></span>
+            <span className="absolute top-2 end-2 h-2 w-2 bg-red-500 rounded-full border border-navy"></span>
           </Button>
           <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white" />
           <ThemeSwitch className="text-slate-300 hover:bg-white/10 hover:text-white" />
@@ -184,7 +184,7 @@ export function StaffDetailsView() {
 
       <Main
         fluid={true}
-        className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-r border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']"
+        className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-e border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']"
       >
         {/* Breadcrumb / Back Link */}
         <div className="mb-6">

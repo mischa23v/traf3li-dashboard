@@ -320,18 +320,21 @@ export function TaskDetailsView() {
         }))
 
         // Map comments to display format
-        const mappedComments = (t.comments || []).map((c: any) => ({
-            id: c._id || c.id,
-            user: c.userName || c.user || 'مستخدم',
-            avatar: c.userAvatar?.charAt(0) || c.userName?.charAt(0) || 'م',
-            text: c.text || c.content || '',
-            time: c.createdAt ? new Date(c.createdAt).toLocaleDateString('ar-SA', {
+        const mappedComments = (t.comments || []).map((c: any) => {
+            const commentDate = new Date(c.createdAt)
+            const formattedTime = !c.createdAt || isNaN(commentDate.getTime()) ? '' : commentDate.toLocaleDateString('ar-SA', {
                 month: 'short',
                 day: 'numeric',
                 hour: '2-digit',
                 minute: '2-digit'
-            }) : ''
-        }))
+            })
+            return {
+            id: c._id || c.id,
+            user: c.userName || c.user || 'مستخدم',
+            avatar: c.userAvatar?.charAt(0) || c.userName?.charAt(0) || 'م',
+            text: c.text || c.content || '',
+            time: formattedTime
+        }})
 
         // Map attachments with voice memo detection and S3 URL handling
         const mappedAttachments = (t.attachments || []).map((a: any) => {
@@ -351,6 +354,9 @@ export function TaskDetailsView() {
                 ? a.downloadUrl
                 : a.fileUrl || a.url
 
+            const uploadDate = new Date(a.uploadedAt)
+            const formattedDate = !a.uploadedAt || isNaN(uploadDate.getTime()) ? '' : uploadDate.toLocaleDateString('ar-SA')
+
             return {
                 _id: a._id || a.id,
                 name: a.fileName || a.name || 'ملف',
@@ -359,7 +365,7 @@ export function TaskDetailsView() {
                 size: a.fileSize ? (a.fileSize / 1024 > 1024
                     ? `${(a.fileSize / 1024 / 1024).toFixed(1)} MB`
                     : `${Math.round(a.fileSize / 1024)} KB`) : '',
-                date: a.uploadedAt ? new Date(a.uploadedAt).toLocaleDateString('ar-SA') : '',
+                date: formattedDate,
                 url,
                 isVoiceMemo: isAudioFile,
                 storageType: a.storageType || 'local',
@@ -379,19 +385,22 @@ export function TaskDetailsView() {
             'attachment_added': 'تم إضافة مرفق'
         }
 
-        const mappedTimeline = (t.history || []).map((h: any, idx: number) => ({
-            id: h._id || `history-${idx}`,
-            title: h.details || actionLabels[h.action] || h.action || 'نشاط',
-            date: h.timestamp ? new Date(h.timestamp).toLocaleDateString('ar-SA', {
+        const mappedTimeline = (t.history || []).map((h: any, idx: number) => {
+            const historyDate = new Date(h.timestamp)
+            const formattedDate = !h.timestamp || isNaN(historyDate.getTime()) ? '' : historyDate.toLocaleDateString('ar-SA', {
                 month: 'short',
                 day: 'numeric',
                 hour: '2-digit',
                 minute: '2-digit'
-            }) : '',
+            })
+            return {
+            id: h._id || `history-${idx}`,
+            title: h.details || actionLabels[h.action] || h.action || 'نشاط',
+            date: formattedDate,
             status: h.action === 'completed' ? 'completed' :
                 h.action === 'created' ? 'completed' : 'upcoming',
             user: h.userName || ''
-        }))
+        }})
 
         // Map dependencies
         const dependencies = t.dependencies || { blockedBy: [], blocks: [] }
@@ -418,13 +427,17 @@ export function TaskDetailsView() {
             'ongoing': 'جارية',
             'not_applicable': 'غير قابل للتطبيق'
         }
-        const mappedOutcome = t.outcome ? {
-            outcome: t.outcome.outcome,
-            outcomeLabel: outcomeLabels[t.outcome.outcome] || t.outcome.outcome,
-            outcomeDate: t.outcome.outcomeDate ? new Date(t.outcome.outcomeDate).toLocaleDateString('ar-SA') : undefined,
-            outcomeNotes: t.outcome.outcomeNotes,
-            settlementAmount: t.outcome.settlementAmount
-        } : null
+        const mappedOutcome = t.outcome ? (() => {
+            const outcomeDate = new Date(t.outcome.outcomeDate)
+            const formattedOutcomeDate = !t.outcome.outcomeDate || isNaN(outcomeDate.getTime()) ? undefined : outcomeDate.toLocaleDateString('ar-SA')
+            return {
+                outcome: t.outcome.outcome,
+                outcomeLabel: outcomeLabels[t.outcome.outcome] || t.outcome.outcome,
+                outcomeDate: formattedOutcomeDate,
+                outcomeNotes: t.outcome.outcomeNotes,
+                settlementAmount: t.outcome.settlementAmount
+            }
+        })() : null
 
         // Time tracking info
         const timeTrackingInfo = t.timeTracking ? {
@@ -444,7 +457,10 @@ export function TaskDetailsView() {
             status: t.status || 'pending',
             priority: t.priority || 'medium',
             taskType: t.taskType || 'other',
-            dueDate: t.dueDate ? new Date(t.dueDate).toLocaleDateString('ar-SA') : 'غير محدد',
+            dueDate: (() => {
+                const dueDate = new Date(t.dueDate)
+                return !t.dueDate || isNaN(dueDate.getTime()) ? 'غير محدد' : dueDate.toLocaleDateString('ar-SA')
+            })(),
             completion,
             assignee,
             assigneeId,
@@ -481,12 +497,12 @@ export function TaskDetailsView() {
 
                 <div className='ms-auto flex items-center gap-4'>
                     <div className="relative hidden md:block">
-                        <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
+                        <Search className="absolute end-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
                         <input type="text" placeholder="بحث..." aria-label="بحث" className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
                     </div>
                     <Button variant="ghost" size="icon" aria-label="التنبيهات" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white">
                         <Bell className="h-5 w-5" />
-                        <span className="absolute top-2 right-2 h-2 w-2 bg-red-500 rounded-full border border-navy"></span>
+                        <span className="absolute top-2 end-2 h-2 w-2 bg-red-500 rounded-full border border-navy"></span>
                     </Button>
                     <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white" />
                     <ThemeSwitch className="text-slate-300 hover:bg-white/10 hover:text-white" />
@@ -497,7 +513,7 @@ export function TaskDetailsView() {
                 <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-emerald-500/50 to-transparent"></div>
             </Header>
 
-            <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-r border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
+            <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-e border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
 
                 {/* Loading State */}
                 {isLoading && (
@@ -1058,7 +1074,10 @@ export function TaskDetailsView() {
                                                                                 {doc.title || doc.fileName?.replace('.html', '') || 'مستند'}
                                                                             </h4>
                                                                             <div className="flex items-center gap-2 text-xs text-slate-500">
-                                                                                <span>{new Date(doc.createdAt || (doc as any).uploadedAt || (doc as any).lastEditedAt || new Date()).toLocaleDateString('ar-SA')}</span>
+                                                                                <span>{(() => {
+                                                                                    const docDate = new Date(doc.createdAt || (doc as any).uploadedAt || (doc as any).lastEditedAt || new Date())
+                                                                                    return isNaN(docDate.getTime()) ? '-' : docDate.toLocaleDateString('ar-SA')
+                                                                                })()}</span>
                                                                             </div>
                                                                         </div>
                                                                         <div className="pt-3 border-t border-emerald-50 flex gap-2">

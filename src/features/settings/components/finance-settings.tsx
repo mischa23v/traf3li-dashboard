@@ -815,11 +815,11 @@ function AccountsList({ accounts, isLoading, accountType, defaultSubType, typeLa
                 <Table>
                     <TableHeader>
                         <TableRow>
-                            <TableHead className="text-right">الرقم</TableHead>
-                            <TableHead className="text-right">الاسم</TableHead>
-                            <TableHead className="text-right">النوع</TableHead>
-                            <TableHead className="text-right">الحالة</TableHead>
-                            <TableHead className="text-right">الإجراءات</TableHead>
+                            <TableHead className="text-end">الرقم</TableHead>
+                            <TableHead className="text-end">الاسم</TableHead>
+                            <TableHead className="text-end">النوع</TableHead>
+                            <TableHead className="text-end">الحالة</TableHead>
+                            <TableHead className="text-end">الإجراءات</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -1105,11 +1105,11 @@ function PriceLevelsList({ priceLevels, isLoading }: PriceLevelsListProps) {
                 <Table>
                     <TableHeader>
                         <TableRow>
-                            <TableHead className="text-right">الرمز</TableHead>
-                            <TableHead className="text-right">الاسم</TableHead>
-                            <TableHead className="text-right">التعديل</TableHead>
-                            <TableHead className="text-right">الشروط</TableHead>
-                            <TableHead className="text-right">الإجراءات</TableHead>
+                            <TableHead className="text-end">الرمز</TableHead>
+                            <TableHead className="text-end">الاسم</TableHead>
+                            <TableHead className="text-end">التعديل</TableHead>
+                            <TableHead className="text-end">الشروط</TableHead>
+                            <TableHead className="text-end">الإجراءات</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>

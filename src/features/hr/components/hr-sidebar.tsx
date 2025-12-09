@@ -166,6 +166,28 @@ export function HRSidebar({
         return 'emerald'
     }
 
+    // Static color class mappings for events
+    const eventTextColorClasses = {
+        red: 'group-hover:text-red-600',
+        blue: 'group-hover:text-blue-600',
+        amber: 'group-hover:text-amber-600',
+        emerald: 'group-hover:text-emerald-600'
+    }
+
+    const eventBgColorClasses = {
+        red: 'bg-red-500',
+        blue: 'bg-blue-500',
+        amber: 'bg-amber-500',
+        emerald: 'bg-emerald-500'
+    }
+
+    const eventBorderColorClasses = {
+        red: 'border-r-4 border-red-500',
+        blue: 'border-r-4 border-blue-500',
+        amber: 'border-r-4 border-amber-500',
+        emerald: 'border-r-4 border-emerald-500'
+    }
+
     // Get priority color for reminders
     const getPriorityColor = (priority?: string) => {
         switch (priority) {
@@ -174,6 +196,20 @@ export function HRSidebar({
             case 'medium': return 'blue'
             default: return 'blue'
         }
+    }
+
+    // Static color class mappings for priorities
+    const priorityBadgeClasses = {
+        red: 'bg-red-50 text-red-500 group-hover:bg-red-500 group-hover:text-white',
+        orange: 'bg-orange-50 text-orange-500 group-hover:bg-orange-500 group-hover:text-white',
+        blue: 'bg-blue-50 text-blue-500 group-hover:bg-blue-500 group-hover:text-white'
+    }
+
+    const priorityTextColorClasses = {
+        red: 'group-hover:text-red-600',
+        orange: 'group-hover:text-orange-600',
+        blue: 'group-hover:text-blue-600'
+    }
     }
 
     // Format reminder time
@@ -391,13 +427,13 @@ export function HRSidebar({
                                             return (
                                                 <div key={event.id} className="flex gap-4 relative group">
                                                     <div className="w-14 text-center shrink-0 pt-1">
-                                                        <div className={cn("text-sm font-bold text-slate-700 transition-colors", `group-hover:text-${colorClass}-600`)}>
+                                                        <div className={cn("text-sm font-bold text-slate-700 transition-colors", eventTextColorClasses[colorClass] || eventTextColorClasses.emerald)}>
                                                             {eventTime}
                                                         </div>
                                                         <div className="text-[10px] text-slate-600">{timePeriod}</div>
                                                     </div>
-                                                    <div className={cn("absolute end-[3.25rem] top-2 w-3 h-3 rounded-full border-2 border-white shadow-sm z-10", `bg-${colorClass}-500`)}></div>
-                                                    <div className={cn("flex-1 bg-white rounded-xl p-3 shadow-sm hover:shadow-md transition-all", `border-e-4 border-${colorClass}-500`)}>
+                                                    <div className={cn("absolute end-[3.25rem] top-2 w-3 h-3 rounded-full border-2 border-white shadow-sm z-10", eventBgColorClasses[colorClass] || eventBgColorClasses.emerald)}></div>
+                                                    <div className={cn("flex-1 bg-white rounded-xl p-3 shadow-sm hover:shadow-md transition-all", eventBorderColorClasses[colorClass]?.replace("border-r-4", "border-e-4") || "border-e-4 border-emerald-500")}>
                                                         <div className="font-bold text-slate-800 text-sm mb-1">{event.title}</div>
                                                         {event.location && (
                                                             <div className="text-xs text-slate-500 flex items-center gap-1">
@@ -448,14 +484,14 @@ export function HRSidebar({
                                                     "w-10 h-10 rounded-full flex items-center justify-center shrink-0 transition-colors",
                                                     isOverdue
                                                         ? "bg-red-50 text-red-500 group-hover:bg-red-500 group-hover:text-white"
-                                                        : `bg-${priorityColor}-50 text-${priorityColor}-500 group-hover:bg-${priorityColor}-500 group-hover:text-white`
+                                                        : (priorityBadgeClasses[priorityColor] || priorityBadgeClasses.blue)
                                                 )}>
                                                     {isOverdue ? <AlertCircle className="w-5 h-5" aria-hidden="true" /> : <Bell className="w-5 h-5" aria-hidden="true" />}
                                                 </div>
                                                 <div className="flex-1 min-w-0">
                                                     <p className={cn(
                                                         "text-sm font-bold text-slate-800 transition-colors truncate",
-                                                        isOverdue ? "group-hover:text-red-600" : `group-hover:text-${priorityColor}-600`
+                                                        isOverdue ? "group-hover:text-red-600" : (priorityTextColorClasses[priorityColor] || priorityTextColorClasses.blue)
                                                     )}>
                                                         {reminder.title}
                                                     </p>

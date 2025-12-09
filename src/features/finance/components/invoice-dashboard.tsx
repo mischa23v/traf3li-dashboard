@@ -134,12 +134,12 @@ export default function InvoiceDashboard() {
 
                 <div className='ms-auto flex items-center gap-4'>
                     <div className="relative hidden md:block">
-                        <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-600" aria-hidden="true" />
+                        <Search className="absolute end-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-600" aria-hidden="true" />
                         <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
                     </div>
                     <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white" aria-label="الإشعارات">
                         <Bell className="h-5 w-5" aria-hidden="true" />
-                        <span className="absolute top-2 right-2 h-2 w-2 bg-red-500 rounded-full border border-navy"></span>
+                        <span className="absolute top-2 end-2 h-2 w-2 bg-red-500 rounded-full border border-navy"></span>
                     </Button>
                     <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white" />
                     <ThemeSwitch className="text-slate-300 hover:bg-white/10 hover:text-white" />
@@ -150,7 +150,7 @@ export default function InvoiceDashboard() {
                 <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-emerald-500/50 to-transparent"></div>
             </Header>
 
-            <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-r border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
+            <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-e border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
                 <div className="max-w-7xl mx-auto space-y-6">
 
                     {/* Hero Section - Contained Navy Card */}
@@ -197,7 +197,7 @@ export default function InvoiceDashboard() {
                                     <div className="text-3xl font-bold">{formatCurrency(totalRevenue)}</div>
                                     <Progress value={65} className="h-1.5 bg-white/10" indicatorClassName="bg-emerald-500" />
                                 </div>
-                                <div className="flex justify-between items-center border-r border-white/10 pe-6">
+                                <div className="flex justify-between items-center border-e border-white/10 pe-6">
                                     <div>
                                         <div className="text-blue-200 text-sm mb-1">عدد الفواتير</div>
                                         <div className="text-2xl font-bold">{totalInvoices} فاتورة</div>
@@ -206,7 +206,7 @@ export default function InvoiceDashboard() {
                                         <FileText className="w-5 h-5 text-blue-200" aria-hidden="true" />
                                     </div>
                                 </div>
-                                <div className="flex justify-between items-center border-r border-white/10 pe-6">
+                                <div className="flex justify-between items-center border-e border-white/10 pe-6">
                                     <div>
                                         <div className="text-blue-200 text-sm mb-1">نسبة التحصيل</div>
                                         <div className="text-2xl font-bold text-emerald-400">{Math.round((paidRevenue / totalRevenue) * 100)}%</div>
@@ -316,7 +316,7 @@ export default function InvoiceDashboard() {
 
                                 <div className="flex items-center gap-3 flex-1 justify-end">
                                     <div className="relative w-full max-w-xs">
-                                        <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-600" aria-hidden="true" />
+                                        <Search className="absolute end-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-600" aria-hidden="true" />
                                         <Input
                                             placeholder="بحث برقم الفاتورة أو العميل..."
                                             className="pe-10 rounded-xl border-slate-200 focus:ring-navy focus:border-navy"
@@ -418,7 +418,7 @@ export default function InvoiceDashboard() {
                                                     <div className="font-bold text-navy text-sm truncate">{name}</div>
                                                     <div className="text-xs text-slate-500">{data.count} فواتير</div>
                                                 </div>
-                                                <div className="text-right">
+                                                <div className="text-end">
                                                     <div className="font-bold text-navy text-sm">{formatCurrency(data.total)}</div>
                                                     <div className="w-16 h-1.5 bg-slate-100 rounded-full mt-1 ms-auto">
                                                         <div

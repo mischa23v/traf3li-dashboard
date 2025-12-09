@@ -45,7 +45,7 @@ function ConflictPolicyPage() {
                 </h3>
                 <div className="text-sm text-slate-700 space-y-1">
                   <p>تنطبق هذه السياسة على:</p>
-                  <ul className="mr-4 mt-2 space-y-1">
+                  <ul className="me-4 mt-2 space-y-1">
                     <li>• جميع المحامين المسجلين على المنصة</li>
                     <li>• المستشارين القانونيين</li>
                     <li>• المكاتب القانونية</li>
@@ -157,7 +157,7 @@ function ConflictPolicyPage() {
             <h2 className="text-2xl font-bold text-[#0f172a] mb-6 pb-3 border-b-2 border-emerald-500">٣. متطلبات الإفصاح</h2>
 
             <div className="space-y-4">
-              <div className="bg-green-50 border-r-4 border-green-500 rounded-lg p-5">
+              <div className="bg-green-50 border-e-4 border-green-500 rounded-lg p-5">
                 <h3 className="font-bold text-green-900 mb-2 flex items-center gap-2">
                   <span>✓</span>
                   الإفصاح الفوري
@@ -168,7 +168,7 @@ function ConflictPolicyPage() {
                 </p>
               </div>
 
-              <div className="bg-blue-50 border-r-4 border-blue-500 rounded-lg p-5">
+              <div className="bg-blue-50 border-e-4 border-blue-500 rounded-lg p-5">
                 <h3 className="font-bold text-blue-900 mb-2 flex items-center gap-2">
                   <span>📝</span>
                   الإفصاح الكتابي
@@ -179,7 +179,7 @@ function ConflictPolicyPage() {
                 </p>
               </div>
 
-              <div className="bg-purple-50 border-r-4 border-purple-500 rounded-lg p-5">
+              <div className="bg-purple-50 border-e-4 border-purple-500 rounded-lg p-5">
                 <h3 className="font-bold text-purple-900 mb-2 flex items-center gap-2">
                   <span>📋</span>
                   الموافقة المستنيرة

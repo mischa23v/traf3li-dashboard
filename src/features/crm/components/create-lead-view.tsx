@@ -618,7 +618,7 @@ export function CreateLeadView() {
         <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-emerald-500/50 to-transparent"></div>
       </Header>
 
-      <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-r border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
+      <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-e border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
         {/* HERO CARD */}
         <ProductivityHero badge="إدارة العملاء المحتملين" title="إضافة عميل محتمل جديد" type="leads" listMode={true} hideButtons={true}>
           <Link to="/dashboard/crm/leads">
@@ -908,7 +908,7 @@ export function CreateLeadView() {
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="">بدون ربط</SelectItem>
-                          {organizationsData?.data?.map((org: any) => (
+                          {(organizationsData?.data ?? organizationsData?.organizations ?? [])?.map((org: any) => (
                             <SelectItem key={org._id} value={org._id}>
                               {org.legalName || org.name}
                             </SelectItem>
@@ -928,7 +928,7 @@ export function CreateLeadView() {
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="">بدون ربط</SelectItem>
-                          {contactsData?.data?.map((contact: any) => (
+                          {(contactsData?.data ?? contactsData?.contacts ?? [])?.map((contact: any) => (
                             <SelectItem key={contact._id} value={contact._id}>
                               {contact.firstName} {contact.lastName} {contact.title ? `(${contact.title})` : ''}
                             </SelectItem>
@@ -1099,7 +1099,7 @@ export function CreateLeadView() {
               </Card>
 
               {/* Conflict Check - Critical for Law Firms */}
-              <Card className="border-0 shadow-sm border-l-4 border-l-yellow-500">
+              <Card className="border-0 shadow-sm border-s-4 border-s-yellow-500">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Shield className="w-5 h-5 text-yellow-500" />

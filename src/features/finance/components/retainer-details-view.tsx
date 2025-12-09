@@ -211,7 +211,7 @@ export default function RetainerDetailsView() {
                 </div>
             </Header>
 
-            <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-r border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
+            <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-e border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
                 {/* Hero Card */}
                 <ProductivityHero
                     badge={`حساب أمانة #${retainer.retainerNumber}`}
@@ -375,7 +375,7 @@ export default function RetainerDetailsView() {
                                                         <p className="text-xs text-slate-500">{formatDate(transaction.createdAt)}</p>
                                                     </div>
                                                 </div>
-                                                <div className="text-left">
+                                                <div className="text-start">
                                                     <p className={`font-bold ${
                                                         transaction.type === 'deposit' ? 'text-emerald-600' : 'text-rose-600'
                                                     }`}>

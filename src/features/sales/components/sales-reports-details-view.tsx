@@ -332,10 +332,10 @@ export function SalesReportsDetailsView() {
                 <table className="w-full">
                   <thead className="bg-slate-50">
                     <tr>
-                      <th className="text-right p-3 font-medium text-slate-600">الفترة</th>
-                      <th className="text-right p-3 font-medium text-slate-600">المبيعات</th>
-                      <th className="text-right p-3 font-medium text-slate-600">الصفقات</th>
-                      <th className="text-right p-3 font-medium text-slate-600">النمو</th>
+                      <th className="text-end p-3 font-medium text-slate-600">الفترة</th>
+                      <th className="text-end p-3 font-medium text-slate-600">المبيعات</th>
+                      <th className="text-end p-3 font-medium text-slate-600">الصفقات</th>
+                      <th className="text-end p-3 font-medium text-slate-600">النمو</th>
                     </tr>
                   </thead>
                   <tbody>

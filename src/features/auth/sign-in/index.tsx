@@ -164,14 +164,14 @@ export function SignIn() {
                   {t('auth.signIn.usernameOrEmail')} <span className="text-red-500">*</span>
                 </label>
                 <div className="relative" dir="ltr">
-                  <div className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500">
+                  <div className="absolute start-3 top-1/2 -translate-y-1/2 text-slate-500">
                     <Icons.User />
                   </div>
                   <input
                     type="text"
                     value={formData.usernameOrEmail}
                     onChange={(e) => updateField('usernameOrEmail', e.target.value)}
-                    className={`w-full h-12 ps-11 pe-4 rounded-xl border bg-slate-50 text-[#0f172a] outline-none transition-all text-left ${
+                    className={`w-full h-12 ps-11 pe-4 rounded-xl border bg-slate-50 text-[#0f172a] outline-none transition-all text-start ${
                       errors.usernameOrEmail ? 'border-red-400' : 'border-slate-200 focus:border-[#0f172a]'
                     }`}
                     placeholder=""
@@ -199,14 +199,14 @@ export function SignIn() {
                   </a>
                 </div>
                 <div className="relative" dir="ltr">
-                  <div className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500">
+                  <div className="absolute start-3 top-1/2 -translate-y-1/2 text-slate-500">
                     <Icons.Lock />
                   </div>
                   <input
                     type={showPassword ? 'text' : 'password'}
                     value={formData.password}
                     onChange={(e) => updateField('password', e.target.value)}
-                    className={`w-full h-12 ps-11 pe-12 rounded-xl border bg-slate-50 text-[#0f172a] outline-none transition-all text-left ${
+                    className={`w-full h-12 ps-11 pe-12 rounded-xl border bg-slate-50 text-[#0f172a] outline-none transition-all text-start ${
                       errors.password ? 'border-red-400' : 'border-slate-200 focus:border-[#0f172a]'
                     }`}
                     placeholder=""
@@ -217,7 +217,7 @@ export function SignIn() {
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-600"
+                    className="absolute end-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-600"
                     disabled={isLoading}
                   >
                     {showPassword ? <Icons.EyeOff /> : <Icons.Eye />}

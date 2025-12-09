@@ -405,7 +405,7 @@ export function SignUp() {
                   <h3 className="font-bold text-[#0f172a] mb-4">نوع الاستخدام</h3>
                   <div className="space-y-3">
                     <button onClick={() => { updateField('lawyerMode', 'marketplace'); setCurrentStep(1); }}
-                      className={`w-full p-4 rounded-xl border-2 transition-all flex items-center gap-4 text-right ${
+                      className={`w-full p-4 rounded-xl border-2 transition-all flex items-center gap-4 text-end ${
                         formData.lawyerMode === 'marketplace' ? 'border-emerald-500 bg-white' : 'border-slate-200 hover:border-slate-300 bg-white'
                       }`}>
                       <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${formData.lawyerMode === 'marketplace' ? 'bg-emerald-500 text-white' : 'bg-slate-100 text-slate-600'}`}>
@@ -418,7 +418,7 @@ export function SignUp() {
                     </button>
 
                     <button onClick={() => { updateField('lawyerMode', 'dashboard'); setCurrentStep(1); }}
-                      className={`w-full p-4 rounded-xl border-2 transition-all flex items-center gap-4 text-right ${
+                      className={`w-full p-4 rounded-xl border-2 transition-all flex items-center gap-4 text-end ${
                         formData.lawyerMode === 'dashboard' ? 'border-emerald-500 bg-white' : 'border-slate-200 hover:border-slate-300 bg-white'
                       }`}>
                       <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${formData.lawyerMode === 'dashboard' ? 'bg-emerald-500 text-white' : 'bg-slate-100 text-slate-600'}`}>
@@ -519,7 +519,7 @@ export function SignUp() {
                   <div>
                     <label className="block text-sm font-medium text-[#0f172a] mb-2">اسم المستخدم <span className="text-red-500">*</span></label>
                     <div className="relative">
-                      <div className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500"><Icons.User /></div>
+                      <div className="absolute end-4 top-1/2 -translate-y-1/2 text-slate-500"><Icons.User /></div>
                       <input type="text" value={formData.username}
                         onChange={(e) => updateField('username', e.target.value.replace(/[^a-zA-Z0-9_]/g, '').toLowerCase())}
                         className={`w-full h-12 pe-12 ps-4 rounded-xl border bg-slate-50 text-[#0f172a] outline-none transition-all ${errors.username ? 'border-red-400' : 'border-slate-200 focus:border-[#0f172a]'}`}
@@ -531,7 +531,7 @@ export function SignUp() {
                   <div>
                     <label className="block text-sm font-medium text-[#0f172a] mb-2">البريد الإلكتروني <span className="text-red-500">*</span></label>
                     <div className="relative">
-                      <div className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500"><Icons.Mail /></div>
+                      <div className="absolute end-4 top-1/2 -translate-y-1/2 text-slate-500"><Icons.Mail /></div>
                       <input type="email" value={formData.email} onChange={(e) => updateField('email', e.target.value)}
                         className={`w-full h-12 pe-12 ps-4 rounded-xl border bg-slate-50 text-[#0f172a] outline-none transition-all ${errors.email ? 'border-red-400' : 'border-slate-200 focus:border-[#0f172a]'}`}
                         dir="ltr" style={{ textAlign: 'left' }} />
@@ -542,11 +542,11 @@ export function SignUp() {
                   <div>
                     <label className="block text-sm font-medium text-[#0f172a] mb-2">كلمة المرور <span className="text-red-500">*</span></label>
                     <div className="relative">
-                      <div className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500"><Icons.Lock /></div>
+                      <div className="absolute end-4 top-1/2 -translate-y-1/2 text-slate-500"><Icons.Lock /></div>
                       <input type={showPassword ? 'text' : 'password'} value={formData.password} onChange={(e) => updateField('password', e.target.value)}
                         className={`w-full h-12 pe-12 ps-12 rounded-xl border bg-slate-50 text-[#0f172a] outline-none transition-all ${errors.password ? 'border-red-400' : 'border-slate-200 focus:border-[#0f172a]'}`}
                         dir="ltr" style={{ textAlign: 'left' }} />
-                      <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-600">
+                      <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute start-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-600">
                         {showPassword ? <Icons.EyeOff /> : <Icons.Eye />}
                       </button>
                     </div>
@@ -556,11 +556,11 @@ export function SignUp() {
                   <div>
                     <label className="block text-sm font-medium text-[#0f172a] mb-2">تأكيد كلمة المرور <span className="text-red-500">*</span></label>
                     <div className="relative">
-                      <div className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500"><Icons.Lock /></div>
+                      <div className="absolute end-4 top-1/2 -translate-y-1/2 text-slate-500"><Icons.Lock /></div>
                       <input type={showConfirmPassword ? 'text' : 'password'} value={formData.confirmPassword} onChange={(e) => updateField('confirmPassword', e.target.value)}
                         className={`w-full h-12 pe-12 ps-12 rounded-xl border bg-slate-50 text-[#0f172a] outline-none transition-all ${errors.confirmPassword ? 'border-red-400' : 'border-slate-200 focus:border-[#0f172a]'}`}
                         dir="ltr" style={{ textAlign: 'left' }} />
-                      <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-600">
+                      <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)} className="absolute start-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-600">
                         {showConfirmPassword ? <Icons.EyeOff /> : <Icons.Eye />}
                       </button>
                     </div>
@@ -570,7 +570,7 @@ export function SignUp() {
                   <div>
                     <label className="block text-sm font-medium text-[#0f172a] mb-2">رقم الجوال <span className="text-red-500">*</span></label>
                     <div className="relative">
-                      <div className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500"><Icons.Phone /></div>
+                      <div className="absolute end-4 top-1/2 -translate-y-1/2 text-slate-500"><Icons.Phone /></div>
                       <input type="tel" value={formData.phone}
                         onChange={(e) => updateField('phone', e.target.value.replace(/\D/g, '').slice(0, 10))}
                         className={`w-full h-12 pe-12 ps-4 rounded-xl border bg-slate-50 text-[#0f172a] outline-none transition-all ${errors.phone ? 'border-red-400' : 'border-slate-200 focus:border-[#0f172a]'}`}
@@ -654,7 +654,7 @@ export function SignUp() {
                           key={court.id}
                           type="button"
                           onClick={() => updateCourt(court.id, 'selected', !isSelected)}
-                          className={`p-4 rounded-xl border-2 text-right transition-all ${
+                          className={`p-4 rounded-xl border-2 text-end transition-all ${
                             isSelected ? 'border-emerald-500 bg-emerald-50' : 'border-slate-200 hover:border-slate-300'
                           }`}
                         >
@@ -800,7 +800,7 @@ export function SignUp() {
                     <div className="space-y-2">
                       {[{ v: 'consultation', l: 'استشارات' }, { v: 'litigation', l: 'ترافع' }, { v: 'both', l: 'كلاهما' }].map(opt => (
                         <button key={opt.v} type="button" onClick={() => updateField('serviceType', opt.v)}
-                          className={`w-full p-3 rounded-xl border-2 text-right font-medium transition-all text-sm ${formData.serviceType === opt.v ? 'border-emerald-500 bg-emerald-50 text-emerald-700' : 'border-slate-200 text-slate-600'}`}>
+                          className={`w-full p-3 rounded-xl border-2 text-end font-medium transition-all text-sm ${formData.serviceType === opt.v ? 'border-emerald-500 bg-emerald-50 text-emerald-700' : 'border-slate-200 text-slate-600'}`}>
                           {formData.serviceType === opt.v && <span className="ms-2">✓</span>}{opt.l}
                         </button>
                       ))}

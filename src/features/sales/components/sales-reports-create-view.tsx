@@ -264,7 +264,7 @@ export function SalesReportsCreateView() {
                   key={module}
                   type="button"
                   onClick={() => toggleDataModule(module)}
-                  className={`p-3 rounded-xl border text-right transition-all ${
+                  className={`p-3 rounded-xl border text-end transition-all ${
                     formData.dataModules.includes(module)
                       ? 'border-emerald-500 bg-emerald-50 text-emerald-700'
                       : 'border-slate-200 hover:border-slate-300'

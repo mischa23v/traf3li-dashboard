@@ -242,7 +242,7 @@ export function AttendanceRecordsListView() {
         <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-emerald-500/50 to-transparent"></div>
       </Header>
 
-      <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-r border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
+      <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-e border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
 
         {/* HERO CARD & STATS */}
         <ProductivityHero badge="الموارد البشرية" title="الحضور والانصراف" type="attendance" stats={heroStats} />
@@ -539,7 +539,7 @@ export function AttendanceRecordsListView() {
                           </div>
                         )}
                       </div>
-                      <Link to={`/dashboard/hr/attendance/${record._id}` as any}>
+                      <Link to={`/dashboard/hr/attendance/${record._id}`}>
                         <Button className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg px-6 shadow-lg shadow-emerald-500/20">
                           عرض السجل
                         </Button>

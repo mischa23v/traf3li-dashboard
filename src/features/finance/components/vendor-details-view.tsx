@@ -384,7 +384,7 @@ export default function VendorDetailsView() {
                                                             {formatDate(bill.billDate)}
                                                         </p>
                                                     </div>
-                                                    <div className="text-left">
+                                                    <div className="text-start">
                                                         <p className="font-bold text-navy">
                                                             {formatCurrency(bill.totalAmount)}
                                                         </p>
