@@ -19,6 +19,7 @@ import { TopNav } from '@/components/layout/top-nav'
 import { DynamicIsland } from '@/components/dynamic-island'
 import { LanguageSwitcher } from '@/components/language-switcher'
 import { ProductivityHero } from '@/components/productivity-hero'
+import { EmptyState } from '@/components/empty-state'
 
 const route = getRouteApi('/_authenticated/dashboard/clients/')
 
@@ -91,16 +92,14 @@ function ClientsContent() {
                   <Skeleton className='h-96 w-full' />
                 </div>
               ) : isEmpty ? (
-                <div className="bg-white rounded-3xl p-12 text-center border border-slate-100 shadow-sm">
-                  <div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <Users className="h-8 w-8 text-brand-blue" aria-hidden="true" />
-                  </div>
-                  <h3 className="text-xl font-bold text-slate-900 mb-2">{t('clients.noClients')}</h3>
-                  <p className="text-slate-500 mb-6">{t('clients.startAddingClient')}</p>
-                  <Button onClick={() => setOpen('add')} className="bg-brand-blue hover:bg-blue-600 text-white px-8">
-                    <Plus className="ms-2 h-4 w-4" aria-hidden="true" />
-                    {t('clients.addNewClient')}
-                  </Button>
+                <div className="bg-white rounded-3xl border border-slate-100 shadow-sm">
+                  <EmptyState
+                    icon="users"
+                    title={t('clients.empty.title')}
+                    description={t('clients.empty.description')}
+                    actionLabel={t('clients.empty.action')}
+                    onAction={() => setOpen('add')}
+                  />
                 </div>
               ) : (
                 <ClientsTable

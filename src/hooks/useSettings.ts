@@ -6,6 +6,7 @@ import settingsService, {
   UpdateNotificationSettings,
 } from '@/services/settingsService'
 import { toast } from 'sonner'
+import { useTranslation } from 'react-i18next'
 
 export const useSettings = () => {
   return useQuery({
@@ -17,15 +18,16 @@ export const useSettings = () => {
 
 export const useUpdateAccountSettings = () => {
   const queryClient = useQueryClient()
+  const { t } = useTranslation()
 
   return useMutation({
     mutationFn: (data: UpdateAccountSettings) =>
       settingsService.updateAccountSettings(data),
     onSuccess: () => {
-      toast.success('تم تحديث إعدادات الحساب بنجاح')
+      toast.success(t('toast.settings.accountSettingsUpdated'))
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'فشل تحديث إعدادات الحساب')
+      toast.error(error.message || t('toast.settings.accountSettingsUpdateFailed'))
     },
     onSettled: async () => {
       // Delay to allow DB propagation
@@ -37,15 +39,16 @@ export const useUpdateAccountSettings = () => {
 
 export const useUpdateAppearanceSettings = () => {
   const queryClient = useQueryClient()
+  const { t } = useTranslation()
 
   return useMutation({
     mutationFn: (data: UpdateAppearanceSettings) =>
       settingsService.updateAppearanceSettings(data),
     onSuccess: () => {
-      toast.success('تم تحديث إعدادات المظهر بنجاح')
+      toast.success(t('toast.settings.appearanceSettingsUpdated'))
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'فشل تحديث إعدادات المظهر')
+      toast.error(error.message || t('toast.settings.appearanceSettingsUpdateFailed'))
     },
     onSettled: async () => {
       // Delay to allow DB propagation
@@ -57,15 +60,16 @@ export const useUpdateAppearanceSettings = () => {
 
 export const useUpdateDisplaySettings = () => {
   const queryClient = useQueryClient()
+  const { t } = useTranslation()
 
   return useMutation({
     mutationFn: (data: UpdateDisplaySettings) =>
       settingsService.updateDisplaySettings(data),
     onSuccess: () => {
-      toast.success('تم تحديث إعدادات العرض بنجاح')
+      toast.success(t('toast.settings.displaySettingsUpdated'))
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'فشل تحديث إعدادات العرض')
+      toast.error(error.message || t('toast.settings.displaySettingsUpdateFailed'))
     },
     onSettled: async () => {
       // Delay to allow DB propagation
@@ -77,15 +81,16 @@ export const useUpdateDisplaySettings = () => {
 
 export const useUpdateNotificationSettings = () => {
   const queryClient = useQueryClient()
+  const { t } = useTranslation()
 
   return useMutation({
     mutationFn: (data: UpdateNotificationSettings) =>
       settingsService.updateNotificationSettings(data),
     onSuccess: () => {
-      toast.success('تم تحديث إعدادات الإشعارات بنجاح')
+      toast.success(t('toast.settings.notificationSettingsUpdated'))
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'فشل تحديث إعدادات الإشعارات')
+      toast.error(error.message || t('toast.settings.notificationSettingsUpdateFailed'))
     },
     onSettled: async () => {
       // Delay to allow DB propagation

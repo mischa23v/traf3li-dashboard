@@ -19,14 +19,26 @@ import { Search, Bell, Users, Plus } from 'lucide-react'
 import { ClientsSidebar } from '@/features/clients/components/clients-sidebar'
 import { Badge } from '@/components/ui/badge'
 import { ProductivityHero } from '@/components/productivity-hero'
+import { EmptyState } from '@/components/empty-state'
+import { useContactsContext } from './components/contacts-provider'
 
 const route = getRouteApi('/_authenticated/dashboard/contacts/')
 
 export function Contacts() {
+  return (
+    <ContactsProvider>
+      <ContactsContent />
+      <ContactsDialogs />
+    </ContactsProvider>
+  )
+}
+
+function ContactsContent() {
   const { t, i18n } = useTranslation()
   const isRTL = i18n.language === 'ar'
   const search = route.useSearch()
   const navigate = route.useNavigate()
+  const { setOpen } = useContactsContext()
 
   // Fetch contacts data from API
   const { data, isLoading } = useContacts({
@@ -40,8 +52,10 @@ export function Contacts() {
     { title: t('sidebar.nav.clients'), href: '/dashboard/clients', isActive: false },
   ]
 
+  const isEmpty = !isLoading && data?.data?.length === 0 && !search.name && !search.status && !search.type
+
   return (
-    <ContactsProvider>
+    <>
       <Header className="bg-navy shadow-none relative">
         <TopNav links={topNav} className="[&>a]:text-slate-300 [&>a:hover]:text-white [&>a[aria-current='page']]:text-white" />
 
@@ -88,28 +102,36 @@ export function Contacts() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* --- Main Content --- */}
           <div className="lg:col-span-2 flex flex-col gap-6">
-            <div className="bg-white rounded-3xl p-1 shadow-sm border border-slate-100">
-              {isLoading ? (
-                <div className='space-y-4 p-6'>
-                  <Skeleton className='h-12 w-full' />
-                  <Skeleton className='h-96 w-full' />
-                </div>
-              ) : (
+            {isLoading ? (
+              <div className='space-y-4'>
+                <Skeleton className='h-12 w-full' />
+                <Skeleton className='h-96 w-full' />
+              </div>
+            ) : isEmpty ? (
+              <div className="bg-white rounded-3xl border border-slate-100 shadow-sm">
+                <EmptyState
+                  icon="users"
+                  title={t('contacts.empty.title')}
+                  description={t('contacts.empty.description')}
+                  actionLabel={t('contacts.empty.action')}
+                  onAction={() => setOpen('add')}
+                />
+              </div>
+            ) : (
+              <div className="bg-white rounded-3xl p-1 shadow-sm border border-slate-100">
                 <ContactsTable
                   data={(data?.data || []) as any}
                   search={search}
                   navigate={navigate}
                 />
-              )}
-            </div>
+              </div>
+            )}
           </div>
 
           {/* Sidebar */}
           <ClientsSidebar context="contacts" />
         </div>
       </Main>
-
-      <ContactsDialogs />
-    </ContactsProvider>
+    </>
   )
 }

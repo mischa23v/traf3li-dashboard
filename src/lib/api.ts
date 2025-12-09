@@ -6,6 +6,7 @@
 
 import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios'
 import { API_CONFIG, getApiUrl } from '@/config/api'
+import i18n from '@/i18n'
 
 // API Base URL - Change based on environment
 const API_BASE_URL = getApiUrl()
@@ -135,12 +136,12 @@ apiClient.interceptors.response.use(
     // Handle 429 Rate Limited
     if (error.response?.status === 429) {
       const retryAfter = parseInt(error.response.headers['retry-after'] || '60', 10)
-      const message = error.response?.data?.message || `طلبات كثيرة جداً. يرجى الانتظار ${formatRetryAfter(retryAfter)}.`
+      const message = error.response?.data?.message || i18n.t('toast.rateLimit.tooManyRequests', { time: formatRetryAfter(retryAfter) })
 
       // Import toast dynamically to avoid circular dependencies
       import('sonner').then(({ toast }) => {
         toast.error(message, {
-          description: 'حاول مرة أخرى لاحقاً',
+          description: i18n.t('toast.rateLimit.tryAgainLater'),
           duration: 5000,
         })
       })
@@ -173,8 +174,8 @@ apiClient.interceptors.response.use(
       // Check for CSRF token errors - reload page to get new token
       if (errorCode === 'CSRF_TOKEN_INVALID' || errorCode === 'CSRF_TOKEN_MISSING') {
         import('sonner').then(({ toast }) => {
-          toast.error('انتهت صلاحية الجلسة', {
-            description: 'جارٍ إعادة تحميل الصفحة...',
+          toast.error(i18n.t('toast.session.expired'), {
+            description: i18n.t('toast.session.expiredDescription'),
             duration: 2000,
           })
         })
@@ -198,7 +199,7 @@ apiClient.interceptors.response.use(
         // Import toast dynamically to avoid circular dependencies
         import('sonner').then(({ toast }) => {
           toast.error(message, {
-            description: 'قد تكون صلاحياتك محدودة. تواصل مع إدارة المكتب للمزيد من المعلومات.',
+            description: i18n.t('toast.permission.deniedDescription'),
             duration: 5000,
           })
         })
@@ -233,7 +234,7 @@ apiClient.interceptors.response.use(
     if (error.message === 'Network Error' || error.code === 'ERR_NETWORK') {
       return Promise.reject({
         status: 0,
-        message: 'لا يمكن الاتصال بالخادم. يرجى التحقق من اتصال الإنترنت.',
+        message: i18n.t('toast.network.connectionError'),
         error: true,
       })
     }
@@ -241,7 +242,7 @@ apiClient.interceptors.response.use(
     // Return formatted error with requestId and validation errors
     return Promise.reject({
       status: error.response?.status || 500,
-      message: error.response?.data?.message || 'حدث خطأ غير متوقع',
+      message: error.response?.data?.message || i18n.t('toast.error.unexpected'),
       error: true,
       requestId: error.response?.data?.requestId,
       errors: error.response?.data?.errors, // Validation errors array
@@ -312,7 +313,7 @@ export const handleApiError = (error: any): string => {
   if (error?.response?.data?.message) {
     return error.response.data.message
   }
-  return 'حدث خطأ غير متوقع. يرجى المحاولة مرة أخرى.'
+  return i18n.t('toast.error.unexpectedRetry')
 }
 
 /**

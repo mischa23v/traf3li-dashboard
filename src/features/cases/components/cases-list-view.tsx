@@ -39,6 +39,7 @@ import { ConfigDrawer } from '@/components/config-drawer'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { useCases, useCaseStatistics } from '@/hooks/useCasesAndClients'
 import { Skeleton } from '@/components/ui/skeleton'
+import { SkeletonTable } from '@/components/skeleton-loader'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import {
   Select,
@@ -59,6 +60,7 @@ import { CreateCaseForm } from './create-case-form'
 import type { Case, CaseStatus, CaseCategory, CasePriority, ClientRef, LawyerRef } from '@/services/casesService'
 import { PracticeSidebar } from './practice-sidebar'
 import { ProductivityHero } from '@/components/productivity-hero'
+import { EmptyState } from '@/components/empty-state'
 
 // Helper functions
 const getClientName = (c: Case): string => {
@@ -325,20 +327,9 @@ export function CasesListView() {
             <div className="space-y-4">
               {/* Loading State */}
               {isLoading && (
-                <>
-                  {[1, 2, 3].map((i) => (
-                    <div key={i} className="bg-white rounded-2xl p-6 border border-slate-100">
-                      <div className="flex gap-4 mb-4">
-                        <Skeleton className="w-12 h-12 rounded-xl" />
-                        <div className="flex-1 space-y-2">
-                          <Skeleton className="h-6 w-3/4" />
-                          <Skeleton className="h-4 w-1/2" />
-                          <Skeleton className="h-4 w-2/3" />
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </>
+                <div className="bg-white rounded-2xl p-6 border border-slate-100">
+                  <SkeletonTable rows={10} columns={5} showHeader={true} />
+                </div>
               )}
 
               {/* Error State */}
@@ -365,19 +356,14 @@ export function CasesListView() {
 
               {/* Empty State */}
               {!isLoading && !isError && filteredCases.length === 0 && (
-                <div className="text-center py-12 bg-white rounded-2xl">
-                  <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-blue-50 mb-4">
-                    <Briefcase className="h-8 w-8 text-blue-500" />
-                  </div>
-                  <h4 className="text-lg font-bold text-navy mb-2">{t('cases.noCases', 'لا توجد قضايا')}</h4>
-                  <p className="text-slate-500 mb-4">{t('cases.noCasesDescription', 'لم يتم العثور على قضايا')}</p>
-                  <Button
-                    onClick={() => setIsCreateDialogOpen(true)}
-                    className="bg-blue-500 hover:bg-blue-600 text-white rounded-xl"
-                  >
-                    <Plus className="ms-2 h-4 w-4" aria-hidden="true" />
-                    {t('cases.createNewCase', 'إنشاء قضية جديدة')}
-                  </Button>
+                <div className="bg-white rounded-2xl">
+                  <EmptyState
+                    icon="cases"
+                    title={t('cases.empty.title')}
+                    description={t('cases.empty.description')}
+                    actionLabel={t('cases.empty.action')}
+                    onAction={() => setIsCreateDialogOpen(true)}
+                  />
                 </div>
               )}
 

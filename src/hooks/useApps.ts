@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import appsService, { GetAppsParams, ConnectAppData } from '@/services/appsService'
 import { toast } from 'sonner'
+import { useTranslation } from 'react-i18next'
 
 export const useApps = (params?: GetAppsParams) => {
   return useQuery({
@@ -21,13 +22,14 @@ export const useApp = (appId: string) => {
 
 export const useConnectApp = () => {
   const queryClient = useQueryClient()
+  const { t } = useTranslation()
 
   return useMutation({
     mutationFn: ({ appId, data }: { appId: string; data?: ConnectAppData }) =>
       appsService.connectApp(appId, data),
     // Update cache on success (Stable & Correct)
     onSuccess: (data) => {
-      toast.success('تم ربط التطبيق بنجاح')
+      toast.success(t('toast.apps.connected'))
 
       // Manually update the cache
       queryClient.setQueriesData({ queryKey: ['apps'] }, (old: any) => {
@@ -44,7 +46,7 @@ export const useConnectApp = () => {
       })
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'فشل ربط التطبيق')
+      toast.error(error.message || t('toast.apps.connectFailed'))
     },
     onSettled: async () => {
       // Delay to allow DB propagation
@@ -56,12 +58,13 @@ export const useConnectApp = () => {
 
 export const useDisconnectApp = () => {
   const queryClient = useQueryClient()
+  const { t } = useTranslation()
 
   return useMutation({
     mutationFn: (appId: string) => appsService.disconnectApp(appId),
     // Update cache on success (Stable & Correct)
     onSuccess: (data) => {
-      toast.success('تم فصل التطبيق بنجاح')
+      toast.success(t('toast.apps.disconnected'))
 
       // Manually update the cache
       queryClient.setQueriesData({ queryKey: ['apps'] }, (old: any) => {
@@ -78,7 +81,7 @@ export const useDisconnectApp = () => {
       })
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'فشل فصل التطبيق')
+      toast.error(error.message || t('toast.apps.disconnectFailed'))
     },
     onSettled: async () => {
       // Delay to allow DB propagation

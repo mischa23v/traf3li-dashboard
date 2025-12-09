@@ -5,6 +5,7 @@ import usersService, {
   UpdateUserData,
 } from '@/services/usersService'
 import { toast } from 'sonner'
+import { useTranslation } from 'react-i18next'
 
 export const useUsers = (params?: GetUsersParams) => {
   return useQuery({
@@ -25,11 +26,12 @@ export const useUser = (userId: string) => {
 
 export const useCreateUser = () => {
   const queryClient = useQueryClient()
+  const { t } = useTranslation()
 
   return useMutation({
     mutationFn: (data: CreateUserData) => usersService.createUser(data),
     onSuccess: (data) => {
-      toast.success('تم إنشاء المستخدم بنجاح')
+      toast.success(t('toast.users.created'))
       // Optimistically update the cache
       queryClient.setQueriesData({ queryKey: ['users'] }, (old: any) => {
         if (!old) return old
@@ -38,7 +40,7 @@ export const useCreateUser = () => {
       })
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'فشل إنشاء المستخدم')
+      toast.error(error.message || t('toast.users.createFailed'))
     },
     onSettled: async () => {
       await new Promise(resolve => setTimeout(resolve, 1000))
@@ -49,12 +51,13 @@ export const useCreateUser = () => {
 
 export const useUpdateUser = () => {
   const queryClient = useQueryClient()
+  const { t } = useTranslation()
 
   return useMutation({
     mutationFn: ({ userId, data }: { userId: string; data: UpdateUserData }) =>
       usersService.updateUser(userId, data),
     onSuccess: (data) => {
-      toast.success('تم تحديث المستخدم بنجاح')
+      toast.success(t('toast.users.updated'))
       // Update specific user in cache
       queryClient.setQueryData(['users', data.id], data)
       // Update list cache
@@ -67,7 +70,7 @@ export const useUpdateUser = () => {
       })
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'فشل تحديث المستخدم')
+      toast.error(error.message || t('toast.users.updateFailed'))
     },
     onSettled: async (_, __, variables) => {
       await new Promise(resolve => setTimeout(resolve, 1000))
@@ -79,11 +82,12 @@ export const useUpdateUser = () => {
 
 export const useDeleteUser = () => {
   const queryClient = useQueryClient()
+  const { t } = useTranslation()
 
   return useMutation({
     mutationFn: (userId: string) => usersService.deleteUser(userId),
     onSuccess: (_, userId) => {
-      toast.success('تم حذف المستخدم بنجاح')
+      toast.success(t('toast.users.deleted'))
       // Remove from cache
       queryClient.setQueriesData({ queryKey: ['users'] }, (old: any) => {
         if (!old) return old
@@ -94,7 +98,7 @@ export const useDeleteUser = () => {
       })
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'فشل حذف المستخدم')
+      toast.error(error.message || t('toast.users.deleteFailed'))
     },
     onSettled: async () => {
       await new Promise(resolve => setTimeout(resolve, 1000))
@@ -105,11 +109,12 @@ export const useDeleteUser = () => {
 
 export const useDeleteMultipleUsers = () => {
   const queryClient = useQueryClient()
+  const { t } = useTranslation()
 
   return useMutation({
     mutationFn: (userIds: string[]) => usersService.deleteMultipleUsers(userIds),
     onSuccess: (_, userIds) => {
-      toast.success('تم حذف المستخدمين بنجاح')
+      toast.success(t('toast.users.bulkDeleted'))
       // Remove from cache
       queryClient.setQueriesData({ queryKey: ['users'] }, (old: any) => {
         if (!old) return old
@@ -120,7 +125,7 @@ export const useDeleteMultipleUsers = () => {
       })
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'فشل حذف المستخدمين')
+      toast.error(error.message || t('toast.users.bulkDeleteFailed'))
     },
     onSettled: async () => {
       await new Promise(resolve => setTimeout(resolve, 1000))
@@ -131,15 +136,16 @@ export const useDeleteMultipleUsers = () => {
 
 export const useInviteUser = () => {
   const queryClient = useQueryClient()
+  const { t } = useTranslation()
 
   return useMutation({
     mutationFn: ({ email, role }: { email: string; role: string }) =>
       usersService.inviteUser(email, role),
     onSuccess: () => {
-      toast.success('تم إرسال الدعوة بنجاح')
+      toast.success(t('toast.users.inviteSent'))
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'فشل إرسال الدعوة')
+      toast.error(error.message || t('toast.users.inviteSendFailed'))
     },
     onSettled: async () => {
       await new Promise(resolve => setTimeout(resolve, 1000))

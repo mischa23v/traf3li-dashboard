@@ -124,11 +124,9 @@ export function OtpInput({ email, onVerify, onResend, className }: OtpInputProps
       await apiClient.post('/auth/send-otp', { email })
 
       toast.success(
-        isRTL ? 'تم إرسال رمز التحقق' : 'OTP sent successfully',
+        t('toast.otp.sent'),
         {
-          description: isRTL
-            ? `تم إرسال رمز التحقق إلى ${email}`
-            : `Verification code sent to ${email}`,
+          description: t('toast.otp.sentDescription', { email }),
         }
       )
 
@@ -145,16 +143,12 @@ export function OtpInput({ email, onVerify, onResend, className }: OtpInputProps
         const retryAfter = err.retryAfter || 3600 // Default to 1 hour
         setRateLimitTime(retryAfter)
 
-        const message = isRTL
-          ? 'طلبات كثيرة جداً. يرجى الانتظار ساعة واحدة.'
-          : 'Too many requests. Please wait 1 hour.'
+        const message = t('toast.otp.tooManyRequests')
 
         setError(message)
         toast.error(message)
       } else {
-        const message = err.message || (isRTL
-          ? 'فشل إرسال رمز التحقق. يرجى المحاولة مرة أخرى.'
-          : 'Failed to send OTP. Please try again.')
+        const message = err.message || t('toast.otp.sendFailed')
 
         setError(message)
         toast.error(message)
@@ -169,7 +163,7 @@ export function OtpInput({ email, onVerify, onResend, className }: OtpInputProps
     const code = otpCode || otp.join('')
 
     if (code.length !== 6) {
-      setError(isRTL ? 'الرجاء إدخال رمز التحقق المكون من 6 أرقام' : 'Please enter a 6-digit OTP')
+      setError(t('toast.otp.invalidDigits'))
       return
     }
 
@@ -183,18 +177,16 @@ export function OtpInput({ email, onVerify, onResend, className }: OtpInputProps
       })
 
       toast.success(
-        isRTL ? 'تم التحقق بنجاح' : 'Verified successfully',
+        t('toast.otp.verified'),
         {
-          description: isRTL ? 'تم التحقق من رمز التحقق بنجاح' : 'OTP verified successfully',
+          description: t('toast.otp.verifiedDescription'),
         }
       )
 
       // Call onVerify callback with response data
       onVerify(response.data)
     } catch (err: any) {
-      const message = err.message || (isRTL
-        ? 'رمز التحقق غير صحيح. يرجى المحاولة مرة أخرى.'
-        : 'Invalid OTP. Please try again.')
+      const message = err.message || t('toast.otp.invalidCode')
 
       setError(message)
 
@@ -314,18 +306,14 @@ export function OtpInput({ email, onVerify, onResend, className }: OtpInputProps
           <div className="flex items-center justify-center gap-2 text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg p-3">
             <Clock className="h-4 w-4" />
             <span>
-              {isRTL
-                ? `يرجى الانتظار ${formatTime(rateLimitTime)} قبل إعادة المحاولة`
-                : `Please wait ${formatTime(rateLimitTime)} before retrying`}
+              {t('toast.otp.pleaseWaitBeforeRetry', { time: formatTime(rateLimitTime) })}
             </span>
           </div>
         ) : cooldownTime > 0 ? (
           <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
             <Clock className="h-4 w-4" />
             <span>
-              {isRTL
-                ? `إعادة الإرسال متاحة خلال ${formatTime(cooldownTime)}`
-                : `Resend available in ${formatTime(cooldownTime)}`}
+              {t('toast.otp.resendAvailable', { time: formatTime(cooldownTime) })}
             </span>
           </div>
         ) : (

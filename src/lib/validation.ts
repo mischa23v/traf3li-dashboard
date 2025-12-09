@@ -1,6 +1,7 @@
 /**
  * Validation utility functions for form inputs
  */
+import i18n from '@/i18n'
 
 /**
  * Validate amount (positive number with max 2 decimal places)
@@ -9,17 +10,17 @@ export function validateAmount(value: number | string): { valid: boolean; error?
   const numValue = typeof value === 'string' ? parseFloat(value) : value
 
   if (isNaN(numValue)) {
-    return { valid: false, error: 'المبلغ يجب أن يكون رقماً' }
+    return { valid: false, error: i18n.t('validation.amount.mustBeNumber') }
   }
 
   if (numValue <= 0) {
-    return { valid: false, error: 'المبلغ يجب أن يكون أكبر من صفر' }
+    return { valid: false, error: i18n.t('validation.amount.mustBePositive') }
   }
 
   // Check for max 2 decimal places
   const decimalPart = value.toString().split('.')[1]
   if (decimalPart && decimalPart.length > 2) {
-    return { valid: false, error: 'المبلغ يجب ألا يحتوي على أكثر من منزلتين عشريتين' }
+    return { valid: false, error: i18n.t('validation.amount.maxDecimals') }
   }
 
   return { valid: true }
@@ -35,24 +36,24 @@ export function validateSaudiIBAN(iban: string): { valid: boolean; error?: strin
 
   // Check if it starts with SA
   if (!cleanIBAN.startsWith('SA')) {
-    return { valid: false, error: 'رقم الآيبان يجب أن يبدأ بـ SA' }
+    return { valid: false, error: i18n.t('validation.iban.mustStartWithSA') }
   }
 
   // Check length (SA + 22 digits = 24 characters)
   if (cleanIBAN.length !== 24) {
-    return { valid: false, error: 'رقم الآيبان السعودي يجب أن يتكون من 24 حرفاً (SA + 22 رقماً)' }
+    return { valid: false, error: i18n.t('validation.iban.length') }
   }
 
   // Check if the rest are digits
   const digits = cleanIBAN.slice(2)
   if (!/^\d{22}$/.test(digits)) {
-    return { valid: false, error: 'رقم الآيبان يجب أن يحتوي على أرقام فقط بعد SA' }
+    return { valid: false, error: i18n.t('validation.iban.digitsOnly') }
   }
 
   // Basic IBAN checksum validation
   const isValidChecksum = validateIBANChecksum(cleanIBAN)
   if (!isValidChecksum) {
-    return { valid: false, error: 'رقم الآيبان غير صحيح (فشل التحقق من checksum)' }
+    return { valid: false, error: i18n.t('validation.iban.invalidChecksum') }
   }
 
   return { valid: true }
@@ -97,11 +98,11 @@ export function validateReferenceNumber(refNumber: string): { valid: boolean; er
 
   // Allow alphanumeric, hyphens, underscores, and spaces
   if (!/^[a-zA-Z0-9\s\-_]+$/.test(refNumber)) {
-    return { valid: false, error: 'رقم المرجع يجب أن يحتوي على أحرف وأرقام فقط' }
+    return { valid: false, error: i18n.t('validation.reference.alphanumeric') }
   }
 
   if (refNumber.length > 50) {
-    return { valid: false, error: 'رقم المرجع يجب ألا يتجاوز 50 حرفاً' }
+    return { valid: false, error: i18n.t('validation.reference.maxLength') }
   }
 
   return { valid: true }

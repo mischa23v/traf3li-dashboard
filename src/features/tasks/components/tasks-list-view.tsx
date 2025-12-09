@@ -14,6 +14,7 @@ import { useTasks, useTaskStats, useBulkDeleteTasks } from '@/hooks/useTasks'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
+import { SkeletonTable } from '@/components/skeleton-loader'
 import { Header } from '@/components/layout/header'
 import { TopNav } from '@/components/layout/top-nav'
 import { DynamicIsland } from '@/components/dynamic-island'
@@ -39,6 +40,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { useCases } from '@/hooks/useCasesAndClients'
 import { useTeamMembers } from '@/hooks/useStaff'
+import { EmptyState } from '@/components/empty-state'
 
 export function TasksListView() {
     const { t, i18n } = useTranslation()
@@ -427,20 +429,9 @@ export function TasksListView() {
                             <div className="p-4 space-y-4">
                                 {/* Loading State */}
                                 {isLoading && (
-                                    <>
-                                        {[1, 2, 3].map((i) => (
-                                            <div key={i} className="bg-[#F8F9FA] rounded-2xl p-6 border border-slate-100">
-                                                <div className="flex gap-4 mb-4">
-                                                    <Skeleton className="w-12 h-12 rounded-xl" />
-                                                    <div className="flex-1 space-y-2">
-                                                        <Skeleton className="h-6 w-3/4" />
-                                                        <Skeleton className="h-4 w-1/2" />
-                                                    </div>
-                                                </div>
-                                                <Skeleton className="h-20 w-full" />
-                                            </div>
-                                        ))}
-                                    </>
+                                    <div className="bg-white rounded-2xl p-6 border border-slate-100">
+                                        <SkeletonTable rows={10} columns={4} showHeader={true} />
+                                    </div>
                                 )}
 
                                 {/* Error State */}
@@ -461,20 +452,14 @@ export function TasksListView() {
 
                                 {/* Empty State */}
                                 {!isLoading && !isError && tasks.length === 0 && (
-                                    <div className="bg-white rounded-2xl p-12 border border-slate-100 text-center">
-                                        <div className="flex justify-center mb-4">
-                                            <div className="w-16 h-16 rounded-full bg-emerald-50 flex items-center justify-center">
-                                                <Briefcase className="w-8 h-8 text-emerald-500" />
-                                            </div>
-                                        </div>
-                                        <h3 className="text-lg font-bold text-slate-900 mb-2">{t('tasks.list.noTasks')}</h3>
-                                        <p className="text-slate-500 mb-4">{t('tasks.list.noTasksDescription')}</p>
-                                        <Button asChild className="bg-emerald-500 hover:bg-emerald-600">
-                                            <Link to="/dashboard/tasks/new">
-                                                <Plus className="w-4 h-4 ms-2" aria-hidden="true" />
-                                                {t('tasks.list.newTask')}
-                                            </Link>
-                                        </Button>
+                                    <div className="bg-white rounded-2xl border border-slate-100">
+                                        <EmptyState
+                                            icon={Briefcase}
+                                            title={t('tasks.empty.title')}
+                                            description={t('tasks.empty.description')}
+                                            actionLabel={t('tasks.empty.action')}
+                                            onAction={() => navigate({ to: '/dashboard/tasks/new' })}
+                                        />
                                     </div>
                                 )}
 
