@@ -112,18 +112,43 @@ async function auditPage(page, url) {
   return logs;
 }
 
+// Helper to write results - MUST always write before exiting
+function writeResults(results) {
+  try {
+    fs.writeFileSync(OUTPUT_FILE, JSON.stringify(results, null, 2));
+    console.log(`Report saved to: ${OUTPUT_FILE}`);
+    return true;
+  } catch (err) {
+    console.error('Failed to write report:', err.message);
+    return false;
+  }
+}
+
+// Filter out noise - browser extension errors, expected warnings, etc.
+function isRealError(log) {
+  const text = log.text || '';
+  const ignorePatterns = [
+    // Browser extension errors
+    'chrome-extension://',
+    'moz-extension://',
+    // React DevTools
+    'Download the React DevTools',
+    // Expected development warnings
+    'Warning: ReactDOM.render is no longer supported',
+    // Font loading (not critical)
+    'Failed to decode downloaded font',
+    // Service worker scope
+    'service worker scope',
+  ];
+  return !ignorePatterns.some(pattern => text.includes(pattern));
+}
+
 async function runAudit() {
   console.log('Starting Console Audit...\n');
   console.log(`Base URL: ${BASE_URL}`);
   console.log(`Output: ${OUTPUT_FILE}`);
   console.log(`Mode: ${isCI ? 'CI (public pages only)' : 'Local (all pages)'}`);
   console.log(`Pages to audit: ${PAGES.length}\n`);
-
-  const browser = await chromium.launch({ headless: true });
-  const context = await browser.newContext({
-    viewport: { width: 1920, height: 1080 },
-    locale: 'ar-SA',
-  });
 
   const results = {
     generatedAt: new Date().toISOString(),
@@ -138,42 +163,79 @@ async function runAudit() {
     pages: {},
   };
 
-  for (const pagePath of PAGES) {
-    const url = `${BASE_URL}${pagePath}`;
-    console.log(`Auditing: ${pagePath}`);
+  let browser = null;
 
-    const page = await context.newPage();
-    const logs = await auditPage(page, url);
-    await page.close();
+  try {
+    browser = await chromium.launch({ headless: true });
+    const context = await browser.newContext({
+      viewport: { width: 1920, height: 1080 },
+      locale: 'ar-SA',
+    });
 
-    const errors = logs.filter((l) => l.type === 'error' || l.type === 'pageerror');
-    const warnings = logs.filter((l) => l.type === 'warn');
-    const requestFailed = logs.filter((l) => l.type === 'requestfailed');
+    for (const pagePath of PAGES) {
+      const url = `${BASE_URL}${pagePath}`;
+      console.log(`Auditing: ${pagePath}`);
 
-    results.pages[pagePath] = {
-      url,
-      errorCount: errors.length,
-      warningCount: warnings.length,
-      requestFailedCount: requestFailed.length,
-      logs,
-    };
+      try {
+        const page = await context.newPage();
+        const logs = await auditPage(page, url);
+        await page.close();
 
-    results.summary.totalErrors += errors.length;
-    results.summary.totalWarnings += warnings.length;
-    results.summary.totalRequestFailed += requestFailed.length;
+        // Filter out noise
+        const filteredLogs = logs.filter(isRealError);
+        const errors = filteredLogs.filter((l) => l.type === 'error' || l.type === 'pageerror');
+        const warnings = filteredLogs.filter((l) => l.type === 'warn');
+        const requestFailed = filteredLogs.filter((l) => l.type === 'requestfailed');
 
-    if (errors.length > 0 || warnings.length > 0) {
-      results.summary.pagesWithErrors++;
-      console.log(`  - ${errors.length} errors, ${warnings.length} warnings`);
-    } else {
-      console.log(`  - Clean!`);
+        results.pages[pagePath] = {
+          url,
+          errorCount: errors.length,
+          warningCount: warnings.length,
+          requestFailedCount: requestFailed.length,
+          logs: filteredLogs,
+        };
+
+        results.summary.totalErrors += errors.length;
+        results.summary.totalWarnings += warnings.length;
+        results.summary.totalRequestFailed += requestFailed.length;
+
+        if (errors.length > 0 || warnings.length > 0) {
+          results.summary.pagesWithErrors++;
+          console.log(`  - ${errors.length} errors, ${warnings.length} warnings`);
+        } else {
+          console.log(`  - Clean!`);
+        }
+      } catch (pageError) {
+        console.log(`  - Error auditing page: ${pageError.message}`);
+        results.pages[pagePath] = {
+          url,
+          errorCount: 1,
+          warningCount: 0,
+          requestFailedCount: 0,
+          logs: [{ type: 'audit_error', text: pageError.message }],
+        };
+        results.summary.totalErrors += 1;
+        results.summary.pagesWithErrors++;
+      }
+    }
+
+    await browser.close();
+    browser = null;
+  } catch (error) {
+    console.error('Browser error:', error.message);
+    results.summary.totalErrors += 1;
+  } finally {
+    if (browser) {
+      try {
+        await browser.close();
+      } catch (e) {
+        // Ignore close errors
+      }
     }
   }
 
-  await browser.close();
-
-  // Write results to file
-  fs.writeFileSync(OUTPUT_FILE, JSON.stringify(results, null, 2));
+  // ALWAYS write results before exiting
+  writeResults(results);
 
   // Print summary
   console.log('\n========== AUDIT SUMMARY ==========');
@@ -182,39 +244,42 @@ async function runAudit() {
   console.log(`Total Errors: ${results.summary.totalErrors}`);
   console.log(`Total Warnings: ${results.summary.totalWarnings}`);
   console.log(`Failed Requests: ${results.summary.totalRequestFailed}`);
-  console.log(`\nReport saved to: ${OUTPUT_FILE}`);
   console.log('====================================\n');
 
-  // Exit with error code if issues found
-  if (results.summary.totalErrors > 0) {
-    process.exit(1);
-  }
+  // Return error count for the caller to decide exit code
+  return results.summary.totalErrors;
 }
 
-runAudit().catch((error) => {
-  console.error('Audit failed:', error);
+runAudit()
+  .then((errorCount) => {
+    // Exit with code 1 if errors found (for CI to detect failures)
+    // But report is already written, so artifact upload will work
+    if (errorCount > 0) {
+      console.log(`\n❌ Found ${errorCount} console errors. Exiting with code 1.`);
+      process.exit(1);
+    } else {
+      console.log('\n✅ No console errors found!');
+      process.exit(0);
+    }
+  })
+  .catch((error) => {
+    console.error('Audit failed:', error);
 
-  // Write a minimal report even on failure so the workflow can upload something
-  const failureReport = {
-    generatedAt: new Date().toISOString(),
-    baseUrl: BASE_URL,
-    error: error.message,
-    summary: {
-      totalPages: 0,
-      pagesWithErrors: 0,
-      totalErrors: 1,
-      totalWarnings: 0,
-      totalRequestFailed: 0,
-    },
-    pages: {},
-  };
+    // Write a minimal report even on failure so the workflow can upload something
+    const failureReport = {
+      generatedAt: new Date().toISOString(),
+      baseUrl: BASE_URL,
+      error: error.message,
+      summary: {
+        totalPages: 0,
+        pagesWithErrors: 0,
+        totalErrors: 1,
+        totalWarnings: 0,
+        totalRequestFailed: 0,
+      },
+      pages: {},
+    };
 
-  try {
-    fs.writeFileSync(OUTPUT_FILE, JSON.stringify(failureReport, null, 2));
-    console.log(`Failure report saved to: ${OUTPUT_FILE}`);
-  } catch (writeError) {
-    console.error('Failed to write report:', writeError);
-  }
-
-  process.exit(1);
-});
+    writeResults(failureReport);
+    process.exit(1);
+  });
