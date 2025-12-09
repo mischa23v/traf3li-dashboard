@@ -53,15 +53,21 @@ export interface Lead {
   expectedCloseDate?: string
 
   // Source
+  // Backend values: website | referral | ads | social | walkin | cold_call | event
+  // Frontend also supports: social_media, advertising, walk_in, other (mapped to backend equivalents)
   source?: {
     type:
       | 'website'
       | 'referral'
-      | 'social_media'
-      | 'advertising'
+      | 'ads'
+      | 'social'
+      | 'walkin'
       | 'cold_call'
-      | 'walk_in'
       | 'event'
+      // Frontend aliases (map to backend equivalents)
+      | 'social_media'  // maps to 'social'
+      | 'advertising'   // maps to 'ads'
+      | 'walk_in'       // maps to 'walkin'
       | 'other'
     referralId?: string
     referralName?: string

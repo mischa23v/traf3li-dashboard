@@ -71,11 +71,13 @@ export const ganttService = {
   },
 
   /**
-   * Update task schedule
+   * Update task dates (for drag-drop)
+   * PUT /api/gantt/task/:id/dates
+   * Body: { startDate, endDate } in "YYYY-MM-DD HH:mm" format
    */
   updateTaskSchedule: async (taskId: string, data: UpdateScheduleData): Promise<GanttTask> => {
     try {
-      const response = await apiClient.put(`/gantt/task/${taskId}/schedule`, data)
+      const response = await apiClient.put(`/gantt/task/${taskId}/dates`, data)
       return response.data.data
     } catch (error: any) {
       throw new Error(handleApiError(error))
@@ -95,11 +97,19 @@ export const ganttService = {
   },
 
   /**
-   * Add dependency between tasks
+   * Create dependency link
+   * POST /api/gantt/link
+   * Body: { source, target, type } where type is 0=FS, 1=SS, 2=FF, 3=SF
    */
   addDependency: async (taskId: string, data: AddDependencyData): Promise<GanttLink> => {
     try {
-      const response = await apiClient.post(`/gantt/task/${taskId}/dependencies`, data)
+      // Transform to backend format
+      const linkData = {
+        source: taskId,
+        target: data.targetTaskId,
+        type: data.type
+      }
+      const response = await apiClient.post(`/gantt/link`, linkData)
       return response.data.data
     } catch (error: any) {
       throw new Error(handleApiError(error))
@@ -107,11 +117,12 @@ export const ganttService = {
   },
 
   /**
-   * Remove dependency
+   * Delete dependency link
+   * DELETE /api/gantt/link/:source/:target
    */
-  removeDependency: async (taskId: string, dependencyId: string): Promise<void> => {
+  removeDependency: async (sourceTaskId: string, targetTaskId: string): Promise<void> => {
     try {
-      await apiClient.delete(`/gantt/task/${taskId}/dependencies/${dependencyId}`)
+      await apiClient.delete(`/gantt/link/${sourceTaskId}/${targetTaskId}`)
     } catch (error: any) {
       throw new Error(handleApiError(error))
     }

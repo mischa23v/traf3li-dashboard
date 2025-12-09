@@ -206,6 +206,45 @@ const clientsService = {
       throw new Error(handleApiError(error))
     }
   },
+
+  /**
+   * Get client's cases
+   * GET /api/clients/:id/cases
+   */
+  getClientCases: async (id: string): Promise<any[]> => {
+    try {
+      const response = await apiClient.get(`/clients/${id}/cases`)
+      return response.data.data || response.data.cases || []
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Get client's invoices
+   * GET /api/clients/:id/invoices
+   */
+  getClientInvoices: async (id: string): Promise<any[]> => {
+    try {
+      const response = await apiClient.get(`/clients/${id}/invoices`)
+      return response.data.data || response.data.invoices || []
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Verify company with Wathq API (Saudi CR verification)
+   * POST /api/clients/:id/verify/wathq
+   */
+  verifyWithWathq: async (id: string): Promise<{ verified: boolean; data?: any }> => {
+    try {
+      const response = await apiClient.post(`/clients/${id}/verify/wathq`)
+      return response.data.data || response.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
 }
 
 export default clientsService

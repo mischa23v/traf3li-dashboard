@@ -10,8 +10,10 @@ import apiClient, { handleApiError } from '@/lib/api'
  * ==================== ENUMS ====================
  */
 
-export type EventType = 'hearing' | 'meeting' | 'deadline' | 'task' | 'conference' | 'consultation' | 'court_session' | 'document_review' | 'training' | 'other'
-export type EventStatus = 'scheduled' | 'in_progress' | 'completed' | 'cancelled' | 'postponed' | 'rescheduled'
+// Backend Event Types: hearing | court_date | meeting | client_meeting | deposition | mediation | arbitration | deadline | filing_deadline | conference_call | internal_meeting | training | webinar | consultation | task | other
+export type EventType = 'hearing' | 'court_date' | 'meeting' | 'client_meeting' | 'deposition' | 'mediation' | 'arbitration' | 'deadline' | 'filing_deadline' | 'conference_call' | 'internal_meeting' | 'training' | 'webinar' | 'consultation' | 'task' | 'other' | 'conference' | 'court_session' | 'document_review'
+// Backend Event Status: scheduled | confirmed | tentative | canceled | cancelled | postponed | completed | in_progress | rescheduled
+export type EventStatus = 'scheduled' | 'confirmed' | 'tentative' | 'canceled' | 'cancelled' | 'postponed' | 'completed' | 'in_progress' | 'rescheduled'
 export type EventPriority = 'low' | 'medium' | 'high' | 'critical'
 export type RSVPStatus = 'pending' | 'accepted' | 'declined' | 'tentative' | 'no_response'
 export type RecurrenceFrequency = 'daily' | 'weekly' | 'biweekly' | 'monthly' | 'quarterly' | 'yearly' | 'custom'

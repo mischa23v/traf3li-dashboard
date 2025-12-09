@@ -36,6 +36,36 @@ import type {
   AddNoteData,
 } from '@/types/crm'
 
+/**
+ * Map frontend source types to backend format
+ * Frontend aliases: social_media, advertising, walk_in
+ * Backend expects: social, ads, walkin
+ */
+const mapSourceToBackend = (source?: string): string | undefined => {
+  if (!source) return source
+  const sourceMap: Record<string, string> = {
+    'social_media': 'social',
+    'advertising': 'ads',
+    'walk_in': 'walkin',
+  }
+  return sourceMap[source] || source
+}
+
+/**
+ * Map backend source types to frontend format
+ * Backend values: social, ads, walkin
+ * Frontend displays: social_media, advertising, walk_in
+ */
+const mapSourceFromBackend = (source?: string): string | undefined => {
+  if (!source) return source
+  const sourceMap: Record<string, string> = {
+    'social': 'social_media',
+    'ads': 'advertising',
+    'walkin': 'walk_in',
+  }
+  return sourceMap[source] || source
+}
+
 // ═══════════════════════════════════════════════════════════════
 // LEAD SERVICE
 // ═══════════════════════════════════════════════════════════════

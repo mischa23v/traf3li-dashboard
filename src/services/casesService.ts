@@ -608,6 +608,19 @@ const casesService = {
   },
 
   /**
+   * Update case progress
+   * PATCH /api/cases/:id/progress
+   */
+  updateProgress: async (id: string, progress: number): Promise<Case> => {
+    try {
+      const response = await apiClient.patch<CaseResponse>(`/cases/${id}/progress`, { progress })
+      return response.data.case
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
    * Update case status
    * PATCH /api/cases/:id/status
    */

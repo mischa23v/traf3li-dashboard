@@ -495,6 +495,89 @@ const financeService = {
     }
   },
 
+  /**
+   * Get invoice statistics
+   * GET /api/invoices/stats
+   */
+  getInvoiceStats: async (): Promise<{
+    total: number
+    byStatus: Record<string, number>
+    totalRevenue: number
+    totalOutstanding: number
+    averageInvoiceAmount: number
+    averageDaysToPayment: number
+  }> => {
+    try {
+      const response = await apiClient.get('/invoices/stats')
+      return response.data.data || response.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Get unbilled time entries and expenses
+   * GET /api/invoices/billable-items
+   */
+  getBillableItems: async (params?: { clientId?: string; caseId?: string }): Promise<{
+    timeEntries: any[]
+    expenses: any[]
+    totals: { timeAmount: number; expenseAmount: number; totalAmount: number }
+  }> => {
+    try {
+      const response = await apiClient.get('/invoices/billable-items', { params })
+      return response.data.data || response.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Record payment on invoice
+   * POST /api/invoices/:id/record-payment
+   */
+  recordPayment: async (id: string, data: {
+    amount: number
+    paymentDate: string
+    paymentMethod: string
+    reference?: string
+  }): Promise<Invoice> => {
+    try {
+      const response = await apiClient.post(`/invoices/${id}/record-payment`, data)
+      return response.data.invoice || response.data.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Void invoice
+   * POST /api/invoices/:id/void
+   */
+  voidInvoice: async (id: string, reason?: string): Promise<Invoice> => {
+    try {
+      const response = await apiClient.post(`/invoices/${id}/void`, { reason })
+      return response.data.invoice || response.data.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Export invoice to PDF
+   * GET /api/invoices/:id/export/pdf
+   */
+  exportInvoicePdf: async (id: string): Promise<Blob> => {
+    try {
+      const response = await apiClient.get(`/invoices/${id}/export/pdf`, {
+        responseType: 'blob'
+      })
+      return response.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
   // ==================== EXPENSES ====================
 
   /**
