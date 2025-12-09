@@ -216,8 +216,8 @@ export const payrollService = {
 
     // Get salary slips for an employee
     getEmployeeSalarySlips: async (employeeId: string): Promise<SalarySlip[]> => {
-        const response = await apiClient.get(`/hr/employees/${employeeId}/payroll`)
-        return response.data
+        const response = await apiClient.get(`/hr/payroll?employeeId=${employeeId}`)
+        return response.data.salarySlips || response.data
     },
 
     // Create salary slip
@@ -264,8 +264,9 @@ export const payrollService = {
         return response.data
     },
 
-    // Download salary slip PDF
+    // Download salary slip PDF (Note: Backend endpoint not implemented yet)
     downloadSalarySlipPDF: async (id: string): Promise<Blob> => {
+        // TODO: Backend needs to implement GET /hr/payroll/:id/pdf endpoint
         const response = await apiClient.get(`/hr/payroll/${id}/pdf`, { responseType: 'blob' })
         return response.data
     },

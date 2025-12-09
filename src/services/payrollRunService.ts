@@ -481,9 +481,9 @@ export const generateWPSFile = async (runId: string): Promise<{ fileUrl: string;
   return response.data
 }
 
-// Submit WPS to bank
+// Submit WPS to bank (Note: uses generate-wps endpoint)
 export const submitWPS = async (runId: string): Promise<PayrollRun> => {
-  const response = await api.post(`/hr/payroll-runs/${runId}/submit-wps`)
+  const response = await api.post(`/hr/payroll-runs/${runId}/generate-wps`)
   return response.data
 }
 
@@ -522,30 +522,34 @@ export const unholdEmployee = async (runId: string, empId: string): Promise<Payr
   return response.data
 }
 
-// Exclude employee from payroll run
+// Exclude employee from payroll run (TODO: Backend endpoint not implemented)
 export const excludeEmployee = async (runId: string, empId: string, reason: string): Promise<PayrollRun> => {
+  // TODO: Backend needs to implement POST /hr/payroll-runs/:id/employees/:empId/exclude
   const response = await api.post(`/hr/payroll-runs/${runId}/employees/${empId}/exclude`, { reason })
   return response.data
 }
 
-// Include employee back in payroll run
+// Include employee back in payroll run (TODO: Backend endpoint not implemented)
 export const includeEmployee = async (runId: string, empId: string): Promise<PayrollRun> => {
+  // TODO: Backend needs to implement POST /hr/payroll-runs/:id/employees/:empId/include
   const response = await api.post(`/hr/payroll-runs/${runId}/employees/${empId}/include`)
   return response.data
 }
 
-// Recalculate single employee in payroll run
+// Recalculate single employee in payroll run (TODO: Backend endpoint not implemented)
 export const recalculateEmployee = async (runId: string, empId: string): Promise<PayrollRun> => {
+  // TODO: Backend needs to implement POST /hr/payroll-runs/:id/employees/:empId/recalculate
   const response = await api.post(`/hr/payroll-runs/${runId}/employees/${empId}/recalculate`)
   return response.data
 }
 
-// Export payroll run report
+// Export payroll run report (TODO: Backend endpoint not implemented)
 export const exportPayrollRunReport = async (
   runId: string,
   reportType: 'summary' | 'detailed' | 'bank_file' | 'wps_sif' | 'journal_entry',
   format: 'pdf' | 'excel' | 'csv'
 ): Promise<Blob> => {
+  // TODO: Backend needs to implement GET /hr/payroll-runs/:id/export
   const response = await api.get(`/hr/payroll-runs/${runId}/export`, {
     params: { reportType, format },
     responseType: 'blob'

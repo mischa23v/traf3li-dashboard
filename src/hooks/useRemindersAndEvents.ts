@@ -565,3 +565,128 @@ export const useEventStats = (filters?: { dateFrom?: string; dateTo?: string; ca
     staleTime: 5 * 60 * 1000,
   })
 }
+
+export const useCheckAvailability = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({ attendeeIds, startDate, endDate }: { attendeeIds: string[]; startDate: string; endDate: string }) =>
+      eventsService.checkAvailability(attendeeIds, startDate, endDate),
+    onError: (error: Error) => {
+      toast.error(error.message || 'فشل التحقق من التوفر')
+    },
+  })
+}
+
+// ==================== BULK OPERATIONS ====================
+
+export const useBulkUpdateReminders = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({ reminderIds, data }: { reminderIds: string[]; data: Partial<CreateReminderData> }) =>
+      remindersService.bulkUpdate(reminderIds, data),
+    onSuccess: () => {
+      toast.success('تم تحديث التذكيرات بنجاح')
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'فشل تحديث التذكيرات')
+    },
+    onSettled: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['reminders'] })
+      await queryClient.invalidateQueries({ queryKey: ['calendar'] })
+    },
+  })
+}
+
+export const useBulkDeleteReminders = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (reminderIds: string[]) => remindersService.bulkDelete(reminderIds),
+    onSuccess: () => {
+      toast.success('تم حذف التذكيرات بنجاح')
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'فشل حذف التذكيرات')
+    },
+    onSettled: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['reminders'] })
+      await queryClient.invalidateQueries({ queryKey: ['calendar'] })
+    },
+  })
+}
+
+export const useBulkCompleteReminders = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (reminderIds: string[]) => remindersService.bulkComplete(reminderIds),
+    onSuccess: () => {
+      toast.success('تم إكمال التذكيرات بنجاح')
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'فشل إكمال التذكيرات')
+    },
+    onSettled: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['reminders'] })
+      await queryClient.invalidateQueries({ queryKey: ['calendar'] })
+    },
+  })
+}
+
+export const useBulkUpdateEvents = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({ eventIds, data }: { eventIds: string[]; data: Partial<CreateEventData> }) =>
+      eventsService.bulkUpdate(eventIds, data),
+    onSuccess: () => {
+      toast.success('تم تحديث الأحداث بنجاح')
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'فشل تحديث الأحداث')
+    },
+    onSettled: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['events'] })
+      await queryClient.invalidateQueries({ queryKey: ['calendar'] })
+    },
+  })
+}
+
+export const useBulkDeleteEvents = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (eventIds: string[]) => eventsService.bulkDelete(eventIds),
+    onSuccess: () => {
+      toast.success('تم حذف الأحداث بنجاح')
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'فشل حذف الأحداث')
+    },
+    onSettled: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['events'] })
+      await queryClient.invalidateQueries({ queryKey: ['calendar'] })
+    },
+  })
+}
+
+export const useBulkCancelEvents = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({ eventIds, reason }: { eventIds: string[]; reason?: string }) =>
+      eventsService.bulkCancel(eventIds, reason),
+    onSuccess: () => {
+      toast.success('تم إلغاء الأحداث بنجاح')
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'فشل إلغاء الأحداث')
+    },
+    onSettled: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['events'] })
+      await queryClient.invalidateQueries({ queryKey: ['calendar'] })
+    },
+  })
+}

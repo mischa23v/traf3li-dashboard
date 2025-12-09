@@ -102,7 +102,7 @@ const contactsService = {
 
   // Bulk delete contacts
   bulkDeleteContacts: async (ids: string[]): Promise<void> => {
-    await api.post('/contacts/bulk-delete', { ids })
+    await api.delete('/contacts/bulk', { data: { ids } })
   },
 
   // Search contacts
@@ -131,7 +131,7 @@ const contactsService = {
 
   // Unlink contact from case
   unlinkFromCase: async (contactId: string, caseId: string): Promise<Contact> => {
-    const response = await api.post(`/contacts/${contactId}/unlink-case`, { caseId })
+    const response = await api.delete(`/contacts/${contactId}/unlink-case/${caseId}`)
     return response.data
   },
 
@@ -143,7 +143,7 @@ const contactsService = {
 
   // Unlink contact from client
   unlinkFromClient: async (contactId: string, clientId: string): Promise<Contact> => {
-    const response = await api.post(`/contacts/${contactId}/unlink-client`, { clientId })
+    const response = await api.delete(`/contacts/${contactId}/unlink-client/${clientId}`)
     return response.data
   },
 }

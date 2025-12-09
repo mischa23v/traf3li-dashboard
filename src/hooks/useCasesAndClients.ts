@@ -880,6 +880,44 @@ export const useCaseAuditHistory = (caseId: string) => {
 }
 
 /**
+ * Update case progress mutation
+ * PATCH /api/cases/:id/progress
+ */
+export const useUpdateCaseProgress = () => {
+  const queryClient = useQueryClient()
+  const { t } = useTranslation()
+
+  return useMutation({
+    mutationFn: ({ id, progress }: { id: string; progress: number }) =>
+      casesService.updateProgress(id, progress),
+    onSuccess: () => {
+      toast.success(t('cases.progressUpdateSuccess', 'تم تحديث تقدم القضية بنجاح'))
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || t('cases.progressUpdateError', 'فشل تحديث تقدم القضية'))
+    },
+    onSettled: async (_, __, { id }) => {
+      await queryClient.invalidateQueries({ queryKey: ['cases'] })
+      return await queryClient.invalidateQueries({ queryKey: ['cases', id] })
+    },
+  })
+}
+
+// ==================== STATISTICS ====================
+
+/**
+ * Fetch case statistics from API
+ * GET /api/cases/statistics
+ */
+export const useCaseStatisticsFromAPI = () => {
+  return useQuery({
+    queryKey: ['cases', 'statistics'],
+    queryFn: () => casesService.getStatistics(),
+    staleTime: 5 * 60 * 1000,
+  })
+}
+
+/**
  * Combined hook for fetching cases and clients together
  * Useful for dropdowns and filters that need both data sources
  */

@@ -564,6 +564,177 @@ const financeService = {
   },
 
   /**
+   * Duplicate invoice
+   * POST /api/invoices/:id/duplicate
+   */
+  duplicateInvoice: async (id: string): Promise<Invoice> => {
+    try {
+      const response = await apiClient.post(`/invoices/${id}/duplicate`)
+      return response.data.invoice || response.data.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Send reminder
+   * POST /api/invoices/:id/send-reminder
+   */
+  sendInvoiceReminder: async (id: string, data?: { message?: string; sendEmail?: boolean }): Promise<Invoice> => {
+    try {
+      const response = await apiClient.post(`/invoices/${id}/send-reminder`, data)
+      return response.data.invoice || response.data.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Convert to credit note
+   * POST /api/invoices/:id/convert-to-credit-note
+   */
+  convertToCreditNote: async (id: string): Promise<Invoice> => {
+    try {
+      const response = await apiClient.post(`/invoices/${id}/convert-to-credit-note`)
+      return response.data.invoice || response.data.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Apply retainer to invoice
+   * POST /api/invoices/:id/apply-retainer
+   */
+  applyRetainer: async (id: string, data: { retainerId: string; amount: number }): Promise<Invoice> => {
+    try {
+      const response = await apiClient.post(`/invoices/${id}/apply-retainer`, data)
+      return response.data.invoice || response.data.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Submit invoice for approval
+   * POST /api/invoices/:id/submit-for-approval
+   */
+  submitForApproval: async (id: string): Promise<Invoice> => {
+    try {
+      const response = await apiClient.post(`/invoices/${id}/submit-for-approval`)
+      return response.data.invoice || response.data.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Approve invoice
+   * POST /api/invoices/:id/approve
+   */
+  approveInvoice: async (id: string, data?: { comments?: string }): Promise<Invoice> => {
+    try {
+      const response = await apiClient.post(`/invoices/${id}/approve`, data)
+      return response.data.invoice || response.data.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Reject invoice
+   * POST /api/invoices/:id/reject
+   */
+  rejectInvoice: async (id: string, data: { reason: string }): Promise<Invoice> => {
+    try {
+      const response = await apiClient.post(`/invoices/${id}/reject`, data)
+      return response.data.invoice || response.data.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Submit invoice to ZATCA
+   * POST /api/invoices/:id/zatca/submit
+   */
+  submitToZATCA: async (id: string): Promise<any> => {
+    try {
+      const response = await apiClient.post(`/invoices/${id}/zatca/submit`)
+      return response.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Get ZATCA status
+   * GET /api/invoices/:id/zatca/status
+   */
+  getZATCAStatus: async (id: string): Promise<any> => {
+    try {
+      const response = await apiClient.get(`/invoices/${id}/zatca/status`)
+      return response.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Get open invoices for a client (for payment allocation)
+   * GET /api/invoices/open/:clientId
+   */
+  getOpenInvoices: async (clientId: string): Promise<Invoice[]> => {
+    try {
+      const response = await apiClient.get(`/invoices/open/${clientId}`)
+      return response.data.invoices || response.data.data || []
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Export invoice to XML (UBL 2.1 format for ZATCA)
+   * GET /api/invoices/:id/xml
+   */
+  exportInvoiceXml: async (id: string): Promise<Blob> => {
+    try {
+      const response = await apiClient.get(`/invoices/${id}/xml`, {
+        responseType: 'blob'
+      })
+      return response.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Create payment intent (Stripe)
+   * POST /api/invoices/:id/payment
+   */
+  createInvoicePaymentIntent: async (id: string, data?: any): Promise<any> => {
+    try {
+      const response = await apiClient.post(`/invoices/${id}/payment`, data)
+      return response.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Confirm payment (Stripe webhook)
+   * PATCH /api/invoices/confirm-payment
+   */
+  confirmInvoicePayment: async (data: any): Promise<any> => {
+    try {
+      const response = await apiClient.patch('/invoices/confirm-payment', data)
+      return response.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
    * Export invoice to PDF
    * GET /api/invoices/:id/pdf
    */
@@ -667,6 +838,123 @@ const financeService = {
   deleteExpense: async (id: string): Promise<void> => {
     try {
       await apiClient.delete(`/expenses/${id}`)
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Get new expense defaults
+   * GET /api/expenses/new
+   */
+  getNewExpenseDefaults: async (): Promise<any> => {
+    try {
+      const response = await apiClient.get('/expenses/new')
+      return response.data.data || response.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Get expense categories
+   * GET /api/expenses/categories
+   */
+  getExpenseCategories: async (): Promise<any> => {
+    try {
+      const response = await apiClient.get('/expenses/categories')
+      return response.data.categories || response.data.data || response.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Get expenses by category
+   * GET /api/expenses/by-category
+   */
+  getExpensesByCategory: async (filters?: any): Promise<any> => {
+    try {
+      const response = await apiClient.get('/expenses/by-category', { params: filters })
+      return response.data.data || response.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Suggest category (AI-powered)
+   * POST /api/expenses/suggest-category
+   */
+  suggestExpenseCategory: async (data: { description: string; vendor?: string; amount?: number }): Promise<any> => {
+    try {
+      const response = await apiClient.post('/expenses/suggest-category', data)
+      return response.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Submit expense for approval
+   * POST /api/expenses/:id/submit
+   */
+  submitExpense: async (id: string): Promise<Expense> => {
+    try {
+      const response = await apiClient.post(`/expenses/${id}/submit`)
+      return response.data.expense || response.data.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Approve expense
+   * POST /api/expenses/:id/approve
+   */
+  approveExpense: async (id: string, data?: { comments?: string }): Promise<Expense> => {
+    try {
+      const response = await apiClient.post(`/expenses/${id}/approve`, data)
+      return response.data.expense || response.data.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Reject expense
+   * POST /api/expenses/:id/reject
+   */
+  rejectExpense: async (id: string, data: { reason: string }): Promise<Expense> => {
+    try {
+      const response = await apiClient.post(`/expenses/${id}/reject`, data)
+      return response.data.expense || response.data.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Mark expense as reimbursed
+   * POST /api/expenses/:id/reimburse
+   */
+  markExpenseAsReimbursed: async (id: string, data?: { paymentMethod?: string; reference?: string }): Promise<Expense> => {
+    try {
+      const response = await apiClient.post(`/expenses/${id}/reimburse`, data)
+      return response.data.expense || response.data.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Bulk approve expenses
+   * POST /api/expenses/bulk-approve
+   */
+  bulkApproveExpenses: async (data: { expenseIds: string[]; comments?: string }): Promise<any> => {
+    try {
+      const response = await apiClient.post('/expenses/bulk-approve', data)
+      return response.data
     } catch (error: any) {
       throw new Error(handleApiError(error))
     }
@@ -893,6 +1181,186 @@ const financeService = {
     try {
       const response = await apiClient.get('/payments/summary', { params: filters })
       return response.data.summary || response.data.data || response.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Get new payment defaults
+   * GET /api/payments/new
+   */
+  getNewPaymentDefaults: async (): Promise<any> => {
+    try {
+      const response = await apiClient.get('/payments/new')
+      return response.data.data || response.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Get payment statistics
+   * GET /api/payments/stats
+   */
+  getPaymentStats: async (filters?: any): Promise<any> => {
+    try {
+      const response = await apiClient.get('/payments/stats', { params: filters })
+      return response.data.stats || response.data.data || response.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Get unreconciled payments
+   * GET /api/payments/unreconciled
+   */
+  getUnreconciledPayments: async (): Promise<Payment[]> => {
+    try {
+      const response = await apiClient.get('/payments/unreconciled')
+      return response.data.payments || response.data.data || []
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Get pending checks
+   * GET /api/payments/pending-checks
+   */
+  getPendingChecks: async (): Promise<Payment[]> => {
+    try {
+      const response = await apiClient.get('/payments/pending-checks')
+      return response.data.payments || response.data.data || []
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Update payment
+   * PUT /api/payments/:id
+   */
+  updatePayment: async (id: string, data: Partial<CreatePaymentData>): Promise<Payment> => {
+    try {
+      const response = await apiClient.put(`/payments/${id}`, data)
+      return response.data.payment || response.data.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Delete payment
+   * DELETE /api/payments/:id
+   */
+  deletePayment: async (id: string): Promise<void> => {
+    try {
+      await apiClient.delete(`/payments/${id}`)
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Bulk delete payments
+   * DELETE /api/payments/bulk
+   */
+  bulkDeletePayments: async (ids: string[]): Promise<void> => {
+    try {
+      await apiClient.delete('/payments/bulk', { data: { ids } })
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Mark payment as failed
+   * POST /api/payments/:id/fail
+   */
+  failPayment: async (id: string): Promise<Payment> => {
+    try {
+      const response = await apiClient.post(`/payments/${id}/fail`)
+      return response.data.payment || response.data.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Create refund for a payment
+   * POST /api/payments/:id/refund
+   */
+  createRefund: async (id: string, data: { amount: number; reason?: string }): Promise<Payment> => {
+    try {
+      const response = await apiClient.post(`/payments/${id}/refund`, data)
+      return response.data.payment || response.data.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Reconcile payment with bank statement
+   * POST /api/payments/:id/reconcile
+   */
+  reconcilePayment: async (id: string, data: { bankStatementId?: string; date?: string }): Promise<Payment> => {
+    try {
+      const response = await apiClient.post(`/payments/${id}/reconcile`, data)
+      return response.data.payment || response.data.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Apply payment to invoices
+   * PUT /api/payments/:id/apply
+   */
+  applyPaymentToInvoices: async (id: string, data: { invoices: Array<{ invoiceId: string; amount: number }> }): Promise<Payment> => {
+    try {
+      const response = await apiClient.put(`/payments/${id}/apply`, data)
+      return response.data.payment || response.data.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Unapply payment from a specific invoice
+   * DELETE /api/payments/:id/unapply/:invoiceId
+   */
+  unapplyPaymentFromInvoice: async (id: string, invoiceId: string): Promise<Payment> => {
+    try {
+      const response = await apiClient.delete(`/payments/${id}/unapply/${invoiceId}`)
+      return response.data.payment || response.data.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Update check status (deposited, cleared, bounced)
+   * PUT /api/payments/:id/check-status
+   */
+  updateCheckStatus: async (id: string, data: { status: string; date?: string; notes?: string }): Promise<Payment> => {
+    try {
+      const response = await apiClient.put(`/payments/${id}/check-status`, data)
+      return response.data.payment || response.data.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Send/resend receipt email
+   * POST /api/payments/:id/send-receipt
+   */
+  sendPaymentReceipt: async (id: string, data?: { email?: string; message?: string }): Promise<Payment> => {
+    try {
+      const response = await apiClient.post(`/payments/${id}/send-receipt`, data)
+      return response.data.payment || response.data.data
     } catch (error: any) {
       throw new Error(handleApiError(error))
     }

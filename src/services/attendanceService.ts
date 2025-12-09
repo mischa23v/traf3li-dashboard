@@ -574,7 +574,7 @@ export const createAttendanceRecord = async (data: CreateAttendanceData): Promis
 }
 
 export const updateAttendanceRecord = async (recordId: string, data: UpdateAttendanceData): Promise<AttendanceRecord> => {
-  const response = await api.patch(`/attendance/${recordId}`, data)
+  const response = await api.put(`/attendance/${recordId}`, data)
   return response.data
 }
 
@@ -622,37 +622,46 @@ export const requestCorrection = async (recordId: string, data: {
   return response.data
 }
 
-// Approve correction
+// Review correction (approve/reject)
 export const approveCorrection = async (recordId: string, correctionId: string, comments?: string): Promise<AttendanceRecord> => {
-  const response = await api.post(`/attendance/${recordId}/corrections/${correctionId}/approve`, { comments })
+  const response = await api.put(`/attendance/${recordId}/corrections/${correctionId}`, {
+    status: 'approved',
+    reviewComments: comments
+  })
   return response.data
 }
 
 // Reject correction
 export const rejectCorrection = async (recordId: string, correctionId: string, reason: string): Promise<AttendanceRecord> => {
-  const response = await api.post(`/attendance/${recordId}/corrections/${correctionId}/reject`, { reason })
+  const response = await api.put(`/attendance/${recordId}/corrections/${correctionId}`, {
+    status: 'rejected',
+    reviewComments: reason
+  })
   return response.data
 }
 
-// Excuse late arrival
+// NOTE: The following functions use endpoints not found in backend routes.
+// They may need to be implemented in the backend or may be redundant with the generic approve/reject endpoints.
+
+// Excuse late arrival (ENDPOINT NOT IN BACKEND - May need backend implementation)
 export const excuseLateArrival = async (recordId: string, reason: string): Promise<AttendanceRecord> => {
   const response = await api.post(`/attendance/${recordId}/excuse-late`, { reason })
   return response.data
 }
 
-// Approve early departure
+// Approve early departure (ENDPOINT NOT IN BACKEND - May need backend implementation)
 export const approveEarlyDeparture = async (recordId: string, comments?: string): Promise<AttendanceRecord> => {
   const response = await api.post(`/attendance/${recordId}/approve-early-departure`, { comments })
   return response.data
 }
 
-// Approve timesheet
+// Approve timesheet (POTENTIALLY REDUNDANT - Consider using approveAttendance instead)
 export const approveTimesheet = async (recordId: string, comments?: string): Promise<AttendanceRecord> => {
   const response = await api.post(`/attendance/${recordId}/approve-timesheet`, { comments })
   return response.data
 }
 
-// Reject timesheet
+// Reject timesheet (POTENTIALLY REDUNDANT - Consider using rejectAttendance instead)
 export const rejectTimesheet = async (recordId: string, reason: string): Promise<AttendanceRecord> => {
   const response = await api.post(`/attendance/${recordId}/reject-timesheet`, { reason })
   return response.data

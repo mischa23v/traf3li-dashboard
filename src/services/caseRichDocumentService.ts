@@ -192,17 +192,13 @@ export const caseRichDocumentService = {
   },
 
   /**
-   * Export document to a specific format
-   * GET /api/cases/:caseId/rich-documents/:docId/export/:format
+   * Export document to PDF
+   * GET /api/cases/:caseId/rich-documents/:docId/export/pdf
    */
-  export: async (
-    caseId: string,
-    docId: string,
-    format: RichDocumentExportFormat
-  ): Promise<RichDocumentExportResponse> => {
+  exportPdf: async (caseId: string, docId: string): Promise<RichDocumentExportResponse> => {
     try {
       const response = await apiClient.get<ApiResponse<RichDocumentExportResponse>>(
-        `/cases/${caseId}/rich-documents/${docId}/export/${format}`
+        `/cases/${caseId}/rich-documents/${docId}/export/pdf`
       )
       return response.data.data!
     } catch (error) {
@@ -211,31 +207,48 @@ export const caseRichDocumentService = {
   },
 
   /**
-   * Get PDF export
-   */
-  exportPdf: async (caseId: string, docId: string): Promise<RichDocumentExportResponse> => {
-    return caseRichDocumentService.export(caseId, docId, 'pdf')
-  },
-
-  /**
-   * Get LaTeX export
+   * Export document to LaTeX
+   * GET /api/cases/:caseId/rich-documents/:docId/export/latex
    */
   exportLatex: async (caseId: string, docId: string): Promise<RichDocumentExportResponse> => {
-    return caseRichDocumentService.export(caseId, docId, 'latex')
+    try {
+      const response = await apiClient.get<ApiResponse<RichDocumentExportResponse>>(
+        `/cases/${caseId}/rich-documents/${docId}/export/latex`
+      )
+      return response.data.data!
+    } catch (error) {
+      throw new Error(handleApiError(error))
+    }
   },
 
   /**
-   * Get Markdown export
+   * Export document to Markdown
+   * GET /api/cases/:caseId/rich-documents/:docId/export/markdown
    */
   exportMarkdown: async (caseId: string, docId: string): Promise<RichDocumentExportResponse> => {
-    return caseRichDocumentService.export(caseId, docId, 'markdown')
+    try {
+      const response = await apiClient.get<ApiResponse<RichDocumentExportResponse>>(
+        `/cases/${caseId}/rich-documents/${docId}/export/markdown`
+      )
+      return response.data.data!
+    } catch (error) {
+      throw new Error(handleApiError(error))
+    }
   },
 
   /**
    * Get HTML preview
+   * GET /api/cases/:caseId/rich-documents/:docId/preview
    */
   getPreview: async (caseId: string, docId: string): Promise<RichDocumentExportResponse> => {
-    return caseRichDocumentService.export(caseId, docId, 'preview')
+    try {
+      const response = await apiClient.get<ApiResponse<RichDocumentExportResponse>>(
+        `/cases/${caseId}/rich-documents/${docId}/preview`
+      )
+      return response.data.data!
+    } catch (error) {
+      throw new Error(handleApiError(error))
+    }
   }
 }
 

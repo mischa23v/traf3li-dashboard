@@ -452,6 +452,12 @@ export const getReportingHierarchy = async (positionId: string) => {
   return response.data
 }
 
+// Get org chart
+export const getOrgChart = async () => {
+  const response = await api.get<any>('/hr/job-positions/org-chart')
+  return response.data
+}
+
 // Create position
 export const createJobPosition = async (data: CreateJobPositionData) => {
   const response = await api.post<JobPosition>('/hr/job-positions', data)
@@ -496,7 +502,7 @@ export const eliminateJobPosition = async (positionId: string, data: { reason: s
 
 // Mark as vacant
 export const markPositionVacant = async (positionId: string, data: { reason: string; vacantSince?: string }) => {
-  const response = await api.post<JobPosition>(`/hr/job-positions/${positionId}/mark-vacant`, data)
+  const response = await api.post<JobPosition>(`/hr/job-positions/${positionId}/vacant`, data)
   return response.data
 }
 
@@ -527,19 +533,31 @@ export const cloneJobPosition = async (positionId: string, data?: { newPositionN
 
 // Update responsibilities
 export const updateResponsibilities = async (positionId: string, responsibilities: Omit<Responsibility, 'responsibilityId'>[]) => {
-  const response = await api.patch<JobPosition>(`/hr/job-positions/${positionId}/responsibilities`, { responsibilities })
+  const response = await api.put<JobPosition>(`/hr/job-positions/${positionId}/responsibilities`, { responsibilities })
   return response.data
 }
 
 // Update qualifications
 export const updateQualifications = async (positionId: string, qualifications: Qualification) => {
-  const response = await api.patch<JobPosition>(`/hr/job-positions/${positionId}/qualifications`, qualifications)
+  const response = await api.put<JobPosition>(`/hr/job-positions/${positionId}/qualifications`, qualifications)
   return response.data
 }
 
 // Update salary range
 export const updateSalaryRange = async (positionId: string, salaryRange: SalaryRange) => {
-  const response = await api.patch<JobPosition>(`/hr/job-positions/${positionId}/salary-range`, salaryRange)
+  const response = await api.put<JobPosition>(`/hr/job-positions/${positionId}/salary-range`, salaryRange)
+  return response.data
+}
+
+// Update competencies
+export const updateCompetencies = async (positionId: string, competencies: any) => {
+  const response = await api.put<JobPosition>(`/hr/job-positions/${positionId}/competencies`, competencies)
+  return response.data
+}
+
+// Add document
+export const addDocument = async (positionId: string, document: any) => {
+  const response = await api.post<JobPosition>(`/hr/job-positions/${positionId}/documents`, document)
   return response.data
 }
 
@@ -559,6 +577,7 @@ export default {
   getVacantPositions,
   getPositionsByDepartment,
   getReportingHierarchy,
+  getOrgChart,
   createJobPosition,
   updateJobPosition,
   deleteJobPosition,
@@ -573,5 +592,7 @@ export default {
   updateResponsibilities,
   updateQualifications,
   updateSalaryRange,
+  updateCompetencies,
+  addDocument,
   exportJobPositions,
 }

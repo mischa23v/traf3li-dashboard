@@ -168,6 +168,20 @@ export const leadService = {
   },
 
   /**
+   * Preview lead conversion (before actual conversion)
+   */
+  previewConversion: async (
+    id: string
+  ): Promise<{ lead: Lead; clientPreview: any }> => {
+    try {
+      const response = await apiClient.get(`/leads/${id}/conversion-preview`)
+      return response.data.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
    * Convert lead to client
    */
   convertToClient: async (

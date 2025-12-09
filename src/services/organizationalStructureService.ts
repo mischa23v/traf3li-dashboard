@@ -478,15 +478,37 @@ export const updateKPI = async (unitId: string, kpiId: string, data: Partial<KPI
   return response.data
 }
 
+// Delete KPI
+export const deleteKPI = async (unitId: string, kpiId: string) => {
+  const response = await api.delete<OrganizationalUnit>(`/hr/organizational-structure/${unitId}/kpis/${kpiId}`)
+  return response.data
+}
+
 // Add leadership position
 export const addLeadershipPosition = async (unitId: string, data: Omit<LeadershipPosition, 'positionId'>) => {
   const response = await api.post<OrganizationalUnit>(`/hr/organizational-structure/${unitId}/leadership`, data)
   return response.data
 }
 
+// Update leadership position
+export const updateLeadershipPosition = async (unitId: string, positionId: string, data: Partial<LeadershipPosition>) => {
+  const response = await api.patch<OrganizationalUnit>(`/hr/organizational-structure/${unitId}/leadership/${positionId}`, data)
+  return response.data
+}
+
 // Remove leadership position
 export const removeLeadershipPosition = async (unitId: string, positionId: string) => {
   const response = await api.delete<OrganizationalUnit>(`/hr/organizational-structure/${unitId}/leadership/${positionId}`)
+  return response.data
+}
+
+// Add document
+export const addDocument = async (unitId: string, data: FormData) => {
+  const response = await api.post<OrganizationalUnit>(`/hr/organizational-structure/${unitId}/documents`, data, {
+    headers: {
+      'Content-Type': 'multipart/form-data'
+    }
+  })
   return response.data
 }
 
@@ -519,7 +541,10 @@ export default {
   updateBudget,
   addKPI,
   updateKPI,
+  deleteKPI,
   addLeadershipPosition,
+  updateLeadershipPosition,
   removeLeadershipPosition,
+  addDocument,
   exportOrganizationalStructure,
 }

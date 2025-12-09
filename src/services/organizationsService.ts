@@ -103,7 +103,7 @@ const organizationsService = {
 
   // Bulk delete organizations
   bulkDeleteOrganizations: async (ids: string[]): Promise<void> => {
-    await api.post('/organizations/bulk-delete', { ids })
+    await api.delete('/organizations/bulk', { data: { ids } })
   },
 
   // Search organizations
@@ -115,6 +115,24 @@ const organizationsService = {
   // Get organizations by client
   getOrganizationsByClient: async (clientId: string): Promise<Organization[]> => {
     const response = await api.get(`/organizations/client/${clientId}`)
+    return response.data
+  },
+
+  // Link organization to case
+  linkToCase: async (organizationId: string, caseId: string): Promise<Organization> => {
+    const response = await api.post(`/organizations/${organizationId}/link-case`, { caseId })
+    return response.data
+  },
+
+  // Link organization to client
+  linkToClient: async (organizationId: string, clientId: string): Promise<Organization> => {
+    const response = await api.post(`/organizations/${organizationId}/link-client`, { clientId })
+    return response.data
+  },
+
+  // Link organization to contact
+  linkToContact: async (organizationId: string, contactId: string): Promise<Organization> => {
+    const response = await api.post(`/organizations/${organizationId}/link-contact`, { contactId })
     return response.data
   },
 }

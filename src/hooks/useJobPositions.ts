@@ -7,6 +7,7 @@ import {
   getVacantPositions,
   getPositionsByDepartment,
   getReportingHierarchy,
+  getOrgChart,
   createJobPosition,
   updateJobPosition,
   deleteJobPosition,
@@ -21,6 +22,8 @@ import {
   updateResponsibilities,
   updateQualifications,
   updateSalaryRange,
+  updateCompetencies,
+  addDocument,
   exportJobPositions,
   type JobPositionFilters,
   type CreateJobPositionData,
@@ -41,6 +44,7 @@ export const jobPositionsKeys = {
   vacant: () => [...jobPositionsKeys.all, 'vacant'] as const,
   department: (departmentId: string) => [...jobPositionsKeys.all, 'department', departmentId] as const,
   hierarchy: (positionId: string) => [...jobPositionsKeys.all, 'hierarchy', positionId] as const,
+  orgChart: () => [...jobPositionsKeys.all, 'org-chart'] as const,
 }
 
 // Get all job positions
@@ -91,6 +95,14 @@ export const useReportingHierarchy = (positionId: string) => {
     queryKey: jobPositionsKeys.hierarchy(positionId),
     queryFn: () => getReportingHierarchy(positionId),
     enabled: !!positionId,
+  })
+}
+
+// Get org chart
+export const useOrgChart = () => {
+  return useQuery({
+    queryKey: jobPositionsKeys.orgChart(),
+    queryFn: getOrgChart,
   })
 }
 
@@ -342,6 +354,38 @@ export const useUpdateSalaryRange = () => {
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل تحديث نطاق الراتب')
+    },
+  })
+}
+
+// Update competencies
+export const useUpdateCompetencies = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: ({ positionId, competencies }: { positionId: string; competencies: any }) =>
+      updateCompetencies(positionId, competencies),
+    onSuccess: (_, { positionId }) => {
+      toast.success('تم تحديث الكفاءات بنجاح')
+      queryClient.invalidateQueries({ queryKey: jobPositionsKeys.detail(positionId) })
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'فشل تحديث الكفاءات')
+    },
+  })
+}
+
+// Add document
+export const useAddDocument = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: ({ positionId, document }: { positionId: string; document: any }) =>
+      addDocument(positionId, document),
+    onSuccess: (_, { positionId }) => {
+      toast.success('تم إضافة المستند بنجاح')
+      queryClient.invalidateQueries({ queryKey: jobPositionsKeys.detail(positionId) })
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'فشل إضافة المستند')
     },
   })
 }

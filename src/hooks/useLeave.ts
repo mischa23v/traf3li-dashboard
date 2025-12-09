@@ -18,6 +18,7 @@ import {
   uploadLeaveDocument,
   completeHandover,
   getPendingApprovals,
+  getLeaveTypes,
   LeaveRequestFilters,
   CreateLeaveRequestData,
   UpdateLeaveRequestData,
@@ -34,6 +35,7 @@ export const leaveKeys = {
   stats: (filters?: { year?: number; department?: string }) => [...leaveKeys.all, 'stats', filters] as const,
   calendar: (startDate: string, endDate: string, department?: string) => [...leaveKeys.all, 'calendar', startDate, endDate, department] as const,
   pendingApprovals: () => [...leaveKeys.all, 'pending-approvals'] as const,
+  types: () => [...leaveKeys.all, 'types'] as const,
 }
 
 // Get leave requests list
@@ -252,5 +254,14 @@ export const useCompleteHandover = () => {
     onSuccess: (_, requestId) => {
       queryClient.invalidateQueries({ queryKey: leaveKeys.detail(requestId) })
     },
+  })
+}
+
+// Get leave types
+export const useLeaveTypes = () => {
+  return useQuery({
+    queryKey: leaveKeys.types(),
+    queryFn: getLeaveTypes,
+    staleTime: 1000 * 60 * 60, // 1 hour - leave types don't change often
   })
 }

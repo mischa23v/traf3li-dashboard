@@ -277,6 +277,18 @@ export const useMoveLeadToStage = () => {
 }
 
 /**
+ * Preview lead conversion (before actual conversion)
+ */
+export const usePreviewLeadConversion = (leadId: string) => {
+  return useQuery({
+    queryKey: ['leads', leadId, 'conversion-preview'],
+    queryFn: () => leadService.previewConversion(leadId),
+    enabled: !!leadId,
+    staleTime: 0, // Always fetch fresh data
+  })
+}
+
+/**
  * Convert lead to client
  */
 export const useConvertLead = () => {

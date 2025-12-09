@@ -1208,6 +1208,53 @@ const tasksService = {
   },
 
   /**
+   * Get single template by ID
+   */
+  getTemplate: async (templateId: string): Promise<Task> => {
+    try {
+      const response = await apiClient.get(`/tasks/templates/${templateId}`)
+      return response.data.template || response.data.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Create new template
+   */
+  createTemplate: async (data: CreateTaskData): Promise<Task> => {
+    try {
+      const response = await apiClient.post('/tasks/templates', data)
+      return response.data.template || response.data.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Update template
+   */
+  updateTemplate: async (templateId: string, data: Partial<CreateTaskData>): Promise<Task> => {
+    try {
+      const response = await apiClient.put(`/tasks/templates/${templateId}`, data)
+      return response.data.template || response.data.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Delete template
+   */
+  deleteTemplate: async (templateId: string): Promise<void> => {
+    try {
+      await apiClient.delete(`/tasks/templates/${templateId}`)
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
    * Create task from template
    */
   createFromTemplate: async (templateId: string, overrides?: Partial<CreateTaskData>): Promise<Task> => {

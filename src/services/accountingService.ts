@@ -929,6 +929,73 @@ export const accountingService = {
     await apiClient.delete(`/bills/${id}`)
   },
 
+  receiveBill: async (id: string, data?: { receivedDate?: string; notes?: string }): Promise<Bill> => {
+    const response = await apiClient.post(`/bills/${id}/receive`, data)
+    return response.data.data
+  },
+
+  cancelBill: async (id: string, reason?: string): Promise<Bill> => {
+    const response = await apiClient.post(`/bills/${id}/cancel`, { reason })
+    return response.data.data
+  },
+
+  duplicateBill: async (id: string): Promise<Bill> => {
+    const response = await apiClient.post(`/bills/${id}/duplicate`)
+    return response.data.data
+  },
+
+  uploadBillAttachment: async (id: string, file: File): Promise<Bill> => {
+    const formData = new FormData()
+    formData.append('file', file)
+    const response = await apiClient.post(`/bills/${id}/attachments`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    })
+    return response.data.data
+  },
+
+  deleteBillAttachment: async (id: string, attachmentId: string): Promise<Bill> => {
+    const response = await apiClient.delete(`/bills/${id}/attachments/${attachmentId}`)
+    return response.data.data
+  },
+
+  getOverdueBills: async (): Promise<Bill[]> => {
+    const response = await apiClient.get('/bills/overdue')
+    return response.data.data
+  },
+
+  getBillsSummary: async (filters?: { startDate?: string; endDate?: string }): Promise<any> => {
+    const response = await apiClient.get('/bills/summary', { params: filters })
+    return response.data.data
+  },
+
+  getRecurringBills: async (): Promise<any[]> => {
+    const response = await apiClient.get('/bills/recurring')
+    return response.data.data
+  },
+
+  stopRecurringBill: async (id: string): Promise<any> => {
+    const response = await apiClient.post(`/bills/${id}/stop-recurring`)
+    return response.data.data
+  },
+
+  generateNextBill: async (id: string): Promise<Bill> => {
+    const response = await apiClient.post(`/bills/${id}/generate-next`)
+    return response.data.data
+  },
+
+  getBillAgingReport: async (): Promise<any> => {
+    const response = await apiClient.get('/bills/reports/aging')
+    return response.data.data
+  },
+
+  exportBills: async (format: 'csv' | 'xlsx', filters?: BillFilters): Promise<Blob> => {
+    const response = await apiClient.get('/bills/export', {
+      params: { format, ...filters },
+      responseType: 'blob'
+    })
+    return response.data
+  },
+
   // ========== VENDORS ==========
 
   getVendors: async (filters?: VendorFilters): Promise<{ vendors: Vendor[]; total: number }> => {

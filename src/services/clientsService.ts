@@ -234,12 +234,123 @@ const clientsService = {
   },
 
   /**
+   * Get client's payments
+   * GET /api/clients/:id/payments
+   */
+  getClientPayments: async (id: string): Promise<any[]> => {
+    try {
+      const response = await apiClient.get(`/clients/${id}/payments`)
+      return response.data.data || response.data.payments || []
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Get client's billing information
+   * GET /api/clients/:id/billing-info
+   */
+  getBillingInfo: async (id: string): Promise<any> => {
+    try {
+      const response = await apiClient.get(`/clients/${id}/billing-info`)
+      return response.data.data || response.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
    * Verify company with Wathq API (Saudi CR verification)
    * POST /api/clients/:id/verify/wathq
    */
-  verifyWithWathq: async (id: string): Promise<{ verified: boolean; data?: any }> => {
+  verifyWithWathq: async (id: string, data?: any): Promise<{ verified: boolean; data?: any }> => {
     try {
-      const response = await apiClient.post(`/clients/${id}/verify/wathq`)
+      const response = await apiClient.post(`/clients/${id}/verify/wathq`, data)
+      return response.data.data || response.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Get Wathq data for a specific data type
+   * GET /api/clients/:id/wathq/:dataType
+   */
+  getWathqData: async (id: string, dataType: string): Promise<any> => {
+    try {
+      const response = await apiClient.get(`/clients/${id}/wathq/${dataType}`)
+      return response.data.data || response.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Upload attachments for a client
+   * POST /api/clients/:id/attachments
+   */
+  uploadAttachments: async (id: string, files: File[]): Promise<any> => {
+    try {
+      const formData = new FormData()
+      files.forEach((file) => {
+        formData.append('files', file)
+      })
+      const response = await apiClient.post(`/clients/${id}/attachments`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      })
+      return response.data.data || response.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Delete an attachment
+   * DELETE /api/clients/:id/attachments/:attachmentId
+   */
+  deleteAttachment: async (id: string, attachmentId: string): Promise<void> => {
+    try {
+      await apiClient.delete(`/clients/${id}/attachments/${attachmentId}`)
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Run conflict check for a client
+   * POST /api/clients/:id/conflict-check
+   */
+  runConflictCheck: async (id: string, data: any): Promise<any> => {
+    try {
+      const response = await apiClient.post(`/clients/${id}/conflict-check`, data)
+      return response.data.data || response.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Update client status
+   * PATCH /api/clients/:id/status
+   */
+  updateStatus: async (id: string, status: string): Promise<any> => {
+    try {
+      const response = await apiClient.patch(`/clients/${id}/status`, { status })
+      return response.data.data || response.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Update client flags
+   * PATCH /api/clients/:id/flags
+   */
+  updateFlags: async (id: string, flags: any): Promise<any> => {
+    try {
+      const response = await apiClient.patch(`/clients/${id}/flags`, flags)
       return response.data.data || response.data
     } catch (error: any) {
       throw new Error(handleApiError(error))

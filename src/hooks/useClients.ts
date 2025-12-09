@@ -121,3 +121,140 @@ export const useBulkDeleteClients = () => {
     },
   })
 }
+
+export const useClientPayments = (clientId: string) => {
+  return useQuery({
+    queryKey: ['clients', clientId, 'payments'],
+    queryFn: () => clientsService.getClientPayments(clientId),
+    enabled: !!clientId,
+    staleTime: 2 * 60 * 1000,
+  })
+}
+
+export const useClientBillingInfo = (clientId: string) => {
+  return useQuery({
+    queryKey: ['clients', clientId, 'billing-info'],
+    queryFn: () => clientsService.getBillingInfo(clientId),
+    enabled: !!clientId,
+    staleTime: 2 * 60 * 1000,
+  })
+}
+
+export const useVerifyWathq = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({ clientId, data }: { clientId: string; data?: any }) =>
+      clientsService.verifyWithWathq(clientId, data),
+    onSuccess: () => {
+      toast.success('تم التحقق من البيانات عبر وثق بنجاح')
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'فشل التحقق من البيانات عبر وثق')
+    },
+    onSettled: async (_, __, { clientId }) => {
+      return await queryClient.invalidateQueries({ queryKey: ['clients', clientId] })
+    },
+  })
+}
+
+export const useWathqData = (clientId: string, dataType: string) => {
+  return useQuery({
+    queryKey: ['clients', clientId, 'wathq', dataType],
+    queryFn: () => clientsService.getWathqData(clientId, dataType),
+    enabled: !!clientId && !!dataType,
+    staleTime: 5 * 60 * 1000,
+  })
+}
+
+export const useUploadClientAttachments = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({ clientId, files }: { clientId: string; files: File[] }) =>
+      clientsService.uploadAttachments(clientId, files),
+    onSuccess: () => {
+      toast.success('تم رفع المرفقات بنجاح')
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'فشل رفع المرفقات')
+    },
+    onSettled: async (_, __, { clientId }) => {
+      return await queryClient.invalidateQueries({ queryKey: ['clients', clientId] })
+    },
+  })
+}
+
+export const useDeleteClientAttachment = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({ clientId, attachmentId }: { clientId: string; attachmentId: string }) =>
+      clientsService.deleteAttachment(clientId, attachmentId),
+    onSuccess: () => {
+      toast.success('تم حذف المرفق بنجاح')
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'فشل حذف المرفق')
+    },
+    onSettled: async (_, __, { clientId }) => {
+      return await queryClient.invalidateQueries({ queryKey: ['clients', clientId] })
+    },
+  })
+}
+
+export const useRunConflictCheck = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({ clientId, data }: { clientId: string; data: any }) =>
+      clientsService.runConflictCheck(clientId, data),
+    onSuccess: () => {
+      toast.success('تم إجراء فحص التعارض بنجاح')
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'فشل فحص التعارض')
+    },
+    onSettled: async (_, __, { clientId }) => {
+      return await queryClient.invalidateQueries({ queryKey: ['clients', clientId] })
+    },
+  })
+}
+
+export const useUpdateClientStatus = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({ clientId, status }: { clientId: string; status: string }) =>
+      clientsService.updateStatus(clientId, status),
+    onSuccess: () => {
+      toast.success('تم تحديث حالة العميل بنجاح')
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'فشل تحديث حالة العميل')
+    },
+    onSettled: async (_, __, { clientId }) => {
+      await queryClient.invalidateQueries({ queryKey: ['clients'] })
+      return await queryClient.invalidateQueries({ queryKey: ['clients', clientId] })
+    },
+  })
+}
+
+export const useUpdateClientFlags = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({ clientId, flags }: { clientId: string; flags: any }) =>
+      clientsService.updateFlags(clientId, flags),
+    onSuccess: () => {
+      toast.success('تم تحديث علامات العميل بنجاح')
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'فشل تحديث علامات العميل')
+    },
+    onSettled: async (_, __, { clientId }) => {
+      await queryClient.invalidateQueries({ queryKey: ['clients'] })
+      return await queryClient.invalidateQueries({ queryKey: ['clients', clientId] })
+    },
+  })
+}

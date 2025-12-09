@@ -1040,6 +1040,30 @@ export const recruitmentService = {
     return response.data
   },
 
+  // Clone job posting (alias for duplicate - backend uses 'clone')
+  cloneJobPosting: async (jobId: string) => {
+    const response = await api.post<JobPosting>(`/hr/recruitment/jobs/${jobId}/clone`)
+    return response.data
+  },
+
+  // Get job pipeline
+  getJobPipeline: async (jobId: string) => {
+    const response = await api.get<{ job: JobPosting; applicants: Applicant[]; stages: any }>(`/hr/recruitment/jobs/${jobId}/pipeline`)
+    return response.data
+  },
+
+  // Get recruitment stats
+  getRecruitmentStats: async () => {
+    const response = await api.get<{
+      totalJobs: number
+      byStatus: { status: JobPostingStatus; count: number }[]
+      totalApplications: number
+      avgTimeToFill: number
+      avgCostPerHire: number
+    }>('/hr/recruitment/stats')
+    return response.data
+  },
+
   // Get job posting stats
   getJobPostingStats: async () => {
     const response = await api.get<{
@@ -1049,6 +1073,24 @@ export const recruitmentService = {
       avgTimeToFill: number
       avgCostPerHire: number
     }>('/hr/recruitment/jobs/stats')
+    return response.data
+  },
+
+  // Get talent pool
+  getTalentPool: async () => {
+    const response = await api.get<{ data: Applicant[]; total: number }>('/hr/recruitment/talent-pool')
+    return response.data
+  },
+
+  // Get jobs nearing deadline
+  getJobsNearingDeadline: async () => {
+    const response = await api.get<JobPosting[]>('/hr/recruitment/jobs/nearing-deadline')
+    return response.data
+  },
+
+  // Change job status
+  changeJobStatus: async (jobId: string, status: JobPostingStatus, reason?: string) => {
+    const response = await api.post<JobPosting>(`/hr/recruitment/jobs/${jobId}/status`, { status, reason })
     return response.data
   },
 
@@ -1096,6 +1138,21 @@ export const recruitmentService = {
     return response.data
   },
 
+  // Update applicant stage
+  updateApplicantStage: async (applicantId: string, stage: string, notes?: string) => {
+    const response = await api.post<Applicant>(`/hr/recruitment/applicants/${applicantId}/stage`, { stage, notes })
+    return response.data
+  },
+
+  // Update talent pool status
+  updateTalentPoolStatus: async (applicantId: string, inTalentPool: boolean, talentPoolNotes?: string) => {
+    const response = await api.patch<Applicant>(`/hr/recruitment/applicants/${applicantId}/talent-pool`, {
+      inTalentPool,
+      talentPoolNotes
+    })
+    return response.data
+  },
+
   // Screen applicant
   screenApplicant: async (applicantId: string, data: {
     screeningScore: number
@@ -1116,6 +1173,18 @@ export const recruitmentService = {
   // Update interview
   updateInterview: async (applicantId: string, interviewId: string, data: Partial<Interview>) => {
     const response = await api.patch<Applicant>(`/hr/recruitment/applicants/${applicantId}/interviews/${interviewId}`, data)
+    return response.data
+  },
+
+  // Submit interview feedback
+  submitInterviewFeedback: async (applicantId: string, interviewId: string, data: {
+    rating?: number
+    feedback?: string
+    recommendation: Recommendation
+    strengths?: string[]
+    concerns?: string[]
+  }) => {
+    const response = await api.post<Applicant>(`/hr/recruitment/applicants/${applicantId}/interviews/${interviewId}/feedback`, data)
     return response.data
   },
 
@@ -1184,6 +1253,12 @@ export const recruitmentService = {
     return response.data
   },
 
+  // Update offer by offerId
+  updateOfferById: async (applicantId: string, offerId: string, data: Partial<Offer>) => {
+    const response = await api.patch<Applicant>(`/hr/recruitment/applicants/${applicantId}/offers/${offerId}`, data)
+    return response.data
+  },
+
   // Accept offer
   acceptOffer: async (applicantId: string, data: { acceptedDate: string; signedOfferUrl?: string }) => {
     const response = await api.post<Applicant>(`/hr/recruitment/applicants/${applicantId}/offer/accept`, data)
@@ -1219,9 +1294,27 @@ export const recruitmentService = {
     return response.data
   },
 
+  // Add reference
+  addReference: async (applicantId: string, data: Omit<Reference, 'referenceNumber'>) => {
+    const response = await api.post<Applicant>(`/hr/recruitment/applicants/${applicantId}/references`, data)
+    return response.data
+  },
+
+  // Update reference check
+  updateReferenceCheck: async (applicantId: string, referenceId: string, data: Partial<Reference>) => {
+    const response = await api.patch<Applicant>(`/hr/recruitment/applicants/${applicantId}/references/${referenceId}`, data)
+    return response.data
+  },
+
   // Add communication
   addCommunication: async (applicantId: string, data: Omit<Communication, 'communicationId'>) => {
     const response = await api.post<Applicant>(`/hr/recruitment/applicants/${applicantId}/communications`, data)
+    return response.data
+  },
+
+  // Add note (using POST /api/hr/recruitment/applicants/:id/notes)
+  addNoteEndpoint: async (applicantId: string, noteType: 'recruiter' | 'hiring_manager' | 'interviewer' | 'internal', note: string) => {
+    const response = await api.post<Applicant>(`/hr/recruitment/applicants/${applicantId}/notes`, { noteType, note })
     return response.data
   },
 
@@ -1254,6 +1347,26 @@ export const recruitmentService = {
       screeningPassRate: number
       interviewToOfferRate: number
     }>('/hr/recruitment/applicants/stats', { params: { jobId } })
+    return response.data
+  },
+
+  // Bulk update stage
+  bulkUpdateStage: async (applicantIds: string[], stage: string, notes?: string) => {
+    const response = await api.post<{ updated: number }>('/hr/recruitment/applicants/bulk-stage-update', {
+      applicantIds,
+      stage,
+      notes
+    })
+    return response.data
+  },
+
+  // Bulk reject
+  bulkReject: async (applicantIds: string[], rejectionReason: string, rejectionCategory: string) => {
+    const response = await api.post<{ rejected: number }>('/hr/recruitment/applicants/bulk-reject', {
+      applicantIds,
+      rejectionReason,
+      rejectionCategory
+    })
     return response.data
   },
 

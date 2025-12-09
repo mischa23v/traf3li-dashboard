@@ -52,10 +52,39 @@ export function useJobPosting(jobId: string) {
   })
 }
 
+export function useRecruitmentStats() {
+  return useQuery({
+    queryKey: recruitmentKeys.jobStats(),
+    queryFn: () => recruitmentService.getRecruitmentStats(),
+  })
+}
+
 export function useJobPostingStats() {
   return useQuery({
     queryKey: recruitmentKeys.jobStats(),
     queryFn: () => recruitmentService.getJobPostingStats(),
+  })
+}
+
+export function useTalentPool() {
+  return useQuery({
+    queryKey: ['talent-pool'],
+    queryFn: () => recruitmentService.getTalentPool(),
+  })
+}
+
+export function useJobsNearingDeadline() {
+  return useQuery({
+    queryKey: ['jobs-nearing-deadline'],
+    queryFn: () => recruitmentService.getJobsNearingDeadline(),
+  })
+}
+
+export function useJobPipeline(jobId: string) {
+  return useQuery({
+    queryKey: ['job-pipeline', jobId],
+    queryFn: () => recruitmentService.getJobPipeline(jobId),
+    enabled: !!jobId,
   })
 }
 
@@ -149,6 +178,32 @@ export function useDuplicateJobPosting() {
   })
 }
 
+export function useCloneJobPosting() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (jobId: string) => recruitmentService.cloneJobPosting(jobId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: recruitmentKeys.jobLists() })
+      queryClient.invalidateQueries({ queryKey: recruitmentKeys.jobStats() })
+    },
+  })
+}
+
+export function useChangeJobStatus() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({ jobId, status, reason }: { jobId: string; status: any; reason?: string }) =>
+      recruitmentService.changeJobStatus(jobId, status, reason),
+    onSuccess: (_, { jobId }) => {
+      queryClient.invalidateQueries({ queryKey: recruitmentKeys.jobDetail(jobId) })
+      queryClient.invalidateQueries({ queryKey: recruitmentKeys.jobLists() })
+      queryClient.invalidateQueries({ queryKey: recruitmentKeys.jobStats() })
+    },
+  })
+}
+
 // ==================== APPLICANT HOOKS ====================
 
 export function useApplicants(filters?: ApplicantFilters) {
@@ -228,6 +283,47 @@ export function useUpdateApplicantStatus() {
   })
 }
 
+export function useUpdateApplicantStage() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({
+      applicantId,
+      stage,
+      notes,
+    }: {
+      applicantId: string
+      stage: string
+      notes?: string
+    }) => recruitmentService.updateApplicantStage(applicantId, stage, notes),
+    onSuccess: (_, { applicantId }) => {
+      queryClient.invalidateQueries({ queryKey: recruitmentKeys.applicantDetail(applicantId) })
+      queryClient.invalidateQueries({ queryKey: recruitmentKeys.applicantLists() })
+      queryClient.invalidateQueries({ queryKey: recruitmentKeys.applicantStats() })
+    },
+  })
+}
+
+export function useUpdateTalentPoolStatus() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({
+      applicantId,
+      inTalentPool,
+      talentPoolNotes,
+    }: {
+      applicantId: string
+      inTalentPool: boolean
+      talentPoolNotes?: string
+    }) => recruitmentService.updateTalentPoolStatus(applicantId, inTalentPool, talentPoolNotes),
+    onSuccess: (_, { applicantId }) => {
+      queryClient.invalidateQueries({ queryKey: recruitmentKeys.applicantDetail(applicantId) })
+      queryClient.invalidateQueries({ queryKey: recruitmentKeys.applicantLists() })
+    },
+  })
+}
+
 export function useScreenApplicant() {
   const queryClient = useQueryClient()
 
@@ -287,6 +383,32 @@ export function useUpdateInterview() {
     }) => recruitmentService.updateInterview(applicantId, interviewId, data),
     onSuccess: (_, { applicantId }) => {
       queryClient.invalidateQueries({ queryKey: recruitmentKeys.applicantDetail(applicantId) })
+    },
+  })
+}
+
+export function useSubmitInterviewFeedback() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({
+      applicantId,
+      interviewId,
+      data,
+    }: {
+      applicantId: string
+      interviewId: string
+      data: {
+        rating?: number
+        feedback?: string
+        recommendation: Recommendation
+        strengths?: string[]
+        concerns?: string[]
+      }
+    }) => recruitmentService.submitInterviewFeedback(applicantId, interviewId, data),
+    onSuccess: (_, { applicantId }) => {
+      queryClient.invalidateQueries({ queryKey: recruitmentKeys.applicantDetail(applicantId) })
+      queryClient.invalidateQueries({ queryKey: recruitmentKeys.applicantLists() })
     },
   })
 }
@@ -605,7 +727,85 @@ export function useUnflagApplicant() {
   })
 }
 
+// ==================== REFERENCE HOOKS ====================
+
+export function useAddReference() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({
+      applicantId,
+      data,
+    }: {
+      applicantId: string
+      data: any
+    }) => recruitmentService.addReference(applicantId, data),
+    onSuccess: (_, { applicantId }) => {
+      queryClient.invalidateQueries({ queryKey: recruitmentKeys.applicantDetail(applicantId) })
+    },
+  })
+}
+
+export function useUpdateReferenceCheck() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({
+      applicantId,
+      referenceId,
+      data,
+    }: {
+      applicantId: string
+      referenceId: string
+      data: any
+    }) => recruitmentService.updateReferenceCheck(applicantId, referenceId, data),
+    onSuccess: (_, { applicantId }) => {
+      queryClient.invalidateQueries({ queryKey: recruitmentKeys.applicantDetail(applicantId) })
+    },
+  })
+}
+
 // ==================== BULK OPERATIONS ====================
+
+export function useBulkUpdateStage() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({
+      applicantIds,
+      stage,
+      notes,
+    }: {
+      applicantIds: string[]
+      stage: string
+      notes?: string
+    }) => recruitmentService.bulkUpdateStage(applicantIds, stage, notes),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: recruitmentKeys.applicantLists() })
+      queryClient.invalidateQueries({ queryKey: recruitmentKeys.applicantStats() })
+    },
+  })
+}
+
+export function useBulkReject() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({
+      applicantIds,
+      rejectionReason,
+      rejectionCategory,
+    }: {
+      applicantIds: string[]
+      rejectionReason: string
+      rejectionCategory: string
+    }) => recruitmentService.bulkReject(applicantIds, rejectionReason, rejectionCategory),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: recruitmentKeys.applicantLists() })
+      queryClient.invalidateQueries({ queryKey: recruitmentKeys.applicantStats() })
+    },
+  })
+}
 
 export function useBulkUpdateApplicants() {
   const queryClient = useQueryClient()

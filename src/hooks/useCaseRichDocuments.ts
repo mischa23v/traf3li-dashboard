@@ -227,7 +227,25 @@ export const useExportCaseRichDocument = () => {
       docId: string
       format: RichDocumentExportFormat
     }) => {
-      const response = await caseRichDocumentService.export(caseId, docId, format)
+      let response: any
+
+      // Call the appropriate export method based on format
+      switch (format) {
+        case 'pdf':
+          response = await caseRichDocumentService.exportPdf(caseId, docId)
+          break
+        case 'latex':
+          response = await caseRichDocumentService.exportLatex(caseId, docId)
+          break
+        case 'markdown':
+          response = await caseRichDocumentService.exportMarkdown(caseId, docId)
+          break
+        case 'preview':
+          response = await caseRichDocumentService.getPreview(caseId, docId)
+          break
+        default:
+          throw new Error(`Unsupported export format: ${format}`)
+      }
 
       // Handle the response based on format
       if (format === 'preview' && response.html) {

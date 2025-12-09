@@ -27,6 +27,25 @@ import {
   confirmViolation,
   dismissViolation,
   getComplianceReport,
+  getAllViolations,
+  getMonthlyReport,
+  getDepartmentStats,
+  getCheckInStatus,
+  getAttendanceSummaryForEmployee,
+  getAttendanceByEmployeeAndDate,
+  markAbsences,
+  importAttendance,
+  startBreak,
+  endBreak,
+  getBreaks,
+  submitCorrection,
+  reviewCorrection,
+  approveAttendance,
+  rejectAttendance,
+  addViolation,
+  resolveViolation,
+  appealViolation,
+  approveOvertimeForRecord,
   type AttendanceFilters,
   type CreateAttendanceData,
   type UpdateAttendanceData,
@@ -427,5 +446,276 @@ export const useComplianceReport = (startDate: string, endDate: string, departme
     queryKey: attendanceKeys.complianceReport(startDate, endDate, department),
     queryFn: () => getComplianceReport(startDate, endDate, department),
     enabled: !!startDate && !!endDate,
+  })
+}
+
+// Additional hooks for backend-aligned functions
+
+// Get all violations (global)
+export const useAllViolations = () => {
+  return useQuery({
+    queryKey: [...attendanceKeys.all, 'all-violations'],
+    queryFn: getAllViolations,
+  })
+}
+
+// Get monthly report
+export const useMonthlyReport = (month?: number, year?: number, department?: string) => {
+  return useQuery({
+    queryKey: [...attendanceKeys.all, 'monthly-report', month, year, department],
+    queryFn: () => getMonthlyReport(month, year, department),
+  })
+}
+
+// Get department stats
+export const useDepartmentStats = (department?: string) => {
+  return useQuery({
+    queryKey: [...attendanceKeys.all, 'department-stats', department],
+    queryFn: () => getDepartmentStats(department),
+  })
+}
+
+// Get check-in status
+export const useCheckInStatus = (employeeId: string) => {
+  return useQuery({
+    queryKey: [...attendanceKeys.all, 'check-in-status', employeeId],
+    queryFn: () => getCheckInStatus(employeeId),
+    enabled: !!employeeId,
+    refetchInterval: 30000, // Refresh every 30 seconds
+  })
+}
+
+// Get attendance summary for employee (alternative to useEmployeeSummary)
+export const useAttendanceSummaryForEmployee = (employeeId: string, startDate?: string, endDate?: string) => {
+  return useQuery({
+    queryKey: [...attendanceKeys.all, 'employee-summary-alt', employeeId, startDate, endDate],
+    queryFn: () => getAttendanceSummaryForEmployee(employeeId, startDate, endDate),
+    enabled: !!employeeId,
+  })
+}
+
+// Get attendance by employee and date
+export const useAttendanceByEmployeeAndDate = (employeeId: string, date: string) => {
+  return useQuery({
+    queryKey: [...attendanceKeys.all, 'by-employee-date', employeeId, date],
+    queryFn: () => getAttendanceByEmployeeAndDate(employeeId, date),
+    enabled: !!employeeId && !!date,
+  })
+}
+
+// Mark absences for a date
+export const useMarkAbsences = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({ date, departmentId }: { date: string; departmentId?: string }) =>
+      markAbsences(date, departmentId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: attendanceKeys.lists() })
+      queryClient.invalidateQueries({ queryKey: attendanceKeys.today() })
+    },
+  })
+}
+
+// Import attendance records (bulk)
+export const useImportAttendance = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (records: CreateAttendanceData[]) => importAttendance(records),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: attendanceKeys.lists() })
+      queryClient.invalidateQueries({ queryKey: attendanceKeys.today() })
+    },
+  })
+}
+
+// Start break
+export const useStartBreak = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({ recordId, breakData }: { recordId: string; breakData: Partial<BreakRecord> }) =>
+      startBreak(recordId, breakData),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: attendanceKeys.detail(variables.recordId) })
+    },
+  })
+}
+
+// End break
+export const useEndBreak = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (recordId: string) => endBreak(recordId),
+    onSuccess: (_, recordId) => {
+      queryClient.invalidateQueries({ queryKey: attendanceKeys.detail(recordId) })
+    },
+  })
+}
+
+// Get breaks for a record
+export const useBreaks = (recordId: string) => {
+  return useQuery({
+    queryKey: [...attendanceKeys.all, 'breaks', recordId],
+    queryFn: () => getBreaks(recordId),
+    enabled: !!recordId,
+  })
+}
+
+// Submit correction (duplicate but with different function name from requestCorrection)
+export const useSubmitCorrection = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({
+      recordId,
+      data,
+    }: {
+      recordId: string
+      data: {
+        correctionType: string
+        field: string
+        originalValue?: string
+        requestedValue: string
+        reason: string
+        evidenceUrl?: string
+      }
+    }) => submitCorrection(recordId, data),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: attendanceKeys.detail(variables.recordId) })
+      queryClient.invalidateQueries({ queryKey: attendanceKeys.pendingApprovals() })
+    },
+  })
+}
+
+// Review correction (backend-aligned version)
+export const useReviewCorrection = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({
+      recordId,
+      correctionId,
+      data,
+    }: {
+      recordId: string
+      correctionId: string
+      data: {
+        status: 'approved' | 'rejected'
+        reviewComments?: string
+      }
+    }) => reviewCorrection(recordId, correctionId, data),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: attendanceKeys.detail(variables.recordId) })
+      queryClient.invalidateQueries({ queryKey: attendanceKeys.pendingApprovals() })
+    },
+  })
+}
+
+// Approve attendance (alternative to approveTimesheet)
+export const useApproveAttendance = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({ recordId, comments }: { recordId: string; comments?: string }) =>
+      approveAttendance(recordId, comments),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: attendanceKeys.detail(variables.recordId) })
+      queryClient.invalidateQueries({ queryKey: attendanceKeys.pendingApprovals() })
+    },
+  })
+}
+
+// Reject attendance (alternative to rejectTimesheet)
+export const useRejectAttendance = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({ recordId, reason }: { recordId: string; reason: string }) =>
+      rejectAttendance(recordId, reason),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: attendanceKeys.detail(variables.recordId) })
+      queryClient.invalidateQueries({ queryKey: attendanceKeys.pendingApprovals() })
+    },
+  })
+}
+
+// Add violation
+export const useAddViolation = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({ recordId, violationData }: { recordId: string; violationData: any }) =>
+      addViolation(recordId, violationData),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: attendanceKeys.detail(variables.recordId) })
+      queryClient.invalidateQueries({ queryKey: attendanceKeys.violations(variables.recordId) })
+    },
+  })
+}
+
+// Resolve violation
+export const useResolveViolation = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({
+      recordId,
+      violationIndex,
+      resolutionData,
+    }: {
+      recordId: string
+      violationIndex: number
+      resolutionData: any
+    }) => resolveViolation(recordId, violationIndex, resolutionData),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: attendanceKeys.detail(variables.recordId) })
+      queryClient.invalidateQueries({ queryKey: attendanceKeys.violations(variables.recordId) })
+    },
+  })
+}
+
+// Appeal violation
+export const useAppealViolation = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({
+      recordId,
+      violationIndex,
+      appealData,
+    }: {
+      recordId: string
+      violationIndex: number
+      appealData: any
+    }) => appealViolation(recordId, violationIndex, appealData),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: attendanceKeys.detail(variables.recordId) })
+      queryClient.invalidateQueries({ queryKey: attendanceKeys.violations(variables.recordId) })
+    },
+  })
+}
+
+// Approve overtime for record (alternative to approveOvertime)
+export const useApproveOvertimeForRecord = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({
+      recordId,
+      data,
+    }: {
+      recordId: string
+      data: {
+        approvedHours?: number
+        comments?: string
+      }
+    }) => approveOvertimeForRecord(recordId, data),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: attendanceKeys.detail(variables.recordId) })
+      queryClient.invalidateQueries({ queryKey: attendanceKeys.pendingApprovals() })
+    },
   })
 }
