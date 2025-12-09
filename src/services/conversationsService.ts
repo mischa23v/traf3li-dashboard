@@ -107,6 +107,7 @@ const conversationsService = {
 
   /**
    * Get messages for a conversation
+   * GET /api/messages/:conversationID (backend route)
    */
   getMessages: async (
     conversationId: string,
@@ -114,7 +115,7 @@ const conversationsService = {
   ): Promise<{ messages: Message[]; total: number }> => {
     try {
       const response = await apiClient.get(
-        `/conversations/${conversationId}/messages`,
+        `/messages/${conversationId}`,
         { params }
       )
       return {
@@ -127,7 +128,39 @@ const conversationsService = {
   },
 
   /**
-   * Send message
+   * Create/Send message with optional file upload
+   * POST /api/messages (backend route)
+   */
+  createMessage: async (
+    data: SendMessageData & { conversationId?: string; files?: File[] }
+  ): Promise<Message> => {
+    try {
+      const formData = new FormData()
+      formData.append('content', data.content)
+
+      if (data.conversationId) {
+        formData.append('conversationId', data.conversationId)
+      }
+
+      if (data.files && data.files.length > 0) {
+        data.files.forEach((file) => {
+          formData.append('files', file)
+        })
+      }
+
+      const response = await apiClient.post('/messages', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      })
+      return response.data.message || response.data.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Send message (legacy method - kept for backward compatibility)
    */
   sendMessage: async (
     conversationId: string,
@@ -146,6 +179,18 @@ const conversationsService = {
 
   /**
    * Mark messages as read
+   * PATCH /api/messages/:conversationID/read (backend route)
+   */
+  markMessagesAsRead: async (conversationId: string): Promise<void> => {
+    try {
+      await apiClient.patch(`/messages/${conversationId}/read`)
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Mark conversation as read (legacy method - kept for backward compatibility)
    */
   markAsRead: async (conversationId: string): Promise<void> => {
     try {

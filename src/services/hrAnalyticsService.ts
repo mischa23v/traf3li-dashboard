@@ -27,27 +27,16 @@ import type {
 // ═══════════════════════════════════════════════════════════════
 export const hrAnalyticsService = {
   /**
-   * Get workforce overview
+   * Get comprehensive dashboard with all key metrics
    */
-  getWorkforceOverview: async (): Promise<WorkforceOverview> => {
-    try {
-      const response = await apiClient.get('/hr-analytics/workforce-overview')
-      return response.data.data
-    } catch (error: any) {
-      throw new Error(handleApiError(error))
-    }
-  },
-
-  /**
-   * Get headcount trends
-   */
-  getHeadcountTrends: async (params: {
+  getDashboard: async (params?: {
     startDate?: string
     endDate?: string
-    groupBy?: 'day' | 'week' | 'month' | 'quarter' | 'year'
-  }): Promise<HeadcountTrend[]> => {
+    department?: string
+    status?: string
+  }): Promise<any> => {
     try {
-      const response = await apiClient.get('/hr-analytics/headcount-trends', { params })
+      const response = await apiClient.get('/hr-analytics/dashboard', { params })
       return response.data.data
     } catch (error: any) {
       throw new Error(handleApiError(error))
@@ -55,11 +44,14 @@ export const hrAnalyticsService = {
   },
 
   /**
-   * Get department breakdown
+   * Get workforce demographics
    */
-  getDepartmentBreakdown: async (): Promise<DepartmentBreakdown[]> => {
+  getDemographics: async (params?: {
+    department?: string
+    status?: string
+  }): Promise<any> => {
     try {
-      const response = await apiClient.get('/hr-analytics/department-breakdown')
+      const response = await apiClient.get('/hr-analytics/demographics', { params })
       return response.data.data
     } catch (error: any) {
       throw new Error(handleApiError(error))
@@ -67,11 +59,31 @@ export const hrAnalyticsService = {
   },
 
   /**
-   * Get tenure distribution
+   * Get turnover analysis
    */
-  getTenureDistribution: async (): Promise<TenureDistribution[]> => {
+  getTurnover: async (params?: {
+    startDate?: string
+    endDate?: string
+    department?: string
+  }): Promise<any> => {
     try {
-      const response = await apiClient.get('/hr-analytics/tenure-distribution')
+      const response = await apiClient.get('/hr-analytics/turnover', { params })
+      return response.data.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Get absenteeism tracking
+   */
+  getAbsenteeism: async (params?: {
+    startDate?: string
+    endDate?: string
+    department?: string
+  }): Promise<any> => {
+    try {
+      const response = await apiClient.get('/hr-analytics/absenteeism', { params })
       return response.data.data
     } catch (error: any) {
       throw new Error(handleApiError(error))
@@ -81,10 +93,10 @@ export const hrAnalyticsService = {
   /**
    * Get attendance analytics
    */
-  getAttendanceAnalytics: async (params?: {
+  getAttendance: async (params?: {
     startDate?: string
     endDate?: string
-    departmentId?: string
+    department?: string
   }): Promise<AttendanceAnalytics> => {
     try {
       const response = await apiClient.get('/hr-analytics/attendance', { params })
@@ -95,42 +107,12 @@ export const hrAnalyticsService = {
   },
 
   /**
-   * Get leave analytics
-   */
-  getLeaveAnalytics: async (params?: {
-    startDate?: string
-    endDate?: string
-    departmentId?: string
-  }): Promise<LeaveAnalytics> => {
-    try {
-      const response = await apiClient.get('/hr-analytics/leave', { params })
-      return response.data.data
-    } catch (error: any) {
-      throw new Error(handleApiError(error))
-    }
-  },
-
-  /**
-   * Get payroll analytics
-   */
-  getPayrollAnalytics: async (params?: {
-    startDate?: string
-    endDate?: string
-  }): Promise<PayrollAnalytics> => {
-    try {
-      const response = await apiClient.get('/hr-analytics/payroll', { params })
-      return response.data.data
-    } catch (error: any) {
-      throw new Error(handleApiError(error))
-    }
-  },
-
-  /**
    * Get performance analytics
    */
-  getPerformanceAnalytics: async (params?: {
-    year?: number
-    departmentId?: string
+  getPerformance: async (params?: {
+    startDate?: string
+    endDate?: string
+    department?: string
   }): Promise<PerformanceAnalytics> => {
     try {
       const response = await apiClient.get('/hr-analytics/performance', { params })
@@ -143,9 +125,10 @@ export const hrAnalyticsService = {
   /**
    * Get recruitment analytics
    */
-  getRecruitmentAnalytics: async (params?: {
+  getRecruitment: async (params?: {
     startDate?: string
     endDate?: string
+    department?: string
   }): Promise<RecruitmentAnalytics> => {
     try {
       const response = await apiClient.get('/hr-analytics/recruitment', { params })
@@ -156,11 +139,13 @@ export const hrAnalyticsService = {
   },
 
   /**
-   * Get diversity analytics
+   * Get compensation analytics
    */
-  getDiversityAnalytics: async (): Promise<DiversityAnalytics> => {
+  getCompensation: async (params?: {
+    department?: string
+  }): Promise<any> => {
     try {
-      const response = await apiClient.get('/hr-analytics/diversity')
+      const response = await apiClient.get('/hr-analytics/compensation', { params })
       return response.data.data
     } catch (error: any) {
       throw new Error(handleApiError(error))
@@ -168,14 +153,15 @@ export const hrAnalyticsService = {
   },
 
   /**
-   * Get attrition analytics
+   * Get training analytics
    */
-  getAttritionAnalytics: async (params?: {
+  getTraining: async (params?: {
     startDate?: string
     endDate?: string
-  }): Promise<AttritionAnalytics> => {
+    department?: string
+  }): Promise<any> => {
     try {
-      const response = await apiClient.get('/hr-analytics/attrition', { params })
+      const response = await apiClient.get('/hr-analytics/training', { params })
       return response.data.data
     } catch (error: any) {
       throw new Error(handleApiError(error))
@@ -183,18 +169,15 @@ export const hrAnalyticsService = {
   },
 
   /**
-   * Get executive summary
+   * Get leave analytics
    */
-  getExecutiveSummary: async (): Promise<{
-    workforce: WorkforceOverview
-    attendance: AttendanceAnalytics
-    payroll: PayrollAnalytics
-    performance: PerformanceAnalytics
-    highlights: string[]
-    alerts: Array<{ type: string; message: string; severity: string }>
-  }> => {
+  getLeave: async (params?: {
+    startDate?: string
+    endDate?: string
+    department?: string
+  }): Promise<LeaveAnalytics> => {
     try {
-      const response = await apiClient.get('/hr-analytics/executive-summary')
+      const response = await apiClient.get('/hr-analytics/leave', { params })
       return response.data.data
     } catch (error: any) {
       throw new Error(handleApiError(error))
@@ -202,12 +185,22 @@ export const hrAnalyticsService = {
   },
 
   /**
-   * Save analytics snapshot
+   * Get Saudization compliance metrics
    */
-  saveSnapshot: async (data: {
-    type: string
-    name?: string
-    period?: { start: Date; end: Date }
+  getSaudization: async (): Promise<any> => {
+    try {
+      const response = await apiClient.get('/hr-analytics/saudization')
+      return response.data.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Take a snapshot of current HR metrics
+   */
+  takeSnapshot: async (data: {
+    snapshotType: 'daily' | 'weekly' | 'monthly' | 'quarterly' | 'yearly'
   }): Promise<{ id: string }> => {
     try {
       const response = await apiClient.post('/hr-analytics/snapshot', data)
@@ -218,23 +211,36 @@ export const hrAnalyticsService = {
   },
 
   /**
-   * Get saved snapshots
+   * Get historical trends from snapshots
    */
-  getSnapshots: async (type?: string): Promise<Array<{
-    _id: string
-    type: string
-    name?: string
-    period: { start: Date; end: Date }
-    createdAt: Date
-    createdBy: string
-  }>> => {
+  getTrends: async (params?: {
+    snapshotType?: string
+    limit?: number
+  }): Promise<any[]> => {
     try {
-      const response = await apiClient.get('/hr-analytics/snapshots', { params: { type } })
+      const response = await apiClient.get('/hr-analytics/trends', { params })
       return response.data.data
     } catch (error: any) {
       throw new Error(handleApiError(error))
     }
   },
+
+  /**
+   * Export analytics report
+   */
+  exportReport: async (params: {
+    startDate?: string
+    endDate?: string
+    department?: string
+    format: 'json' | 'excel' | 'pdf'
+  }): Promise<any> => {
+    try {
+      const response = await apiClient.get('/hr-analytics/export', { params })
+      return response.data.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  }
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -242,11 +248,13 @@ export const hrAnalyticsService = {
 // ═══════════════════════════════════════════════════════════════
 export const hrPredictionsService = {
   /**
-   * Get attrition risk predictions
+   * Get attrition risk scores for all employees
    */
-  getAttritionRisk: async (): Promise<AttritionRiskSummary> => {
+  getAttritionRisk: async (params?: {
+    department?: string
+  }): Promise<any> => {
     try {
-      const response = await apiClient.get('/hr-analytics/predictions/attrition-risk')
+      const response = await apiClient.get('/hr-analytics/predictions/attrition', { params })
       return response.data.data
     } catch (error: any) {
       throw new Error(handleApiError(error))
@@ -254,11 +262,11 @@ export const hrPredictionsService = {
   },
 
   /**
-   * Get attrition risk for specific employee
+   * Get detailed attrition risk analysis for specific employee
    */
   getEmployeeAttritionRisk: async (employeeId: string): Promise<AttritionRiskPrediction> => {
     try {
-      const response = await apiClient.get(`/hr-analytics/predictions/attrition-risk/${employeeId}`)
+      const response = await apiClient.get(`/hr-analytics/predictions/attrition/${employeeId}`)
       return response.data.data
     } catch (error: any) {
       throw new Error(handleApiError(error))
@@ -268,11 +276,11 @@ export const hrPredictionsService = {
   /**
    * Get workforce forecast
    */
-  getWorkforceForecast: async (months: number = 12): Promise<WorkforceForecast[]> => {
+  getWorkforceForecast: async (params?: {
+    months?: number
+  }): Promise<WorkforceForecast[]> => {
     try {
-      const response = await apiClient.get('/hr-analytics/predictions/workforce-forecast', {
-        params: { months }
-      })
+      const response = await apiClient.get('/hr-analytics/predictions/workforce', { params })
       return response.data.data
     } catch (error: any) {
       throw new Error(handleApiError(error))
@@ -280,13 +288,13 @@ export const hrPredictionsService = {
   },
 
   /**
-   * Get promotion readiness
+   * Identify high-potential employees and promotion readiness
    */
-  getPromotionReadiness: async (threshold: number = 75): Promise<PromotionReadiness[]> => {
+  getHighPotential: async (params?: {
+    limit?: number
+  }): Promise<any[]> => {
     try {
-      const response = await apiClient.get('/hr-analytics/predictions/promotion-readiness', {
-        params: { threshold }
-      })
+      const response = await apiClient.get('/hr-analytics/predictions/high-potential', { params })
       return response.data.data
     } catch (error: any) {
       throw new Error(handleApiError(error))
@@ -294,11 +302,11 @@ export const hrPredictionsService = {
   },
 
   /**
-   * Recalculate predictions
+   * Get employees at high flight risk
    */
-  recalculate: async (): Promise<{ success: boolean; calculatedAt: Date }> => {
+  getFlightRisk: async (): Promise<any[]> => {
     try {
-      const response = await apiClient.post('/hr-analytics/predictions/recalculate')
+      const response = await apiClient.get('/hr-analytics/predictions/flight-risk')
       return response.data.data
     } catch (error: any) {
       throw new Error(handleApiError(error))
@@ -306,22 +314,26 @@ export const hrPredictionsService = {
   },
 
   /**
-   * Get hiring needs forecast
+   * Predict likely absence days and identify at-risk employees
    */
-  getHiringNeedsForecast: async (months: number = 12): Promise<Array<{
-    month: string
-    department: string
-    estimatedOpenings: number
-    reason: string
-    confidence: number
-  }>> => {
+  getAbsencePredictions: async (): Promise<any> => {
     try {
-      const response = await apiClient.get('/hr-analytics/predictions/hiring-needs', {
-        params: { months }
-      })
+      const response = await apiClient.get('/hr-analytics/predictions/absence')
       return response.data.data
     } catch (error: any) {
       throw new Error(handleApiError(error))
     }
   },
+
+  /**
+   * Predict engagement trends and identify disengaged employees
+   */
+  getEngagementPredictions: async (): Promise<any> => {
+    try {
+      const response = await apiClient.get('/hr-analytics/predictions/engagement')
+      return response.data.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  }
 }

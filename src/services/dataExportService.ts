@@ -84,25 +84,25 @@ const dataExportService = {
 
   // Start export job
   startExport: async (options: ExportOptions): Promise<ExportJob> => {
-    const response = await api.post('/exports', options)
+    const response = await api.post('/data-export/export', options)
     return response.data
   },
 
   // Get export job status
   getExportStatus: async (jobId: string): Promise<ExportJob> => {
-    const response = await api.get(`/exports/${jobId}`)
+    const response = await api.get(`/data-export/jobs/${jobId}`)
     return response.data
   },
 
   // Get all export jobs
   getExportHistory: async (entityType?: EntityType): Promise<ExportJob[]> => {
-    const response = await api.get('/exports', { params: { entityType } })
+    const response = await api.get('/data-export/jobs', { params: { entityType } })
     return response.data
   },
 
   // Download exported file
   downloadExport: async (jobId: string): Promise<Blob> => {
-    const response = await api.get(`/exports/${jobId}/download`, {
+    const response = await api.get(`/data-export/jobs/${jobId}/download`, {
       responseType: 'blob'
     })
     return response.data
@@ -110,24 +110,18 @@ const dataExportService = {
 
   // Cancel export job
   cancelExport: async (jobId: string): Promise<void> => {
-    await api.delete(`/exports/${jobId}`)
+    await api.post(`/data-export/jobs/${jobId}/cancel`)
+  },
+
+  // Delete export job
+  deleteExport: async (jobId: string): Promise<void> => {
+    await api.delete(`/data-export/jobs/${jobId}`)
   },
 
   // ===== IMPORT OPERATIONS =====
 
-  // Preview import file
-  previewImport: async (file: File, entityType: EntityType): Promise<ImportPreview> => {
-    const formData = new FormData()
-    formData.append('file', file)
-    formData.append('entityType', entityType)
-    const response = await api.post('/imports/preview', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' }
-    })
-    return response.data
-  },
-
-  // Start import job
-  startImport: async (options: ImportOptions): Promise<ImportJob> => {
+  // Create import job (upload file)
+  createImportJob: async (options: ImportOptions): Promise<ImportJob> => {
     const formData = new FormData()
     formData.append('file', options.file)
     formData.append('entityType', options.entityType)
@@ -143,65 +137,93 @@ const dataExportService = {
     if (options.dryRun !== undefined) {
       formData.append('dryRun', String(options.dryRun))
     }
-    const response = await api.post('/imports', formData, {
+    const response = await api.post('/data-export/import', formData, {
       headers: { 'Content-Type': 'multipart/form-data' }
     })
     return response.data
   },
 
+  // Start import job (begin processing)
+  startImportJob: async (jobId: string): Promise<ImportJob> => {
+    const response = await api.post(`/data-export/import/${jobId}/start`)
+    return response.data
+  },
+
+  // Validate import file
+  validateImportFile: async (jobId: string): Promise<ImportJob> => {
+    const response = await api.post(`/data-export/import/${jobId}/validate`)
+    return response.data
+  },
+
   // Get import job status
   getImportStatus: async (jobId: string): Promise<ImportJob> => {
-    const response = await api.get(`/imports/${jobId}`)
+    const response = await api.get(`/data-export/import/${jobId}`)
     return response.data
   },
 
   // Get all import jobs
   getImportHistory: async (entityType?: EntityType): Promise<ImportJob[]> => {
-    const response = await api.get('/imports', { params: { entityType } })
+    const response = await api.get('/data-export/imports', { params: { entityType } })
     return response.data
   },
 
   // Cancel import job
   cancelImport: async (jobId: string): Promise<void> => {
-    await api.delete(`/imports/${jobId}`)
+    await api.post(`/data-export/import/${jobId}/cancel`)
   },
 
-  // Download import error report
-  downloadErrorReport: async (jobId: string): Promise<Blob> => {
-    const response = await api.get(`/imports/${jobId}/errors`, {
-      responseType: 'blob'
+  // Legacy method names for compatibility
+  previewImport: async (file: File, entityType: EntityType): Promise<ImportPreview> => {
+    // Note: Backend doesn't have a preview endpoint, using validate instead
+    const formData = new FormData()
+    formData.append('file', file)
+    formData.append('entityType', entityType)
+    const response = await api.post('/data-export/import', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
     })
-    return response.data
+    const job = response.data
+    await api.post(`/data-export/import/${job._id}/validate`)
+    return {
+      columns: [],
+      sampleData: [],
+      suggestedMapping: {},
+      totalRows: job.totalRecords || 0,
+    }
+  },
+
+  startImport: async (options: ImportOptions): Promise<ImportJob> => {
+    const job = await dataExportService.createImportJob(options)
+    return await dataExportService.startImportJob(job._id)
   },
 
   // ===== EXPORT TEMPLATES =====
 
   // Get export templates
   getTemplates: async (entityType?: EntityType): Promise<ExportTemplate[]> => {
-    const response = await api.get('/export-templates', { params: { entityType } })
+    const response = await api.get('/data-export/templates', { params: { entityType } })
     return response.data
   },
 
   // Create export template
   createTemplate: async (template: Omit<ExportTemplate, '_id' | 'createdAt'>): Promise<ExportTemplate> => {
-    const response = await api.post('/export-templates', template)
+    const response = await api.post('/data-export/templates', template)
     return response.data
   },
 
   // Update export template
   updateTemplate: async (id: string, data: Partial<ExportTemplate>): Promise<ExportTemplate> => {
-    const response = await api.patch(`/export-templates/${id}`, data)
+    const response = await api.patch(`/data-export/templates/${id}`, data)
     return response.data
   },
 
   // Delete export template
   deleteTemplate: async (id: string): Promise<void> => {
-    await api.delete(`/export-templates/${id}`)
+    await api.delete(`/data-export/templates/${id}`)
   },
 
   // ===== UTILITY =====
 
-  // Get available columns for entity type
+  // Get available columns for entity type (client-side only, no backend endpoint)
   getEntityColumns: async (entityType: EntityType): Promise<{
     field: string
     label: string
@@ -209,17 +231,14 @@ const dataExportService = {
     type: string
     required?: boolean
   }[]> => {
-    const response = await api.get(`/exports/columns/${entityType}`)
-    return response.data
-  },
-
-  // Generate sample import template
-  downloadSampleTemplate: async (entityType: EntityType, format: 'xlsx' | 'csv'): Promise<Blob> => {
-    const response = await api.get(`/imports/template/${entityType}`, {
-      params: { format },
-      responseType: 'blob'
-    })
-    return response.data
+    // Using client-side entityColumns definition
+    const columns = entityColumns[entityType] || []
+    return columns.map(col => ({
+      field: col.field,
+      label: col.label,
+      labelAr: col.labelAr,
+      type: 'string',
+    }))
   },
 }
 

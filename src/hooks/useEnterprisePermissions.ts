@@ -402,3 +402,382 @@ export const useUserAccessibleResources = (userId: string, resourceType?: string
     staleTime: 2 * 60 * 1000,
   })
 }
+
+// ==================== CONFIG HOOKS ====================
+
+/**
+ * Hook to get permission configuration
+ */
+export const usePermissionConfig = () => {
+  return useQuery({
+    queryKey: [...permissionKeys.all, 'config'],
+    queryFn: () => permissionService.getPermissionConfig(),
+    staleTime: 5 * 60 * 1000,
+  })
+}
+
+/**
+ * Hook to update permission configuration
+ */
+export const useUpdatePermissionConfig = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (config: any) => permissionService.updatePermissionConfig(config),
+    onSuccess: () => {
+      toast.success('تم تحديث إعدادات الصلاحيات بنجاح')
+      queryClient.invalidateQueries({ queryKey: [...permissionKeys.all, 'config'] })
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'فشل تحديث إعدادات الصلاحيات')
+    },
+  })
+}
+
+// ==================== RELATION STATS HOOKS ====================
+
+/**
+ * Hook to get relation statistics
+ */
+export const useRelationStats = () => {
+  return useQuery({
+    queryKey: [...permissionKeys.relations(), 'stats'],
+    queryFn: () => permissionService.getRelationStats(),
+    staleTime: 2 * 60 * 1000,
+  })
+}
+
+/**
+ * Hook to grant a relation
+ */
+export const useGrantRelation = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (data: any) => permissionService.grantRelation(data),
+    onSuccess: () => {
+      toast.success('تم منح العلاقة بنجاح')
+      queryClient.invalidateQueries({ queryKey: permissionKeys.relations() })
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'فشل منح العلاقة')
+    },
+  })
+}
+
+/**
+ * Hook to revoke a relation
+ */
+export const useRevokeRelation = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (data: any) => permissionService.revokeRelation(data),
+    onSuccess: () => {
+      toast.success('تم إلغاء العلاقة بنجاح')
+      queryClient.invalidateQueries({ queryKey: permissionKeys.relations() })
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'فشل إلغاء العلاقة')
+    },
+  })
+}
+
+/**
+ * Hook to get resource relations
+ */
+export const useResourceRelations = (namespace: string, object: string) => {
+  return useQuery({
+    queryKey: [...permissionKeys.relations(), namespace, object],
+    queryFn: () => permissionService.getResourceRelations(namespace, object),
+    enabled: !!namespace && !!object,
+    staleTime: 2 * 60 * 1000,
+  })
+}
+
+// ==================== BATCH PERMISSION HOOKS ====================
+
+/**
+ * Hook to batch check permissions
+ */
+export const useBatchCheckPermissions = () => {
+  return useMutation({
+    mutationFn: (requests: CheckPermissionRequest[]) =>
+      permissionService.checkPermissionBatch(requests),
+  })
+}
+
+/**
+ * Hook to get my permissions
+ */
+export const useMyPermissions = () => {
+  return useQuery({
+    queryKey: [...permissionKeys.all, 'my-permissions'],
+    queryFn: () => permissionService.getMyPermissions(),
+    staleTime: 2 * 60 * 1000,
+  })
+}
+
+/**
+ * Hook to expand permissions (Keto-style)
+ */
+export const useExpandPermissions = (namespace: string, resourceId: string, relation: string) => {
+  return useQuery({
+    queryKey: [...permissionKeys.all, 'expand', namespace, resourceId, relation],
+    queryFn: () => permissionService.expandPermissions(namespace, resourceId, relation),
+    enabled: !!namespace && !!resourceId && !!relation,
+    staleTime: 2 * 60 * 1000,
+  })
+}
+
+/**
+ * Hook to get user resources
+ */
+export const useUserResources = (userId: string) => {
+  return useQuery({
+    queryKey: [...permissionKeys.all, 'user-resources', userId],
+    queryFn: () => permissionService.getUserResources(userId),
+    enabled: !!userId,
+    staleTime: 2 * 60 * 1000,
+  })
+}
+
+// ==================== DENIED ATTEMPTS & COMPLIANCE ====================
+
+/**
+ * Hook to get denied access attempts
+ */
+export const useDeniedAttempts = (params?: {
+  startDate?: string
+  endDate?: string
+  userId?: string
+  limit?: number
+}) => {
+  return useQuery({
+    queryKey: [...permissionKeys.decisions(), 'denied', params],
+    queryFn: () => permissionService.getDeniedAttempts(params),
+    staleTime: 1 * 60 * 1000,
+  })
+}
+
+/**
+ * Hook to get compliance report
+ */
+export const useComplianceReport = (params?: {
+  startDate?: string
+  endDate?: string
+}) => {
+  return useQuery({
+    queryKey: [...permissionKeys.decisions(), 'compliance', params],
+    queryFn: () => permissionService.getComplianceReport(params),
+    staleTime: 5 * 60 * 1000,
+  })
+}
+
+// ==================== CACHE HOOKS ====================
+
+/**
+ * Hook to get cache statistics
+ */
+export const useCacheStats = () => {
+  return useQuery({
+    queryKey: [...permissionKeys.all, 'cache', 'stats'],
+    queryFn: () => permissionService.getCacheStats(),
+    staleTime: 30 * 1000, // 30 seconds
+  })
+}
+
+/**
+ * Hook to clear cache
+ */
+export const useClearCache = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: () => permissionService.clearCache(),
+    onSuccess: () => {
+      toast.success('تم مسح الذاكرة المؤقتة بنجاح')
+      queryClient.invalidateQueries({ queryKey: permissionKeys.all })
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'فشل مسح الذاكرة المؤقتة')
+    },
+  })
+}
+
+// ==================== UI ACCESS CONTROL HOOKS ====================
+
+/**
+ * Hook to get visible sidebar items
+ */
+export const useVisibleSidebar = () => {
+  return useQuery({
+    queryKey: [...permissionKeys.all, 'ui', 'sidebar'],
+    queryFn: () => permissionService.getVisibleSidebar(),
+    staleTime: 5 * 60 * 1000,
+  })
+}
+
+/**
+ * Hook to get all sidebar items (admin)
+ */
+export const useAllSidebarItems = () => {
+  return useQuery({
+    queryKey: [...permissionKeys.all, 'ui', 'sidebar', 'all'],
+    queryFn: () => permissionService.getAllSidebarItems(),
+    staleTime: 5 * 60 * 1000,
+  })
+}
+
+/**
+ * Hook to update sidebar visibility
+ */
+export const useUpdateSidebarVisibility = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({ itemId, data }: { itemId: string; data: any }) =>
+      permissionService.updateSidebarVisibility(itemId, data),
+    onSuccess: () => {
+      toast.success('تم تحديث رؤية القائمة الجانبية بنجاح')
+      queryClient.invalidateQueries({ queryKey: [...permissionKeys.all, 'ui', 'sidebar'] })
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'فشل تحديث رؤية القائمة الجانبية')
+    },
+  })
+}
+
+/**
+ * Hook to check page access
+ */
+export const useCheckPageAccess = () => {
+  return useMutation({
+    mutationFn: (pageId: string) => permissionService.checkPageAccess(pageId),
+  })
+}
+
+/**
+ * Hook to get all page access rules (admin)
+ */
+export const useAllPageAccess = () => {
+  return useQuery({
+    queryKey: [...permissionKeys.all, 'ui', 'pages', 'all'],
+    queryFn: () => permissionService.getAllPageAccess(),
+    staleTime: 5 * 60 * 1000,
+  })
+}
+
+/**
+ * Hook to update page access for role
+ */
+export const useUpdatePageAccessForRole = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({ pageId, data }: { pageId: string; data: any }) =>
+      permissionService.updatePageAccessForRole(pageId, data),
+    onSuccess: () => {
+      toast.success('تم تحديث صلاحيات الصفحة بنجاح')
+      queryClient.invalidateQueries({ queryKey: [...permissionKeys.all, 'ui', 'pages'] })
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'فشل تحديث صلاحيات الصفحة')
+    },
+  })
+}
+
+/**
+ * Hook to get UI access configuration
+ */
+export const useUIAccessConfig = () => {
+  return useQuery({
+    queryKey: [...permissionKeys.all, 'ui', 'config'],
+    queryFn: () => permissionService.getUIAccessConfig(),
+    staleTime: 5 * 60 * 1000,
+  })
+}
+
+/**
+ * Hook to update UI access configuration
+ */
+export const useUpdateUIAccessConfig = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (config: any) => permissionService.updateUIAccessConfig(config),
+    onSuccess: () => {
+      toast.success('تم تحديث إعدادات الوصول للواجهة بنجاح')
+      queryClient.invalidateQueries({ queryKey: [...permissionKeys.all, 'ui', 'config'] })
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'فشل تحديث إعدادات الوصول للواجهة')
+    },
+  })
+}
+
+/**
+ * Hook to get access matrix
+ */
+export const useAccessMatrix = () => {
+  return useQuery({
+    queryKey: [...permissionKeys.all, 'ui', 'matrix'],
+    queryFn: () => permissionService.getAccessMatrix(),
+    staleTime: 5 * 60 * 1000,
+  })
+}
+
+/**
+ * Hook to bulk update role access
+ */
+export const useBulkUpdateRoleAccess = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({ role, data }: { role: string; data: any }) =>
+      permissionService.bulkUpdateRoleAccess(role, data),
+    onSuccess: () => {
+      toast.success('تم تحديث صلاحيات الدور بنجاح')
+      queryClient.invalidateQueries({ queryKey: [...permissionKeys.all, 'ui'] })
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'فشل تحديث صلاحيات الدور')
+    },
+  })
+}
+
+/**
+ * Hook to add user override
+ */
+export const useAddUserOverride = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (data: any) => permissionService.addUserOverride(data),
+    onSuccess: () => {
+      toast.success('تم إضافة استثناء المستخدم بنجاح')
+      queryClient.invalidateQueries({ queryKey: [...permissionKeys.all, 'ui'] })
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'فشل إضافة استثناء المستخدم')
+    },
+  })
+}
+
+/**
+ * Hook to remove user override
+ */
+export const useRemoveUserOverride = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (userId: string) => permissionService.removeUserOverride(userId),
+    onSuccess: () => {
+      toast.success('تم إزالة استثناء المستخدم بنجاح')
+      queryClient.invalidateQueries({ queryKey: [...permissionKeys.all, 'ui'] })
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'فشل إزالة استثناء المستخدم')
+    },
+  })
+}

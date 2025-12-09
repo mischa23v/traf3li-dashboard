@@ -20,6 +20,9 @@ import {
   bulkDeleteOnboardings,
   getOnboardingByEmployee,
   getUpcomingProbationReviews,
+  addChecklistCategory,
+  addChecklistTask,
+  addEmployeeFeedback,
   type OnboardingFilters,
   type CreateOnboardingData,
   type UpdateOnboardingData,
@@ -27,6 +30,7 @@ import {
   type OnboardingDocumentType,
   type ProbationReview,
   type ProbationDecision,
+  type OnboardingTask,
 } from '@/services/onboardingService'
 
 // Query Keys
@@ -338,6 +342,72 @@ export const useCompleteOnboarding = () => {
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل في إكمال برنامج التأهيل')
+    },
+  })
+}
+
+// Add checklist category
+export const useAddChecklistCategory = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({ onboardingId, category }: {
+      onboardingId: string
+      category: {
+        categoryName: string
+        categoryNameAr?: string
+      }
+    }) => addChecklistCategory(onboardingId, category),
+    onSuccess: (_, variables) => {
+      toast.success('تم إضافة فئة القائمة بنجاح')
+      queryClient.invalidateQueries({ queryKey: onboardingKeys.detail(variables.onboardingId) })
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'فشل في إضافة فئة القائمة')
+    },
+  })
+}
+
+// Add checklist task
+export const useAddChecklistTask = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({ onboardingId, categoryId, task }: {
+      onboardingId: string
+      categoryId: string
+      task: Partial<OnboardingTask>
+    }) => addChecklistTask(onboardingId, categoryId, task),
+    onSuccess: (_, variables) => {
+      toast.success('تم إضافة مهمة القائمة بنجاح')
+      queryClient.invalidateQueries({ queryKey: onboardingKeys.detail(variables.onboardingId) })
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'فشل في إضافة مهمة القائمة')
+    },
+  })
+}
+
+// Add employee feedback
+export const useAddEmployeeFeedback = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({ onboardingId, feedback }: {
+      onboardingId: string
+      feedback: {
+        feedbackType: 'first_day' | 'first_week' | 'first_month' | 'general'
+        rating?: number
+        comments: string
+        suggestions?: string
+      }
+    }) => addEmployeeFeedback(onboardingId, feedback),
+    onSuccess: (_, variables) => {
+      toast.success('تم إضافة ملاحظات الموظف بنجاح')
+      queryClient.invalidateQueries({ queryKey: onboardingKeys.detail(variables.onboardingId) })
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'فشل في إضافة ملاحظات الموظف')
     },
   })
 }

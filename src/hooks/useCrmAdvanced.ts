@@ -20,7 +20,6 @@ import type {
   CampaignFilters,
   CreateDripCampaignData,
   CreateSegmentData,
-  TrackBehaviorData,
   LeadScoreConfig,
   SendMessageData,
   SendTemplateMessageData,
@@ -360,10 +359,10 @@ export const useLeadScores = (params?: {
   })
 }
 
-export const useLeadScore = (leadId: string) => {
+export const useLeadInsights = (leadId: string) => {
   return useQuery({
-    queryKey: ['lead-score', leadId],
-    queryFn: () => leadScoringService.getLeadScore(leadId),
+    queryKey: ['lead-insights', leadId],
+    queryFn: () => leadScoringService.getLeadInsights(leadId),
     enabled: !!leadId,
   })
 }
@@ -374,7 +373,7 @@ export const useCalculateLeadScore = () => {
     mutationFn: (leadId: string) => leadScoringService.calculateScore(leadId),
     onSuccess: (_, leadId) => {
       queryClient.invalidateQueries({ queryKey: ['lead-scores'] })
-      queryClient.invalidateQueries({ queryKey: ['lead-score', leadId] })
+      queryClient.invalidateQueries({ queryKey: ['lead-insights', leadId] })
       toast.success('تم حساب التقييم')
     },
     onError: (error: Error) => {
@@ -413,12 +412,87 @@ export const useLeadScoreDistribution = () => {
   })
 }
 
-export const useTrackLeadBehavior = () => {
+// Lead Scoring Tracking Hooks
+export const useTrackEmailOpen = () => {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: (data: TrackBehaviorData) => leadScoringService.trackBehavior(data),
+    mutationFn: (data: { leadId: string; campaignId?: string; emailId?: string }) =>
+      leadScoringService.trackEmailOpen(data),
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['lead-score', variables.leadId] })
+      queryClient.invalidateQueries({ queryKey: ['lead-insights', variables.leadId] })
+      queryClient.invalidateQueries({ queryKey: ['lead-scores'] })
+    },
+  })
+}
+
+export const useTrackEmailClick = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (data: { leadId: string; campaignId?: string; emailId?: string; linkUrl?: string }) =>
+      leadScoringService.trackEmailClick(data),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['lead-insights', variables.leadId] })
+      queryClient.invalidateQueries({ queryKey: ['lead-scores'] })
+    },
+  })
+}
+
+export const useTrackDocumentView = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (data: { leadId: string; documentId: string; documentType?: string }) =>
+      leadScoringService.trackDocumentView(data),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['lead-insights', variables.leadId] })
+      queryClient.invalidateQueries({ queryKey: ['lead-scores'] })
+    },
+  })
+}
+
+export const useTrackWebsiteVisit = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (data: { leadId: string; pageUrl: string; duration?: number }) =>
+      leadScoringService.trackWebsiteVisit(data),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['lead-insights', variables.leadId] })
+      queryClient.invalidateQueries({ queryKey: ['lead-scores'] })
+    },
+  })
+}
+
+export const useTrackFormSubmit = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (data: { leadId: string; formId: string; formType?: string }) =>
+      leadScoringService.trackFormSubmit(data),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['lead-insights', variables.leadId] })
+      queryClient.invalidateQueries({ queryKey: ['lead-scores'] })
+    },
+  })
+}
+
+export const useTrackMeeting = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (data: { leadId: string; meetingId?: string; duration?: number; outcome?: string }) =>
+      leadScoringService.trackMeeting(data),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['lead-insights', variables.leadId] })
+      queryClient.invalidateQueries({ queryKey: ['lead-scores'] })
+    },
+  })
+}
+
+export const useTrackCall = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (data: { leadId: string; callId?: string; duration?: number; outcome?: string }) =>
+      leadScoringService.trackCall(data),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['lead-insights', variables.leadId] })
+      queryClient.invalidateQueries({ queryKey: ['lead-scores'] })
     },
   })
 }

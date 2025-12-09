@@ -102,30 +102,15 @@ export const deviceService = {
   },
 
   /**
-   * Test device connection
+   * Update device heartbeat
    */
-  testConnection: async (id: string): Promise<{ success: boolean; latency: number }> => {
-    try {
-      const response = await apiClient.post(`/biometric/devices/${id}/test`)
-      return response.data.data
-    } catch (error: any) {
-      throw new Error(handleApiError(error))
-    }
-  },
-
-  /**
-   * Get device health status
-   */
-  getDeviceHealth: async (id: string): Promise<{
-    status: string
-    lastHeartbeat: Date
-    uptime: number
+  updateHeartbeat: async (id: string, data?: {
+    status?: string
     temperature?: number
     memoryUsage?: number
-  }> => {
+  }): Promise<void> => {
     try {
-      const response = await apiClient.get(`/biometric/devices/${id}/health`)
-      return response.data.data
+      await apiClient.post(`/biometric/devices/${id}/heartbeat`, data)
     } catch (error: any) {
       throw new Error(handleApiError(error))
     }
@@ -237,23 +222,13 @@ export const enrollmentService = {
   },
 
   /**
-   * Suspend enrollment
+   * Set PIN for enrollment
    */
-  suspendEnrollment: async (id: string, reason: string): Promise<BiometricEnrollment> => {
+  setPIN: async (enrollmentId: string, data: {
+    pin: string
+  }): Promise<BiometricEnrollment> => {
     try {
-      const response = await apiClient.post(`/biometric/enrollments/${id}/suspend`, { reason })
-      return response.data.data
-    } catch (error: any) {
-      throw new Error(handleApiError(error))
-    }
-  },
-
-  /**
-   * Reactivate enrollment
-   */
-  reactivateEnrollment: async (id: string): Promise<BiometricEnrollment> => {
-    try {
-      const response = await apiClient.post(`/biometric/enrollments/${id}/reactivate`)
+      const response = await apiClient.post(`/biometric/enrollments/${enrollmentId}/pin`, data)
       return response.data.data
     } catch (error: any) {
       throw new Error(handleApiError(error))
@@ -270,12 +245,95 @@ export const enrollmentService = {
       throw new Error(handleApiError(error))
     }
   },
+
+  /**
+   * Get enrollment statistics
+   */
+  getEnrollmentStats: async (): Promise<{
+    total: number
+    active: number
+    suspended: number
+    byMethod: Record<string, number>
+  }> => {
+    try {
+      const response = await apiClient.get('/biometric/enrollments/stats')
+      return response.data.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
 }
 
 // ═══════════════════════════════════════════════════════════════
-// VERIFICATION LOG SERVICE
+// VERIFICATION & IDENTIFICATION SERVICE
 // ═══════════════════════════════════════════════════════════════
 export const verificationService = {
+  /**
+   * Verify employee identity
+   */
+  verifyIdentity: async (data: {
+    method: 'fingerprint' | 'facial' | 'card' | 'pin'
+    deviceId?: string
+    template?: string
+    cardNumber?: string
+    pin?: string
+    employeeId?: string
+  }): Promise<{
+    success: boolean
+    employeeId?: string
+    confidence?: number
+    message?: string
+  }> => {
+    try {
+      const response = await apiClient.post('/biometric/verify', data)
+      return response.data.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Identify employee from biometric data
+   */
+  identifyEmployee: async (data: {
+    method: 'fingerprint' | 'facial'
+    deviceId?: string
+    template: string
+  }): Promise<{
+    success: boolean
+    employeeId?: string
+    confidence?: number
+    matches?: Array<{ employeeId: string; confidence: number }>
+  }> => {
+    try {
+      const response = await apiClient.post('/biometric/identify', data)
+      return response.data.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Check-in with GPS location
+   */
+  checkInWithGPS: async (data: {
+    employeeId: string
+    latitude: number
+    longitude: number
+    verificationType: 'check-in' | 'check-out'
+  }): Promise<{
+    success: boolean
+    withinGeofence: boolean
+    distance?: number
+    zoneName?: string
+  }> => {
+    try {
+      const response = await apiClient.post('/biometric/checkin-gps', data)
+      return response.data.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
   /**
    * Get verification logs
    */
@@ -285,18 +343,6 @@ export const verificationService = {
     try {
       const response = await apiClient.get('/biometric/logs', { params: filters })
       return response.data
-    } catch (error: any) {
-      throw new Error(handleApiError(error))
-    }
-  },
-
-  /**
-   * Get live verification feed (most recent)
-   */
-  getLiveFeed: async (limit: number = 20): Promise<VerificationLog[]> => {
-    try {
-      const response = await apiClient.get('/biometric/logs/live', { params: { limit } })
-      return response.data.data
     } catch (error: any) {
       throw new Error(handleApiError(error))
     }
@@ -323,14 +369,16 @@ export const verificationService = {
   },
 
   /**
-   * Export logs to CSV
+   * Get failed verification attempts
    */
-  exportLogs: async (filters?: VerificationFilters): Promise<Blob> => {
+  getFailedAttempts: async (filters?: {
+    startDate?: string
+    endDate?: string
+    employeeId?: string
+    deviceId?: string
+  }): Promise<{ data: VerificationLog[]; pagination: any }> => {
     try {
-      const response = await apiClient.get('/biometric/logs/export', {
-        params: filters,
-        responseType: 'blob'
-      })
+      const response = await apiClient.get('/biometric/logs/failed', { params: filters })
       return response.data
     } catch (error: any) {
       throw new Error(handleApiError(error))
@@ -338,16 +386,55 @@ export const verificationService = {
   },
 
   /**
-   * Manual verification entry
+   * Get spoofing attempts
    */
-  createManualEntry: async (data: {
-    employeeId: string
-    verificationType: string
-    timestamp: Date
-    notes?: string
-  }): Promise<VerificationLog> => {
+  getSpoofingAttempts: async (filters?: {
+    startDate?: string
+    endDate?: string
+    deviceId?: string
+  }): Promise<{ data: VerificationLog[]; pagination: any }> => {
     try {
-      const response = await apiClient.post('/biometric/logs/manual', data)
+      const response = await apiClient.get('/biometric/logs/spoofing', { params: filters })
+      return response.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Get daily summary
+   */
+  getDailySummary: async (date?: string): Promise<{
+    date: string
+    totalVerifications: number
+    successfulVerifications: number
+    failedVerifications: number
+    byMethod: Record<string, number>
+    byEmployee: Array<{ employeeId: string; count: number }>
+  }> => {
+    try {
+      const response = await apiClient.get('/biometric/logs/daily-summary', {
+        params: { date }
+      })
+      return response.data.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Process logs (batch processing)
+   */
+  processLogs: async (data: {
+    startDate: string
+    endDate: string
+    action?: string
+  }): Promise<{
+    processed: number
+    errors: number
+  }> => {
+    try {
+      const response = await apiClient.post('/biometric/logs/process', data)
       return response.data.data
     } catch (error: any) {
       throw new Error(handleApiError(error))
@@ -366,7 +453,7 @@ export const geofenceService = {
     filters?: GeofenceFilters
   ): Promise<{ data: GeofenceZone[]; pagination: any }> => {
     try {
-      const response = await apiClient.get('/biometric/geofences', { params: filters })
+      const response = await apiClient.get('/biometric/geofence', { params: filters })
       return response.data
     } catch (error: any) {
       throw new Error(handleApiError(error))
@@ -378,7 +465,7 @@ export const geofenceService = {
    */
   getZone: async (id: string): Promise<GeofenceZone> => {
     try {
-      const response = await apiClient.get(`/biometric/geofences/${id}`)
+      const response = await apiClient.get(`/biometric/geofence/${id}`)
       return response.data.data
     } catch (error: any) {
       throw new Error(handleApiError(error))
@@ -390,7 +477,7 @@ export const geofenceService = {
    */
   createZone: async (data: CreateGeofenceData): Promise<GeofenceZone> => {
     try {
-      const response = await apiClient.post('/biometric/geofences', data)
+      const response = await apiClient.post('/biometric/geofence', data)
       return response.data.data
     } catch (error: any) {
       throw new Error(handleApiError(error))
@@ -402,7 +489,7 @@ export const geofenceService = {
    */
   updateZone: async (id: string, data: Partial<CreateGeofenceData>): Promise<GeofenceZone> => {
     try {
-      const response = await apiClient.put(`/biometric/geofences/${id}`, data)
+      const response = await apiClient.put(`/biometric/geofence/${id}`, data)
       return response.data.data
     } catch (error: any) {
       throw new Error(handleApiError(error))
@@ -414,47 +501,22 @@ export const geofenceService = {
    */
   deleteZone: async (id: string): Promise<void> => {
     try {
-      await apiClient.delete(`/biometric/geofences/${id}`)
+      await apiClient.delete(`/biometric/geofence/${id}`)
     } catch (error: any) {
       throw new Error(handleApiError(error))
     }
   },
 
   /**
-   * Toggle zone active status
+   * Validate geofence (check if location is within zones)
    */
-  toggleZone: async (id: string): Promise<GeofenceZone> => {
+  validateGeofence: async (data: {
+    latitude: number
+    longitude: number
+    employeeId?: string
+  }): Promise<LocationCheckResult> => {
     try {
-      const response = await apiClient.post(`/biometric/geofences/${id}/toggle`)
-      return response.data.data
-    } catch (error: any) {
-      throw new Error(handleApiError(error))
-    }
-  },
-
-  /**
-   * Check if location is within zones
-   */
-  checkLocation: async (latitude: number, longitude: number): Promise<LocationCheckResult> => {
-    try {
-      const response = await apiClient.post('/biometric/geofences/check', {
-        latitude,
-        longitude
-      })
-      return response.data.data
-    } catch (error: any) {
-      throw new Error(handleApiError(error))
-    }
-  },
-
-  /**
-   * Assign employees to zone
-   */
-  assignEmployees: async (zoneId: string, employeeIds: string[]): Promise<GeofenceZone> => {
-    try {
-      const response = await apiClient.post(`/biometric/geofences/${zoneId}/assign`, {
-        employeeIds
-      })
+      const response = await apiClient.post('/biometric/geofence/validate', data)
       return response.data.data
     } catch (error: any) {
       throw new Error(handleApiError(error))

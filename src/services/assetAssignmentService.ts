@@ -691,7 +691,7 @@ export const initiateReturn = async (assignmentId: string, data: {
   returnReasonDetails?: string
   returnDueDate: string
 }): Promise<AssetAssignment> => {
-  const response = await api.post(`/hr/asset-assignments/${assignmentId}/initiate-return`, data)
+  const response = await api.post(`/hr/asset-assignments/${assignmentId}/return/initiate`, data)
   return response.data
 }
 
@@ -713,7 +713,7 @@ export const completeReturn = async (assignmentId: string, data: {
   dataWiped?: boolean
   notes?: string
 }): Promise<AssetAssignment> => {
-  const response = await api.post(`/hr/asset-assignments/${assignmentId}/complete-return`, data)
+  const response = await api.post(`/hr/asset-assignments/${assignmentId}/return/complete`, data)
   return response.data
 }
 
@@ -770,7 +770,7 @@ export const updateAssetStatus = async (assignmentId: string, data: {
   status: AssetAssignmentStatus
   notes?: string
 }): Promise<AssetAssignment> => {
-  const response = await api.post(`/hr/asset-assignments/${assignmentId}/status`, data)
+  const response = await api.put(`/hr/asset-assignments/${assignmentId}/status`, data)
   return response.data
 }
 
@@ -795,7 +795,7 @@ export const getOverdueReturns = async (): Promise<Array<{
   expectedReturnDate: string
   daysOverdue: number
 }>> => {
-  const response = await api.get('/hr/asset-assignments/overdue-returns')
+  const response = await api.get('/hr/asset-assignments/overdue')
   return response.data
 }
 
@@ -828,6 +828,73 @@ export const exportAssetAssignments = async (filters?: AssetAssignmentFilters): 
 
 // Issue clearance certificate
 export const issueClearanceCertificate = async (assignmentId: string): Promise<AssetAssignment> => {
-  const response = await api.post(`/hr/asset-assignments/${assignmentId}/issue-clearance`)
+  const response = await api.post(`/hr/asset-assignments/${assignmentId}/clearance`)
+  return response.data
+}
+
+// Transfer asset to another employee
+export const transferAsset = async (assignmentId: string, data: {
+  newEmployeeId: string
+  newEmployeeName: string
+  transferDate: string
+  transferReason?: string
+  notes?: string
+}): Promise<AssetAssignment> => {
+  const response = await api.post(`/hr/asset-assignments/${assignmentId}/transfer`, data)
+  return response.data
+}
+
+// Report repair needed
+export const reportRepair = async (assignmentId: string, data: {
+  issueDescription: string
+  severity: 'minor' | 'moderate' | 'major' | 'critical'
+  causeOfDamage?: 'normal_wear' | 'accident' | 'misuse' | 'manufacturing_defect' | 'external_factors' | 'unknown'
+  employeeLiable?: boolean
+  liabilityAmount?: number
+  notes?: string
+}): Promise<AssetAssignment> => {
+  const response = await api.post(`/hr/asset-assignments/${assignmentId}/repair`, data)
+  return response.data
+}
+
+// Update repair status
+export const updateRepairStatus = async (assignmentId: string, repairId: string, data: {
+  repairStatus: 'reported' | 'assessed' | 'approved' | 'in_progress' | 'completed' | 'unrepairable'
+  repairStartDate?: string
+  repairCompletionDate?: string
+  repairedBy?: string
+  vendorName?: string
+  totalRepairCost?: number
+  assetFunctional?: boolean
+  notes?: string
+}): Promise<AssetAssignment> => {
+  const response = await api.put(`/hr/asset-assignments/${assignmentId}/repair/${repairId}`, data)
+  return response.data
+}
+
+// Get warranty expiring soon
+export const getWarrantyExpiring = async (): Promise<Array<{
+  assignmentId: string
+  employeeName: string
+  assetName: string
+  assetType: AssetType
+  warrantyEndDate: string
+  daysUntilExpiry: number
+}>> => {
+  const response = await api.get('/hr/asset-assignments/warranty-expiring')
+  return response.data
+}
+
+// Get asset policies
+export const getAssetPolicies = async (): Promise<Array<{
+  policyId: string
+  policyName: string
+  policyNameAr?: string
+  policyType: string
+  description?: string
+  effectiveDate?: string
+  document?: string
+}>> => {
+  const response = await api.get('/hr/asset-assignments/policies')
   return response.data
 }

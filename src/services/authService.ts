@@ -131,6 +131,54 @@ export interface RegisterData {
 }
 
 /**
+ * Check Availability Data Interface
+ */
+export interface CheckAvailabilityData {
+  field: 'email' | 'username' | 'phone'
+  value: string
+}
+
+/**
+ * Check Availability Response
+ */
+export interface CheckAvailabilityResponse {
+  available: boolean
+  message?: string
+}
+
+/**
+ * Send OTP Data Interface
+ */
+export interface SendOTPData {
+  email: string
+}
+
+/**
+ * OTP Response Interface
+ */
+export interface OTPResponse {
+  success: boolean
+  message: string
+  expiresIn?: number
+}
+
+/**
+ * Verify OTP Data Interface
+ */
+export interface VerifyOTPData {
+  email: string
+  code: string
+}
+
+/**
+ * OTP Status Response
+ */
+export interface OTPStatusResponse {
+  attemptsRemaining: number
+  resetTime?: string
+}
+
+/**
  * API Response Interface
  */
 interface AuthResponse {
@@ -322,6 +370,117 @@ const authService = {
    */
   isClient: (): boolean => {
     return authService.hasRole('client')
+  },
+
+  /**
+   * Check availability of email, username, or phone
+   */
+  checkAvailability: async (data: CheckAvailabilityData): Promise<CheckAvailabilityResponse> => {
+    try {
+      const response = await apiClient.post<{ error: boolean; available: boolean; message?: string }>(
+        '/auth/check-availability',
+        data
+      )
+
+      if (response.data.error) {
+        throw new Error(response.data.message || 'فشل التحقق من التوفر')
+      }
+
+      return {
+        available: response.data.available,
+        message: response.data.message
+      }
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Send OTP to email for passwordless authentication
+   */
+  sendOTP: async (data: SendOTPData): Promise<OTPResponse> => {
+    try {
+      const response = await apiClient.post<{ success: boolean; message: string; expiresIn?: number }>(
+        '/auth/send-otp',
+        data
+      )
+
+      return {
+        success: response.data.success,
+        message: response.data.message,
+        expiresIn: response.data.expiresIn
+      }
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Verify OTP code and login
+   */
+  verifyOTP: async (data: VerifyOTPData): Promise<User> => {
+    try {
+      const response = await apiClient.post<AuthResponse>(
+        '/auth/verify-otp',
+        data
+      )
+
+      if (response.data.error || !response.data.user) {
+        throw new Error(response.data.message || 'فشل التحقق من رمز OTP')
+      }
+
+      // Normalize user data to ensure firmId is set
+      const user = normalizeUser(response.data.user)
+
+      // Store user data in localStorage
+      localStorage.setItem('user', JSON.stringify(user))
+
+      return user
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Resend OTP code
+   */
+  resendOTP: async (data: SendOTPData): Promise<OTPResponse> => {
+    try {
+      const response = await apiClient.post<{ success: boolean; message: string; expiresIn?: number }>(
+        '/auth/resend-otp',
+        data
+      )
+
+      return {
+        success: response.data.success,
+        message: response.data.message,
+        expiresIn: response.data.expiresIn
+      }
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Check OTP rate limit status
+   */
+  checkOTPStatus: async (): Promise<OTPStatusResponse> => {
+    try {
+      const response = await apiClient.get<{
+        success: boolean
+        data: {
+          attemptsRemaining: number
+          resetTime?: string
+        }
+      }>('/auth/otp-status')
+
+      return {
+        attemptsRemaining: response.data.data.attemptsRemaining,
+        resetTime: response.data.data.resetTime
+      }
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
   },
 }
 

@@ -607,43 +607,43 @@ export const compensationApi = {
       })
     }
     const queryString = params.toString()
-    const url = queryString ? `/compensation?${queryString}` : '/compensation'
+    const url = queryString ? `/hr/compensation-rewards?${queryString}` : '/hr/compensation-rewards'
     const response = await api.get(url)
     return response.data
   },
 
   // Get a single compensation record by ID
   getById: async (id: string): Promise<CompensationReward> => {
-    const response = await api.get(`/compensation/${id}`)
+    const response = await api.get(`/hr/compensation-rewards/${id}`)
     return response.data
   },
 
   // Get compensation by employee ID
   getByEmployee: async (employeeId: string): Promise<CompensationReward> => {
-    const response = await api.get(`/compensation/employee/${employeeId}`)
+    const response = await api.get(`/hr/compensation-rewards/employee/${employeeId}`)
     return response.data
   },
 
   // Create a new compensation record
   create: async (data: CreateCompensationInput): Promise<CompensationReward> => {
-    const response = await api.post('/compensation', data)
+    const response = await api.post('/hr/compensation-rewards', data)
     return response.data
   },
 
   // Update an existing compensation record
   update: async (id: string, data: UpdateCompensationInput): Promise<CompensationReward> => {
-    const response = await api.patch(`/compensation/${id}`, data)
+    const response = await api.patch(`/hr/compensation-rewards/${id}`, data)
     return response.data
   },
 
   // Delete a compensation record
   delete: async (id: string): Promise<void> => {
-    await api.delete(`/compensation/${id}`)
+    await api.delete(`/hr/compensation-rewards/${id}`)
   },
 
   // Bulk delete compensation records
   bulkDelete: async (ids: string[]): Promise<void> => {
-    await api.post('/compensation/bulk-delete', { ids })
+    await api.post('/hr/compensation-rewards/bulk-delete', { ids })
   },
 
   // Process salary increase
@@ -654,25 +654,25 @@ export const compensationApi = {
     changeReason?: string
     effectiveDate: string
   }): Promise<CompensationReward> => {
-    const response = await api.post(`/compensation/${id}/salary-increase`, data)
+    const response = await api.post(`/hr/compensation-rewards/${id}/salary-increase`, data)
     return response.data
   },
 
   // Add allowance
   addAllowance: async (id: string, allowance: Omit<Allowance, 'allowanceId'>): Promise<CompensationReward> => {
-    const response = await api.post(`/compensation/${id}/allowances`, allowance)
+    const response = await api.post(`/hr/compensation-rewards/${id}/allowances`, allowance)
     return response.data
   },
 
   // Update allowance
   updateAllowance: async (id: string, allowanceId: string, data: Partial<Allowance>): Promise<CompensationReward> => {
-    const response = await api.patch(`/compensation/${id}/allowances/${allowanceId}`, data)
+    const response = await api.patch(`/hr/compensation-rewards/${id}/allowances/${allowanceId}`, data)
     return response.data
   },
 
   // Remove allowance
   removeAllowance: async (id: string, allowanceId: string): Promise<CompensationReward> => {
-    const response = await api.delete(`/compensation/${id}/allowances/${allowanceId}`)
+    const response = await api.delete(`/hr/compensation-rewards/${id}/allowances/${allowanceId}`)
     return response.data
   },
 
@@ -684,13 +684,13 @@ export const compensationApi = {
     year: number
     paymentDate?: string
   }): Promise<CompensationReward> => {
-    const response = await api.post(`/compensation/${id}/bonus`, data)
+    const response = await api.post(`/hr/compensation-rewards/${id}/bonus`, data)
     return response.data
   },
 
   // Submit for salary review
   submitForReview: async (id: string): Promise<CompensationReward> => {
-    const response = await api.post(`/compensation/${id}/submit-for-review`)
+    const response = await api.post(`/hr/compensation-rewards/${id}/submit-review`)
     return response.data
   },
 
@@ -701,13 +701,22 @@ export const compensationApi = {
     effectiveDate: string
     comments?: string
   }): Promise<CompensationReward> => {
-    const response = await api.post(`/compensation/${id}/approve-review`, data)
+    const response = await api.post(`/hr/compensation-rewards/${id}/approve-review`, data)
+    return response.data
+  },
+
+  // Decline salary review
+  declineReview: async (id: string, data: {
+    reason: string
+    comments?: string
+  }): Promise<CompensationReward> => {
+    const response = await api.post(`/hr/compensation-rewards/${id}/decline-review`, data)
     return response.data
   },
 
   // Add recognition award
   addRecognition: async (id: string, award: Omit<RecognitionAward, 'programId'>): Promise<CompensationReward> => {
-    const response = await api.post(`/compensation/${id}/recognition`, award)
+    const response = await api.post(`/hr/compensation-rewards/${id}/recognition`, award)
     return response.data
   },
 
@@ -724,7 +733,40 @@ export const compensationApi = {
     totalPayrollCost: number
     avgBonusPayout: number
   }> => {
-    const url = officeId ? `/compensation/stats?officeId=${officeId}` : '/compensation/stats'
+    const url = officeId ? `/hr/compensation-rewards/stats?officeId=${officeId}` : '/hr/compensation-rewards/stats'
+    const response = await api.get(url)
+    return response.data
+  },
+
+  // Get pending reviews
+  getPendingReviews: async (): Promise<Array<{
+    compensationId: string
+    employeeId: string
+    employeeName: string
+    employeeNameAr?: string
+    department?: string
+    currentSalary: number
+    recommendedIncrease?: number
+    recommendedPercentage?: number
+    reviewStatus: ReviewStatus
+    submissionDate: string
+  }>> => {
+    const response = await api.get('/hr/compensation-rewards/pending-reviews')
+    return response.data
+  },
+
+  // Get department summary
+  getDepartmentSummary: async (departmentId?: string): Promise<Array<{
+    department: string
+    employeeCount: number
+    averageSalary: number
+    totalPayroll: number
+    averageCompaRatio: number
+    pendingReviews: number
+  }>> => {
+    const url = departmentId
+      ? `/hr/compensation-rewards/department-summary?departmentId=${departmentId}`
+      : '/hr/compensation-rewards/department-summary'
     const response = await api.get(url)
     return response.data
   },
@@ -738,13 +780,29 @@ export const compensationApi = {
     avgCompaRatio: number
     distribution: { category: CompaRatioCategory; count: number }[]
   }> => {
-    const response = await api.get(`/compensation/pay-grade-analysis/${payGrade}`)
+    const response = await api.get(`/hr/compensation-rewards/pay-grade-analysis/${payGrade}`)
     return response.data
   },
 
   // Generate total rewards statement
   generateTotalRewardsStatement: async (id: string): Promise<{ statementUrl: string }> => {
-    const response = await api.post(`/compensation/${id}/total-rewards-statement`)
+    const response = await api.post(`/hr/compensation-rewards/${id}/total-rewards-statement`)
+    return response.data
+  },
+
+  // Export compensation records
+  exportCompensation: async (filters?: CompensationFilters): Promise<Blob> => {
+    const params = new URLSearchParams()
+    if (filters) {
+      Object.entries(filters).forEach(([key, value]) => {
+        if (value !== undefined && value !== null && value !== '') {
+          params.append(key, String(value))
+        }
+      })
+    }
+    const queryString = params.toString()
+    const url = queryString ? `/hr/compensation-rewards/export?${queryString}` : '/hr/compensation-rewards/export'
+    const response = await api.get(url, { responseType: 'blob' })
     return response.data
   }
 }

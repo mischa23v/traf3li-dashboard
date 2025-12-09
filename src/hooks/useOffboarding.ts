@@ -9,6 +9,7 @@ import {
   getOffboardingStats,
   updateOffboardingStatus,
   completeExitInterview,
+  addClearanceItem,
   updateClearanceItem,
   completeClearanceSection,
   calculateFinalSettlement,
@@ -195,6 +196,23 @@ export const useCompleteExitInterview = () => {
     },
     onError: (error: Error) => {
       toast.error(error.message || 'فشل في إكمال مقابلة الخروج')
+    },
+  })
+}
+
+// Add clearance item
+export const useAddClearanceItem = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({ offboardingId, item }: { offboardingId: string; item: Partial<ClearanceItem> }) =>
+      addClearanceItem(offboardingId, item),
+    onSuccess: (_, variables) => {
+      toast.success('تم إضافة عنصر الإخلاء بنجاح')
+      queryClient.invalidateQueries({ queryKey: offboardingKeys.detail(variables.offboardingId) })
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'فشل في إضافة عنصر الإخلاء')
     },
   })
 }

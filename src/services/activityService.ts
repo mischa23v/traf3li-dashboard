@@ -263,7 +263,43 @@ const activityService = {
   },
 
   /**
-   * Get activities for a specific entity (task, event, reminder)
+   * Get a single activity by ID
+   */
+  getById: async (id: string): Promise<Activity> => {
+    try {
+      const response = await apiClient.get(`/activities/${id}`)
+      return response.data
+    } catch (error) {
+      throw error
+    }
+  },
+
+  /**
+   * Get activity summary (stats)
+   */
+  getSummary: async (): Promise<any> => {
+    try {
+      const response = await apiClient.get('/activities/summary')
+      return response.data
+    } catch (error) {
+      throw error
+    }
+  },
+
+  /**
+   * Get activity overview (dashboard)
+   */
+  getOverview: async (): Promise<any> => {
+    try {
+      const response = await apiClient.get('/activities/overview')
+      return response.data
+    } catch (error) {
+      throw error
+    }
+  },
+
+  /**
+   * Get activities for a specific entity (matches backend route: /entity/:entityType/:entityId)
    */
   getByEntity: async (
     entityType: ActivityEntityType,
@@ -272,20 +308,8 @@ const activityService = {
   ): Promise<Activity[]> => {
     try {
       const response = await apiClient.get(
-        `/activities/${entityType}/${entityId}?limit=${limit}`
+        `/activities/entity/${entityType}/${entityId}?limit=${limit}`
       )
-      return response.data.activities || response.data
-    } catch (error) {
-      throw error
-    }
-  },
-
-  /**
-   * Get recent activities for the current user
-   */
-  getRecent: async (limit = 20): Promise<Activity[]> => {
-    try {
-      const response = await apiClient.get(`/activities/recent?limit=${limit}`)
       return response.data.activities || response.data
     } catch (error) {
       throw error

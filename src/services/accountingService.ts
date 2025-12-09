@@ -687,7 +687,59 @@ export const accountingService = {
   },
 
   getGLEntry: async (id: string): Promise<GLEntry> => {
-    const response = await apiClient.get(`/general-ledger/entries/${id}`)
+    const response = await apiClient.get(`/general-ledger/${id}`)
+    return response.data.data
+  },
+
+  voidGLEntry: async (id: string): Promise<GLEntry> => {
+    const response = await apiClient.post(`/general-ledger/${id}/void`)
+    return response.data.data
+  },
+
+  getAccountBalance: async (accountId: string, startDate?: string, endDate?: string): Promise<{ balance: number; debit: number; credit: number }> => {
+    const response = await apiClient.get(`/general-ledger/account-balance/${accountId}`, {
+      params: { startDate, endDate }
+    })
+    return response.data.data
+  },
+
+  getGLTrialBalance: async (startDate?: string, endDate?: string): Promise<any> => {
+    const response = await apiClient.get('/general-ledger/trial-balance', {
+      params: { startDate, endDate }
+    })
+    return response.data.data
+  },
+
+  getGLProfitLoss: async (startDate?: string, endDate?: string): Promise<any> => {
+    const response = await apiClient.get('/general-ledger/profit-loss', {
+      params: { startDate, endDate }
+    })
+    return response.data.data
+  },
+
+  getGLBalanceSheet: async (asOfDate?: string): Promise<any> => {
+    const response = await apiClient.get('/general-ledger/balance-sheet', {
+      params: { asOfDate }
+    })
+    return response.data.data
+  },
+
+  getEntriesByReference: async (model: string, id: string): Promise<GLEntry[]> => {
+    const response = await apiClient.get(`/general-ledger/reference/${model}/${id}`)
+    return response.data.data
+  },
+
+  getGLSummary: async (startDate?: string, endDate?: string): Promise<any> => {
+    const response = await apiClient.get('/general-ledger/summary', {
+      params: { startDate, endDate }
+    })
+    return response.data.data
+  },
+
+  getGLStats: async (startDate?: string, endDate?: string): Promise<any> => {
+    const response = await apiClient.get('/general-ledger/stats', {
+      params: { startDate, endDate }
+    })
     return response.data.data
   },
 
@@ -714,7 +766,7 @@ export const accountingService = {
   },
 
   updateJournalEntry: async (id: string, data: Partial<CreateJournalEntryData>): Promise<JournalEntry> => {
-    const response = await apiClient.put(`/journal-entries/${id}`, data)
+    const response = await apiClient.patch(`/journal-entries/${id}`, data)
     return response.data.data
   },
 

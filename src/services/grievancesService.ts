@@ -477,15 +477,82 @@ export const exportGrievances = async (filters?: GrievanceFilters) => {
   return response.data
 }
 
+// Get overdue grievances
+export const getOverdueGrievances = async () => {
+  const response = await api.get<Grievance[]>('/hr/grievances/overdue')
+  return response.data
+}
+
+// Acknowledge grievance
+export const acknowledgeGrievance = async (grievanceId: string, data?: { notes?: string }) => {
+  const response = await api.post<Grievance>(`/hr/grievances/${grievanceId}/acknowledge`, data)
+  return response.data
+}
+
+// Add interview
+export const addInterview = async (grievanceId: string, data: {
+  intervieweeId?: string
+  intervieweeName: string
+  intervieweeType: 'complainant' | 'respondent' | 'witness' | 'other'
+  interviewDate: string
+  interviewerName: string
+  interviewNotes?: string
+  keyFindings?: string[]
+}) => {
+  const response = await api.post<Grievance>(`/hr/grievances/${grievanceId}/interviews`, data)
+  return response.data
+}
+
+// File appeal
+export const fileAppeal = async (grievanceId: string, data: {
+  appealReason: string
+  appealReasonAr?: string
+  newEvidenceProvided?: boolean
+  appealDate: string
+  appealedBy?: string
+}) => {
+  const response = await api.post<Grievance>(`/hr/grievances/${grievanceId}/appeal`, data)
+  return response.data
+}
+
+// Decide appeal
+export const decideAppeal = async (grievanceId: string, data: {
+  appealDecision: 'upheld' | 'partially_upheld' | 'denied'
+  decisionRationale: string
+  decisionRationaleAr?: string
+  decisionDate: string
+  decidedBy: string
+  furtherAction?: string
+}) => {
+  const response = await api.post<Grievance>(`/hr/grievances/${grievanceId}/appeal/decide`, data)
+  return response.data
+}
+
+// Escalate to labor office
+export const escalateToLaborOffice = async (grievanceId: string, data: {
+  escalationReason: string
+  laborOfficeName?: string
+  laborOfficeLocation?: string
+  caseNumber?: string
+  escalationDate: string
+  representativeAssigned?: string
+  legalCounselInvolved?: boolean
+}) => {
+  const response = await api.post<Grievance>(`/hr/grievances/${grievanceId}/labor-office`, data)
+  return response.data
+}
+
 export default {
   getGrievances,
   getGrievance,
   getGrievanceStats,
+  getOverdueGrievances,
   getEmployeeGrievances,
   createGrievance,
   updateGrievance,
   deleteGrievance,
   bulkDeleteGrievances,
+  acknowledgeGrievance,
   startInvestigation,
   completeInvestigation,
   resolveGrievance,
@@ -495,5 +562,9 @@ export default {
   addTimelineEvent,
   addWitness,
   addEvidence,
+  addInterview,
+  fileAppeal,
+  decideAppeal,
+  escalateToLaborOffice,
   exportGrievances,
 }

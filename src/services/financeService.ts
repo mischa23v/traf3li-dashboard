@@ -1112,6 +1112,127 @@ const financeService = {
     }
   },
 
+  /**
+   * Get unbilled time entries
+   */
+  getUnbilledEntries: async (filters?: {
+    caseId?: string
+    clientId?: string
+    assigneeId?: string
+  }): Promise<{ data: TimeEntry[]; pagination: any }> => {
+    try {
+      const response = await apiClient.get('/time-tracking/unbilled', { params: filters })
+      return response.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Get UTBMS activity codes
+   */
+  getActivityCodes: async (): Promise<Array<{
+    code: string
+    description: string
+    category: string
+  }>> => {
+    try {
+      const response = await apiClient.get('/time-tracking/activity-codes')
+      return response.data.data || response.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Bulk delete time entries
+   */
+  bulkDeleteTimeEntries: async (entryIds: string[]): Promise<{
+    deleted: number
+    failed: number
+  }> => {
+    try {
+      const response = await apiClient.delete('/time-tracking/entries/bulk', {
+        data: { entryIds }
+      })
+      return response.data.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Bulk approve time entries
+   */
+  bulkApproveTimeEntries: async (entryIds: string[]): Promise<{
+    approved: number
+    failed: number
+  }> => {
+    try {
+      const response = await apiClient.post('/time-tracking/entries/bulk-approve', {
+        entryIds
+      })
+      return response.data.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Write off a time entry (شطب الوقت)
+   */
+  writeOffTimeEntry: async (id: string, reason: string): Promise<TimeEntry> => {
+    try {
+      const response = await apiClient.post(`/time-tracking/entries/${id}/write-off`, {
+        reason
+      })
+      return response.data.timeEntry || response.data.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Write down a time entry (تخفيض المبلغ)
+   */
+  writeDownTimeEntry: async (id: string, data: {
+    amount: number
+    reason: string
+  }): Promise<TimeEntry> => {
+    try {
+      const response = await apiClient.post(`/time-tracking/entries/${id}/write-down`, data)
+      return response.data.timeEntry || response.data.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Approve time entry
+   */
+  approveTimeEntry: async (id: string): Promise<TimeEntry> => {
+    try {
+      const response = await apiClient.post(`/time-tracking/entries/${id}/approve`)
+      return response.data.timeEntry || response.data.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Reject time entry
+   */
+  rejectTimeEntry: async (id: string, reason: string): Promise<TimeEntry> => {
+    try {
+      const response = await apiClient.post(`/time-tracking/entries/${id}/reject`, {
+        reason
+      })
+      return response.data.timeEntry || response.data.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
   // ==================== PAYMENTS ====================
 
   /**

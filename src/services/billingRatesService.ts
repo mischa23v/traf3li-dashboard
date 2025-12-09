@@ -412,11 +412,11 @@ const billingRatesService = {
 
   /**
    * Update billing rate
-   * PATCH /api/billing/rates/:id
+   * PUT /api/billing/rates/:id
    */
   updateRate: async (id: string, data: UpdateRateData): Promise<BillingRate> => {
     try {
-      const response = await apiClient.patch<RateResponse>(`/billing/rates/${id}`, data)
+      const response = await apiClient.put<RateResponse>(`/billing/rates/${id}`, data)
       return response.data.rate
     } catch (error: any) {
       throw new Error(handleApiError(error))
@@ -435,7 +435,70 @@ const billingRatesService = {
     }
   },
 
+  /**
+   * Get rate statistics
+   * GET /api/billing/rates/stats
+   */
+  getRateStats: async (): Promise<any> => {
+    try {
+      const response = await apiClient.get<any>('/billing/rates/stats')
+      return response.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Get applicable rate for a user/case/client
+   * GET /api/billing/rates/applicable
+   */
+  getApplicableRate: async (params: { userId?: string; caseId?: string; clientId?: string; category?: RateCategory }): Promise<BillingRate | null> => {
+    try {
+      const queryParams = new URLSearchParams()
+      if (params.userId) queryParams.append('userId', params.userId)
+      if (params.caseId) queryParams.append('caseId', params.caseId)
+      if (params.clientId) queryParams.append('clientId', params.clientId)
+      if (params.category) queryParams.append('category', params.category)
+
+      const queryString = queryParams.toString()
+      const url = queryString ? `/billing/rates/applicable?${queryString}` : '/billing/rates/applicable'
+
+      const response = await apiClient.get<RateResponse>(url)
+      return response.data.rate
+    } catch (error: any) {
+      if (error.response?.status === 404) return null
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Set standard rate (quick setup)
+   * POST /api/billing/rates/standard
+   */
+  setStandardRate: async (data: { amount: number; currency: Currency }): Promise<BillingRate> => {
+    try {
+      const response = await apiClient.post<RateResponse>('/billing/rates/standard', data)
+      return response.data.rate
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
   // ==================== RATE GROUPS ====================
+
+  /**
+   * Get default rate group
+   * GET /api/billing/groups/default
+   */
+  getDefaultRateGroup: async (): Promise<RateGroup | null> => {
+    try {
+      const response = await apiClient.get<RateGroupResponse>('/billing/groups/default')
+      return response.data.group
+    } catch (error: any) {
+      if (error.response?.status === 404) return null
+      throw new Error(handleApiError(error))
+    }
+  },
 
   /**
    * Get all rate groups
@@ -516,11 +579,11 @@ const billingRatesService = {
 
   /**
    * Add rate to group
-   * POST /api/billing/groups/:groupId/rates/:rateId
+   * POST /api/billing/groups/:groupId/rates
    */
   addRateToGroup: async (groupId: string, rateId: string): Promise<RateGroup> => {
     try {
-      const response = await apiClient.post<RateGroupResponse>(`/billing/groups/${groupId}/rates/${rateId}`)
+      const response = await apiClient.post<RateGroupResponse>(`/billing/groups/${groupId}/rates`, { rateId })
       return response.data.group
     } catch (error: any) {
       throw new Error(handleApiError(error))
@@ -534,6 +597,19 @@ const billingRatesService = {
   removeRateFromGroup: async (groupId: string, rateId: string): Promise<RateGroup> => {
     try {
       const response = await apiClient.delete<RateGroupResponse>(`/billing/groups/${groupId}/rates/${rateId}`)
+      return response.data.group
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Duplicate rate group
+   * POST /api/billing/groups/:id/duplicate
+   */
+  duplicateRateGroup: async (id: string, name: string, nameAr: string): Promise<RateGroup> => {
+    try {
+      const response = await apiClient.post<RateGroupResponse>(`/billing/groups/${id}/duplicate`, { name, nameAr })
       return response.data.group
     } catch (error: any) {
       throw new Error(handleApiError(error))
@@ -567,12 +643,26 @@ const billingRatesService = {
   },
 
   /**
-   * Get rate card for entity
-   * GET /api/billing/rate-cards/:entityType/:entityId
+   * Get rate card for client
+   * GET /api/billing/rate-cards/client/:clientId
    */
-  getRateCardForEntity: async (entityType: string, entityId: string): Promise<RateCard | null> => {
+  getRateCardForClient: async (clientId: string): Promise<RateCard | null> => {
     try {
-      const response = await apiClient.get<RateCardResponse>(`/billing/rate-cards/${entityType}/${entityId}`)
+      const response = await apiClient.get<RateCardResponse>(`/billing/rate-cards/client/${clientId}`)
+      return response.data.rateCard
+    } catch (error: any) {
+      if (error.response?.status === 404) return null
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Get rate card for case
+   * GET /api/billing/rate-cards/case/:caseId
+   */
+  getRateCardForCase: async (caseId: string): Promise<RateCard | null> => {
+    try {
+      const response = await apiClient.get<RateCardResponse>(`/billing/rate-cards/case/${caseId}`)
       return response.data.rateCard
     } catch (error: any) {
       if (error.response?.status === 404) return null
@@ -613,6 +703,58 @@ const billingRatesService = {
   deleteRateCard: async (id: string): Promise<void> => {
     try {
       await apiClient.delete(`/billing/rate-cards/${id}`)
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Calculate rate for billing
+   * POST /api/billing/rate-cards/calculate
+   */
+  calculateRate: async (data: { caseId?: string; clientId?: string; category: RateCategory; duration?: number }): Promise<{ amount: number; rate: BillingRate }> => {
+    try {
+      const response = await apiClient.post<any>('/billing/rate-cards/calculate', data)
+      return response.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Add custom rate to rate card
+   * POST /api/billing/rate-cards/:id/rates
+   */
+  addCustomRate: async (id: string, data: { rateId: string; customAmount?: number; customCurrency?: Currency; notes?: string }): Promise<RateCard> => {
+    try {
+      const response = await apiClient.post<RateCardResponse>(`/billing/rate-cards/${id}/rates`, data)
+      return response.data.rateCard
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Update custom rate in rate card
+   * PATCH /api/billing/rate-cards/:id/rates/:rateId
+   */
+  updateCustomRate: async (id: string, rateId: string, data: { customAmount?: number; customCurrency?: Currency; notes?: string }): Promise<RateCard> => {
+    try {
+      const response = await apiClient.patch<RateCardResponse>(`/billing/rate-cards/${id}/rates/${rateId}`, data)
+      return response.data.rateCard
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Remove custom rate from rate card
+   * DELETE /api/billing/rate-cards/:id/rates/:rateId
+   */
+  removeCustomRate: async (id: string, rateId: string): Promise<RateCard> => {
+    try {
+      const response = await apiClient.delete<RateCardResponse>(`/billing/rate-cards/${id}/rates/${rateId}`)
+      return response.data.rateCard
     } catch (error: any) {
       throw new Error(handleApiError(error))
     }

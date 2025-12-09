@@ -136,7 +136,27 @@ const documentsService = {
     return response.data
   },
 
-  // Upload new document
+  // Get upload URL (S3 presigned URL)
+  getUploadUrl: async (
+    fileName: string,
+    fileType: string,
+    metadata: CreateDocumentData
+  ): Promise<{ uploadUrl: string; documentId: string }> => {
+    const response = await api.post('/documents/upload', {
+      fileName,
+      fileType,
+      ...metadata,
+    })
+    return response.data
+  },
+
+  // Confirm upload after uploading to S3
+  confirmUpload: async (documentId: string): Promise<Document> => {
+    const response = await api.post('/documents/confirm', { documentId })
+    return response.data
+  },
+
+  // Upload new document (legacy/direct upload)
   uploadDocument: async (
     file: File,
     metadata: CreateDocumentData,
@@ -204,25 +224,6 @@ const documentsService = {
     return response.data
   },
 
-  // Get download URL with disposition (for S3 presigned URLs)
-  getDownloadUrl: async (
-    id: string,
-    disposition: 'inline' | 'attachment' = 'attachment'
-  ): Promise<string> => {
-    const response = await api.get(`/documents/${id}/download-url`, {
-      params: { disposition },
-    })
-    return response.data.downloadUrl
-  },
-
-  // Get preview URL (inline disposition)
-  getPreviewUrl: async (id: string): Promise<string> => {
-    const response = await api.get(`/documents/${id}/download-url`, {
-      params: { disposition: 'inline' },
-    })
-    return response.data.downloadUrl
-  },
-
   // Generate shareable link
   shareDocument: async (
     id: string,
@@ -234,7 +235,7 @@ const documentsService = {
 
   // Revoke shareable link
   revokeShareLink: async (id: string): Promise<void> => {
-    await api.delete(`/documents/${id}/share`)
+    await api.post(`/documents/${id}/revoke-share`)
   },
 
   // Upload new version of document
@@ -248,7 +249,7 @@ const documentsService = {
     formData.append('file', file)
     if (changeNote) formData.append('changeNote', changeNote)
 
-    const response = await api.post(`/documents/${id}/version`, formData, {
+    const response = await api.post(`/documents/${id}/versions`, formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
@@ -277,18 +278,6 @@ const documentsService = {
     return response.data
   },
 
-  // Encrypt document
-  encryptDocument: async (id: string): Promise<Document> => {
-    const response = await api.post(`/documents/${id}/encrypt`)
-    return response.data
-  },
-
-  // Decrypt document (returns temporary URL)
-  decryptDocument: async (id: string): Promise<{ decryptedUrl: string }> => {
-    const response = await api.post(`/documents/${id}/decrypt`)
-    return response.data
-  },
-
   // Search documents
   searchDocuments: async (query: string): Promise<Document[]> => {
     const response = await api.get(`/documents/search?q=${encodeURIComponent(query)}`)
@@ -308,7 +297,7 @@ const documentsService = {
 
   // Move document to case
   moveDocumentToCase: async (documentId: string, caseId: string): Promise<Document> => {
-    const response = await api.patch(`/documents/${documentId}/move`, { caseId })
+    const response = await api.post(`/documents/${documentId}/move`, { caseId })
     return response.data
   },
 

@@ -637,6 +637,15 @@ export const completeExitInterview = async (offboardingId: string, data: Partial
   return response.data
 }
 
+// Add clearance item
+export const addClearanceItem = async (
+  offboardingId: string,
+  item: Partial<ClearanceItem>
+): Promise<OffboardingRecord> => {
+  const response = await api.post(`/hr/offboarding/${offboardingId}/clearance/items`, item)
+  return response.data
+}
+
 // Update clearance item
 export const updateClearanceItem = async (offboardingId: string, itemId: string, data: Partial<ClearanceItem>): Promise<OffboardingRecord> => {
   const response = await api.patch(`/hr/offboarding/${offboardingId}/clearance/items/${itemId}`, data)

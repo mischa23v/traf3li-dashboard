@@ -637,3 +637,39 @@ export const getUpcomingProbationReviews = async (days?: number): Promise<Array<
   const response = await api.get(`/hr/onboarding/upcoming-reviews?${params.toString()}`)
   return response.data
 }
+
+// Add checklist category
+export const addChecklistCategory = async (
+  onboardingId: string,
+  category: {
+    categoryName: string
+    categoryNameAr?: string
+  }
+): Promise<OnboardingRecord> => {
+  const response = await api.post(`/hr/onboarding/${onboardingId}/checklist/categories`, category)
+  return response.data
+}
+
+// Add checklist task
+export const addChecklistTask = async (
+  onboardingId: string,
+  categoryId: string,
+  task: Partial<OnboardingTask>
+): Promise<OnboardingRecord> => {
+  const response = await api.post(`/hr/onboarding/${onboardingId}/checklist/categories/${categoryId}/tasks`, task)
+  return response.data
+}
+
+// Add employee feedback
+export const addEmployeeFeedback = async (
+  onboardingId: string,
+  feedback: {
+    feedbackType: 'first_day' | 'first_week' | 'first_month' | 'general'
+    rating?: number
+    comments: string
+    suggestions?: string
+  }
+): Promise<OnboardingRecord> => {
+  const response = await api.post(`/hr/onboarding/${onboardingId}/feedback`, feedback)
+  return response.data
+}

@@ -1123,61 +1123,21 @@ export const reportsApi = {
     return response.data
   },
 
-  // Get reports by category
-  getByCategory: async (category: ReportCategory): Promise<Report[]> => {
-    const response = await api.get(`/reports/category/${category}`)
+  // Get report templates
+  getTemplates: async (): Promise<Report[]> => {
+    const response = await api.get('/reports/templates')
     return response.data
   },
 
-  // Get reports by section
-  getBySection: async (section: ReportSection): Promise<Report[]> => {
-    const response = await api.get(`/reports/section/${section}`)
-    return response.data
-  },
-
-  // Create report
-  create: async (data: CreateReportInput): Promise<Report> => {
-    const response = await api.post('/reports', data)
-    return response.data
-  },
-
-  // Update report
-  update: async (id: string, data: UpdateReportInput): Promise<Report> => {
-    const response = await api.put(`/reports/${id}`, data)
+  // Generate report
+  generate: async (data: any): Promise<Report> => {
+    const response = await api.post('/reports/generate', data)
     return response.data
   },
 
   // Delete report
   delete: async (id: string): Promise<void> => {
     await api.delete(`/reports/${id}`)
-  },
-
-  // Bulk delete
-  bulkDelete: async (ids: string[]): Promise<void> => {
-    await api.post('/reports/bulk-delete', { ids })
-  },
-
-  // Run report
-  runReport: async (id: string, parameters?: Record<string, any>): Promise<{
-    data: any[]
-    metadata: {
-      executionTime: number
-      recordCount: number
-      generatedAt: string
-    }
-  }> => {
-    const response = await api.post(`/reports/${id}/run`, { parameters })
-    return response.data
-  },
-
-  // Export report
-  exportReport: async (id: string, format: OutputFormat, parameters?: Record<string, any>): Promise<{
-    fileUrl: string
-    fileName: string
-    format: OutputFormat
-  }> => {
-    const response = await api.post(`/reports/${id}/export`, { format, parameters })
-    return response.data
   },
 
   // Schedule report
@@ -1192,98 +1152,359 @@ export const reportsApi = {
     return response.data
   },
 
-  // Pause schedule
-  pauseSchedule: async (id: string): Promise<Report> => {
-    const response = await api.post(`/reports/${id}/schedule/pause`)
+  // Unschedule report
+  unscheduleReport: async (id: string): Promise<void> => {
+    await api.delete(`/reports/${id}/schedule`)
+  },
+
+  // Financial/Accounting Reports
+  getProfitLossReport: async (params?: Record<string, any>): Promise<any> => {
+    const response = await api.get('/reports/profit-loss', { params })
     return response.data
   },
 
-  // Resume schedule
-  resumeSchedule: async (id: string): Promise<Report> => {
-    const response = await api.post(`/reports/${id}/schedule/resume`)
+  getBalanceSheetReport: async (params?: Record<string, any>): Promise<any> => {
+    const response = await api.get('/reports/balance-sheet', { params })
     return response.data
   },
 
-  // Get execution history
-  getExecutionHistory: async (id: string): Promise<ScheduleExecution[]> => {
-    const response = await api.get(`/reports/${id}/executions`)
+  getCaseProfitabilityReport: async (params?: Record<string, any>): Promise<any> => {
+    const response = await api.get('/reports/case-profitability', { params })
     return response.data
   },
 
-  // Duplicate report
-  duplicate: async (id: string, newName: string): Promise<Report> => {
-    const response = await api.post(`/reports/${id}/duplicate`, { newName })
+  getARAgingReport: async (params?: Record<string, any>): Promise<any> => {
+    const response = await api.get('/reports/ar-aging', { params })
     return response.data
   },
 
-  // Get report stats
-  getStats: async (officeId?: string): Promise<{
+  getTrialBalanceReport: async (params?: Record<string, any>): Promise<any> => {
+    const response = await api.get('/reports/trial-balance', { params })
+    return response.data
+  },
+
+  // Direct Report Endpoints
+  getAccountsAgingReport: async (params?: Record<string, any>): Promise<any> => {
+    const response = await api.get('/reports/accounts-aging', { params })
+    return response.data
+  },
+
+  getRevenueByClientReport: async (params?: Record<string, any>): Promise<any> => {
+    const response = await api.get('/reports/revenue-by-client', { params })
+    return response.data
+  },
+
+  getOutstandingInvoicesReport: async (params?: Record<string, any>): Promise<any> => {
+    const response = await api.get('/reports/outstanding-invoices', { params })
+    return response.data
+  },
+
+  getTimeEntriesReport: async (params?: Record<string, any>): Promise<any> => {
+    const response = await api.get('/reports/time-entries', { params })
+    return response.data
+  },
+
+  // Export report (generic)
+  exportReport: async (format: OutputFormat, parameters?: Record<string, any>): Promise<{
+    fileUrl: string
+    fileName: string
+    format: OutputFormat
+  }> => {
+    const response = await api.post('/reports/export', { format, parameters })
+    return response.data
+  }
+}
+
+// ==================== ANALYTICS REPORTS API ====================
+
+export const analyticsReportsApi = {
+  // Statistics & Dashboard
+  getStats: async (): Promise<{
     totalReports: number
     activeReports: number
     scheduledReports: number
-    byCategory: Record<string, number>
-    byType: Record<string, number>
-    mostUsedReports: Array<{ reportId: string; reportName: string; runCount: number }>
+    bySection: Record<string, number>
     recentExecutions: Array<{ reportId: string; reportName: string; executedAt: string }>
   }> => {
-    const params = officeId ? `?officeId=${officeId}` : ''
-    const response = await api.get(`/reports/stats${params}`)
+    const response = await api.get('/analytics-reports/stats')
     return response.data
   },
 
-  // Get available data sources
-  getDataSources: async (): Promise<Array<{
-    moduleId: string
-    moduleName: string
-    moduleNameAr: string
-    fields: Array<{
-      fieldId: string
-      fieldName: string
-      fieldNameAr: string
-      dataType: string
-    }>
-  }>> => {
-    const response = await api.get('/reports/data-sources')
-    return response.data
-  },
-
-  // Preview report data
-  previewData: async (config: {
-    dataModules: DataModule[]
-    columns: string[]
-    filters?: ReportFilter[]
-    limit?: number
-  }): Promise<{
-    data: any[]
-    columns: string[]
-    recordCount: number
-  }> => {
-    const response = await api.post('/reports/preview', config)
-    return response.data
-  },
-
-  // Add to favorites
-  addToFavorites: async (id: string): Promise<void> => {
-    await api.post(`/reports/${id}/favorite`)
-  },
-
-  // Remove from favorites
-  removeFromFavorites: async (id: string): Promise<void> => {
-    await api.delete(`/reports/${id}/favorite`)
-  },
-
-  // Get favorites
   getFavorites: async (): Promise<Report[]> => {
-    const response = await api.get('/reports/favorites')
+    const response = await api.get('/analytics-reports/favorites')
     return response.data
   },
 
-  // Share report
-  shareReport: async (id: string, recipients: Array<{
-    userId?: string
-    email?: string
-    permissions: string[]
-  }>): Promise<void> => {
-    await api.post(`/reports/${id}/share`, { recipients })
+  getPinnedReports: async (): Promise<Report[]> => {
+    const response = await api.get('/analytics-reports/pinned')
+    return response.data
+  },
+
+  getTemplates: async (): Promise<Report[]> => {
+    const response = await api.get('/analytics-reports/templates')
+    return response.data
+  },
+
+  // Section-specific reports
+  getBySection: async (section: ReportSection): Promise<Report[]> => {
+    const response = await api.get(`/analytics-reports/section/${section}`)
+    return response.data
+  },
+
+  // Create from template
+  createFromTemplate: async (templateId: string, data?: any): Promise<Report> => {
+    const response = await api.post(`/analytics-reports/from-template/${templateId}`, data)
+    return response.data
+  },
+
+  // CRUD Operations
+  getAll: async (filters?: ReportFilters): Promise<Report[]> => {
+    const params = new URLSearchParams()
+    if (filters) {
+      Object.entries(filters).forEach(([key, value]) => {
+        if (value !== undefined && value !== null) {
+          params.append(key, String(value))
+        }
+      })
+    }
+    const response = await api.get(`/analytics-reports?${params.toString()}`)
+    return response.data
+  },
+
+  create: async (data: CreateReportInput): Promise<Report> => {
+    const response = await api.post('/analytics-reports', data)
+    return response.data
+  },
+
+  bulkDelete: async (ids: string[]): Promise<void> => {
+    await api.post('/analytics-reports/bulk-delete', { ids })
+  },
+
+  getById: async (id: string): Promise<Report> => {
+    const response = await api.get(`/analytics-reports/${id}`)
+    return response.data
+  },
+
+  update: async (id: string, data: UpdateReportInput): Promise<Report> => {
+    const response = await api.patch(`/analytics-reports/${id}`, data)
+    return response.data
+  },
+
+  updatePut: async (id: string, data: UpdateReportInput): Promise<Report> => {
+    const response = await api.put(`/analytics-reports/${id}`, data)
+    return response.data
+  },
+
+  delete: async (id: string): Promise<void> => {
+    await api.delete(`/analytics-reports/${id}`)
+  },
+
+  // Report Execution
+  runReport: async (id: string, parameters?: Record<string, any>): Promise<{
+    data: any[]
+    metadata: {
+      executionTime: number
+      recordCount: number
+      generatedAt: string
+    }
+  }> => {
+    const response = await api.post(`/analytics-reports/${id}/run`, { parameters })
+    return response.data
+  },
+
+  cloneReport: async (id: string, newName?: string): Promise<Report> => {
+    const response = await api.post(`/analytics-reports/${id}/clone`, { newName })
+    return response.data
+  },
+
+  exportReport: async (id: string, format: OutputFormat, parameters?: Record<string, any>): Promise<{
+    fileUrl: string
+    fileName: string
+    format: OutputFormat
+  }> => {
+    const response = await api.post(`/analytics-reports/${id}/export`, { format, parameters })
+    return response.data
+  },
+
+  // Favorites & Pinning
+  toggleFavorite: async (id: string): Promise<Report> => {
+    const response = await api.post(`/analytics-reports/${id}/favorite`)
+    return response.data
+  },
+
+  togglePinned: async (id: string): Promise<Report> => {
+    const response = await api.post(`/analytics-reports/${id}/pin`)
+    return response.data
+  },
+
+  // Scheduling
+  scheduleReport: async (id: string, schedule: {
+    frequency: ScheduleFrequency
+    startDate: string
+    endDate?: string
+    time: string
+    distributionList?: DistributionRecipient[]
+  }): Promise<Report> => {
+    const response = await api.post(`/analytics-reports/${id}/schedule`, schedule)
+    return response.data
+  },
+
+  unscheduleReport: async (id: string): Promise<void> => {
+    await api.delete(`/analytics-reports/${id}/schedule`)
+  }
+}
+
+// ==================== SAVED REPORTS API ====================
+
+export const savedReportsApi = {
+  // Saved Reports
+  getReports: async (filters?: Record<string, any>): Promise<any[]> => {
+    const params = new URLSearchParams()
+    if (filters) {
+      Object.entries(filters).forEach(([key, value]) => {
+        if (value !== undefined && value !== null) {
+          params.append(key, String(value))
+        }
+      })
+    }
+    const response = await api.get(`/saved-reports/reports?${params.toString()}`)
+    return response.data
+  },
+
+  createReport: async (data: any): Promise<any> => {
+    const response = await api.post('/saved-reports/reports', data)
+    return response.data
+  },
+
+  getReport: async (id: string): Promise<any> => {
+    const response = await api.get(`/saved-reports/reports/${id}`)
+    return response.data
+  },
+
+  updateReport: async (id: string, data: any): Promise<any> => {
+    const response = await api.patch(`/saved-reports/reports/${id}`, data)
+    return response.data
+  },
+
+  deleteReport: async (id: string): Promise<void> => {
+    await api.delete(`/saved-reports/reports/${id}`)
+  },
+
+  runReport: async (id: string, parameters?: Record<string, any>): Promise<any> => {
+    const response = await api.post(`/saved-reports/reports/${id}/run`, { parameters })
+    return response.data
+  },
+
+  duplicateReport: async (id: string, newName?: string): Promise<any> => {
+    const response = await api.post(`/saved-reports/reports/${id}/duplicate`, { newName })
+    return response.data
+  },
+
+  // Dashboard Widgets
+  getDefaultWidgets: async (): Promise<any[]> => {
+    const response = await api.get('/saved-reports/widgets/defaults')
+    return response.data
+  },
+
+  updateLayout: async (layout: any[]): Promise<void> => {
+    await api.patch('/saved-reports/widgets/layout', { layout })
+  },
+
+  getWidgets: async (): Promise<any[]> => {
+    const response = await api.get('/saved-reports/widgets')
+    return response.data
+  },
+
+  createWidget: async (data: any): Promise<any> => {
+    const response = await api.post('/saved-reports/widgets', data)
+    return response.data
+  },
+
+  getWidget: async (id: string): Promise<any> => {
+    const response = await api.get(`/saved-reports/widgets/${id}`)
+    return response.data
+  },
+
+  updateWidget: async (id: string, data: any): Promise<any> => {
+    const response = await api.patch(`/saved-reports/widgets/${id}`, data)
+    return response.data
+  },
+
+  deleteWidget: async (id: string): Promise<void> => {
+    await api.delete(`/saved-reports/widgets/${id}`)
+  },
+
+  getWidgetData: async (id: string, params?: Record<string, any>): Promise<any> => {
+    const response = await api.get(`/saved-reports/widgets/${id}/data`, { params })
+    return response.data
+  }
+}
+
+// ==================== METRICS API ====================
+
+export const metricsApi = {
+  // Get Prometheus-format metrics
+  getMetrics: async (): Promise<string> => {
+    const response = await api.get('/metrics')
+    return response.data
+  },
+
+  // Get metrics in JSON format
+  getMetricsJson: async (): Promise<{
+    timestamp: string
+    uptime: number
+    http: {
+      requestsTotal: number
+      requestRate: number
+      errorRate: number
+      errors: number
+      activeConnections: number
+      byStatus: Record<string, number>
+      byMethod: Record<string, number>
+      latency: {
+        p50: number
+        p95: number
+        p99: number
+        avg: number
+      }
+    }
+    database: any
+    redis: any
+    memory: any
+    disk: any
+    system: {
+      platform: string
+      nodeVersion: string
+      cpuCores: number
+      loadAverage: number[]
+    }
+  }> => {
+    const response = await api.get('/metrics/json')
+    return response.data
+  },
+
+  // Get performance metrics
+  getPerformanceMetrics: async (): Promise<{
+    success: boolean
+    data: {
+      targets: {
+        description: string
+        backendApiTarget: string
+        firstContentfulPaint: string
+        timeToInteractive: string
+      }
+    }
+  }> => {
+    const response = await api.get('/metrics/performance')
+    return response.data
+  },
+
+  // Reset metrics
+  resetMetrics: async (): Promise<{
+    success: boolean
+    message: string
+  }> => {
+    const response = await api.post('/metrics/reset')
+    return response.data
   }
 }

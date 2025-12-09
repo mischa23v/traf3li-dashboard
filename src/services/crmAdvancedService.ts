@@ -628,109 +628,9 @@ export const segmentService = {
 // LEAD SCORING SERVICE
 // ═══════════════════════════════════════════════════════════════
 export const leadScoringService = {
-  /**
-   * Get all lead scores
-   */
-  getScores: async (params?: {
-    grade?: string
-    minScore?: number
-    maxScore?: number
-  }): Promise<{ data: LeadScore[]; pagination: any }> => {
-    try {
-      const response = await apiClient.get('/lead-scoring/scores', { params })
-      // API returns: { success: true, data: { scores: [...], pagination: {...} } }
-      return {
-        data: response.data.data.scores,
-        pagination: response.data.data.pagination
-      }
-    } catch (error: any) {
-      throw new Error(handleApiError(error))
-    }
-  },
-
-  /**
-   * Get score for specific lead
-   */
-  getLeadScore: async (leadId: string): Promise<LeadScore> => {
-    try {
-      const response = await apiClient.get(`/lead-scoring/scores/${leadId}`)
-      return response.data.data
-    } catch (error: any) {
-      throw new Error(handleApiError(error))
-    }
-  },
-
-  /**
-   * Calculate score for lead
-   */
-  calculateScore: async (leadId: string): Promise<LeadScore> => {
-    try {
-      const response = await apiClient.post(`/lead-scoring/calculate/${leadId}`)
-      return response.data.data
-    } catch (error: any) {
-      throw new Error(handleApiError(error))
-    }
-  },
-
-  /**
-   * Calculate scores for all leads
-   */
-  calculateAllScores: async (): Promise<{ calculated: number }> => {
-    try {
-      const response = await apiClient.post('/lead-scoring/calculate-all')
-      return response.data.data
-    } catch (error: any) {
-      throw new Error(handleApiError(error))
-    }
-  },
-
-  /**
-   * Get leaderboard (top leads)
-   */
-  getLeaderboard: async (limit: number = 10): Promise<LeadScore[]> => {
-    try {
-      const response = await apiClient.get('/lead-scoring/leaderboard', { params: { limit } })
-      return response.data.data
-    } catch (error: any) {
-      throw new Error(handleApiError(error))
-    }
-  },
-
-  /**
-   * Get score distribution
-   */
-  getDistribution: async (): Promise<LeadScoreDistribution[]> => {
-    try {
-      const response = await apiClient.get('/lead-scoring/distribution')
-      return response.data.data
-    } catch (error: any) {
-      throw new Error(handleApiError(error))
-    }
-  },
-
-  /**
-   * Track lead behavior
-   */
-  trackBehavior: async (data: TrackBehaviorData): Promise<LeadScore> => {
-    try {
-      const response = await apiClient.post('/lead-scoring/track-behavior', data)
-      return response.data.data
-    } catch (error: any) {
-      throw new Error(handleApiError(error))
-    }
-  },
-
-  /**
-   * Apply score decay
-   */
-  applyDecay: async (): Promise<{ affected: number }> => {
-    try {
-      const response = await apiClient.post('/lead-scoring/apply-decay')
-      return response.data.data
-    } catch (error: any) {
-      throw new Error(handleApiError(error))
-    }
-  },
+  // ───────────────────────────────────────────────────────────────
+  // CONFIGURATION
+  // ───────────────────────────────────────────────────────────────
 
   /**
    * Get scoring config
@@ -750,6 +650,277 @@ export const leadScoringService = {
   updateConfig: async (data: Partial<LeadScoreConfig>): Promise<LeadScoreConfig> => {
     try {
       const response = await apiClient.put('/lead-scoring/config', data)
+      return response.data.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  // ───────────────────────────────────────────────────────────────
+  // SCORE CALCULATION
+  // ───────────────────────────────────────────────────────────────
+
+  /**
+   * Calculate score for specific lead
+   */
+  calculateScore: async (leadId: string): Promise<LeadScore> => {
+    try {
+      const response = await apiClient.post(`/lead-scoring/calculate/${leadId}`)
+      return response.data.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Calculate scores for all leads (admin only)
+   */
+  calculateAllScores: async (): Promise<{ calculated: number }> => {
+    try {
+      const response = await apiClient.post('/lead-scoring/calculate-all')
+      return response.data.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Calculate scores for batch of leads
+   */
+  calculateBatch: async (leadIds: string[]): Promise<{ calculated: number; results: LeadScore[] }> => {
+    try {
+      const response = await apiClient.post('/lead-scoring/calculate-batch', { leadIds })
+      return response.data.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  // ───────────────────────────────────────────────────────────────
+  // REPORTING & ANALYTICS
+  // ───────────────────────────────────────────────────────────────
+
+  /**
+   * Get all lead scores with filters
+   */
+  getScores: async (params?: {
+    grade?: string
+    minScore?: number
+    maxScore?: number
+    page?: number
+    limit?: number
+  }): Promise<{ data: LeadScore[]; pagination: any }> => {
+    try {
+      const response = await apiClient.get('/lead-scoring/scores', { params })
+      // API returns: { success: true, data: { scores: [...], pagination: {...} } }
+      return {
+        data: response.data.data.scores,
+        pagination: response.data.data.pagination
+      }
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Get leaderboard (top scoring leads)
+   */
+  getLeaderboard: async (limit: number = 10): Promise<LeadScore[]> => {
+    try {
+      const response = await apiClient.get('/lead-scoring/leaderboard', { params: { limit } })
+      return response.data.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Get score distribution by grade
+   */
+  getDistribution: async (): Promise<LeadScoreDistribution[]> => {
+    try {
+      const response = await apiClient.get('/lead-scoring/distribution')
+      return response.data.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Get top leads (highest scoring)
+   */
+  getTopLeads: async (limit: number = 20): Promise<LeadScore[]> => {
+    try {
+      const response = await apiClient.get('/lead-scoring/top-leads', { params: { limit } })
+      return response.data.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Get leads by grade (A, B, C, D, F)
+   */
+  getLeadsByGrade: async (grade: string, params?: { page?: number; limit?: number }): Promise<{ data: LeadScore[]; pagination: any }> => {
+    try {
+      const response = await apiClient.get(`/lead-scoring/by-grade/${grade}`, { params })
+      return response.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Get detailed insights for a specific lead
+   */
+  getLeadInsights: async (leadId: string): Promise<{
+    score: LeadScore
+    scoreHistory: Array<{ date: string; score: number; grade: string }>
+    recentActivities: Array<{ type: string; points: number; date: string }>
+    recommendations: string[]
+  }> => {
+    try {
+      const response = await apiClient.get(`/lead-scoring/insights/${leadId}`)
+      return response.data.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Get score trends over time
+   */
+  getScoreTrends: async (params?: {
+    startDate?: string
+    endDate?: string
+    interval?: 'day' | 'week' | 'month'
+  }): Promise<{
+    trends: Array<{ date: string; avgScore: number; count: number }>
+    gradeDistribution: Record<string, number>
+  }> => {
+    try {
+      const response = await apiClient.get('/lead-scoring/trends', { params })
+      return response.data.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Get conversion analysis by score/grade
+   */
+  getConversionAnalysis: async (): Promise<{
+    byGrade: Record<string, { total: number; converted: number; conversionRate: number }>
+    byScoreRange: Array<{ range: string; total: number; converted: number; conversionRate: number }>
+    avgScoreConverted: number
+    avgScoreNotConverted: number
+  }> => {
+    try {
+      const response = await apiClient.get('/lead-scoring/conversion-analysis')
+      return response.data.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  // ───────────────────────────────────────────────────────────────
+  // BEHAVIORAL TRACKING
+  // ───────────────────────────────────────────────────────────────
+
+  /**
+   * Track email open
+   */
+  trackEmailOpen: async (data: { leadId: string; campaignId?: string; emailId?: string }): Promise<LeadScore> => {
+    try {
+      const response = await apiClient.post('/lead-scoring/track/email-open', data)
+      return response.data.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Track email click
+   */
+  trackEmailClick: async (data: { leadId: string; campaignId?: string; emailId?: string; linkUrl?: string }): Promise<LeadScore> => {
+    try {
+      const response = await apiClient.post('/lead-scoring/track/email-click', data)
+      return response.data.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Track document view
+   */
+  trackDocumentView: async (data: { leadId: string; documentId: string; documentType?: string }): Promise<LeadScore> => {
+    try {
+      const response = await apiClient.post('/lead-scoring/track/document-view', data)
+      return response.data.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Track website visit
+   */
+  trackWebsiteVisit: async (data: { leadId: string; pageUrl: string; duration?: number }): Promise<LeadScore> => {
+    try {
+      const response = await apiClient.post('/lead-scoring/track/website-visit', data)
+      return response.data.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Track form submission
+   */
+  trackFormSubmit: async (data: { leadId: string; formId: string; formType?: string }): Promise<LeadScore> => {
+    try {
+      const response = await apiClient.post('/lead-scoring/track/form-submit', data)
+      return response.data.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Track meeting
+   */
+  trackMeeting: async (data: { leadId: string; meetingId?: string; duration?: number; outcome?: string }): Promise<LeadScore> => {
+    try {
+      const response = await apiClient.post('/lead-scoring/track/meeting', data)
+      return response.data.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Track call
+   */
+  trackCall: async (data: { leadId: string; callId?: string; duration?: number; outcome?: string }): Promise<LeadScore> => {
+    try {
+      const response = await apiClient.post('/lead-scoring/track/call', data)
+      return response.data.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  // ───────────────────────────────────────────────────────────────
+  // DECAY MANAGEMENT
+  // ───────────────────────────────────────────────────────────────
+
+  /**
+   * Process score decay (admin only)
+   */
+  processDecay: async (): Promise<{ processed: number; affected: number }> => {
+    try {
+      const response = await apiClient.post('/lead-scoring/process-decay')
       return response.data.data
     } catch (error: any) {
       throw new Error(handleApiError(error))

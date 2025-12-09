@@ -644,6 +644,17 @@ export const processClaimPayment = async (claimId: string, data: {
   return response.data
 }
 
+// Confirm payment
+export const confirmClaimPayment = async (claimId: string, data: {
+  paymentDate: string
+  paymentReference: string
+  amountPaid: number
+  notes?: string
+}): Promise<ExpenseClaimRecord> => {
+  const response = await api.post(`/hr/expense-claims/${claimId}/confirm-payment`, data)
+  return response.data
+}
+
 // Add line item
 export const addLineItem = async (claimId: string, data: {
   category: ExpenseCategory

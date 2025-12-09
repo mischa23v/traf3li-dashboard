@@ -349,6 +349,12 @@ export const performanceReviewService = {
     return response.data
   },
 
+  // Delete performance review
+  deletePerformanceReview: async (reviewId: string) => {
+    const response = await api.delete(`/hr/performance-reviews/${reviewId}`)
+    return response.data
+  },
+
   // Submit self-assessment
   submitSelfAssessment: async (reviewId: string, data: SelfAssessment & {
     competencyRatings: { competencyId: string; rating: RatingScale; comments: string }[]
@@ -425,18 +431,6 @@ export const performanceReviewService = {
     return response.data
   },
 
-  // Approve review step
-  approveReviewStep: async (reviewId: string, stepNumber: number, data: { comments?: string }) => {
-    const response = await api.post<PerformanceReview>(`/hr/performance-reviews/${reviewId}/approve/${stepNumber}`, data)
-    return response.data
-  },
-
-  // Reject review step
-  rejectReviewStep: async (reviewId: string, stepNumber: number, data: { comments: string }) => {
-    const response = await api.post<PerformanceReview>(`/hr/performance-reviews/${reviewId}/reject/${stepNumber}`, data)
-    return response.data
-  },
-
   // Get review templates
   getReviewTemplates: async (reviewType?: ReviewType) => {
     const response = await api.get<ReviewTemplate[]>('/hr/performance-reviews/templates', { params: { reviewType } })
@@ -446,6 +440,12 @@ export const performanceReviewService = {
   // Create review template
   createReviewTemplate: async (data: Omit<ReviewTemplate, '_id' | 'templateId'>) => {
     const response = await api.post<ReviewTemplate>('/hr/performance-reviews/templates', data)
+    return response.data
+  },
+
+  // Update review template
+  updateReviewTemplate: async (templateId: string, data: Partial<ReviewTemplate>) => {
+    const response = await api.patch<ReviewTemplate>(`/hr/performance-reviews/templates/${templateId}`, data)
     return response.data
   },
 
@@ -478,6 +478,22 @@ export const performanceReviewService = {
       overdueReviews: number
       upcomingDue: number
     }>('/hr/performance-reviews/stats', { params: filters })
+    return response.data
+  },
+
+  // Get overdue reviews
+  getOverdueReviews: async (filters?: { departmentId?: string; managerId?: string }) => {
+    const response = await api.get<Array<{
+      reviewId: string
+      employeeId: string
+      employeeName: string
+      employeeNameAr: string
+      reviewType: ReviewType
+      reviewDueDate: string
+      daysOverdue: number
+      status: ReviewStatus
+      managerName: string
+    }>>('/hr/performance-reviews/overdue', { params: filters })
     return response.data
   },
 
@@ -526,15 +542,6 @@ export const performanceReviewService = {
   // Send reminder
   sendReminder: async (reviewId: string, reminderType: 'self_assessment' | 'manager_review' | '360_feedback' | 'acknowledgement') => {
     const response = await api.post(`/hr/performance-reviews/${reviewId}/reminder`, { reminderType })
-    return response.data
-  },
-
-  // Export reviews
-  exportReviews: async (filters?: PerformanceReviewFilters, format: 'pdf' | 'excel' = 'excel') => {
-    const response = await api.get('/hr/performance-reviews/export', {
-      params: { ...filters, format },
-      responseType: 'blob'
-    })
     return response.data
   },
 }

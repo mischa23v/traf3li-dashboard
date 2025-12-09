@@ -838,6 +838,106 @@ export const successionPlanningApi = {
     return response.data
   },
 
+  // Activate plan
+  activate: async (id: string, data?: { activationDate?: string; notes?: string }): Promise<SuccessionPlan> => {
+    const response = await api.post(`/succession-plans/${id}/activate`, data)
+    return response.data
+  },
+
+  // Archive plan
+  archive: async (id: string, data?: { archiveReason?: string; notes?: string }): Promise<SuccessionPlan> => {
+    const response = await api.post(`/succession-plans/${id}/archive`, data)
+    return response.data
+  },
+
+  // Update successor readiness
+  updateSuccessorReadiness: async (planId: string, successorId: string, data: {
+    readinessLevel: ReadinessLevel
+    readyInMonths?: number
+    overallReadinessScore?: number
+    readinessGaps?: string[]
+    accelerators?: string[]
+  }): Promise<SuccessionPlan> => {
+    const response = await api.patch(`/succession-plans/${planId}/successors/${successorId}/readiness`, data)
+    return response.data
+  },
+
+  // Update successor development plan
+  updateSuccessorDevelopmentPlan: async (planId: string, successorId: string, data: {
+    developmentGoals?: string[]
+    trainingRequired?: string[]
+    targetCompletionDate?: string
+    progressPercentage?: number
+    developmentBudget?: number
+    developmentStatus?: 'not_started' | 'in_progress' | 'completed'
+  }): Promise<SuccessionPlan> => {
+    const response = await api.patch(`/succession-plans/${planId}/successors/${successorId}/development`, data)
+    return response.data
+  },
+
+  // Add review
+  addReview: async (planId: string, data: {
+    reviewDate: string
+    reviewerName: string
+    comments?: string
+    recommendedActions?: string[]
+  }): Promise<SuccessionPlan> => {
+    const response = await api.post(`/succession-plans/${planId}/reviews`, data)
+    return response.data
+  },
+
+  // Add action
+  addAction: async (planId: string, data: {
+    action: string
+    responsible: string
+    dueDate?: string
+    targetQuarter?: string
+    priority?: 'high' | 'medium' | 'low'
+    isShortTerm?: boolean
+  }): Promise<SuccessionPlan> => {
+    const response = await api.post(`/succession-plans/${planId}/actions`, data)
+    return response.data
+  },
+
+  // Update action
+  updateAction: async (planId: string, actionId: string, data: {
+    status?: 'pending' | 'in_progress' | 'completed' | 'overdue' | 'planned'
+    action?: string
+    responsible?: string
+    dueDate?: string
+    targetQuarter?: string
+    priority?: 'high' | 'medium' | 'low'
+  }): Promise<SuccessionPlan> => {
+    const response = await api.patch(`/succession-plans/${planId}/actions/${actionId}`, data)
+    return response.data
+  },
+
+  // Add document
+  addDocument: async (planId: string, data: {
+    name: string
+    type: 'plan' | 'assessment' | 'development' | 'transition' | 'other'
+    url?: string
+  }): Promise<SuccessionPlan> => {
+    const response = await api.post(`/succession-plans/${planId}/documents`, data)
+    return response.data
+  },
+
+  // Export succession plans
+  export: async (filters?: SuccessionPlanFilters): Promise<Blob> => {
+    const params = new URLSearchParams()
+    if (filters) {
+      Object.entries(filters).forEach(([key, value]) => {
+        if (value !== undefined && value !== null && value !== '') {
+          params.append(key, String(value))
+        }
+      })
+    }
+    const queryString = params.toString()
+    const url = queryString ? `/succession-plans/export?${queryString}` : '/succession-plans/export'
+    const response = await api.get(url, { responseType: 'blob' })
+    return response.data
+  },
+
   // Get statistics
   getStats: async (officeId?: string): Promise<{
     totalPlans: number

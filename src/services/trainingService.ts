@@ -875,3 +875,18 @@ export const exportTrainings = async (filters?: TrainingFilters): Promise<Blob> 
   })
   return response.data
 }
+
+// Get training policies
+export const getTrainingPolicies = async (): Promise<Array<{
+  policyId: string
+  policyName: string
+  policyNameAr?: string
+  policyType: 'compliance' | 'development' | 'general'
+  description?: string
+  effectiveDate: string
+  documentUrl?: string
+  mandatory: boolean
+}>> => {
+  const response = await api.get('/hr/trainings/policies')
+  return response.data
+}

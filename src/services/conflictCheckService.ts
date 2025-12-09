@@ -149,69 +149,45 @@ export const conflictCheckService = {
     return response.data
   },
 
-  // Update conflict match resolution
+  // Update conflict check
+  updateConflictCheck: async (
+    id: string,
+    data: Partial<ConflictCheckRequest>
+  ): Promise<ConflictCheckResult> => {
+    const response = await api.patch(`/conflict-checks/${id}`, data)
+    return response.data
+  },
+
+  // Delete conflict check
+  deleteConflictCheck: async (id: string): Promise<void> => {
+    await api.delete(`/conflict-checks/${id}`)
+  },
+
+  // Resolve match (Backend uses matchIndex, not matchId)
   resolveConflictMatch: async (
     checkId: string,
-    matchId: string,
+    matchIndex: number,
     resolution: {
       status: 'cleared' | 'flagged' | 'waived'
       notes: string
     }
   ): Promise<ConflictMatch> => {
-    const response = await api.put(
-      `/conflict-checks/${checkId}/matches/${matchId}/resolve`,
+    const response = await api.post(
+      `/conflict-checks/${checkId}/matches/${matchIndex}/resolve`,
       resolution
     )
     return response.data
   },
 
-  // Add conflict waiver
-  addConflictWaiver: async (
-    checkId: string,
-    waiver: Omit<ConflictWaiver, 'waivedBy' | 'waivedAt'>
-  ): Promise<ConflictCheckResult> => {
-    const response = await api.post(`/conflict-checks/${checkId}/waiver`, waiver)
+  // Quick conflict check (matches backend /quick endpoint)
+  quickConflictCheck: async (request: ConflictCheckRequest): Promise<ConflictCheckResult> => {
+    const response = await api.post('/conflict-checks/quick', request)
     return response.data
   },
 
-  // Clear all matches in a conflict check
-  clearConflictCheck: async (
-    checkId: string,
-    notes: string
-  ): Promise<ConflictCheckResult> => {
-    const response = await api.put(`/conflict-checks/${checkId}/clear`, { notes })
-    return response.data
-  },
-
-  // Quick search for potential conflicts
-  quickConflictSearch: async (
-    name: string,
-    type?: 'individual' | 'organization'
-  ): Promise<ConflictMatch[]> => {
-    const response = await api.get('/conflict-checks/quick-search', {
-      params: { name, type },
-    })
-    return response.data
-  },
-
-  // Get conflict check for a specific entity
-  getEntityConflictChecks: async (
-    entityType: 'client' | 'case' | 'matter',
-    entityId: string
-  ): Promise<ConflictCheckResult[]> => {
-    const response = await api.get(`/conflict-checks/entity/${entityType}/${entityId}`)
-    return response.data
-  },
-
-  // Export conflict check report
-  exportConflictReport: async (
-    checkId: string,
-    format: 'pdf' | 'docx'
-  ): Promise<Blob> => {
-    const response = await api.get(`/conflict-checks/${checkId}/export`, {
-      params: { format },
-      responseType: 'blob',
-    })
+  // Get conflict stats
+  getConflictStats: async (): Promise<any> => {
+    const response = await api.get('/conflict-checks/stats')
     return response.data
   },
 }

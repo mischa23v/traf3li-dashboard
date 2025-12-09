@@ -201,8 +201,9 @@ export const trustAccountService = {
     return response.data
   },
 
+  // Note: Backend doesn't have a close endpoint - use updateTrustAccount with status: 'closed'
   closeTrustAccount: async (id: string, reason: string): Promise<TrustAccount> => {
-    const response = await api.put(`/trust-accounts/${id}/close`, { reason })
+    const response = await api.patch(`/trust-accounts/${id}`, { status: 'closed', notes: reason })
     return response.data
   },
 
@@ -301,9 +302,9 @@ export const trustAccountService = {
     return response.data
   },
 
+  // Note: Backend doesn't have this endpoint - transactions are cleared during reconciliation
   markTransactionCleared: async (id: string, clearedDate: string): Promise<TrustTransaction> => {
-    const response = await api.put(`/trust-transactions/${id}/clear`, { clearedDate })
-    return response.data
+    throw new Error('Endpoint not available - use reconciliation process to clear transactions')
   },
 
   // Reconciliation
@@ -382,6 +383,7 @@ export const trustAccountService = {
   },
 
   // Reports
+  // Note: Backend doesn't have client ledger report endpoint
   getClientLedgerReport: async (
     accountId: string,
     clientId: string,
@@ -395,13 +397,10 @@ export const trustAccountService = {
     closingBalance: number
     transactions: TrustTransaction[]
   }> => {
-    const response = await api.get(
-      `/trust-accounts/${accountId}/clients/${clientId}/ledger`,
-      { params }
-    )
-    return response.data
+    throw new Error('Endpoint not available - use getTransactions with clientId filter instead')
   },
 
+  // Note: Backend doesn't have export endpoint
   exportTrustReport: async (
     accountId: string,
     params: {
@@ -412,10 +411,12 @@ export const trustAccountService = {
       format: 'pdf' | 'xlsx'
     }
   ): Promise<Blob> => {
-    const response = await api.get(`/trust-accounts/${accountId}/export`, {
-      params,
-      responseType: 'blob',
-    })
+    throw new Error('Endpoint not available')
+  },
+
+  // Get account summary
+  getAccountSummary: async (id: string): Promise<any> => {
+    const response = await api.get(`/trust-accounts/${id}/summary`)
     return response.data
   },
 }

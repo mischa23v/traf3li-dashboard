@@ -184,9 +184,14 @@ export const matterBudgetService = {
     return response.data
   },
 
-  getMatterBudget: async (matterId: string): Promise<MatterBudget | null> => {
-    const response = await api.get(`/matters/${matterId}/budget`)
-    return response.data
+  getBudgetByCase: async (caseId: string): Promise<MatterBudget | null> => {
+    try {
+      const response = await api.get(`/matter-budgets/case/${caseId}`)
+      return response.data
+    } catch (error: any) {
+      if (error.response?.status === 404) return null
+      throw error
+    }
   },
 
   createBudget: async (
@@ -200,7 +205,7 @@ export const matterBudgetService = {
   },
 
   updateBudget: async (id: string, data: Partial<MatterBudget>): Promise<MatterBudget> => {
-    const response = await api.put(`/matter-budgets/${id}`, data)
+    const response = await api.patch(`/matter-budgets/${id}`, data)
     return response.data
   },
 
@@ -208,26 +213,21 @@ export const matterBudgetService = {
     await api.delete(`/matter-budgets/${id}`)
   },
 
-  // Budget Status
-  approveBudget: async (id: string, notes?: string): Promise<MatterBudget> => {
-    const response = await api.put(`/matter-budgets/${id}/approve`, { notes })
+  // Budget Analysis
+  getBudgetAnalysis: async (id: string): Promise<any> => {
+    const response = await api.get(`/matter-budgets/${id}/analysis`)
     return response.data
   },
 
-  activateBudget: async (id: string): Promise<MatterBudget> => {
-    const response = await api.put(`/matter-budgets/${id}/activate`)
+  // Budget Alerts
+  getBudgetAlerts: async (params?: {
+    level?: BudgetAlertLevel
+    acknowledged?: boolean
+  }): Promise<BudgetAlert[]> => {
+    const response = await api.get('/matter-budgets/alerts', { params })
     return response.data
   },
 
-  completeBudget: async (id: string): Promise<MatterBudget> => {
-    const response = await api.put(`/matter-budgets/${id}/complete`)
-    return response.data
-  },
-
-  cancelBudget: async (id: string, reason: string): Promise<MatterBudget> => {
-    const response = await api.put(`/matter-budgets/${id}/cancel`, { reason })
-    return response.data
-  },
 
   // Budget Phases
   addPhase: async (
@@ -243,7 +243,7 @@ export const matterBudgetService = {
     phaseId: string,
     data: Partial<BudgetPhase>
   ): Promise<MatterBudget> => {
-    const response = await api.put(`/matter-budgets/${budgetId}/phases/${phaseId}`, data)
+    const response = await api.patch(`/matter-budgets/${budgetId}/phases/${phaseId}`, data)
     return response.data
   },
 
@@ -252,73 +252,8 @@ export const matterBudgetService = {
     return response.data
   },
 
-  // Budget Categories
-  addCategory: async (
-    budgetId: string,
-    category: Omit<BudgetCategory, '_id' | 'usedAmount' | 'remainingAmount' | 'percentUsed'>
-  ): Promise<MatterBudget> => {
-    const response = await api.post(`/matter-budgets/${budgetId}/categories`, category)
-    return response.data
-  },
-
-  updateCategory: async (
-    budgetId: string,
-    categoryId: string,
-    data: Partial<BudgetCategory>
-  ): Promise<MatterBudget> => {
-    const response = await api.put(
-      `/matter-budgets/${budgetId}/categories/${categoryId}`,
-      data
-    )
-    return response.data
-  },
-
-  deleteCategory: async (budgetId: string, categoryId: string): Promise<MatterBudget> => {
-    const response = await api.delete(
-      `/matter-budgets/${budgetId}/categories/${categoryId}`
-    )
-    return response.data
-  },
-
-  // Budget Tasks
-  addTask: async (
-    budgetId: string,
-    phaseId: string,
-    task: Omit<BudgetTask, '_id' | 'actualHours' | 'actualAmount'>
-  ): Promise<MatterBudget> => {
-    const response = await api.post(
-      `/matter-budgets/${budgetId}/phases/${phaseId}/tasks`,
-      task
-    )
-    return response.data
-  },
-
-  updateTask: async (
-    budgetId: string,
-    phaseId: string,
-    taskId: string,
-    data: Partial<BudgetTask>
-  ): Promise<MatterBudget> => {
-    const response = await api.put(
-      `/matter-budgets/${budgetId}/phases/${phaseId}/tasks/${taskId}`,
-      data
-    )
-    return response.data
-  },
-
-  deleteTask: async (
-    budgetId: string,
-    phaseId: string,
-    taskId: string
-  ): Promise<MatterBudget> => {
-    const response = await api.delete(
-      `/matter-budgets/${budgetId}/phases/${phaseId}/tasks/${taskId}`
-    )
-    return response.data
-  },
-
   // Budget Entries
-  getBudgetEntries: async (
+  getEntries: async (
     budgetId: string,
     params?: {
       phaseId?: string
@@ -334,52 +269,30 @@ export const matterBudgetService = {
     return response.data
   },
 
-  // Budget Alerts
-  acknowledgeAlert: async (budgetId: string, alertId: string): Promise<MatterBudget> => {
-    const response = await api.put(
-      `/matter-budgets/${budgetId}/alerts/${alertId}/acknowledge`
-    )
-    return response.data
-  },
-
-  updateAlertThresholds: async (
+  addEntry: async (
     budgetId: string,
-    thresholds: { warning: number; critical: number }
+    entry: Omit<BudgetEntry, '_id' | 'createdAt'>
   ): Promise<MatterBudget> => {
-    const response = await api.put(`/matter-budgets/${budgetId}/thresholds`, thresholds)
+    const response = await api.post(`/matter-budgets/${budgetId}/entries`, entry)
     return response.data
   },
 
-  // Summary & Reports
-  getBudgetSummary: async (params?: {
-    clientId?: string
-    startDate?: string
-    endDate?: string
-  }): Promise<BudgetSummary> => {
-    const response = await api.get('/matter-budgets/summary', { params })
-    return response.data
-  },
-
-  getBudgetComparison: async (
+  updateEntry: async (
     budgetId: string,
-    params?: {
-      groupBy: 'month' | 'quarter' | 'phase' | 'category'
-    }
-  ): Promise<BudgetComparison[]> => {
-    const response = await api.get(`/matter-budgets/${budgetId}/comparison`, { params })
+    entryId: string,
+    data: Partial<BudgetEntry>
+  ): Promise<MatterBudget> => {
+    const response = await api.patch(`/matter-budgets/${budgetId}/entries/${entryId}`, data)
     return response.data
   },
 
-  exportBudget: async (budgetId: string, format: 'pdf' | 'xlsx'): Promise<Blob> => {
-    const response = await api.get(`/matter-budgets/${budgetId}/export`, {
-      params: { format },
-      responseType: 'blob',
-    })
+  deleteEntry: async (budgetId: string, entryId: string): Promise<MatterBudget> => {
+    const response = await api.delete(`/matter-budgets/${budgetId}/entries/${entryId}`)
     return response.data
   },
 
   // Templates
-  getBudgetTemplates: async (): Promise<
+  getTemplates: async (): Promise<
     {
       _id: string
       name: string
@@ -392,16 +305,27 @@ export const matterBudgetService = {
     return response.data
   },
 
-  createFromTemplate: async (
-    templateId: string,
-    matterId: string,
-    totalBudget: number
-  ): Promise<MatterBudget> => {
-    const response = await api.post('/matter-budgets/from-template', {
-      templateId,
-      matterId,
-      totalBudget,
-    })
+  createTemplate: async (data: {
+    name: string
+    type: BudgetType
+    phases?: Partial<BudgetPhase>[]
+    categories?: Partial<BudgetCategory>[]
+  }): Promise<any> => {
+    const response = await api.post('/matter-budgets/templates', data)
     return response.data
+  },
+
+  updateTemplate: async (id: string, data: Partial<{
+    name: string
+    type: BudgetType
+    phases?: Partial<BudgetPhase>[]
+    categories?: Partial<BudgetCategory>[]
+  }>): Promise<any> => {
+    const response = await api.patch(`/matter-budgets/templates/${id}`, data)
+    return response.data
+  },
+
+  deleteTemplate: async (id: string): Promise<void> => {
+    await api.delete(`/matter-budgets/templates/${id}`)
   },
 }

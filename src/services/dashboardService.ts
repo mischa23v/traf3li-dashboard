@@ -147,12 +147,39 @@ export const getRecentMessages = async (
   }
 }
 
+/**
+ * Get Activity Overview
+ */
+export const getActivityOverview = async (): Promise<any> => {
+  try {
+    const response = await apiClient.get('/dashboard/activity')
+    return response.data.activity || response.data.data
+  } catch (error) {
+    throw handleApiError(error)
+  }
+}
+
+/**
+ * Get Detailed Dashboard Stats (alternative endpoint)
+ * GET /dashboard/stats
+ */
+export const getDetailedDashboardStats = async (): Promise<any> => {
+  try {
+    const response = await apiClient.get('/dashboard/stats')
+    return response.data.stats || response.data.data
+  } catch (error) {
+    throw handleApiError(error)
+  }
+}
+
 const dashboardService = {
   getDashboardStats,
   getDashboardHeroStats,
   getTodayEvents,
   getFinancialSummary,
   getRecentMessages,
+  getActivityOverview,
+  getDetailedDashboardStats,
 }
 
 export default dashboardService
