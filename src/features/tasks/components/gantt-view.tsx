@@ -99,21 +99,50 @@ export function GanttView() {
   useEffect(() => {
     if (!isGanttLoaded || !containerRef.current || !gantt) return
 
-    // Configure Gantt date format
-    gantt.config.date_format = '%Y-%m-%d %H:%i'
-    gantt.config.xml_date = '%Y-%m-%d %H:%i'
+    // Configure Gantt date format - use default format that gantt knows how to parse
+    gantt.config.date_format = '%d-%m-%Y'
+    gantt.config.xml_date = '%d-%m-%Y'
 
-    // Set up date parsing and formatting functions to fix parseDate error
-    gantt.templates.parse_date = function(date: string) {
-      return new Date(date)
+    // Override the internal date parsing/formatting to handle backend format
+    // Backend sends: "YYYY-MM-DD HH:mm" (e.g., "2025-01-15 00:00")
+    // This fixes "s is not a function at Object.parseDate" error
+    gantt.date.str_to_date = function(format: string) {
+      return function(str: string) {
+        if (!str) return new Date()
+
+        // Parse "YYYY-MM-DD HH:mm" format from backend
+        // Example: "2025-01-15 00:00"
+        const match = str.match(/^(\d{4})-(\d{2})-(\d{2})\s+(\d{2}):(\d{2})/)
+        if (match) {
+          const [, year, month, day, hours, minutes] = match
+          return new Date(
+            parseInt(year, 10),
+            parseInt(month, 10) - 1, // Month is 0-indexed
+            parseInt(day, 10),
+            parseInt(hours, 10),
+            parseInt(minutes, 10)
+          )
+        }
+
+        // Fallback: try ISO format or other formats
+        const date = new Date(str)
+        return isNaN(date.getTime()) ? new Date() : date
+      }
     }
-    gantt.templates.format_date = function(date: Date) {
-      const year = date.getFullYear()
-      const month = String(date.getMonth() + 1).padStart(2, '0')
-      const day = String(date.getDate()).padStart(2, '0')
-      const hours = String(date.getHours()).padStart(2, '0')
-      const minutes = String(date.getMinutes()).padStart(2, '0')
-      return `${year}-${month}-${day} ${hours}:${minutes}`
+
+    gantt.date.date_to_str = function(format: string) {
+      return function(date: Date) {
+        if (!date || !(date instanceof Date) || isNaN(date.getTime())) {
+          return ''
+        }
+        // Output in "YYYY-MM-DD HH:mm" format to match backend
+        const year = date.getFullYear()
+        const month = String(date.getMonth() + 1).padStart(2, '0')
+        const day = String(date.getDate()).padStart(2, '0')
+        const hours = String(date.getHours()).padStart(2, '0')
+        const minutes = String(date.getMinutes()).padStart(2, '0')
+        return `${year}-${month}-${day} ${hours}:${minutes}`
+      }
     }
 
     gantt.config.scale_height = 50
@@ -234,35 +263,25 @@ export function GanttView() {
   useEffect(() => {
     if (!isGanttLoaded || !ganttData || !gantt) return
 
-    // Sanitize data to ensure dates are valid strings
+    // Sanitize data - validate required fields, pass through backend date format
+    // Backend sends dates as "YYYY-MM-DD HH:mm" (e.g., "2025-01-15 00:00")
     const sanitizedData = {
-      data: ganttData.data.map(item => {
-        // Convert dates to valid format, skip items with invalid dates
-        const startDate = item.start_date ? new Date(item.start_date) : new Date()
-        const endDate = item.end_date ? new Date(item.end_date) : null
+      data: ganttData.data
+        .map(item => {
+          // Validate start_date exists and is a string
+          if (!item.start_date || typeof item.start_date !== 'string') {
+            return null // Skip items without valid start date
+          }
 
-        // Skip items with invalid dates
-        if (isNaN(startDate.getTime())) {
-          return null
-        }
-
-        // Format date as string for dhtmlx-gantt
-        const formatDate = (date: Date) => {
-          const year = date.getFullYear()
-          const month = String(date.getMonth() + 1).padStart(2, '0')
-          const day = String(date.getDate()).padStart(2, '0')
-          const hours = String(date.getHours()).padStart(2, '0')
-          const minutes = String(date.getMinutes()).padStart(2, '0')
-          return `${year}-${month}-${day} ${hours}:${minutes}`
-        }
-
-        return {
-          ...item,
-          start_date: formatDate(startDate),
-          end_date: endDate && !isNaN(endDate.getTime()) ? formatDate(endDate) : undefined,
-          duration: item.duration || 1, // Default duration if missing
-        }
-      }).filter(Boolean), // Remove null items
+          return {
+            ...item,
+            // Pass through backend date format - our str_to_date parser handles it
+            start_date: item.start_date,
+            end_date: item.end_date || undefined,
+            duration: item.duration || 1,
+          }
+        })
+        .filter(Boolean),
       links: ganttData.links || []
     }
 
