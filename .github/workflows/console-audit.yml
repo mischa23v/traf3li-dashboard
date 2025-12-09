@@ -40,12 +40,34 @@ jobs:
       - name: Start preview server
         run: |
           npm run preview &
-          sleep 5
+          echo "Waiting for server to start..."
+          # Wait for the server to be ready (up to 30 seconds)
+          for i in {1..30}; do
+            if curl -s http://localhost:4173 > /dev/null 2>&1; then
+              echo "Server is ready!"
+              break
+            fi
+            echo "Attempt $i: Server not ready, waiting..."
+            sleep 1
+          done
 
       - name: Run console audit
+        id: audit
+        continue-on-error: true
         run: node scripts/console-audit.js
         env:
           BASE_URL: http://localhost:4173
+          CI: true
+
+      - name: Verify report exists
+        run: |
+          if [ -f console-audit-report.json ]; then
+            echo "Report file exists"
+            cat console-audit-report.json | head -20
+          else
+            echo "Report file not found, creating empty report"
+            echo '{"generatedAt":"'$(date -u +"%Y-%m-%dT%H:%M:%SZ")'","error":"Report not generated","summary":{"totalPages":0,"pagesWithErrors":0,"totalErrors":1,"totalWarnings":0,"totalRequestFailed":0},"pages":{}}' > console-audit-report.json
+          fi
 
       - name: Upload audit report
         uses: actions/upload-artifact@v4
@@ -61,7 +83,12 @@ jobs:
         with:
           script: |
             const fs = require('fs');
-            const report = JSON.parse(fs.readFileSync('console-audit-report.json', 'utf8'));
+            let report;
+            try {
+              report = JSON.parse(fs.readFileSync('console-audit-report.json', 'utf8'));
+            } catch (e) {
+              report = { summary: { totalErrors: 1, totalPages: 0, pagesWithErrors: 0, totalWarnings: 0, totalRequestFailed: 0 }, pages: {}, error: e.message };
+            }
 
             const status = report.summary.totalErrors === 0 ? '✅' : '❌';
 
@@ -98,11 +125,10 @@ jobs:
               body: body
             });
 
-      - name: Fail if errors found
+      - name: Check audit result
         run: |
-          ERRORS=$(cat console-audit-report.json | jq '.summary.totalErrors')
-          if [ "$ERRORS" -gt 0 ]; then
-            echo "❌ Found $ERRORS console errors!"
+          if [ "${{ steps.audit.outcome }}" == "failure" ]; then
+            echo "❌ Console audit found errors. Check the report artifact for details."
             exit 1
           fi
-          echo "✅ No console errors found"
+          echo "✅ Console audit passed!"
