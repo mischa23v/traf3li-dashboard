@@ -311,6 +311,10 @@ export function CreateClientView() {
     // Attachments
     const [attachments, setAttachments] = useState<File[]>([])
 
+    // Consent (PDPL compliance)
+    const [consentDataProcessing, setConsentDataProcessing] = useState(false)
+    const [consentPrivacyPolicy, setConsentPrivacyPolicy] = useState(false)
+
     // Lawyers list
     const lawyers = useMemo(() => {
         if (!lawyersData) return []

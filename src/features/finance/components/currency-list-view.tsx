@@ -96,7 +96,6 @@ export function CurrencyListView() {
 
         if (confirm(`هل أنت متأكد من حذف ${selectedIds.length} سعر صرف؟`)) {
             // TODO: Implement bulk delete mutation when available
-            console.log('Delete rates:', selectedIds)
             setIsSelectionMode(false)
             setSelectedIds([])
         }

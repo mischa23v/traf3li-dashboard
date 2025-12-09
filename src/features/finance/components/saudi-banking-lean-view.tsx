@@ -222,8 +222,7 @@ export function SaudiBankingLeanView() {
     ]
 
     const handleConnectBank = () => {
-        // Initialize Lean LinkSDK
-        console.log('Opening Lean LinkSDK...')
+        // TODO: Initialize Lean LinkSDK
         // In real implementation:
         // 1. Create customer if not exists
         // 2. Get customer token

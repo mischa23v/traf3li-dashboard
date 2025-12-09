@@ -152,7 +152,6 @@ export function EmailMarketingListView() {
     const handleDeleteCampaign = (campaignId: string) => {
         if (confirm('هل أنت متأكد من حذف هذه الحملة؟')) {
             // TODO: Implement delete when backend is ready
-            console.log('Delete campaign:', campaignId)
         }
     }
 
