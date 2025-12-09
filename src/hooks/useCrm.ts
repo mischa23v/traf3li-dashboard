@@ -79,6 +79,7 @@ export const useLeadsByPipeline = (pipelineId?: string) => {
   return useQuery({
     queryKey: ['leads', 'pipeline', pipelineId],
     queryFn: () => leadService.getByPipeline(pipelineId),
+    enabled: !!pipelineId, // Only fetch when we have a valid pipeline ID
     staleTime: 1 * 60 * 1000, // 1 minute
   })
 }
