@@ -141,9 +141,9 @@ export function ApplicantsListView() {
   const heroStats = useMemo(() => {
     if (!statsData) return undefined
     return [
-      { label: 'إجمالي المتقدمين', value: statsData.totalApplicants || 0 },
-      { label: 'قيد المقابلة', value: statsData.byStatus?.find(s => s.status === 'interviewing')?.count || 0 },
-      { label: 'تم تعيينهم', value: statsData.byStatus?.find(s => s.status === 'hired')?.count || 0 },
+      { label: 'إجمالي المتقدمين', value: statsData.totalApplicants || 0, icon: Users, status: 'normal' as const },
+      { label: 'قيد المقابلة', value: statsData.byStatus?.find(s => s.status === 'interviewing')?.count || 0, icon: Clock, status: 'normal' as const },
+      { label: 'تم تعيينهم', value: statsData.byStatus?.find(s => s.status === 'hired')?.count || 0, icon: CheckCircle, status: 'normal' as const },
     ]
   }, [statsData])
 
