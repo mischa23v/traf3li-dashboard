@@ -99,21 +99,31 @@ export function GanttView() {
   useEffect(() => {
     if (!isGanttLoaded || !containerRef.current || !gantt) return
 
-    // Configure Gantt date format
-    gantt.config.date_format = '%Y-%m-%d %H:%i'
-    gantt.config.xml_date = '%Y-%m-%d %H:%i'
+    // Configure Gantt date format - use default format that gantt knows how to parse
+    gantt.config.date_format = '%d-%m-%Y'
+    gantt.config.xml_date = '%d-%m-%Y'
 
-    // Set up date parsing and formatting functions to fix parseDate error
-    gantt.templates.parse_date = function(date: string) {
-      return new Date(date)
+    // Override the internal date parsing/formatting to handle ISO dates
+    // This fixes "s is not a function at Object.parseDate" error
+    gantt.date.str_to_date = function(format: string) {
+      return function(str: string) {
+        if (!str) return new Date()
+        // Handle any date string format by letting JavaScript parse it
+        const date = new Date(str)
+        return isNaN(date.getTime()) ? new Date() : date
+      }
     }
-    gantt.templates.format_date = function(date: Date) {
-      const year = date.getFullYear()
-      const month = String(date.getMonth() + 1).padStart(2, '0')
-      const day = String(date.getDate()).padStart(2, '0')
-      const hours = String(date.getHours()).padStart(2, '0')
-      const minutes = String(date.getMinutes()).padStart(2, '0')
-      return `${year}-${month}-${day} ${hours}:${minutes}`
+
+    gantt.date.date_to_str = function(format: string) {
+      return function(date: Date) {
+        if (!date || !(date instanceof Date) || isNaN(date.getTime())) {
+          return ''
+        }
+        const day = String(date.getDate()).padStart(2, '0')
+        const month = String(date.getMonth() + 1).padStart(2, '0')
+        const year = date.getFullYear()
+        return `${day}-${month}-${year}`
+      }
     }
 
     gantt.config.scale_height = 50
@@ -234,35 +244,31 @@ export function GanttView() {
   useEffect(() => {
     if (!isGanttLoaded || !ganttData || !gantt) return
 
-    // Sanitize data to ensure dates are valid strings
+    // Sanitize data - ensure valid dates and required fields
     const sanitizedData = {
-      data: ganttData.data.map(item => {
-        // Convert dates to valid format, skip items with invalid dates
-        const startDate = item.start_date ? new Date(item.start_date) : new Date()
-        const endDate = item.end_date ? new Date(item.end_date) : null
+      data: ganttData.data
+        .map(item => {
+          // Validate start_date
+          const startDate = item.start_date ? new Date(item.start_date) : null
+          if (!startDate || isNaN(startDate.getTime())) {
+            return null // Skip items without valid start date
+          }
 
-        // Skip items with invalid dates
-        if (isNaN(startDate.getTime())) {
-          return null
-        }
+          // Validate end_date (optional)
+          let endDate = item.end_date ? new Date(item.end_date) : null
+          if (endDate && isNaN(endDate.getTime())) {
+            endDate = null
+          }
 
-        // Format date as string for dhtmlx-gantt
-        const formatDate = (date: Date) => {
-          const year = date.getFullYear()
-          const month = String(date.getMonth() + 1).padStart(2, '0')
-          const day = String(date.getDate()).padStart(2, '0')
-          const hours = String(date.getHours()).padStart(2, '0')
-          const minutes = String(date.getMinutes()).padStart(2, '0')
-          return `${year}-${month}-${day} ${hours}:${minutes}`
-        }
-
-        return {
-          ...item,
-          start_date: formatDate(startDate),
-          end_date: endDate && !isNaN(endDate.getTime()) ? formatDate(endDate) : undefined,
-          duration: item.duration || 1, // Default duration if missing
-        }
-      }).filter(Boolean), // Remove null items
+          return {
+            ...item,
+            // Pass dates as ISO strings - our str_to_date override will parse them
+            start_date: startDate.toISOString(),
+            end_date: endDate ? endDate.toISOString() : undefined,
+            duration: item.duration || 1,
+          }
+        })
+        .filter(Boolean),
       links: ganttData.links || []
     }
 
