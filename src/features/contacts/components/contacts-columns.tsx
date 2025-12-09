@@ -45,8 +45,10 @@ export function useContactsColumns(): ColumnDef<Contact>[] {
         <DataTableColumnHeader column={column} title={t('contacts.columns.name')} />
       ),
       cell: ({ row }) => {
-        const fullName = `${row.original.firstName} ${row.original.lastName}`
-        const initials = `${row.original.firstName[0] || ''}${row.original.lastName[0] || ''}`.toUpperCase()
+        const firstName = row.original.firstName || ''
+        const lastName = row.original.lastName || ''
+        const fullName = `${firstName} ${lastName}`.trim() || '-'
+        const initials = `${firstName[0] || ''}${lastName[0] || ''}`.toUpperCase() || '?'
         return (
           <div className='flex items-center gap-3'>
             <Avatar className='h-8 w-8'>
@@ -65,7 +67,7 @@ export function useContactsColumns(): ColumnDef<Contact>[] {
       },
       enableSorting: true,
       filterFn: (row, _id, filterValue) => {
-        const fullName = `${row.original.firstName} ${row.original.lastName}`.toLowerCase()
+        const fullName = `${row.original.firstName || ''} ${row.original.lastName || ''}`.toLowerCase()
         return fullName.includes(filterValue.toLowerCase())
       },
     },
