@@ -405,12 +405,12 @@ export function CurrencyDetailsView() {
                                     </div>
                                 ) : (
                                     <div className="overflow-x-auto">
-                                        <table className="w-full text-right">
+                                        <table className="w-full text-start">
                                             <thead className="bg-slate-50 text-slate-500 text-sm font-medium">
                                                 <tr>
                                                     <th className="px-4 py-3 rounded-tr-xl">التاريخ</th>
                                                     <th className="px-4 py-3 text-center">السعر</th>
-                                                    <th className="px-4 py-3 text-left rounded-tl-xl">التغير</th>
+                                                    <th className="px-4 py-3 text-start rounded-tl-xl">التغير</th>
                                                 </tr>
                                             </thead>
                                             <tbody className="divide-y divide-slate-100">
@@ -420,7 +420,7 @@ export function CurrencyDetailsView() {
                                                         <td className="px-4 py-3 text-center font-mono text-slate-900">
                                                             {h.rate.toFixed(4)}
                                                         </td>
-                                                        <td className="px-4 py-3 text-left">
+                                                        <td className="px-4 py-3 text-start">
                                                             <Badge className={`${h.change > 0 ? 'bg-emerald-100 text-emerald-700' : h.change < 0 ? 'bg-red-100 text-red-700' : 'bg-slate-100 text-slate-700'} border-0`}>
                                                                 {h.change > 0 ? '+' : ''}{h.change.toFixed(2)}%
                                                             </Badge>

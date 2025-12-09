@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { saudiNationalIdSchema, saudiPhoneSchema, saudiIbanSchema } from '@/lib/zod-validators'
 
 export const registrationSchema = z.object({
     // ═══════════════════════════════════════════════════════
@@ -20,10 +21,7 @@ export const registrationSchema = z.object({
         .regex(/\d/, 'يجب أن تحتوي على رقم'),
     confirmPassword: z.string(),
     profilePicture: z.any().optional(), // File
-    phone: z.string()
-        .min(10, 'رقم الهاتف يجب أن يكون 10 أرقام على الأقل')
-        .max(15, 'رقم الهاتف طويل جداً')
-        .regex(/^\+?[0-9]{10,15}$/, 'صيغة رقم الهاتف غير صحيحة (مثال: +966501234567)'),
+    phone: saudiPhoneSchema,
     gender: z.enum(['ذكر', 'أنثى']),
     nationality: z.string().min(2, 'الجنسية مطلوبة'),
     country: z.string().default('السعودية'),
@@ -102,11 +100,11 @@ export const registrationSchema = z.object({
     // ═══════════════════════════════════════════════════════
     // 9. KYC / COMPLIANCE
     // ═══════════════════════════════════════════════════════
-    nationalId: z.string().min(10, 'رقم الهوية الوطنية مطلوب'),
+    nationalId: saudiNationalIdSchema,
     nationalIdDocument: z.any().optional(), // File
     mailingAddress: z.string().min(5, 'العنوان الوطني مطلوب'),
     workAddress: z.string().optional(),
-    ibanNumber: z.string().min(15, 'رقم الآيبان مطلوب'),
+    ibanNumber: saudiIbanSchema,
     bankName: z.string().min(2, 'اسم البنك مطلوب'),
 
     agreedToTerms: z.boolean().refine(val => val === true, 'يجب الموافقة على الشروط والأحكام'),

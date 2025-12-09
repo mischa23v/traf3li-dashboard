@@ -4,6 +4,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { Loader2, User, Building, Phone, MapPin, FileText, Calendar, ChevronDown } from 'lucide-react'
+import { saudiNationalIdSchemaOptional, saudiCrNumberSchemaOptional } from '@/lib/zod-validators'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
@@ -36,13 +37,13 @@ const createCaseSchema = z.object({
   priority: z.enum(['low', 'medium', 'high', 'critical']).optional(),
   // Labor case plaintiff details
   plaintiffName: z.string().optional(),
-  plaintiffNationalId: z.string().optional(),
+  plaintiffNationalId: saudiNationalIdSchemaOptional,
   plaintiffPhone: z.string().optional(),
   plaintiffAddress: z.string().optional(),
   plaintiffCity: z.string().optional(),
   // Labor case company details
   companyName: z.string().optional(),
-  companyRegistrationNumber: z.string().optional(),
+  companyRegistrationNumber: saudiCrNumberSchemaOptional,
   companyAddress: z.string().optional(),
   companyCity: z.string().optional(),
 })

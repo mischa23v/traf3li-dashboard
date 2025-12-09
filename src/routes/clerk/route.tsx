@@ -68,6 +68,7 @@ function MissingClerkPubKey() {
                 <a
                   href='https://go.clerk.com/GttUAaK'
                   target='_blank'
+                  rel='noopener noreferrer'
                   className='underline decoration-dashed underline-offset-4 hover:decoration-solid'
                 >
                   Clerk

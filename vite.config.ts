@@ -35,6 +35,7 @@ export default defineConfig({
     },
   },
   build: {
+    sourcemap: 'hidden', // Hidden source maps for Sentry (not exposed in browser)
     rollupOptions: {
       output: {
         manualChunks: {

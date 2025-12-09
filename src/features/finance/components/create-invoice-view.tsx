@@ -643,12 +643,12 @@ export function CreateInvoiceView() {
                                                 {statusInfo.label}
                                             </Badge>
                                         </div>
-                                        <div className="text-left space-y-1">
+                                        <div className="text-start space-y-1">
                                             <Label className="text-xs text-slate-500">رقم الفاتورة</Label>
                                             <Input
                                                 value={invoiceNumber}
                                                 onChange={(e) => setInvoiceNumber(e.target.value)}
-                                                className="w-48 rounded-xl border-slate-200 text-left font-mono"
+                                                className="w-48 rounded-xl border-slate-200 text-start font-mono"
                                                 dir="ltr"
                                             />
                                         </div>
@@ -1541,9 +1541,9 @@ export function CreateInvoiceView() {
                                                                     <table className="w-full text-sm">
                                                                         <thead className="bg-slate-50">
                                                                             <tr>
-                                                                                <th className="px-4 py-2 text-right">القسط</th>
-                                                                                <th className="px-4 py-2 text-right">تاريخ الاستحقاق</th>
-                                                                                <th className="px-4 py-2 text-right">المبلغ</th>
+                                                                                <th className="px-4 py-2 text-start">القسط</th>
+                                                                                <th className="px-4 py-2 text-start">تاريخ الاستحقاق</th>
+                                                                                <th className="px-4 py-2 text-start">المبلغ</th>
                                                                             </tr>
                                                                         </thead>
                                                                         <tbody>

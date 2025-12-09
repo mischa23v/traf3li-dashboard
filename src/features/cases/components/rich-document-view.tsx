@@ -16,6 +16,7 @@ import {
   AlertCircle,
   User
 } from 'lucide-react'
+import { sanitizeHtml } from '@/utils/sanitize'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -311,7 +312,7 @@ export function RichDocumentView({
                 ? "'Amiri', 'Cairo', serif"
                 : 'inherit'
             }}
-            dangerouslySetInnerHTML={{ __html: document.content }}
+            dangerouslySetInnerHTML={{ __html: sanitizeHtml(document.content) }}
           />
         </CardContent>
       </Card>

@@ -1,6 +1,11 @@
 import '@testing-library/jest-dom'
 import { cleanup } from '@testing-library/react'
-import { afterEach, vi } from 'vitest'
+import { afterEach, beforeAll, afterAll, vi } from 'vitest'
+import { server } from './mocks/server'
+
+beforeAll(() => server.listen({ onUnhandledRequest: 'warn' }))
+afterEach(() => server.resetHandlers())
+afterAll(() => server.close())
 
 // Cleanup after each test
 afterEach(() => {

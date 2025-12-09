@@ -6,6 +6,7 @@ import contactsService, {
 } from '@/services/contactsService'
 import { toast } from '@/hooks/use-toast'
 import { useTranslation } from 'react-i18next'
+import { createOptimisticMutation } from '@/lib/mutation-utils'
 
 // Query keys
 export const contactsKeys = {
@@ -72,28 +73,59 @@ export const useCreateContact = () => {
 
   return useMutation({
     mutationFn: (data: CreateContactData) => contactsService.createContact(data),
-    // Update cache on success (Stable & Correct)
-    onSuccess: (data) => {
-      toast({
-        title: t('status.success'),
-        description: t('status.createdSuccessfully'),
-      })
+    onMutate: async (newContact) => {
+      // Cancel outgoing refetches
+      await queryClient.cancelQueries({ queryKey: contactsKeys.lists() })
 
-      // Manually update the cache
+      // Snapshot previous value
+      const previousData = queryClient.getQueriesData({ queryKey: contactsKeys.lists() })
+
+      // Optimistically update all list queries
       queryClient.setQueriesData({ queryKey: contactsKeys.lists() }, (old: any) => {
         if (!old) return old
         // Handle { contacts: [...] } structure
         if (old.contacts && Array.isArray(old.contacts)) {
           return {
             ...old,
-            contacts: [data, ...old.contacts]
+            contacts: [{ ...newContact, _id: 'temp-' + Date.now() }, ...old.contacts]
           }
         }
-        if (Array.isArray(old)) return [data, ...old]
+        if (Array.isArray(old)) return [{ ...newContact, _id: 'temp-' + Date.now() }, ...old]
+        return old
+      })
+
+      return { previousData }
+    },
+    onSuccess: (data) => {
+      toast({
+        title: t('status.success'),
+        description: t('status.createdSuccessfully'),
+      })
+
+      // Update cache with real data
+      queryClient.setQueriesData({ queryKey: contactsKeys.lists() }, (old: any) => {
+        if (!old) return old
+        // Handle { contacts: [...] } structure
+        if (old.contacts && Array.isArray(old.contacts)) {
+          return {
+            ...old,
+            contacts: old.contacts.map((c: any) =>
+              c._id?.startsWith('temp-') ? data : c
+            )
+          }
+        }
+        if (Array.isArray(old)) return old.map((c: any) => c._id?.startsWith('temp-') ? data : c)
         return old
       })
     },
-    onError: (error: any) => {
+    onError: (error: any, _variables, context) => {
+      // Rollback on error
+      if (context?.previousData) {
+        context.previousData.forEach(([queryKey, data]) => {
+          queryClient.setQueryData(queryKey, data)
+        })
+      }
+
       toast({
         variant: 'destructive',
         title: t('status.error'),
@@ -101,9 +133,8 @@ export const useCreateContact = () => {
       })
     },
     onSettled: async () => {
-      // Delay to allow DB propagation
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      return await queryClient.invalidateQueries({ queryKey: contactsKeys.all, refetchType: 'all' })
+      // Invalidate without delay
+      await queryClient.invalidateQueries({ queryKey: contactsKeys.all, refetchType: 'all' })
     },
   })
 }
@@ -116,13 +147,56 @@ export const useUpdateContact = () => {
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: UpdateContactData }) =>
       contactsService.updateContact(id, data),
+    onMutate: async ({ id, data }) => {
+      // Cancel outgoing refetches
+      await queryClient.cancelQueries({ queryKey: contactsKeys.detail(id) })
+      await queryClient.cancelQueries({ queryKey: contactsKeys.lists() })
+
+      // Snapshot previous values
+      const previousDetail = queryClient.getQueryData(contactsKeys.detail(id))
+      const previousLists = queryClient.getQueriesData({ queryKey: contactsKeys.lists() })
+
+      // Optimistically update detail
+      queryClient.setQueryData(contactsKeys.detail(id), (old: any) => {
+        if (!old) return old
+        return { ...old, ...data }
+      })
+
+      // Optimistically update lists
+      queryClient.setQueriesData({ queryKey: contactsKeys.lists() }, (old: any) => {
+        if (!old) return old
+        // Handle { contacts: [...] } structure
+        if (old.contacts && Array.isArray(old.contacts)) {
+          return {
+            ...old,
+            contacts: old.contacts.map((c: any) =>
+              c._id === id ? { ...c, ...data } : c
+            )
+          }
+        }
+        if (Array.isArray(old)) return old.map((c: any) => c._id === id ? { ...c, ...data } : c)
+        return old
+      })
+
+      return { previousDetail, previousLists }
+    },
     onSuccess: () => {
       toast({
         title: t('status.success'),
         description: t('status.updatedSuccessfully'),
       })
     },
-    onError: (error: any) => {
+    onError: (error: any, { id }, context) => {
+      // Rollback on error
+      if (context?.previousDetail !== undefined) {
+        queryClient.setQueryData(contactsKeys.detail(id), context.previousDetail)
+      }
+      if (context?.previousLists) {
+        context.previousLists.forEach(([queryKey, data]) => {
+          queryClient.setQueryData(queryKey, data)
+        })
+      }
+
       toast({
         variant: 'destructive',
         title: t('status.error'),
@@ -130,8 +204,9 @@ export const useUpdateContact = () => {
       })
     },
     onSettled: async (_, __, { id }) => {
+      // Invalidate without delay
       await queryClient.invalidateQueries({ queryKey: contactsKeys.all })
-      return await queryClient.invalidateQueries({ queryKey: contactsKeys.detail(id) })
+      await queryClient.invalidateQueries({ queryKey: contactsKeys.detail(id) })
     },
   })
 }
@@ -143,14 +218,14 @@ export const useDeleteContact = () => {
 
   return useMutation({
     mutationFn: (id: string) => contactsService.deleteContact(id),
-    // Update cache on success (Stable & Correct)
-    onSuccess: (_, id) => {
-      toast({
-        title: t('status.success'),
-        description: t('status.deletedSuccessfully'),
-      })
+    onMutate: async (id) => {
+      // Cancel outgoing refetches
+      await queryClient.cancelQueries({ queryKey: contactsKeys.lists() })
 
-      // Manually update the cache
+      // Snapshot previous value
+      const previousData = queryClient.getQueriesData({ queryKey: contactsKeys.lists() })
+
+      // Optimistically update all list queries
       queryClient.setQueriesData({ queryKey: contactsKeys.lists() }, (old: any) => {
         if (!old) return old
         // Handle { contacts: [...] } structure
@@ -163,8 +238,23 @@ export const useDeleteContact = () => {
         if (Array.isArray(old)) return old.filter((c: any) => c._id !== id)
         return old
       })
+
+      return { previousData }
     },
-    onError: (error: any) => {
+    onSuccess: (_, id) => {
+      toast({
+        title: t('status.success'),
+        description: t('status.deletedSuccessfully'),
+      })
+    },
+    onError: (error: any, _id, context) => {
+      // Rollback on error
+      if (context?.previousData) {
+        context.previousData.forEach(([queryKey, data]) => {
+          queryClient.setQueryData(queryKey, data)
+        })
+      }
+
       toast({
         variant: 'destructive',
         title: t('status.error'),
@@ -172,9 +262,8 @@ export const useDeleteContact = () => {
       })
     },
     onSettled: async () => {
-      // Delay to allow DB propagation
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      return await queryClient.invalidateQueries({ queryKey: contactsKeys.all, refetchType: 'all' })
+      // Invalidate without delay
+      await queryClient.invalidateQueries({ queryKey: contactsKeys.all, refetchType: 'all' })
     },
   })
 }
@@ -186,14 +275,14 @@ export const useBulkDeleteContacts = () => {
 
   return useMutation({
     mutationFn: (ids: string[]) => contactsService.bulkDeleteContacts(ids),
-    // Update cache on success (Stable & Correct)
-    onSuccess: (_, ids) => {
-      toast({
-        title: t('status.success'),
-        description: t('status.deletedSuccessfully'),
-      })
+    onMutate: async (ids) => {
+      // Cancel outgoing refetches
+      await queryClient.cancelQueries({ queryKey: contactsKeys.lists() })
 
-      // Manually update the cache
+      // Snapshot previous value
+      const previousData = queryClient.getQueriesData({ queryKey: contactsKeys.lists() })
+
+      // Optimistically update all list queries
       queryClient.setQueriesData({ queryKey: contactsKeys.lists() }, (old: any) => {
         if (!old) return old
         // Handle { contacts: [...] } structure
@@ -206,8 +295,23 @@ export const useBulkDeleteContacts = () => {
         if (Array.isArray(old)) return old.filter((c: any) => !ids.includes(c._id))
         return old
       })
+
+      return { previousData }
     },
-    onError: (error: any) => {
+    onSuccess: (_, ids) => {
+      toast({
+        title: t('status.success'),
+        description: t('status.deletedSuccessfully'),
+      })
+    },
+    onError: (error: any, _ids, context) => {
+      // Rollback on error
+      if (context?.previousData) {
+        context.previousData.forEach(([queryKey, data]) => {
+          queryClient.setQueryData(queryKey, data)
+        })
+      }
+
       toast({
         variant: 'destructive',
         title: t('status.error'),
@@ -215,9 +319,8 @@ export const useBulkDeleteContacts = () => {
       })
     },
     onSettled: async () => {
-      // Delay to allow DB propagation
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      return await queryClient.invalidateQueries({ queryKey: contactsKeys.all, refetchType: 'all' })
+      // Invalidate without delay
+      await queryClient.invalidateQueries({ queryKey: contactsKeys.all, refetchType: 'all' })
     },
   })
 }
@@ -230,13 +333,42 @@ export const useLinkContactToCase = () => {
   return useMutation({
     mutationFn: ({ contactId, caseId }: { contactId: string; caseId: string }) =>
       contactsService.linkToCase(contactId, caseId),
+    onMutate: async ({ contactId, caseId }) => {
+      // Cancel outgoing refetches
+      await queryClient.cancelQueries({ queryKey: contactsKeys.detail(contactId) })
+      await queryClient.cancelQueries({ queryKey: contactsKeys.byCase(caseId) })
+
+      // Snapshot previous values
+      const previousDetail = queryClient.getQueryData(contactsKeys.detail(contactId))
+      const previousByCase = queryClient.getQueryData(contactsKeys.byCase(caseId))
+
+      // Optimistically update detail to add case
+      queryClient.setQueryData(contactsKeys.detail(contactId), (old: any) => {
+        if (!old) return old
+        const cases = old.cases || []
+        if (!cases.includes(caseId)) {
+          return { ...old, cases: [...cases, caseId] }
+        }
+        return old
+      })
+
+      return { previousDetail, previousByCase }
+    },
     onSuccess: () => {
       toast({
         title: t('status.success'),
         description: t('status.updatedSuccessfully'),
       })
     },
-    onError: (error: any) => {
+    onError: (error: any, { contactId }, context) => {
+      // Rollback on error
+      if (context?.previousDetail !== undefined) {
+        queryClient.setQueryData(contactsKeys.detail(contactId), context.previousDetail)
+      }
+      if (context?.previousByCase !== undefined) {
+        queryClient.setQueryData(contactsKeys.byCase(contactId), context.previousByCase)
+      }
+
       toast({
         variant: 'destructive',
         title: t('status.error'),
@@ -244,8 +376,9 @@ export const useLinkContactToCase = () => {
       })
     },
     onSettled: async (_, __, { contactId, caseId }) => {
+      // Invalidate without delay
       await queryClient.invalidateQueries({ queryKey: contactsKeys.detail(contactId) })
-      return await queryClient.invalidateQueries({ queryKey: contactsKeys.byCase(caseId) })
+      await queryClient.invalidateQueries({ queryKey: contactsKeys.byCase(caseId) })
     },
   })
 }
@@ -258,13 +391,39 @@ export const useUnlinkContactFromCase = () => {
   return useMutation({
     mutationFn: ({ contactId, caseId }: { contactId: string; caseId: string }) =>
       contactsService.unlinkFromCase(contactId, caseId),
+    onMutate: async ({ contactId, caseId }) => {
+      // Cancel outgoing refetches
+      await queryClient.cancelQueries({ queryKey: contactsKeys.detail(contactId) })
+      await queryClient.cancelQueries({ queryKey: contactsKeys.byCase(caseId) })
+
+      // Snapshot previous values
+      const previousDetail = queryClient.getQueryData(contactsKeys.detail(contactId))
+      const previousByCase = queryClient.getQueryData(contactsKeys.byCase(caseId))
+
+      // Optimistically update detail to remove case
+      queryClient.setQueryData(contactsKeys.detail(contactId), (old: any) => {
+        if (!old) return old
+        const cases = old.cases || []
+        return { ...old, cases: cases.filter((id: string) => id !== caseId) }
+      })
+
+      return { previousDetail, previousByCase }
+    },
     onSuccess: () => {
       toast({
         title: t('status.success'),
         description: t('status.updatedSuccessfully'),
       })
     },
-    onError: (error: any) => {
+    onError: (error: any, { contactId }, context) => {
+      // Rollback on error
+      if (context?.previousDetail !== undefined) {
+        queryClient.setQueryData(contactsKeys.detail(contactId), context.previousDetail)
+      }
+      if (context?.previousByCase !== undefined) {
+        queryClient.setQueryData(contactsKeys.byCase(contactId), context.previousByCase)
+      }
+
       toast({
         variant: 'destructive',
         title: t('status.error'),
@@ -272,8 +431,9 @@ export const useUnlinkContactFromCase = () => {
       })
     },
     onSettled: async (_, __, { contactId, caseId }) => {
+      // Invalidate without delay
       await queryClient.invalidateQueries({ queryKey: contactsKeys.detail(contactId) })
-      return await queryClient.invalidateQueries({ queryKey: contactsKeys.byCase(caseId) })
+      await queryClient.invalidateQueries({ queryKey: contactsKeys.byCase(caseId) })
     },
   })
 }
