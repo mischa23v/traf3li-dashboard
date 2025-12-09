@@ -2,20 +2,9 @@ import z from 'zod'
 import { createFileRoute } from '@tanstack/react-router'
 import { Contacts } from '@/features/contacts'
 
-// ============ DEBUG LOGGING ============
-let validationCount = 0
-// ============ DEBUG END ============
-
-// Stable fallback arrays to prevent infinite re-renders
-// Using .catch([]) creates new array references on every validation,
-// causing TanStack Router to detect "changes" and trigger re-validation loops
-const EMPTY_STATUS_ARRAY: ('active' | 'inactive' | 'archived')[] = []
-const EMPTY_TYPE_ARRAY: ('individual' | 'organization' | 'court' | 'attorney' | 'expert' | 'government' | 'other')[] = []
-const EMPTY_CATEGORY_ARRAY: ('client_contact' | 'opposing_party' | 'witness' | 'expert_witness' | 'judge' | 'court_clerk' | 'other')[] = []
-
 const contactsSearchSchema = z.object({
-  page: z.number().optional().catch(1),
-  pageSize: z.number().optional().catch(10),
+  page: z.number().optional(),
+  pageSize: z.number().optional(),
   // Facet filters
   status: z
     .array(
@@ -25,8 +14,7 @@ const contactsSearchSchema = z.object({
         z.literal('archived'),
       ])
     )
-    .optional()
-    .catch(EMPTY_STATUS_ARRAY),
+    .optional(),
   type: z
     .array(
       z.union([
@@ -39,8 +27,7 @@ const contactsSearchSchema = z.object({
         z.literal('other'),
       ])
     )
-    .optional()
-    .catch(EMPTY_TYPE_ARRAY),
+    .optional(),
   category: z
     .array(
       z.union([
@@ -53,35 +40,47 @@ const contactsSearchSchema = z.object({
         z.literal('other'),
       ])
     )
-    .optional()
-    .catch(EMPTY_CATEGORY_ARRAY),
+    .optional(),
   // Per-column text filter
-  name: z.string().optional().catch(''),
+  name: z.string().optional(),
 })
 
-// ============ DEBUG: Wrap validateSearch to log calls ============
-const debugValidateSearch = (search: unknown) => {
-  validationCount++
-  console.log(`%c[ROUTE] validateSearch called #${validationCount}`, 'background: #f0f; color: #fff; font-weight: bold;', {
-    input: search,
-    inputStringified: JSON.stringify(search),
-  })
-  const result = contactsSearchSchema.parse(search)
-  console.log(`%c[ROUTE] validateSearch result #${validationCount}`, 'background: #f0f; color: #fff;', {
-    result,
-    resultStringified: JSON.stringify(result),
-    statusRef: result.status,
-    typeRef: result.type,
-    categoryRef: result.category,
-    statusIsEmptyArray: result.status === EMPTY_STATUS_ARRAY,
-    typeIsEmptyArray: result.type === EMPTY_TYPE_ARRAY,
-    categoryIsEmptyArray: result.category === EMPTY_CATEGORY_ARRAY,
-  })
+type ContactsSearch = z.infer<typeof contactsSearchSchema>
+
+// Structural sharing: cache the last result and return it if contents are identical
+// This prevents TanStack Router from detecting "changes" when the object reference changes
+let cachedSearch: ContactsSearch | null = null
+let cachedSearchKey: string | null = null
+
+function validateSearchWithStructuralSharing(search: unknown): ContactsSearch {
+  // Parse the incoming search params (handles validation)
+  const parseResult = contactsSearchSchema.safeParse(search)
+
+  // If parsing fails, return empty object (or cached if available)
+  if (!parseResult.success) {
+    if (cachedSearch !== null) {
+      return cachedSearch
+    }
+    return {} as ContactsSearch
+  }
+
+  const result = parseResult.data
+
+  // Create a stable key for comparison (only include defined values)
+  const resultKey = JSON.stringify(result, (_, v) => v === undefined ? null : v)
+
+  // If the result is identical to cached, return the cached reference
+  if (cachedSearchKey === resultKey && cachedSearch !== null) {
+    return cachedSearch
+  }
+
+  // Update cache and return new result
+  cachedSearch = result
+  cachedSearchKey = resultKey
   return result
 }
-// ============ DEBUG END ============
 
 export const Route = createFileRoute('/_authenticated/dashboard/contacts/')({
-  validateSearch: debugValidateSearch,
+  validateSearch: validateSearchWithStructuralSharing,
   component: Contacts,
 })
