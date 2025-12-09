@@ -448,7 +448,7 @@ const getBgClasses = (color: string) => {
                             <div className="flex items-start justify-between">
                               <div className="flex items-center gap-3">
                                 <div className={`p-2 ${getBgClasses(UNIT_TYPE_LABELS[unit.unitType]?.color || 'slate')} rounded-xl`}>
-                                  <TypeIcon className={`w-5 h-5 ${getTextColorClass(UNIT_TYPE_LABELS[unit.unitType]?.color || \'slate\')}`} />
+                                  <TypeIcon className={`w-5 h-5 ${getTextColorClass(UNIT_TYPE_LABELS[unit.unitType]?.color || 'slate')}`} />
                                 </div>
                                 <div>
                                   <div className="flex items-center gap-2 mb-1">

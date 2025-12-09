@@ -134,7 +134,6 @@ export function ReputationSidebar({
         orange: 'group-hover:text-orange-600',
         blue: 'group-hover:text-blue-600'
     }
-    }
 
     // Format reminder time
     const formatReminderTime = (dateString?: string) => {
