@@ -302,53 +302,22 @@ export interface BillingStatistics {
 
 // ==================== API RESPONSES ====================
 
-interface RatesResponse {
-  error: boolean
-  rates: BillingRate[]
-  total?: number
+interface BackendResponse<T> {
+  success: boolean
+  message?: string
+  data?: T
+  pagination?: {
+    page: number
+    limit: number
+    total: number
+    pages: number
+  }
 }
 
-interface RateResponse {
-  error: boolean
-  rate: BillingRate
-}
-
-interface RateGroupsResponse {
-  error: boolean
-  groups: RateGroup[]
-  total?: number
-}
-
-interface RateGroupResponse {
-  error: boolean
-  group: RateGroup
-}
-
-interface RateCardsResponse {
-  error: boolean
-  rateCards: RateCard[]
-  total?: number
-}
-
-interface RateCardResponse {
-  error: boolean
-  rateCard: RateCard
-}
-
-interface TimeEntriesResponse {
-  error: boolean
-  entries: TimeEntry[]
-  total?: number
-}
-
-interface TimeEntryResponse {
-  error: boolean
-  entry: TimeEntry
-}
-
-interface StatisticsResponse {
-  error: boolean
-  statistics: BillingStatistics
+// Legacy response formats (for single items that don't use 'data' wrapper)
+interface LegacyRateResponse {
+  success: boolean
+  billingRate: BillingRate
 }
 
 // ==================== SERVICE ====================
@@ -374,10 +343,10 @@ const billingRatesService = {
       const queryString = params.toString()
       const url = queryString ? `/billing/rates?${queryString}` : '/billing/rates'
 
-      const response = await apiClient.get<RatesResponse>(url)
+      const response = await apiClient.get<BackendResponse<BillingRate[]>>(url)
       return {
-        rates: response.data.rates || [],
-        total: response.data.total || response.data.rates?.length || 0,
+        rates: response.data.data || [],
+        total: response.data.pagination?.total || response.data.data?.length || 0,
       }
     } catch (error: any) {
       throw new Error(handleApiError(error))
@@ -390,8 +359,8 @@ const billingRatesService = {
    */
   getRate: async (id: string): Promise<BillingRate> => {
     try {
-      const response = await apiClient.get<RateResponse>(`/billing/rates/${id}`)
-      return response.data.rate
+      const response = await apiClient.get<BackendResponse<BillingRate>>(`/billing/rates/${id}`)
+      return response.data.data!
     } catch (error: any) {
       throw new Error(handleApiError(error))
     }
@@ -403,8 +372,8 @@ const billingRatesService = {
    */
   createRate: async (data: CreateRateData): Promise<BillingRate> => {
     try {
-      const response = await apiClient.post<RateResponse>('/billing/rates', data)
-      return response.data.rate
+      const response = await apiClient.post<LegacyRateResponse>('/billing/rates', data)
+      return response.data.billingRate
     } catch (error: any) {
       throw new Error(handleApiError(error))
     }
@@ -416,8 +385,8 @@ const billingRatesService = {
    */
   updateRate: async (id: string, data: UpdateRateData): Promise<BillingRate> => {
     try {
-      const response = await apiClient.put<RateResponse>(`/billing/rates/${id}`, data)
-      return response.data.rate
+      const response = await apiClient.put<LegacyRateResponse>(`/billing/rates/${id}`, data)
+      return response.data.billingRate
     } catch (error: any) {
       throw new Error(handleApiError(error))
     }
@@ -441,8 +410,8 @@ const billingRatesService = {
    */
   getRateStats: async (): Promise<any> => {
     try {
-      const response = await apiClient.get<any>('/billing/rates/stats')
-      return response.data
+      const response = await apiClient.get<BackendResponse<any>>('/billing/rates/stats')
+      return response.data.data
     } catch (error: any) {
       throw new Error(handleApiError(error))
     }
@@ -463,8 +432,8 @@ const billingRatesService = {
       const queryString = queryParams.toString()
       const url = queryString ? `/billing/rates/applicable?${queryString}` : '/billing/rates/applicable'
 
-      const response = await apiClient.get<RateResponse>(url)
-      return response.data.rate
+      const response = await apiClient.get<BackendResponse<BillingRate>>(url)
+      return response.data.data || null
     } catch (error: any) {
       if (error.response?.status === 404) return null
       throw new Error(handleApiError(error))
@@ -477,8 +446,8 @@ const billingRatesService = {
    */
   setStandardRate: async (data: { amount: number; currency: Currency }): Promise<BillingRate> => {
     try {
-      const response = await apiClient.post<RateResponse>('/billing/rates/standard', data)
-      return response.data.rate
+      const response = await apiClient.post<LegacyRateResponse>('/billing/rates/standard', data)
+      return response.data.billingRate
     } catch (error: any) {
       throw new Error(handleApiError(error))
     }
@@ -492,8 +461,8 @@ const billingRatesService = {
    */
   getDefaultRateGroup: async (): Promise<RateGroup | null> => {
     try {
-      const response = await apiClient.get<RateGroupResponse>('/billing/groups/default')
-      return response.data.group
+      const response = await apiClient.get<BackendResponse<RateGroup>>('/billing/groups/default')
+      return response.data.data || null
     } catch (error: any) {
       if (error.response?.status === 404) return null
       throw new Error(handleApiError(error))
@@ -516,10 +485,10 @@ const billingRatesService = {
       const queryString = params.toString()
       const url = queryString ? `/billing/groups?${queryString}` : '/billing/groups'
 
-      const response = await apiClient.get<RateGroupsResponse>(url)
+      const response = await apiClient.get<BackendResponse<RateGroup[]>>(url)
       return {
-        groups: response.data.groups || [],
-        total: response.data.total || response.data.groups?.length || 0,
+        groups: response.data.data || [],
+        total: response.data.pagination?.total || response.data.data?.length || 0,
       }
     } catch (error: any) {
       throw new Error(handleApiError(error))
@@ -532,8 +501,8 @@ const billingRatesService = {
    */
   getRateGroup: async (id: string): Promise<RateGroup> => {
     try {
-      const response = await apiClient.get<RateGroupResponse>(`/billing/groups/${id}`)
-      return response.data.group
+      const response = await apiClient.get<BackendResponse<RateGroup>>(`/billing/groups/${id}`)
+      return response.data.data!
     } catch (error: any) {
       throw new Error(handleApiError(error))
     }
@@ -545,8 +514,8 @@ const billingRatesService = {
    */
   createRateGroup: async (data: CreateRateGroupData): Promise<RateGroup> => {
     try {
-      const response = await apiClient.post<RateGroupResponse>('/billing/groups', data)
-      return response.data.group
+      const response = await apiClient.post<BackendResponse<RateGroup>>('/billing/groups', data)
+      return response.data.data!
     } catch (error: any) {
       throw new Error(handleApiError(error))
     }
@@ -558,8 +527,8 @@ const billingRatesService = {
    */
   updateRateGroup: async (id: string, data: UpdateRateGroupData): Promise<RateGroup> => {
     try {
-      const response = await apiClient.patch<RateGroupResponse>(`/billing/groups/${id}`, data)
-      return response.data.group
+      const response = await apiClient.patch<BackendResponse<RateGroup>>(`/billing/groups/${id}`, data)
+      return response.data.data!
     } catch (error: any) {
       throw new Error(handleApiError(error))
     }
@@ -583,8 +552,8 @@ const billingRatesService = {
    */
   addRateToGroup: async (groupId: string, rateId: string): Promise<RateGroup> => {
     try {
-      const response = await apiClient.post<RateGroupResponse>(`/billing/groups/${groupId}/rates`, { rateId })
-      return response.data.group
+      const response = await apiClient.post<BackendResponse<RateGroup>>(`/billing/groups/${groupId}/rates`, { rateId })
+      return response.data.data!
     } catch (error: any) {
       throw new Error(handleApiError(error))
     }
@@ -596,8 +565,8 @@ const billingRatesService = {
    */
   removeRateFromGroup: async (groupId: string, rateId: string): Promise<RateGroup> => {
     try {
-      const response = await apiClient.delete<RateGroupResponse>(`/billing/groups/${groupId}/rates/${rateId}`)
-      return response.data.group
+      const response = await apiClient.delete<BackendResponse<RateGroup>>(`/billing/groups/${groupId}/rates/${rateId}`)
+      return response.data.data!
     } catch (error: any) {
       throw new Error(handleApiError(error))
     }
@@ -609,8 +578,8 @@ const billingRatesService = {
    */
   duplicateRateGroup: async (id: string, name: string, nameAr: string): Promise<RateGroup> => {
     try {
-      const response = await apiClient.post<RateGroupResponse>(`/billing/groups/${id}/duplicate`, { name, nameAr })
-      return response.data.group
+      const response = await apiClient.post<BackendResponse<RateGroup>>(`/billing/groups/${id}/duplicate`, { name, nameAr })
+      return response.data.data!
     } catch (error: any) {
       throw new Error(handleApiError(error))
     }
@@ -620,7 +589,7 @@ const billingRatesService = {
 
   /**
    * Get all rate cards
-   * GET /api/billing/rate-cards
+   * GET /api/rate-cards
    */
   getRateCards: async (filters?: { entityType?: string; entityId?: string; isActive?: boolean }): Promise<{ rateCards: RateCard[]; total: number }> => {
     try {
@@ -630,12 +599,12 @@ const billingRatesService = {
       if (filters?.isActive !== undefined) params.append('isActive', filters.isActive.toString())
 
       const queryString = params.toString()
-      const url = queryString ? `/billing/rate-cards?${queryString}` : '/billing/rate-cards'
+      const url = queryString ? `/rate-cards?${queryString}` : '/rate-cards'
 
-      const response = await apiClient.get<RateCardsResponse>(url)
+      const response = await apiClient.get<BackendResponse<RateCard[]>>(url)
       return {
-        rateCards: response.data.rateCards || [],
-        total: response.data.total || response.data.rateCards?.length || 0,
+        rateCards: response.data.data || [],
+        total: response.data.pagination?.total || response.data.data?.length || 0,
       }
     } catch (error: any) {
       throw new Error(handleApiError(error))
@@ -644,12 +613,12 @@ const billingRatesService = {
 
   /**
    * Get rate card for client
-   * GET /api/billing/rate-cards/client/:clientId
+   * GET /api/rate-cards/client/:clientId
    */
   getRateCardForClient: async (clientId: string): Promise<RateCard | null> => {
     try {
-      const response = await apiClient.get<RateCardResponse>(`/billing/rate-cards/client/${clientId}`)
-      return response.data.rateCard
+      const response = await apiClient.get<BackendResponse<RateCard>>(`/rate-cards/client/${clientId}`)
+      return response.data.data || null
     } catch (error: any) {
       if (error.response?.status === 404) return null
       throw new Error(handleApiError(error))
@@ -658,12 +627,12 @@ const billingRatesService = {
 
   /**
    * Get rate card for case
-   * GET /api/billing/rate-cards/case/:caseId
+   * GET /api/rate-cards/case/:caseId
    */
   getRateCardForCase: async (caseId: string): Promise<RateCard | null> => {
     try {
-      const response = await apiClient.get<RateCardResponse>(`/billing/rate-cards/case/${caseId}`)
-      return response.data.rateCard
+      const response = await apiClient.get<BackendResponse<RateCard>>(`/rate-cards/case/${caseId}`)
+      return response.data.data || null
     } catch (error: any) {
       if (error.response?.status === 404) return null
       throw new Error(handleApiError(error))
@@ -671,13 +640,26 @@ const billingRatesService = {
   },
 
   /**
+   * Get rate card for entity (unified method for client or case)
+   * GET /api/rate-cards/client/:clientId or GET /api/rate-cards/case/:caseId
+   */
+  getRateCardForEntity: async (entityType: string, entityId: string): Promise<RateCard | null> => {
+    if (entityType === 'client') {
+      return billingRatesService.getRateCardForClient(entityId)
+    } else if (entityType === 'case') {
+      return billingRatesService.getRateCardForCase(entityId)
+    }
+    throw new Error(`Invalid entity type: ${entityType}. Must be 'client' or 'case'.`)
+  },
+
+  /**
    * Create rate card
-   * POST /api/billing/rate-cards
+   * POST /api/rate-cards
    */
   createRateCard: async (data: CreateRateCardData): Promise<RateCard> => {
     try {
-      const response = await apiClient.post<RateCardResponse>('/billing/rate-cards', data)
-      return response.data.rateCard
+      const response = await apiClient.post<BackendResponse<RateCard>>('/rate-cards', data)
+      return response.data.data!
     } catch (error: any) {
       throw new Error(handleApiError(error))
     }
@@ -685,12 +667,12 @@ const billingRatesService = {
 
   /**
    * Update rate card
-   * PATCH /api/billing/rate-cards/:id
+   * PATCH /api/rate-cards/:id
    */
   updateRateCard: async (id: string, data: UpdateRateCardData): Promise<RateCard> => {
     try {
-      const response = await apiClient.patch<RateCardResponse>(`/billing/rate-cards/${id}`, data)
-      return response.data.rateCard
+      const response = await apiClient.patch<BackendResponse<RateCard>>(`/rate-cards/${id}`, data)
+      return response.data.data!
     } catch (error: any) {
       throw new Error(handleApiError(error))
     }
@@ -698,11 +680,11 @@ const billingRatesService = {
 
   /**
    * Delete rate card
-   * DELETE /api/billing/rate-cards/:id
+   * DELETE /api/rate-cards/:id
    */
   deleteRateCard: async (id: string): Promise<void> => {
     try {
-      await apiClient.delete(`/billing/rate-cards/${id}`)
+      await apiClient.delete(`/rate-cards/${id}`)
     } catch (error: any) {
       throw new Error(handleApiError(error))
     }
@@ -710,12 +692,12 @@ const billingRatesService = {
 
   /**
    * Calculate rate for billing
-   * POST /api/billing/rate-cards/calculate
+   * POST /api/rate-cards/calculate
    */
   calculateRate: async (data: { caseId?: string; clientId?: string; category: RateCategory; duration?: number }): Promise<{ amount: number; rate: BillingRate }> => {
     try {
-      const response = await apiClient.post<any>('/billing/rate-cards/calculate', data)
-      return response.data
+      const response = await apiClient.post<BackendResponse<{ amount: number; rate: BillingRate }>>('/rate-cards/calculate', data)
+      return response.data.data!
     } catch (error: any) {
       throw new Error(handleApiError(error))
     }
@@ -723,12 +705,12 @@ const billingRatesService = {
 
   /**
    * Add custom rate to rate card
-   * POST /api/billing/rate-cards/:id/rates
+   * POST /api/rate-cards/:id/rates
    */
   addCustomRate: async (id: string, data: { rateId: string; customAmount?: number; customCurrency?: Currency; notes?: string }): Promise<RateCard> => {
     try {
-      const response = await apiClient.post<RateCardResponse>(`/billing/rate-cards/${id}/rates`, data)
-      return response.data.rateCard
+      const response = await apiClient.post<BackendResponse<RateCard>>(`/rate-cards/${id}/rates`, data)
+      return response.data.data!
     } catch (error: any) {
       throw new Error(handleApiError(error))
     }
@@ -736,12 +718,12 @@ const billingRatesService = {
 
   /**
    * Update custom rate in rate card
-   * PATCH /api/billing/rate-cards/:id/rates/:rateId
+   * PATCH /api/rate-cards/:id/rates/:rateId
    */
   updateCustomRate: async (id: string, rateId: string, data: { customAmount?: number; customCurrency?: Currency; notes?: string }): Promise<RateCard> => {
     try {
-      const response = await apiClient.patch<RateCardResponse>(`/billing/rate-cards/${id}/rates/${rateId}`, data)
-      return response.data.rateCard
+      const response = await apiClient.patch<BackendResponse<RateCard>>(`/rate-cards/${id}/rates/${rateId}`, data)
+      return response.data.data!
     } catch (error: any) {
       throw new Error(handleApiError(error))
     }
@@ -749,12 +731,12 @@ const billingRatesService = {
 
   /**
    * Remove custom rate from rate card
-   * DELETE /api/billing/rate-cards/:id/rates/:rateId
+   * DELETE /api/rate-cards/:id/rates/:rateId
    */
   removeCustomRate: async (id: string, rateId: string): Promise<RateCard> => {
     try {
-      const response = await apiClient.delete<RateCardResponse>(`/billing/rate-cards/${id}/rates/${rateId}`)
-      return response.data.rateCard
+      const response = await apiClient.delete<BackendResponse<RateCard>>(`/rate-cards/${id}/rates/${rateId}`)
+      return response.data.data!
     } catch (error: any) {
       throw new Error(handleApiError(error))
     }
@@ -783,10 +765,10 @@ const billingRatesService = {
       const queryString = params.toString()
       const url = queryString ? `/billing/time-entries?${queryString}` : '/billing/time-entries'
 
-      const response = await apiClient.get<TimeEntriesResponse>(url)
+      const response = await apiClient.get<BackendResponse<TimeEntry[]>>(url)
       return {
-        entries: response.data.entries || [],
-        total: response.data.total || response.data.entries?.length || 0,
+        entries: response.data.data || [],
+        total: response.data.pagination?.total || response.data.data?.length || 0,
       }
     } catch (error: any) {
       throw new Error(handleApiError(error))
@@ -799,8 +781,8 @@ const billingRatesService = {
    */
   createTimeEntry: async (data: CreateTimeEntryData): Promise<TimeEntry> => {
     try {
-      const response = await apiClient.post<TimeEntryResponse>('/billing/time-entries', data)
-      return response.data.entry
+      const response = await apiClient.post<BackendResponse<TimeEntry>>('/billing/time-entries', data)
+      return response.data.data!
     } catch (error: any) {
       throw new Error(handleApiError(error))
     }
@@ -812,8 +794,8 @@ const billingRatesService = {
    */
   updateTimeEntry: async (id: string, data: UpdateTimeEntryData): Promise<TimeEntry> => {
     try {
-      const response = await apiClient.patch<TimeEntryResponse>(`/billing/time-entries/${id}`, data)
-      return response.data.entry
+      const response = await apiClient.patch<BackendResponse<TimeEntry>>(`/billing/time-entries/${id}`, data)
+      return response.data.data!
     } catch (error: any) {
       throw new Error(handleApiError(error))
     }
@@ -837,8 +819,8 @@ const billingRatesService = {
    */
   approveTimeEntries: async (ids: string[]): Promise<TimeEntry[]> => {
     try {
-      const response = await apiClient.post<TimeEntriesResponse>('/billing/time-entries/approve', { ids })
-      return response.data.entries || []
+      const response = await apiClient.post<BackendResponse<TimeEntry[]>>('/billing/time-entries/approve', { ids })
+      return response.data.data || []
     } catch (error: any) {
       throw new Error(handleApiError(error))
     }
@@ -852,8 +834,8 @@ const billingRatesService = {
    */
   getStatistics: async (): Promise<BillingStatistics> => {
     try {
-      const response = await apiClient.get<StatisticsResponse>('/billing/statistics')
-      return response.data.statistics
+      const response = await apiClient.get<BackendResponse<BillingStatistics>>('/billing/statistics')
+      return response.data.data!
     } catch (error: any) {
       throw new Error(handleApiError(error))
     }
