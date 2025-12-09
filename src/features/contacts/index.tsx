@@ -1,3 +1,4 @@
+import { useMemo } from 'react'
 import { getRouteApi } from '@tanstack/react-router'
 import { ConfigDrawer } from '@/components/config-drawer'
 import { Header } from '@/components/layout/header'
@@ -28,12 +29,15 @@ export function Contacts() {
   const search = route.useSearch()
   const navigate = route.useNavigate()
 
-  // Fetch contacts data from API
-  const { data, isLoading } = useContacts({
+  // Memoize filter object to prevent infinite re-renders
+  const contactFilters = useMemo(() => ({
     status: search.status?.[0],
     type: search.type?.[0],
     search: search.name,
-  })
+  }), [search.status, search.type, search.name])
+
+  // Fetch contacts data from API
+  const { data, isLoading } = useContacts(contactFilters)
 
   const topNav = [
     { title: t('sidebar.nav.contacts'), href: '/dashboard/contacts', isActive: true },
