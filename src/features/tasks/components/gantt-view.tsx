@@ -103,12 +103,28 @@ export function GanttView() {
     gantt.config.date_format = '%d-%m-%Y'
     gantt.config.xml_date = '%d-%m-%Y'
 
-    // Override the internal date parsing/formatting to handle ISO dates
+    // Override the internal date parsing/formatting to handle backend format
+    // Backend sends: "YYYY-MM-DD HH:mm" (e.g., "2025-01-15 00:00")
     // This fixes "s is not a function at Object.parseDate" error
     gantt.date.str_to_date = function(format: string) {
       return function(str: string) {
         if (!str) return new Date()
-        // Handle any date string format by letting JavaScript parse it
+
+        // Parse "YYYY-MM-DD HH:mm" format from backend
+        // Example: "2025-01-15 00:00"
+        const match = str.match(/^(\d{4})-(\d{2})-(\d{2})\s+(\d{2}):(\d{2})/)
+        if (match) {
+          const [, year, month, day, hours, minutes] = match
+          return new Date(
+            parseInt(year, 10),
+            parseInt(month, 10) - 1, // Month is 0-indexed
+            parseInt(day, 10),
+            parseInt(hours, 10),
+            parseInt(minutes, 10)
+          )
+        }
+
+        // Fallback: try ISO format or other formats
         const date = new Date(str)
         return isNaN(date.getTime()) ? new Date() : date
       }
@@ -119,10 +135,13 @@ export function GanttView() {
         if (!date || !(date instanceof Date) || isNaN(date.getTime())) {
           return ''
         }
-        const day = String(date.getDate()).padStart(2, '0')
-        const month = String(date.getMonth() + 1).padStart(2, '0')
+        // Output in "YYYY-MM-DD HH:mm" format to match backend
         const year = date.getFullYear()
-        return `${day}-${month}-${year}`
+        const month = String(date.getMonth() + 1).padStart(2, '0')
+        const day = String(date.getDate()).padStart(2, '0')
+        const hours = String(date.getHours()).padStart(2, '0')
+        const minutes = String(date.getMinutes()).padStart(2, '0')
+        return `${year}-${month}-${day} ${hours}:${minutes}`
       }
     }
 
@@ -244,27 +263,21 @@ export function GanttView() {
   useEffect(() => {
     if (!isGanttLoaded || !ganttData || !gantt) return
 
-    // Sanitize data - ensure valid dates and required fields
+    // Sanitize data - validate required fields, pass through backend date format
+    // Backend sends dates as "YYYY-MM-DD HH:mm" (e.g., "2025-01-15 00:00")
     const sanitizedData = {
       data: ganttData.data
         .map(item => {
-          // Validate start_date
-          const startDate = item.start_date ? new Date(item.start_date) : null
-          if (!startDate || isNaN(startDate.getTime())) {
+          // Validate start_date exists and is a string
+          if (!item.start_date || typeof item.start_date !== 'string') {
             return null // Skip items without valid start date
-          }
-
-          // Validate end_date (optional)
-          let endDate = item.end_date ? new Date(item.end_date) : null
-          if (endDate && isNaN(endDate.getTime())) {
-            endDate = null
           }
 
           return {
             ...item,
-            // Pass dates as ISO strings - our str_to_date override will parse them
-            start_date: startDate.toISOString(),
-            end_date: endDate ? endDate.toISOString() : undefined,
+            // Pass through backend date format - our str_to_date parser handles it
+            start_date: item.start_date,
+            end_date: item.end_date || undefined,
             duration: item.duration || 1,
           }
         })
