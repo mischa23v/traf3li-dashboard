@@ -3,7 +3,7 @@
  * Handles all bank reconciliation, matching, and currency API calls
  */
 
-import { api } from '@/lib/api'
+import { apiClientNoVersion as api } from '@/lib/api'
 
 // ==================== TYPES ====================
 
