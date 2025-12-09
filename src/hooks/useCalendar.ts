@@ -10,20 +10,9 @@ import calendarService, { CalendarFilters } from '@/services/calendarService'
  * Get unified calendar view
  */
 export const useCalendar = (filters: CalendarFilters) => {
-  // ============ DEBUG LOGGING ============
-  console.log('%c[useCalendar] Hook called with:', 'color: #f80; font-weight: bold;', {
-    filters,
-    filtersStringified: JSON.stringify(filters),
-    enabled: !!(filters.startDate && filters.endDate),
-  })
-  // ============ DEBUG END ============
-
   return useQuery({
     queryKey: ['calendar', filters],
-    queryFn: () => {
-      console.log('%c[useCalendar] queryFn EXECUTING', 'background: #f80; color: #000;', { filters })
-      return calendarService.getCalendar(filters)
-    },
+    queryFn: () => calendarService.getCalendar(filters),
     staleTime: 2 * 60 * 1000, // 2 minutes
     enabled: !!(filters.startDate && filters.endDate),
     retry: 1,

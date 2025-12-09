@@ -1,7 +1,7 @@
-import { useState, useMemo, useRef, useEffect } from 'react'
+import { useState, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
-    Clock, Bell, MapPin, Calendar as CalendarIcon,
+    Bell, MapPin, Calendar as CalendarIcon,
     Plus, CheckSquare, Trash2, List, X, ChevronRight, Loader2, AlertCircle
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -28,12 +28,6 @@ export function ClientsSidebar({
     selectedCount = 0,
     onDeleteSelected
 }: ClientsSidebarProps) {
-    // ============ DEBUG LOGGING START ============
-    const renderCount = useRef(0)
-    renderCount.current++
-    console.log(`%c[SIDEBAR] Render #${renderCount.current} (context: ${context})`, 'background: #0ff; color: #000; font-weight: bold;')
-    // ============ DEBUG LOGGING END ============
-
     const { t, i18n } = useTranslation()
     const isRTL = i18n.language === 'ar'
     const dateLocale = isRTL ? arSA : enUS

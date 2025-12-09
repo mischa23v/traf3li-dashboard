@@ -1,4 +1,4 @@
-import { useMemo, useEffect, useRef } from 'react'
+import { useMemo } from 'react'
 import { getRouteApi } from '@tanstack/react-router'
 import { ConfigDrawer } from '@/components/config-drawer'
 import { Header } from '@/components/layout/header'
@@ -16,85 +16,26 @@ import { TopNav } from '@/components/layout/top-nav'
 import { DynamicIsland } from '@/components/dynamic-island'
 import { LanguageSwitcher } from '@/components/language-switcher'
 import { Button } from '@/components/ui/button'
-import { Search, Bell, Users, Plus } from 'lucide-react'
+import { Search, Bell } from 'lucide-react'
 import { ClientsSidebar } from '@/features/clients/components/clients-sidebar'
-import { Badge } from '@/components/ui/badge'
 import { ProductivityHero } from '@/components/productivity-hero'
 
 const route = getRouteApi('/_authenticated/dashboard/contacts/')
 
 export function Contacts() {
-  // ============ DEBUG LOGGING START ============
-  const renderCount = useRef(0)
-  const prevSearch = useRef<any>(null)
-  const prevFilters = useRef<any>(null)
-  const prevData = useRef<any>(null)
-
-  renderCount.current++
-  console.log(`%c[CONTACTS] Render #${renderCount.current}`, 'background: #ff0; color: #000; font-weight: bold;')
-  // ============ DEBUG LOGGING END ============
-
   const { t, i18n } = useTranslation()
-  const isRTL = i18n.language === 'ar'
   const search = route.useSearch()
   const navigate = route.useNavigate()
 
-  // ============ DEBUG: Track search changes ============
-  useEffect(() => {
-    const searchChanged = JSON.stringify(prevSearch.current) !== JSON.stringify(search)
-    if (searchChanged) {
-      console.log('%c[CONTACTS] search CHANGED:', 'color: #f00; font-weight: bold;', {
-        prev: prevSearch.current,
-        current: search,
-        statusRef: search.status,
-        typeRef: search.type,
-        nameRef: search.name,
-      })
-      prevSearch.current = search
-    }
-  })
-  // ============ DEBUG END ============
-
-  // Memoize filter object to prevent infinite re-renders
-  const contactFilters = useMemo(() => {
-    const filters = {
-      status: search.status?.[0],
-      type: search.type?.[0],
-      search: search.name,
-    }
-    console.log('%c[CONTACTS] contactFilters computed:', 'color: #00f;', filters)
-    return filters
-  }, [search.status, search.type, search.name])
-
-  // ============ DEBUG: Track filter changes ============
-  useEffect(() => {
-    const filtersChanged = JSON.stringify(prevFilters.current) !== JSON.stringify(contactFilters)
-    if (filtersChanged) {
-      console.log('%c[CONTACTS] contactFilters CHANGED:', 'color: #f00; font-weight: bold;', {
-        prev: prevFilters.current,
-        current: contactFilters,
-      })
-      prevFilters.current = contactFilters
-    }
-  })
-  // ============ DEBUG END ============
+  // Memoize filter object to prevent unnecessary re-renders
+  const contactFilters = useMemo(() => ({
+    status: search.status?.[0],
+    type: search.type?.[0],
+    search: search.name,
+  }), [search.status, search.type, search.name])
 
   // Fetch contacts data from API
   const { data, isLoading } = useContacts(contactFilters)
-
-  // ============ DEBUG: Track data changes ============
-  useEffect(() => {
-    const dataChanged = prevData.current !== data
-    if (dataChanged) {
-      console.log('%c[CONTACTS] data CHANGED:', 'color: #f00; font-weight: bold;', {
-        prevRef: prevData.current,
-        currentRef: data,
-        isLoading,
-      })
-      prevData.current = data
-    }
-  })
-  // ============ DEBUG END ============
 
   // Memoize topNav to prevent unnecessary re-renders
   const topNav = useMemo(() => [
