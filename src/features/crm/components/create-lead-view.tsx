@@ -900,14 +900,14 @@ export function CreateLeadView() {
                     <div className="space-y-2">
                       <label className="text-sm font-medium text-slate-700">ربط بمنظمة</label>
                       <Select
-                        value={formData.organizationId}
-                        onValueChange={(value) => handleChange('organizationId', value)}
+                        value={formData.organizationId || '__none__'}
+                        onValueChange={(value) => handleChange('organizationId', value === '__none__' ? '' : value)}
                       >
                         <SelectTrigger className="rounded-xl">
                           <SelectValue placeholder="اختر منظمة (اختياري)" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="">بدون ربط</SelectItem>
+                          <SelectItem value="__none__">بدون ربط</SelectItem>
                           {(organizationsData?.data ?? organizationsData?.organizations ?? [])?.map((org: any) => (
                             <SelectItem key={org._id} value={org._id}>
                               {org.legalName || org.name}
@@ -920,14 +920,14 @@ export function CreateLeadView() {
                     <div className="space-y-2">
                       <label className="text-sm font-medium text-slate-700">ربط بجهة اتصال</label>
                       <Select
-                        value={formData.contactId}
-                        onValueChange={(value) => handleChange('contactId', value)}
+                        value={formData.contactId || '__none__'}
+                        onValueChange={(value) => handleChange('contactId', value === '__none__' ? '' : value)}
                       >
                         <SelectTrigger className="rounded-xl">
                           <SelectValue placeholder="اختر جهة اتصال (اختياري)" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="">بدون ربط</SelectItem>
+                          <SelectItem value="__none__">بدون ربط</SelectItem>
                           {(contactsData?.data ?? contactsData?.contacts ?? [])?.map((contact: any) => (
                             <SelectItem key={contact._id} value={contact._id}>
                               {contact.firstName} {contact.lastName} {contact.title ? `(${contact.title})` : ''}
