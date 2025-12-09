@@ -592,11 +592,35 @@ const eventsService = {
   // ==================== Agenda & Notes ====================
 
   /**
-   * Update event agenda
+   * Add agenda item
    */
-  updateAgenda: async (eventId: string, agenda: Event['agenda']): Promise<Event> => {
+  addAgendaItem: async (eventId: string, agendaItem: { title: string; duration?: number; presenter?: string; notes?: string }): Promise<Event> => {
     try {
-      const response = await apiClient.patch(`/events/${eventId}/agenda`, { agenda })
+      const response = await apiClient.post(`/events/${eventId}/agenda`, agendaItem)
+      return response.data.event || response.data.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Update agenda item
+   */
+  updateAgendaItem: async (eventId: string, agendaId: string, agendaItem: { title?: string; duration?: number; presenter?: string; notes?: string }): Promise<Event> => {
+    try {
+      const response = await apiClient.put(`/events/${eventId}/agenda/${agendaId}`, agendaItem)
+      return response.data.event || response.data.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Delete agenda item
+   */
+  deleteAgendaItem: async (eventId: string, agendaId: string): Promise<Event> => {
+    try {
+      const response = await apiClient.delete(`/events/${eventId}/agenda/${agendaId}`)
       return response.data.event || response.data.data
     } catch (error: any) {
       throw new Error(handleApiError(error))
@@ -621,6 +645,18 @@ const eventsService = {
   addActionItem: async (eventId: string, actionItem: { description: string; assignedTo?: string; dueDate?: string }): Promise<Event> => {
     try {
       const response = await apiClient.post(`/events/${eventId}/action-items`, actionItem)
+      return response.data.event || response.data.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Update action item
+   */
+  updateActionItem: async (eventId: string, itemId: string, actionItem: { description?: string; assignedTo?: string; dueDate?: string; completed?: boolean }): Promise<Event> => {
+    try {
+      const response = await apiClient.put(`/events/${eventId}/action-items/${itemId}`, actionItem)
       return response.data.event || response.data.data
     } catch (error: any) {
       throw new Error(handleApiError(error))
@@ -727,6 +763,30 @@ const eventsService = {
   getToday: async (): Promise<Event[]> => {
     try {
       const response = await apiClient.get('/events/today')
+      return response.data.events || response.data.data || []
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Get events by specific date
+   */
+  getEventsByDate: async (date: string): Promise<Event[]> => {
+    try {
+      const response = await apiClient.get(`/events/date/${date}`)
+      return response.data.events || response.data.data || []
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Get events by month
+   */
+  getEventsByMonth: async (year: number, month: number): Promise<Event[]> => {
+    try {
+      const response = await apiClient.get(`/events/month/${year}/${month}`)
       return response.data.events || response.data.data || []
     } catch (error: any) {
       throw new Error(handleApiError(error))
@@ -875,7 +935,7 @@ const eventsService = {
    */
   bulkUpdate: async (eventIds: string[], data: Partial<CreateEventData>): Promise<BulkOperationResult> => {
     try {
-      const response = await apiClient.patch('/events/bulk', { eventIds, ...data })
+      const response = await apiClient.put('/events/bulk', { eventIds, ...data })
       return response.data
     } catch (error: any) {
       throw new Error(handleApiError(error))

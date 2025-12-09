@@ -1,9 +1,9 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
   Briefcase, Plus, Search, Filter, MoreVertical,
   Clock, DollarSign, MapPin, Star, Eye, Edit, Trash2,
-  CheckCircle, XCircle, AlertCircle, Bell
+  CheckCircle, XCircle, AlertCircle, Bell, Loader2
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -38,69 +38,26 @@ import { LanguageSwitcher } from '@/components/language-switcher'
 import { DynamicIsland } from '@/components/dynamic-island'
 import { JobsSidebar } from './components/jobs-sidebar'
 import { ProductivityHero } from '@/components/productivity-hero'
-
-// Mock data for my services
-const mockServices = [
-  {
-    id: '1',
-    title: 'استشارات قانونية عامة',
-    titleEn: 'General Legal Consultation',
-    description: 'تقديم استشارات قانونية شاملة في مختلف المجالات',
-    price: 500,
-    priceType: 'fixed',
-    category: 'consultation',
-    status: 'active',
-    views: 245,
-    orders: 12,
-    rating: 4.8,
-    reviewCount: 10,
-    createdAt: '2024-01-15',
-  },
-  {
-    id: '2',
-    title: 'صياغة العقود التجارية',
-    titleEn: 'Commercial Contract Drafting',
-    description: 'إعداد وصياغة العقود التجارية والاتفاقيات',
-    price: 1500,
-    priceType: 'fixed',
-    category: 'contracts',
-    status: 'active',
-    views: 189,
-    orders: 8,
-    rating: 4.9,
-    reviewCount: 7,
-    createdAt: '2024-02-01',
-  },
-  {
-    id: '3',
-    title: 'الترافع أمام المحاكم',
-    titleEn: 'Court Representation',
-    description: 'تمثيل العملاء والترافع في القضايا المدنية والتجارية',
-    price: 200,
-    priceType: 'hourly',
-    category: 'litigation',
-    status: 'paused',
-    views: 312,
-    orders: 15,
-    rating: 4.7,
-    reviewCount: 14,
-    createdAt: '2024-01-20',
-  },
-]
+import { useMyJobs, useDeleteJob, useJobStatistics } from '@/hooks/useJobs'
 
 const categories = [
   { value: 'all', label: 'جميع الفئات', labelEn: 'All Categories' },
-  { value: 'consultation', label: 'استشارات', labelEn: 'Consultations' },
-  { value: 'contracts', label: 'عقود', labelEn: 'Contracts' },
-  { value: 'litigation', label: 'ترافع', labelEn: 'Litigation' },
-  { value: 'registration', label: 'تسجيل', labelEn: 'Registration' },
+  { value: 'labor', label: 'عمالي', labelEn: 'Labor' },
+  { value: 'commercial', label: 'تجاري', labelEn: 'Commercial' },
+  { value: 'personal-status', label: 'أحوال شخصية', labelEn: 'Personal Status' },
+  { value: 'criminal', label: 'جنائي', labelEn: 'Criminal' },
+  { value: 'real-estate', label: 'عقاري', labelEn: 'Real Estate' },
+  { value: 'traffic', label: 'مروري', labelEn: 'Traffic' },
+  { value: 'administrative', label: 'إداري', labelEn: 'Administrative' },
+  { value: 'other', label: 'أخرى', labelEn: 'Other' },
 ]
 
 const statuses = [
   { value: 'all', label: 'جميع الحالات', labelEn: 'All Statuses' },
-  { value: 'active', label: 'نشط', labelEn: 'Active' },
-  { value: 'paused', label: 'متوقف', labelEn: 'Paused' },
-  { value: 'draft', label: 'مسودة', labelEn: 'Draft' },
+  { value: 'open', label: 'مفتوح', labelEn: 'Open' },
+  { value: 'in-progress', label: 'قيد التنفيذ', labelEn: 'In Progress' },
+  { value: 'completed', label: 'مكتمل', labelEn: 'Completed' },
+  { value: 'cancelled', label: 'ملغي', labelEn: 'Cancelled' },
 ]
 
 export function MyServices() {
@@ -110,6 +67,13 @@ export function MyServices() {
   const [categoryFilter, setCategoryFilter] = useState('all')
   const [statusFilter, setStatusFilter] = useState('all')
 
+  // Fetch my jobs from API
+  const { data: myJobs, isLoading, isError } = useMyJobs()
+  const deleteJobMutation = useDeleteJob()
+
+  // Calculate statistics
+  const stats = useJobStatistics(myJobs)
+
   const topNav = [
     { title: isRTL ? 'خدماتي' : 'My Services', href: '/dashboard/jobs/my-services', isActive: true },
     { title: isRTL ? 'تصفح الوظائف' : 'Browse Jobs', href: '/dashboard/jobs/browse', isActive: false },
@@ -117,23 +81,41 @@ export function MyServices() {
 
   const getStatusBadge = (status: string) => {
     switch (status) {
-      case 'active':
-        return <Badge className="bg-emerald-100 text-emerald-700 hover:bg-emerald-100 border-0"><CheckCircle className="h-3 w-3 me-1" />{isRTL ? 'نشط' : 'Active'}</Badge>
-      case 'paused':
-        return <Badge className="bg-amber-100 text-amber-700 hover:bg-amber-100 border-0"><AlertCircle className="h-3 w-3 me-1" aria-hidden="true" />{isRTL ? 'متوقف' : 'Paused'}</Badge>
-      case 'draft':
-        return <Badge className="bg-slate-100 text-slate-700 hover:bg-slate-100 border-0"><XCircle className="h-3 w-3 me-1" />{isRTL ? 'مسودة' : 'Draft'}</Badge>
+      case 'open':
+        return <Badge className="bg-emerald-100 text-emerald-700 hover:bg-emerald-100 border-0"><CheckCircle className="h-3 w-3 me-1" />{isRTL ? 'مفتوح' : 'Open'}</Badge>
+      case 'in-progress':
+        return <Badge className="bg-blue-100 text-blue-700 hover:bg-blue-100 border-0"><Clock className="h-3 w-3 me-1" aria-hidden="true" />{isRTL ? 'قيد التنفيذ' : 'In Progress'}</Badge>
+      case 'completed':
+        return <Badge className="bg-emerald-100 text-emerald-700 hover:bg-emerald-100 border-0"><CheckCircle className="h-3 w-3 me-1" />{isRTL ? 'مكتمل' : 'Completed'}</Badge>
+      case 'cancelled':
+        return <Badge className="bg-slate-100 text-slate-700 hover:bg-slate-100 border-0"><XCircle className="h-3 w-3 me-1" />{isRTL ? 'ملغي' : 'Cancelled'}</Badge>
       default:
         return null
     }
   }
 
-  const filteredServices = mockServices.filter(service => {
-    const matchesSearch = service.title.includes(searchQuery) || service.titleEn.toLowerCase().includes(searchQuery.toLowerCase())
-    const matchesCategory = categoryFilter === 'all' || service.category === categoryFilter
-    const matchesStatus = statusFilter === 'all' || service.status === statusFilter
-    return matchesSearch && matchesCategory && matchesStatus
-  })
+  const getCategoryLabel = (category: string) => {
+    const cat = categories.find(c => c.value === category)
+    return isRTL ? cat?.label : cat?.labelEn
+  }
+
+  const handleDelete = async (id: string) => {
+    if (confirm(isRTL ? 'هل أنت متأكد من حذف هذه الوظيفة؟' : 'Are you sure you want to delete this job?')) {
+      await deleteJobMutation.mutateAsync(id)
+    }
+  }
+
+  const filteredServices = useMemo(() => {
+    if (!myJobs) return []
+
+    return myJobs.filter(job => {
+      const matchesSearch = job.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                           job.description.toLowerCase().includes(searchQuery.toLowerCase())
+      const matchesCategory = categoryFilter === 'all' || job.category === categoryFilter
+      const matchesStatus = statusFilter === 'all' || job.status === statusFilter
+      return matchesSearch && matchesCategory && matchesStatus
+    })
+  }, [myJobs, searchQuery, categoryFilter, statusFilter])
 
   return (
     <>
@@ -196,8 +178,8 @@ export function MyServices() {
                       <Briefcase className="h-5 w-5 text-blue-600" />
                     </div>
                   </div>
-                  <p className="text-2xl font-bold text-navy">{mockServices.length}</p>
-                  <p className="text-xs text-slate-500">{isRTL ? 'إجمالي الخدمات' : 'Total Services'}</p>
+                  <p className="text-2xl font-bold text-navy">{isLoading ? '...' : stats.total}</p>
+                  <p className="text-xs text-slate-500">{isRTL ? 'إجمالي الوظائف' : 'Total Jobs'}</p>
                 </CardContent>
               </Card>
               <Card className="border-slate-100 shadow-sm">
@@ -207,8 +189,8 @@ export function MyServices() {
                       <CheckCircle className="h-5 w-5 text-emerald-600" />
                     </div>
                   </div>
-                  <p className="text-2xl font-bold text-navy">35</p>
-                  <p className="text-xs text-slate-500">{isRTL ? 'الطلبات المكتملة' : 'Completed Orders'}</p>
+                  <p className="text-2xl font-bold text-navy">{isLoading ? '...' : stats.completed}</p>
+                  <p className="text-xs text-slate-500">{isRTL ? 'مكتملة' : 'Completed'}</p>
                 </CardContent>
               </Card>
               <Card className="border-slate-100 shadow-sm">
@@ -218,7 +200,7 @@ export function MyServices() {
                       <Eye className="h-5 w-5 text-purple-600" />
                     </div>
                   </div>
-                  <p className="text-2xl font-bold text-navy">746</p>
+                  <p className="text-2xl font-bold text-navy">{isLoading ? '...' : stats.totalViews}</p>
                   <p className="text-xs text-slate-500">{isRTL ? 'المشاهدات' : 'Total Views'}</p>
                 </CardContent>
               </Card>
@@ -226,11 +208,11 @@ export function MyServices() {
                 <CardContent className="p-4">
                   <div className="flex items-center justify-between mb-2">
                     <div className="h-10 w-10 bg-amber-50 rounded-lg flex items-center justify-center">
-                      <Star className="h-5 w-5 text-amber-600" />
+                      <DollarSign className="h-5 w-5 text-amber-600" />
                     </div>
                   </div>
-                  <p className="text-2xl font-bold text-navy">4.8</p>
-                  <p className="text-xs text-slate-500">{isRTL ? 'متوسط التقييم' : 'Avg Rating'}</p>
+                  <p className="text-2xl font-bold text-navy">{isLoading ? '...' : stats.totalProposals}</p>
+                  <p className="text-xs text-slate-500">{isRTL ? 'العروض' : 'Proposals'}</p>
                 </CardContent>
               </Card>
             </div>
@@ -277,86 +259,119 @@ export function MyServices() {
             </Card>
 
             {/* Services Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {filteredServices.map((service) => (
-                <Card key={service.id} className="hover:shadow-lg transition-all duration-300 border-slate-100 group">
-                  <CardHeader className="pb-3">
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1">
-                        <CardTitle className="text-lg font-bold text-navy group-hover:text-emerald-600 transition-colors">
-                          {isRTL ? service.title : service.titleEn}
-                        </CardTitle>
-                        <CardDescription className="mt-1 line-clamp-2 text-sm">
-                          {service.description}
-                        </CardDescription>
+            {isLoading ? (
+              <div className="flex items-center justify-center py-12">
+                <Loader2 className="h-8 w-8 animate-spin text-emerald-600" />
+              </div>
+            ) : isError ? (
+              <Card className="border-red-200 bg-red-50/50">
+                <CardContent className="p-12 text-center">
+                  <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
+                  <h3 className="text-lg font-bold text-red-700">
+                    {isRTL ? 'حدث خطأ في تحميل البيانات' : 'Error loading data'}
+                  </h3>
+                  <p className="text-red-600 mt-1">
+                    {isRTL ? 'يرجى المحاولة مرة أخرى لاحقاً' : 'Please try again later'}
+                  </p>
+                </CardContent>
+              </Card>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {filteredServices.map((job) => (
+                  <Card key={job._id} className="hover:shadow-lg transition-all duration-300 border-slate-100 group">
+                    <CardHeader className="pb-3">
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <CardTitle className="text-lg font-bold text-navy group-hover:text-emerald-600 transition-colors">
+                            {job.title}
+                          </CardTitle>
+                          <CardDescription className="mt-1 line-clamp-2 text-sm">
+                            {job.description}
+                          </CardDescription>
+                          <Badge variant="outline" className="mt-2 text-xs">
+                            {getCategoryLabel(job.category)}
+                          </Badge>
+                        </div>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-500 hover:text-navy">
+                              <MoreVertical className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem>
+                              <Eye className="h-4 w-4 me-2" />
+                              {isRTL ? 'عرض' : 'View'}
+                            </DropdownMenuItem>
+                            <DropdownMenuItem>
+                              <Edit className="h-4 w-4 me-2" aria-hidden="true" />
+                              {isRTL ? 'تعديل' : 'Edit'}
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              className="text-red-600"
+                              onClick={() => handleDelete(job._id)}
+                              disabled={deleteJobMutation.isPending}
+                            >
+                              <Trash2 className="h-4 w-4 me-2" />
+                              {isRTL ? 'حذف' : 'Delete'}
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
                       </div>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-500 hover:text-navy">
-                            <MoreVertical className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem>
-                            <Eye className="h-4 w-4 me-2" />
-                            {isRTL ? 'عرض' : 'View'}
-                          </DropdownMenuItem>
-                          <DropdownMenuItem>
-                            <Edit className="h-4 w-4 me-2" aria-hidden="true" />
-                            {isRTL ? 'تعديل' : 'Edit'}
-                          </DropdownMenuItem>
-                          <DropdownMenuItem className="text-red-600">
-                            <Trash2 className="h-4 w-4 me-2" />
-                            {isRTL ? 'حذف' : 'Delete'}
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      {getStatusBadge(service.status)}
-                      <div className="flex items-center bg-amber-50 px-2 py-1 rounded-lg text-amber-600 border border-amber-100">
-                        <Star className="h-3.5 w-3.5 fill-current" />
-                        <span className="ms-1 text-sm font-bold">{service.rating}</span>
-                        <span className="text-amber-400 text-xs ms-1">({service.reviewCount})</span>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        {getStatusBadge(job.status)}
+                        {job.location && (
+                          <div className="flex items-center text-slate-500 text-xs">
+                            <MapPin className="h-3 w-3 me-1" />
+                            {job.location}
+                          </div>
+                        )}
                       </div>
-                    </div>
-                    <div className="flex items-center justify-between text-sm pt-4 border-t border-slate-50">
-                      <div className="flex items-center font-bold text-navy">
-                        <DollarSign className="h-4 w-4 me-1 text-emerald-500" />
-                        <span>{service.price} {isRTL ? 'ر.س' : 'SAR'}</span>
-                        <span className="ms-1 text-slate-500 font-normal text-xs">/ {service.priceType === 'hourly' ? (isRTL ? 'ساعة' : 'hour') : (isRTL ? 'ثابت' : 'fixed')}</span>
+                      <div className="flex items-center justify-between text-sm pt-4 border-t border-slate-50">
+                        <div className="flex items-center font-bold text-navy">
+                          <DollarSign className="h-4 w-4 me-1 text-emerald-500" />
+                          <span>{job.budget.min.toLocaleString()} - {job.budget.max.toLocaleString()} {isRTL ? 'ر.س' : 'SAR'}</span>
+                        </div>
+                        <div className="flex items-center gap-3 text-slate-500">
+                          <span className="flex items-center text-xs">
+                            <Eye className="h-3.5 w-3.5 me-1" />
+                            {job.views}
+                          </span>
+                          <span className="flex items-center text-xs">
+                            <Briefcase className="h-3.5 w-3.5 me-1" />
+                            {job.proposalsCount}
+                          </span>
+                        </div>
                       </div>
-                      <div className="flex items-center gap-3 text-slate-500">
-                        <span className="flex items-center text-xs">
-                          <Eye className="h-3.5 w-3.5 me-1" />
-                          {service.views}
-                        </span>
-                        <span className="flex items-center text-xs">
-                          <Briefcase className="h-3.5 w-3.5 me-1" />
-                          {service.orders}
-                        </span>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
 
-            {filteredServices.length === 0 && (
+            {!isLoading && !isError && filteredServices.length === 0 && (
               <Card className="border-dashed border-2 border-slate-200 bg-slate-50/50">
                 <CardContent className="p-12 text-center">
                   <div className="h-16 w-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
                     <Briefcase className="h-8 w-8 text-slate-300" />
                   </div>
                   <h3 className="text-lg font-bold text-navy">
-                    {isRTL ? 'لا توجد خدمات' : 'No services found'}
+                    {isRTL ? 'لا توجد وظائف' : 'No jobs found'}
                   </h3>
                   <p className="text-slate-500 mt-1 max-w-xs mx-auto">
-                    {isRTL ? 'قم بإضافة خدمة جديدة أو تعديل معايير البحث' : 'Add a new service or adjust your search criteria'}
+                    {isRTL ? 'قم بإضافة وظيفة جديدة أو تعديل معايير البحث' : 'Add a new job or adjust your search criteria'}
                   </p>
-                  <Button variant="outline" className="mt-4 border-slate-200">
+                  <Button
+                    variant="outline"
+                    className="mt-4 border-slate-200"
+                    onClick={() => {
+                      setSearchQuery('')
+                      setCategoryFilter('all')
+                      setStatusFilter('all')
+                    }}
+                  >
                     {isRTL ? 'مسح الفلاتر' : 'Clear Filters'}
                   </Button>
                 </CardContent>

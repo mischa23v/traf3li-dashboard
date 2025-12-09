@@ -806,7 +806,7 @@ const remindersService = {
    */
   bulkUpdate: async (reminderIds: string[], data: Partial<CreateReminderData>): Promise<BulkOperationResult> => {
     try {
-      const response = await apiClient.patch('/reminders/bulk', { reminderIds, ...data })
+      const response = await apiClient.put('/reminders/bulk', { reminderIds, ...data })
       return response.data
     } catch (error: any) {
       throw new Error(handleApiError(error))

@@ -46,8 +46,10 @@ export function HRSidebar({
     const [selectedDate, setSelectedDate] = useState(new Date())
 
     // Calculate date range for the strip (Today + 4 days)
-    const startDate = useMemo(() => startOfDay(new Date()).toISOString(), [])
-    const endDate = useMemo(() => endOfDay(addDays(new Date(), 4)).toISOString(), [])
+    // Fixed: Move date calculation outside useMemo to prevent infinite re-renders
+    const today = useMemo(() => new Date(), [])
+    const startDate = useMemo(() => startOfDay(today).toISOString(), [today])
+    const endDate = useMemo(() => endOfDay(addDays(today, 4)).toISOString(), [today])
 
     // Fetch calendar data for the calendar tab
     const { data: calendarData, isLoading: isCalendarLoading } = useCalendar({
@@ -144,14 +146,14 @@ export function HRSidebar({
     // Generate 5 days for the strip
     const calendarStripDays = useMemo(() => {
         return Array.from({ length: 5 }).map((_, i) => {
-            const date = addDays(new Date(), i)
+            const date = addDays(today, i)
             return {
                 date,
                 dayName: format(date, 'EEEE', { locale: dateLocale }),
                 dayNumber: format(date, 'd')
             }
         })
-    }, [dateLocale])
+    }, [today, dateLocale])
 
     // Get time period (AM/PM) in current locale
     const getTimePeriod = (hours: number) => {

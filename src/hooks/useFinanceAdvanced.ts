@@ -158,11 +158,11 @@ export const useBankTransactions = (id: string, filters?: BankTransactionFilters
 // MATCHING HOOKS
 // ═══════════════════════════════════════════════════════════════
 
-export const useMatchSuggestions = (transactionId: string) => {
+export const useMatchSuggestions = (accountId: string) => {
   return useQuery({
-    queryKey: ['match-suggestions', transactionId],
-    queryFn: () => matchingService.getSuggestions(transactionId),
-    enabled: !!transactionId,
+    queryKey: ['match-suggestions', accountId],
+    queryFn: () => matchingService.getSuggestions(accountId),
+    enabled: !!accountId,
   })
 }
 
@@ -183,7 +183,7 @@ export const useCreateMatch = () => {
 export const useAutoMatchAll = () => {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: (bankFeedId?: string) => matchingService.autoMatchAll(bankFeedId),
+    mutationFn: (accountId: string) => matchingService.autoMatchAll(accountId),
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['bank-transactions'] })
       toast.success(`تم مطابقة ${data.matched} معاملة تلقائياً`)
@@ -328,21 +328,21 @@ export const useToggleMatchingRule = () => {
 // ═══════════════════════════════════════════════════════════════
 
 export const useReconciliationReport = (
-  bankFeedId: string,
+  accountId: string,
   params?: { startDate?: string; endDate?: string }
 ) => {
   return useQuery({
-    queryKey: ['reconciliation-report', bankFeedId, params],
-    queryFn: () => reconciliationReportService.getReport(bankFeedId, params),
-    enabled: !!bankFeedId,
+    queryKey: ['reconciliation-report', accountId, params],
+    queryFn: () => reconciliationReportService.getReport(accountId, params),
+    enabled: !!accountId,
     staleTime: 2 * 60 * 1000,
   })
 }
 
 export const useExportReconciliationReport = () => {
   return useMutation({
-    mutationFn: ({ bankFeedId, format }: { bankFeedId: string; format: 'pdf' | 'xlsx' }) =>
-      reconciliationReportService.exportReport(bankFeedId, format),
+    mutationFn: ({ accountId, format }: { accountId: string; format: 'pdf' | 'xlsx' }) =>
+      reconciliationReportService.exportReport(accountId, format),
     onSuccess: (blob, variables) => {
       const url = window.URL.createObjectURL(blob)
       const a = document.createElement('a')

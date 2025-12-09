@@ -565,11 +565,11 @@ const financeService = {
 
   /**
    * Export invoice to PDF
-   * GET /api/invoices/:id/export/pdf
+   * GET /api/invoices/:id/pdf
    */
   exportInvoicePdf: async (id: string): Promise<Blob> => {
     try {
-      const response = await apiClient.get(`/invoices/${id}/export/pdf`, {
+      const response = await apiClient.get(`/invoices/${id}/pdf`, {
         responseType: 'blob'
       })
       return response.data
@@ -624,7 +624,7 @@ const financeService = {
    */
   updateExpense: async (id: string, data: Partial<CreateExpenseData>): Promise<Expense> => {
     try {
-      const response = await apiClient.patch(`/expenses/${id}`, data)
+      const response = await apiClient.put(`/expenses/${id}`, data)
       return response.data.expense || response.data.data
     } catch (error: any) {
       throw new Error(handleApiError(error))

@@ -1,9 +1,9 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
   Briefcase, Search, Filter, MapPin, Clock, DollarSign,
   Building2, Star, ChevronLeft, ChevronRight, Bookmark,
-  Eye, Calendar, Users, ArrowUpRight, Bell
+  Eye, Calendar, Users, ArrowUpRight, Bell, Loader2, AlertCircle
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -33,114 +33,18 @@ import { LanguageSwitcher } from '@/components/language-switcher'
 import { DynamicIsland } from '@/components/dynamic-island'
 import { JobsSidebar } from './jobs-sidebar'
 import { ProductivityHero } from '@/components/productivity-hero'
-
-// Mock data for job listings
-const mockJobs = [
-  {
-    id: '1',
-    title: 'محامي قضايا تجارية',
-    titleEn: 'Commercial Litigation Lawyer',
-    company: 'شركة المستقبل للمحاماة',
-    companyEn: 'Future Law Firm',
-    location: 'الرياض',
-    locationEn: 'Riyadh',
-    type: 'full-time',
-    salary: { min: 15000, max: 25000 },
-    experience: '3-5 سنوات',
-    experienceEn: '3-5 years',
-    category: 'litigation',
-    description: 'نبحث عن محامٍ متخصص في القضايا التجارية مع خبرة في الترافع أمام المحاكم التجارية',
-    postedAt: '2024-11-20',
-    applicants: 23,
-    views: 156,
-    isBookmarked: false,
-    urgent: true,
-  },
-  {
-    id: '2',
-    title: 'مستشار قانوني - عقود',
-    titleEn: 'Legal Consultant - Contracts',
-    company: 'مجموعة الراجحي القابضة',
-    companyEn: 'Al Rajhi Holding Group',
-    location: 'جدة',
-    locationEn: 'Jeddah',
-    type: 'contract',
-    salary: { min: 20000, max: 30000 },
-    experience: '5-7 سنوات',
-    experienceEn: '5-7 years',
-    category: 'contracts',
-    description: 'مطلوب مستشار قانوني متخصص في صياغة ومراجعة العقود التجارية والاتفاقيات',
-    postedAt: '2024-11-18',
-    applicants: 15,
-    views: 98,
-    isBookmarked: true,
-    urgent: false,
-  },
-  {
-    id: '3',
-    title: 'محامي ملكية فكرية',
-    titleEn: 'Intellectual Property Lawyer',
-    company: 'شركة التقنية الحديثة',
-    companyEn: 'Modern Tech Company',
-    location: 'الدمام',
-    locationEn: 'Dammam',
-    type: 'full-time',
-    salary: { min: 18000, max: 28000 },
-    experience: '4-6 سنوات',
-    experienceEn: '4-6 years',
-    category: 'ip',
-    description: 'فرصة للعمل مع شركة تقنية رائدة في مجال حماية الملكية الفكرية وبراءات الاختراع',
-    postedAt: '2024-11-22',
-    applicants: 8,
-    views: 67,
-    isBookmarked: false,
-    urgent: false,
-  },
-  {
-    id: '4',
-    title: 'محامي قضايا عمالية',
-    titleEn: 'Labor Law Attorney',
-    company: 'مكتب العدالة للمحاماة',
-    companyEn: 'Justice Law Office',
-    location: 'الرياض',
-    locationEn: 'Riyadh',
-    type: 'part-time',
-    salary: { min: 8000, max: 12000 },
-    experience: '2-4 سنوات',
-    experienceEn: '2-4 years',
-    category: 'labor',
-    description: 'نبحث عن محامٍ متخصص في قضايا العمل والعمال للانضمام لفريقنا بدوام جزئي',
-    postedAt: '2024-11-21',
-    applicants: 31,
-    views: 189,
-    isBookmarked: false,
-    urgent: true,
-  },
-]
+import { useJobs } from '@/hooks/useJobs'
 
 const categories = [
   { value: 'all', label: 'جميع التخصصات', labelEn: 'All Specialties' },
-  { value: 'litigation', label: 'ترافع', labelEn: 'Litigation' },
-  { value: 'contracts', label: 'عقود', labelEn: 'Contracts' },
-  { value: 'ip', label: 'ملكية فكرية', labelEn: 'Intellectual Property' },
-  { value: 'labor', label: 'عمالي', labelEn: 'Labor Law' },
-  { value: 'corporate', label: 'شركات', labelEn: 'Corporate' },
-]
-
-const jobTypes = [
-  { value: 'all', label: 'جميع الأنواع', labelEn: 'All Types' },
-  { value: 'full-time', label: 'دوام كامل', labelEn: 'Full Time' },
-  { value: 'part-time', label: 'دوام جزئي', labelEn: 'Part Time' },
-  { value: 'contract', label: 'عقد', labelEn: 'Contract' },
-  { value: 'remote', label: 'عن بعد', labelEn: 'Remote' },
-]
-
-const locations = [
-  { value: 'all', label: 'جميع المدن', labelEn: 'All Cities' },
-  { value: 'riyadh', label: 'الرياض', labelEn: 'Riyadh' },
-  { value: 'jeddah', label: 'جدة', labelEn: 'Jeddah' },
-  { value: 'dammam', label: 'الدمام', labelEn: 'Dammam' },
-  { value: 'makkah', label: 'مكة', labelEn: 'Makkah' },
+  { value: 'labor', label: 'عمالي', labelEn: 'Labor' },
+  { value: 'commercial', label: 'تجاري', labelEn: 'Commercial' },
+  { value: 'personal-status', label: 'أحوال شخصية', labelEn: 'Personal Status' },
+  { value: 'criminal', label: 'جنائي', labelEn: 'Criminal' },
+  { value: 'real-estate', label: 'عقاري', labelEn: 'Real Estate' },
+  { value: 'traffic', label: 'مروري', labelEn: 'Traffic' },
+  { value: 'administrative', label: 'إداري', labelEn: 'Administrative' },
+  { value: 'other', label: 'أخرى', labelEn: 'Other' },
 ]
 
 export function BrowseJobs() {
@@ -148,9 +52,21 @@ export function BrowseJobs() {
   const isRTL = i18n.language === 'ar'
   const [searchQuery, setSearchQuery] = useState('')
   const [categoryFilter, setCategoryFilter] = useState('all')
-  const [typeFilter, setTypeFilter] = useState('all')
-  const [locationFilter, setLocationFilter] = useState('all')
-  const [bookmarkedJobs, setBookmarkedJobs] = useState<string[]>(['2'])
+  const [statusFilter, setStatusFilter] = useState('open')
+  const [bookmarkedJobs, setBookmarkedJobs] = useState<string[]>([])
+
+  // Fetch jobs from API with filters
+  const filters = useMemo(() => ({
+    category: categoryFilter !== 'all' ? categoryFilter : undefined,
+    status: statusFilter || 'open',
+  }), [categoryFilter, statusFilter])
+
+  const { data: jobsData, isLoading, isError } = useJobs(filters)
+
+  const getCategoryLabel = (category: string) => {
+    const cat = categories.find(c => c.value === category)
+    return isRTL ? cat?.label : cat?.labelEn
+  }
 
   const topNav = [
     { title: isRTL ? 'خدماتي' : 'My Services', href: '/dashboard/jobs/my-services', isActive: false },
@@ -165,17 +81,6 @@ export function BrowseJobs() {
     )
   }
 
-  const getJobTypeBadge = (type: string) => {
-    const labels: Record<string, { ar: string; en: string; color: string }> = {
-      'full-time': { ar: 'دوام كامل', en: 'Full Time', color: 'bg-blue-100 text-blue-700' },
-      'part-time': { ar: 'دوام جزئي', en: 'Part Time', color: 'bg-purple-100 text-purple-700' },
-      'contract': { ar: 'عقد', en: 'Contract', color: 'bg-amber-100 text-amber-700' },
-      'remote': { ar: 'عن بعد', en: 'Remote', color: 'bg-emerald-100 text-emerald-700' },
-    }
-    const label = labels[type] || { ar: type, en: type, color: 'bg-slate-100 text-slate-700' }
-    return <Badge className={`${label.color} hover:${label.color} border-0`}>{isRTL ? label.ar : label.en}</Badge>
-  }
-
   const formatDate = (dateStr: string) => {
     const date = new Date(dateStr)
     const now = new Date()
@@ -188,18 +93,17 @@ export function BrowseJobs() {
     return isRTL ? `منذ ${Math.floor(diffDays / 7)} أسابيع` : `${Math.floor(diffDays / 7)} weeks ago`
   }
 
-  const filteredJobs = mockJobs.filter(job => {
-    const matchesSearch = job.title.includes(searchQuery) ||
-      job.titleEn.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      job.company.includes(searchQuery) ||
-      job.companyEn.toLowerCase().includes(searchQuery.toLowerCase())
-    const matchesCategory = categoryFilter === 'all' || job.category === categoryFilter
-    const matchesType = typeFilter === 'all' || job.type === typeFilter
-    const matchesLocation = locationFilter === 'all' ||
-      job.location.includes(locations.find(l => l.value === locationFilter)?.label || '') ||
-      job.locationEn.toLowerCase() === locationFilter
-    return matchesSearch && matchesCategory && matchesType && matchesLocation
-  })
+  // Apply client-side filtering for better UX
+  const filteredJobs = useMemo(() => {
+    if (!jobsData || !Array.isArray(jobsData)) return []
+
+    return jobsData.filter(job => {
+      const matchesSearch = searchQuery === '' ||
+        job.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        job.description.toLowerCase().includes(searchQuery.toLowerCase())
+      return matchesSearch
+    })
+  }, [jobsData, searchQuery])
 
   return (
     <>
@@ -320,9 +224,42 @@ export function BrowseJobs() {
               </Select>
             </div>
 
+            {/* Loading State */}
+            {isLoading && (
+              <Card className="border-slate-100 shadow-sm">
+                <CardContent className="p-12 text-center">
+                  <Loader2 className="h-12 w-12 text-emerald-500 animate-spin mx-auto mb-4" />
+                  <h3 className="text-lg font-bold text-navy">
+                    {isRTL ? 'جاري تحميل الوظائف...' : 'Loading jobs...'}
+                  </h3>
+                  <p className="text-slate-500 mt-1">
+                    {isRTL ? 'الرجاء الانتظار' : 'Please wait'}
+                  </p>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Error State */}
+            {isError && (
+              <Card className="border-red-100 bg-red-50/50 shadow-sm">
+                <CardContent className="p-12 text-center">
+                  <div className="h-16 w-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Briefcase className="h-8 w-8 text-red-500" />
+                  </div>
+                  <h3 className="text-lg font-bold text-red-900">
+                    {isRTL ? 'حدث خطأ في تحميل الوظائف' : 'Error loading jobs'}
+                  </h3>
+                  <p className="text-red-700 mt-1 max-w-xs mx-auto">
+                    {isRTL ? 'الرجاء المحاولة مرة أخرى لاحقاً' : 'Please try again later'}
+                  </p>
+                </CardContent>
+              </Card>
+            )}
+
             {/* Job Listings */}
-            <div className="space-y-4">
-              {filteredJobs.map((job) => (
+            {!isLoading && !isError && (
+              <div className="space-y-4">
+                {filteredJobs.map((job) => (
                 <Card key={job.id} className="hover:shadow-lg transition-all duration-300 group border-slate-100">
                   <CardContent className="p-6">
                     <div className="flex flex-col md:flex-row md:items-start gap-4">
@@ -404,29 +341,35 @@ export function BrowseJobs() {
                   </CardContent>
                 </Card>
               ))}
-            </div>
 
-            {filteredJobs.length === 0 && (
-              <Card className="border-dashed border-2 border-slate-200 bg-slate-50/50">
-                <CardContent className="p-12 text-center">
-                  <div className="h-16 w-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <Briefcase className="h-8 w-8 text-slate-300" />
-                  </div>
-                  <h3 className="text-lg font-bold text-navy">
-                    {isRTL ? 'لا توجد وظائف مطابقة' : 'No matching jobs found'}
-                  </h3>
-                  <p className="text-slate-500 mt-1 max-w-xs mx-auto">
-                    {isRTL ? 'جرب تعديل معايير البحث' : 'Try adjusting your search criteria'}
-                  </p>
-                  <Button variant="outline" className="mt-4 border-slate-200">
-                    {isRTL ? 'مسح الفلاتر' : 'Clear Filters'}
-                  </Button>
-                </CardContent>
-              </Card>
+                {filteredJobs.length === 0 && (
+                  <Card className="border-dashed border-2 border-slate-200 bg-slate-50/50">
+                    <CardContent className="p-12 text-center">
+                      <div className="h-16 w-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <Briefcase className="h-8 w-8 text-slate-300" />
+                      </div>
+                      <h3 className="text-lg font-bold text-navy">
+                        {isRTL ? 'لا توجد وظائف مطابقة' : 'No matching jobs found'}
+                      </h3>
+                      <p className="text-slate-500 mt-1 max-w-xs mx-auto">
+                        {isRTL ? 'جرب تعديل معايير البحث' : 'Try adjusting your search criteria'}
+                      </p>
+                      <Button variant="outline" className="mt-4 border-slate-200" onClick={() => {
+                        setSearchQuery('')
+                        setCategoryFilter('all')
+                        setTypeFilter('all')
+                        setLocationFilter('all')
+                      }}>
+                        {isRTL ? 'مسح الفلاتر' : 'Clear Filters'}
+                      </Button>
+                    </CardContent>
+                  </Card>
+                )}
+              </div>
             )}
 
             {/* Pagination */}
-            {filteredJobs.length > 0 && (
+            {!isLoading && !isError && filteredJobs.length > 0 && (
               <div className="flex items-center justify-center gap-2 pt-4">
                 <Button variant="outline" size="icon" disabled className="rounded-lg border-slate-200">
                   {isRTL ? <ChevronRight className="h-4 w-4" aria-hidden="true" /> : <ChevronLeft className="h-4 w-4" aria-hidden="true" />}

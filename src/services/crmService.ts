@@ -104,7 +104,8 @@ export const leadService = {
   createLead: async (data: CreateLeadData): Promise<Lead> => {
     try {
       const response = await apiClient.post('/leads', data)
-      return response.data.data || response.data.lead
+      // Backend returns: { success, message, data: { lead, automation } }
+      return response.data.data?.lead || response.data.data || response.data.lead
     } catch (error: any) {
       throw new Error(handleApiError(error))
     }
@@ -116,6 +117,7 @@ export const leadService = {
   updateLead: async (id: string, data: Partial<Lead>): Promise<Lead> => {
     try {
       const response = await apiClient.put(`/leads/${id}`, data)
+      // Backend returns: { success, message, data: lead }
       return response.data.data || response.data.lead
     } catch (error: any) {
       throw new Error(handleApiError(error))
@@ -142,6 +144,7 @@ export const leadService = {
   ): Promise<Lead> => {
     try {
       const response = await apiClient.post(`/leads/${id}/status`, data)
+      // Backend returns: { success, message, data: lead }
       return response.data.data || response.data.lead
     } catch (error: any) {
       throw new Error(handleApiError(error))
@@ -157,6 +160,7 @@ export const leadService = {
   ): Promise<Lead> => {
     try {
       const response = await apiClient.post(`/leads/${id}/move`, data)
+      // Backend returns: { success, message, data: lead }
       return response.data.data || response.data.lead
     } catch (error: any) {
       throw new Error(handleApiError(error))
@@ -262,6 +266,7 @@ export const leadService = {
   ): Promise<Lead> => {
     try {
       const response = await apiClient.post(`/leads/${id}/follow-up`, data)
+      // Backend returns: { success, message, data: lead }
       return response.data.data || response.data.lead
     } catch (error: any) {
       throw new Error(handleApiError(error))
@@ -307,6 +312,7 @@ export const pipelineService = {
   createPipeline: async (data: CreatePipelineData): Promise<Pipeline> => {
     try {
       const response = await apiClient.post('/crm-pipelines', data)
+      // Backend returns: { success, message, data: pipeline }
       return response.data.data || response.data.pipeline
     } catch (error: any) {
       throw new Error(handleApiError(error))
@@ -322,6 +328,7 @@ export const pipelineService = {
   ): Promise<Pipeline> => {
     try {
       const response = await apiClient.put(`/crm-pipelines/${id}`, data)
+      // Backend returns: { success, message, data: pipeline }
       return response.data.data || response.data.pipeline
     } catch (error: any) {
       throw new Error(handleApiError(error))
@@ -345,6 +352,7 @@ export const pipelineService = {
   addStage: async (id: string, data: CreateStageData): Promise<Pipeline> => {
     try {
       const response = await apiClient.post(`/crm-pipelines/${id}/stages`, data)
+      // Backend returns: { success, message, data: pipeline }
       return response.data.data || response.data.pipeline
     } catch (error: any) {
       throw new Error(handleApiError(error))
@@ -364,6 +372,7 @@ export const pipelineService = {
         `/crm-pipelines/${id}/stages/${stageId}`,
         data
       )
+      // Backend returns: { success, message, data: pipeline }
       return response.data.data || response.data.pipeline
     } catch (error: any) {
       throw new Error(handleApiError(error))
@@ -393,6 +402,7 @@ export const pipelineService = {
         `/crm-pipelines/${id}/stages/reorder`,
         { stageOrders }
       )
+      // Backend returns: { success, message, data: pipeline }
       return response.data.data || response.data.pipeline
     } catch (error: any) {
       throw new Error(handleApiError(error))
@@ -417,6 +427,7 @@ export const pipelineService = {
   setDefault: async (id: string): Promise<Pipeline> => {
     try {
       const response = await apiClient.post(`/crm-pipelines/${id}/default`)
+      // Backend returns: { success, message, data: pipeline }
       return response.data.data || response.data.pipeline
     } catch (error: any) {
       throw new Error(handleApiError(error))
@@ -435,6 +446,7 @@ export const pipelineService = {
         `/crm-pipelines/${id}/duplicate`,
         data
       )
+      // Backend returns: { success, message, data: pipeline }
       return response.data.data || response.data.pipeline
     } catch (error: any) {
       throw new Error(handleApiError(error))
@@ -478,6 +490,7 @@ export const referralService = {
   createReferral: async (data: CreateReferralData): Promise<Referral> => {
     try {
       const response = await apiClient.post('/referrals', data)
+      // Backend returns: { success, message, data: referral }
       return response.data.data || response.data.referral
     } catch (error: any) {
       throw new Error(handleApiError(error))
@@ -493,6 +506,7 @@ export const referralService = {
   ): Promise<Referral> => {
     try {
       const response = await apiClient.put(`/referrals/${id}`, data)
+      // Backend returns: { success, message, data: referral }
       return response.data.data || response.data.referral
     } catch (error: any) {
       throw new Error(handleApiError(error))
@@ -548,6 +562,7 @@ export const referralService = {
   ): Promise<Referral> => {
     try {
       const response = await apiClient.post(`/referrals/${id}/leads`, data)
+      // Backend returns: { success, message, data: referral }
       return response.data.data || response.data.referral
     } catch (error: any) {
       throw new Error(handleApiError(error))
@@ -567,6 +582,7 @@ export const referralService = {
         `/referrals/${id}/leads/${leadId}/convert`,
         { clientId }
       )
+      // Backend returns: { success, message, data: referral }
       return response.data.data || response.data.referral
     } catch (error: any) {
       throw new Error(handleApiError(error))
@@ -582,6 +598,7 @@ export const referralService = {
   ): Promise<Referral> => {
     try {
       const response = await apiClient.post(`/referrals/${id}/payments`, data)
+      // Backend returns: { success, message, data: referral }
       return response.data.data || response.data.referral
     } catch (error: any) {
       throw new Error(handleApiError(error))
@@ -642,7 +659,8 @@ export const crmActivityService = {
   createActivity: async (data: CreateActivityData): Promise<CrmActivity> => {
     try {
       const response = await apiClient.post('/crm-activities', data)
-      return response.data.data
+      // Backend returns: { success, message, data: activity }
+      return response.data.data || response.data.activity
     } catch (error: any) {
       throw new Error(handleApiError(error))
     }
@@ -657,7 +675,8 @@ export const crmActivityService = {
   ): Promise<CrmActivity> => {
     try {
       const response = await apiClient.put(`/crm-activities/${id}`, data)
-      return response.data.data
+      // Backend returns: { success, message, data: activity }
+      return response.data.data || response.data.activity
     } catch (error: any) {
       throw new Error(handleApiError(error))
     }
@@ -755,7 +774,8 @@ export const crmActivityService = {
       const response = await apiClient.post(`/crm-activities/${id}/complete`, {
         outcomeNotes,
       })
-      return response.data.data
+      // Backend returns: { success, message, data: activity }
+      return response.data.data || response.data.activity
     } catch (error: any) {
       throw new Error(handleApiError(error))
     }
@@ -767,7 +787,8 @@ export const crmActivityService = {
   logCall: async (data: LogCallData): Promise<CrmActivity> => {
     try {
       const response = await apiClient.post('/crm-activities/log/call', data)
-      return response.data.data
+      // Backend returns: { success, message, data: activity }
+      return response.data.data || response.data.activity
     } catch (error: any) {
       throw new Error(handleApiError(error))
     }
@@ -779,7 +800,8 @@ export const crmActivityService = {
   logEmail: async (data: LogEmailData): Promise<CrmActivity> => {
     try {
       const response = await apiClient.post('/crm-activities/log/email', data)
-      return response.data.data
+      // Backend returns: { success, message, data: activity }
+      return response.data.data || response.data.activity
     } catch (error: any) {
       throw new Error(handleApiError(error))
     }
@@ -791,7 +813,8 @@ export const crmActivityService = {
   logMeeting: async (data: LogMeetingData): Promise<CrmActivity> => {
     try {
       const response = await apiClient.post('/crm-activities/log/meeting', data)
-      return response.data.data
+      // Backend returns: { success, message, data: activity }
+      return response.data.data || response.data.activity
     } catch (error: any) {
       throw new Error(handleApiError(error))
     }
@@ -803,7 +826,8 @@ export const crmActivityService = {
   addNote: async (data: AddNoteData): Promise<CrmActivity> => {
     try {
       const response = await apiClient.post('/crm-activities/log/note', data)
-      return response.data.data
+      // Backend returns: { success, message, data: activity }
+      return response.data.data || response.data.activity
     } catch (error: any) {
       throw new Error(handleApiError(error))
     }

@@ -731,7 +731,159 @@ export const getPendingApprovals = async (): Promise<{
   corrections: AttendanceRecord[]
   overtime: AttendanceRecord[]
 }> => {
-  const response = await api.get('/attendance/pending-approvals')
+  const response = await api.get('/attendance/corrections/pending')
+  return response.data
+}
+
+// Get today's attendance overview
+export const getTodayAttendanceOverview = async (department?: string): Promise<{
+  date: string
+  summary: DailySummary
+  records: AttendanceRecord[]
+}> => {
+  const params = new URLSearchParams()
+  if (department) params.append('department', department)
+  const response = await api.get(`/attendance/today?${params.toString()}`)
+  return response.data
+}
+
+// Get violations
+export const getAllViolations = async (): Promise<AttendanceRecord[]> => {
+  const response = await api.get('/attendance/violations')
+  return response.data
+}
+
+// Get monthly report
+export const getMonthlyReport = async (month?: number, year?: number, department?: string): Promise<any> => {
+  const params = new URLSearchParams()
+  if (month) params.append('month', month.toString())
+  if (year) params.append('year', year.toString())
+  if (department) params.append('department', department)
+  const response = await api.get(`/attendance/report/monthly?${params.toString()}`)
+  return response.data
+}
+
+// Get department stats
+export const getDepartmentStats = async (department?: string): Promise<any> => {
+  const params = new URLSearchParams()
+  if (department) params.append('department', department)
+  const response = await api.get(`/attendance/stats/department?${params.toString()}`)
+  return response.data
+}
+
+// Get check-in status
+export const getCheckInStatus = async (employeeId: string): Promise<any> => {
+  const response = await api.get(`/attendance/status/${employeeId}`)
+  return response.data
+}
+
+// Get attendance summary for employee
+export const getAttendanceSummaryForEmployee = async (employeeId: string, startDate?: string, endDate?: string): Promise<EmployeeSummary> => {
+  const params = new URLSearchParams()
+  if (startDate) params.append('startDate', startDate)
+  if (endDate) params.append('endDate', endDate)
+  const response = await api.get(`/attendance/summary/${employeeId}?${params.toString()}`)
+  return response.data
+}
+
+// Get attendance by employee and date
+export const getAttendanceByEmployeeAndDate = async (employeeId: string, date: string): Promise<AttendanceRecord> => {
+  const response = await api.get(`/attendance/employee/${employeeId}/date/${date}`)
+  return response.data
+}
+
+// Mark absences for a date
+export const markAbsences = async (date: string, departmentId?: string): Promise<any> => {
+  const response = await api.post('/attendance/mark-absences', { date, departmentId })
+  return response.data
+}
+
+// Import attendance records (bulk)
+export const importAttendance = async (records: CreateAttendanceData[]): Promise<{
+  success: number
+  failed: number
+  errors: Array<{ index: number; error: string }>
+}> => {
+  const response = await api.post('/attendance/import', { records })
+  return response.data
+}
+
+// Start break
+export const startBreak = async (recordId: string, breakData: Partial<BreakRecord>): Promise<AttendanceRecord> => {
+  const response = await api.post(`/attendance/${recordId}/break/start`, breakData)
+  return response.data
+}
+
+// End break
+export const endBreak = async (recordId: string): Promise<AttendanceRecord> => {
+  const response = await api.post(`/attendance/${recordId}/break/end`)
+  return response.data
+}
+
+// Get breaks for a record
+export const getBreaks = async (recordId: string): Promise<BreakRecord[]> => {
+  const response = await api.get(`/attendance/${recordId}/breaks`)
+  return response.data
+}
+
+// Submit correction request
+export const submitCorrection = async (recordId: string, data: {
+  correctionType: string
+  field: string
+  originalValue?: string
+  requestedValue: string
+  reason: string
+  evidenceUrl?: string
+}): Promise<AttendanceRecord> => {
+  const response = await api.post(`/attendance/${recordId}/corrections`, data)
+  return response.data
+}
+
+// Review correction (approve/reject)
+export const reviewCorrection = async (recordId: string, correctionId: string, data: {
+  status: 'approved' | 'rejected'
+  reviewComments?: string
+}): Promise<AttendanceRecord> => {
+  const response = await api.put(`/attendance/${recordId}/corrections/${correctionId}`, data)
+  return response.data
+}
+
+// Approve attendance
+export const approveAttendance = async (recordId: string, comments?: string): Promise<AttendanceRecord> => {
+  const response = await api.post(`/attendance/${recordId}/approve`, { comments })
+  return response.data
+}
+
+// Reject attendance
+export const rejectAttendance = async (recordId: string, reason: string): Promise<AttendanceRecord> => {
+  const response = await api.post(`/attendance/${recordId}/reject`, { reason })
+  return response.data
+}
+
+// Add violation
+export const addViolation = async (recordId: string, violationData: Partial<AttendanceViolation>): Promise<AttendanceRecord> => {
+  const response = await api.post(`/attendance/${recordId}/violations`, violationData)
+  return response.data
+}
+
+// Resolve violation
+export const resolveViolation = async (recordId: string, violationIndex: number, resolutionData: any): Promise<AttendanceRecord> => {
+  const response = await api.put(`/attendance/${recordId}/violations/${violationIndex}/resolve`, resolutionData)
+  return response.data
+}
+
+// Appeal violation
+export const appealViolation = async (recordId: string, violationIndex: number, appealData: any): Promise<AttendanceRecord> => {
+  const response = await api.post(`/attendance/${recordId}/violations/${violationIndex}/appeal`, appealData)
+  return response.data
+}
+
+// Approve overtime
+export const approveOvertimeForRecord = async (recordId: string, data: {
+  approvedHours?: number
+  comments?: string
+}): Promise<AttendanceRecord> => {
+  const response = await api.post(`/attendance/${recordId}/overtime/approve`, data)
   return response.data
 }
 

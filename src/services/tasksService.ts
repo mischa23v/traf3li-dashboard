@@ -714,7 +714,7 @@ const tasksService = {
    */
   toggleSubtask: async (taskId: string, subtaskId: string): Promise<Task> => {
     try {
-      const response = await apiClient.post(`/tasks/${taskId}/subtasks/${subtaskId}/toggle`)
+      const response = await apiClient.patch(`/tasks/${taskId}/subtasks/${subtaskId}/toggle`)
       return response.data.task || response.data.data
     } catch (error: any) {
       throw new Error(handleApiError(error))
@@ -752,7 +752,7 @@ const tasksService = {
    */
   startTimeTracking: async (taskId: string): Promise<Task> => {
     try {
-      const response = await apiClient.post(`/tasks/${taskId}/time-tracking/start`)
+      const response = await apiClient.post(`/tasks/${taskId}/timer/start`)
       return response.data.task || response.data.data
     } catch (error: any) {
       throw new Error(handleApiError(error))
@@ -764,7 +764,7 @@ const tasksService = {
    */
   stopTimeTracking: async (taskId: string, notes?: string): Promise<Task> => {
     try {
-      const response = await apiClient.post(`/tasks/${taskId}/time-tracking/stop`, { notes })
+      const response = await apiClient.post(`/tasks/${taskId}/timer/stop`, { notes })
       return response.data.task || response.data.data
     } catch (error: any) {
       throw new Error(handleApiError(error))
@@ -776,7 +776,7 @@ const tasksService = {
    */
   addTimeEntry: async (taskId: string, data: { minutes: number; date: string; notes?: string }): Promise<Task> => {
     try {
-      const response = await apiClient.post(`/tasks/${taskId}/time-tracking/manual`, data)
+      const response = await apiClient.post(`/tasks/${taskId}/time`, data)
       return response.data.task || response.data.data
     } catch (error: any) {
       throw new Error(handleApiError(error))
@@ -788,7 +788,7 @@ const tasksService = {
    */
   getTimeTrackingSummary: async (taskId: string): Promise<{ totalMinutes: number; sessions: TimeSession[] }> => {
     try {
-      const response = await apiClient.get(`/tasks/${taskId}/time-tracking`)
+      const response = await apiClient.get(`/tasks/${taskId}/time-tracking/summary`)
       return response.data
     } catch (error: any) {
       throw new Error(handleApiError(error))
@@ -814,7 +814,7 @@ const tasksService = {
    */
   updateComment: async (taskId: string, commentId: string, text: string): Promise<Task> => {
     try {
-      const response = await apiClient.patch(`/tasks/${taskId}/comments/${commentId}`, { text })
+      const response = await apiClient.put(`/tasks/${taskId}/comments/${commentId}`, { text })
       return response.data.task || response.data.data
     } catch (error: any) {
       throw new Error(handleApiError(error))
@@ -1155,6 +1155,18 @@ const tasksService = {
   },
 
   /**
+   * Get tasks by case
+   */
+  getTasksByCase: async (caseId: string): Promise<Task[]> => {
+    try {
+      const response = await apiClient.get(`/tasks/case/${caseId}`)
+      return response.data.tasks || response.data.data || []
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
    * Get my tasks (assigned to current user)
    */
   getMyTasks: async (filters?: Omit<TaskFilters, 'assignedTo'>): Promise<{ tasks: Task[]; total: number }> => {
@@ -1226,7 +1238,7 @@ const tasksService = {
    */
   bulkUpdate: async (taskIds: string[], data: Partial<CreateTaskData>): Promise<BulkOperationResult> => {
     try {
-      const response = await apiClient.patch('/tasks/bulk', { taskIds, ...data })
+      const response = await apiClient.put('/tasks/bulk', { taskIds, ...data })
       return response.data
     } catch (error: any) {
       throw new Error(handleApiError(error))

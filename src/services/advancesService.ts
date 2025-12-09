@@ -380,36 +380,36 @@ export const getAdvances = async (filters?: AdvanceFilters): Promise<AdvanceResp
   if (filters?.page) params.append('page', filters.page.toString())
   if (filters?.limit) params.append('limit', filters.limit.toString())
 
-  const response = await api.get(`/hr/advances?${params.toString()}`)
+  const response = await api.get(`/hr/employee-advances?${params.toString()}`)
   return response.data
 }
 
 // Get single advance
 export const getAdvance = async (advanceId: string): Promise<AdvanceRecord> => {
-  const response = await api.get(`/hr/advances/${advanceId}`)
+  const response = await api.get(`/hr/employee-advances/${advanceId}`)
   return response.data
 }
 
 // Create advance
 export const createAdvance = async (data: CreateAdvanceData): Promise<AdvanceRecord> => {
-  const response = await api.post('/hr/advances', data)
+  const response = await api.post('/hr/employee-advances', data)
   return response.data
 }
 
 // Update advance
 export const updateAdvance = async (advanceId: string, data: UpdateAdvanceData): Promise<AdvanceRecord> => {
-  const response = await api.patch(`/hr/advances/${advanceId}`, data)
+  const response = await api.patch(`/hr/employee-advances/${advanceId}`, data)
   return response.data
 }
 
 // Delete advance
 export const deleteAdvance = async (advanceId: string): Promise<void> => {
-  await api.delete(`/hr/advances/${advanceId}`)
+  await api.delete(`/hr/employee-advances/${advanceId}`)
 }
 
 // Get advance stats
 export const getAdvanceStats = async (): Promise<AdvanceStats> => {
-  const response = await api.get('/hr/advances/stats')
+  const response = await api.get('/hr/employee-advances/stats')
   return response.data
 }
 
@@ -421,13 +421,19 @@ export const checkAdvanceEligibility = async (employeeId: string, amount: number
   availableLimit: number
   ineligibilityReasons?: string[]
 }> => {
-  const response = await api.post('/hr/advances/check-eligibility', { employeeId, amount })
+  const response = await api.post('/hr/employee-advances/check-eligibility', { employeeId, amount })
   return response.data
 }
 
-// Submit advance request
+// Cancel advance request
+export const cancelAdvanceRequest = async (advanceId: string): Promise<AdvanceRecord> => {
+  const response = await api.post(`/hr/employee-advances/${advanceId}/cancel`)
+  return response.data
+}
+
+// Submit advance request for approval
 export const submitAdvanceRequest = async (advanceId: string): Promise<AdvanceRecord> => {
-  const response = await api.post(`/hr/advances/${advanceId}/submit`)
+  const response = await api.post(`/hr/employee-advances/${advanceId}/submit`)
   return response.data
 }
 
@@ -437,7 +443,7 @@ export const approveAdvance = async (advanceId: string, data: {
   approvedInstallments?: number
   comments?: string
 }): Promise<AdvanceRecord> => {
-  const response = await api.post(`/hr/advances/${advanceId}/approve`, data)
+  const response = await api.post(`/hr/employee-advances/${advanceId}/approve`, data)
   return response.data
 }
 
@@ -446,7 +452,7 @@ export const rejectAdvance = async (advanceId: string, data: {
   reason: string
   comments?: string
 }): Promise<AdvanceRecord> => {
-  const response = await api.post(`/hr/advances/${advanceId}/reject`, data)
+  const response = await api.post(`/hr/employee-advances/${advanceId}/reject`, data)
   return response.data
 }
 
@@ -461,7 +467,7 @@ export const disburseAdvance = async (advanceId: string, data: {
   transferReference?: string
   urgentDisbursement?: boolean
 }): Promise<AdvanceRecord> => {
-  const response = await api.post(`/hr/advances/${advanceId}/disburse`, data)
+  const response = await api.post(`/hr/employee-advances/${advanceId}/disburse`, data)
   return response.data
 }
 
@@ -474,7 +480,7 @@ export const recordAdvanceRecovery = async (advanceId: string, data: {
   recoveryReference?: string
   notes?: string
 }): Promise<AdvanceRecord> => {
-  const response = await api.post(`/hr/advances/${advanceId}/recoveries`, data)
+  const response = await api.post(`/hr/employee-advances/${advanceId}/recover`, data)
   return response.data
 }
 
@@ -485,7 +491,7 @@ export const processPayrollDeduction = async (advanceId: string, data: {
   payrollYear: number
   deductedAmount: number
 }): Promise<AdvanceRecord> => {
-  const response = await api.post(`/hr/advances/${advanceId}/payroll-deduction`, data)
+  const response = await api.post(`/hr/employee-advances/${advanceId}/payroll-deduction`, data)
   return response.data
 }
 
@@ -495,35 +501,60 @@ export const processEarlyRecovery = async (advanceId: string, data: {
   recoveryMethod: RecoveryMethod
   recoveryReference?: string
 }): Promise<AdvanceRecord> => {
-  const response = await api.post(`/hr/advances/${advanceId}/early-recovery`, data)
+  const response = await api.post(`/hr/employee-advances/${advanceId}/early-recovery`, data)
   return response.data
 }
 
-// Waive advance
+// Write off advance
+export const writeOffAdvance = async (advanceId: string, data: {
+  writeOffReason: string
+  comments?: string
+}): Promise<AdvanceRecord> => {
+  const response = await api.post(`/hr/employee-advances/${advanceId}/write-off`, data)
+  return response.data
+}
+
+// Waive advance (partial or full)
 export const waiveAdvance = async (advanceId: string, data: {
   waiveReason: string
   waiveAmount?: number
   comments?: string
 }): Promise<AdvanceRecord> => {
-  const response = await api.post(`/hr/advances/${advanceId}/waive`, data)
+  const response = await api.post(`/hr/employee-advances/${advanceId}/waive`, data)
   return response.data
 }
 
 // Issue clearance letter
 export const issueClearanceLetter = async (advanceId: string): Promise<AdvanceRecord> => {
-  const response = await api.post(`/hr/advances/${advanceId}/issue-clearance`)
+  const response = await api.post(`/hr/employee-advances/${advanceId}/issue-clearance`)
+  return response.data
+}
+
+// Upload document
+export const uploadAdvanceDocument = async (advanceId: string, file: File): Promise<AdvanceRecord> => {
+  const formData = new FormData()
+  formData.append('file', file)
+  const response = await api.post(`/hr/employee-advances/${advanceId}/documents`, formData, {
+    headers: { 'Content-Type': 'multipart/form-data' }
+  })
+  return response.data
+}
+
+// Add communication
+export const addCommunication = async (advanceId: string, data: any): Promise<AdvanceRecord> => {
+  const response = await api.post(`/hr/employee-advances/${advanceId}/communications`, data)
   return response.data
 }
 
 // Bulk delete
 export const bulkDeleteAdvances = async (ids: string[]): Promise<{ deleted: number }> => {
-  const response = await api.post('/hr/advances/bulk-delete', { ids })
+  const response = await api.post('/hr/employee-advances/bulk-delete', { ids })
   return response.data
 }
 
 // Get employee advances
 export const getEmployeeAdvances = async (employeeId: string): Promise<AdvanceRecord[]> => {
-  const response = await api.get(`/hr/advances/by-employee/${employeeId}`)
+  const response = await api.get(`/hr/employee-advances/by-employee/${employeeId}`)
   return response.data
 }
 
@@ -536,7 +567,7 @@ export const getPendingApprovals = async (): Promise<Array<{
   urgency: UrgencyLevel
   requestDate: string
 }>> => {
-  const response = await api.get('/hr/advances/pending-approvals')
+  const response = await api.get('/hr/employee-advances/pending-approvals')
   return response.data
 }
 
@@ -549,12 +580,12 @@ export const getOverdueRecoveries = async (): Promise<Array<{
   amount: number
   daysOverdue: number
 }>> => {
-  const response = await api.get('/hr/advances/overdue-recoveries')
+  const response = await api.get('/hr/employee-advances/overdue-recoveries')
   return response.data
 }
 
 // Get emergency advances
 export const getEmergencyAdvances = async (): Promise<AdvanceRecord[]> => {
-  const response = await api.get('/hr/advances/emergency')
+  const response = await api.get('/hr/employee-advances/emergency')
   return response.data
 }

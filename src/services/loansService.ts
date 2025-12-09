@@ -352,36 +352,36 @@ export const getLoans = async (filters?: LoanFilters): Promise<LoanResponse> => 
   if (filters?.page) params.append('page', filters.page.toString())
   if (filters?.limit) params.append('limit', filters.limit.toString())
 
-  const response = await api.get(`/hr/loans?${params.toString()}`)
+  const response = await api.get(`/hr/employee-loans?${params.toString()}`)
   return response.data
 }
 
 // Get single loan
 export const getLoan = async (loanId: string): Promise<LoanRecord> => {
-  const response = await api.get(`/hr/loans/${loanId}`)
+  const response = await api.get(`/hr/employee-loans/${loanId}`)
   return response.data
 }
 
 // Create loan
 export const createLoan = async (data: CreateLoanData): Promise<LoanRecord> => {
-  const response = await api.post('/hr/loans', data)
+  const response = await api.post('/hr/employee-loans', data)
   return response.data
 }
 
 // Update loan
 export const updateLoan = async (loanId: string, data: UpdateLoanData): Promise<LoanRecord> => {
-  const response = await api.patch(`/hr/loans/${loanId}`, data)
+  const response = await api.patch(`/hr/employee-loans/${loanId}`, data)
   return response.data
 }
 
 // Delete loan
 export const deleteLoan = async (loanId: string): Promise<void> => {
-  await api.delete(`/hr/loans/${loanId}`)
+  await api.delete(`/hr/employee-loans/${loanId}`)
 }
 
 // Get loan stats
 export const getLoanStats = async (): Promise<LoanStats> => {
-  const response = await api.get('/hr/loans/stats')
+  const response = await api.get('/hr/employee-loans/stats')
   return response.data
 }
 
@@ -393,13 +393,13 @@ export const checkLoanEligibility = async (employeeId: string, amount: number): 
   availableCredit: number
   ineligibilityReasons?: string[]
 }> => {
-  const response = await api.post('/hr/loans/check-eligibility', { employeeId, amount })
+  const response = await api.post('/hr/employee-loans/check-eligibility', { employeeId, amount })
   return response.data
 }
 
 // Submit application
 export const submitLoanApplication = async (loanId: string): Promise<LoanRecord> => {
-  const response = await api.post(`/hr/loans/${loanId}/submit`)
+  const response = await api.post(`/hr/employee-loans/${loanId}/submit`)
   return response.data
 }
 
@@ -410,7 +410,7 @@ export const approveLoan = async (loanId: string, data: {
   comments?: string
   conditions?: string[]
 }): Promise<LoanRecord> => {
-  const response = await api.post(`/hr/loans/${loanId}/approve`, data)
+  const response = await api.post(`/hr/employee-loans/${loanId}/approve`, data)
   return response.data
 }
 
@@ -419,7 +419,7 @@ export const rejectLoan = async (loanId: string, data: {
   reason: string
   comments?: string
 }): Promise<LoanRecord> => {
-  const response = await api.post(`/hr/loans/${loanId}/reject`, data)
+  const response = await api.post(`/hr/employee-loans/${loanId}/reject`, data)
   return response.data
 }
 
@@ -433,7 +433,7 @@ export const disburseLoan = async (loanId: string, data: {
   }
   transferReference?: string
 }): Promise<LoanRecord> => {
-  const response = await api.post(`/hr/loans/${loanId}/disburse`, data)
+  const response = await api.post(`/hr/employee-loans/${loanId}/disburse`, data)
   return response.data
 }
 
@@ -446,7 +446,7 @@ export const recordLoanPayment = async (loanId: string, data: {
   paymentReference?: string
   notes?: string
 }): Promise<LoanRecord> => {
-  const response = await api.post(`/hr/loans/${loanId}/payments`, data)
+  const response = await api.post(`/hr/employee-loans/${loanId}/payments`, data)
   return response.data
 }
 
@@ -457,7 +457,7 @@ export const processPayrollDeduction = async (loanId: string, data: {
   payrollYear: number
   deductedAmount: number
 }): Promise<LoanRecord> => {
-  const response = await api.post(`/hr/loans/${loanId}/payroll-deduction`, data)
+  const response = await api.post(`/hr/employee-loans/${loanId}/payroll-deduction`, data)
   return response.data
 }
 
@@ -470,7 +470,7 @@ export const calculateEarlySettlement = async (loanId: string): Promise<{
   totalSettlementAmount: number
   savings: number
 }> => {
-  const response = await api.get(`/hr/loans/${loanId}/early-settlement-calculation`)
+  const response = await api.get(`/hr/employee-loans/${loanId}/early-settlement-calculation`)
   return response.data
 }
 
@@ -480,7 +480,7 @@ export const processEarlySettlement = async (loanId: string, data: {
   paymentMethod: PaymentMethod
   paymentReference?: string
 }): Promise<LoanRecord> => {
-  const response = await api.post(`/hr/loans/${loanId}/early-settlement`, data)
+  const response = await api.post(`/hr/employee-loans/${loanId}/early-settlement`, data)
   return response.data
 }
 
@@ -489,7 +489,7 @@ export const markLoanDefaulted = async (loanId: string, data: {
   defaultReason: string
   notes?: string
 }): Promise<LoanRecord> => {
-  const response = await api.post(`/hr/loans/${loanId}/default`, data)
+  const response = await api.post(`/hr/employee-loans/${loanId}/default`, data)
   return response.data
 }
 
@@ -499,25 +499,41 @@ export const restructureLoan = async (loanId: string, data: {
   newInstallments: number
   reason: string
 }): Promise<LoanRecord> => {
-  const response = await api.post(`/hr/loans/${loanId}/restructure`, data)
+  const response = await api.post(`/hr/employee-loans/${loanId}/restructure`, data)
   return response.data
 }
 
 // Issue clearance letter
 export const issueClearanceLetter = async (loanId: string): Promise<LoanRecord> => {
-  const response = await api.post(`/hr/loans/${loanId}/issue-clearance`)
+  const response = await api.post(`/hr/employee-loans/${loanId}/issue-clearance`)
+  return response.data
+}
+
+// Upload document
+export const uploadLoanDocument = async (loanId: string, file: File): Promise<LoanRecord> => {
+  const formData = new FormData()
+  formData.append('file', file)
+  const response = await api.post(`/hr/employee-loans/${loanId}/documents`, formData, {
+    headers: { 'Content-Type': 'multipart/form-data' }
+  })
+  return response.data
+}
+
+// Add communication
+export const addCommunication = async (loanId: string, data: any): Promise<LoanRecord> => {
+  const response = await api.post(`/hr/employee-loans/${loanId}/communications`, data)
   return response.data
 }
 
 // Bulk delete
 export const bulkDeleteLoans = async (ids: string[]): Promise<{ deleted: number }> => {
-  const response = await api.post('/hr/loans/bulk-delete', { ids })
+  const response = await api.post('/hr/employee-loans/bulk-delete', { ids })
   return response.data
 }
 
 // Get employee loans
 export const getEmployeeLoans = async (employeeId: string): Promise<LoanRecord[]> => {
-  const response = await api.get(`/hr/loans/by-employee/${employeeId}`)
+  const response = await api.get(`/hr/employee-loans/by-employee/${employeeId}`)
   return response.data
 }
 
@@ -529,7 +545,7 @@ export const getPendingApprovals = async (): Promise<Array<{
   amount: number
   applicationDate: string
 }>> => {
-  const response = await api.get('/hr/loans/pending-approvals')
+  const response = await api.get('/hr/employee-loans/pending-approvals')
   return response.data
 }
 
@@ -542,6 +558,6 @@ export const getOverdueInstallments = async (): Promise<Array<{
   amount: number
   daysOverdue: number
 }>> => {
-  const response = await api.get('/hr/loans/overdue-installments')
+  const response = await api.get('/hr/employee-loans/overdue-installments')
   return response.data
 }

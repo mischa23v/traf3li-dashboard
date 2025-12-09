@@ -705,3 +705,15 @@ export const getPendingApprovals = async (): Promise<LeaveRequest[]> => {
   const response = await api.get('/leave-requests/pending-approvals')
   return response.data
 }
+
+// Get leave types
+export const getLeaveTypes = async (): Promise<Array<{
+  leaveType: LeaveType
+  name: string
+  nameAr: string
+  maxDays?: number
+  article?: string
+}>> => {
+  const response = await api.get('/leave-requests/types')
+  return response.data
+}

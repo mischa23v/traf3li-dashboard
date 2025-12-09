@@ -40,7 +40,7 @@ export const bankFeedService = {
     filters?: BankFeedFilters
   ): Promise<{ data: BankFeed[]; pagination: any }> => {
     try {
-      const response = await apiClient.get('/bank-reconciliations/feeds', { params: filters })
+      const response = await apiClient.get('/bank-reconciliation/feeds', { params: filters })
       return response.data
     } catch (error: any) {
       throw new Error(handleApiError(error))
@@ -52,7 +52,7 @@ export const bankFeedService = {
    */
   getFeed: async (id: string): Promise<BankFeed> => {
     try {
-      const response = await apiClient.get(`/bank-reconciliations/feeds/${id}`)
+      const response = await apiClient.get(`/bank-reconciliation/feeds/${id}`)
       return response.data.data
     } catch (error: any) {
       throw new Error(handleApiError(error))
@@ -64,7 +64,7 @@ export const bankFeedService = {
    */
   createFeed: async (data: CreateBankFeedData): Promise<BankFeed> => {
     try {
-      const response = await apiClient.post('/bank-reconciliations/feeds', data)
+      const response = await apiClient.post('/bank-reconciliation/feeds', data)
       return response.data.data
     } catch (error: any) {
       throw new Error(handleApiError(error))
@@ -76,7 +76,7 @@ export const bankFeedService = {
    */
   updateFeed: async (id: string, data: Partial<CreateBankFeedData>): Promise<BankFeed> => {
     try {
-      const response = await apiClient.put(`/bank-reconciliations/feeds/${id}`, data)
+      const response = await apiClient.put(`/bank-reconciliation/feeds/${id}`, data)
       return response.data.data
     } catch (error: any) {
       throw new Error(handleApiError(error))
@@ -88,7 +88,7 @@ export const bankFeedService = {
    */
   deleteFeed: async (id: string): Promise<void> => {
     try {
-      await apiClient.delete(`/bank-reconciliations/feeds/${id}`)
+      await apiClient.delete(`/bank-reconciliation/feeds/${id}`)
     } catch (error: any) {
       throw new Error(handleApiError(error))
     }
@@ -99,7 +99,7 @@ export const bankFeedService = {
    */
   fetchTransactions: async (id: string): Promise<{ imported: number; lastSync: Date }> => {
     try {
-      const response = await apiClient.post(`/bank-reconciliations/feeds/${id}/fetch`)
+      const response = await apiClient.post(`/bank-reconciliation/feeds/${id}/fetch`)
       return response.data.data
     } catch (error: any) {
       throw new Error(handleApiError(error))
@@ -122,7 +122,7 @@ export const bankFeedService = {
       formData.append('dateFormat', dateFormat)
 
       const response = await apiClient.post(
-        `/bank-reconciliations/feeds/${id}/import/csv`,
+        `/bank-reconciliation/import/csv`,
         formData,
         { headers: { 'Content-Type': 'multipart/form-data' } }
       )
@@ -141,7 +141,7 @@ export const bankFeedService = {
       formData.append('file', file)
 
       const response = await apiClient.post(
-        `/bank-reconciliations/feeds/${id}/import/ofx`,
+        `/bank-reconciliation/import/ofx`,
         formData,
         { headers: { 'Content-Type': 'multipart/form-data' } }
       )
@@ -159,7 +159,7 @@ export const bankFeedService = {
     filters?: BankTransactionFilters
   ): Promise<{ data: BankTransaction[]; pagination: any }> => {
     try {
-      const response = await apiClient.get(`/bank-reconciliations/feeds/${id}/transactions`, {
+      const response = await apiClient.get(`/bank-reconciliation/feeds/${id}/transactions`, {
         params: filters
       })
       return response.data
@@ -176,9 +176,9 @@ export const matchingService = {
   /**
    * Get match suggestions for transaction
    */
-  getSuggestions: async (transactionId: string): Promise<MatchSuggestion> => {
+  getSuggestions: async (accountId: string): Promise<MatchSuggestion> => {
     try {
-      const response = await apiClient.get(`/bank-reconciliations/suggestions/${transactionId}`)
+      const response = await apiClient.get(`/bank-reconciliation/suggestions/${accountId}`)
       return response.data.data
     } catch (error: any) {
       throw new Error(handleApiError(error))
@@ -186,11 +186,11 @@ export const matchingService = {
   },
 
   /**
-   * Create manual match
+   * Create manual match (split match)
    */
   createMatch: async (data: CreateMatchData): Promise<BankTransactionMatch> => {
     try {
-      const response = await apiClient.post('/bank-reconciliations/match', data)
+      const response = await apiClient.post('/bank-reconciliation/match/split', data)
       return response.data.data
     } catch (error: any) {
       throw new Error(handleApiError(error))
@@ -200,15 +200,13 @@ export const matchingService = {
   /**
    * Auto-match all unmatched transactions
    */
-  autoMatchAll: async (bankFeedId?: string): Promise<{
+  autoMatchAll: async (accountId: string): Promise<{
     matched: number
     unmatched: number
     suggestions: number
   }> => {
     try {
-      const response = await apiClient.post('/bank-reconciliations/auto-match', {
-        bankFeedId
-      })
+      const response = await apiClient.post(`/bank-reconciliation/auto-match/${accountId}`)
       return response.data.data
     } catch (error: any) {
       throw new Error(handleApiError(error))
@@ -220,7 +218,7 @@ export const matchingService = {
    */
   confirmMatch: async (matchId: string): Promise<BankTransactionMatch> => {
     try {
-      const response = await apiClient.post(`/bank-reconciliations/matches/${matchId}/confirm`)
+      const response = await apiClient.post(`/bank-reconciliation/match/confirm/${matchId}`)
       return response.data.data
     } catch (error: any) {
       throw new Error(handleApiError(error))
@@ -232,7 +230,7 @@ export const matchingService = {
    */
   rejectMatch: async (matchId: string): Promise<void> => {
     try {
-      await apiClient.post(`/bank-reconciliations/matches/${matchId}/reject`)
+      await apiClient.post(`/bank-reconciliation/match/reject/${matchId}`)
     } catch (error: any) {
       throw new Error(handleApiError(error))
     }
@@ -243,20 +241,21 @@ export const matchingService = {
    */
   unmatch: async (matchId: string): Promise<void> => {
     try {
-      await apiClient.delete(`/bank-reconciliations/matches/${matchId}`)
+      await apiClient.delete(`/bank-reconciliation/match/${matchId}`)
     } catch (error: any) {
       throw new Error(handleApiError(error))
     }
   },
 
   /**
-   * Exclude transaction from reconciliation
+   * Exclude transaction from reconciliation (not available in backend routes)
+   * This endpoint does not exist in the backend
    */
   excludeTransaction: async (transactionId: string, reason: string): Promise<void> => {
     try {
-      await apiClient.post(`/bank-reconciliations/transactions/${transactionId}/exclude`, {
-        reason
-      })
+      // Note: This endpoint is not implemented in the backend
+      // The backend uses clear/unclear transaction on reconciliation instead
+      throw new Error('Endpoint not available - use reconciliation clear/unclear instead')
     } catch (error: any) {
       throw new Error(handleApiError(error))
     }
@@ -272,7 +271,7 @@ export const matchingRulesService = {
    */
   getRules: async (): Promise<MatchingRule[]> => {
     try {
-      const response = await apiClient.get('/bank-reconciliations/rules')
+      const response = await apiClient.get('/bank-reconciliation/rules')
       return response.data.data
     } catch (error: any) {
       throw new Error(handleApiError(error))
@@ -280,12 +279,12 @@ export const matchingRulesService = {
   },
 
   /**
-   * Get single rule
+   * Get single rule (not available in backend routes)
    */
   getRule: async (id: string): Promise<MatchingRule> => {
     try {
-      const response = await apiClient.get(`/bank-reconciliations/rules/${id}`)
-      return response.data.data
+      // Note: This endpoint is not implemented in the backend
+      throw new Error('Endpoint not available - use getRules() to fetch all rules')
     } catch (error: any) {
       throw new Error(handleApiError(error))
     }
@@ -296,7 +295,7 @@ export const matchingRulesService = {
    */
   createRule: async (data: CreateMatchingRuleData): Promise<MatchingRule> => {
     try {
-      const response = await apiClient.post('/bank-reconciliations/rules', data)
+      const response = await apiClient.post('/bank-reconciliation/rules', data)
       return response.data.data
     } catch (error: any) {
       throw new Error(handleApiError(error))
@@ -308,7 +307,7 @@ export const matchingRulesService = {
    */
   updateRule: async (id: string, data: Partial<CreateMatchingRuleData>): Promise<MatchingRule> => {
     try {
-      const response = await apiClient.put(`/bank-reconciliations/rules/${id}`, data)
+      const response = await apiClient.put(`/bank-reconciliation/rules/${id}`, data)
       return response.data.data
     } catch (error: any) {
       throw new Error(handleApiError(error))
@@ -320,30 +319,31 @@ export const matchingRulesService = {
    */
   deleteRule: async (id: string): Promise<void> => {
     try {
-      await apiClient.delete(`/bank-reconciliations/rules/${id}`)
+      await apiClient.delete(`/bank-reconciliation/rules/${id}`)
     } catch (error: any) {
       throw new Error(handleApiError(error))
     }
   },
 
   /**
-   * Toggle rule active status
+   * Toggle rule active status (not available in backend routes)
    */
   toggleRule: async (id: string): Promise<MatchingRule> => {
     try {
-      const response = await apiClient.post(`/bank-reconciliations/rules/${id}/toggle`)
-      return response.data.data
+      // Note: This endpoint is not implemented in the backend
+      throw new Error('Endpoint not available - update the rule to change its active status')
     } catch (error: any) {
       throw new Error(handleApiError(error))
     }
   },
 
   /**
-   * Reorder rules priority
+   * Reorder rules priority (not available in backend routes)
    */
   reorderRules: async (ruleIds: string[]): Promise<void> => {
     try {
-      await apiClient.post('/bank-reconciliations/rules/reorder', { ruleIds })
+      // Note: This endpoint is not implemented in the backend
+      throw new Error('Endpoint not available')
     } catch (error: any) {
       throw new Error(handleApiError(error))
     }
@@ -355,14 +355,17 @@ export const matchingRulesService = {
 // ═══════════════════════════════════════════════════════════════
 export const reconciliationReportService = {
   /**
-   * Get reconciliation report
+   * Get reconciliation report (not available as a specific endpoint)
+   * Use getReconciliationStatus or getUnmatchedTransactions instead
    */
-  getReport: async (bankFeedId: string, params?: {
+  getReport: async (accountId: string, params?: {
     startDate?: string
     endDate?: string
   }): Promise<ReconciliationReport> => {
     try {
-      const response = await apiClient.get(`/bank-reconciliations/report/${bankFeedId}`, {
+      // Note: This endpoint is not implemented in the backend
+      // Use /bank-reconciliation/status/:accountId instead
+      const response = await apiClient.get(`/bank-reconciliation/status/${accountId}`, {
         params
       })
       return response.data.data
@@ -372,15 +375,12 @@ export const reconciliationReportService = {
   },
 
   /**
-   * Export reconciliation report
+   * Export reconciliation report (not available in backend routes)
    */
-  exportReport: async (bankFeedId: string, format: 'pdf' | 'xlsx'): Promise<Blob> => {
+  exportReport: async (accountId: string, format: 'pdf' | 'xlsx'): Promise<Blob> => {
     try {
-      const response = await apiClient.get(`/bank-reconciliations/report/${bankFeedId}/export`, {
-        params: { format },
-        responseType: 'blob'
-      })
-      return response.data
+      // Note: This endpoint is not implemented in the backend
+      throw new Error('Endpoint not available')
     } catch (error: any) {
       throw new Error(handleApiError(error))
     }
@@ -404,19 +404,29 @@ export const currencyService = {
   },
 
   /**
-   * Get specific exchange rate
+   * Get specific exchange rate (not available as a separate endpoint)
+   * Use getRates() and filter the results instead
    */
   getRate: async (fromCurrency: string, toCurrency: string): Promise<ExchangeRate> => {
     try {
-      const response = await apiClient.get(`/currency/rates/${fromCurrency}/${toCurrency}`)
-      return response.data.data
+      // Note: This endpoint is not implemented in the backend
+      // The backend only has /currency/rates (get all)
+      const response = await apiClient.get('/currency/rates')
+      const rates = response.data.data || []
+      const rate = rates.find((r: any) =>
+        r.fromCurrency === fromCurrency && r.toCurrency === toCurrency
+      )
+      if (!rate) {
+        throw new Error(`Exchange rate for ${fromCurrency} to ${toCurrency} not found`)
+      }
+      return rate
     } catch (error: any) {
       throw new Error(handleApiError(error))
     }
   },
 
   /**
-   * Get rate history
+   * Get rate history (not available in backend routes)
    */
   getRateHistory: async (
     fromCurrency: string,
@@ -424,10 +434,8 @@ export const currencyService = {
     params?: { startDate?: string; endDate?: string }
   ): Promise<ExchangeRateHistory[]> => {
     try {
-      const response = await apiClient.get(`/currency/rates/${fromCurrency}/${toCurrency}/history`, {
-        params
-      })
-      return response.data.data
+      // Note: This endpoint is not implemented in the backend
+      throw new Error('Endpoint not available')
     } catch (error: any) {
       throw new Error(handleApiError(error))
     }
@@ -450,7 +458,7 @@ export const currencyService = {
    */
   refreshRates: async (): Promise<{ updated: number; lastUpdate: Date }> => {
     try {
-      const response = await apiClient.post('/currency/rates/refresh')
+      const response = await apiClient.post('/currency/update')
       return response.data.data
     } catch (error: any) {
       throw new Error(handleApiError(error))
@@ -490,12 +498,12 @@ export const currencyService = {
   },
 
   /**
-   * Update currency settings
+   * Update currency settings (not available in backend routes)
    */
   updateSettings: async (data: Partial<CurrencySettings>): Promise<CurrencySettings> => {
     try {
-      const response = await apiClient.put('/currency/settings', data)
-      return response.data.data
+      // Note: This endpoint is not implemented in the backend
+      throw new Error('Endpoint not available')
     } catch (error: any) {
       throw new Error(handleApiError(error))
     }

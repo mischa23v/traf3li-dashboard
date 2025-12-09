@@ -197,7 +197,7 @@ export const trustAccountService = {
   },
 
   updateTrustAccount: async (id: string, data: Partial<TrustAccount>): Promise<TrustAccount> => {
-    const response = await api.put(`/trust-accounts/${id}`, data)
+    const response = await api.patch(`/trust-accounts/${id}`, data)
     return response.data
   },
 
@@ -207,14 +207,13 @@ export const trustAccountService = {
   },
 
   // Client Trust Balances
-  getClientTrustBalances: async (params?: {
-    accountId?: string
+  getClientTrustBalances: async (accountId: string, params?: {
     clientId?: string
     caseId?: string
     minBalance?: number
     maxBalance?: number
   }): Promise<ClientTrustBalanceListResponse> => {
-    const response = await api.get('/trust-accounts/client-balances', { params })
+    const response = await api.get(`/trust-accounts/${accountId}/balances`, { params })
     return response.data
   },
 
@@ -222,13 +221,12 @@ export const trustAccountService = {
     accountId: string,
     clientId: string
   ): Promise<ClientTrustBalance> => {
-    const response = await api.get(`/trust-accounts/${accountId}/clients/${clientId}`)
+    const response = await api.get(`/trust-accounts/${accountId}/balances/${clientId}`)
     return response.data
   },
 
   // Trust Transactions
-  getTrustTransactions: async (params?: {
-    accountId?: string
+  getTrustTransactions: async (accountId: string, params?: {
     clientId?: string
     caseId?: string
     type?: TransactionType
@@ -238,12 +236,12 @@ export const trustAccountService = {
     page?: number
     pageSize?: number
   }): Promise<TrustTransactionListResponse> => {
-    const response = await api.get('/trust-transactions', { params })
+    const response = await api.get(`/trust-accounts/${accountId}/transactions`, { params })
     return response.data
   },
 
-  getTrustTransaction: async (id: string): Promise<TrustTransaction> => {
-    const response = await api.get(`/trust-transactions/${id}`)
+  getTrustTransaction: async (accountId: string, transactionId: string): Promise<TrustTransaction> => {
+    const response = await api.get(`/trust-accounts/${accountId}/transactions/${transactionId}`)
     return response.data
   },
 
@@ -258,7 +256,8 @@ export const trustAccountService = {
     payor: string
     notes?: string
   }): Promise<TrustTransaction> => {
-    const response = await api.post('/trust-transactions/deposit', data)
+    const { accountId, ...transactionData } = data
+    const response = await api.post(`/trust-accounts/${accountId}/transactions`, transactionData)
     return response.data
   },
 
@@ -276,7 +275,8 @@ export const trustAccountService = {
     relatedExpenseId?: string
     notes?: string
   }): Promise<TrustTransaction> => {
-    const response = await api.post('/trust-transactions/withdrawal', data)
+    const { accountId, ...transactionData } = data
+    const response = await api.post(`/trust-accounts/${accountId}/transactions`, transactionData)
     return response.data
   },
 
@@ -291,12 +291,13 @@ export const trustAccountService = {
     description: string
     notes?: string
   }): Promise<{ fromTransaction: TrustTransaction; toTransaction: TrustTransaction }> => {
-    const response = await api.post('/trust-transactions/transfer', data)
+    const { fromAccountId, ...transferData } = data
+    const response = await api.post(`/trust-accounts/${fromAccountId}/transfer`, transferData)
     return response.data
   },
 
-  voidTransaction: async (id: string, reason: string): Promise<TrustTransaction> => {
-    const response = await api.put(`/trust-transactions/${id}/void`, { reason })
+  voidTransaction: async (accountId: string, transactionId: string, reason: string): Promise<TrustTransaction> => {
+    const response = await api.post(`/trust-accounts/${accountId}/transactions/${transactionId}/void`, { reason })
     return response.data
   },
 
@@ -306,21 +307,27 @@ export const trustAccountService = {
   },
 
   // Reconciliation
-  getReconciliations: async (params?: {
-    accountId?: string
+  getReconciliations: async (accountId: string, params?: {
     status?: 'in_progress' | 'completed' | 'exception'
     startDate?: string
     endDate?: string
     page?: number
     pageSize?: number
   }): Promise<TrustReconciliationListResponse> => {
-    const response = await api.get('/trust-reconciliations', { params })
+    const response = await api.get(`/trust-accounts/${accountId}/reconciliations`, { params })
     return response.data
   },
 
-  getReconciliation: async (id: string): Promise<TrustReconciliation> => {
-    const response = await api.get(`/trust-reconciliations/${id}`)
-    return response.data
+  getReconciliation: async (accountId: string, reconciliationId: string): Promise<TrustReconciliation> => {
+    // Note: Backend doesn't have a specific endpoint for getting a single reconciliation
+    // Use getReconciliations and filter by ID instead
+    const response = await api.get(`/trust-accounts/${accountId}/reconciliations`)
+    const reconciliations = response.data.data || []
+    const reconciliation = reconciliations.find((r: any) => r._id === reconciliationId)
+    if (!reconciliation) {
+      throw new Error(`Reconciliation ${reconciliationId} not found`)
+    }
+    return reconciliation
   },
 
   startReconciliation: async (data: {
@@ -329,46 +336,48 @@ export const trustAccountService = {
     periodEnd: string
     bankStatementBalance: number
   }): Promise<TrustReconciliation> => {
-    const response = await api.post('/trust-reconciliations', data)
+    const { accountId, ...reconciliationData } = data
+    const response = await api.post(`/trust-accounts/${accountId}/reconciliations`, reconciliationData)
     return response.data
   },
 
   updateReconciliation: async (
-    id: string,
+    accountId: string,
+    reconciliationId: string,
     data: Partial<TrustReconciliation>
   ): Promise<TrustReconciliation> => {
-    const response = await api.put(`/trust-reconciliations/${id}`, data)
-    return response.data
+    // Note: Backend doesn't have an update reconciliation endpoint
+    throw new Error('Endpoint not available')
   },
 
   completeReconciliation: async (
-    id: string,
+    accountId: string,
+    reconciliationId: string,
     notes?: string
   ): Promise<TrustReconciliation> => {
-    const response = await api.put(`/trust-reconciliations/${id}/complete`, { notes })
-    return response.data
+    // Note: Backend doesn't have a complete reconciliation endpoint
+    throw new Error('Endpoint not available')
   },
 
   addReconciliationAdjustment: async (
-    id: string,
+    accountId: string,
+    reconciliationId: string,
     adjustment: ReconciliationAdjustment
   ): Promise<TrustReconciliation> => {
-    const response = await api.post(`/trust-reconciliations/${id}/adjustments`, adjustment)
-    return response.data
+    // Note: Backend doesn't have an adjustment endpoint
+    throw new Error('Endpoint not available')
   },
 
   // Three-Way Reconciliation
   runThreeWayReconciliation: async (accountId: string): Promise<ThreeWayReconciliation> => {
-    const response = await api.post(`/trust-accounts/${accountId}/three-way-reconciliation`)
+    const response = await api.post(`/trust-accounts/${accountId}/three-way-reconciliations`)
     return response.data
   },
 
   getThreeWayReconciliationHistory: async (
     accountId: string
   ): Promise<ThreeWayReconciliation[]> => {
-    const response = await api.get(
-      `/trust-accounts/${accountId}/three-way-reconciliation/history`
-    )
+    const response = await api.get(`/trust-accounts/${accountId}/three-way-reconciliations`)
     return response.data
   },
 

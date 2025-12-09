@@ -327,6 +327,25 @@ const hrService = {
     await apiClient.post('/hr/employees/bulk-delete', { ids })
   },
 
+  // ==================== FORM OPTIONS ====================
+
+  getFormOptions: async (): Promise<any> => {
+    const response = await apiClient.get('/hr/options')
+    return response.data
+  },
+
+  // ==================== ALLOWANCES ====================
+
+  addAllowance: async (id: string, data: Allowance): Promise<Employee> => {
+    const response = await apiClient.post(`/hr/employees/${id}/allowances`, data)
+    return response.data
+  },
+
+  removeAllowance: async (id: string, allowanceId: string): Promise<Employee> => {
+    const response = await apiClient.delete(`/hr/employees/${id}/allowances/${allowanceId}`)
+    return response.data
+  },
+
   // ==================== DOCUMENTS ====================
 
   uploadDocument: async (employeeId: string, file: File, documentType: DocumentType): Promise<EmployeeDocument> => {

@@ -270,6 +270,18 @@ export const payrollService = {
         return response.data
     },
 
+    // Bulk approve salary slips
+    bulkApproveSalarySlips: async (ids: string[]): Promise<{ approved: number }> => {
+        const response = await apiClient.post('/hr/payroll/approve', { ids })
+        return response.data
+    },
+
+    // Bulk pay salary slips
+    bulkPaySalarySlips: async (ids: string[]): Promise<{ paid: number }> => {
+        const response = await apiClient.post('/hr/payroll/pay', { ids })
+        return response.data
+    },
+
     // Submit to WPS
     submitToWPS: async (ids: string[]): Promise<{ success: boolean; reference: string }> => {
         const response = await apiClient.post('/hr/payroll/wps/submit', { ids })

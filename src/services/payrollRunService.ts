@@ -428,74 +428,74 @@ export const getPayrollRuns = async (filters?: PayrollRunFilters): Promise<Payro
   if (filters?.page) params.append('page', filters.page.toString())
   if (filters?.limit) params.append('limit', filters.limit.toString())
 
-  const response = await api.get(`/payroll-runs?${params.toString()}`)
+  const response = await api.get(`/hr/payroll-runs?${params.toString()}`)
   return response.data
 }
 
 export const getPayrollRun = async (runId: string): Promise<PayrollRun> => {
-  const response = await api.get(`/payroll-runs/${runId}`)
+  const response = await api.get(`/hr/payroll-runs/${runId}`)
   return response.data
 }
 
 export const createPayrollRun = async (data: CreatePayrollRunData): Promise<PayrollRun> => {
-  const response = await api.post('/payroll-runs', data)
+  const response = await api.post('/hr/payroll-runs', data)
   return response.data
 }
 
 export const updatePayrollRun = async (runId: string, data: UpdatePayrollRunData): Promise<PayrollRun> => {
-  const response = await api.patch(`/payroll-runs/${runId}`, data)
+  const response = await api.patch(`/hr/payroll-runs/${runId}`, data)
   return response.data
 }
 
 export const deletePayrollRun = async (runId: string): Promise<void> => {
-  await api.delete(`/payroll-runs/${runId}`)
+  await api.delete(`/hr/payroll-runs/${runId}`)
 }
 
 // Calculate payroll for all employees in the run
 export const calculatePayrollRun = async (runId: string): Promise<PayrollRun> => {
-  const response = await api.post(`/payroll-runs/${runId}/calculate`)
+  const response = await api.post(`/hr/payroll-runs/${runId}/calculate`)
   return response.data
 }
 
 // Validate payroll run before approval
 export const validatePayrollRun = async (runId: string): Promise<PayrollRun> => {
-  const response = await api.post(`/payroll-runs/${runId}/validate`)
+  const response = await api.post(`/hr/payroll-runs/${runId}/validate`)
   return response.data
 }
 
 // Approve payroll run
 export const approvePayrollRun = async (runId: string, comments?: string): Promise<PayrollRun> => {
-  const response = await api.post(`/payroll-runs/${runId}/approve`, { comments })
+  const response = await api.post(`/hr/payroll-runs/${runId}/approve`, { comments })
   return response.data
 }
 
 // Process payments
 export const processPayments = async (runId: string): Promise<PayrollRun> => {
-  const response = await api.post(`/payroll-runs/${runId}/process-payments`)
+  const response = await api.post(`/hr/payroll-runs/${runId}/process-payments`)
   return response.data
 }
 
 // Generate WPS file
 export const generateWPSFile = async (runId: string): Promise<{ fileUrl: string; fileName: string }> => {
-  const response = await api.post(`/payroll-runs/${runId}/generate-wps`)
+  const response = await api.post(`/hr/payroll-runs/${runId}/generate-wps`)
   return response.data
 }
 
-// Submit WPS
+// Submit WPS to bank
 export const submitWPS = async (runId: string): Promise<PayrollRun> => {
-  const response = await api.post(`/payroll-runs/${runId}/submit-wps`)
-  return response.data
-}
-
-// Send payslip notifications to employees
-export const sendPayslipNotifications = async (runId: string): Promise<{ sent: number; failed: number }> => {
-  const response = await api.post(`/payroll-runs/${runId}/send-notifications`)
+  const response = await api.post(`/hr/payroll-runs/${runId}/submit-wps`)
   return response.data
 }
 
 // Cancel payroll run
 export const cancelPayrollRun = async (runId: string, reason: string): Promise<PayrollRun> => {
-  const response = await api.post(`/payroll-runs/${runId}/cancel`, { reason })
+  const response = await api.post(`/hr/payroll-runs/${runId}/cancel`, { reason })
+  return response.data
+}
+
+// Send payslip notifications to employees
+export const sendPayslipNotifications = async (runId: string): Promise<{ sent: number; failed: number }> => {
+  const response = await api.post(`/hr/payroll-runs/${runId}/send-notifications`)
   return response.data
 }
 
@@ -507,44 +507,48 @@ export const getPayrollRunStats = async (): Promise<{
   completedThisMonth: number
   totalPaidThisMonth: number
 }> => {
-  const response = await api.get('/payroll-runs/stats')
+  const response = await api.get('/hr/payroll-runs/stats')
   return response.data
 }
 
 // Hold/Unhold employee in payroll run
-export const holdEmployee = async (runId: string, employeeId: string, reason: string): Promise<PayrollRun> => {
-  const response = await api.post(`/payroll-runs/${runId}/employees/${employeeId}/hold`, { reason })
+export const holdEmployee = async (runId: string, empId: string, reason: string): Promise<PayrollRun> => {
+  const response = await api.post(`/hr/payroll-runs/${runId}/employees/${empId}/hold`, { reason })
   return response.data
 }
 
-export const unholdEmployee = async (runId: string, employeeId: string): Promise<PayrollRun> => {
-  const response = await api.post(`/payroll-runs/${runId}/employees/${employeeId}/unhold`)
+export const unholdEmployee = async (runId: string, empId: string): Promise<PayrollRun> => {
+  const response = await api.post(`/hr/payroll-runs/${runId}/employees/${empId}/unhold`)
   return response.data
 }
 
-// Exclude/Include employee
-export const excludeEmployee = async (runId: string, employeeId: string, reason: string): Promise<PayrollRun> => {
-  const response = await api.post(`/payroll-runs/${runId}/employees/${employeeId}/exclude`, { reason })
+// Exclude employee from payroll run
+export const excludeEmployee = async (runId: string, empId: string, reason: string): Promise<PayrollRun> => {
+  const response = await api.post(`/hr/payroll-runs/${runId}/employees/${empId}/exclude`, { reason })
   return response.data
 }
 
-export const includeEmployee = async (runId: string, employeeId: string): Promise<PayrollRun> => {
-  const response = await api.post(`/payroll-runs/${runId}/employees/${employeeId}/include`)
+// Include employee back in payroll run
+export const includeEmployee = async (runId: string, empId: string): Promise<PayrollRun> => {
+  const response = await api.post(`/hr/payroll-runs/${runId}/employees/${empId}/include`)
   return response.data
 }
 
-// Recalculate single employee
-export const recalculateEmployee = async (runId: string, employeeId: string): Promise<PayrollRun> => {
-  const response = await api.post(`/payroll-runs/${runId}/employees/${employeeId}/recalculate`)
+// Recalculate single employee in payroll run
+export const recalculateEmployee = async (runId: string, empId: string): Promise<PayrollRun> => {
+  const response = await api.post(`/hr/payroll-runs/${runId}/employees/${empId}/recalculate`)
   return response.data
 }
 
-// Export reports
+// Export payroll run report
 export const exportPayrollRunReport = async (
   runId: string,
   reportType: 'summary' | 'detailed' | 'bank_file' | 'wps_sif' | 'journal_entry',
   format: 'pdf' | 'excel' | 'csv'
-): Promise<{ fileUrl: string; fileName: string }> => {
-  const response = await api.post(`/payroll-runs/${runId}/export`, { reportType, format })
+): Promise<Blob> => {
+  const response = await api.get(`/hr/payroll-runs/${runId}/export`, {
+    params: { reportType, format },
+    responseType: 'blob'
+  })
   return response.data
 }

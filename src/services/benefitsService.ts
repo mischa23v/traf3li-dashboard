@@ -379,91 +379,139 @@ export interface UpdateBenefitData extends Partial<CreateBenefitData> {
 
 // Get all benefits
 export const getBenefits = async (filters?: BenefitFilters) => {
-  const response = await api.get<{ data: EmployeeBenefit[]; total: number; page: number; totalPages: number }>('/hr/benefits', { params: filters })
+  const response = await api.get<{ data: EmployeeBenefit[]; total: number; page: number; totalPages: number }>('/hr/employee-benefits', { params: filters })
   return response.data
 }
 
 // Get single benefit
 export const getBenefit = async (benefitId: string) => {
-  const response = await api.get<EmployeeBenefit>(`/hr/benefits/${benefitId}`)
+  const response = await api.get<EmployeeBenefit>(`/hr/employee-benefits/${benefitId}`)
   return response.data
 }
 
 // Get benefit stats
 export const getBenefitStats = async () => {
-  const response = await api.get<BenefitStats>('/hr/benefits/stats')
+  const response = await api.get<BenefitStats>('/hr/employee-benefits/stats')
+  return response.data
+}
+
+// Get expiring benefits
+export const getExpiringBenefits = async (days: number = 30) => {
+  const response = await api.get<EmployeeBenefit[]>(`/hr/employee-benefits/expiring?days=${days}`)
+  return response.data
+}
+
+// Get cost summary
+export const getBenefitCostSummary = async () => {
+  const response = await api.get<any>('/hr/employee-benefits/cost-summary')
   return response.data
 }
 
 // Get employee benefits
 export const getEmployeeBenefits = async (employeeId: string) => {
-  const response = await api.get<EmployeeBenefit[]>(`/hr/benefits/employee/${employeeId}`)
+  const response = await api.get<EmployeeBenefit[]>(`/hr/employee-benefits/employee/${employeeId}`)
   return response.data
 }
 
 // Create benefit enrollment
 export const createBenefit = async (data: CreateBenefitData) => {
-  const response = await api.post<EmployeeBenefit>('/hr/benefits', data)
+  const response = await api.post<EmployeeBenefit>('/hr/employee-benefits', data)
   return response.data
 }
 
 // Update benefit
 export const updateBenefit = async (benefitId: string, data: UpdateBenefitData) => {
-  const response = await api.patch<EmployeeBenefit>(`/hr/benefits/${benefitId}`, data)
+  const response = await api.patch<EmployeeBenefit>(`/hr/employee-benefits/${benefitId}`, data)
   return response.data
 }
 
 // Delete benefit
 export const deleteBenefit = async (benefitId: string) => {
-  const response = await api.delete(`/hr/benefits/${benefitId}`)
+  const response = await api.delete(`/hr/employee-benefits/${benefitId}`)
   return response.data
 }
 
 // Bulk delete benefits
 export const bulkDeleteBenefits = async (ids: string[]) => {
-  const response = await api.post('/hr/benefits/bulk-delete', { ids })
+  const response = await api.post('/hr/employee-benefits/bulk-delete', { ids })
   return response.data
 }
 
 // Activate benefit
 export const activateBenefit = async (benefitId: string, data?: { notes?: string }) => {
-  const response = await api.post<EmployeeBenefit>(`/hr/benefits/${benefitId}/activate`, data)
+  const response = await api.post<EmployeeBenefit>(`/hr/employee-benefits/${benefitId}/activate`, data)
   return response.data
 }
 
 // Suspend benefit
 export const suspendBenefit = async (benefitId: string, data: { reason: string }) => {
-  const response = await api.post<EmployeeBenefit>(`/hr/benefits/${benefitId}/suspend`, data)
+  const response = await api.post<EmployeeBenefit>(`/hr/employee-benefits/${benefitId}/suspend`, data)
   return response.data
 }
 
 // Terminate benefit
 export const terminateBenefit = async (benefitId: string, data: { reason: string; terminationDate?: string }) => {
-  const response = await api.post<EmployeeBenefit>(`/hr/benefits/${benefitId}/terminate`, data)
+  const response = await api.post<EmployeeBenefit>(`/hr/employee-benefits/${benefitId}/terminate`, data)
   return response.data
 }
 
 // Add dependent
 export const addDependent = async (benefitId: string, data: Omit<CoveredDependent, 'memberId'>) => {
-  const response = await api.post<EmployeeBenefit>(`/hr/benefits/${benefitId}/dependents`, data)
+  const response = await api.post<EmployeeBenefit>(`/hr/employee-benefits/${benefitId}/dependents`, data)
   return response.data
 }
 
 // Remove dependent
 export const removeDependent = async (benefitId: string, memberId: string) => {
-  const response = await api.delete<EmployeeBenefit>(`/hr/benefits/${benefitId}/dependents/${memberId}`)
+  const response = await api.delete<EmployeeBenefit>(`/hr/employee-benefits/${benefitId}/dependents/${memberId}`)
+  return response.data
+}
+
+// Add beneficiary
+export const addBeneficiary = async (benefitId: string, data: Omit<Beneficiary, 'beneficiaryId'>) => {
+  const response = await api.post<EmployeeBenefit>(`/hr/employee-benefits/${benefitId}/beneficiaries`, data)
   return response.data
 }
 
 // Update beneficiary
 export const updateBeneficiary = async (benefitId: string, beneficiaryId: string, data: Partial<Beneficiary>) => {
-  const response = await api.patch<EmployeeBenefit>(`/hr/benefits/${benefitId}/beneficiaries/${beneficiaryId}`, data)
+  const response = await api.patch<EmployeeBenefit>(`/hr/employee-benefits/${benefitId}/beneficiaries/${beneficiaryId}`, data)
+  return response.data
+}
+
+// Remove beneficiary
+export const removeBeneficiary = async (benefitId: string, beneficiaryId: string) => {
+  const response = await api.delete<EmployeeBenefit>(`/hr/employee-benefits/${benefitId}/beneficiaries/${beneficiaryId}`)
+  return response.data
+}
+
+// Submit claim
+export const submitClaim = async (benefitId: string, data: any) => {
+  const response = await api.post<EmployeeBenefit>(`/hr/employee-benefits/${benefitId}/claims`, data)
+  return response.data
+}
+
+// Update claim status
+export const updateClaimStatus = async (benefitId: string, claimId: string, data: any) => {
+  const response = await api.patch<EmployeeBenefit>(`/hr/employee-benefits/${benefitId}/claims/${claimId}`, data)
+  return response.data
+}
+
+// Request pre-authorization
+export const requestPreAuth = async (benefitId: string, data: any) => {
+  const response = await api.post<EmployeeBenefit>(`/hr/employee-benefits/${benefitId}/pre-auth`, data)
+  return response.data
+}
+
+// Report qualifying event
+export const reportQualifyingEvent = async (benefitId: string, data: any) => {
+  const response = await api.post<EmployeeBenefit>(`/hr/employee-benefits/${benefitId}/qualifying-events`, data)
   return response.data
 }
 
 // Export benefits
 export const exportBenefits = async (filters?: BenefitFilters) => {
-  const response = await api.get('/hr/benefits/export', {
+  const response = await api.get('/hr/employee-benefits/export', {
     params: filters,
     responseType: 'blob'
   })
