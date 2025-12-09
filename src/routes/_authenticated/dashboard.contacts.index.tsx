@@ -2,10 +2,16 @@ import z from 'zod'
 import { createFileRoute } from '@tanstack/react-router'
 import { Contacts } from '@/features/contacts'
 
+// Stable fallback arrays - using .default() ensures these exact references are returned
+// when URL params are missing, preventing the router from detecting "changes"
+const EMPTY_STATUS_ARRAY: ('active' | 'inactive' | 'archived')[] = []
+const EMPTY_TYPE_ARRAY: ('individual' | 'organization' | 'court' | 'attorney' | 'expert' | 'government' | 'other')[] = []
+const EMPTY_CATEGORY_ARRAY: ('client_contact' | 'opposing_party' | 'witness' | 'expert_witness' | 'judge' | 'court_clerk' | 'other')[] = []
+
 const contactsSearchSchema = z.object({
   page: z.number().optional(),
   pageSize: z.number().optional(),
-  // Facet filters
+  // Facet filters - use .default() to handle missing params, .catch() for invalid data
   status: z
     .array(
       z.union([
@@ -14,7 +20,8 @@ const contactsSearchSchema = z.object({
         z.literal('archived'),
       ])
     )
-    .optional(),
+    .default(EMPTY_STATUS_ARRAY)
+    .catch(EMPTY_STATUS_ARRAY),
   type: z
     .array(
       z.union([
@@ -27,7 +34,8 @@ const contactsSearchSchema = z.object({
         z.literal('other'),
       ])
     )
-    .optional(),
+    .default(EMPTY_TYPE_ARRAY)
+    .catch(EMPTY_TYPE_ARRAY),
   category: z
     .array(
       z.union([
@@ -40,7 +48,8 @@ const contactsSearchSchema = z.object({
         z.literal('other'),
       ])
     )
-    .optional(),
+    .default(EMPTY_CATEGORY_ARRAY)
+    .catch(EMPTY_CATEGORY_ARRAY),
   // Per-column text filter
   name: z.string().optional(),
 })
@@ -56,18 +65,26 @@ function validateSearchWithStructuralSharing(search: unknown): ContactsSearch {
   // Parse the incoming search params (handles validation)
   const parseResult = contactsSearchSchema.safeParse(search)
 
-  // If parsing fails, return empty object (or cached if available)
+  // If parsing fails, return cached or default
   if (!parseResult.success) {
     if (cachedSearch !== null) {
       return cachedSearch
     }
-    return {} as ContactsSearch
+    // Return a stable default with the constant arrays
+    const defaultResult: ContactsSearch = {
+      status: EMPTY_STATUS_ARRAY,
+      type: EMPTY_TYPE_ARRAY,
+      category: EMPTY_CATEGORY_ARRAY,
+    }
+    cachedSearch = defaultResult
+    cachedSearchKey = JSON.stringify(defaultResult)
+    return defaultResult
   }
 
   const result = parseResult.data
 
-  // Create a stable key for comparison (only include defined values)
-  const resultKey = JSON.stringify(result, (_, v) => v === undefined ? null : v)
+  // Create a stable key for comparison
+  const resultKey = JSON.stringify(result)
 
   // If the result is identical to cached, return the cached reference
   if (cachedSearchKey === resultKey && cachedSearch !== null) {
