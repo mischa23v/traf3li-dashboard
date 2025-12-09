@@ -107,8 +107,8 @@ export function Contacts() {
             </div>
           </div>
 
-          {/* Sidebar */}
-          <ClientsSidebar context="contacts" />
+          {/* Sidebar - temporarily disabled for debugging */}
+          {/* <ClientsSidebar context="contacts" /> */}
         </div>
       </Main>
 

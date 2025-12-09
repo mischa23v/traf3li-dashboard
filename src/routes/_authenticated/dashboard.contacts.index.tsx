@@ -11,7 +11,7 @@ const EMPTY_CATEGORY_ARRAY: ('client_contact' | 'opposing_party' | 'witness' | '
 const contactsSearchSchema = z.object({
   page: z.number().optional(),
   pageSize: z.number().optional(),
-  // Facet filters - use .default() to handle missing params, .catch() for invalid data
+  // Facet filters - .catch() handles invalid input, .default() handles missing input
   status: z
     .array(
       z.union([
@@ -20,8 +20,8 @@ const contactsSearchSchema = z.object({
         z.literal('archived'),
       ])
     )
-    .default(EMPTY_STATUS_ARRAY)
-    .catch(EMPTY_STATUS_ARRAY),
+    .catch(EMPTY_STATUS_ARRAY)
+    .default(EMPTY_STATUS_ARRAY),
   type: z
     .array(
       z.union([
@@ -34,8 +34,8 @@ const contactsSearchSchema = z.object({
         z.literal('other'),
       ])
     )
-    .default(EMPTY_TYPE_ARRAY)
-    .catch(EMPTY_TYPE_ARRAY),
+    .catch(EMPTY_TYPE_ARRAY)
+    .default(EMPTY_TYPE_ARRAY),
   category: z
     .array(
       z.union([
@@ -48,8 +48,8 @@ const contactsSearchSchema = z.object({
         z.literal('other'),
       ])
     )
-    .default(EMPTY_CATEGORY_ARRAY)
-    .catch(EMPTY_CATEGORY_ARRAY),
+    .catch(EMPTY_CATEGORY_ARRAY)
+    .default(EMPTY_CATEGORY_ARRAY),
   // Per-column text filter
   name: z.string().optional(),
 })
