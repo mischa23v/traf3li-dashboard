@@ -1,6 +1,5 @@
 'use client'
 
-import { useMemo } from 'react'
 import type { ColumnDef } from '@tanstack/react-table'
 import { cn } from '@/lib/utils'
 import { Badge } from '@/components/ui/badge'
@@ -12,12 +11,12 @@ import { type Contact } from '../data/schema'
 import { ContactsRowActions } from './data-table-row-actions'
 import { useTranslation } from 'react-i18next'
 
+// Match clients-columns pattern exactly - NO useMemo
+// The `t` function changes reference on every render, causing useMemo with [t] dependency to trigger infinite loops
 export function useContactsColumns(): ColumnDef<Contact>[] {
-  const { t, i18n } = useTranslation()
+  const { t } = useTranslation()
 
-  // Memoize columns to prevent infinite re-render loop
-  // Dependencies: translation function and language (for re-translation on language change)
-  return useMemo(() => [
+  return [
     {
       id: 'select',
       header: ({ table }) => (
@@ -175,5 +174,5 @@ export function useContactsColumns(): ColumnDef<Contact>[] {
       id: 'actions',
       cell: ({ row }) => <ContactsRowActions row={row} />,
     },
-  ], [t, i18n.language])
+  ]
 }
