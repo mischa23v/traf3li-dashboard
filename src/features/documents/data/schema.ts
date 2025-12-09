@@ -12,6 +12,18 @@ export const documentCategories = [
 
 export type DocumentCategory = (typeof documentCategories)[number]
 
+// Document modules for R2 bucket routing
+export const documentModules = [
+  'crm',
+  'finance',
+  'hr',
+  'tasks',
+  'judgments',
+  'documents',
+] as const
+
+export type DocumentModule = (typeof documentModules)[number]
+
 // Document schema
 export const documentSchema = z.object({
   _id: z.string(),
@@ -96,6 +108,7 @@ export type DocumentVersion = z.infer<typeof documentVersionSchema>
 // Create document schema
 export const createDocumentSchema = z.object({
   category: z.enum(documentCategories),
+  module: z.enum(documentModules).optional(),
   caseId: z.string().optional(),
   clientId: z.string().optional(),
   description: z.string().optional(),

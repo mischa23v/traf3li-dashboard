@@ -12,6 +12,18 @@ export const documentCategories = [
 
 export type DocumentCategory = (typeof documentCategories)[number]
 
+// Document modules for R2 bucket routing
+export const documentModules = [
+  'crm',
+  'finance',
+  'hr',
+  'tasks',
+  'judgments',
+  'documents',
+] as const
+
+export type DocumentModule = (typeof documentModules)[number]
+
 // Document interface
 export interface Document {
   _id: string
@@ -97,11 +109,46 @@ export interface DocumentsResponse {
 // Create document metadata
 export interface CreateDocumentData {
   category: DocumentCategory
+  module?: DocumentModule
   caseId?: string
   clientId?: string
   description?: string
   tags?: string[]
   isConfidential?: boolean
+}
+
+// Upload URL request data
+export interface GetUploadUrlData {
+  fileName: string
+  fileType: string
+  category: DocumentCategory
+  module?: DocumentModule
+  clientId?: string
+}
+
+// Upload URL response
+export interface UploadUrlResponse {
+  uploadUrl: string
+  fileKey: string
+  bucket: string
+  module: DocumentModule
+  expiresIn: number
+}
+
+// Confirm upload data
+export interface ConfirmUploadData {
+  fileName: string
+  fileKey: string
+  bucket: string
+  module: DocumentModule
+  category: DocumentCategory
+  caseId?: string
+  clientId?: string
+  description?: string
+  tags?: string[]
+  isConfidential?: boolean
+  fileSize?: number
+  fileType?: string
 }
 
 // Update document metadata
@@ -136,35 +183,89 @@ const documentsService = {
     return response.data
   },
 
-  // Upload new document
+  // Get presigned upload URL
+  getUploadUrl: async (data: GetUploadUrlData): Promise<UploadUrlResponse> => {
+    const response = await api.post('/documents/upload', data)
+    return response.data
+  },
+
+  // Upload file directly to R2/S3 using presigned URL
+  uploadFileToStorage: async (
+    uploadUrl: string,
+    file: File,
+    onProgress?: (progress: number) => void
+  ): Promise<void> => {
+    return new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest()
+
+      xhr.upload.addEventListener('progress', (event) => {
+        if (event.lengthComputable && onProgress) {
+          const progress = Math.round((event.loaded * 100) / event.total)
+          onProgress(progress)
+        }
+      })
+
+      xhr.addEventListener('load', () => {
+        if (xhr.status >= 200 && xhr.status < 300) {
+          resolve()
+        } else {
+          reject(new Error(`Upload failed with status ${xhr.status}`))
+        }
+      })
+
+      xhr.addEventListener('error', () => {
+        reject(new Error('Upload failed due to network error'))
+      })
+
+      xhr.open('PUT', uploadUrl)
+      xhr.setRequestHeader('Content-Type', file.type)
+      xhr.send(file)
+    })
+  },
+
+  // Confirm document upload (save metadata to DB)
+  confirmUpload: async (data: ConfirmUploadData): Promise<Document> => {
+    const response = await api.post('/documents/confirm', data)
+    return response.data
+  },
+
+  // Upload new document (two-step presigned URL flow)
   uploadDocument: async (
     file: File,
     metadata: CreateDocumentData,
     onProgress?: (progress: number) => void
   ): Promise<Document> => {
-    const formData = new FormData()
-    formData.append('file', file)
-    formData.append('category', metadata.category)
-    if (metadata.caseId) formData.append('caseId', metadata.caseId)
-    if (metadata.clientId) formData.append('clientId', metadata.clientId)
-    if (metadata.description) formData.append('description', metadata.description)
-    if (metadata.tags) formData.append('tags', JSON.stringify(metadata.tags))
-    if (metadata.isConfidential !== undefined) {
-      formData.append('isConfidential', String(metadata.isConfidential))
+    // Step 1: Get presigned upload URL
+    const uploadUrlData: GetUploadUrlData = {
+      fileName: file.name,
+      fileType: file.type,
+      category: metadata.category,
+      module: metadata.module,
+      clientId: metadata.clientId,
     }
 
-    const response = await api.post('/documents/upload', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-      onUploadProgress: (progressEvent) => {
-        if (onProgress && progressEvent.total) {
-          const progress = Math.round((progressEvent.loaded * 100) / progressEvent.total)
-          onProgress(progress)
-        }
-      },
-    })
-    return response.data
+    const { uploadUrl, fileKey, bucket, module } = await documentsService.getUploadUrl(uploadUrlData)
+
+    // Step 2: Upload file directly to R2/S3
+    await documentsService.uploadFileToStorage(uploadUrl, file, onProgress)
+
+    // Step 3: Confirm upload and save metadata
+    const confirmData: ConfirmUploadData = {
+      fileName: file.name,
+      fileKey,
+      bucket,
+      module,
+      category: metadata.category,
+      caseId: metadata.caseId,
+      clientId: metadata.clientId,
+      description: metadata.description,
+      tags: metadata.tags,
+      isConfidential: metadata.isConfidential,
+      fileSize: file.size,
+      fileType: file.type,
+    }
+
+    return documentsService.confirmUpload(confirmData)
   },
 
   // Update document metadata

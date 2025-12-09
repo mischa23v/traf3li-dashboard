@@ -31,7 +31,7 @@ import {
 } from '@/components/ui/select'
 import { Progress } from '@/components/ui/progress'
 import { useUploadDocument } from '@/hooks/useDocuments'
-import { createDocumentSchema, type CreateDocumentData } from '../data/schema'
+import { createDocumentSchema, type CreateDocumentData, type DocumentModule } from '../data/schema'
 import { categoryOptions, formatFileSize, MAX_FILE_SIZE, acceptedFileTypes } from '../data/data'
 import { useTranslation } from 'react-i18next'
 import { Upload, X, FileText } from 'lucide-react'
@@ -42,6 +42,7 @@ interface DocumentsUploadDialogProps {
   onOpenChange: (open: boolean) => void
   defaultCaseId?: string
   defaultClientId?: string
+  defaultModule?: DocumentModule
 }
 
 export function DocumentsUploadDialog({
@@ -49,6 +50,7 @@ export function DocumentsUploadDialog({
   onOpenChange,
   defaultCaseId,
   defaultClientId,
+  defaultModule,
 }: DocumentsUploadDialogProps) {
   const { t, i18n } = useTranslation()
   const isArabic = i18n.language === 'ar'
@@ -61,6 +63,7 @@ export function DocumentsUploadDialog({
     resolver: zodResolver(createDocumentSchema) as any,
     defaultValues: {
       category: 'other',
+      module: defaultModule || 'documents',
       caseId: defaultCaseId || '',
       clientId: defaultClientId || '',
       description: '',
