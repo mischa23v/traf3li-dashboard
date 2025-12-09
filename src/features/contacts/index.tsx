@@ -1,4 +1,3 @@
-import { useMemo } from 'react'
 import { getRouteApi } from '@tanstack/react-router'
 import { ConfigDrawer } from '@/components/config-drawer'
 import { Header } from '@/components/layout/header'
@@ -22,29 +21,36 @@ import { ProductivityHero } from '@/components/productivity-hero'
 
 const route = getRouteApi('/_authenticated/dashboard/contacts/')
 
+// Match the clients pattern exactly - wrapper component with content inside provider
 export function Contacts() {
-  const { t, i18n } = useTranslation()
+  return (
+    <ContactsProvider>
+      <ContactsContent />
+      <ContactsDialogs />
+    </ContactsProvider>
+  )
+}
+
+function ContactsContent() {
+  const { t } = useTranslation()
   const search = route.useSearch()
   const navigate = route.useNavigate()
 
-  // Memoize filter object to prevent unnecessary re-renders
-  const contactFilters = useMemo(() => ({
+  // Fetch contacts data from API - pass filters directly like clients does (NO useMemo)
+  const { data, isLoading } = useContacts({
     status: search.status?.[0],
     type: search.type?.[0],
     search: search.name,
-  }), [search.status, search.type, search.name])
+  })
 
-  // Fetch contacts data from API
-  const { data, isLoading } = useContacts(contactFilters)
-
-  // Memoize topNav to prevent unnecessary re-renders
-  const topNav = useMemo(() => [
+  // Inline topNav like clients does (NO useMemo)
+  const topNav = [
     { title: t('sidebar.nav.contacts'), href: '/dashboard/contacts', isActive: true },
     { title: t('sidebar.nav.clients'), href: '/dashboard/clients', isActive: false },
-  ], [t])
+  ]
 
   return (
-    <ContactsProvider>
+    <>
       <Header className="bg-navy shadow-none relative">
         <TopNav links={topNav} className="[&>a]:text-slate-300 [&>a:hover]:text-white [&>a[aria-current='page']]:text-white" />
 
@@ -111,8 +117,6 @@ export function Contacts() {
           <ClientsSidebar context="contacts" />
         </div>
       </Main>
-
-      <ContactsDialogs />
-    </ContactsProvider>
+    </>
   )
 }
