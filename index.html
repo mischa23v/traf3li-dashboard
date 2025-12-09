@@ -12,11 +12,11 @@
   <!-- Content Security Policy (frame-ancestors moved to HTTP headers in vercel.json) -->
   <meta http-equiv="Content-Security-Policy" content="
     default-src 'self';
-    script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net;
+    script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://static.cloudflareinsights.com https://vercel.live;
     style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
     font-src 'self' https://fonts.gstatic.com;
     img-src 'self' data: https: blob:;
-    connect-src 'self' https://api.traf3li.com wss://api.traf3li.com https://*.sentry.io;
+    connect-src 'self' https://api.traf3li.com wss://api.traf3li.com https://*.sentry.io https://cloudflareinsights.com https://vercel.live;
     form-action 'self';
     base-uri 'self';
   ">
@@ -55,7 +55,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="Traf3li" />
-  <link rel="apple-touch-icon" href="/images/icon-192.png" />
+  <link rel="apple-touch-icon" href="/images/favicon.png" />
 
   <!-- Preconnect to API for faster initial requests -->
   <link rel="preconnect" href="https://api.traf3li.com" />
