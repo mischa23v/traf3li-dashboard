@@ -1,5 +1,6 @@
 'use client'
 
+import { useMemo } from 'react'
 import type { ColumnDef } from '@tanstack/react-table'
 import { cn } from '@/lib/utils'
 import { Badge } from '@/components/ui/badge'
@@ -12,9 +13,11 @@ import { ContactsRowActions } from './data-table-row-actions'
 import { useTranslation } from 'react-i18next'
 
 export function useContactsColumns(): ColumnDef<Contact>[] {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
 
-  return [
+  // Memoize columns to prevent infinite re-render loop
+  // Dependencies: translation function and language (for re-translation on language change)
+  return useMemo(() => [
     {
       id: 'select',
       header: ({ table }) => (
@@ -172,5 +175,5 @@ export function useContactsColumns(): ColumnDef<Contact>[] {
       id: 'actions',
       cell: ({ row }) => <ContactsRowActions row={row} />,
     },
-  ]
+  ], [t, i18n.language])
 }
