@@ -9,8 +9,10 @@ import { ProfileDropdown } from '@/components/profile-dropdown'
 import { Link } from '@tanstack/react-router'
 import { Checkbox } from '@/components/ui/checkbox'
 import { ProductivityHero } from '@/components/productivity-hero'
+import { useBankFeeds, useDeleteBankFeed } from '@/hooks/useFinanceAdvanced'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
+import { Skeleton } from '@/components/ui/skeleton'
 import { Header } from '@/components/layout/header'
 import { TopNav } from '@/components/layout/top-nav'
 import { DynamicIsland } from '@/components/dynamic-island'
@@ -18,8 +20,9 @@ import { Input } from '@/components/ui/input'
 import {
     Search, Bell, Building2, Plus, MoreHorizontal, ChevronLeft,
     Eye, Trash2, Edit3, SortAsc, X, CheckCircle2, XCircle, Clock, ArrowRightLeft,
-    Wallet, CreditCard, PiggyBank, Landmark
+    Wallet, CreditCard, PiggyBank, Landmark, AlertCircle, RefreshCw
 } from 'lucide-react'
+import { useNavigate } from '@tanstack/react-router'
 import { format } from 'date-fns'
 import { arSA, enUS } from 'date-fns/locale'
 import {
@@ -36,75 +39,11 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { toast } from 'sonner'
-
-// Sample bank accounts data
-const sampleBankAccounts = [
-    {
-        id: '1',
-        accountName: { ar: 'الحساب الرئيسي', en: 'Main Account' },
-        accountNumber: '****1234',
-        bankName: { ar: 'مصرف الراجحي', en: 'Al Rajhi Bank' },
-        accountType: 'checking',
-        currency: 'SAR',
-        balance: 125000,
-        lastReconciled: new Date(2024, 11, 1),
-        status: 'active',
-        matchedCount: 45,
-        unmatchedCount: 3,
-        pendingCount: 2,
-        isConnected: true,
-    },
-    {
-        id: '2',
-        accountName: { ar: 'حساب التوفير', en: 'Savings Account' },
-        accountNumber: '****5678',
-        bankName: { ar: 'البنك الأهلي', en: 'SNB Bank' },
-        accountType: 'savings',
-        currency: 'SAR',
-        balance: 450000,
-        lastReconciled: new Date(2024, 10, 28),
-        status: 'active',
-        matchedCount: 12,
-        unmatchedCount: 0,
-        pendingCount: 1,
-        isConnected: true,
-    },
-    {
-        id: '3',
-        accountName: { ar: 'بطاقة الأعمال', en: 'Business Card' },
-        accountNumber: '****9012',
-        bankName: { ar: 'مصرف الإنماء', en: 'Alinma Bank' },
-        accountType: 'credit',
-        currency: 'SAR',
-        balance: -15000,
-        lastReconciled: new Date(2024, 10, 15),
-        status: 'active',
-        matchedCount: 28,
-        unmatchedCount: 5,
-        pendingCount: 0,
-        isConnected: false,
-    },
-    {
-        id: '4',
-        accountName: { ar: 'حساب الرواتب', en: 'Payroll Account' },
-        accountNumber: '****3456',
-        bankName: { ar: 'بنك الرياض', en: 'Riyad Bank' },
-        accountType: 'checking',
-        currency: 'SAR',
-        balance: 85000,
-        lastReconciled: null,
-        status: 'inactive',
-        matchedCount: 0,
-        unmatchedCount: 15,
-        pendingCount: 8,
-        isConnected: false,
-    },
-]
 
 export function ReconciliationListView() {
     const { t, i18n } = useTranslation()
     const isRTL = i18n.language === 'ar'
+    const navigate = useNavigate()
     const [isSelectionMode, setIsSelectionMode] = useState(false)
     const [selectedIds, setSelectedIds] = useState<string[]>([])
 
@@ -113,6 +52,28 @@ export function ReconciliationListView() {
     const [statusFilter, setStatusFilter] = useState<string>('all')
     const [typeFilter, setTypeFilter] = useState<string>('all')
     const [sortBy, setSortBy] = useState<string>('lastReconciled')
+
+    // Mutations
+    const deleteBankFeedMutation = useDeleteBankFeed()
+
+    // API Filters
+    const filters = useMemo(() => {
+        const f: any = {}
+        if (statusFilter !== 'all') f.status = statusFilter
+        if (typeFilter !== 'all') f.accountType = typeFilter
+        if (searchQuery.trim()) f.search = searchQuery.trim()
+        if (sortBy === 'lastReconciled') {
+            f.sortBy = 'lastReconciled'
+            f.sortOrder = 'desc'
+        } else if (sortBy === 'name') {
+            f.sortBy = 'accountName'
+            f.sortOrder = 'asc'
+        } else if (sortBy === 'balance') {
+            f.sortBy = 'balance'
+            f.sortOrder = 'desc'
+        }
+        return f
+    }, [statusFilter, typeFilter, searchQuery, sortBy])
 
     // Check if any filter is active
     const hasActiveFilters = searchQuery || statusFilter !== 'all' || typeFilter !== 'all'
@@ -124,56 +85,35 @@ export function ReconciliationListView() {
         setTypeFilter('all')
     }
 
-    // Helper function to format dates in both languages
-    const formatDualDate = (date: Date | null | undefined) => {
-        if (!date) return isRTL ? 'غير محدد' : 'Not set'
+    // Fetch bank feeds from API
+    const { data: bankFeedsData, isLoading, isError, error, refetch } = useBankFeeds(filters)
+
+    // Helper function to format dates
+    const formatDualDate = (dateString: string | null | undefined) => {
+        if (!dateString) return isRTL ? 'غير محدد' : 'Not set'
+        const date = new Date(dateString)
         return format(date, isRTL ? 'd MMMM yyyy' : 'MMM d, yyyy', { locale: isRTL ? arSA : enUS })
     }
 
-    // Filter and sort bank accounts
+    // Transform API data
     const bankAccounts = useMemo(() => {
-        let filtered = [...sampleBankAccounts]
-
-        // Search filter
-        if (searchQuery.trim()) {
-            const query = searchQuery.toLowerCase()
-            filtered = filtered.filter(account =>
-                account.accountName.en.toLowerCase().includes(query) ||
-                account.accountName.ar.includes(query) ||
-                account.accountNumber.includes(query) ||
-                account.bankName.en.toLowerCase().includes(query) ||
-                account.bankName.ar.includes(query)
-            )
-        }
-
-        // Status filter
-        if (statusFilter !== 'all') {
-            filtered = filtered.filter(account => account.status === statusFilter)
-        }
-
-        // Type filter
-        if (typeFilter !== 'all') {
-            filtered = filtered.filter(account => account.accountType === typeFilter)
-        }
-
-        // Sorting
-        filtered.sort((a, b) => {
-            if (sortBy === 'lastReconciled') {
-                const dateA = a.lastReconciled?.getTime() || 0
-                const dateB = b.lastReconciled?.getTime() || 0
-                return dateB - dateA
-            } else if (sortBy === 'name') {
-                return (isRTL ? a.accountName.ar : a.accountName.en).localeCompare(
-                    isRTL ? b.accountName.ar : b.accountName.en
-                )
-            } else if (sortBy === 'balance') {
-                return b.balance - a.balance
-            }
-            return 0
-        })
-
-        return filtered
-    }, [searchQuery, statusFilter, typeFilter, sortBy, isRTL])
+        if (!bankFeedsData?.data) return []
+        return bankFeedsData.data.map((feed: any) => ({
+            id: feed._id,
+            accountName: feed.accountName || (isRTL ? 'غير محدد' : 'Not specified'),
+            accountNumber: feed.accountNumber || '',
+            bankName: feed.bankName || (isRTL ? 'غير محدد' : 'Not specified'),
+            accountType: feed.accountType || 'checking',
+            currency: feed.currency || 'SAR',
+            balance: feed.balance || 0,
+            lastReconciled: feed.lastReconciled,
+            status: feed.status || 'active',
+            matchedCount: feed.stats?.matched || 0,
+            unmatchedCount: feed.stats?.unmatched || 0,
+            pendingCount: feed.stats?.pending || 0,
+            isConnected: feed.isConnected || false,
+        }))
+    }, [bankFeedsData, isRTL])
 
     // Selection Handlers
     const handleToggleSelectionMode = () => {
@@ -191,26 +131,36 @@ export function ReconciliationListView() {
 
     const handleDeleteSelected = () => {
         if (selectedIds.length === 0) return
-        toast.success(isRTL ? `تم حذف ${selectedIds.length} حساب بنكي` : `${selectedIds.length} bank account(s) deleted`)
-        setIsSelectionMode(false)
-        setSelectedIds([])
+        const confirmMsg = isRTL
+            ? `هل أنت متأكد من حذف ${selectedIds.length} حساب بنكي؟`
+            : `Are you sure you want to delete ${selectedIds.length} bank account(s)?`
+
+        if (confirm(confirmMsg)) {
+            selectedIds.forEach(id => {
+                deleteBankFeedMutation.mutate(id)
+            })
+            setIsSelectionMode(false)
+            setSelectedIds([])
+        }
     }
 
     // Single bank feed actions
     const handleViewBankFeed = (feedId: string) => {
-        toast.info(isRTL ? 'عرض تفاصيل الحساب' : 'Viewing account details')
+        navigate({ to: '/dashboard/finance/reconciliation/$feedId', params: { feedId } })
     }
 
     const handleEditBankFeed = (feedId: string) => {
-        toast.info(isRTL ? 'تعديل بيانات الحساب' : 'Editing account')
+        navigate({ to: '/dashboard/finance/reconciliation/new', search: { editId: feedId } })
     }
 
     const handleDeleteBankFeed = (feedId: string) => {
-        toast.success(isRTL ? 'تم حذف الحساب البنكي' : 'Bank account deleted')
-    }
+        const confirmMsg = isRTL
+            ? 'هل أنت متأكد من حذف هذا الحساب البنكي؟'
+            : 'Are you sure you want to delete this bank account?'
 
-    const handleReconcile = (feedId: string) => {
-        toast.info(isRTL ? 'بدء عملية التسوية البنكية' : 'Starting bank reconciliation')
+        if (confirm(confirmMsg)) {
+            deleteBankFeedMutation.mutate(feedId)
+        }
     }
 
     // Status badge styling
@@ -264,10 +214,11 @@ export function ReconciliationListView() {
 
     // Stats for hero
     const heroStats = useMemo(() => {
-        const totalAccounts = sampleBankAccounts.length
-        const totalMatched = sampleBankAccounts.reduce((sum, acc) => sum + acc.matchedCount, 0)
-        const totalUnmatched = sampleBankAccounts.reduce((sum, acc) => sum + acc.unmatchedCount, 0)
-        const totalPending = sampleBankAccounts.reduce((sum, acc) => sum + acc.pendingCount, 0)
+        const data = bankFeedsData?.data || []
+        const totalAccounts = data.length
+        const totalMatched = data.reduce((sum: number, feed: any) => sum + (feed.stats?.matched || 0), 0)
+        const totalUnmatched = data.reduce((sum: number, feed: any) => sum + (feed.stats?.unmatched || 0), 0)
+        const totalPending = data.reduce((sum: number, feed: any) => sum + (feed.stats?.pending || 0), 0)
 
         return [
             { label: isRTL ? 'إجمالي الحسابات' : 'Total Accounts', value: totalAccounts, icon: Building2, status: 'normal' as const },
@@ -275,7 +226,7 @@ export function ReconciliationListView() {
             { label: isRTL ? 'غير متطابقة' : 'Unmatched', value: totalUnmatched, icon: XCircle, status: totalUnmatched > 0 ? 'attention' as const : 'zero' as const },
             { label: isRTL ? 'معلقة' : 'Pending', value: totalPending, icon: Clock, status: totalPending > 0 ? 'attention' as const : 'zero' as const },
         ]
-    }, [isRTL])
+    }, [bankFeedsData, isRTL])
 
     const topNav = [
         { title: isRTL ? 'نظرة عامة' : 'Overview', href: '/dashboard/overview', isActive: false },
@@ -421,28 +372,70 @@ export function ReconciliationListView() {
                             </div>
 
                             <div className="p-4 space-y-4">
-                                {/* Empty State after filtering */}
-                                {bankAccounts.length === 0 && (
+                                {/* Loading State */}
+                                {isLoading && (
+                                    <>
+                                        {[1, 2, 3].map((i) => (
+                                            <div key={i} className="bg-[#F8F9FA] rounded-2xl p-6 border border-slate-100">
+                                                <div className="flex gap-4 mb-4">
+                                                    <Skeleton className="w-14 h-14 rounded-xl" />
+                                                    <div className="flex-1 space-y-2">
+                                                        <Skeleton className="h-6 w-3/4" />
+                                                        <Skeleton className="h-4 w-1/2" />
+                                                    </div>
+                                                </div>
+                                                <Skeleton className="h-16 w-full" />
+                                            </div>
+                                        ))}
+                                    </>
+                                )}
+
+                                {/* Error State */}
+                                {isError && (
                                     <div className="bg-white rounded-2xl p-12 border border-slate-100 text-center">
                                         <div className="flex justify-center mb-4">
-                                            <div className="w-16 h-16 rounded-full bg-slate-50 flex items-center justify-center">
-                                                <Search className="w-8 h-8 text-slate-400" aria-hidden="true" />
+                                            <div className="w-16 h-16 rounded-full bg-red-50 flex items-center justify-center">
+                                                <AlertCircle className="w-8 h-8 text-red-500" aria-hidden="true" />
                                             </div>
                                         </div>
                                         <h3 className="text-lg font-bold text-slate-900 mb-2">
-                                            {isRTL ? 'لا توجد نتائج' : 'No results found'}
+                                            {isRTL ? 'حدث خطأ أثناء تحميل الحسابات' : 'Error loading accounts'}
                                         </h3>
                                         <p className="text-slate-500 mb-4">
-                                            {isRTL ? 'جرب تغيير معايير البحث' : 'Try adjusting your search criteria'}
+                                            {(error as Error)?.message || (isRTL ? 'تعذر الاتصال بالخادم' : 'Could not connect to server')}
                                         </p>
-                                        <Button onClick={clearFilters} variant="outline" className="rounded-xl">
-                                            {isRTL ? 'مسح الفلاتر' : 'Clear Filters'}
+                                        <Button onClick={() => refetch()} className="bg-emerald-500 hover:bg-emerald-600">
+                                            <RefreshCw className="h-4 w-4 me-2" />
+                                            {isRTL ? 'إعادة المحاولة' : 'Retry'}
+                                        </Button>
+                                    </div>
+                                )}
+
+                                {/* Empty State */}
+                                {!isLoading && !isError && bankAccounts.length === 0 && (
+                                    <div className="bg-white rounded-2xl p-12 border border-slate-100 text-center">
+                                        <div className="flex justify-center mb-4">
+                                            <div className="w-16 h-16 rounded-full bg-emerald-50 flex items-center justify-center">
+                                                <Building2 className="w-8 h-8 text-emerald-500" aria-hidden="true" />
+                                            </div>
+                                        </div>
+                                        <h3 className="text-lg font-bold text-slate-900 mb-2">
+                                            {isRTL ? 'لا توجد حسابات بنكية' : 'No bank accounts'}
+                                        </h3>
+                                        <p className="text-slate-500 mb-4">
+                                            {isRTL ? 'ابدأ بإضافة حساب بنكي جديد للتسوية' : 'Start by adding a new bank account for reconciliation'}
+                                        </p>
+                                        <Button asChild className="bg-emerald-500 hover:bg-emerald-600">
+                                            <Link to="/dashboard/finance/reconciliation/new">
+                                                <Plus className="w-4 h-4 me-2" aria-hidden="true" />
+                                                {isRTL ? 'إضافة حساب بنكي' : 'Add Bank Account'}
+                                            </Link>
                                         </Button>
                                     </div>
                                 )}
 
                                 {/* Bank Account Cards */}
-                                {bankAccounts.map((account) => (
+                                {!isLoading && !isError && bankAccounts.map((account) => (
                                     <div
                                         key={account.id}
                                         className={`bg-[#F8F9FA] rounded-2xl p-6 border transition-all group ${selectedIds.includes(account.id) ? 'border-emerald-500 bg-emerald-50/30' : 'border-slate-100 hover:border-emerald-200 hover:shadow-md'}`}
@@ -461,15 +454,11 @@ export function ReconciliationListView() {
                                                 </div>
                                                 <div>
                                                     <div className="flex items-center gap-2 flex-wrap mb-1">
-                                                        <h4 className="font-bold text-navy text-lg">
-                                                            {isRTL ? account.accountName.ar : account.accountName.en}
-                                                        </h4>
+                                                        <h4 className="font-bold text-navy text-lg">{account.accountName}</h4>
                                                         {getStatusBadge(account.status)}
                                                         {getConnectionBadge(account.isConnected)}
                                                     </div>
-                                                    <p className="text-slate-500 text-sm">
-                                                        {isRTL ? account.bankName.ar : account.bankName.en} • {account.accountNumber}
-                                                    </p>
+                                                    <p className="text-slate-500 text-sm">{account.bankName} • {account.accountNumber}</p>
                                                 </div>
                                             </div>
                                             <DropdownMenu>
@@ -534,13 +523,12 @@ export function ReconciliationListView() {
                                                     </div>
                                                 </div>
                                             </div>
-                                            <Button
-                                                onClick={() => handleReconcile(account.id)}
-                                                className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg px-6 shadow-lg shadow-emerald-500/20"
-                                            >
-                                                <ArrowRightLeft className="h-4 w-4 me-2" aria-hidden="true" />
-                                                {isRTL ? 'التسوية' : 'Reconcile'}
-                                            </Button>
+                                            <Link to={`/dashboard/finance/reconciliation/${account.id}` as any}>
+                                                <Button className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg px-6 shadow-lg shadow-emerald-500/20">
+                                                    <ArrowRightLeft className="h-4 w-4 me-2" aria-hidden="true" />
+                                                    {isRTL ? 'التسوية' : 'Reconcile'}
+                                                </Button>
+                                            </Link>
                                         </div>
                                     </div>
                                 ))}
