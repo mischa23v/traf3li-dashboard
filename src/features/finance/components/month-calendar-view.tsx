@@ -289,7 +289,7 @@ export function MonthCalendarView() {
                 <Dialog key={index}>
                   <DialogTrigger asChild>
                     <button
-                      className={`min-h-[100px] p-2 rounded border text-right transition-all hover:border-primary ${
+                      className={`min-h-[100px] p-2 rounded border text-end transition-all hover:border-primary ${
                         today ? 'bg-primary/10 border-primary' : 'bg-background border-muted'
                       } ${dayEntries.length > 0 ? 'cursor-pointer' : ''}`}
                       onClick={() => setSelectedDate(date)}
@@ -352,7 +352,7 @@ export function MonthCalendarView() {
                                       <p className="text-sm text-slate-600">{entry.clientName}</p>
                                     )}
                                   </div>
-                                  <div className="text-left">
+                                  <div className="text-start">
                                     <p className="font-medium">{formatDuration(entry.duration)}</p>
                                     <span className={`text-xs ${entry.billable ? 'text-green-600' : 'text-gray-500'}`}>
                                       {entry.billable ? 'قابل للفوترة' : 'غير قابل'}

@@ -206,7 +206,7 @@ export function AccountsAgingReport() {
                 <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-emerald-500/50 to-transparent"></div>
             </Header>
 
-            <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-r border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
+            <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-e border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
                 <div className="max-w-7xl mx-auto space-y-6">
 
                     {/* Hero Header */}
@@ -359,13 +359,13 @@ export function AccountsAgingReport() {
                             <Table>
                                 <TableHeader>
                                     <TableRow className="bg-slate-50/50">
-                                        <TableHead className="text-right font-bold text-slate-700 w-8"></TableHead>
-                                        <TableHead className="text-right font-bold text-slate-700">العميل</TableHead>
+                                        <TableHead className="text-end font-bold text-slate-700 w-8"></TableHead>
+                                        <TableHead className="text-end font-bold text-slate-700">العميل</TableHead>
                                         <TableHead className="text-center font-bold text-slate-700">0-30 يوم</TableHead>
                                         <TableHead className="text-center font-bold text-slate-700">31-60 يوم</TableHead>
                                         <TableHead className="text-center font-bold text-slate-700">61-90 يوم</TableHead>
                                         <TableHead className="text-center font-bold text-slate-700">+90 يوم</TableHead>
-                                        <TableHead className="text-left font-bold text-slate-700">الإجمالي</TableHead>
+                                        <TableHead className="text-start font-bold text-slate-700">الإجمالي</TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
@@ -405,7 +405,7 @@ export function AccountsAgingReport() {
                                                                 {formatCurrency(client.ninetyPlusDays)}
                                                             </span>
                                                         </TableCell>
-                                                        <TableCell className="text-left font-bold text-navy">{formatCurrency(client.total)}</TableCell>
+                                                        <TableCell className="text-start font-bold text-navy">{formatCurrency(client.total)}</TableCell>
                                                     </TableRow>
                                                 </CollapsibleTrigger>
                                                 <CollapsibleContent asChild>

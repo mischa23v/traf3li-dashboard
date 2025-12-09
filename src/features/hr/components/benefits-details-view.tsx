@@ -55,6 +55,33 @@ import {
 } from '@/services/benefitsService'
 
 export function BenefitsDetailsView() {
+  const getColorClasses = (color: string) => {
+    const colorMap = {
+        blue: 'bg-blue-100 text-blue-700 border-blue-200',
+        green: 'bg-green-100 text-green-700 border-green-200',
+        emerald: 'bg-emerald-100 text-emerald-700 border-emerald-200',
+        red: 'bg-red-100 text-red-700 border-red-200',
+        amber: 'bg-amber-100 text-amber-700 border-amber-200',
+        yellow: 'bg-yellow-100 text-yellow-700 border-yellow-200',
+        orange: 'bg-orange-100 text-orange-700 border-orange-200',
+        purple: 'bg-purple-100 text-purple-700 border-purple-200',
+        pink: 'bg-pink-100 text-pink-700 border-pink-200',
+        indigo: 'bg-indigo-100 text-indigo-700 border-indigo-200',
+        violet: 'bg-violet-100 text-violet-700 border-violet-200',
+        slate: 'bg-slate-100 text-slate-700 border-slate-200',
+        gray: 'bg-gray-100 text-gray-700 border-gray-200',
+        zinc: 'bg-zinc-100 text-zinc-700 border-zinc-200',
+        stone: 'bg-stone-100 text-stone-700 border-stone-200',
+        teal: 'bg-teal-100 text-teal-700 border-teal-200',
+        cyan: 'bg-cyan-100 text-cyan-700 border-cyan-200',
+        sky: 'bg-sky-100 text-sky-700 border-sky-200',
+        lime: 'bg-lime-100 text-lime-700 border-lime-200',
+        rose: 'bg-rose-100 text-rose-700 border-rose-200',
+        fuchsia: 'bg-fuchsia-100 text-fuchsia-700 border-fuchsia-200'
+    }
+    return colorMap[color] || 'bg-gray-100 text-gray-700 border-gray-200'
+}
+
   const navigate = useNavigate()
   const { benefitId } = useParams({ strict: false })
 
@@ -171,7 +198,7 @@ export function BenefitsDetailsView() {
         <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-emerald-500/50 to-transparent"></div>
       </Header>
 
-      <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-r border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
+      <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-e border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
         <ProductivityHero
           badge="الموارد البشرية"
           title="تفاصيل الميزة"
@@ -375,7 +402,7 @@ export function BenefitsDetailsView() {
                       </div>
                       <div className="p-4 bg-slate-50 rounded-xl">
                         <p className="text-xs text-slate-500 mb-1">التصنيف</p>
-                        <Badge className={`bg-${BENEFIT_CATEGORY_LABELS[benefit.benefitCategory]?.color}-100 text-${BENEFIT_CATEGORY_LABELS[benefit.benefitCategory]?.color}-700`}>
+                        <Badge className={getColorClasses(BENEFIT_CATEGORY_LABELS[benefit.benefitCategory]?.color)}>
                           {BENEFIT_CATEGORY_LABELS[benefit.benefitCategory]?.ar}
                         </Badge>
                       </div>

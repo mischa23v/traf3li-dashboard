@@ -352,7 +352,7 @@ export function JobPostingCreateView() {
 
         <div className='ms-auto flex items-center gap-4'>
           <div className="relative hidden md:block">
-            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
+            <Search className="absolute end-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
             <input type="text" placeholder="بحث..." aria-label="بحث" className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
           </div>
           <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white" aria-label="الإشعارات">
@@ -366,7 +366,7 @@ export function JobPostingCreateView() {
         <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-emerald-500/50 to-transparent"></div>
       </Header>
 
-      <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-6 rounded-tr-3xl shadow-inner border-r border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
+      <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-6 rounded-tr-3xl shadow-inner border-e border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
         {/* Page Header */}
         <div className="flex items-center gap-4">
           <Button
@@ -702,7 +702,7 @@ export function JobPostingCreateView() {
                           <button
                             key={skill.id}
                             onClick={() => toggleSkill(skill.id)}
-                            className={`p-3 rounded-xl border-2 transition-all text-right ${
+                            className={`p-3 rounded-xl border-2 transition-all text-end ${
                               isSelected
                                 ? 'border-emerald-500 bg-emerald-50'
                                 : 'border-slate-200 hover:border-emerald-200'

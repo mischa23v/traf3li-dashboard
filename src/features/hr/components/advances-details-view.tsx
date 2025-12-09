@@ -74,6 +74,33 @@ const RECOVERY_METHOD_LABELS: Record<RecoveryMethod, { ar: string; en: string }>
 }
 
 export function AdvancesDetailsView() {
+  const getColorClasses = (color: string) => {
+    const colorMap = {
+        blue: 'bg-blue-100 text-blue-700 border-blue-200',
+        green: 'bg-green-100 text-green-700 border-green-200',
+        emerald: 'bg-emerald-100 text-emerald-700 border-emerald-200',
+        red: 'bg-red-100 text-red-700 border-red-200',
+        amber: 'bg-amber-100 text-amber-700 border-amber-200',
+        yellow: 'bg-yellow-100 text-yellow-700 border-yellow-200',
+        orange: 'bg-orange-100 text-orange-700 border-orange-200',
+        purple: 'bg-purple-100 text-purple-700 border-purple-200',
+        pink: 'bg-pink-100 text-pink-700 border-pink-200',
+        indigo: 'bg-indigo-100 text-indigo-700 border-indigo-200',
+        violet: 'bg-violet-100 text-violet-700 border-violet-200',
+        slate: 'bg-slate-100 text-slate-700 border-slate-200',
+        gray: 'bg-gray-100 text-gray-700 border-gray-200',
+        zinc: 'bg-zinc-100 text-zinc-700 border-zinc-200',
+        stone: 'bg-stone-100 text-stone-700 border-stone-200',
+        teal: 'bg-teal-100 text-teal-700 border-teal-200',
+        cyan: 'bg-cyan-100 text-cyan-700 border-cyan-200',
+        sky: 'bg-sky-100 text-sky-700 border-sky-200',
+        lime: 'bg-lime-100 text-lime-700 border-lime-200',
+        rose: 'bg-rose-100 text-rose-700 border-rose-200',
+        fuchsia: 'bg-fuchsia-100 text-fuchsia-700 border-fuchsia-200'
+    }
+    return colorMap[color] || 'bg-gray-100 text-gray-700 border-gray-200'
+}
+
   const params = useParams({ strict: false }) as { advanceId?: string }
   const advanceId = params.advanceId || ''
   const navigate = useNavigate()
@@ -225,12 +252,12 @@ export function AdvancesDetailsView() {
         </div>
         <div className='ms-auto flex items-center gap-4'>
           <div className="relative hidden md:block">
-            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
+            <Search className="absolute end-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
             <input type="text" placeholder="بحث..." aria-label="بحث" className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
           </div>
           <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white" aria-label="الإشعارات">
             <Bell className="h-5 w-5" aria-hidden="true" />
-            <span className="absolute top-2 right-2 h-2 w-2 bg-red-500 rounded-full border border-navy"></span>
+            <span className="absolute top-2 end-2 h-2 w-2 bg-red-500 rounded-full border border-navy"></span>
           </Button>
           <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white" />
           <ThemeSwitch className="text-slate-300 hover:bg-white/10 hover:text-white" />
@@ -240,7 +267,7 @@ export function AdvancesDetailsView() {
         <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-emerald-500/50 to-transparent"></div>
       </Header>
 
-      <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-r border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
+      <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-e border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
         <ProductivityHero
           badge="السلف"
           title={advance?.employeeNameAr || advance?.employeeName || 'تفاصيل السلفة'}
@@ -514,13 +541,13 @@ export function AdvancesDetailsView() {
                             </div>
                             <div className="flex justify-between">
                               <span className="text-slate-500">نوع السلفة</span>
-                              <Badge className={`bg-${ADVANCE_TYPE_LABELS[advance.advanceType]?.color}-100 text-${ADVANCE_TYPE_LABELS[advance.advanceType]?.color}-700`}>
+                              <Badge className={getColorClasses(ADVANCE_TYPE_LABELS[advance.advanceType]?.color)}>
                                 {ADVANCE_TYPE_LABELS[advance.advanceType]?.ar}
                               </Badge>
                             </div>
                             <div className="flex justify-between">
                               <span className="text-slate-500">الأولوية</span>
-                              <Badge className={`bg-${URGENCY_LABELS[advance.urgency]?.color}-100 text-${URGENCY_LABELS[advance.urgency]?.color}-700`}>
+                              <Badge className={getColorClasses(URGENCY_LABELS[advance.urgency]?.color)}>
                                 {URGENCY_LABELS[advance.urgency]?.ar}
                               </Badge>
                             </div>
@@ -611,7 +638,7 @@ export function AdvancesDetailsView() {
                                       </p>
                                     </div>
                                   </div>
-                                  <div className="text-left">
+                                  <div className="text-start">
                                     <p className="font-bold text-navy">{installment.installmentAmount.toLocaleString('ar-SA')} ر.س</p>
                                     <Badge className={`${
                                       installment.status === 'paid' ? 'bg-emerald-100 text-emerald-700' :
@@ -664,7 +691,7 @@ export function AdvancesDetailsView() {
                                       </p>
                                     </div>
                                   </div>
-                                  <div className="text-left">
+                                  <div className="text-start">
                                     <p className="font-bold text-emerald-600">+{recovery.recoveredAmount.toLocaleString('ar-SA')} ر.س</p>
                                     <p className="text-xs text-slate-500">
                                       {RECOVERY_METHOD_LABELS[recovery.recoveryMethod]?.ar}

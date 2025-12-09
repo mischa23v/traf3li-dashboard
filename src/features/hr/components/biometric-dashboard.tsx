@@ -120,7 +120,7 @@ export function BiometricDashboard() {
 
         <div className="ms-auto flex items-center gap-2 sm:gap-4 overflow-x-auto min-w-0">
           <div className="relative hidden md:block min-w-0">
-            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
+            <Search className="absolute end-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
             <input
               type="text"
               placeholder={t('common.search')}
@@ -133,7 +133,7 @@ export function BiometricDashboard() {
             className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white flex-shrink-0"
           >
             <Bell className="h-5 w-5" />
-            <span className="absolute top-2 right-2 h-2 w-2 bg-red-500 rounded-full border border-navy"></span>
+            <span className="absolute top-2 end-2 h-2 w-2 bg-red-500 rounded-full border border-navy"></span>
           </Button>
           <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white flex-shrink-0" />
           <ThemeSwitch className="text-slate-300 hover:bg-white/10 hover:text-white hidden sm:flex flex-shrink-0" />
@@ -145,7 +145,7 @@ export function BiometricDashboard() {
 
       <Main
         fluid={true}
-        className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-r border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']"
+        className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-e border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']"
       >
         {/* HERO CARD */}
         <ProductivityHero

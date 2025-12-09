@@ -151,12 +151,12 @@ export default function AccountActivityDashboard() {
 
                 <div className='ms-auto flex items-center gap-4'>
                     <div className="relative hidden md:block">
-                        <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-600" aria-hidden="true" />
+                        <Search className="absolute end-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-600" aria-hidden="true" />
                         <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
                     </div>
                     <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white" aria-label="الإشعارات">
                         <Bell className="h-5 w-5" aria-hidden="true" />
-                        <span className="absolute top-2 right-2 h-2 w-2 bg-red-500 rounded-full border border-navy"></span>
+                        <span className="absolute top-2 end-2 h-2 w-2 bg-red-500 rounded-full border border-navy"></span>
                     </Button>
                     <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white" />
                     <ThemeSwitch className="text-slate-300 hover:bg-white/10 hover:text-white" />
@@ -167,7 +167,7 @@ export default function AccountActivityDashboard() {
                 <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-emerald-500/50 to-transparent"></div>
             </Header>
 
-            <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-r border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
+            <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-e border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
                 {isLoading ? (
                     <div className="max-w-7xl mx-auto space-y-6">
                         <div className="bg-white rounded-3xl p-8">
@@ -254,7 +254,7 @@ export default function AccountActivityDashboard() {
                                         <div className="text-3xl font-bold text-white">نشط</div>
                                         <Progress value={65} className="h-1.5 bg-white/10" indicatorClassName="bg-brand-blue" />
                                     </div>
-                                    <div className="flex justify-between items-center border-r border-white/10 pe-6">
+                                    <div className="flex justify-between items-center border-e border-white/10 pe-6">
                                         <div>
                                             <div className="text-blue-200 text-sm mb-1">إجمالي المقبوضات</div>
                                             <div className="text-2xl font-bold text-emerald-400">{formatCurrency(totalIncome)}</div>
@@ -263,7 +263,7 @@ export default function AccountActivityDashboard() {
                                             <ArrowUpRight className="w-5 h-5 text-emerald-400" />
                                         </div>
                                     </div>
-                                    <div className="flex justify-between items-center border-r border-white/10 pe-6">
+                                    <div className="flex justify-between items-center border-e border-white/10 pe-6">
                                         <div>
                                             <div className="text-blue-200 text-sm mb-1">إجمالي المصروفات</div>
                                             <div className="text-2xl font-bold text-red-400">{formatCurrency(totalExpenses)}</div>
@@ -389,7 +389,7 @@ export default function AccountActivityDashboard() {
 
                                             <div className="flex items-center gap-3 flex-1 justify-end">
                                                 <div className="relative w-full max-w-xs">
-                                                    <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-600" aria-hidden="true" />
+                                                    <Search className="absolute end-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-600" aria-hidden="true" />
                                                     <Input
                                                         placeholder="بحث في السجل..."
                                                         className="pe-10 rounded-xl border-slate-200 focus:ring-[#022c22] focus:border-[#022c22]"
@@ -434,7 +434,7 @@ export default function AccountActivityDashboard() {
                                                                                     </Link>
                                                                                     <p className="text-slate-600 text-sm">{activity.description}</p>
                                                                                 </div>
-                                                                                <div className="text-left">
+                                                                                <div className="text-start">
                                                                                     <span className="text-xs text-slate-600 bg-slate-50 px-2 py-1 rounded-md">{activity.time}</span>
                                                                                 </div>
                                                                             </div>

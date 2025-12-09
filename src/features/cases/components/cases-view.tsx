@@ -186,7 +186,7 @@ export function CasesView() {
                     </div>
                     <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white" aria-label="التنبيهات">
                         <Bell className="h-5 w-5" aria-hidden="true" />
-                        <span className="absolute top-2 right-2 h-2 w-2 bg-red-500 rounded-full border border-navy"></span>
+                        <span className="absolute top-2 end-2 h-2 w-2 bg-red-500 rounded-full border border-navy"></span>
                     </Button>
                     <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white" />
                     <ThemeSwitch className="text-slate-300 hover:bg-white/10 hover:text-white" />
@@ -197,7 +197,7 @@ export function CasesView() {
                 <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-emerald-500/50 to-transparent"></div>
             </Header>
 
-            <Main fluid={true} className="bg-slate-50/50 flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-r border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
+            <Main fluid={true} className="bg-slate-50/50 flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-e border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
                 <div className="max-w-7xl mx-auto space-y-6">
 
                     {/* Hero Section - Contained Navy Card */}
@@ -246,13 +246,13 @@ export function CasesView() {
                                     </div>
                                     <Progress value={caseData.progress} className="h-2 bg-white/10" indicatorClassName="bg-emerald-500" />
                                 </div>
-                                <div className="flex justify-between items-center border-r border-white/10 pe-6">
+                                <div className="flex justify-between items-center border-e border-white/10 pe-6">
                                     <div>
                                         <div className="text-blue-200 text-sm mb-1">قيمة المطالبة</div>
                                         <div className="text-2xl font-bold">{caseData.claimAmount.toLocaleString()} ر.س</div>
                                     </div>
                                 </div>
-                                <div className="flex justify-between items-center border-r border-white/10 pe-6">
+                                <div className="flex justify-between items-center border-e border-white/10 pe-6">
                                     <div>
                                         <div className="text-blue-200 text-sm mb-1">الربح المتوقع</div>
                                         <div className="text-2xl font-bold text-emerald-400">{caseData.expectedProfit.toLocaleString()} ر.س</div>
@@ -289,7 +289,7 @@ export function CasesView() {
                                 </CardHeader>
                                 <CardContent className="p-0">
                                     <ScrollArea className="h-[600px] p-6">
-                                        <div className="relative border-r-2 border-slate-100 pe-6 space-y-8">
+                                        <div className="relative border-e-2 border-slate-100 pe-6 space-y-8">
                                             {hearings.map((event, index) => (
                                                 <div key={index} className="relative">
                                                     <div className={`absolute -right-[31px] top-1 w-4 h-4 rounded-full border-2 border-white ${index === 0 ? 'bg-brand-blue' : 'bg-slate-300'}`}></div>
@@ -555,7 +555,7 @@ export function CasesView() {
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                        <div className="text-left">
+                                                        <div className="text-start">
                                                             <div className="text-xl font-bold text-navy">{claim.amount.toLocaleString()} ر.س</div>
                                                         </div>
                                                     </div>

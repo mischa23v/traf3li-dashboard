@@ -471,11 +471,11 @@ export function SignUpForm() {
                 <div className="bg-[#F8F9FA] rounded-2xl p-5 border border-slate-100 animate-fadeIn">
                   <h3 className="font-bold text-[#0f172a] mb-4">نوع الاستخدام</h3>
                   <div className="space-y-3">
-                    <button onClick={() => { updateField('lawyerMode', 'marketplace'); setCurrentStep(1); }} className={`w-full p-4 rounded-xl border-2 transition-all flex items-center gap-4 text-right ${formData.lawyerMode === 'marketplace' ? 'border-emerald-500 bg-white' : 'border-slate-200 hover:border-slate-300 bg-white'}`}>
+                    <button onClick={() => { updateField('lawyerMode', 'marketplace'); setCurrentStep(1); }} className={`w-full p-4 rounded-xl border-2 transition-all flex items-center gap-4 text-end ${formData.lawyerMode === 'marketplace' ? 'border-emerald-500 bg-white' : 'border-slate-200 hover:border-slate-300 bg-white'}`}>
                       <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${formData.lawyerMode === 'marketplace' ? 'bg-emerald-500 text-white' : 'bg-slate-100 text-slate-600'}`}><Icons.Store /></div>
                       <div className="flex-1"><h4 className="font-bold text-[#0f172a] text-sm">السوق + لوحة التحكم</h4><p className="text-xs text-slate-500">استقبال عملاء جدد وإدارة القضايا</p></div>
                     </button>
-                    <button onClick={() => updateField('lawyerMode', 'dashboard')} className={`w-full p-4 rounded-xl border-2 transition-all flex items-center gap-4 text-right ${formData.lawyerMode === 'dashboard' ? 'border-emerald-500 bg-white' : 'border-slate-200 hover:border-slate-300 bg-white'}`}>
+                    <button onClick={() => updateField('lawyerMode', 'dashboard')} className={`w-full p-4 rounded-xl border-2 transition-all flex items-center gap-4 text-end ${formData.lawyerMode === 'dashboard' ? 'border-emerald-500 bg-white' : 'border-slate-200 hover:border-slate-300 bg-white'}`}>
                       <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${formData.lawyerMode === 'dashboard' ? 'bg-emerald-500 text-white' : 'bg-slate-100 text-slate-600'}`}><Icons.Layout /></div>
                       <div className="flex-1"><h4 className="font-bold text-[#0f172a] text-sm">لوحة التحكم فقط</h4><p className="text-xs text-slate-500">إدارة القضايا الحالية</p></div>
                     </button>
@@ -485,15 +485,15 @@ export function SignUpForm() {
                     <div className="mt-4 pt-4 border-t border-slate-200 animate-fadeIn">
                       <h4 className="font-bold text-[#0f172a] mb-3 text-sm">كيف تريد العمل؟</h4>
                       <div className="space-y-2">
-                        <button onClick={() => { updateField('lawyerWorkMode', 'solo'); setCurrentStep(1); }} className={`w-full p-3 rounded-xl border-2 transition-all flex items-center gap-3 text-right ${formData.lawyerWorkMode === 'solo' ? 'border-emerald-500 bg-emerald-50' : 'border-slate-200 hover:border-slate-300'}`}>
+                        <button onClick={() => { updateField('lawyerWorkMode', 'solo'); setCurrentStep(1); }} className={`w-full p-3 rounded-xl border-2 transition-all flex items-center gap-3 text-end ${formData.lawyerWorkMode === 'solo' ? 'border-emerald-500 bg-emerald-50' : 'border-slate-200 hover:border-slate-300'}`}>
                           <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${formData.lawyerWorkMode === 'solo' ? 'bg-emerald-500 text-white' : 'bg-slate-100 text-slate-600'}`}><Icons.User /></div>
                           <div className="flex-1"><h5 className="font-bold text-[#0f172a] text-xs">محامي مستقل</h5><p className="text-xs text-slate-500">العمل بشكل مستقل بدون مكتب</p></div>
                         </button>
-                        <button onClick={() => { updateField('lawyerWorkMode', 'create_firm'); setCurrentStep(1); }} className={`w-full p-3 rounded-xl border-2 transition-all flex items-center gap-3 text-right ${formData.lawyerWorkMode === 'create_firm' ? 'border-emerald-500 bg-emerald-50' : 'border-slate-200 hover:border-slate-300'}`}>
+                        <button onClick={() => { updateField('lawyerWorkMode', 'create_firm'); setCurrentStep(1); }} className={`w-full p-3 rounded-xl border-2 transition-all flex items-center gap-3 text-end ${formData.lawyerWorkMode === 'create_firm' ? 'border-emerald-500 bg-emerald-50' : 'border-slate-200 hover:border-slate-300'}`}>
                           <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${formData.lawyerWorkMode === 'create_firm' ? 'bg-emerald-500 text-white' : 'bg-slate-100 text-slate-600'}`}><Icons.Store /></div>
                           <div className="flex-1"><h5 className="font-bold text-[#0f172a] text-xs">إنشاء مكتب جديد</h5><p className="text-xs text-slate-500">إنشاء مكتب محاماة وإدارة الفريق</p></div>
                         </button>
-                        <button onClick={() => { updateField('lawyerWorkMode', 'join_firm'); setCurrentStep(1); }} className={`w-full p-3 rounded-xl border-2 transition-all flex items-center gap-3 text-right ${formData.lawyerWorkMode === 'join_firm' ? 'border-emerald-500 bg-emerald-50' : 'border-slate-200 hover:border-slate-300'}`}>
+                        <button onClick={() => { updateField('lawyerWorkMode', 'join_firm'); setCurrentStep(1); }} className={`w-full p-3 rounded-xl border-2 transition-all flex items-center gap-3 text-end ${formData.lawyerWorkMode === 'join_firm' ? 'border-emerald-500 bg-emerald-50' : 'border-slate-200 hover:border-slate-300'}`}>
                           <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${formData.lawyerWorkMode === 'join_firm' ? 'bg-emerald-500 text-white' : 'bg-slate-100 text-slate-600'}`}><Icons.Users /></div>
                           <div className="flex-1"><h5 className="font-bold text-[#0f172a] text-xs">الانضمام لمكتب</h5><p className="text-xs text-slate-500">لدي كود دعوة للانضمام لمكتب</p></div>
                         </button>
@@ -601,7 +601,7 @@ export function SignUpForm() {
                       <AvailabilityIndicator status={availability.username} />
                     </div>
                     <div className="relative">
-                      <div className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500"><Icons.User /></div>
+                      <div className="absolute end-4 top-1/2 -translate-y-1/2 text-slate-500"><Icons.User /></div>
                       <input type="text" value={formData.username} onChange={(e) => updateField('username', e.target.value.replace(/[^a-zA-Z0-9_]/g, '').toLowerCase())} className={`w-full h-12 pe-12 ps-4 rounded-xl border bg-slate-50 text-[#0f172a] outline-none transition-all ${errors.username || availability.username === 'taken' ? 'border-red-400' : availability.username === 'available' ? 'border-green-400' : 'border-slate-200 focus:border-[#0f172a]'}`} dir="ltr" style={{ textAlign: 'left' }} maxLength={20} />
                     </div>
                     {errors.username && <p className="text-red-500 text-xs mt-1">{errors.username}</p>}
@@ -612,7 +612,7 @@ export function SignUpForm() {
                       <AvailabilityIndicator status={availability.email} />
                     </div>
                     <div className="relative">
-                      <div className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500"><Icons.Mail /></div>
+                      <div className="absolute end-4 top-1/2 -translate-y-1/2 text-slate-500"><Icons.Mail /></div>
                       <input type="email" value={formData.email} onChange={(e) => updateField('email', e.target.value)} className={`w-full h-12 pe-12 ps-4 rounded-xl border bg-slate-50 text-[#0f172a] outline-none transition-all ${errors.email || availability.email === 'taken' ? 'border-red-400' : availability.email === 'available' ? 'border-green-400' : 'border-slate-200 focus:border-[#0f172a]'}`} dir="ltr" style={{ textAlign: 'left' }} />
                     </div>
                     {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
@@ -625,7 +625,7 @@ export function SignUpForm() {
                         <AvailabilityIndicator status={availability.phone} />
                       </div>
                       <div className="relative">
-                        <div className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500"><Icons.Phone /></div>
+                        <div className="absolute end-4 top-1/2 -translate-y-1/2 text-slate-500"><Icons.Phone /></div>
                         <input type="tel" value={formData.phone} onChange={(e) => updateField('phone', e.target.value.replace(/\D/g, '').slice(0, 10))} className={`w-full h-12 pe-12 ps-4 rounded-xl border bg-slate-50 text-[#0f172a] outline-none transition-all ${errors.phone || availability.phone === 'taken' ? 'border-red-400' : availability.phone === 'available' ? 'border-green-400' : 'border-slate-200 focus:border-[#0f172a]'}`} placeholder="05XXXXXXXX" dir="ltr" style={{ textAlign: 'left' }} maxLength={10} />
                       </div>
                       {errors.phone && <p className="text-red-500 text-xs mt-1">{errors.phone}</p>}
@@ -636,7 +636,7 @@ export function SignUpForm() {
                     <div>
                       <label className="block text-sm font-medium text-[#0f172a] mb-2">كود الدعوة <span className="text-red-500">*</span></label>
                       <div className="relative">
-                        <div className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500"><Icons.Award /></div>
+                        <div className="absolute end-4 top-1/2 -translate-y-1/2 text-slate-500"><Icons.Award /></div>
                         <input type="text" value={formData.invitationCode} onChange={(e) => updateField('invitationCode', e.target.value.toUpperCase())} className={`w-full h-12 pe-12 ps-4 rounded-xl border bg-slate-50 text-[#0f172a] outline-none transition-all ${errors.invitationCode ? 'border-red-400' : 'border-slate-200 focus:border-[#0f172a]'}`} placeholder="أدخل كود الدعوة من المكتب" dir="ltr" style={{ textAlign: 'left' }} />
                       </div>
                       {errors.invitationCode && <p className="text-red-500 text-xs mt-1">{errors.invitationCode}</p>}
@@ -652,9 +652,9 @@ export function SignUpForm() {
                   <div>
                     <label className="block text-sm font-medium text-[#0f172a] mb-2">كلمة المرور <span className="text-red-500">*</span></label>
                     <div className="relative">
-                      <div className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500"><Icons.Lock /></div>
+                      <div className="absolute end-4 top-1/2 -translate-y-1/2 text-slate-500"><Icons.Lock /></div>
                       <input type={showPassword ? 'text' : 'password'} value={formData.password} onChange={(e) => updateField('password', e.target.value)} className={`w-full h-12 pe-12 ps-12 rounded-xl border bg-slate-50 text-[#0f172a] outline-none transition-all ${errors.password ? 'border-red-400' : 'border-slate-200 focus:border-[#0f172a]'}`} dir="ltr" style={{ textAlign: 'left' }} />
-                      <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-600" aria-label={showPassword ? 'إخفاء كلمة المرور' : 'إظهار كلمة المرور'}>{showPassword ? <Icons.EyeOff /> : <Icons.Eye />}</button>
+                      <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute start-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-600" aria-label={showPassword ? 'إخفاء كلمة المرور' : 'إظهار كلمة المرور'}>{showPassword ? <Icons.EyeOff /> : <Icons.Eye />}</button>
                     </div>
                     {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password}</p>}
                     <PasswordStrength password={formData.password} className="mt-3" />
@@ -662,9 +662,9 @@ export function SignUpForm() {
                   <div>
                     <label className="block text-sm font-medium text-[#0f172a] mb-2">تأكيد كلمة المرور <span className="text-red-500">*</span></label>
                     <div className="relative">
-                      <div className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500"><Icons.Lock /></div>
+                      <div className="absolute end-4 top-1/2 -translate-y-1/2 text-slate-500"><Icons.Lock /></div>
                       <input type={showConfirmPassword ? 'text' : 'password'} value={formData.confirmPassword} onChange={(e) => updateField('confirmPassword', e.target.value)} className={`w-full h-12 pe-12 ps-12 rounded-xl border bg-slate-50 text-[#0f172a] outline-none transition-all ${errors.confirmPassword ? 'border-red-400' : 'border-slate-200 focus:border-[#0f172a]'}`} dir="ltr" style={{ textAlign: 'left' }} />
-                      <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-600" aria-label={showConfirmPassword ? 'إخفاء تأكيد كلمة المرور' : 'إظهار تأكيد كلمة المرور'}>{showConfirmPassword ? <Icons.EyeOff /> : <Icons.Eye />}</button>
+                      <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)} className="absolute start-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-600" aria-label={showConfirmPassword ? 'إخفاء تأكيد كلمة المرور' : 'إظهار تأكيد كلمة المرور'}>{showConfirmPassword ? <Icons.EyeOff /> : <Icons.Eye />}</button>
                     </div>
                     {errors.confirmPassword && <p className="text-red-500 text-xs mt-1">{errors.confirmPassword}</p>}
                   </div>
@@ -770,9 +770,9 @@ export function SignUpForm() {
                       <div>
                         <label className="block text-sm font-medium text-[#0f172a] mb-2">كلمة المرور <span className="text-red-500">*</span></label>
                         <div className="relative">
-                          <div className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500"><Icons.Lock /></div>
+                          <div className="absolute end-4 top-1/2 -translate-y-1/2 text-slate-500"><Icons.Lock /></div>
                           <input type={showPassword ? 'text' : 'password'} value={formData.password} onChange={(e) => updateField('password', e.target.value)} className={`w-full h-12 pe-12 ps-12 rounded-xl border bg-slate-50 text-[#0f172a] outline-none transition-all ${errors.password ? 'border-red-400' : 'border-slate-200 focus:border-[#0f172a]'}`} dir="ltr" style={{ textAlign: 'left' }} />
-                          <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-600" aria-label={showPassword ? 'إخفاء كلمة المرور' : 'إظهار كلمة المرور'}>{showPassword ? <Icons.EyeOff /> : <Icons.Eye />}</button>
+                          <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute start-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-600" aria-label={showPassword ? 'إخفاء كلمة المرور' : 'إظهار كلمة المرور'}>{showPassword ? <Icons.EyeOff /> : <Icons.Eye />}</button>
                         </div>
                         {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password}</p>}
                         <PasswordStrength password={formData.password} className="mt-3" />
@@ -780,9 +780,9 @@ export function SignUpForm() {
                       <div>
                         <label className="block text-sm font-medium text-[#0f172a] mb-2">تأكيد كلمة المرور <span className="text-red-500">*</span></label>
                         <div className="relative">
-                          <div className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500"><Icons.Lock /></div>
+                          <div className="absolute end-4 top-1/2 -translate-y-1/2 text-slate-500"><Icons.Lock /></div>
                           <input type={showConfirmPassword ? 'text' : 'password'} value={formData.confirmPassword} onChange={(e) => updateField('confirmPassword', e.target.value)} className={`w-full h-12 pe-12 ps-12 rounded-xl border bg-slate-50 text-[#0f172a] outline-none transition-all ${errors.confirmPassword ? 'border-red-400' : 'border-slate-200 focus:border-[#0f172a]'}`} dir="ltr" style={{ textAlign: 'left' }} />
-                          <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-600" aria-label={showConfirmPassword ? 'إخفاء تأكيد كلمة المرور' : 'إظهار تأكيد كلمة المرور'}>{showConfirmPassword ? <Icons.EyeOff /> : <Icons.Eye />}</button>
+                          <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)} className="absolute start-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-600" aria-label={showConfirmPassword ? 'إخفاء تأكيد كلمة المرور' : 'إظهار تأكيد كلمة المرور'}>{showConfirmPassword ? <Icons.EyeOff /> : <Icons.Eye />}</button>
                         </div>
                         {errors.confirmPassword && <p className="text-red-500 text-xs mt-1">{errors.confirmPassword}</p>}
                       </div>
@@ -792,7 +792,7 @@ export function SignUpForm() {
                           <AvailabilityIndicator status={availability.phone} />
                         </div>
                         <div className="relative">
-                          <div className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500"><Icons.Phone /></div>
+                          <div className="absolute end-4 top-1/2 -translate-y-1/2 text-slate-500"><Icons.Phone /></div>
                           <input type="tel" value={formData.phone} onChange={(e) => updateField('phone', e.target.value.replace(/\D/g, '').slice(0, 10))} className={`w-full h-12 pe-12 ps-4 rounded-xl border bg-slate-50 text-[#0f172a] outline-none transition-all ${errors.phone || availability.phone === 'taken' ? 'border-red-400' : availability.phone === 'available' ? 'border-green-400' : 'border-slate-200 focus:border-[#0f172a]'}`} placeholder="05XXXXXXXX" dir="ltr" style={{ textAlign: 'left' }} maxLength={10} />
                         </div>
                         {errors.phone && <p className="text-red-500 text-xs mt-1">{errors.phone}</p>}
@@ -855,7 +855,7 @@ export function SignUpForm() {
                           const courtData = formData.courts[court.id] || {};
                           const isSelected = courtData.selected;
                           return (
-                            <button key={court.id} type="button" onClick={() => updateCourt(court.id, 'selected', !isSelected)} className={`p-4 rounded-xl border-2 text-right transition-all ${isSelected ? 'border-emerald-500 bg-emerald-50' : 'border-slate-200 hover:border-slate-300'}`}>
+                            <button key={court.id} type="button" onClick={() => updateCourt(court.id, 'selected', !isSelected)} className={`p-4 rounded-xl border-2 text-end transition-all ${isSelected ? 'border-emerald-500 bg-emerald-50' : 'border-slate-200 hover:border-slate-300'}`}>
                               <div className="flex items-center gap-2">
                                 <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${isSelected ? 'border-emerald-500 bg-emerald-500' : 'border-slate-300'}`}>{isSelected && <Icons.Check />}</div>
                                 <span className={`font-medium text-sm ${isSelected ? 'text-emerald-700' : 'text-[#0f172a]'}`}>{court.name}</span>
@@ -954,7 +954,7 @@ export function SignUpForm() {
                         {errors.serviceType && <p className="text-red-500 text-xs mb-2">{errors.serviceType}</p>}
                         <div className="space-y-2">
                           {[{ v: 'consultation', l: 'استشارات' }, { v: 'litigation', l: 'ترافع' }, { v: 'both', l: 'كلاهما' }].map(opt => (
-                            <button key={opt.v} type="button" onClick={() => updateField('serviceType', opt.v)} className={`w-full p-3 rounded-xl border-2 text-right font-medium transition-all text-sm ${formData.serviceType === opt.v ? 'border-emerald-500 bg-emerald-50 text-emerald-700' : 'border-slate-200 text-slate-600'}`}>
+                            <button key={opt.v} type="button" onClick={() => updateField('serviceType', opt.v)} className={`w-full p-3 rounded-xl border-2 text-end font-medium transition-all text-sm ${formData.serviceType === opt.v ? 'border-emerald-500 bg-emerald-50 text-emerald-700' : 'border-slate-200 text-slate-600'}`}>
                               {formData.serviceType === opt.v && <span className="ms-2">✓</span>}{opt.l}
                             </button>
                           ))}

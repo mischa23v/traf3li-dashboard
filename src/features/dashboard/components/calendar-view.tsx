@@ -292,12 +292,12 @@ export function CalendarView() {
 
                 <div className='ms-auto flex items-center gap-4'>
                     <div className="relative hidden md:block">
-                        <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
+                        <Search className="absolute end-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
                         <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
                     </div>
                     <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white">
                         <Bell className="h-5 w-5" />
-                        <span className="absolute top-2 right-2 h-2 w-2 bg-red-500 rounded-full border border-navy"></span>
+                        <span className="absolute top-2 end-2 h-2 w-2 bg-red-500 rounded-full border border-navy"></span>
                     </Button>
                     <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white" />
                     <ThemeSwitch className="text-slate-300 hover:bg-white/10 hover:text-white" />
@@ -308,7 +308,7 @@ export function CalendarView() {
                 <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-emerald-500/50 to-transparent"></div>
             </Header>
 
-            <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-r border-white/5 overflow-hidden">
+            <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-e border-white/5 overflow-hidden">
 
                 {/* HERO BANNER */}
                 <div className="bg-navy rounded-3xl p-8 relative overflow-hidden text-white shadow-xl shadow-navy/20 group">
@@ -519,7 +519,7 @@ export function CalendarView() {
                                                                     <div
                                                                         key={idx}
                                                                         className={`
-                                                                text-[10px] px-2 py-1.5 rounded-lg font-bold truncate border-r-[3px] shadow-sm transition-all hover:scale-[1.02] hover:shadow-md flex items-center gap-1.5
+                                                                text-[10px] px-2 py-1.5 rounded-lg font-bold truncate border-e-[3px] shadow-sm transition-all hover:scale-[1.02] hover:shadow-md flex items-center gap-1.5
                                                                 ${item.type === 'court' ? 'bg-red-50 text-red-700 border-red-500' :
                                                                                 item.type === 'deadline' ? 'bg-orange-50 text-orange-700 border-orange-500' :
                                                                                     item.type === 'meeting' ? 'bg-blue-50 text-blue-700 border-blue-500' :

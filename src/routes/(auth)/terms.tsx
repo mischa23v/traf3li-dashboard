@@ -34,7 +34,7 @@ function TermsPage() {
                   مرحباً بك في <strong className="text-emerald-600">ترافعلي (TRAF3LI)</strong>، المنصة الإلكترونية الرائدة لربط العملاء بالمحامين المرخصين في المملكة العربية السعودية. 
                   نحن منصة متكاملة لإدارة الخدمات القانونية وسوق للخدمات القانونية.
                 </p>
-                <div className="mt-4 bg-emerald-50 border-r-4 border-emerald-500 rounded-lg p-4">
+                <div className="mt-4 bg-emerald-50 border-e-4 border-emerald-500 rounded-lg p-4">
                   <p className="text-sm font-semibold text-emerald-900 mb-2">معلومات المنصة:</p>
                   <ul className="text-sm text-emerald-800 space-y-1">
                     <li><strong>اسم المنصة:</strong> ترافعلي (TRAF3LI)</li>
@@ -145,7 +145,7 @@ function TermsPage() {
                     <span className="text-2xl">🏪</span>
                     سوق الخدمات القانونية (Marketplace)
                   </h4>
-                  <ul className="text-sm text-emerald-800 space-y-1 mr-6">
+                  <ul className="text-sm text-emerald-800 space-y-1 me-6">
                     <li>• عرض الخدمات القانونية المتاحة من المحامين المسجلين</li>
                     <li>• تصنيف الخدمات حسب المجال القانوني</li>
                     <li>• تصفح ملفات المحامين وتقييماتهم</li>
@@ -158,7 +158,7 @@ function TermsPage() {
                     <span className="text-2xl">💼</span>
                     نظام المشاريع والعروض (Bidding System)
                   </h4>
-                  <ul className="text-sm text-blue-800 space-y-1 mr-6">
+                  <ul className="text-sm text-blue-800 space-y-1 me-6">
                     <li>• نشر المشاريع القانونية من قبل العملاء</li>
                     <li>• تلقي عروض من المحامين المؤهلين</li>
                     <li>• مقارنة العروض واختيار الأنسب</li>
@@ -170,7 +170,7 @@ function TermsPage() {
                     <span className="text-2xl">⚖️</span>
                     إدارة القضايا (Case Management)
                   </h4>
-                  <ul className="text-sm text-purple-800 space-y-1 mr-6">
+                  <ul className="text-sm text-purple-800 space-y-1 me-6">
                     <li>• متابعة القضايا القانونية الجارية</li>
                     <li>• مشاركة المستندات والملفات بشكل آمن</li>
                     <li>• تتبع الجلسات والمواعيد القضائية</li>
@@ -182,7 +182,7 @@ function TermsPage() {
                     <span className="text-2xl">❓</span>
                     منصة الأسئلة والأجوبة (Q&A Community)
                   </h4>
-                  <ul className="text-sm text-orange-800 space-y-1 mr-6">
+                  <ul className="text-sm text-orange-800 space-y-1 me-6">
                     <li>• طرح الأسئلة القانونية العامة</li>
                     <li>• الحصول على إجابات من المحامين المسجلين</li>
                     <li>• بناء مجتمع قانوني تفاعلي</li>
@@ -194,7 +194,7 @@ function TermsPage() {
                     <span className="text-2xl">💬</span>
                     نظام المراسلات (Messaging System)
                   </h4>
-                  <ul className="text-sm text-cyan-800 space-y-1 mr-6">
+                  <ul className="text-sm text-cyan-800 space-y-1 me-6">
                     <li>• التواصل المباشر بين العملاء والمحامين</li>
                     <li>• مراسلات فورية آمنة ومشفرة</li>
                     <li>• مشاركة الملفات والمستندات</li>
@@ -202,7 +202,7 @@ function TermsPage() {
                 </div>
               </div>
 
-              <div className="bg-red-50 border-r-4 border-red-500 rounded-lg p-4 mt-6">
+              <div className="bg-red-50 border-e-4 border-red-500 rounded-lg p-4 mt-6">
                 <h4 className="font-bold text-red-900 mb-2">⚠️ دور المنصة</h4>
                 <p className="text-sm text-red-800">
                   ترافعلي هي منصة وسيطة تربط بين العملاء والمحامين. المنصة <strong>لا تقدم</strong> استشارات قانونية مباشرة 
@@ -436,7 +436,7 @@ function TermsPage() {
                 </p>
                 <div className="bg-red-50 border border-red-200 rounded-lg p-4">
                   <h4 className="font-semibold text-red-900 mb-2">محظور:</h4>
-                  <ul className="text-sm text-red-800 space-y-1 mr-4">
+                  <ul className="text-sm text-red-800 space-y-1 me-4">
                     <li>✗ نسخ أو تقليد تصميم المنصة</li>
                     <li>✗ استخدام شعار أو علامة ترافعلي دون إذن كتابي</li>
                     <li>✗ استخراج البيانات بطرق آلية (Scraping)</li>
@@ -461,14 +461,14 @@ function TermsPage() {
             <div className="space-y-6">
               <div>
                 <h3 className="text-xl font-semibold text-[#0f172a] mb-3">٨.١ السرية المهنية (Attorney-Client Privilege)</h3>
-                <div className="bg-purple-50 border-r-4 border-purple-500 rounded-lg p-5">
+                <div className="bg-purple-50 border-e-4 border-purple-500 rounded-lg p-5">
                   <p className="text-purple-900 font-medium mb-3">
                     🔒 جميع المحامين المسجلين ملزمون بالحفاظ على <strong>السرية التامة</strong> لمعلومات العملاء 
                     وفقاً لقواعد السلوك المهني للمحامين في المملكة العربية السعودية.
                   </p>
                   <div className="bg-white rounded-lg p-4 mt-3">
                     <p className="text-sm font-semibold text-purple-900 mb-2">لا يجوز للمحامي:</p>
-                    <ul className="text-sm text-purple-800 space-y-1 mr-4">
+                    <ul className="text-sm text-purple-800 space-y-1 me-4">
                       <li>✗ الإفصاح عن معلومات العميل لأي طرف ثالث</li>
                       <li>✗ استخدام معلومات العميل لأغراض شخصية</li>
                       <li>✗ مناقشة تفاصيل القضية علناً</li>
@@ -516,7 +516,7 @@ function TermsPage() {
               <div className="grid md:grid-cols-2 gap-4">
                 <div>
                   <h4 className="font-semibold text-red-800 mb-2">محتوى غير قانوني:</h4>
-                  <ul className="text-sm text-red-700 space-y-1 mr-4">
+                  <ul className="text-sm text-red-700 space-y-1 me-4">
                     <li>• ترويج للجرائم أو الإرهاب</li>
                     <li>• غسيل الأموال أو الاحتيال</li>
                     <li>• انتهاك للقوانين السعودية</li>
@@ -524,7 +524,7 @@ function TermsPage() {
                 </div>
                 <div>
                   <h4 className="font-semibold text-red-800 mb-2">محتوى مسيء:</h4>
-                  <ul className="text-sm text-red-700 space-y-1 mr-4">
+                  <ul className="text-sm text-red-700 space-y-1 me-4">
                     <li>• خطاب كراهية أو تمييز</li>
                     <li>• تشهير أو قذف</li>
                     <li>• تهديدات أو تحرش</li>
@@ -532,7 +532,7 @@ function TermsPage() {
                 </div>
                 <div>
                   <h4 className="font-semibold text-red-800 mb-2">محتوى مضلل:</h4>
-                  <ul className="text-sm text-red-700 space-y-1 mr-4">
+                  <ul className="text-sm text-red-700 space-y-1 me-4">
                     <li>• معلومات قانونية كاذبة</li>
                     <li>• انتحال شخصية</li>
                     <li>• بيانات مزيفة</li>
@@ -540,7 +540,7 @@ function TermsPage() {
                 </div>
                 <div>
                   <h4 className="font-semibold text-red-800 mb-2">انتهاكات الملكية:</h4>
-                  <ul className="text-sm text-red-700 space-y-1 mr-4">
+                  <ul className="text-sm text-red-700 space-y-1 me-4">
                     <li>• محتوى محمي بحقوق النشر</li>
                     <li>• علامات تجارية مزيفة</li>
                     <li>• برامج مقرصنة</li>
@@ -573,7 +573,7 @@ function TermsPage() {
                 </h3>
                 <div className="space-y-3 text-amber-900">
                   <p className="font-medium">ترافعلي هي منصة وسيطة <strong>تربط</strong> بين العملاء والمحامين. نحن:</p>
-                  <ul className="space-y-2 mr-4">
+                  <ul className="space-y-2 me-4">
                     <li className="flex gap-2">
                       <span className="text-red-600 font-bold">✗</span>
                       <span><strong>لا نقدم</strong> استشارات قانونية</span>
@@ -622,7 +622,7 @@ function TermsPage() {
               <div>
                 <h3 className="text-xl font-semibold text-[#0f172a] mb-4">نظام حل النزاعات (٣ مراحل)</h3>
                 <div className="space-y-4">
-                  <div className="bg-green-50 border-r-4 border-green-500 rounded-lg p-5">
+                  <div className="bg-green-50 border-e-4 border-green-500 rounded-lg p-5">
                     <div className="flex items-start gap-3">
                       <span className="bg-green-500 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold flex-shrink-0">١</span>
                       <div>
@@ -634,7 +634,7 @@ function TermsPage() {
                     </div>
                   </div>
 
-                  <div className="bg-blue-50 border-r-4 border-blue-500 rounded-lg p-5">
+                  <div className="bg-blue-50 border-e-4 border-blue-500 rounded-lg p-5">
                     <div className="flex items-start gap-3">
                       <span className="bg-blue-500 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold flex-shrink-0">٢</span>
                       <div>
@@ -646,7 +646,7 @@ function TermsPage() {
                     </div>
                   </div>
 
-                  <div className="bg-purple-50 border-r-4 border-purple-500 rounded-lg p-5">
+                  <div className="bg-purple-50 border-e-4 border-purple-500 rounded-lg p-5">
                     <div className="flex items-start gap-3">
                       <span className="bg-purple-500 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold flex-shrink-0">٣</span>
                       <div>
@@ -684,7 +684,7 @@ function TermsPage() {
                 </p>
                 <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                   <p className="text-sm font-semibold text-blue-900 mb-2">عند الإنهاء:</p>
-                  <ul className="text-sm text-blue-800 space-y-1 mr-4">
+                  <ul className="text-sm text-blue-800 space-y-1 me-4">
                     <li>• يتم إيقاف الوصول فوراً</li>
                     <li>• تُحذف البيانات الشخصية خلال <strong>٩٠ يوماً</strong></li>
                     <li>• تبقى الالتزامات المالية سارية</li>
@@ -699,7 +699,7 @@ function TermsPage() {
                   <p className="text-red-900 font-medium mb-3">
                     نحتفظ بالحق في تعليق أو إنهاء حسابك <strong>فوراً ودون إشعار مسبق</strong> في الحالات التالية:
                   </p>
-                  <ul className="text-sm text-red-800 space-y-2 mr-4">
+                  <ul className="text-sm text-red-800 space-y-2 me-4">
                     <li>• انتهاك القوانين السعودية</li>
                     <li>• الاحتيال أو التزوير</li>
                     <li>• انتحال الشخصية</li>
@@ -727,7 +727,7 @@ function TermsPage() {
                 </p>
                 <div className="bg-white rounded-lg p-4">
                   <p className="text-sm font-semibold text-purple-900 mb-2">هذا يشمل:</p>
-                  <ul className="text-sm text-purple-800 space-y-1 mr-4">
+                  <ul className="text-sm text-purple-800 space-y-1 me-4">
                     <li>✓ الحصول على موافقة صريحة لمعالجة البيانات</li>
                     <li>✓ احترام حقوق أصحاب البيانات (الوصول، التصحيح، المحو)</li>
                     <li>✓ تعيين مسؤول حماية بيانات (DPO)</li>
@@ -823,7 +823,7 @@ function TermsPage() {
                   <span>❓ كيف أتأكد من أن المحامي مرخص؟</span>
                   <span className="text-emerald-600 group-open:rotate-180 transition-transform">▼</span>
                 </summary>
-                <p className="text-sm text-slate-700 mt-3 mr-6">
+                <p className="text-sm text-slate-700 mt-3 me-6">
                   جميع المحامين المسجلين يُعرضون رقم ترخيصهم من وزارة العدل. 
                   يمكنك التحقق عبر موقع وزارة العدل.
                 </p>
@@ -834,7 +834,7 @@ function TermsPage() {
                   <span>❓ ماذا لو لم أكن راضياً عن الخدمة؟</span>
                   <span className="text-emerald-600 group-open:rotate-180 transition-transform">▼</span>
                 </summary>
-                <p className="text-sm text-slate-700 mt-3 mr-6">
+                <p className="text-sm text-slate-700 mt-3 me-6">
                   يمكنك تقديم شكوى خلال ٧ أيام. سنراجع الحالة وقد نطلب تعديلات أو نسترد المبلغ حسب الحالة.
                 </p>
               </details>
@@ -844,7 +844,7 @@ function TermsPage() {
                   <span>❓ هل معلوماتي آمنة؟</span>
                   <span className="text-emerald-600 group-open:rotate-180 transition-transform">▼</span>
                 </summary>
-                <p className="text-sm text-slate-700 mt-3 mr-6">
+                <p className="text-sm text-slate-700 mt-3 me-6">
                   نعم، نستخدم أعلى معايير التشفير (AES-256-GCM) والأمان. 
                   راجع <a href="/privacy" className="text-emerald-600 hover:underline">سياسة الخصوصية</a> للمزيد من التفاصيل.
                 </p>
@@ -855,7 +855,7 @@ function TermsPage() {
                   <span>❓ كم تستغرق عملية حل النزاعات؟</span>
                   <span className="text-emerald-600 group-open:rotate-180 transition-transform">▼</span>
                 </summary>
-                <p className="text-sm text-slate-700 mt-3 mr-6">
+                <p className="text-sm text-slate-700 mt-3 me-6">
                   عادة ١-١٤ يوماً حسب تعقيد الحالة ومدى تعاون الطرفين.
                 </p>
               </details>
@@ -865,7 +865,7 @@ function TermsPage() {
                   <span>❓ كيف يتم تحويل الأموال للمحامي؟</span>
                   <span className="text-emerald-600 group-open:rotate-180 transition-transform">▼</span>
                 </summary>
-                <p className="text-sm text-slate-700 mt-3 mr-6">
+                <p className="text-sm text-slate-700 mt-3 me-6">
                   بعد تأكيد العميل على اكتمال العمل أو بعد ١٤ يوماً تلقائياً، 
                   تُحول الأموال للمحامي بعد خصم عمولة المنصة (١٠٪).
                 </p>

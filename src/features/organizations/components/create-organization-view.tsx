@@ -393,7 +393,7 @@ export function CreateOrganizationView() {
                 <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-emerald-500/50 to-transparent"></div>
             </Header>
 
-            <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-r border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
+            <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-e border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
                 {/* HERO CARD */}
                 <ProductivityHero badge="المنظمات" title="إنشاء منظمة" type="organizations" listMode={true} />
 
@@ -851,7 +851,7 @@ export function CreateOrganizationView() {
                                                             <SelectValue placeholder="اختر جهة الاتصال" />
                                                         </SelectTrigger>
                                                         <SelectContent>
-                                                            {contactsData?.data?.map((c: any) => (
+                                                            {(contactsData?.data ?? contactsData?.contacts ?? [])?.map((c: any) => (
                                                                 <SelectItem key={c._id} value={c._id}>
                                                                     {c.firstName} {c.lastName}
                                                                 </SelectItem>

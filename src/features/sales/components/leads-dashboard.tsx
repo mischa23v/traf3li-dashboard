@@ -959,7 +959,7 @@ export function LeadsDashboard() {
 
           <div className="flex items-center gap-2 flex-1 max-w-md">
             <div className="relative flex-1">
-              <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
+              <Search className="absolute end-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
               <Input
                 placeholder="بحث عن عملاء محتملين..."
                 value={searchQuery}

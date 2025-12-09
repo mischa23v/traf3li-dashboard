@@ -314,7 +314,7 @@ export function OutstandingInvoicesReport() {
                     {index + 1} فاتورة {index < 2 ? 'متأخرة' : 'مستحقة'}
                   </p>
                 </div>
-                <div className="text-left">
+                <div className="text-start">
                   <p className="font-bold">{((index + 1) * 25000).toLocaleString('ar-SA')} ر.س</p>
                   {index < 2 && (
                     <p className="text-sm text-red-600">متأخر {(index + 1) * 15} يوم</p>

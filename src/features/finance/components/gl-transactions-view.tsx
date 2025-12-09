@@ -323,7 +323,7 @@ export function GLTransactionsView({
             {/* Search */}
             <div className="flex-1 min-w-[250px]">
               <div className="relative">
-                <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-600" aria-hidden="true" />
+                <Search className="absolute end-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-600" aria-hidden="true" />
                 <Input
                   placeholder="بحث في الوصف..."
                   className="pe-10 rounded-xl border-slate-200 focus:ring-emerald-500 focus:border-emerald-500"
@@ -364,7 +364,7 @@ export function GLTransactionsView({
                   <TableHead className="font-bold text-slate-900">التاريخ</TableHead>
                   <TableHead className="font-bold text-slate-900">الوصف</TableHead>
                   <TableHead className="font-bold text-slate-900">النوع</TableHead>
-                  <TableHead className="font-bold text-slate-900 text-left">المبلغ</TableHead>
+                  <TableHead className="font-bold text-slate-900 text-start">المبلغ</TableHead>
                   <TableHead className="font-bold text-slate-900">القضية</TableHead>
                 </TableRow>
               </TableHeader>
@@ -387,7 +387,7 @@ export function GLTransactionsView({
                           {getTypeLabel(txn.type)}
                         </Badge>
                       </TableCell>
-                      <TableCell className="text-left font-bold text-emerald-600 whitespace-nowrap">
+                      <TableCell className="text-start font-bold text-emerald-600 whitespace-nowrap">
                         {formatSAR(halalasToSAR(txn.amount))}
                       </TableCell>
                       <TableCell>

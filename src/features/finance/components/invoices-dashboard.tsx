@@ -96,8 +96,10 @@ export default function InvoicesDashboard() {
 
     // Transform API data to component format
     const invoices = useMemo(() => {
-        if (!invoicesData?.invoices) return []
-        return invoicesData.invoices.map((inv: any) => ({
+        if (!invoicesData) return []
+        // Handle both { invoices: [] } and { data: [] } response structures
+        const invoiceArray = invoicesData.invoices ?? invoicesData.data ?? []
+        return invoiceArray.map((inv: any) => ({
             id: inv.invoiceNumber || inv._id,
             client: inv.clientId?.name || inv.clientId?.firstName + ' ' + inv.clientId?.lastName || 'عميل غير محدد',
             amount: inv.totalAmount || 0,
@@ -120,9 +122,10 @@ export default function InvoicesDashboard() {
 
     // Calculate statistics
     const stats = useMemo(() => {
-        if (!invoicesData?.invoices) return { totalPending: 0, totalOverdue: 0, totalPaidThisMonth: 0 }
+        if (!invoicesData) return { totalPending: 0, totalOverdue: 0, totalPaidThisMonth: 0 }
 
-        const allInvoices = invoicesData.invoices
+        // Handle both { invoices: [] } and { data: [] } response structures
+        const allInvoices = invoicesData.invoices ?? invoicesData.data ?? []
         const totalPending = allInvoices
             .filter((inv: any) => inv.status === 'pending' || inv.status === 'sent')
             .reduce((sum: number, inv: any) => sum + (inv.balanceDue || inv.totalAmount || 0), 0)
@@ -172,12 +175,12 @@ export default function InvoicesDashboard() {
                     </div>
                     <div className='ms-auto flex items-center gap-4'>
                         <div className="relative hidden md:block">
-                            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-600" aria-hidden="true" />
+                            <Search className="absolute end-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-600" aria-hidden="true" />
                             <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
                         </div>
                         <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white" aria-label="الإشعارات">
                             <Bell className="h-5 w-5" aria-hidden="true" />
-                            <span className="absolute top-2 right-2 h-2 w-2 bg-red-500 rounded-full border border-navy"></span>
+                            <span className="absolute top-2 end-2 h-2 w-2 bg-red-500 rounded-full border border-navy"></span>
                         </Button>
                         <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white" />
                         <ThemeSwitch className="text-slate-300 hover:bg-white/10 hover:text-white" />
@@ -217,12 +220,12 @@ export default function InvoicesDashboard() {
                     </div>
                     <div className='ms-auto flex items-center gap-4'>
                         <div className="relative hidden md:block">
-                            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-600" aria-hidden="true" />
+                            <Search className="absolute end-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-600" aria-hidden="true" />
                             <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
                         </div>
                         <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white" aria-label="الإشعارات">
                             <Bell className="h-5 w-5" aria-hidden="true" />
-                            <span className="absolute top-2 right-2 h-2 w-2 bg-red-500 rounded-full border border-navy"></span>
+                            <span className="absolute top-2 end-2 h-2 w-2 bg-red-500 rounded-full border border-navy"></span>
                         </Button>
                         <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white" />
                         <ThemeSwitch className="text-slate-300 hover:bg-white/10 hover:text-white" />
@@ -263,12 +266,12 @@ export default function InvoicesDashboard() {
 
                 <div className='ms-auto flex items-center gap-4'>
                     <div className="relative hidden md:block">
-                        <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-600" aria-hidden="true" />
+                        <Search className="absolute end-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-600" aria-hidden="true" />
                         <input type="text" placeholder="بحث..." className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
                     </div>
                     <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white">
                         <Bell className="h-5 w-5" aria-hidden="true" />
-                        <span className="absolute top-2 right-2 h-2 w-2 bg-red-500 rounded-full border border-navy"></span>
+                        <span className="absolute top-2 end-2 h-2 w-2 bg-red-500 rounded-full border border-navy"></span>
                     </Button>
                     <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white" />
                     <ThemeSwitch className="text-slate-300 hover:bg-white/10 hover:text-white" />
@@ -279,7 +282,7 @@ export default function InvoicesDashboard() {
                 <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-emerald-500/50 to-transparent"></div>
             </Header>
 
-            <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-r border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
+            <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-e border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
 
                 {/* HERO CARD & STATS */}
                 <ProductivityHero badge="الفواتير" title="الفواتير" type="invoices" />
@@ -339,7 +342,7 @@ export default function InvoicesDashboard() {
 
                                             <div className="flex items-center gap-3">
                                                 <div className="relative w-full max-w-xs">
-                                                    <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-600" aria-hidden="true" />
+                                                    <Search className="absolute end-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-600" aria-hidden="true" />
                                                     <Input
                                                         placeholder="بحث في الفواتير..."
                                                         className="pe-10 rounded-xl border-slate-200 focus:ring-[#022c22] focus:border-[#022c22]"
@@ -516,11 +519,11 @@ export default function InvoicesDashboard() {
                                                     </div>
                                                 </div>
                                                 <div className="flex items-center gap-8 border-t md:border-t-0 border-slate-100 pt-4 md:pt-0">
-                                                    <div className="text-center md:text-right">
+                                                    <div className="text-center md:text-end">
                                                         <div className="text-xs text-slate-600 mb-1">تاريخ الاستحقاق</div>
                                                         <div className="font-bold text-navy">{inv.dueDate}</div>
                                                     </div>
-                                                    <div className="text-center md:text-right">
+                                                    <div className="text-center md:text-end">
                                                         <div className="text-xs text-slate-600 mb-1">المبلغ</div>
                                                         <div className="font-bold text-xl text-navy">{formatCurrency(inv.amount)}</div>
                                                     </div>

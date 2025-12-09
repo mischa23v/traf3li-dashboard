@@ -113,7 +113,7 @@ export function Dashboard() {
       </Header>
 
       {/* ===== Main ===== */}
-      <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-r border-white/5 overflow-hidden">
+      <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-e border-white/5 overflow-hidden">
 
         {/* HERO BANNER */}
         <div className="bg-navy rounded-3xl p-8 relative overflow-hidden text-white shadow-xl shadow-navy/20 group">
@@ -273,6 +273,24 @@ export function Dashboard() {
                       const eventTime = event.startDate ? new Date(event.startDate).toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' }) : t('dashboard.schedule.notSpecified')
                       const colorMap = { meeting: 'blue', session: 'green', deadline: 'amber' }
                       const eventColor = colorMap[event.type] || 'blue'
+
+                      // Static color class mappings
+                      const lineColorClasses = {
+                        blue: 'bg-blue-500',
+                        green: 'bg-green-500',
+                        amber: 'bg-amber-500',
+                        red: 'bg-red-500',
+                        emerald: 'bg-emerald-500'
+                      }
+
+                      const badgeColorClasses = {
+                        blue: 'bg-blue-50 text-blue-700',
+                        green: 'bg-green-50 text-green-700',
+                        amber: 'bg-amber-50 text-amber-700',
+                        red: 'bg-red-50 text-red-700',
+                        emerald: 'bg-emerald-50 text-emerald-700'
+                      }
+
                       return (
                         <Link
                           key={event._id}
@@ -281,12 +299,12 @@ export function Dashboard() {
                           className="flex items-center p-6 hover:bg-slate-50/80 transition-colors group cursor-pointer block"
                         >
                           <div className="w-20 font-bold text-slate-600 text-sm">{eventTime}</div>
-                          <div className={`w-1.5 h-12 rounded-full bg-${eventColor}-500 me-4 ms-2`}></div>
+                          <div className={`w-1.5 h-12 rounded-full ${lineColorClasses[eventColor] || lineColorClasses.blue} me-4 ms-2`}></div>
                           <div className="flex-1">
                             <h4 className="font-bold text-navy text-lg group-hover:text-brand-blue transition-colors">{event.title}</h4>
                             <div className="flex items-center gap-4 mt-1 text-xs font-medium text-slate-500">
                               <span className="flex items-center gap-1"><MapPinIcon className="h-3 w-3" /> {typeof event.location === 'string' ? event.location : (event.location?.name || event.location?.address || t('dashboard.schedule.remote'))}</span>
-                              <span className={`bg-${eventColor}-50 text-${eventColor}-700 px-2 py-0.5 rounded-md font-bold`}>
+                              <span className={`${badgeColorClasses[eventColor] || badgeColorClasses.blue} px-2 py-0.5 rounded-md font-bold`}>
                                 {event.type === 'session' ? t('dashboard.schedule.eventTypes.session') : event.type === 'meeting' ? t('dashboard.schedule.eventTypes.meeting') : t('dashboard.schedule.eventTypes.deadline')}
                               </span>
                             </div>
@@ -346,7 +364,7 @@ export function Dashboard() {
                       <div className="mt-3 w-full bg-white rounded-full h-2 overflow-hidden">
                         <div className="bg-purple-500 h-full w-3/4"></div>
                       </div>
-                      <p className="text-xs text-purple-600 font-bold mt-2 text-left">{t('dashboard.training.progress', { percent: 75 })}</p>
+                      <p className="text-xs text-purple-600 font-bold mt-2 text-start">{t('dashboard.training.progress', { percent: 75 })}</p>
                     </div>
                     <Button variant="ghost" className="w-full text-purple-600 hover:bg-purple-50 rounded-xl">{t('dashboard.training.continue')}</Button>
                   </div>

@@ -134,7 +134,7 @@ function PrivacyPage() {
                       <p className="text-sm text-amber-800 mb-3">
                         نستخدم <strong>Stripe</strong> لمعالجة المدفوعات. نخزن فقط:
                       </p>
-                      <ul className="text-sm text-amber-800 space-y-1 mr-4">
+                      <ul className="text-sm text-amber-800 space-y-1 me-4">
                         <li>• Payment Intent ID من Stripe</li>
                         <li>• آخر 4 أرقام من البطاقة</li>
                         <li>• نوع البطاقة (Visa, Mada, إلخ)</li>
@@ -182,7 +182,7 @@ function PrivacyPage() {
             <h2 className="text-2xl font-bold text-[#0f172a] mb-6 pb-3 border-b-2 border-emerald-500">٢. الأساس القانوني لمعالجة البيانات</h2>
             
             <div className="space-y-4">
-              <div className="bg-green-50 border-r-4 border-green-500 rounded-lg p-5">
+              <div className="bg-green-50 border-e-4 border-green-500 rounded-lg p-5">
                 <h3 className="font-bold text-green-900 mb-2 flex items-center gap-2">
                   <span>✓</span>
                   الموافقة (Consent)
@@ -193,7 +193,7 @@ function PrivacyPage() {
                 </p>
               </div>
 
-              <div className="bg-blue-50 border-r-4 border-blue-500 rounded-lg p-5">
+              <div className="bg-blue-50 border-e-4 border-blue-500 rounded-lg p-5">
                 <h3 className="font-bold text-blue-900 mb-2 flex items-center gap-2">
                   <span>📝</span>
                   تنفيذ العقد (Contract Performance)
@@ -203,7 +203,7 @@ function PrivacyPage() {
                 </p>
               </div>
 
-              <div className="bg-purple-50 border-r-4 border-purple-500 rounded-lg p-5">
+              <div className="bg-purple-50 border-e-4 border-purple-500 rounded-lg p-5">
                 <h3 className="font-bold text-purple-900 mb-2 flex items-center gap-2">
                   <span>⚖️</span>
                   الالتزام القانوني (Legal Obligation)
@@ -213,7 +213,7 @@ function PrivacyPage() {
                 </p>
               </div>
 
-              <div className="bg-orange-50 border-r-4 border-orange-500 rounded-lg p-5">
+              <div className="bg-orange-50 border-e-4 border-orange-500 rounded-lg p-5">
                 <h3 className="font-bold text-orange-900 mb-2 flex items-center gap-2">
                   <span>🎯</span>
                   المصالح المشروعة (Legitimate Interests)
@@ -292,7 +292,7 @@ function PrivacyPage() {
               <p className="text-sm text-amber-800">
                 لن نرسل لك رسائل تسويقية إلا بموافقتك. يمكنك إلغاء الاشتراك في أي وقت عبر:
               </p>
-              <ul className="text-sm text-amber-800 mt-2 mr-4">
+              <ul className="text-sm text-amber-800 mt-2 me-4">
                 <li>• رابط "إلغاء الاشتراك" في البريد الإلكتروني</li>
                 <li>• إعدادات الإشعارات في حسابك</li>
                 <li>• التواصل مع: privacy@traf3li.com</li>
@@ -351,7 +351,7 @@ function PrivacyPage() {
                   <p className="text-sm text-slate-700 mb-3">
                     قد نكشف عن بياناتك للجهات الحكومية في الحالات التالية:
                   </p>
-                  <ul className="text-sm text-slate-700 space-y-2 mr-4">
+                  <ul className="text-sm text-slate-700 space-y-2 me-4">
                     <li>• أوامر المحكمة</li>
                     <li>• طلبات الجهات الأمنية</li>
                     <li>• الامتثال التنظيمي (وزارة التجارة، هيئة الزكاة، SDAIA)</li>
@@ -663,7 +663,7 @@ function PrivacyPage() {
               </div>
               <div className="bg-white rounded-lg p-4 mt-4">
                 <p className="text-sm font-semibold text-red-900 mb-2">سنوفر لك:</p>
-                <ul className="text-sm text-red-800 space-y-1 mr-4">
+                <ul className="text-sm text-red-800 space-y-1 me-4">
                   <li>• طبيعة الانتهاك وما حدث بالضبط</li>
                   <li>• البيانات المتأثرة</li>
                   <li>• التدابير المتخذة للاحتواء</li>
@@ -790,7 +790,7 @@ function PrivacyPage() {
               <p className="text-sm text-amber-800">
                 إذا كنت غير راضي عن طريقة تعاملنا مع بياناتك:
               </p>
-              <ol className="text-sm text-amber-800 space-y-1 mr-4 mt-2">
+              <ol className="text-sm text-amber-800 space-y-1 me-4 mt-2">
                 <li>1. اتصل بنا أولاً: privacy@traf3li.com</li>
                 <li>2. إذا لم تكن راضياً، قدم شكوى إلى SDAIA</li>
               </ol>

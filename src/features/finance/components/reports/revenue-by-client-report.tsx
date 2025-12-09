@@ -206,7 +206,7 @@ export function RevenueByClientReport() {
                 <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-emerald-500/50 to-transparent"></div>
             </Header>
 
-            <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-r border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
+            <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-e border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
                 <div className="max-w-7xl mx-auto space-y-6">
 
                     {/* Hero Header */}
@@ -414,7 +414,7 @@ export function RevenueByClientReport() {
                                 <Table>
                                     <TableHeader>
                                         <TableRow className="bg-slate-50/50">
-                                            <TableHead className="text-right font-bold text-slate-700">العميل</TableHead>
+                                            <TableHead className="text-end font-bold text-slate-700">العميل</TableHead>
                                             <TableHead className="text-center font-bold text-slate-700">الفواتير</TableHead>
                                             <TableHead className="text-center font-bold text-slate-700">الإيرادات</TableHead>
                                             <TableHead className="text-center font-bold text-slate-700">المحصل</TableHead>

@@ -135,7 +135,7 @@ export function OnboardingDetailsView() {
         <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-emerald-500/50 to-transparent"></div>
       </Header>
 
-      <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-r border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
+      <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-e border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
 
         {/* Loading State */}
         {isLoading && (
@@ -285,7 +285,7 @@ export function OnboardingDetailsView() {
                           {onboarding.completion.tasksCompleted} من {onboarding.completion.tasksTotal} مهمة مكتملة
                         </p>
                       </div>
-                      <div className="text-right">
+                      <div className="text-end">
                         <span className="text-3xl font-bold text-navy">{onboarding.completion.completionPercentage}%</span>
                       </div>
                     </div>

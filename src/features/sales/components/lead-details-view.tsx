@@ -422,7 +422,7 @@ export default function LeadDetailsView() {
                                     {lead.activities && lead.activities.length > 0 ? (
                                         <div className="space-y-4">
                                             {lead.activities.map((activity) => (
-                                                <div key={activity._id} className="flex gap-4 border-r-2 border-emerald-500 pe-4">
+                                                <div key={activity._id} className="flex gap-4 border-e-2 border-emerald-500 pe-4">
                                                     <div className="flex-1">
                                                         <div className="flex items-center gap-2 mb-1">
                                                             <Badge variant="outline" className="text-xs">

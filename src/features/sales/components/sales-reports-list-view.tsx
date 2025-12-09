@@ -210,7 +210,7 @@ export function SalesReportsListView() {
         <div className="flex flex-wrap items-center gap-4">
           <div className="flex-1 min-w-[200px] max-w-md">
             <div className="relative">
-              <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
+              <Search className="absolute end-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
               <Input
                 placeholder="بحث في التقارير..."
                 value={searchQuery}
@@ -280,11 +280,11 @@ export function SalesReportsListView() {
           <Table>
             <TableHeader>
               <TableRow className="bg-slate-50/50">
-                <TableHead className="text-right">التقرير</TableHead>
-                <TableHead className="text-right">الفئة</TableHead>
-                <TableHead className="text-right">الحالة</TableHead>
-                <TableHead className="text-right">تاريخ الإنشاء</TableHead>
-                <TableHead className="text-right">آخر تحديث</TableHead>
+                <TableHead className="text-end">التقرير</TableHead>
+                <TableHead className="text-end">الفئة</TableHead>
+                <TableHead className="text-end">الحالة</TableHead>
+                <TableHead className="text-end">تاريخ الإنشاء</TableHead>
+                <TableHead className="text-end">آخر تحديث</TableHead>
                 <TableHead className="text-center w-[100px]">الإجراءات</TableHead>
               </TableRow>
             </TableHeader>
