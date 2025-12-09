@@ -40,12 +40,21 @@ class SocketService {
     })
 
     this.socket.on('disconnect', (reason) => {
+      if (import.meta.env.DEV) {
+        console.warn('[Socket] Disconnected:', reason)
+      }
     })
 
     this.socket.on('connect_error', (error) => {
+      if (import.meta.env.DEV) {
+        console.warn('[Socket] Connection error:', error.message)
+      }
     })
 
     this.socket.on('error', (error) => {
+      if (import.meta.env.DEV) {
+        console.error('[Socket] Error:', error)
+      }
     })
   }
 
