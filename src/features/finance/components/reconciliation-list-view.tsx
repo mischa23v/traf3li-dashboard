@@ -1,5 +1,6 @@
 import { FinanceSidebar } from './finance-sidebar'
 import { useState, useMemo } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Main } from '@/components/layout/main'
 import { LanguageSwitcher } from '@/components/language-switcher'
 import { ThemeSwitch } from '@/components/theme-switch'
@@ -8,18 +9,21 @@ import { ProfileDropdown } from '@/components/profile-dropdown'
 import { Link } from '@tanstack/react-router'
 import { Checkbox } from '@/components/ui/checkbox'
 import { ProductivityHero } from '@/components/productivity-hero'
-import { useBankFeeds, useBankTransactions, useDeleteBankFeed } from '@/hooks/useFinanceAdvanced'
+import { useBankFeeds, useDeleteBankFeed } from '@/hooks/useFinanceAdvanced'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Header } from '@/components/layout/header'
 import { TopNav } from '@/components/layout/top-nav'
 import { DynamicIsland } from '@/components/dynamic-island'
-import { Search, Bell, AlertCircle, Building2, Plus, MoreHorizontal, ChevronLeft, Eye, Trash2, Edit3, SortAsc, Filter, X, CreditCard, TrendingUp, CheckCircle2, XCircle, Clock, ArrowRightLeft } from 'lucide-react'
+import { Input } from '@/components/ui/input'
+import {
+    Search, Bell, AlertCircle, Building2, Plus, MoreHorizontal, ChevronLeft,
+    Eye, Trash2, Edit3, SortAsc, X, CheckCircle2, XCircle, Clock, ArrowRightLeft
+} from 'lucide-react'
 import { useNavigate } from '@tanstack/react-router'
 import { format } from 'date-fns'
-import { arSA } from 'date-fns/locale'
-import { Input } from '@/components/ui/input'
+import { arSA, enUS } from 'date-fns/locale'
 import {
     Select,
     SelectContent,
@@ -36,6 +40,8 @@ import {
 } from '@/components/ui/dropdown-menu'
 
 export function ReconciliationListView() {
+    const { t, i18n } = useTranslation()
+    const isRTL = i18n.language === 'ar'
     const navigate = useNavigate()
     const [isSelectionMode, setIsSelectionMode] = useState(false)
     const [selectedIds, setSelectedIds] = useState<string[]>([])
@@ -52,23 +58,9 @@ export function ReconciliationListView() {
     // API Filters
     const filters = useMemo(() => {
         const f: any = {}
-
-        // Status filter
-        if (statusFilter !== 'all') {
-            f.status = statusFilter
-        }
-
-        // Type filter
-        if (typeFilter !== 'all') {
-            f.accountType = typeFilter
-        }
-
-        // Search
-        if (searchQuery.trim()) {
-            f.search = searchQuery.trim()
-        }
-
-        // Sort
+        if (statusFilter !== 'all') f.status = statusFilter
+        if (typeFilter !== 'all') f.accountType = typeFilter
+        if (searchQuery.trim()) f.search = searchQuery.trim()
         if (sortBy === 'lastReconciled') {
             f.sortBy = 'lastReconciled'
             f.sortOrder = 'desc'
@@ -79,7 +71,6 @@ export function ReconciliationListView() {
             f.sortBy = 'balance'
             f.sortOrder = 'desc'
         }
-
         return f
     }, [statusFilter, typeFilter, searchQuery, sortBy])
 
@@ -98,12 +89,9 @@ export function ReconciliationListView() {
 
     // Helper function to format dates in both languages
     const formatDualDate = (dateString: string | null | undefined) => {
-        if (!dateString) return { arabic: 'غير محدد', english: 'Not set' }
+        if (!dateString) return isRTL ? 'غير محدد' : 'Not set'
         const date = new Date(dateString)
-        return {
-            arabic: format(date, 'd MMMM yyyy', { locale: arSA }),
-            english: format(date, 'MMM d, yyyy')
-        }
+        return format(date, isRTL ? 'd MMMM yyyy' : 'MMM d, yyyy', { locale: isRTL ? arSA : enUS })
     }
 
     // Transform API data
@@ -112,9 +100,9 @@ export function ReconciliationListView() {
 
         return bankFeedsData.data.map((feed: any) => ({
             id: feed._id,
-            accountName: feed.accountName || 'غير محدد',
+            accountName: feed.accountName || (isRTL ? 'غير محدد' : 'Not specified'),
             accountNumber: feed.accountNumber || '',
-            bankName: feed.bankName || 'غير محدد',
+            bankName: feed.bankName || (isRTL ? 'غير محدد' : 'Not specified'),
             accountType: feed.accountType || 'checking',
             currency: feed.currency || 'SAR',
             balance: feed.balance || 0,
@@ -127,7 +115,7 @@ export function ReconciliationListView() {
             isConnected: feed.isConnected || false,
             _id: feed._id,
         }))
-    }, [bankFeedsData])
+    }, [bankFeedsData, isRTL])
 
     // Selection Handlers
     const handleToggleSelectionMode = () => {
@@ -145,8 +133,11 @@ export function ReconciliationListView() {
 
     const handleDeleteSelected = () => {
         if (selectedIds.length === 0) return
+        const confirmMsg = isRTL
+            ? `هل أنت متأكد من حذف ${selectedIds.length} حساب بنكي؟`
+            : `Are you sure you want to delete ${selectedIds.length} bank account(s)?`
 
-        if (confirm(`هل أنت متأكد من حذف ${selectedIds.length} حساب بنكي؟`)) {
+        if (confirm(confirmMsg)) {
             selectedIds.forEach(id => {
                 deleteBankFeedMutation.mutate(id)
             })
@@ -165,7 +156,11 @@ export function ReconciliationListView() {
     }
 
     const handleDeleteBankFeed = (feedId: string) => {
-        if (confirm('هل أنت متأكد من حذف هذا الحساب البنكي؟')) {
+        const confirmMsg = isRTL
+            ? 'هل أنت متأكد من حذف هذا الحساب البنكي؟'
+            : 'Are you sure you want to delete this bank account?'
+
+        if (confirm(confirmMsg)) {
             deleteBankFeedMutation.mutate(feedId)
         }
     }
@@ -173,27 +168,29 @@ export function ReconciliationListView() {
     // Status badge styling
     const getStatusBadge = (status: string) => {
         const styles: Record<string, string> = {
-            active: 'bg-emerald-100 text-emerald-700 border-emerald-200',
-            inactive: 'bg-slate-100 text-slate-700 border-slate-200',
-            disconnected: 'bg-red-100 text-red-700 border-red-200',
+            active: 'bg-emerald-100 text-emerald-700 border-0',
+            inactive: 'bg-slate-100 text-slate-700 border-0',
+            disconnected: 'bg-red-100 text-red-700 border-0',
         }
-        const labels: Record<string, string> = {
-            active: 'نشط',
-            inactive: 'غير نشط',
-            disconnected: 'غير متصل',
+        const labels: Record<string, { ar: string; en: string }> = {
+            active: { ar: 'نشط', en: 'Active' },
+            inactive: { ar: 'غير نشط', en: 'Inactive' },
+            disconnected: { ar: 'غير متصل', en: 'Disconnected' },
         }
-        return <Badge className={`${styles[status] || styles.active} border-0 rounded-md px-2`}>{labels[status] || status}</Badge>
+        const label = labels[status] || { ar: status, en: status }
+        return <Badge className={`${styles[status] || styles.active} rounded-md px-2`}>{isRTL ? label.ar : label.en}</Badge>
     }
 
     // Account type badge
     const getTypeBadge = (type: string) => {
-        const labels: Record<string, string> = {
-            checking: 'جاري',
-            savings: 'توفير',
-            credit: 'بطاقة ائتمان',
-            loan: 'قرض',
+        const labels: Record<string, { ar: string; en: string }> = {
+            checking: { ar: 'جاري', en: 'Checking' },
+            savings: { ar: 'توفير', en: 'Savings' },
+            credit: { ar: 'بطاقة ائتمان', en: 'Credit Card' },
+            loan: { ar: 'قرض', en: 'Loan' },
         }
-        return <Badge variant="outline" className="text-xs">{labels[type] || type}</Badge>
+        const label = labels[type] || { ar: type, en: type }
+        return <Badge variant="outline" className="text-xs">{isRTL ? label.ar : label.en}</Badge>
     }
 
     // Connection status badge
@@ -201,12 +198,12 @@ export function ReconciliationListView() {
         return isConnected ? (
             <Badge className="bg-blue-100 text-blue-700 border-0 rounded-md px-2 text-xs">
                 <CheckCircle2 className="h-3 w-3 ms-1" aria-hidden="true" />
-                متصل
+                {isRTL ? 'متصل' : 'Connected'}
             </Badge>
         ) : (
             <Badge className="bg-amber-100 text-amber-700 border-0 rounded-md px-2 text-xs">
                 <Clock className="h-3 w-3 ms-1" aria-hidden="true" />
-                يدوي
+                {isRTL ? 'يدوي' : 'Manual'}
             </Badge>
         )
     }
@@ -221,18 +218,18 @@ export function ReconciliationListView() {
         const totalPending = bankFeedsData.data.reduce((sum: number, feed: any) => sum + (feed.stats?.pending || 0), 0)
 
         return [
-            { label: 'إجمالي الحسابات', value: totalAccounts || 0, icon: Building2, status: 'normal' as const },
-            { label: 'معاملات متطابقة', value: totalMatched || 0, icon: CheckCircle2, status: 'normal' as const },
-            { label: 'معاملات غير متطابقة', value: totalUnmatched || 0, icon: XCircle, status: totalUnmatched > 0 ? 'attention' as const : 'zero' as const },
-            { label: 'معاملات معلقة', value: totalPending || 0, icon: Clock, status: totalPending > 0 ? 'attention' as const : 'zero' as const },
+            { label: isRTL ? 'إجمالي الحسابات' : 'Total Accounts', value: totalAccounts || 0, icon: Building2, status: 'normal' as const },
+            { label: isRTL ? 'معاملات متطابقة' : 'Matched', value: totalMatched || 0, icon: CheckCircle2, status: 'normal' as const },
+            { label: isRTL ? 'غير متطابقة' : 'Unmatched', value: totalUnmatched || 0, icon: XCircle, status: totalUnmatched > 0 ? 'attention' as const : 'zero' as const },
+            { label: isRTL ? 'معلقة' : 'Pending', value: totalPending || 0, icon: Clock, status: totalPending > 0 ? 'attention' as const : 'zero' as const },
         ]
-    }, [bankFeedsData])
+    }, [bankFeedsData, isRTL])
 
     const topNav = [
-        { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
-        { title: 'الفواتير', href: '/dashboard/finance/invoices', isActive: false },
-        { title: 'المدفوعات', href: '/dashboard/finance/payments', isActive: false },
-        { title: 'التسوية البنكية', href: '/dashboard/finance/reconciliation', isActive: true },
+        { title: isRTL ? 'نظرة عامة' : 'Overview', href: '/dashboard/overview', isActive: false },
+        { title: isRTL ? 'الفواتير' : 'Invoices', href: '/dashboard/finance/invoices', isActive: false },
+        { title: isRTL ? 'المدفوعات' : 'Payments', href: '/dashboard/finance/payments', isActive: false },
+        { title: isRTL ? 'التسوية البنكية' : 'Reconciliation', href: '/dashboard/finance/reconciliation', isActive: true },
     ]
 
     return (
@@ -249,10 +246,14 @@ export function ReconciliationListView() {
                 <div className='ms-auto flex items-center gap-2 sm:gap-4 overflow-x-auto min-w-0'>
                     <div className="relative hidden md:block min-w-0">
                         <Search className="absolute end-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
-                        <input type="text" placeholder="بحث..." aria-label="بحث" className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50" />
+                        <input
+                            type="text"
+                            placeholder={t('common.search', isRTL ? 'بحث...' : 'Search...')}
+                            className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+                        />
                     </div>
-                    <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white flex-shrink-0" aria-label="الإشعارات">
-                        <Bell className="h-5 w-5" aria-hidden="true" />
+                    <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white flex-shrink-0">
+                        <Bell className="h-5 w-5" />
                         <span className="absolute top-2 end-2 h-2 w-2 bg-red-500 rounded-full border border-navy"></span>
                     </Button>
                     <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white flex-shrink-0" />
@@ -267,7 +268,12 @@ export function ReconciliationListView() {
             <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-e border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
 
                 {/* HERO CARD & STATS */}
-                <ProductivityHero badge="المالية" title="التسوية البنكية" type="reconciliation" stats={heroStats} />
+                <ProductivityHero
+                    badge={isRTL ? 'المالية' : 'Finance'}
+                    title={isRTL ? 'التسوية البنكية' : 'Bank Reconciliation'}
+                    type="reconciliation"
+                    stats={heroStats}
+                />
 
                 {/* MAIN GRID LAYOUT */}
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -285,8 +291,7 @@ export function ReconciliationListView() {
                                         <Search className="absolute end-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
                                         <Input
                                             type="text"
-                                            placeholder="بحث بالاسم أو رقم الحساب..."
-                                            aria-label="بحث بالاسم أو رقم الحساب"
+                                            placeholder={isRTL ? 'بحث بالاسم أو رقم الحساب...' : 'Search by name or account number...'}
                                             value={searchQuery}
                                             onChange={(e) => setSearchQuery(e.target.value)}
                                             className="pe-10 h-10 rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500/20"
@@ -295,28 +300,28 @@ export function ReconciliationListView() {
 
                                     {/* Status Filter */}
                                     <Select value={statusFilter} onValueChange={setStatusFilter}>
-                                        <SelectTrigger className="w-[130px] h-10 rounded-xl border-slate-200">
-                                            <SelectValue placeholder="الحالة" />
+                                        <SelectTrigger className="w-[140px] h-10 rounded-xl border-slate-200">
+                                            <SelectValue placeholder={isRTL ? 'الحالة' : 'Status'} />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            <SelectItem value="all">كل الحالات</SelectItem>
-                                            <SelectItem value="active">نشط</SelectItem>
-                                            <SelectItem value="inactive">غير نشط</SelectItem>
-                                            <SelectItem value="disconnected">غير متصل</SelectItem>
+                                            <SelectItem value="all">{isRTL ? 'كل الحالات' : 'All Statuses'}</SelectItem>
+                                            <SelectItem value="active">{isRTL ? 'نشط' : 'Active'}</SelectItem>
+                                            <SelectItem value="inactive">{isRTL ? 'غير نشط' : 'Inactive'}</SelectItem>
+                                            <SelectItem value="disconnected">{isRTL ? 'غير متصل' : 'Disconnected'}</SelectItem>
                                         </SelectContent>
                                     </Select>
 
                                     {/* Account Type Filter */}
                                     <Select value={typeFilter} onValueChange={setTypeFilter}>
-                                        <SelectTrigger className="w-[140px] h-10 rounded-xl border-slate-200">
-                                            <SelectValue placeholder="نوع الحساب" />
+                                        <SelectTrigger className="w-[150px] h-10 rounded-xl border-slate-200">
+                                            <SelectValue placeholder={isRTL ? 'نوع الحساب' : 'Account Type'} />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            <SelectItem value="all">كل الأنواع</SelectItem>
-                                            <SelectItem value="checking">جاري</SelectItem>
-                                            <SelectItem value="savings">توفير</SelectItem>
-                                            <SelectItem value="credit">بطاقة ائتمان</SelectItem>
-                                            <SelectItem value="loan">قرض</SelectItem>
+                                            <SelectItem value="all">{isRTL ? 'كل الأنواع' : 'All Types'}</SelectItem>
+                                            <SelectItem value="checking">{isRTL ? 'جاري' : 'Checking'}</SelectItem>
+                                            <SelectItem value="savings">{isRTL ? 'توفير' : 'Savings'}</SelectItem>
+                                            <SelectItem value="credit">{isRTL ? 'بطاقة ائتمان' : 'Credit Card'}</SelectItem>
+                                            <SelectItem value="loan">{isRTL ? 'قرض' : 'Loan'}</SelectItem>
                                         </SelectContent>
                                     </Select>
                                 </div>
@@ -327,12 +332,12 @@ export function ReconciliationListView() {
                                     <Select value={sortBy} onValueChange={setSortBy}>
                                         <SelectTrigger className="w-[160px] h-10 rounded-xl border-slate-200">
                                             <SortAsc className="h-4 w-4 ms-2 text-slate-500" aria-hidden="true" />
-                                            <SelectValue placeholder="ترتيب حسب" />
+                                            <SelectValue placeholder={isRTL ? 'ترتيب حسب' : 'Sort by'} />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            <SelectItem value="lastReconciled">آخر تسوية</SelectItem>
-                                            <SelectItem value="name">الاسم</SelectItem>
-                                            <SelectItem value="balance">الرصيد</SelectItem>
+                                            <SelectItem value="lastReconciled">{isRTL ? 'آخر تسوية' : 'Last Reconciled'}</SelectItem>
+                                            <SelectItem value="name">{isRTL ? 'الاسم' : 'Name'}</SelectItem>
+                                            <SelectItem value="balance">{isRTL ? 'الرصيد' : 'Balance'}</SelectItem>
                                         </SelectContent>
                                     </Select>
 
@@ -345,7 +350,7 @@ export function ReconciliationListView() {
                                             className="h-10 px-4 text-red-500 hover:text-red-600 hover:bg-red-50 rounded-xl"
                                         >
                                             <X className="h-4 w-4 ms-2" aria-hidden="true" />
-                                            مسح الفلاتر
+                                            {isRTL ? 'مسح الفلاتر' : 'Clear Filters'}
                                         </Button>
                                     )}
                                 </div>
@@ -355,9 +360,11 @@ export function ReconciliationListView() {
                         {/* MAIN BANK FEEDS LIST */}
                         <div className="bg-white rounded-3xl p-1 shadow-sm border border-slate-100">
                             <div className="p-6 pb-2 flex justify-between items-center">
-                                <h3 className="font-bold text-navy text-xl">الحسابات البنكية</h3>
+                                <h3 className="font-bold text-navy text-xl">
+                                    {isRTL ? 'الحسابات البنكية' : 'Bank Accounts'}
+                                </h3>
                                 <Badge className="bg-slate-100 text-slate-600 border-0 rounded-full px-4 py-1">
-                                    {bankFeeds.length} حساب
+                                    {isRTL ? `${bankFeeds.length} حساب` : `${bankFeeds.length} accounts`}
                                 </Badge>
                             </div>
 
@@ -388,10 +395,14 @@ export function ReconciliationListView() {
                                                 <AlertCircle className="w-8 h-8 text-red-500" aria-hidden="true" />
                                             </div>
                                         </div>
-                                        <h3 className="text-lg font-bold text-slate-900 mb-2">حدث خطأ أثناء تحميل الحسابات البنكية</h3>
-                                        <p className="text-slate-500 mb-4">{error?.message || 'تعذر الاتصال بالخادم'}</p>
+                                        <h3 className="text-lg font-bold text-slate-900 mb-2">
+                                            {isRTL ? 'حدث خطأ أثناء تحميل الحسابات البنكية' : 'Error loading bank accounts'}
+                                        </h3>
+                                        <p className="text-slate-500 mb-4">
+                                            {(error as Error)?.message || (isRTL ? 'تعذر الاتصال بالخادم' : 'Could not connect to server')}
+                                        </p>
                                         <Button onClick={() => refetch()} className="bg-emerald-500 hover:bg-emerald-600">
-                                            إعادة المحاولة
+                                            {isRTL ? 'إعادة المحاولة' : 'Retry'}
                                         </Button>
                                     </div>
                                 )}
@@ -404,20 +415,27 @@ export function ReconciliationListView() {
                                                 <Building2 className="w-8 h-8 text-emerald-500" aria-hidden="true" />
                                             </div>
                                         </div>
-                                        <h3 className="text-lg font-bold text-slate-900 mb-2">لا يوجد حسابات بنكية</h3>
-                                        <p className="text-slate-500 mb-4">ابدأ بإضافة حساب بنكي جديد</p>
+                                        <h3 className="text-lg font-bold text-slate-900 mb-2">
+                                            {isRTL ? 'لا يوجد حسابات بنكية' : 'No bank accounts'}
+                                        </h3>
+                                        <p className="text-slate-500 mb-4">
+                                            {isRTL ? 'ابدأ بإضافة حساب بنكي جديد' : 'Start by adding a new bank account'}
+                                        </p>
                                         <Button asChild className="bg-emerald-500 hover:bg-emerald-600">
                                             <Link to="/dashboard/finance/reconciliation/new">
                                                 <Plus className="w-4 h-4 ms-2" aria-hidden="true" />
-                                                إضافة حساب بنكي
+                                                {isRTL ? 'إضافة حساب بنكي' : 'Add Bank Account'}
                                             </Link>
                                         </Button>
                                     </div>
                                 )}
 
-                                {/* Success State - Bank Feeds List */}
+                                {/* Success State - Bank Feeds Cards */}
                                 {!isLoading && !isError && bankFeeds.map((feed) => (
-                                    <div key={feed.id} className={`bg-[#F8F9FA] rounded-2xl p-6 border transition-all group ${selectedIds.includes(feed.id) ? 'border-emerald-500 bg-emerald-50/30' : 'border-slate-100 hover:border-emerald-200'}`}>
+                                    <div
+                                        key={feed.id}
+                                        className={`bg-[#F8F9FA] rounded-2xl p-6 border transition-all group ${selectedIds.includes(feed.id) ? 'border-emerald-500 bg-emerald-50/30' : 'border-slate-100 hover:border-emerald-200'}`}
+                                    >
                                         <div className="flex justify-between items-start mb-4">
                                             <div className="flex gap-4 items-center">
                                                 {isSelectionMode && (
@@ -427,11 +445,11 @@ export function ReconciliationListView() {
                                                         className="h-6 w-6 rounded-md border-slate-300 data-[state=checked]:bg-emerald-500 data-[state=checked]:border-emerald-500"
                                                     />
                                                 )}
-                                                <div className="w-14 h-14 rounded-xl bg-white flex items-center justify-center shadow-sm text-emerald-600 font-bold text-lg">
+                                                <div className="w-14 h-14 rounded-xl bg-white flex items-center justify-center shadow-sm text-emerald-600">
                                                     <Building2 className="h-7 w-7" aria-hidden="true" />
                                                 </div>
                                                 <div>
-                                                    <div className="flex items-center gap-2 mb-1">
+                                                    <div className="flex items-center gap-2 flex-wrap mb-1">
                                                         <h4 className="font-bold text-navy text-lg">{feed.accountName}</h4>
                                                         {getStatusBadge(feed.status)}
                                                         {getConnectionBadge(feed.isConnected)}
@@ -441,18 +459,18 @@ export function ReconciliationListView() {
                                             </div>
                                             <DropdownMenu>
                                                 <DropdownMenuTrigger asChild>
-                                                    <Button variant="ghost" size="icon" className="text-slate-500 hover:text-navy" aria-label="خيارات">
+                                                    <Button variant="ghost" size="icon" className="text-slate-500 hover:text-navy">
                                                         <MoreHorizontal className="h-5 w-5" aria-hidden="true" />
                                                     </Button>
                                                 </DropdownMenuTrigger>
                                                 <DropdownMenuContent align="end" className="w-48">
                                                     <DropdownMenuItem onClick={() => handleViewBankFeed(feed.id)}>
                                                         <Eye className="h-4 w-4 ms-2" aria-hidden="true" />
-                                                        عرض التفاصيل
+                                                        {isRTL ? 'عرض التفاصيل' : 'View Details'}
                                                     </DropdownMenuItem>
                                                     <DropdownMenuItem onClick={() => handleEditBankFeed(feed.id)}>
                                                         <Edit3 className="h-4 w-4 ms-2 text-blue-500" aria-hidden="true" />
-                                                        تعديل البيانات
+                                                        {isRTL ? 'تعديل البيانات' : 'Edit'}
                                                     </DropdownMenuItem>
                                                     <DropdownMenuSeparator />
                                                     <DropdownMenuItem
@@ -460,41 +478,41 @@ export function ReconciliationListView() {
                                                         className="text-red-600 focus:text-red-600"
                                                     >
                                                         <Trash2 className="h-4 w-4 ms-2" aria-hidden="true" />
-                                                        حذف الحساب
+                                                        {isRTL ? 'حذف الحساب' : 'Delete'}
                                                     </DropdownMenuItem>
                                                 </DropdownMenuContent>
                                             </DropdownMenu>
                                         </div>
 
-                                        <div className="flex items-center justify-between pt-4 border-t border-slate-200/50">
-                                            <div className="flex items-center gap-6">
+                                        <div className="flex flex-wrap items-center justify-between pt-4 border-t border-slate-200/50 gap-4">
+                                            <div className="flex flex-wrap items-center gap-4">
                                                 {/* Reconciliation Stats */}
                                                 <div className="flex items-center gap-4 text-sm">
                                                     <div className="flex items-center gap-1 text-emerald-600">
                                                         <CheckCircle2 className="h-4 w-4" aria-hidden="true" />
                                                         <span className="font-bold">{feed.matchedCount}</span>
-                                                        <span className="text-slate-500">متطابقة</span>
+                                                        <span className="text-slate-500">{isRTL ? 'متطابقة' : 'matched'}</span>
                                                     </div>
                                                     <div className="flex items-center gap-1 text-red-600">
                                                         <XCircle className="h-4 w-4" aria-hidden="true" />
                                                         <span className="font-bold">{feed.unmatchedCount}</span>
-                                                        <span className="text-slate-500">غير متطابقة</span>
+                                                        <span className="text-slate-500">{isRTL ? 'غير متطابقة' : 'unmatched'}</span>
                                                     </div>
                                                     <div className="flex items-center gap-1 text-amber-600">
                                                         <Clock className="h-4 w-4" aria-hidden="true" />
                                                         <span className="font-bold">{feed.pendingCount}</span>
-                                                        <span className="text-slate-500">معلقة</span>
+                                                        <span className="text-slate-500">{isRTL ? 'معلقة' : 'pending'}</span>
                                                     </div>
                                                 </div>
                                                 {/* Account Info */}
                                                 <div className="flex items-center gap-3">
                                                     {getTypeBadge(feed.accountType)}
                                                     <div className="text-center">
-                                                        <div className="text-xs text-slate-600">آخر تسوية</div>
-                                                        <div className="font-medium text-navy text-sm">{feed.lastReconciledFormatted.arabic}</div>
+                                                        <div className="text-xs text-slate-600">{isRTL ? 'آخر تسوية' : 'Last reconciled'}</div>
+                                                        <div className="font-medium text-navy text-sm">{feed.lastReconciledFormatted}</div>
                                                     </div>
                                                     <div className="text-center">
-                                                        <div className="text-xs text-slate-600">الرصيد</div>
+                                                        <div className="text-xs text-slate-600">{isRTL ? 'الرصيد' : 'Balance'}</div>
                                                         <div className="font-bold text-navy text-sm">{feed.balance.toLocaleString()} {feed.currency}</div>
                                                     </div>
                                                 </div>
@@ -502,7 +520,7 @@ export function ReconciliationListView() {
                                             <Link to={`/dashboard/finance/reconciliation/${feed.id}` as any}>
                                                 <Button className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg px-6 shadow-lg shadow-emerald-500/20">
                                                     <ArrowRightLeft className="h-4 w-4 ms-2" aria-hidden="true" />
-                                                    التسوية
+                                                    {isRTL ? 'التسوية' : 'Reconcile'}
                                                 </Button>
                                             </Link>
                                         </div>
@@ -510,16 +528,18 @@ export function ReconciliationListView() {
                                 ))}
                             </div>
 
-                            <div className="p-4 pt-0 text-center">
-                                <Button variant="ghost" className="text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 w-full rounded-xl py-6">
-                                    عرض جميع الحسابات
-                                    <ChevronLeft className="h-4 w-4 me-2" aria-hidden="true" />
-                                </Button>
-                            </div>
+                            {bankFeeds.length > 0 && (
+                                <div className="p-4 pt-0 text-center">
+                                    <Button variant="ghost" className="text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 w-full rounded-xl py-6">
+                                        {isRTL ? 'عرض جميع الحسابات' : 'View All Accounts'}
+                                        <ChevronLeft className="h-4 w-4 me-2" aria-hidden="true" />
+                                    </Button>
+                                </div>
+                            )}
                         </div>
                     </div>
 
-                    {/* LEFT COLUMN (Widgets) */}
+                    {/* LEFT COLUMN (Sidebar) */}
                     <FinanceSidebar
                         context="reconciliation"
                         isSelectionMode={isSelectionMode}
