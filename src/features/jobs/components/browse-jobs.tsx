@@ -47,11 +47,30 @@ const categories = [
   { value: 'other', label: 'أخرى', labelEn: 'Other' },
 ]
 
+const jobTypes = [
+  { value: 'all', label: 'جميع الأنواع', labelEn: 'All Types' },
+  { value: 'full-time', label: 'دوام كامل', labelEn: 'Full-time' },
+  { value: 'part-time', label: 'دوام جزئي', labelEn: 'Part-time' },
+  { value: 'contract', label: 'عقد', labelEn: 'Contract' },
+  { value: 'remote', label: 'عن بعد', labelEn: 'Remote' },
+]
+
+const locations = [
+  { value: 'all', label: 'جميع المواقع', labelEn: 'All Locations' },
+  { value: 'riyadh', label: 'الرياض', labelEn: 'Riyadh' },
+  { value: 'jeddah', label: 'جدة', labelEn: 'Jeddah' },
+  { value: 'dammam', label: 'الدمام', labelEn: 'Dammam' },
+  { value: 'makkah', label: 'مكة المكرمة', labelEn: 'Makkah' },
+  { value: 'madinah', label: 'المدينة المنورة', labelEn: 'Madinah' },
+]
+
 export function BrowseJobs() {
   const { i18n, t } = useTranslation()
   const isRTL = i18n.language === 'ar'
   const [searchQuery, setSearchQuery] = useState('')
   const [categoryFilter, setCategoryFilter] = useState('all')
+  const [typeFilter, setTypeFilter] = useState('all')
+  const [locationFilter, setLocationFilter] = useState('all')
   const [statusFilter, setStatusFilter] = useState('open')
   const [bookmarkedJobs, setBookmarkedJobs] = useState<string[]>([])
 
@@ -91,6 +110,21 @@ export function BrowseJobs() {
     if (diffDays === 1) return isRTL ? 'أمس' : 'Yesterday'
     if (diffDays < 7) return isRTL ? `منذ ${diffDays} أيام` : `${diffDays} days ago`
     return isRTL ? `منذ ${Math.floor(diffDays / 7)} أسابيع` : `${Math.floor(diffDays / 7)} weeks ago`
+  }
+
+  const getJobTypeBadge = (type: string) => {
+    const typeConfig: Record<string, { bg: string; text: string; labelAr: string; labelEn: string }> = {
+      'full-time': { bg: 'bg-emerald-100', text: 'text-emerald-700', labelAr: 'دوام كامل', labelEn: 'Full-time' },
+      'part-time': { bg: 'bg-blue-100', text: 'text-blue-700', labelAr: 'دوام جزئي', labelEn: 'Part-time' },
+      'contract': { bg: 'bg-amber-100', text: 'text-amber-700', labelAr: 'عقد', labelEn: 'Contract' },
+      'remote': { bg: 'bg-purple-100', text: 'text-purple-700', labelAr: 'عن بعد', labelEn: 'Remote' },
+    }
+    const config = typeConfig[type] || { bg: 'bg-slate-100', text: 'text-slate-700', labelAr: type, labelEn: type }
+    return (
+      <Badge className={`${config.bg} ${config.text} hover:${config.bg} border-0`}>
+        {isRTL ? config.labelAr : config.labelEn}
+      </Badge>
+    )
   }
 
   // Apply client-side filtering for better UX
