@@ -19,10 +19,19 @@ const path = require('path');
 const BASE_URL = process.env.BASE_URL || 'http://localhost:5173';
 const OUTPUT_FILE = path.join(__dirname, '..', 'console-audit-report.json');
 
-// Pages to audit (add more as needed)
-const PAGES = [
+// Pages to audit - public pages only for CI (no auth required)
+// In CI, authenticated pages will redirect to login, so we only audit public pages
+const PUBLIC_PAGES = [
   '/',
   '/sign-in',
+  '/otp',
+  '/sign-up',
+  '/forgot-password',
+];
+
+// Full list for local testing with authentication
+const ALL_PAGES = [
+  ...PUBLIC_PAGES,
   '/dashboard',
   '/dashboard/clients',
   '/dashboard/cases',
@@ -47,6 +56,10 @@ const PAGES = [
   '/dashboard/settings',
   '/dashboard/apps',
 ];
+
+// Use PUBLIC_PAGES in CI, ALL_PAGES for local testing
+const isCI = process.env.CI === 'true' || process.env.GITHUB_ACTIONS === 'true';
+const PAGES = isCI ? PUBLIC_PAGES : ALL_PAGES;
 
 async function auditPage(page, url) {
   const logs = [];
@@ -102,7 +115,9 @@ async function auditPage(page, url) {
 async function runAudit() {
   console.log('Starting Console Audit...\n');
   console.log(`Base URL: ${BASE_URL}`);
-  console.log(`Output: ${OUTPUT_FILE}\n`);
+  console.log(`Output: ${OUTPUT_FILE}`);
+  console.log(`Mode: ${isCI ? 'CI (public pages only)' : 'Local (all pages)'}`);
+  console.log(`Pages to audit: ${PAGES.length}\n`);
 
   const browser = await chromium.launch({ headless: true });
   const context = await browser.newContext({
@@ -178,5 +193,28 @@ async function runAudit() {
 
 runAudit().catch((error) => {
   console.error('Audit failed:', error);
+
+  // Write a minimal report even on failure so the workflow can upload something
+  const failureReport = {
+    generatedAt: new Date().toISOString(),
+    baseUrl: BASE_URL,
+    error: error.message,
+    summary: {
+      totalPages: 0,
+      pagesWithErrors: 0,
+      totalErrors: 1,
+      totalWarnings: 0,
+      totalRequestFailed: 0,
+    },
+    pages: {},
+  };
+
+  try {
+    fs.writeFileSync(OUTPUT_FILE, JSON.stringify(failureReport, null, 2));
+    console.log(`Failure report saved to: ${OUTPUT_FILE}`);
+  } catch (writeError) {
+    console.error('Failed to write report:', writeError);
+  }
+
   process.exit(1);
 });
