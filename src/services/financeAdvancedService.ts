@@ -3,7 +3,7 @@
  * Handles bank reconciliation, multi-currency, and related API calls
  */
 
-import { apiClientNoVersionNoVersion, handleApiError } from '@/lib/api'
+import { apiClientNoVersion, handleApiError } from '@/lib/api'
 import type {
   // Bank Feed types
   BankFeed,
