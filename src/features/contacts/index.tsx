@@ -39,10 +39,11 @@ export function Contacts() {
   // Fetch contacts data from API
   const { data, isLoading } = useContacts(contactFilters)
 
-  const topNav = [
+  // Memoize topNav to prevent unnecessary re-renders
+  const topNav = useMemo(() => [
     { title: t('sidebar.nav.contacts'), href: '/dashboard/contacts', isActive: true },
     { title: t('sidebar.nav.clients'), href: '/dashboard/clients', isActive: false },
-  ]
+  ], [t])
 
   return (
     <ContactsProvider>
