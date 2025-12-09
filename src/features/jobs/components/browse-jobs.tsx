@@ -1,21 +1,15 @@
 import { useState, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
-  Briefcase, Search, Filter, MapPin, Clock, DollarSign,
-  Building2, Star, ChevronLeft, ChevronRight, Bookmark,
-  Eye, Calendar, Users, ArrowUpRight, Bell, Loader2, AlertCircle
+  Briefcase, Search, MapPin, Clock, DollarSign,
+  Building2, ChevronLeft, Bookmark, Eye, Calendar,
+  Users, ArrowUpRight, Bell, AlertCircle, X, MoreHorizontal,
+  Filter
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-  CardFooter,
-} from '@/components/ui/card'
+import { Skeleton } from '@/components/ui/skeleton'
 import {
   Select,
   SelectContent,
@@ -23,6 +17,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 import { Header } from '@/components/layout/header'
 import { Main } from '@/components/layout/main'
 import { TopNav } from '@/components/layout/top-nav'
@@ -34,6 +34,7 @@ import { DynamicIsland } from '@/components/dynamic-island'
 import { JobsSidebar } from './jobs-sidebar'
 import { ProductivityHero } from '@/components/productivity-hero'
 import { useJobs } from '@/hooks/useJobs'
+import type { Job } from '@/services/jobsService'
 
 const categories = [
   { value: 'all', label: 'جميع التخصصات', labelEn: 'All Specialties' },
@@ -47,44 +48,75 @@ const categories = [
   { value: 'other', label: 'أخرى', labelEn: 'Other' },
 ]
 
-const jobTypes = [
-  { value: 'all', label: 'جميع الأنواع', labelEn: 'All Types' },
-  { value: 'full-time', label: 'دوام كامل', labelEn: 'Full-time' },
-  { value: 'part-time', label: 'دوام جزئي', labelEn: 'Part-time' },
-  { value: 'contract', label: 'عقد', labelEn: 'Contract' },
-  { value: 'remote', label: 'عن بعد', labelEn: 'Remote' },
+const statuses = [
+  { value: 'all', label: 'جميع الحالات', labelEn: 'All Statuses' },
+  { value: 'open', label: 'مفتوح', labelEn: 'Open' },
+  { value: 'in-progress', label: 'قيد التنفيذ', labelEn: 'In Progress' },
+  { value: 'completed', label: 'مكتمل', labelEn: 'Completed' },
+  { value: 'cancelled', label: 'ملغي', labelEn: 'Cancelled' },
 ]
 
-const locations = [
-  { value: 'all', label: 'جميع المواقع', labelEn: 'All Locations' },
-  { value: 'riyadh', label: 'الرياض', labelEn: 'Riyadh' },
-  { value: 'jeddah', label: 'جدة', labelEn: 'Jeddah' },
-  { value: 'dammam', label: 'الدمام', labelEn: 'Dammam' },
-  { value: 'makkah', label: 'مكة المكرمة', labelEn: 'Makkah' },
-  { value: 'madinah', label: 'المدينة المنورة', labelEn: 'Madinah' },
-]
+// Status colors
+const statusColors: Record<string, string> = {
+  'open': 'bg-emerald-100 text-emerald-700 border-0',
+  'in-progress': 'bg-blue-100 text-blue-700 border-0',
+  'completed': 'bg-slate-100 text-slate-700 border-0',
+  'cancelled': 'bg-red-100 text-red-700 border-0',
+}
 
 export function BrowseJobs() {
   const { i18n, t } = useTranslation()
   const isRTL = i18n.language === 'ar'
+
+  // Filter states
   const [searchQuery, setSearchQuery] = useState('')
   const [categoryFilter, setCategoryFilter] = useState('all')
-  const [typeFilter, setTypeFilter] = useState('all')
-  const [locationFilter, setLocationFilter] = useState('all')
-  const [statusFilter, setStatusFilter] = useState('open')
+  const [statusFilter, setStatusFilter] = useState('all')
   const [bookmarkedJobs, setBookmarkedJobs] = useState<string[]>([])
 
-  // Fetch jobs from API with filters
-  const filters = useMemo(() => ({
-    category: categoryFilter !== 'all' ? categoryFilter : undefined,
-    status: statusFilter || 'open',
-  }), [categoryFilter, statusFilter])
+  // API Filters
+  const filters = useMemo(() => {
+    const f: any = {}
+    if (categoryFilter !== 'all') f.category = categoryFilter
+    if (statusFilter !== 'all') f.status = statusFilter
+    return f
+  }, [categoryFilter, statusFilter])
 
-  const { data: jobsData, isLoading, isError } = useJobs(filters)
+  // Check if any filter is active
+  const hasActiveFilters = searchQuery || categoryFilter !== 'all' || statusFilter !== 'all'
+
+  // Clear all filters
+  const clearFilters = () => {
+    setSearchQuery('')
+    setCategoryFilter('all')
+    setStatusFilter('all')
+  }
+
+  // Fetch jobs from API
+  const { data: jobsData, isLoading, isError, error, refetch } = useJobs(filters)
+
+  // Transform and filter jobs
+  const jobs = useMemo(() => {
+    if (!jobsData || !Array.isArray(jobsData)) return []
+
+    return jobsData.filter((job: Job) => {
+      if (!searchQuery) return true
+      const query = searchQuery.toLowerCase()
+      return (
+        job.title?.toLowerCase().includes(query) ||
+        job.description?.toLowerCase().includes(query)
+      )
+    })
+  }, [jobsData, searchQuery])
 
   const getCategoryLabel = (category: string) => {
     const cat = categories.find(c => c.value === category)
     return isRTL ? cat?.label : cat?.labelEn
+  }
+
+  const getStatusLabel = (status: string) => {
+    const s = statuses.find(st => st.value === status)
+    return isRTL ? s?.label : s?.labelEn
   }
 
   const topNav = [
@@ -101,6 +133,7 @@ export function BrowseJobs() {
   }
 
   const formatDate = (dateStr: string) => {
+    if (!dateStr) return ''
     const date = new Date(dateStr)
     const now = new Date()
     const diffTime = Math.abs(now.getTime() - date.getTime())
@@ -112,35 +145,16 @@ export function BrowseJobs() {
     return isRTL ? `منذ ${Math.floor(diffDays / 7)} أسابيع` : `${Math.floor(diffDays / 7)} weeks ago`
   }
 
-  const getJobTypeBadge = (type: string) => {
-    const typeConfig: Record<string, { bg: string; text: string; labelAr: string; labelEn: string }> = {
-      'full-time': { bg: 'bg-emerald-100', text: 'text-emerald-700', labelAr: 'دوام كامل', labelEn: 'Full-time' },
-      'part-time': { bg: 'bg-blue-100', text: 'text-blue-700', labelAr: 'دوام جزئي', labelEn: 'Part-time' },
-      'contract': { bg: 'bg-amber-100', text: 'text-amber-700', labelAr: 'عقد', labelEn: 'Contract' },
-      'remote': { bg: 'bg-purple-100', text: 'text-purple-700', labelAr: 'عن بعد', labelEn: 'Remote' },
-    }
-    const config = typeConfig[type] || { bg: 'bg-slate-100', text: 'text-slate-700', labelAr: type, labelEn: type }
-    return (
-      <Badge className={`${config.bg} ${config.text} hover:${config.bg} border-0`}>
-        {isRTL ? config.labelAr : config.labelEn}
-      </Badge>
-    )
+  const formatBudget = (budget: { min?: number; max?: number } | undefined) => {
+    if (!budget) return isRTL ? 'غير محدد' : 'Not specified'
+    const min = budget.min?.toLocaleString() || '0'
+    const max = budget.max?.toLocaleString() || '0'
+    return `${min} - ${max} ${isRTL ? 'ر.س' : 'SAR'}`
   }
-
-  // Apply client-side filtering for better UX
-  const filteredJobs = useMemo(() => {
-    if (!jobsData || !Array.isArray(jobsData)) return []
-
-    return jobsData.filter(job => {
-      const matchesSearch = searchQuery === '' ||
-        job.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        job.description.toLowerCase().includes(searchQuery.toLowerCase())
-      return matchesSearch
-    })
-  }, [jobsData, searchQuery])
 
   return (
     <>
+      {/* Header */}
       <Header className="bg-navy shadow-none relative">
         <TopNav links={topNav} className="[&>a]:text-slate-300 [&>a:hover]:text-white [&>a[aria-current='page']]:text-white" />
 
@@ -149,8 +163,8 @@ export function BrowseJobs() {
           <DynamicIsland />
         </div>
 
-        <div className="ms-auto flex items-center gap-4">
-          <div className="relative hidden md:block">
+        <div className='ms-auto flex items-center gap-2 sm:gap-4 overflow-x-auto min-w-0'>
+          <div className="relative hidden md:block min-w-0">
             <Search className="absolute end-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
             <input
               type="text"
@@ -158,267 +172,282 @@ export function BrowseJobs() {
               className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
             />
           </div>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white"
-          >
+          <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white flex-shrink-0">
             <Bell className="h-5 w-5" />
             <span className="absolute top-2 end-2 h-2 w-2 bg-red-500 rounded-full border border-navy"></span>
           </Button>
-          <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white" />
-          <ThemeSwitch className="text-slate-300 hover:bg-white/10 hover:text-white" />
-          <ConfigDrawer className="text-slate-300 hover:bg-white/10 hover:text-white" />
-          <ProfileDropdown className="text-slate-300 hover:bg-white/10 hover:text-white" />
+          <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white flex-shrink-0" />
+          <ThemeSwitch className="text-slate-300 hover:bg-white/10 hover:text-white hidden sm:flex flex-shrink-0" />
+          <ConfigDrawer className="text-slate-300 hover:bg-white/10 hover:text-white hidden lg:flex flex-shrink-0" />
+          <ProfileDropdown className="text-slate-300 hover:bg-white/10 hover:text-white flex-shrink-0" />
         </div>
         {/* Bottom Gradient Line */}
         <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-emerald-500/50 to-transparent"></div>
       </Header>
 
-      <Main
-        fluid={true}
-        className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-e border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']"
-      >
-        {/* HERO BANNER */}
-        <ProductivityHero badge={isRTL ? 'الوظائف والخدمات' : 'Jobs & Services'} title={isRTL ? 'تصفح الوظائف' : 'Browse Jobs'} type="jobs" hideButtons={true} />
+      <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-e border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
 
+        {/* HERO CARD */}
+        <ProductivityHero
+          badge={isRTL ? 'الوظائف والخدمات' : 'Jobs & Services'}
+          title={isRTL ? 'تصفح الوظائف' : 'Browse Jobs'}
+          type="jobs"
+          hideButtons={true}
+        />
+
+        {/* MAIN GRID LAYOUT */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* --- Main Content --- */}
-          <div className="lg:col-span-2 flex flex-col gap-6">
 
-            {/* Search and Filters */}
-            <Card className="border-slate-100 shadow-sm">
-              <CardContent className="p-4">
-                <div className="flex flex-col gap-4">
-                  <div className="relative">
-                    <Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
+          {/* RIGHT COLUMN (Main Content) */}
+          <div className="lg:col-span-2 space-y-6">
+
+            {/* FILTERS BAR */}
+            <div className="bg-white rounded-2xl p-4 shadow-sm border border-slate-100">
+              <div className="flex flex-col gap-4">
+                <div className="flex flex-wrap items-center gap-3">
+                  {/* Search Input */}
+                  <div className="relative flex-1 min-w-[200px] max-w-md">
+                    <Search className="absolute end-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" aria-hidden="true" />
                     <Input
-                      placeholder={isRTL ? 'بحث بالعنوان، الشركة...' : 'Search by title, company...'}
+                      type="text"
+                      placeholder={isRTL ? 'بحث بالعنوان أو الوصف...' : 'Search by title or description...'}
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      className="ps-10 rounded-xl border-slate-200"
+                      className="pe-10 h-10 rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500/20"
                     />
                   </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-                      <SelectTrigger className="rounded-xl border-slate-200">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {categories.map((cat) => (
-                          <SelectItem key={cat.value} value={cat.value}>
-                            {isRTL ? cat.label : cat.labelEn}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <Select value={typeFilter} onValueChange={setTypeFilter}>
-                      <SelectTrigger className="rounded-xl border-slate-200">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {jobTypes.map((type) => (
-                          <SelectItem key={type.value} value={type.value}>
-                            {isRTL ? type.label : type.labelEn}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <Select value={locationFilter} onValueChange={setLocationFilter}>
-                      <SelectTrigger className="rounded-xl border-slate-200">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {locations.map((loc) => (
-                          <SelectItem key={loc.value} value={loc.value}>
-                            {isRTL ? loc.label : loc.labelEn}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
 
-            {/* Results Count */}
-            <div className="flex items-center justify-between px-2">
-              <p className="text-slate-500 font-medium">
-                {isRTL ? `${filteredJobs.length} وظيفة متاحة` : `${filteredJobs.length} jobs available`}
-              </p>
-              <Select defaultValue="recent">
-                <SelectTrigger className="w-[180px] rounded-xl border-slate-200 bg-white">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="recent">{isRTL ? 'الأحدث' : 'Most Recent'}</SelectItem>
-                  <SelectItem value="salary">{isRTL ? 'الراتب الأعلى' : 'Highest Salary'}</SelectItem>
-                  <SelectItem value="applicants">{isRTL ? 'الأكثر تقدماً' : 'Most Applied'}</SelectItem>
-                </SelectContent>
-              </Select>
+                  {/* Category Filter */}
+                  <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+                    <SelectTrigger className="w-[160px] h-10 rounded-xl border-slate-200">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {categories.map((cat) => (
+                        <SelectItem key={cat.value} value={cat.value}>
+                          {isRTL ? cat.label : cat.labelEn}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+
+                  {/* Status Filter */}
+                  <Select value={statusFilter} onValueChange={setStatusFilter}>
+                    <SelectTrigger className="w-[140px] h-10 rounded-xl border-slate-200">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {statuses.map((status) => (
+                        <SelectItem key={status.value} value={status.value}>
+                          {isRTL ? status.label : status.labelEn}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+
+                  {/* Clear Filters Button */}
+                  {hasActiveFilters && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={clearFilters}
+                      className="h-10 px-4 text-red-500 hover:text-red-600 hover:bg-red-50 rounded-xl"
+                    >
+                      <X className="h-4 w-4 ms-2" aria-hidden="true" />
+                      {isRTL ? 'مسح الفلاتر' : 'Clear Filters'}
+                    </Button>
+                  )}
+                </div>
+              </div>
             </div>
 
-            {/* Loading State */}
-            {isLoading && (
-              <Card className="border-slate-100 shadow-sm">
-                <CardContent className="p-12 text-center">
-                  <Loader2 className="h-12 w-12 text-emerald-500 animate-spin mx-auto mb-4" />
-                  <h3 className="text-lg font-bold text-navy">
-                    {isRTL ? 'جاري تحميل الوظائف...' : 'Loading jobs...'}
-                  </h3>
-                  <p className="text-slate-500 mt-1">
-                    {isRTL ? 'الرجاء الانتظار' : 'Please wait'}
-                  </p>
-                </CardContent>
-              </Card>
-            )}
+            {/* MAIN JOBS LIST */}
+            <div className="bg-white rounded-3xl p-1 shadow-sm border border-slate-100">
+              <div className="p-6 pb-2 flex justify-between items-center">
+                <h3 className="font-bold text-navy text-xl">
+                  {isRTL ? 'قائمة الوظائف' : 'Jobs List'}
+                </h3>
+                <Badge className="bg-slate-100 text-slate-600 border-0 rounded-full px-4 py-1">
+                  {isRTL ? `${jobs.length} وظيفة` : `${jobs.length} jobs`}
+                </Badge>
+              </div>
 
-            {/* Error State */}
-            {isError && (
-              <Card className="border-red-100 bg-red-50/50 shadow-sm">
-                <CardContent className="p-12 text-center">
-                  <div className="h-16 w-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <Briefcase className="h-8 w-8 text-red-500" />
-                  </div>
-                  <h3 className="text-lg font-bold text-red-900">
-                    {isRTL ? 'حدث خطأ في تحميل الوظائف' : 'Error loading jobs'}
-                  </h3>
-                  <p className="text-red-700 mt-1 max-w-xs mx-auto">
-                    {isRTL ? 'الرجاء المحاولة مرة أخرى لاحقاً' : 'Please try again later'}
-                  </p>
-                </CardContent>
-              </Card>
-            )}
-
-            {/* Job Listings */}
-            {!isLoading && !isError && (
-              <div className="space-y-4">
-                {filteredJobs.map((job) => (
-                <Card key={job.id} className="hover:shadow-lg transition-all duration-300 group border-slate-100">
-                  <CardContent className="p-6">
-                    <div className="flex flex-col md:flex-row md:items-start gap-4">
-                      {/* Company Logo Placeholder */}
-                      <div className="h-16 w-16 bg-slate-50 rounded-xl flex items-center justify-center shrink-0 border border-slate-100">
-                        <Building2 className="h-8 w-8 text-slate-500" aria-hidden="true" />
+              <div className="p-4 space-y-4">
+                {/* Loading State */}
+                {isLoading && (
+                  <>
+                    {[1, 2, 3].map((i) => (
+                      <div key={i} className="bg-[#F8F9FA] rounded-2xl p-6 border border-slate-100">
+                        <div className="flex gap-4 mb-4">
+                          <Skeleton className="w-14 h-14 rounded-xl" />
+                          <div className="flex-1 space-y-2">
+                            <Skeleton className="h-6 w-3/4" />
+                            <Skeleton className="h-4 w-1/2" />
+                          </div>
+                        </div>
+                        <Skeleton className="h-16 w-full" />
                       </div>
+                    ))}
+                  </>
+                )}
 
-                      {/* Job Details */}
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-start justify-between gap-4">
-                          <div>
-                            <div className="flex items-center gap-2 flex-wrap">
-                              <h3 className="font-bold text-lg text-navy group-hover:text-emerald-600 transition-colors">
-                                {isRTL ? job.title : job.titleEn}
-                              </h3>
-                              {job.urgent && (
-                                <Badge className="bg-red-100 text-red-700 hover:bg-red-100 border-0">
-                                  {isRTL ? 'عاجل' : 'Urgent'}
-                                </Badge>
-                              )}
-                            </div>
-                            <p className="text-slate-600 mt-1 font-medium">
-                              {isRTL ? job.company : job.companyEn}
-                            </p>
-                          </div>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => toggleBookmark(job.id)}
-                            className={bookmarkedJobs.includes(job.id) ? 'text-amber-500 hover:text-amber-600' : 'text-slate-300 hover:text-navy'}
-                          >
-                            <Bookmark className={`h-5 w-5 ${bookmarkedJobs.includes(job.id) ? 'fill-current' : ''}`} />
-                          </Button>
-                        </div>
-
-                        <div className="flex flex-wrap items-center gap-3 mt-3 text-sm text-slate-500">
-                          <span className="flex items-center bg-slate-50 px-2 py-1 rounded-lg">
-                            <MapPin className="h-3.5 w-3.5 me-1 text-slate-500" aria-hidden="true" />
-                            {isRTL ? job.location : job.locationEn}
-                          </span>
-                          <span className="flex items-center bg-slate-50 px-2 py-1 rounded-lg">
-                            <Clock className="h-3.5 w-3.5 me-1 text-slate-500" aria-hidden="true" />
-                            {isRTL ? job.experience : job.experienceEn}
-                          </span>
-                          <span className="flex items-center bg-slate-50 px-2 py-1 rounded-lg">
-                            <DollarSign className="h-3.5 w-3.5 me-1 text-slate-500" />
-                            {job.salary.min.toLocaleString()} - {job.salary.max.toLocaleString()} {isRTL ? 'ر.س' : 'SAR'}
-                          </span>
-                        </div>
-
-                        <p className="text-slate-600 mt-3 line-clamp-2 text-sm leading-relaxed">
-                          {job.description}
-                        </p>
-
-                        <div className="flex flex-wrap items-center justify-between mt-4 pt-4 border-t border-slate-50">
-                          <div className="flex items-center gap-4 text-sm text-slate-500">
-                            {getJobTypeBadge(job.type)}
-                            <span className="flex items-center text-xs">
-                              <Calendar className="h-3.5 w-3.5 me-1" aria-hidden="true" />
-                              {formatDate(job.postedAt)}
-                            </span>
-                            <span className="flex items-center text-xs">
-                              <Users className="h-3.5 w-3.5 me-1" aria-hidden="true" />
-                              {job.applicants} {isRTL ? 'متقدم' : 'applicants'}
-                            </span>
-                            <span className="flex items-center text-xs">
-                              <Eye className="h-3.5 w-3.5 me-1" />
-                              {job.views}
-                            </span>
-                          </div>
-                          <Button className="bg-emerald-500 hover:bg-emerald-600 mt-3 sm:mt-0 shadow-lg shadow-emerald-500/20 rounded-lg">
-                            {isRTL ? 'تقدم الآن' : 'Apply Now'}
-                            <ArrowUpRight className="h-4 w-4 ms-1" />
-                          </Button>
-                        </div>
+                {/* Error State */}
+                {isError && (
+                  <div className="bg-white rounded-2xl p-12 border border-slate-100 text-center">
+                    <div className="flex justify-center mb-4">
+                      <div className="w-16 h-16 rounded-full bg-red-50 flex items-center justify-center">
+                        <AlertCircle className="w-8 h-8 text-red-500" aria-hidden="true" />
                       </div>
                     </div>
-                  </CardContent>
-                </Card>
-              ))}
+                    <h3 className="text-lg font-bold text-slate-900 mb-2">
+                      {isRTL ? 'حدث خطأ في تحميل الوظائف' : 'Error loading jobs'}
+                    </h3>
+                    <p className="text-slate-500 mb-4">
+                      {(error as Error)?.message || (isRTL ? 'الرجاء المحاولة مرة أخرى' : 'Please try again')}
+                    </p>
+                    <Button onClick={() => refetch()} className="bg-emerald-500 hover:bg-emerald-600">
+                      {isRTL ? 'إعادة المحاولة' : 'Retry'}
+                    </Button>
+                  </div>
+                )}
 
-                {filteredJobs.length === 0 && (
-                  <Card className="border-dashed border-2 border-slate-200 bg-slate-50/50">
-                    <CardContent className="p-12 text-center">
-                      <div className="h-16 w-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <Briefcase className="h-8 w-8 text-slate-300" />
+                {/* Empty State */}
+                {!isLoading && !isError && jobs.length === 0 && (
+                  <div className="bg-white rounded-2xl p-12 border border-slate-100 text-center">
+                    <div className="flex justify-center mb-4">
+                      <div className="w-16 h-16 rounded-full bg-emerald-50 flex items-center justify-center">
+                        <Briefcase className="w-8 h-8 text-emerald-500" />
                       </div>
-                      <h3 className="text-lg font-bold text-navy">
-                        {isRTL ? 'لا توجد وظائف مطابقة' : 'No matching jobs found'}
-                      </h3>
-                      <p className="text-slate-500 mt-1 max-w-xs mx-auto">
-                        {isRTL ? 'جرب تعديل معايير البحث' : 'Try adjusting your search criteria'}
-                      </p>
-                      <Button variant="outline" className="mt-4 border-slate-200" onClick={() => {
-                        setSearchQuery('')
-                        setCategoryFilter('all')
-                        setTypeFilter('all')
-                        setLocationFilter('all')
-                      }}>
+                    </div>
+                    <h3 className="text-lg font-bold text-slate-900 mb-2">
+                      {isRTL ? 'لا توجد وظائف مطابقة' : 'No matching jobs found'}
+                    </h3>
+                    <p className="text-slate-500 mb-4">
+                      {isRTL ? 'جرب تعديل معايير البحث' : 'Try adjusting your search criteria'}
+                    </p>
+                    {hasActiveFilters && (
+                      <Button onClick={clearFilters} variant="outline" className="border-slate-200">
                         {isRTL ? 'مسح الفلاتر' : 'Clear Filters'}
                       </Button>
-                    </CardContent>
-                  </Card>
+                    )}
+                  </div>
                 )}
-              </div>
-            )}
 
-            {/* Pagination */}
-            {!isLoading && !isError && filteredJobs.length > 0 && (
-              <div className="flex items-center justify-center gap-2 pt-4">
-                <Button variant="outline" size="icon" disabled className="rounded-lg border-slate-200">
-                  {isRTL ? <ChevronRight className="h-4 w-4" aria-hidden="true" /> : <ChevronLeft className="h-4 w-4" aria-hidden="true" />}
-                </Button>
-                <Button variant="outline" className="bg-navy text-white hover:bg-navy/90 border-navy rounded-lg">1</Button>
-                <Button variant="outline" className="rounded-lg border-slate-200">2</Button>
-                <Button variant="outline" className="rounded-lg border-slate-200">3</Button>
-                <Button variant="outline" size="icon" className="rounded-lg border-slate-200">
-                  {isRTL ? <ChevronLeft className="h-4 w-4" aria-hidden="true" /> : <ChevronRight className="h-4 w-4" aria-hidden="true" />}
-                </Button>
+                {/* Success State - Jobs Cards */}
+                {!isLoading && !isError && jobs.map((job: Job) => (
+                  <div
+                    key={job._id}
+                    className="bg-[#F8F9FA] rounded-2xl p-6 border border-slate-100 hover:border-emerald-200 transition-all group"
+                  >
+                    <div className="flex justify-between items-start mb-4">
+                      <div className="flex gap-4 items-start">
+                        <div className="w-14 h-14 rounded-xl bg-white flex items-center justify-center shadow-sm text-emerald-600">
+                          <Briefcase className="h-6 w-6" />
+                        </div>
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 flex-wrap mb-1">
+                            <h4 className="font-bold text-navy text-lg group-hover:text-emerald-600 transition-colors">
+                              {job.title}
+                            </h4>
+                            <Badge className={statusColors[job.status] || 'bg-slate-100 text-slate-700'}>
+                              {getStatusLabel(job.status)}
+                            </Badge>
+                          </div>
+                          <div className="flex items-center gap-2 text-slate-500 text-sm">
+                            <Building2 className="h-3.5 w-3.5" />
+                            <span>{job.userID?.username || (isRTL ? 'مستخدم' : 'User')}</span>
+                            <span className="mx-1">•</span>
+                            <span>{getCategoryLabel(job.category)}</span>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => toggleBookmark(job._id)}
+                          className={bookmarkedJobs.includes(job._id) ? 'text-amber-500 hover:text-amber-600' : 'text-slate-300 hover:text-navy'}
+                        >
+                          <Bookmark className={`h-5 w-5 ${bookmarkedJobs.includes(job._id) ? 'fill-current' : ''}`} />
+                        </Button>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="icon" className="text-slate-500 hover:text-navy">
+                              <MoreHorizontal className="h-5 w-5" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end" className="w-48">
+                            <DropdownMenuItem>
+                              <Eye className="h-4 w-4 ms-2" aria-hidden="true" />
+                              {isRTL ? 'عرض التفاصيل' : 'View Details'}
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </div>
+                    </div>
+
+                    {/* Description */}
+                    <p className="text-slate-600 text-sm line-clamp-2 mb-4 leading-relaxed">
+                      {job.description}
+                    </p>
+
+                    {/* Meta Info */}
+                    <div className="flex flex-wrap items-center gap-3 mb-4">
+                      {job.location && (
+                        <span className="flex items-center bg-white px-3 py-1.5 rounded-lg text-sm text-slate-600">
+                          <MapPin className="h-3.5 w-3.5 me-1.5 text-slate-400" aria-hidden="true" />
+                          {job.location}
+                        </span>
+                      )}
+                      <span className="flex items-center bg-white px-3 py-1.5 rounded-lg text-sm text-slate-600">
+                        <DollarSign className="h-3.5 w-3.5 me-1.5 text-slate-400" />
+                        {formatBudget(job.budget)}
+                      </span>
+                      {job.deadline && (
+                        <span className="flex items-center bg-white px-3 py-1.5 rounded-lg text-sm text-slate-600">
+                          <Clock className="h-3.5 w-3.5 me-1.5 text-slate-400" aria-hidden="true" />
+                          {new Date(job.deadline).toLocaleDateString(isRTL ? 'ar-SA' : 'en-US')}
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Footer */}
+                    <div className="flex items-center justify-between pt-4 border-t border-slate-200/50">
+                      <div className="flex items-center gap-4 text-sm text-slate-500">
+                        <span className="flex items-center">
+                          <Calendar className="h-3.5 w-3.5 me-1" aria-hidden="true" />
+                          {formatDate(job.createdAt)}
+                        </span>
+                        <span className="flex items-center">
+                          <Users className="h-3.5 w-3.5 me-1" aria-hidden="true" />
+                          {job.proposalsCount || 0} {isRTL ? 'عرض' : 'proposals'}
+                        </span>
+                        <span className="flex items-center">
+                          <Eye className="h-3.5 w-3.5 me-1" />
+                          {job.views || 0}
+                        </span>
+                      </div>
+                      <Button className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg px-6 shadow-lg shadow-emerald-500/20">
+                        {isRTL ? 'تقدم الآن' : 'Apply Now'}
+                        <ArrowUpRight className="h-4 w-4 ms-1" />
+                      </Button>
+                    </div>
+                  </div>
+                ))}
               </div>
-            )}
+
+              {jobs.length > 0 && (
+                <div className="p-4 pt-0 text-center">
+                  <Button variant="ghost" className="text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 w-full rounded-xl py-6">
+                    {isRTL ? 'عرض المزيد' : 'View More'}
+                    <ChevronLeft className="h-4 w-4 me-2" aria-hidden="true" />
+                  </Button>
+                </div>
+              )}
+            </div>
           </div>
 
-          {/* Sidebar */}
+          {/* LEFT COLUMN (Sidebar) */}
           <JobsSidebar context="browse-jobs" />
         </div>
       </Main>
