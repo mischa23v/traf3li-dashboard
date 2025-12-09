@@ -234,8 +234,40 @@ export function GanttView() {
   useEffect(() => {
     if (!isGanttLoaded || !ganttData || !gantt) return
 
+    // Sanitize data to ensure dates are valid strings
+    const sanitizedData = {
+      data: ganttData.data.map(item => {
+        // Convert dates to valid format, skip items with invalid dates
+        const startDate = item.start_date ? new Date(item.start_date) : new Date()
+        const endDate = item.end_date ? new Date(item.end_date) : null
+
+        // Skip items with invalid dates
+        if (isNaN(startDate.getTime())) {
+          return null
+        }
+
+        // Format date as string for dhtmlx-gantt
+        const formatDate = (date: Date) => {
+          const year = date.getFullYear()
+          const month = String(date.getMonth() + 1).padStart(2, '0')
+          const day = String(date.getDate()).padStart(2, '0')
+          const hours = String(date.getHours()).padStart(2, '0')
+          const minutes = String(date.getMinutes()).padStart(2, '0')
+          return `${year}-${month}-${day} ${hours}:${minutes}`
+        }
+
+        return {
+          ...item,
+          start_date: formatDate(startDate),
+          end_date: endDate && !isNaN(endDate.getTime()) ? formatDate(endDate) : undefined,
+          duration: item.duration || 1, // Default duration if missing
+        }
+      }).filter(Boolean), // Remove null items
+      links: ganttData.links || []
+    }
+
     gantt.clearAll()
-    gantt.parse(ganttData)
+    gantt.parse(sanitizedData)
   }, [isGanttLoaded, ganttData])
 
   // Update time scale
