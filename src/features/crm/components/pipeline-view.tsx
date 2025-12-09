@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react'
+import { useState, useMemo, useEffect, useCallback } from 'react'
 import {
   Plus,
   Users,
@@ -336,9 +336,10 @@ export function PipelineView() {
 
   // Fetch pipelines
   const { data: pipelinesData } = usePipelines()
-  const pipelines = pipelinesData?.data || []
+  // Memoize pipelines array to prevent new reference on every render
+  const pipelines = useMemo(() => pipelinesData?.data || [], [pipelinesData?.data])
 
-  // Fetch leads by pipeline
+  // Fetch leads by pipeline - only fetch when we have a valid pipeline ID
   const {
     data: pipelineData,
     isLoading,
@@ -352,13 +353,18 @@ export function PipelineView() {
   const { mutate: updateStage, isPending: isUpdatingStage } = useUpdatePipelineStage()
 
   const pipeline = pipelineData?.pipeline
-  const leadsByStage = pipelineData?.leadsByStage || {}
+  // Memoize leadsByStage to prevent new reference on every render
+  const leadsByStage = useMemo(() => pipelineData?.leadsByStage || {}, [pipelineData?.leadsByStage])
 
   // Auto-select default pipeline on load
   useEffect(() => {
     if (!selectedPipelineId && pipelines.length > 0) {
       const defaultPipeline = pipelines.find((p: Pipeline) => p.isDefault)
-      setSelectedPipelineId(defaultPipeline?._id || pipelines[0]._id)
+      const pipelineId = defaultPipeline?._id || pipelines[0]?._id
+      // Only set if we have a valid pipeline ID to prevent infinite loop
+      if (pipelineId) {
+        setSelectedPipelineId(pipelineId)
+      }
     }
   }, [pipelines, selectedPipelineId])
 

@@ -40,11 +40,14 @@ export function SalesSidebar({
     const startDate = useMemo(() => startOfDay(today).toISOString(), [today])
     const endDate = useMemo(() => endOfDay(addDays(today, 4)).toISOString(), [today])
 
-    // Fetch calendar data for the calendar tab
-    const { data: calendarData, isLoading: isCalendarLoading } = useCalendar({
+    // Memoize the calendar filter object to prevent infinite re-renders
+    const calendarFilters = useMemo(() => ({
         startDate,
         endDate
-    })
+    }), [startDate, endDate])
+
+    // Fetch calendar data for the calendar tab
+    const { data: calendarData, isLoading: isCalendarLoading } = useCalendar(calendarFilters)
 
     // Fetch upcoming reminders for the notifications tab
     const { data: upcomingRemindersData, isLoading: isRemindersLoading } = useUpcomingReminders(7)
