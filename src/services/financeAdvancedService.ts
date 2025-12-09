@@ -3,7 +3,7 @@
  * Handles bank reconciliation, multi-currency, and related API calls
  */
 
-import apiClient, { handleApiError } from '@/lib/api'
+import { apiClientNoVersionNoVersion, handleApiError } from '@/lib/api'
 import type {
   // Bank Feed types
   BankFeed,
@@ -40,7 +40,7 @@ export const bankFeedService = {
     filters?: BankFeedFilters
   ): Promise<{ data: BankFeed[]; pagination: any }> => {
     try {
-      const response = await apiClient.get('/bank-reconciliation/feeds', { params: filters })
+      const response = await apiClientNoVersion.get('/bank-reconciliation/feeds', { params: filters })
       return response.data
     } catch (error: any) {
       throw new Error(handleApiError(error))
@@ -52,7 +52,7 @@ export const bankFeedService = {
    */
   getFeed: async (id: string): Promise<BankFeed> => {
     try {
-      const response = await apiClient.get(`/bank-reconciliation/feeds/${id}`)
+      const response = await apiClientNoVersion.get(`/bank-reconciliation/feeds/${id}`)
       return response.data.data
     } catch (error: any) {
       throw new Error(handleApiError(error))
@@ -64,7 +64,7 @@ export const bankFeedService = {
    */
   createFeed: async (data: CreateBankFeedData): Promise<BankFeed> => {
     try {
-      const response = await apiClient.post('/bank-reconciliation/feeds', data)
+      const response = await apiClientNoVersion.post('/bank-reconciliation/feeds', data)
       return response.data.data
     } catch (error: any) {
       throw new Error(handleApiError(error))
@@ -76,7 +76,7 @@ export const bankFeedService = {
    */
   updateFeed: async (id: string, data: Partial<CreateBankFeedData>): Promise<BankFeed> => {
     try {
-      const response = await apiClient.put(`/bank-reconciliation/feeds/${id}`, data)
+      const response = await apiClientNoVersion.put(`/bank-reconciliation/feeds/${id}`, data)
       return response.data.data
     } catch (error: any) {
       throw new Error(handleApiError(error))
@@ -88,7 +88,7 @@ export const bankFeedService = {
    */
   deleteFeed: async (id: string): Promise<void> => {
     try {
-      await apiClient.delete(`/bank-reconciliation/feeds/${id}`)
+      await apiClientNoVersion.delete(`/bank-reconciliation/feeds/${id}`)
     } catch (error: any) {
       throw new Error(handleApiError(error))
     }
@@ -99,7 +99,7 @@ export const bankFeedService = {
    */
   fetchTransactions: async (id: string): Promise<{ imported: number; lastSync: Date }> => {
     try {
-      const response = await apiClient.post(`/bank-reconciliation/feeds/${id}/fetch`)
+      const response = await apiClientNoVersion.post(`/bank-reconciliation/feeds/${id}/fetch`)
       return response.data.data
     } catch (error: any) {
       throw new Error(handleApiError(error))
@@ -121,7 +121,7 @@ export const bankFeedService = {
       formData.append('columnMapping', JSON.stringify(columnMapping))
       formData.append('dateFormat', dateFormat)
 
-      const response = await apiClient.post(
+      const response = await apiClientNoVersion.post(
         `/bank-reconciliation/import/csv`,
         formData,
         { headers: { 'Content-Type': 'multipart/form-data' } }
@@ -140,7 +140,7 @@ export const bankFeedService = {
       const formData = new FormData()
       formData.append('file', file)
 
-      const response = await apiClient.post(
+      const response = await apiClientNoVersion.post(
         `/bank-reconciliation/import/ofx`,
         formData,
         { headers: { 'Content-Type': 'multipart/form-data' } }
@@ -159,7 +159,7 @@ export const bankFeedService = {
     filters?: BankTransactionFilters
   ): Promise<{ data: BankTransaction[]; pagination: any }> => {
     try {
-      const response = await apiClient.get(`/bank-reconciliation/feeds/${id}/transactions`, {
+      const response = await apiClientNoVersion.get(`/bank-reconciliation/feeds/${id}/transactions`, {
         params: filters
       })
       return response.data
@@ -178,7 +178,7 @@ export const matchingService = {
    */
   getSuggestions: async (accountId: string): Promise<MatchSuggestion> => {
     try {
-      const response = await apiClient.get(`/bank-reconciliation/suggestions/${accountId}`)
+      const response = await apiClientNoVersion.get(`/bank-reconciliation/suggestions/${accountId}`)
       return response.data.data
     } catch (error: any) {
       throw new Error(handleApiError(error))
@@ -190,7 +190,7 @@ export const matchingService = {
    */
   createMatch: async (data: CreateMatchData): Promise<BankTransactionMatch> => {
     try {
-      const response = await apiClient.post('/bank-reconciliation/match/split', data)
+      const response = await apiClientNoVersion.post('/bank-reconciliation/match/split', data)
       return response.data.data
     } catch (error: any) {
       throw new Error(handleApiError(error))
@@ -206,7 +206,7 @@ export const matchingService = {
     suggestions: number
   }> => {
     try {
-      const response = await apiClient.post(`/bank-reconciliation/auto-match/${accountId}`)
+      const response = await apiClientNoVersion.post(`/bank-reconciliation/auto-match/${accountId}`)
       return response.data.data
     } catch (error: any) {
       throw new Error(handleApiError(error))
@@ -218,7 +218,7 @@ export const matchingService = {
    */
   confirmMatch: async (matchId: string): Promise<BankTransactionMatch> => {
     try {
-      const response = await apiClient.post(`/bank-reconciliation/match/confirm/${matchId}`)
+      const response = await apiClientNoVersion.post(`/bank-reconciliation/match/confirm/${matchId}`)
       return response.data.data
     } catch (error: any) {
       throw new Error(handleApiError(error))
@@ -230,7 +230,7 @@ export const matchingService = {
    */
   rejectMatch: async (matchId: string): Promise<void> => {
     try {
-      await apiClient.post(`/bank-reconciliation/match/reject/${matchId}`)
+      await apiClientNoVersion.post(`/bank-reconciliation/match/reject/${matchId}`)
     } catch (error: any) {
       throw new Error(handleApiError(error))
     }
@@ -241,7 +241,7 @@ export const matchingService = {
    */
   unmatch: async (matchId: string): Promise<void> => {
     try {
-      await apiClient.delete(`/bank-reconciliation/match/${matchId}`)
+      await apiClientNoVersion.delete(`/bank-reconciliation/match/${matchId}`)
     } catch (error: any) {
       throw new Error(handleApiError(error))
     }
@@ -271,7 +271,7 @@ export const matchingRulesService = {
    */
   getRules: async (): Promise<MatchingRule[]> => {
     try {
-      const response = await apiClient.get('/bank-reconciliation/rules')
+      const response = await apiClientNoVersion.get('/bank-reconciliation/rules')
       return response.data.data
     } catch (error: any) {
       throw new Error(handleApiError(error))
@@ -295,7 +295,7 @@ export const matchingRulesService = {
    */
   createRule: async (data: CreateMatchingRuleData): Promise<MatchingRule> => {
     try {
-      const response = await apiClient.post('/bank-reconciliation/rules', data)
+      const response = await apiClientNoVersion.post('/bank-reconciliation/rules', data)
       return response.data.data
     } catch (error: any) {
       throw new Error(handleApiError(error))
@@ -307,7 +307,7 @@ export const matchingRulesService = {
    */
   updateRule: async (id: string, data: Partial<CreateMatchingRuleData>): Promise<MatchingRule> => {
     try {
-      const response = await apiClient.put(`/bank-reconciliation/rules/${id}`, data)
+      const response = await apiClientNoVersion.put(`/bank-reconciliation/rules/${id}`, data)
       return response.data.data
     } catch (error: any) {
       throw new Error(handleApiError(error))
@@ -319,7 +319,7 @@ export const matchingRulesService = {
    */
   deleteRule: async (id: string): Promise<void> => {
     try {
-      await apiClient.delete(`/bank-reconciliation/rules/${id}`)
+      await apiClientNoVersion.delete(`/bank-reconciliation/rules/${id}`)
     } catch (error: any) {
       throw new Error(handleApiError(error))
     }
@@ -365,7 +365,7 @@ export const reconciliationReportService = {
     try {
       // Note: This endpoint is not implemented in the backend
       // Use /bank-reconciliation/status/:accountId instead
-      const response = await apiClient.get(`/bank-reconciliation/status/${accountId}`, {
+      const response = await apiClientNoVersion.get(`/bank-reconciliation/status/${accountId}`, {
         params
       })
       return response.data.data
@@ -396,7 +396,7 @@ export const currencyService = {
    */
   getRates: async (): Promise<ExchangeRate[]> => {
     try {
-      const response = await apiClient.get('/currency/rates')
+      const response = await apiClientNoVersion.get('/currency/rates')
       return response.data.data
     } catch (error: any) {
       throw new Error(handleApiError(error))
@@ -411,7 +411,7 @@ export const currencyService = {
     try {
       // Note: This endpoint is not implemented in the backend
       // The backend only has /currency/rates (get all)
-      const response = await apiClient.get('/currency/rates')
+      const response = await apiClientNoVersion.get('/currency/rates')
       const rates = response.data.data || []
       const rate = rates.find((r: any) =>
         r.fromCurrency === fromCurrency && r.toCurrency === toCurrency
@@ -446,7 +446,7 @@ export const currencyService = {
    */
   convert: async (data: ConvertCurrencyData): Promise<CurrencyConversion> => {
     try {
-      const response = await apiClient.post('/currency/convert', data)
+      const response = await apiClientNoVersion.post('/currency/convert', data)
       return response.data.data
     } catch (error: any) {
       throw new Error(handleApiError(error))
@@ -458,7 +458,7 @@ export const currencyService = {
    */
   refreshRates: async (): Promise<{ updated: number; lastUpdate: Date }> => {
     try {
-      const response = await apiClient.post('/currency/update')
+      const response = await apiClientNoVersion.post('/currency/update')
       return response.data.data
     } catch (error: any) {
       throw new Error(handleApiError(error))
@@ -474,7 +474,7 @@ export const currencyService = {
     rate: number
   ): Promise<ExchangeRate> => {
     try {
-      const response = await apiClient.post('/currency/rates', {
+      const response = await apiClientNoVersion.post('/currency/rates', {
         fromCurrency,
         toCurrency,
         rate
@@ -490,7 +490,7 @@ export const currencyService = {
    */
   getSettings: async (): Promise<CurrencySettings> => {
     try {
-      const response = await apiClient.get('/currency/settings')
+      const response = await apiClientNoVersion.get('/currency/settings')
       return response.data.data
     } catch (error: any) {
       throw new Error(handleApiError(error))

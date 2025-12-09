@@ -10,8 +10,12 @@ import { API_CONFIG, getApiUrl } from '@/config/api'
 // API Base URL - Change based on environment
 const API_BASE_URL = getApiUrl()
 
+// Non-versioned API base URL (for routes that don't use /v1)
+const API_BASE_URL_NO_VERSION = `${API_CONFIG.baseUrl}/api`
+
 // Export the base URL for use in other components (e.g., file downloads)
 export const API_URL = API_BASE_URL
+export const API_URL_NO_VERSION = API_BASE_URL_NO_VERSION
 export const API_DOMAIN = API_CONFIG.baseUrl
 
 // Cache for GET requests (simple in-memory cache)
@@ -41,6 +45,54 @@ export const apiClient = axios.create({
   },
   timeout: API_CONFIG.timeout,
 })
+
+/**
+ * Non-versioned API client instance
+ * For routes that don't use /v1 prefix (e.g., bank-reconciliation, currency)
+ */
+export const apiClientNoVersion = axios.create({
+  baseURL: API_BASE_URL_NO_VERSION,
+  withCredentials: true,
+  headers: {
+    'Content-Type': 'application/json',
+    'Accept': 'application/json',
+  },
+  timeout: API_CONFIG.timeout,
+})
+
+// Apply same interceptors to non-versioned client
+apiClientNoVersion.interceptors.request.use(
+  (config: InternalAxiosRequestConfig) => {
+    const method = config.method?.toLowerCase()
+    if (method && ['post', 'put', 'patch', 'delete'].includes(method)) {
+      const csrfToken = getCsrfToken()
+      if (csrfToken) {
+        config.headers.set('X-CSRF-Token', csrfToken)
+      }
+    }
+    return config
+  },
+  (error: AxiosError) => Promise.reject(error)
+)
+
+apiClientNoVersion.interceptors.response.use(
+  (response) => response,
+  async (error: AxiosError<any>) => {
+    if (error.response?.status === 401) {
+      localStorage.removeItem('user')
+      if (!window.location.pathname.includes('/sign-in')) {
+        window.location.href = '/sign-in'
+      }
+    }
+    return Promise.reject({
+      status: error.response?.status || 500,
+      message: error.response?.data?.message || 'حدث خطأ غير متوقع',
+      error: true,
+      requestId: error.response?.data?.requestId,
+      errors: error.response?.data?.errors,
+    })
+  }
+)
 
 /**
  * Request Interceptor
