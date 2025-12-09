@@ -95,11 +95,27 @@ export function ReconciliationListView() {
         return format(date, isRTL ? 'd MMMM yyyy' : 'MMM d, yyyy', { locale: isRTL ? arSA : enUS })
     }
 
+    // Helper to extract array from API response (handles different structures)
+    const extractFeedsArray = (data: any): any[] => {
+        if (!data) return []
+        // Direct array
+        if (Array.isArray(data)) return data
+        // { data: [...] }
+        if (Array.isArray(data.data)) return data.data
+        // { feeds: [...] }
+        if (Array.isArray(data.feeds)) return data.feeds
+        // { data: { feeds: [...] } }
+        if (data.data && Array.isArray(data.data.feeds)) return data.data.feeds
+        // { results: [...] }
+        if (Array.isArray(data.results)) return data.results
+        return []
+    }
+
     // Transform API data
     const bankAccounts = useMemo(() => {
-        if (!bankFeedsData?.data) return []
-        return bankFeedsData.data.map((feed: any) => ({
-            id: feed._id,
+        const feeds = extractFeedsArray(bankFeedsData)
+        return feeds.map((feed: any) => ({
+            id: feed._id || feed.id,
             accountName: feed.accountName || (isRTL ? 'غير محدد' : 'Not specified'),
             accountNumber: feed.accountNumber || '',
             bankName: feed.bankName || (isRTL ? 'غير محدد' : 'Not specified'),
@@ -214,7 +230,7 @@ export function ReconciliationListView() {
 
     // Stats for hero
     const heroStats = useMemo(() => {
-        const data = bankFeedsData?.data || []
+        const data = extractFeedsArray(bankFeedsData)
         const totalAccounts = data.length
         const totalMatched = data.reduce((sum: number, feed: any) => sum + (feed.stats?.matched || 0), 0)
         const totalUnmatched = data.reduce((sum: number, feed: any) => sum + (feed.stats?.unmatched || 0), 0)
