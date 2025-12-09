@@ -9,7 +9,7 @@
   <link rel="icon" type="image/png" href="/images/favicon_light.png" media="(prefers-color-scheme: dark)" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <!-- Content Security Policy -->
+  <!-- Content Security Policy (frame-ancestors moved to HTTP headers in vercel.json) -->
   <meta http-equiv="Content-Security-Policy" content="
     default-src 'self';
     script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net;
@@ -17,7 +17,6 @@
     font-src 'self' https://fonts.gstatic.com;
     img-src 'self' data: https: blob:;
     connect-src 'self' https://api.traf3li.com wss://api.traf3li.com https://*.sentry.io;
-    frame-ancestors 'none';
     form-action 'self';
     base-uri 'self';
   ">
@@ -52,6 +51,7 @@
 
   <!-- PWA Manifest -->
   <link rel="manifest" href="/manifest.json" />
+  <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="Traf3li" />
