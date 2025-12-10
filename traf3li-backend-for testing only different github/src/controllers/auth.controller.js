@@ -72,10 +72,14 @@ const authLogin = async (request, response) => {
                 isSeller: user.isSeller
             }, JWT_SECRET, { expiresIn: '7 days' });
             
+            // Auto-detect localhost from request origin
+            const origin = request.get('origin') || '';
+            const isLocalhost = origin.includes('localhost') || origin.includes('127.0.0.1');
+
             const cookieConfig = {
                 httpOnly: true,
-                sameSite: 'none',    // Required for cross-origin requests
-                secure: true,        // Required when sameSite is 'none'
+                sameSite: isLocalhost ? 'lax' : 'none',
+                secure: !isLocalhost,  // false for localhost (HTTP), true for production (HTTPS)
                 maxAge: 60 * 60 * 24 * 7 * 1000, // 7 days
                 path: '/'
             }
@@ -99,10 +103,14 @@ const authLogin = async (request, response) => {
 }
 
 const authLogout = async (request, response) => {
+    // Auto-detect localhost from request origin (must match login settings)
+    const origin = request.get('origin') || '';
+    const isLocalhost = origin.includes('localhost') || origin.includes('127.0.0.1');
+
     return response.clearCookie('accessToken', {
         httpOnly: true,
-        sameSite: 'none',    // Must match login cookie settings
-        secure: true,        // Must match login cookie settings
+        sameSite: isLocalhost ? 'lax' : 'none',
+        secure: !isLocalhost,
         path: '/'
     })
     .send({
