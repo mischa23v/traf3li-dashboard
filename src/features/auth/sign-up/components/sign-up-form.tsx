@@ -1,5 +1,8 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
-import { apiClient } from '@/lib/api';
+import { apiClientNoVersion } from '@/lib/api';
+
+// Auth routes are NOT versioned - they're at /api/auth/*, not /api/v1/auth/*
+const authApi = apiClientNoVersion;
 import { PasswordStrength } from '@/components/password-strength';
 
 // Debounce hook for real-time validation
@@ -129,7 +132,7 @@ export function SignUpForm() {
     setAvailability(prev => ({ ...prev, [field]: 'checking' }));
 
     try {
-      const response = await apiClient.post('/auth/check-availability', { [field]: value });
+      const response = await authApi.post('/auth/check-availability', { [field]: value });
       const isAvailable = response.data?.available !== false;
       setAvailability(prev => ({ ...prev, [field]: isAvailable ? 'available' : 'taken' }));
 
@@ -410,7 +413,7 @@ export function SignUpForm() {
           });
         }
         
-        const response = await apiClient.post('/auth/register', payload);
+        const response = await authApi.post('/auth/register', payload);
         if (response.status === 201) setShowSuccess(true);
       } catch (error: any) {
         alert(error.response?.data?.message || 'حدث خطأ ما، يرجى المحاولة مرة أخرى');

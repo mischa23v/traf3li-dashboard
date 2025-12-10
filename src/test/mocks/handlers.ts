@@ -1,10 +1,12 @@
 import { http, HttpResponse } from 'msw'
 
+// Auth routes are NOT versioned - they're at /api/auth/*, not /api/v1/auth/*
+const AUTH_URL = 'http://localhost:3000/api'
 const API_URL = 'http://localhost:3000/api/v1'
 
 export const handlers = [
-  // Auth handlers
-  http.post(`${API_URL}/auth/login`, async ({ request }) => {
+  // Auth handlers (non-versioned)
+  http.post(`${AUTH_URL}/auth/login`, async ({ request }) => {
     const body = await request.json() as { email: string; password: string }
     if (body.email === 'test@example.com' && body.password === 'password123') {
       return HttpResponse.json({
@@ -15,7 +17,7 @@ export const handlers = [
     return HttpResponse.json({ message: 'Invalid credentials' }, { status: 401 })
   }),
 
-  http.get(`${API_URL}/auth/me`, () => {
+  http.get(`${AUTH_URL}/auth/me`, () => {
     return HttpResponse.json({
       id: '1',
       email: 'test@example.com',
@@ -24,7 +26,7 @@ export const handlers = [
     })
   }),
 
-  http.post(`${API_URL}/auth/logout`, () => {
+  http.post(`${AUTH_URL}/auth/logout`, () => {
     return HttpResponse.json({ success: true })
   }),
 

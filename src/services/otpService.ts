@@ -3,7 +3,10 @@
  * Handles OTP-based authentication API calls
  */
 
-import apiClient, { handleApiError } from '@/lib/api'
+import { apiClientNoVersion, handleApiError } from '@/lib/api'
+
+// Auth routes are NOT versioned - they're at /api/auth/*, not /api/v1/auth/*
+const authApi = apiClientNoVersion
 
 // OTP Purpose types
 export type OtpPurpose = 'login' | 'registration' | 'password_reset' | 'email_verification'
@@ -74,7 +77,7 @@ const otpService = {
    */
   sendOtp: async (data: SendOtpRequest): Promise<SendOtpResponse> => {
     try {
-      const response = await apiClient.post<SendOtpResponse>('/auth/send-otp', data)
+      const response = await authApi.post<SendOtpResponse>('/auth/send-otp', data)
       return response.data
     } catch (error: any) {
       // Check for rate limit error
@@ -97,7 +100,7 @@ const otpService = {
    */
   verifyOtp: async (data: VerifyOtpRequest): Promise<VerifyOtpResponse> => {
     try {
-      const response = await apiClient.post<VerifyOtpResponse>('/auth/verify-otp', data)
+      const response = await authApi.post<VerifyOtpResponse>('/auth/verify-otp', data)
 
       if (response.data.success && response.data.user) {
         // Store user data in localStorage
@@ -125,7 +128,7 @@ const otpService = {
    */
   resendOtp: async (data: SendOtpRequest): Promise<SendOtpResponse> => {
     try {
-      const response = await apiClient.post<SendOtpResponse>('/auth/resend-otp', data)
+      const response = await authApi.post<SendOtpResponse>('/auth/resend-otp', data)
       return response.data
     } catch (error: any) {
       if (error?.status === 429) {
@@ -147,7 +150,7 @@ const otpService = {
    */
   getOtpStatus: async (email: string, purpose: OtpPurpose): Promise<OtpStatusResponse> => {
     try {
-      const response = await apiClient.get<OtpStatusResponse>('/auth/otp-status', {
+      const response = await authApi.get<OtpStatusResponse>('/auth/otp-status', {
         params: { email, purpose },
       })
       return response.data
