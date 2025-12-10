@@ -1,10 +1,10 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import {
     Save, Calendar, User, Flag, FileText, Users, Loader2, Scale,
-    Plus, X, Clock, Tag, Repeat, ListTodo, ChevronDown,
-    Zap, Bell, Check
+    Plus, X, Clock, Repeat, ListTodo, ChevronDown, ChevronRight,
+    Bell, ArrowLeft, Sparkles, Hash
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -20,24 +20,15 @@ import {
     SelectValue,
 } from "@/components/ui/select"
 import {
-    Collapsible,
-    CollapsibleContent,
-    CollapsibleTrigger,
-} from "@/components/ui/collapsible"
-import {
-    Card,
-    CardContent,
-    CardHeader,
-    CardTitle,
-} from "@/components/ui/card"
-import { FieldTooltip } from '@/components/ui/field-tooltip'
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
+} from "@/components/ui/popover"
 import { Header } from '@/components/layout/header'
 import { TopNav } from '@/components/layout/top-nav'
 import { DynamicIsland } from '@/components/dynamic-island'
 import { Main } from '@/components/layout/main'
 import { Link, useNavigate } from '@tanstack/react-router'
-import { TasksSidebar } from './tasks-sidebar'
-import { ProductivityHero } from '@/components/productivity-hero'
 import { useCreateTask, useTaskTemplates, useCreateFromTemplate } from '@/hooks/useTasks'
 import { useClients, useCases, useTeamMembers } from '@/hooks/useCasesAndClients'
 import { cn } from '@/lib/utils'
@@ -49,7 +40,6 @@ import {
     DAYS_OF_WEEK,
     ASSIGNEE_STRATEGY_OPTIONS,
     REMINDER_TYPE_OPTIONS,
-    FIELD_TOOLTIPS,
 } from '../constants/task-options'
 import type {
     TaskPriority,
@@ -67,18 +57,28 @@ interface SubtaskInput {
     autoReset?: boolean
 }
 
+// Priority pill colors
+const priorityColors = {
+    urgent: 'bg-red-500 text-white',
+    high: 'bg-orange-500 text-white',
+    medium: 'bg-yellow-500 text-white',
+    low: 'bg-slate-400 text-white',
+}
+
+const priorityLabels = {
+    urgent: 'عاجل',
+    high: 'مرتفع',
+    medium: 'متوسط',
+    low: 'منخفض',
+}
+
 export function CreateTaskView() {
     const { t } = useTranslation()
     const navigate = useNavigate()
     const createTaskMutation = useCreateTask()
     const { data: templates } = useTaskTemplates()
     const createFromTemplateMutation = useCreateFromTemplate()
-
-    // Section refs for scrolling
-    const basicRef = useRef<HTMLDivElement>(null)
-    const schedulingRef = useRef<HTMLDivElement>(null)
-    const subtasksRef = useRef<HTMLDivElement>(null)
-    const remindersRef = useRef<HTMLDivElement>(null)
+    const titleInputRef = useRef<HTMLInputElement>(null)
 
     // Fetch real data from APIs
     const { data: clients, isLoading: clientsLoading } = useClients()
@@ -121,34 +121,30 @@ export function CreateTaskView() {
     // Reminders state
     const [reminders, setReminders] = useState<{ type: string; beforeMinutes: number }[]>([])
 
-    // Collapsible section states (start closed by default)
-    const [showScheduling, setShowScheduling] = useState(false)
+    // UI state for expanded sections
+    const [showDescription, setShowDescription] = useState(false)
+    const [showMoreOptions, setShowMoreOptions] = useState(false)
     const [showSubtasks, setShowSubtasks] = useState(false)
+    const [showRecurring, setShowRecurring] = useState(false)
     const [showReminders, setShowReminders] = useState(false)
-
-    // Tags input
     const [tagInput, setTagInput] = useState('')
 
-    // Form validation state
-    const [errors, setErrors] = useState<Record<string, string>>({})
-    const [touched, setTouched] = useState<Record<string, boolean>>({})
+    // Auto-focus title on mount
+    useEffect(() => {
+        titleInputRef.current?.focus()
+    }, [])
 
-    // Check if basic info is complete
-    const isBasicComplete = formData.title.trim().length > 0
-
-    // Handle field blur for validation
-    const handleBlur = (field: string) => {
-        setTouched(prev => ({ ...prev, [field]: true }))
-    }
-
-    // Validate form
-    const validateForm = (): boolean => {
-        if (!formData.title.trim()) {
-            toast.error('عنوان المهمة مطلوب')
-            return false
+    // Keyboard shortcut: CMD+Enter to save
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+                e.preventDefault()
+                handleSubmit(e as unknown as React.FormEvent)
+            }
         }
-        return true
-    }
+        window.addEventListener('keydown', handleKeyDown)
+        return () => window.removeEventListener('keydown', handleKeyDown)
+    }, [formData])
 
     const handleChange = (field: string, value: any) => {
         setFormData(prev => ({ ...prev, [field]: value }))
@@ -157,9 +153,7 @@ export function CreateTaskView() {
     const addSubtask = () => {
         if (newSubtask.trim()) {
             setSubtasks(prev => [...prev, {
-                id: typeof crypto !== 'undefined' && crypto.randomUUID
-                    ? crypto.randomUUID()
-                    : `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+                id: crypto.randomUUID?.() || `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
                 title: newSubtask.trim(),
                 autoReset: isRecurring
             }])
@@ -190,6 +184,7 @@ export function CreateTaskView() {
 
     const addReminder = () => {
         setReminders(prev => [...prev, { type: 'notification', beforeMinutes: 30 }])
+        setShowReminders(true)
     }
 
     const updateReminder = (index: number, field: string, value: any) => {
@@ -214,7 +209,11 @@ export function CreateTaskView() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
 
-        if (!validateForm()) return
+        if (!formData.title.trim()) {
+            toast.error('عنوان المهمة مطلوب')
+            titleInputRef.current?.focus()
+            return
+        }
 
         const taskData = {
             title: formData.title,
@@ -270,6 +269,11 @@ export function CreateTaskView() {
         })
     }
 
+    // Get display values
+    const selectedClient = clients?.data?.find(c => c._id === formData.clientId)
+    const selectedCase = cases?.cases?.find(c => c._id === formData.caseId)
+    const selectedAssignee = teamMembers?.find(m => m._id === formData.assignedTo)
+
     const topNav = [
         { title: 'نظرة عامة', href: '/dashboard/overview', isActive: false },
         { title: 'المهام', href: '/dashboard/tasks/list', isActive: true },
@@ -287,243 +291,262 @@ export function CreateTaskView() {
                 <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-emerald-500/50 to-transparent"></div>
             </Header>
 
-            <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-4 sm:p-6 lg:p-8 space-y-6 rounded-tr-3xl shadow-inner border-e border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
-                {/* HERO CARD - Hidden on mobile */}
-                <div className="hidden md:block">
-                    <ProductivityHero badge="إدارة المهام" title="إنشاء مهمة" type="tasks" listMode={true} />
-                </div>
+            <Main fluid={true} className="bg-gradient-to-b from-slate-50 to-white min-h-screen">
+                <div className="max-w-3xl mx-auto px-4 py-8">
+                    {/* Back button */}
+                    <Link to="/dashboard/tasks/list" className="inline-flex items-center gap-2 text-slate-500 hover:text-slate-700 mb-6 transition-colors group">
+                        <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+                        <span className="text-sm">العودة للمهام</span>
+                    </Link>
 
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    {/* RIGHT COLUMN (Main Content) */}
-                    <div className="lg:col-span-2 space-y-6">
-
-                        {/* Templates Section */}
-                        {templates && templates.length > 0 && (
-                            <Card className="rounded-2xl shadow-sm border-slate-100">
-                                <CardContent className="py-4">
-                                    <p className="text-sm text-slate-600 mb-3">إنشاء سريع من قالب:</p>
-                                    <div className="flex flex-wrap gap-2">
-                                        {templates.slice(0, 5).map((template) => (
-                                            <Button
-                                                key={template._id}
-                                                variant="outline"
-                                                size="sm"
-                                                onClick={() => handleUseTemplate(template._id)}
-                                                className="rounded-full text-xs"
-                                                disabled={createFromTemplateMutation.isPending}
-                                            >
-                                                {template.title}
-                                            </Button>
-                                        ))}
+                    {/* Main form card */}
+                    <div className="bg-white rounded-2xl shadow-xl shadow-slate-200/50 border border-slate-100 overflow-hidden">
+                        <form onSubmit={handleSubmit}>
+                            {/* Header */}
+                            <div className="px-8 pt-8 pb-6 border-b border-slate-100">
+                                <div className="flex items-center gap-3 mb-6">
+                                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center shadow-lg shadow-emerald-500/20">
+                                        <Sparkles className="w-5 h-5 text-white" />
                                     </div>
-                                </CardContent>
-                            </Card>
-                        )}
+                                    <div>
+                                        <h1 className="text-xl font-bold text-slate-900">مهمة جديدة</h1>
+                                        <p className="text-sm text-slate-500">اضغط ⌘+Enter للحفظ السريع</p>
+                                    </div>
+                                </div>
 
-                        <form onSubmit={handleSubmit} className="space-y-6">
-                            {/* CARD 1: Basic Details */}
-                            <div ref={basicRef}>
-                                <Card className="rounded-3xl shadow-sm border-slate-100">
-                                    <CardHeader className="bg-slate-50/50 rounded-t-3xl border-b border-slate-100">
-                                        <div className="flex items-center justify-between">
-                                            <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                                                <Zap className="w-5 h-5 text-emerald-500" />
-                                                المعلومات الأساسية
-                                            </CardTitle>
-                                            {isBasicComplete && (
-                                                <div className="flex items-center gap-1.5 text-emerald-600">
-                                                    <Check className="w-4 h-4" />
-                                                    <span className="text-xs font-medium">مكتمل</span>
-                                                </div>
-                                            )}
-                                        </div>
-                                    </CardHeader>
-                                    <CardContent className="space-y-5 pt-6">
-                                        {/* Row 1: Title + Status */}
-                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                            <div className="space-y-2">
-                                                <Label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                                    <FileText className="w-4 h-4 text-slate-400" />
-                                                    عنوان المهمة
-                                                    <span className="text-red-500">*</span>
-                                                    <FieldTooltip content={FIELD_TOOLTIPS.title} />
-                                                </Label>
-                                                <Input
-                                                    placeholder="مثال: مراجعة العقد النهائي"
-                                                    className={cn(
-                                                        "rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500 h-12",
-                                                        touched.title && errors.title && "border-red-500"
-                                                    )}
-                                                    value={formData.title}
-                                                    onChange={(e) => handleChange('title', e.target.value)}
-                                                    onBlur={() => handleBlur('title')}
-                                                />
-                                            </div>
-                                            <div className="space-y-2">
-                                                <Label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                                    <ListTodo className="w-4 h-4 text-slate-400" />
-                                                    الحالة
-                                                    <FieldTooltip content={FIELD_TOOLTIPS.status} />
-                                                </Label>
-                                                <Select value={formData.status} onValueChange={(v) => handleChange('status', v)}>
-                                                    <SelectTrigger className="rounded-xl border-slate-200 h-12">
-                                                        <SelectValue placeholder="اختر الحالة" />
-                                                    </SelectTrigger>
-                                                    <SelectContent>
-                                                        {ACTIVE_STATUS_OPTIONS.map(option => (
-                                                            <SelectItem key={option.value} value={option.value}>
-                                                                <div className="flex items-center gap-2">
-                                                                    <span className={cn("w-2 h-2 rounded-full", option.bgColor)} />
-                                                                    {option.label}
-                                                                </div>
-                                                            </SelectItem>
-                                                        ))}
-                                                    </SelectContent>
-                                                </Select>
-                                            </div>
-                                        </div>
+                                {/* Title input - The star of the show */}
+                                <Input
+                                    ref={titleInputRef}
+                                    placeholder="ما المهمة التي تريد إنجازها؟"
+                                    className="text-xl font-semibold border-0 shadow-none focus-visible:ring-0 px-0 h-auto py-2 placeholder:text-slate-300"
+                                    value={formData.title}
+                                    onChange={(e) => handleChange('title', e.target.value)}
+                                />
 
-                                        {/* Row 2: Priority + Classification */}
-                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                            <div className="space-y-2">
-                                                <Label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                                    <Flag className="w-4 h-4 text-slate-400" />
-                                                    الأولوية
-                                                    <FieldTooltip content={FIELD_TOOLTIPS.priority} />
-                                                </Label>
-                                                <Select value={formData.priority} onValueChange={(v) => handleChange('priority', v)}>
-                                                    <SelectTrigger className="rounded-xl border-slate-200 h-12">
-                                                        <SelectValue placeholder="اختر الأولوية" />
-                                                    </SelectTrigger>
-                                                    <SelectContent>
-                                                        {MAIN_PRIORITY_OPTIONS.map(option => (
-                                                            <SelectItem key={option.value} value={option.value}>
-                                                                <div className="flex items-center gap-2">
-                                                                    <span className={cn("w-2 h-2 rounded-full", option.dotColor)} />
-                                                                    {option.label}
-                                                                </div>
-                                                            </SelectItem>
-                                                        ))}
-                                                    </SelectContent>
-                                                </Select>
-                                            </div>
-                                            <div className="space-y-2">
-                                                <Label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                                    <Tag className="w-4 h-4 text-slate-400" />
-                                                    التصنيف
-                                                    <FieldTooltip content={FIELD_TOOLTIPS.category} />
-                                                </Label>
-                                                <Select value={formData.label} onValueChange={(v) => handleChange('label', v)}>
-                                                    <SelectTrigger className="rounded-xl border-slate-200 h-12">
-                                                        <SelectValue placeholder="اختر التصنيف" />
-                                                    </SelectTrigger>
-                                                    <SelectContent>
-                                                        {CATEGORY_OPTIONS.map(option => (
-                                                            <SelectItem key={option.value} value={option.value}>
-                                                                <Badge variant="secondary" className={cn("text-xs", option.bgColor, option.color)}>
-                                                                    {option.label}
-                                                                </Badge>
-                                                            </SelectItem>
-                                                        ))}
-                                                    </SelectContent>
-                                                </Select>
-                                            </div>
-                                        </div>
-
-                                        {/* Row 3: Tags */}
-                                        <div className="space-y-2">
-                                            <Label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                                <Tag className="w-4 h-4 text-slate-400" />
-                                                الوسوم
-                                                <FieldTooltip content={FIELD_TOOLTIPS.tags} />
-                                            </Label>
-                                            {formData.tags.length > 0 && (
-                                                <div className="flex flex-wrap gap-2 mb-2">
-                                                    {formData.tags.map(tag => (
-                                                        <Badge key={tag} variant="secondary" className="gap-1 bg-emerald-100 text-emerald-700">
-                                                            {tag}
-                                                            <button type="button" onClick={() => removeTag(tag)} className="hover:text-red-500">
-                                                                <X className="w-3 h-3" />
-                                                            </button>
-                                                        </Badge>
-                                                    ))}
-                                                </div>
-                                            )}
-                                            <div className="flex gap-2">
-                                                <Input
-                                                    placeholder="اكتب وسم واضغط Enter"
-                                                    className="rounded-xl border-slate-200 flex-1 h-12"
-                                                    value={tagInput}
-                                                    onChange={(e) => setTagInput(e.target.value)}
-                                                    onKeyDown={(e) => {
-                                                        if (e.key === 'Enter') {
-                                                            e.preventDefault()
-                                                            addTag()
-                                                        }
-                                                    }}
-                                                />
-                                                <Button type="button" variant="outline" onClick={addTag} className="rounded-xl h-12 px-4">
-                                                    <Plus className="w-4 h-4" />
-                                                </Button>
-                                            </div>
-                                        </div>
-
-                                        {/* Row 4: Due Date + Time + Estimated Minutes */}
-                                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                                            <div className="space-y-2">
-                                                <Label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                                    <Calendar className="w-4 h-4 text-slate-400" />
-                                                    تاريخ الاستحقاق
-                                                    <FieldTooltip content={FIELD_TOOLTIPS.dueDate} />
-                                                </Label>
+                                {/* Quick action pills */}
+                                <div className="flex flex-wrap items-center gap-2 mt-4">
+                                    {/* Due Date Pill */}
+                                    <Popover>
+                                        <PopoverTrigger asChild>
+                                            <button
+                                                type="button"
+                                                className={cn(
+                                                    "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm transition-all",
+                                                    formData.dueDate
+                                                        ? "bg-emerald-100 text-emerald-700 hover:bg-emerald-200"
+                                                        : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                                                )}
+                                            >
+                                                <Calendar className="w-3.5 h-3.5" />
+                                                {formData.dueDate ? new Date(formData.dueDate).toLocaleDateString('ar-SA') : 'تاريخ'}
+                                            </button>
+                                        </PopoverTrigger>
+                                        <PopoverContent className="w-auto p-3" align="start">
+                                            <div className="space-y-3">
+                                                <Label className="text-xs text-slate-500">تاريخ الاستحقاق</Label>
                                                 <Input
                                                     type="date"
-                                                    className="rounded-xl border-slate-200 h-12"
+                                                    className="rounded-lg h-10"
                                                     value={formData.dueDate}
                                                     onChange={(e) => handleChange('dueDate', e.target.value)}
                                                 />
-                                            </div>
-                                            <div className="space-y-2">
-                                                <Label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                                    <Clock className="w-4 h-4 text-slate-400" />
-                                                    الوقت
-                                                    <FieldTooltip content={FIELD_TOOLTIPS.dueTime} />
-                                                </Label>
+                                                <Label className="text-xs text-slate-500">الوقت</Label>
                                                 <Input
                                                     type="time"
-                                                    className="rounded-xl border-slate-200 h-12"
+                                                    className="rounded-lg h-10"
                                                     value={formData.dueTime}
                                                     onChange={(e) => handleChange('dueTime', e.target.value)}
                                                 />
                                             </div>
-                                            <div className="space-y-2">
-                                                <Label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                                    <Clock className="w-4 h-4 text-slate-400" />
-                                                    الوقت المقدر (دقائق)
-                                                    <FieldTooltip content={FIELD_TOOLTIPS.estimatedMinutes} />
-                                                </Label>
-                                                <Input
-                                                    type="number"
-                                                    min="0"
-                                                    placeholder="60"
-                                                    className="rounded-xl border-slate-200 h-12"
-                                                    value={formData.estimatedMinutes || ''}
-                                                    onChange={(e) => handleChange('estimatedMinutes', parseInt(e.target.value) || 0)}
-                                                />
-                                            </div>
-                                        </div>
+                                        </PopoverContent>
+                                    </Popover>
 
-                                        {/* Row 5: Client + Case */}
+                                    {/* Priority Pill */}
+                                    <Popover>
+                                        <PopoverTrigger asChild>
+                                            <button
+                                                type="button"
+                                                className={cn(
+                                                    "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm transition-all",
+                                                    priorityColors[formData.priority]
+                                                )}
+                                            >
+                                                <Flag className="w-3.5 h-3.5" />
+                                                {priorityLabels[formData.priority]}
+                                            </button>
+                                        </PopoverTrigger>
+                                        <PopoverContent className="w-40 p-2" align="start">
+                                            {MAIN_PRIORITY_OPTIONS.map(option => (
+                                                <button
+                                                    key={option.value}
+                                                    type="button"
+                                                    onClick={() => handleChange('priority', option.value)}
+                                                    className={cn(
+                                                        "w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-colors",
+                                                        formData.priority === option.value ? "bg-slate-100" : "hover:bg-slate-50"
+                                                    )}
+                                                >
+                                                    <span className={cn("w-2 h-2 rounded-full", option.dotColor)} />
+                                                    {option.label}
+                                                </button>
+                                            ))}
+                                        </PopoverContent>
+                                    </Popover>
+
+                                    {/* Assignee Pill */}
+                                    <Popover>
+                                        <PopoverTrigger asChild>
+                                            <button
+                                                type="button"
+                                                className={cn(
+                                                    "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm transition-all",
+                                                    selectedAssignee
+                                                        ? "bg-blue-100 text-blue-700 hover:bg-blue-200"
+                                                        : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                                                )}
+                                            >
+                                                <User className="w-3.5 h-3.5" />
+                                                {selectedAssignee ? `${selectedAssignee.firstName} ${selectedAssignee.lastName}` : 'تعيين'}
+                                            </button>
+                                        </PopoverTrigger>
+                                        <PopoverContent className="w-64 p-2" align="start">
+                                            {teamLoading ? (
+                                                <div className="flex items-center justify-center py-4">
+                                                    <Loader2 className="h-4 w-4 animate-spin" />
+                                                </div>
+                                            ) : teamMembers && teamMembers.length > 0 ? (
+                                                teamMembers.map((member) => (
+                                                    <button
+                                                        key={member._id}
+                                                        type="button"
+                                                        onClick={() => handleChange('assignedTo', member._id)}
+                                                        className={cn(
+                                                            "w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-colors",
+                                                            formData.assignedTo === member._id ? "bg-blue-50 text-blue-700" : "hover:bg-slate-50"
+                                                        )}
+                                                    >
+                                                        <div className="w-6 h-6 rounded-full bg-slate-200 flex items-center justify-center text-xs font-medium">
+                                                            {member.firstName?.[0]}
+                                                        </div>
+                                                        {member.firstName} {member.lastName}
+                                                    </button>
+                                                ))
+                                            ) : (
+                                                <p className="text-sm text-slate-500 text-center py-4">لا يوجد أعضاء فريق</p>
+                                            )}
+                                        </PopoverContent>
+                                    </Popover>
+
+                                    {/* Status Pill */}
+                                    <Popover>
+                                        <PopoverTrigger asChild>
+                                            <button
+                                                type="button"
+                                                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm bg-slate-100 text-slate-600 hover:bg-slate-200 transition-all"
+                                            >
+                                                <ListTodo className="w-3.5 h-3.5" />
+                                                {ACTIVE_STATUS_OPTIONS.find(s => s.value === formData.status)?.label || 'الحالة'}
+                                            </button>
+                                        </PopoverTrigger>
+                                        <PopoverContent className="w-48 p-2" align="start">
+                                            {ACTIVE_STATUS_OPTIONS.map(option => (
+                                                <button
+                                                    key={option.value}
+                                                    type="button"
+                                                    onClick={() => handleChange('status', option.value)}
+                                                    className={cn(
+                                                        "w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-colors",
+                                                        formData.status === option.value ? "bg-slate-100" : "hover:bg-slate-50"
+                                                    )}
+                                                >
+                                                    <span className={cn("w-2 h-2 rounded-full", option.bgColor)} />
+                                                    {option.label}
+                                                </button>
+                                            ))}
+                                        </PopoverContent>
+                                    </Popover>
+
+                                    {/* Add Description button */}
+                                    {!showDescription && (
+                                        <button
+                                            type="button"
+                                            onClick={() => setShowDescription(true)}
+                                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm bg-slate-100 text-slate-500 hover:bg-slate-200 hover:text-slate-600 transition-all"
+                                        >
+                                            <FileText className="w-3.5 h-3.5" />
+                                            وصف
+                                        </button>
+                                    )}
+                                </div>
+
+                                {/* Description (expandable) */}
+                                {showDescription && (
+                                    <div className="mt-4 animate-in slide-in-from-top-2 duration-200">
+                                        <Textarea
+                                            placeholder="أضف وصفاً للمهمة..."
+                                            className="min-h-[80px] rounded-xl border-slate-200 resize-none focus:border-emerald-500"
+                                            value={formData.description}
+                                            onChange={(e) => handleChange('description', e.target.value)}
+                                            autoFocus
+                                        />
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Expandable sections */}
+                            <div className="divide-y divide-slate-100">
+                                {/* Tags & Category */}
+                                <div className="px-8 py-4">
+                                    <div className="flex flex-wrap items-center gap-2">
+                                        {formData.tags.map(tag => (
+                                            <Badge key={tag} variant="secondary" className="gap-1 bg-slate-100 text-slate-700 hover:bg-slate-200">
+                                                <Hash className="w-3 h-3" />
+                                                {tag}
+                                                <button type="button" onClick={() => removeTag(tag)} className="hover:text-red-500 ms-1">
+                                                    <X className="w-3 h-3" />
+                                                </button>
+                                            </Badge>
+                                        ))}
+                                        <Input
+                                            placeholder="+ أضف وسم"
+                                            className="border-0 shadow-none focus-visible:ring-0 w-32 h-8 text-sm px-2"
+                                            value={tagInput}
+                                            onChange={(e) => setTagInput(e.target.value)}
+                                            onKeyDown={(e) => {
+                                                if (e.key === 'Enter') {
+                                                    e.preventDefault()
+                                                    addTag()
+                                                }
+                                            }}
+                                        />
+                                    </div>
+                                </div>
+
+                                {/* Client & Case */}
+                                <button
+                                    type="button"
+                                    onClick={() => setShowMoreOptions(!showMoreOptions)}
+                                    className="w-full px-8 py-4 flex items-center justify-between text-slate-600 hover:bg-slate-50 transition-colors"
+                                >
+                                    <span className="flex items-center gap-2 text-sm">
+                                        <Scale className="w-4 h-4" />
+                                        ربط بعميل أو قضية
+                                        {(selectedClient || selectedCase) && (
+                                            <span className="text-emerald-600 text-xs">
+                                                ({selectedClient?.fullName || ''} {selectedCase?.title ? `- ${selectedCase.title}` : ''})
+                                            </span>
+                                        )}
+                                    </span>
+                                    <ChevronDown className={cn("w-4 h-4 transition-transform", showMoreOptions && "rotate-180")} />
+                                </button>
+                                {showMoreOptions && (
+                                    <div className="px-8 py-4 bg-slate-50/50 animate-in slide-in-from-top-2 duration-200">
                                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                             <div className="space-y-2">
-                                                <Label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                                    <User className="w-4 h-4 text-slate-400" />
-                                                    {t('tasks.client', 'العميل')}
-                                                    <FieldTooltip content={FIELD_TOOLTIPS.client} />
-                                                </Label>
+                                                <Label className="text-xs text-slate-500">العميل</Label>
                                                 <Select value={formData.clientId} onValueChange={(v) => handleChange('clientId', v)}>
-                                                    <SelectTrigger className="rounded-xl border-slate-200 h-12">
-                                                        <SelectValue placeholder={t('tasks.selectClient', 'اختر العميل')} />
+                                                    <SelectTrigger className="rounded-xl border-slate-200 h-11">
+                                                        <SelectValue placeholder="اختر العميل" />
                                                     </SelectTrigger>
                                                     <SelectContent>
                                                         {clientsLoading ? (
@@ -537,22 +560,16 @@ export function CreateTaskView() {
                                                                 </SelectItem>
                                                             ))
                                                         ) : (
-                                                            <div className="text-center py-4 text-slate-500 text-sm">
-                                                                {t('tasks.noClients', 'لا يوجد عملاء')}
-                                                            </div>
+                                                            <div className="text-center py-4 text-slate-500 text-sm">لا يوجد عملاء</div>
                                                         )}
                                                     </SelectContent>
                                                 </Select>
                                             </div>
                                             <div className="space-y-2">
-                                                <Label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                                    <Scale className="w-4 h-4 text-slate-400" />
-                                                    {t('tasks.linkedCase', 'القضية المرتبطة')}
-                                                    <FieldTooltip content={FIELD_TOOLTIPS.case} />
-                                                </Label>
+                                                <Label className="text-xs text-slate-500">القضية</Label>
                                                 <Select value={formData.caseId} onValueChange={(v) => handleChange('caseId', v)}>
-                                                    <SelectTrigger className="rounded-xl border-slate-200 h-12">
-                                                        <SelectValue placeholder={t('tasks.selectCase', 'اختر القضية')} />
+                                                    <SelectTrigger className="rounded-xl border-slate-200 h-11">
+                                                        <SelectValue placeholder="اختر القضية" />
                                                     </SelectTrigger>
                                                     <SelectContent>
                                                         {casesLoading ? (
@@ -566,396 +583,381 @@ export function CreateTaskView() {
                                                                 </SelectItem>
                                                             ))
                                                         ) : (
-                                                            <div className="text-center py-4 text-slate-500 text-sm">
-                                                                {t('tasks.noCases', 'لا توجد قضايا')}
-                                                            </div>
+                                                            <div className="text-center py-4 text-slate-500 text-sm">لا توجد قضايا</div>
                                                         )}
                                                     </SelectContent>
                                                 </Select>
                                             </div>
                                         </div>
-
-                                        {/* Row 6: Assigned To */}
-                                        <div className="space-y-2">
-                                            <Label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                                <Users className="w-4 h-4 text-slate-400" />
-                                                {t('tasks.assignedTo', 'تعيين إلى')}
-                                                <FieldTooltip content={FIELD_TOOLTIPS.assignedTo} />
-                                            </Label>
-                                            <Select value={formData.assignedTo} onValueChange={(v) => handleChange('assignedTo', v)}>
-                                                <SelectTrigger className="rounded-xl border-slate-200 h-12">
-                                                    <SelectValue placeholder={t('tasks.selectAssignee', 'اختر المسؤول')} />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    {teamLoading ? (
-                                                        <div className="flex items-center justify-center py-4">
-                                                            <Loader2 className="h-4 w-4 animate-spin" />
-                                                        </div>
-                                                    ) : teamMembers && teamMembers.length > 0 ? (
-                                                        teamMembers.map((member) => (
-                                                            <SelectItem key={member._id} value={member._id}>
-                                                                {member.firstName} {member.lastName}
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
+                                            <div className="space-y-2">
+                                                <Label className="text-xs text-slate-500">التصنيف</Label>
+                                                <Select value={formData.label} onValueChange={(v) => handleChange('label', v)}>
+                                                    <SelectTrigger className="rounded-xl border-slate-200 h-11">
+                                                        <SelectValue placeholder="اختر التصنيف" />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                        {CATEGORY_OPTIONS.map(option => (
+                                                            <SelectItem key={option.value} value={option.value}>
+                                                                <Badge variant="secondary" className={cn("text-xs", option.bgColor, option.color)}>
+                                                                    {option.label}
+                                                                </Badge>
                                                             </SelectItem>
-                                                        ))
-                                                    ) : (
-                                                        <div className="text-center py-4 text-slate-500 text-sm">
-                                                            {t('tasks.noTeamMembers', 'لا يوجد أعضاء فريق')}
-                                                        </div>
-                                                    )}
-                                                </SelectContent>
-                                            </Select>
-                                        </div>
-
-                                        {/* Row 7: Description */}
-                                        <div className="space-y-2">
-                                            <Label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                                <FileText className="w-4 h-4 text-slate-400" />
-                                                وصف المهمة
-                                                <FieldTooltip content={FIELD_TOOLTIPS.description} />
-                                            </Label>
-                                            <Textarea
-                                                placeholder="أدخل تفاصيل إضافية عن المهمة..."
-                                                className="min-h-[100px] rounded-xl border-slate-200 resize-none"
-                                                value={formData.description}
-                                                onChange={(e) => handleChange('description', e.target.value)}
-                                            />
-                                        </div>
-                                    </CardContent>
-                                </Card>
-                            </div>
-
-                            {/* CARD 2: Recurring Task */}
-                            <div ref={schedulingRef}>
-                                <Collapsible open={showScheduling} onOpenChange={setShowScheduling}>
-                                    <Card className="rounded-3xl shadow-sm border-slate-100">
-                                        <CollapsibleTrigger asChild>
-                                            <CardHeader className="cursor-pointer hover:bg-slate-50/50 transition-colors rounded-t-3xl bg-slate-50/50 border-b border-slate-100">
-                                                <div className="flex items-center justify-between">
-                                                    <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                                                        <Repeat className="w-5 h-5 text-emerald-500" />
-                                                        مهمة متكررة
-                                                        {isRecurring && (
-                                                            <Badge variant="secondary" className="bg-emerald-100 text-emerald-700 text-xs">
-                                                                مفعّل
-                                                            </Badge>
-                                                        )}
-                                                    </CardTitle>
-                                                    <ChevronDown className={cn("w-5 h-5 text-slate-500 transition-transform", showScheduling && "rotate-180")} />
-                                                </div>
-                                            </CardHeader>
-                                        </CollapsibleTrigger>
-                                        <CollapsibleContent>
-                                            <CardContent className="space-y-5 pt-6">
-                                                {/* Recurring Toggle */}
-                                                <div className="flex items-center gap-3 p-4 bg-slate-50 rounded-xl">
-                                                    <Checkbox
-                                                        id="recurring-toggle"
-                                                        checked={isRecurring}
-                                                        onCheckedChange={(checked) => setIsRecurring(checked === true)}
-                                                        className="h-5 w-5 border-2 border-slate-300 data-[state=checked]:bg-emerald-500 data-[state=checked]:border-emerald-500"
-                                                    />
-                                                    <label htmlFor="recurring-toggle" className="flex items-center gap-2 cursor-pointer flex-1">
-                                                        <span className="font-medium text-slate-700">تفعيل التكرار</span>
-                                                    </label>
-                                                </div>
-
-                                                {/* Recurring Options */}
-                                                {isRecurring && (
-                                                    <div className="space-y-4 p-4 bg-emerald-50/50 rounded-xl border border-emerald-100">
-                                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                                            <div className="space-y-2">
-                                                                <Label className="text-sm font-medium text-slate-700">التكرار</Label>
-                                                                <Select
-                                                                    value={recurringConfig.frequency}
-                                                                    onValueChange={(v: RecurrenceFrequency) => setRecurringConfig(prev => ({ ...prev, frequency: v }))}
-                                                                >
-                                                                    <SelectTrigger className="rounded-xl h-12">
-                                                                        <SelectValue />
-                                                                    </SelectTrigger>
-                                                                    <SelectContent>
-                                                                        {FREQUENCY_OPTIONS.map(option => (
-                                                                            <SelectItem key={option.value} value={option.value}>{option.label}</SelectItem>
-                                                                        ))}
-                                                                    </SelectContent>
-                                                                </Select>
-                                                            </div>
-                                                            <div className="space-y-2">
-                                                                <Label className="text-sm font-medium text-slate-700">نوع التكرار</Label>
-                                                                <Select
-                                                                    value={recurringConfig.type}
-                                                                    onValueChange={(v: RecurrenceType) => setRecurringConfig(prev => ({ ...prev, type: v }))}
-                                                                >
-                                                                    <SelectTrigger className="rounded-xl h-12">
-                                                                        <SelectValue />
-                                                                    </SelectTrigger>
-                                                                    <SelectContent>
-                                                                        <SelectItem value="due_date">بناءً على تاريخ الاستحقاق</SelectItem>
-                                                                        <SelectItem value="completion_date">بناءً على تاريخ الإكمال</SelectItem>
-                                                                    </SelectContent>
-                                                                </Select>
-                                                            </div>
-                                                        </div>
-
-                                                        {recurringConfig.frequency === 'weekly' && (
-                                                            <div className="space-y-2">
-                                                                <Label className="text-sm font-medium text-slate-700">أيام الأسبوع</Label>
-                                                                <div className="flex flex-wrap gap-2">
-                                                                    {DAYS_OF_WEEK.map(day => (
-                                                                        <Button
-                                                                            key={day.value}
-                                                                            type="button"
-                                                                            variant={recurringConfig.daysOfWeek?.includes(day.value) ? "default" : "outline"}
-                                                                            size="sm"
-                                                                            onClick={() => toggleDayOfWeek(day.value)}
-                                                                            className={cn("rounded-full h-10 min-w-10", recurringConfig.daysOfWeek?.includes(day.value) && "bg-emerald-500 hover:bg-emerald-600")}
-                                                                        >
-                                                                            {day.label}
-                                                                        </Button>
-                                                                    ))}
-                                                                </div>
-                                                            </div>
-                                                        )}
-
-                                                        {recurringConfig.frequency === 'custom' && (
-                                                            <div className="space-y-2">
-                                                                <Label className="text-sm font-medium text-slate-700">كل X أيام</Label>
-                                                                <Input
-                                                                    type="number"
-                                                                    min="1"
-                                                                    className="rounded-xl w-32 h-12"
-                                                                    value={recurringConfig.interval || 1}
-                                                                    onChange={(e) => setRecurringConfig(prev => ({ ...prev, interval: parseInt(e.target.value) || 1 }))}
-                                                                />
-                                                            </div>
-                                                        )}
-
-                                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                                            <div className="space-y-2">
-                                                                <Label className="text-sm font-medium text-slate-700">استراتيجية التعيين</Label>
-                                                                <Select
-                                                                    value={recurringConfig.assigneeStrategy}
-                                                                    onValueChange={(v: AssigneeStrategy) => setRecurringConfig(prev => ({ ...prev, assigneeStrategy: v }))}
-                                                                >
-                                                                    <SelectTrigger className="rounded-xl h-12">
-                                                                        <SelectValue />
-                                                                    </SelectTrigger>
-                                                                    <SelectContent>
-                                                                        {ASSIGNEE_STRATEGY_OPTIONS.map(option => (
-                                                                            <SelectItem key={option.value} value={option.value}>{option.label}</SelectItem>
-                                                                        ))}
-                                                                    </SelectContent>
-                                                                </Select>
-                                                            </div>
-                                                            <div className="space-y-2">
-                                                                <Label className="text-sm font-medium text-slate-700">تاريخ الانتهاء (اختياري)</Label>
-                                                                <Input
-                                                                    type="date"
-                                                                    className="rounded-xl h-12"
-                                                                    value={recurringConfig.endDate || ''}
-                                                                    onChange={(e) => setRecurringConfig(prev => ({ ...prev, endDate: e.target.value }))}
-                                                                />
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                )}
-                                            </CardContent>
-                                        </CollapsibleContent>
-                                    </Card>
-                                </Collapsible>
-                            </div>
-
-                            {/* CARD 3: Subtasks */}
-                            <div ref={subtasksRef}>
-                                <Collapsible open={showSubtasks} onOpenChange={setShowSubtasks}>
-                                    <Card className="rounded-3xl shadow-sm border-slate-100">
-                                        <CollapsibleTrigger asChild>
-                                            <CardHeader className="cursor-pointer hover:bg-slate-50/50 transition-colors rounded-t-3xl bg-slate-50/50 border-b border-slate-100">
-                                                <div className="flex items-center justify-between">
-                                                    <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                                                        <ListTodo className="w-5 h-5 text-emerald-500" />
-                                                        المهام الفرعية
-                                                        {subtasks.length > 0 && (
-                                                            <Badge variant="secondary" className="bg-emerald-100 text-emerald-700 text-xs">
-                                                                {subtasks.length}
-                                                            </Badge>
-                                                        )}
-                                                    </CardTitle>
-                                                    <ChevronDown className={cn("w-5 h-5 text-slate-500 transition-transform", showSubtasks && "rotate-180")} />
-                                                </div>
-                                            </CardHeader>
-                                        </CollapsibleTrigger>
-                                        <CollapsibleContent>
-                                            <CardContent className="space-y-4 pt-6">
-                                                {subtasks.length > 0 && (
-                                                    <div className="space-y-2">
-                                                        {subtasks.map((subtask) => (
-                                                            <div key={subtask.id} className="flex items-center gap-3 p-3 bg-slate-50 rounded-xl">
-                                                                <span className="flex-1 text-slate-700">{subtask.title}</span>
-                                                                {isRecurring && (
-                                                                    <label className="flex items-center gap-2 text-sm text-slate-500">
-                                                                        <Checkbox
-                                                                            checked={subtask.autoReset}
-                                                                            onCheckedChange={() => toggleSubtaskAutoReset(subtask.id)}
-                                                                        />
-                                                                        إعادة تعيين
-                                                                    </label>
-                                                                )}
-                                                                <Button
-                                                                    type="button"
-                                                                    variant="ghost"
-                                                                    size="icon"
-                                                                    onClick={() => removeSubtask(subtask.id)}
-                                                                    className="text-red-500 hover:text-red-600 hover:bg-red-50 h-8 w-8"
-                                                                >
-                                                                    <X className="w-4 h-4" />
-                                                                </Button>
-                                                            </div>
                                                         ))}
-                                                    </div>
-                                                )}
-                                                <div className="space-y-2">
-                                                    <Label className="text-sm font-medium text-slate-700">إضافة مهمة فرعية</Label>
-                                                    <div className="flex gap-2">
-                                                        <Input
-                                                            placeholder="عنوان المهمة الفرعية"
-                                                            className="rounded-xl border-slate-200 flex-1 h-12"
-                                                            value={newSubtask}
-                                                            onChange={(e) => setNewSubtask(e.target.value)}
-                                                            onKeyDown={(e) => {
-                                                                if (e.key === 'Enter') {
-                                                                    e.preventDefault()
-                                                                    addSubtask()
-                                                                }
-                                                            }}
-                                                        />
-                                                        <Button type="button" onClick={addSubtask} className="rounded-xl h-12 bg-emerald-500 hover:bg-emerald-600">
-                                                            <Plus className="w-4 h-4 ms-2" />
-                                                            إضافة
-                                                        </Button>
-                                                    </div>
-                                                </div>
-                                            </CardContent>
-                                        </CollapsibleContent>
-                                    </Card>
-                                </Collapsible>
-                            </div>
-
-                            {/* CARD 4: Reminders */}
-                            <div ref={remindersRef}>
-                                <Collapsible open={showReminders} onOpenChange={setShowReminders}>
-                                    <Card className="rounded-3xl shadow-sm border-slate-100">
-                                        <CollapsibleTrigger asChild>
-                                            <CardHeader className="cursor-pointer hover:bg-slate-50/50 transition-colors rounded-t-3xl bg-slate-50/50 border-b border-slate-100">
-                                                <div className="flex items-center justify-between">
-                                                    <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                                                        <Bell className="w-5 h-5 text-emerald-500" />
-                                                        التذكيرات
-                                                        {reminders.length > 0 && (
-                                                            <Badge variant="secondary" className="bg-emerald-100 text-emerald-700 text-xs">
-                                                                {reminders.length}
-                                                            </Badge>
-                                                        )}
-                                                    </CardTitle>
-                                                    <ChevronDown className={cn("w-5 h-5 text-slate-500 transition-transform", showReminders && "rotate-180")} />
-                                                </div>
-                                            </CardHeader>
-                                        </CollapsibleTrigger>
-                                        <CollapsibleContent>
-                                            <CardContent className="space-y-4 pt-6">
-                                                {reminders.length > 0 && (
-                                                    <div className="space-y-2">
-                                                        {reminders.map((reminder, index) => (
-                                                            <div key={index} className="flex items-center gap-3 p-3 bg-slate-50 rounded-xl flex-wrap">
-                                                                <div className="space-y-1">
-                                                                    <Label className="text-xs text-slate-500">نوع التذكير</Label>
-                                                                    <Select
-                                                                        value={reminder.type}
-                                                                        onValueChange={(v) => updateReminder(index, 'type', v)}
-                                                                    >
-                                                                        <SelectTrigger className="rounded-xl w-32 h-10">
-                                                                            <SelectValue />
-                                                                        </SelectTrigger>
-                                                                        <SelectContent>
-                                                                            {REMINDER_TYPE_OPTIONS.map(option => (
-                                                                                <SelectItem key={option.value} value={option.value}>{option.label}</SelectItem>
-                                                                            ))}
-                                                                        </SelectContent>
-                                                                    </Select>
-                                                                </div>
-                                                                <div className="space-y-1">
-                                                                    <Label className="text-xs text-slate-500">قبل (دقائق)</Label>
-                                                                    <Input
-                                                                        type="number"
-                                                                        min="1"
-                                                                        className="rounded-xl w-24 h-10"
-                                                                        value={reminder.beforeMinutes}
-                                                                        onChange={(e) => updateReminder(index, 'beforeMinutes', parseInt(e.target.value) || 30)}
-                                                                    />
-                                                                </div>
-                                                                <Button
-                                                                    type="button"
-                                                                    variant="ghost"
-                                                                    size="icon"
-                                                                    onClick={() => removeReminder(index)}
-                                                                    className="text-red-500 hover:text-red-600 hover:bg-red-50 h-10 w-10 mt-auto"
-                                                                >
-                                                                    <X className="w-4 h-4" />
-                                                                </Button>
-                                                            </div>
-                                                        ))}
-                                                    </div>
-                                                )}
-                                                <Button
-                                                    type="button"
-                                                    variant="outline"
-                                                    onClick={addReminder}
-                                                    className="w-full rounded-xl h-12 border-dashed border-2 text-slate-500 hover:text-emerald-600 hover:border-emerald-300 hover:bg-emerald-50/50"
-                                                >
-                                                    <Plus className="w-4 h-4 ms-2" />
-                                                    إضافة تذكير
-                                                </Button>
-                                            </CardContent>
-                                        </CollapsibleContent>
-                                    </Card>
-                                </Collapsible>
-                            </div>
-
-                            {/* Submit Buttons */}
-                            <Card className="rounded-3xl shadow-sm border-slate-100">
-                                <CardContent className="py-4">
-                                    <div className="flex flex-col sm:flex-row items-center justify-end gap-3">
-                                        <Link to="/dashboard/tasks/list" className="w-full sm:w-auto">
-                                            <Button type="button" variant="ghost" className="w-full text-slate-500 hover:text-slate-700 h-12">
-                                                إلغاء
-                                            </Button>
-                                        </Link>
-                                        <Button
-                                            type="submit"
-                                            className="w-full sm:w-auto bg-emerald-500 hover:bg-emerald-600 text-white min-w-[160px] rounded-xl shadow-lg shadow-emerald-500/20 h-12"
-                                            disabled={createTaskMutation.isPending}
-                                        >
-                                            {createTaskMutation.isPending ? (
-                                                <span className="flex items-center gap-2">
-                                                    <Loader2 className="w-4 h-4 animate-spin" />
-                                                    جاري الحفظ...
-                                                </span>
-                                            ) : (
-                                                <span className="flex items-center gap-2">
-                                                    <Save className="w-4 h-4" />
-                                                    حفظ المهمة
-                                                </span>
-                                            )}
-                                        </Button>
+                                                    </SelectContent>
+                                                </Select>
+                                            </div>
+                                            <div className="space-y-2">
+                                                <Label className="text-xs text-slate-500">الوقت المقدر (دقائق)</Label>
+                                                <Input
+                                                    type="number"
+                                                    min="0"
+                                                    placeholder="60"
+                                                    className="rounded-xl border-slate-200 h-11"
+                                                    value={formData.estimatedMinutes || ''}
+                                                    onChange={(e) => handleChange('estimatedMinutes', parseInt(e.target.value) || 0)}
+                                                />
+                                            </div>
+                                        </div>
                                     </div>
-                                </CardContent>
-                            </Card>
+                                )}
+
+                                {/* Subtasks */}
+                                <button
+                                    type="button"
+                                    onClick={() => setShowSubtasks(!showSubtasks)}
+                                    className="w-full px-8 py-4 flex items-center justify-between text-slate-600 hover:bg-slate-50 transition-colors"
+                                >
+                                    <span className="flex items-center gap-2 text-sm">
+                                        <ListTodo className="w-4 h-4" />
+                                        المهام الفرعية
+                                        {subtasks.length > 0 && (
+                                            <Badge variant="secondary" className="bg-emerald-100 text-emerald-700 text-xs">
+                                                {subtasks.length}
+                                            </Badge>
+                                        )}
+                                    </span>
+                                    <ChevronDown className={cn("w-4 h-4 transition-transform", showSubtasks && "rotate-180")} />
+                                </button>
+                                {showSubtasks && (
+                                    <div className="px-8 py-4 bg-slate-50/50 animate-in slide-in-from-top-2 duration-200">
+                                        {subtasks.length > 0 && (
+                                            <div className="space-y-2 mb-4">
+                                                {subtasks.map((subtask) => (
+                                                    <div key={subtask.id} className="flex items-center gap-3 p-3 bg-white rounded-xl border border-slate-100">
+                                                        <div className="w-5 h-5 rounded-full border-2 border-slate-300" />
+                                                        <span className="flex-1 text-slate-700 text-sm">{subtask.title}</span>
+                                                        {isRecurring && (
+                                                            <label className="flex items-center gap-2 text-xs text-slate-500">
+                                                                <Checkbox
+                                                                    checked={subtask.autoReset}
+                                                                    onCheckedChange={() => toggleSubtaskAutoReset(subtask.id)}
+                                                                    className="h-4 w-4"
+                                                                />
+                                                                إعادة تعيين
+                                                            </label>
+                                                        )}
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => removeSubtask(subtask.id)}
+                                                            className="text-slate-400 hover:text-red-500 transition-colors"
+                                                        >
+                                                            <X className="w-4 h-4" />
+                                                        </button>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        )}
+                                        <div className="flex gap-2">
+                                            <Input
+                                                placeholder="أضف مهمة فرعية..."
+                                                className="rounded-xl border-slate-200 flex-1 h-11"
+                                                value={newSubtask}
+                                                onChange={(e) => setNewSubtask(e.target.value)}
+                                                onKeyDown={(e) => {
+                                                    if (e.key === 'Enter') {
+                                                        e.preventDefault()
+                                                        addSubtask()
+                                                    }
+                                                }}
+                                            />
+                                            <Button type="button" onClick={addSubtask} size="sm" className="rounded-xl h-11 bg-emerald-500 hover:bg-emerald-600">
+                                                <Plus className="w-4 h-4" />
+                                            </Button>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Recurring */}
+                                <button
+                                    type="button"
+                                    onClick={() => setShowRecurring(!showRecurring)}
+                                    className="w-full px-8 py-4 flex items-center justify-between text-slate-600 hover:bg-slate-50 transition-colors"
+                                >
+                                    <span className="flex items-center gap-2 text-sm">
+                                        <Repeat className="w-4 h-4" />
+                                        تكرار المهمة
+                                        {isRecurring && (
+                                            <Badge variant="secondary" className="bg-emerald-100 text-emerald-700 text-xs">
+                                                مفعّل
+                                            </Badge>
+                                        )}
+                                    </span>
+                                    <ChevronDown className={cn("w-4 h-4 transition-transform", showRecurring && "rotate-180")} />
+                                </button>
+                                {showRecurring && (
+                                    <div className="px-8 py-4 bg-slate-50/50 animate-in slide-in-from-top-2 duration-200">
+                                        <div className="flex items-center gap-3 p-4 bg-white rounded-xl border border-slate-100 mb-4">
+                                            <Checkbox
+                                                id="recurring-toggle"
+                                                checked={isRecurring}
+                                                onCheckedChange={(checked) => setIsRecurring(checked === true)}
+                                                className="h-5 w-5 data-[state=checked]:bg-emerald-500 data-[state=checked]:border-emerald-500"
+                                            />
+                                            <label htmlFor="recurring-toggle" className="flex-1 cursor-pointer">
+                                                <span className="font-medium text-slate-700 text-sm">تفعيل التكرار</span>
+                                                <p className="text-xs text-slate-500">ستتكرر المهمة تلقائياً حسب الجدول المحدد</p>
+                                            </label>
+                                        </div>
+
+                                        {isRecurring && (
+                                            <div className="space-y-4 p-4 bg-emerald-50/50 rounded-xl border border-emerald-100">
+                                                <div className="grid grid-cols-2 gap-4">
+                                                    <div className="space-y-2">
+                                                        <Label className="text-xs text-slate-500">التكرار</Label>
+                                                        <Select
+                                                            value={recurringConfig.frequency}
+                                                            onValueChange={(v: RecurrenceFrequency) => setRecurringConfig(prev => ({ ...prev, frequency: v }))}
+                                                        >
+                                                            <SelectTrigger className="rounded-xl h-11">
+                                                                <SelectValue />
+                                                            </SelectTrigger>
+                                                            <SelectContent>
+                                                                {FREQUENCY_OPTIONS.map(option => (
+                                                                    <SelectItem key={option.value} value={option.value}>{option.label}</SelectItem>
+                                                                ))}
+                                                            </SelectContent>
+                                                        </Select>
+                                                    </div>
+                                                    <div className="space-y-2">
+                                                        <Label className="text-xs text-slate-500">نوع التكرار</Label>
+                                                        <Select
+                                                            value={recurringConfig.type}
+                                                            onValueChange={(v: RecurrenceType) => setRecurringConfig(prev => ({ ...prev, type: v }))}
+                                                        >
+                                                            <SelectTrigger className="rounded-xl h-11">
+                                                                <SelectValue />
+                                                            </SelectTrigger>
+                                                            <SelectContent>
+                                                                <SelectItem value="due_date">بناءً على تاريخ الاستحقاق</SelectItem>
+                                                                <SelectItem value="completion_date">بناءً على تاريخ الإكمال</SelectItem>
+                                                            </SelectContent>
+                                                        </Select>
+                                                    </div>
+                                                </div>
+
+                                                {recurringConfig.frequency === 'weekly' && (
+                                                    <div className="space-y-2">
+                                                        <Label className="text-xs text-slate-500">أيام الأسبوع</Label>
+                                                        <div className="flex flex-wrap gap-2">
+                                                            {DAYS_OF_WEEK.map(day => (
+                                                                <button
+                                                                    key={day.value}
+                                                                    type="button"
+                                                                    onClick={() => toggleDayOfWeek(day.value)}
+                                                                    className={cn(
+                                                                        "w-10 h-10 rounded-full text-sm font-medium transition-all",
+                                                                        recurringConfig.daysOfWeek?.includes(day.value)
+                                                                            ? "bg-emerald-500 text-white"
+                                                                            : "bg-white border border-slate-200 text-slate-600 hover:border-emerald-300"
+                                                                    )}
+                                                                >
+                                                                    {day.label}
+                                                                </button>
+                                                            ))}
+                                                        </div>
+                                                    </div>
+                                                )}
+
+                                                {recurringConfig.frequency === 'custom' && (
+                                                    <div className="space-y-2">
+                                                        <Label className="text-xs text-slate-500">كل X أيام</Label>
+                                                        <Input
+                                                            type="number"
+                                                            min="1"
+                                                            className="rounded-xl w-32 h-11"
+                                                            value={recurringConfig.interval || 1}
+                                                            onChange={(e) => setRecurringConfig(prev => ({ ...prev, interval: parseInt(e.target.value) || 1 }))}
+                                                        />
+                                                    </div>
+                                                )}
+
+                                                <div className="grid grid-cols-2 gap-4">
+                                                    <div className="space-y-2">
+                                                        <Label className="text-xs text-slate-500">استراتيجية التعيين</Label>
+                                                        <Select
+                                                            value={recurringConfig.assigneeStrategy}
+                                                            onValueChange={(v: AssigneeStrategy) => setRecurringConfig(prev => ({ ...prev, assigneeStrategy: v }))}
+                                                        >
+                                                            <SelectTrigger className="rounded-xl h-11">
+                                                                <SelectValue />
+                                                            </SelectTrigger>
+                                                            <SelectContent>
+                                                                {ASSIGNEE_STRATEGY_OPTIONS.map(option => (
+                                                                    <SelectItem key={option.value} value={option.value}>{option.label}</SelectItem>
+                                                                ))}
+                                                            </SelectContent>
+                                                        </Select>
+                                                    </div>
+                                                    <div className="space-y-2">
+                                                        <Label className="text-xs text-slate-500">تاريخ الانتهاء</Label>
+                                                        <Input
+                                                            type="date"
+                                                            className="rounded-xl h-11"
+                                                            value={recurringConfig.endDate || ''}
+                                                            onChange={(e) => setRecurringConfig(prev => ({ ...prev, endDate: e.target.value }))}
+                                                        />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
+
+                                {/* Reminders */}
+                                <button
+                                    type="button"
+                                    onClick={() => setShowReminders(!showReminders)}
+                                    className="w-full px-8 py-4 flex items-center justify-between text-slate-600 hover:bg-slate-50 transition-colors"
+                                >
+                                    <span className="flex items-center gap-2 text-sm">
+                                        <Bell className="w-4 h-4" />
+                                        التذكيرات
+                                        {reminders.length > 0 && (
+                                            <Badge variant="secondary" className="bg-emerald-100 text-emerald-700 text-xs">
+                                                {reminders.length}
+                                            </Badge>
+                                        )}
+                                    </span>
+                                    <ChevronDown className={cn("w-4 h-4 transition-transform", showReminders && "rotate-180")} />
+                                </button>
+                                {showReminders && (
+                                    <div className="px-8 py-4 bg-slate-50/50 animate-in slide-in-from-top-2 duration-200">
+                                        {reminders.length > 0 && (
+                                            <div className="space-y-2 mb-4">
+                                                {reminders.map((reminder, index) => (
+                                                    <div key={index} className="flex items-center gap-3 p-3 bg-white rounded-xl border border-slate-100">
+                                                        <Select
+                                                            value={reminder.type}
+                                                            onValueChange={(v) => updateReminder(index, 'type', v)}
+                                                        >
+                                                            <SelectTrigger className="rounded-lg w-32 h-9 text-sm">
+                                                                <SelectValue />
+                                                            </SelectTrigger>
+                                                            <SelectContent>
+                                                                {REMINDER_TYPE_OPTIONS.map(option => (
+                                                                    <SelectItem key={option.value} value={option.value}>{option.label}</SelectItem>
+                                                                ))}
+                                                            </SelectContent>
+                                                        </Select>
+                                                        <span className="text-sm text-slate-500">قبل</span>
+                                                        <Input
+                                                            type="number"
+                                                            min="1"
+                                                            className="rounded-lg w-20 h-9 text-sm"
+                                                            value={reminder.beforeMinutes}
+                                                            onChange={(e) => updateReminder(index, 'beforeMinutes', parseInt(e.target.value) || 30)}
+                                                        />
+                                                        <span className="text-sm text-slate-500">دقيقة</span>
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => removeReminder(index)}
+                                                            className="text-slate-400 hover:text-red-500 transition-colors ms-auto"
+                                                        >
+                                                            <X className="w-4 h-4" />
+                                                        </button>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        )}
+                                        <button
+                                            type="button"
+                                            onClick={addReminder}
+                                            className="w-full py-3 border-2 border-dashed border-slate-200 rounded-xl text-slate-500 hover:border-emerald-300 hover:text-emerald-600 hover:bg-emerald-50/50 transition-all text-sm"
+                                        >
+                                            <Plus className="w-4 h-4 inline-block ms-2" />
+                                            إضافة تذكير
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Footer / Actions */}
+                            <div className="px-8 py-6 bg-slate-50 border-t border-slate-100 flex items-center justify-between gap-4">
+                                {/* Templates */}
+                                {templates && templates.length > 0 && (
+                                    <Popover>
+                                        <PopoverTrigger asChild>
+                                            <button
+                                                type="button"
+                                                className="text-sm text-slate-500 hover:text-slate-700 flex items-center gap-1.5 transition-colors"
+                                            >
+                                                <Sparkles className="w-4 h-4" />
+                                                استخدم قالب
+                                                <ChevronRight className="w-3 h-3" />
+                                            </button>
+                                        </PopoverTrigger>
+                                        <PopoverContent className="w-64 p-2" align="start">
+                                            {templates.slice(0, 5).map((template) => (
+                                                <button
+                                                    key={template._id}
+                                                    type="button"
+                                                    onClick={() => handleUseTemplate(template._id)}
+                                                    className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm hover:bg-slate-50 transition-colors text-start"
+                                                    disabled={createFromTemplateMutation.isPending}
+                                                >
+                                                    <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center">
+                                                        <FileText className="w-4 h-4 text-slate-500" />
+                                                    </div>
+                                                    <span className="flex-1 truncate">{template.title}</span>
+                                                </button>
+                                            ))}
+                                        </PopoverContent>
+                                    </Popover>
+                                )}
+
+                                <div className="flex items-center gap-3 ms-auto">
+                                    <Link to="/dashboard/tasks/list">
+                                        <Button type="button" variant="ghost" className="text-slate-500 hover:text-slate-700 h-11 px-6">
+                                            إلغاء
+                                        </Button>
+                                    </Link>
+                                    <Button
+                                        type="submit"
+                                        className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl shadow-lg shadow-emerald-500/20 h-11 px-8 font-medium"
+                                        disabled={createTaskMutation.isPending}
+                                    >
+                                        {createTaskMutation.isPending ? (
+                                            <span className="flex items-center gap-2">
+                                                <Loader2 className="w-4 h-4 animate-spin" />
+                                                جاري الحفظ...
+                                            </span>
+                                        ) : (
+                                            <span className="flex items-center gap-2">
+                                                <Save className="w-4 h-4" />
+                                                حفظ المهمة
+                                            </span>
+                                        )}
+                                    </Button>
+                                </div>
+                            </div>
                         </form>
                     </div>
 
-                    {/* Sidebar Widgets - Hidden on mobile */}
-                    <div className="hidden lg:block">
-                        <TasksSidebar context="tasks" />
-                    </div>
+                    {/* Keyboard shortcut hint */}
+                    <p className="text-center text-xs text-slate-400 mt-6">
+                        اضغط <kbd className="px-1.5 py-0.5 bg-slate-100 rounded text-slate-600 font-mono">⌘</kbd> + <kbd className="px-1.5 py-0.5 bg-slate-100 rounded text-slate-600 font-mono">Enter</kbd> للحفظ السريع
+                    </p>
                 </div>
             </Main>
         </>
