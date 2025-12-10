@@ -3,7 +3,10 @@ import { useTranslation } from 'react-i18next'
 import { Loader2, Mail, Clock } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from './ui/button'
-import { apiClient } from '@/lib/api'
+import { apiClientNoVersion } from '@/lib/api'
+
+// Auth routes are NOT versioned - they're at /api/auth/*, not /api/v1/auth/*
+const authApi = apiClientNoVersion
 import { toast } from 'sonner'
 
 interface OtpInputProps {
@@ -121,7 +124,7 @@ export function OtpInput({ email, onVerify, onResend, className }: OtpInputProps
     setError('')
 
     try {
-      await apiClient.post('/auth/send-otp', { email })
+      await authApi.post('/auth/send-otp', { email })
 
       toast.success(
         isRTL ? 'تم إرسال رمز التحقق' : 'OTP sent successfully',
@@ -177,7 +180,7 @@ export function OtpInput({ email, onVerify, onResend, className }: OtpInputProps
     setError('')
 
     try {
-      const response = await apiClient.post('/auth/verify-otp', {
+      const response = await authApi.post('/auth/verify-otp', {
         email,
         otp: code,
       })
