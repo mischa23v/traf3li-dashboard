@@ -3,8 +3,8 @@ import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import {
     Save, Calendar, User, Flag, FileText, Loader2, Scale,
-    Plus, X, Clock, Repeat, ListTodo, ChevronDown, ChevronRight,
-    Bell, CheckSquare, Hash, ArrowRight
+    Plus, X, Clock, Repeat, ListTodo, ChevronDown, ChevronUp, ChevronRight,
+    Bell, CheckSquare, Hash, ArrowRight, Sparkles
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -24,6 +24,11 @@ import {
     PopoverContent,
     PopoverTrigger,
 } from "@/components/ui/popover"
+import {
+    Collapsible,
+    CollapsibleContent,
+    CollapsibleTrigger,
+} from "@/components/ui/collapsible"
 import { Header } from '@/components/layout/header'
 import { TopNav } from '@/components/layout/top-nav'
 import { DynamicIsland } from '@/components/dynamic-island'
@@ -539,25 +544,25 @@ export function CreateTaskView() {
                                         </div>
                                     </div>
 
-                                    {/* Client & Case */}
-                                    <button
-                                        type="button"
-                                        onClick={() => setShowMoreOptions(!showMoreOptions)}
-                                        className="w-full px-8 py-4 flex items-center justify-between text-slate-600 hover:bg-slate-50 transition-colors"
-                                    >
-                                        <span className="flex items-center gap-2 text-base font-medium">
-                                            <Scale className="w-5 h-5" />
-                                            ربط بعميل أو قضية
-                                            {(selectedClient || selectedCase) && (
-                                                <span className="text-emerald-600 text-sm">
-                                                    ({selectedClient?.fullName || ''} {selectedCase?.title ? `- ${selectedCase.title}` : ''})
-                                                </span>
-                                            )}
-                                        </span>
-                                        <ChevronDown className={cn("w-5 h-5 transition-transform", showMoreOptions && "rotate-180")} />
-                                    </button>
-                                    {showMoreOptions && (
-                                        <div className="px-8 py-4 bg-slate-50/50 animate-in slide-in-from-top-2 duration-200">
+                                {/* Client & Case Section */}
+                                <Collapsible open={showMoreOptions} onOpenChange={setShowMoreOptions}>
+                                    <div className="border-t border-slate-100 pt-6">
+                                        <CollapsibleTrigger asChild>
+                                            <Button variant="ghost" className="w-full justify-between p-0 h-auto hover:bg-transparent px-8">
+                                                <h3 className="text-lg font-semibold text-slate-800 flex items-center gap-2">
+                                                    <Scale className="w-5 h-5 text-emerald-500" />
+                                                    ربط بعميل أو قضية
+                                                    {(selectedClient || selectedCase) && (
+                                                        <span className="text-emerald-600 text-sm font-normal">
+                                                            ({selectedClient?.fullName || ''} {selectedCase?.title ? `- ${selectedCase.title}` : ''})
+                                                        </span>
+                                                    )}
+                                                </h3>
+                                                {showMoreOptions ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
+                                            </Button>
+                                        </CollapsibleTrigger>
+                                        <CollapsibleContent className="mt-4">
+                                            <div className="space-y-4 p-4 mx-8 bg-slate-50 rounded-xl">
                                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                                 <div className="space-y-2">
                                                     <Label className="text-xs text-slate-500">العميل</Label>
@@ -636,28 +641,30 @@ export function CreateTaskView() {
                                                     />
                                                 </div>
                                             </div>
-                                        </div>
-                                    )}
+                                            </div>
+                                        </CollapsibleContent>
+                                    </div>
+                                </Collapsible>
 
-                                    {/* Subtasks */}
-                                    <button
-                                        type="button"
-                                        onClick={() => setShowSubtasks(!showSubtasks)}
-                                        className="w-full px-8 py-4 flex items-center justify-between text-slate-600 hover:bg-slate-50 transition-colors"
-                                    >
-                                        <span className="flex items-center gap-2 text-base font-medium">
-                                            <ListTodo className="w-5 h-5" />
-                                            المهام الفرعية
-                                            {subtasks.length > 0 && (
-                                                <Badge variant="secondary" className="bg-emerald-100 text-emerald-700 text-sm">
-                                                    {subtasks.length}
-                                                </Badge>
-                                            )}
-                                        </span>
-                                        <ChevronDown className={cn("w-5 h-5 transition-transform", showSubtasks && "rotate-180")} />
-                                    </button>
-                                    {showSubtasks && (
-                                        <div className="px-8 py-4 bg-slate-50/50 animate-in slide-in-from-top-2 duration-200">
+                                {/* Subtasks Section */}
+                                <Collapsible open={showSubtasks} onOpenChange={setShowSubtasks}>
+                                    <div className="border-t border-slate-100 pt-6">
+                                        <CollapsibleTrigger asChild>
+                                            <Button variant="ghost" className="w-full justify-between p-0 h-auto hover:bg-transparent px-8">
+                                                <h3 className="text-lg font-semibold text-slate-800 flex items-center gap-2">
+                                                    <ListTodo className="w-5 h-5 text-emerald-500" />
+                                                    المهام الفرعية
+                                                    {subtasks.length > 0 && (
+                                                        <Badge variant="secondary" className="bg-emerald-100 text-emerald-700 text-sm">
+                                                            {subtasks.length}
+                                                        </Badge>
+                                                    )}
+                                                </h3>
+                                                {showSubtasks ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
+                                            </Button>
+                                        </CollapsibleTrigger>
+                                        <CollapsibleContent className="mt-4">
+                                            <div className="space-y-4 p-4 mx-8 bg-slate-50 rounded-xl">
                                             {subtasks.length > 0 && (
                                                 <div className="space-y-2 mb-4">
                                                     {subtasks.map((subtask) => (
@@ -702,28 +709,30 @@ export function CreateTaskView() {
                                                     <Plus className="w-4 h-4" />
                                                 </Button>
                                             </div>
-                                        </div>
-                                    )}
+                                            </div>
+                                        </CollapsibleContent>
+                                    </div>
+                                </Collapsible>
 
-                                    {/* Recurring */}
-                                    <button
-                                        type="button"
-                                        onClick={() => setShowRecurring(!showRecurring)}
-                                        className="w-full px-8 py-4 flex items-center justify-between text-slate-600 hover:bg-slate-50 transition-colors"
-                                    >
-                                        <span className="flex items-center gap-2 text-base font-medium">
-                                            <Repeat className="w-5 h-5" />
-                                            تكرار المهمة
-                                            {isRecurring && (
-                                                <Badge variant="secondary" className="bg-emerald-100 text-emerald-700 text-sm">
-                                                    مفعّل
-                                                </Badge>
-                                            )}
-                                        </span>
-                                        <ChevronDown className={cn("w-5 h-5 transition-transform", showRecurring && "rotate-180")} />
-                                    </button>
-                                    {showRecurring && (
-                                        <div className="px-8 py-4 bg-slate-50/50 animate-in slide-in-from-top-2 duration-200">
+                                {/* Recurring Section */}
+                                <Collapsible open={showRecurring} onOpenChange={setShowRecurring}>
+                                    <div className="border-t border-slate-100 pt-6">
+                                        <CollapsibleTrigger asChild>
+                                            <Button variant="ghost" className="w-full justify-between p-0 h-auto hover:bg-transparent px-8">
+                                                <h3 className="text-lg font-semibold text-slate-800 flex items-center gap-2">
+                                                    <Repeat className="w-5 h-5 text-emerald-500" />
+                                                    تكرار المهمة
+                                                    {isRecurring && (
+                                                        <Badge variant="secondary" className="bg-emerald-100 text-emerald-700 text-sm">
+                                                            مفعّل
+                                                        </Badge>
+                                                    )}
+                                                </h3>
+                                                {showRecurring ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
+                                            </Button>
+                                        </CollapsibleTrigger>
+                                        <CollapsibleContent className="mt-4">
+                                            <div className="space-y-4 p-4 mx-8 bg-slate-50 rounded-xl">
                                             <div className="flex items-center gap-3 p-4 bg-white rounded-xl border border-slate-100 mb-4">
                                                 <Checkbox
                                                     id="recurring-toggle"
@@ -838,28 +847,30 @@ export function CreateTaskView() {
                                                     </div>
                                                 </div>
                                             )}
-                                        </div>
-                                    )}
+                                            </div>
+                                        </CollapsibleContent>
+                                    </div>
+                                </Collapsible>
 
-                                    {/* Reminders */}
-                                    <button
-                                        type="button"
-                                        onClick={() => setShowReminders(!showReminders)}
-                                        className="w-full px-8 py-4 flex items-center justify-between text-slate-600 hover:bg-slate-50 transition-colors"
-                                    >
-                                        <span className="flex items-center gap-2 text-base font-medium">
-                                            <Bell className="w-5 h-5" />
-                                            التذكيرات
-                                            {reminders.length > 0 && (
-                                                <Badge variant="secondary" className="bg-emerald-100 text-emerald-700 text-sm">
-                                                    {reminders.length}
-                                                </Badge>
-                                            )}
-                                        </span>
-                                        <ChevronDown className={cn("w-5 h-5 transition-transform", showReminders && "rotate-180")} />
-                                    </button>
-                                    {showReminders && (
-                                        <div className="px-8 py-4 bg-slate-50/50 animate-in slide-in-from-top-2 duration-200">
+                                {/* Reminders Section */}
+                                <Collapsible open={showReminders} onOpenChange={setShowReminders}>
+                                    <div className="border-t border-slate-100 pt-6">
+                                        <CollapsibleTrigger asChild>
+                                            <Button variant="ghost" className="w-full justify-between p-0 h-auto hover:bg-transparent px-8">
+                                                <h3 className="text-lg font-semibold text-slate-800 flex items-center gap-2">
+                                                    <Bell className="w-5 h-5 text-emerald-500" />
+                                                    التذكيرات
+                                                    {reminders.length > 0 && (
+                                                        <Badge variant="secondary" className="bg-emerald-100 text-emerald-700 text-sm">
+                                                            {reminders.length}
+                                                        </Badge>
+                                                    )}
+                                                </h3>
+                                                {showReminders ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
+                                            </Button>
+                                        </CollapsibleTrigger>
+                                        <CollapsibleContent className="mt-4">
+                                            <div className="space-y-4 p-4 mx-8 bg-slate-50 rounded-xl">
                                             {reminders.length > 0 && (
                                                 <div className="space-y-2 mb-4">
                                                     {reminders.map((reminder, index) => (
@@ -905,9 +916,10 @@ export function CreateTaskView() {
                                                 <Plus className="w-4 h-4 inline-block ms-2" />
                                                 إضافة تذكير
                                             </button>
-                                        </div>
-                                    )}
-                                </div>
+                                            </div>
+                                        </CollapsibleContent>
+                                    </div>
+                                </Collapsible>
 
                                 {/* Footer / Actions */}
                                 <div className="px-8 py-6 bg-slate-50 border-t border-slate-100 flex items-center justify-between gap-4">
