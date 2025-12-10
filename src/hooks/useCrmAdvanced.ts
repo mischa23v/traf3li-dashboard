@@ -529,7 +529,7 @@ export const useWhatsAppConversations = (filters?: ConversationFilters) => {
     queryKey: ['whatsapp-conversations', filters],
     queryFn: () => whatsAppService.getConversations(filters),
     staleTime: 30 * 1000,
-    refetchInterval: 10000, // Refresh every 10 seconds
+    refetchInterval: 30000, // Refresh every 30 seconds (reduced from 10s for performance)
   })
 }
 
