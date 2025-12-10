@@ -4,7 +4,7 @@ import { toast } from 'sonner'
 import {
     Save, Calendar, User, Flag, FileText, Loader2, Scale,
     Plus, X, Clock, Repeat, ListTodo, ChevronDown, ChevronRight,
-    Bell, CheckSquare, Hash, ArrowRight
+    Bell, CheckSquare, Hash, ArrowRight, Sparkles
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
