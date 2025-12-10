@@ -217,6 +217,21 @@ apiClient.interceptors.response.use(
       }
     }
 
+    // Handle 400 with "Unauthorized" message - Backend returns 400 for missing token
+    // This is a compatibility fix until backend is updated to return 401
+    if (error.response?.status === 400) {
+      const message = error.response?.data?.message?.toLowerCase() || ''
+      if (message.includes('unauthorized') || message.includes('access denied') || message.includes('relogin')) {
+        // Clear any stored auth state
+        localStorage.removeItem('user')
+
+        // Redirect to sign-in page if not already there
+        if (!window.location.pathname.includes('/sign-in')) {
+          window.location.href = '/sign-in'
+        }
+      }
+    }
+
     // Handle 403 Forbidden - Permission denied (including departed users) and CSRF errors
     if (error.response?.status === 403) {
       const message = error.response?.data?.message

@@ -10,25 +10,15 @@ export const Route = createFileRoute('/_authenticated')({
     // This prevents showing authenticated UI with stale/expired sessions
     try {
       await checkAuth()
-      const isAuthenticated = useAuthStore.getState().isAuthenticated
-
-      if (!isAuthenticated) {
-        throw redirect({
-          to: '/sign-in',
-          search: {
-            redirect: location.href,
-          },
-        })
-      }
-
-      // No firm check needed - lawyers without firm are treated as solo lawyers
-      // The auth store's checkAuth() already handles setting solo lawyer permissions
     } catch (error) {
-      // Check if this is a redirect (not an actual error)
-      if (error && typeof error === 'object' && 'to' in error) {
-        throw error
-      }
+      // checkAuth() shouldn't throw, but if it does, log it and continue
+      // We'll check isAuthenticated below
+      console.error('checkAuth error:', error)
+    }
 
+    const isAuthenticated = useAuthStore.getState().isAuthenticated
+
+    if (!isAuthenticated) {
       // Clear any stale auth state
       useAuthStore.getState().logout()
       throw redirect({
@@ -38,6 +28,9 @@ export const Route = createFileRoute('/_authenticated')({
         },
       })
     }
+
+    // No firm check needed - lawyers without firm are treated as solo lawyers
+    // The auth store's checkAuth() already handles setting solo lawyer permissions
   },
   component: AuthenticatedLayout,
 })
