@@ -313,8 +313,9 @@ const authService = {
 
       return user
     } catch (error: any) {
-      // If unauthorized, clear localStorage
-      if (error?.status === 401) {
+      // If unauthorized (401) or unauthorized access (400 from backend), clear localStorage
+      // Backend may return 400 for missing token, so treat both as auth errors
+      if (error?.status === 401 || error?.status === 400) {
         localStorage.removeItem('user')
       }
       return null
