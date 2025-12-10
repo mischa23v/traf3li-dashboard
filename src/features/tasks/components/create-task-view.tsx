@@ -4,7 +4,7 @@ import { toast } from 'sonner'
 import {
     Save, Calendar, User, Flag, FileText, Loader2, Scale,
     Plus, X, Clock, Repeat, ListTodo, ChevronDown, ChevronRight,
-    Bell, Sparkles, Hash
+    Bell, Sparkles, Hash, ArrowRight
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -59,12 +59,12 @@ interface SubtaskInput {
     autoReset?: boolean
 }
 
-// Priority pill colors
+// Priority pill colors - using emerald theme to match hero card
 const priorityColors: Record<string, string> = {
     urgent: 'bg-red-500 text-white',
     high: 'bg-orange-500 text-white',
-    medium: 'bg-yellow-500 text-white',
-    low: 'bg-slate-400 text-white',
+    medium: 'bg-emerald-500 text-white',
+    low: 'bg-emerald-400 text-white',
 }
 
 const priorityLabels: Record<string, string> = {
@@ -300,6 +300,14 @@ export function CreateTaskView() {
                     <ProductivityHero badge="إدارة المهام" title="إنشاء مهمة" type="tasks" listMode={true} />
                 </div>
 
+                {/* Back Arrow Link */}
+                <div className="flex items-center gap-3 mb-2">
+                    <Link to="/dashboard/tasks/list" className="p-2.5 bg-white hover:bg-emerald-50 rounded-xl transition-colors shadow-sm border border-slate-100 group">
+                        <ArrowRight className="w-5 h-5 text-slate-400 group-hover:text-emerald-600 transition-colors" />
+                    </Link>
+                    <span className="text-base font-medium text-slate-600">العودة للمهام</span>
+                </div>
+
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     {/* RIGHT COLUMN (Main Content) */}
                     <div className="lg:col-span-2">
@@ -309,39 +317,42 @@ export function CreateTaskView() {
                                 {/* Header */}
                                 <div className="px-8 pt-8 pb-6 border-b border-slate-100">
                                     <div className="flex items-center gap-3 mb-6">
-                                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center shadow-lg shadow-emerald-500/20">
-                                            <Sparkles className="w-5 h-5 text-white" />
+                                        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center shadow-lg shadow-emerald-500/20">
+                                            <Sparkles className="w-6 h-6 text-white" />
                                         </div>
                                         <div>
-                                            <h1 className="text-xl font-bold text-slate-900">مهمة جديدة</h1>
-                                            <p className="text-sm text-slate-500">اضغط ⌘+Enter للحفظ السريع</p>
+                                            <h1 className="text-2xl font-bold text-slate-900">مهمة جديدة</h1>
+                                            <p className="text-base text-slate-500">اضغط ⌘+Enter للحفظ السريع</p>
                                         </div>
                                     </div>
 
-                                    {/* Title input - The star of the show */}
-                                    <Input
-                                        ref={titleInputRef}
-                                        placeholder="ما المهمة التي تريد إنجازها؟"
-                                        className="text-xl font-semibold border-0 shadow-none focus-visible:ring-0 px-0 h-auto py-2 placeholder:text-slate-300"
-                                        value={formData.title}
-                                        onChange={(e) => handleChange('title', e.target.value)}
-                                    />
+                                    {/* Title input with label - The star of the show */}
+                                    <div className="space-y-2">
+                                        <Label className="text-base font-semibold text-slate-700">عنوان المهمة</Label>
+                                        <Input
+                                            ref={titleInputRef}
+                                            placeholder="اكتب عنوان المهمة هنا..."
+                                            className="text-2xl font-bold border-2 border-slate-200 focus:border-emerald-500 rounded-xl shadow-none focus-visible:ring-0 px-4 h-14 placeholder:text-slate-300 placeholder:font-normal"
+                                            value={formData.title}
+                                            onChange={(e) => handleChange('title', e.target.value)}
+                                        />
+                                    </div>
 
                                     {/* Quick action pills */}
-                                    <div className="flex flex-wrap items-center gap-2 mt-4">
+                                    <div className="flex flex-wrap items-center gap-2.5 mt-5">
                                         {/* Due Date Pill */}
                                         <Popover>
                                             <PopoverTrigger asChild>
                                                 <button
                                                     type="button"
                                                     className={cn(
-                                                        "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm transition-all",
+                                                        "inline-flex items-center gap-2 px-4 py-2 rounded-full text-base font-medium transition-all",
                                                         formData.dueDate
-                                                            ? "bg-emerald-100 text-emerald-700 hover:bg-emerald-200"
-                                                            : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                                                            ? "bg-emerald-500 text-white hover:bg-emerald-600"
+                                                            : "bg-emerald-100 text-emerald-700 hover:bg-emerald-200"
                                                     )}
                                                 >
-                                                    <Calendar className="w-3.5 h-3.5" />
+                                                    <Calendar className="w-4 h-4" />
                                                     {formData.dueDate ? new Date(formData.dueDate).toLocaleDateString('ar-SA') : 'تاريخ'}
                                                 </button>
                                             </PopoverTrigger>
@@ -371,11 +382,11 @@ export function CreateTaskView() {
                                                 <button
                                                     type="button"
                                                     className={cn(
-                                                        "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm transition-all",
+                                                        "inline-flex items-center gap-2 px-4 py-2 rounded-full text-base font-medium transition-all",
                                                         priorityColors[formData.priority]
                                                     )}
                                                 >
-                                                    <Flag className="w-3.5 h-3.5" />
+                                                    <Flag className="w-4 h-4" />
                                                     {priorityLabels[formData.priority]}
                                                 </button>
                                             </PopoverTrigger>
@@ -403,13 +414,13 @@ export function CreateTaskView() {
                                                 <button
                                                     type="button"
                                                     className={cn(
-                                                        "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm transition-all",
+                                                        "inline-flex items-center gap-2 px-4 py-2 rounded-full text-base font-medium transition-all",
                                                         selectedAssignee
-                                                            ? "bg-blue-100 text-blue-700 hover:bg-blue-200"
-                                                            : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                                                            ? "bg-emerald-500 text-white hover:bg-emerald-600"
+                                                            : "bg-emerald-100 text-emerald-700 hover:bg-emerald-200"
                                                     )}
                                                 >
-                                                    <User className="w-3.5 h-3.5" />
+                                                    <User className="w-4 h-4" />
                                                     {selectedAssignee ? `${selectedAssignee.firstName} ${selectedAssignee.lastName}` : 'تعيين'}
                                                 </button>
                                             </PopoverTrigger>
@@ -446,9 +457,9 @@ export function CreateTaskView() {
                                             <PopoverTrigger asChild>
                                                 <button
                                                     type="button"
-                                                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm bg-slate-100 text-slate-600 hover:bg-slate-200 transition-all"
+                                                    className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-base font-medium bg-emerald-100 text-emerald-700 hover:bg-emerald-200 transition-all"
                                                 >
-                                                    <ListTodo className="w-3.5 h-3.5" />
+                                                    <ListTodo className="w-4 h-4" />
                                                     {ACTIVE_STATUS_OPTIONS.find(s => s.value === formData.status)?.label || 'الحالة'}
                                                 </button>
                                             </PopoverTrigger>
@@ -475,9 +486,9 @@ export function CreateTaskView() {
                                             <button
                                                 type="button"
                                                 onClick={() => setShowDescription(true)}
-                                                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm bg-slate-100 text-slate-500 hover:bg-slate-200 hover:text-slate-600 transition-all"
+                                                className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-base font-medium bg-emerald-100 text-emerald-700 hover:bg-emerald-200 transition-all"
                                             >
-                                                <FileText className="w-3.5 h-3.5" />
+                                                <FileText className="w-4 h-4" />
                                                 وصف
                                             </button>
                                         )}
@@ -532,16 +543,16 @@ export function CreateTaskView() {
                                         onClick={() => setShowMoreOptions(!showMoreOptions)}
                                         className="w-full px-8 py-4 flex items-center justify-between text-slate-600 hover:bg-slate-50 transition-colors"
                                     >
-                                        <span className="flex items-center gap-2 text-sm">
-                                            <Scale className="w-4 h-4" />
+                                        <span className="flex items-center gap-2 text-base font-medium">
+                                            <Scale className="w-5 h-5" />
                                             ربط بعميل أو قضية
                                             {(selectedClient || selectedCase) && (
-                                                <span className="text-emerald-600 text-xs">
+                                                <span className="text-emerald-600 text-sm">
                                                     ({selectedClient?.fullName || ''} {selectedCase?.title ? `- ${selectedCase.title}` : ''})
                                                 </span>
                                             )}
                                         </span>
-                                        <ChevronDown className={cn("w-4 h-4 transition-transform", showMoreOptions && "rotate-180")} />
+                                        <ChevronDown className={cn("w-5 h-5 transition-transform", showMoreOptions && "rotate-180")} />
                                     </button>
                                     {showMoreOptions && (
                                         <div className="px-8 py-4 bg-slate-50/50 animate-in slide-in-from-top-2 duration-200">
@@ -632,16 +643,16 @@ export function CreateTaskView() {
                                         onClick={() => setShowSubtasks(!showSubtasks)}
                                         className="w-full px-8 py-4 flex items-center justify-between text-slate-600 hover:bg-slate-50 transition-colors"
                                     >
-                                        <span className="flex items-center gap-2 text-sm">
-                                            <ListTodo className="w-4 h-4" />
+                                        <span className="flex items-center gap-2 text-base font-medium">
+                                            <ListTodo className="w-5 h-5" />
                                             المهام الفرعية
                                             {subtasks.length > 0 && (
-                                                <Badge variant="secondary" className="bg-emerald-100 text-emerald-700 text-xs">
+                                                <Badge variant="secondary" className="bg-emerald-100 text-emerald-700 text-sm">
                                                     {subtasks.length}
                                                 </Badge>
                                             )}
                                         </span>
-                                        <ChevronDown className={cn("w-4 h-4 transition-transform", showSubtasks && "rotate-180")} />
+                                        <ChevronDown className={cn("w-5 h-5 transition-transform", showSubtasks && "rotate-180")} />
                                     </button>
                                     {showSubtasks && (
                                         <div className="px-8 py-4 bg-slate-50/50 animate-in slide-in-from-top-2 duration-200">
@@ -698,16 +709,16 @@ export function CreateTaskView() {
                                         onClick={() => setShowRecurring(!showRecurring)}
                                         className="w-full px-8 py-4 flex items-center justify-between text-slate-600 hover:bg-slate-50 transition-colors"
                                     >
-                                        <span className="flex items-center gap-2 text-sm">
-                                            <Repeat className="w-4 h-4" />
+                                        <span className="flex items-center gap-2 text-base font-medium">
+                                            <Repeat className="w-5 h-5" />
                                             تكرار المهمة
                                             {isRecurring && (
-                                                <Badge variant="secondary" className="bg-emerald-100 text-emerald-700 text-xs">
+                                                <Badge variant="secondary" className="bg-emerald-100 text-emerald-700 text-sm">
                                                     مفعّل
                                                 </Badge>
                                             )}
                                         </span>
-                                        <ChevronDown className={cn("w-4 h-4 transition-transform", showRecurring && "rotate-180")} />
+                                        <ChevronDown className={cn("w-5 h-5 transition-transform", showRecurring && "rotate-180")} />
                                     </button>
                                     {showRecurring && (
                                         <div className="px-8 py-4 bg-slate-50/50 animate-in slide-in-from-top-2 duration-200">
@@ -834,16 +845,16 @@ export function CreateTaskView() {
                                         onClick={() => setShowReminders(!showReminders)}
                                         className="w-full px-8 py-4 flex items-center justify-between text-slate-600 hover:bg-slate-50 transition-colors"
                                     >
-                                        <span className="flex items-center gap-2 text-sm">
-                                            <Bell className="w-4 h-4" />
+                                        <span className="flex items-center gap-2 text-base font-medium">
+                                            <Bell className="w-5 h-5" />
                                             التذكيرات
                                             {reminders.length > 0 && (
-                                                <Badge variant="secondary" className="bg-emerald-100 text-emerald-700 text-xs">
+                                                <Badge variant="secondary" className="bg-emerald-100 text-emerald-700 text-sm">
                                                     {reminders.length}
                                                 </Badge>
                                             )}
                                         </span>
-                                        <ChevronDown className={cn("w-4 h-4 transition-transform", showReminders && "rotate-180")} />
+                                        <ChevronDown className={cn("w-5 h-5 transition-transform", showReminders && "rotate-180")} />
                                     </button>
                                     {showReminders && (
                                         <div className="px-8 py-4 bg-slate-50/50 animate-in slide-in-from-top-2 duration-200">
