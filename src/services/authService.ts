@@ -409,15 +409,17 @@ const authService = {
           return cachedUser
         }
 
-        // Only clear if this is NOT a transient issue
-        logAuthEvent('CLEARING_AUTH_STATE', {
-          reason: 'Too many failures or not recently authenticated',
+        // IMPORTANT: Even if we decide to "clear auth", DON'T actually clear localStorage
+        // or reset lastSuccessfulAuth! Multiple parallel route preloads race and clearing
+        // state here causes ALL of them to fail. Just return null to redirect to sign-in.
+        // Only explicit logout() should clear localStorage.
+        logAuthEvent('AUTH_CHECK_FAILED_NO_CLEAR', {
+          reason: 'Backend returned no user, conditions not met for using cache',
           consecutive401Count,
           recentlyAuthenticated,
+          hasCachedUser: !!cachedUser,
+          note: 'NOT clearing localStorage - only logout() does that',
         })
-        localStorage.removeItem('user')
-        lastSuccessfulAuth = 0
-        consecutive401Count = 0
         return null
       }
 
@@ -472,10 +474,11 @@ const authService = {
           return cachedUser
         }
 
-        logAuthEvent('CLEARING_AUTH_STATE', { trigger: '401_exceeded_threshold' })
-        localStorage.removeItem('user')
-        lastSuccessfulAuth = 0
-        consecutive401Count = 0
+        // DON'T clear localStorage here! Race conditions with parallel route preloads.
+        logAuthEvent('AUTH_401_FAILED_NO_CLEAR', {
+          trigger: '401_conditions_not_met',
+          note: 'NOT clearing localStorage - only logout() does that',
+        })
         return null
       }
 
@@ -498,10 +501,11 @@ const authService = {
             return cachedUser
           }
 
-          logAuthEvent('CLEARING_AUTH_STATE', { trigger: '400_auth_error' })
-          localStorage.removeItem('user')
-          lastSuccessfulAuth = 0
-          consecutive401Count = 0
+          // DON'T clear localStorage here! Race conditions with parallel route preloads.
+          logAuthEvent('AUTH_400_FAILED_NO_CLEAR', {
+            trigger: '400_conditions_not_met',
+            note: 'NOT clearing localStorage - only logout() does that',
+          })
           return null
         }
       }
