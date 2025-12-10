@@ -310,13 +310,13 @@ const authService = {
    */
   getCurrentUser: async (): Promise<User | null> => {
     try {
-      console.log('[AUTH DEBUG] Calling /auth/me...')
+      console.log('[AUTH] getCurrentUser - calling /auth/me')
       const response = await authApi.get<AuthResponse>('/auth/me')
-      console.log('[AUTH DEBUG] /auth/me response:', response.status, response.data)
+      console.log('[AUTH] getCurrentUser - success:', response.data.user?.username)
 
       if (response.data.error || !response.data.user) {
         // Backend explicitly said no user - clear auth
-        console.log('[AUTH DEBUG] Backend returned error or no user:', response.data)
+        console.warn('[AUTH] getCurrentUser - backend returned no user:', response.data.message)
         localStorage.removeItem('user')
         return null
       }
@@ -329,17 +329,18 @@ const authService = {
 
       return user
     } catch (error: any) {
-      console.log('[AUTH DEBUG] /auth/me ERROR:', {
+      // Log error details for debugging
+      console.error('[AUTH] getCurrentUser - ERROR:', {
         status: error?.status,
         message: error?.message,
-        error: error,
-        fullError: JSON.stringify(error, null, 2)
+        url: '/auth/me',
+        timestamp: new Date().toISOString(),
       })
 
       // Only treat 401 as "not authenticated"
       // 401 = token invalid/expired → user needs to login again
       if (error?.status === 401) {
-        console.log('[AUTH DEBUG] 401 - clearing auth')
+        console.warn('[AUTH] getCurrentUser - 401, session expired')
         localStorage.removeItem('user')
         return null
       }
@@ -347,9 +348,8 @@ const authService = {
       // For 400 with specific auth error messages, also treat as auth failure
       if (error?.status === 400) {
         const message = error?.message?.toLowerCase() || ''
-        console.log('[AUTH DEBUG] 400 error, message:', message)
         if (message.includes('unauthorized') || message.includes('access denied') || message.includes('token')) {
-          console.log('[AUTH DEBUG] 400 with auth message - clearing auth')
+          console.warn('[AUTH] getCurrentUser - 400 with auth error, clearing session')
           localStorage.removeItem('user')
           return null
         }
@@ -359,14 +359,13 @@ const authService = {
       // Return the cached user instead - they might still be authenticated
       // This prevents logout on temporary server issues
       const cachedUser = authService.getCachedUser()
-      console.log('[AUTH DEBUG] Non-auth error, cachedUser:', cachedUser ? 'exists' : 'null')
       if (cachedUser) {
-        console.warn('[AUTH DEBUG] Using cached user due to non-auth error:', error?.status, error?.message)
+        console.warn('[AUTH] getCurrentUser - using cached user due to error:', error?.status)
         return cachedUser
       }
 
       // No cached user and error - return null but don't redirect
-      console.log('[AUTH DEBUG] No cached user, returning null')
+      console.warn('[AUTH] getCurrentUser - no cached user, returning null')
       return null
     }
   },

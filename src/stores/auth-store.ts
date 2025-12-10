@@ -88,9 +88,17 @@ export const useAuthStore = create<AuthState>()(
        * Logout Action
        */
       logout: async () => {
+        // Log logout call with stack trace to identify what triggered it
+        console.warn('[AUTH] logout() called', {
+          timestamp: new Date().toISOString(),
+          currentPath: typeof window !== 'undefined' ? window.location.pathname : 'unknown',
+          stack: new Error().stack?.split('\n').slice(1, 5).join('\n'),
+        })
+
         set({ isLoading: true })
         try {
           await authService.logout()
+          console.log('[AUTH] logout successful')
           set({
             user: null,
             isAuthenticated: false,
@@ -102,6 +110,7 @@ export const useAuthStore = create<AuthState>()(
           // Clear permissions on logout
           usePermissionsStore.getState().clearPermissions()
         } catch (error: any) {
+          console.error('[AUTH] logout API failed:', error)
           // Even if API fails, clear state
           set({
             user: null,
@@ -120,6 +129,19 @@ export const useAuthStore = create<AuthState>()(
        * Set User Action
        */
       setUser: (user: User | null) => {
+        const prevUser = useAuthStore.getState().user
+        const wasAuthenticated = useAuthStore.getState().isAuthenticated
+        const willBeAuthenticated = user !== null
+
+        // Log state changes for debugging
+        if (wasAuthenticated !== willBeAuthenticated) {
+          console.log('[AUTH] setUser - auth state changing:', {
+            from: wasAuthenticated ? prevUser?.username : 'not authenticated',
+            to: willBeAuthenticated ? user?.username : 'not authenticated',
+            timestamp: new Date().toISOString(),
+          })
+        }
+
         set({
           user,
           isAuthenticated: user !== null,
