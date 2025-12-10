@@ -920,6 +920,7 @@ export function CreateTaskView() {
                                         </CollapsibleContent>
                                     </div>
                                 </Collapsible>
+                                </div>
 
                                 {/* Footer / Actions */}
                                 <div className="px-8 py-6 bg-slate-50 border-t border-slate-100 flex items-center justify-between gap-4">
