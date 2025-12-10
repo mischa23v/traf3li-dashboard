@@ -413,7 +413,7 @@ export function SignUpForm() {
           });
         }
         
-        const response = await apiClient.post('/auth/register', payload);
+        const response = await authApi.post('/auth/register', payload);
         if (response.status === 201) setShowSuccess(true);
       } catch (error: any) {
         alert(error.response?.data?.message || 'حدث خطأ ما، يرجى المحاولة مرة أخرى');

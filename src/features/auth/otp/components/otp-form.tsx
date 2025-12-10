@@ -22,7 +22,10 @@ import {
 } from '@/components/ui/input-otp'
 import { Loader2, RefreshCw } from 'lucide-react'
 import { toast } from 'sonner'
-import { apiClient } from '@/lib/api'
+import { apiClientNoVersion } from '@/lib/api'
+
+// Auth routes are NOT versioned - /api/auth/*, not /api/v1/auth/*
+const authApi = apiClientNoVersion
 
 const formSchema = z.object({
   otp: z
@@ -82,7 +85,7 @@ export function OtpForm({ className, email, onResendOtp, ...props }: OtpFormProp
       if (onResendOtp) {
         await onResendOtp()
       } else if (email) {
-        await apiClient.post('/auth/send-otp', { email })
+        await authApi.post('/auth/send-otp', { email })
       }
       toast.success('تم إرسال رمز التحقق بنجاح')
       setCooldown(RESEND_COOLDOWN)
@@ -108,7 +111,7 @@ export function OtpForm({ className, email, onResendOtp, ...props }: OtpFormProp
     try {
       // In production, this would call the actual API
       if (email) {
-        await apiClient.post('/auth/verify-otp', { email, otp: data.otp })
+        await authApi.post('/auth/verify-otp', { email, otp: data.otp })
         toast.success('تم التحقق بنجاح')
         navigate({ to: '/' })
       } else {
