@@ -300,19 +300,19 @@ export function CreateTaskView() {
                     <ProductivityHero badge="إدارة المهام" title="إنشاء مهمة" type="tasks" listMode={true} />
                 </div>
 
-                {/* Back Arrow Link */}
-                <div className="flex items-center gap-3 mb-2">
-                    <Link to="/dashboard/tasks/list" className="p-2.5 bg-white hover:bg-emerald-50 rounded-xl transition-colors shadow-sm border border-slate-100 group">
-                        <ArrowRight className="w-5 h-5 text-slate-400 group-hover:text-emerald-600 transition-colors" />
-                    </Link>
-                    <span className="text-base font-medium text-slate-600">العودة للمهام</span>
-                </div>
-
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     {/* RIGHT COLUMN (Main Content) */}
-                    <div className="lg:col-span-2">
-                        {/* Main form card - 10/10 Design */}
-                        <div className="bg-white rounded-2xl shadow-xl shadow-slate-200/50 border border-slate-100 overflow-hidden">
+                    <div className="lg:col-span-2 space-y-4">
+                        {/* Back Arrow Link - Styled like sidebar cards */}
+                        <Link to="/dashboard/tasks/list" className="flex items-center gap-3 p-4 bg-white rounded-2xl shadow-sm border border-slate-100 hover:border-emerald-200 hover:shadow-md transition-all group">
+                            <div className="w-10 h-10 rounded-xl bg-slate-100 group-hover:bg-emerald-100 flex items-center justify-center transition-colors">
+                                <ArrowRight className="w-5 h-5 text-slate-500 group-hover:text-emerald-600 transition-colors" />
+                            </div>
+                            <span className="text-base font-medium text-slate-700 group-hover:text-emerald-700 transition-colors">العودة لقائمة المهام</span>
+                        </Link>
+
+                        {/* Main form card */}
+                        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
                             <form onSubmit={handleSubmit}>
                                 {/* Header */}
                                 <div className="px-8 pt-8 pb-6 border-b border-slate-100">
@@ -322,34 +322,34 @@ export function CreateTaskView() {
                                         </div>
                                         <div>
                                             <h1 className="text-2xl font-bold text-slate-900">مهمة جديدة</h1>
-                                            <p className="text-base text-slate-500">اضغط ⌘+Enter للحفظ السريع</p>
+                                            <p className="text-base text-slate-500">للحفظ السريع اضغط كنترول + إنتر</p>
                                         </div>
                                     </div>
 
-                                    {/* Title input with label - The star of the show */}
+                                    {/* Title input with label */}
                                     <div className="space-y-2">
-                                        <Label className="text-base font-semibold text-slate-700">عنوان المهمة</Label>
+                                        <Label className="text-sm font-medium text-slate-600">عنوان المهمة</Label>
                                         <Input
                                             ref={titleInputRef}
                                             placeholder="اكتب عنوان المهمة هنا..."
-                                            className="text-2xl font-bold border-2 border-slate-200 focus:border-emerald-500 rounded-xl shadow-none focus-visible:ring-0 px-4 h-14 placeholder:text-slate-300 placeholder:font-normal"
+                                            className="text-lg font-semibold border border-slate-200 focus:border-emerald-500 rounded-xl shadow-none focus-visible:ring-0 px-4 h-12 placeholder:text-slate-400 placeholder:font-normal bg-slate-50/50"
                                             value={formData.title}
                                             onChange={(e) => handleChange('title', e.target.value)}
                                         />
                                     </div>
 
                                     {/* Quick action pills */}
-                                    <div className="flex flex-wrap items-center gap-2.5 mt-5">
+                                    <div className="flex flex-wrap items-center gap-2 mt-5">
                                         {/* Due Date Pill */}
                                         <Popover>
                                             <PopoverTrigger asChild>
                                                 <button
                                                     type="button"
                                                     className={cn(
-                                                        "inline-flex items-center gap-2 px-4 py-2 rounded-full text-base font-medium transition-all",
+                                                        "inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-sm font-medium transition-all border",
                                                         formData.dueDate
-                                                            ? "bg-emerald-500 text-white hover:bg-emerald-600"
-                                                            : "bg-emerald-100 text-emerald-700 hover:bg-emerald-200"
+                                                            ? "bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100"
+                                                            : "bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100 hover:border-slate-300"
                                                     )}
                                                 >
                                                     <Calendar className="w-4 h-4" />
@@ -381,12 +381,14 @@ export function CreateTaskView() {
                                             <PopoverTrigger asChild>
                                                 <button
                                                     type="button"
-                                                    className={cn(
-                                                        "inline-flex items-center gap-2 px-4 py-2 rounded-full text-base font-medium transition-all",
-                                                        priorityColors[formData.priority]
-                                                    )}
+                                                    className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-sm font-medium transition-all border bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100 hover:border-slate-300"
                                                 >
-                                                    <Flag className="w-4 h-4" />
+                                                    <span className={cn("w-2.5 h-2.5 rounded-full", {
+                                                        'bg-red-500': formData.priority === 'urgent',
+                                                        'bg-orange-500': formData.priority === 'high',
+                                                        'bg-emerald-500': formData.priority === 'medium',
+                                                        'bg-slate-400': formData.priority === 'low',
+                                                    })} />
                                                     {priorityLabels[formData.priority]}
                                                 </button>
                                             </PopoverTrigger>
@@ -414,10 +416,10 @@ export function CreateTaskView() {
                                                 <button
                                                     type="button"
                                                     className={cn(
-                                                        "inline-flex items-center gap-2 px-4 py-2 rounded-full text-base font-medium transition-all",
+                                                        "inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-sm font-medium transition-all border",
                                                         selectedAssignee
-                                                            ? "bg-emerald-500 text-white hover:bg-emerald-600"
-                                                            : "bg-emerald-100 text-emerald-700 hover:bg-emerald-200"
+                                                            ? "bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100"
+                                                            : "bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100 hover:border-slate-300"
                                                     )}
                                                 >
                                                     <User className="w-4 h-4" />
@@ -457,7 +459,7 @@ export function CreateTaskView() {
                                             <PopoverTrigger asChild>
                                                 <button
                                                     type="button"
-                                                    className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-base font-medium bg-emerald-100 text-emerald-700 hover:bg-emerald-200 transition-all"
+                                                    className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-sm font-medium bg-slate-50 text-slate-600 border border-slate-200 hover:bg-slate-100 hover:border-slate-300 transition-all"
                                                 >
                                                     <ListTodo className="w-4 h-4" />
                                                     {ACTIVE_STATUS_OPTIONS.find(s => s.value === formData.status)?.label || 'الحالة'}
@@ -486,7 +488,7 @@ export function CreateTaskView() {
                                             <button
                                                 type="button"
                                                 onClick={() => setShowDescription(true)}
-                                                className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-base font-medium bg-emerald-100 text-emerald-700 hover:bg-emerald-200 transition-all"
+                                                className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-sm font-medium bg-slate-50 text-slate-600 border border-slate-200 hover:bg-slate-100 hover:border-slate-300 transition-all"
                                             >
                                                 <FileText className="w-4 h-4" />
                                                 وصف
