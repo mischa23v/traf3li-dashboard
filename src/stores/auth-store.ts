@@ -142,15 +142,18 @@ export const useAuthStore = create<AuthState>()(
        * so we only clear auth state when user is explicitly null (401 from backend)
        */
       checkAuth: async () => {
+        console.log('[AUTH DEBUG] checkAuth called')
         set({ isLoading: true })
         try {
           const user = await authService.getCurrentUser()
+          console.log('[AUTH DEBUG] checkAuth - user from getCurrentUser:', user ? user.username : 'null')
           set({
             user,
             isAuthenticated: user !== null,
             isLoading: false,
             error: null,
           })
+          console.log('[AUTH DEBUG] checkAuth - isAuthenticated set to:', user !== null)
 
           // Set Sentry user context if user is authenticated
           if (user) {
