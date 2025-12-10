@@ -5,7 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import {
     Loader2, User, Building, Phone, MapPin, FileText, Calendar, ChevronDown,
-    Scale, Flag, Briefcase, Hash, Sparkles, Clock
+    Scale, Flag, Briefcase, Hash, Sparkles
 } from 'lucide-react'
 import { saudiNationalIdSchemaOptional, saudiCrNumberSchemaOptional } from '@/lib/zod-validators'
 import { Button } from '@/components/ui/button'
@@ -80,7 +80,6 @@ const PRIORITY_OPTIONS = [
 export function CreateCaseForm({ onSuccess }: CreateCaseFormProps) {
     const { t } = useTranslation()
     const [laborDetailsOpen, setLaborDetailsOpen] = useState(false)
-    const [showDescription, setShowDescription] = useState(false)
     const createCaseMutation = useCreateCase()
 
     const {
@@ -157,14 +156,6 @@ export function CreateCaseForm({ onSuccess }: CreateCaseFormProps) {
         }
     }
 
-    const getCategoryColor = (category: string) => {
-        return CATEGORY_OPTIONS.find(c => c.value === category)?.color || CATEGORY_OPTIONS[6].color
-    }
-
-    const getPriorityDot = (priority: string) => {
-        return PRIORITY_OPTIONS.find(p => p.value === priority)?.dotColor || PRIORITY_OPTIONS[1].dotColor
-    }
-
     return (
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-0">
             {/* Form Header with Section Label */}
@@ -198,80 +189,70 @@ export function CreateCaseForm({ onSuccess }: CreateCaseFormProps) {
                 </div>
             </div>
 
-            {/* Quick Options Bar - Pill Style */}
-            <div className="py-5 border-y border-slate-100">
-                <div className="flex flex-wrap items-center gap-2">
-                    {/* Category Pill */}
-                    <Select value={selectedCategory} onValueChange={handleCategoryChange}>
-                        <SelectTrigger className={cn(
-                            "w-auto h-auto px-4 py-2 rounded-full text-sm font-medium border transition-all gap-2",
-                            getCategoryColor(selectedCategory)
-                        )}>
-                            <Briefcase className="w-4 h-4" />
-                            <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent className="rounded-2xl border-0 shadow-xl">
-                            {CATEGORY_OPTIONS.map(option => (
-                                <SelectItem key={option.value} value={option.value} className="rounded-xl">
-                                    <span className={cn("px-2 py-0.5 rounded-full text-xs font-medium", option.color)}>
-                                        {option.label}
-                                    </span>
-                                </SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
+            {/* Category, Priority & Description Section */}
+            <div className="py-6 border-b border-slate-100">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                    <div className="space-y-2">
+                        <Label className="text-sm font-medium text-slate-600 flex items-center gap-1">
+                            <Briefcase className="w-3.5 h-3.5 text-slate-400" />
+                            نوع القضية <span className="text-red-500">*</span>
+                        </Label>
+                        <Select value={selectedCategory} onValueChange={handleCategoryChange}>
+                            <SelectTrigger className="rounded-xl border-slate-200 h-12 bg-white">
+                                <SelectValue placeholder="اختر نوع القضية" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {CATEGORY_OPTIONS.map(option => (
+                                    <SelectItem key={option.value} value={option.value}>
+                                        <div className="flex items-center gap-2">
+                                            <span className={cn("px-2 py-0.5 rounded-full text-xs font-medium", option.color)}>
+                                                {option.label}
+                                            </span>
+                                        </div>
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                    </div>
 
-                    {/* Priority Pill */}
-                    <Select
-                        value={selectedPriority}
-                        onValueChange={(v) => setValue('priority', v as CasePriority)}
-                    >
-                        <SelectTrigger className={cn(
-                            "w-auto h-auto px-4 py-2 rounded-full text-sm font-medium border transition-all gap-2",
-                            selectedPriority !== 'medium'
-                                ? selectedPriority === 'critical' ? "bg-red-50 text-red-700 border-red-200"
-                                : selectedPriority === 'high' ? "bg-orange-50 text-orange-700 border-orange-200"
-                                : "bg-slate-50 text-slate-700 border-slate-200"
-                                : "bg-white text-slate-600 border-slate-200"
-                        )}>
-                            <Flag className="w-4 h-4" />
-                            <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent className="rounded-2xl border-0 shadow-xl">
-                            {PRIORITY_OPTIONS.map(option => (
-                                <SelectItem key={option.value} value={option.value} className="rounded-xl">
-                                    <div className="flex items-center gap-2">
-                                        <span className={cn("w-2.5 h-2.5 rounded-full", option.dotColor)} />
-                                        {option.label}
-                                    </div>
-                                </SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
-
-                    {/* Add Description Toggle */}
-                    {!showDescription && (
-                        <button
-                            type="button"
-                            onClick={() => setShowDescription(true)}
-                            className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium bg-white text-slate-600 border border-dashed border-slate-300 hover:border-blue-300 hover:bg-blue-50 hover:text-blue-700 transition-all"
+                    <div className="space-y-2">
+                        <Label className="text-sm font-medium text-slate-600 flex items-center gap-1">
+                            <Flag className="w-3.5 h-3.5 text-slate-400" />
+                            الأولوية
+                        </Label>
+                        <Select
+                            value={selectedPriority}
+                            onValueChange={(v) => setValue('priority', v as CasePriority)}
                         >
-                            <FileText className="w-4 h-4" />
-                            + إضافة وصف
-                        </button>
-                    )}
+                            <SelectTrigger className="rounded-xl border-slate-200 h-12 bg-white">
+                                <SelectValue placeholder="اختر الأولوية" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {PRIORITY_OPTIONS.map(option => (
+                                    <SelectItem key={option.value} value={option.value}>
+                                        <div className="flex items-center gap-2">
+                                            <span className={cn("w-2.5 h-2.5 rounded-full", option.dotColor)} />
+                                            {option.label}
+                                        </div>
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                    </div>
                 </div>
 
-                {/* Description (expandable) */}
-                {showDescription && (
-                    <div className="mt-4 animate-in slide-in-from-top-2 duration-200">
-                        <Textarea
-                            placeholder="أدخل وصفاً مختصراً للقضية..."
-                            className="min-h-[100px] rounded-2xl border-slate-200 resize-none focus:border-blue-500 text-base"
-                            {...register('description')}
-                        />
-                    </div>
-                )}
+                {/* Description */}
+                <div className="space-y-2">
+                    <Label className="text-sm font-medium text-slate-600 flex items-center gap-1">
+                        <FileText className="w-3.5 h-3.5 text-slate-400" />
+                        وصف القضية
+                    </Label>
+                    <Textarea
+                        placeholder="أدخل وصفاً مختصراً للقضية..."
+                        className="min-h-[100px] rounded-xl border-slate-200 resize-none focus:border-blue-500 text-base bg-white"
+                        {...register('description')}
+                    />
+                </div>
             </div>
 
             {/* Client Info Section */}
@@ -508,7 +489,7 @@ export function CreateCaseForm({ onSuccess }: CreateCaseFormProps) {
                 </div>
                 {/* Helpful hint */}
                 <p className="text-xs text-slate-400 mt-3 flex items-center justify-end gap-1">
-                    <Clock className="w-3 h-3" />
+                    <Sparkles className="w-3 h-3" />
                     الحقول المميزة بـ <span className="text-red-500">*</span> مطلوبة
                 </p>
             </div>
