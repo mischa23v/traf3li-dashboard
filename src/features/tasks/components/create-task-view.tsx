@@ -3,8 +3,8 @@ import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import {
     Save, Calendar, User, Flag, FileText, Loader2, Scale,
-    Plus, X, Clock, Repeat, ListTodo, ChevronDown, ChevronUp, ChevronRight,
-    Bell, CheckSquare, Hash, ArrowRight, Sparkles
+    Plus, X, Repeat, ListTodo, ChevronDown,
+    Bell, Hash, ArrowRight, Sparkles
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -319,63 +319,94 @@ export function CreateTaskView() {
                         {/* Main form card */}
                         <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
                             <form onSubmit={handleSubmit}>
-                                {/* Header */}
-                                <div className="px-8 pt-8 pb-6 border-b border-slate-100">
-                                    <div className="flex items-center gap-3 mb-6">
-                                        <div className="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center">
-                                            <CheckSquare className="w-6 h-6 text-emerald-500 fill-emerald-500/20" />
-                                        </div>
-                                        <div>
-                                            <h1 className="text-2xl font-bold text-slate-900">مهمة جديدة</h1>
-                                            <p className="text-base text-slate-500">للحفظ السريع اضغط كنترول + إنتر</p>
-                                        </div>
-                                    </div>
-
-                                    {/* Title input with label */}
-                                    <div className="space-y-2">
-                                        <Label className="text-sm font-medium text-slate-600">عنوان المهمة</Label>
+                                {/* Header - Minimal, Focus on Title */}
+                                <div className="px-6 sm:px-8 pt-6 sm:pt-8 pb-6">
+                                    {/* Title input - The hero of the form */}
+                                    <div className="space-y-1">
                                         <Input
                                             ref={titleInputRef}
-                                            placeholder="اكتب عنوان المهمة هنا..."
-                                            className="text-lg font-semibold border border-slate-200 focus:border-emerald-500 rounded-xl shadow-none focus-visible:ring-0 px-4 h-12 placeholder:text-slate-400 placeholder:font-normal bg-slate-50/50"
+                                            placeholder="ما المهمة التي تريد إنجازها؟"
+                                            className="text-xl sm:text-2xl font-bold border-0 border-b-2 border-transparent focus:border-emerald-500 rounded-none shadow-none focus-visible:ring-0 px-0 h-auto py-3 placeholder:text-slate-300 placeholder:font-normal bg-transparent transition-colors"
                                             value={formData.title}
                                             onChange={(e) => handleChange('title', e.target.value)}
+                                            required
+                                            autoComplete="off"
                                         />
+                                        <p className="text-xs text-slate-400">مثال: مراجعة عقد الشركة، إرسال تقرير القضية، الاتصال بالعميل</p>
                                     </div>
 
-                                    {/* Quick action pills */}
-                                    <div className="flex flex-wrap items-center gap-2 mt-5">
-                                        {/* Due Date Pill */}
+                                    {/* Quick Options - Feels like adding tags */}
+                                    <div className="flex flex-wrap items-center gap-2 mt-6 pt-4 border-t border-slate-100">
+                                        {/* Due Date Pill with Quick Shortcuts */}
                                         <Popover>
                                             <PopoverTrigger asChild>
                                                 <button
                                                     type="button"
                                                     className={cn(
-                                                        "inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-sm font-medium transition-all border",
+                                                        "inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm transition-all",
                                                         formData.dueDate
-                                                            ? "bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100"
-                                                            : "bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100 hover:border-slate-300"
+                                                            ? "bg-emerald-100 text-emerald-800 hover:bg-emerald-200"
+                                                            : "bg-slate-100 text-slate-600 hover:bg-slate-200"
                                                     )}
                                                 >
-                                                    <Calendar className="w-4 h-4" />
-                                                    {formData.dueDate ? new Date(formData.dueDate).toLocaleDateString('ar-SA') : 'تاريخ'}
+                                                    <Calendar className="w-3.5 h-3.5" />
+                                                    {formData.dueDate ? new Date(formData.dueDate).toLocaleDateString('ar-SA', { weekday: 'short', month: 'short', day: 'numeric' }) : 'موعد'}
+                                                    {formData.dueDate && (
+                                                        <X
+                                                            className="w-3 h-3 hover:text-red-500"
+                                                            onClick={(e) => { e.stopPropagation(); handleChange('dueDate', ''); handleChange('dueTime', ''); }}
+                                                        />
+                                                    )}
                                                 </button>
                                             </PopoverTrigger>
-                                            <PopoverContent className="w-auto p-3" align="start">
-                                                <div className="space-y-3">
-                                                    <Label className="text-xs text-slate-500">تاريخ الاستحقاق</Label>
+                                            <PopoverContent className="w-64 p-0" align="start">
+                                                {/* Quick date shortcuts */}
+                                                <div className="p-2 border-b border-slate-100">
+                                                    <div className="grid grid-cols-3 gap-1">
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => handleChange('dueDate', new Date().toISOString().split('T')[0])}
+                                                            className="px-2 py-1.5 text-xs rounded-lg hover:bg-emerald-50 hover:text-emerald-700 transition-colors"
+                                                        >
+                                                            اليوم
+                                                        </button>
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => {
+                                                                const tomorrow = new Date();
+                                                                tomorrow.setDate(tomorrow.getDate() + 1);
+                                                                handleChange('dueDate', tomorrow.toISOString().split('T')[0]);
+                                                            }}
+                                                            className="px-2 py-1.5 text-xs rounded-lg hover:bg-emerald-50 hover:text-emerald-700 transition-colors"
+                                                        >
+                                                            غداً
+                                                        </button>
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => {
+                                                                const nextWeek = new Date();
+                                                                nextWeek.setDate(nextWeek.getDate() + 7);
+                                                                handleChange('dueDate', nextWeek.toISOString().split('T')[0]);
+                                                            }}
+                                                            className="px-2 py-1.5 text-xs rounded-lg hover:bg-emerald-50 hover:text-emerald-700 transition-colors"
+                                                        >
+                                                            بعد أسبوع
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                                <div className="p-3 space-y-3">
                                                     <Input
                                                         type="date"
-                                                        className="rounded-lg h-10"
+                                                        className="rounded-lg h-9 text-sm"
                                                         value={formData.dueDate}
                                                         onChange={(e) => handleChange('dueDate', e.target.value)}
                                                     />
-                                                    <Label className="text-xs text-slate-500">الوقت</Label>
                                                     <Input
                                                         type="time"
-                                                        className="rounded-lg h-10"
+                                                        className="rounded-lg h-9 text-sm"
                                                         value={formData.dueTime}
                                                         onChange={(e) => handleChange('dueTime', e.target.value)}
+                                                        placeholder="الوقت (اختياري)"
                                                     />
                                                 </div>
                                             </PopoverContent>
@@ -386,15 +417,21 @@ export function CreateTaskView() {
                                             <PopoverTrigger asChild>
                                                 <button
                                                     type="button"
-                                                    className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-sm font-medium transition-all border bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100 hover:border-slate-300"
+                                                    className={cn(
+                                                        "inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm transition-all",
+                                                        formData.priority !== 'medium'
+                                                            ? "bg-amber-100 text-amber-800 hover:bg-amber-200"
+                                                            : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                                                    )}
                                                 >
-                                                    <span className={cn("w-2.5 h-2.5 rounded-full", {
-                                                        'bg-red-500': formData.priority === 'urgent',
-                                                        'bg-orange-500': formData.priority === 'high',
-                                                        'bg-emerald-500': formData.priority === 'medium',
-                                                        'bg-slate-400': formData.priority === 'low',
-                                                    })} />
+                                                    <Flag className="w-3.5 h-3.5" />
                                                     {priorityLabels[formData.priority]}
+                                                    {formData.priority !== 'medium' && (
+                                                        <X
+                                                            className="w-3 h-3 hover:text-red-500"
+                                                            onClick={(e) => { e.stopPropagation(); handleChange('priority', 'medium'); }}
+                                                        />
+                                                    )}
                                                 </button>
                                             </PopoverTrigger>
                                             <PopoverContent className="w-40 p-2" align="start">
@@ -421,14 +458,20 @@ export function CreateTaskView() {
                                                 <button
                                                     type="button"
                                                     className={cn(
-                                                        "inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-sm font-medium transition-all border",
+                                                        "inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm transition-all",
                                                         selectedAssignee
-                                                            ? "bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100"
-                                                            : "bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100 hover:border-slate-300"
+                                                            ? "bg-blue-100 text-blue-800 hover:bg-blue-200"
+                                                            : "bg-slate-100 text-slate-600 hover:bg-slate-200"
                                                     )}
                                                 >
-                                                    <User className="w-4 h-4" />
+                                                    <User className="w-3.5 h-3.5" />
                                                     {selectedAssignee ? `${selectedAssignee.firstName} ${selectedAssignee.lastName}` : 'تعيين'}
+                                                    {selectedAssignee && (
+                                                        <X
+                                                            className="w-3 h-3 hover:text-red-500"
+                                                            onClick={(e) => { e.stopPropagation(); handleChange('assignedTo', ''); }}
+                                                        />
+                                                    )}
                                                 </button>
                                             </PopoverTrigger>
                                             <PopoverContent className="w-64 p-2" align="start">
@@ -464,10 +507,21 @@ export function CreateTaskView() {
                                             <PopoverTrigger asChild>
                                                 <button
                                                     type="button"
-                                                    className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-sm font-medium bg-slate-50 text-slate-600 border border-slate-200 hover:bg-slate-100 hover:border-slate-300 transition-all"
+                                                    className={cn(
+                                                        "inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm transition-all",
+                                                        formData.status !== 'backlog'
+                                                            ? "bg-purple-100 text-purple-800 hover:bg-purple-200"
+                                                            : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                                                    )}
                                                 >
-                                                    <ListTodo className="w-4 h-4" />
+                                                    <ListTodo className="w-3.5 h-3.5" />
                                                     {ACTIVE_STATUS_OPTIONS.find(s => s.value === formData.status)?.label || 'الحالة'}
+                                                    {formData.status !== 'backlog' && (
+                                                        <X
+                                                            className="w-3 h-3 hover:text-red-500"
+                                                            onClick={(e) => { e.stopPropagation(); handleChange('status', 'backlog'); }}
+                                                        />
+                                                    )}
                                                 </button>
                                             </PopoverTrigger>
                                             <PopoverContent className="w-48 p-2" align="start">
@@ -493,10 +547,10 @@ export function CreateTaskView() {
                                             <button
                                                 type="button"
                                                 onClick={() => setShowDescription(true)}
-                                                className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-sm font-medium bg-slate-50 text-slate-600 border border-slate-200 hover:bg-slate-100 hover:border-slate-300 transition-all"
+                                                className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm bg-slate-100 text-slate-600 hover:bg-slate-200 transition-all"
                                             >
-                                                <FileText className="w-4 h-4" />
-                                                وصف
+                                                <FileText className="w-3.5 h-3.5" />
+                                                + وصف
                                             </button>
                                         )}
                                     </div>
@@ -517,52 +571,77 @@ export function CreateTaskView() {
 
                                 {/* Expandable sections */}
                                 <div className="divide-y divide-slate-100">
-                                    {/* Tags & Category */}
-                                    <div className="px-8 py-4">
-                                        <div className="flex flex-wrap items-center gap-2">
-                                            {formData.tags.map(tag => (
-                                                <Badge key={tag} variant="secondary" className="gap-1 bg-slate-100 text-slate-700 hover:bg-slate-200">
-                                                    <Hash className="w-3 h-3" />
-                                                    {tag}
-                                                    <button type="button" onClick={() => removeTag(tag)} className="hover:text-red-500 ms-1">
-                                                        <X className="w-3 h-3" />
-                                                    </button>
-                                                </Badge>
-                                            ))}
-                                            <Input
-                                                placeholder="+ أضف وسم"
-                                                className="border-0 shadow-none focus-visible:ring-0 w-32 h-8 text-sm px-2"
-                                                value={tagInput}
-                                                onChange={(e) => setTagInput(e.target.value)}
-                                                onKeyDown={(e) => {
-                                                    if (e.key === 'Enter') {
-                                                        e.preventDefault()
-                                                        addTag()
-                                                    }
-                                                }}
-                                            />
+                                    {/* Tags Section - Smart suggestions */}
+                                    <div className="px-6 sm:px-8 py-4">
+                                        <div className="space-y-3">
+                                            {/* Added tags */}
+                                            <div className="flex flex-wrap items-center gap-2">
+                                                {formData.tags.map(tag => (
+                                                    <span key={tag} className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm bg-emerald-100 text-emerald-800">
+                                                        <Hash className="w-3 h-3" />
+                                                        {tag}
+                                                        <button type="button" onClick={() => removeTag(tag)} className="hover:text-red-500">
+                                                            <X className="w-3 h-3" />
+                                                        </button>
+                                                    </span>
+                                                ))}
+                                                <div className="relative">
+                                                    <Input
+                                                        list="tag-suggestions"
+                                                        placeholder="+ وسم"
+                                                        className="border-0 shadow-none focus-visible:ring-0 w-24 h-7 text-sm px-2 bg-transparent"
+                                                        value={tagInput}
+                                                        onChange={(e) => setTagInput(e.target.value)}
+                                                        onKeyDown={(e) => {
+                                                            if (e.key === 'Enter') {
+                                                                e.preventDefault()
+                                                                addTag()
+                                                            }
+                                                        }}
+                                                    />
+                                                    <datalist id="tag-suggestions">
+                                                        {['عاجل', 'مهم', 'متابعة', 'مراجعة', 'قانوني', 'مالي', 'إداري', 'محكمة', 'عقد', 'استشارة'].filter(t => !formData.tags.includes(t)).map(suggestion => (
+                                                            <option key={suggestion} value={suggestion} />
+                                                        ))}
+                                                    </datalist>
+                                                </div>
+                                            </div>
+                                            {/* Quick suggestions - only show if no tags yet */}
+                                            {formData.tags.length === 0 && (
+                                                <div className="flex flex-wrap gap-1.5">
+                                                    <span className="text-xs text-slate-400 me-1">اقتراحات:</span>
+                                                    {['عاجل', 'متابعة', 'مراجعة', 'محكمة', 'عقد'].map(suggestion => (
+                                                        <button
+                                                            key={suggestion}
+                                                            type="button"
+                                                            onClick={() => handleChange('tags', [...formData.tags, suggestion])}
+                                                            className="px-2 py-0.5 text-xs rounded-full bg-slate-50 text-slate-500 hover:bg-emerald-50 hover:text-emerald-600 transition-colors"
+                                                        >
+                                                            + {suggestion}
+                                                        </button>
+                                                    ))}
+                                                </div>
+                                            )}
                                         </div>
                                     </div>
 
                                 {/* Client & Case Section */}
                                 <Collapsible open={showMoreOptions} onOpenChange={setShowMoreOptions}>
-                                    <div className="border-t border-slate-100 pt-6">
+                                    <div className="px-6 sm:px-8 py-3">
                                         <CollapsibleTrigger asChild>
-                                            <Button variant="ghost" className="w-full justify-between p-0 h-auto hover:bg-transparent px-8">
-                                                <h3 className="text-lg font-semibold text-slate-800 flex items-center gap-2">
-                                                    <Scale className="w-5 h-5 text-emerald-500" />
-                                                    ربط بعميل أو قضية
-                                                    {(selectedClient || selectedCase) && (
-                                                        <span className="text-emerald-600 text-sm font-normal">
-                                                            ({selectedClient?.fullName || ''} {selectedCase?.title ? `- ${selectedCase.title}` : ''})
-                                                        </span>
-                                                    )}
-                                                </h3>
-                                                {showMoreOptions ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
-                                            </Button>
+                                            <button type="button" className="flex items-center gap-2 text-sm text-slate-500 hover:text-slate-700 transition-colors group">
+                                                <Scale className="w-4 h-4" />
+                                                <span>ربط بعميل أو قضية</span>
+                                                {(selectedClient || selectedCase) && (
+                                                    <span className="text-emerald-600 text-xs">
+                                                        ({selectedClient?.fullName || ''}{selectedCase?.title ? ` - ${selectedCase.title}` : ''})
+                                                    </span>
+                                                )}
+                                                <ChevronDown className={cn("w-4 h-4 transition-transform", showMoreOptions && "rotate-180")} />
+                                            </button>
                                         </CollapsibleTrigger>
-                                        <CollapsibleContent className="mt-4">
-                                            <div className="space-y-4 p-4 mx-8 bg-slate-50 rounded-xl">
+                                        <CollapsibleContent className="mt-3">
+                                            <div className="space-y-4 p-4 bg-slate-50 rounded-xl">
                                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                                 <div className="space-y-2">
                                                     <Label className="text-xs text-slate-500">العميل</Label>
@@ -648,23 +727,21 @@ export function CreateTaskView() {
 
                                 {/* Subtasks Section */}
                                 <Collapsible open={showSubtasks} onOpenChange={setShowSubtasks}>
-                                    <div className="border-t border-slate-100 pt-6">
+                                    <div className="px-6 sm:px-8 py-3">
                                         <CollapsibleTrigger asChild>
-                                            <Button variant="ghost" className="w-full justify-between p-0 h-auto hover:bg-transparent px-8">
-                                                <h3 className="text-lg font-semibold text-slate-800 flex items-center gap-2">
-                                                    <ListTodo className="w-5 h-5 text-emerald-500" />
-                                                    المهام الفرعية
-                                                    {subtasks.length > 0 && (
-                                                        <Badge variant="secondary" className="bg-emerald-100 text-emerald-700 text-sm">
-                                                            {subtasks.length}
-                                                        </Badge>
-                                                    )}
-                                                </h3>
-                                                {showSubtasks ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
-                                            </Button>
+                                            <button type="button" className="flex items-center gap-2 text-sm text-slate-500 hover:text-slate-700 transition-colors">
+                                                <ListTodo className="w-4 h-4" />
+                                                <span>المهام الفرعية</span>
+                                                {subtasks.length > 0 && (
+                                                    <span className="px-1.5 py-0.5 text-xs rounded-full bg-emerald-100 text-emerald-700">
+                                                        {subtasks.length}
+                                                    </span>
+                                                )}
+                                                <ChevronDown className={cn("w-4 h-4 transition-transform", showSubtasks && "rotate-180")} />
+                                            </button>
                                         </CollapsibleTrigger>
-                                        <CollapsibleContent className="mt-4">
-                                            <div className="space-y-4 p-4 mx-8 bg-slate-50 rounded-xl">
+                                        <CollapsibleContent className="mt-3">
+                                            <div className="space-y-3 p-4 bg-slate-50 rounded-xl">
                                             {subtasks.length > 0 && (
                                                 <div className="space-y-2 mb-4">
                                                     {subtasks.map((subtask) => (
@@ -716,23 +793,21 @@ export function CreateTaskView() {
 
                                 {/* Recurring Section */}
                                 <Collapsible open={showRecurring} onOpenChange={setShowRecurring}>
-                                    <div className="border-t border-slate-100 pt-6">
+                                    <div className="px-6 sm:px-8 py-3">
                                         <CollapsibleTrigger asChild>
-                                            <Button variant="ghost" className="w-full justify-between p-0 h-auto hover:bg-transparent px-8">
-                                                <h3 className="text-lg font-semibold text-slate-800 flex items-center gap-2">
-                                                    <Repeat className="w-5 h-5 text-emerald-500" />
-                                                    تكرار المهمة
-                                                    {isRecurring && (
-                                                        <Badge variant="secondary" className="bg-emerald-100 text-emerald-700 text-sm">
-                                                            مفعّل
-                                                        </Badge>
-                                                    )}
-                                                </h3>
-                                                {showRecurring ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
-                                            </Button>
+                                            <button type="button" className="flex items-center gap-2 text-sm text-slate-500 hover:text-slate-700 transition-colors">
+                                                <Repeat className="w-4 h-4" />
+                                                <span>تكرار المهمة</span>
+                                                {isRecurring && (
+                                                    <span className="px-1.5 py-0.5 text-xs rounded-full bg-emerald-100 text-emerald-700">
+                                                        مفعّل
+                                                    </span>
+                                                )}
+                                                <ChevronDown className={cn("w-4 h-4 transition-transform", showRecurring && "rotate-180")} />
+                                            </button>
                                         </CollapsibleTrigger>
-                                        <CollapsibleContent className="mt-4">
-                                            <div className="space-y-4 p-4 mx-8 bg-slate-50 rounded-xl">
+                                        <CollapsibleContent className="mt-3">
+                                            <div className="space-y-4 p-4 bg-slate-50 rounded-xl">
                                             <div className="flex items-center gap-3 p-4 bg-white rounded-xl border border-slate-100 mb-4">
                                                 <Checkbox
                                                     id="recurring-toggle"
@@ -854,23 +929,21 @@ export function CreateTaskView() {
 
                                 {/* Reminders Section */}
                                 <Collapsible open={showReminders} onOpenChange={setShowReminders}>
-                                    <div className="border-t border-slate-100 pt-6">
+                                    <div className="px-6 sm:px-8 py-3">
                                         <CollapsibleTrigger asChild>
-                                            <Button variant="ghost" className="w-full justify-between p-0 h-auto hover:bg-transparent px-8">
-                                                <h3 className="text-lg font-semibold text-slate-800 flex items-center gap-2">
-                                                    <Bell className="w-5 h-5 text-emerald-500" />
-                                                    التذكيرات
-                                                    {reminders.length > 0 && (
-                                                        <Badge variant="secondary" className="bg-emerald-100 text-emerald-700 text-sm">
-                                                            {reminders.length}
-                                                        </Badge>
-                                                    )}
-                                                </h3>
-                                                {showReminders ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
-                                            </Button>
+                                            <button type="button" className="flex items-center gap-2 text-sm text-slate-500 hover:text-slate-700 transition-colors">
+                                                <Bell className="w-4 h-4" />
+                                                <span>التذكيرات</span>
+                                                {reminders.length > 0 && (
+                                                    <span className="px-1.5 py-0.5 text-xs rounded-full bg-emerald-100 text-emerald-700">
+                                                        {reminders.length}
+                                                    </span>
+                                                )}
+                                                <ChevronDown className={cn("w-4 h-4 transition-transform", showReminders && "rotate-180")} />
+                                            </button>
                                         </CollapsibleTrigger>
-                                        <CollapsibleContent className="mt-4">
-                                            <div className="space-y-4 p-4 mx-8 bg-slate-50 rounded-xl">
+                                        <CollapsibleContent className="mt-3">
+                                            <div className="space-y-3 p-4 bg-slate-50 rounded-xl">
                                             {reminders.length > 0 && (
                                                 <div className="space-y-2 mb-4">
                                                     {reminders.map((reminder, index) => (
@@ -923,63 +996,65 @@ export function CreateTaskView() {
                                 </div>
 
                                 {/* Footer / Actions */}
-                                <div className="px-8 py-6 bg-slate-50 border-t border-slate-100 flex items-center justify-between gap-4">
-                                    {/* Templates */}
-                                    {templates && templates.length > 0 && (
-                                        <Popover>
-                                            <PopoverTrigger asChild>
-                                                <button
-                                                    type="button"
-                                                    className="text-sm text-slate-500 hover:text-slate-700 flex items-center gap-1.5 transition-colors"
-                                                >
-                                                    <Sparkles className="w-4 h-4" />
-                                                    استخدم قالب
-                                                    <ChevronRight className="w-3 h-3" />
-                                                </button>
-                                            </PopoverTrigger>
-                                            <PopoverContent className="w-64 p-2" align="start">
-                                                {templates.slice(0, 5).map((template) => (
-                                                    <button
-                                                        key={template._id}
-                                                        type="button"
-                                                        onClick={() => handleUseTemplate(template._id)}
-                                                        className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm hover:bg-slate-50 transition-colors text-start"
-                                                        disabled={createFromTemplateMutation.isPending}
-                                                    >
-                                                        <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center">
-                                                            <FileText className="w-4 h-4 text-slate-500" />
-                                                        </div>
-                                                        <span className="flex-1 truncate">{template.title}</span>
-                                                    </button>
-                                                ))}
-                                            </PopoverContent>
-                                        </Popover>
-                                    )}
-
-                                    <div className="flex items-center gap-3 ms-auto">
-                                        <Link to="/dashboard/tasks/list">
-                                            <Button type="button" variant="ghost" className="text-slate-500 hover:text-slate-700 h-11 px-6">
-                                                إلغاء
-                                            </Button>
-                                        </Link>
-                                        <Button
-                                            type="submit"
-                                            className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl shadow-lg shadow-emerald-500/20 h-11 px-8 font-medium"
-                                            disabled={createTaskMutation.isPending}
-                                        >
-                                            {createTaskMutation.isPending ? (
-                                                <span className="flex items-center gap-2">
-                                                    <Loader2 className="w-4 h-4 animate-spin" />
-                                                    جاري الحفظ...
-                                                </span>
-                                            ) : (
-                                                <span className="flex items-center gap-2">
-                                                    <Save className="w-4 h-4" />
-                                                    حفظ المهمة
-                                                </span>
+                                <div className="px-6 sm:px-8 py-4 bg-slate-50/50 border-t border-slate-100">
+                                    <div className="flex items-center justify-between gap-4">
+                                        {/* Templates - subtle link */}
+                                        <div className="flex-1">
+                                            {templates && templates.length > 0 && (
+                                                <Popover>
+                                                    <PopoverTrigger asChild>
+                                                        <button type="button" className="text-xs text-slate-400 hover:text-slate-600 flex items-center gap-1 transition-colors">
+                                                            <Sparkles className="w-3.5 h-3.5" />
+                                                            أو استخدم قالب
+                                                        </button>
+                                                    </PopoverTrigger>
+                                                    <PopoverContent className="w-56 p-1.5" align="start">
+                                                        {templates.slice(0, 5).map((template) => (
+                                                            <button
+                                                                key={template._id}
+                                                                type="button"
+                                                                onClick={() => handleUseTemplate(template._id)}
+                                                                className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm hover:bg-slate-50 transition-colors text-start"
+                                                                disabled={createFromTemplateMutation.isPending}
+                                                            >
+                                                                <FileText className="w-4 h-4 text-slate-400" />
+                                                                <span className="flex-1 truncate text-slate-600">{template.title}</span>
+                                                            </button>
+                                                        ))}
+                                                    </PopoverContent>
+                                                </Popover>
                                             )}
-                                        </Button>
+                                        </div>
+
+                                        {/* Action buttons */}
+                                        <div className="flex items-center gap-2">
+                                            <Link to="/dashboard/tasks/list">
+                                                <Button type="button" variant="ghost" size="sm" className="text-slate-500 hover:text-slate-700">
+                                                    إلغاء
+                                                </Button>
+                                            </Link>
+                                            <Button
+                                                type="submit"
+                                                size="sm"
+                                                className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg px-6"
+                                                disabled={createTaskMutation.isPending}
+                                            >
+                                                {createTaskMutation.isPending ? (
+                                                    <>
+                                                        <Loader2 className="w-4 h-4 animate-spin ms-2" />
+                                                        جاري الحفظ
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <Save className="w-4 h-4 ms-2" />
+                                                        حفظ
+                                                    </>
+                                                )}
+                                            </Button>
+                                        </div>
                                     </div>
+                                    {/* Helpful hint */}
+                                    <p className="text-xs text-slate-400 mt-2">اضغط كنترول + إنتر للحفظ السريع</p>
                                 </div>
                             </form>
                         </div>
