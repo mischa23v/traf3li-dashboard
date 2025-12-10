@@ -77,8 +77,7 @@ export function useSessionTimeout(): UseSessionTimeoutReturn {
   // Track warning state
   const [isWarning, setIsWarning] = useState<boolean>(false)
 
-  // Timeout references for cleanup
-  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  // Interval reference for cleanup
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
   /**
@@ -218,36 +217,10 @@ export function useSessionTimeout(): UseSessionTimeoutReturn {
   }, [checkSessionStatus])
 
   /**
-   * Setup auto-logout timeout
-   */
-  useEffect(() => {
-    // Set timeout for auto-logout
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current)
-    }
-
-    const timeUntilLogout = SESSION_TIMEOUT - (Date.now() - lastActivityRef.current)
-
-    if (timeUntilLogout > 0) {
-      timeoutRef.current = setTimeout(handleAutoLogout, timeUntilLogout)
-    }
-
-    // Cleanup
-    return () => {
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current)
-      }
-    }
-  }, [handleAutoLogout, isWarning]) // Re-run when warning state changes
-
-  /**
    * Cleanup on unmount
    */
   useEffect(() => {
     return () => {
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current)
-      }
       if (intervalRef.current) {
         clearInterval(intervalRef.current)
       }
