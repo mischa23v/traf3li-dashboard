@@ -22,8 +22,10 @@ export const Route = createFileRoute('/_authenticated')({
 
     if (!isAuthenticated) {
       console.log('[AUTH DEBUG] NOT authenticated - redirecting to sign-in')
-      // Clear any stale auth state
-      useAuthStore.getState().logout()
+      // Don't call logout() here - it makes an API call that clears cookies
+      // If we're already not authenticated, just redirect. The sign-in page
+      // will handle any cleanup needed. Calling logout() causes a loop when
+      // the server is having issues (Redis errors, etc.)
       throw redirect({
         to: '/sign-in',
         search: {
