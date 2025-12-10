@@ -61,19 +61,19 @@ export const useRegister = () => {
  * Hook to logout user
  */
 export const useLogout = () => {
-  const clearUser = useAuthStore((state) => state.clearUser)
+  const setUser = useAuthStore((state) => state.setUser)
   const queryClient = useQueryClient()
 
   return useMutation({
     mutationFn: () => authService.logout(),
     onSuccess: () => {
-      clearUser()
+      setUser(null)
       queryClient.clear()
       toast.success('تم تسجيل الخروج بنجاح')
     },
     onError: (error: Error) => {
       // Still clear user even if API call fails
-      clearUser()
+      setUser(null)
       queryClient.clear()
       toast.error(error.message || 'فشل تسجيل الخروج')
     },
@@ -85,17 +85,13 @@ export const useLogout = () => {
  */
 export const useCurrentUser = (enabled: boolean = true) => {
   const setUser = useAuthStore((state) => state.setUser)
-  const clearUser = useAuthStore((state) => state.clearUser)
 
   return useQuery({
     queryKey: authKeys.currentUser(),
     queryFn: async () => {
       const user = await authService.getCurrentUser()
-      if (user) {
-        setUser(user)
-      } else {
-        clearUser()
-      }
+      // setUser handles both setting user or clearing (when null)
+      setUser(user)
       return user
     },
     enabled,
