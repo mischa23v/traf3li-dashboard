@@ -3,15 +3,14 @@ import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import {
     Save, Calendar, User, Flag, FileText, Users, Loader2, Scale,
-    Plus, X, Clock, Tag, Repeat, ListTodo, ChevronDown, Check,
-    Zap, CalendarClock, Bell, ArrowRight
+    Plus, X, Clock, Tag, Repeat, ListTodo, ChevronDown,
+    Zap, CalendarClock, Bell
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Badge } from '@/components/ui/badge'
-import { Switch } from '@/components/ui/switch'
 import { Label } from '@/components/ui/label'
 import {
     Select,
@@ -68,60 +67,6 @@ interface SubtaskInput {
     autoReset?: boolean
 }
 
-// Progress Stepper Component
-interface StepperProps {
-    steps: { id: string; label: string; icon: React.ReactNode }[]
-    completedSteps: string[]
-    activeStep: string
-    onStepClick: (stepId: string) => void
-}
-
-function ProgressStepper({ steps, completedSteps, activeStep, onStepClick }: StepperProps) {
-    return (
-        <div className="flex items-center justify-center gap-2 sm:gap-4 py-4">
-            {steps.map((step, index) => (
-                <div key={step.id} className="flex items-center">
-                    <button
-                        type="button"
-                        onClick={() => onStepClick(step.id)}
-                        className={cn(
-                            "flex items-center gap-2 px-3 py-2 rounded-xl transition-all duration-200",
-                            "focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2",
-                            completedSteps.includes(step.id)
-                                ? "bg-emerald-100 text-emerald-700"
-                                : activeStep === step.id
-                                    ? "bg-emerald-50 text-emerald-600 ring-1 ring-emerald-200"
-                                    : "bg-slate-50 text-slate-500 hover:bg-slate-100"
-                        )}
-                    >
-                        <div className={cn(
-                            "w-6 h-6 rounded-full flex items-center justify-center text-xs font-medium",
-                            completedSteps.includes(step.id)
-                                ? "bg-emerald-500 text-white"
-                                : activeStep === step.id
-                                    ? "bg-emerald-500 text-white"
-                                    : "bg-slate-200 text-slate-600"
-                        )}>
-                            {completedSteps.includes(step.id) ? (
-                                <Check className="w-3.5 h-3.5" />
-                            ) : (
-                                index + 1
-                            )}
-                        </div>
-                        <span className="text-sm font-medium hidden sm:inline">{step.label}</span>
-                    </button>
-                    {index < steps.length - 1 && (
-                        <ArrowRight className={cn(
-                            "w-4 h-4 mx-1 sm:mx-2 rtl:rotate-180",
-                            completedSteps.includes(step.id) ? "text-emerald-400" : "text-slate-300"
-                        )} />
-                    )}
-                </div>
-            ))}
-        </div>
-    )
-}
-
 export function CreateTaskView() {
     const { t } = useTranslation()
     const navigate = useNavigate()
@@ -176,10 +121,10 @@ export function CreateTaskView() {
     // Reminders state
     const [reminders, setReminders] = useState<{ type: string; beforeMinutes: number }[]>([])
 
-    // Collapsible section states
-    const [showScheduling, setShowScheduling] = useState(true)
-    const [showSubtasks, setShowSubtasks] = useState(true)
-    const [showReminders, setShowReminders] = useState(true)
+    // Collapsible section states (start closed by default)
+    const [showScheduling, setShowScheduling] = useState(false)
+    const [showSubtasks, setShowSubtasks] = useState(false)
+    const [showReminders, setShowReminders] = useState(false)
 
     // Tags input
     const [tagInput, setTagInput] = useState('')
@@ -187,51 +132,6 @@ export function CreateTaskView() {
     // Form validation state
     const [errors, setErrors] = useState<Record<string, string>>({})
     const [touched, setTouched] = useState<Record<string, boolean>>({})
-
-    // Stepper configuration
-    const steps = [
-        { id: 'basic', label: 'الأساسيات', icon: <Zap className="w-4 h-4" /> },
-        { id: 'scheduling', label: 'الجدولة', icon: <CalendarClock className="w-4 h-4" /> },
-        { id: 'subtasks', label: 'المهام الفرعية', icon: <ListTodo className="w-4 h-4" /> },
-        { id: 'reminders', label: 'التذكيرات', icon: <Bell className="w-4 h-4" /> },
-    ]
-
-    // Calculate completed steps
-    const getCompletedSteps = (): string[] => {
-        const completed: string[] = []
-        if (formData.title.trim()) completed.push('basic')
-        if (formData.dueDate || formData.dueTime || formData.estimatedMinutes > 0 || isRecurring) completed.push('scheduling')
-        if (subtasks.length > 0) completed.push('subtasks')
-        if (reminders.length > 0) completed.push('reminders')
-        return completed
-    }
-
-    // Get active step
-    const getActiveStep = (): string => {
-        if (!formData.title.trim()) return 'basic'
-        if (showScheduling && !getCompletedSteps().includes('scheduling')) return 'scheduling'
-        if (showSubtasks && !getCompletedSteps().includes('subtasks')) return 'subtasks'
-        if (showReminders && !getCompletedSteps().includes('reminders')) return 'reminders'
-        return 'basic'
-    }
-
-    // Handle step click
-    const handleStepClick = (stepId: string) => {
-        const refs: Record<string, React.RefObject<HTMLDivElement>> = {
-            basic: basicRef,
-            scheduling: schedulingRef,
-            subtasks: subtasksRef,
-            reminders: remindersRef,
-        }
-        const ref = refs[stepId]
-        if (ref?.current) {
-            ref.current.scrollIntoView({ behavior: 'smooth', block: 'start' })
-        }
-        // Open the section if it's collapsed
-        if (stepId === 'scheduling') setShowScheduling(true)
-        if (stepId === 'subtasks') setShowSubtasks(true)
-        if (stepId === 'reminders') setShowReminders(true)
-    }
 
     // Handle field blur for validation
     const handleBlur = (field: string) => {
@@ -393,27 +293,6 @@ export function CreateTaskView() {
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     {/* RIGHT COLUMN (Main Content) */}
                     <div className="lg:col-span-2 space-y-6">
-
-                        {/* Title Card with Stepper */}
-                        <Card className="rounded-3xl shadow-sm border-slate-100">
-                            <CardHeader className="pb-2">
-                                <CardTitle className="text-xl font-bold text-slate-800 flex items-center gap-3">
-                                    <div className="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center">
-                                        <FileText className="w-5 h-5 text-emerald-600" />
-                                    </div>
-                                    إنشاء مهمة
-                                </CardTitle>
-                                <p className="text-sm text-slate-500 mt-1">ابدأ بعنوان مختصر ثم أضف التفاصيل</p>
-                            </CardHeader>
-                            <CardContent className="pt-0">
-                                <ProgressStepper
-                                    steps={steps}
-                                    completedSteps={getCompletedSteps()}
-                                    activeStep={getActiveStep()}
-                                    onStepClick={handleStepClick}
-                                />
-                            </CardContent>
-                        </Card>
 
                         {/* Templates Section */}
                         {templates && templates.length > 0 && (
@@ -752,19 +631,17 @@ export function CreateTaskView() {
                                                 </div>
 
                                                 {/* Recurring Toggle */}
-                                                <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl">
-                                                    <div className="flex items-center gap-3">
-                                                        <Repeat className="w-5 h-5 text-emerald-500" />
-                                                        <div>
-                                                            <p className="font-medium text-slate-700">مهمة متكررة</p>
-                                                            <p className="text-xs text-slate-500">تكرار المهمة بشكل دوري</p>
-                                                        </div>
-                                                    </div>
-                                                    <Switch
+                                                <div className="flex items-center gap-3 p-4 bg-slate-50 rounded-xl">
+                                                    <Checkbox
+                                                        id="recurring-toggle"
                                                         checked={isRecurring}
-                                                        onCheckedChange={setIsRecurring}
-                                                        className="data-[state=checked]:bg-emerald-500"
+                                                        onCheckedChange={(checked) => setIsRecurring(checked === true)}
+                                                        className="h-5 w-5 border-2 border-slate-300 data-[state=checked]:bg-emerald-500 data-[state=checked]:border-emerald-500"
                                                     />
+                                                    <label htmlFor="recurring-toggle" className="flex items-center gap-2 cursor-pointer flex-1">
+                                                        <Repeat className="w-5 h-5 text-emerald-500" />
+                                                        <span className="font-medium text-slate-700">تفعيل التكرار</span>
+                                                    </label>
                                                 </div>
 
                                                 {/* Recurring Options */}
