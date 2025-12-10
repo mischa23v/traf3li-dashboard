@@ -245,6 +245,12 @@ const AUTH_GRACE_PERIOD = 30 * 60 * 1000 // 30 minutes - trust cached user for e
 const MAX_CONSECUTIVE_401 = 10 // Very high threshold - almost never auto-logout
 
 /**
+ * Request deduplication for getCurrentUser
+ * Prevents multiple concurrent /auth/me calls when multiple routes preload simultaneously
+ */
+let pendingAuthRequest: Promise<User | null> | null = null
+
+/**
  * Auth event logger - only logs in development mode
  * In production, this is a no-op for performance
  */
@@ -348,10 +354,22 @@ const authService = {
    *
    * IMPORTANT: Only returns null for explicit auth failures (401)
    * For other errors (500, network), returns cached user to prevent unnecessary logout
+   *
+   * Uses request deduplication to prevent multiple concurrent /auth/me calls
+   * when multiple routes preload simultaneously (e.g., TanStack Router's beforeLoad)
    */
   getCurrentUser: async (): Promise<User | null> => {
+    // If there's already a pending request, return the same promise
+    // This prevents multiple concurrent /auth/me calls
+    if (pendingAuthRequest) {
+      logAuthEvent('GET_CURRENT_USER_DEDUPE', { action: 'reusing pending request' })
+      return pendingAuthRequest
+    }
+
     logAuthEvent('GET_CURRENT_USER_START', { action: 'calling /auth/me' })
 
+    // Create the actual request and store the promise
+    pendingAuthRequest = (async (): Promise<User | null> => {
     try {
       const response = await authApi.get<AuthResponse>('/auth/me')
 
@@ -503,6 +521,15 @@ const authService = {
         errorMessage: error?.message,
       })
       return null
+    }
+    })()
+
+    // Wait for the request to complete
+    try {
+      return await pendingAuthRequest
+    } finally {
+      // Clear the pending request so future calls make a new request
+      pendingAuthRequest = null
     }
   },
 
