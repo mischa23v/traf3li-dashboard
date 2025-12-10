@@ -547,15 +547,19 @@ const authService = {
   },
 
   /**
-   * Get cached user from localStorage (with memory fallback)
+   * Get cached user from localStorage (with multiple fallbacks)
    * Use this for initial load, then verify with getCurrentUser()
    *
-   * IMPORTANT: Falls back to memoryCachedUser if localStorage is empty.
-   * This prevents race conditions where localStorage gets cleared by one
-   * parallel request while others are still checking auth.
+   * Fallback chain (in order):
+   * 1. localStorage.user (direct authService storage)
+   * 2. memoryCachedUser (in-memory backup)
+   * 3. localStorage.auth-storage (Zustand persist storage)
+   *
+   * This prevents logout during race conditions or mysterious localStorage clears.
    */
   getCachedUser: (): User | null => {
     try {
+      // 1. Try direct localStorage first
       const userStr = localStorage.getItem('user')
       if (userStr) {
         const user = JSON.parse(userStr)
@@ -564,11 +568,10 @@ const authService = {
         return user
       }
 
-      // localStorage is empty - try memory cache as fallback
-      // This is CRITICAL for preventing logout during race conditions
+      // 2. localStorage.user is empty - try memory cache
       if (memoryCachedUser) {
         logAuthEvent('USING_MEMORY_CACHE_FALLBACK', {
-          reason: 'localStorage empty but memoryCachedUser exists',
+          reason: 'localStorage.user empty but memoryCachedUser exists',
           userId: memoryCachedUser._id,
         })
         // Restore to localStorage since it was empty
@@ -576,17 +579,60 @@ const authService = {
         return memoryCachedUser
       }
 
+      // 3. Last resort - check Zustand's auth-storage (different localStorage key)
+      // This catches cases where localStorage.user got cleared but auth-storage didn't
+      const authStorageStr = localStorage.getItem('auth-storage')
+      if (authStorageStr) {
+        try {
+          const authStorage = JSON.parse(authStorageStr)
+          if (authStorage?.state?.user) {
+            const user = authStorage.state.user
+            logAuthEvent('USING_ZUSTAND_STORAGE_FALLBACK', {
+              reason: 'localStorage.user and memoryCachedUser empty, but auth-storage has user',
+              userId: user._id,
+            })
+            // Restore to both localStorage and memory
+            localStorage.setItem('user', JSON.stringify(user))
+            memoryCachedUser = user
+            return user
+          }
+        } catch {
+          // Ignore parse errors for auth-storage
+        }
+      }
+
       return null
     } catch (error) {
-      // JSON parse error - try memory cache
+      // JSON parse error - try memory cache and Zustand storage
       if (memoryCachedUser) {
         logAuthEvent('USING_MEMORY_CACHE_AFTER_PARSE_ERROR', {
-          reason: 'localStorage parse failed but memoryCachedUser exists',
+          reason: 'localStorage.user parse failed but memoryCachedUser exists',
           userId: memoryCachedUser._id,
         })
         localStorage.setItem('user', JSON.stringify(memoryCachedUser))
         return memoryCachedUser
       }
+
+      // Try Zustand storage as last resort
+      try {
+        const authStorageStr = localStorage.getItem('auth-storage')
+        if (authStorageStr) {
+          const authStorage = JSON.parse(authStorageStr)
+          if (authStorage?.state?.user) {
+            const user = authStorage.state.user
+            logAuthEvent('USING_ZUSTAND_STORAGE_AFTER_PARSE_ERROR', {
+              reason: 'localStorage.user corrupted, using auth-storage fallback',
+              userId: user._id,
+            })
+            localStorage.setItem('user', JSON.stringify(user))
+            memoryCachedUser = user
+            return user
+          }
+        }
+      } catch {
+        // Ignore
+      }
+
       localStorage.removeItem('user')
       return null
     }
