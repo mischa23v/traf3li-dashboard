@@ -52,6 +52,7 @@ const queryClient = new QueryClient({
         )
       },
       refetchOnWindowFocus: false, // Disable refetch on window focus for better performance
+      refetchIntervalInBackground: false, // Stop polling when tab is hidden (saves API calls)
       staleTime: 2 * 60 * 1000, // 2 minutes (increased from 10s for better caching)
       gcTime: 5 * 60 * 1000, // 5 minutes in cache (renamed from cacheTime in React Query v5)
     },

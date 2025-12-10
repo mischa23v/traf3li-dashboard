@@ -263,7 +263,7 @@ export const useLiveFeed = (limit: number = 20) => {
   return useQuery({
     queryKey: ['verification-live-feed', limit],
     queryFn: () => verificationService.getLiveFeed(limit),
-    refetchInterval: 5000, // Refresh every 5 seconds
+    refetchInterval: 30000, // Refresh every 30 seconds (reduced from 5s for performance)
   })
 }
 
