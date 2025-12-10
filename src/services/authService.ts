@@ -3,7 +3,11 @@
  * Handles all authentication-related API calls
  */
 
-import apiClient, { handleApiError, clearCache } from '@/lib/api'
+import { apiClientNoVersion, handleApiError, clearCache } from '@/lib/api'
+
+// Auth routes are NOT versioned - they're at /api/auth/*, not /api/v1/auth/*
+// So we use apiClientNoVersion (baseURL: https://api.traf3li.com/api)
+const authApi = apiClientNoVersion
 
 /**
  * Firm info returned with user
@@ -242,7 +246,7 @@ const authService = {
       clearCache()
 
       // Call backend login API
-      const response = await apiClient.post<AuthResponse>(
+      const response = await authApi.post<AuthResponse>(
         '/auth/login',
         credentials
       )
@@ -270,7 +274,7 @@ const authService = {
    */
   register: async (data: RegisterData): Promise<void> => {
     try {
-      const response = await apiClient.post<AuthResponse>(
+      const response = await authApi.post<AuthResponse>(
         '/auth/register',
         data
       )
@@ -289,7 +293,7 @@ const authService = {
    */
   logout: async (): Promise<void> => {
     try {
-      await apiClient.post('/auth/logout')
+      await authApi.post('/auth/logout')
       localStorage.removeItem('user')
     } catch (error: any) {
       // Even if API call fails, clear local storage
@@ -303,7 +307,7 @@ const authService = {
    */
   getCurrentUser: async (): Promise<User | null> => {
     try {
-      const response = await apiClient.get<AuthResponse>('/auth/me')
+      const response = await authApi.get<AuthResponse>('/auth/me')
 
       if (response.data.error || !response.data.user) {
         return null
@@ -382,7 +386,7 @@ const authService = {
    */
   checkAvailability: async (data: CheckAvailabilityData): Promise<CheckAvailabilityResponse> => {
     try {
-      const response = await apiClient.post<{ error: boolean; available: boolean; message?: string }>(
+      const response = await authApi.post<{ error: boolean; available: boolean; message?: string }>(
         '/auth/check-availability',
         data
       )
@@ -405,7 +409,7 @@ const authService = {
    */
   sendOTP: async (data: SendOTPData): Promise<OTPResponse> => {
     try {
-      const response = await apiClient.post<{ success: boolean; message: string; expiresIn?: number }>(
+      const response = await authApi.post<{ success: boolean; message: string; expiresIn?: number }>(
         '/auth/send-otp',
         data
       )
@@ -425,7 +429,7 @@ const authService = {
    */
   verifyOTP: async (data: VerifyOTPData): Promise<User> => {
     try {
-      const response = await apiClient.post<AuthResponse>(
+      const response = await authApi.post<AuthResponse>(
         '/auth/verify-otp',
         data
       )
@@ -451,7 +455,7 @@ const authService = {
    */
   resendOTP: async (data: SendOTPData): Promise<OTPResponse> => {
     try {
-      const response = await apiClient.post<{ success: boolean; message: string; expiresIn?: number }>(
+      const response = await authApi.post<{ success: boolean; message: string; expiresIn?: number }>(
         '/auth/resend-otp',
         data
       )
@@ -471,7 +475,7 @@ const authService = {
    */
   checkOTPStatus: async (): Promise<OTPStatusResponse> => {
     try {
-      const response = await apiClient.get<{
+      const response = await authApi.get<{
         success: boolean
         data: {
           attemptsRemaining: number
