@@ -4,6 +4,7 @@ import { useAuthStore } from '@/stores/auth-store'
 
 export const Route = createFileRoute('/_authenticated')({
   beforeLoad: async ({ location }) => {
+    console.log('[AUTH DEBUG] _authenticated beforeLoad called for:', location.pathname)
     const { checkAuth } = useAuthStore.getState()
 
     // Always verify authentication with backend, even if localStorage says authenticated
@@ -13,12 +14,14 @@ export const Route = createFileRoute('/_authenticated')({
     } catch (error) {
       // checkAuth() shouldn't throw, but if it does, log it and continue
       // We'll check isAuthenticated below
-      console.error('checkAuth error:', error)
+      console.error('[AUTH DEBUG] checkAuth threw error:', error)
     }
 
     const isAuthenticated = useAuthStore.getState().isAuthenticated
+    console.log('[AUTH DEBUG] After checkAuth, isAuthenticated:', isAuthenticated)
 
     if (!isAuthenticated) {
+      console.log('[AUTH DEBUG] NOT authenticated - redirecting to sign-in')
       // Clear any stale auth state
       useAuthStore.getState().logout()
       throw redirect({
@@ -29,6 +32,7 @@ export const Route = createFileRoute('/_authenticated')({
       })
     }
 
+    console.log('[AUTH DEBUG] Authenticated - proceeding')
     // No firm check needed - lawyers without firm are treated as solo lawyers
     // The auth store's checkAuth() already handles setting solo lawyer permissions
   },
