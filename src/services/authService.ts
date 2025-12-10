@@ -240,6 +240,7 @@ const normalizeUser = (user: User): User => {
  */
 let lastSuccessfulAuth: number = 0
 let consecutive401Count: number = 0
+let memoryCachedUser: User | null = null // Keep user in memory as backup to localStorage
 const AUTH_GRACE_PERIOD = 30 * 60 * 1000 // 30 minutes - trust cached user for extended period
 const MAX_CONSECUTIVE_401 = 10 // Very high threshold - almost never auto-logout
 
@@ -308,6 +309,9 @@ const authService = {
       // All authorization must be enforced on the backend
       localStorage.setItem('user', JSON.stringify(user))
 
+      // Also keep in memory as backup (localStorage can be cleared by other tabs/race conditions)
+      memoryCachedUser = user
+
       // Mark successful authentication
       lastSuccessfulAuth = Date.now()
       consecutive401Count = 0
@@ -343,7 +347,10 @@ const authService = {
 
   /**
    * Logout user
-   * Clears HttpOnly cookie and localStorage
+   * Clears HttpOnly cookie, localStorage, AND memory cache
+   *
+   * IMPORTANT: This is the ONLY place that should clear auth state.
+   * getCurrentUser() should NEVER clear localStorage/memory - only logout() does.
    */
   logout: async (): Promise<void> => {
     // CRITICAL: Log the FULL stack trace to find what's calling logout
@@ -355,15 +362,22 @@ const authService = {
 
     try {
       await authApi.post('/auth/logout')
+      // Clear ALL auth state
       localStorage.removeItem('user')
+      memoryCachedUser = null
+      lastSuccessfulAuth = 0
+      consecutive401Count = 0
       logAuthEvent('LOGOUT_SUCCESS', { apiCallSucceeded: true })
     } catch (error: any) {
-      // Even if API call fails, clear local storage
+      // Even if API call fails, clear ALL auth state
       localStorage.removeItem('user')
+      memoryCachedUser = null
+      lastSuccessfulAuth = 0
+      consecutive401Count = 0
       logAuthEvent('LOGOUT_API_FAILED', {
         error: error?.message,
         status: error?.status,
-        clearedLocalStorageAnyway: true,
+        clearedAllAuthStateAnyway: true,
       })
     }
   },
@@ -432,6 +446,9 @@ const authService = {
 
       // Update localStorage with fresh user data
       localStorage.setItem('user', JSON.stringify(user))
+
+      // Also keep in memory as backup
+      memoryCachedUser = user
 
       logAuthEvent('GET_CURRENT_USER_SUCCESS', {
         username: user.username,
@@ -530,15 +547,46 @@ const authService = {
   },
 
   /**
-   * Get cached user from localStorage
+   * Get cached user from localStorage (with memory fallback)
    * Use this for initial load, then verify with getCurrentUser()
+   *
+   * IMPORTANT: Falls back to memoryCachedUser if localStorage is empty.
+   * This prevents race conditions where localStorage gets cleared by one
+   * parallel request while others are still checking auth.
    */
   getCachedUser: (): User | null => {
     try {
       const userStr = localStorage.getItem('user')
-      if (!userStr) return null
-      return JSON.parse(userStr)
+      if (userStr) {
+        const user = JSON.parse(userStr)
+        // Keep memory cache in sync
+        memoryCachedUser = user
+        return user
+      }
+
+      // localStorage is empty - try memory cache as fallback
+      // This is CRITICAL for preventing logout during race conditions
+      if (memoryCachedUser) {
+        logAuthEvent('USING_MEMORY_CACHE_FALLBACK', {
+          reason: 'localStorage empty but memoryCachedUser exists',
+          userId: memoryCachedUser._id,
+        })
+        // Restore to localStorage since it was empty
+        localStorage.setItem('user', JSON.stringify(memoryCachedUser))
+        return memoryCachedUser
+      }
+
+      return null
     } catch (error) {
+      // JSON parse error - try memory cache
+      if (memoryCachedUser) {
+        logAuthEvent('USING_MEMORY_CACHE_AFTER_PARSE_ERROR', {
+          reason: 'localStorage parse failed but memoryCachedUser exists',
+          userId: memoryCachedUser._id,
+        })
+        localStorage.setItem('user', JSON.stringify(memoryCachedUser))
+        return memoryCachedUser
+      }
       localStorage.removeItem('user')
       return null
     }
@@ -642,6 +690,17 @@ const authService = {
 
       // Store user data in localStorage
       localStorage.setItem('user', JSON.stringify(user))
+
+      // Also keep in memory as backup
+      memoryCachedUser = user
+
+      // Mark successful authentication (OTP is also a login method)
+      lastSuccessfulAuth = Date.now()
+      consecutive401Count = 0
+      logAuthEvent('VERIFY_OTP_SUCCESS', {
+        username: user.username,
+        userId: user._id,
+      })
 
       return user
     } catch (error: any) {
