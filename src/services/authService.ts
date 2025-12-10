@@ -245,37 +245,14 @@ const AUTH_GRACE_PERIOD = 30 * 60 * 1000 // 30 minutes - trust cached user for e
 const MAX_CONSECUTIVE_401 = 10 // Very high threshold - almost never auto-logout
 
 /**
- * DEBUG: Comprehensive auth state logger
- * Logs to console with full context to help debug logout issues
+ * Auth event logger - only logs in development mode
+ * In production, this is a no-op for performance
  */
-const logAuthEvent = (event: string, data: Record<string, any>) => {
-  const authState = {
-    event,
-    timestamp: new Date().toISOString(),
-    lastSuccessfulAuth: lastSuccessfulAuth ? new Date(lastSuccessfulAuth).toISOString() : 'never',
-    timeSinceLastSuccess: lastSuccessfulAuth ? `${Math.round((Date.now() - lastSuccessfulAuth) / 1000)}s ago` : 'N/A',
-    consecutive401Count,
-    gracePeriodRemaining: lastSuccessfulAuth ? `${Math.round((AUTH_GRACE_PERIOD - (Date.now() - lastSuccessfulAuth)) / 1000)}s` : 'N/A',
-    hasLocalStorageUser: !!localStorage.getItem('user'),
-    currentPath: typeof window !== 'undefined' ? window.location.pathname : 'unknown',
-    ...data,
-  }
-
-  // Use a distinctive prefix for easy filtering in console/logs
-  console.log('%c[AUTH-DEBUG]', 'background: #007bff; color: white; padding: 2px 6px; border-radius: 3px;', event, authState)
-
-  // Also log to Sentry if available (will show in Render logs via Sentry)
-  if (typeof window !== 'undefined' && (window as any).Sentry) {
-    (window as any).Sentry.addBreadcrumb({
-      category: 'auth',
-      message: event,
-      data: authState,
-      level: 'info',
-    })
-  }
-
-  return authState
-}
+const logAuthEvent = import.meta.env.DEV
+  ? (event: string, data: Record<string, any>) => {
+      console.log('[AUTH]', event, data)
+    }
+  : () => {} // No-op in production
 
 /**
  * Auth Service Object
@@ -353,33 +330,16 @@ const authService = {
    * getCurrentUser() should NEVER clear localStorage/memory - only logout() does.
    */
   logout: async (): Promise<void> => {
-    // CRITICAL: Log the FULL stack trace to find what's calling logout
-    const stackTrace = new Error().stack?.split('\n').slice(1, 8).join('\n') || 'unknown'
-    logAuthEvent('LOGOUT_CALLED', {
-      stackTrace,
-      calledFrom: stackTrace.split('\n')[1]?.trim() || 'unknown',
-    })
-
     try {
       await authApi.post('/auth/logout')
-      // Clear ALL auth state
-      localStorage.removeItem('user')
-      memoryCachedUser = null
-      lastSuccessfulAuth = 0
-      consecutive401Count = 0
-      logAuthEvent('LOGOUT_SUCCESS', { apiCallSucceeded: true })
-    } catch (error: any) {
-      // Even if API call fails, clear ALL auth state
-      localStorage.removeItem('user')
-      memoryCachedUser = null
-      lastSuccessfulAuth = 0
-      consecutive401Count = 0
-      logAuthEvent('LOGOUT_API_FAILED', {
-        error: error?.message,
-        status: error?.status,
-        clearedAllAuthStateAnyway: true,
-      })
+    } catch {
+      // Ignore logout API errors - we clear state anyway
     }
+    // Clear ALL auth state regardless of API result
+    localStorage.removeItem('user')
+    memoryCachedUser = null
+    lastSuccessfulAuth = 0
+    consecutive401Count = 0
   },
 
   /**

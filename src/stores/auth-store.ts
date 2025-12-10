@@ -88,60 +88,26 @@ export const useAuthStore = create<AuthState>()(
        * Logout Action
        */
       logout: async () => {
-        // Log logout call with stack trace to identify what triggered it
-        console.warn('[AUTH] logout() called', {
-          timestamp: new Date().toISOString(),
-          currentPath: typeof window !== 'undefined' ? window.location.pathname : 'unknown',
-          stack: new Error().stack?.split('\n').slice(1, 5).join('\n'),
-        })
-
         set({ isLoading: true })
         try {
           await authService.logout()
-          console.log('[AUTH] logout successful')
-          set({
-            user: null,
-            isAuthenticated: false,
-            isLoading: false,
-            error: null,
-          })
-          // Clear Sentry user context
-          setSentryUser(null)
-          // Clear permissions on logout
-          usePermissionsStore.getState().clearPermissions()
-        } catch (error: any) {
-          console.error('[AUTH] logout API failed:', error)
-          // Even if API fails, clear state
-          set({
-            user: null,
-            isAuthenticated: false,
-            isLoading: false,
-            error: null,
-          })
-          // Clear Sentry user context
-          setSentryUser(null)
-          // Also clear permissions
-          usePermissionsStore.getState().clearPermissions()
+        } catch {
+          // Ignore - authService.logout already clears state
         }
+        set({
+          user: null,
+          isAuthenticated: false,
+          isLoading: false,
+          error: null,
+        })
+        setSentryUser(null)
+        usePermissionsStore.getState().clearPermissions()
       },
 
       /**
        * Set User Action
        */
       setUser: (user: User | null) => {
-        const prevUser = useAuthStore.getState().user
-        const wasAuthenticated = useAuthStore.getState().isAuthenticated
-        const willBeAuthenticated = user !== null
-
-        // Log state changes for debugging
-        if (wasAuthenticated !== willBeAuthenticated) {
-          console.log('[AUTH] setUser - auth state changing:', {
-            from: wasAuthenticated ? prevUser?.username : 'not authenticated',
-            to: willBeAuthenticated ? user?.username : 'not authenticated',
-            timestamp: new Date().toISOString(),
-          })
-        }
-
         set({
           user,
           isAuthenticated: user !== null,
@@ -164,18 +130,15 @@ export const useAuthStore = create<AuthState>()(
        * so we only clear auth state when user is explicitly null (401 from backend)
        */
       checkAuth: async () => {
-        console.log('[AUTH DEBUG] checkAuth called')
         set({ isLoading: true })
         try {
           const user = await authService.getCurrentUser()
-          console.log('[AUTH DEBUG] checkAuth - user from getCurrentUser:', user ? user.username : 'null')
           set({
             user,
             isAuthenticated: user !== null,
             isLoading: false,
             error: null,
           })
-          console.log('[AUTH DEBUG] checkAuth - isAuthenticated set to:', user !== null)
 
           // Set Sentry user context if user is authenticated
           if (user) {
@@ -196,23 +159,18 @@ export const useAuthStore = create<AuthState>()(
               // Firm member - fetch permissions from firm API
               try {
                 await usePermissionsStore.getState().fetchPermissions()
-              } catch (permError) {
+              } catch {
                 // Don't fail auth check if permissions fetch fails
-                console.warn('Permissions fetch failed, continuing with auth:', permError)
               }
             } else {
               // No firm = solo lawyer
-              // Set permissions from response if available, otherwise mark as solo
               usePermissionsStore.getState().setPermissionsFromLogin(user.permissions || null, true)
             }
           }
-        } catch (error: any) {
-          // getCurrentUser shouldn't throw (it catches and returns null/cached user)
-          // But if it does throw, preserve existing auth state rather than logging out
-          console.error('Unexpected error in checkAuth:', error)
+        } catch {
+          // getCurrentUser shouldn't throw - but if it does, try cached user
           const cachedUser = authService.getCachedUser()
           if (cachedUser) {
-            // Keep user logged in if we have cached data
             set({
               user: cachedUser,
               isAuthenticated: true,
