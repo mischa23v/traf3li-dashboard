@@ -233,11 +233,15 @@ const normalizeUser = (user: User): User => {
 
 /**
  * Track auth state for resilience against intermittent failures
+ *
+ * PRINCIPLE: NEVER auto-logout on errors. Only logout on explicit user action.
+ * If auth is truly expired, backend will reject all requests and user can
+ * manually refresh or logout. Random errors should NEVER kick users out.
  */
 let lastSuccessfulAuth: number = 0
 let consecutive401Count: number = 0
-const AUTH_GRACE_PERIOD = 5 * 60 * 1000 // 5 minutes - if we had success recently, trust cached user
-const MAX_CONSECUTIVE_401 = 3 // Only logout after 3 consecutive 401s
+const AUTH_GRACE_PERIOD = 30 * 60 * 1000 // 30 minutes - trust cached user for extended period
+const MAX_CONSECUTIVE_401 = 10 // Very high threshold - almost never auto-logout
 
 /**
  * Auth Service Object
@@ -328,10 +332,32 @@ const authService = {
       console.log('[AUTH] getCurrentUser - success:', response.data.user?.username)
 
       if (response.data.error || !response.data.user) {
-        // Backend explicitly said no user - clear auth
-        console.warn('[AUTH] getCurrentUser - backend returned no user:', response.data.message)
+        // Backend said no user - but DON'T immediately logout!
+        // Apply same resilience as 401 errors
+        const cachedUser = authService.getCachedUser()
+        const timeSinceLastSuccess = Date.now() - lastSuccessfulAuth
+        const recentlyAuthenticated = timeSinceLastSuccess < AUTH_GRACE_PERIOD
+
         consecutive401Count++
+
+        console.warn('[AUTH] getCurrentUser - backend returned no user:', {
+          message: response.data.message,
+          consecutive401Count,
+          recentlyAuthenticated,
+          hasCachedUser: !!cachedUser,
+        })
+
+        // If recently authenticated and have cached user, DON'T logout
+        // This handles intermittent cookie issues
+        if (recentlyAuthenticated && cachedUser && consecutive401Count < MAX_CONSECUTIVE_401) {
+          console.warn('[AUTH] getCurrentUser - using cached user despite backend error')
+          return cachedUser
+        }
+
+        // Only clear if this is NOT a transient issue
         localStorage.removeItem('user')
+        lastSuccessfulAuth = 0
+        consecutive401Count = 0
         return null
       }
 
