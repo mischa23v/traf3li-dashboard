@@ -4,7 +4,7 @@ import { toast } from 'sonner'
 import {
     Save, Calendar, User, Flag, FileText, Loader2, Scale,
     Plus, X, Clock, Repeat, ListTodo, ChevronDown, ChevronRight,
-    Bell, Sparkles, Hash, ArrowRight
+    Bell, CheckSquare, Hash, ArrowRight
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -317,8 +317,8 @@ export function CreateTaskView() {
                                 {/* Header */}
                                 <div className="px-8 pt-8 pb-6 border-b border-slate-100">
                                     <div className="flex items-center gap-3 mb-6">
-                                        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center shadow-lg shadow-emerald-500/20">
-                                            <Sparkles className="w-6 h-6 text-white" />
+                                        <div className="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center">
+                                            <CheckSquare className="w-6 h-6 text-emerald-500 fill-emerald-500/20" />
                                         </div>
                                         <div>
                                             <h1 className="text-2xl font-bold text-slate-900">مهمة جديدة</h1>

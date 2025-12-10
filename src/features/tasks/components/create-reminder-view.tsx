@@ -4,7 +4,7 @@ import {
     ArrowRight, Save, Calendar, Clock,
     Bell, FileText, AlertCircle, Loader2,
     Plus, X, ChevronDown, ChevronUp, Repeat, Users,
-    Scale, User, Briefcase, Mail, MessageSquare, Smartphone
+    Scale, User, Briefcase, Mail, MessageSquare, Smartphone, CheckSquare
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -265,39 +265,60 @@ export function CreateReminderView() {
                 <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-emerald-500/50 to-transparent"></div>
             </Header>
 
-            <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-e border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
-                {/* HERO CARD - Full width */}
-                <ProductivityHero badge="التذكيرات" title="إنشاء تذكير" type="reminders" listMode={true} />
+            <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-4 sm:p-6 lg:p-8 space-y-6 rounded-tr-3xl shadow-inner border-e border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
+                {/* HERO CARD - Hidden on mobile */}
+                <div className="hidden md:block">
+                    <ProductivityHero badge="التذكيرات" title="إنشاء تذكير" type="reminders" listMode={true} />
+                </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     {/* Main Form Content */}
-                    <div className="lg:col-span-2 space-y-8">
+                    <div className="lg:col-span-2 space-y-4">
+                        {/* Back Arrow Link - Styled like sidebar cards */}
+                        <Link to="/dashboard/tasks/reminders" className="flex items-center gap-3 p-4 bg-white rounded-2xl shadow-sm border border-slate-100 hover:border-emerald-200 hover:shadow-md transition-all group">
+                            <div className="w-10 h-10 rounded-xl bg-slate-100 group-hover:bg-emerald-100 flex items-center justify-center transition-colors">
+                                <ArrowRight className="w-5 h-5 text-slate-500 group-hover:text-emerald-600 transition-colors" />
+                            </div>
+                            <span className="text-base font-medium text-slate-700 group-hover:text-emerald-700 transition-colors">العودة لقائمة التذكيرات</span>
+                        </Link>
 
                         {/* Form Card */}
-                        <div className="bg-white rounded-3xl p-8 shadow-sm border border-slate-100">
-                            <form onSubmit={handleSubmit} className="space-y-8">
-                                {/* Basic Info */}
-                                <div className="space-y-6">
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                        <div className="space-y-2">
-                                            <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                                                <Bell className="w-4 h-4 text-emerald-500" />
-                                                عنوان التذكير
-                                            </label>
-                                            <Input
-                                                placeholder="مثال: انتهاء مهلة الاستئناف"
-                                                className={cn(
-                                                    "rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500",
-                                                    touched.title && errors.title && "border-red-500 focus:border-red-500 focus:ring-red-500/20"
-                                                )}
-                                                value={formData.title}
-                                                onChange={(e) => handleChange('title', e.target.value)}
-                                                onBlur={() => handleBlur('title')}
-                                            />
-                                            {touched.title && errors.title && (
-                                                <p className="text-sm text-red-500 mt-1">{errors.title}</p>
-                                            )}
+                        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+                            <form onSubmit={handleSubmit}>
+                                {/* Header */}
+                                <div className="px-8 pt-8 pb-6 border-b border-slate-100">
+                                    <div className="flex items-center gap-3 mb-6">
+                                        <div className="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center">
+                                            <CheckSquare className="w-6 h-6 text-emerald-500 fill-emerald-500/20" />
                                         </div>
+                                        <div>
+                                            <h1 className="text-2xl font-bold text-slate-900">تذكير جديد</h1>
+                                            <p className="text-base text-slate-500">للحفظ السريع اضغط كنترول + إنتر</p>
+                                        </div>
+                                    </div>
+
+                                    {/* Title input with label */}
+                                    <div className="space-y-2">
+                                        <label className="text-sm font-medium text-slate-600">عنوان التذكير</label>
+                                        <Input
+                                            placeholder="اكتب عنوان التذكير هنا..."
+                                            className={cn(
+                                                "text-lg font-semibold border border-slate-200 focus:border-emerald-500 rounded-xl shadow-none focus-visible:ring-0 px-4 h-12 placeholder:text-slate-400 placeholder:font-normal bg-slate-50/50",
+                                                touched.title && errors.title && "border-red-500 focus:border-red-500"
+                                            )}
+                                            value={formData.title}
+                                            onChange={(e) => handleChange('title', e.target.value)}
+                                            onBlur={() => handleBlur('title')}
+                                        />
+                                        {touched.title && errors.title && (
+                                            <p className="text-sm text-red-500 mt-1">{errors.title}</p>
+                                        )}
+                                    </div>
+                                </div>
+
+                                {/* Basic Info */}
+                                <div className="px-8 py-6 space-y-6">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                         <div className="space-y-2">
                                             <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
                                                 <AlertCircle className="w-4 h-4 text-emerald-500" aria-hidden="true" />
@@ -792,37 +813,41 @@ export function CreateReminderView() {
                                     </div>
                                 </Collapsible>
 
-                                {/* Submit */}
-                                <div className="flex items-center justify-end gap-4 pt-6 border-t border-slate-100">
-                                    <Link to="/dashboard/tasks/reminders">
-                                        <Button type="button" variant="ghost" className="text-slate-500 hover:text-navy">
-                                            إلغاء
+                                {/* Footer / Actions */}
+                                <div className="px-8 py-6 bg-slate-50 border-t border-slate-100 flex items-center justify-between gap-4">
+                                    <div className="flex items-center gap-3 ms-auto">
+                                        <Link to="/dashboard/tasks/reminders">
+                                            <Button type="button" variant="ghost" className="text-slate-500 hover:text-slate-700 h-11 px-6">
+                                                إلغاء
+                                            </Button>
+                                        </Link>
+                                        <Button
+                                            type="submit"
+                                            className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl shadow-lg shadow-emerald-500/20 h-11 px-8 font-medium"
+                                            disabled={createReminderMutation.isPending}
+                                        >
+                                            {createReminderMutation.isPending ? (
+                                                <span className="flex items-center gap-2">
+                                                    <Loader2 className="w-4 h-4 animate-spin" />
+                                                    جاري الحفظ...
+                                                </span>
+                                            ) : (
+                                                <span className="flex items-center gap-2">
+                                                    <Save className="w-4 h-4" aria-hidden="true" />
+                                                    حفظ التذكير
+                                                </span>
+                                            )}
                                         </Button>
-                                    </Link>
-                                    <Button
-                                        type="submit"
-                                        className="bg-emerald-500 hover:bg-emerald-600 text-white min-w-[140px] rounded-xl shadow-lg shadow-emerald-500/20"
-                                        disabled={createReminderMutation.isPending}
-                                    >
-                                        {createReminderMutation.isPending ? (
-                                            <span className="flex items-center gap-2">
-                                                <Loader2 className="w-4 h-4 animate-spin" />
-                                                جاري الحفظ...
-                                            </span>
-                                        ) : (
-                                            <span className="flex items-center gap-2">
-                                                <Save className="w-4 h-4" aria-hidden="true" />
-                                                حفظ التذكير
-                                            </span>
-                                        )}
-                                    </Button>
+                                    </div>
                                 </div>
                             </form>
                         </div>
                     </div>
 
-                    {/* Sidebar Widgets */}
-                    <TasksSidebar context="reminders" />
+                    {/* Sidebar Widgets - Hidden on mobile */}
+                    <div className="hidden lg:block">
+                        <TasksSidebar context="reminders" />
+                    </div>
                 </div>
             </Main>
         </>
