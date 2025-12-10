@@ -69,11 +69,12 @@ const queryClient = new QueryClient({
   queryCache: new QueryCache({
     onError: (error) => {
       if (error instanceof AxiosError) {
+        // DON'T auto-logout on 401 here - this triggers on ANY query failure
+        // The auth check in _authenticated route handles session expiry properly
+        // Calling logout() here causes loops when Redis/backend has issues
         if (error.response?.status === 401) {
+          // Just show toast, don't logout - let the route guard handle it
           toast.error('Session expired!')
-          useAuthStore.getState().logout()
-          // const redirect = `${router.history.location.href}`
-          // router.navigate({ to: '/sign-in', search: { redirect } })
         }
         if (error.response?.status === 500) {
           toast.error('Internal Server Error!')
