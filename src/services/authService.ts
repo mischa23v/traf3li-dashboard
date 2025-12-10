@@ -3,7 +3,7 @@
  * Handles all authentication-related API calls
  */
 
-import apiClient, { handleApiError } from '@/lib/api'
+import apiClient, { handleApiError, clearCache } from '@/lib/api'
 
 /**
  * Firm info returned with user
@@ -237,6 +237,10 @@ const authService = {
    */
   login: async (credentials: LoginCredentials): Promise<User> => {
     try {
+      // Clear any cached API responses before login
+      // This ensures fresh data is fetched after authentication
+      clearCache()
+
       // Call backend login API
       const response = await apiClient.post<AuthResponse>(
         '/auth/login',
