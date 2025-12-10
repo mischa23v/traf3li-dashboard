@@ -137,6 +137,9 @@ export const useAuthStore = create<AuthState>()(
       /**
        * Check Authentication Status
        * Verifies with backend that token is still valid
+       *
+       * IMPORTANT: getCurrentUser now returns cached user on non-auth errors,
+       * so we only clear auth state when user is explicitly null (401 from backend)
        */
       checkAuth: async () => {
         set({ isLoading: true })
@@ -170,6 +173,7 @@ export const useAuthStore = create<AuthState>()(
                 await usePermissionsStore.getState().fetchPermissions()
               } catch (permError) {
                 // Don't fail auth check if permissions fetch fails
+                console.warn('Permissions fetch failed, continuing with auth:', permError)
               }
             } else {
               // No firm = solo lawyer
@@ -178,16 +182,28 @@ export const useAuthStore = create<AuthState>()(
             }
           }
         } catch (error: any) {
-          set({
-            user: null,
-            isAuthenticated: false,
-            isLoading: false,
-            error: null, // Don't show error on initial auth check
-          })
-          // Clear Sentry user context
-          setSentryUser(null)
-          // Clear permissions if auth failed
-          usePermissionsStore.getState().clearPermissions()
+          // getCurrentUser shouldn't throw (it catches and returns null/cached user)
+          // But if it does throw, preserve existing auth state rather than logging out
+          console.error('Unexpected error in checkAuth:', error)
+          const cachedUser = authService.getCachedUser()
+          if (cachedUser) {
+            // Keep user logged in if we have cached data
+            set({
+              user: cachedUser,
+              isAuthenticated: true,
+              isLoading: false,
+              error: null,
+            })
+          } else {
+            set({
+              user: null,
+              isAuthenticated: false,
+              isLoading: false,
+              error: null,
+            })
+            setSentryUser(null)
+            usePermissionsStore.getState().clearPermissions()
+          }
         }
       },
     }),

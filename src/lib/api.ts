@@ -78,12 +78,9 @@ apiClientNoVersion.interceptors.request.use(
 apiClientNoVersion.interceptors.response.use(
   (response) => response,
   async (error: AxiosError<any>) => {
-    if (error.response?.status === 401) {
-      localStorage.removeItem('user')
-      if (!window.location.pathname.includes('/sign-in')) {
-        window.location.href = '/sign-in'
-      }
-    }
+    // DON'T auto-redirect on 401 for auth routes
+    // Let the auth service decide what to do based on the specific endpoint
+    // This prevents logout on temporary errors or non-auth 401s
     return Promise.reject({
       status: error.response?.status || 500,
       message: error.response?.data?.message || 'حدث خطأ غير متوقع',

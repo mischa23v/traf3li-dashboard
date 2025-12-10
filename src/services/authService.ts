@@ -304,12 +304,17 @@ const authService = {
   /**
    * Get current authenticated user
    * Verifies token validity with backend
+   *
+   * IMPORTANT: Only returns null for explicit auth failures (401)
+   * For other errors (500, network), returns cached user to prevent unnecessary logout
    */
   getCurrentUser: async (): Promise<User | null> => {
     try {
       const response = await authApi.get<AuthResponse>('/auth/me')
 
       if (response.data.error || !response.data.user) {
+        // Backend explicitly said no user - clear auth
+        localStorage.removeItem('user')
         return null
       }
 
@@ -321,11 +326,32 @@ const authService = {
 
       return user
     } catch (error: any) {
-      // If unauthorized (401) or unauthorized access (400 from backend), clear localStorage
-      // Backend may return 400 for missing token, so treat both as auth errors
-      if (error?.status === 401 || error?.status === 400) {
+      // Only treat 401 as "not authenticated"
+      // 401 = token invalid/expired → user needs to login again
+      if (error?.status === 401) {
         localStorage.removeItem('user')
+        return null
       }
+
+      // For 400 with specific auth error messages, also treat as auth failure
+      if (error?.status === 400) {
+        const message = error?.message?.toLowerCase() || ''
+        if (message.includes('unauthorized') || message.includes('access denied') || message.includes('token')) {
+          localStorage.removeItem('user')
+          return null
+        }
+      }
+
+      // For other errors (500, network issues, etc.), DON'T log out
+      // Return the cached user instead - they might still be authenticated
+      // This prevents logout on temporary server issues
+      const cachedUser = authService.getCachedUser()
+      if (cachedUser) {
+        console.warn('Auth check failed with non-auth error, using cached user:', error?.status, error?.message)
+        return cachedUser
+      }
+
+      // No cached user and error - return null but don't redirect
       return null
     }
   },
