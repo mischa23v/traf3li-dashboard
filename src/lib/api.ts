@@ -203,29 +203,32 @@ apiClient.interceptors.response.use(
       })
     }
 
-    // Handle 401 Unauthorized - User needs to login
+    // Handle 401 Unauthorized
+    // DON'T redirect here - let the route guard handle auth state
+    // Hard redirecting on ANY 401 causes logout loops when backend has issues
     if (error.response?.status === 401) {
-      // Clear any stored auth state
-      localStorage.removeItem('user')
-
-      // Redirect to sign-in page if not already there
-      if (!window.location.pathname.includes('/sign-in')) {
-        window.location.href = '/sign-in'
-      }
+      console.warn('[API] 401 Unauthorized:', {
+        url: error.config?.url,
+        method: error.config?.method,
+        message: error.response?.data?.message,
+        timestamp: new Date().toISOString(),
+      })
+      // Don't clear localStorage or redirect - let auth system handle it
+      // The _authenticated route guard will check auth and redirect if needed
     }
 
-    // Handle 400 with "Unauthorized" message - Backend returns 400 for missing token
-    // This is a compatibility fix until backend is updated to return 401
+    // Handle 400 with "Unauthorized" message
+    // Log but don't force redirect - let auth system handle it
     if (error.response?.status === 400) {
       const message = error.response?.data?.message?.toLowerCase() || ''
       if (message.includes('unauthorized') || message.includes('access denied') || message.includes('relogin')) {
-        // Clear any stored auth state
-        localStorage.removeItem('user')
-
-        // Redirect to sign-in page if not already there
-        if (!window.location.pathname.includes('/sign-in')) {
-          window.location.href = '/sign-in'
-        }
+        console.warn('[API] 400 with auth message:', {
+          url: error.config?.url,
+          method: error.config?.method,
+          message: error.response?.data?.message,
+          timestamp: new Date().toISOString(),
+        })
+        // Don't clear localStorage or redirect - let auth system handle it
       }
     }
 
