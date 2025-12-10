@@ -224,5 +224,5 @@ server.listen(PORT, () => {
     console.log(`   - All *.vercel.app domains (preview deployments)`);
     console.log(`   - http://localhost:5173`);
     console.log(`   - http://localhost:5174`);
-    console.log(`🍪 Cookie settings: httpOnly, sameSite=${process.env.NODE_ENV === 'production' ? 'none' : 'strict'}, secure=${process.env.NODE_ENV === 'production'}`);
+    console.log(`🍪 Cookie settings: httpOnly=true, sameSite=none, secure=true`);
 });

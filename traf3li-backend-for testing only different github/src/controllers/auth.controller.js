@@ -3,7 +3,7 @@ const { CustomException } = require('../utils');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 
-const { JWT_SECRET, NODE_ENV } = process.env;
+const { JWT_SECRET } = process.env;
 const saltRounds = 10;
 
 const authRegister = async (request, response) => {
@@ -74,8 +74,8 @@ const authLogin = async (request, response) => {
             
             const cookieConfig = {
                 httpOnly: true,
-                sameSite: NODE_ENV === 'production' ? 'none' : 'strict',
-                secure: NODE_ENV === 'production',
+                sameSite: 'none',    // Required for cross-origin requests
+                secure: true,        // Required when sameSite is 'none'
                 maxAge: 60 * 60 * 24 * 7 * 1000, // 7 days
                 path: '/'
             }
@@ -101,8 +101,8 @@ const authLogin = async (request, response) => {
 const authLogout = async (request, response) => {
     return response.clearCookie('accessToken', {
         httpOnly: true,
-        sameSite: NODE_ENV === 'production' ? 'none' : 'strict',
-        secure: NODE_ENV === 'production',
+        sameSite: 'none',    // Must match login cookie settings
+        secure: true,        // Must match login cookie settings
         path: '/'
     })
     .send({
