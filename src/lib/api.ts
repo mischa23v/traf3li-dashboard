@@ -11,12 +11,15 @@ import { API_CONFIG, getApiUrl } from '@/config/api'
 const API_BASE_URL = getApiUrl()
 
 // Non-versioned API base URL (for routes that don't use /v1)
-const API_BASE_URL_NO_VERSION = `${API_CONFIG.baseUrl}/api`
+// In production with proxy: /api
+// In development: https://api.traf3li.com/api
+const API_BASE_URL_NO_VERSION = API_CONFIG.useProxy ? '/api' : `${API_CONFIG.baseUrl}/api`
 
 // Export the base URL for use in other components (e.g., file downloads)
 export const API_URL = API_BASE_URL
 export const API_URL_NO_VERSION = API_BASE_URL_NO_VERSION
-export const API_DOMAIN = API_CONFIG.baseUrl
+// API_DOMAIN is used for direct links (e.g., file downloads) - always use full URL
+export const API_DOMAIN = API_CONFIG.useProxy ? 'https://api.traf3li.com' : API_CONFIG.baseUrl
 
 // Cache for GET requests (simple in-memory cache)
 const requestCache = new Map<string, { data: any; timestamp: number }>()
