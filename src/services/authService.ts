@@ -244,6 +244,39 @@ const AUTH_GRACE_PERIOD = 30 * 60 * 1000 // 30 minutes - trust cached user for e
 const MAX_CONSECUTIVE_401 = 10 // Very high threshold - almost never auto-logout
 
 /**
+ * DEBUG: Comprehensive auth state logger
+ * Logs to console with full context to help debug logout issues
+ */
+const logAuthEvent = (event: string, data: Record<string, any>) => {
+  const authState = {
+    event,
+    timestamp: new Date().toISOString(),
+    lastSuccessfulAuth: lastSuccessfulAuth ? new Date(lastSuccessfulAuth).toISOString() : 'never',
+    timeSinceLastSuccess: lastSuccessfulAuth ? `${Math.round((Date.now() - lastSuccessfulAuth) / 1000)}s ago` : 'N/A',
+    consecutive401Count,
+    gracePeriodRemaining: lastSuccessfulAuth ? `${Math.round((AUTH_GRACE_PERIOD - (Date.now() - lastSuccessfulAuth)) / 1000)}s` : 'N/A',
+    hasLocalStorageUser: !!localStorage.getItem('user'),
+    currentPath: typeof window !== 'undefined' ? window.location.pathname : 'unknown',
+    ...data,
+  }
+
+  // Use a distinctive prefix for easy filtering in console/logs
+  console.log('%c[AUTH-DEBUG]', 'background: #007bff; color: white; padding: 2px 6px; border-radius: 3px;', event, authState)
+
+  // Also log to Sentry if available (will show in Render logs via Sentry)
+  if (typeof window !== 'undefined' && (window as any).Sentry) {
+    (window as any).Sentry.addBreadcrumb({
+      category: 'auth',
+      message: event,
+      data: authState,
+      level: 'info',
+    })
+  }
+
+  return authState
+}
+
+/**
  * Auth Service Object
  */
 const authService = {
@@ -278,7 +311,11 @@ const authService = {
       // Mark successful authentication
       lastSuccessfulAuth = Date.now()
       consecutive401Count = 0
-      console.log('[AUTH] login successful, auth tracking reset')
+      logAuthEvent('LOGIN_SUCCESS', {
+        username: user.username,
+        userId: user._id,
+        firmId: user.firmId,
+      })
 
       return user
     } catch (error: any) {
@@ -309,12 +346,25 @@ const authService = {
    * Clears HttpOnly cookie and localStorage
    */
   logout: async (): Promise<void> => {
+    // CRITICAL: Log the FULL stack trace to find what's calling logout
+    const stackTrace = new Error().stack?.split('\n').slice(1, 8).join('\n') || 'unknown'
+    logAuthEvent('LOGOUT_CALLED', {
+      stackTrace,
+      calledFrom: stackTrace.split('\n')[1]?.trim() || 'unknown',
+    })
+
     try {
       await authApi.post('/auth/logout')
       localStorage.removeItem('user')
+      logAuthEvent('LOGOUT_SUCCESS', { apiCallSucceeded: true })
     } catch (error: any) {
       // Even if API call fails, clear local storage
       localStorage.removeItem('user')
+      logAuthEvent('LOGOUT_API_FAILED', {
+        error: error?.message,
+        status: error?.status,
+        clearedLocalStorageAnyway: true,
+      })
     }
   },
 
@@ -326,10 +376,10 @@ const authService = {
    * For other errors (500, network), returns cached user to prevent unnecessary logout
    */
   getCurrentUser: async (): Promise<User | null> => {
+    logAuthEvent('GET_CURRENT_USER_START', { action: 'calling /auth/me' })
+
     try {
-      console.log('[AUTH] getCurrentUser - calling /auth/me')
       const response = await authApi.get<AuthResponse>('/auth/me')
-      console.log('[AUTH] getCurrentUser - success:', response.data.user?.username)
 
       if (response.data.error || !response.data.user) {
         // Backend said no user - but DON'T immediately logout!
@@ -340,21 +390,31 @@ const authService = {
 
         consecutive401Count++
 
-        console.warn('[AUTH] getCurrentUser - backend returned no user:', {
-          message: response.data.message,
-          consecutive401Count,
-          recentlyAuthenticated,
-          hasCachedUser: !!cachedUser,
+        const decision = recentlyAuthenticated && cachedUser && consecutive401Count < MAX_CONSECUTIVE_401
+          ? 'USING_CACHED_USER'
+          : 'WILL_CLEAR_AUTH'
+
+        logAuthEvent('GET_CURRENT_USER_NO_USER', {
+          backendMessage: response.data.message,
+          backendError: response.data.error,
+          decision,
+          willUseCachedUser: decision === 'USING_CACHED_USER',
+          reason: decision === 'USING_CACHED_USER'
+            ? 'Recently authenticated, have cached user, under failure threshold'
+            : `recentlyAuth=${recentlyAuthenticated}, hasCached=${!!cachedUser}, count=${consecutive401Count}/${MAX_CONSECUTIVE_401}`,
         })
 
         // If recently authenticated and have cached user, DON'T logout
-        // This handles intermittent cookie issues
-        if (recentlyAuthenticated && cachedUser && consecutive401Count < MAX_CONSECUTIVE_401) {
-          console.warn('[AUTH] getCurrentUser - using cached user despite backend error')
+        if (decision === 'USING_CACHED_USER') {
           return cachedUser
         }
 
         // Only clear if this is NOT a transient issue
+        logAuthEvent('CLEARING_AUTH_STATE', {
+          reason: 'Too many failures or not recently authenticated',
+          consecutive401Count,
+          recentlyAuthenticated,
+        })
         localStorage.removeItem('user')
         lastSuccessfulAuth = 0
         consecutive401Count = 0
@@ -371,14 +431,18 @@ const authService = {
       // Update localStorage with fresh user data
       localStorage.setItem('user', JSON.stringify(user))
 
+      logAuthEvent('GET_CURRENT_USER_SUCCESS', {
+        username: user.username,
+        userId: user._id,
+      })
+
       return user
     } catch (error: any) {
       const cachedUser = authService.getCachedUser()
       const timeSinceLastSuccess = Date.now() - lastSuccessfulAuth
       const recentlyAuthenticated = timeSinceLastSuccess < AUTH_GRACE_PERIOD
 
-      // Log error details for debugging
-      console.error('[AUTH] getCurrentUser - ERROR:', {
+      logAuthEvent('GET_CURRENT_USER_ERROR', {
         status: error?.status,
         message: error?.message,
         url: '/auth/me',
@@ -393,21 +457,22 @@ const authService = {
       if (error?.status === 401) {
         consecutive401Count++
 
-        // If we were recently authenticated and have cached user, this might be
-        // an intermittent cookie issue - don't log out immediately
-        if (recentlyAuthenticated && cachedUser && consecutive401Count < MAX_CONSECUTIVE_401) {
-          console.warn('[AUTH] getCurrentUser - 401 but recently authenticated, using cached user', {
-            consecutive401Count,
-            maxAllowed: MAX_CONSECUTIVE_401,
-          })
+        const decision = recentlyAuthenticated && cachedUser && consecutive401Count < MAX_CONSECUTIVE_401
+          ? 'USING_CACHED_USER'
+          : 'WILL_CLEAR_AUTH'
+
+        logAuthEvent('GET_CURRENT_USER_401', {
+          decision,
+          reason: decision === 'USING_CACHED_USER'
+            ? 'Recently authenticated, have cached user, under failure threshold'
+            : `recentlyAuth=${recentlyAuthenticated}, hasCached=${!!cachedUser}, count=${consecutive401Count}/${MAX_CONSECUTIVE_401}`,
+        })
+
+        if (decision === 'USING_CACHED_USER') {
           return cachedUser
         }
 
-        // Too many consecutive failures or not recently authenticated - actually log out
-        console.warn('[AUTH] getCurrentUser - 401, clearing session', {
-          consecutive401Count,
-          recentlyAuthenticated,
-        })
+        logAuthEvent('CLEARING_AUTH_STATE', { trigger: '401_exceeded_threshold' })
         localStorage.removeItem('user')
         lastSuccessfulAuth = 0
         consecutive401Count = 0
@@ -420,13 +485,20 @@ const authService = {
         if (message.includes('unauthorized') || message.includes('access denied') || message.includes('token')) {
           consecutive401Count++
 
-          // Same resilience logic for 400 auth errors
-          if (recentlyAuthenticated && cachedUser && consecutive401Count < MAX_CONSECUTIVE_401) {
-            console.warn('[AUTH] getCurrentUser - 400 auth error but recently authenticated, using cached user')
+          const decision = recentlyAuthenticated && cachedUser && consecutive401Count < MAX_CONSECUTIVE_401
+            ? 'USING_CACHED_USER'
+            : 'WILL_CLEAR_AUTH'
+
+          logAuthEvent('GET_CURRENT_USER_400_AUTH', {
+            decision,
+            errorMessage: message,
+          })
+
+          if (decision === 'USING_CACHED_USER') {
             return cachedUser
           }
 
-          console.warn('[AUTH] getCurrentUser - 400 with auth error, clearing session')
+          logAuthEvent('CLEARING_AUTH_STATE', { trigger: '400_auth_error' })
           localStorage.removeItem('user')
           lastSuccessfulAuth = 0
           consecutive401Count = 0
@@ -437,12 +509,18 @@ const authService = {
       // For other errors (500, network issues, etc.), DON'T log out
       // Return the cached user instead - they might still be authenticated
       if (cachedUser) {
-        console.warn('[AUTH] getCurrentUser - using cached user due to error:', error?.status)
+        logAuthEvent('GET_CURRENT_USER_OTHER_ERROR_USING_CACHE', {
+          errorStatus: error?.status,
+          errorMessage: error?.message,
+        })
         return cachedUser
       }
 
       // No cached user and error - return null but don't redirect
-      console.warn('[AUTH] getCurrentUser - no cached user, returning null')
+      logAuthEvent('GET_CURRENT_USER_NO_CACHE_RETURNING_NULL', {
+        errorStatus: error?.status,
+        errorMessage: error?.message,
+      })
       return null
     }
   },
