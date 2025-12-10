@@ -4,7 +4,7 @@ import { toast } from 'sonner'
 import {
     Save, Calendar, User, Flag, FileText, Users, Loader2, Scale,
     Plus, X, Clock, Tag, Repeat, ListTodo, ChevronDown,
-    Zap, Bell, Check, ArrowLeft
+    Zap, Bell, Check
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -65,60 +65,6 @@ interface SubtaskInput {
     id: string
     title: string
     autoReset?: boolean
-}
-
-// Progress Stepper Component (Right-aligned for RTL)
-interface StepperProps {
-    steps: { id: string; label: string; icon: React.ReactNode }[]
-    completedSteps: string[]
-    activeStep: string
-    onStepClick: (stepId: string) => void
-}
-
-function ProgressStepper({ steps, completedSteps, activeStep, onStepClick }: StepperProps) {
-    return (
-        <div className="flex items-center justify-end gap-1 sm:gap-2 py-3 overflow-x-auto">
-            {steps.map((step, index) => (
-                <div key={step.id} className="flex items-center">
-                    {index > 0 && (
-                        <ArrowLeft className={cn(
-                            "w-3 h-3 sm:w-4 sm:h-4 mx-1 sm:mx-2",
-                            completedSteps.includes(steps[index - 1].id) ? "text-emerald-400" : "text-slate-300"
-                        )} />
-                    )}
-                    <button
-                        type="button"
-                        onClick={() => onStepClick(step.id)}
-                        className={cn(
-                            "flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg sm:rounded-xl transition-all duration-200",
-                            "focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2",
-                            completedSteps.includes(step.id)
-                                ? "bg-emerald-100 text-emerald-700"
-                                : activeStep === step.id
-                                    ? "bg-emerald-50 text-emerald-600 ring-1 ring-emerald-200"
-                                    : "bg-slate-50 text-slate-500 hover:bg-slate-100"
-                        )}
-                    >
-                        <div className={cn(
-                            "w-5 h-5 sm:w-6 sm:h-6 rounded-full flex items-center justify-center text-xs font-medium",
-                            completedSteps.includes(step.id)
-                                ? "bg-emerald-500 text-white"
-                                : activeStep === step.id
-                                    ? "bg-emerald-500 text-white"
-                                    : "bg-slate-200 text-slate-600"
-                        )}>
-                            {completedSteps.includes(step.id) ? (
-                                <Check className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
-                            ) : (
-                                index + 1
-                            )}
-                        </div>
-                        <span className="text-xs sm:text-sm font-medium hidden sm:inline">{step.label}</span>
-                    </button>
-                </div>
-            ))}
-        </div>
-    )
 }
 
 export function CreateTaskView() {
@@ -187,50 +133,8 @@ export function CreateTaskView() {
     const [errors, setErrors] = useState<Record<string, string>>({})
     const [touched, setTouched] = useState<Record<string, boolean>>({})
 
-    // Stepper configuration
-    const steps = [
-        { id: 'basic', label: 'الأساسيات', icon: <Zap className="w-4 h-4" /> },
-        { id: 'recurring', label: 'التكرار', icon: <Repeat className="w-4 h-4" /> },
-        { id: 'subtasks', label: 'المهام الفرعية', icon: <ListTodo className="w-4 h-4" /> },
-        { id: 'reminders', label: 'التذكيرات', icon: <Bell className="w-4 h-4" /> },
-    ]
-
-    // Calculate completed steps based on form state
-    const getCompletedSteps = (): string[] => {
-        const completed: string[] = []
-        if (formData.title.trim()) completed.push('basic')
-        if (isRecurring || showScheduling) completed.push('recurring')
-        if (subtasks.length > 0 || showSubtasks) completed.push('subtasks')
-        if (reminders.length > 0 || showReminders) completed.push('reminders')
-        return completed
-    }
-
-    // Get active step based on what's currently being filled
-    const getActiveStep = (): string => {
-        if (!formData.title.trim()) return 'basic'
-        if (showScheduling) return 'recurring'
-        if (showSubtasks) return 'subtasks'
-        if (showReminders) return 'reminders'
-        return 'basic'
-    }
-
-    // Handle step click - scroll to section and open it
-    const handleStepClick = (stepId: string) => {
-        const refs: Record<string, React.RefObject<HTMLDivElement | null>> = {
-            basic: basicRef,
-            recurring: schedulingRef,
-            subtasks: subtasksRef,
-            reminders: remindersRef,
-        }
-        const ref = refs[stepId]
-        if (ref?.current) {
-            ref.current.scrollIntoView({ behavior: 'smooth', block: 'start' })
-        }
-        // Open the section if it's collapsed
-        if (stepId === 'recurring') setShowScheduling(true)
-        if (stepId === 'subtasks') setShowSubtasks(true)
-        if (stepId === 'reminders') setShowReminders(true)
-    }
+    // Check if basic info is complete
+    const isBasicComplete = formData.title.trim().length > 0
 
     // Handle field blur for validation
     const handleBlur = (field: string) => {
@@ -416,27 +320,23 @@ export function CreateTaskView() {
                             </Card>
                         )}
 
-                        {/* Progress Stepper - Right aligned */}
-                        <Card className="rounded-2xl shadow-sm border-slate-100">
-                            <CardContent className="py-2 px-4">
-                                <ProgressStepper
-                                    steps={steps}
-                                    completedSteps={getCompletedSteps()}
-                                    activeStep={getActiveStep()}
-                                    onStepClick={handleStepClick}
-                                />
-                            </CardContent>
-                        </Card>
-
                         <form onSubmit={handleSubmit} className="space-y-6">
                             {/* CARD 1: Basic Details */}
                             <div ref={basicRef}>
                                 <Card className="rounded-3xl shadow-sm border-slate-100">
                                     <CardHeader className="bg-slate-50/50 rounded-t-3xl border-b border-slate-100">
-                                        <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                                            <Zap className="w-5 h-5 text-emerald-500" />
-                                            المعلومات الأساسية
-                                        </CardTitle>
+                                        <div className="flex items-center justify-between">
+                                            <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
+                                                <Zap className="w-5 h-5 text-emerald-500" />
+                                                المعلومات الأساسية
+                                            </CardTitle>
+                                            {isBasicComplete && (
+                                                <div className="flex items-center gap-1.5 text-emerald-600">
+                                                    <Check className="w-4 h-4" />
+                                                    <span className="text-xs font-medium">مكتمل</span>
+                                                </div>
+                                            )}
+                                        </div>
                                     </CardHeader>
                                     <CardContent className="space-y-5 pt-6">
                                         {/* Row 1: Title + Status */}
@@ -734,6 +634,11 @@ export function CreateTaskView() {
                                                     <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
                                                         <Repeat className="w-5 h-5 text-emerald-500" />
                                                         مهمة متكررة
+                                                        {isRecurring && (
+                                                            <Badge variant="secondary" className="bg-emerald-100 text-emerald-700 text-xs">
+                                                                مفعّل
+                                                            </Badge>
+                                                        )}
                                                     </CardTitle>
                                                     <ChevronDown className={cn("w-5 h-5 text-slate-500 transition-transform", showScheduling && "rotate-180")} />
                                                 </div>
