@@ -102,7 +102,6 @@ export function Leads() {
     const { data: leadsData, isLoading, isError, error, refetch } = useLeads(filters)
     const deleteLeadMutation = useDeleteLead()
     const convertLeadMutation = useConvertLead()
-    const { mutate: bulkDeleteLeads } = useBulkDeleteLeads()
 
     const leads = leadsData?.data || []
 
