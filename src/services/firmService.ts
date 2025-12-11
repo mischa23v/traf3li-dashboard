@@ -444,6 +444,58 @@ const firmService = {
       throw new Error(handleApiError(error))
     }
   },
+
+  /**
+   * Get all firms (admin only)
+   * GET /api/firms
+   */
+  getFirms: async (): Promise<any[]> => {
+    try {
+      const response = await apiClient.get<ApiResponse<any[]>>('/firms')
+      return response.data.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Add lawyer to firm
+   * POST /api/firms/:id/lawyers
+   */
+  addLawyer: async (
+    firmId: string,
+    data: {
+      userId?: string
+      email?: string
+      firstName?: string
+      lastName?: string
+      role?: string
+      barNumber?: string
+      practiceAreas?: string[]
+    }
+  ): Promise<any> => {
+    try {
+      const response = await apiClient.post<ApiResponse<any>>(
+        `/firms/${firmId}/lawyers`,
+        data
+      )
+      return response.data.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Remove lawyer from firm
+   * DELETE /api/firms/:id/lawyers/:lawyerId
+   */
+  removeLawyer: async (firmId: string, lawyerId: string): Promise<void> => {
+    try {
+      await apiClient.delete(`/firms/${firmId}/lawyers/${lawyerId}`)
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
 }
 
 export default firmService

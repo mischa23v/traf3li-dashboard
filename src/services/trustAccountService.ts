@@ -207,6 +207,10 @@ export const trustAccountService = {
     return response.data
   },
 
+  deleteTrustAccount: async (id: string): Promise<void> => {
+    await api.delete(`/trust-accounts/${id}`)
+  },
+
   // Client Trust Balances
   getClientTrustBalances: async (accountId: string, params?: {
     clientId?: string

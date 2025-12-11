@@ -406,6 +406,54 @@ const billService = {
       throw new Error(handleApiError(error))
     }
   },
+
+  /**
+   * Approve bill
+   * POST /api/bills/:id/approve
+   */
+  approveBill: async (id: string, notes?: string): Promise<Bill> => {
+    try {
+      const response = await apiClient.post(`/bills/${id}/approve`, { notes })
+      return response.data.bill || response.data.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Pay bill
+   * POST /api/bills/:id/pay
+   */
+  payBill: async (id: string, paymentData?: {
+    paymentDate?: string
+    paymentMethod?: string
+    referenceNumber?: string
+    amount?: number
+    notes?: string
+  }): Promise<Bill> => {
+    try {
+      const response = await apiClient.post(`/bills/${id}/pay`, paymentData)
+      return response.data.bill || response.data.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
+
+  /**
+   * Post bill to General Ledger
+   * POST /api/bills/:id/post-to-gl
+   */
+  postToGL: async (id: string, data?: {
+    postingDate?: string
+    notes?: string
+  }): Promise<Bill> => {
+    try {
+      const response = await apiClient.post(`/bills/${id}/post-to-gl`, data)
+      return response.data.bill || response.data.data
+    } catch (error: any) {
+      throw new Error(handleApiError(error))
+    }
+  },
 }
 
 export default billService
