@@ -521,41 +521,58 @@ export function CreateClientView() {
             return
         }
 
-        // Build fullName based on client type and name entry mode
-        let fullName: string
+        // Build fullNameArabic based on client type and name entry mode
+        let fullNameArabic_computed: string
         if (clientType === 'company') {
-            fullName = companyName || 'شركة جديدة'
+            fullNameArabic_computed = companyName || 'شركة جديدة'
         } else {
             // Individual - use full name or 4-part name based on mode
             if (nameEntryMode === 'full') {
-                fullName = fullNameArabic || 'عميل جديد'
+                fullNameArabic_computed = fullNameArabic || 'عميل جديد'
             } else {
                 const nameParts = [firstName, fatherName, grandfatherName, familyName].filter(Boolean)
-                fullName = nameParts.length > 0 ? nameParts.join(' ') : 'عميل جديد'
+                fullNameArabic_computed = nameParts.length > 0 ? nameParts.join(' ') : 'عميل جديد'
             }
         }
 
-        // Backend expects flat structure with these fields:
-        // Required: fullName, phone
-        // Optional: email, alternatePhone, nationalId, companyName, companyRegistration, address, city, country, notes, preferredContactMethod, language, status
-        const clientData = {
-            // Required fields with defaults
-            fullName,
+        // Backend API Structure:
+        // Individual: clientType, phone, fullNameArabic, nationalId (all required)
+        // Company: clientType, phone, companyName, crNumber (all required)
+        const clientData = clientType === 'individual' ? {
+            // Individual client
+            clientType: 'individual',
             phone: phone || '+966500000000',
+            fullNameArabic: fullNameArabic_computed,
+            nationalId: nationalId || '1234567890', // Default for testing
+
+            // Optional fields
+            firstName: firstName || undefined,
+            lastName: familyName || undefined,
+            email: email || undefined,
+            gender: gender || undefined,
+            nationality: nationality || undefined,
+            address: (city || district || street) ? {
+                city: city || undefined,
+                district: district || undefined,
+                street: street || undefined,
+                postalCode: postalCode || undefined,
+            } : undefined,
+        } : {
+            // Company client
+            clientType: 'company',
+            phone: phone || companyPhone || '+966500000000',
+            companyName: companyName || 'شركة جديدة',
+            crNumber: crNumber || '1234567890', // Default for testing
 
             // Optional fields
             email: email || undefined,
-            alternatePhone: alternatePhone || undefined,
-            nationalId: clientType === 'individual' ? nationalId : undefined,
-            companyName: clientType === 'company' ? companyName : undefined,
-            companyRegistration: clientType === 'company' ? crNumber : undefined,
-            address: fullAddress || street || undefined,
-            city: clientType === 'company' ? companyCity : city || undefined,
-            country: 'Saudi Arabia',
-            notes: generalNotes || undefined,
-            preferredContactMethod: preferredContact || 'phone',
-            language: preferredLanguage || 'ar',
-            status: status || 'active',
+            companyNameEnglish: companyNameEnglish || undefined,
+            legalRepresentative: legalRepName ? {
+                name: legalRepName,
+                nationalId: legalRepId || undefined,
+                position: legalRepPosition || undefined,
+                phone: legalRepPhone || undefined,
+            } : undefined,
         }
 
         createClient(clientData as any, {
