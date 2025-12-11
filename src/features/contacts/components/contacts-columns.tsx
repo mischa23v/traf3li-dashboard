@@ -74,39 +74,44 @@ export function useContactsColumns(): ColumnDef<Contact>[] {
       },
     },
     {
-      accessorKey: 'type',
+      id: 'type',
+      accessorFn: (row) => row.type || 'individual',
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title={t('contacts.columns.type')} />
       ),
       cell: ({ row }) => {
-        const type = contactTypes.find((t) => t.value === row.getValue('type'))
-        if (!type) return null
+        const typeValue = row.original.type || 'individual'
+        const type = contactTypes.find((t) => t.value === typeValue)
+        if (!type) return <span className='text-muted-foreground'>-</span>
         const Icon = type.icon
         return (
           <div className='flex items-center gap-2'>
             <Icon className='h-4 w-4 text-muted-foreground' />
-            <span>{t(`contacts.types.${row.getValue('type')}`)}</span>
+            <span>{t(`contacts.types.${typeValue}`)}</span>
           </div>
         )
       },
       filterFn: (row, id, value: string[]) => {
-        return value.includes(row.getValue(id))
+        const typeValue = row.original.type || 'individual'
+        return value.includes(typeValue)
       },
     },
     {
-      accessorKey: 'category',
+      id: 'category',
+      accessorFn: (row) => row.category || row.primaryRole,
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title={t('contacts.columns.category')} />
       ),
       cell: ({ row }) => {
-        const categoryValue = row.getValue('category') as string
+        const categoryValue = row.original.category || row.original.primaryRole
         if (!categoryValue) return <span className='text-muted-foreground'>-</span>
         const category = contactCategories.find((c) => c.value === categoryValue)
-        if (!category) return null
+        if (!category) return <span>{categoryValue}</span>
         return <span>{t(`contacts.categories.${categoryValue}`)}</span>
       },
       filterFn: (row, id, value: string[]) => {
-        return value.includes(row.getValue(id))
+        const categoryValue = row.original.category || row.original.primaryRole
+        return categoryValue ? value.includes(categoryValue) : false
       },
     },
     {
@@ -151,12 +156,13 @@ export function useContactsColumns(): ColumnDef<Contact>[] {
       },
     },
     {
-      accessorKey: 'status',
+      id: 'status',
+      accessorFn: (row) => row.status || 'active',
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title={t('contacts.columns.status')} />
       ),
       cell: ({ row }) => {
-        const status = row.getValue('status') as string
+        const status = (row.original.status || 'active') as string
         return (
           <Badge
             variant='outline'
@@ -167,7 +173,8 @@ export function useContactsColumns(): ColumnDef<Contact>[] {
         )
       },
       filterFn: (row, id, value: string[]) => {
-        return value.includes(row.getValue(id))
+        const status = row.original.status || 'active'
+        return value.includes(status)
       },
     },
     {

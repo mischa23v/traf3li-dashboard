@@ -2,32 +2,76 @@ import api from './api'
 
 export interface Contact {
   _id: string
-  lawyerId: string
-  firstName: string
-  lastName: string
+  lawyerId?: string
+  // Name fields
+  salutation?: string
+  firstName?: string
+  middleName?: string
+  lastName?: string
+  preferredName?: string
+  suffix?: string
+  fullNameArabic?: string
+  arabicName?: {
+    firstName?: string
+    fatherName?: string
+    grandfatherName?: string
+    familyName?: string
+    fullName?: string
+  }
+  // Contact info
   email?: string
   phone?: string
   alternatePhone?: string
-  title?: string // Job title
+  // Classification
+  type?: 'individual' | 'organization' | 'court' | 'attorney' | 'expert' | 'government' | 'other'
+  category?: string
+  primaryRole?: string
+  // Employment
+  title?: string
   company?: string
-  type: 'individual' | 'organization' | 'court' | 'attorney' | 'expert' | 'government' | 'other'
-  category?: 'client_contact' | 'opposing_party' | 'witness' | 'expert_witness' | 'judge' | 'court_clerk' | 'other'
+  organizationId?: string
+  department?: string
+  // Address
   address?: string
   city?: string
+  district?: string
   postalCode?: string
   country?: string
+  // Identification
+  nationalId?: string
+  iqamaNumber?: string
+  passportNumber?: string
+  passportCountry?: string
+  dateOfBirth?: string
+  nationality?: string
+  // Communication preferences
+  preferredLanguage?: string
+  preferredContactMethod?: string
+  // Status & flags
+  status?: 'active' | 'inactive' | 'archived' | 'deceased'
+  priority?: string
+  vipStatus?: boolean
+  riskLevel?: string
+  isBlacklisted?: boolean
+  blacklistReason?: string
+  // Conflict check
+  conflictCheckStatus?: string
+  conflictNotes?: string
+  conflictCheckDate?: string
+  // Other
   notes?: string
   tags?: string[]
-  linkedCases?: string[] // Case IDs
-  linkedClients?: string[] // Client IDs
-  status: 'active' | 'inactive' | 'archived'
-  createdAt: string
-  updatedAt: string
+  practiceAreas?: string[]
+  linkedCases?: string[]
+  linkedClients?: string[]
+  createdAt?: string
+  updatedAt?: string
 }
 
 export interface ContactFilters {
   type?: string
   category?: string
+  primaryRole?: string
   status?: string
   search?: string
   page?: number
@@ -35,15 +79,16 @@ export interface ContactFilters {
 }
 
 export interface CreateContactData {
-  firstName: string
-  lastName: string
+  firstName?: string
+  lastName?: string
   email?: string
   phone?: string
   alternatePhone?: string
   title?: string
   company?: string
-  type: string
+  type?: string
   category?: string
+  primaryRole?: string
   address?: string
   city?: string
   postalCode?: string
