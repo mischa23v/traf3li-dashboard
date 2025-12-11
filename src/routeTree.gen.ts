@@ -93,6 +93,7 @@ import { Route as AuthenticatedDashboardSettingsCompanyRouteImport } from './rou
 import { Route as AuthenticatedDashboardReputationOverviewRouteImport } from './routes/_authenticated/dashboard.reputation.overview'
 import { Route as AuthenticatedDashboardReputationBadgesRouteImport } from './routes/_authenticated/dashboard.reputation.badges'
 import { Route as AuthenticatedDashboardOrganizationsNewRouteImport } from './routes/_authenticated/dashboard.organizations.new'
+import { Route as AuthenticatedDashboardOrganizationsOrganizationIdRouteImport } from './routes/_authenticated/dashboard.organizations.$organizationId'
 import { Route as AuthenticatedDashboardMessagesEmailRouteImport } from './routes/_authenticated/dashboard.messages.email'
 import { Route as AuthenticatedDashboardMessagesChatRouteImport } from './routes/_authenticated/dashboard.messages.chat'
 import { Route as AuthenticatedDashboardKnowledgeLawsRouteImport } from './routes/_authenticated/dashboard.knowledge.laws'
@@ -733,6 +734,12 @@ const AuthenticatedDashboardOrganizationsNewRoute =
   AuthenticatedDashboardOrganizationsNewRouteImport.update({
     id: '/dashboard/organizations/new',
     path: '/dashboard/organizations/new',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedDashboardOrganizationsOrganizationIdRoute =
+  AuthenticatedDashboardOrganizationsOrganizationIdRouteImport.update({
+    id: '/dashboard/organizations/$organizationId',
+    path: '/dashboard/organizations/$organizationId',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedDashboardMessagesEmailRoute =
@@ -1901,6 +1908,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/knowledge/laws': typeof AuthenticatedDashboardKnowledgeLawsRoute
   '/dashboard/messages/chat': typeof AuthenticatedDashboardMessagesChatRoute
   '/dashboard/messages/email': typeof AuthenticatedDashboardMessagesEmailRoute
+  '/dashboard/organizations/$organizationId': typeof AuthenticatedDashboardOrganizationsOrganizationIdRoute
   '/dashboard/organizations/new': typeof AuthenticatedDashboardOrganizationsNewRoute
   '/dashboard/reputation/badges': typeof AuthenticatedDashboardReputationBadgesRoute
   '/dashboard/reputation/overview': typeof AuthenticatedDashboardReputationOverviewRoute
@@ -2166,6 +2174,7 @@ export interface FileRoutesByTo {
   '/dashboard/knowledge/laws': typeof AuthenticatedDashboardKnowledgeLawsRoute
   '/dashboard/messages/chat': typeof AuthenticatedDashboardMessagesChatRoute
   '/dashboard/messages/email': typeof AuthenticatedDashboardMessagesEmailRoute
+  '/dashboard/organizations/$organizationId': typeof AuthenticatedDashboardOrganizationsOrganizationIdRoute
   '/dashboard/organizations/new': typeof AuthenticatedDashboardOrganizationsNewRoute
   '/dashboard/reputation/badges': typeof AuthenticatedDashboardReputationBadgesRoute
   '/dashboard/reputation/overview': typeof AuthenticatedDashboardReputationOverviewRoute
@@ -2436,6 +2445,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/knowledge/laws': typeof AuthenticatedDashboardKnowledgeLawsRoute
   '/_authenticated/dashboard/messages/chat': typeof AuthenticatedDashboardMessagesChatRoute
   '/_authenticated/dashboard/messages/email': typeof AuthenticatedDashboardMessagesEmailRoute
+  '/_authenticated/dashboard/organizations/$organizationId': typeof AuthenticatedDashboardOrganizationsOrganizationIdRoute
   '/_authenticated/dashboard/organizations/new': typeof AuthenticatedDashboardOrganizationsNewRoute
   '/_authenticated/dashboard/reputation/badges': typeof AuthenticatedDashboardReputationBadgesRoute
   '/_authenticated/dashboard/reputation/overview': typeof AuthenticatedDashboardReputationOverviewRoute
@@ -2704,6 +2714,7 @@ export interface FileRouteTypes {
     | '/dashboard/knowledge/laws'
     | '/dashboard/messages/chat'
     | '/dashboard/messages/email'
+    | '/dashboard/organizations/$organizationId'
     | '/dashboard/organizations/new'
     | '/dashboard/reputation/badges'
     | '/dashboard/reputation/overview'
@@ -2969,6 +2980,7 @@ export interface FileRouteTypes {
     | '/dashboard/knowledge/laws'
     | '/dashboard/messages/chat'
     | '/dashboard/messages/email'
+    | '/dashboard/organizations/$organizationId'
     | '/dashboard/organizations/new'
     | '/dashboard/reputation/badges'
     | '/dashboard/reputation/overview'
@@ -3238,6 +3250,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/knowledge/laws'
     | '/_authenticated/dashboard/messages/chat'
     | '/_authenticated/dashboard/messages/email'
+    | '/_authenticated/dashboard/organizations/$organizationId'
     | '/_authenticated/dashboard/organizations/new'
     | '/_authenticated/dashboard/reputation/badges'
     | '/_authenticated/dashboard/reputation/overview'
@@ -4065,6 +4078,13 @@ declare module '@tanstack/react-router' {
       path: '/dashboard/organizations/new'
       fullPath: '/dashboard/organizations/new'
       preLoaderRoute: typeof AuthenticatedDashboardOrganizationsNewRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dashboard/organizations/$organizationId': {
+      id: '/_authenticated/dashboard/organizations/$organizationId'
+      path: '/dashboard/organizations/$organizationId'
+      fullPath: '/dashboard/organizations/$organizationId'
+      preLoaderRoute: typeof AuthenticatedDashboardOrganizationsOrganizationIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/dashboard/messages/email': {
@@ -5503,6 +5523,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardKnowledgeLawsRoute: typeof AuthenticatedDashboardKnowledgeLawsRoute
   AuthenticatedDashboardMessagesChatRoute: typeof AuthenticatedDashboardMessagesChatRoute
   AuthenticatedDashboardMessagesEmailRoute: typeof AuthenticatedDashboardMessagesEmailRoute
+  AuthenticatedDashboardOrganizationsOrganizationIdRoute: typeof AuthenticatedDashboardOrganizationsOrganizationIdRoute
   AuthenticatedDashboardOrganizationsNewRoute: typeof AuthenticatedDashboardOrganizationsNewRoute
   AuthenticatedDashboardReputationBadgesRoute: typeof AuthenticatedDashboardReputationBadgesRoute
   AuthenticatedDashboardReputationOverviewRoute: typeof AuthenticatedDashboardReputationOverviewRoute
@@ -5733,6 +5754,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
     AuthenticatedDashboardMessagesChatRoute,
   AuthenticatedDashboardMessagesEmailRoute:
     AuthenticatedDashboardMessagesEmailRoute,
+  AuthenticatedDashboardOrganizationsOrganizationIdRoute:
+    AuthenticatedDashboardOrganizationsOrganizationIdRoute,
   AuthenticatedDashboardOrganizationsNewRoute:
     AuthenticatedDashboardOrganizationsNewRoute,
   AuthenticatedDashboardReputationBadgesRoute:

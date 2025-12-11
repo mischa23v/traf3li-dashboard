@@ -1,32 +1,34 @@
-'use client'
-
-import {
-  createContext,
-  useContext,
-  useState,
-  type Dispatch,
-  type SetStateAction,
-  type ReactNode,
-} from 'react'
+import React, { useState, createContext, useContext } from 'react'
 import type { Organization } from '../data/schema'
 
-type OrganizationsDialogType = 'add' | 'edit' | 'delete' | 'view'
+type OrganizationsDialogType = 'create' | 'edit' | 'delete' | 'view'
 
-type OrganizationsContextType = {
+interface OrganizationsContextType {
   open: OrganizationsDialogType | null
-  setOpen: (type: OrganizationsDialogType | null) => void
-  currentRow: Organization | null
-  setCurrentRow: Dispatch<SetStateAction<Organization | null>>
+  setOpen: (dialog: OrganizationsDialogType | null) => void
+  currentOrganization: Organization | null
+  setCurrentOrganization: (organization: Organization | null) => void
 }
 
-const OrganizationsContext = createContext<OrganizationsContextType | undefined>(undefined)
+const OrganizationsContext = createContext<OrganizationsContextType | null>(null)
 
-export function OrganizationsProvider({ children }: { children: ReactNode }) {
+interface OrganizationsProviderProps {
+  children: React.ReactNode
+}
+
+export function OrganizationsProvider({ children }: OrganizationsProviderProps) {
   const [open, setOpen] = useState<OrganizationsDialogType | null>(null)
-  const [currentRow, setCurrentRow] = useState<Organization | null>(null)
+  const [currentOrganization, setCurrentOrganization] = useState<Organization | null>(null)
 
   return (
-    <OrganizationsContext.Provider value={{ open, setOpen, currentRow, setCurrentRow }}>
+    <OrganizationsContext.Provider
+      value={{
+        open,
+        setOpen,
+        currentOrganization,
+        setCurrentOrganization,
+      }}
+    >
       {children}
     </OrganizationsContext.Provider>
   )
@@ -34,8 +36,8 @@ export function OrganizationsProvider({ children }: { children: ReactNode }) {
 
 export function useOrganizationsContext() {
   const context = useContext(OrganizationsContext)
-  if (context === undefined) {
-    throw new Error('useOrganizationsContext must be used within an OrganizationsProvider')
+  if (!context) {
+    throw new Error('useOrganizationsContext must be used within OrganizationsProvider')
   }
   return context
 }

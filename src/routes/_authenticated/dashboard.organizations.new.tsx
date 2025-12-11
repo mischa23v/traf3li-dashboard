@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { CreateOrganizationView } from '@/features/organizations/components/create-organization-view'
+import { Organizations } from '@/features/organizations'
 
 export const Route = createFileRoute('/_authenticated/dashboard/organizations/new')({
-    component: CreateOrganizationView,
+  component: Organizations,
 })
