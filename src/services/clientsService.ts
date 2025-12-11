@@ -61,22 +61,35 @@ export interface Client {
 }
 
 /**
- * Create Client Data
+ * Create Client Data - matches backend API
  */
 export interface CreateClientData {
-  fullName: string
+  clientType?: 'individual' | 'company'
+  fullNameArabic?: string
+  fullNameEnglish?: string
+  firstName?: string
+  lastName?: string
   email?: string
-  phone: string
+  phone?: string
   alternatePhone?: string
   nationalId?: string
   companyName?: string
-  companyRegistration?: string
-  address?: string
+  companyNameEnglish?: string
+  crNumber?: string
+  address?: string | {
+    city?: string
+    district?: string
+    street?: string
+    postalCode?: string
+  }
   city?: string
   country?: string
   notes?: string
-  preferredContactMethod?: 'email' | 'phone' | 'sms' | 'whatsapp'
+  generalNotes?: string
+  preferredContact?: 'email' | 'phone' | 'sms' | 'whatsapp'
+  preferredLanguage?: string
   language?: string
+  status?: 'active' | 'inactive' | 'archived' | 'pending'
 }
 
 /**

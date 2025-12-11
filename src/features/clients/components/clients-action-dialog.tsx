@@ -30,20 +30,20 @@ import { Lock } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
 const formSchema = z.object({
-  fullName: z.string().min(2, 'الاسم مطلوب ويجب أن يكون حرفين على الأقل'),
+  fullNameArabic: z.string().min(2, 'الاسم مطلوب ويجب أن يكون حرفين على الأقل'),
   email: z.string().email('البريد الإلكتروني غير صالح').optional().or(z.literal('')),
   phone: z.string().min(9, 'رقم الهاتف مطلوب'),
   alternatePhone: z.string().optional(),
   nationalId: z.string().optional(),
   companyName: z.string().optional(),
-  companyRegistration: z.string().optional(),
+  crNumber: z.string().optional(),
   address: z.string().optional(),
   city: z.string().optional(),
   country: z.string().default('SA'),
   notes: z.string().optional(),
-  preferredContactMethod: z.enum(['email', 'phone', 'sms', 'whatsapp']).default('phone'),
+  preferredContact: z.enum(['email', 'phone', 'sms', 'whatsapp']).default('phone'),
   language: z.string().default('ar'),
-  status: z.enum(['active', 'inactive', 'archived']).default('active'),
+  status: z.enum(['active', 'inactive', 'archived', 'pending']).default('active'),
 })
 
 type ClientForm = z.infer<typeof formSchema>
@@ -66,38 +66,55 @@ export function ClientsActionDialog({
   const { mutate: updateClient, isPending: isUpdating } = useUpdateClient()
   const isPending = isCreating || isUpdating
 
+  // Helper to get display name for edit form
+  const getEditDisplayName = () => {
+    if (!currentRow) return ''
+    if (currentRow.clientType === 'individual' || !currentRow.clientType) {
+      return currentRow.fullNameArabic || currentRow.fullNameEnglish ||
+             [currentRow.firstName, currentRow.lastName].filter(Boolean).join(' ') || ''
+    }
+    return currentRow.companyName || currentRow.companyNameEnglish || ''
+  }
+
+  // Helper to get address as string
+  const getAddressString = () => {
+    if (!currentRow?.address) return ''
+    if (typeof currentRow.address === 'string') return currentRow.address
+    return currentRow.address.street || ''
+  }
+
   const form = useForm<ClientForm>({
     resolver: zodResolver(formSchema) as any,
     defaultValues: isEdit
       ? {
-          fullName: currentRow.fullName,
+          fullNameArabic: getEditDisplayName(),
           email: currentRow.email || '',
-          phone: currentRow.phone,
+          phone: currentRow.phone || '',
           alternatePhone: currentRow.alternatePhone || '',
           nationalId: currentRow.nationalId || '',
           companyName: currentRow.companyName || '',
-          companyRegistration: currentRow.companyRegistration || '',
-          address: currentRow.address || '',
+          crNumber: currentRow.crNumber || '',
+          address: getAddressString(),
           city: currentRow.city || '',
           country: currentRow.country || 'SA',
-          notes: currentRow.notes || '',
-          preferredContactMethod: currentRow.preferredContactMethod || 'phone',
-          language: currentRow.language || 'ar',
+          notes: currentRow.notes || currentRow.generalNotes || '',
+          preferredContact: currentRow.preferredContactMethod || currentRow.preferredContact || 'phone',
+          language: currentRow.language || currentRow.preferredLanguage || 'ar',
           status: currentRow.status || 'active',
         }
       : {
-          fullName: '',
+          fullNameArabic: '',
           email: '',
           phone: '',
           alternatePhone: '',
           nationalId: '',
           companyName: '',
-          companyRegistration: '',
+          crNumber: '',
           address: '',
           city: '',
           country: 'SA',
           notes: '',
-          preferredContactMethod: 'phone',
+          preferredContact: 'phone',
           language: 'ar',
           status: 'active',
         },
@@ -158,7 +175,7 @@ export function ClientsActionDialog({
                 <div className='grid grid-cols-1 gap-4 sm:grid-cols-2'>
                   <FormField
                     control={form.control}
-                    name='fullName'
+                    name='fullNameArabic'
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>{t('clients.form.fullName')}</FormLabel>
@@ -251,7 +268,7 @@ export function ClientsActionDialog({
                   />
                   <FormField
                     control={form.control}
-                    name='preferredContactMethod'
+                    name='preferredContact'
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>{t('clients.form.preferredContactMethod')}</FormLabel>
@@ -295,7 +312,7 @@ export function ClientsActionDialog({
                   />
                   <FormField
                     control={form.control}
-                    name='companyRegistration'
+                    name='crNumber'
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>{t('clients.form.companyRegistration')}</FormLabel>

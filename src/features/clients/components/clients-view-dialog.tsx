@@ -37,6 +37,15 @@ type ClientViewDialogProps = {
   currentRow: Client
 }
 
+// Helper to get display name for a client
+const getClientDisplayName = (client: Client): string => {
+  if (client.clientType === 'individual' || !client.clientType) {
+    return client.fullNameArabic || client.fullNameEnglish ||
+           [client.firstName, client.lastName].filter(Boolean).join(' ') || '-'
+  }
+  return client.companyName || client.companyNameEnglish || '-'
+}
+
 export function ClientsViewDialog({
   open,
   onOpenChange,
@@ -46,10 +55,12 @@ export function ClientsViewDialog({
   const isArabic = i18n.language === 'ar'
   const dateLocale = isArabic ? ar : enUS
 
+  const preferredMethod = currentRow.preferredContactMethod || currentRow.preferredContact || 'phone'
   const contactMethod = contactMethods.find(
-    (m) => m.value === currentRow.preferredContactMethod
+    (m) => m.value === preferredMethod
   )
   const ContactIcon = contactMethod?.icon || MessageCircle
+  const status = currentRow.status || 'active'
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -57,7 +68,7 @@ export function ClientsViewDialog({
         <DialogHeader>
           <DialogTitle className='flex items-center gap-2'>
             <User className='h-5 w-5' />
-            {currentRow.fullName}
+            {getClientDisplayName(currentRow)}
           </DialogTitle>
           <DialogDescription>
             {t('clients.viewClientDescription')}
@@ -71,14 +82,14 @@ export function ClientsViewDialog({
               variant='outline'
               className={cn(
                 'capitalize',
-                clientStatusColors.get(currentRow.status)
+                clientStatusColors.get(status as any)
               )}
             >
-              {t(`clients.statuses.${currentRow.status}`)}
+              {t(`clients.statuses.${status}`)}
             </Badge>
-            {currentRow.clientId && (
+            {currentRow.clientNumber && (
               <span className='text-sm text-muted-foreground'>
-                #{currentRow.clientId}
+                #{currentRow.clientNumber}
               </span>
             )}
           </div>
@@ -133,7 +144,7 @@ export function ClientsViewDialog({
                     {t('clients.form.preferredContactMethod')}
                   </p>
                   <p className='font-medium'>
-                    {t(`clients.contactMethods.${currentRow.preferredContactMethod}`)}
+                    {t(`clients.contactMethods.${preferredMethod}`)}
                   </p>
                 </div>
               </div>
@@ -162,7 +173,7 @@ export function ClientsViewDialog({
           )}
 
           {/* Company Information */}
-          {(currentRow.companyName || currentRow.companyRegistration) && (
+          {(currentRow.companyName || currentRow.crNumber) && (
             <>
               <Separator />
               <div className='space-y-4'>
@@ -181,7 +192,7 @@ export function ClientsViewDialog({
                       </div>
                     </div>
                   )}
-                  {currentRow.companyRegistration && (
+                  {currentRow.crNumber && (
                     <div className='flex items-center gap-3'>
                       <FileText className='h-4 w-4 text-muted-foreground' />
                       <div>
@@ -189,7 +200,7 @@ export function ClientsViewDialog({
                           {t('clients.form.companyRegistration')}
                         </p>
                         <p className='font-medium'>
-                          {currentRow.companyRegistration}
+                          {currentRow.crNumber}
                         </p>
                       </div>
                     </div>
@@ -214,9 +225,14 @@ export function ClientsViewDialog({
                       {t('clients.form.address')}
                     </p>
                     <p className='font-medium'>
-                      {[currentRow.address, currentRow.city, currentRow.country]
-                        .filter(Boolean)
-                        .join('، ')}
+                      {(() => {
+                        const addressStr = typeof currentRow.address === 'string'
+                          ? currentRow.address
+                          : currentRow.address?.street
+                        return [addressStr, currentRow.city, currentRow.country]
+                          .filter(Boolean)
+                          .join('، ')
+                      })()}
                     </p>
                   </div>
                 </div>
@@ -314,18 +330,26 @@ export function ClientsViewDialog({
           )}
 
           {/* Timestamps */}
-          <Separator />
-          <div className='flex items-center gap-6 text-sm text-muted-foreground'>
-            <div className='flex items-center gap-2'>
-              <Calendar className='h-4 w-4' />
-              <span>
-                {t('clients.createdAt')}:{' '}
-                {format(new Date(currentRow.createdAt), 'PPP', {
-                  locale: dateLocale,
-                })}
-              </span>
-            </div>
-          </div>
+          {currentRow.createdAt && (
+            <>
+              <Separator />
+              <div className='flex items-center gap-6 text-sm text-muted-foreground'>
+                <div className='flex items-center gap-2'>
+                  <Calendar className='h-4 w-4' />
+                  <span>
+                    {t('clients.createdAt')}:{' '}
+                    {format(
+                      currentRow.createdAt instanceof Date
+                        ? currentRow.createdAt
+                        : new Date(currentRow.createdAt),
+                      'PPP',
+                      { locale: dateLocale }
+                    )}
+                  </span>
+                </div>
+              </div>
+            </>
+          )}
         </div>
       </DialogContent>
     </Dialog>
