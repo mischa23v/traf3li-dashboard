@@ -197,11 +197,13 @@ export function CreateTaskView() {
         e.preventDefault()
 
         const taskData = {
-            title: formData.title,
-            description: formData.description,
-            status: formData.status,
-            priority: formData.priority,
+            // Required API fields with defaults for testing
+            title: formData.title || 'مهمة جديدة',
+            status: formData.status || 'todo',
+            priority: formData.priority || 'medium',
             taskType: 'other',
+            // Optional fields
+            description: formData.description,
             ...(typeof formData.label === 'string' && formData.label.trim().length > 0 ? { label: formData.label as TaskLabel } : {}),
             tags: formData.tags,
             ...(formData.dueDate && { dueDate: formData.dueDate }),

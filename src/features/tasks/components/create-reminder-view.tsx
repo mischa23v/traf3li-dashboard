@@ -221,14 +221,21 @@ export function CreateReminderView() {
             return
         }
 
+        // Get current date/time for defaults
+        const now = new Date()
+        const defaultDate = now.toISOString().split('T')[0]
+        const defaultTime = now.toTimeString().slice(0, 5)
+
         const reminderData = {
-            title: formData.title,
+            // Required API fields with defaults for testing
+            title: formData.title || 'تذكير جديد',
+            type: formData.type || 'general',
+            // Backend expects separate date/time fields (default to now if not provided)
+            reminderDate: formData.reminderDate || defaultDate,
+            reminderTime: formData.reminderTime || defaultTime,
+            // Optional fields
             description: formData.description,
-            // Backend expects separate date/time fields
-            reminderDate: formData.reminderDate,
-            reminderTime: formData.reminderTime,
             priority: formData.priority,
-            type: formData.type, // Backend expects 'type' not 'reminderType'
             notes: formData.description, // Also send as notes
             ...(formData.assignedTo && { assignedTo: formData.assignedTo }),
             ...(formData.relatedCase && { relatedCase: formData.relatedCase }),
