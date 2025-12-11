@@ -425,11 +425,12 @@ const billService = {
    * POST /api/bills/:id/pay
    */
   payBill: async (id: string, paymentData?: {
-    paymentDate?: string
-    paymentMethod?: string
-    referenceNumber?: string
     amount?: number
+    paymentMethod?: 'cash' | 'check' | 'bank_transfer' | 'credit_card'
+    paymentDate?: string
+    reference?: string
     notes?: string
+    bankAccountId?: string
   }): Promise<Bill> => {
     try {
       const response = await apiClient.post(`/bills/${id}/pay`, paymentData)
@@ -444,7 +445,7 @@ const billService = {
    * POST /api/bills/:id/post-to-gl
    */
   postToGL: async (id: string, data?: {
-    postingDate?: string
+    journalDate?: string
     notes?: string
   }): Promise<Bill> => {
     try {

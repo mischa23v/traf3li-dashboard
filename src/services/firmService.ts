@@ -460,26 +460,11 @@ const firmService = {
 
   /**
    * Add lawyer to firm
-   * POST /api/firms/:id/lawyers
+   * POST /api/firms/lawyer/add
    */
-  addLawyer: async (
-    firmId: string,
-    data: {
-      userId?: string
-      email?: string
-      firstName?: string
-      lastName?: string
-      role?: string
-      barNumber?: string
-      practiceAreas?: string[]
-    }
-  ): Promise<any> => {
+  addLawyer: async (lawyerId: string, firmId: string): Promise<void> => {
     try {
-      const response = await apiClient.post<ApiResponse<any>>(
-        `/firms/${firmId}/lawyers`,
-        data
-      )
-      return response.data.data
+      await apiClient.post('/firms/lawyer/add', { lawyerId, firmId })
     } catch (error: any) {
       throw new Error(handleApiError(error))
     }
@@ -487,11 +472,11 @@ const firmService = {
 
   /**
    * Remove lawyer from firm
-   * DELETE /api/firms/:id/lawyers/:lawyerId
+   * POST /api/firms/lawyer/remove
    */
-  removeLawyer: async (firmId: string, lawyerId: string): Promise<void> => {
+  removeLawyer: async (lawyerId: string, firmId: string): Promise<void> => {
     try {
-      await apiClient.delete(`/firms/${firmId}/lawyers/${lawyerId}`)
+      await apiClient.post('/firms/lawyer/remove', { lawyerId, firmId })
     } catch (error: any) {
       throw new Error(handleApiError(error))
     }
