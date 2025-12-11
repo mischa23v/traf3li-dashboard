@@ -9,6 +9,17 @@ import { type Client } from '../data/schema'
 import { DataTableRowActions } from './data-table-row-actions'
 import { useTranslation } from 'react-i18next'
 
+// Helper to get display name for a client
+const getDisplayName = (client: Client): string => {
+  // For individual clients, prefer fullNameArabic
+  if (client.clientType === 'individual' || !client.clientType) {
+    return client.fullNameArabic || client.fullNameEnglish ||
+           [client.firstName, client.lastName].filter(Boolean).join(' ') || '-'
+  }
+  // For company clients, use companyName
+  return client.companyName || client.companyNameEnglish || '-'
+}
+
 export const useClientsColumns = (): ColumnDef<Client>[] => {
   const { t } = useTranslation()
 
@@ -41,13 +52,14 @@ export const useClientsColumns = (): ColumnDef<Client>[] => {
       enableHiding: false,
     },
     {
-      accessorKey: 'fullName',
+      id: 'fullName',
+      accessorFn: (row) => getDisplayName(row),
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title={t('clients.columns.fullName')} />
       ),
       cell: ({ row }) => (
         <LongText className='max-w-36 ps-3 font-medium'>
-          {row.getValue('fullName')}
+          {getDisplayName(row.original)}
         </LongText>
       ),
       meta: {
@@ -97,7 +109,8 @@ export const useClientsColumns = (): ColumnDef<Client>[] => {
       enableSorting: false,
     },
     {
-      accessorKey: 'preferredContactMethod',
+      id: 'preferredContactMethod',
+      accessorFn: (row) => row.preferredContactMethod || row.preferredContact || 'phone',
       header: ({ column }) => (
         <DataTableColumnHeader
           column={column}
@@ -105,7 +118,7 @@ export const useClientsColumns = (): ColumnDef<Client>[] => {
         />
       ),
       cell: ({ row }) => {
-        const method = row.getValue('preferredContactMethod') as string
+        const method = (row.original.preferredContactMethod || row.original.preferredContact || 'phone') as string
         const contactMethod = contactMethods.find((m) => m.value === method)
         return (
           <div className='flex items-center gap-2'>
@@ -119,17 +132,19 @@ export const useClientsColumns = (): ColumnDef<Client>[] => {
         )
       },
       filterFn: (row, id, value) => {
-        return value.includes(row.getValue(id))
+        const method = row.original.preferredContactMethod || row.original.preferredContact || 'phone'
+        return value.includes(method)
       },
       enableSorting: false,
     },
     {
-      accessorKey: 'status',
+      id: 'status',
+      accessorFn: (row) => row.status || 'active',
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title={t('clients.columns.status')} />
       ),
       cell: ({ row }) => {
-        const status = row.getValue('status') as string
+        const status = (row.original.status || 'active') as string
         const badgeColor = clientStatusColors.get(status as any)
         return (
           <div className='flex gap-2'>
@@ -140,7 +155,8 @@ export const useClientsColumns = (): ColumnDef<Client>[] => {
         )
       },
       filterFn: (row, id, value) => {
-        return value.includes(row.getValue(id))
+        const status = row.original.status || 'active'
+        return value.includes(status)
       },
       enableHiding: false,
       enableSorting: false,

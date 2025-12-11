@@ -3,6 +3,7 @@ import {
   UserCheck,
   UserX,
   Archive,
+  Clock,
   Mail,
   Phone,
   MessageSquare,
@@ -17,6 +18,7 @@ export const clientStatusColors = new Map<ClientStatus, string>([
     'archived',
     'bg-amber-100/30 text-amber-900 dark:text-amber-200 border-amber-200',
   ],
+  ['pending', 'bg-blue-100/30 text-blue-900 dark:text-blue-200 border-blue-200'],
 ])
 
 export const clientStatuses = [
@@ -37,6 +39,12 @@ export const clientStatuses = [
     labelEn: 'Archived',
     value: 'archived' as const,
     icon: Archive,
+  },
+  {
+    label: 'معلق',
+    labelEn: 'Pending',
+    value: 'pending' as const,
+    icon: Clock,
   },
 ] as const
 

@@ -6,38 +6,58 @@
 import apiClient, { handleApiError } from '@/lib/api'
 
 /**
- * Client Interface
+ * Client Interface - matches backend API response
  */
 export interface Client {
   _id: string
-  clientId: string
-  lawyerId: string
-  fullName: string
-  email?: string
-  phone: string
-  alternatePhone?: string
-  nationalId?: string
+  clientNumber?: string
+  clientType?: 'individual' | 'company'
+  lawyerId?: string
+  // Name fields - individual clients
+  fullNameArabic?: string
+  fullNameEnglish?: string
+  firstName?: string
+  lastName?: string
+  // Company fields
   companyName?: string
-  companyRegistration?: string
-  address?: string
+  companyNameEnglish?: string
+  crNumber?: string
+  // Contact info
+  email?: string
+  phone?: string
+  alternatePhone?: string
+  whatsapp?: string
+  // Identification
+  nationalId?: string
+  // Address
+  address?: string | {
+    city?: string
+    district?: string
+    street?: string
+    postalCode?: string
+  }
   city?: string
-  country: string
+  country?: string
+  // Preferences
   notes?: string
-  preferredContactMethod: 'email' | 'phone' | 'sms' | 'whatsapp'
-  language: string
-  status: 'active' | 'inactive' | 'archived'
-  // Billing & Balance (NEW)
+  generalNotes?: string
+  preferredContact?: 'email' | 'phone' | 'sms' | 'whatsapp'
+  preferredContactMethod?: 'email' | 'phone' | 'sms' | 'whatsapp'
+  preferredLanguage?: string
+  language?: string
+  status?: 'active' | 'inactive' | 'archived' | 'pending'
+  // Billing & Balance
   billing?: {
     creditBalance: number
     currency?: string
   }
   totalPaid?: number
   totalOutstanding?: number
-  // Conversion tracking (NEW)
+  // Conversion tracking
   convertedFromLead?: boolean
   convertedAt?: string
-  createdAt: string
-  updatedAt: string
+  createdAt?: string
+  updatedAt?: string
 }
 
 /**
