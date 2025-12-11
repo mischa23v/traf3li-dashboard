@@ -42,13 +42,18 @@ export function ContactsViewDialog({
   const isArabic = i18n.language === 'ar'
   const dateLocale = isArabic ? ar : enUS
 
-  const fullName = `${currentRow.firstName} ${currentRow.lastName}`
-  const initials = `${currentRow.firstName[0] || ''}${currentRow.lastName[0] || ''}`.toUpperCase()
-  const contactType = contactTypes.find((t) => t.value === currentRow.type)
+  const firstName = currentRow.firstName || ''
+  const lastName = currentRow.lastName || ''
+  const fullName = `${firstName} ${lastName}`.trim() || '-'
+  const initials = `${firstName[0] || ''}${lastName[0] || ''}`.toUpperCase() || '?'
+  const typeValue = currentRow.type || 'individual'
+  const contactType = contactTypes.find((t) => t.value === typeValue)
   const TypeIcon = contactType?.icon || User
-  const category = currentRow.category
-    ? contactCategories.find((c) => c.value === currentRow.category)
+  const categoryValue = currentRow.category || currentRow.primaryRole
+  const category = categoryValue
+    ? contactCategories.find((c) => c.value === categoryValue)
     : null
+  const status = currentRow.status || 'active'
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -79,14 +84,14 @@ export function ContactsViewDialog({
                   variant='outline'
                   className={cn(
                     'capitalize',
-                    contactStatusColors.get(currentRow.status)
+                    contactStatusColors.get(status)
                   )}
                 >
-                  {t(`contacts.statuses.${currentRow.status}`)}
+                  {t(`contacts.statuses.${status}`)}
                 </Badge>
                 <div className='flex items-center gap-1 text-sm text-muted-foreground'>
                   <TypeIcon className='h-4 w-4' />
-                  {t(`contacts.types.${currentRow.type}`)}
+                  {t(`contacts.types.${typeValue}`)}
                 </div>
               </div>
             </div>
@@ -158,7 +163,7 @@ export function ContactsViewDialog({
                       </div>
                     </div>
                   )}
-                  {category && (
+                  {category && categoryValue && (
                     <div className='flex items-center gap-3'>
                       <Tag className='h-4 w-4 text-muted-foreground' />
                       <div>
@@ -166,7 +171,7 @@ export function ContactsViewDialog({
                           {t('contacts.form.category')}
                         </p>
                         <p className='font-medium'>
-                          {t(`contacts.categories.${currentRow.category}`)}
+                          {t(`contacts.categories.${categoryValue}`)}
                         </p>
                       </div>
                     </div>
@@ -217,18 +222,22 @@ export function ContactsViewDialog({
           )}
 
           {/* Timestamps */}
-          <Separator />
-          <div className='flex items-center gap-6 text-sm text-muted-foreground'>
-            <div className='flex items-center gap-2'>
-              <Calendar className='h-4 w-4' />
-              <span>
-                {t('contacts.createdAt')}:{' '}
-                {format(new Date(currentRow.createdAt), 'PPP', {
-                  locale: dateLocale,
-                })}
-              </span>
-            </div>
-          </div>
+          {currentRow.createdAt && (
+            <>
+              <Separator />
+              <div className='flex items-center gap-6 text-sm text-muted-foreground'>
+                <div className='flex items-center gap-2'>
+                  <Calendar className='h-4 w-4' />
+                  <span>
+                    {t('contacts.createdAt')}:{' '}
+                    {format(new Date(currentRow.createdAt), 'PPP', {
+                      locale: dateLocale,
+                    })}
+                  </span>
+                </div>
+              </div>
+            </>
+          )}
         </div>
       </DialogContent>
     </Dialog>

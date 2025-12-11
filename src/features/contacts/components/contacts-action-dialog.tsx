@@ -77,21 +77,21 @@ export function ContactsActionDialog({
   useEffect(() => {
     if (currentRow) {
       form.reset({
-        firstName: currentRow.firstName,
-        lastName: currentRow.lastName,
+        firstName: currentRow.firstName || '',
+        lastName: currentRow.lastName || '',
         email: currentRow.email || '',
         phone: currentRow.phone || '',
         alternatePhone: currentRow.alternatePhone || '',
         title: currentRow.title || '',
         company: currentRow.company || '',
-        type: currentRow.type,
-        category: currentRow.category,
+        type: currentRow.type || 'individual',
+        category: currentRow.category || currentRow.primaryRole,
         address: currentRow.address || '',
         city: currentRow.city || '',
         postalCode: currentRow.postalCode || '',
         country: currentRow.country || '',
         notes: currentRow.notes || '',
-        status: currentRow.status,
+        status: currentRow.status || 'active',
       })
     } else {
       form.reset({
