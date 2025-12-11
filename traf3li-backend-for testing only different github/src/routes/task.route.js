@@ -1,15 +1,16 @@
 const express = require('express');
 const { userMiddleware } = require('../middlewares');
-const { 
-    createTask, 
-    getTasks, 
-    getTask, 
-    updateTask, 
+const {
+    createTask,
+    getTasks,
+    getTask,
+    updateTask,
     deleteTask,
     completeTask,
     getUpcomingTasks,
     getOverdueTasks,
-    getTasksByCase
+    getTasksByCase,
+    bulkDeleteTasks
 } = require('../controllers/task.controller');
 
 const app = express.Router();
@@ -28,6 +29,9 @@ app.get('/overdue', userMiddleware, getOverdueTasks);
 
 // Get tasks by case
 app.get('/case/:caseId', userMiddleware, getTasksByCase);
+
+// Bulk delete tasks
+app.delete('/bulk', userMiddleware, bulkDeleteTasks);
 
 // Get single task
 app.get('/:_id', userMiddleware, getTask);
