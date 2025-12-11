@@ -124,7 +124,7 @@ export const bankFeedService = {
       formData.append('columnMapping', JSON.stringify(columnMapping))
       formData.append('dateFormat', dateFormat)
 
-      const response = await apiClientNoVersion.post(
+      const response = await apiClient.post(
         `/bank-reconciliation/import/csv`,
         formData,
         { headers: { 'Content-Type': 'multipart/form-data' } }
@@ -143,7 +143,7 @@ export const bankFeedService = {
       const formData = new FormData()
       formData.append('file', file)
 
-      const response = await apiClientNoVersion.post(
+      const response = await apiClient.post(
         `/bank-reconciliation/import/ofx`,
         formData,
         { headers: { 'Content-Type': 'multipart/form-data' } }
