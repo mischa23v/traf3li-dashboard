@@ -134,11 +134,12 @@ export function CreateClientView() {
     const [wathqData, setWathqData] = useState<WathqResponse | null>(null)
     const [mojData, setMojData] = useState<MOJResponse | null>(null)
 
-    // Form state - Individual
+    // Form state - Individual (الاسم الرباعي - 4-part Arabic name)
     const [nationalId, setNationalId] = useState('')
-    const [firstName, setFirstName] = useState('')
-    const [middleName, setMiddleName] = useState('')
-    const [lastName, setLastName] = useState('')
+    const [firstName, setFirstName] = useState('')       // الاسم الأول
+    const [fatherName, setFatherName] = useState('')     // اسم الأب
+    const [grandfatherName, setGrandfatherName] = useState('') // اسم الجد
+    const [familyName, setFamilyName] = useState('')     // اسم العائلة
     const [fullNameArabic, setFullNameArabic] = useState('')
     const [fullNameEnglish, setFullNameEnglish] = useState('')
     const [gender, setGender] = useState<'male' | 'female'>('male')
@@ -517,13 +518,13 @@ export function CreateClientView() {
             return
         }
 
-        // Build fullName based on client type
+        // Build fullName based on client type (الاسم الرباعي for individuals)
         let fullName: string
         if (clientType === 'company') {
             fullName = companyName || 'شركة جديدة'
         } else {
-            // Individual - combine first and last name
-            const nameParts = [firstName, middleName, lastName].filter(Boolean)
+            // Individual - combine 4-part Arabic name (الاسم الرباعي)
+            const nameParts = [firstName, fatherName, grandfatherName, familyName].filter(Boolean)
             fullName = nameParts.length > 0 ? nameParts.join(' ') : 'عميل جديد'
         }
 
@@ -682,31 +683,71 @@ export function CreateClientView() {
                                             )}
                                         </div>
 
-                                        {/* Manual entry fields */}
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                            <div className="space-y-2">
-                                                <Label className="text-sm font-medium text-slate-700">
-                                                    الاسم الكامل
-                                                </Label>
-                                                <Input
-                                                    value={fullNameArabic}
-                                                    onChange={(e) => setFullNameArabic(e.target.value)}
-                                                    placeholder="أدخل الاسم الكامل"
-                                                    className="rounded-xl border-slate-200"
-                                                />
+                                        {/* الاسم الرباعي - Arabic 4-Part Name */}
+                                        <div className="space-y-3">
+                                            <Label className="text-sm font-medium text-slate-700">الاسم الرباعي</Label>
+                                            <p className="text-xs text-slate-500">أدخل الاسم الرباعي كما يظهر في الهوية الوطنية</p>
+                                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                                <div className="space-y-2">
+                                                    <Label className="text-xs text-slate-500">الاسم الأول</Label>
+                                                    <Input
+                                                        value={firstName}
+                                                        onChange={(e) => setFirstName(e.target.value)}
+                                                        placeholder="محمد"
+                                                        className="rounded-xl border-slate-200"
+                                                    />
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <Label className="text-xs text-slate-500">اسم الأب</Label>
+                                                    <Input
+                                                        value={fatherName}
+                                                        onChange={(e) => setFatherName(e.target.value)}
+                                                        placeholder="عبدالله"
+                                                        className="rounded-xl border-slate-200"
+                                                    />
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <Label className="text-xs text-slate-500">اسم الجد</Label>
+                                                    <Input
+                                                        value={grandfatherName}
+                                                        onChange={(e) => setGrandfatherName(e.target.value)}
+                                                        placeholder="سعود"
+                                                        className="rounded-xl border-slate-200"
+                                                    />
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <Label className="text-xs text-slate-500">اسم العائلة</Label>
+                                                    <Input
+                                                        value={familyName}
+                                                        onChange={(e) => setFamilyName(e.target.value)}
+                                                        placeholder="الشمري"
+                                                        className="rounded-xl border-slate-200"
+                                                    />
+                                                </div>
                                             </div>
-                                            <div className="space-y-2">
-                                                <Label className="text-sm font-medium text-slate-700">الجنس</Label>
-                                                <Select value={gender} onValueChange={(v) => setGender(v as 'male' | 'female')}>
-                                                    <SelectTrigger className="rounded-xl border-slate-200">
-                                                        <SelectValue />
-                                                    </SelectTrigger>
-                                                    <SelectContent>
-                                                        <SelectItem value="male">ذكر</SelectItem>
-                                                        <SelectItem value="female">أنثى</SelectItem>
-                                                    </SelectContent>
-                                                </Select>
+                                            {/* Full Name Preview */}
+                                            <div className="p-3 bg-slate-50 rounded-xl">
+                                                <Label className="text-xs text-slate-500">الاسم الكامل:</Label>
+                                                <p className="font-medium text-slate-800">
+                                                    {[firstName, fatherName, grandfatherName, familyName]
+                                                        .filter(Boolean)
+                                                        .join(' ') || 'أدخل الاسم الرباعي'}
+                                                </p>
                                             </div>
+                                        </div>
+
+                                        {/* Gender */}
+                                        <div className="space-y-2">
+                                            <Label className="text-sm font-medium text-slate-700">الجنس</Label>
+                                            <Select value={gender} onValueChange={(v) => setGender(v as 'male' | 'female')}>
+                                                <SelectTrigger className="rounded-xl border-slate-200 w-48">
+                                                    <SelectValue />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    <SelectItem value="male">ذكر</SelectItem>
+                                                    <SelectItem value="female">أنثى</SelectItem>
+                                                </SelectContent>
+                                            </Select>
                                         </div>
                                     </CardContent>
                                 </Card>
