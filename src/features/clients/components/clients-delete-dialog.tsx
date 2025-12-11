@@ -10,6 +10,15 @@ import { type Client } from '../data/schema'
 import { useDeleteClient } from '@/hooks/useClients'
 import { useTranslation } from 'react-i18next'
 
+// Helper to get display name for a client
+const getClientDisplayName = (client: Client): string => {
+  if (client.clientType === 'individual' || !client.clientType) {
+    return client.fullNameArabic || client.fullNameEnglish ||
+           [client.firstName, client.lastName].filter(Boolean).join(' ') || '-'
+  }
+  return client.companyName || client.companyNameEnglish || '-'
+}
+
 type ClientDeleteDialogProps = {
   open: boolean
   onOpenChange: (open: boolean) => void
@@ -25,8 +34,10 @@ export function ClientsDeleteDialog({
   const [value, setValue] = useState('')
   const { mutate: deleteClient, isPending } = useDeleteClient()
 
+  const displayName = getClientDisplayName(currentRow)
+
   const handleDelete = () => {
-    if (value.trim() !== currentRow.fullName) return
+    if (value.trim() !== displayName) return
 
     deleteClient(currentRow._id, {
       onSuccess: () => {
@@ -44,7 +55,7 @@ export function ClientsDeleteDialog({
         onOpenChange(state)
       }}
       handleConfirm={handleDelete}
-      disabled={value.trim() !== currentRow.fullName || isPending}
+      disabled={value.trim() !== displayName || isPending}
       title={
         <span className='text-destructive'>
           <AlertTriangle
@@ -57,7 +68,7 @@ export function ClientsDeleteDialog({
       desc={
         <div className='space-y-4'>
           <p className='mb-2'>
-            {t('clients.deleteConfirmation', { name: currentRow.fullName })}
+            {t('clients.deleteConfirmation', { name: displayName })}
           </p>
 
           <Label className='my-2'>
