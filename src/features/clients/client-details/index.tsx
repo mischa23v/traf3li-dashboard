@@ -38,6 +38,15 @@ import { cn } from '@/lib/utils'
 
 const route = getRouteApi('/_authenticated/dashboard/clients/$clientId')
 
+// Helper to get display name for a client
+const getClientDisplayName = (client: any): string => {
+  if (client.clientType === 'company') {
+    return client.companyName || client.companyNameEnglish || '-'
+  }
+  return client.fullNameArabic || client.fullNameEnglish ||
+         [client.firstName, client.lastName].filter(Boolean).join(' ') || '-'
+}
+
 export function ClientDetails() {
   const { t, i18n } = useTranslation()
   const isArabic = i18n.language === 'ar'
@@ -92,10 +101,12 @@ export function ClientDetails() {
 
   const client = data.client
   const { relatedData, summary } = data
+  const preferredMethod = client.preferredContactMethod || client.preferredContact || 'phone'
   const contactMethod = contactMethods.find(
-    (m) => m.value === client.preferredContactMethod
+    (m) => m.value === preferredMethod
   )
   const ContactIcon = contactMethod?.icon || MessageCircle
+  const clientStatus = client.status || 'active'
 
   return (
     <>
@@ -119,21 +130,25 @@ export function ClientDetails() {
             </Button>
             <div>
               <div className='flex items-center gap-3'>
-                <h1 className='text-2xl font-bold'>{client.fullName}</h1>
+                <h1 className='text-2xl font-bold'>{getClientDisplayName(client)}</h1>
                 <Badge
                   variant='outline'
                   className={cn(
                     'capitalize',
-                    clientStatusColors.get(client.status)
+                    clientStatusColors.get(clientStatus as any)
                   )}
                 >
-                  {t(`clients.statuses.${client.status}`)}
+                  {t(`clients.statuses.${clientStatus}`)}
                 </Badge>
               </div>
               <p className='text-muted-foreground'>
-                {client.clientId && `#${client.clientId} • `}
-                {t('clients.createdAt')}:{' '}
-                {format(new Date(client.createdAt), 'PPP', { locale: dateLocale })}
+                {client.clientNumber && `#${client.clientNumber} • `}
+                {client.createdAt && (
+                  <>
+                    {t('clients.createdAt')}:{' '}
+                    {format(new Date(client.createdAt), 'PPP', { locale: dateLocale })}
+                  </>
+                )}
               </p>
             </div>
           </div>
@@ -295,7 +310,7 @@ export function ClientDetails() {
                           {t('clients.form.preferredContactMethod')}
                         </p>
                         <p className='font-medium'>
-                          {t(`clients.contactMethods.${client.preferredContactMethod}`)}
+                          {t(`clients.contactMethods.${preferredMethod}`)}
                         </p>
                       </div>
                     </div>
@@ -324,7 +339,7 @@ export function ClientDetails() {
                 )}
 
                 {/* Company Information */}
-                {(client.companyName || client.companyRegistration) && (
+                {(client.companyName || client.crNumber) && (
                   <>
                     <Separator />
                     <div className='space-y-4'>
@@ -343,7 +358,7 @@ export function ClientDetails() {
                             </div>
                           </div>
                         )}
-                        {client.companyRegistration && (
+                        {client.crNumber && (
                           <div className='flex items-center gap-3'>
                             <FileText className='h-4 w-4 text-muted-foreground' />
                             <div>
@@ -351,7 +366,7 @@ export function ClientDetails() {
                                 {t('clients.form.companyRegistration')}
                               </p>
                               <p className='font-medium'>
-                                {client.companyRegistration}
+                                {client.crNumber}
                               </p>
                             </div>
                           </div>
@@ -376,9 +391,19 @@ export function ClientDetails() {
                             {t('clients.form.address')}
                           </p>
                           <p className='font-medium'>
-                            {[client.address, client.city, client.country]
-                              .filter(Boolean)
-                              .join('، ')}
+                            {(() => {
+                              const addressParts: string[] = []
+                              if (typeof client.address === 'string') {
+                                addressParts.push(client.address)
+                              } else if (client.address) {
+                                if (client.address.street) addressParts.push(client.address.street)
+                                if (client.address.district) addressParts.push(client.address.district)
+                                if (client.address.city) addressParts.push(client.address.city)
+                              }
+                              if (client.city && !addressParts.includes(client.city)) addressParts.push(client.city)
+                              if (client.country) addressParts.push(client.country)
+                              return addressParts.filter(Boolean).join('، ') || '-'
+                            })()}
                           </p>
                         </div>
                       </div>
