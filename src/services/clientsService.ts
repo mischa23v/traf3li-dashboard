@@ -145,7 +145,31 @@ const clientsService = {
   getClient: async (id: string): Promise<ClientDetail> => {
     try {
       const response = await apiClient.get(`/clients/${id}`)
-      return response.data.data
+      const data = response.data.data || response.data
+
+      // Handle both API response formats:
+      // 1. { client: {...}, relatedData: {...}, summary: {...} }
+      // 2. Direct client object: { _id: "...", clientNumber: "...", ... }
+      if (data.client) {
+        return data as ClientDetail
+      }
+
+      // Transform direct client response to expected format
+      return {
+        client: data as Client,
+        relatedData: {
+          cases: data.cases || [],
+          invoices: data.invoices || [],
+          payments: data.payments || [],
+        },
+        summary: {
+          totalCases: data.cases?.length || 0,
+          totalInvoices: data.invoices?.length || 0,
+          totalInvoiced: data.totalInvoiced || 0,
+          totalPaid: data.totalPaid || 0,
+          outstandingBalance: data.outstandingBalance || data.totalOutstanding || 0,
+        },
+      }
     } catch (error: any) {
       throw new Error(handleApiError(error))
     }

@@ -1199,6 +1199,7 @@
     "actions": "الإجراءات",
     "sar": "ر.س",
     "retry": "إعادة المحاولة",
+    "errorOccurred": "حدث خطأ ما",
     "unknownError": "خطأ غير معروف",
     "preview": "معاينة",
     "download": "تحميل",
@@ -1625,7 +1626,10 @@
     "viewClientDescription": "عرض التفاصيل الكاملة للعميل",
     "noClients": "لا يوجد عملاء",
     "notFound": "العميل غير موجود",
+    "clientNotFoundDescription": "العميل المطلوب غير موجود أو تم حذفه",
     "backToClients": "العودة إلى العملاء",
+    "noResults": "لا توجد نتائج",
+    "tryDifferentSearch": "حاول البحث بكلمات مختلفة أو تغيير الفلاتر",
     "createdAt": "تاريخ الإضافة",
     "selected": "{{count}} عميل محدد",
     "deleteConfirmation": "هل أنت متأكد من حذف العميل {{name}}؟ لا يمكن التراجع عن هذا الإجراء.",
@@ -1638,12 +1642,18 @@
       "city": "المدينة",
       "companyName": "اسم الشركة",
       "contactMethod": "طريقة التواصل",
-      "status": "الحالة"
+      "status": "الحالة",
+      "type": "نوع العميل"
+    },
+    "types": {
+      "individual": "فرد",
+      "company": "شركة"
     },
     "statuses": {
       "active": "نشط",
       "inactive": "غير نشط",
-      "archived": "مؤرشف"
+      "archived": "مؤرشف",
+      "pending": "قيد الانتظار"
     },
     "contactMethods": {
       "email": "البريد الإلكتروني",
@@ -1700,9 +1710,12 @@
     "casesDescription": "{{count}} قضية مرتبطة بهذا العميل",
     "invoicesDescription": "{{count}} فاتورة لهذا العميل",
     "paymentsDescription": "{{count}} دفعة من هذا العميل",
-    "noCases": "لا توجد قضايا مرتبطة بهذا العميل",
-    "noInvoices": "لا توجد فواتير لهذا العميل",
-    "noPayments": "لا توجد مدفوعات من هذا العميل"
+    "noCases": "لا توجد قضايا",
+    "noCasesDescription": "لا توجد قضايا مرتبطة بهذا العميل حتى الآن",
+    "noInvoices": "لا توجد فواتير",
+    "noInvoicesDescription": "لا توجد فواتير لهذا العميل حتى الآن",
+    "noPayments": "لا توجد مدفوعات",
+    "noPaymentsDescription": "لا توجد مدفوعات من هذا العميل حتى الآن"
   },
   "staff": {
     "title": "إدارة فريق العمل",
