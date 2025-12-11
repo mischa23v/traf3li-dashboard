@@ -2,6 +2,89 @@ const PdfmeTemplate = require('../models/pdfmeTemplate.model');
 const { CustomException } = require('../utils');
 const fs = require('fs');
 const path = require('path');
+const mongoose = require('mongoose');
+
+// Import pdfme packages
+const { generate } = require('@pdfme/generator');
+const { BLANK_PDF } = require('@pdfme/common');
+
+// ==================== VALIDATION HELPERS ====================
+
+const VALID_CATEGORIES = ['invoice', 'contract', 'receipt', 'report', 'statement', 'letter', 'certificate', 'custom'];
+const VALID_TYPES = ['standard', 'detailed', 'summary', 'minimal', 'custom'];
+
+// Validate MongoDB ObjectId
+const isValidObjectId = (id) => mongoose.Types.ObjectId.isValid(id);
+
+// Sanitize filename to prevent path traversal
+const sanitizeFileName = (fileName) => {
+    if (!fileName || typeof fileName !== 'string') return null;
+    // Remove any path components and only keep the basename
+    const sanitized = path.basename(fileName);
+    // Only allow alphanumeric, dash, underscore, and .pdf extension
+    if (!/^[\w\-]+\.pdf$/i.test(sanitized)) return null;
+    return sanitized;
+};
+
+// Validate string field
+const validateString = (value, fieldName, minLength = 1, maxLength = 500) => {
+    if (!value || typeof value !== 'string') {
+        throw CustomException(`${fieldName} is required and must be a string`, 400);
+    }
+    if (value.length < minLength || value.length > maxLength) {
+        throw CustomException(`${fieldName} must be between ${minLength} and ${maxLength} characters`, 400);
+    }
+    return value.trim();
+};
+
+// Validate category
+const validateCategory = (category) => {
+    if (!category || !VALID_CATEGORIES.includes(category)) {
+        throw CustomException(`Invalid category. Must be one of: ${VALID_CATEGORIES.join(', ')}`, 400);
+    }
+    return category;
+};
+
+// Validate type
+const validateType = (type) => {
+    if (type && !VALID_TYPES.includes(type)) {
+        throw CustomException(`Invalid type. Must be one of: ${VALID_TYPES.join(', ')}`, 400);
+    }
+    return type || 'standard';
+};
+
+// Validate schemas array
+const validateSchemas = (schemas) => {
+    if (!schemas || !Array.isArray(schemas)) {
+        throw CustomException('schemas must be an array', 400);
+    }
+    if (schemas.length === 0) {
+        throw CustomException('schemas array cannot be empty', 400);
+    }
+    return schemas;
+};
+
+// Validate basePdf
+const validateBasePdf = (basePdf) => {
+    if (!basePdf || typeof basePdf !== 'string') {
+        throw CustomException('basePdf is required', 400);
+    }
+    // Allow BLANK_PDF keyword or base64 data
+    if (basePdf !== 'BLANK_PDF' && !basePdf.startsWith('data:application/pdf')) {
+        throw CustomException('basePdf must be "BLANK_PDF" or a valid base64 PDF data URL', 400);
+    }
+    return basePdf;
+};
+
+// Validate pagination
+const validatePagination = (page, limit) => {
+    const pageNum = parseInt(page) || 1;
+    const limitNum = parseInt(limit) || 10;
+    return {
+        page: Math.max(1, pageNum),
+        limit: Math.min(100, Math.max(1, limitNum)) // Max 100 items per page
+    };
+};
 
 // Ensure upload directories exist
 const ensureDirectories = () => {
@@ -18,22 +101,27 @@ ensureDirectories();
 
 // Create template
 const createTemplate = async (request, response) => {
-    const { name, nameAr, description, descriptionAr, category, type, basePdf, schemas, isDefault, isActive } = request.body;
     try {
-        if (!name || !nameAr || !category || !basePdf || !schemas) {
-            throw CustomException('Missing required fields: name, nameAr, category, basePdf, schemas', 400);
-        }
+        const { name, nameAr, description, descriptionAr, category, type, basePdf, schemas, isDefault, isActive } = request.body;
+
+        // Validate required fields
+        const validatedName = validateString(name, 'name', 1, 200);
+        const validatedNameAr = validateString(nameAr, 'nameAr', 1, 200);
+        const validatedCategory = validateCategory(category);
+        const validatedType = validateType(type);
+        const validatedBasePdf = validateBasePdf(basePdf);
+        const validatedSchemas = validateSchemas(schemas);
 
         const template = new PdfmeTemplate({
-            name,
-            nameAr,
-            description: description || '',
-            descriptionAr: descriptionAr || '',
-            category,
-            type: type || 'standard',
-            basePdf,
-            schemas,
-            isDefault: isDefault || false,
+            name: validatedName,
+            nameAr: validatedNameAr,
+            description: description ? String(description).substring(0, 1000) : '',
+            descriptionAr: descriptionAr ? String(descriptionAr).substring(0, 1000) : '',
+            category: validatedCategory,
+            type: validatedType,
+            basePdf: validatedBasePdf,
+            schemas: validatedSchemas,
+            isDefault: Boolean(isDefault),
             isActive: isActive !== false,
             createdBy: request.userID
         });
@@ -56,33 +144,44 @@ const createTemplate = async (request, response) => {
 
 // Get all templates with filters and pagination
 const getTemplates = async (request, response) => {
-    const { category, type, isDefault, isActive, search, page = 1, limit = 10 } = request.query;
     try {
+        const { category, type, isDefault, isActive, search } = request.query;
+        const { page, limit } = validatePagination(request.query.page, request.query.limit);
+
         const filters = {};
 
-        if (category) filters.category = category;
-        if (type) filters.type = type;
-        if (isDefault !== undefined) filters.isDefault = isDefault === 'true';
-        if (isActive !== undefined) filters.isActive = isActive === 'true';
+        if (category && VALID_CATEGORIES.includes(category)) {
+            filters.category = category;
+        }
+        if (type && VALID_TYPES.includes(type)) {
+            filters.type = type;
+        }
+        if (isDefault !== undefined) {
+            filters.isDefault = isDefault === 'true';
+        }
+        if (isActive !== undefined) {
+            filters.isActive = isActive === 'true';
+        }
 
-        // Search in name, nameAr, description, descriptionAr
-        if (search) {
+        // Search in name, nameAr, description, descriptionAr (sanitize search input)
+        if (search && typeof search === 'string' && search.length <= 100) {
+            const sanitizedSearch = search.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
             filters.$or = [
-                { name: { $regex: search, $options: 'i' } },
-                { nameAr: { $regex: search, $options: 'i' } },
-                { description: { $regex: search, $options: 'i' } },
-                { descriptionAr: { $regex: search, $options: 'i' } }
+                { name: { $regex: sanitizedSearch, $options: 'i' } },
+                { nameAr: { $regex: sanitizedSearch, $options: 'i' } },
+                { description: { $regex: sanitizedSearch, $options: 'i' } },
+                { descriptionAr: { $regex: sanitizedSearch, $options: 'i' } }
             ];
         }
 
-        const skip = (parseInt(page) - 1) * parseInt(limit);
+        const skip = (page - 1) * limit;
 
         const [templates, total] = await Promise.all([
             PdfmeTemplate.find(filters)
                 .populate('createdBy', 'fullName username email')
                 .sort({ createdAt: -1 })
                 .skip(skip)
-                .limit(parseInt(limit)),
+                .limit(limit),
             PdfmeTemplate.countDocuments(filters)
         ]);
 
@@ -90,8 +189,8 @@ const getTemplates = async (request, response) => {
             error: false,
             data: templates,
             total,
-            page: parseInt(page),
-            limit: parseInt(limit)
+            page,
+            limit
         });
     } catch ({ message, status = 500 }) {
         return response.status(status).send({
@@ -105,6 +204,10 @@ const getTemplates = async (request, response) => {
 const getTemplate = async (request, response) => {
     const { id } = request.params;
     try {
+        if (!isValidObjectId(id)) {
+            throw CustomException('Invalid template ID', 400);
+        }
+
         const template = await PdfmeTemplate.findById(id)
             .populate('createdBy', 'fullName username email');
 
@@ -127,30 +230,47 @@ const getTemplate = async (request, response) => {
 // Update template
 const updateTemplate = async (request, response) => {
     const { id } = request.params;
-    const updateData = request.body;
     try {
+        if (!isValidObjectId(id)) {
+            throw CustomException('Invalid template ID', 400);
+        }
+
         const template = await PdfmeTemplate.findById(id);
 
         if (!template) {
             throw CustomException('Template not found!', 404);
         }
 
-        // Only creator can update (unless admin - could add admin check)
+        // Only creator can update
         if (template.createdBy.toString() !== request.userID) {
             throw CustomException('You do not have permission to update this template!', 403);
         }
 
+        const updateData = {};
+        const { name, nameAr, description, descriptionAr, category, type, basePdf, schemas, isDefault, isActive } = request.body;
+
+        // Validate and add only provided fields
+        if (name !== undefined) updateData.name = validateString(name, 'name', 1, 200);
+        if (nameAr !== undefined) updateData.nameAr = validateString(nameAr, 'nameAr', 1, 200);
+        if (description !== undefined) updateData.description = String(description).substring(0, 1000);
+        if (descriptionAr !== undefined) updateData.descriptionAr = String(descriptionAr).substring(0, 1000);
+        if (category !== undefined) updateData.category = validateCategory(category);
+        if (type !== undefined) updateData.type = validateType(type);
+        if (basePdf !== undefined) updateData.basePdf = validateBasePdf(basePdf);
+        if (schemas !== undefined) {
+            updateData.schemas = validateSchemas(schemas);
+            updateData.version = template.version + 1;
+        }
+        if (isDefault !== undefined) updateData.isDefault = Boolean(isDefault);
+        if (isActive !== undefined) updateData.isActive = Boolean(isActive);
+
         // If setting as default, unset other defaults in same category
         if (updateData.isDefault === true) {
+            const categoryToUse = updateData.category || template.category;
             await PdfmeTemplate.updateMany(
-                { category: template.category, _id: { $ne: id } },
+                { category: categoryToUse, _id: { $ne: id } },
                 { isDefault: false }
             );
-        }
-
-        // Increment version if schemas changed
-        if (updateData.schemas) {
-            updateData.version = template.version + 1;
         }
 
         const updatedTemplate = await PdfmeTemplate.findByIdAndUpdate(
@@ -177,6 +297,10 @@ const updateTemplate = async (request, response) => {
 const deleteTemplate = async (request, response) => {
     const { id } = request.params;
     try {
+        if (!isValidObjectId(id)) {
+            throw CustomException('Invalid template ID', 400);
+        }
+
         const template = await PdfmeTemplate.findById(id);
 
         if (!template) {
@@ -206,17 +330,22 @@ const deleteTemplate = async (request, response) => {
 // Clone template
 const cloneTemplate = async (request, response) => {
     const { id } = request.params;
-    const { name, nameAr } = request.body;
     try {
+        if (!isValidObjectId(id)) {
+            throw CustomException('Invalid template ID', 400);
+        }
+
         const template = await PdfmeTemplate.findById(id);
 
         if (!template) {
             throw CustomException('Template not found!', 404);
         }
 
+        const { name, nameAr } = request.body;
+
         const clonedTemplate = new PdfmeTemplate({
-            name: name || `${template.name} (Copy)`,
-            nameAr: nameAr || `${template.nameAr} (نسخة)`,
+            name: name ? validateString(name, 'name', 1, 200) : `${template.name} (Copy)`,
+            nameAr: nameAr ? validateString(nameAr, 'nameAr', 1, 200) : `${template.nameAr} (نسخة)`,
             description: template.description,
             descriptionAr: template.descriptionAr,
             category: template.category,
@@ -249,6 +378,10 @@ const cloneTemplate = async (request, response) => {
 const setDefaultTemplate = async (request, response) => {
     const { id } = request.params;
     try {
+        if (!isValidObjectId(id)) {
+            throw CustomException('Invalid template ID', 400);
+        }
+
         const template = await PdfmeTemplate.findById(id);
 
         if (!template) {
@@ -282,6 +415,10 @@ const setDefaultTemplate = async (request, response) => {
 const getDefaultTemplate = async (request, response) => {
     const { category } = request.params;
     try {
+        if (!VALID_CATEGORIES.includes(category)) {
+            throw CustomException(`Invalid category. Must be one of: ${VALID_CATEGORIES.join(', ')}`, 400);
+        }
+
         const template = await PdfmeTemplate.findOne({
             category,
             isDefault: true,
@@ -319,23 +456,40 @@ const getDefaultTemplate = async (request, response) => {
 
 // ==================== PDF GENERATION ====================
 
+// Generate PDF from template using pdfme
+const generatePdfFromTemplate = async (template, inputs) => {
+    const templateData = {
+        basePdf: template.basePdf === 'BLANK_PDF' ? BLANK_PDF : template.basePdf,
+        schemas: template.schemas
+    };
+
+    const pdf = await generate({
+        template: templateData,
+        inputs: [inputs]
+    });
+
+    return Buffer.from(pdf);
+};
+
 // Preview template (generates PDF with sample/provided data)
 const previewTemplate = async (request, response) => {
     const { id } = request.params;
-    const { inputs } = request.body;
     try {
+        if (!isValidObjectId(id)) {
+            throw CustomException('Invalid template ID', 400);
+        }
+
         const template = await PdfmeTemplate.findById(id);
 
         if (!template) {
             throw CustomException('Template not found!', 404);
         }
 
-        // For now, return template data - actual PDF generation requires @pdfme/generator
-        // This endpoint structure is ready for when the package is installed
+        const { inputs } = request.body;
         const pdfBuffer = await generatePdfFromTemplate(template, inputs || {});
 
         response.setHeader('Content-Type', 'application/pdf');
-        response.setHeader('Content-Disposition', `inline; filename="preview-${template.name}.pdf"`);
+        response.setHeader('Content-Disposition', `inline; filename="preview-${template.name.replace(/[^a-zA-Z0-9]/g, '_')}.pdf"`);
         return response.send(pdfBuffer);
     } catch ({ message, status = 500 }) {
         return response.status(status).send({
@@ -347,10 +501,17 @@ const previewTemplate = async (request, response) => {
 
 // Generate PDF from template
 const generatePdf = async (request, response) => {
-    const { templateId, inputs, type = 'pdf' } = request.body;
     try {
-        if (!templateId || !inputs) {
-            throw CustomException('Missing required fields: templateId, inputs', 400);
+        const { templateId, inputs, type = 'pdf' } = request.body;
+
+        if (!templateId) {
+            throw CustomException('templateId is required', 400);
+        }
+        if (!isValidObjectId(templateId)) {
+            throw CustomException('Invalid template ID', 400);
+        }
+        if (!inputs || typeof inputs !== 'object') {
+            throw CustomException('inputs must be an object', 400);
         }
 
         const template = await PdfmeTemplate.findById(templateId);
@@ -381,15 +542,19 @@ const generatePdf = async (request, response) => {
 
 // Generate Invoice PDF
 const generateInvoicePdf = async (request, response) => {
-    const { invoiceData, templateId, includeQR, qrData } = request.body;
     try {
-        if (!invoiceData) {
-            throw CustomException('Missing required field: invoiceData', 400);
+        const { invoiceData, templateId, includeQR, qrData } = request.body;
+
+        if (!invoiceData || typeof invoiceData !== 'object') {
+            throw CustomException('invoiceData is required and must be an object', 400);
         }
 
         // Get template - either specified or default invoice template
         let template;
         if (templateId) {
+            if (!isValidObjectId(templateId)) {
+                throw CustomException('Invalid template ID', 400);
+            }
             template = await PdfmeTemplate.findById(templateId);
         } else {
             template = await PdfmeTemplate.findOne({ category: 'invoice', isDefault: true, isActive: true });
@@ -403,8 +568,9 @@ const generateInvoicePdf = async (request, response) => {
         const inputs = mapInvoiceDataToInputs(invoiceData, includeQR, qrData);
         const pdfBuffer = await generatePdfFromTemplate(template, inputs);
 
-        // Save PDF file
-        const fileName = `invoice-${invoiceData.invoiceNumber || Date.now()}.pdf`;
+        // Generate safe filename
+        const invoiceNum = String(invoiceData.invoiceNumber || Date.now()).replace(/[^a-zA-Z0-9\-]/g, '_');
+        const fileName = `invoice-${invoiceNum}.pdf`;
         const filePath = path.join('uploads/pdfs', fileName);
         fs.writeFileSync(filePath, pdfBuffer);
 
@@ -428,14 +594,18 @@ const generateInvoicePdf = async (request, response) => {
 
 // Generate Contract PDF
 const generateContractPdf = async (request, response) => {
-    const { contractData, templateId } = request.body;
     try {
-        if (!contractData) {
-            throw CustomException('Missing required field: contractData', 400);
+        const { contractData, templateId } = request.body;
+
+        if (!contractData || typeof contractData !== 'object') {
+            throw CustomException('contractData is required and must be an object', 400);
         }
 
         let template;
         if (templateId) {
+            if (!isValidObjectId(templateId)) {
+                throw CustomException('Invalid template ID', 400);
+            }
             template = await PdfmeTemplate.findById(templateId);
         } else {
             template = await PdfmeTemplate.findOne({ category: 'contract', isDefault: true, isActive: true });
@@ -448,7 +618,8 @@ const generateContractPdf = async (request, response) => {
         const inputs = mapContractDataToInputs(contractData);
         const pdfBuffer = await generatePdfFromTemplate(template, inputs);
 
-        const fileName = `contract-${contractData.contractNumber || Date.now()}.pdf`;
+        const contractNum = String(contractData.contractNumber || Date.now()).replace(/[^a-zA-Z0-9\-]/g, '_');
+        const fileName = `contract-${contractNum}.pdf`;
         const filePath = path.join('uploads/pdfs', fileName);
         fs.writeFileSync(filePath, pdfBuffer);
 
@@ -472,14 +643,18 @@ const generateContractPdf = async (request, response) => {
 
 // Generate Receipt PDF
 const generateReceiptPdf = async (request, response) => {
-    const { receiptData, templateId } = request.body;
     try {
-        if (!receiptData) {
-            throw CustomException('Missing required field: receiptData', 400);
+        const { receiptData, templateId } = request.body;
+
+        if (!receiptData || typeof receiptData !== 'object') {
+            throw CustomException('receiptData is required and must be an object', 400);
         }
 
         let template;
         if (templateId) {
+            if (!isValidObjectId(templateId)) {
+                throw CustomException('Invalid template ID', 400);
+            }
             template = await PdfmeTemplate.findById(templateId);
         } else {
             template = await PdfmeTemplate.findOne({ category: 'receipt', isDefault: true, isActive: true });
@@ -492,7 +667,8 @@ const generateReceiptPdf = async (request, response) => {
         const inputs = mapReceiptDataToInputs(receiptData);
         const pdfBuffer = await generatePdfFromTemplate(template, inputs);
 
-        const fileName = `receipt-${receiptData.receiptNumber || Date.now()}.pdf`;
+        const receiptNum = String(receiptData.receiptNumber || Date.now()).replace(/[^a-zA-Z0-9\-]/g, '_');
+        const fileName = `receipt-${receiptNum}.pdf`;
         const filePath = path.join('uploads/pdfs', fileName);
         fs.writeFileSync(filePath, pdfBuffer);
 
@@ -516,17 +692,23 @@ const generateReceiptPdf = async (request, response) => {
 
 // Async PDF Generation (queued)
 const generatePdfAsync = async (request, response) => {
-    const { templateId, inputs, type } = request.body;
     try {
-        // For now, generate synchronously - can be enhanced with job queue (Bull, etc.)
-        // This endpoint is ready for future async implementation
+        const { templateId, inputs } = request.body;
+
+        if (!templateId) {
+            throw CustomException('templateId is required', 400);
+        }
+        if (!isValidObjectId(templateId)) {
+            throw CustomException('Invalid template ID', 400);
+        }
+
         const template = await PdfmeTemplate.findById(templateId);
 
         if (!template) {
             throw CustomException('Template not found!', 404);
         }
 
-        const pdfBuffer = await generatePdfFromTemplate(template, inputs);
+        const pdfBuffer = await generatePdfFromTemplate(template, inputs || {});
         const fileName = `generated-${Date.now()}.pdf`;
         const filePath = path.join('uploads/pdfs', fileName);
         fs.writeFileSync(filePath, pdfBuffer);
@@ -550,19 +732,33 @@ const generatePdfAsync = async (request, response) => {
     }
 };
 
-// Download generated PDF
+// Download generated PDF - SECURED against path traversal
 const downloadPdf = async (request, response) => {
-    const { fileName } = request.params;
     try {
-        const filePath = path.join('uploads/pdfs', fileName);
+        const { fileName } = request.params;
 
-        if (!fs.existsSync(filePath)) {
+        // Sanitize filename to prevent path traversal
+        const sanitizedFileName = sanitizeFileName(fileName);
+        if (!sanitizedFileName) {
+            throw CustomException('Invalid file name', 400);
+        }
+
+        const filePath = path.join('uploads/pdfs', sanitizedFileName);
+        const absolutePath = path.resolve(filePath);
+
+        // Double-check the resolved path is within uploads/pdfs
+        const uploadsDir = path.resolve('uploads/pdfs');
+        if (!absolutePath.startsWith(uploadsDir)) {
+            throw CustomException('Access denied', 403);
+        }
+
+        if (!fs.existsSync(absolutePath)) {
             throw CustomException('PDF file not found!', 404);
         }
 
         response.setHeader('Content-Type', 'application/pdf');
-        response.setHeader('Content-Disposition', `attachment; filename="${fileName}"`);
-        return response.sendFile(path.resolve(filePath));
+        response.setHeader('Content-Disposition', `attachment; filename="${sanitizedFileName}"`);
+        return response.sendFile(absolutePath);
     } catch ({ message, status = 500 }) {
         return response.status(status).send({
             error: true,
@@ -573,56 +769,24 @@ const downloadPdf = async (request, response) => {
 
 // ==================== HELPER FUNCTIONS ====================
 
-// Generate PDF from template using pdfme
-// Note: Requires @pdfme/generator and @pdfme/common packages
-const generatePdfFromTemplate = async (template, inputs) => {
-    try {
-        // Dynamic import to handle optional dependency
-        const { generate } = await import('@pdfme/generator');
-        const { BLANK_PDF } = await import('@pdfme/common');
-
-        const templateData = {
-            basePdf: template.basePdf === 'BLANK_PDF' ? BLANK_PDF : template.basePdf,
-            schemas: template.schemas
-        };
-
-        const pdf = await generate({
-            template: templateData,
-            inputs: [inputs]
-        });
-
-        return Buffer.from(pdf);
-    } catch (importError) {
-        // Fallback: Return a placeholder message if pdfme is not installed
-        console.warn('PDFMe generator not available:', importError.message);
-
-        // Create a simple placeholder PDF buffer (minimal valid PDF)
-        const placeholderPdf = Buffer.from(
-            '%PDF-1.4\n1 0 obj<</Type/Catalog/Pages 2 0 R>>endobj 2 0 obj<</Type/Pages/Kids[3 0 R]/Count 1>>endobj 3 0 obj<</Type/Page/MediaBox[0 0 612 792]/Parent 2 0 R/Resources<<>>>>endobj xref 0 4 0000000000 65535 f 0000000009 00000 n 0000000052 00000 n 0000000101 00000 n trail<</Size 4/Root 1 0 R>>startxref 178 %%EOF',
-            'utf8'
-        );
-        return placeholderPdf;
-    }
-};
-
 // Map invoice data to template inputs
 const mapInvoiceDataToInputs = (invoiceData, includeQR, qrData) => {
     const inputs = {
-        invoiceNumber: invoiceData.invoiceNumber || '',
-        date: invoiceData.date || new Date().toISOString().split('T')[0],
-        clientName: invoiceData.client?.name || invoiceData.clientName || '',
-        clientEmail: invoiceData.client?.email || invoiceData.clientEmail || '',
-        clientAddress: invoiceData.client?.address || invoiceData.clientAddress || '',
+        invoiceNumber: String(invoiceData.invoiceNumber || ''),
+        date: String(invoiceData.date || new Date().toISOString().split('T')[0]),
+        clientName: String(invoiceData.client?.name || invoiceData.clientName || ''),
+        clientEmail: String(invoiceData.client?.email || invoiceData.clientEmail || ''),
+        clientAddress: String(invoiceData.client?.address || invoiceData.clientAddress || ''),
         items: JSON.stringify(invoiceData.items || []),
         subtotal: String(invoiceData.subtotal || 0),
         tax: String(invoiceData.tax || invoiceData.vatAmount || 0),
         totalAmount: String(invoiceData.totalAmount || invoiceData.total || 0),
-        currency: invoiceData.currency || 'SAR',
-        notes: invoiceData.notes || ''
+        currency: String(invoiceData.currency || 'SAR'),
+        notes: String(invoiceData.notes || '')
     };
 
     if (includeQR && qrData) {
-        inputs.qrCode = qrData;
+        inputs.qrCode = String(qrData);
     }
 
     return inputs;
@@ -631,33 +795,33 @@ const mapInvoiceDataToInputs = (invoiceData, includeQR, qrData) => {
 // Map contract data to template inputs
 const mapContractDataToInputs = (contractData) => {
     return {
-        contractNumber: contractData.contractNumber || '',
-        date: contractData.date || new Date().toISOString().split('T')[0],
-        partyAName: contractData.partyA?.name || '',
-        partyAAddress: contractData.partyA?.address || '',
-        partyANationalId: contractData.partyA?.nationalId || '',
-        partyBName: contractData.partyB?.name || '',
-        partyBAddress: contractData.partyB?.address || '',
-        partyBNationalId: contractData.partyB?.nationalId || '',
-        subject: contractData.subject || '',
+        contractNumber: String(contractData.contractNumber || ''),
+        date: String(contractData.date || new Date().toISOString().split('T')[0]),
+        partyAName: String(contractData.partyA?.name || ''),
+        partyAAddress: String(contractData.partyA?.address || ''),
+        partyANationalId: String(contractData.partyA?.nationalId || ''),
+        partyBName: String(contractData.partyB?.name || ''),
+        partyBAddress: String(contractData.partyB?.address || ''),
+        partyBNationalId: String(contractData.partyB?.nationalId || ''),
+        subject: String(contractData.subject || ''),
         terms: JSON.stringify(contractData.terms || []),
         amount: String(contractData.amount || 0),
-        startDate: contractData.startDate || '',
-        endDate: contractData.endDate || ''
+        startDate: String(contractData.startDate || ''),
+        endDate: String(contractData.endDate || '')
     };
 };
 
 // Map receipt data to template inputs
 const mapReceiptDataToInputs = (receiptData) => {
     return {
-        receiptNumber: receiptData.receiptNumber || '',
-        date: receiptData.date || new Date().toISOString().split('T')[0],
-        receivedFrom: receiptData.receivedFrom || '',
+        receiptNumber: String(receiptData.receiptNumber || ''),
+        date: String(receiptData.date || new Date().toISOString().split('T')[0]),
+        receivedFrom: String(receiptData.receivedFrom || ''),
         amount: String(receiptData.amount || 0),
-        amountInWords: receiptData.amountInWords || '',
-        purpose: receiptData.purpose || '',
-        paymentMethod: receiptData.paymentMethod || '',
-        notes: receiptData.notes || ''
+        amountInWords: String(receiptData.amountInWords || ''),
+        purpose: String(receiptData.purpose || ''),
+        paymentMethod: String(receiptData.paymentMethod || ''),
+        notes: String(receiptData.notes || '')
     };
 };
 
