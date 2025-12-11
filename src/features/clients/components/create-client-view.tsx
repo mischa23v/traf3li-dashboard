@@ -295,8 +295,8 @@ export function CreateClientView() {
     const [attachments, setAttachments] = useState<File[]>([])
 
     // Consent (PDPL compliance)
-    const [consentDataProcessing, setConsentDataProcessing] = useState(false)
-    const [consentPrivacyPolicy, setConsentPrivacyPolicy] = useState(false)
+    const [consentDataProcessing, setConsentDataProcessing] = useState(true)
+    const [consentPrivacyPolicy, setConsentPrivacyPolicy] = useState(true)
 
     // Lawyers list
     const lawyers = useMemo(() => {
@@ -398,12 +398,6 @@ export function CreateClientView() {
         // Clear previous errors
         setClientValidationErrors([])
         clearError()
-
-        // Validate consents
-        if (!consentDataProcessing || !consentPrivacyPolicy) {
-            alert('يجب الموافقة على معالجة البيانات وسياسة الخصوصية')
-            return
-        }
 
         // Client-side validation
         const errors: ValidationError[] = []
