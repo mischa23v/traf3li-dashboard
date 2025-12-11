@@ -204,48 +204,48 @@ export const payrollService = {
                 }
             })
         }
-        const response = await apiClient.get(`/hr/payroll?${params.toString()}`)
+        const response = await apiClient.get(`/payroll?${params.toString()}`)
         return response.data
     },
 
     // Get single salary slip
     getSalarySlip: async (id: string): Promise<SalarySlip> => {
-        const response = await apiClient.get(`/hr/payroll/${id}`)
+        const response = await apiClient.get(`/payroll/${id}`)
         return response.data
     },
 
     // Get salary slips for an employee
     getEmployeeSalarySlips: async (employeeId: string): Promise<SalarySlip[]> => {
-        const response = await apiClient.get(`/hr/payroll?employeeId=${employeeId}`)
+        const response = await apiClient.get(`/payroll?employeeId=${employeeId}`)
         return response.data.salarySlips || response.data
     },
 
     // Create salary slip
     createSalarySlip: async (data: CreateSalarySlipData): Promise<SalarySlip> => {
-        const response = await apiClient.post('/hr/payroll', data)
+        const response = await apiClient.post('/payroll', data)
         return response.data
     },
 
     // Update salary slip
     updateSalarySlip: async (id: string, data: Partial<CreateSalarySlipData>): Promise<SalarySlip> => {
-        const response = await apiClient.put(`/hr/payroll/${id}`, data)
+        const response = await apiClient.put(`/payroll/${id}`, data)
         return response.data
     },
 
     // Delete salary slip
     deleteSalarySlip: async (id: string): Promise<void> => {
-        await apiClient.delete(`/hr/payroll/${id}`)
+        await apiClient.delete(`/payroll/${id}`)
     },
 
     // Approve salary slip
     approveSalarySlip: async (id: string): Promise<SalarySlip> => {
-        const response = await apiClient.post(`/hr/payroll/${id}/approve`)
+        const response = await apiClient.post(`/payroll/${id}/approve`)
         return response.data
     },
 
     // Mark as paid
     markAsPaid: async (id: string, transactionReference?: string): Promise<SalarySlip> => {
-        const response = await apiClient.post(`/hr/payroll/${id}/pay`, { transactionReference })
+        const response = await apiClient.post(`/payroll/${id}/pay`, { transactionReference })
         return response.data
     },
 
@@ -254,38 +254,38 @@ export const payrollService = {
         const params = new URLSearchParams()
         if (month) params.append('month', String(month))
         if (year) params.append('year', String(year))
-        const response = await apiClient.get(`/hr/payroll/stats?${params.toString()}`)
+        const response = await apiClient.get(`/payroll/stats?${params.toString()}`)
         return response.data
     },
 
     // Generate bulk payroll
     generateBulkPayroll: async (month: number, year: number, employeeIds?: string[]): Promise<SalarySlip[]> => {
-        const response = await apiClient.post('/hr/payroll/generate', { month, year, employeeIds })
+        const response = await apiClient.post('/payroll/generate', { month, year, employeeIds })
         return response.data
     },
 
     // Download salary slip PDF (Note: Backend endpoint not implemented yet)
     downloadSalarySlipPDF: async (id: string): Promise<Blob> => {
-        // TODO: Backend needs to implement GET /hr/payroll/:id/pdf endpoint
-        const response = await apiClient.get(`/hr/payroll/${id}/pdf`, { responseType: 'blob' })
+        // TODO: Backend needs to implement GET /payroll/:id/pdf endpoint
+        const response = await apiClient.get(`/payroll/${id}/pdf`, { responseType: 'blob' })
         return response.data
     },
 
     // Bulk approve salary slips
     bulkApproveSalarySlips: async (ids: string[]): Promise<{ approved: number }> => {
-        const response = await apiClient.post('/hr/payroll/approve', { ids })
+        const response = await apiClient.post('/payroll/approve', { ids })
         return response.data
     },
 
     // Bulk pay salary slips
     bulkPaySalarySlips: async (ids: string[]): Promise<{ paid: number }> => {
-        const response = await apiClient.post('/hr/payroll/pay', { ids })
+        const response = await apiClient.post('/payroll/pay', { ids })
         return response.data
     },
 
     // Submit to WPS
     submitToWPS: async (ids: string[]): Promise<{ success: boolean; reference: string }> => {
-        const response = await apiClient.post('/hr/payroll/wps/submit', { ids })
+        const response = await apiClient.post('/payroll/wps/submit', { ids })
         return response.data
     },
 }
