@@ -314,17 +314,18 @@ export function CreateContactView() {
         e.preventDefault()
 
         const contactData = {
-            // Basic
+            // Required API fields with defaults for testing
+            firstName: formData.firstName || 'جهة اتصال',
+            lastName: formData.lastName || 'جديدة',
+            type: formData.contactType || 'individual',
+            // Optional fields
             salutation: formData.salutation === 'none' ? undefined : formData.salutation,
-            firstName: formData.firstName,
             middleName: formData.middleName || undefined,
-            lastName: formData.lastName,
             preferredName: formData.preferredName || undefined,
             suffix: formData.suffix || undefined,
             fullNameArabic: formData.fullNameArabic || undefined,
 
-            // Type
-            type: formData.contactType,
+            // Classification
             primaryRole: formData.primaryRole || undefined,
             relationshipTypes: formData.relationshipTypes.length > 0 ? formData.relationshipTypes : undefined,
 
