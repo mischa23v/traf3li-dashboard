@@ -1092,7 +1092,7 @@ export const accountingService = {
   },
 
   depositToRetainer: async (id: string, data: RetainerDepositData): Promise<{ retainer: Retainer; transaction: RetainerTransaction }> => {
-    const response = await apiClient.post(`/retainers/${id}/deposit`, data)
+    const response = await apiClient.post(`/retainers/${id}/replenish`, data)
     return response.data.data
   },
 
@@ -1102,7 +1102,7 @@ export const accountingService = {
   },
 
   getRetainerTransactions: async (id: string): Promise<RetainerTransaction[]> => {
-    const response = await apiClient.get(`/retainers/${id}/transactions`)
+    const response = await apiClient.get(`/retainers/${id}/history`)
     return response.data.data
   },
 
