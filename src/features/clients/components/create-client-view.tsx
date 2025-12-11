@@ -521,31 +521,23 @@ export function CreateClientView() {
             return
         }
 
-        // Build fullNameArabic based on client type and name entry mode
-        let fullNameArabic_computed: string
-        if (clientType === 'company') {
-            fullNameArabic_computed = companyName || 'شركة جديدة'
+        // Build fullNameArabic based on name entry mode
+        let fullNameArabic_computed = ''
+        if (nameEntryMode === 'full') {
+            fullNameArabic_computed = fullNameArabic
         } else {
-            // Individual - use full name or 4-part name based on mode
-            if (nameEntryMode === 'full') {
-                fullNameArabic_computed = fullNameArabic || 'عميل جديد'
-            } else {
-                const nameParts = [firstName, fatherName, grandfatherName, familyName].filter(Boolean)
-                fullNameArabic_computed = nameParts.length > 0 ? nameParts.join(' ') : 'عميل جديد'
-            }
+            const nameParts = [firstName, fatherName, grandfatherName, familyName].filter(Boolean)
+            fullNameArabic_computed = nameParts.join(' ')
         }
 
-        // Backend API Structure:
-        // Individual: clientType, phone, fullNameArabic, nationalId (all required)
-        // Company: clientType, phone, companyName, crNumber (all required)
+        // Backend now handles all defaults - no required fields
+        // Just send whatever user entered, backend will use defaults for empty values
         const clientData = clientType === 'individual' ? {
-            // Individual client
+            // Individual client - all fields optional
             clientType: 'individual',
-            phone: phone || '+966500000000',
-            fullNameArabic: fullNameArabic_computed,
-            nationalId: nationalId || '1234567890', // Default for testing
-
-            // Optional fields
+            phone: phone || undefined,
+            fullNameArabic: fullNameArabic_computed || undefined,
+            nationalId: nationalId || undefined,
             firstName: firstName || undefined,
             lastName: familyName || undefined,
             email: email || undefined,
@@ -558,13 +550,11 @@ export function CreateClientView() {
                 postalCode: postalCode || undefined,
             } : undefined,
         } : {
-            // Company client
+            // Company client - all fields optional
             clientType: 'company',
-            phone: phone || companyPhone || '+966500000000',
-            companyName: companyName || 'شركة جديدة',
-            crNumber: crNumber || '1234567890', // Default for testing
-
-            // Optional fields
+            phone: phone || companyPhone || undefined,
+            companyName: companyName || undefined,
+            crNumber: crNumber || undefined,
             email: email || undefined,
             companyNameEnglish: companyNameEnglish || undefined,
             legalRepresentative: legalRepName ? {

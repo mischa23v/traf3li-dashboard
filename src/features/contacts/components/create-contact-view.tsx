@@ -317,33 +317,33 @@ export function CreateContactView() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
 
-        // Build arabicName based on entry mode
-        // Backend expects: { firstName, fatherName, grandfatherName, familyName }
-        let arabicName
-        if (nameEntryMode === 'full') {
-            // Split full name into parts or use defaults
-            const nameParts = (formData.fullNameArabic || 'جهة اتصال جديدة جديد').split(' ')
+        // Build arabicName based on entry mode - backend handles defaults
+        let arabicName = undefined
+        if (nameEntryMode === 'full' && formData.fullNameArabic) {
+            // Split full name into parts
+            const nameParts = formData.fullNameArabic.split(' ')
             arabicName = {
-                firstName: nameParts[0] || 'جهة',
-                fatherName: nameParts[1] || 'اتصال',
-                grandfatherName: nameParts[2] || 'جديدة',
-                familyName: nameParts[3] || nameParts.slice(3).join(' ') || 'جديد',
+                firstName: nameParts[0] || undefined,
+                fatherName: nameParts[1] || undefined,
+                grandfatherName: nameParts[2] || undefined,
+                familyName: nameParts.slice(3).join(' ') || nameParts[3] || undefined,
             }
-        } else {
+        } else if (nameEntryMode === 'parts' && (formData.firstName || formData.fatherName || formData.grandfatherName || formData.familyName)) {
             arabicName = {
-                firstName: formData.firstName || 'جهة',
-                fatherName: formData.fatherName || 'اتصال',
-                grandfatherName: formData.grandfatherName || 'جديدة',
-                familyName: formData.familyName || 'جديد',
+                firstName: formData.firstName || undefined,
+                fatherName: formData.fatherName || undefined,
+                grandfatherName: formData.grandfatherName || undefined,
+                familyName: formData.familyName || undefined,
             }
         }
 
+        // Backend now handles all defaults - no required fields
         const contactData = {
-            // Arabic 4-Part Name (PRIMARY for backend)
-            arabicName,
+            // Arabic 4-Part Name - only send if user entered something
+            ...(arabicName && { arabicName }),
 
-            // Type
-            type: formData.contactType || 'individual',
+            // Type - only send if not default
+            type: formData.contactType || undefined,
 
             // Optional fields
             salutation: formData.salutation === 'none' ? undefined : formData.salutation,
