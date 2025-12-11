@@ -46,7 +46,10 @@ const {
     calendarRoute,
 
     // Dashboard HR
-    benefitRoute
+    benefitRoute,
+
+    // PDFMe
+    pdfmeRoute
 } = require('./routes');
 
 const app = express();
@@ -193,6 +196,9 @@ app.use('/api/calendar', calendarRoute);
 
 // Dashboard HR Routes
 app.use('/api/benefits', benefitRoute);
+
+// PDFMe Routes
+app.use('/api/pdfme', pdfmeRoute);
 
 // Health check endpoint (useful for monitoring)
 app.get('/health', (req, res) => {
