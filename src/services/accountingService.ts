@@ -667,7 +667,7 @@ export const accountingService = {
   },
 
   updateAccount: async (id: string, data: Partial<Account>): Promise<Account> => {
-    const response = await apiClient.put(`/accounts/${id}`, data)
+    const response = await apiClient.patch(`/accounts/${id}`, data)
     return response.data.data
   },
 

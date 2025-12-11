@@ -1,4 +1,4 @@
-import api from './api'
+import { apiClientNoVersion as api } from '@/lib/api'
 
 export interface CurrencySettings {
   baseCurrency: string
