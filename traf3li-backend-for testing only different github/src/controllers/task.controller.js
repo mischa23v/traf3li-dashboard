@@ -421,6 +421,60 @@ const getTasksByCase = async (request, response) => {
     }
 };
 
+// Bulk delete tasks
+const bulkDeleteTasks = async (request, response) => {
+    const { taskIds } = request.body;
+
+    try {
+        if (!taskIds || !Array.isArray(taskIds) || taskIds.length === 0) {
+            throw CustomException('Task IDs are required', 400);
+        }
+
+        const results = {
+            success: 0,
+            failed: 0,
+            errors: []
+        };
+
+        for (const taskId of taskIds) {
+            try {
+                const task = await Task.findById(taskId);
+
+                if (!task) {
+                    results.failed++;
+                    results.errors.push({ id: taskId, error: 'Task not found' });
+                    continue;
+                }
+
+                // Only creator can delete
+                if (task.createdBy.toString() !== request.userID) {
+                    results.failed++;
+                    results.errors.push({ id: taskId, error: 'No permission to delete' });
+                    continue;
+                }
+
+                await Task.findByIdAndDelete(taskId);
+                results.success++;
+            } catch (err) {
+                results.failed++;
+                results.errors.push({ id: taskId, error: err.message });
+            }
+        }
+
+        return response.send({
+            error: false,
+            success: results.success,
+            failed: results.failed,
+            errors: results.errors.length > 0 ? results.errors : undefined
+        });
+    } catch ({ message, status = 500 }) {
+        return response.status(status).send({
+            error: true,
+            message
+        });
+    }
+};
+
 // Helper function to calculate next due date for recurring tasks
 const calculateNextDueDate = (currentDueDate, frequency) => {
     const nextDate = new Date(currentDueDate);
@@ -451,5 +505,6 @@ module.exports = {
     completeTask,
     getUpcomingTasks,
     getOverdueTasks,
-    getTasksByCase
+    getTasksByCase,
+    bulkDeleteTasks
 };
