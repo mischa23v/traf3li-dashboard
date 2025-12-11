@@ -208,27 +208,25 @@ export function EmailCampaignCreateView() {
                 <CardContent className="space-y-6">
                   <div className="space-y-2">
                     <label className="text-sm font-medium text-slate-700">
-                      اسم الحملة <span className="text-red-500">*</span>
+                      اسم الحملة
                     </label>
                     <Input
                       placeholder="حملة العروض الصيفية"
                       className="rounded-xl"
                       value={formData.name}
                       onChange={(e) => handleChange('name', e.target.value)}
-                      required
                     />
                   </div>
 
                   <div className="space-y-2">
                     <label className="text-sm font-medium text-slate-700">
-                      عنوان الرسالة <span className="text-red-500">*</span>
+                      عنوان الرسالة
                     </label>
                     <Input
                       placeholder="عروض حصرية لك - خصم حتى 50%"
                       className="rounded-xl"
                       value={formData.subject}
                       onChange={(e) => handleChange('subject', e.target.value)}
-                      required
                     />
                   </div>
 
@@ -247,19 +245,18 @@ export function EmailCampaignCreateView() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <label className="text-sm font-medium text-slate-700">
-                        اسم المرسل <span className="text-red-500">*</span>
+                        اسم المرسل
                       </label>
                       <Input
                         placeholder="شركة الأمل القانونية"
                         className="rounded-xl"
                         value={formData.fromName}
                         onChange={(e) => handleChange('fromName', e.target.value)}
-                        required
                       />
                     </div>
                     <div className="space-y-2">
                       <label className="text-sm font-medium text-slate-700">
-                        بريد المرسل <span className="text-red-500">*</span>
+                        بريد المرسل
                       </label>
                       <Input
                         type="email"
@@ -268,7 +265,6 @@ export function EmailCampaignCreateView() {
                         dir="ltr"
                         value={formData.fromEmail}
                         onChange={(e) => handleChange('fromEmail', e.target.value)}
-                        required
                       />
                     </div>
                   </div>
@@ -318,7 +314,7 @@ export function EmailCampaignCreateView() {
 
                   <div className="space-y-2">
                     <label className="text-sm font-medium text-slate-700">
-                      محتوى HTML <span className="text-red-500">*</span>
+                      محتوى HTML
                     </label>
                     <Textarea
                       placeholder="<h1>مرحباً بك</h1><p>محتوى الرسالة هنا...</p>"
@@ -326,7 +322,6 @@ export function EmailCampaignCreateView() {
                       dir="ltr"
                       value={formData.htmlContent}
                       onChange={(e) => handleChange('htmlContent', e.target.value)}
-                      required
                     />
                   </div>
 
@@ -484,26 +479,24 @@ export function EmailCampaignCreateView() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-slate-50 rounded-xl">
                       <div className="space-y-2">
                         <label className="text-sm font-medium text-slate-700">
-                          التاريخ <span className="text-red-500">*</span>
+                          التاريخ
                         </label>
                         <Input
                           type="date"
                           className="rounded-xl"
                           value={formData.scheduledDate}
                           onChange={(e) => handleChange('scheduledDate', e.target.value)}
-                          required={formData.sendType === 'scheduled'}
                         />
                       </div>
                       <div className="space-y-2">
                         <label className="text-sm font-medium text-slate-700">
-                          الوقت <span className="text-red-500">*</span>
+                          الوقت
                         </label>
                         <Input
                           type="time"
                           className="rounded-xl"
                           value={formData.scheduledTime}
                           onChange={(e) => handleChange('scheduledTime', e.target.value)}
-                          required={formData.sendType === 'scheduled'}
                         />
                       </div>
                     </div>
