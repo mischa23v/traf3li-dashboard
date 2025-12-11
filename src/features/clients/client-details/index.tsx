@@ -1,9 +1,8 @@
-import { Link, getRouteApi } from '@tanstack/react-router'
+import { useState } from 'react'
+import { Link, getRouteApi, useNavigate } from '@tanstack/react-router'
 import { format } from 'date-fns'
 import { ar, enUS } from 'date-fns/locale'
 import {
-  ArrowRight,
-  ArrowLeft,
   User,
   Phone,
   Mail,
@@ -18,23 +17,38 @@ import {
   Edit,
   Trash2,
   Lock,
+  Search,
+  Bell,
+  AlertCircle,
+  MoreHorizontal,
+  Eye,
+  Download,
+  ChevronLeft,
+  ChevronRight,
+  Users,
+  CreditCard,
+  TrendingUp,
+  Wallet,
 } from 'lucide-react'
 import { ConfigDrawer } from '@/components/config-drawer'
 import { Header } from '@/components/layout/header'
 import { Main } from '@/components/layout/main'
 import { ProfileDropdown } from '@/components/profile-dropdown'
-import { Search } from '@/components/search'
 import { ThemeSwitch } from '@/components/theme-switch'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Separator } from '@/components/ui/separator'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useClient } from '@/hooks/useClients'
 import { clientStatusColors, contactMethods } from '../data/data'
 import { useTranslation } from 'react-i18next'
 import { cn } from '@/lib/utils'
+import { TopNav } from '@/components/layout/top-nav'
+import { DynamicIsland } from '@/components/dynamic-island'
+import { LanguageSwitcher } from '@/components/language-switcher'
+import { ProductivityHero } from '@/components/productivity-hero'
+import { ClientsSidebar } from '../components/clients-sidebar'
 
 const route = getRouteApi('/_authenticated/dashboard/clients/$clientId')
 
@@ -47,506 +61,572 @@ const getClientDisplayName = (client: any): string => {
          [client.firstName, client.lastName].filter(Boolean).join(' ') || '-'
 }
 
+// Helper to get initials
+const getClientInitials = (client: any): string => {
+  const name = getClientDisplayName(client)
+  if (name === '-') return '?'
+  const parts = name.split(' ').filter(Boolean)
+  if (parts.length >= 2) {
+    return `${parts[0][0]}${parts[1][0]}`.toUpperCase()
+  }
+  return name.substring(0, 2).toUpperCase()
+}
+
 export function ClientDetails() {
   const { t, i18n } = useTranslation()
   const isArabic = i18n.language === 'ar'
   const dateLocale = isArabic ? ar : enUS
   const { clientId } = route.useParams()
-  const BackArrow = isArabic ? ArrowRight : ArrowLeft
+  const navigate = useNavigate()
+  const [activeTab, setActiveTab] = useState('overview')
 
-  const { data, isLoading, isError } = useClient(clientId)
+  const { data, isLoading, isError, error, refetch } = useClient(clientId)
 
-  if (isLoading) {
-    return (
-      <>
-        <Header fixed>
-          <Search />
-          <div className='ms-auto flex items-center gap-4'>
-            <ThemeSwitch />
-            <ConfigDrawer />
-            <ProfileDropdown />
-          </div>
-        </Header>
-        <Main className='flex flex-1 flex-col gap-4 sm:gap-6'>
-          <Skeleton className='h-8 w-48' />
-          <Skeleton className='h-96 w-full' />
-        </Main>
-      </>
-    )
-  }
+  const topNav = [
+    { title: t('sidebar.nav.clients'), href: '/dashboard/clients', isActive: true },
+    { title: t('sidebar.nav.organizations'), href: '/dashboard/organizations', isActive: false },
+    { title: t('sidebar.nav.cases'), href: '/dashboard/cases', isActive: false },
+  ]
 
-  if (isError || !data) {
-    return (
-      <>
-        <Header fixed>
-          <Search />
-          <div className='ms-auto flex items-center gap-4'>
-            <ThemeSwitch />
-            <ConfigDrawer />
-            <ProfileDropdown />
-          </div>
-        </Header>
-        <Main className='flex flex-1 flex-col items-center justify-center gap-4'>
-          <p className='text-lg text-muted-foreground'>{t('clients.notFound')}</p>
-          <Button asChild>
-            <Link to='/dashboard/clients'>
-              <BackArrow className='me-2 h-4 w-4' />
-              {t('clients.backToClients')}
-            </Link>
-          </Button>
-        </Main>
-      </>
-    )
-  }
+  // Transform client data
+  const client = data?.client
+  const relatedData = data?.relatedData || { cases: [], invoices: [], payments: [] }
+  const summary = data?.summary || { totalCases: 0, totalInvoices: 0, totalPaid: 0, outstandingBalance: 0 }
 
-  const client = data.client
-  const { relatedData, summary } = data
-  const preferredMethod = client.preferredContactMethod || client.preferredContact || 'phone'
-  const contactMethod = contactMethods.find(
-    (m) => m.value === preferredMethod
-  )
+  const preferredMethod = client?.preferredContactMethod || client?.preferredContact || 'phone'
+  const contactMethod = contactMethods.find((m) => m.value === preferredMethod)
   const ContactIcon = contactMethod?.icon || MessageCircle
-  const clientStatus = client.status || 'active'
+  const clientStatus = client?.status || 'active'
 
   return (
     <>
-      <Header fixed>
-        <Search />
-        <div className='ms-auto flex items-center gap-4'>
-          <ThemeSwitch />
-          <ConfigDrawer />
-          <ProfileDropdown />
+      {/* Header - Navy with gradient */}
+      <Header className="bg-navy shadow-none relative">
+        <TopNav links={topNav} className="[&>a]:text-slate-300 [&>a:hover]:text-white [&>a[aria-current='page']]:text-white" />
+
+        {/* Dynamic Island - Centered */}
+        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50">
+          <DynamicIsland />
         </div>
+
+        <div className='ms-auto flex items-center gap-4'>
+          <div className="relative hidden md:block">
+            <Search className="absolute end-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
+            <input
+              type="text"
+              placeholder={t('common.search')}
+              className="h-9 w-64 rounded-xl border border-white/10 bg-white/5 pe-9 ps-4 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+            />
+          </div>
+          <Button variant="ghost" size="icon" className="relative rounded-full text-slate-300 hover:bg-white/10 hover:text-white">
+            <Bell className="h-5 w-5" />
+            <span className="absolute top-2 end-2 h-2 w-2 bg-red-500 rounded-full border border-navy"></span>
+          </Button>
+          <LanguageSwitcher className="text-slate-300 hover:bg-white/10 hover:text-white" />
+          <ThemeSwitch className="text-slate-300 hover:bg-white/10 hover:text-white" />
+          <ConfigDrawer className="text-slate-300 hover:bg-white/10 hover:text-white" />
+          <ProfileDropdown className="text-slate-300 hover:bg-white/10 hover:text-white" />
+        </div>
+
+        {/* Bottom Gradient Line */}
+        <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-emerald-500/50 to-transparent"></div>
       </Header>
 
-      <Main className='flex flex-1 flex-col gap-4 sm:gap-6'>
-        {/* Header */}
-        <div className='flex flex-wrap items-start justify-between gap-4'>
-          <div className='flex items-center gap-4'>
-            <Button variant='ghost' size='icon' asChild>
-              <Link to='/dashboard/clients'>
-                <BackArrow className='h-4 w-4' />
-              </Link>
-            </Button>
-            <div>
-              <div className='flex items-center gap-3'>
-                <h1 className='text-2xl font-bold'>{getClientDisplayName(client)}</h1>
-                <Badge
-                  variant='outline'
-                  className={cn(
-                    'capitalize',
-                    clientStatusColors.get(clientStatus as any)
-                  )}
-                >
-                  {t(`clients.statuses.${clientStatus}`)}
-                </Badge>
+      {/* Main Content */}
+      <Main fluid={true} className="bg-[#f8f9fa] flex-1 w-full p-6 lg:p-8 space-y-8 rounded-tr-3xl shadow-inner border-e border-white/5 overflow-hidden font-['IBM_Plex_Sans_Arabic']">
+
+        {/* Loading State */}
+        {isLoading && (
+          <div className="space-y-6">
+            <Skeleton className="h-48 w-full rounded-3xl" />
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+              <div className="lg:col-span-2">
+                <Skeleton className="h-96 w-full rounded-2xl" />
               </div>
-              <p className='text-muted-foreground'>
-                {client.clientNumber && `#${client.clientNumber} • `}
-                {client.createdAt && (
-                  <>
-                    {t('clients.createdAt')}:{' '}
-                    {format(new Date(client.createdAt), 'PPP', { locale: dateLocale })}
-                  </>
-                )}
-              </p>
+              <div>
+                <Skeleton className="h-96 w-full rounded-2xl" />
+              </div>
             </div>
           </div>
-          <div className='flex gap-2'>
-            <Button variant='outline' size='sm'>
-              <Edit className='me-2 h-4 w-4' />
-              {t('common.edit')}
-            </Button>
-            <Button variant='destructive' size='sm'>
-              <Trash2 className='me-2 h-4 w-4' />
-              {t('common.delete')}
-            </Button>
-          </div>
-        </div>
+        )}
 
-        {/* Balance Summary Card */}
-        <Card>
-          <CardHeader>
-            <CardTitle>{t('clients.summary.creditBalance')}</CardTitle>
-            <CardDescription>{t('clients.summary.balanceDescription')}</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className='grid grid-cols-1 gap-4 sm:grid-cols-3'>
-              <div className='space-y-2'>
-                <p className='text-sm text-muted-foreground'>{t('clients.summary.creditBalance')}</p>
-                <p className={cn('text-2xl font-bold', (client.billing?.creditBalance ?? 0) > 0 ? 'text-green-600' : '')}>
-                  {(client.billing?.creditBalance ?? 0).toLocaleString()} {t('common.sar')}
-                </p>
-              </div>
-              <div className='space-y-2'>
-                <p className='text-sm text-muted-foreground'>{t('clients.summary.totalPaid')}</p>
-                <p className='text-2xl font-bold'>
-                  {(client.totalPaid ?? 0).toLocaleString()} {t('common.sar')}
-                </p>
-              </div>
-              <div className='space-y-2'>
-                <p className='text-sm text-muted-foreground'>{t('clients.summary.outstanding')}</p>
-                <p className={cn('text-2xl font-bold', (client.totalOutstanding ?? 0) > 0 ? 'text-destructive' : '')}>
-                  {(client.totalOutstanding ?? 0).toLocaleString()} {t('common.sar')}
-                </p>
+        {/* Error State */}
+        {isError && (
+          <div className="bg-white rounded-2xl p-12 border border-slate-100 text-center">
+            <div className="flex justify-center mb-4">
+              <div className="w-16 h-16 rounded-full bg-red-50 flex items-center justify-center">
+                <AlertCircle className="w-8 h-8 text-red-500" />
               </div>
             </div>
-          </CardContent>
-        </Card>
+            <h3 className="text-lg font-bold text-slate-900 mb-2">{t('clients.notFound')}</h3>
+            <p className="text-slate-500 mb-4">{error?.message || t('common.errorOccurred')}</p>
+            <div className="flex gap-3 justify-center">
+              <Button onClick={() => refetch()} className="bg-emerald-500 hover:bg-emerald-600">
+                {t('common.retry')}
+              </Button>
+              <Button variant="outline" asChild>
+                <Link to="/dashboard/clients">{t('clients.backToClients')}</Link>
+              </Button>
+            </div>
+          </div>
+        )}
 
-        {/* Summary Cards */}
-        <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4'>
-          <Card>
-            <CardHeader className='flex flex-row items-center justify-between pb-2'>
-              <CardTitle className='text-sm font-medium'>
-                {t('clients.summary.totalCases')}
-              </CardTitle>
-              <Briefcase className='h-4 w-4 text-muted-foreground' />
-            </CardHeader>
-            <CardContent>
-              <div className='text-2xl font-bold'>{summary.totalCases}</div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className='flex flex-row items-center justify-between pb-2'>
-              <CardTitle className='text-sm font-medium'>
-                {t('clients.summary.totalInvoices')}
-              </CardTitle>
-              <Receipt className='h-4 w-4 text-muted-foreground' />
-            </CardHeader>
-            <CardContent>
-              <div className='text-2xl font-bold'>{summary.totalInvoices}</div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className='flex flex-row items-center justify-between pb-2'>
-              <CardTitle className='text-sm font-medium'>
-                {t('clients.summary.totalPaid')}
-              </CardTitle>
-              <DollarSign className='h-4 w-4 text-muted-foreground' />
-            </CardHeader>
-            <CardContent>
-              <div className='text-2xl font-bold'>
-                {summary.totalPaid.toLocaleString()} {t('common.sar')}
+        {/* Empty State */}
+        {!isLoading && !isError && !client && (
+          <div className="bg-white rounded-2xl p-12 border border-slate-100 text-center">
+            <div className="flex justify-center mb-4">
+              <div className="w-16 h-16 rounded-full bg-emerald-50 flex items-center justify-center">
+                <Users className="w-8 h-8 text-emerald-500" />
               </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className='flex flex-row items-center justify-between pb-2'>
-              <CardTitle className='text-sm font-medium'>
-                {t('clients.summary.outstanding')}
-              </CardTitle>
-              <DollarSign className='h-4 w-4 text-muted-foreground' />
-            </CardHeader>
-            <CardContent>
-              <div className='text-2xl font-bold text-destructive'>
-                {summary.outstandingBalance.toLocaleString()} {t('common.sar')}
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+            </div>
+            <h3 className="text-lg font-bold text-slate-900 mb-2">{t('clients.notFound')}</h3>
+            <p className="text-slate-500 mb-4">{t('clients.clientNotFoundDescription')}</p>
+            <Button asChild className="bg-emerald-500 hover:bg-emerald-600">
+              <Link to="/dashboard/clients">{t('clients.backToClients')}</Link>
+            </Button>
+          </div>
+        )}
 
-        {/* Tabs */}
-        <Tabs defaultValue='info' className='w-full'>
-          <TabsList>
-            <TabsTrigger value='info'>{t('clients.tabs.info')}</TabsTrigger>
-            <TabsTrigger value='cases'>{t('clients.tabs.cases')}</TabsTrigger>
-            <TabsTrigger value='invoices'>{t('clients.tabs.invoices')}</TabsTrigger>
-            <TabsTrigger value='payments'>{t('clients.tabs.payments')}</TabsTrigger>
-          </TabsList>
+        {/* Success State */}
+        {!isLoading && !isError && client && (
+          <>
+            {/* Hero Card with Client Info */}
+            <ProductivityHero
+              badge={t('clients.management')}
+              title={getClientDisplayName(client)}
+              type="clients"
+              listMode={true}
+            />
 
-          <TabsContent value='info' className='mt-4'>
-            <Card>
-              <CardHeader>
-                <CardTitle>{t('clients.form.clientInfo')}</CardTitle>
-                <CardDescription>{t('clients.viewClientDescription')}</CardDescription>
-              </CardHeader>
-              <CardContent className='space-y-6'>
-                {/* Contact Information */}
-                <div className='space-y-4'>
-                  <h4 className='text-sm font-medium'>{t('clients.form.contactInfo')}</h4>
-                  <div className='grid grid-cols-1 gap-4 sm:grid-cols-2'>
-                    <div className='flex items-center gap-3'>
-                      <Phone className='h-4 w-4 text-muted-foreground' />
-                      <div>
-                        <p className='text-sm text-muted-foreground'>
-                          {t('clients.form.phone')}<Lock className="h-3 w-3 text-muted-foreground inline ms-1" aria-hidden="true" />
-                        </p>
-                        <p className='font-medium' dir='ltr'>
-                          {client.phone}
-                        </p>
-                      </div>
-                    </div>
-                    {client.alternatePhone && (
-                      <div className='flex items-center gap-3'>
-                        <Phone className='h-4 w-4 text-muted-foreground' />
-                        <div>
-                          <p className='text-sm text-muted-foreground'>
-                            {t('clients.form.alternatePhone')}<Lock className="h-3 w-3 text-muted-foreground inline ms-1" aria-hidden="true" />
-                          </p>
-                          <p className='font-medium' dir='ltr'>
-                            {client.alternatePhone}
-                          </p>
-                        </div>
-                      </div>
+            {/* Client Header Card */}
+            <div className="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm">
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                <div className="flex items-center gap-4">
+                  {/* Avatar */}
+                  <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-emerald-500/20">
+                    {client.clientType === 'company' ? (
+                      <Building2 className="h-8 w-8" />
+                    ) : (
+                      getClientInitials(client)
                     )}
-                    {client.email && (
-                      <div className='flex items-center gap-3'>
-                        <Mail className='h-4 w-4 text-muted-foreground' />
-                        <div>
-                          <p className='text-sm text-muted-foreground'>
-                            {t('clients.form.email')}<Lock className="h-3 w-3 text-muted-foreground inline ms-1" aria-hidden="true" />
-                          </p>
-                          <p className='font-medium' dir='ltr'>
-                            {client.email}
-                          </p>
-                        </div>
-                      </div>
-                    )}
-                    <div className='flex items-center gap-3'>
-                      <ContactIcon className='h-4 w-4 text-muted-foreground' />
-                      <div>
-                        <p className='text-sm text-muted-foreground'>
-                          {t('clients.form.preferredContactMethod')}
-                        </p>
-                        <p className='font-medium'>
-                          {t(`clients.contactMethods.${preferredMethod}`)}
-                        </p>
-                      </div>
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-3 mb-1">
+                      <h2 className="text-xl font-bold text-slate-900">{getClientDisplayName(client)}</h2>
+                      <Badge
+                        variant="outline"
+                        className={cn('capitalize', clientStatusColors.get(clientStatus as any))}
+                      >
+                        {t(`clients.statuses.${clientStatus}`)}
+                      </Badge>
                     </div>
+                    <p className="text-slate-500 text-sm">
+                      {client.clientNumber && <span className="me-2">#{client.clientNumber}</span>}
+                      {client.createdAt && (
+                        <>
+                          <Calendar className="h-3 w-3 inline me-1" />
+                          {format(new Date(client.createdAt), 'PPP', { locale: dateLocale })}
+                        </>
+                      )}
+                    </p>
                   </div>
                 </div>
+                <div className="flex gap-2">
+                  <Button variant="outline" size="sm" className="rounded-xl">
+                    <Edit className="me-2 h-4 w-4" />
+                    {t('common.edit')}
+                  </Button>
+                  <Button variant="outline" size="sm" className="rounded-xl text-red-600 hover:bg-red-50 hover:text-red-700 border-red-200">
+                    <Trash2 className="me-2 h-4 w-4" />
+                    {t('common.delete')}
+                  </Button>
+                </div>
+              </div>
+            </div>
 
-                {/* Identity Information */}
-                {client.nationalId && (
-                  <>
-                    <Separator />
-                    <div className='space-y-4'>
-                      <h4 className='text-sm font-medium'>
-                        {t('clients.form.identityInfo')}
-                      </h4>
-                      <div className='flex items-center gap-3'>
-                        <FileText className='h-4 w-4 text-muted-foreground' />
-                        <div>
-                          <p className='text-sm text-muted-foreground'>
-                            {t('clients.form.nationalId')}<Lock className="h-3 w-3 text-muted-foreground inline ms-1" aria-hidden="true" />
-                          </p>
-                          <p className='font-medium'>{client.nationalId}</p>
-                        </div>
-                      </div>
+            {/* Summary Cards - Financial Overview */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm hover:shadow-md transition-all">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-sm text-slate-500">{t('clients.summary.creditBalance')}</span>
+                  <div className="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center">
+                    <Wallet className="h-5 w-5 text-emerald-600" />
+                  </div>
+                </div>
+                <p className={cn('text-2xl font-bold', (client.billing?.creditBalance ?? 0) > 0 ? 'text-emerald-600' : 'text-slate-900')}>
+                  {(client.billing?.creditBalance ?? 0).toLocaleString()} <span className="text-sm font-normal">{t('common.sar')}</span>
+                </p>
+              </div>
+
+              <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm hover:shadow-md transition-all">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-sm text-slate-500">{t('clients.summary.totalCases')}</span>
+                  <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center">
+                    <Briefcase className="h-5 w-5 text-blue-600" />
+                  </div>
+                </div>
+                <p className="text-2xl font-bold text-slate-900">{summary.totalCases}</p>
+              </div>
+
+              <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm hover:shadow-md transition-all">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-sm text-slate-500">{t('clients.summary.totalPaid')}</span>
+                  <div className="w-10 h-10 rounded-xl bg-teal-50 flex items-center justify-center">
+                    <TrendingUp className="h-5 w-5 text-teal-600" />
+                  </div>
+                </div>
+                <p className="text-2xl font-bold text-slate-900">
+                  {summary.totalPaid.toLocaleString()} <span className="text-sm font-normal">{t('common.sar')}</span>
+                </p>
+              </div>
+
+              <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm hover:shadow-md transition-all">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-sm text-slate-500">{t('clients.summary.outstanding')}</span>
+                  <div className="w-10 h-10 rounded-xl bg-red-50 flex items-center justify-center">
+                    <CreditCard className="h-5 w-5 text-red-600" />
+                  </div>
+                </div>
+                <p className={cn('text-2xl font-bold', summary.outstandingBalance > 0 ? 'text-red-600' : 'text-slate-900')}>
+                  {summary.outstandingBalance.toLocaleString()} <span className="text-sm font-normal">{t('common.sar')}</span>
+                </p>
+              </div>
+            </div>
+
+            {/* Main Grid - 3 columns */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+              {/* Main Content - 2 columns */}
+              <div className="lg:col-span-2 space-y-6">
+                <Card className="border border-slate-100 shadow-sm rounded-2xl overflow-hidden min-h-[500px]">
+                  <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+                    <div className="border-b border-slate-100 px-4 sm:px-6 py-4">
+                      <TabsList className="inline-flex h-10 items-center justify-center rounded-lg bg-slate-100 p-1 text-slate-500 w-full sm:w-auto">
+                        {['overview', 'cases', 'invoices', 'payments'].map((tab) => (
+                          <TabsTrigger
+                            key={tab}
+                            value={tab}
+                            className="
+                              inline-flex items-center justify-center whitespace-nowrap rounded-md px-3 sm:px-4 py-2 text-sm font-medium ring-offset-white transition-all
+                              focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2
+                              disabled:pointer-events-none disabled:opacity-50
+                              data-[state=active]:bg-emerald-950 data-[state=active]:text-white data-[state=active]:shadow-sm
+                              data-[state=inactive]:hover:bg-slate-200
+                              flex-1 sm:flex-initial
+                            "
+                          >
+                            {tab === 'overview' ? t('clients.tabs.info') :
+                             tab === 'cases' ? t('clients.tabs.cases') :
+                             tab === 'invoices' ? t('clients.tabs.invoices') :
+                             t('clients.tabs.payments')}
+                          </TabsTrigger>
+                        ))}
+                      </TabsList>
                     </div>
-                  </>
-                )}
 
-                {/* Company Information */}
-                {(client.companyName || client.crNumber) && (
-                  <>
-                    <Separator />
-                    <div className='space-y-4'>
-                      <h4 className='text-sm font-medium'>
-                        {t('clients.form.companyInfo')}
-                      </h4>
-                      <div className='grid grid-cols-1 gap-4 sm:grid-cols-2'>
-                        {client.companyName && (
-                          <div className='flex items-center gap-3'>
-                            <Building2 className='h-4 w-4 text-muted-foreground' />
-                            <div>
-                              <p className='text-sm text-muted-foreground'>
-                                {t('clients.form.companyName')}
-                              </p>
-                              <p className='font-medium'>{client.companyName}</p>
+                    <div className="p-4 sm:p-6 bg-slate-50/50 min-h-[400px]">
+                      {/* Overview Tab */}
+                      <TabsContent value="overview" className="mt-0 space-y-6">
+                        {/* Contact Information Card */}
+                        <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
+                          <CardHeader className="pb-3">
+                            <CardTitle className="text-base font-bold text-navy flex items-center gap-2">
+                              <Phone className="w-4 h-4 text-emerald-600" />
+                              {t('clients.form.contactInfo')}
+                            </CardTitle>
+                          </CardHeader>
+                          <CardContent className="space-y-4">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                              {client.phone && (
+                                <div className="flex items-center gap-3 p-3 rounded-xl bg-slate-50">
+                                  <div className="w-10 h-10 rounded-lg bg-emerald-100 flex items-center justify-center">
+                                    <Phone className="h-5 w-5 text-emerald-600" />
+                                  </div>
+                                  <div>
+                                    <p className="text-xs text-slate-500">{t('clients.form.phone')}</p>
+                                    <p className="font-medium text-slate-900" dir="ltr">{client.phone}</p>
+                                  </div>
+                                </div>
+                              )}
+                              {client.email && (
+                                <div className="flex items-center gap-3 p-3 rounded-xl bg-slate-50">
+                                  <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center">
+                                    <Mail className="h-5 w-5 text-blue-600" />
+                                  </div>
+                                  <div>
+                                    <p className="text-xs text-slate-500">{t('clients.form.email')}</p>
+                                    <p className="font-medium text-slate-900" dir="ltr">{client.email}</p>
+                                  </div>
+                                </div>
+                              )}
+                              {client.alternatePhone && (
+                                <div className="flex items-center gap-3 p-3 rounded-xl bg-slate-50">
+                                  <div className="w-10 h-10 rounded-lg bg-teal-100 flex items-center justify-center">
+                                    <Phone className="h-5 w-5 text-teal-600" />
+                                  </div>
+                                  <div>
+                                    <p className="text-xs text-slate-500">{t('clients.form.alternatePhone')}</p>
+                                    <p className="font-medium text-slate-900" dir="ltr">{client.alternatePhone}</p>
+                                  </div>
+                                </div>
+                              )}
+                              <div className="flex items-center gap-3 p-3 rounded-xl bg-slate-50">
+                                <div className="w-10 h-10 rounded-lg bg-purple-100 flex items-center justify-center">
+                                  <ContactIcon className="h-5 w-5 text-purple-600" />
+                                </div>
+                                <div>
+                                  <p className="text-xs text-slate-500">{t('clients.form.preferredContactMethod')}</p>
+                                  <p className="font-medium text-slate-900">{t(`clients.contactMethods.${preferredMethod}`)}</p>
+                                </div>
+                              </div>
                             </div>
-                          </div>
+                          </CardContent>
+                        </Card>
+
+                        {/* Identity & Company Info */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                          {/* Identity Card */}
+                          {client.nationalId && (
+                            <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
+                              <CardHeader className="pb-3">
+                                <CardTitle className="text-base font-bold text-navy flex items-center gap-2">
+                                  <FileText className="w-4 h-4 text-amber-600" />
+                                  {t('clients.form.identityInfo')}
+                                </CardTitle>
+                              </CardHeader>
+                              <CardContent>
+                                <div className="flex items-center gap-3 p-3 rounded-xl bg-slate-50">
+                                  <div className="w-10 h-10 rounded-lg bg-amber-100 flex items-center justify-center">
+                                    <Lock className="h-5 w-5 text-amber-600" />
+                                  </div>
+                                  <div>
+                                    <p className="text-xs text-slate-500">{t('clients.form.nationalId')}</p>
+                                    <p className="font-medium text-slate-900">{client.nationalId}</p>
+                                  </div>
+                                </div>
+                              </CardContent>
+                            </Card>
+                          )}
+
+                          {/* Company Card */}
+                          {(client.companyName || client.crNumber) && (
+                            <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
+                              <CardHeader className="pb-3">
+                                <CardTitle className="text-base font-bold text-navy flex items-center gap-2">
+                                  <Building2 className="w-4 h-4 text-blue-600" />
+                                  {t('clients.form.companyInfo')}
+                                </CardTitle>
+                              </CardHeader>
+                              <CardContent className="space-y-3">
+                                {client.companyName && (
+                                  <div className="flex justify-between text-sm">
+                                    <span className="text-slate-500">{t('clients.form.companyName')}</span>
+                                    <span className="font-medium text-slate-900">{client.companyName}</span>
+                                  </div>
+                                )}
+                                {client.crNumber && (
+                                  <div className="flex justify-between text-sm">
+                                    <span className="text-slate-500">{t('clients.form.companyRegistration')}</span>
+                                    <span className="font-medium text-slate-900">{client.crNumber}</span>
+                                  </div>
+                                )}
+                              </CardContent>
+                            </Card>
+                          )}
+                        </div>
+
+                        {/* Address Card */}
+                        {(client.city || client.address) && (
+                          <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
+                            <CardHeader className="pb-3">
+                              <CardTitle className="text-base font-bold text-navy flex items-center gap-2">
+                                <MapPin className="w-4 h-4 text-red-600" />
+                                {t('clients.form.addressInfo')}
+                              </CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                              <div className="flex items-center gap-3 p-3 rounded-xl bg-slate-50">
+                                <div className="w-10 h-10 rounded-lg bg-red-100 flex items-center justify-center">
+                                  <MapPin className="h-5 w-5 text-red-600" />
+                                </div>
+                                <div>
+                                  <p className="text-xs text-slate-500">{t('clients.form.address')}</p>
+                                  <p className="font-medium text-slate-900">
+                                    {(() => {
+                                      const addressParts: string[] = []
+                                      if (typeof client.address === 'string') {
+                                        addressParts.push(client.address)
+                                      } else if (client.address) {
+                                        if (client.address.street) addressParts.push(client.address.street)
+                                        if (client.address.district) addressParts.push(client.address.district)
+                                      }
+                                      if (client.city && !addressParts.includes(client.city)) addressParts.push(client.city)
+                                      if (client.country) addressParts.push(client.country)
+                                      return addressParts.filter(Boolean).join('، ') || '-'
+                                    })()}
+                                  </p>
+                                </div>
+                              </div>
+                            </CardContent>
+                          </Card>
                         )}
-                        {client.crNumber && (
-                          <div className='flex items-center gap-3'>
-                            <FileText className='h-4 w-4 text-muted-foreground' />
-                            <div>
-                              <p className='text-sm text-muted-foreground'>
-                                {t('clients.form.companyRegistration')}
+
+                        {/* Notes Card */}
+                        {(client.notes || client.generalNotes) && (
+                          <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
+                            <CardHeader className="pb-3">
+                              <CardTitle className="text-base font-bold text-navy flex items-center gap-2">
+                                <FileText className="w-4 h-4 text-slate-600" />
+                                {t('clients.form.notes')}
+                              </CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                              <p className="text-sm text-slate-600 whitespace-pre-wrap leading-relaxed">
+                                {client.notes || client.generalNotes}
                               </p>
-                              <p className='font-medium'>
-                                {client.crNumber}
-                              </p>
-                            </div>
-                          </div>
+                            </CardContent>
+                          </Card>
                         )}
-                      </div>
+                      </TabsContent>
+
+                      {/* Cases Tab */}
+                      <TabsContent value="cases" className="mt-0">
+                        <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
+                          <CardContent className="p-6">
+                            {relatedData.cases.length === 0 ? (
+                              <div className="text-center py-12">
+                                <div className="w-16 h-16 rounded-full bg-slate-50 flex items-center justify-center mx-auto mb-4">
+                                  <Briefcase className="w-8 h-8 text-slate-300" />
+                                </div>
+                                <h3 className="text-lg font-bold text-slate-900 mb-2">{t('clients.noCases')}</h3>
+                                <p className="text-slate-500">{t('clients.noCasesDescription')}</p>
+                              </div>
+                            ) : (
+                              <div className="space-y-4">
+                                {relatedData.cases.map((caseItem: any, index: number) => (
+                                  <div
+                                    key={caseItem._id}
+                                    className="flex items-center justify-between p-4 rounded-xl bg-slate-50 hover:bg-slate-100 transition-all"
+                                    style={{ animationDelay: `${index * 50}ms` }}
+                                  >
+                                    <div className="flex items-center gap-4">
+                                      <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center">
+                                        <Briefcase className="h-5 w-5 text-blue-600" />
+                                      </div>
+                                      <div>
+                                        <p className="font-medium text-slate-900">{caseItem.title}</p>
+                                        <p className="text-sm text-slate-500">{caseItem.caseNumber}</p>
+                                      </div>
+                                    </div>
+                                    <div className="flex items-center gap-3">
+                                      <Badge variant="outline">{caseItem.status}</Badge>
+                                      <Button variant="ghost" size="sm" className="text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 rounded-lg">
+                                        <Eye className="h-4 w-4" />
+                                      </Button>
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                          </CardContent>
+                        </Card>
+                      </TabsContent>
+
+                      {/* Invoices Tab */}
+                      <TabsContent value="invoices" className="mt-0">
+                        <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
+                          <CardContent className="p-6">
+                            {relatedData.invoices.length === 0 ? (
+                              <div className="text-center py-12">
+                                <div className="w-16 h-16 rounded-full bg-slate-50 flex items-center justify-center mx-auto mb-4">
+                                  <Receipt className="w-8 h-8 text-slate-300" />
+                                </div>
+                                <h3 className="text-lg font-bold text-slate-900 mb-2">{t('clients.noInvoices')}</h3>
+                                <p className="text-slate-500">{t('clients.noInvoicesDescription')}</p>
+                              </div>
+                            ) : (
+                              <div className="space-y-4">
+                                {relatedData.invoices.map((invoice: any, index: number) => (
+                                  <div
+                                    key={invoice._id}
+                                    className="flex items-center justify-between p-4 rounded-xl bg-slate-50 hover:bg-slate-100 transition-all"
+                                    style={{ animationDelay: `${index * 50}ms` }}
+                                  >
+                                    <div className="flex items-center gap-4">
+                                      <div className="w-10 h-10 rounded-lg bg-amber-100 flex items-center justify-center">
+                                        <Receipt className="h-5 w-5 text-amber-600" />
+                                      </div>
+                                      <div>
+                                        <p className="font-medium text-slate-900">{invoice.invoiceNumber}</p>
+                                        <p className="text-sm text-slate-500">
+                                          {invoice.issueDate && format(new Date(invoice.issueDate), 'PPP', { locale: dateLocale })}
+                                        </p>
+                                      </div>
+                                    </div>
+                                    <div className="text-end">
+                                      <p className="font-bold text-slate-900">
+                                        {invoice.totalAmount?.toLocaleString()} {t('common.sar')}
+                                      </p>
+                                      <Badge variant="outline" className="mt-1">{invoice.status}</Badge>
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                          </CardContent>
+                        </Card>
+                      </TabsContent>
+
+                      {/* Payments Tab */}
+                      <TabsContent value="payments" className="mt-0">
+                        <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
+                          <CardContent className="p-6">
+                            {relatedData.payments.length === 0 ? (
+                              <div className="text-center py-12">
+                                <div className="w-16 h-16 rounded-full bg-slate-50 flex items-center justify-center mx-auto mb-4">
+                                  <DollarSign className="w-8 h-8 text-slate-300" />
+                                </div>
+                                <h3 className="text-lg font-bold text-slate-900 mb-2">{t('clients.noPayments')}</h3>
+                                <p className="text-slate-500">{t('clients.noPaymentsDescription')}</p>
+                              </div>
+                            ) : (
+                              <div className="space-y-4">
+                                {relatedData.payments.map((payment: any, index: number) => (
+                                  <div
+                                    key={payment._id}
+                                    className="flex items-center justify-between p-4 rounded-xl bg-slate-50 hover:bg-slate-100 transition-all"
+                                    style={{ animationDelay: `${index * 50}ms` }}
+                                  >
+                                    <div className="flex items-center gap-4">
+                                      <div className="w-10 h-10 rounded-lg bg-emerald-100 flex items-center justify-center">
+                                        <DollarSign className="h-5 w-5 text-emerald-600" />
+                                      </div>
+                                      <div>
+                                        <p className="font-bold text-emerald-600">
+                                          {payment.amount?.toLocaleString()} {t('common.sar')}
+                                        </p>
+                                        <p className="text-sm text-slate-500">
+                                          {payment.date && format(new Date(payment.date), 'PPP', { locale: dateLocale })}
+                                        </p>
+                                      </div>
+                                    </div>
+                                    <Badge variant="outline">{payment.status}</Badge>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                          </CardContent>
+                        </Card>
+                      </TabsContent>
                     </div>
-                  </>
-                )}
+                  </Tabs>
+                </Card>
+              </div>
 
-                {/* Address Information */}
-                {(client.city || client.address) && (
-                  <>
-                    <Separator />
-                    <div className='space-y-4'>
-                      <h4 className='text-sm font-medium'>
-                        {t('clients.form.addressInfo')}
-                      </h4>
-                      <div className='flex items-center gap-3'>
-                        <MapPin className='h-4 w-4 text-muted-foreground' />
-                        <div>
-                          <p className='text-sm text-muted-foreground'>
-                            {t('clients.form.address')}
-                          </p>
-                          <p className='font-medium'>
-                            {(() => {
-                              const addressParts: string[] = []
-                              if (typeof client.address === 'string') {
-                                addressParts.push(client.address)
-                              } else if (client.address) {
-                                if (client.address.street) addressParts.push(client.address.street)
-                                if (client.address.district) addressParts.push(client.address.district)
-                                if (client.address.city) addressParts.push(client.address.city)
-                              }
-                              if (client.city && !addressParts.includes(client.city)) addressParts.push(client.city)
-                              if (client.country) addressParts.push(client.country)
-                              return addressParts.filter(Boolean).join('، ') || '-'
-                            })()}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  </>
-                )}
-
-                {/* Notes */}
-                {client.notes && (
-                  <>
-                    <Separator />
-                    <div className='space-y-4'>
-                      <h4 className='text-sm font-medium'>{t('clients.form.notes')}</h4>
-                      <p className='text-sm text-muted-foreground whitespace-pre-wrap'>
-                        {client.notes}
-                      </p>
-                    </div>
-                  </>
-                )}
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value='cases' className='mt-4'>
-            <Card>
-              <CardHeader>
-                <CardTitle>{t('clients.tabs.cases')}</CardTitle>
-                <CardDescription>
-                  {t('clients.casesDescription', { count: relatedData.cases.length })}
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                {relatedData.cases.length === 0 ? (
-                  <p className='text-center text-muted-foreground py-8'>
-                    {t('clients.noCases')}
-                  </p>
-                ) : (
-                  <div className='space-y-4'>
-                    {relatedData.cases.map((caseItem: any) => (
-                      <div
-                        key={caseItem._id}
-                        className='flex items-center justify-between rounded-lg border p-4'
-                      >
-                        <div>
-                          <p className='font-medium'>{caseItem.title}</p>
-                          <p className='text-sm text-muted-foreground'>
-                            {caseItem.caseNumber}
-                          </p>
-                        </div>
-                        <Badge>{caseItem.status}</Badge>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value='invoices' className='mt-4'>
-            <Card>
-              <CardHeader>
-                <CardTitle>{t('clients.tabs.invoices')}</CardTitle>
-                <CardDescription>
-                  {t('clients.invoicesDescription', {
-                    count: relatedData.invoices.length,
-                  })}
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                {relatedData.invoices.length === 0 ? (
-                  <p className='text-center text-muted-foreground py-8'>
-                    {t('clients.noInvoices')}
-                  </p>
-                ) : (
-                  <div className='space-y-4'>
-                    {relatedData.invoices.map((invoice: any) => (
-                      <div
-                        key={invoice._id}
-                        className='flex items-center justify-between rounded-lg border p-4'
-                      >
-                        <div>
-                          <p className='font-medium'>{invoice.invoiceNumber}</p>
-                          <p className='text-sm text-muted-foreground'>
-                            {format(new Date(invoice.issueDate), 'PPP', {
-                              locale: dateLocale,
-                            })}
-                          </p>
-                        </div>
-                        <div className='text-end'>
-                          <p className='font-medium'>
-                            {invoice.totalAmount.toLocaleString()} {t('common.sar')}
-                          </p>
-                          <Badge variant='outline'>{invoice.status}</Badge>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value='payments' className='mt-4'>
-            <Card>
-              <CardHeader>
-                <CardTitle>{t('clients.tabs.payments')}</CardTitle>
-                <CardDescription>
-                  {t('clients.paymentsDescription', {
-                    count: relatedData.payments.length,
-                  })}
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                {relatedData.payments.length === 0 ? (
-                  <p className='text-center text-muted-foreground py-8'>
-                    {t('clients.noPayments')}
-                  </p>
-                ) : (
-                  <div className='space-y-4'>
-                    {relatedData.payments.map((payment: any) => (
-                      <div
-                        key={payment._id}
-                        className='flex items-center justify-between rounded-lg border p-4'
-                      >
-                        <div>
-                          <p className='font-medium'>
-                            {payment.amount.toLocaleString()} {t('common.sar')}
-                          </p>
-                          <p className='text-sm text-muted-foreground'>
-                            {format(new Date(payment.date), 'PPP', {
-                              locale: dateLocale,
-                            })}
-                          </p>
-                        </div>
-                        <Badge variant='outline'>{payment.status}</Badge>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
+              {/* Sidebar - 1 column */}
+              <ClientsSidebar context="details" clientId={clientId} />
+            </div>
+          </>
+        )}
       </Main>
     </>
   )
