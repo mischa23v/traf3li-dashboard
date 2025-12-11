@@ -125,19 +125,29 @@ const contactsService = {
   // Get single contact by ID
   getContact: async (id: string): Promise<Contact> => {
     const response = await api.get(`/contacts/${id}`)
-    return response.data
+    // Handle both API response formats:
+    // 1. Direct contact object: { _id: "...", firstName: "..." }
+    // 2. Wrapped: { data: { _id: "...", firstName: "..." } }
+    // 3. Nested: { success: true, data: { _id: "...", firstName: "..." } }
+    const data = response.data
+    if (data?.data) {
+      return data.data as Contact
+    }
+    return data as Contact
   },
 
   // Create new contact
   createContact: async (data: CreateContactData): Promise<Contact> => {
     const response = await api.post('/contacts', data)
-    return response.data
+    // Handle wrapped response: { data: {...} } or { contact: {...} }
+    return response.data?.data || response.data?.contact || response.data
   },
 
   // Update contact
   updateContact: async (id: string, data: UpdateContactData): Promise<Contact> => {
     const response = await api.patch(`/contacts/${id}`, data)
-    return response.data
+    // Handle wrapped response: { data: {...} } or { contact: {...} }
+    return response.data?.data || response.data?.contact || response.data
   },
 
   // Delete contact
