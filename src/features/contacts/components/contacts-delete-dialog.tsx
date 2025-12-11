@@ -25,7 +25,9 @@ export function ContactsDeleteDialog({
   const [value, setValue] = useState('')
   const { mutate: deleteContact, isPending } = useDeleteContact()
 
-  const fullName = `${currentRow.firstName} ${currentRow.lastName}`
+  const firstName = currentRow.firstName || ''
+  const lastName = currentRow.lastName || ''
+  const fullName = `${firstName} ${lastName}`.trim() || '-'
 
   const handleDelete = () => {
     if (value.trim() !== fullName) return
