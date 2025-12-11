@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useSearch } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 import { Plus, Upload, Download, Search, Bell, FileText, Layers, CheckCircle2, Calendar } from 'lucide-react'
@@ -16,12 +16,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Dialog, DialogContent } from '@/components/ui/dialog'
 import { usePdfmeTemplates } from '@/hooks/usePdfme'
-import { PdfTemplatesProvider, usePdfTemplatesContext } from './components/pdf-templates-provider'
-import { PdfTemplatesTable } from './components/pdf-templates-table'
-import { PdfTemplateActionDialog } from './components/pdf-template-action-dialog'
-import { PdfTemplateDeleteDialog } from './components/pdf-template-delete-dialog'
-import { PdfTemplateViewDialog } from './components/pdf-template-view-dialog'
-import { PdfTemplateDuplicateDialog } from './components/pdf-template-duplicate-dialog'
+import { PdfTemplatesProvider, usePdfTemplatesContext } from './components/template-provider'
+import { PdfTemplatesTable } from './components/template-table'
+import { TemplateViewDialog, TemplateDeleteDialog, TemplateDuplicateDialog, TemplatePreviewDialog } from './components/template-dialogs'
 import { PdfDesigner } from './components/pdf-designer'
 import { SettingsSidebar } from '../settings/components/settings-sidebar'
 import type { PdfmeTemplateCategory } from '@/services/pdfmeService'
@@ -39,22 +36,28 @@ function PdfTemplatesContent() {
     setCurrentTemplate,
   } = usePdfTemplatesContext()
 
-  const page = search.page || 1
-  const pageSize = search.pageSize || 10
+  // Handle edit action from row actions
+  useEffect(() => {
+    if (open === 'edit' || open === 'designer') {
+      setDesignerOpen(true)
+      setOpen(null)
+    }
+  }, [open, setOpen])
 
-  const { data, isLoading } = usePdfmeTemplates({
-    page,
-    limit: pageSize,
+  // Fetch data for stats display
+  // TODO: Replace with dedicated stats endpoint that returns totals across all pages
+  const { data } = usePdfmeTemplates({
+    page: 1,
+    limit: 1000, // Get a large number to calculate accurate stats
     category: selectedCategory !== 'all' ? selectedCategory : undefined,
-    search: search.search,
   })
 
   const templates = data?.data || []
   const totalCount = data?.total || 0
 
-  // Calculate stats
+  // Calculate stats from fetched data
   const stats = {
-    total: templates.length,
+    total: totalCount,
     byCategory: {
       invoice: templates.filter(t => t.category === 'invoice').length,
       contract: templates.filter(t => t.category === 'contract').length,
@@ -72,16 +75,6 @@ function PdfTemplatesContent() {
   const handleAdd = () => {
     setCurrentTemplate(null)
     setDesignerOpen(true)
-  }
-
-  const handleEdit = (template: any) => {
-    setCurrentTemplate(template)
-    setDesignerOpen(true)
-  }
-
-  const handleCloseDialog = () => {
-    setOpen(null)
-    setCurrentTemplate(null)
   }
 
   const handleCloseDesigner = () => {
@@ -277,22 +270,9 @@ function PdfTemplatesContent() {
             </div>
 
             {/* Templates Table */}
-            {isLoading ? (
-              <div className="flex h-[400px] items-center justify-center bg-white rounded-2xl border border-slate-100">
-                <div className="h-8 w-8 animate-spin rounded-full border-4 border-brand-blue border-t-transparent" />
-              </div>
-            ) : (
-              <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
-                <PdfTemplatesTable
-                  data={templates}
-                  totalCount={totalCount}
-                  page={page}
-                  pageSize={pageSize}
-                  isLoading={isLoading}
-                  onEdit={handleEdit}
-                />
-              </div>
-            )}
+            <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+              <PdfTemplatesTable />
+            </div>
           </div>
 
           {/* Sidebar */}
@@ -301,29 +281,10 @@ function PdfTemplatesContent() {
       </Main>
 
       {/* Dialogs */}
-      <PdfTemplateActionDialog
-        open={open === 'add' || open === 'edit'}
-        onOpenChange={(isOpen) => !isOpen && handleCloseDialog()}
-        currentTemplate={currentTemplate}
-      />
-
-      <PdfTemplateViewDialog
-        open={open === 'view'}
-        onOpenChange={(isOpen) => !isOpen && handleCloseDialog()}
-        currentTemplate={currentTemplate}
-      />
-
-      <PdfTemplateDeleteDialog
-        open={open === 'delete'}
-        onOpenChange={(isOpen) => !isOpen && handleCloseDialog()}
-        currentTemplate={currentTemplate}
-      />
-
-      <PdfTemplateDuplicateDialog
-        open={open === 'duplicate'}
-        onOpenChange={(isOpen) => !isOpen && handleCloseDialog()}
-        currentTemplate={currentTemplate}
-      />
+      <TemplateViewDialog />
+      <TemplateDeleteDialog />
+      <TemplateDuplicateDialog />
+      <TemplatePreviewDialog />
 
       {/* PDF Designer Modal - Full Screen */}
       <Dialog open={designerOpen} onOpenChange={setDesignerOpen}>

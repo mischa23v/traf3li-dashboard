@@ -198,8 +198,11 @@ const pdfmeService = {
   },
 
   // Clone template
-  cloneTemplate: async (id: string, name?: string): Promise<PdfmeTemplate> => {
-    const response = await api.post(`/pdfme/templates/${id}/clone`, { name })
+  cloneTemplate: async (
+    id: string,
+    data?: { name?: string; nameAr?: string }
+  ): Promise<PdfmeTemplate> => {
+    const response = await api.post(`/pdfme/templates/${id}/clone`, data)
     return response.data
   },
 

@@ -1,3 +1,4 @@
+import * as React from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -213,12 +214,22 @@ export function TemplateDuplicateDialog() {
   const cloneMutation = useClonePdfmeTemplate()
 
   const form = useForm<DuplicateFormValues>({
-    resolver: zodResolver(duplicateFormSchema) as any,
+    resolver: zodResolver(duplicateFormSchema),
     defaultValues: {
       name: currentTemplate ? `${currentTemplate.name} (Copy)` : '',
       nameAr: currentTemplate ? `${currentTemplate.nameAr} (نسخة)` : '',
     },
   })
+
+  // Reset form when template changes
+  React.useEffect(() => {
+    if (currentTemplate && open === 'duplicate') {
+      form.reset({
+        name: `${currentTemplate.name} (Copy)`,
+        nameAr: `${currentTemplate.nameAr} (نسخة)`,
+      })
+    }
+  }, [currentTemplate, open, form])
 
   if (!currentTemplate || open !== 'duplicate') return null
 
@@ -226,7 +237,10 @@ export function TemplateDuplicateDialog() {
     cloneMutation.mutate(
       {
         id: currentTemplate._id,
-        name: values.name,
+        data: {
+          name: values.name,
+          nameAr: values.nameAr,
+        },
       },
       {
         onSuccess: () => {
@@ -303,11 +317,13 @@ export function TemplatePreviewDialog() {
 
   if (!currentTemplate || open !== 'preview') return null
 
-  // Sample inputs for preview - you may want to customize this based on template category
+  // Sample inputs for preview
+  // TODO: Generate sample data based on template schema fields
+  // For production use, implement a function that creates appropriate sample data
+  // based on currentTemplate.schemas and currentTemplate.category
   const sampleInputs = [
     {
-      // Add sample data based on template schema
-      // This is a placeholder - should be adapted to match actual schema fields
+      // Example: invoiceNumber: 'INV-001', date: new Date().toISOString(), etc.
     },
   ]
 

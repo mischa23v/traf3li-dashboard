@@ -18,6 +18,13 @@ export const PdfForm = forwardRef<PdfFormRef, PdfFormProps>(
   ({ template, inputs = [{}], onInputsChange, lang = 'ar' }, ref) => {
     const containerRef = useRef<HTMLDivElement>(null)
     const formRef = useRef<Form | null>(null)
+    // Store callback in ref to avoid recreating form when callback changes
+    const onInputsChangeRef = useRef(onInputsChange)
+
+    // Keep callback ref up to date
+    useEffect(() => {
+      onInputsChangeRef.current = onInputsChange
+    }, [onInputsChange])
 
     useImperativeHandle(ref, () => ({
       getInputs: () => formRef.current?.getInputs() || []
@@ -34,24 +41,12 @@ export const PdfForm = forwardRef<PdfFormRef, PdfFormProps>(
         options: { lang }
       })
 
-      // Set up input change listener if callback is provided
-      if (onInputsChange) {
-        const handleChange = () => {
-          const currentInputs = formRef.current?.getInputs()
-          if (currentInputs) {
-            onInputsChange(currentInputs)
-          }
-        }
-
-        // PDFMe Form doesn't have a built-in change event, so we poll or
-        // the parent can call getInputs when needed via ref
-        // For now, we'll let the parent control when to get inputs via ref
-      }
-
       return () => {
+        // CRITICAL: Always destroy form instance to prevent memory leaks
         formRef.current?.destroy()
+        formRef.current = null
       }
-    }, [template, lang])
+    }, [template, inputs, lang])
 
     return <div ref={containerRef} className="h-full w-full" />
   }

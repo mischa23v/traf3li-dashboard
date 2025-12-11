@@ -1131,7 +1131,12 @@
     "years": "Years",
     "quarter": "Quarter",
     "month": "Month",
-    "week": "Week"
+    "week": "Week",
+    "status": "Status",
+    "active": "Active",
+    "inactive": "Inactive",
+    "createdAt": "Created At",
+    "default": "Default"
   },
   "validation": {
     "required": "This field is required",
@@ -2259,6 +2264,8 @@
     "duplicateTemplate": "Duplicate Template",
     "duplicateDescription": "Create a copy of template \"{{name}}\"",
     "preview": "Preview",
+    "previewDescription": "View how this template will look with sample data",
+    "noPreviewAvailable": "No preview available for this template",
     "import": "Import",
     "export": "Export",
     "setAsDefault": "Set as Default",

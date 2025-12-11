@@ -44,7 +44,7 @@ export function usePdfTemplateColumns(): ColumnDef<PdfmeTemplate>[] {
       {
         accessorKey: 'name',
         header: ({ column }) => (
-          <DataTableColumnHeader column={column} title={t('pdfTemplates.name')} />
+          <DataTableColumnHeader column={column} title={t('pdfTemplates.table.columns.name')} />
         ),
         cell: ({ row }) => {
           const name = isRTL ? row.original.nameAr : row.original.name
@@ -75,7 +75,7 @@ export function usePdfTemplateColumns(): ColumnDef<PdfmeTemplate>[] {
       {
         accessorKey: 'category',
         header: ({ column }) => (
-          <DataTableColumnHeader column={column} title={t('pdfTemplates.category')} />
+          <DataTableColumnHeader column={column} title={t('pdfTemplates.table.columns.category')} />
         ),
         cell: ({ row }) => {
           const category = templateCategories.find((cat) => cat.value === row.original.category)
@@ -94,7 +94,7 @@ export function usePdfTemplateColumns(): ColumnDef<PdfmeTemplate>[] {
       {
         accessorKey: 'type',
         header: ({ column }) => (
-          <DataTableColumnHeader column={column} title={t('pdfTemplates.type')} />
+          <DataTableColumnHeader column={column} title={t('pdfTemplates.table.columns.type')} />
         ),
         cell: ({ row }) => {
           const templateType = templateTypes.find((type) => type.value === row.original.type)
@@ -111,7 +111,7 @@ export function usePdfTemplateColumns(): ColumnDef<PdfmeTemplate>[] {
       {
         accessorKey: 'isDefault',
         header: ({ column }) => (
-          <DataTableColumnHeader column={column} title={t('pdfTemplates.default')} />
+          <DataTableColumnHeader column={column} title={t('pdfTemplates.table.columns.isDefault')} />
         ),
         cell: ({ row }) => {
           if (row.original.isDefault) {
