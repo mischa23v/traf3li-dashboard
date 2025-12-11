@@ -490,7 +490,7 @@ const casesService = {
       if (filters?.sortOrder) params.append('sortOrder', filters.sortOrder)
 
       const queryString = params.toString()
-      const url = queryString ? `/cases/?${queryString}` : '/cases/'
+      const url = queryString ? `/cases?${queryString}` : '/cases'
 
       const response = await apiClient.get<CasesResponse>(url)
       return {
@@ -522,7 +522,7 @@ const casesService = {
    */
   createCase: async (data: CreateCaseData): Promise<Case> => {
     try {
-      const response = await apiClient.post<CaseResponse>('/cases/', data)
+      const response = await apiClient.post<CaseResponse>('/cases', data)
       return response.data.case
     } catch (error: any) {
       throw new Error(handleApiError(error))
@@ -535,7 +535,7 @@ const casesService = {
    */
   createCaseFromContract: async (data: CreateCaseFromContractData): Promise<Case> => {
     try {
-      const response = await apiClient.post<CaseResponse>('/cases/', data)
+      const response = await apiClient.post<CaseResponse>('/cases', data)
       return response.data.case
     } catch (error: any) {
       throw new Error(handleApiError(error))
