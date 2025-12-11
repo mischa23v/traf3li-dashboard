@@ -205,11 +205,20 @@ export function TasksListView() {
     const handleDeleteSelected = () => {
         if (selectedTaskIds.length === 0) return
 
+        // DEBUG: Log task IDs being deleted
+        console.log('🗑️ Attempting to delete tasks:', selectedTaskIds)
+        console.log('📋 Current tasks in view:', tasks.map(t => ({ id: t.id, title: t.title })))
+
         if (confirm(t('tasks.list.deleteMultipleConfirm', { count: selectedTaskIds.length }))) {
             bulkDeleteTasks(selectedTaskIds, {
-                onSuccess: () => {
+                onSuccess: (result) => {
+                    console.log('✅ Bulk delete success:', result)
                     setIsSelectionMode(false)
                     setSelectedTaskIds([])
+                },
+                onError: (error: any) => {
+                    console.error('❌ Bulk delete failed:', error)
+                    console.error('Failed task IDs:', error?.failedIds)
                 }
             })
         }
