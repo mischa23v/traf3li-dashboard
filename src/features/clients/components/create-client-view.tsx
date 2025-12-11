@@ -521,41 +521,48 @@ export function CreateClientView() {
             return
         }
 
-        // Build fullName based on client type and name entry mode
-        let fullName: string
-        if (clientType === 'company') {
-            fullName = companyName || 'شركة جديدة'
+        // Build fullNameArabic based on name entry mode
+        let fullNameArabic_computed = ''
+        if (nameEntryMode === 'full') {
+            fullNameArabic_computed = fullNameArabic
         } else {
-            // Individual - use full name or 4-part name based on mode
-            if (nameEntryMode === 'full') {
-                fullName = fullNameArabic || 'عميل جديد'
-            } else {
-                const nameParts = [firstName, fatherName, grandfatherName, familyName].filter(Boolean)
-                fullName = nameParts.length > 0 ? nameParts.join(' ') : 'عميل جديد'
-            }
+            const nameParts = [firstName, fatherName, grandfatherName, familyName].filter(Boolean)
+            fullNameArabic_computed = nameParts.join(' ')
         }
 
-        // Backend expects flat structure with these fields:
-        // Required: fullName, phone
-        // Optional: email, alternatePhone, nationalId, companyName, companyRegistration, address, city, country, notes, preferredContactMethod, language, status
-        const clientData = {
-            // Required fields with defaults
-            fullName,
-            phone: phone || '+966500000000',
-
-            // Optional fields
+        // Backend now handles all defaults - no required fields
+        // Just send whatever user entered, backend will use defaults for empty values
+        const clientData = clientType === 'individual' ? {
+            // Individual client - all fields optional
+            clientType: 'individual',
+            phone: phone || undefined,
+            fullNameArabic: fullNameArabic_computed || undefined,
+            nationalId: nationalId || undefined,
+            firstName: firstName || undefined,
+            lastName: familyName || undefined,
             email: email || undefined,
-            alternatePhone: alternatePhone || undefined,
-            nationalId: clientType === 'individual' ? nationalId : undefined,
-            companyName: clientType === 'company' ? companyName : undefined,
-            companyRegistration: clientType === 'company' ? crNumber : undefined,
-            address: fullAddress || street || undefined,
-            city: clientType === 'company' ? companyCity : city || undefined,
-            country: 'Saudi Arabia',
-            notes: generalNotes || undefined,
-            preferredContactMethod: preferredContact || 'phone',
-            language: preferredLanguage || 'ar',
-            status: status || 'active',
+            gender: gender || undefined,
+            nationality: nationality || undefined,
+            address: (city || district || street) ? {
+                city: city || undefined,
+                district: district || undefined,
+                street: street || undefined,
+                postalCode: postalCode || undefined,
+            } : undefined,
+        } : {
+            // Company client - all fields optional
+            clientType: 'company',
+            phone: phone || companyPhone || undefined,
+            companyName: companyName || undefined,
+            crNumber: crNumber || undefined,
+            email: email || undefined,
+            companyNameEnglish: companyNameEnglish || undefined,
+            legalRepresentative: legalRepName ? {
+                name: legalRepName,
+                nationalId: legalRepId || undefined,
+                position: legalRepPosition || undefined,
+                phone: legalRepPhone || undefined,
+            } : undefined,
         }
 
         createClient(clientData as any, {
