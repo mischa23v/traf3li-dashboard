@@ -54,16 +54,24 @@ const LEAD_SOURCES = [
     { value: 'other', label: 'أخرى' },
 ]
 
+// Saudi phone regex: +966XXXXXXXXX format (optional validation)
+const saudiPhoneRegex = /^\+966[0-9]{9}$/
+
 const createLeadSchema = z.object({
     displayName: z.string().optional(),
     firstName: z.string().min(1, 'الاسم الأول مطلوب'),
     lastName: z.string().optional(),
     email: z.string().email('البريد الإلكتروني غير صحيح').optional().or(z.literal('')),
-    phone: z.string().optional(),
+    phone: z.string()
+        .optional()
+        .refine(
+            (val) => !val || saudiPhoneRegex.test(val),
+            'صيغة رقم الهاتف غير صحيحة (مثال: +966512345678)'
+        ),
     status: z.string().default('new'),
     pipelineId: z.string().optional(),
     sourceType: z.string().optional(),
-    sourceDetail: z.string().optional(),
+    sourceNotes: z.string().optional(),
     estimatedValue: z.coerce.number().optional(),
     probability: z.coerce.number().min(0).max(100).optional(),
     notes: z.string().optional(),
@@ -115,7 +123,7 @@ export function CreateLead() {
             notes: data.notes || undefined,
             source: data.sourceType ? {
                 type: data.sourceType,
-                detail: data.sourceDetail,
+                notes: data.sourceNotes || undefined,
             } : undefined,
         }
 
@@ -281,9 +289,15 @@ export function CreateLead() {
                                                 id="phone"
                                                 {...register('phone')}
                                                 className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500"
-                                                placeholder="+966 5XX XXX XXXX"
+                                                placeholder="+966512345678"
                                                 dir="ltr"
                                             />
+                                            {errors.phone && (
+                                                <p className="text-sm text-red-500 flex items-center gap-1">
+                                                    <AlertCircle className="w-3 h-3" />
+                                                    {errors.phone.message}
+                                                </p>
+                                            )}
                                         </div>
                                     </div>
                                 </div>
@@ -354,12 +368,12 @@ export function CreateLead() {
                                             </Select>
                                         </div>
                                         <div className="space-y-2">
-                                            <Label htmlFor="sourceDetail" className="text-sm font-medium text-slate-700">
-                                                تفاصيل المصدر
+                                            <Label htmlFor="sourceNotes" className="text-sm font-medium text-slate-700">
+                                                ملاحظات المصدر
                                             </Label>
                                             <Input
-                                                id="sourceDetail"
-                                                {...register('sourceDetail')}
+                                                id="sourceNotes"
+                                                {...register('sourceNotes')}
                                                 className="rounded-xl border-slate-200 focus:border-emerald-500 focus:ring-emerald-500"
                                                 placeholder="مثال: اسم الشخص المُحيل"
                                             />
