@@ -313,7 +313,7 @@ export const taskSchema = z.object({
   id: z.string(),
 
   // Basic info
-  title: z.string().min(1, 'العنوان مطلوب'),
+  title: z.string().optional(),
   description: z.string().optional(),
 
   // Task Type (Legal-specific)
@@ -400,7 +400,7 @@ export type Task = z.infer<typeof taskSchema>
  */
 
 export const taskFormSchema = z.object({
-  title: z.string().min(1, 'العنوان مطلوب'),
+  title: z.string().optional(),
   description: z.string().optional(),
   taskType: taskTypeEnum.default('other'),
   status: taskStatusEnum.default('todo'),
