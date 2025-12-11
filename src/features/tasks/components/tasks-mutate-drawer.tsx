@@ -240,7 +240,7 @@ export function TasksMutateDrawer({
               name='title'
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>العنوان *</FormLabel>
+                  <FormLabel>العنوان</FormLabel>
                   <FormControl>
                     <Input {...field} placeholder='أدخل عنوان المهمة' />
                   </FormControl>

@@ -196,12 +196,6 @@ export function CreateTaskView() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
 
-        if (!formData.title.trim()) {
-            toast.error('عنوان المهمة مطلوب')
-            titleInputRef.current?.focus()
-            return
-        }
-
         const taskData = {
             title: formData.title,
             description: formData.description,
