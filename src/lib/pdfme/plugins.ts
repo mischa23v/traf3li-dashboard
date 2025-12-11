@@ -27,7 +27,7 @@ export const getPlugins = (): Record<string, Plugin> => ({
   QRCode: barcodes.qrcode,
   Barcode: barcodes.code128,
   Code39: barcodes.code39,
-  Code93: barcodes.code93,
+  NW7: barcodes.nw7,
   EAN13: barcodes.ean13,
   EAN8: barcodes.ean8,
   UPCA: barcodes.upca,
@@ -59,7 +59,7 @@ export { text, image, barcodes, line, rectangle, ellipse, table }
 export const qrcode = barcodes.qrcode
 export const code128 = barcodes.code128
 export const code39 = barcodes.code39
-export const code93 = barcodes.code93
+export const nw7 = barcodes.nw7
 export const ean13 = barcodes.ean13
 export const ean8 = barcodes.ean8
 export const upca = barcodes.upca

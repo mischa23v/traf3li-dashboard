@@ -275,7 +275,7 @@ export const useSetDefaultPdfmeTemplate = () => {
 
   return useMutation({
     mutationFn: (id: string) => pdfmeService.setDefaultTemplate(id),
-    onSuccess: (data) => {
+    onSuccess: (data: PdfmeTemplate) => {
       toast({
         title: t('status.success'),
         description: t('pdfme.setDefaultSuccess', 'Default template set successfully'),

@@ -16,7 +16,7 @@ export function getBlankTemplate(): Template {
  * @param filename - The name for the downloaded file
  */
 export function downloadPdf(pdf: Uint8Array, filename: string): void {
-  const blob = new Blob([pdf.buffer], { type: 'application/pdf' });
+  const blob = new Blob([pdf], { type: 'application/pdf' });
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
   link.href = url;

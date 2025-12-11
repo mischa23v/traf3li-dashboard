@@ -131,7 +131,7 @@ export function PdfTemplatesTable() {
   // Update URL search params
   const updateSearch = (updates: Partial<typeof search>) => {
     navigate({
-      search: (prev) => ({ ...prev, ...updates }),
+      search: { ...search, ...updates },
     })
   }
 
