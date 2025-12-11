@@ -12,68 +12,120 @@ export const contactTypeSchema = z.enum([
 ])
 export type ContactType = z.infer<typeof contactTypeSchema>
 
-// Contact category enum
+// Contact category/role enum (backend uses primaryRole)
 export const contactCategorySchema = z.enum([
   'client_contact',
   'opposing_party',
+  'opposing_counsel',
   'witness',
   'expert_witness',
   'judge',
   'court_clerk',
+  'mediator',
+  'arbitrator',
+  'referral_source',
+  'vendor',
   'other',
 ])
 export type ContactCategory = z.infer<typeof contactCategorySchema>
 
-// Contact status enum
-export const contactStatusSchema = z.enum(['active', 'inactive', 'archived'])
+// Contact status enum (includes deceased)
+export const contactStatusSchema = z.enum(['active', 'inactive', 'archived', 'deceased'])
 export type ContactStatus = z.infer<typeof contactStatusSchema>
 
-// Contact schema
+// Arabic name schema
+const arabicNameSchema = z.object({
+  firstName: z.string().optional(),
+  fatherName: z.string().optional(),
+  grandfatherName: z.string().optional(),
+  familyName: z.string().optional(),
+  fullName: z.string().optional(),
+}).optional()
+
+// Contact schema - matches backend API (all fields optional)
 export const contactSchema = z.object({
   _id: z.string(),
-  lawyerId: z.string(),
-  firstName: z.string(),
-  lastName: z.string(),
-  email: z.string().email().optional().or(z.literal('')),
+  lawyerId: z.string().optional(),
+  // Name fields
+  salutation: z.string().optional(),
+  firstName: z.string().optional(),
+  middleName: z.string().optional(),
+  lastName: z.string().optional(),
+  preferredName: z.string().optional(),
+  suffix: z.string().optional(),
+  fullNameArabic: z.string().optional(),
+  arabicName: arabicNameSchema,
+  // Contact info
+  email: z.string().optional(),
   phone: z.string().optional(),
   alternatePhone: z.string().optional(),
-  title: z.string().optional(), // Job title
-  company: z.string().optional(),
-  type: contactTypeSchema,
+  // Classification
+  type: contactTypeSchema.optional(),
   category: contactCategorySchema.optional(),
+  primaryRole: contactCategorySchema.optional(),
+  // Employment
+  title: z.string().optional(),
+  company: z.string().optional(),
+  organizationId: z.string().optional(),
+  department: z.string().optional(),
+  // Address
   address: z.string().optional(),
   city: z.string().optional(),
+  district: z.string().optional(),
   postalCode: z.string().optional(),
   country: z.string().optional(),
+  // Identification
+  nationalId: z.string().optional(),
+  iqamaNumber: z.string().optional(),
+  passportNumber: z.string().optional(),
+  passportCountry: z.string().optional(),
+  dateOfBirth: z.string().optional(),
+  nationality: z.string().optional(),
+  // Communication preferences
+  preferredLanguage: z.string().optional(),
+  preferredContactMethod: z.string().optional(),
+  // Status & flags
+  status: contactStatusSchema.optional(),
+  priority: z.string().optional(),
+  vipStatus: z.boolean().optional(),
+  riskLevel: z.string().optional(),
+  isBlacklisted: z.boolean().optional(),
+  blacklistReason: z.string().optional(),
+  // Conflict check
+  conflictCheckStatus: z.string().optional(),
+  conflictNotes: z.string().optional(),
+  conflictCheckDate: z.string().optional(),
+  // Other
   notes: z.string().optional(),
   tags: z.array(z.string()).optional(),
+  practiceAreas: z.array(z.string()).optional(),
   linkedCases: z.array(z.string()).optional(),
   linkedClients: z.array(z.string()).optional(),
-  status: contactStatusSchema,
-  createdAt: z.string(),
-  updatedAt: z.string(),
+  createdAt: z.string().optional(),
+  updatedAt: z.string().optional(),
 })
 
 export type Contact = z.infer<typeof contactSchema>
 
-// Create contact form schema
+// Create contact form schema (all optional for backend flexibility)
 export const createContactSchema = z.object({
-  firstName: z.string().min(2, 'First name must be at least 2 characters'),
-  lastName: z.string().min(2, 'Last name must be at least 2 characters'),
+  firstName: z.string().optional(),
+  lastName: z.string().optional(),
   email: z.string().email().optional().or(z.literal('')),
   phone: z.string().optional(),
   alternatePhone: z.string().optional(),
   title: z.string().optional(),
   company: z.string().optional(),
-  type: contactTypeSchema,
+  type: contactTypeSchema.optional(),
   category: contactCategorySchema.optional(),
+  primaryRole: contactCategorySchema.optional(),
   address: z.string().optional(),
   city: z.string().optional(),
   postalCode: z.string().optional(),
   country: z.string().optional(),
   notes: z.string().optional(),
   tags: z.array(z.string()).optional(),
-  status: contactStatusSchema.default('active'),
+  status: contactStatusSchema.optional(),
 })
 
 export type CreateContactInput = z.infer<typeof createContactSchema>
