@@ -1,9 +1,12 @@
 /**
  * Bank Reconciliation Service
  * Handles all bank reconciliation, matching, and currency API calls
+ *
+ * Uses versioned API client (/api/v1/bank-reconciliation/*) as backend
+ * serves singular form at v1, not plural at non-versioned route.
  */
 
-import { apiClientNoVersion as api } from '@/lib/api'
+import { apiClient as api } from '@/lib/api'
 
 // ==================== TYPES ====================
 
