@@ -103,6 +103,7 @@ import { Route as AuthenticatedDashboardJobsBrowseRouteImport } from './routes/_
 import { Route as AuthenticatedDashboardFinanceOverviewRouteImport } from './routes/_authenticated/dashboard.finance.overview'
 import { Route as AuthenticatedDashboardCrmPipelineRouteImport } from './routes/_authenticated/dashboard.crm.pipeline'
 import { Route as AuthenticatedDashboardContactsNewRouteImport } from './routes/_authenticated/dashboard.contacts.new'
+import { Route as AuthenticatedDashboardContactsContactIdRouteImport } from './routes/_authenticated/dashboard.contacts.$contactId'
 import { Route as AuthenticatedDashboardClientsNewRouteImport } from './routes/_authenticated/dashboard.clients.new'
 import { Route as AuthenticatedDashboardClientsClientIdRouteImport } from './routes/_authenticated/dashboard.clients.$clientId'
 import { Route as AuthenticatedDashboardCasesCaseIdRouteImport } from './routes/_authenticated/dashboard.cases.$caseId'
@@ -792,6 +793,12 @@ const AuthenticatedDashboardContactsNewRoute =
   AuthenticatedDashboardContactsNewRouteImport.update({
     id: '/dashboard/contacts/new',
     path: '/dashboard/contacts/new',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedDashboardContactsContactIdRoute =
+  AuthenticatedDashboardContactsContactIdRouteImport.update({
+    id: '/dashboard/contacts/$contactId',
+    path: '/dashboard/contacts/$contactId',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedDashboardClientsNewRoute =
@@ -1883,6 +1890,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/cases/$caseId': typeof AuthenticatedDashboardCasesCaseIdRoute
   '/dashboard/clients/$clientId': typeof AuthenticatedDashboardClientsClientIdRoute
   '/dashboard/clients/new': typeof AuthenticatedDashboardClientsNewRoute
+  '/dashboard/contacts/$contactId': typeof AuthenticatedDashboardContactsContactIdRoute
   '/dashboard/contacts/new': typeof AuthenticatedDashboardContactsNewRoute
   '/dashboard/crm/pipeline': typeof AuthenticatedDashboardCrmPipelineRoute
   '/dashboard/finance/overview': typeof AuthenticatedDashboardFinanceOverviewRoute
@@ -2147,6 +2155,7 @@ export interface FileRoutesByTo {
   '/dashboard/cases/$caseId': typeof AuthenticatedDashboardCasesCaseIdRoute
   '/dashboard/clients/$clientId': typeof AuthenticatedDashboardClientsClientIdRoute
   '/dashboard/clients/new': typeof AuthenticatedDashboardClientsNewRoute
+  '/dashboard/contacts/$contactId': typeof AuthenticatedDashboardContactsContactIdRoute
   '/dashboard/contacts/new': typeof AuthenticatedDashboardContactsNewRoute
   '/dashboard/crm/pipeline': typeof AuthenticatedDashboardCrmPipelineRoute
   '/dashboard/finance/overview': typeof AuthenticatedDashboardFinanceOverviewRoute
@@ -2416,6 +2425,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/cases/$caseId': typeof AuthenticatedDashboardCasesCaseIdRoute
   '/_authenticated/dashboard/clients/$clientId': typeof AuthenticatedDashboardClientsClientIdRoute
   '/_authenticated/dashboard/clients/new': typeof AuthenticatedDashboardClientsNewRoute
+  '/_authenticated/dashboard/contacts/$contactId': typeof AuthenticatedDashboardContactsContactIdRoute
   '/_authenticated/dashboard/contacts/new': typeof AuthenticatedDashboardContactsNewRoute
   '/_authenticated/dashboard/crm/pipeline': typeof AuthenticatedDashboardCrmPipelineRoute
   '/_authenticated/dashboard/finance/overview': typeof AuthenticatedDashboardFinanceOverviewRoute
@@ -2683,6 +2693,7 @@ export interface FileRouteTypes {
     | '/dashboard/cases/$caseId'
     | '/dashboard/clients/$clientId'
     | '/dashboard/clients/new'
+    | '/dashboard/contacts/$contactId'
     | '/dashboard/contacts/new'
     | '/dashboard/crm/pipeline'
     | '/dashboard/finance/overview'
@@ -2947,6 +2958,7 @@ export interface FileRouteTypes {
     | '/dashboard/cases/$caseId'
     | '/dashboard/clients/$clientId'
     | '/dashboard/clients/new'
+    | '/dashboard/contacts/$contactId'
     | '/dashboard/contacts/new'
     | '/dashboard/crm/pipeline'
     | '/dashboard/finance/overview'
@@ -3215,6 +3227,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/cases/$caseId'
     | '/_authenticated/dashboard/clients/$clientId'
     | '/_authenticated/dashboard/clients/new'
+    | '/_authenticated/dashboard/contacts/$contactId'
     | '/_authenticated/dashboard/contacts/new'
     | '/_authenticated/dashboard/crm/pipeline'
     | '/_authenticated/dashboard/finance/overview'
@@ -4122,6 +4135,13 @@ declare module '@tanstack/react-router' {
       path: '/dashboard/contacts/new'
       fullPath: '/dashboard/contacts/new'
       preLoaderRoute: typeof AuthenticatedDashboardContactsNewRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dashboard/contacts/$contactId': {
+      id: '/_authenticated/dashboard/contacts/$contactId'
+      path: '/dashboard/contacts/$contactId'
+      fullPath: '/dashboard/contacts/$contactId'
+      preLoaderRoute: typeof AuthenticatedDashboardContactsContactIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/dashboard/clients/new': {
@@ -5472,6 +5492,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardCasesCaseIdRoute: typeof AuthenticatedDashboardCasesCaseIdRoute
   AuthenticatedDashboardClientsClientIdRoute: typeof AuthenticatedDashboardClientsClientIdRoute
   AuthenticatedDashboardClientsNewRoute: typeof AuthenticatedDashboardClientsNewRoute
+  AuthenticatedDashboardContactsContactIdRoute: typeof AuthenticatedDashboardContactsContactIdRoute
   AuthenticatedDashboardContactsNewRoute: typeof AuthenticatedDashboardContactsNewRoute
   AuthenticatedDashboardCrmPipelineRoute: typeof AuthenticatedDashboardCrmPipelineRoute
   AuthenticatedDashboardFinanceOverviewRoute: typeof AuthenticatedDashboardFinanceOverviewRoute
@@ -5691,6 +5712,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDashboardClientsClientIdRoute:
     AuthenticatedDashboardClientsClientIdRoute,
   AuthenticatedDashboardClientsNewRoute: AuthenticatedDashboardClientsNewRoute,
+  AuthenticatedDashboardContactsContactIdRoute:
+    AuthenticatedDashboardContactsContactIdRoute,
   AuthenticatedDashboardContactsNewRoute:
     AuthenticatedDashboardContactsNewRoute,
   AuthenticatedDashboardCrmPipelineRoute:
