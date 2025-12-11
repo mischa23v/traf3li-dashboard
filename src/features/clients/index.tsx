@@ -35,7 +35,6 @@ function ClientsContent() {
   const { t } = useTranslation()
   const search = route.useSearch()
   const navigate = route.useNavigate()
-  const { setOpen } = useClientsContext()
 
   // Fetch clients data from API
   const { data, isLoading } = useClients({
@@ -97,10 +96,12 @@ function ClientsContent() {
                   </div>
                   <h3 className="text-xl font-bold text-slate-900 mb-2">{t('clients.noClients')}</h3>
                   <p className="text-slate-500 mb-6">{t('clients.startAddingClient')}</p>
-                  <Button onClick={() => setOpen('add')} className="bg-brand-blue hover:bg-blue-600 text-white px-8">
-                    <Plus className="ms-2 h-4 w-4" aria-hidden="true" />
-                    {t('clients.addNewClient')}
-                  </Button>
+                  <Link to="/dashboard/clients/new">
+                    <Button className="bg-brand-blue hover:bg-blue-600 text-white px-8">
+                      <Plus className="ms-2 h-4 w-4" aria-hidden="true" />
+                      {t('clients.addNewClient')}
+                    </Button>
+                  </Link>
                 </div>
               ) : (
                 <ClientsTable

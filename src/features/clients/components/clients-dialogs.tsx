@@ -8,12 +8,6 @@ export function ClientsDialogs() {
 
   return (
     <>
-      <ClientsActionDialog
-        key='client-add'
-        open={open === 'add'}
-        onOpenChange={() => setOpen('add')}
-      />
-
       {currentRow && (
         <>
           <ClientsViewDialog
