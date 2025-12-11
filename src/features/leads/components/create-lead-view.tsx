@@ -54,20 +54,12 @@ const LEAD_SOURCES = [
     { value: 'other', label: 'أخرى' },
 ]
 
-// Saudi phone regex: +966XXXXXXXXX format (optional validation)
-const saudiPhoneRegex = /^\+966[0-9]{9}$/
-
 const createLeadSchema = z.object({
     displayName: z.string().optional(),
-    firstName: z.string().min(1, 'الاسم الأول مطلوب'),
+    firstName: z.string().optional(),
     lastName: z.string().optional(),
     email: z.string().email('البريد الإلكتروني غير صحيح').optional().or(z.literal('')),
-    phone: z.string()
-        .optional()
-        .refine(
-            (val) => !val || saudiPhoneRegex.test(val),
-            'صيغة رقم الهاتف غير صحيحة (مثال: +966512345678)'
-        ),
+    phone: z.string().optional(),
     status: z.string().default('new'),
     pipelineId: z.string().optional(),
     sourceType: z.string().optional(),
@@ -213,7 +205,7 @@ export function CreateLead() {
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                         <div className="space-y-2">
                                             <Label htmlFor="firstName" className="text-sm font-medium text-slate-700">
-                                                الاسم الأول *
+                                                الاسم الأول
                                             </Label>
                                             <Input
                                                 id="firstName"
