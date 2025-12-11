@@ -75,21 +75,6 @@ type ClientType = 'individual' | 'company'
 type VerificationStatus = 'idle' | 'loading' | 'verified' | 'error'
 
 // Verification response interfaces
-interface YakeenResponse {
-    firstName: string
-    middleName: string
-    lastName: string
-    fullNameArabic: string
-    fullNameEnglish: string
-    gender: 'male' | 'female'
-    nationality: string
-    dateOfBirth: string
-    dateOfBirthHijri: string
-    idStatus: string
-    issueDate: string
-    expiryDate: string
-}
-
 interface WathqResponse {
     crNumber: string
     crName: string
@@ -142,12 +127,10 @@ export function CreateClientView() {
     const [clientType, setClientType] = useState<ClientType>('individual')
 
     // Verification states
-    const [yakeenStatus, setYakeenStatus] = useState<VerificationStatus>('idle')
     const [wathqStatus, setWathqStatus] = useState<VerificationStatus>('idle')
     const [mojStatus, setMojStatus] = useState<VerificationStatus>('idle')
 
     // Verified data
-    const [yakeenData, setYakeenData] = useState<YakeenResponse | null>(null)
     const [wathqData, setWathqData] = useState<WathqResponse | null>(null)
     const [mojData, setMojData] = useState<MOJResponse | null>(null)
 
@@ -322,43 +305,6 @@ export function CreateClientView() {
     }, [lawyersData])
 
     // Verification handlers
-    const verifyWithYakeen = async () => {
-        if (!nationalId || nationalId.length < 10) return
-
-        setYakeenStatus('loading')
-        try {
-            const response = await fetch('/api/verify/yakeen', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ nationalId })
-            })
-            const data = await response.json()
-
-            if (data.success) {
-                setYakeenData(data.data)
-                setYakeenStatus('verified')
-
-                // Auto-fill fields
-                setFirstName(data.data.firstName)
-                setMiddleName(data.data.middleName)
-                setLastName(data.data.lastName)
-                setFullNameArabic(data.data.fullNameArabic)
-                setFullNameEnglish(data.data.fullNameEnglish)
-                setGender(data.data.gender)
-                setNationality(data.data.nationality)
-                setDateOfBirth(data.data.dateOfBirth)
-                setDateOfBirthHijri(data.data.dateOfBirthHijri)
-                setIdStatus(data.data.idStatus)
-                setIdIssueDate(data.data.issueDate)
-                setIdExpiryDate(data.data.expiryDate)
-            } else {
-                setYakeenStatus('error')
-            }
-        } catch (error) {
-            setYakeenStatus('error')
-        }
-    }
-
     const verifyWithWathq = async () => {
         if (!crNumber || crNumber.length < 10) return
 
@@ -596,8 +542,6 @@ export function CreateClientView() {
                 idStatus,
                 idIssueDate,
                 idExpiryDate,
-                yakeenVerified: yakeenStatus === 'verified',
-                yakeenVerifiedAt: yakeenStatus === 'verified' ? new Date().toISOString() : null,
             }),
 
             // Company info
@@ -893,47 +837,28 @@ export function CreateClientView() {
                             {clientType === 'individual' && (
                                 <Card className="rounded-3xl shadow-sm border-slate-100">
                                     <CardHeader className="pb-4">
-                                        <div className="flex items-center justify-between">
-                                            <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                                                <User className="w-5 h-5 text-emerald-500" aria-hidden="true" />
-                                                المعلومات الشخصية
-                                            </CardTitle>
-                                            <VerificationBadge service="يقين" status={yakeenStatus} />
-                                        </div>
+                                        <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
+                                            <User className="w-5 h-5 text-emerald-500" aria-hidden="true" />
+                                            المعلومات الشخصية
+                                        </CardTitle>
                                     </CardHeader>
                                     <CardContent className="space-y-6">
-                                        {/* National ID with verification */}
+                                        {/* National ID */}
                                         <div className="space-y-2">
                                             <Label className="text-sm font-medium text-slate-700">
-                                                رقم الهوية الوطنية / الإقامة<Lock className="h-3 w-3 text-slate-500 inline ms-1" aria-hidden="true" />                                             </Label>
-                                            <div className="flex gap-2">
-                                                <Input
-                                                    value={nationalId}
-                                                    onChange={(e) => setNationalId(e.target.value)}
-                                                    placeholder="1234567890"
-                                                    className={cn(
-                                                        "flex-1 rounded-xl border-slate-200",
-                                                        nationalId && !isValidNationalId(nationalId) && "border-red-500"
-                                                    )}
-                                                    dir="ltr"
-                                                    maxLength={10}
-                                                />
-                                                <Button
-                                                    type="button"
-                                                    onClick={verifyWithYakeen}
-                                                    disabled={yakeenStatus === 'loading' || nationalId.length < 10}
-                                                    className="rounded-xl bg-blue-500 hover:bg-blue-600"
-                                                >
-                                                    {yakeenStatus === 'loading' ? (
-                                                        <Loader2 className="w-4 h-4 animate-spin" />
-                                                    ) : (
-                                                        <>
-                                                            <Search className="w-4 h-4 ms-2" aria-hidden="true" />
-                                                            تحقق عبر يقين
-                                                        </>
-                                                    )}
-                                                </Button>
-                                            </div>
+                                                رقم الهوية الوطنية / الإقامة<Lock className="h-3 w-3 text-slate-500 inline ms-1" aria-hidden="true" />
+                                            </Label>
+                                            <Input
+                                                value={nationalId}
+                                                onChange={(e) => setNationalId(e.target.value)}
+                                                placeholder="1234567890"
+                                                className={cn(
+                                                    "rounded-xl border-slate-200",
+                                                    nationalId && !isValidNationalId(nationalId) && "border-red-500"
+                                                )}
+                                                dir="ltr"
+                                                maxLength={10}
+                                            />
                                             {nationalId && !isValidNationalId(nationalId) && (
                                                 <p className="text-sm text-red-600">
                                                     {getErrorMessage('nationalId', isArabic ? 'ar' : 'en')}
@@ -941,83 +866,32 @@ export function CreateClientView() {
                                             )}
                                         </div>
 
-                                        {/* Auto-filled fields */}
-                                        {yakeenStatus === 'verified' && (
-                                            <div className={cn("space-y-4 p-4 rounded-xl", yakeenStatus === 'verified' ? "bg-green-50 border border-green-200" : "")}>
-                                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                                    <div className="space-y-2">
-                                                        <Label className="text-sm text-slate-600">الاسم الأول</Label>
-                                                        <Input value={firstName} disabled className="bg-white/50 rounded-xl" />
-                                                    </div>
-                                                    <div className="space-y-2">
-                                                        <Label className="text-sm text-slate-600">اسم الأب</Label>
-                                                        <Input value={middleName} disabled className="bg-white/50 rounded-xl" />
-                                                    </div>
-                                                    <div className="space-y-2">
-                                                        <Label className="text-sm text-slate-600">اسم العائلة</Label>
-                                                        <Input value={lastName} disabled className="bg-white/50 rounded-xl" />
-                                                    </div>
-                                                </div>
-
-                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                                    <div className="space-y-2">
-                                                        <Label className="text-sm text-slate-600">الاسم الكامل (عربي)</Label>
-                                                        <Input value={fullNameArabic} disabled className="bg-white/50 rounded-xl" />
-                                                    </div>
-                                                    <div className="space-y-2">
-                                                        <Label className="text-sm text-slate-600">الاسم الكامل (إنجليزي)</Label>
-                                                        <Input value={fullNameEnglish} disabled className="bg-white/50 rounded-xl" dir="ltr" />
-                                                    </div>
-                                                </div>
-
-                                                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                                                    <div className="space-y-2">
-                                                        <Label className="text-sm text-slate-600">الجنس</Label>
-                                                        <Input value={gender === 'male' ? 'ذكر' : 'أنثى'} disabled className="bg-white/50 rounded-xl" />
-                                                    </div>
-                                                    <div className="space-y-2">
-                                                        <Label className="text-sm text-slate-600">الجنسية</Label>
-                                                        <Input value={nationality} disabled className="bg-white/50 rounded-xl" />
-                                                    </div>
-                                                    <div className="space-y-2">
-                                                        <Label className="text-sm text-slate-600">تاريخ الميلاد</Label>
-                                                        <Input value={dateOfBirth} disabled className="bg-white/50 rounded-xl" dir="ltr" />
-                                                    </div>
-                                                    <div className="space-y-2">
-                                                        <Label className="text-sm text-slate-600">حالة الهوية</Label>
-                                                        <Input value={idStatus} disabled className="bg-white/50 rounded-xl" />
-                                                    </div>
-                                                </div>
+                                        {/* Manual entry fields */}
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            <div className="space-y-2">
+                                                <Label className="text-sm font-medium text-slate-700">
+                                                    الاسم الكامل
+                                                </Label>
+                                                <Input
+                                                    value={fullNameArabic}
+                                                    onChange={(e) => setFullNameArabic(e.target.value)}
+                                                    placeholder="أدخل الاسم الكامل"
+                                                    className="rounded-xl border-slate-200"
+                                                />
                                             </div>
-                                        )}
-
-                                        {/* Manual entry if not verified */}
-                                        {yakeenStatus !== 'verified' && (
-                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                                <div className="space-y-2">
-                                                    <Label className="text-sm font-medium text-slate-700">
-                                                        الاسم الكامل                                                     </Label>
-                                                    <Input
-                                                        value={fullNameArabic}
-                                                        onChange={(e) => setFullNameArabic(e.target.value)}
-                                                        placeholder="أدخل الاسم الكامل"
-                                                        className="rounded-xl border-slate-200"
-                                                    />
-                                                </div>
-                                                <div className="space-y-2">
-                                                    <Label className="text-sm font-medium text-slate-700">الجنس</Label>
-                                                    <Select value={gender} onValueChange={(v) => setGender(v as 'male' | 'female')}>
-                                                        <SelectTrigger className="rounded-xl border-slate-200">
-                                                            <SelectValue />
-                                                        </SelectTrigger>
-                                                        <SelectContent>
-                                                            <SelectItem value="male">ذكر</SelectItem>
-                                                            <SelectItem value="female">أنثى</SelectItem>
-                                                        </SelectContent>
-                                                    </Select>
-                                                </div>
+                                            <div className="space-y-2">
+                                                <Label className="text-sm font-medium text-slate-700">الجنس</Label>
+                                                <Select value={gender} onValueChange={(v) => setGender(v as 'male' | 'female')}>
+                                                    <SelectTrigger className="rounded-xl border-slate-200">
+                                                        <SelectValue />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                        <SelectItem value="male">ذكر</SelectItem>
+                                                        <SelectItem value="female">أنثى</SelectItem>
+                                                    </SelectContent>
+                                                </Select>
                                             </div>
-                                        )}
+                                        </div>
                                     </CardContent>
                                 </Card>
                             )}
