@@ -38,6 +38,9 @@ const calendarRoute = require('./calendar.route');
 // Dashboard HR Routes
 const benefitRoute = require('./benefit.route');
 
+// PDFMe Routes
+const pdfmeRoute = require('./pdfme.route');
+
 module.exports = {
     // Marketplace
     gigRoute,
@@ -77,5 +80,8 @@ module.exports = {
     calendarRoute,
 
     // Dashboard HR
-    benefitRoute
+    benefitRoute,
+
+    // PDFMe
+    pdfmeRoute
 };

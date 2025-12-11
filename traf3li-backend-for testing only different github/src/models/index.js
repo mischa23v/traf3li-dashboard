@@ -39,6 +39,9 @@ const Report = require('./report.model');
 // Dashboard HR Models
 const EmployeeBenefit = require('./employeeBenefit.model');
 
+// PDFMe Models
+const PdfmeTemplate = require('./pdfmeTemplate.model');
+
 module.exports = {
     // Marketplace
     User,
@@ -79,5 +82,8 @@ module.exports = {
     Report,
 
     // Dashboard HR
-    EmployeeBenefit
+    EmployeeBenefit,
+
+    // PDFMe
+    PdfmeTemplate
 };
