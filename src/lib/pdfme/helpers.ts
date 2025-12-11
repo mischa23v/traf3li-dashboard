@@ -1,4 +1,4 @@
-import { Template, BLANK_PDF } from '@pdfme/common';
+import { BLANK_PDF, type Template } from '@pdfme/common';
 
 /**
  * Returns a blank A4 template with default settings
@@ -6,11 +6,7 @@ import { Template, BLANK_PDF } from '@pdfme/common';
 export function getBlankTemplate(): Template {
   return {
     basePdf: BLANK_PDF,
-    schemas: [
-      {
-        // Empty schema for a blank template
-      },
-    ],
+    schemas: [[]], // Empty schema array for a blank template
   };
 }
 
@@ -20,7 +16,7 @@ export function getBlankTemplate(): Template {
  * @param filename - The name for the downloaded file
  */
 export function downloadPdf(pdf: Uint8Array, filename: string): void {
-  const blob = new Blob([pdf], { type: 'application/pdf' });
+  const blob = new Blob([pdf.buffer], { type: 'application/pdf' });
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
   link.href = url;
@@ -75,33 +71,47 @@ export function readFile(file: File): Promise<string> {
  * Converts a base64 string to a Uint8Array
  * @param base64 - The base64 string to convert
  * @returns The converted Uint8Array
+ * @throws {Error} If the base64 string is invalid
  */
 export function base64ToUint8Array(base64: string): Uint8Array {
-  // Remove data URL prefix if present (e.g., "data:application/pdf;base64,")
-  const base64String = base64.split(',')[1] || base64;
+  try {
+    // Remove data URL prefix if present (e.g., "data:application/pdf;base64,")
+    const base64String = base64.split(',')[1] || base64;
 
-  const binaryString = atob(base64String);
-  const bytes = new Uint8Array(binaryString.length);
+    const binaryString = atob(base64String);
+    const bytes = new Uint8Array(binaryString.length);
 
-  for (let i = 0; i < binaryString.length; i++) {
-    bytes[i] = binaryString.charCodeAt(i);
+    for (let i = 0; i < binaryString.length; i++) {
+      bytes[i] = binaryString.charCodeAt(i);
+    }
+
+    return bytes;
+  } catch (error) {
+    throw new Error(
+      `Failed to convert base64 to Uint8Array: ${error instanceof Error ? error.message : 'Invalid base64 string'}`
+    );
   }
-
-  return bytes;
 }
 
 /**
  * Converts a Uint8Array to a base64 string
  * @param uint8Array - The Uint8Array to convert
  * @returns The base64 string representation
+ * @throws {Error} If the conversion fails
  */
 export function uint8ArrayToBase64(uint8Array: Uint8Array): string {
-  let binaryString = '';
-  const len = uint8Array.byteLength;
+  try {
+    let binaryString = '';
+    const len = uint8Array.byteLength;
 
-  for (let i = 0; i < len; i++) {
-    binaryString += String.fromCharCode(uint8Array[i]);
+    for (let i = 0; i < len; i++) {
+      binaryString += String.fromCharCode(uint8Array[i]);
+    }
+
+    return btoa(binaryString);
+  } catch (error) {
+    throw new Error(
+      `Failed to convert Uint8Array to base64: ${error instanceof Error ? error.message : 'Conversion failed'}`
+    );
   }
-
-  return btoa(binaryString);
 }

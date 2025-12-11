@@ -1212,7 +1212,12 @@
     "years": "سنوات",
     "quarter": "ربع سنوي",
     "month": "شهر",
-    "week": "أسبوع"
+    "week": "أسبوع",
+    "status": "الحالة",
+    "active": "نشط",
+    "inactive": "غير نشط",
+    "createdAt": "تاريخ الإنشاء",
+    "default": "افتراضي"
   },
   "validation": {
     "required": "هذا الحقل مطلوب",
@@ -2347,6 +2352,8 @@
     "duplicateTemplate": "نسخ القالب",
     "duplicateDescription": "إنشاء نسخة من القالب \"{{name}}\"",
     "preview": "معاينة",
+    "previewDescription": "عرض كيف سيبدو هذا القالب مع بيانات العينة",
+    "noPreviewAvailable": "المعاينة غير متاحة لهذا القالب",
     "import": "استيراد",
     "export": "تصدير",
     "setAsDefault": "تعيين كافتراضي",

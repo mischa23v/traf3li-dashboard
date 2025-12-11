@@ -3,7 +3,7 @@ import {
   FileSpreadsheet,
   FileMinus,
   Receipt,
-  FileContract,
+  FileCheck,
   Mail,
   Award,
   Settings,
@@ -26,7 +26,7 @@ export const templateCategories: {
     value: 'contract',
     label: 'Contract',
     labelAr: 'عقد',
-    icon: FileContract,
+    icon: FileCheck,
   },
   {
     value: 'receipt',

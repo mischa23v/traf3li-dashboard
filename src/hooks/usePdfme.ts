@@ -223,8 +223,8 @@ export const useClonePdfmeTemplate = () => {
   const { t } = useTranslation()
 
   return useMutation({
-    mutationFn: ({ id, name }: { id: string; name?: string }) =>
-      pdfmeService.cloneTemplate(id, name),
+    mutationFn: ({ id, data }: { id: string; data?: { name?: string; nameAr?: string } }) =>
+      pdfmeService.cloneTemplate(id, data),
     // Update cache on success
     onSuccess: (data) => {
       toast({

@@ -66,6 +66,7 @@ import { Route as AuthenticatedDashboardCalendarRouteImport } from './routes/_au
 import { Route as AuthenticatedDashboardTagsIndexRouteImport } from './routes/_authenticated/dashboard.tags.index'
 import { Route as AuthenticatedDashboardStaffIndexRouteImport } from './routes/_authenticated/dashboard.staff.index'
 import { Route as AuthenticatedDashboardReportsIndexRouteImport } from './routes/_authenticated/dashboard.reports.index'
+import { Route as AuthenticatedDashboardPdfTemplatesIndexRouteImport } from './routes/_authenticated/dashboard.pdf-templates.index'
 import { Route as AuthenticatedDashboardOrganizationsIndexRouteImport } from './routes/_authenticated/dashboard.organizations.index'
 import { Route as AuthenticatedDashboardInvoiceTemplatesIndexRouteImport } from './routes/_authenticated/dashboard.invoice-templates.index'
 import { Route as AuthenticatedDashboardFollowupsIndexRouteImport } from './routes/_authenticated/dashboard.followups.index'
@@ -569,6 +570,12 @@ const AuthenticatedDashboardReportsIndexRoute =
   AuthenticatedDashboardReportsIndexRouteImport.update({
     id: '/dashboard/reports/',
     path: '/dashboard/reports/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedDashboardPdfTemplatesIndexRoute =
+  AuthenticatedDashboardPdfTemplatesIndexRouteImport.update({
+    id: '/dashboard/pdf-templates/',
+    path: '/dashboard/pdf-templates/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedDashboardOrganizationsIndexRoute =
@@ -1912,6 +1919,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/followups': typeof AuthenticatedDashboardFollowupsIndexRoute
   '/dashboard/invoice-templates': typeof AuthenticatedDashboardInvoiceTemplatesIndexRoute
   '/dashboard/organizations': typeof AuthenticatedDashboardOrganizationsIndexRoute
+  '/dashboard/pdf-templates': typeof AuthenticatedDashboardPdfTemplatesIndexRoute
   '/dashboard/reports': typeof AuthenticatedDashboardReportsIndexRoute
   '/dashboard/staff': typeof AuthenticatedDashboardStaffIndexRoute
   '/dashboard/tags': typeof AuthenticatedDashboardTagsIndexRoute
@@ -2175,6 +2183,7 @@ export interface FileRoutesByTo {
   '/dashboard/followups': typeof AuthenticatedDashboardFollowupsIndexRoute
   '/dashboard/invoice-templates': typeof AuthenticatedDashboardInvoiceTemplatesIndexRoute
   '/dashboard/organizations': typeof AuthenticatedDashboardOrganizationsIndexRoute
+  '/dashboard/pdf-templates': typeof AuthenticatedDashboardPdfTemplatesIndexRoute
   '/dashboard/reports': typeof AuthenticatedDashboardReportsIndexRoute
   '/dashboard/staff': typeof AuthenticatedDashboardStaffIndexRoute
   '/dashboard/tags': typeof AuthenticatedDashboardTagsIndexRoute
@@ -2443,6 +2452,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/followups/': typeof AuthenticatedDashboardFollowupsIndexRoute
   '/_authenticated/dashboard/invoice-templates/': typeof AuthenticatedDashboardInvoiceTemplatesIndexRoute
   '/_authenticated/dashboard/organizations/': typeof AuthenticatedDashboardOrganizationsIndexRoute
+  '/_authenticated/dashboard/pdf-templates/': typeof AuthenticatedDashboardPdfTemplatesIndexRoute
   '/_authenticated/dashboard/reports/': typeof AuthenticatedDashboardReportsIndexRoute
   '/_authenticated/dashboard/staff/': typeof AuthenticatedDashboardStaffIndexRoute
   '/_authenticated/dashboard/tags/': typeof AuthenticatedDashboardTagsIndexRoute
@@ -2709,6 +2719,7 @@ export interface FileRouteTypes {
     | '/dashboard/followups'
     | '/dashboard/invoice-templates'
     | '/dashboard/organizations'
+    | '/dashboard/pdf-templates'
     | '/dashboard/reports'
     | '/dashboard/staff'
     | '/dashboard/tags'
@@ -2972,6 +2983,7 @@ export interface FileRouteTypes {
     | '/dashboard/followups'
     | '/dashboard/invoice-templates'
     | '/dashboard/organizations'
+    | '/dashboard/pdf-templates'
     | '/dashboard/reports'
     | '/dashboard/staff'
     | '/dashboard/tags'
@@ -3239,6 +3251,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/followups/'
     | '/_authenticated/dashboard/invoice-templates/'
     | '/_authenticated/dashboard/organizations/'
+    | '/_authenticated/dashboard/pdf-templates/'
     | '/_authenticated/dashboard/reports/'
     | '/_authenticated/dashboard/staff/'
     | '/_authenticated/dashboard/tags/'
@@ -3850,6 +3863,13 @@ declare module '@tanstack/react-router' {
       path: '/dashboard/reports'
       fullPath: '/dashboard/reports'
       preLoaderRoute: typeof AuthenticatedDashboardReportsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dashboard/pdf-templates/': {
+      id: '/_authenticated/dashboard/pdf-templates/'
+      path: '/dashboard/pdf-templates'
+      fullPath: '/dashboard/pdf-templates'
+      preLoaderRoute: typeof AuthenticatedDashboardPdfTemplatesIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/dashboard/organizations/': {
@@ -5488,6 +5508,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardFollowupsIndexRoute: typeof AuthenticatedDashboardFollowupsIndexRoute
   AuthenticatedDashboardInvoiceTemplatesIndexRoute: typeof AuthenticatedDashboardInvoiceTemplatesIndexRoute
   AuthenticatedDashboardOrganizationsIndexRoute: typeof AuthenticatedDashboardOrganizationsIndexRoute
+  AuthenticatedDashboardPdfTemplatesIndexRoute: typeof AuthenticatedDashboardPdfTemplatesIndexRoute
   AuthenticatedDashboardReportsIndexRoute: typeof AuthenticatedDashboardReportsIndexRoute
   AuthenticatedDashboardStaffIndexRoute: typeof AuthenticatedDashboardStaffIndexRoute
   AuthenticatedDashboardTagsIndexRoute: typeof AuthenticatedDashboardTagsIndexRoute
@@ -5735,6 +5756,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
     AuthenticatedDashboardInvoiceTemplatesIndexRoute,
   AuthenticatedDashboardOrganizationsIndexRoute:
     AuthenticatedDashboardOrganizationsIndexRoute,
+  AuthenticatedDashboardPdfTemplatesIndexRoute:
+    AuthenticatedDashboardPdfTemplatesIndexRoute,
   AuthenticatedDashboardReportsIndexRoute:
     AuthenticatedDashboardReportsIndexRoute,
   AuthenticatedDashboardStaffIndexRoute: AuthenticatedDashboardStaffIndexRoute,

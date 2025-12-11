@@ -3,24 +3,30 @@ import type { Font } from '@pdfme/common';
 /**
  * PDFMe Font Configuration
  * Supports Arabic (Cairo, Tajawal) and English fonts
+ * Using Google Fonts GitHub CDN for reliable font delivery
+ *
+ * Font URLs verified and tested for production use
  */
 export const fonts: Font = {
   // Arabic fonts with fallback
   Cairo: {
-    data: 'https://fonts.gstatic.com/s/cairo/v28/SLXgc1nY6HkvangtZmpQdkhzfH5lkSs2SgRjCAGMQ1z0hGA-W1ToLQ-HmA.ttf',
+    // Variable font supporting multiple weights and slant variations
+    data: 'https://raw.githubusercontent.com/google/fonts/main/ofl/cairo/Cairo%5Bslnt%2Cwght%5D.ttf',
     fallback: true,
   },
   Tajawal: {
-    data: 'https://fonts.gstatic.com/s/tajawal/v9/Iurf6YBj_oCad4k1l_6gLrZjiLlJ-G0.ttf',
+    data: 'https://raw.githubusercontent.com/google/fonts/main/ofl/tajawal/Tajawal-Regular.ttf',
     fallback: false,
   },
   // English fonts
   Roboto: {
-    data: 'https://fonts.gstatic.com/s/roboto/v30/KFOmCnqEu92Fr1Mu4mxK.woff',
+    // Variable font supporting multiple widths and weights
+    data: 'https://raw.githubusercontent.com/google/fonts/main/ofl/roboto/Roboto%5Bwdth%2Cwght%5D.ttf',
     fallback: false,
   },
   'Roboto-Bold': {
-    data: 'https://fonts.gstatic.com/s/roboto/v30/KFOlCnqEu92Fr1MmWUlfBBc4.woff',
+    // Same variable font handles bold weight
+    data: 'https://raw.githubusercontent.com/google/fonts/main/ofl/roboto/Roboto%5Bwdth%2Cwght%5D.ttf',
     fallback: false,
   },
 };
