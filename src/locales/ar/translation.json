@@ -125,7 +125,8 @@
       "preferences": "التفضيلات",
       "apps": "التطبيقات",
       "importExport": "استيراد/تصدير",
-      "helpCenter": "مركز المساعدة"
+      "helpCenter": "مركز المساعدة",
+      "pdfTemplates": "قوالب PDF"
     },
     "general": "عام",
     "dashboard": "لوحة التحكم",
@@ -149,7 +150,12 @@
     "other": "أخرى",
     "account": "الحساب",
     "appearance": "المظهر",
-    "notifications": "الإشعارات",
+    "notifications": {
+      "title": "التنبيهات",
+      "noReminders": "لا توجد تنبيهات قادمة",
+      "overdue": "متأخر",
+      "viewAll": "عرض كل التنبيهات"
+    },
     "display": "العرض",
     "quickActions": {
       "title": "إجراءات سريعة",
@@ -167,12 +173,6 @@
       "pm": "مساءً",
       "remote": "عن بعد",
       "viewFullSchedule": "عرض الجدول الكامل"
-    },
-    "notifications": {
-      "title": "التنبيهات",
-      "noReminders": "لا توجد تنبيهات قادمة",
-      "overdue": "متأخر",
-      "viewAll": "عرض كل التنبيهات"
     }
   },
   "auth": {
@@ -1175,7 +1175,7 @@
     "system": "النظام"
   },
   "common": {
-    "search": "بحث...",
+    "search": "بحث",
     "loading": "جاري التحميل...",
     "uploading": "جاري الرفع...",
     "submit": "إرسال",
@@ -1197,9 +1197,22 @@
     "filter": "تصفية",
     "sort": "ترتيب",
     "actions": "الإجراءات",
-    "error": "حدث خطأ، يرجى المحاولة مرة أخرى",
-    "currency": "ر.س",
-    "notSpecified": "غير محدد"
+    "sar": "ر.س",
+    "retry": "إعادة المحاولة",
+    "unknownError": "خطأ غير معروف",
+    "preview": "معاينة",
+    "download": "تحميل",
+    "warning": "تحذير",
+    "openInNewTab": "فتح في علامة تبويب جديدة",
+    "selectFile": "اختر ملف",
+    "all": "الكل",
+    "viewDetails": "عرض التفاصيل",
+    "serverError": "تعذر الاتصال بالخادم",
+    "year": "سنة",
+    "years": "سنوات",
+    "quarter": "ربع سنوي",
+    "month": "شهر",
+    "week": "أسبوع"
   },
   "validation": {
     "required": "هذا الحقل مطلوب",
@@ -1282,7 +1295,7 @@
     "progress": "التقدم",
     "type": "النوع",
     "nextHearing": "الجلسة القادمة",
-    "claimAmount": "قيمة المطالبة",
+    "claimAmount": "المبلغ (ر.س)",
     "caseNumber": "رقم القضية",
     "details": "التفاصيل",
     "viewAll": "عرض جميع القضايا",
@@ -1342,7 +1355,6 @@
     "addClaimDescription": "أضف مطالبة جديدة للقضية",
     "claimType": "نوع المطالبة",
     "selectClaimType": "اختر نوع المطالبة",
-    "claimAmount": "المبلغ (ر.س)",
     "claimPeriod": "الفترة (اختياري)",
     "claimPeriodPlaceholder": "مثال: يناير 2024 - مارس 2024",
     "claimDescription": "الوصف (اختياري)",
@@ -1561,46 +1573,6 @@
       "validationTitleRequired": "يرجى إدخال عنوان المستند",
       "validationContentRequired": "يرجى إدخال محتوى المستند"
     }
-  },
-  "common": {
-    "search": "بحث",
-    "loading": "جاري التحميل...",
-    "uploading": "جاري الرفع...",
-    "submit": "إرسال",
-    "cancel": "إلغاء",
-    "delete": "حذف",
-    "edit": "تعديل",
-    "save": "حفظ",
-    "close": "إغلاق",
-    "add": "إضافة",
-    "create": "إنشاء",
-    "update": "تحديث",
-    "remove": "إزالة",
-    "confirm": "تأكيد",
-    "yes": "نعم",
-    "no": "لا",
-    "view": "عرض",
-    "export": "تصدير",
-    "import": "استيراد",
-    "filter": "تصفية",
-    "sort": "ترتيب",
-    "actions": "الإجراءات",
-    "sar": "ر.س",
-    "retry": "إعادة المحاولة",
-    "unknownError": "خطأ غير معروف",
-    "preview": "معاينة",
-    "download": "تحميل",
-    "warning": "تحذير",
-    "openInNewTab": "فتح في علامة تبويب جديدة",
-    "selectFile": "اختر ملف",
-    "all": "الكل",
-    "viewDetails": "عرض التفاصيل",
-    "serverError": "تعذر الاتصال بالخادم",
-    "year": "سنة",
-    "years": "سنوات",
-    "quarter": "ربع سنوي",
-    "month": "شهر",
-    "week": "أسبوع"
   },
   "hrAnalytics": {
     "title": "تحليلات الموارد البشرية",
@@ -2878,28 +2850,28 @@
     "verifyTitle": "التحقق من البريد",
     "verifySubtitle": "أدخل الرمز المرسل إلى {{email}}",
     "email": "البريد الإلكتروني",
-    "enterOtp": "أدخل رمز التحقق",
     "sendOtp": "إرسال رمز التحقق",
-    "verify": "تحقق",
     "sending": "جاري الإرسال...",
-    "verifying": "جاري التحقق...",
     "waitSeconds": "انتظر {{seconds}} ثانية",
-    "otpSent": "تم إرسال رمز التحقق إلى بريدك الإلكتروني",
-    "otpResent": "تم إعادة إرسال رمز التحقق",
-    "success": "تم تسجيل الدخول بنجاح",
+    "or": "أو",
+    "usePassword": "تسجيل الدخول بكلمة المرور",
     "changeEmail": "تغيير البريد الإلكتروني",
+    "enterOtp": "أدخل رمز التحقق",
+    "verify": "تحقق",
+    "verifying": "جاري التحقق...",
     "didntReceive": "لم يصلك الرمز؟",
     "resend": "إعادة إرسال الرمز",
     "resendIn": "إعادة الإرسال خلال {{seconds}} ثانية",
     "attemptsLeft": "المحاولات المتبقية: {{count}}",
-    "or": "أو",
-    "usePassword": "تسجيل الدخول بكلمة المرور",
     "termsPrefix": "بتسجيل الدخول، أنت توافق على",
     "terms": "الشروط والأحكام",
     "and": "و",
     "privacy": "سياسة الخصوصية",
     "noAccount": "ليس لديك حساب؟",
     "signUp": "إنشاء حساب جديد",
+    "otpSent": "تم إرسال رمز التحقق إلى بريدك الإلكتروني",
+    "otpResent": "تم إعادة إرسال رمز التحقق",
+    "success": "تم تسجيل الدخول بنجاح",
     "errors": {
       "emailRequired": "البريد الإلكتروني مطلوب",
       "invalidEmail": "البريد الإلكتروني غير صالح",
@@ -3131,46 +3103,6 @@
     "signOut": "تسجيل الخروج",
     "helpText": "إذا كنت تعتقد أن هذا خطأ، يرجى التواصل مع الدعم الفني"
   },
-  "otpLogin": {
-    "title": "تسجيل الدخول",
-    "subtitle": "أدخل بريدك الإلكتروني لتلقي رمز التحقق",
-    "verifyTitle": "التحقق من البريد",
-    "verifySubtitle": "أدخل الرمز المرسل إلى {{email}}",
-    "email": "البريد الإلكتروني",
-    "sendOtp": "إرسال رمز التحقق",
-    "sending": "جاري الإرسال...",
-    "waitSeconds": "انتظر {{seconds}} ثانية",
-    "or": "أو",
-    "usePassword": "تسجيل الدخول بكلمة المرور",
-    "changeEmail": "تغيير البريد الإلكتروني",
-    "enterOtp": "أدخل رمز التحقق",
-    "verify": "تحقق",
-    "verifying": "جاري التحقق...",
-    "didntReceive": "لم يصلك الرمز؟",
-    "resend": "إعادة إرسال الرمز",
-    "resendIn": "إعادة الإرسال خلال {{seconds}} ثانية",
-    "attemptsLeft": "المحاولات المتبقية: {{count}}",
-    "termsPrefix": "بتسجيل الدخول، أنت توافق على",
-    "terms": "الشروط والأحكام",
-    "and": "و",
-    "privacy": "سياسة الخصوصية",
-    "noAccount": "ليس لديك حساب؟",
-    "signUp": "إنشاء حساب جديد",
-    "otpSent": "تم إرسال رمز التحقق إلى بريدك الإلكتروني",
-    "otpResent": "تم إعادة إرسال رمز التحقق",
-    "success": "تم تسجيل الدخول بنجاح",
-    "errors": {
-      "emailRequired": "البريد الإلكتروني مطلوب",
-      "invalidEmail": "البريد الإلكتروني غير صالح",
-      "otpRequired": "يرجى إدخال رمز التحقق المكون من 6 أرقام",
-      "invalidOtp": "رمز التحقق غير صحيح. المحاولات المتبقية: {{attemptsLeft}}",
-      "noAttemptsLeft": "انتهت المحاولات. يرجى طلب رمز جديد",
-      "rateLimited": "يرجى الانتظار {{waitTime}} ثانية",
-      "sendFailed": "فشل في إرسال رمز التحقق",
-      "verifyFailed": "فشل في التحقق من الرمز",
-      "resendFailed": "فشل في إعادة إرسال الرمز"
-    }
-  },
   "leads": {
     "title": "إدارة العملاء المحتملين",
     "management": "إدارة العملاء المحتملين",
@@ -3305,6 +3237,278 @@
       "hasLowercase": "حرف صغير واحد على الأقل",
       "hasNumber": "رقم واحد على الأقل",
       "hasSpecialChar": "رمز خاص واحد على الأقل (!@#$%^&*)"
+    }
+  },
+  "pdfTemplates": {
+    "title": "قوالب PDF",
+    "description": "إدارة قوالب PDF للمستندات",
+    "addNew": "قالب جديد",
+    "createTemplate": "إنشاء قالب",
+    "editTemplate": "تعديل القالب",
+    "deleteTemplate": "حذف القالب",
+    "duplicateTemplate": "نسخ القالب",
+    "previewTemplate": "معاينة القالب",
+    "openDesigner": "فتح المصمم",
+    "setAsDefault": "تعيين كافتراضي",
+    "removeDefault": "إزالة الافتراضي",
+    "categories": {
+      "invoice": "فاتورة",
+      "contract": "عقد",
+      "receipt": "إيصال",
+      "report": "تقرير",
+      "letter": "خطاب",
+      "certificate": "شهادة",
+      "agreement": "اتفاقية",
+      "proposal": "مقترح",
+      "quotation": "عرض سعر",
+      "statement": "كشف حساب",
+      "form": "نموذج",
+      "label": "ملصق",
+      "badge": "بطاقة",
+      "ticket": "تذكرة",
+      "custom": "مخصص",
+      "other": "أخرى"
+    },
+    "types": {
+      "standard": "قياسي",
+      "detailed": "مفصل",
+      "summary": "ملخص",
+      "simplified": "مبسط",
+      "professional": "احترافي",
+      "basic": "أساسي",
+      "advanced": "متقدم",
+      "custom": "مخصص"
+    },
+    "table": {
+      "columns": {
+        "name": "اسم القالب",
+        "category": "الفئة",
+        "type": "النوع",
+        "isDefault": "افتراضي",
+        "isActive": "نشط",
+        "createdAt": "تاريخ الإنشاء",
+        "updatedAt": "تاريخ التحديث",
+        "createdBy": "أنشئ بواسطة",
+        "actions": "الإجراءات"
+      },
+      "filters": {
+        "all": "جميع القوالب",
+        "active": "النشطة",
+        "inactive": "غير النشطة",
+        "default": "القوالب الافتراضية",
+        "custom": "القوالب المخصصة",
+        "byCategory": "تصفية حسب الفئة",
+        "byType": "تصفية حسب النوع",
+        "search": "البحث عن قوالب..."
+      }
+    },
+    "form": {
+      "labels": {
+        "name": "اسم القالب",
+        "description": "الوصف",
+        "category": "الفئة",
+        "type": "النوع",
+        "isDefault": "تعيين كقالب افتراضي",
+        "isActive": "الحالة النشطة",
+        "design": "تصميم القالب",
+        "schema": "مخطط البيانات",
+        "basedOn": "بناءً على القالب"
+      },
+      "placeholders": {
+        "name": "أدخل اسم القالب",
+        "description": "أدخل وصف القالب",
+        "category": "اختر الفئة",
+        "type": "اختر النوع",
+        "basedOn": "اختر القالب للنسخ"
+      },
+      "hints": {
+        "name": "اختر اسماً وصفياً للقالب الخاص بك",
+        "description": "وصف موجز لاستخدام القالب والغرض منه",
+        "isDefault": "يتم اختيار القوالب الافتراضية تلقائياً لهذه الفئة",
+        "isActive": "القوالب غير النشطة لن تظهر في قوائم الاختيار",
+        "design": "قم بتكوين التخطيط المرئي وتصميم القالب الخاص بك",
+        "schema": "حدد هيكل البيانات لهذا القالب"
+      },
+      "validation": {
+        "nameRequired": "اسم القالب مطلوب",
+        "nameMinLength": "يجب أن يكون الاسم 3 أحرف على الأقل",
+        "nameMaxLength": "يجب ألا يتجاوز الاسم 100 حرف",
+        "categoryRequired": "الفئة مطلوبة",
+        "typeRequired": "النوع مطلوب",
+        "designRequired": "تصميم القالب مطلوب",
+        "schemaRequired": "مخطط البيانات مطلوب",
+        "invalidJson": "تنسيق JSON غير صالح"
+      }
+    },
+    "actions": {
+      "create": "إنشاء",
+      "edit": "تعديل",
+      "delete": "حذف",
+      "duplicate": "نسخ",
+      "preview": "معاينة",
+      "download": "تحميل",
+      "export": "تصدير",
+      "import": "استيراد",
+      "designer": "تصميم",
+      "save": "حفظ القالب",
+      "cancel": "إلغاء",
+      "confirm": "تأكيد",
+      "activate": "تنشيط",
+      "deactivate": "إلغاء التنشيط"
+    },
+    "dialogs": {
+      "create": {
+        "title": "إنشاء قالب جديد",
+        "description": "إنشاء قالب PDF جديد من الصفر أو بناءً على قالب موجود"
+      },
+      "edit": {
+        "title": "تعديل القالب",
+        "description": "تعديل إعدادات القالب والتصميم"
+      },
+      "delete": {
+        "title": "حذف القالب",
+        "description": "هل أنت متأكد من حذف هذا القالب؟ لا يمكن التراجع عن هذا الإجراء.",
+        "warning": "هذا القالب معين حالياً كافتراضي. حذفه سيؤثر على إنشاء المستندات."
+      },
+      "duplicate": {
+        "title": "نسخ القالب",
+        "description": "إنشاء نسخة من هذا القالب باسم جديد"
+      },
+      "setDefault": {
+        "title": "تعيين كقالب افتراضي",
+        "description": "تعيين هذا القالب كافتراضي لفئة {category}؟",
+        "warning": "سيتم استبدال القالب الافتراضي الحالي."
+      },
+      "removeDefault": {
+        "title": "إزالة الحالة الافتراضية",
+        "description": "إزالة الحالة الافتراضية من هذا القالب؟"
+      },
+      "deactivate": {
+        "title": "إلغاء تنشيط القالب",
+        "description": "إلغاء تنشيط هذا القالب سيخفيه من قوائم الاختيار. متابعة؟"
+      },
+      "importTemplate": {
+        "title": "استيراد قالب",
+        "description": "استيراد قالب من ملف JSON"
+      },
+      "exportTemplate": {
+        "title": "تصدير قالب",
+        "description": "تصدير القالب كملف JSON"
+      }
+    },
+    "designer": {
+      "title": "مصمم القوالب",
+      "loading": "جاري تحميل المصمم...",
+      "saving": "جاري حفظ القالب...",
+      "toolbar": {
+        "undo": "تراجع",
+        "redo": "إعادة",
+        "zoom": "تكبير/تصغير",
+        "grid": "الشبكة",
+        "rulers": "المساطر",
+        "preview": "معاينة",
+        "save": "حفظ"
+      },
+      "panels": {
+        "elements": "العناصر",
+        "properties": "الخصائص",
+        "data": "حقول البيانات",
+        "styles": "الأنماط"
+      },
+      "elements": {
+        "text": "نص",
+        "image": "صورة",
+        "table": "جدول",
+        "line": "خط",
+        "rectangle": "مستطيل",
+        "barcode": "باركود",
+        "qrcode": "رمز QR"
+      },
+      "properties": {
+        "position": "الموضع",
+        "size": "الحجم",
+        "font": "الخط",
+        "color": "اللون",
+        "alignment": "المحاذاة",
+        "border": "الحدود",
+        "background": "الخلفية"
+      }
+    },
+    "messages": {
+      "success": {
+        "created": "تم إنشاء القالب بنجاح",
+        "updated": "تم تحديث القالب بنجاح",
+        "deleted": "تم حذف القالب بنجاح",
+        "duplicated": "تم نسخ القالب بنجاح",
+        "setDefault": "تم تعيين القالب كافتراضي بنجاح",
+        "removeDefault": "تم إزالة الحالة الافتراضية بنجاح",
+        "activated": "تم تنشيط القالب بنجاح",
+        "deactivated": "تم إلغاء تنشيط القالب بنجاح",
+        "imported": "تم استيراد القالب بنجاح",
+        "exported": "تم تصدير القالب بنجاح"
+      },
+      "error": {
+        "createFailed": "فشل إنشاء القالب",
+        "updateFailed": "فشل تحديث القالب",
+        "deleteFailed": "فشل حذف القالب",
+        "duplicateFailed": "فشل نسخ القالب",
+        "loadFailed": "فشل تحميل القالب",
+        "loadListFailed": "فشل تحميل قائمة القوالب",
+        "setDefaultFailed": "فشل تعيين القالب كافتراضي",
+        "removeDefaultFailed": "فشل إزالة الحالة الافتراضية",
+        "activateFailed": "فشل تنشيط القالب",
+        "deactivateFailed": "فشل إلغاء تنشيط القالب",
+        "importFailed": "فشل استيراد القالب",
+        "exportFailed": "فشل تصدير القالب",
+        "designerLoadFailed": "فشل تحميل مصمم القوالب",
+        "designerSaveFailed": "فشل حفظ تصميم القالب",
+        "invalidFile": "تنسيق الملف غير صالح",
+        "networkError": "خطأ في الشبكة. يرجى التحقق من اتصالك.",
+        "unauthorized": "ليس لديك إذن لتنفيذ هذا الإجراء",
+        "notFound": "القالب غير موجود",
+        "alreadyExists": "يوجد بالفعل قالب بهذا الاسم"
+      },
+      "info": {
+        "noTemplates": "لم يتم العثور على قوالب",
+        "designerUnsavedChanges": "لديك تغييرات غير محفوظة. هل تريد الحفظ قبل المغادرة؟",
+        "selectTemplate": "اختر قالباً لعرض التفاصيل"
+      }
+    },
+    "empty": {
+      "title": "لا توجد قوالب بعد",
+      "description": "ابدأ بإنشاء قالب PDF الأول الخاص بك",
+      "createButton": "إنشاء أول قالب",
+      "noResults": {
+        "title": "لم يتم العثور على قوالب",
+        "description": "حاول ضبط الفلاتر أو معايير البحث"
+      }
+    },
+    "status": {
+      "active": "نشط",
+      "inactive": "غير نشط",
+      "default": "افتراضي",
+      "custom": "مخصص"
+    },
+    "tooltips": {
+      "edit": "تعديل إعدادات القالب",
+      "delete": "حذف هذا القالب",
+      "duplicate": "إنشاء نسخة من هذا القالب",
+      "preview": "معاينة مخرجات القالب",
+      "designer": "فتح في مصمم القوالب",
+      "setDefault": "تعيين كافتراضي للفئة",
+      "removeDefault": "إزالة الحالة الافتراضية",
+      "activate": "تنشيط هذا القالب",
+      "deactivate": "إلغاء تنشيط هذا القالب",
+      "download": "تحميل ملف القالب",
+      "export": "تصدير القالب كـ JSON",
+      "import": "استيراد قالب من ملف"
+    },
+    "breadcrumb": {
+      "home": "الرئيسية",
+      "templates": "القوالب",
+      "create": "إنشاء",
+      "edit": "تعديل",
+      "designer": "المصمم"
     }
   }
 }
