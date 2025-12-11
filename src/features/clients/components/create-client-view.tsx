@@ -517,215 +517,37 @@ export function CreateClientView() {
             return
         }
 
+        // Build fullName based on client type
+        let fullName: string
+        if (clientType === 'company') {
+            fullName = companyName || 'شركة جديدة'
+        } else {
+            // Individual - combine first and last name
+            const nameParts = [firstName, middleName, lastName].filter(Boolean)
+            fullName = nameParts.length > 0 ? nameParts.join(' ') : 'عميل جديد'
+        }
+
+        // Backend expects flat structure with these fields:
+        // Required: fullName, phone
+        // Optional: email, alternatePhone, nationalId, companyName, companyRegistration, address, city, country, notes, preferredContactMethod, language, status
         const clientData = {
-            // Type
-            clientType,
+            // Required fields with defaults
+            fullName,
+            phone: phone || '+966500000000',
 
-            // Individual info
-            ...(clientType === 'individual' && {
-                nationalId,
-                firstName,
-                middleName,
-                lastName,
-                fullNameArabic,
-                fullNameEnglish,
-                gender,
-                nationality,
-                dateOfBirth,
-                dateOfBirthHijri,
-                idStatus,
-                idIssueDate,
-                idExpiryDate,
-            }),
-
-            // Company info
-            ...(clientType === 'company' && {
-                crNumber,
-                companyName,
-                companyNameEnglish,
-                unifiedNumber,
-                crStatus,
-                entityDuration,
-                capital,
-                companyPhone,
-                crIssueDate,
-                mainActivity,
-                website,
-                ecommerceLink,
-                companyCity,
-                companyAddress,
-                owners,
-                managers,
-                legalRepresentative: {
-                    name: legalRepName,
-                    nationalId: legalRepId,
-                    position: legalRepPosition,
-                    phone: legalRepPhone,
-                },
-                wathqVerified: wathqStatus === 'verified',
-                wathqVerifiedAt: wathqStatus === 'verified' ? new Date().toISOString() : null,
-            }),
-
-            // Contact info - LINKED TO FINANCE SECTION
-            contact: {
-                phone,
-                alternatePhone,
-                whatsapp: sameAsPhone ? phone : whatsapp,
-                email,
-                secondaryEmail,
-                preferredContact,
-                preferredTime,
-                preferredLanguage,
-            },
-
-            // Address - LINKED TO INVOICE ADDRESS
-            address: {
-                city,
-                district,
-                street,
-                buildingNumber,
-                postalCode,
-                additionalNumber,
-                unitNumber,
-                fullAddress,
-            },
-            ...(differentMailingAddress && {
-                mailingAddress: {
-                    city: mailingCity,
-                    address: mailingAddress,
-                }
-            }),
-
-            // Power of Attorney
-            ...(hasPowerOfAttorney && {
-                powerOfAttorney: {
-                    attorneyId,
-                    attorneyName,
-                    attorneyType,
-                    attorneyGender,
-                    attorneyStatus,
-                    attorneyResidence,
-                    attorneyWorkplace,
-                    source: poaSource,
-                    poaNumber,
-                    notaryNumber,
-                    issueDate: poaIssueDate,
-                    expiryDate: poaExpiryDate,
-                    phone: attorneyPhone,
-                    email: attorneyEmail,
-                    powers: poaPowers,
-                    limitations: poaLimitations,
-                    mojVerified: mojStatus === 'verified',
-                    mojVerifiedAt: mojStatus === 'verified' ? new Date().toISOString() : null,
-                }
-            }),
-
-            // Assignment
-            assignment: {
-                responsibleLawyerId,
-                assistantLawyerId,
-                paralegalId,
-                researcherId,
-                departmentId,
-                officeId,
-            },
-            clientSource,
-            ...(clientSource === 'referral' && {
-                referredBy,
-                referralCommission,
-            }),
-
-            // Billing - CRITICAL FOR FINANCE LINKING
-            billing: {
-                type: billingType,
-                hourlyRate,
-                currency,
-                paymentTerms,
-                creditLimit,
-                ...(hasDiscount && {
-                    discount: {
-                        percent: discountPercent,
-                        reason: discountReason,
-                    }
-                }),
-                invoiceDelivery,
-                invoiceLanguage,
-            },
-            // VAT - CRITICAL FOR ZATCA
-            ...(isVatRegistered && { vatNumber }),
-            isVatRegistered,
-
-            // Professional info
-            professional: {
-                profession,
-                employer,
-                workPhone,
-                workAddress,
-                monthlyIncome,
-                eligibleForLegalAid,
-            },
-
-            // Emergency contact
-            emergencyContact: {
-                name: emergencyName,
-                relation: emergencyRelation,
-                phone: emergencyPhone,
-                altPhone: emergencyAltPhone,
-                email: emergencyEmail,
-                address: emergencyAddress,
-            },
-
-            // Communication preferences
-            communicationPreferences: {
-                allowEmail,
-                allowSms,
-                allowWhatsapp,
-                allowPhone,
-                notifications: {
-                    caseUpdates: notifyCaseUpdates,
-                    hearings: notifyHearings,
-                    invoices: notifyInvoices,
-                    payments: notifyPayments,
-                    newsletter: notifyNewsletter,
-                }
-            },
-
-            // Conflict check
-            conflictCheck: {
-                checked: conflictChecked,
-                checkedBy: conflictCheckedBy,
-                checkDate: conflictCheckDate,
-                hasConflict,
-                details: conflictDetails,
-                resolution: conflictResolution,
-                approvedBy: conflictApprovedBy,
-            },
-
-            // Flags
-            flags: {
-                isVip,
-                isHighRisk,
-                needsApproval,
-                isBlacklisted,
-                blacklistReason,
-                creditHold,
-            },
-
-            // Compliance
-            compliance: {
-                consentDataProcessing,
-                consentPrivacyPolicy,
-                consentDate: new Date().toISOString(),
-                consentIP: '', // Will be filled by backend
-            },
-
-            // Notes & tags
-            generalNotes,
-            internalNotes,
-            tags,
-
-            // Status
-            status,
+            // Optional fields
+            email: email || undefined,
+            alternatePhone: alternatePhone || undefined,
+            nationalId: clientType === 'individual' ? nationalId : undefined,
+            companyName: clientType === 'company' ? companyName : undefined,
+            companyRegistration: clientType === 'company' ? crNumber : undefined,
+            address: fullAddress || street || undefined,
+            city: clientType === 'company' ? companyCity : city || undefined,
+            country: 'Saudi Arabia',
+            notes: generalNotes || undefined,
+            preferredContactMethod: preferredContact || 'phone',
+            language: preferredLanguage || 'ar',
+            status: status || 'active',
         }
 
         createClient(clientData as any, {
