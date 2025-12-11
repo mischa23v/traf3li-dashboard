@@ -125,7 +125,8 @@
       "preferences": "Preferences",
       "apps": "Applications",
       "importExport": "Import/Export",
-      "helpCenter": "Help Center"
+      "helpCenter": "Help Center",
+      "pdfTemplates": "PDF Templates"
     },
     "general": "General",
     "dashboard": "Dashboard",
@@ -149,7 +150,12 @@
     "other": "Other",
     "account": "Account",
     "appearance": "Appearance",
-    "notifications": "Notifications",
+    "notifications": {
+      "title": "Notifications",
+      "noReminders": "No upcoming reminders",
+      "overdue": "Overdue",
+      "viewAll": "View All Reminders"
+    },
     "display": "Display",
     "quickActions": {
       "title": "Quick Actions",
@@ -167,12 +173,6 @@
       "pm": "PM",
       "remote": "Remote",
       "viewFullSchedule": "View Full Schedule"
-    },
-    "notifications": {
-      "title": "Notifications",
-      "noReminders": "No upcoming reminders",
-      "overdue": "Overdue",
-      "viewAll": "View All Reminders"
     }
   },
   "auth": {
@@ -1094,7 +1094,7 @@
     "system": "System"
   },
   "common": {
-    "search": "Search...",
+    "search": "Search",
     "loading": "Loading...",
     "uploading": "Uploading...",
     "submit": "Submit",
@@ -1116,9 +1116,22 @@
     "filter": "Filter",
     "sort": "Sort",
     "actions": "Actions",
-    "error": "An error occurred, please try again",
-    "currency": "SAR",
-    "notSpecified": "Not specified"
+    "sar": "SAR",
+    "retry": "Retry",
+    "unknownError": "Unknown error",
+    "preview": "Preview",
+    "download": "Download",
+    "warning": "Warning",
+    "openInNewTab": "Open in New Tab",
+    "selectFile": "Select File",
+    "all": "All",
+    "viewDetails": "View Details",
+    "serverError": "Unable to connect to server",
+    "year": "Year",
+    "years": "Years",
+    "quarter": "Quarter",
+    "month": "Month",
+    "week": "Week"
   },
   "validation": {
     "required": "This field is required",
@@ -1201,7 +1214,7 @@
     "progress": "Progress",
     "type": "Type",
     "nextHearing": "Next Hearing",
-    "claimAmount": "Claim Amount",
+    "claimAmount": "Amount (SAR)",
     "caseNumber": "Case Number",
     "details": "Details",
     "viewAll": "View All Cases",
@@ -1261,7 +1274,6 @@
     "addClaimDescription": "Add a new claim to the case",
     "claimType": "Claim Type",
     "selectClaimType": "Select claim type",
-    "claimAmount": "Amount (SAR)",
     "claimPeriod": "Period (optional)",
     "claimPeriodPlaceholder": "e.g., January 2024 - March 2024",
     "claimDescription": "Description (optional)",
@@ -1481,75 +1493,28 @@
       "validationContentRequired": "Please enter document content"
     }
   },
-  "common": {
-    "search": "Search",
-    "loading": "Loading...",
-    "uploading": "Uploading...",
-    "submit": "Submit",
-    "cancel": "Cancel",
-    "delete": "Delete",
-    "edit": "Edit",
-    "save": "Save",
-    "close": "Close",
-    "add": "Add",
-    "create": "Create",
-    "update": "Update",
-    "remove": "Remove",
-    "confirm": "Confirm",
-    "yes": "Yes",
-    "no": "No",
-    "view": "View",
-    "export": "Export",
-    "import": "Import",
-    "filter": "Filter",
-    "sort": "Sort",
-    "actions": "Actions",
-    "sar": "SAR",
-    "retry": "Retry",
-    "unknownError": "Unknown error",
-    "preview": "Preview",
-    "download": "Download",
-    "warning": "Warning",
-    "openInNewTab": "Open in New Tab",
-    "selectFile": "Select File",
-    "all": "All",
-    "viewDetails": "View Details",
-    "serverError": "Unable to connect to server",
-    "year": "Year",
-    "years": "Years",
-    "quarter": "Quarter",
-    "month": "Month",
-    "week": "Week"
-  },
   "hrAnalytics": {
     "title": "HR Analytics",
-    "insights": "Analytics Insights",
-    "avgSalary": "Average Salary",
-    "avgTenure": "Average Tenure",
-    "turnoverRate": "Turnover Rate",
+    "insights": "HR Insights",
     "totalEmployees": "Total Employees",
-    "departmentBreakdown": "Department Breakdown",
+    "turnoverRate": "Turnover Rate",
+    "avgTenure": "Average Tenure",
+    "avgSalary": "Average Salary",
     "headcountTrends": "Headcount Trends",
-    "salaryDistribution": "Salary Distribution",
-    "ageDistribution": "Age Distribution",
-    "genderDistribution": "Gender Distribution",
-    "performanceOverview": "Performance Overview",
+    "departmentBreakdown": "Department Breakdown",
+    "attendance": "Attendance",
     "attendanceRate": "Attendance Rate",
-    "leaveUtilization": "Leave Utilization",
-    "trainingCompletion": "Training Completion",
-    "retentionRate": "Retention Rate",
-    "newHires": "New Hires",
-    "terminations": "Terminations",
-    "promotions": "Promotions",
-    "averageAge": "Average Age",
-    "experienceLevel": "Experience Level",
-    "educationLevel": "Education Level",
-    "skillsGap": "Skills Gap",
-    "diversityMetrics": "Diversity Metrics",
-    "costPerHire": "Cost Per Hire",
-    "timeToFill": "Time to Fill",
-    "employeeSatisfaction": "Employee Satisfaction",
-    "productivityIndex": "Productivity Index"
+    "lateArrivals": "Late Arrivals",
+    "absences": "Absences",
+    "performance": "Performance",
+    "avgScore": "Average Score",
+    "diversity": "Diversity",
+    "genderDistribution": "Gender Distribution",
+    "ageDistribution": "Age Distribution",
+    "payrollOverview": "Payroll Overview",
+    "totalPayroll": "Total Payroll",
+    "medianSalary": "Median Salary",
+    "ytdGrowth": "YTD Growth"
   },
   "clients": {
     "title": "Client Management",
@@ -2794,36 +2759,36 @@
   "otpLogin": {
     "title": "Sign In",
     "subtitle": "Enter your email to receive a verification code",
-    "verifyTitle": "Verify Email",
+    "verifyTitle": "Email Verification",
     "verifySubtitle": "Enter the code sent to {{email}}",
     "email": "Email",
-    "enterOtp": "Enter verification code",
     "sendOtp": "Send Verification Code",
-    "verify": "Verify",
     "sending": "Sending...",
-    "verifying": "Verifying...",
     "waitSeconds": "Wait {{seconds}} seconds",
-    "otpSent": "Verification code sent to your email",
-    "otpResent": "Verification code resent",
-    "success": "Login successful",
-    "changeEmail": "Change email",
-    "didntReceive": "Didn't receive the code?",
-    "resend": "Resend code",
-    "resendIn": "Resend in {{seconds}} seconds",
-    "attemptsLeft": "Attempts left: {{count}}",
     "or": "or",
     "usePassword": "Sign in with password",
-    "termsPrefix": "By signing in, you agree to our",
+    "changeEmail": "Change Email",
+    "enterOtp": "Enter Verification Code",
+    "verify": "Verify",
+    "verifying": "Verifying...",
+    "didntReceive": "Didn't receive the code?",
+    "resend": "Resend Code",
+    "resendIn": "Resend in {{seconds}} seconds",
+    "attemptsLeft": "Attempts left: {{count}}",
+    "termsPrefix": "By signing in, you agree to",
     "terms": "Terms of Service",
     "and": "and",
     "privacy": "Privacy Policy",
     "noAccount": "Don't have an account?",
-    "signUp": "Create account",
+    "signUp": "Create New Account",
+    "otpSent": "Verification code sent to your email",
+    "otpResent": "Verification code resent",
+    "success": "Signed in successfully",
     "errors": {
       "emailRequired": "Email is required",
       "invalidEmail": "Invalid email address",
-      "otpRequired": "Please enter the 6-digit code",
-      "invalidOtp": "Invalid code. Attempts left: {{attemptsLeft}}",
+      "otpRequired": "Please enter the 6-digit verification code",
+      "invalidOtp": "Invalid verification code. Attempts left: {{attemptsLeft}}",
       "noAttemptsLeft": "No attempts left. Please request a new code",
       "rateLimited": "Please wait {{waitTime}} seconds",
       "sendFailed": "Failed to send verification code",
@@ -3050,46 +3015,6 @@
     "signOut": "Sign Out",
     "helpText": "If you believe this is an error, please contact technical support"
   },
-  "otpLogin": {
-    "title": "Sign In",
-    "subtitle": "Enter your email to receive a verification code",
-    "verifyTitle": "Email Verification",
-    "verifySubtitle": "Enter the code sent to {{email}}",
-    "email": "Email",
-    "sendOtp": "Send Verification Code",
-    "sending": "Sending...",
-    "waitSeconds": "Wait {{seconds}} seconds",
-    "or": "or",
-    "usePassword": "Sign in with password",
-    "changeEmail": "Change Email",
-    "enterOtp": "Enter Verification Code",
-    "verify": "Verify",
-    "verifying": "Verifying...",
-    "didntReceive": "Didn't receive the code?",
-    "resend": "Resend Code",
-    "resendIn": "Resend in {{seconds}} seconds",
-    "attemptsLeft": "Attempts left: {{count}}",
-    "termsPrefix": "By signing in, you agree to",
-    "terms": "Terms of Service",
-    "and": "and",
-    "privacy": "Privacy Policy",
-    "noAccount": "Don't have an account?",
-    "signUp": "Create New Account",
-    "otpSent": "Verification code sent to your email",
-    "otpResent": "Verification code resent",
-    "success": "Signed in successfully",
-    "errors": {
-      "emailRequired": "Email is required",
-      "invalidEmail": "Invalid email address",
-      "otpRequired": "Please enter the 6-digit verification code",
-      "invalidOtp": "Invalid verification code. Attempts left: {{attemptsLeft}}",
-      "noAttemptsLeft": "No attempts left. Please request a new code",
-      "rateLimited": "Please wait {{waitTime}} seconds",
-      "sendFailed": "Failed to send verification code",
-      "verifyFailed": "Failed to verify code",
-      "resendFailed": "Failed to resend code"
-    }
-  },
   "leads": {
     "title": "Lead Management",
     "management": "Lead Management",
@@ -3229,29 +3154,6 @@
       "device_error": "Device Error"
     }
   },
-  "hrAnalytics": {
-    "title": "HR Analytics",
-    "insights": "HR Insights",
-    "totalEmployees": "Total Employees",
-    "turnoverRate": "Turnover Rate",
-    "avgTenure": "Average Tenure",
-    "avgSalary": "Average Salary",
-    "headcountTrends": "Headcount Trends",
-    "departmentBreakdown": "Department Breakdown",
-    "attendance": "Attendance",
-    "attendanceRate": "Attendance Rate",
-    "lateArrivals": "Late Arrivals",
-    "absences": "Absences",
-    "performance": "Performance",
-    "avgScore": "Average Score",
-    "diversity": "Diversity",
-    "genderDistribution": "Gender Distribution",
-    "ageDistribution": "Age Distribution",
-    "payrollOverview": "Payroll Overview",
-    "totalPayroll": "Total Payroll",
-    "medianSalary": "Median Salary",
-    "ytdGrowth": "YTD Growth"
-  },
   "hrPredictions": {
     "title": "AI Predictions",
     "subtitle": "AI-powered analytics for predicting workforce future",
@@ -3387,6 +3289,277 @@
       "hasLowercase": "At least 1 lowercase letter",
       "hasNumber": "At least 1 number",
       "hasSpecialChar": "At least 1 special character (!@#$%^&*)"
+    }
+  },
+  "pdfTemplates": {
+    "title": "PDF Templates",
+    "description": "Manage PDF templates for documents and reports",
+    "addNew": "New Template",
+    "createTemplate": "Create Template",
+    "editTemplate": "Edit Template",
+    "deleteTemplate": "Delete Template",
+    "duplicateTemplate": "Duplicate Template",
+    "previewTemplate": "Preview Template",
+    "openDesigner": "Open Designer",
+    "setAsDefault": "Set as Default",
+    "removeDefault": "Remove Default",
+    "categories": {
+      "invoice": "Invoice",
+      "contract": "Contract",
+      "receipt": "Receipt",
+      "report": "Report",
+      "letter": "Letter",
+      "certificate": "Certificate",
+      "agreement": "Agreement",
+      "proposal": "Proposal",
+      "quotation": "Quotation",
+      "statement": "Statement",
+      "form": "Form",
+      "label": "Label",
+      "badge": "Badge",
+      "ticket": "Ticket",
+      "other": "Other"
+    },
+    "types": {
+      "standard": "Standard",
+      "detailed": "Detailed",
+      "summary": "Summary",
+      "simplified": "Simplified",
+      "professional": "Professional",
+      "basic": "Basic",
+      "advanced": "Advanced",
+      "custom": "Custom"
+    },
+    "table": {
+      "columns": {
+        "name": "Template Name",
+        "category": "Category",
+        "type": "Type",
+        "isDefault": "Default",
+        "isActive": "Active",
+        "createdAt": "Created Date",
+        "updatedAt": "Updated Date",
+        "createdBy": "Created By",
+        "actions": "Actions"
+      },
+      "filters": {
+        "all": "All Templates",
+        "active": "Active",
+        "inactive": "Inactive",
+        "default": "Default Templates",
+        "custom": "Custom Templates",
+        "byCategory": "Filter by Category",
+        "byType": "Filter by Type",
+        "search": "Search templates..."
+      }
+    },
+    "form": {
+      "labels": {
+        "name": "Template Name",
+        "description": "Description",
+        "category": "Category",
+        "type": "Type",
+        "isDefault": "Set as Default Template",
+        "isActive": "Active Status",
+        "design": "Template Design",
+        "schema": "Data Schema",
+        "basedOn": "Based on Template"
+      },
+      "placeholders": {
+        "name": "Enter template name",
+        "description": "Enter template description",
+        "category": "Select category",
+        "type": "Select type",
+        "basedOn": "Select template to duplicate"
+      },
+      "hints": {
+        "name": "Choose a descriptive name for your template",
+        "description": "Brief description of template usage and purpose",
+        "isDefault": "Default templates are automatically selected for this category",
+        "isActive": "Inactive templates won't appear in selection lists",
+        "design": "Configure the visual layout and design of your template",
+        "schema": "Define the data structure for this template"
+      },
+      "validation": {
+        "nameRequired": "Template name is required",
+        "nameMinLength": "Name must be at least 3 characters",
+        "nameMaxLength": "Name must not exceed 100 characters",
+        "categoryRequired": "Category is required",
+        "typeRequired": "Type is required",
+        "designRequired": "Template design is required",
+        "schemaRequired": "Data schema is required",
+        "invalidJson": "Invalid JSON format"
+      }
+    },
+    "actions": {
+      "create": "Create",
+      "edit": "Edit",
+      "delete": "Delete",
+      "duplicate": "Duplicate",
+      "preview": "Preview",
+      "download": "Download",
+      "export": "Export",
+      "import": "Import",
+      "designer": "Design",
+      "save": "Save Template",
+      "cancel": "Cancel",
+      "confirm": "Confirm",
+      "activate": "Activate",
+      "deactivate": "Deactivate"
+    },
+    "dialogs": {
+      "create": {
+        "title": "Create New Template",
+        "description": "Create a new PDF template from scratch or based on existing template"
+      },
+      "edit": {
+        "title": "Edit Template",
+        "description": "Modify template settings and design"
+      },
+      "delete": {
+        "title": "Delete Template",
+        "description": "Are you sure you want to delete this template? This action cannot be undone.",
+        "warning": "This template is currently set as default. Deleting it will affect document generation."
+      },
+      "duplicate": {
+        "title": "Duplicate Template",
+        "description": "Create a copy of this template with a new name"
+      },
+      "setDefault": {
+        "title": "Set as Default Template",
+        "description": "Set this template as the default for {category} category?",
+        "warning": "This will replace the current default template."
+      },
+      "removeDefault": {
+        "title": "Remove Default Status",
+        "description": "Remove default status from this template?"
+      },
+      "deactivate": {
+        "title": "Deactivate Template",
+        "description": "Deactivating this template will hide it from selection lists. Continue?"
+      },
+      "importTemplate": {
+        "title": "Import Template",
+        "description": "Import template from JSON file"
+      },
+      "exportTemplate": {
+        "title": "Export Template",
+        "description": "Export template as JSON file"
+      }
+    },
+    "designer": {
+      "title": "Template Designer",
+      "loading": "Loading designer...",
+      "saving": "Saving template...",
+      "toolbar": {
+        "undo": "Undo",
+        "redo": "Redo",
+        "zoom": "Zoom",
+        "grid": "Grid",
+        "rulers": "Rulers",
+        "preview": "Preview",
+        "save": "Save"
+      },
+      "panels": {
+        "elements": "Elements",
+        "properties": "Properties",
+        "data": "Data Fields",
+        "styles": "Styles"
+      },
+      "elements": {
+        "text": "Text",
+        "image": "Image",
+        "table": "Table",
+        "line": "Line",
+        "rectangle": "Rectangle",
+        "barcode": "Barcode",
+        "qrcode": "QR Code"
+      },
+      "properties": {
+        "position": "Position",
+        "size": "Size",
+        "font": "Font",
+        "color": "Color",
+        "alignment": "Alignment",
+        "border": "Border",
+        "background": "Background"
+      }
+    },
+    "messages": {
+      "success": {
+        "created": "Template created successfully",
+        "updated": "Template updated successfully",
+        "deleted": "Template deleted successfully",
+        "duplicated": "Template duplicated successfully",
+        "setDefault": "Template set as default successfully",
+        "removeDefault": "Default status removed successfully",
+        "activated": "Template activated successfully",
+        "deactivated": "Template deactivated successfully",
+        "imported": "Template imported successfully",
+        "exported": "Template exported successfully"
+      },
+      "error": {
+        "createFailed": "Failed to create template",
+        "updateFailed": "Failed to update template",
+        "deleteFailed": "Failed to delete template",
+        "duplicateFailed": "Failed to duplicate template",
+        "loadFailed": "Failed to load template",
+        "loadListFailed": "Failed to load templates list",
+        "setDefaultFailed": "Failed to set template as default",
+        "removeDefaultFailed": "Failed to remove default status",
+        "activateFailed": "Failed to activate template",
+        "deactivateFailed": "Failed to deactivate template",
+        "importFailed": "Failed to import template",
+        "exportFailed": "Failed to export template",
+        "designerLoadFailed": "Failed to load template designer",
+        "designerSaveFailed": "Failed to save template design",
+        "invalidFile": "Invalid file format",
+        "networkError": "Network error. Please check your connection.",
+        "unauthorized": "You don't have permission to perform this action",
+        "notFound": "Template not found",
+        "alreadyExists": "A template with this name already exists"
+      },
+      "info": {
+        "noTemplates": "No templates found",
+        "designerUnsavedChanges": "You have unsaved changes. Save before leaving?",
+        "selectTemplate": "Select a template to view details"
+      }
+    },
+    "empty": {
+      "title": "No Templates Yet",
+      "description": "Get started by creating your first PDF template",
+      "createButton": "Create First Template",
+      "noResults": {
+        "title": "No Templates Found",
+        "description": "Try adjusting your filters or search criteria"
+      }
+    },
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive",
+      "default": "Default",
+      "custom": "Custom"
+    },
+    "tooltips": {
+      "edit": "Edit template settings",
+      "delete": "Delete this template",
+      "duplicate": "Create a copy of this template",
+      "preview": "Preview template output",
+      "designer": "Open in template designer",
+      "setDefault": "Set as default for category",
+      "removeDefault": "Remove default status",
+      "activate": "Activate this template",
+      "deactivate": "Deactivate this template",
+      "download": "Download template file",
+      "export": "Export template as JSON",
+      "import": "Import template from file"
+    },
+    "breadcrumb": {
+      "home": "Home",
+      "templates": "Templates",
+      "create": "Create",
+      "edit": "Edit",
+      "designer": "Designer"
     }
   }
 }

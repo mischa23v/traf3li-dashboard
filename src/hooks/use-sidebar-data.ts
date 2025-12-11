@@ -298,6 +298,11 @@ export function useSidebarData(): SidebarData {
               module: 'invoices',
             },
             {
+              title: 'sidebar.nav.pdfTemplates',
+              url: '/dashboard/pdf-templates',
+              module: 'documents',
+            },
+            {
               title: 'sidebar.nav.payments',
               url: '/dashboard/finance/payments',
               module: 'payments',
