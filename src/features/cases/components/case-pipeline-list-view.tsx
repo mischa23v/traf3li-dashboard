@@ -162,10 +162,19 @@ export function CasePipelineListView() {
 
   // Navigation handlers
   const handleOpenPipeline = (caseId: string) => {
+    console.log('[CasePipelineListView] 🚀 Opening pipeline for case:', {
+      caseId,
+      navigateTo: `/dashboard/cases/${caseId}/pipeline`,
+      timestamp: new Date().toISOString(),
+    })
     navigate({ to: `/dashboard/cases/${caseId}/pipeline` as any })
   }
 
   const handleViewCase = (caseId: string) => {
+    console.log('[CasePipelineListView] 🚀 Opening case details:', {
+      caseId,
+      navigateTo: `/dashboard/cases/${caseId}`,
+    })
     navigate({ to: `/dashboard/cases/${caseId}` as any })
   }
 

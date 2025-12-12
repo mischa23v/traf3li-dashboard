@@ -103,6 +103,15 @@ export function CasePipelineDetailView() {
   // Get caseId from URL params
   const caseId = (params as { caseId?: string }).caseId || ''
 
+  // DEBUG: Log params and caseId
+  console.log('[CasePipelineDetailView] 🔍 Component mounted:', {
+    rawParams: params,
+    extractedCaseId: caseId,
+    url: window.location.href,
+    pathname: window.location.pathname,
+    timestamp: new Date().toISOString(),
+  })
+
   // State
   const [endCaseDialogOpen, setEndCaseDialogOpen] = useState(false)
   const [endOutcome, setEndOutcome] = useState<string>('settled')
@@ -113,12 +122,30 @@ export function CasePipelineDetailView() {
   // Clear cache for this specific case when component mounts to ensure fresh data
   useEffect(() => {
     if (caseId) {
+      console.log('[CasePipelineDetailView] 🧹 Clearing cache for:', `/cases/${caseId}`)
       clearCache(`/cases/${caseId}`)
     }
   }, [caseId])
 
   // Fetch case data
   const { data: selectedCase, isLoading, isError, error, refetch, isFetching } = useCase(caseId)
+
+  // DEBUG: Log fetch results
+  useEffect(() => {
+    console.log('[CasePipelineDetailView] 📊 Fetch state:', {
+      caseId,
+      isLoading,
+      isError,
+      isFetching,
+      hasData: !!selectedCase,
+      caseTitle: selectedCase?.title,
+      error: error ? {
+        message: (error as any)?.message,
+        status: (error as any)?.status,
+        fullError: error,
+      } : null,
+    })
+  }, [caseId, isLoading, isError, isFetching, selectedCase, error])
   const { mutate: updateCase, isPending: isUpdatingCase } = useUpdateCase()
 
   // Get current pipeline configuration
