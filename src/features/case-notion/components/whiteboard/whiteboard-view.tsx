@@ -6,7 +6,7 @@
  * - BlockDetailPanel (right, conditional)
  */
 
-import { useState, useCallback, useEffect } from 'react'
+import { useState, useCallback, useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
@@ -45,6 +45,16 @@ export function WhiteboardView({ caseId, pageId, readOnly }: WhiteboardViewProps
   const [localBlocks, setLocalBlocks] = useState<Block[]>([])
   const [localConnections, setLocalConnections] = useState<BlockConnection[]>([])
 
+  // Refs for debouncing and tracking pending updates
+  const pendingMoveUpdates = useRef<Map<string, { x: number; y: number; timeout: NodeJS.Timeout }>>(new Map())
+  const pendingResizeUpdates = useRef<Map<string, { width: number; height: number; timeout: NodeJS.Timeout }>>(new Map())
+  const connectionsRef = useRef<BlockConnection[]>([])
+
+  // Keep connectionsRef in sync
+  useEffect(() => {
+    connectionsRef.current = localConnections
+  }, [localConnections])
+
   // Fetch page data
   const { data: page, isLoading: pageLoading } = useCaseNotionPage(caseId, pageId)
   const { data: blocksData, isLoading: blocksLoading } = useCaseNotionBlocks(caseId, pageId)
@@ -79,64 +89,82 @@ export function WhiteboardView({ caseId, pageId, readOnly }: WhiteboardViewProps
     }
   }, [])
 
-  // Handle block move
+  // Handle block move - DEBOUNCED to prevent continuous API calls during drag
   const handleBlockMove = useCallback(
-    async (blockId: string, x: number, y: number) => {
-      // Optimistic update
+    (blockId: string, x: number, y: number) => {
+      // Optimistic update (immediate)
       setLocalBlocks((prev) =>
         prev.map((block) =>
           block._id === blockId ? { ...block, canvasX: x, canvasY: y } : block
         )
       )
 
-      // Update on server
-      try {
-        await updateBlock.mutateAsync({
-          caseId,
-          pageId,
-          blockId,
-          data: {
-            properties: {
+      // Clear any pending update for this block
+      const pending = pendingMoveUpdates.current.get(blockId)
+      if (pending) {
+        clearTimeout(pending.timeout)
+      }
+
+      // Debounce server update - only update after 300ms of no movement
+      const timeout = setTimeout(async () => {
+        pendingMoveUpdates.current.delete(blockId)
+        try {
+          await updateBlock.mutateAsync({
+            caseId,
+            pageId,
+            blockId,
+            data: {
               canvasX: x,
               canvasY: y,
             },
-          },
-        })
-      } catch (error) {
-        console.error('Failed to update block position:', error)
-        toast.error(t('whiteboard.moveError', 'Failed to move block'))
-      }
+          })
+        } catch (error) {
+          console.error('Failed to update block position:', error)
+          toast.error(t('whiteboard.moveError', 'Failed to move block'))
+        }
+      }, 300)
+
+      pendingMoveUpdates.current.set(blockId, { x, y, timeout })
     },
     [caseId, pageId, updateBlock, t]
   )
 
-  // Handle block resize
+  // Handle block resize - DEBOUNCED to prevent continuous API calls during drag
   const handleBlockResize = useCallback(
-    async (blockId: string, width: number, height: number) => {
-      // Optimistic update
+    (blockId: string, width: number, height: number) => {
+      // Optimistic update (immediate)
       setLocalBlocks((prev) =>
         prev.map((block) =>
           block._id === blockId ? { ...block, canvasWidth: width, canvasHeight: height } : block
         )
       )
 
-      // Update on server
-      try {
-        await updateBlock.mutateAsync({
-          caseId,
-          pageId,
-          blockId,
-          data: {
-            properties: {
+      // Clear any pending update for this block
+      const pending = pendingResizeUpdates.current.get(blockId)
+      if (pending) {
+        clearTimeout(pending.timeout)
+      }
+
+      // Debounce server update - only update after 300ms of no resizing
+      const timeout = setTimeout(async () => {
+        pendingResizeUpdates.current.delete(blockId)
+        try {
+          await updateBlock.mutateAsync({
+            caseId,
+            pageId,
+            blockId,
+            data: {
               canvasWidth: width,
               canvasHeight: height,
             },
-          },
-        })
-      } catch (error) {
-        console.error('Failed to update block size:', error)
-        toast.error(t('whiteboard.resizeError', 'Failed to resize block'))
-      }
+          })
+        } catch (error) {
+          console.error('Failed to update block size:', error)
+          toast.error(t('whiteboard.resizeError', 'Failed to resize block'))
+        }
+      }, 300)
+
+      pendingResizeUpdates.current.set(blockId, { width, height, timeout })
     },
     [caseId, pageId, updateBlock, t]
   )
@@ -214,11 +242,14 @@ export function WhiteboardView({ caseId, pageId, readOnly }: WhiteboardViewProps
     [caseId, pageId, deleteBlock, selectedBlock, t]
   )
 
-  // Handle connection creation
+  // Handle connection creation - FIXED: Uses ref to avoid stale closure
   const handleConnectionCreate = useCallback(
     async (sourceId: string, targetId: string) => {
+      // Use ref for current connections to avoid stale closure
+      const currentConnections = connectionsRef.current
+
       // Check if connection already exists
-      const exists = localConnections.some(
+      const exists = currentConnections.some(
         (conn) =>
           (conn.sourceBlockId === sourceId && conn.targetBlockId === targetId) ||
           (conn.sourceBlockId === targetId && conn.targetBlockId === sourceId)
@@ -240,14 +271,14 @@ export function WhiteboardView({ caseId, pageId, readOnly }: WhiteboardViewProps
       // Optimistic update
       setLocalConnections((prev) => [...prev, newConnection])
 
-      // Update page with new connections
+      // Update page with new connections - use functional update pattern
       try {
         await updatePage.mutateAsync({
           caseId,
           pageId,
           data: {
             // @ts-ignore - connections field exists but may not be typed
-            connections: [...localConnections, newConnection],
+            connections: [...currentConnections, newConnection],
           },
         })
         toast.success(t('whiteboard.connectionCreated', 'Connection created'))
@@ -257,12 +288,15 @@ export function WhiteboardView({ caseId, pageId, readOnly }: WhiteboardViewProps
         toast.error(t('whiteboard.connectionError', 'Failed to create connection'))
       }
     },
-    [caseId, pageId, localConnections, updatePage, t]
+    [caseId, pageId, updatePage, t]
   )
 
-  // Handle connection deletion
+  // Handle connection deletion - FIXED: Uses ref to avoid stale closure
   const handleConnectionDelete = useCallback(
     async (connectionId: string) => {
+      // Use ref for current connections to avoid stale closure
+      const currentConnections = connectionsRef.current
+
       // Optimistic update
       setLocalConnections((prev) => prev.filter((conn) => conn._id !== connectionId))
 
@@ -273,7 +307,7 @@ export function WhiteboardView({ caseId, pageId, readOnly }: WhiteboardViewProps
           pageId,
           data: {
             // @ts-ignore
-            connections: localConnections.filter((c) => c._id !== connectionId),
+            connections: currentConnections.filter((c) => c._id !== connectionId),
           },
         })
         toast.success(t('whiteboard.connectionDeleted', 'Connection deleted'))
@@ -284,7 +318,7 @@ export function WhiteboardView({ caseId, pageId, readOnly }: WhiteboardViewProps
         queryClient.invalidateQueries({ queryKey: caseNotionKeys.page(caseId, pageId) })
       }
     },
-    [caseId, pageId, localConnections, updatePage, queryClient, t]
+    [caseId, pageId, updatePage, queryClient, t]
   )
 
   // Handle whiteboard config change

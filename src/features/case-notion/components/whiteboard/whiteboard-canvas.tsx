@@ -232,9 +232,12 @@ export function WhiteboardCanvas({
     ]
   )
 
-  // Handle canvas mouse up
+  // Handle canvas mouse up - works with both React events and native events
   const handleCanvasMouseUp = useCallback(
-    (e: ReactMouseEvent) => {
+    (e: ReactMouseEvent | MouseEvent) => {
+      const wasPanning = isPanning
+      const wasDragging = draggingBlockId !== null
+
       setIsPanning(false)
       setDraggingBlockId(null)
 
@@ -255,7 +258,7 @@ export function WhiteboardCanvas({
       }
 
       // Save pan position
-      if (isPanning) {
+      if (wasPanning) {
         onConfigChange({ panX, panY })
       }
     },
@@ -264,16 +267,21 @@ export function WhiteboardCanvas({
       connectionStart,
       onConnectionCreate,
       isPanning,
+      draggingBlockId,
       panX,
       panY,
       onConfigChange,
     ]
   )
 
-  // Handle block drag start
+  // Handle block drag start - CRITICAL: Uses document-level events like tldraw/excalidraw
   const handleBlockDragStart = useCallback(
     (blockId: string, e: ReactMouseEvent) => {
       if (readOnly) return
+
+      // Prevent default and stop propagation to avoid conflicts
+      e.preventDefault()
+      e.stopPropagation()
 
       const block = blocks.find((b) => b._id === blockId)
       if (!block) return
@@ -353,6 +361,85 @@ export function WhiteboardCanvas({
     setPanY(0)
     onConfigChange({ zoom: 1, panX: 0, panY: 0 })
   }, [onConfigChange])
+
+  // CRITICAL: Document-level event listeners for drag operations
+  // This pattern is used by tldraw, excalidraw, ReactFlow, dnd-kit
+  // Ensures drag continues even when cursor leaves the canvas
+  useEffect(() => {
+    if (!draggingBlockId && !isPanning && !isDrawingConnection) return
+
+    const handleDocumentMouseMove = (e: MouseEvent) => {
+      if (isPanning) {
+        setPanX(e.clientX - panStart.x)
+        setPanY(e.clientY - panStart.y)
+        return
+      }
+
+      if (draggingBlockId) {
+        const dx = (e.clientX - dragStart.x) / zoom
+        const dy = (e.clientY - dragStart.y) / zoom
+        const newX = snapToGrid(dragBlockStart.x + dx)
+        const newY = snapToGrid(dragBlockStart.y + dy)
+        onBlockMove(draggingBlockId, newX, newY)
+        return
+      }
+
+      if (isDrawingConnection) {
+        const { x, y } = screenToCanvas(e.clientX, e.clientY)
+        setConnectionEnd({ x, y })
+      }
+    }
+
+    const handleDocumentMouseUp = (e: MouseEvent) => {
+      if (isDrawingConnection && connectionStart) {
+        // Check if we're over a block to complete the connection
+        const target = e.target as HTMLElement
+        const blockElement = target.closest('[data-block-id]')
+        if (blockElement) {
+          const targetBlockId = blockElement.getAttribute('data-block-id')
+          if (targetBlockId && targetBlockId !== connectionStart) {
+            onConnectionCreate(connectionStart, targetBlockId)
+          }
+        }
+      }
+
+      // Save config if we were panning
+      if (isPanning) {
+        onConfigChange({ panX, panY })
+      }
+
+      setIsPanning(false)
+      setDraggingBlockId(null)
+      setIsDrawingConnection(false)
+      setConnectionStart(null)
+      setConnectionEnd(null)
+    }
+
+    // Attach to document for reliable drag tracking
+    document.addEventListener('mousemove', handleDocumentMouseMove)
+    document.addEventListener('mouseup', handleDocumentMouseUp)
+
+    return () => {
+      document.removeEventListener('mousemove', handleDocumentMouseMove)
+      document.removeEventListener('mouseup', handleDocumentMouseUp)
+    }
+  }, [
+    draggingBlockId,
+    isPanning,
+    isDrawingConnection,
+    connectionStart,
+    panStart,
+    dragStart,
+    dragBlockStart,
+    zoom,
+    snapToGrid,
+    onBlockMove,
+    screenToCanvas,
+    onConnectionCreate,
+    onConfigChange,
+    panX,
+    panY,
+  ])
 
   // Keyboard shortcuts
   useEffect(() => {

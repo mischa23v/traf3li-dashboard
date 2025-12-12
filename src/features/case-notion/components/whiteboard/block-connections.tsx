@@ -212,7 +212,7 @@ export function BlockConnections({
       style={{ width: '100%', height: '100%' }}
     >
       <defs>
-        {/* Arrow marker */}
+        {/* Arrow marker - Using direct fill colors instead of Tailwind classes for SVG compatibility */}
         <marker
           id="arrowhead"
           markerWidth="10"
@@ -221,7 +221,7 @@ export function BlockConnections({
           refY="3.5"
           orient="auto"
         >
-          <polygon points="0 0, 10 3.5, 0 7" fill="currentColor" className="text-slate-400" />
+          <polygon points="0 0, 10 3.5, 0 7" fill="#94a3b8" />
         </marker>
 
         <marker
@@ -232,7 +232,7 @@ export function BlockConnections({
           refY="3.5"
           orient="auto"
         >
-          <polygon points="0 0, 10 3.5, 0 7" fill="currentColor" className="text-emerald-500" />
+          <polygon points="0 0, 10 3.5, 0 7" fill="#10b981" />
         </marker>
 
         <marker
@@ -243,7 +243,7 @@ export function BlockConnections({
           refY="3.5"
           orient="auto"
         >
-          <polygon points="0 0, 10 3.5, 0 7" fill="currentColor" className="text-emerald-600" />
+          <polygon points="0 0, 10 3.5, 0 7" fill="#059669" />
         </marker>
 
         {/* Bidirectional arrow */}
@@ -255,7 +255,7 @@ export function BlockConnections({
           refY="3.5"
           orient="auto-start-reverse"
         >
-          <polygon points="10 0, 0 3.5, 10 7" fill="currentColor" className="text-slate-400" />
+          <polygon points="10 0, 0 3.5, 10 7" fill="#94a3b8" />
         </marker>
       </defs>
 
