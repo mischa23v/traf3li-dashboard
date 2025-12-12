@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react'
-import { Link, useParams } from '@tanstack/react-router'
+import { Link, useParams, Outlet, useLocation } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 import {
   FileText,
@@ -200,6 +200,15 @@ export function CaseDetailsView() {
   const [deleteDocId, setDeleteDocId] = useState<string | null>(null)
 
   const { caseId } = useParams({ strict: false }) as { caseId: string }
+  const location = useLocation()
+
+  // Check if we're on a child route (pipeline or notion)
+  const isChildRoute = location.pathname.includes('/pipeline') || location.pathname.includes('/notion')
+
+  // If on child route, just render the child component via Outlet
+  if (isChildRoute) {
+    return <Outlet />
+  }
 
   // Queries
   const { data: caseData, isLoading, isError, error, refetch } = useCase(caseId)
