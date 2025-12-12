@@ -74,9 +74,11 @@ export function WhiteboardView({ caseId, pageId, readOnly }: WhiteboardViewProps
   const deleteBlock = useDeleteBlock()
   const updatePage = useUpdateCaseNotionPage()
 
-  // Sync blocks from server
+  // Sync blocks from server - FIX: Check array length, not just existence (empty array is truthy)
   useEffect(() => {
-    const blocks = page?.blocks || blocksData || []
+    const blocks = (page?.blocks && page.blocks.length > 0)
+      ? page.blocks
+      : (blocksData || [])
     setLocalBlocks(blocks)
     setLocalConnections(page?.connections || [])
   }, [page?.blocks, blocksData, page?.connections])
@@ -169,7 +171,7 @@ export function WhiteboardView({ caseId, pageId, readOnly }: WhiteboardViewProps
     [caseId, pageId, updateBlock, t]
   )
 
-  // Handle block creation
+  // Handle block creation - FIX: Send canvas positions at TOP LEVEL, not in properties
   const handleBlockCreate = useCallback(
     async (x: number, y: number) => {
       try {
@@ -180,12 +182,11 @@ export function WhiteboardView({ caseId, pageId, readOnly }: WhiteboardViewProps
             pageId,
             type: 'text',
             content: [],
-            properties: {
-              canvasX: x,
-              canvasY: y,
-              canvasWidth: 200,
-              canvasHeight: 150,
-            },
+            // Canvas positions at TOP LEVEL (matching Block schema)
+            canvasX: x,
+            canvasY: y,
+            canvasWidth: 200,
+            canvasHeight: 150,
           },
         })
 
@@ -415,6 +416,7 @@ export function WhiteboardView({ caseId, pageId, readOnly }: WhiteboardViewProps
           : 'linkedDocumentId'
 
       try {
+        // FIX: Send canvas positions at TOP LEVEL, not in properties
         const newBlock = await createBlock.mutateAsync({
           caseId,
           pageId,
@@ -422,13 +424,12 @@ export function WhiteboardView({ caseId, pageId, readOnly }: WhiteboardViewProps
             pageId,
             type: 'text',
             content,
-            properties: {
-              canvasX: x,
-              canvasY: y,
-              canvasWidth: 200,
-              canvasHeight: 150,
-              [linkField]: data._id,
-            },
+            // Canvas positions at TOP LEVEL (matching Block schema)
+            canvasX: x,
+            canvasY: y,
+            canvasWidth: 200,
+            canvasHeight: 150,
+            [linkField]: data._id,
           },
         })
 

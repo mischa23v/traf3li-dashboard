@@ -566,6 +566,19 @@ export const createBlockInputSchema = z.object({
   parentId: z.string().optional(),
   afterBlockId: z.string().optional(), // Insert after this block
   indent: z.number().optional(),
+  // Canvas positioning for whiteboard view (TOP-LEVEL fields)
+  canvasX: z.number().optional(),
+  canvasY: z.number().optional(),
+  canvasWidth: z.number().optional(),
+  canvasHeight: z.number().optional(),
+  // Visual styling
+  blockColor: z.enum(['default', 'red', 'orange', 'yellow', 'green', 'blue', 'purple', 'pink', 'gray']).optional(),
+  priority: z.enum(['low', 'medium', 'high', 'urgent']).optional(),
+  // Links to case entities
+  linkedEventId: z.string().optional(),
+  linkedTaskId: z.string().optional(),
+  linkedHearingId: z.string().optional(),
+  linkedDocumentId: z.string().optional(),
 })
 
 export type CreateBlockInput = z.infer<typeof createBlockInputSchema>
@@ -576,6 +589,19 @@ export const updateBlockInputSchema = z.object({
   type: z.enum(blockTypes).optional(),
   checked: z.boolean().optional(),
   isCollapsed: z.boolean().optional(),
+  // Canvas positioning for whiteboard view (TOP-LEVEL fields)
+  canvasX: z.number().optional(),
+  canvasY: z.number().optional(),
+  canvasWidth: z.number().optional(),
+  canvasHeight: z.number().optional(),
+  // Visual styling
+  blockColor: z.enum(['default', 'red', 'orange', 'yellow', 'green', 'blue', 'purple', 'pink', 'gray']).optional(),
+  priority: z.enum(['low', 'medium', 'high', 'urgent']).optional(),
+  // Links to case entities
+  linkedEventId: z.string().optional(),
+  linkedTaskId: z.string().optional(),
+  linkedHearingId: z.string().optional(),
+  linkedDocumentId: z.string().optional(),
 })
 
 export type UpdateBlockInput = z.infer<typeof updateBlockInputSchema>
