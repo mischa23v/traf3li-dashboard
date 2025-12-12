@@ -249,6 +249,8 @@ import { Route as AuthenticatedDashboardFinanceBillsNewRouteImport } from './rou
 import { Route as AuthenticatedDashboardFinanceBillsBillIdRouteImport } from './routes/_authenticated/dashboard.finance.bills.$billId'
 import { Route as AuthenticatedDashboardFinanceActivityNewRouteImport } from './routes/_authenticated/dashboard.finance.activity.new'
 import { Route as AuthenticatedDashboardFinanceActivityActivityIdRouteImport } from './routes/_authenticated/dashboard.finance.activity.$activityId'
+import { Route as AuthenticatedDashboardCrmWhatsappStartRouteImport } from './routes/_authenticated/dashboard.crm.whatsapp.start'
+import { Route as AuthenticatedDashboardCrmWhatsappNewRouteImport } from './routes/_authenticated/dashboard.crm.whatsapp.new'
 import { Route as AuthenticatedDashboardCrmWhatsappConversationIdRouteImport } from './routes/_authenticated/dashboard.crm.whatsapp.$conversationId'
 import { Route as AuthenticatedDashboardCrmReportsNewRouteImport } from './routes/_authenticated/dashboard.crm.reports.new'
 import { Route as AuthenticatedDashboardCrmReportsReportIdRouteImport } from './routes/_authenticated/dashboard.crm.reports.$reportId'
@@ -1672,6 +1674,18 @@ const AuthenticatedDashboardFinanceActivityActivityIdRoute =
     path: '/dashboard/finance/activity/$activityId',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedDashboardCrmWhatsappStartRoute =
+  AuthenticatedDashboardCrmWhatsappStartRouteImport.update({
+    id: '/dashboard/crm/whatsapp/start',
+    path: '/dashboard/crm/whatsapp/start',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedDashboardCrmWhatsappNewRoute =
+  AuthenticatedDashboardCrmWhatsappNewRouteImport.update({
+    id: '/dashboard/crm/whatsapp/new',
+    path: '/dashboard/crm/whatsapp/new',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedDashboardCrmWhatsappConversationIdRoute =
   AuthenticatedDashboardCrmWhatsappConversationIdRouteImport.update({
     id: '/dashboard/crm/whatsapp/$conversationId',
@@ -1950,6 +1964,8 @@ export interface FileRoutesByFullPath {
   '/dashboard/crm/reports/$reportId': typeof AuthenticatedDashboardCrmReportsReportIdRoute
   '/dashboard/crm/reports/new': typeof AuthenticatedDashboardCrmReportsNewRoute
   '/dashboard/crm/whatsapp/$conversationId': typeof AuthenticatedDashboardCrmWhatsappConversationIdRoute
+  '/dashboard/crm/whatsapp/new': typeof AuthenticatedDashboardCrmWhatsappNewRoute
+  '/dashboard/crm/whatsapp/start': typeof AuthenticatedDashboardCrmWhatsappStartRoute
   '/dashboard/finance/activity/$activityId': typeof AuthenticatedDashboardFinanceActivityActivityIdRouteWithChildren
   '/dashboard/finance/activity/new': typeof AuthenticatedDashboardFinanceActivityNewRoute
   '/dashboard/finance/bills/$billId': typeof AuthenticatedDashboardFinanceBillsBillIdRouteWithChildren
@@ -2216,6 +2232,8 @@ export interface FileRoutesByTo {
   '/dashboard/crm/reports/$reportId': typeof AuthenticatedDashboardCrmReportsReportIdRoute
   '/dashboard/crm/reports/new': typeof AuthenticatedDashboardCrmReportsNewRoute
   '/dashboard/crm/whatsapp/$conversationId': typeof AuthenticatedDashboardCrmWhatsappConversationIdRoute
+  '/dashboard/crm/whatsapp/new': typeof AuthenticatedDashboardCrmWhatsappNewRoute
+  '/dashboard/crm/whatsapp/start': typeof AuthenticatedDashboardCrmWhatsappStartRoute
   '/dashboard/finance/activity/$activityId': typeof AuthenticatedDashboardFinanceActivityActivityIdRouteWithChildren
   '/dashboard/finance/activity/new': typeof AuthenticatedDashboardFinanceActivityNewRoute
   '/dashboard/finance/bills/$billId': typeof AuthenticatedDashboardFinanceBillsBillIdRouteWithChildren
@@ -2487,6 +2505,8 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/crm/reports/$reportId': typeof AuthenticatedDashboardCrmReportsReportIdRoute
   '/_authenticated/dashboard/crm/reports/new': typeof AuthenticatedDashboardCrmReportsNewRoute
   '/_authenticated/dashboard/crm/whatsapp/$conversationId': typeof AuthenticatedDashboardCrmWhatsappConversationIdRoute
+  '/_authenticated/dashboard/crm/whatsapp/new': typeof AuthenticatedDashboardCrmWhatsappNewRoute
+  '/_authenticated/dashboard/crm/whatsapp/start': typeof AuthenticatedDashboardCrmWhatsappStartRoute
   '/_authenticated/dashboard/finance/activity/$activityId': typeof AuthenticatedDashboardFinanceActivityActivityIdRouteWithChildren
   '/_authenticated/dashboard/finance/activity/new': typeof AuthenticatedDashboardFinanceActivityNewRoute
   '/_authenticated/dashboard/finance/bills/$billId': typeof AuthenticatedDashboardFinanceBillsBillIdRouteWithChildren
@@ -2756,6 +2776,8 @@ export interface FileRouteTypes {
     | '/dashboard/crm/reports/$reportId'
     | '/dashboard/crm/reports/new'
     | '/dashboard/crm/whatsapp/$conversationId'
+    | '/dashboard/crm/whatsapp/new'
+    | '/dashboard/crm/whatsapp/start'
     | '/dashboard/finance/activity/$activityId'
     | '/dashboard/finance/activity/new'
     | '/dashboard/finance/bills/$billId'
@@ -3022,6 +3044,8 @@ export interface FileRouteTypes {
     | '/dashboard/crm/reports/$reportId'
     | '/dashboard/crm/reports/new'
     | '/dashboard/crm/whatsapp/$conversationId'
+    | '/dashboard/crm/whatsapp/new'
+    | '/dashboard/crm/whatsapp/start'
     | '/dashboard/finance/activity/$activityId'
     | '/dashboard/finance/activity/new'
     | '/dashboard/finance/bills/$billId'
@@ -3292,6 +3316,8 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/crm/reports/$reportId'
     | '/_authenticated/dashboard/crm/reports/new'
     | '/_authenticated/dashboard/crm/whatsapp/$conversationId'
+    | '/_authenticated/dashboard/crm/whatsapp/new'
+    | '/_authenticated/dashboard/crm/whatsapp/start'
     | '/_authenticated/dashboard/finance/activity/$activityId'
     | '/_authenticated/dashboard/finance/activity/new'
     | '/_authenticated/dashboard/finance/bills/$billId'
@@ -5172,6 +5198,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardFinanceActivityActivityIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/dashboard/crm/whatsapp/start': {
+      id: '/_authenticated/dashboard/crm/whatsapp/start'
+      path: '/dashboard/crm/whatsapp/start'
+      fullPath: '/dashboard/crm/whatsapp/start'
+      preLoaderRoute: typeof AuthenticatedDashboardCrmWhatsappStartRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dashboard/crm/whatsapp/new': {
+      id: '/_authenticated/dashboard/crm/whatsapp/new'
+      path: '/dashboard/crm/whatsapp/new'
+      fullPath: '/dashboard/crm/whatsapp/new'
+      preLoaderRoute: typeof AuthenticatedDashboardCrmWhatsappNewRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/dashboard/crm/whatsapp/$conversationId': {
       id: '/_authenticated/dashboard/crm/whatsapp/$conversationId'
       path: '/dashboard/crm/whatsapp/$conversationId'
@@ -5565,6 +5605,8 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardCrmReportsReportIdRoute: typeof AuthenticatedDashboardCrmReportsReportIdRoute
   AuthenticatedDashboardCrmReportsNewRoute: typeof AuthenticatedDashboardCrmReportsNewRoute
   AuthenticatedDashboardCrmWhatsappConversationIdRoute: typeof AuthenticatedDashboardCrmWhatsappConversationIdRoute
+  AuthenticatedDashboardCrmWhatsappNewRoute: typeof AuthenticatedDashboardCrmWhatsappNewRoute
+  AuthenticatedDashboardCrmWhatsappStartRoute: typeof AuthenticatedDashboardCrmWhatsappStartRoute
   AuthenticatedDashboardFinanceActivityActivityIdRoute: typeof AuthenticatedDashboardFinanceActivityActivityIdRouteWithChildren
   AuthenticatedDashboardFinanceActivityNewRoute: typeof AuthenticatedDashboardFinanceActivityNewRoute
   AuthenticatedDashboardFinanceBillsBillIdRoute: typeof AuthenticatedDashboardFinanceBillsBillIdRouteWithChildren
@@ -5830,6 +5872,10 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
     AuthenticatedDashboardCrmReportsNewRoute,
   AuthenticatedDashboardCrmWhatsappConversationIdRoute:
     AuthenticatedDashboardCrmWhatsappConversationIdRoute,
+  AuthenticatedDashboardCrmWhatsappNewRoute:
+    AuthenticatedDashboardCrmWhatsappNewRoute,
+  AuthenticatedDashboardCrmWhatsappStartRoute:
+    AuthenticatedDashboardCrmWhatsappStartRoute,
   AuthenticatedDashboardFinanceActivityActivityIdRoute:
     AuthenticatedDashboardFinanceActivityActivityIdRouteWithChildren,
   AuthenticatedDashboardFinanceActivityNewRoute:

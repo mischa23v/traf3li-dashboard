@@ -942,11 +942,47 @@ export const whatsAppService = {
       const response = await apiClient.get('/whatsapp/conversations', { params: filters })
       // Normalize response - handle different API response structures
       const responseData = response.data
-      return {
-        data: responseData.data || responseData.conversations || [],
-        pagination: responseData.pagination || { total: responseData.total || 0 }
+
+      // Debug logging to understand API response structure
+      console.log('[WhatsApp] getConversations raw response:', JSON.stringify(responseData, null, 2))
+
+      // Handle various API response formats:
+      // Format 1: { data: [...], pagination: {...} }
+      // Format 2: { conversations: [...], total: X }
+      // Format 3: { success: true, data: { conversations: [...] } }
+      // Format 4: { success: true, data: [...] }
+      let conversations: WhatsAppConversation[] = []
+      let pagination: any = { total: 0 }
+
+      if (Array.isArray(responseData)) {
+        // Direct array response
+        conversations = responseData
+        pagination = { total: responseData.length }
+      } else if (responseData?.data) {
+        if (Array.isArray(responseData.data)) {
+          // { data: [...] }
+          conversations = responseData.data
+        } else if (responseData.data?.conversations) {
+          // { data: { conversations: [...] } }
+          conversations = responseData.data.conversations
+          pagination = responseData.data.pagination || { total: responseData.data.total || conversations.length }
+        } else if (Array.isArray(responseData.data?.data)) {
+          // { data: { data: [...] } }
+          conversations = responseData.data.data
+          pagination = responseData.data.pagination || { total: conversations.length }
+        }
+        pagination = responseData.pagination || pagination
+      } else if (responseData?.conversations) {
+        // { conversations: [...], total: X }
+        conversations = responseData.conversations
+        pagination = responseData.pagination || { total: responseData.total || conversations.length }
       }
+
+      console.log('[WhatsApp] Normalized conversations count:', conversations.length)
+
+      return { data: conversations, pagination }
     } catch (error: any) {
+      console.error('[WhatsApp] getConversations error:', error)
       throw new Error(handleApiError(error))
     }
   },
