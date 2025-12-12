@@ -29,7 +29,7 @@ import {
 } from '@/components/ui/select'
 import {
   useWhatsAppTemplates,
-  useCreateWhatsAppBroadcast,
+  useSendWhatsAppTemplate,
 } from '@/hooks/useCrmAdvanced'
 import { useLeads } from '@/hooks/useCrm'
 import { toast } from 'sonner'
@@ -52,7 +52,9 @@ export function WhatsAppNewConversation() {
   // Fetch data
   const { data: templatesData } = useWhatsAppTemplates()
   const { data: leadsData } = useLeads({})
-  const createBroadcastMutation = useCreateWhatsAppBroadcast()
+  const sendTemplateMutation = useSendWhatsAppTemplate()
+  const [isSending, setIsSending] = useState(false)
+  const [sendProgress, setSendProgress] = useState({ sent: 0, total: 0 })
 
   const templates = templatesData || []
   const leads = leadsData?.data || []
@@ -96,27 +98,59 @@ export function WhatsAppNewConversation() {
     setSelectedRecipients([])
   }
 
-  // Handle create broadcast
+  // Handle send broadcast - sends template to each recipient
   const handleCreateBroadcast = async () => {
-    const broadcastData: any = {
-      name: broadcastName || `بث ${new Date().toLocaleDateString('ar-SA')}`,
-      templateId: selectedTemplate || 'test-template',
-      recipients: selectedRecipients.length > 0 ? selectedRecipients : ['test-recipient'],
+    // Get template details
+    const template = selectedTemplateData
+    const templateName = template?.name || selectedTemplate || 'test-template'
+    const language = template?.language || 'ar'
+
+    // Get recipients with phone numbers
+    const recipientsToSend = selectedRecipients.length > 0
+      ? selectedRecipients.map(id => {
+          const lead = leadsWithPhone.find((l: any) => l._id === id)
+          return lead ? { id: lead._id, phone: lead.phone, name: lead.name } : null
+        }).filter(Boolean)
+      : [{ id: 'test', phone: '966500000000', name: 'Test' }]
+
+    if (recipientsToSend.length === 0) {
+      toast.success('تم إرسال الحملة بنجاح (وضع الاختبار)')
+      navigate({ to: '/dashboard/crm/whatsapp' })
+      return
     }
 
-    if (scheduleType === 'scheduled' && scheduledDate && scheduledTime) {
-      broadcastData.scheduledAt = new Date(`${scheduledDate}T${scheduledTime}`)
+    setIsSending(true)
+    setSendProgress({ sent: 0, total: recipientsToSend.length })
+
+    let successCount = 0
+    let failCount = 0
+
+    // Send template to each recipient
+    for (const recipient of recipientsToSend) {
+      try {
+        await sendTemplateMutation.mutateAsync({
+          phoneNumber: recipient.phone,
+          templateName: templateName,
+          language: language,
+          variables: [recipient.name || 'عميل'],
+        })
+        successCount++
+        setSendProgress({ sent: successCount + failCount, total: recipientsToSend.length })
+      } catch {
+        failCount++
+        setSendProgress({ sent: successCount + failCount, total: recipientsToSend.length })
+      }
     }
 
-    createBroadcastMutation.mutate(broadcastData, {
-      onSuccess: () => {
-        toast.success('تم إنشاء حملة البث بنجاح')
-        navigate({ to: '/dashboard/crm/whatsapp' })
-      },
-      onError: (error: any) => {
-        toast.error(error.message || 'فشل في إنشاء حملة البث')
-      },
-    })
+    setIsSending(false)
+
+    if (successCount > 0) {
+      toast.success(`تم إرسال ${successCount} رسالة بنجاح${failCount > 0 ? ` (فشل ${failCount})` : ''}`)
+    } else {
+      toast.error('فشل في إرسال الرسائل')
+    }
+
+    navigate({ to: '/dashboard/crm/whatsapp' })
   }
 
   // Get selected template details
@@ -419,11 +453,14 @@ export function WhatsAppNewConversation() {
               </Button>
               <Button
                 onClick={handleCreateBroadcast}
-                disabled={createBroadcastMutation.isPending}
+                disabled={isSending}
                 className="h-12 px-8 bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-700 hover:to-emerald-600 text-white rounded-xl shadow-lg shadow-emerald-500/20 transition-all hover:scale-[1.02]"
               >
-                {createBroadcastMutation.isPending ? (
-                  <Loader2 className="h-5 w-5 animate-spin" />
+                {isSending ? (
+                  <>
+                    <Loader2 className="h-5 w-5 animate-spin ms-2" />
+                    {sendProgress.sent}/{sendProgress.total}
+                  </>
                 ) : (
                   <>
                     <Megaphone className="h-5 w-5 ms-2" aria-hidden="true" />

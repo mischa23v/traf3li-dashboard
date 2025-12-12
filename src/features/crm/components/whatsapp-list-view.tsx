@@ -8,7 +8,7 @@ import { ProfileDropdown } from '@/components/profile-dropdown'
 import { Link } from '@tanstack/react-router'
 import { Checkbox } from '@/components/ui/checkbox'
 import { ProductivityHero } from '@/components/productivity-hero'
-import { useWhatsAppConversations, useWhatsAppTemplates, useWhatsAppBroadcasts } from '@/hooks/useCrmAdvanced'
+import { useWhatsAppConversations, useWhatsAppTemplates } from '@/hooks/useCrmAdvanced'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -18,8 +18,7 @@ import { DynamicIsland } from '@/components/dynamic-island'
 import {
     Search, Bell, AlertCircle, MessageSquare, Plus, MoreHorizontal,
     ChevronLeft, Eye, Trash2, SortAsc, X, MessageCircle, Clock,
-    CheckCheck, Check, Phone, User, Filter, Archive, Tag, Megaphone,
-    Send, Calendar, Users
+    CheckCheck, Check, Phone, User, Filter, Archive, Tag
 } from 'lucide-react'
 import { useNavigate } from '@tanstack/react-router'
 import { format } from 'date-fns'
@@ -73,7 +72,6 @@ export function WhatsAppListView() {
     // Fetch data
     const { data: conversationsData, isLoading, isError, error, refetch } = useWhatsAppConversations(filters)
     const { data: templatesData } = useWhatsAppTemplates()
-    const { data: broadcastsData } = useWhatsAppBroadcasts()
 
     // Helper function to format dates
     const formatDualDate = (dateString: string | null | undefined) => {
@@ -144,39 +142,6 @@ export function WhatsAppListView() {
             language: template.language,
         }))
     }, [templatesData])
-
-    // Transform broadcasts data
-    const broadcasts = useMemo(() => {
-        if (!broadcastsData) return []
-        return broadcastsData.map((broadcast: any) => ({
-            id: broadcast._id,
-            name: broadcast.name,
-            templateId: broadcast.templateId,
-            recipientsCount: broadcast.recipients?.length || 0,
-            status: broadcast.status,
-            stats: broadcast.stats || { total: 0, sent: 0, delivered: 0, read: 0, failed: 0 },
-            scheduledAt: broadcast.scheduledAt,
-            startedAt: broadcast.startedAt,
-            completedAt: broadcast.completedAt,
-            createdAt: broadcast.createdAt,
-        }))
-    }, [broadcastsData])
-
-    // Get broadcast status badge
-    const getBroadcastStatusBadge = (status: string) => {
-        switch (status) {
-            case 'draft':
-                return <Badge className="bg-slate-100 text-slate-600 border-0 rounded-lg px-2 py-0.5 text-xs font-bold">مسودة</Badge>
-            case 'sending':
-                return <Badge className="bg-blue-100 text-blue-700 border-0 rounded-lg px-2 py-0.5 text-xs font-bold">جاري الإرسال</Badge>
-            case 'completed':
-                return <Badge className="bg-emerald-100 text-emerald-700 border-0 rounded-lg px-2 py-0.5 text-xs font-bold">مكتمل</Badge>
-            case 'failed':
-                return <Badge className="bg-red-100 text-red-700 border-0 rounded-lg px-2 py-0.5 text-xs font-bold">فشل</Badge>
-            default:
-                return <Badge className="bg-amber-100 text-amber-700 border-0 rounded-lg px-2 py-0.5 text-xs font-bold">قيد الانتظار</Badge>
-        }
-    }
 
     // Selection Handlers
     const handleToggleSelectionMode = () => {
@@ -590,111 +555,6 @@ export function WhatsAppListView() {
                                     </Button>
                                 </div>
                             )}
-                        </div>
-
-                        {/* BROADCAST CAMPAIGNS */}
-                        <div className="bg-white rounded-3xl p-1 shadow-sm border border-slate-100">
-                            <div className="p-6 pb-2 flex justify-between items-center">
-                                <h3 className="font-bold text-navy text-lg flex items-center gap-2">
-                                    <Megaphone className="h-5 w-5 text-emerald-500" aria-hidden="true" />
-                                    حملات البث
-                                </h3>
-                                <div className="flex items-center gap-2">
-                                    <Badge className="bg-blue-100 text-blue-700 border-0 rounded-full px-3 py-0.5 text-xs">
-                                        {broadcasts.length} حملة
-                                    </Badge>
-                                    <Button asChild size="sm" className="bg-emerald-500 hover:bg-emerald-600 rounded-lg h-8 px-3 text-xs">
-                                        <Link to="/dashboard/crm/whatsapp/new">
-                                            <Plus className="h-3.5 w-3.5 ms-1" aria-hidden="true" />
-                                            حملة جديدة
-                                        </Link>
-                                    </Button>
-                                </div>
-                            </div>
-
-                            <div className="p-4 space-y-3">
-                                {broadcasts.length === 0 ? (
-                                    <div className="text-center py-8 bg-[#F8F9FA] rounded-xl border border-slate-100">
-                                        <Megaphone className="h-10 w-10 mx-auto mb-3 text-slate-300" aria-hidden="true" />
-                                        <p className="text-slate-500 text-sm mb-2">لا توجد حملات بث</p>
-                                        <p className="text-slate-400 text-xs mb-4">أنشئ حملة بث جديدة للتواصل مع عملائك</p>
-                                        <Button asChild size="sm" className="bg-emerald-500 hover:bg-emerald-600 shadow-lg shadow-emerald-500/20">
-                                            <Link to="/dashboard/crm/whatsapp/new">
-                                                <Plus className="h-4 w-4 ms-2" aria-hidden="true" />
-                                                إنشاء حملة
-                                            </Link>
-                                        </Button>
-                                    </div>
-                                ) : (
-                                    broadcasts.map((broadcast) => (
-                                        <div
-                                            key={broadcast.id}
-                                            className="bg-[#F8F9FA] rounded-xl p-4 border border-slate-100 hover:border-emerald-200 transition-all"
-                                        >
-                                            <div className="flex items-start justify-between mb-3">
-                                                <div className="flex items-center gap-3">
-                                                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-lg shadow-blue-500/20">
-                                                        <Megaphone className="h-5 w-5 text-white" aria-hidden="true" />
-                                                    </div>
-                                                    <div>
-                                                        <h4 className="font-bold text-navy text-sm">{broadcast.name}</h4>
-                                                        <p className="text-xs text-slate-500 flex items-center gap-1.5 mt-0.5">
-                                                            <Users className="h-3 w-3" aria-hidden="true" />
-                                                            {broadcast.recipientsCount} مستلم
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                                {getBroadcastStatusBadge(broadcast.status)}
-                                            </div>
-
-                                            {/* Stats */}
-                                            {broadcast.stats && broadcast.status !== 'draft' && (
-                                                <div className="grid grid-cols-4 gap-2 mb-3">
-                                                    <div className="text-center p-2 bg-white rounded-lg">
-                                                        <p className="text-sm font-bold text-navy">{broadcast.stats.sent}</p>
-                                                        <p className="text-[10px] text-slate-500">مرسل</p>
-                                                    </div>
-                                                    <div className="text-center p-2 bg-white rounded-lg">
-                                                        <p className="text-sm font-bold text-emerald-600">{broadcast.stats.delivered}</p>
-                                                        <p className="text-[10px] text-slate-500">تم التسليم</p>
-                                                    </div>
-                                                    <div className="text-center p-2 bg-white rounded-lg">
-                                                        <p className="text-sm font-bold text-blue-600">{broadcast.stats.read}</p>
-                                                        <p className="text-[10px] text-slate-500">مقروء</p>
-                                                    </div>
-                                                    <div className="text-center p-2 bg-white rounded-lg">
-                                                        <p className="text-sm font-bold text-red-500">{broadcast.stats.failed}</p>
-                                                        <p className="text-[10px] text-slate-500">فشل</p>
-                                                    </div>
-                                                </div>
-                                            )}
-
-                                            {/* Footer */}
-                                            <div className="flex items-center justify-between pt-2 border-t border-slate-100">
-                                                <div className="flex items-center gap-2 text-xs text-slate-500">
-                                                    {broadcast.scheduledAt ? (
-                                                        <>
-                                                            <Calendar className="h-3.5 w-3.5" aria-hidden="true" />
-                                                            <span>مجدول: {format(new Date(broadcast.scheduledAt), 'd MMM yyyy', { locale: isRTL ? arSA : enUS })}</span>
-                                                        </>
-                                                    ) : broadcast.createdAt ? (
-                                                        <>
-                                                            <Clock className="h-3.5 w-3.5" aria-hidden="true" />
-                                                            <span>{format(new Date(broadcast.createdAt), 'd MMM yyyy', { locale: isRTL ? arSA : enUS })}</span>
-                                                        </>
-                                                    ) : null}
-                                                </div>
-                                                {broadcast.status === 'draft' && (
-                                                    <Button size="sm" className="h-7 text-xs bg-emerald-50 hover:bg-emerald-500 text-emerald-600 hover:text-white rounded-lg">
-                                                        <Send className="h-3 w-3 ms-1" aria-hidden="true" />
-                                                        إرسال
-                                                    </Button>
-                                                )}
-                                            </div>
-                                        </div>
-                                    ))
-                                )}
-                            </div>
                         </div>
 
                         {/* TEMPLATES QUICK ACCESS */}

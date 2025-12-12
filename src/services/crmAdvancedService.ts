@@ -995,8 +995,8 @@ export const whatsAppService = {
    */
   sendTemplateMessage: async (data: SendTemplateMessageData): Promise<WhatsAppMessage> => {
     try {
-      const response = await apiClient.post('/whatsapp/messages/send-template', data)
-      return response.data.data
+      const response = await apiClient.post('/whatsapp/send/template', data)
+      return response.data.data || response.data
     } catch (error: any) {
       throw new Error(handleApiError(error))
     }
